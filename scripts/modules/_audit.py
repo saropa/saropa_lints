@@ -3,8 +3,8 @@ Comprehensive rule audit for saropa_lints.
 
 Provides rule inventory, duplicate detection, tier distribution,
 OWASP security coverage, DX message quality analysis, and quality
-metrics. Can be run standalone (via audit_rules.py wrapper) or
-called from the publish workflow as a pre-publish gate.
+metrics. Called from the publish workflow (publish_to_pubdev.py)
+as a pre-publish gate.
 
 The main entry point is ``run_full_audit()``, which returns an
 ``AuditResult`` dataclass for programmatic inspection.
@@ -193,7 +193,7 @@ class RuleMessage:
         See inline comments for each check and its penalty.
         """
         msg = self.problem_message.lower()
-        content = re.sub(r"^\[[a-z_]+\]\s*", "", self.problem_message)
+        content = re.sub(r"^\[[a-z0-9_]+\]\s*", "", self.problem_message)
 
         # --- Vague language (-20) ---
         vague_patterns = [
@@ -406,10 +406,10 @@ def find_duplicate_rules(rules_dir: Path) -> dict:
     class_pattern = re.compile(
         r"class\s+([A-Za-z0-9_]+)\s+extends\s+SaropaLintRule"
     )
-    rule_name_pattern = re.compile(r"name:\s*'([a-z_]+)'")
+    rule_name_pattern = re.compile(r"name:\s*'([a-z0-9_]+)'")
     alias_pattern = re.compile(r"///\s*Alias:\s*([a-zA-Z0-9_,\s]+)")
     lint_code_pattern = re.compile(
-        r"name:\s*'([a-z_]+)'.*?problemMessage:\s*(?:'([^']*)'|\"([^\"]*)\")",
+        r"name:\s*'([a-z0-9_]+)'.*?problemMessage:\s*(?:'([^']*)'|\"([^\"]*)\")",
         re.DOTALL,
     )
 
@@ -474,7 +474,7 @@ def find_duplicate_rules(rules_dir: Path) -> dict:
 
 def get_file_stats(rules_dir: Path) -> list[FileStats]:
     """Get per-file statistics for all rule files."""
-    name_pattern = re.compile(r"name:\s*'([a-z_]+)'")
+    name_pattern = re.compile(r"name:\s*'([a-z0-9_]+)'")
     fix_pattern = re.compile(r"class \w+ extends DartFix")
     stats: list[FileStats] = []
 
@@ -506,7 +506,7 @@ def get_implemented_rules(
 
     lintcode_pattern = re.compile(
         r"static const (?:LintCode )?_code\w* = LintCode\(\s*"
-        r"name:\s*'([a-z_]+)',",
+        r"name:\s*'([a-z0-9_]+)',",
         re.DOTALL,
     )
     alias_pattern = re.compile(
@@ -531,7 +531,7 @@ def get_implemented_rules(
 def get_roadmap_rules(roadmap_path: Path) -> set[str]:
     """Extract rule names from ROADMAP.md table entries."""
     rules: set[str] = set()
-    pattern = re.compile(r"^\|\s*`([a-z_]+)`\s*\|", re.MULTILINE)
+    pattern = re.compile(r"^\|\s*`([a-z0-9_]+)`\s*\|", re.MULTILINE)
     content = roadmap_path.read_text(encoding="utf-8")
     rules.update(pattern.findall(content))
     return rules
@@ -549,9 +549,9 @@ def get_rules_with_corrections(
     without_correction: set[str] = set()
 
     lint_code_with_correction = re.compile(
-        r"name:\s*'([a-z_]+)'.*?correctionMessage:", re.DOTALL
+        r"name:\s*'([a-z0-9_]+)'.*?correctionMessage:", re.DOTALL
     )
-    name_pattern = re.compile(r"name:\s*'([a-z_]+)'")
+    name_pattern = re.compile(r"name:\s*'([a-z0-9_]+)'")
 
     for dart_file in rules_dir.glob("*.dart"):
         if dart_file.name == "all_rules.dart":
@@ -571,7 +571,7 @@ def get_owasp_coverage(rules_dir: Path) -> OwaspCoverage:
     """Extract OWASP coverage from rule files."""
     coverage = OwaspCoverage()
 
-    name_pattern = re.compile(r"name:\s*'([a-z_]+)'")
+    name_pattern = re.compile(r"name:\s*'([a-z0-9_]+)'")
     owasp_block_pattern = re.compile(
         r"OwaspMapping get owasp => const OwaspMapping\(\s*"
         r"mobile:\s*<OwaspMobile>\{([^}]*)\},?\s*"
@@ -653,7 +653,7 @@ def get_tier_stats(tiers_path: Path) -> TierStats:
                 for line in set_content.splitlines()
                 if not line.strip().startswith("//")
             )
-            rule_names = re.findall(r"'([a-z_]+)'", set_content)
+            rule_names = re.findall(r"'([a-z0-9_]+)'", set_content)
             stats.counts[tier] = len(rule_names)
             stats.rules[tier] = set(rule_names)
 
@@ -664,7 +664,7 @@ def get_tier_stats(tiers_path: Path) -> TierStats:
     match = re.search(stylistic_pattern, content, re.DOTALL)
     if match:
         set_content = match.group(1)
-        stylistic_rules = set(re.findall(r"'([a-z_]+)'", set_content))
+        stylistic_rules = set(re.findall(r"'([a-z0-9_]+)'", set_content))
         stats.counts["stylistic"] = len(stylistic_rules)
         stats.rules["stylistic"] = stylistic_rules
         stats.stylistic_rules = stylistic_rules
@@ -704,7 +704,7 @@ def extract_rule_messages(rules_dir: Path) -> list[RuleMessage]:
 
     lint_code_pattern = re.compile(
         r"static const (?:LintCode )?_code = LintCode\(\s*"
-        r"name:\s*'([a-z_]+)',\s*"
+        r"name:\s*'([a-z0-9_]+)',\s*"
         r"problemMessage:\s*"
         r"(?:'([^']*)'|\"([^\"]*)\"),\s*"
         r"(?:correctionMessage:\s*(?:'([^']*)'|\"([^\"]*)\"),?\s*)?"

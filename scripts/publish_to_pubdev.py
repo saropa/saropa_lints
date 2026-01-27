@@ -99,29 +99,32 @@ def check_modules_exist() -> bool:
     This runs BEFORE any module imports so the user gets a clear
     error message instead of a Python ImportError traceback.
 
+    Uses ASCII-only output since enable_ansi_support() hasn't run yet.
+
     Returns:
         True if all modules found, False otherwise.
     """
+    # Reconfigure stdout to UTF-8 early (Windows cp1252 can't print Unicode)
+    try:
+        sys.stdout.reconfigure(encoding="utf-8")  # type: ignore[attr-defined]
+    except (AttributeError, OSError):
+        pass
+
     scripts_dir = Path(__file__).resolve().parent
     all_found = True
 
     for module_rel in _REQUIRED_MODULES:
         module_path = scripts_dir / module_rel
         if module_path.exists():
-            # Use basic print here - utils not imported yet
-            print(f"  \033[92m✓\033[0m Module found: {module_rel}")
+            print(f"  [OK] Module found: {module_rel}")
         else:
-            print(f"  \033[91m✗\033[0m Module MISSING: {module_rel}")
+            print(f"  [MISSING] Module MISSING: {module_rel}")
             all_found = False
 
     if not all_found:
         print()
-        print(
-            "\033[91m  Required modules are missing from scripts/modules/.\033[0m"
-        )
-        print(
-            "  Ensure the following files exist:"
-        )
+        print("  ERROR: Required modules are missing from scripts/modules/.")
+        print("  Ensure the following files exist:")
         for m in _REQUIRED_MODULES:
             print(f"    scripts/{m}")
 

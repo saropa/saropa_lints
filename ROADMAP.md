@@ -228,7 +228,7 @@ For Category D rules (no fix possible):
 
 ### Tracking Progress
 
-Update `scripts/audit_rules.py` to track:
+Update `scripts/publish_to_pubdev.py` audit to track:
 - Rules with fixes vs without
 - Rules documented as "no fix possible" vs "fix TODO"
 - Category breakdown (A/B/C/D)
