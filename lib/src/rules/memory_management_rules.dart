@@ -49,9 +49,9 @@ class AvoidLargeObjectsInStateRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_large_objects_in_state',
     problemMessage:
-        '[avoid_large_objects_in_state] Large data structures in State may cause memory issues.',
+        '[avoid_large_objects_in_state] Unbounded List, Map, Set, or ByteData field declared in a State class grows without limit as data accumulates. Without pagination or size constraints, this allocates excessive memory that degrades scroll performance, increases garbage collection pressure, and eventually crashes the app with an out-of-memory error on devices with limited RAM.',
     correctionMessage:
-        'Consider pagination, streaming, or external state management.',
+        'Use pagination to load data in fixed-size chunks, stream results lazily from the data source, or move large collections to external state management with disposal and lifecycle control.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -247,8 +247,9 @@ class AvoidCapturingThisInCallbacksRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_capturing_this_in_callbacks',
     problemMessage:
-        '[avoid_capturing_this_in_callbacks] Callback may capture entire object, preventing garbage collection.',
-    correctionMessage: 'Use method reference or extract only needed values.',
+        '[avoid_capturing_this_in_callbacks] Closure callback captures a reference to the entire enclosing object instance via implicit this. This prevents garbage collection of the object and all its fields for as long as the callback exists. Long-lived callbacks such as stream listeners, timers, or global event handlers create memory leaks that accumulate over the app session lifetime.',
+    correctionMessage:
+        'Extract only the specific values needed into local variables before the closure, or use a static method reference that does not capture the enclosing object instance.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -785,9 +786,9 @@ class AvoidUnboundedCacheGrowthRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_unbounded_cache_growth',
     problemMessage:
-        '[avoid_unbounded_cache_growth] Cache without size limit grows indefinitely. This will eventually exhaust device memory and crash the app with an out-of-memory error.',
+        '[avoid_unbounded_cache_growth] Map or collection used as a cache has no maximum size constraint. Without eviction logic, the cache grows indefinitely as new entries are added, consuming increasing amounts of device memory. This eventually exhausts available RAM and crashes the app with an out-of-memory error, particularly on mobile devices with limited memory resources.',
     correctionMessage:
-        'Add size limit with LRU eviction or use a bounded cache implementation.',
+        'Implement a bounded cache with a maximum entry count and LRU (Least Recently Used) eviction policy, or use a cache library that manages size limits automatically.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
