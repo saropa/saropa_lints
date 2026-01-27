@@ -1112,7 +1112,7 @@ class RequireIntlDateFormatLocaleRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_intl_date_format_locale',
     problemMessage:
-        '[require_intl_date_format_locale] DateFormat without explicit locale. Format varies by device/platform. Consequence: Dates may display inconsistently for users in different regions, causing confusion.',
+        '[require_intl_date_format_locale] DateFormat created without an explicit locale parameter. The format output varies unpredictably across devices and platforms because each uses a different system default locale. Users in different regions see dates in unexpected formats (e.g., MM/DD/YYYY vs DD/MM/YYYY), leading to confusion about whether 01/02 means January 2nd or February 1st.',
     correctionMessage:
         'Always provide a locale to DateFormat (e.g., DateFormat.yMd(locale)) to ensure dates are formatted consistently for all users.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -1415,7 +1415,7 @@ class RequireIntlCurrencyFormatRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_intl_currency_format',
     problemMessage:
-        '[require_intl_currency_format] Manual currency formatting. Symbol placement and decimals vary by locale. Consequence: Incorrect formatting can confuse users and cause financial errors.',
+        '[require_intl_currency_format] Currency value formatted manually using string interpolation with currency symbols. Symbol placement (prefix vs suffix), decimal separator (period vs comma), and digit grouping vary by locale. Manual formatting produces incorrect output for international users, causing financial confusion and misread amounts that undermine trust.',
     correctionMessage:
         'Use NumberFormat.currency(locale: locale, symbol: s) to format currency values, ensuring correct symbols and decimal placement for every locale.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -1556,7 +1556,7 @@ class RequireIntlPluralRulesRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_intl_plural_rules',
     problemMessage:
-        '[require_intl_plural_rules] Manual pluralization. Different languages have different plural rules. Consequence: Hardcoded plural logic can break translations and confuse users.',
+        '[require_intl_plural_rules] Manual pluralization logic using if/else or ternary expressions on count values. Languages such as Russian, Arabic, and Polish have complex plural categories (zero, one, two, few, many, other) that simple singular/plural branching cannot handle. This produces grammatically incorrect text for international users and breaks translation workflows.',
     correctionMessage:
         'Replace manual plural logic with Intl.plural() to handle pluralization correctly in every supported language.',
     errorSeverity: DiagnosticSeverity.WARNING,

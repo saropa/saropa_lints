@@ -57,7 +57,7 @@ class PreferSpecificExceptionsRule extends SaropaLintRule {
     problemMessage:
         '[prefer_specific_exceptions] Throw specific exception types instead of generic Exception.',
     correctionMessage:
-        'Create a custom exception class for better error handling.',
+        'Create a custom exception class so callers can catch specific failures and provide targeted error recovery.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -115,8 +115,9 @@ class PreferGenericExceptionRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_generic_exception',
     problemMessage:
-        '[prefer_generic_exception] Consider using generic Exception for simplicity.',
-    correctionMessage: 'Generic Exception is often sufficient.',
+        '[prefer_generic_exception] Custom exception classes add boilerplate without proportional benefit. Use generic Exception to keep error handling simple.',
+    correctionMessage:
+        'Replace the custom exception with Exception to reduce class boilerplate while still conveying the error message.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -181,8 +182,9 @@ class PreferExceptionSuffixRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_exception_suffix',
     problemMessage:
-        '[prefer_exception_suffix] Exception classes should end with "Exception" suffix.',
-    correctionMessage: 'Rename to end with "Exception" for clarity.',
+        '[prefer_exception_suffix] Exception classes missing the "Exception" suffix are harder to identify as throwable types during code review and IDE search.',
+    correctionMessage:
+        'Rename the class to end with "Exception" so it is immediately recognizable as a throwable type in code and search results.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -249,8 +251,9 @@ class PreferErrorSuffixRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_error_suffix',
     problemMessage:
-        '[prefer_error_suffix] Exception classes should end with "Error" suffix.',
-    correctionMessage: 'Rename to end with "Error" for consistency.',
+        '[prefer_error_suffix] The "Exception" suffix is verbose and inconsistent with Dart core types like StateError and ArgumentError. Use "Error" for brevity.',
+    correctionMessage:
+        'Rename the class to end with "Error" instead of "Exception" to align with Dart core naming conventions and reduce verbosity.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -329,7 +332,8 @@ class PreferOnOverCatchRule extends SaropaLintRule {
     name: 'prefer_on_over_catch',
     problemMessage:
         '[prefer_on_over_catch] Use "on ExceptionType" instead of bare "catch".',
-    correctionMessage: 'Specific exception types make error handling clearer.',
+    correctionMessage:
+        'Add an "on ExceptionType" clause to catch only expected failures and let unexpected errors propagate to the caller.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -392,8 +396,9 @@ class PreferCatchOverOnRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_catch_over_on',
     problemMessage:
-        '[prefer_catch_over_on] Consider using bare "catch" for simplicity.',
-    correctionMessage: 'Bare catch is simpler and catches all exceptions.',
+        '[prefer_catch_over_on] Typed "on" clauses add complexity and risk missing unexpected exception types. A bare catch ensures no failure goes unhandled.',
+    correctionMessage:
+        'Replace the "on ExceptionType" clause with a bare "catch (e)" to simplify error handling and ensure all exceptions are caught.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -466,7 +471,8 @@ class PreferGivenWhenThenCommentsRule extends SaropaLintRule {
     name: 'prefer_given_when_then_comments',
     problemMessage:
         '[prefer_given_when_then_comments] Use Arrange/Act/Assert or Given/When/Then comments in tests.',
-    correctionMessage: 'Add structure comments to organize test phases.',
+    correctionMessage:
+        'Add "// Arrange", "// Act", "// Assert" (or Given/When/Then) comments to delineate setup, execution, and verification phases.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -556,9 +562,9 @@ class PreferSelfDocumentingTestsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_self_documenting_tests',
     problemMessage:
-        '[prefer_self_documenting_tests] Avoid Arrange/Act/Assert comments - prefer self-documenting code.',
+        '[prefer_self_documenting_tests] Structure comments like Arrange/Act/Assert add noise to well-written tests. Self-documenting code with clear variable names and assertions is more maintainable.',
     correctionMessage:
-        'Write clear, self-documenting tests without structure comments.',
+        'Remove the structure comments and use descriptive variable names and focused assertions to make the test self-documenting.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -717,7 +723,8 @@ class PreferSingleExpectationPerTestRule extends SaropaLintRule {
     name: 'prefer_single_expectation_per_test',
     problemMessage:
         '[prefer_single_expectation_per_test] Tests should have a single logical assertion.',
-    correctionMessage: 'Split into multiple tests for clarity.',
+    correctionMessage:
+        'Split into multiple focused tests, each verifying one behavior, so failures pinpoint exactly which expectation broke.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -817,8 +824,9 @@ class PreferGroupedExpectationsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_grouped_expectations',
     problemMessage:
-        '[prefer_grouped_expectations] Consider grouping related assertions in one test.',
-    correctionMessage: 'Group related assertions to reduce test boilerplate.',
+        '[prefer_grouped_expectations] Isolating every assertion into its own test duplicates setup logic and inflates the test suite. Group related assertions to reduce boilerplate.',
+    correctionMessage:
+        'Combine related assertions into a single test to share setup logic, reduce duplication, and keep the test suite concise.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 

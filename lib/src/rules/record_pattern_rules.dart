@@ -37,9 +37,9 @@ class AvoidBottomTypeInPatternsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_bottom_type_in_patterns',
     problemMessage:
-        '[avoid_bottom_type_in_patterns] Pattern uses bottom type which will never match (void/Never) or only matches null.',
+        '[avoid_bottom_type_in_patterns] Pattern uses a bottom type (void, Never, or Null) that either never matches any value or only matches null. This creates dead code in switch cases and if-case expressions, silently hiding logic errors.',
     correctionMessage:
-        'Replace with the actual expected type, or use Object? for any value.',
+        'Replace the bottom type with the actual expected type, or use Object? if matching any value including null.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 

@@ -390,7 +390,7 @@ class AvoidAnalyticsInBuildRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_analytics_in_build',
     problemMessage:
-        '[avoid_analytics_in_build] Analytics calls inside build() are triggered on every rebuild, resulting in duplicate events, inaccurate tracking data, degraded app performance, and inflated backend costs. This can skew business metrics, violate analytics best practices, and make it difficult to analyze real user behavior. Persistent analytics spam may also trigger rate limits or data quality flags in analytics platforms.',
+        '[avoid_analytics_in_build] Analytics calls inside build() are triggered on every rebuild, resulting in duplicate events, inaccurate tracking data, degraded app performance, and inflated backend costs. This can skew business metrics, produce misleading dashboards, and make it difficult to analyze real user behavior. Persistent analytics spam may also trigger rate limits or data quality flags in analytics platforms.',
     correctionMessage:
         'Move analytics calls to initState(), event handlers, or lifecycle methods triggered once per user action or screen view. Audit analytics logic for duplicate events and add tests to verify correct event tracking. Document analytics integration for maintainability.',
     errorSeverity: DiagnosticSeverity.WARNING,
