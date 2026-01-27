@@ -3586,9 +3586,9 @@ class RequireNotificationPermissionAndroid13Rule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_notification_permission_android13',
     problemMessage:
-        '[require_notification_permission_android13] Notification shown without POST_NOTIFICATIONS permission check.',
+        '[require_notification_permission_android13] Notification displayed without checking POST_NOTIFICATIONS permission on Android 13+. On API level 33 and above, notifications fail silently without this runtime permission, causing users to miss critical alerts, messages, and updates with no error feedback to the developer or the user.',
     correctionMessage:
-        'Request Permission.notification before showing notifications.',
+        'Check and request Permission.notification at runtime before calling any notification display method on Android 13+ (API 33+) devices.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 

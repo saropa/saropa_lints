@@ -386,8 +386,9 @@ class RequireLateInitializationInInitStateRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_late_initialization_in_init_state',
     problemMessage:
-        '[require_late_initialization_in_init_state] Late field initialized in build() recreates the object on every setState call. Animation controllers restart, stream subscriptions duplicate, and the UI jank becomes visible.',
-    correctionMessage: 'Move initialization to initState() which runs once.',
+        '[require_late_initialization_in_init_state] Late field initialized in build() recreates the object on every setState() call. AnimationController instances restart their animations, StreamSubscription objects create duplicate listeners, and the resulting UI jank becomes visible to users. This also wastes memory by allocating new objects on every widget rebuild cycle.',
+    correctionMessage:
+        'Move late field initialization into initState(), which executes only once when the State object is first created, ensuring stable object lifecycle and preventing duplicate allocations.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 

@@ -8,6 +8,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 > See [CHANGELOG_ARCHIVE.md](./CHANGELOG_ARCHIVE.md) for versions 0.1.0 through 4.2.0.
 
 ---
+## [4.8.3] - 2026-01-26
+
+### Changed
+
+- **Improved DX message quality for 25 critical/high-impact lint rules**: Expanded problem messages to clearly explain the detected issue, its real-world consequence, and the user impact. Expanded correction messages with specific, actionable fix guidance. Affected rules span forms, navigation, memory management, images, Riverpod, GetX, lifecycle, Firebase, JSON, and API categories.
+- **Critical DX pass rate**: 98.3% → 100% (60/60 rules passing)
+- **High DX pass rate**: 34.8% → 42.7% (+23 additional rules passing)
+
 ## [4.8.2] - 2026-01-26
 
 ### Added

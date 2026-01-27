@@ -60,9 +60,9 @@ class PreferAutovalidateOnInteractionRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_autovalidate_on_interaction',
     problemMessage:
-        '[prefer_autovalidate_on_interaction] AutovalidateMode.always validates every keystroke. Consequence: This leads to poor user experience, input lag, and frustration.',
+        '[prefer_autovalidate_on_interaction] AutovalidateMode.always triggers form validation on every keystroke and widget rebuild. This causes visible input lag as validators run continuously, fires excessive error messages before the user finishes typing, and degrades the user experience with distracting red error text that appears immediately on empty fields.',
     correctionMessage:
-        'Use AutovalidateMode.onUserInteraction for better user experience.',
+        'Use AutovalidateMode.onUserInteraction to defer validation until the user interacts with the field, reducing input lag and preventing premature error display.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -152,9 +152,9 @@ class RequireKeyboardTypeRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_keyboard_type',
     problemMessage:
-        '[require_keyboard_type] Text field appears to be email/phone but lacks appropriate keyboardType. Consequence: Users may struggle to enter data efficiently, leading to errors and poor accessibility.',
+        '[require_keyboard_type] Text field label suggests email or phone input but no keyboardType is specified. Without TextInputType.emailAddress or TextInputType.phone, users see a generic text keyboard lacking the @ key, .com shortcut, or numeric layout. This causes input errors, slows data entry, and hurts accessibility for users who rely on specialized keyboard layouts.',
     correctionMessage:
-        'Add keyboardType: TextInputType.emailAddress or TextInputType.phone.',
+        'Add keyboardType: TextInputType.emailAddress for email fields or TextInputType.phone for phone number fields to show the appropriate keyboard layout.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -287,9 +287,9 @@ class RequireTextOverflowInRowRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_text_overflow_in_row',
     problemMessage:
-        '[require_text_overflow_in_row] Text in Row without overflow handling shows yellow/black overflow stripes on long content. Consequence: This results in unreadable UI and a poor user experience.',
+        '[require_text_overflow_in_row] Text widget inside a Row has no overflow handling. When text content exceeds the available width, Flutter renders yellow and black diagonal overflow stripes that break the visual layout. Users see unreadable, clipped content with an ugly error indicator instead of gracefully truncated or wrapped text.',
     correctionMessage:
-        'Add overflow: TextOverflow.ellipsis or wrap in Expanded/Flexible.',
+        'Add overflow: TextOverflow.ellipsis to the Text widget, or wrap it in an Expanded or Flexible widget to constrain its width within the Row layout.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -375,8 +375,9 @@ class RequireSecureKeyboardRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_secure_keyboard',
     problemMessage:
-        '[require_secure_keyboard] Password field without obscureText exposes password to shoulder surfers.',
-    correctionMessage: 'Add obscureText: true to hide password input.',
+        '[require_secure_keyboard] Password field detected without obscureText: true. The password is displayed as plain text on screen, exposing credentials to shoulder surfing attacks in public spaces. Nearby observers can read the password directly from the display, compromising user account security and violating OWASP M1 credential protection guidelines.',
+    correctionMessage:
+        'Add obscureText: true to the TextField or TextFormField to mask password characters and protect user credentials from visual exposure on screen.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -535,9 +536,9 @@ class RequireErrorMessageContextRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_error_message_context',
     problemMessage:
-        '[require_error_message_context] Generic "Invalid" error leaves users guessing what went wrong or how to fix it.',
+        '[require_error_message_context] Form validation returns a generic error message without explaining what the user did wrong or how to fix it. Vague messages like "Invalid" or "Required" frustrate users, increase form abandonment rates, and fail accessibility standards that require specific, actionable error feedback to help users correct their input.',
     correctionMessage:
-        'Replace with descriptive message: "Email must be valid" instead of "Invalid".',
+        'Replace generic messages with field-specific guidance: use "Email address format is invalid" instead of "Invalid" or "Phone number is required" instead of "Required".',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -713,8 +714,9 @@ class AvoidValidationInBuildRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_validation_in_build',
     problemMessage:
-        '[avoid_validation_in_build] Complex/async validation on every keystroke causes input lag and excessive API calls. Consequence: This can degrade performance, frustrate users, and increase backend costs.',
-    correctionMessage: 'Move complex validation to onSubmit or use debouncing.',
+        '[avoid_validation_in_build] Complex or async validation running inside build() executes on every keystroke and widget rebuild. This causes visible input lag as network calls fire per character, floods the backend API with excessive requests, degrades performance with unnecessary widget rebuilds, and frustrates users who see delayed responses while typing in form fields.',
+    correctionMessage:
+        'Move complex validation logic to the form onSubmit handler, or use a debounce mechanism to delay validation until the user pauses typing for a set interval.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -871,9 +873,9 @@ class AvoidFormWithoutUnfocusRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_form_without_unfocus',
     problemMessage:
-        '[avoid_form_without_unfocus] Form submission without unfocus() leaves keyboard open, blocking success feedback.',
+        '[avoid_form_without_unfocus] Form submission handler does not call unfocus() before processing. The on-screen keyboard stays open after submission, blocking the success message, navigation, or dialog that confirms the action to the user. This creates a confusing experience where users cannot see feedback and may repeatedly tap the submit button.',
     correctionMessage:
-        'Add FocusScope.of(context).unfocus() at start of submit handler.',
+        'Add FocusScope.of(context).unfocus() at the beginning of the submit handler to dismiss the keyboard before showing any success feedback or navigation.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -1034,9 +1036,9 @@ class AvoidClearingFormOnErrorRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_clearing_form_on_error',
     problemMessage:
-        '[avoid_clearing_form_on_error] Clearing form fields on validation error loses user input.',
+        '[avoid_clearing_form_on_error] Form fields are cleared when validation fails, destroying all user input. Users lose their partially-correct data and must re-enter everything from scratch. This frustrating pattern increases form abandonment, wastes user time, and creates a hostile experience that drives users away from completing the form submission.',
     correctionMessage:
-        'Preserve input when validation fails; only highlight errors.',
+        'Preserve all form field values when validation fails. Only highlight the specific fields with errors and show inline error messages to guide the user in correcting their input.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -1982,9 +1984,9 @@ class RequireFormKeyInStatefulWidgetRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_form_key_in_stateful_widget',
     problemMessage:
-        '[require_form_key_in_stateful_widget] GlobalKey created in build(). Key changes every rebuild, losing state.',
+        '[require_form_key_in_stateful_widget] GlobalKey<FormState> created inside the build() method is re-instantiated on every widget rebuild triggered by setState(). Each rebuild creates a new key, causing the form to lose all current field values, validation state, and user input. This produces a frustrating user experience where typed data disappears unpredictably during state changes.',
     correctionMessage:
-        'Move GlobalKey to a State class field to preserve form state.',
+        'Declare the GlobalKey<FormState> as a field in the State class rather than inside build(). State class fields persist across rebuilds and preserve form data.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 

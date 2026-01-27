@@ -71,9 +71,9 @@ class RequireGetxWorkerDisposeRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_getx_worker_dispose',
     problemMessage:
-        '[require_getx_worker_dispose] GetX Worker field is not disposed in onClose(). This causes memory leaks.',
+        '[require_getx_worker_dispose] GetX Worker field has no corresponding dispose() call in onClose(). Without disposing the Worker, its internal stream subscription remains active after the GetxController is destroyed. This creates a memory leak where the Worker, its closure, and all captured references are retained in memory indefinitely.',
     correctionMessage:
-        'Call worker.dispose() in onClose() before super.onClose().',
+        'Call worker.dispose() inside the onClose() method before calling super.onClose() to properly clean up the Worker stream subscription and prevent memory leaks.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
