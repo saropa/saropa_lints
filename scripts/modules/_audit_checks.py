@@ -267,7 +267,12 @@ def get_file_stats(rules_dir: Path) -> list[FileStats]:
 def get_implemented_rules(
     rules_dir: Path,
 ) -> tuple[set[str], set[str], int]:
-    """Extract rule names, aliases, and quick fix count.
+    """Extract rule names, aliases, and quick fix count from rule files.
+
+    Scans ``*_rules.dart`` files for ``LintCode`` definitions and extracts
+    the ``name:`` value.  Handles both literal names (``name: 'rule'``) and
+    variable references (``name: _name``) by resolving the variable through
+    ``static const String`` declarations in the same file.
 
     Returns:
         Tuple of (rule_names, aliases, quick_fix_count).
@@ -277,9 +282,17 @@ def get_implemented_rules(
     fix_count = 0
 
     lintcode_pattern = re.compile(
-        r"static const (?:LintCode )?_code\w* = LintCode\(\s*"
+        r"static const (?:LintCode )?_code\w*\s*=\s*LintCode\(\s*"
         r"name:\s*'([a-z0-9_]+)',",
         re.DOTALL,
+    )
+    lintcode_var_pattern = re.compile(
+        r"static const (?:LintCode )?_code\w*\s*=\s*LintCode\(\s*"
+        r"name:\s*(_\w+),",
+        re.DOTALL,
+    )
+    name_const_pattern = re.compile(
+        r"static const String (_\w+)\s*=\s*'([a-z0-9_]+)';",
     )
     alias_pattern = re.compile(
         r"^///\s*Alias:\s*([a-zA-Z0-9_,\s]+)", re.MULTILINE
@@ -290,6 +303,16 @@ def get_implemented_rules(
         content = dart_file.read_text(encoding="utf-8")
         rules.update(lintcode_pattern.findall(content))
         fix_count += len(fix_pattern.findall(content))
+
+        # Resolve variable-referenced rule names (e.g. name: _name)
+        name_consts = {
+            m.group(1): m.group(2)
+            for m in name_const_pattern.finditer(content)
+        }
+        for var_match in lintcode_var_pattern.finditer(content):
+            var_name = var_match.group(1)
+            if var_name in name_consts:
+                rules.add(name_consts[var_name])
 
         for match in alias_pattern.findall(content):
             for alias in match.split(","):
