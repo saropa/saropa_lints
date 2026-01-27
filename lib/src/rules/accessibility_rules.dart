@@ -1158,7 +1158,7 @@ class RequireImageSemanticsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_image_semantics',
     problemMessage:
-        '[require_image_semantics] Image lacks semanticLabel. Screen readers cannot describe this image.',
+        '[require_image_semantics] Image widget lacks a semanticLabel parameter. Screen readers cannot describe this image to users with visual impairments, making the content inaccessible. This violates WCAG 1.1.1 (Non-text Content) and may exclude your app from accessibility-mandated markets.',
     correctionMessage:
         "Add semanticLabel: 'description' or excludeFromSemantics: true for decorative images.",
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -2106,7 +2106,7 @@ class RequireBadgeSemanticsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_badge_semantics',
     problemMessage:
-        '[require_badge_semantics] Badge or status indicator is missing accessibility semantics. Without a semantic label, screen readers cannot announce the badge or its meaning to users with visual impairments.',
+        '[require_badge_semantics] Badge or status indicator is missing accessibility semantics. Without a semantic label, screen readers cannot announce the badge count or its meaning to users with visual impairments, hiding important notification or status information from a significant portion of your users.',
     correctionMessage:
         'Wrap the Badge widget in a Semantics widget with a descriptive label (e.g., "3 unread messages") so assistive technologies can announce its content and purpose.',
     errorSeverity: DiagnosticSeverity.WARNING,
