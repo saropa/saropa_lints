@@ -360,6 +360,12 @@ def run_full_audit(
 
     # Near matches
     remaining = roadmap - roadmap_duplicates
+    # Also exclude _test variant rules (handled by _test exclusion above)
+    remaining = {
+        r
+        for r in remaining
+        if not (r.endswith("_test") and r[: -len("_test")] in implemented)
+    }
     near_matches: list[tuple[str, str]] = []
     for roadmap_rule in sorted(remaining):
         for impl_rule in implemented:
