@@ -90,35 +90,103 @@ TIER_SET_PATTERNS: dict[str, str] = {
 }
 
 
-def get_implemented_rule_names(rules_dir: Path) -> set[str]:
-    """Extract all rule names from LintCode definitions in *_rules.dart.
+def get_registered_rule_names(
+    saropa_lints_path: Path,
+    rules_dir: Path,
+) -> set[str]:
+    """Extract rule names for classes registered in _allRuleFactories.
 
-    Parses ``static const _code = LintCode(name: 'rule_name', ...)``
-    blocks to find implemented rule names. Only matches actual LintCode
-    definitions, not comments or example code.
+    This is the accurate "implemented rules" set — only rules that
+    are actually registered in the plugin's factory list. Unregistered
+    LintCode definitions in source files are excluded.
+
+    The approach:
+      1. Parse ``saropa_lints.dart`` to extract class names from
+         ``_allRuleFactories`` (e.g. ``AvoidDebugPrintRule``).
+      2. For each class, find its ``_code`` LintCode definition in
+         the corresponding ``*_rules.dart`` file.
+      3. Extract the ``name:`` value from the LintCode constructor.
 
     Args:
+        saropa_lints_path: Path to lib/saropa_lints.dart.
         rules_dir: Path to lib/src/rules/ directory.
 
     Returns:
-        Set of rule name strings (e.g. {'avoid_print', 'require_dispose'}).
+        Set of rule name strings registered in the plugin.
     """
-    rules: set[str] = set()
+    saropa_content = saropa_lints_path.read_text(encoding="utf-8")
 
-    # Match LintCode blocks: static const [LintCode] _code* = LintCode(name: '...',
-    lintcode_pattern = re.compile(
-        r"static const (?:LintCode )?_code\w* = LintCode\(\s*"
-        r"name:\s*'([a-z_]+)',",
+    # Step 1: Extract factory class names (ClassName.new entries)
+    factory_match = re.search(
+        r"final List<LintRule Function\(\)> _allRuleFactories"
+        r".*?=.*?\[(.+?)\];",
+        saropa_content,
         re.DOTALL,
     )
+    if not factory_match:
+        print_warning("Could not find _allRuleFactories in saropa_lints.dart")
+        return set()
 
+    class_names = re.findall(r"(\w+)\.new", factory_match.group(1))
+
+    # Step 2: Build file content cache (read each file once)
+    file_contents: dict[str, str] = {}
     for dart_file in rules_dir.glob("*.dart"):
         if dart_file.name == "all_rules.dart":
             continue
-        content = dart_file.read_text(encoding="utf-8")
-        rules.update(lintcode_pattern.findall(content))
+        file_contents[dart_file.name] = dart_file.read_text(encoding="utf-8")
 
-    return rules
+    # Step 3: Resolve each class name to its _code rule name
+    # Matches: static const [LintCode] _code = LintCode(name: 'rule_name',
+    # Also handles: name: _name (variable reference)
+    code_literal = re.compile(
+        r"static const (?:LintCode )?_code\s*=\s*LintCode\(\s*"
+        r"name:\s*'([a-z_0-9]+)',",
+        re.DOTALL,
+    )
+    code_variable = re.compile(
+        r"static const (?:LintCode )?_code\s*=\s*LintCode\(\s*"
+        r"name:\s*(_\w+),",
+        re.DOTALL,
+    )
+    name_const = re.compile(
+        r"static const String (_\w+)\s*=\s*'([a-z_0-9]+)';",
+    )
+
+    registered: set[str] = set()
+
+    for class_name in class_names:
+        for _fname, content in file_contents.items():
+            class_start = content.find(f"class {class_name} ")
+            if class_start == -1:
+                continue
+
+            # Find next class definition (or end of file)
+            next_class = content.find("\nclass ", class_start + 1)
+            class_body = content[class_start : (
+                next_class if next_class != -1 else len(content)
+            )]
+
+            # Try literal name: 'rule_name'
+            match = code_literal.search(class_body)
+            if match:
+                registered.add(match.group(1))
+                break
+
+            # Try variable reference: name: _name
+            var_match = code_variable.search(class_body)
+            if var_match:
+                var_name = var_match.group(1)
+                # Resolve the variable to its string value
+                for nm in name_const.finditer(class_body):
+                    if nm.group(1) == var_name:
+                        registered.add(nm.group(2))
+                        break
+                break
+
+            break
+
+    return registered
 
 
 def get_aliases(rules_dir: Path) -> set[str]:
@@ -177,7 +245,7 @@ def get_tier_assignments(tiers_path: Path) -> dict[str, set[str]]:
                 for line in set_content.splitlines()
                 if not line.strip().startswith("//")
             )
-            rule_names = re.findall(r"'([a-z_]+)'", set_content)
+            rule_names = re.findall(r"'([a-z0-9_]+)'", set_content)
             tiers[tier_name] = set(rule_names)
         else:
             tiers[tier_name] = set()
@@ -234,20 +302,21 @@ def get_opinionated_prefer_rules(rules_dir: Path) -> set[str]:
 def check_tier_integrity(
     rules_dir: Path,
     tiers_path: Path,
+    saropa_lints_path: Path | None = None,
 ) -> TierIntegrityResult:
     """Run all tier integrity checks.
 
     This is the main entry point. It performs four checks:
 
     Check 1 - Orphan rules:
-        Every implemented rule must appear in exactly one tier set.
-        Rules that exist in *_rules.dart but not in any tier set in
-        tiers.dart are orphans.
+        Every registered plugin rule must appear in exactly one tier
+        set. Rules in _allRuleFactories but not in any tier set are
+        orphans.
 
     Check 2 - Phantom rules:
-        Every rule in tiers.dart must be implemented (or be an alias).
-        Rules listed in a tier set but not found in any *_rules.dart
-        file are phantoms.
+        Every rule in tiers.dart must be registered in the plugin
+        (or be an alias). Rules listed in a tier set but not found
+        in _allRuleFactories are phantoms.
 
     Check 3 - Multi-tier rules:
         Each rule must appear in at most one tier set. The tier sets
@@ -262,11 +331,16 @@ def check_tier_integrity(
     Args:
         rules_dir: Path to lib/src/rules/ directory.
         tiers_path: Path to lib/src/tiers.dart.
+        saropa_lints_path: Path to lib/saropa_lints.dart. If None,
+            derived from rules_dir parent.
 
     Returns:
         TierIntegrityResult with pass/fail and details of all issues.
     """
-    implemented = get_implemented_rule_names(rules_dir)
+    if saropa_lints_path is None:
+        saropa_lints_path = rules_dir.parent.parent / "saropa_lints.dart"
+
+    implemented = get_registered_rule_names(saropa_lints_path, rules_dir)
     aliases = get_aliases(rules_dir)
     tiers = get_tier_assignments(tiers_path)
     opinionated_prefer = get_opinionated_prefer_rules(rules_dir)

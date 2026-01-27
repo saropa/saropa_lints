@@ -647,7 +647,7 @@ This is more reliable than IDE integration because it runs the actual CLI tool r
 Want a clickable button instead of remembering the keyboard shortcut? Install the included extension:
 
 ```bash
-python scripts/install_vscode_extension.py
+python scripts/modules/_install_vscode_extension.py
 ```
 
 Then restart VS Code.
