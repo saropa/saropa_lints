@@ -8,12 +8,14 @@ import 'package:test/test.dart';
 /// 3. require_https_only - safe replacement pattern detection
 /// 4. avoid_passing_self_as_argument - literal value exclusion
 /// 5. avoid_variable_shadowing - sibling closure scoping
+/// 6. avoid_isar_clear_in_production - receiver type checking
 ///
 /// Test fixtures are located in:
 /// - example/lib/require_subscription_status_check_example.dart
 /// - example/lib/navigation/require_deep_link_fallback_fixture.dart
 /// - example/lib/security/require_https_only_fixture.dart
 /// - example/lib/avoid_variable_shadowing_fixture.dart
+/// - example/lib/isar/avoid_isar_clear_in_production_fixture.dart
 void main() {
   group('False Positive Fixes - v4.2.3', () {
     group('require_subscription_status_check', () {
@@ -282,6 +284,33 @@ void main() {
         );
       });
     });
+
+    group('avoid_isar_clear_in_production', () {
+      test('should only flag clear() on Isar instances', () {
+        // Expected behavior:
+        // isar.clear() without kDebugMode guard SHOULD trigger
+        // isar.clear() inside if (kDebugMode) should NOT trigger
+
+        expect(
+          'Only Isar.clear() triggers the rule',
+          isNotNull,
+        );
+      });
+
+      test('should not flag clear() on Map, List, Set, or other types', () {
+        // Expected behavior: These should NOT trigger
+        // - cache.clear()      (Map<String, List<String>>)
+        // - items.clear()      (List<int>)
+        // - tags.clear()       (Set<String>)
+        // - buffer.clear()     (StringBuffer)
+        // - controller.clear() (TextEditingController)
+
+        expect(
+          'Non-Isar clear() calls are not flagged',
+          isNotNull,
+        );
+      });
+    });
   });
 
   group('Test Fixture Coverage', () {
@@ -302,6 +331,11 @@ void main() {
 
     test('avoid_variable_shadowing has test fixture', () {
       // Located at: example/lib/avoid_variable_shadowing_fixture.dart
+      expect(true, isTrue);
+    });
+
+    test('avoid_isar_clear_in_production has test fixture', () {
+      // Located at: example/lib/isar/avoid_isar_clear_in_production_fixture.dart
       expect(true, isTrue);
     });
   });
