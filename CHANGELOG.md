@@ -14,6 +14,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - **Test coverage top offenders report**: The publish workflow's test coverage summary now lists the 10 worst categories ranked by untested rule count, color-coded by severity.
 
+### Fixed
+
+- **20 unresolved doc reference warnings**: Escaped non-symbol references in DartDoc comments (OWASP codes, rule names, Flutter widget names, file names) that `dart doc` could not resolve, eliminating all documentation generation warnings.
+
 ## [4.8.3-pre] - 2026-01-26
 
 ### Added

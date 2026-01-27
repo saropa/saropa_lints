@@ -638,7 +638,7 @@ class PatternIndex {
   /// Build the pattern index from enabled rules.
   ///
   /// Call this once when the plugin initializes with the filtered rule list.
-  /// Rules that declare [requiredPatterns] will be indexed; rules without
+  /// Rules that declare `requiredPatterns` will be indexed; rules without
   /// patterns are tracked separately and always run.
   static void build(Iterable<RulePatternInfo> rules) {
     _patternToRules.clear();
