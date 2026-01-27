@@ -1664,8 +1664,9 @@ class RequireMapIdleCallbackRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_map_idle_callback',
     problemMessage:
-        '[require_map_idle_callback] Data fetching should use onCameraIdle, not onCameraMove. Consequence: Fetching on every move can spam APIs, slow the app, and waste bandwidth.',
-    correctionMessage: 'Move data fetching to onCameraIdle to prevent spam.',
+        '[require_map_idle_callback] Data fetching triggered in onCameraMove fires on every frame during map pan and zoom gestures. This spams backend APIs with hundreds of redundant requests per second, causes severe performance degradation with UI jank, and wastes user bandwidth and battery on mobile devices.',
+    correctionMessage:
+        'Move data-fetching logic to the onCameraIdle callback, which fires once after the user stops interacting with the map, preventing API spam and frame drops.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 

@@ -1105,9 +1105,9 @@ class AvoidOptionalFieldCrashRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_optional_field_crash',
     problemMessage:
-        '[avoid_optional_field_crash] JSON field access may crash if null. Use null-aware operators.',
+        '[avoid_optional_field_crash] JSON field accessed with direct bracket notation on a Map that may contain null values. When the API response omits an optional field, this direct access throws a runtime exception that crashes the app. Defensive null-aware access with ?[] prevents unexpected null pointer errors and provides graceful handling of incomplete or malformed JSON responses.',
     correctionMessage:
-        'Use ?[] for optional access or provide default with ?? operator.',
+        'Use the null-aware bracket operator ?[] for optional field access, and provide a fallback default value with the ?? operator to handle missing JSON fields safely.',
     errorSeverity: DiagnosticSeverity.ERROR,
   );
 

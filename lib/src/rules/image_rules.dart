@@ -389,8 +389,9 @@ class RequireImageErrorFallbackRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_image_error_fallback',
     problemMessage:
-        '[require_image_error_fallback] Image.network without errorBuilder shows broken image icon when load fails. Users see an ugly error state instead of a graceful fallback.',
-    correctionMessage: 'Add errorBuilder callback to handle network failures.',
+        '[require_image_error_fallback] Image.network used without an errorBuilder callback. When the network request fails due to connectivity issues, 404 errors, or server timeouts, Flutter displays a broken image icon placeholder. Users see an ugly, unexplained error state instead of a meaningful fallback such as a retry button or alternative content that maintains the visual layout.',
+    correctionMessage:
+        'Add an errorBuilder callback to Image.network that returns a fallback widget, such as an error icon with retry functionality or a placeholder image, when the network request fails.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -1193,9 +1194,9 @@ class RequireImageStreamDisposeRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_image_stream_dispose',
     problemMessage:
-        '[require_image_stream_dispose] ImageStream listener must be removed in dispose() to prevent memory leaks.',
+        '[require_image_stream_dispose] ImageStream listener is not removed in the dispose() method. The listener retains a reference to the widget State object, preventing garbage collection after the widget is removed from the tree. This creates a memory leak where decoded image data and the entire widget state remain allocated indefinitely, consuming device memory.',
     correctionMessage:
-        'Add _imageStream?.removeListener(_listener) in dispose() method.',
+        'Add _imageStream?.removeListener(_listener) in the dispose() method before calling super.dispose() to release the ImageStream reference and prevent memory leaks.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -1569,9 +1570,9 @@ class RequireImageCacheDimensionsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_image_cache_dimensions',
     problemMessage:
-        '[require_image_cache_dimensions] Image.network without cacheWidth/cacheHeight. High memory usage.',
+        '[require_image_cache_dimensions] Image.network loads the full-resolution image into memory without cacheWidth or cacheHeight constraints. A 4000x3000 pixel photo decodes to approximately 48MB of uncompressed bitmap data in memory. Without cache dimensions, displaying multiple images causes excessive memory consumption that leads to out-of-memory crashes on lower-end devices.',
     correctionMessage:
-        'Add cacheWidth and/or cacheHeight to limit decoded image size.',
+        'Add cacheWidth and cacheHeight parameters matching the display dimensions to limit the decoded image size in memory and reduce overall memory consumption.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
