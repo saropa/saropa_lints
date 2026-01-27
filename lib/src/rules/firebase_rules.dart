@@ -48,9 +48,9 @@ class AvoidFirestoreUnboundedQueryRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_firestore_unbounded_query',
     problemMessage:
-        '[avoid_firestore_unbounded_query] Firestore query without limit() could return excessive data. Consequence: This can cause high costs, slow performance, and app crashes.',
+        '[avoid_firestore_unbounded_query] Firestore query without limit() returns unbounded data from the entire collection. This triggers excessive bandwidth consumption, inflated Firestore read costs, slow UI rendering, and out-of-memory crashes on low-end devices when the collection grows large.',
     correctionMessage:
-        'Add .limit(n) to prevent unbounded queries and control costs. Unbounded queries can result in high bills, slow apps, and even out-of-memory errors.',
+        'Add .limit(n) to cap the number of documents returned and prevent unbounded queries. Unbounded reads can result in high bills, slow apps, and out-of-memory errors.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -434,9 +434,9 @@ class AvoidPrefsForLargeDataRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_prefs_for_large_data',
     problemMessage:
-        '[avoid_prefs_for_large_data] SharedPreferences is not suitable for large data. Use a database. Consequence: Storing large data can cause app slowdowns, crashes, and data corruption.',
+        '[avoid_prefs_for_large_data] SharedPreferences loads its entire file into memory on first access, making it unsuitable for large datasets. Storing collections or large JSON blobs here causes slow app startup, excessive memory consumption, UI freezes, and potential data corruption on write failures.',
     correctionMessage:
-        'Use Hive, Isar, or SQLite for collections. SharedPreferences is for small settings only.',
+        'Use a database such as Hive, Isar, or SQLite for collections and large data. Reserve SharedPreferences for small, simple settings like booleans and locale strings.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 

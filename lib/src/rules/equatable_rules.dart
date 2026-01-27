@@ -188,7 +188,7 @@ class ListAllEquatableFieldsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'list_all_equatable_fields',
     problemMessage:
-        '[list_all_equatable_fields] Equatable class has fields not included in props. Equality checks fail silently, causing inconsistent behavior in collections, comparisons, and UI updates.',
+        '[list_all_equatable_fields] Equatable class has fields not included in props. Equality checks fail silently when these fields differ, causing inconsistent behavior in collections, comparisons, and UI updates. Two objects with different field values will be treated as equal, leading to missed rebuilds, incorrect deduplication, and subtle bugs that are extremely hard to trace.',
     correctionMessage:
         'Add all instance fields to the props getter for correct equality. Otherwise, objects may not compare as equal when expected, leading to subtle bugs.',
     errorSeverity: DiagnosticSeverity.WARNING,

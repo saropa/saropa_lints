@@ -38,9 +38,9 @@ class AvoidEqualExpressionsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_equal_expressions',
     problemMessage:
-        '[avoid_equal_expressions] Both sides of the binary expression are identical.',
+        '[avoid_equal_expressions] Both sides of the binary expression are identical, meaning the comparison always produces the same result (true for ==, false for >, <). This is almost always a copy-paste bug where the developer intended to compare two different values, and the redundant comparison masks the real logic error in the code.',
     correctionMessage:
-        'This is likely a bug. Use different expressions on each side.',
+        'Replace one side of the expression with the intended comparison target to fix the copy-paste error.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -125,8 +125,8 @@ class AvoidNegationsInEqualityChecksRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_negations_in_equality_checks',
     problemMessage:
-        '[avoid_negations_in_equality_checks] Use != instead of negating == comparison.',
-    correctionMessage: 'Replace !(a == b) with a != b.',
+        '[avoid_negations_in_equality_checks] Equality check is wrapped in a negation operator !(a == b) instead of using the direct != operator. The negated form adds unnecessary cognitive overhead, increases nesting depth, and is harder to scan during code review. The != operator expresses the same intent more clearly and concisely.',
+    correctionMessage: 'Replace !(a == b) with a != b for direct and readable inequality checking.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -218,9 +218,10 @@ class AvoidSelfAssignmentRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_self_assignment',
-    problemMessage: '[avoid_self_assignment] Variable is assigned to itself.',
+    problemMessage:
+        '[avoid_self_assignment] Variable is assigned to itself (x = x), which has no effect and indicates a copy-paste error or incomplete refactor. The assignment executes at runtime but produces no state change, wasting CPU cycles and obscuring the developer\'s actual intent. This dead code makes maintenance harder because readers must determine whether the assignment was intentional.',
     correctionMessage:
-        'Remove the self-assignment or assign a different value.',
+        'Remove the self-assignment entirely, or replace the right-hand side with the intended source value.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -299,8 +300,9 @@ class AvoidSelfCompareRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_self_compare',
-    problemMessage: '[avoid_self_compare] Variable is compared to itself.',
-    correctionMessage: 'Use isNaN for NaN checks, or compare different values.',
+    problemMessage:
+        '[avoid_self_compare] Variable is compared to itself (x == x, x > x, etc.), which always produces a constant result (true for ==, false for inequality operators) unless the value is NaN. This is almost always a copy-paste bug where the developer intended to compare two distinct values, and the redundant comparison hides the real logic error in the code.',
+    correctionMessage: 'Use .isNaN for NaN detection, or replace one operand with the intended comparison target.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -377,8 +379,8 @@ class AvoidUnnecessaryCompareToRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_unnecessary_compare_to',
     problemMessage:
-        '[avoid_unnecessary_compare_to] Use == instead of compareTo() == 0.',
-    correctionMessage: 'Replace compareTo(x) == 0 with == x.',
+        '[avoid_unnecessary_compare_to] Using compareTo() == 0 for equality checking is unnecessarily verbose when the == operator expresses the same comparison directly. The compareTo method is designed for ordering (less than, greater than), and using it for equality adds cognitive overhead, increases code length, and obscures the developer\'s intent of a simple equality check.',
+    correctionMessage: 'Replace compareTo(x) == 0 with == x, and compareTo(x) != 0 with != x for clarity.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -497,8 +499,9 @@ class NoEqualArgumentsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'no_equal_arguments',
-    problemMessage: '[no_equal_arguments] Same argument passed multiple times.',
-    correctionMessage: 'Check if this is intentional or a copy-paste error.',
+    problemMessage:
+        '[no_equal_arguments] The same identifier is passed as multiple positional arguments to a function call, which typically indicates a copy-paste error where distinct values were intended (e.g., setPosition(x, x) instead of setPosition(x, y)). This silent bug produces incorrect behavior that passes compilation but yields wrong results at runtime.',
+    correctionMessage: 'Verify whether duplicate arguments are intentional, and replace with the intended distinct values.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 

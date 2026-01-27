@@ -57,7 +57,7 @@ class RequireVsyncMixinRule extends SaropaLintRule {
     problemMessage:
         '[require_vsync_mixin] AnimationController is missing a vsync parameter. Without vsync, animations run without frame synchronization, causing visual tearing, wasted CPU cycles, and degraded user experience. This can lead to janky motion and battery drain, especially on mobile devices. Always provide vsync: this and mix in SingleTickerProviderStateMixin to ensure smooth, efficient animations and proper resource management.',
     correctionMessage:
-        'Add vsync: this and mix in SingleTickerProviderStateMixin.',
+        'Add vsync: this and mix in SingleTickerProviderStateMixin to synchronize animation frames with the display refresh rate, preventing unnecessary CPU and memory usage.',
     errorSeverity: DiagnosticSeverity.ERROR,
   );
 
@@ -598,9 +598,9 @@ class AvoidLayoutPassesRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_layout_passes',
     problemMessage:
-        '[avoid_layout_passes] Using IntrinsicWidth or IntrinsicHeight causes Flutter to perform two layout passes for affected widgets, which significantly hurts performance, especially in complex UIs or lists. This can lead to dropped frames, laggy animations, and poor user experience. Prefer using CrossAxisAlignment.stretch, Expanded, or fixed dimensions to avoid extra layout computation.',
+        '[avoid_layout_passes] Using IntrinsicWidth or IntrinsicHeight causes Flutter to perform two layout passes for affected child widgets in the build tree, which significantly hurts performance, especially in complex UIs or lists. This can lead to dropped frames, laggy animations, and poor user experience. Prefer using CrossAxisAlignment.stretch, Expanded, or fixed dimensions to avoid extra layout computation.',
     correctionMessage:
-        'Use CrossAxisAlignment.stretch, Expanded, or fixed dimensions instead.',
+        'Replace IntrinsicWidth/IntrinsicHeight with CrossAxisAlignment.stretch, Expanded, or fixed dimensions to eliminate the extra layout pass in the build tree.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 

@@ -1530,9 +1530,9 @@ class RequireIsarNonNullableMigrationRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_isar_non_nullable_migration',
     problemMessage:
-        '[require_isar_non_nullable_migration] Making a field non-nullable without a default value will break migrations: existing records with null values will cause runtime errors or data loss during schema upgrades.',
+        '[require_isar_non_nullable_migration] Making a field non-nullable without a default value will break migrations: existing database records that contain null values for this field will cause runtime deserialization errors, data loss, or schema upgrade failures when the app is updated.',
     correctionMessage:
-        'Either keep the field nullable or provide a default value to ensure safe migrations and prevent data loss.',
+        'Either keep the field nullable or provide a default value to ensure safe migrations, prevent data loss, and avoid runtime deserialization errors.',
     errorSeverity: DiagnosticSeverity.ERROR,
   );
 

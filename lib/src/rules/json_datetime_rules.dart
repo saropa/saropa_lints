@@ -337,8 +337,9 @@ class PreferDurationConstantsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_duration_constants',
     problemMessage:
-        '[prefer_duration_constants] Duration can use a cleaner unit.',
-    correctionMessage: 'Use a larger unit for cleaner code.',
+        '[prefer_duration_constants] Duration constructor uses a smaller time unit than necessary, reducing readability and making the intended duration harder to understand at a glance.',
+    correctionMessage:
+        'Replace with the equivalent larger time unit (e.g., Duration(seconds: 60) becomes Duration(minutes: 1)) for clarity.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -415,9 +416,9 @@ class AvoidDatetimeNowInTestsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_datetime_now_in_tests',
     problemMessage:
-        '[avoid_datetime_now_in_tests] DateTime.now() in tests can cause flaky behavior.',
+        '[avoid_datetime_now_in_tests] DateTime.now() in tests produces non-deterministic values that vary between runs, causing flaky assertions that pass locally but fail in CI, making test failures impossible to reproduce reliably.',
     correctionMessage:
-        'Use fixed datetime values or a clock abstraction for predictable tests.',
+        'Use fixed DateTime values (e.g., DateTime(2024, 1, 15)) or inject a clock abstraction for deterministic, reproducible tests.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 

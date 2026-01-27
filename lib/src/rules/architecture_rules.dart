@@ -43,9 +43,9 @@ class AvoidDirectDataAccessInUiRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_direct_data_access_in_ui',
     problemMessage:
-        '[avoid_direct_data_access_in_ui] Widget directly accesses data layer. This couples UI to data implementation.',
+        '[avoid_direct_data_access_in_ui] Widget class declares a field typed as Repository, DataSource, ApiClient, or similar data-layer class, creating a direct coupling between the UI and data implementation. This bypasses the domain/business logic layer, making the widget untestable in isolation, difficult to refactor when data sources change, and prone to leaking data concerns into the presentation layer.',
     correctionMessage:
-        'Inject a ViewModel, Cubit, or Controller that wraps the data layer.',
+        'Inject a ViewModel, Cubit, or Controller that wraps the data layer and exposes only presentation-ready state.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -132,9 +132,9 @@ class AvoidBusinessLogicInUiRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_business_logic_in_ui',
     problemMessage:
-        '[avoid_business_logic_in_ui] Business logic should not be in UI layer.',
+        '[avoid_business_logic_in_ui] Widget class contains methods named with calculation or transformation verbs (calculate, compute, validate, process, etc.), indicating business logic embedded in the UI layer. This violates separation of concerns, making the logic impossible to reuse across screens, untestable without widget infrastructure, and tightly coupled to Flutter framework classes.',
     correctionMessage:
-        'Move calculations and business rules to domain/service layer.',
+        'Move calculations and business rules to a domain or service layer class that can be tested and reused independently.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -226,9 +226,9 @@ class AvoidCircularDependenciesRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_circular_dependencies',
     problemMessage:
-        '[avoid_circular_dependencies] Service depends on another service of the same layer. This may cause circular dependencies.',
+        '[avoid_circular_dependencies] Service class constructor depends on another service of the same architectural layer (both end with Service, Repository, Controller, etc.). This creates circular dependency chains that break initialization order, prevent unit testing with mocks, and produce tightly coupled modules that cannot be modified or deployed independently.',
     correctionMessage:
-        'Extract shared logic to a new service, use interfaces, or communicate via events.',
+        'Extract shared logic to a new service, define interfaces for cross-service contracts, or communicate via an event bus.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -315,9 +315,9 @@ class AvoidGodClassRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_god_class',
     problemMessage:
-        '[avoid_god_class] Class has too many members (>15 fields or >20 methods). Violates Single Responsibility.',
+        '[avoid_god_class] Class declares more than 15 fields or 20 methods, violating the Single Responsibility Principle. God classes accumulate unrelated responsibilities, making them difficult to understand, test, and maintain. Changes to one responsibility risk breaking others, and the class becomes a merge-conflict magnet as multiple developers modify it concurrently.',
     correctionMessage:
-        'Extract related fields and methods into focused helper classes.',
+        'Extract cohesive groups of related fields and methods into focused helper or delegate classes with clear responsibilities.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -386,9 +386,9 @@ class AvoidUiInDomainLayerRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_ui_in_domain_layer',
     problemMessage:
-        '[avoid_ui_in_domain_layer] Domain layer should not have UI dependencies.',
+        '[avoid_ui_in_domain_layer] Domain-layer file (models, entities, or domain directory) references Flutter UI types such as Widget, BuildContext, Color, or TextStyle. This couples domain logic to the Flutter framework, preventing code reuse in non-Flutter contexts (CLI tools, server-side Dart, packages), breaking testability without widget infrastructure, and violating clean architecture boundaries.',
     correctionMessage:
-        'Remove Flutter/UI imports from domain models and services.',
+        'Remove Flutter/UI imports from domain models and services, and move presentation concerns to the UI layer.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -478,9 +478,9 @@ class AvoidCrossFeatureDependenciesRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_cross_feature_dependencies',
     problemMessage:
-        '[avoid_cross_feature_dependencies] Feature module depends on another feature.',
+        '[avoid_cross_feature_dependencies] File inside a feature module imports from a different feature module directory, creating a direct cross-feature dependency. This breaks feature isolation, prevents independent development and testing of features, and makes it impossible to extract or remove a feature without cascading changes across the codebase. Cross-feature coupling also increases merge conflicts and deployment risks.',
     correctionMessage:
-        'Move shared code to core/shared layer or use dependency injection.',
+        'Move shared code to a core or shared layer, or use dependency injection to decouple features from each other.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -551,9 +551,9 @@ class AvoidSingletonPatternRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_singleton_pattern',
     problemMessage:
-        '[avoid_singleton_pattern] Singleton pattern detected. Cannot mock in tests or have multiple instances.',
+        '[avoid_singleton_pattern] Class uses the singleton pattern (static instance field, factory constructor, and private constructor). Singletons hide dependencies, prevent mocking in unit tests, make it impossible to run tests in parallel with isolated state, and create implicit global state that is difficult to reason about and reset between test cases.',
     correctionMessage:
-        'Use DI container: getIt.registerSingleton(MyService()) and inject where needed.',
+        'Use a DI container (e.g., getIt.registerSingleton(MyService())) and inject the instance where needed for testability.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -634,7 +634,7 @@ class AvoidTouchOnlyGesturesRule extends SaropaLintRule {
     problemMessage:
         '[avoid_touch_only_gestures] GestureDetector with only onTap. Missing desktop/web interactions.',
     correctionMessage:
-        'Add onSecondaryTap for right-click and consider hover states.',
+        'Add onSecondaryTap for right-click context menus and onLongPress as a mobile fallback for desktop interactions.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 

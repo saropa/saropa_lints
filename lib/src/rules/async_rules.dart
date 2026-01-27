@@ -208,9 +208,9 @@ class AvoidNestedStreamsAndFuturesRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_nested_streams_and_futures',
     problemMessage:
-        '[avoid_nested_streams_and_futures] Stream<Future<T>> or Future<Stream<T>> detected. Complex to consume - each item needs await or stream needs await. This increases cognitive load and can lead to resource leaks or missed events.',
+        '[avoid_nested_streams_and_futures] Stream<Future<T>> or Future<Stream<T>> detected. Complex to consume - each item needs await or stream needs await. This increases cognitive load and can lead to memory leaks, unclosed stream subscriptions, or missed events.',
     correctionMessage:
-        'Flatten with async* generator or Stream.asyncMap() instead.',
+        'Flatten the nested type by using an async* generator function or Stream.asyncMap() to produce a simpler type.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -270,7 +270,7 @@ class AvoidPassingAsyncWhenSyncExpectedRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_passing_async_when_sync_expected',
     problemMessage:
-        '[avoid_passing_async_when_sync_expected] Async callback passed to sync-only method. Returned Future is discarded - errors lost silently.',
+        '[avoid_passing_async_when_sync_expected] Async callback passed to a sync-only method such as forEach, map, or where. The returned Future is silently discarded, which means any errors thrown inside the callback are lost and never reported. This makes debugging extremely difficult and can hide critical failures in your application logic.',
     correctionMessage:
         'Use Future.wait() with map(), or for-loop with await, instead of forEach/where/etc.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -489,7 +489,7 @@ class AvoidUnassignedStreamSubscriptionsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_unassigned_stream_subscriptions',
     problemMessage:
-        '[avoid_unassigned_stream_subscriptions] Stream subscription not assigned. Cannot cancel it, causing memory leaks.',
+        '[avoid_unassigned_stream_subscriptions] Stream subscription created by listen() is not assigned to a variable. Without a reference to the StreamSubscription, you cannot cancel it during dispose, which causes memory leaks, prevents garbage collection, and allows callbacks to fire after the widget or object has been destroyed.',
     correctionMessage:
         'Assign to variable: final sub = stream.listen(...); then sub.cancel() in dispose.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -603,7 +603,7 @@ class PreferAssigningAwaitExpressionsRule extends SaropaLintRule {
     problemMessage:
         '[prefer_assigning_await_expressions] Inline await expression. Harder to debug and inspect intermediate values. Consequence: Extracting to a variable improves readability, makes debugging easier, and helps catch errors sooner.',
     correctionMessage:
-        'Extract to variable: final result = await fetch(); then use result.',
+        'Extract the await expression to a named variable: final result = await fetch(); then use result in subsequent code.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -2238,7 +2238,7 @@ class AvoidStreamInBuildRule extends SaropaLintRule {
     problemMessage:
         'Creating a Stream or StreamController inside a widget’s build() method causes a new stream instance to be created on every rebuild of that widget. This leads to multiple overlapping subscriptions, memory leaks, and lost or duplicated events, making the widget’s state unpredictable and difficult to debug. Always manage streams as persistent fields in the State class, not as local variables in build(). See https://docs.flutter.dev/cookbook/networking/web-sockets#using-streambuilder.',
     correctionMessage:
-        'Move all Stream and StreamController creation out of the build() method and into the State class, typically initializing them in initState() and disposing them in dispose(). This ensures a single, consistent stream lifecycle per widget instance and prevents resource leaks or event loss. See https://docs.flutter.dev/cookbook/networking/web-sockets#using-streambuilder for best practices.',
+        'Move all Stream and StreamController creation out of the build() method and into the State class, typically initializing them in initState() and disposing them in dispose(). This ensures a single, consistent stream lifecycle per widget instance and prevents memory leaks or event loss. See https://docs.flutter.dev/cookbook/networking/web-sockets#using-streambuilder for recommended patterns.',
     errorSeverity: DiagnosticSeverity.ERROR,
   );
 
@@ -2313,7 +2313,7 @@ class RequireStreamControllerCloseRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_stream_controller_close',
     problemMessage:
-        '[require_stream_controller_close] Failing to close a StreamController in the dispose() method leaves the stream open, causing memory leaks, resource exhaustion, and potential app crashes. Unclosed streams can accumulate events and listeners, degrading performance and making debugging difficult. Proper closure is essential for robust, production-quality Flutter apps.',
+        '[require_stream_controller_close] Failing to close a StreamController in the dispose() method leaves the stream open, causing memory leaks, connection handle exhaustion, and potential app crashes. Unclosed streams can accumulate events and listeners, degrading performance and making debugging difficult. Proper closure is essential for robust, production-quality Flutter apps.',
     correctionMessage:
         'Call controller.close() in dispose() before super.dispose(). For wrapper types (e.g., IsarStreamController), calling wrapper.dispose() is also acceptable if the wrapper internally closes its StreamController.',
     errorSeverity: DiagnosticSeverity.ERROR,
@@ -2494,7 +2494,7 @@ class AvoidMultipleStreamListenersRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_multiple_stream_listeners',
     problemMessage:
-        '[avoid_multiple_stream_listeners] Multiple listen() calls on the same non-broadcast stream are not allowed. This causes runtime exceptions and can break your app’s logic.',
+        '[avoid_multiple_stream_listeners] Multiple listen() calls detected on the same non-broadcast stream. Single-subscription streams only allow one active listener at a time. Adding a second listener throws a StateError at runtime, which crashes your app and makes the stream connection unusable for all subscribers.',
     correctionMessage:
         'Convert the stream to a broadcast stream using .asBroadcastStream(), or ensure only one listener is attached.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -2575,7 +2575,7 @@ class RequireStreamErrorHandlingRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_stream_error_handling',
     problemMessage:
-        '[require_stream_error_handling] Stream.listen() is called without providing an onError handler. Unhandled stream errors will cause uncaught exceptions and may crash your app.',
+        '[require_stream_error_handling] Stream.listen() is called without providing an onError callback or wrapping the stream in a try-catch. Unhandled stream errors propagate as uncaught exceptions, which crash your app in production and terminate the stream connection permanently, preventing any further data from being received.',
     correctionMessage:
         'Add an onError callback to your stream.listen() to handle errors gracefully and prevent crashes.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -2898,7 +2898,7 @@ class RequireCompleterErrorHandlingRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_completer_error_handling',
     problemMessage:
-        '[require_completer_error_handling] Using a Completer in a try-catch block without calling completeError in the catch block can cause the Future to hang forever if an error occurs. This leads to resource leaks and unpredictable app behavior.',
+        '[require_completer_error_handling] Using a Completer in a try-catch block without calling completeError in the catch block can cause the Future to hang forever if an error occurs. This leads to memory leaks, dangling stream subscriptions, and unclosed connection handles that degrade app stability over time.',
     correctionMessage:
         'Always call completer.completeError(e) in the catch block to ensure the Future completes with an error and does not hang.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -4101,7 +4101,7 @@ class PreferAsyncInitStateRule extends SaropaLintRule {
     name: 'prefer_async_init_state',
     problemMessage:
         '[prefer_async_init_state] Using .then().setState() pattern in initState. '
-        'Consider storing Future and using FutureBuilder for loading states.',
+        'Store the Future in a field and use FutureBuilder to manage loading states declaratively.',
     correctionMessage:
         'Store the Future in a field and use FutureBuilder in build().',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -4187,7 +4187,7 @@ class RequireNetworkStatusCheckRule extends SaropaLintRule {
     name: 'require_network_status_check',
     problemMessage:
         '[require_network_status_check] `[HEURISTIC]` Network call without '
-        'connectivity check. Consider checking network status first.',
+        'connectivity check. Verify network status before making requests to avoid silent failures.',
     correctionMessage:
         'Check Connectivity().checkConnectivity() before making requests.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -4277,7 +4277,7 @@ class AvoidSyncOnEveryChangeRule extends SaropaLintRule {
     name: 'avoid_sync_on_every_change',
     problemMessage:
         '[avoid_sync_on_every_change] `[HEURISTIC]` API call in onChanged '
-        'callback may fire on every keystroke. Consider debouncing.',
+        'callback may fire on every keystroke. Add a debounce timer to batch rapid inputs before syncing.',
     correctionMessage:
         'Use a debouncer or batch changes before syncing to server.',
     errorSeverity: DiagnosticSeverity.WARNING,
