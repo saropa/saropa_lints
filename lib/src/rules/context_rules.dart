@@ -5,7 +5,7 @@
 /// These rules detect common misuses of BuildContext that can lead to
 /// runtime crashes, memory leaks, or unpredictable behavior.
 ///
-/// See also: [async_context_utils.dart] for shared mounted-check utilities.
+/// See also: `async_context_utils.dart` for shared mounted-check utilities.
 library;
 
 import 'package:analyzer/dart/ast/ast.dart';
