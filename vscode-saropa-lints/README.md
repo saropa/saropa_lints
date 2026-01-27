@@ -15,7 +15,7 @@ A simple VS Code extension that adds a button and keyboard shortcut to run Sarop
 From the saropa_lints package root:
 
 ```bash
-python scripts/install_vscode_extension.py
+python scripts/modules/_install_vscode_extension.py
 ```
 
 The script will:
