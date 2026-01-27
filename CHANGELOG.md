@@ -8,7 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 > See [CHANGELOG_ARCHIVE.md](./CHANGELOG_ARCHIVE.md) for versions 0.1.0 through 4.2.0.
 
 ---
-## [4.8.3] - 2026-01-27
+## [4.8.4] - 2026-01-27
 
 ### Added
 
@@ -32,7 +32,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - **`doc/flutter_widget_rules_full_table.md`**: Obsolete split-plan document that was no longer referenced.
 
-## [4.8.3-pre] - 2026-01-26
+## [4.8.3] - 2026-01-26
 
 ### Added
 
