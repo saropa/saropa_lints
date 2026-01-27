@@ -103,4 +103,33 @@ def display_test_coverage(project_dir: Path) -> None:
         color,
     )
     print_colored("  " + "-" * 50, Color.CYAN)
-    print()
+
+    # Top 10 worst offenders ranked by untested rule count
+    ranked = sorted(
+        category_details,
+        key=lambda c: c[1] - c[2],
+        reverse=True,
+    )[:10]
+
+    if ranked and ranked[0][1] - ranked[0][2] > 0:
+        print()
+        print_colored("  Top offenders (by untested rules):", Color.WHITE)
+        print()
+        for category, rules, fixtures in ranked:
+            untested = rules - fixtures
+            if untested <= 0:
+                break
+            pct = (fixtures / rules * 100) if rules > 0 else 0
+            if pct < 10:
+                row_color = Color.RED
+            elif pct < 30:
+                row_color = Color.YELLOW
+            else:
+                row_color = Color.CYAN
+            print_colored(
+                f"      {category:<30s} "
+                f"{untested:>4d} untested / {rules:>4d} "
+                f"({pct:5.1f}% covered)",
+                row_color,
+            )
+        print()
