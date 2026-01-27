@@ -830,7 +830,7 @@ class RequireGetItRegistrationOrderRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_getit_registration_order',
     problemMessage:
-        '[require_getit_registration_order] GetIt registration uses dependency not yet registered at this point. This can cause runtime errors and unpredictable dependency resolution.',
+        '[require_getit_registration_order] GetIt registration uses a dependency not yet registered at this point in the setup sequence. This causes runtime errors when the service locator attempts to resolve an unregistered type, resulting in app crashes during startup or lazy initialization that are difficult to reproduce and debug in production.',
     correctionMessage:
         'Register dependencies before services that depend on them, or use registerLazySingleton.',
     errorSeverity: DiagnosticSeverity.WARNING,

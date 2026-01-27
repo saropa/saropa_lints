@@ -233,7 +233,7 @@ class AvoidThrowObjectsWithoutToStringRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_throw_objects_without_tostring',
     problemMessage:
-        '[avoid_throw_objects_without_tostring] Thrown objects should have a useful toString() method for error reporting and debugging. Throwing objects without a meaningful string representation makes error logs cryptic and hinders troubleshooting, especially in production.',
+        '[avoid_throw_objects_without_tostring] Thrown objects without a useful toString() method produce cryptic error logs that hinder troubleshooting. When caught in production, these errors display unhelpful messages like "Instance of MyClass" instead of actionable details, making it nearly impossible to diagnose root causes from crash reports.',
     correctionMessage:
         'Throw Exception or Error subclasses, or implement toString() on custom error objects. Ensure error messages are clear and actionable for maintainers and support teams.',
     errorSeverity: DiagnosticSeverity.INFO,

@@ -574,9 +574,9 @@ class RequireTypeAdapterRegistrationRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_type_adapter_registration',
     problemMessage:
-        '[require_type_adapter_registration] Hive box opened with custom type but adapter may not be registered. Consequence: Data may not be read/written correctly, causing runtime errors or data loss.',
+        '[require_type_adapter_registration] Hive box opened with a custom type but the corresponding TypeAdapter may not be registered. Unregistered adapters cause HiveError at runtime, preventing all read and write operations on the box, which leads to app crashes and complete data inaccessibility.',
     correctionMessage:
-        'Ensure Hive.registerAdapter() is called before opening typed boxes. Otherwise, your app may crash or lose data when reading/writing.',
+        'Call Hive.registerAdapter() for every custom type before opening boxes that use it. Without registration, your app will crash or lose data when reading or writing.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 

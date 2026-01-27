@@ -287,7 +287,7 @@ class RequireTextOverflowInRowRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_text_overflow_in_row',
     problemMessage:
-        '[require_text_overflow_in_row] Text widget inside a Row has no overflow handling. When text content exceeds the available width, Flutter renders yellow and black diagonal overflow stripes that break the visual layout. Users see unreadable, clipped content with an ugly error indicator instead of gracefully truncated or wrapped text.',
+        '[require_text_overflow_in_row] Text child element inside a Row build tree has no overflow handling. When text content exceeds the available width, Flutter renders yellow and black diagonal overflow stripes that break the visual layout. Users see unreadable, clipped content with an ugly error indicator instead of gracefully truncated or wrapped text.',
     correctionMessage:
         'Add overflow: TextOverflow.ellipsis to the Text widget, or wrap it in an Expanded or Flexible widget to constrain its width within the Row layout.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -800,9 +800,9 @@ class RequireSubmitButtonStateRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_submit_button_state',
     problemMessage:
-        '[require_submit_button_state] Submit button without loading state allows double-submission, causing duplicate requests. Consequence: This can result in duplicate form submissions, wasted resources, and user confusion.',
+        '[require_submit_button_state] Submit button with an async onPressed handler lacks a loading state guard. Without disabling the button during submission, users can tap repeatedly and trigger duplicate network connection requests, duplicate database writes, and duplicate payment transactions. Each extra tap fires another async operation, wasting server memory and bandwidth while producing confusing duplicate entries.',
     correctionMessage:
-        'Add loading state: onPressed: _isLoading ? null : _submit. Prevents accidental double-submits and duplicate requests.',
+        'Add a boolean loading state flag and set onPressed: _isLoading ? null : _submit to disable the button during async submission.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -943,9 +943,9 @@ class RequireFormRestorationRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_form_restoration',
     problemMessage:
-        '[require_form_restoration] Form with 5+ fields should use RestorationMixin to survive backgrounding. Consequence: Without restoration, users may lose their input if the app is backgrounded or killed.',
+        '[require_form_restoration] Form with 5+ TextEditingController fields lacks RestorationMixin. When the operating system kills the app in the background to reclaim memory, all user input is permanently lost. Users who spent time filling out a lengthy form return to find every field empty and must re-enter all data from scratch.',
     correctionMessage:
-        'Add RestorationMixin or persist draft state to prevent data loss. This ensures user input is not lost unexpectedly.',
+        'Add RestorationMixin to the State class and use RestorableTextEditingController fields, or persist draft state to SharedPreferences to prevent data loss.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -1106,9 +1106,9 @@ class RequireFormFieldControllerRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_form_field_controller',
     problemMessage:
-        '[require_form_field_controller] TextFormField without controller or onSaved loses value on rebuild. Consequence: User input may be lost when the widget rebuilds, leading to frustration.',
+        '[require_form_field_controller] TextFormField has no controller, onSaved, or initialValue. When the parent StatefulWidget triggers a rebuild via setState(), the field value is silently discarded because there is no mechanism to persist or retrieve the user input. This causes typed data to vanish unpredictably and forces users to re-enter their input repeatedly.',
     correctionMessage:
-        'Add controller: _controller or onSaved: (value) => _field = value. This ensures form values are preserved across rebuilds.',
+        'Add controller: _controller to persist the value, or onSaved: (value) => _field = value to capture input on form save.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -1184,9 +1184,9 @@ class AvoidFormInAlertDialogRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_form_in_alert_dialog',
     problemMessage:
-        '[avoid_form_in_alert_dialog] Form in AlertDialog may lose state on rebuild. Use separate StatefulWidget. Consequence: Form state can be lost or behave unpredictably, confusing users.',
+        '[avoid_form_in_alert_dialog] Form placed directly inside AlertDialog loses all field values, validation state, and user input when the dialog rebuilds due to a parent setState() or keyboard appearance. Because the dialog builder creates a new Form on each build call, there is no StatefulWidget to preserve form state across rebuilds, producing a frustrating experience where typed data disappears.',
     correctionMessage:
-        'Extract form to a StatefulWidget class for reliable state management. This ensures form state is preserved and predictable.',
+        'Extract the form content into a dedicated StatefulWidget class and use that as the dialog content to preserve form state reliably.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 

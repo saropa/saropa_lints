@@ -7273,7 +7273,7 @@ class PassExistingFutureToFutureBuilderRule extends SaropaLintRule {
     problemMessage:
         '[pass_existing_future_to_future_builder] Creating new Future in FutureBuilder restarts the async operation on every widget rebuild. This causes duplicate network calls, database queries, and slow UI with visible loading states.',
     correctionMessage:
-        'Cache the Future in initState() or a field and pass it to the builder.',
+        'Cache the Future in initState() or a final field and pass the stored reference to the FutureBuilder to prevent duplicate async operations on each rebuild.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 

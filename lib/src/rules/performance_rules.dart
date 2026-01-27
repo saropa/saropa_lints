@@ -511,7 +511,7 @@ class PreferComputeForHeavyWorkRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_compute_for_heavy_work',
     problemMessage:
-        '[prefer_compute_for_heavy_work] Heavy computation is performed on the main thread. This can block the UI, causing jank, slow animations, or unresponsive app behavior.',
+        '[prefer_compute_for_heavy_work] Heavy computation such as encryption, compression, or parsing runs synchronously on the main UI thread. This blocks the rendering pipeline, freezing animations, dropping frames, and making the app unresponsive to touch input for the duration of the operation. On lower-end devices, this delay is especially pronounced and triggers ANR warnings on Android.',
     correctionMessage:
         'Move heavy work to a separate isolate using compute() or Isolate.run(). This keeps the UI responsive and prevents dropped frames or slow user interactions, especially on lower-end devices.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -1818,7 +1818,7 @@ class AvoidTextSpanInBuildRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_text_span_in_build',
     problemMessage:
-        '[avoid_text_span_in_build] TextSpan recreated in build() forces expensive text layout recalculation on every rebuild. This causes visible jank when scrolling or animating.',
+        '[avoid_text_span_in_build] TextSpan recreated inside the build() method forces the Flutter rendering pipeline to recalculate expensive text layout metrics on every widget rebuild. This includes glyph positioning, line breaking, and paragraph layout. The repeated computation causes visible jank during scrolling and animations, especially for RichText with multiple styled spans.',
     correctionMessage:
         'Cache TextSpan as a final field or extract to a method that returns cached spans.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -1899,7 +1899,7 @@ class AvoidLargeListCopyRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_large_list_copy',
     problemMessage:
-        '[avoid_large_list_copy] List.from() and toList() create a full copy of all elements, which can use excessive memory and slow down your app when working with large lists.',
+        '[avoid_large_list_copy] List.from() and toList() allocate a new list and copy every element, doubling memory consumption for the duration of the operation. For large collections, this triggers garbage collection pauses that freeze the UI and degrade scrolling performance. The unnecessary allocation pressure accumulates rapidly in loops or frequently called methods.',
     correctionMessage:
         'Use lazy Iterable operations (like map, where, or take) instead of copying large lists, unless a full copy is required. If you must copy, document why to help maintainers understand the performance tradeoff.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -3850,7 +3850,7 @@ class AvoidMoneyArithmeticOnDoubleRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_money_arithmetic_on_double',
     problemMessage:
-        '[avoid_money_arithmetic_on_double] Floating point arithmetic causes precision errors in financial calculations. Users may be charged incorrect amounts or see wrong totals.',
+        '[avoid_money_arithmetic_on_double] Floating point arithmetic on double values introduces rounding errors in financial calculations. For example, 0.1 + 0.2 yields 0.30000000000000004 instead of 0.3. This causes users to see incorrect totals, be charged wrong amounts, and produces accounting discrepancies that compound over multiple transactions and are difficult to trace.',
     correctionMessage:
         'Use int for cents, Decimal package, or money package for financial calculations.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -4353,7 +4353,7 @@ class RequireIsolateForHeavyRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_isolate_for_heavy',
     problemMessage:
-        '[require_isolate_for_heavy] Heavy computation blocks the main thread, causing UI jank and dropped frames.',
+        '[require_isolate_for_heavy] Heavy computation such as JSON decoding, image processing, or data parsing runs on the main thread, blocking the UI event loop. This prevents frame rendering, freezes animations, and makes the app unresponsive to user input. On lower-end devices, operations exceeding 16ms per frame cause visible stutter and dropped frames that degrade the user experience.',
     correctionMessage:
         'Use compute(_parse, data) or Isolate.run(() => _parse(data)) to run in background.',
     errorSeverity: DiagnosticSeverity.WARNING,

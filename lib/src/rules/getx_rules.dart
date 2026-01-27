@@ -199,9 +199,9 @@ class RequireGetxPermanentCleanupRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_getx_permanent_cleanup',
     problemMessage:
-        '[require_getx_permanent_cleanup] Get.put(permanent: true) registers a controller or service that will never be automatically deleted. This can cause memory leaks and resource waste if you do not manually clean up. Controllers registered as permanent remain in memory for the lifetime of the app unless explicitly deleted. This is especially risky for generic or global controllers that may not always be needed.',
+        '[require_getx_permanent_cleanup] Get.put(permanent: true) registers a navigation, scroll, or animation controller that will never be automatically deleted. This can cause memory leaks if you do not manually clean up. Instances registered as permanent remain in memory for the lifetime of the app unless explicitly deleted. This is especially risky for feature-specific or page-scoped controllers that may not always be needed.',
     correctionMessage:
-        'Always call Get.delete<T>() when the controller or service is no longer needed, such as during logout or app shutdown. If the controller must remain for the entire app lifetime, document the reason with a code comment or ignore. Avoid using permanent: true for generic or feature-specific controllers unless absolutely necessary.',
+        'Always call Get.delete<T>() when the navigation, animation, or page controller is no longer needed, such as during logout or app shutdown. If the instance must remain for the entire app lifetime, document the reason with a code comment or ignore. Avoid using permanent: true for feature-specific controllers unless absolutely necessary.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 

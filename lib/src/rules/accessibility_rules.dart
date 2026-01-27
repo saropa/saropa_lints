@@ -121,9 +121,9 @@ class AvoidSmallTouchTargetsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_small_touch_targets',
     problemMessage:
-        '[avoid_small_touch_targets] Touch target under 44px. Users with motor impairments will struggle to tap accurately (WCAG 2.5.5).',
+        '[avoid_small_touch_targets] Touch target under 44px violates WCAG 2.5.5 (Target Size). Users with motor impairments, tremors, or limited dexterity will struggle to tap accurately, causing frustration and excluding them from core functionality. The minimum recommended touch target size is 48x48 logical pixels to ensure reliable interaction across all ability levels.',
     correctionMessage:
-        'Wrap in SizedBox(width: 48, height: 48) or use Material minimumSize.',
+        'Wrap the interactive element in a SizedBox(width: 48, height: 48) or set MaterialTapTargetSize.padded to ensure the touch area meets the 48px minimum.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -358,9 +358,9 @@ class AvoidColorOnlyIndicatorsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_color_only_indicators',
     problemMessage:
-        '[avoid_color_only_indicators] Color-only status indicator. 8% of men are colorblind and cannot distinguish red/green (WCAG 1.4.1).',
+        '[avoid_color_only_indicators] Color-only status indicator excludes approximately 8% of men and 0.5% of women who have color vision deficiency and cannot distinguish red from green. Relying solely on color to convey meaning violates WCAG 1.4.1 (Use of Color), which requires a secondary visual cue such as an icon, text label, or pattern to communicate status information.',
     correctionMessage:
-        'Add Icon(isError ? Icons.error : Icons.check) alongside the color.',
+        'Add a secondary visual cue alongside the color, such as Icon(isError ? Icons.error : Icons.check), a text label, or a distinct shape to convey status.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -533,9 +533,9 @@ class RequireSemanticsLabelRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_semantics_label',
     problemMessage:
-        '[require_semantics_label] This Semantics widget with a button, link, or other interactive role is missing a label, making it inaccessible to screen readers. Without a label, users cannot understand the purpose of the interactive element, which reduces usability and fails accessibility standards. Labels are essential for describing the action or purpose of interactive elements.',
+        '[require_semantics_label] This Semantics child element with a button, link, or other interactive role is missing a label, making it inaccessible to screen readers. Without a label, users cannot understand the purpose of the interactive element, which reduces usability and fails accessibility standards. Labels are essential for describing the action or purpose of interactive elements in the widget tree.',
     correctionMessage:
-        "Always provide a descriptive label for Semantics widgets with interactive roles (e.g., label: 'Submit form'). Audit your codebase for Semantics usage and add labels where missing. Refer to Flutter accessibility documentation for best practices on labeling interactive elements.",
+        "Always provide a descriptive label for Semantics child elements with interactive roles (e.g., label: 'Submit form'). Audit your build methods for Semantics usage and add labels where missing. Refer to Flutter accessibility documentation for labeling interactive elements.",
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -1067,9 +1067,9 @@ class AvoidTextScaleFactorIgnoreRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_text_scale_factor_ignore',
     problemMessage:
-        '[avoid_text_scale_factor_ignore] Setting textScaleFactor to 1.0 on a text widget overrides user accessibility settings, preventing users from increasing text size for readability. This excludes users with low vision and fails accessibility standards. Respecting user-configured text scaling is essential for inclusive design.',
+        '[avoid_text_scale_factor_ignore] Setting textScaleFactor to 1.0 on a text child element overrides user accessibility settings, preventing users from increasing text size for readability. This excludes users with low vision and fails accessibility standards. Respecting user-configured text scaling in the widget tree is essential for inclusive design.',
     correctionMessage:
-        'Remove hardcoded textScaleFactor values or use clamp() to limit scaling range while still allowing user adjustments. Audit your codebase for textScaleFactor usage and refactor to respect accessibility settings. See Flutter documentation for best practices on text scaling and accessibility.',
+        'Remove hardcoded textScaleFactor values or use clamp() to limit scaling range while still allowing user adjustments. Audit your build methods for textScaleFactor usage and refactor to respect accessibility settings. See Flutter documentation on text scaling and accessibility.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -1275,9 +1275,9 @@ class AvoidHiddenInteractiveRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_hidden_interactive',
     problemMessage:
-        '[avoid_hidden_interactive] This interactive element uses excludeFromSemantics, making it completely inaccessible to screen readers and users with assistive technologies. Excluding interactive widgets from semantics prevents users with disabilities from discovering or activating key actions, which fails accessibility standards and can break critical workflows.',
+        '[avoid_hidden_interactive] This interactive element uses excludeFromSemantics, making it completely inaccessible to screen readers and users with assistive technologies. Excluding interactive child elements from the semantics tree prevents users with disabilities from discovering or activating key actions, which fails accessibility standards and can break critical workflows.',
     correctionMessage:
-        'Remove excludeFromSemantics from interactive elements, or wrap them in a Semantics widget with a descriptive label to ensure accessibility. Audit your codebase for excludeFromSemantics usage and refactor to provide proper semantic information. Refer to Flutter accessibility documentation for guidance on semantics and interactive widgets.',
+        'Remove excludeFromSemantics from interactive elements, or wrap them in a Semantics parent with a descriptive label to ensure accessibility. Audit your build methods for excludeFromSemantics usage and refactor to provide proper semantic information. Refer to Flutter accessibility documentation for guidance.',
     errorSeverity: DiagnosticSeverity.ERROR,
   );
 
@@ -1489,9 +1489,9 @@ class RequireButtonSemanticsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_button_semantics',
     problemMessage:
-        '[require_button_semantics] Custom interactive elements (e.g., GestureDetector, InkWell) are missing Semantics with button: true. Without proper semantics, assistive technologies cannot identify these widgets as buttons, making them inaccessible to screen reader users.',
+        '[require_button_semantics] Custom interactive elements (e.g., GestureDetector, InkWell) are missing Semantics with button: true. Without proper semantics, assistive technologies cannot identify these child elements as buttons, making them inaccessible to screen reader users who rely on the widget tree for navigation.',
     correctionMessage:
-        'Wrap custom tap targets in Semantics(button: true, label: "...") or use built-in widgets like IconButton, TextButton, or ElevatedButton that provide correct accessibility roles and labels.',
+        'Wrap custom tap targets in a Semantics parent (button: true, label: "...") or use built-in child elements like IconButton, TextButton, or ElevatedButton that provide correct accessibility roles and labels.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -1594,9 +1594,9 @@ class PreferExplicitSemanticsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_explicit_semantics',
     problemMessage:
-        '[prefer_explicit_semantics] Custom widgets lack explicit Semantics, making them invisible or meaningless to screen readers and assistive technologies. All non-trivial widgets should provide a semantic label or description for accessibility.',
+        '[prefer_explicit_semantics] Custom build methods lack explicit Semantics, making their child elements invisible or meaningless to screen readers and assistive technologies. All non-trivial elements in the widget tree must provide a semantic label or description for accessibility.',
     correctionMessage:
-        'Add a Semantics widget with a descriptive label to your custom widget, or ensure that all important content is accessible via semantics. Example: Semantics(label: "Rating: 4 out of 5 stars").',
+        'Add a Semantics parent with a descriptive label to your custom build output, or ensure that all important child content is accessible via semantics. Example: Semantics(label: "Rating: 4 out of 5 stars").',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -1694,9 +1694,9 @@ class AvoidHoverOnlyRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_hover_only',
     problemMessage:
-        '[avoid_hover_only] Interactive elements respond only to hover events, excluding mobile and touch users as well as people with motor disabilities. All actionable widgets must support both pointer and touch interactions for universal accessibility.',
+        '[avoid_hover_only] Interactive elements respond only to hover events, excluding mobile and touch users as well as people with motor disabilities. All actionable child elements in the widget tree must support both pointer and touch interactions for universal accessibility.',
     correctionMessage:
-        'Add onTap or onPressed handlers using GestureDetector, InkWell, or use widgets like Tooltip that support both mouse and touch input. Never rely solely on hover for interactivity.',
+        'Add onTap or onPressed handlers using GestureDetector, InkWell, or use built-in components like Tooltip that support both mouse and touch input. Never rely solely on hover for interactivity.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -1911,9 +1911,9 @@ class RequireMinimumContrastRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_minimum_contrast',
     problemMessage:
-        '[require_minimum_contrast] Low contrast text is unreadable for users with low vision. WCAG 2.1 requires 4.5:1 minimum.',
+        '[require_minimum_contrast] Low contrast text excludes users with low vision, cataracts, or age-related sight loss who cannot distinguish foreground from background. WCAG 2.1 Success Criterion 1.4.3 requires a minimum contrast ratio of 4.5:1 for normal text and 3:1 for large text. Failing to meet this threshold makes content unreadable for millions of users worldwide.',
     correctionMessage:
-        'Use darker text on light backgrounds or lighter text on dark backgrounds.',
+        'Increase the contrast ratio by using darker text on light backgrounds or lighter text on dark backgrounds, aiming for at least 4.5:1 for normal text.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -2929,9 +2929,9 @@ class RequireSemanticLabelIconsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_semantic_label_icons',
     problemMessage:
-        '[require_semantic_label_icons] Icon widget is missing a semanticLabel, making it invisible or meaningless to screen readers and assistive technologies. All icons that convey information or actions must have a descriptive semanticLabel for accessibility compliance.',
+        '[require_semantic_label_icons] Icon child element is missing a semanticLabel, making it invisible or meaningless to screen readers and assistive technologies. All icons that convey information or actions in the widget tree must have a descriptive semanticLabel for accessibility compliance.',
     correctionMessage:
-        "Add a semanticLabel property to your Icon widget describing its meaning or purpose (e.g., semanticLabel: 'Add item'). This ensures screen readers can announce the icon to users with visual impairments.",
+        "Add a semanticLabel property to your Icon child element describing its meaning or purpose (e.g., semanticLabel: 'Add item'). This ensures screen readers can announce the icon to users with visual impairments.",
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -3040,7 +3040,7 @@ class RequireAccessibleImagesRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_accessible_images',
     problemMessage:
-        '[require_accessible_images] Image lacks accessibility handling. Screen readers cannot describe it.',
+        '[require_accessible_images] Image element lacks accessibility handling, making it invisible to screen readers and users with visual impairments. Without a semanticLabel describing the image content, assistive technologies skip over it entirely, leaving users unable to understand the visual context. This violates WCAG 1.1.1 (Non-text Content), which requires all meaningful images to have a text alternative.',
     correctionMessage:
         "Add semanticLabel: 'description' or excludeFromSemantics: true for decorative images.",
     errorSeverity: DiagnosticSeverity.WARNING,
