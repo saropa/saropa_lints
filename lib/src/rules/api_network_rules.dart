@@ -433,7 +433,8 @@ class RequireApiErrorMappingRule extends SaropaLintRule {
     name: 'require_api_error_mapping',
     problemMessage:
         '[require_api_error_mapping] Raw API exceptions are exposed to users, leaking implementation details and providing unhelpful error messages. This can confuse users and expose sensitive information such as server paths, stack traces, or internal status codes. Always catch specific exceptions and map them to domain errors with clear, actionable messages to protect against information disclosure and improve error recovery.',
-    correctionMessage: 'Catch specific exceptions (SocketException, TimeoutException, HttpException) and map each to a typed domain error with a user-facing message.',
+    correctionMessage:
+        'Catch specific exceptions (SocketException, TimeoutException, HttpException) and map each to a typed domain error with a user-facing message.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
