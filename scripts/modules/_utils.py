@@ -72,13 +72,11 @@ def get_output_level() -> OutputLevel:
 # =============================================================================
 # COLOR AND PRINTING
 # =============================================================================
-# Unified ANSI color codes used by all scripts. This is the superset
-# of colors from audit_rules.py and publish_to_pubdev.py.
+# Unified ANSI color codes used by all scripts.
 #
 # NOTE: The Saropa ASCII logo (show_saropa_logo) is defined here but
-# must ONLY be called by entry point scripts (publish_to_pubdev.py,
-# audit_rules.py). Module scripts (_audit.py, _tier_integrity.py)
-# must NEVER call it.
+# must ONLY be called by the entry point script (publish_to_pubdev.py).
+# Module scripts must NEVER call it.
 
 
 class Color(Enum):
