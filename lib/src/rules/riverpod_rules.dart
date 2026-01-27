@@ -957,9 +957,9 @@ class RequireRiverpodErrorHandlingRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_riverpod_error_handling',
     problemMessage:
-        '[require_riverpod_error_handling] AsyncValue accessed without error handling. Handle loading/error states.',
+        '[require_riverpod_error_handling] AsyncValue from a Riverpod provider accessed without handling error and loading states. When the async operation fails or is in progress, accessing .value directly throws a StateError or returns null, causing crashes or displaying stale data. Users see broken UI instead of loading indicators or error messages.',
     correctionMessage:
-        'Use .when() or .maybeWhen() to handle all AsyncValue states.',
+        'Use .when(data: _, loading: _, error: _) or .maybeWhen() to handle all AsyncValue states explicitly, providing loading indicators and error messages.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -1240,9 +1240,9 @@ class PreferRiverpodAutoDisposeRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_riverpod_auto_dispose',
     problemMessage:
-        '[prefer_riverpod_auto_dispose] Provider without autoDispose may leak memory when no longer used.',
+        '[prefer_riverpod_auto_dispose] Provider declared without the autoDispose modifier retains its state and resources indefinitely even after all listening widgets are destroyed. This causes memory leaks, stale data accumulation, and unnecessary background computation that grows over the app lifetime, degrading performance progressively.',
     correctionMessage:
-        'Use .autoDispose modifier: StateProvider.autoDispose<T>((ref) => ...).',
+        'Add the .autoDispose modifier to the provider declaration (e.g., StateProvider.autoDispose<T>) so resources are released when no widget is actively listening.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
