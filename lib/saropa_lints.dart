@@ -11,7 +11,7 @@
 /// ```
 ///
 /// This generates `analysis_options.yaml` with explicit rule lists.
-/// See [BROKEN_TIERS.md] for why YAML-based tier config is not supported.
+/// See `BROKEN_TIERS.md` for why YAML-based tier config is not supported.
 ///
 /// Available tiers: `essential` (1), `recommended` (2),
 /// `professional` (3), `comprehensive` (4), `insanity` (5).
