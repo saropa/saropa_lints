@@ -4,7 +4,7 @@
 /// Unified CLI for saropa_lints tools.
 ///
 /// Usage:
-///   dart run saropa_lints <command> [options]
+///   dart run saropa_lints `<command>` [options]
 ///
 /// Commands:
 ///   init            Generate analysis_options.yaml with explicit rule config

@@ -1,0 +1,208 @@
+"""
+Pub.dev lint issue detection and auto-fix.
+
+Checks for issues that pub.dev's stricter analysis (`lints_core`) will
+flag, such as dangling library doc comments and unescaped angle brackets
+in documentation comments.
+
+Usage from publish script:
+    issues = check_pubdev_lint_issues(project_dir)
+    fixed  = fix_doc_angle_brackets(project_dir)
+
+Version:   1.0
+Author:    Saropa
+Copyright: (c) 2025-2026 Saropa
+"""
+
+from __future__ import annotations
+
+import re
+from collections.abc import Iterator
+from pathlib import Path
+
+from scripts.modules._utils import print_info
+
+# Directories that pub.dev analyses (matches .pubignore exclusions)
+_SCAN_SUBDIRS = ("lib", "bin")
+
+# Matches angle bracket expressions in doc comments:
+#   word<content>  e.g. Future<void>, State<T>
+#   <content>      e.g. <command>, <tier>
+# Excludes content containing backticks (already escaped).
+_ANGLE_RE = re.compile(r"(?:\b[\w.]+)?<[^>`]+>")
+
+
+def check_pubdev_lint_issues(project_dir: Path) -> list[str]:
+    """Check for issues that pub.dev's stricter lints will catch.
+
+    Scans ``lib/`` and ``bin/`` for:
+    - Dangling library doc comments (``///`` not followed by ``library;``)
+    - Unescaped angle brackets in doc comments (interpreted as HTML)
+
+    Returns:
+        List of human-readable issue descriptions with file:line locations.
+    """
+    issues: list[str] = []
+
+    for subdir in _SCAN_SUBDIRS:
+        scan_dir = project_dir / subdir
+        if not scan_dir.exists():
+            continue
+        for dart_file in scan_dir.rglob("*.dart"):
+            content = dart_file.read_text(encoding="utf-8")
+            lines = content.split("\n")
+            rel_path = dart_file.relative_to(project_dir)
+
+            _check_dangling_library_doc(lines, rel_path, issues)
+            _check_angle_brackets(lines, rel_path, issues)
+
+    return issues
+
+
+def fix_doc_angle_brackets(project_dir: Path) -> int:
+    """Auto-fix angle brackets in doc comments by wrapping in backticks.
+
+    Scans ``lib/`` and ``bin/`` for doc comments containing unescaped
+    angle brackets (outside code fences and inline backticks) and wraps
+    them in backticks so pub.dev analysis won't flag them as HTML.
+
+    Returns:
+        Number of lines fixed.
+    """
+    total_fixed = 0
+
+    for subdir in _SCAN_SUBDIRS:
+        scan_dir = project_dir / subdir
+        if not scan_dir.exists():
+            continue
+        for dart_file in scan_dir.rglob("*.dart"):
+            fixed = _fix_file_angle_brackets(dart_file, project_dir)
+            total_fixed += fixed
+
+    return total_fixed
+
+
+# ── internal helpers ─────────────────────────────────────────────────
+
+
+def _unescaped_angle_matches(doc_content: str) -> list[re.Match[str]]:
+    """Return angle bracket matches not inside backtick-delimited text."""
+    return [
+        m
+        for m in _ANGLE_RE.finditer(doc_content)
+        if doc_content[: m.start()].count("`") % 2 == 0
+    ]
+
+
+def _iter_doc_lines(
+    lines: list[str],
+) -> Iterator[tuple[int, str]]:
+    """Yield ``(index, doc_content)`` for doc lines outside code fences.
+
+    ``doc_content`` is the text after ``///`` with leading/trailing
+    whitespace preserved so regex match positions stay valid for
+    in-place replacement.
+    """
+    in_code_block = False
+    for i, line in enumerate(lines):
+        stripped = line.strip()
+        if stripped.startswith("///") and "```" in stripped:
+            in_code_block = not in_code_block
+            continue
+        if in_code_block:
+            continue
+        if not stripped.startswith("///"):
+            in_code_block = False
+            continue
+        # Keep content after /// unstripped so match offsets are valid
+        doc_content = stripped[3:]
+        if doc_content.lstrip().startswith("```"):
+            continue
+        yield i, doc_content
+
+
+def _check_dangling_library_doc(
+    lines: list[str],
+    rel_path: Path,
+    issues: list[str],
+) -> None:
+    """Detect ``///`` doc comments not attached to a ``library`` directive."""
+    in_header = True
+    found_doc_comment = False
+    doc_comment_line = 0
+
+    for i, line in enumerate(lines, 1):
+        stripped = line.strip()
+        if not stripped or stripped.startswith("#!"):
+            continue
+        if stripped.startswith("// ignore"):
+            continue
+        if stripped.startswith("///") and in_header:
+            if not found_doc_comment:
+                found_doc_comment = True
+                doc_comment_line = i
+            continue
+        if (
+            stripped == "library;" or stripped.startswith("library ")
+        ) and found_doc_comment:
+            found_doc_comment = False
+            break
+        if not stripped.startswith("///"):
+            in_header = False
+            if found_doc_comment:
+                issues.append(
+                    f"{rel_path}:{doc_comment_line}: "
+                    "Dangling library doc comment."
+                )
+            break
+
+
+def _check_angle_brackets(
+    lines: list[str],
+    rel_path: Path,
+    issues: list[str],
+) -> None:
+    """Detect unescaped angle brackets in doc comments."""
+    for idx, doc_content in _iter_doc_lines(lines):
+        for match in _unescaped_angle_matches(doc_content):
+            issues.append(
+                f"{rel_path}:{idx + 1}: Angle brackets in "
+                f"'{match.group()}' interpreted as HTML. "
+                f"Wrap in backticks: `{match.group()}`"
+            )
+
+
+def _fix_file_angle_brackets(
+    dart_file: Path, project_dir: Path
+) -> int:
+    """Fix angle brackets in a single file. Returns count of fixes."""
+    content = dart_file.read_text(encoding="utf-8")
+    lines = content.split("\n")
+    rel_path = dart_file.relative_to(project_dir)
+    changed = False
+    total_fixes = 0
+
+    for idx, doc_content in _iter_doc_lines(lines):
+        fixes = _unescaped_angle_matches(doc_content)
+        if not fixes:
+            continue
+
+        # Wrap each match in backticks, right-to-left
+        prefix_end = lines[idx].index("///") + 3
+        new_doc = doc_content
+        for match in reversed(fixes):
+            s, e = match.start(), match.end()
+            new_doc = new_doc[:s] + "`" + match.group() + "`" + new_doc[e:]
+
+        lines[idx] = lines[idx][:prefix_end] + new_doc
+        changed = True
+        total_fixes += len(fixes)
+        print_info(
+            f"Fixed {rel_path}:{idx + 1}: "
+            f"wrapped {len(fixes)} angle bracket(s)"
+        )
+
+    if changed:
+        dart_file.write_text("\n".join(lines), encoding="utf-8")
+
+    return total_fixes
