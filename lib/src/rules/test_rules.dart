@@ -2974,7 +2974,7 @@ class RequireMockHttpClientRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_mock_http_client',
     problemMessage:
-        '[require_mock_http_client] Real HTTP call in test causes flaky tests and slow CI from network dependencies.',
+        '[require_mock_http_client] Real HTTP calls in tests create network dependencies that cause flaky failures and slow CI pipelines. Tests become non-deterministic, failing on timeout when servers are slow and passing inconsistently across environments, making test results unreliable for merge decisions.',
     correctionMessage:
         'Use MockClient or mock the HTTP layer for deterministic tests.',
     errorSeverity: DiagnosticSeverity.WARNING,
