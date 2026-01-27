@@ -18,7 +18,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
-- **Improved DX messages for 8 rules**: Expanded `problemMessage` and `correctionMessage` text across `notification_rules`, `performance_rules`, `qr_scanner_rules`, `resource_management_rules`, `security_rules`, and `state_management_rules` to explain user-facing consequences and provide more specific fix guidance.
+- **Improved DX messages for 58 high-impact rules**: Expanded `problemMessage` and `correctionMessage` text across `navigation_rules`, `notification_rules`, `package_specific_rules`, `performance_rules`, `platform_rules`, `qr_scanner_rules`, `resource_management_rules`, `riverpod_rules`, `scroll_rules`, `security_rules`, and `state_management_rules` to explain user-facing consequences and provide more specific fix guidance. Each problem message now meets the 180-character minimum with clear issue/consequence/impact structure; each correction message meets the 80-character minimum with actionable fix guidance.
+- **DX audit: relaxed vague language check for low-impact rules**: The `_audit_dx.py` scoring module no longer penalises advisory phrasing ("consider", "prefer", etc.) in low-impact rules, since suggestive language is appropriate for rules that are informational by nature.
 
 ### Fixed
 
