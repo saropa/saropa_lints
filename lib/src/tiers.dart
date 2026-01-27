@@ -178,6 +178,11 @@ const Set<String> stylisticRules = <String>{
   'prefer_then_over_await',
   'prefer_var_over_explicit_type',
   'prefer_wheretype_over_where_is',
+
+  // === Control flow & collection style (opinionated - opt-in only) ===
+  'prefer_early_return',
+  'prefer_mutable_collections',
+  'prefer_record_over_equatable',
 };
 
 /// Essential tier rules - Critical rules that prevent crashes, data loss, and security holes.
@@ -1974,7 +1979,6 @@ const Set<String> professionalOnlyRules = <String>{
   'double_literal_format',
   'enforce_parameters_ordering',
   'enum_constants_ordering',
-  'format_comment_style',
   'function_always_returns_same_value',
   'limit_max_imports',
   'map_keys_ordering',
@@ -2326,6 +2330,7 @@ const Set<String> insanityOnlyRules = <String>{
   'prefer_specific_numeric_types', // int vs num pedantry
 
   // Documentation pedantry
+  'format_comment_style', // comment formatting conventions
   'prefer_providing_intl_description', // i18n descriptions
   'prefer_providing_intl_examples', // i18n examples
 
