@@ -327,6 +327,15 @@ def run_full_audit(
     print_section("ROADMAP SYNC")
     roadmap_duplicates = implemented & roadmap
 
+    # Exclude _test variant rules whose base rule is also implemented
+    # (e.g. require_https_only_test is an intentional test-file variant of
+    # require_https_only, documented in ROADMAP for discoverability).
+    roadmap_duplicates = {
+        r
+        for r in roadmap_duplicates
+        if not (r.endswith("_test") and r[: -len("_test")] in implemented)
+    }
+
     if roadmap_duplicates:
         print_subheader(f"Duplicates Found ({len(roadmap_duplicates)})")
         print_warning(
