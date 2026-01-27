@@ -1449,9 +1449,6 @@ class PreferFakeOverMockRule extends SaropaLintRule {
   @override
   Set<FileType>? get applicableFileTypes => {FileType.test};
 
-  @override
-  bool get skipTestFiles => false; // Run specifically in test files
-
   static const LintCode _code = LintCode(
     name: 'prefer_fake_over_mock',
     problemMessage:
@@ -1550,9 +1547,6 @@ class RequireEdgeCaseTestsRule extends SaropaLintRule {
 
   @override
   Set<FileType>? get applicableFileTypes => {FileType.test};
-
-  @override
-  bool get skipTestFiles => false;
 
   static const LintCode _code = LintCode(
     name: 'require_edge_case_tests',
@@ -1667,9 +1661,6 @@ class PreferTestDataBuilderRule extends SaropaLintRule {
   @override
   Set<FileType>? get applicableFileTypes => {FileType.test};
 
-  @override
-  bool get skipTestFiles => false;
-
   static const LintCode _code = LintCode(
     name: 'prefer_test_data_builder',
     problemMessage:
@@ -1778,9 +1769,6 @@ class AvoidTestImplementationDetailsRule extends SaropaLintRule {
   @override
   Set<FileType>? get applicableFileTypes => {FileType.test};
 
-  @override
-  bool get skipTestFiles => false;
-
   static const LintCode _code = LintCode(
     name: 'avoid_test_implementation_details',
     problemMessage:
@@ -1883,9 +1871,6 @@ class RequireGetItResetInTestsRule extends SaropaLintRule {
 
   @override
   Set<FileType>? get applicableFileTypes => {FileType.test};
-
-  @override
-  bool get skipTestFiles => false; // This rule specifically targets test files
 
   // cspell:ignore getit
   static const LintCode _code = LintCode(

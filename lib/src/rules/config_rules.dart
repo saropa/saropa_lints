@@ -40,9 +40,6 @@ class AvoidHardcodedConfigRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.medium;
 
-  @override
-  bool get skipTestFiles => true;
-
   static const LintCode _code = LintCode(
     name: 'avoid_hardcoded_config',
     problemMessage:

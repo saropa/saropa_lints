@@ -5641,9 +5641,6 @@ class RequireHttpsOnlyRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   @override
-  bool get skipTestFiles => true;
-
-  @override
   OwaspMapping get owasp => const OwaspMapping(
         mobile: <OwaspMobile>{OwaspMobile.m5},
         web: <OwaspWeb>{OwaspWeb.a05},
