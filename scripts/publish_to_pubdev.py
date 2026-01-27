@@ -504,14 +504,36 @@ def run_analysis(project_dir: Path) -> bool:
     print_info("Checking for pub.dev lint issues...")
     pubdev_issues = check_pubdev_lint_issues(project_dir)
     if pubdev_issues:
-        print_error("Found pub.dev lint issues:")
+        print_warning(f"Found {len(pubdev_issues)} pub.dev lint issue(s):")
         for issue in pubdev_issues:
             print_colored(f"      {issue}", Color.YELLOW)
-        print_info(
-            "Run with --fix-docs to auto-fix doc comment issues."
-        )
-        return False
-    print_success("No pub.dev lint issues found")
+
+        # Auto-fix doc comment issues
+        print_info("Auto-fixing doc comment issues...")
+        fixed_brackets = fix_doc_angle_brackets(project_dir)
+        fixed_refs = fix_doc_references(project_dir)
+        total_fixed = fixed_brackets + fixed_refs
+
+        if total_fixed:
+            print_success(
+                f"Auto-fixed {total_fixed} issue(s) "
+                f"({fixed_brackets} angle bracket(s), "
+                f"{fixed_refs} doc reference(s))."
+            )
+
+        # Re-check for remaining issues
+        remaining = check_pubdev_lint_issues(project_dir)
+        if remaining:
+            print_error(
+                f"{len(remaining)} unfixable pub.dev lint issue(s) remain:"
+            )
+            for issue in remaining:
+                print_colored(f"      {issue}", Color.YELLOW)
+            return False
+
+        print_success("All pub.dev lint issues resolved")
+    else:
+        print_success("No pub.dev lint issues found")
 
     result = run_command(
         ["flutter", "analyze"], project_dir, "Analyzing code"
