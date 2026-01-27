@@ -55,9 +55,9 @@ class RequireGoogleSigninErrorHandlingRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_google_signin_error_handling',
     problemMessage:
-        '[require_google_signin_error_handling] Google Sign-In without error handling crashes when user cancels or network fails. Users will see an unexpected crash instead of a friendly error message.',
+        '[require_google_signin_error_handling] Google Sign-In call without error handling crashes when the user cancels the sign-in flow, the network is unavailable, or Google Play Services are outdated. Users see an unhandled exception crash screen instead of a friendly error message, causing frustration and potential data loss in unsaved work.',
     correctionMessage:
-        'Wrap the signIn() call in try-catch to handle failures gracefully.',
+        'Wrap the signIn() call in a try-catch block that handles PlatformException and network errors, and display a user-friendly error message with a retry option.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -311,9 +311,9 @@ class RequireSupabaseErrorHandlingRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_supabase_error_handling',
     problemMessage:
-        '[require_supabase_error_handling] Supabase calls without error handling crash on network failures or auth errors. Users will see unexpected crashes instead of friendly error messages.',
+        '[require_supabase_error_handling] Supabase operation called without error handling crashes when the network is unavailable, authentication tokens expire, or the database rejects the query. Users see an unhandled exception crash screen instead of a friendly error message, causing data loss and a broken user experience.',
     correctionMessage:
-        'Wrap Supabase operations in try-catch to handle failures gracefully.',
+        'Wrap Supabase operations in a try-catch block that handles PostgrestException and network errors, and display user-friendly messages with retry options.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -790,9 +790,9 @@ class AvoidWebviewFileAccessRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_webview_file_access',
     problemMessage:
-        '[avoid_webview_file_access] WebView file access enabled creates a security vulnerability. Malicious web content can read local files, exposing user data, credentials, and app internals to attackers.',
+        '[avoid_webview_file_access] WebView file access enabled (allowFileAccess: true) creates a critical security vulnerability. Malicious web content loaded in the WebView can read local files including user data, cached credentials, and app configuration, then exfiltrate them to attacker-controlled servers without user consent or visible indication.',
     correctionMessage:
-        'Remove allowFileAccess: true or set it to false explicitly.',
+        'Remove allowFileAccess: true or explicitly set it to false. If file access is required, restrict it to specific directories and validate all file paths.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -930,9 +930,9 @@ class RequireWorkmanagerConstraintsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_workmanager_constraints',
     problemMessage:
-        '[require_workmanager_constraints] WorkManager task without constraints runs unconditionally, draining battery and using metered data.',
+        '[require_workmanager_constraints] WorkManager task registered without constraints runs unconditionally regardless of network availability, battery level, or charging state. This drains battery during low-power conditions, consumes metered mobile data, and causes failed network requests when connectivity is unavailable, wasting system resources.',
     correctionMessage:
-        'Add Constraints(networkType: NetworkType.connected) to control when tasks run.',
+        'Add Constraints(networkType: NetworkType.connected) and optionally requiresBatteryNotLow or requiresCharging to control when background tasks execute.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -1668,8 +1668,9 @@ class RequireEnviedObfuscationRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_envied_obfuscation',
     problemMessage:
-        '[require_envied_obfuscation] Envied should use obfuscation for security.',
-    correctionMessage: 'Add obfuscate: true to @Envied or @EnviedField.',
+        '[require_envied_obfuscation] Envied environment variable generated without obfuscation stores secrets as plaintext string constants in the compiled binary. Attackers can extract API keys, database URLs, and authentication tokens using basic reverse engineering tools, enabling unauthorized access to your backend services and third-party APIs.',
+    correctionMessage:
+        'Add obfuscate: true to the @Envied annotation or individual @EnviedField annotations to encode secrets at compile time and prevent plaintext extraction.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -1837,9 +1838,9 @@ class RequireOpenaiErrorHandlingRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_openai_error_handling',
     problemMessage:
-        '[require_openai_error_handling] OpenAI API calls without error handling crash when rate limited or when the service is unavailable. Users see unhandled exceptions instead of graceful fallback behavior.',
+        '[require_openai_error_handling] OpenAI API call without error handling crashes when the service returns rate limit errors (429), the API is temporarily unavailable (503), or the request exceeds token limits. Users see an unhandled exception crash screen instead of graceful fallback behavior, causing lost context and a broken experience.',
     correctionMessage:
-        'Wrap OpenAI calls in try-catch to handle rate limits and failures.',
+        'Wrap OpenAI API calls in a try-catch block that handles rate limits with exponential backoff and service errors with user-friendly fallback messages.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -2250,9 +2251,9 @@ class PreferImagePickerMaxDimensionsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_image_picker_max_dimensions',
     problemMessage:
-        '[prefer_image_picker_max_dimensions] pickImage() without maxWidth/maxHeight loads full-resolution images (12+ MP), causing OutOfMemoryError.',
+        '[prefer_image_picker_max_dimensions] pickImage() called without maxWidth or maxHeight parameters loads full-resolution camera images (12+ megapixels on modern devices). Decoding these large images into memory causes OutOfMemoryError crashes on lower-end devices, excessive memory consumption that triggers OS app kills, and slow image processing.',
     correctionMessage:
-        'Add maxWidth: 1920, maxHeight: 1080 or appropriate limits for your use case.',
+        'Add maxWidth and maxHeight parameters (e.g., maxWidth: 1920, maxHeight: 1080) to limit image resolution and prevent out-of-memory crashes on constrained devices.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -2456,9 +2457,9 @@ class PreferGeolocatorDistanceFilterRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_geolocator_distance_filter',
     problemMessage:
-        '[prefer_geolocator_distance_filter] Location stream without distanceFilter causes excessive updates and battery drain.',
+        '[prefer_geolocator_distance_filter] Location stream subscription without a distanceFilter fires continuous GPS updates at the maximum sensor rate regardless of actual movement. This causes excessive battery drain, unnecessary network requests to location services, and high CPU usage from processing redundant position updates that provide no new information.',
     correctionMessage:
-        'Add distanceFilter to LocationSettings to reduce unnecessary updates.',
+        'Add distanceFilter to LocationSettings (e.g., distanceFilter: 10) to receive updates only when the user moves a meaningful distance, reducing battery and CPU usage.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
