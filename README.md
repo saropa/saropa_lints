@@ -3,7 +3,7 @@
 # Saropa Lints
 
 [![ci](https://github.com/saropa/saropa_lints/actions/workflows/ci.yml/badge.svg)](https://github.com/saropa/saropa_lints/actions/workflows/ci.yml)
-[![pub package](https://img.shields.io/badge/pub-4.8.1-blue)](https://pub.dev/packages/saropa_lints)
+[![pub package](https://img.shields.io/badge/pub-4.8.6-blue)](https://pub.dev/packages/saropa_lints)
 [![pub points](https://img.shields.io/pub/points/saropa_lints)](https://pub.dev/packages/saropa_lints/score)
 [![rules](https://img.shields.io/badge/rules-1677%2B-4B0082)](https://github.com/saropa/saropa_lints/blob/main/doc/rules/README.md)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)

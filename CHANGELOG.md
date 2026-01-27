@@ -9,6 +9,30 @@ Dates are not included in version headers — [pub.dev](https://pub.dev/packages
 > See [CHANGELOG_ARCHIVE.md](./CHANGELOG_ARCHIVE.md) for versions 0.1.0 through 4.2.0.
 
 ---
+## [4.8.6]
+
+### Added
+
+- **`TestRelevance` enum**: New three-value enum (`never`, `always`, `testOnly`) for granular control over whether lint rules run on test files. Rules can now declare their test file relationship explicitly instead of using a boolean flag.
+
+### Changed
+
+- **Rules now skip test files by default**: The default `testRelevance` is `TestRelevance.never`, meaning ~1600 production-focused rules no longer fire on test files. This eliminates thousands of irrelevant violations (e.g., `prefer_matcher_over_equals`, `move_variable_closer_to_its_usage`, `no_empty_string`) that were flooding test code. Rules that should run on tests can override `testRelevance => TestRelevance.always`.
+- **Backwards-compatible auto-detection**: Rules using `applicableFileTypes => {FileType.test}` are automatically treated as `TestRelevance.testOnly` with no code changes required.
+- **DX message quality improvements for 25 rules**: Expanded `problemMessage` text for rules that were below the 180-character minimum or lacked a clear consequence. Each message now explains both the problem and its real-world impact (e.g., memory leaks, crashes, stale UI). Affected rules: `prefer_consumer_widget`, `avoid_bloc_in_bloc`, `avoid_change_notifier_in_widget`, `require_provider_dispose`, `require_error_handling_in_async`, `require_getx_controller_dispose`, `dispose_provider_instances`, `avoid_getx_rx_inside_build`, `avoid_mutable_rx_variables`, `dispose_provided_instances`, `avoid_listen_in_async`, `avoid_equatable_mutable_collections`, `avoid_static_state`, `avoid_provider_in_init_state`, `require_bloc_manual_dispose`, `prefer_bloc_listener_for_side_effects`, `avoid_bloc_context_dependency`, `avoid_provider_value_rebuild`, `avoid_riverpod_notifier_in_build`, `avoid_bloc_business_logic_in_ui`, `require_mock_http_client`, `avoid_dynamic_json_access`, `require_enum_unknown_value`, `require_image_semantics`, `require_badge_semantics`.
+
+### Fixed
+
+- **`avoid_isar_clear_in_production` false positive on non-Isar types**: The rule previously flagged every `.clear()` call regardless of receiver type, producing ERROR-severity false positives on `Map.clear()`, `List.clear()`, `Set.clear()`, `TextEditingController.clear()`, and any other class with a `clear()` method. Now uses static type checking to verify the receiver is an `Isar` instance before reporting.
+- **`require_error_case_tests` false positives**: Expanded test name keyword detection to recognize boundary/defensive test patterns (`null`, `empty`, `boundary`, `edge`, `negative`, `fallback`, `missing`) in addition to error keywords. Updated correction message to acknowledge that test files for pure enums, defensive try/catch code, and non-nullable extension methods legitimately have no error-throwing paths.
+- **`prefer_setup_teardown` false positive on independent locals**: The rule no longer flags repeated primitive variable declarations (`int count = 0`, `const int iterations = 1000`) as duplicated setup code. Simple literal initializations and const declarations are now excluded from the setup signature comparison, so only meaningful setup (object construction, service initialization) triggers the suggestion.
+- **`require_change_notifier_dispose` false positives**: Fixed three categories of false positive: (1) Fields not owned by the class (e.g., controllers received from `Autocomplete` callbacks) are no longer flagged — the rule now uses `_findOwnedFieldsOfType` ownership detection consistent with sibling disposal rules. (2) Generic container types like `Map<K, ScrollController>` no longer match via substring — exact type matching is now used. (3) Extension method disposal wrappers (e.g., `.disposeSafe()`) are now recognized as valid disposal patterns by all disposal rules.
+
+### Deprecated
+
+- **`skipTestFiles` getter**: Replaced by `testRelevance`. The old boolean getter still compiles but is marked `@Deprecated`. Migration: `skipTestFiles => true` is now the default; `skipTestFiles => false` becomes `testRelevance => TestRelevance.always`.
+
+---
 ## [4.8.5]
 
 ### Added
