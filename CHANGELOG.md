@@ -13,11 +13,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - **Test coverage top offenders report**: The publish workflow's test coverage summary now lists the 10 worst categories ranked by untested rule count, color-coded by severity.
+- **File health top offenders**: The "Files needing quick fixes" audit section now lists the top 5 worst files sorted by fix coverage, showing fixes/rules and percentage.
 
 ### Fixed
 
 - **20 unresolved doc reference warnings**: Escaped non-symbol references in DartDoc comments (OWASP codes, rule names, Flutter widget names, file names) that `dart doc` could not resolve, eliminating all documentation generation warnings.
 - **Publish script commit step**: "No changes to commit" message now shows as success (green) instead of warning (yellow), since it is not an error condition.
+- **ROADMAP near-match false positives**: `_test` variant rules are now excluded from near-match detection, matching the existing duplicate exclusion logic.
+
+### Removed
+
+- **`doc/flutter_widget_rules_full_table.md`**: Obsolete split-plan document that was no longer referenced.
 
 ## [4.8.3-pre] - 2026-01-26
 
