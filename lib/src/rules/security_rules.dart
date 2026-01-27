@@ -622,9 +622,9 @@ class AvoidWebViewJavaScriptEnabledRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_webview_javascript_enabled',
     problemMessage:
-        '[avoid_webview_javascript_enabled] WebView with JavaScript enabled may be vulnerable to XSS attacks.',
+        '[avoid_webview_javascript_enabled] WebView with JavaScript enabled expands the attack surface to cross-site scripting (XSS) vulnerabilities. Malicious scripts injected through untrusted content can steal session tokens, access device APIs, redirect users to phishing pages, and exfiltrate sensitive data without the user\'s knowledge.',
     correctionMessage:
-        'Consider disabling JavaScript or ensure only trusted content is loaded.',
+        'Disable JavaScript with javaScriptEnabled: false unless required, and ensure only trusted HTTPS content is loaded when JavaScript must remain enabled.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -1413,9 +1413,9 @@ class RequireCertificatePinningRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_certificate_pinning',
     problemMessage:
-        '[require_certificate_pinning] HttpClient without certificate pinning is vulnerable to man-in-the-middle attacks. Attackers on the same network can intercept and modify traffic.',
+        '[require_certificate_pinning] HttpClient without certificate pinning accepts any valid certificate, making it vulnerable to man-in-the-middle attacks. Attackers on the same network can intercept, read, and modify all HTTPS traffic including authentication tokens, personal data, and financial information without detection.',
     correctionMessage:
-        'Set badCertificateCallback to validate server certificates.',
+        'Set badCertificateCallback to validate the server certificate fingerprint against a known pin, rejecting connections that do not match your expected certificate.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -1848,9 +1848,9 @@ class AvoidGenericKeyInUrlRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_generic_key_in_url',
     problemMessage:
-        '[avoid_generic_key_in_url] Sensitive data in URL query parameters is logged by servers, proxies, and browsers. This exposes credentials in access logs and browser history.',
+        '[avoid_generic_key_in_url] Sensitive data embedded in URL query parameters is logged by web servers, proxy caches, browser history, and analytics tools. This exposes API keys, tokens, and credentials in access logs and referrer headers, where they persist indefinitely and can be harvested by attackers with log access.',
     correctionMessage:
-        'Consider using Authorization header instead of URL parameters.',
+        'Move sensitive parameters to the Authorization header or request body where they are not logged by intermediate network infrastructure.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -1920,9 +1920,9 @@ class PreferSecureRandomRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_secure_random',
     problemMessage:
-        '[prefer_secure_random] Random() is predictable. Use Random.secure() for security-sensitive code.',
+        '[prefer_secure_random] Random() uses a predictable pseudo-random number generator that produces reproducible sequences from a known seed. Tokens, passwords, encryption keys, or nonces generated with Random() can be predicted by attackers, enabling session hijacking, credential guessing, and cryptographic attacks.',
     correctionMessage:
-        'Replace Random() with Random.secure() for tokens, passwords, or crypto.',
+        'Replace Random() with Random.secure() for security-sensitive operations such as token generation, password creation, nonce generation, and cryptographic key derivation.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -2418,9 +2418,9 @@ class AvoidJwtDecodeClientRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_jwt_decode_client',
     problemMessage:
-        '[avoid_jwt_decode_client] Decoding JWT on client for authorization is insecure. Attackers can manipulate decoded claims to bypass permissions and access restricted features.',
+        '[avoid_jwt_decode_client] Decoding JWT tokens on the client for authorization decisions is insecure because the client cannot verify token signatures. Attackers can craft or modify JWT claims to bypass permission checks, escalate privileges, and access restricted features or data without valid server-issued credentials.',
     correctionMessage:
-        'Verify JWT claims on the server. Client-decoded JWTs can be manipulated.',
+        'Verify JWT claims and signature on the server side only. Use client-decoded JWT data for display purposes only, never for authorization or access control decisions.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -2520,9 +2520,9 @@ class RequireLogoutCleanupRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_logout_cleanup',
     problemMessage:
-        '[require_logout_cleanup] Incomplete logout cleanup leaves sensitive data accessible. The next user on a shared device could access previous user data and session tokens.',
+        '[require_logout_cleanup] Incomplete logout cleanup leaves session tokens, cached user data, and authentication state accessible in local storage. On shared or stolen devices, the next user can access the previous account, personal data, and session tokens without re-authenticating, enabling unauthorized account access.',
     correctionMessage:
-        'Ensure logout clears tokens, cached user data, and resets auth state.',
+        'Ensure logout clears all tokens from secure storage, removes cached user data, resets navigation state, and invalidates the server session to prevent unauthorized access.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -2974,9 +2974,9 @@ class RequireDeepLinkValidationRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_deep_link_validation',
     problemMessage:
-        '[require_deep_link_validation] Deep link parameter used without validation. Malicious links can inject arbitrary data, leading to crashes, unauthorized access, or code execution.',
+        '[require_deep_link_validation] Deep link parameter used without validation allows attackers to craft malicious URLs that inject arbitrary data into your app. Unvalidated deep link parameters can cause crashes from unexpected types, unauthorized access to restricted screens, or execution of unintended actions on behalf of the user.',
     correctionMessage:
-        'Add null check and format validation for deep link parameters.',
+        'Add null checks, type validation, and format verification for all deep link parameters before using them for navigation or data operations.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -4107,9 +4107,9 @@ class RequireSharedPrefsNullHandlingRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_shared_prefs_null_handling',
     problemMessage:
-        '[require_shared_prefs_null_handling] SharedPreferences getter with null assertion crashes if key is missing. This is a common source of production crashes on first launch or after app updates.',
+        '[require_shared_prefs_null_handling] SharedPreferences getter with null assertion (!) crashes with a NoSuchMethodError if the key does not exist. This is a common source of production crashes on first launch, after app updates that add new preference keys, or when storage is cleared by the OS under memory pressure.',
     correctionMessage:
-        'Use null-aware operator (??) with a default value, or handle nullable type.',
+        'Use the null-aware operator (??) with a sensible default value, or handle the nullable return type explicitly to prevent null assertion crashes in production.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -4377,9 +4377,9 @@ class AvoidRedirectInjectionRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_redirect_injection',
     problemMessage:
-        '[avoid_redirect_injection] Redirect URL from parameter without domain validation. Open redirect risk.',
+        '[avoid_redirect_injection] Redirect URL read from a parameter or user input without domain validation creates an open redirect vulnerability. Attackers craft URLs pointing to your app that redirect victims to phishing sites, credential harvesters, or malware downloads while appearing to originate from your trusted domain.',
     correctionMessage:
-        'Validate redirect URL host against trusted domains allowlist.',
+        'Validate the redirect URL host against an allowlist of trusted domains before performing the redirect, and reject URLs with unexpected schemes or external hosts.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
