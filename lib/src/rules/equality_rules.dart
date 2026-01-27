@@ -126,7 +126,8 @@ class AvoidNegationsInEqualityChecksRule extends SaropaLintRule {
     name: 'avoid_negations_in_equality_checks',
     problemMessage:
         '[avoid_negations_in_equality_checks] Equality check is wrapped in a negation operator !(a == b) instead of using the direct != operator. The negated form adds unnecessary cognitive overhead, increases nesting depth, and is harder to scan during code review. The != operator expresses the same intent more clearly and concisely.',
-    correctionMessage: 'Replace !(a == b) with a != b for direct and readable inequality checking.',
+    correctionMessage:
+        'Replace !(a == b) with a != b for direct and readable inequality checking.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -302,7 +303,8 @@ class AvoidSelfCompareRule extends SaropaLintRule {
     name: 'avoid_self_compare',
     problemMessage:
         '[avoid_self_compare] Variable is compared to itself (x == x, x > x, etc.), which always produces a constant result (true for ==, false for inequality operators) unless the value is NaN. This is almost always a copy-paste bug where the developer intended to compare two distinct values, and the redundant comparison hides the real logic error in the code.',
-    correctionMessage: 'Use .isNaN for NaN detection, or replace one operand with the intended comparison target.',
+    correctionMessage:
+        'Use .isNaN for NaN detection, or replace one operand with the intended comparison target.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -380,7 +382,8 @@ class AvoidUnnecessaryCompareToRule extends SaropaLintRule {
     name: 'avoid_unnecessary_compare_to',
     problemMessage:
         '[avoid_unnecessary_compare_to] Using compareTo() == 0 for equality checking is unnecessarily verbose when the == operator expresses the same comparison directly. The compareTo method is designed for ordering (less than, greater than), and using it for equality adds cognitive overhead, increases code length, and obscures the developer\'s intent of a simple equality check.',
-    correctionMessage: 'Replace compareTo(x) == 0 with == x, and compareTo(x) != 0 with != x for clarity.',
+    correctionMessage:
+        'Replace compareTo(x) == 0 with == x, and compareTo(x) != 0 with != x for clarity.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -501,7 +504,8 @@ class NoEqualArgumentsRule extends SaropaLintRule {
     name: 'no_equal_arguments',
     problemMessage:
         '[no_equal_arguments] The same identifier is passed as multiple positional arguments to a function call, which typically indicates a copy-paste error where distinct values were intended (e.g., setPosition(x, x) instead of setPosition(x, y)). This silent bug produces incorrect behavior that passes compilation but yields wrong results at runtime.',
-    correctionMessage: 'Verify whether duplicate arguments are intentional, and replace with the intended distinct values.',
+    correctionMessage:
+        'Verify whether duplicate arguments are intentional, and replace with the intended distinct values.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
