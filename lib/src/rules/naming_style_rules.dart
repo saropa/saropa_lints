@@ -31,7 +31,8 @@ class AvoidGetterPrefixRule extends SaropaLintRule {
     name: 'prefer_no_getter_prefix',
     problemMessage:
         "[prefer_no_getter_prefix] Getter with 'get' prefix is redundant. Dart convention omits it.",
-    correctionMessage: "Rename: getName → name, getValue → value.",
+    correctionMessage:
+        "Remove the 'get' prefix from the getter name. For example, rename getName to name, or getValue to value.",
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -88,7 +89,8 @@ class AvoidNonAsciiSymbolsRule extends SaropaLintRule {
     name: 'avoid_non_ascii_symbols',
     problemMessage:
         '[avoid_non_ascii_symbols] String contains non-ASCII characters.',
-    correctionMessage: 'Use only ASCII characters or escape sequences.',
+    correctionMessage:
+        'Replace non-ASCII characters with ASCII equivalents or Unicode escape sequences (e.g., \\u00E9 for e-acute).',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -163,7 +165,8 @@ class FormatCommentRule extends SaropaLintRule {
     name: 'prefer_capitalized_comment_start',
     problemMessage:
         '[prefer_capitalized_comment_start] Comment should start with capital letter.',
-    correctionMessage: 'Capitalize the first letter of the comment.',
+    correctionMessage:
+        'Capitalize the first letter of the comment text. Prose comments that start with lowercase letters reduce readability.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -315,7 +318,8 @@ class MatchClassNamePatternRule extends SaropaLintRule {
     name: 'match_class_name_pattern',
     problemMessage:
         '[match_class_name_pattern] Class name does not follow expected pattern.',
-    correctionMessage: 'Ensure class name follows naming conventions.',
+    correctionMessage:
+        'Rename the class to follow Dart naming conventions. Use UpperCamelCase and include a suffix matching its purpose (e.g., Widget, State, Screen).',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -407,7 +411,8 @@ class MatchGetterSetterFieldNamesRule extends SaropaLintRule {
     name: 'match_getter_setter_field_names',
     problemMessage:
         '[match_getter_setter_field_names] Getter/setter name should match the backing field.',
-    correctionMessage: 'Rename to match the field name (without underscore).',
+    correctionMessage:
+        'Rename the getter or setter to match the backing field name without the leading underscore. For example, _count should have getter count, not total.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -489,7 +494,8 @@ class MatchLibFolderStructureRule extends SaropaLintRule {
     name: 'match_lib_folder_structure',
     problemMessage:
         '[match_lib_folder_structure] Test file location should mirror lib folder structure.',
-    correctionMessage: 'Move test file to match the lib directory structure.',
+    correctionMessage:
+        'Move the test file so its path mirrors the lib folder structure. For example, lib/src/utils/helper.dart should have test/src/utils/helper_test.dart.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -538,7 +544,7 @@ class MatchPositionalFieldNamesOnAssignmentRule extends SaropaLintRule {
     problemMessage:
         '[match_positional_field_names_on_assignment] Positional field name should match the variable being assigned.',
     correctionMessage:
-        'Rename the positional field to match the assignment target.',
+        'Rename the positional field to match the variable it is assigned to. Mismatched names cause confusion when reading destructured assignments.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -624,7 +630,7 @@ class PreferBooleanPrefixesRule extends SaropaLintRule {
     problemMessage:
         '[prefer_boolean_prefixes] Boolean variable should have a prefix (is/has/can/should/will/did).',
     correctionMessage:
-        'Rename to use a boolean prefix like isEnabled, hasData, etc.',
+        'Rename this boolean field to use a standard prefix (is, has, can, should, will, did) or suffix (Enabled, Active, Visible). Example: enabled becomes isEnabled.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -821,7 +827,7 @@ class PreferBooleanPrefixesForLocalsRule extends SaropaLintRule {
     problemMessage:
         '[prefer_boolean_prefixes_for_locals] Local boolean variable should have a prefix (is/has/can/should/will/did).',
     correctionMessage:
-        'Rename to use a boolean prefix like isEnabled, hasData, etc.',
+        'Rename this local boolean variable to use a standard prefix (is, has, can, should, will, did) or suffix (Enabled, Active, Visible). Example: status becomes isActive.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -993,7 +999,7 @@ class PreferBooleanPrefixesForParamsRule extends SaropaLintRule {
     problemMessage:
         '[prefer_boolean_prefixes_for_params] Boolean parameter should have a prefix (is/has/can/should/will/did).',
     correctionMessage:
-        'Rename to use a boolean prefix like isEnabled, hasData, etc.',
+        'Rename this boolean parameter to use a standard prefix (is, has, can, should, will, did) or suffix (Enabled, Active, Visible). Example: visible becomes isVisible.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -1199,7 +1205,8 @@ class PreferCorrectCallbackFieldNameRule extends SaropaLintRule {
     name: 'prefer_correct_callback_field_name',
     problemMessage:
         "[prefer_correct_callback_field_name] Callback field missing 'on' prefix. Flutter convention uses onPressed, onChanged.",
-    correctionMessage: "Rename: callback → onCallback, tapHandler → onTap.",
+    correctionMessage:
+        "Rename callback fields to use the 'on' prefix following Flutter convention. For example, callback becomes onCallback and tapHandler becomes onTap.",
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -1328,7 +1335,7 @@ class PreferCorrectErrorNameRule extends SaropaLintRule {
     problemMessage:
         '[prefer_correct_error_name] Catch parameter uses nonstandard name. Use "e" or "error" for consistency and readability.',
     correctionMessage:
-        'Rename catch parameter to "e" or "error". Example: catch (e) or catch (error).',
+        'Rename the catch parameter to "e" or "error" for consistency. Example: catch (e) { } or catch (error) { }.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -1382,7 +1389,8 @@ class PreferCorrectHandlerNameRule extends SaropaLintRule {
     name: 'prefer_correct_handler_name',
     problemMessage:
         '[prefer_correct_handler_name] Event handler should start with "on" or "_on".',
-    correctionMessage: 'Rename to follow handler naming convention.',
+    correctionMessage:
+        'Rename the event handler method to start with "on" or "_on" prefix. For example, buttonPressed becomes onButtonPressed.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -1462,7 +1470,7 @@ class PreferCorrectIdentifierLengthRule extends SaropaLintRule {
     problemMessage:
         '[prefer_correct_identifier_length] Identifier name length is not ideal.',
     correctionMessage:
-        'Use names between 2-30 characters (except common short names).',
+        'Use names between 2 and 40 characters long. Single-character names (except i, j, k, x, y, z, e, n) reduce readability; overly long names hinder scanning.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -1561,7 +1569,8 @@ class PreferCorrectSetterParameterNameRule extends SaropaLintRule {
     name: 'prefer_correct_setter_parameter_name',
     problemMessage:
         '[prefer_correct_setter_parameter_name] Setter parameter should be named "value".',
-    correctionMessage: 'Rename the parameter to "value".',
+    correctionMessage:
+        'Rename the setter parameter to "value" for consistency with Dart conventions. Example: set name(String value) => _name = value;',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -1625,7 +1634,8 @@ class PreferExplicitParameterNamesRule extends SaropaLintRule {
     name: 'prefer_explicit_parameter_names',
     problemMessage:
         '[prefer_explicit_parameter_names] Function type parameters should have names.',
-    correctionMessage: 'Add parameter names for better documentation.',
+    correctionMessage:
+        'Add descriptive names to function type parameters. Unnamed parameters lose intent: void Function(String) becomes void Function(String message).',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -1668,7 +1678,8 @@ class PreferMatchFileNameRule extends SaropaLintRule {
     name: 'prefer_match_file_name',
     problemMessage:
         '[prefer_match_file_name] File name should match the primary class name.',
-    correctionMessage: 'Rename the file or class to match.',
+    correctionMessage:
+        'Rename either the file or the primary class so they match. For example, user_service.dart should contain class UserService.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -1736,7 +1747,7 @@ class PreferPrefixedGlobalConstantsRule extends SaropaLintRule {
     problemMessage:
         '[prefer_prefixed_global_constants] Global constant should have a descriptive prefix.',
     correctionMessage:
-        'Consider prefixing with "k" or using a descriptive name.',
+        'Prefix the global constant with "k" (e.g., kMaxRetries) or use a longer descriptive name to distinguish it from local variables.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -1803,7 +1814,8 @@ class TagNameRule extends SaropaLintRule {
     name: 'prefer_kebab_tag_name',
     problemMessage:
         '[prefer_kebab_tag_name] Tag name should follow naming conventions.',
-    correctionMessage: 'Use kebab-case for tag names.',
+    correctionMessage:
+        'Use kebab-case (lowercase with hyphens) for tag names. Tag names must start with a lowercase letter and contain only lowercase letters, digits, and hyphens.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 

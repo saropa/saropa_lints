@@ -83,8 +83,9 @@ class PreferEarlyReturnRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_early_return',
     problemMessage:
-        '[prefer_early_return] Consider using early return instead of nested if blocks. Early returns reduce nesting and make code easier to follow, improving readability and maintainability.',
-    correctionMessage: 'Guard clauses at the top reduce nesting.',
+        '[prefer_early_return] Deeply nested if blocks increase cognitive load and make code harder to follow. Early returns flatten the structure and clarify preconditions.',
+    correctionMessage:
+        'Invert conditions and return early at the top of the function to reduce nesting and improve readability.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -286,8 +287,9 @@ class PreferGuardClausesRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_guard_clauses',
     problemMessage:
-        '[prefer_guard_clauses] Consider using guard clauses at the start of the function. Guard clauses make preconditions explicit and help prevent bugs.',
-    correctionMessage: 'Guard clauses make preconditions explicit.',
+        '[prefer_guard_clauses] Wrapping the entire function body in an if block obscures preconditions and increases nesting. Guard clauses make preconditions explicit and help prevent bugs.',
+    correctionMessage:
+        'Extract the condition as a guard clause with early return at the top to make preconditions explicit and reduce nesting.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -359,8 +361,9 @@ class PreferPositiveConditionsFirstRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_positive_conditions_first',
     problemMessage:
-        '[prefer_positive_conditions_first] Consider using positive conditions with happy path first. Positive conditions make code more optimistic and easier to understand.',
-    correctionMessage: 'Positive conditions are easier to understand.',
+        '[prefer_positive_conditions_first] Guard clauses with negated conditions push the happy path deeper into the function. Positive conditions make the primary logic path prominent and easier to understand.',
+    correctionMessage:
+        'Restructure to place the positive condition first so the happy path is prominent and easier to follow.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -442,8 +445,9 @@ class PreferSwitchStatementRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_switch_statement',
     problemMessage:
-        '[prefer_switch_statement] Consider using switch statement instead of expression. Switch statements are more familiar and flexible, and allow side effects.',
-    correctionMessage: 'Switch statements are more familiar and flexible.',
+        '[prefer_switch_statement] Switch expressions limit flexibility for side effects and debugging. Switch statements support imperative logic, breakpoints, and multi-line case bodies.',
+    correctionMessage:
+        'Replace the switch expression with a switch statement to enable side effects, multi-line cases, and debuggability.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -501,8 +505,9 @@ class PreferCascadeOverChainedRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_cascade_over_chained',
     problemMessage:
-        '[prefer_cascade_over_chained] Consider using cascade (..) for consecutive mutations. Cascades clarify that operations are on the same object and reduce boilerplate.',
-    correctionMessage: 'Cascades make it clear operations are on same object.',
+        '[prefer_cascade_over_chained] Consecutive method calls on the same variable repeat the target name unnecessarily. Cascade notation (..) signals that all operations mutate the same object.',
+    correctionMessage:
+        'Rewrite consecutive calls using cascade (..) to eliminate the repeated variable name and clarify mutation intent.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -589,8 +594,9 @@ class PreferChainedOverCascadeRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_chained_over_cascade',
     problemMessage:
-        '[prefer_chained_over_cascade] Consider using separate statements instead of cascade. Separate statements are more familiar and explicit, and work with builder patterns.',
-    correctionMessage: 'Separate statements are more familiar and explicit.',
+        '[prefer_chained_over_cascade] Cascade notation is unfamiliar to developers from other languages and breaks builder patterns. Separate statements are explicit about each operation.',
+    correctionMessage:
+        'Replace cascade (..) with separate statements to improve readability and maintain compatibility with builder patterns.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -729,8 +735,9 @@ class PreferDefaultEnumCaseRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_default_enum_case',
     problemMessage:
-        '[prefer_default_enum_case] Consider using default case for future-proofing. Default cases handle unknown enum values gracefully and make code robust to future changes.',
-    correctionMessage: 'Default case handles unknown enum values gracefully.',
+        '[prefer_default_enum_case] Exhaustive enum switches break at compile time when new values are added, requiring immediate updates across the codebase. A default case handles unknown values gracefully.',
+    correctionMessage:
+        'Add a default case to handle unknown or future enum values gracefully and prevent compile-time breakage on enum changes.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -811,8 +818,9 @@ class PreferAsyncOnlyWhenAwaitingRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_async_only_when_awaiting',
     problemMessage:
-        '[prefer_async_only_when_awaiting] Function is async but does not use await.',
-    correctionMessage: 'Remove async or add await expressions.',
+        '[prefer_async_only_when_awaiting] Function is marked async but contains no await expressions, adding unnecessary Future wrapping overhead and obscuring intent.',
+    correctionMessage:
+        'Remove the async keyword and return a Future directly, or add await expressions if asynchronous work is intended.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -917,8 +925,9 @@ class PreferAwaitOverThenRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_await_over_then',
     problemMessage:
-        '[prefer_await_over_then] Consider using await instead of .then() chains.',
-    correctionMessage: 'await provides better readability and error handling.',
+        '[prefer_await_over_then] The .then() chain obscures sequential async logic and complicates error handling. Rewrite with await for clearer control flow.',
+    correctionMessage:
+        'Replace .then() with await to enable sequential reading, try/catch error handling, and easier debugging of async code.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -973,8 +982,9 @@ class PreferThenOverAwaitRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_then_over_await',
     problemMessage:
-        '[prefer_then_over_await] Consider using .then() for functional style.',
-    correctionMessage: '.then() provides explicit Future chaining.',
+        '[prefer_then_over_await] The await keyword introduces implicit suspension points that break functional composition. Use .then() for explicit Future chaining.',
+    correctionMessage:
+        'Replace await with .then() to maintain functional composition and make asynchronous data flow explicit in the call chain.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -1030,8 +1040,9 @@ class PreferSyncOverAsyncWhereSimpleRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_sync_over_async_where_possible',
     problemMessage:
-        '[prefer_sync_over_async_where_possible] Consider returning Future.value() for simple sync values.',
-    correctionMessage: 'Avoid async overhead when not awaiting.',
+        '[prefer_sync_over_async_where_possible] Marking a function async when it only returns a synchronous value adds unnecessary Future wrapping overhead and obscures intent.',
+    correctionMessage:
+        'Remove the async keyword and return Future.value() directly to eliminate unnecessary Future wrapping and clarify synchronous intent.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 

@@ -52,7 +52,7 @@ class RequireHttpStatusCheckRule extends SaropaLintRule {
     problemMessage:
         '[require_http_status_check] HTTP response body is used without first checking the status code. This can result in undetected failures, silent data corruption, or security issues if error responses are parsed as valid data. Always check if (response.statusCode == 200) before parsing response.body to ensure only successful responses are processed and errors are handled appropriately.',
     correctionMessage:
-        'Check if (response.statusCode == 200) before parsing response.body.',
+        'Check if (response.statusCode == 200) before parsing response.body to ensure only successful responses are processed and error payloads are handled separately.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -115,7 +115,7 @@ class AvoidHardcodedApiUrlsRule extends SaropaLintRule {
     problemMessage:
         '[avoid_hardcoded_api_urls] Hardcoded API URLs prevent switching between development, staging, and production environments, making code inflexible and error-prone. This practice also risks leaking sensitive endpoints and complicates maintenance. Always extract API URLs to configuration constants (e.g., ApiConfig.baseUrl) to enable environment switching and improve security.',
     correctionMessage:
-        "Extract to a config constant: Uri.parse('\${ApiConfig.baseUrl}/endpoint').",
+        "Extract the URL to a configuration constant (e.g., ApiConfig.baseUrl) so endpoints can be switched per environment without code changes.",
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -432,8 +432,8 @@ class RequireApiErrorMappingRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_api_error_mapping',
     problemMessage:
-        '[require_api_error_mapping] Raw API exceptions are exposed to users, leaking implementation details and providing unhelpful error messages. This can confuse users and expose sensitive information. Always catch specific exceptions and map them to domain errors with clear, actionable messages for better user experience and security.',
-    correctionMessage: 'Catch specific exceptions and map to domain errors.',
+        '[require_api_error_mapping] Raw API exceptions are exposed to users, leaking implementation details and providing unhelpful error messages. This can confuse users and expose sensitive information such as server paths, stack traces, or internal status codes. Always catch specific exceptions and map them to domain errors with clear, actionable messages to protect against information disclosure and improve error recovery.',
+    correctionMessage: 'Catch specific exceptions (SocketException, TimeoutException, HttpException) and map each to a typed domain error with a user-facing message.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -515,9 +515,9 @@ class RequireRequestTimeoutRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_request_timeout',
     problemMessage:
-        '[require_request_timeout] HTTP request is missing a timeout configuration, which means it may hang indefinitely if the server does not respond. This can cause the app to freeze, degrade user experience, and waste resources. Always add .timeout(Duration(seconds: 30)) or configure timeout in client options to ensure requests fail gracefully and users are informed of network issues.',
+        '[require_request_timeout] HTTP request is missing a timeout configuration, which means it may hang indefinitely if the server does not respond. This can cause the app to freeze, degrade user experience, and waste socket connections and memory. Always add .timeout(Duration(seconds: 30)) or configure timeout in client options to ensure requests fail gracefully and users are informed of network issues.',
     correctionMessage:
-        'Add .timeout(Duration(seconds: 30)) or configure timeout in client options.',
+        'Add .timeout(Duration(seconds: 30)) to the request or configure connectTimeout and receiveTimeout in your HTTP client options.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -654,7 +654,7 @@ class RequireOfflineIndicatorRule extends SaropaLintRule {
     problemMessage:
         '[require_offline_indicator] Connectivity is checked, but there is no offline indicator shown to users. Without a clear indicator, users may not understand why features are unavailable or why requests fail. Always show a banner, snackbar, or icon when connectivity is lost to improve transparency and user experience.',
     correctionMessage:
-        'Show a banner, snackbar, or icon when connectivity is lost.',
+        'Show a visible offline indicator (banner, snackbar, or status icon) when connectivity is lost so users understand why features are unavailable.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -1371,9 +1371,9 @@ class RequireCancelTokenRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_cancel_token',
     problemMessage:
-        '[require_cancel_token] Async request without cancellation continues after widget disposes, wasting resources and causing setState errors. Not cancelling can lead to memory leaks, wasted bandwidth, and crashes from setState on disposed widgets.',
+        '[require_cancel_token] Async request without cancellation continues after a StatefulWidget disposes its State, wasting bandwidth and causing setState errors. Not cancelling can lead to memory leaks, wasted network connections, and crashes from calling setState on a disposed State object after the parent removes the child from the widget tree.',
     correctionMessage:
-        'Use CancelToken (Dio) or implement request cancellation on dispose.',
+        'Use CancelToken (Dio) or implement request cancellation in the State dispose() method to stop in-flight requests when the widget is removed.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -4031,7 +4031,7 @@ class PreferDioOverHttpRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_dio_over_http',
     problemMessage:
-        '[prefer_dio_over_http] Using http package. Dio provides better features for production apps.',
+        '[prefer_dio_over_http] Using http package. Dio provides interceptors, cancellation, and structured error handling suited for production apps.',
     correctionMessage:
         'Consider using Dio for interceptors, cancellation, and error handling.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -4325,7 +4325,7 @@ class RequireWebsocketReconnectionRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_websocket_reconnection',
     problemMessage:
-        '[require_websocket_reconnection] WebSocket without reconnection logic will stay disconnected after network interruptions. Users will see stale data or miss real-time updates.',
+        '[require_websocket_reconnection] WebSocket connection without reconnection logic will stay permanently disconnected after network interruptions, server restarts, or mobile network handoffs. Users will see stale data, miss real-time updates, and have no indication that the live connection has dropped until they manually refresh or restart the app.',
     correctionMessage:
         'Implement automatic reconnection with exponential backoff for WebSocket connections.',
     errorSeverity: DiagnosticSeverity.WARNING,

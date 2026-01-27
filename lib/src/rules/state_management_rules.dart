@@ -174,7 +174,7 @@ class RequireStreamControllerDisposeRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_stream_controller_dispose',
     problemMessage:
-        '[require_stream_controller_dispose] Not closing a StreamController in dispose will leak memory, keep listeners active, and may cause app slowdowns, crashes, or persistent background activity. This can lead to resource exhaustion, battery drain, and unpredictable bugs, especially in production apps with frequent widget disposal. Unclosed controllers may also prevent garbage collection and block app updates.',
+        '[require_stream_controller_dispose] Not closing a StreamController in the StatefulWidget dispose method will leak memory, keep listeners active, and cause app slowdowns, crashes, or persistent background activity. This leads to stream subscription exhaustion, battery drain, and unpredictable bugs, especially in production apps with frequent widget tree rebuilds. Unclosed controllers also prevent garbage collection and block app updates.',
     correctionMessage:
         'Always call controller.close() in the dispose method of your widget or class to properly release resources and prevent memory leaks. Audit all StreamController usage for proper cleanup and add tests for resource management. Document disposal logic for maintainability.',
     errorSeverity: DiagnosticSeverity.ERROR,
@@ -342,7 +342,7 @@ class RequireValueNotifierDisposeRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_value_notifier_dispose',
     problemMessage:
-        '[require_value_notifier_dispose] If you do not dispose a ValueNotifier, it will leak memory, keep listeners attached, and may update widgets that have already been disposed. This can cause memory leaks, unexpected UI updates, and hard-to-find bugs in your app.',
+        '[require_value_notifier_dispose] If you do not dispose a ValueNotifier, it will leak memory, keep listeners attached, and trigger updates on a StatefulWidget that has already been removed from the widget tree. This causes memory leaks, unexpected UI updates, and hard-to-find bugs in your app.',
     correctionMessage:
         'Call notifier.dispose() in the dispose method of your widget or class to properly release resources and prevent memory leaks.',
     errorSeverity: DiagnosticSeverity.ERROR,
@@ -631,7 +631,7 @@ class RequireMountedCheckRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_mounted_check',
     problemMessage:
-        '[require_mounted_check] Calling setState after an await without checking if the widget is still mounted can throw a "setState called after dispose" error. This leads to runtime exceptions, app instability, and hard-to-debug crashes, especially in async code.',
+        '[require_mounted_check] Calling setState after an await without checking if the StatefulWidget is still mounted in the widget tree throws a "setState called after dispose" error. This leads to runtime exceptions, app instability, and hard-to-debug crashes, especially in async code.',
     correctionMessage:
         'Add "if (!mounted) return;" before calling setState after an await to ensure the widget is still in the widget tree and prevent runtime errors.',
     errorSeverity: DiagnosticSeverity.ERROR,
@@ -1132,7 +1132,7 @@ class AvoidStatefulWithoutStateRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_stateful_without_state',
     problemMessage:
-        '[avoid_stateful_without_state] Using a StatefulWidget without any state fields adds unnecessary complexity, increases lifecycle overhead, and can confuse maintainers. This leads to harder-to-read code, wasted resources, and potential performance issues.',
+        '[avoid_stateful_without_state] Using a StatefulWidget without any state fields adds unnecessary complexity, increases lifecycle overhead, and can confuse maintainers. This leads to harder-to-read code, wasted memory allocations for the State object, and potential performance issues.',
     correctionMessage:
         'Convert the widget to a StatelessWidget if it does not manage any state. This simplifies your code and improves performance.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -1400,7 +1400,7 @@ class RequireBlocCloseRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_bloc_close',
     problemMessage:
-        '[require_bloc_close] If you do not close your Bloc or Cubit in dispose(), it will leak memory, keep listeners active, and may cause app slowdowns or crashes. Always close Blocs and Cubits to prevent resource leaks and unexpected behavior after widget disposal.',
+        '[require_bloc_close] If you do not close your Bloc or Cubit in the StatefulWidget dispose() method, it will leak memory, keep stream subscriptions active, and cause app slowdowns or crashes. Always close Blocs and Cubits to prevent leaks and unexpected behavior after the widget tree is rebuilt.',
     correctionMessage:
         'Add _bloc.close() (or cubit.close()) in the dispose() method before calling super.dispose() to properly release resources and prevent memory leaks.',
     errorSeverity: DiagnosticSeverity.ERROR,
@@ -2228,7 +2228,7 @@ class AvoidGetFindInBuildRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_get_find_in_build',
     problemMessage:
-        '[avoid_get_find_in_build] Calling Get.find() inside build() is inefficient and can cause unnecessary object creation and performance issues. This leads to wasted resources and can make your app less responsive.',
+        '[avoid_get_find_in_build] Calling Get.find() inside the build method is inefficient and can cause unnecessary object creation and performance issues. This leads to wasted memory allocations on every rebuild and makes your app less responsive.',
     correctionMessage:
         'Use GetBuilder<T> or Obx for reactive updates with GetX, and avoid calling Get.find() in build() to improve performance.',
     errorSeverity: DiagnosticSeverity.ERROR,
@@ -2651,7 +2651,7 @@ class PreferSelectForPartialRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_select_for_partial',
     problemMessage:
-        '[prefer_select_for_partial] Watching the entire provider when only one field is needed causes unnecessary widget rebuilds, wasting resources and reducing app performance. This can make your UI less efficient and responsive.',
+        '[prefer_select_for_partial] Watching the entire provider when only one field is needed causes unnecessary widget tree rebuilds, wasting memory and CPU cycles and reducing app performance. This makes your UI less efficient and responsive.',
     correctionMessage:
         'Use ref.watch(provider.select((s) => s.field)) for partial watching to optimize rebuilds and improve performance.',
     errorSeverity: DiagnosticSeverity.ERROR,
@@ -3104,7 +3104,7 @@ class PreferCopyWithForStateRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_copy_with_for_state',
     problemMessage:
-        '[prefer_copy_with_for_state] Directly modifying BLoC state breaks immutability, leading to unpredictable UI updates, missed rebuilds, and subtle bugs. This makes your app harder to debug and maintain.',
+        '[prefer_copy_with_for_state] Directly modifying BLoC state breaks immutability, leading to unpredictable UI updates, missed rebuilds, and subtle bugs that surface only in production. The BLoC pattern relies on immutable state transitions to guarantee that every emit triggers a rebuild; mutating fields in place silently bypasses this contract.',
     correctionMessage:
         'Use state.copyWith(field: value) to create a new immutable state object and trigger proper UI updates.',
     errorSeverity: DiagnosticSeverity.ERROR,
@@ -3415,7 +3415,7 @@ class AvoidBlocInBlocRule extends SaropaLintRule {
     problemMessage:
         '[avoid_bloc_in_bloc] BLoC directly calling another BLoC creates tight coupling between state managers. This makes unit testing difficult, risks circular dependencies, and breaks the unidirectional data flow pattern that BLoC relies on for predictable state management.',
     correctionMessage:
-        'Coordinate between BLoCs at the widget layer or use streams.',
+        'Coordinate between BLoCs at the widget layer using BlocListener, or communicate through shared streams to maintain loose coupling.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -3682,7 +3682,7 @@ class AvoidChangeNotifierInWidgetRule extends SaropaLintRule {
     problemMessage:
         '[avoid_change_notifier_in_widget] ChangeNotifier created inside build() is re-instantiated on every widget rebuild, losing all accumulated state and listener registrations. This causes flickering UI, lost user input, and wasted allocations that trigger unnecessary garbage collection.',
     correctionMessage:
-        'Create in ChangeNotifierProvider or StatefulWidget.initState().',
+        'Create the ChangeNotifier in a ChangeNotifierProvider or in StatefulWidget.initState() to preserve state across rebuilds and ensure proper disposal.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -3764,9 +3764,9 @@ class RequireProviderDisposeRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_provider_dispose',
     problemMessage:
-        '[require_provider_dispose] Provider creating a ChangeNotifier without a dispose callback leaks listener registrations and memory. Over time, leaked notifiers accumulate stale listeners that fire on disposed widgets, causing setState-after-dispose errors and increasing memory pressure.',
+        '[require_provider_dispose] Provider creating a ChangeNotifier without a dispose callback leaks listener registrations and memory. Over time, leaked notifiers accumulate stale listeners that fire after the StatefulWidget is removed from the tree, causing setState-after-dispose errors and increasing memory pressure.',
     correctionMessage:
-        'Use ChangeNotifierProvider (auto-disposes) or add dispose callback.',
+        'Use ChangeNotifierProvider (auto-disposes) or add a dispose callback that calls notifier.dispose() to release all listener registrations.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -4146,7 +4146,7 @@ class RequireErrorHandlingInAsyncRule extends SaropaLintRule {
     problemMessage:
         '[require_error_handling_in_async] Async provider without error handling allows exceptions to propagate unhandled. Unhandled errors in FutureProvider or StreamProvider surface as uncaught exceptions that crash the app or leave the UI in a permanent loading state with no recovery path.',
     correctionMessage:
-        'Add try-catch in provider or handle AsyncValue.error in UI with .when().',
+        'Add try-catch in the provider body or handle AsyncValue.error in the UI with .when() to show error states and enable user recovery.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -4348,7 +4348,7 @@ class RequireGetxControllerDisposeRule extends SaropaLintRule {
     problemMessage:
         '[require_getx_controller_dispose] GetxController holds TextEditingController or StreamSubscription fields but does not override onClose() to dispose them. Undisposed controllers and subscriptions leak native resources and continue processing events after the screen is removed, causing crashes.',
     correctionMessage:
-        'Override onClose() to dispose controllers, cancel subscriptions, etc.',
+        'Override onClose() to dispose TextEditingController, ScrollController, and cancel StreamSubscription fields before calling super.onClose().',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -4484,9 +4484,9 @@ class AvoidObsOutsideControllerRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_obs_outside_controller',
     problemMessage:
-        '[avoid_obs_outside_controller] .obs used outside GetxController creates observables without proper lifecycle management. These observables cause memory leaks because they are never disposed when the widget tree rebuilds.',
+        '[avoid_obs_outside_controller] .obs used outside a GetxController or GetxService creates observables without proper lifecycle management. These observables cause memory leaks because they are never disposed when the widget tree rebuilds.',
     correctionMessage:
-        'Move observable state to a GetxController for proper lifecycle management.',
+        'Move observable state into a GetxController or GetxService, where onClose() automatically disposes Rx subscriptions and prevents memory leaks.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -5586,9 +5586,9 @@ class DisposeProvidersRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'dispose_provider_instances',
     problemMessage:
-        '[dispose_provider_instances] Provider creating a disposable instance without a dispose callback leaks controllers and stream subscriptions. These undisposed resources accumulate across navigation, increasing memory usage and leaving background listeners that fire on destroyed widgets.',
+        '[dispose_provider_instances] Provider creating a disposable instance without a dispose callback leaks stream subscriptions and controllers. These undisposed resources accumulate across navigation, increasing memory usage and leaving background listeners that fire after the parent StatefulWidget is removed from the tree.',
     correctionMessage:
-        'Add dispose: (_, instance) => instance.dispose() to clean up resources.',
+        'Add dispose: (_, instance) => instance.dispose() to the Provider constructor to release stream subscriptions and controllers on removal.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -6939,7 +6939,7 @@ class AvoidGetxRxInsideBuildRule extends SaropaLintRule {
     name: 'avoid_getx_rx_inside_build',
     problemMessage:
         '[avoid_getx_rx_inside_build] Creating .obs reactive variables inside build() allocates a new Rx instance on every rebuild. Each instance leaks because it is never disposed, and the widget observes a fresh variable each time, losing all previous state and accumulating orphaned subscriptions.',
-    correctionMessage: 'Move reactive variables to a GetxController.',
+    correctionMessage: 'Move reactive .obs variables into a GetxController and access them via GetBuilder or Obx to preserve state across rebuilds.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -7007,8 +7007,8 @@ class AvoidMutableRxVariablesRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_mutable_rx_variables',
     problemMessage:
-        '[avoid_mutable_rx_variables] Reassigning an Rx variable with = replaces the entire reactive wrapper, breaking all existing Obx listeners that still reference the old instance. The UI stops updating because widgets observe a stale object, leading to a frozen interface that appears unresponsive.',
-    correctionMessage: 'Use .value = or callable syntax to update.',
+        '[avoid_mutable_rx_variables] Reassigning an Rx variable with = replaces the entire reactive wrapper, breaking all existing Obx listeners that still reference the old instance. The build method stops receiving updates because child widgets observe a stale object, leading to a frozen interface that appears unresponsive.',
+    correctionMessage: 'Use .value = or callable syntax to update the Rx variable without replacing the reactive wrapper that Obx listeners depend on.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -7085,9 +7085,9 @@ class DisposeProvidedInstancesRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'dispose_provided_instances',
     problemMessage:
-        '[dispose_provided_instances] Provider creates a disposable instance without a dispose callback, causing memory leaks. Undisposed controllers and stream subscriptions persist after widget removal, continuing to hold resources and fire callbacks that trigger setState-after-dispose errors.',
+        '[dispose_provided_instances] Provider creates a disposable instance without a dispose callback, causing memory leaks. Undisposed stream subscriptions and controllers persist after the parent StatefulWidget is removed from the tree, continuing to hold resources and fire callbacks that trigger setState-after-dispose errors.',
     correctionMessage:
-        'Add dispose: (_, instance) => instance.dispose() to clean up.',
+        'Add dispose: (_, instance) => instance.dispose() to the Provider constructor to release stream subscriptions and controllers on removal.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -7554,7 +7554,7 @@ class AvoidListenInAsyncRule extends SaropaLintRule {
     name: 'avoid_listen_in_async',
     problemMessage:
         '[avoid_listen_in_async] Using context.watch() inside an async callback triggers widget rebuilds during asynchronous execution, creating stale closures that capture outdated state. This causes data races where async operations complete with wrong values, leading to corrupted state or duplicate side effects.',
-    correctionMessage: 'Replace watch() with read() in async callbacks.',
+    correctionMessage: 'Replace context.watch() with context.read() in async callbacks to capture the current value without subscribing to rebuilds.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -8958,7 +8958,7 @@ class AvoidEquatableMutableCollectionsRule extends SaropaLintRule {
     problemMessage:
         '[avoid_equatable_mutable_collections] Mutable collections in Equatable classes break equality comparison because list contents can change after the hash code is computed. This causes BLoC state transitions to be silently skipped when props appear unchanged, leaving the UI displaying stale data.',
     correctionMessage:
-        'Use List.unmodifiable() or immutable collections like IList.',
+        'Use List.unmodifiable(), UnmodifiableListView, or an immutable collection like IList to guarantee stable equality and hash codes in Equatable props.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -9195,7 +9195,7 @@ class AvoidStaticStateRule extends SaropaLintRule {
     problemMessage:
         '[avoid_static_state] Static mutable state persists across hot-reloads and tests, causing stale data and inconsistent behavior. Tests fail unpredictably due to shared state leaking between runs, and production bugs become hard to reproduce across different app sessions and isolates.',
     correctionMessage:
-        'Use proper state management (Provider, Riverpod, Bloc) instead.',
+        'Replace static mutable fields with scoped state management (Provider, Riverpod, or Bloc) to ensure proper isolation across tests and hot-reloads.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -9286,7 +9286,7 @@ class AvoidProviderInInitStateRule extends SaropaLintRule {
     name: 'avoid_provider_in_init_state',
     problemMessage:
         '[avoid_provider_in_init_state] Accessing Provider in initState() may fail because the widget context is not fully mounted in the element tree. This can throw a ProviderNotFoundException or return stale data, causing initialization logic to operate on incorrect values or crash on first render.',
-    correctionMessage: 'Move to didChangeDependencies() instead.',
+    correctionMessage: 'Move Provider access to didChangeDependencies() where the BuildContext is fully mounted and InheritedWidget lookups are safe.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -9481,7 +9481,7 @@ class RequireBlocManualDisposeRule extends SaropaLintRule {
     problemMessage:
         '[require_bloc_manual_dispose] Bloc or Cubit holds StreamController or Timer fields but does not override close() to dispose them. Undisposed resources cause memory leaks that accumulate across navigation, eventually increasing memory pressure until the operating system kills the app.',
     correctionMessage:
-        'Override close() to dispose controllers and close streams.',
+        'Override close() to dispose StreamController, Timer, and other held resources, then call super.close() to complete the Bloc lifecycle.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -10098,7 +10098,7 @@ class PreferBlocListenerForSideEffectsRule extends SaropaLintRule {
     name: 'prefer_bloc_listener_for_side_effects',
     problemMessage:
         '[prefer_bloc_listener_for_side_effects] Side effects inside BlocBuilder execute on every widget rebuild, causing user-facing errors like duplicate navigation pushes, multiple snackbars stacking on screen, or repeated API calls that waste bandwidth and may corrupt server-side state.',
-    correctionMessage: 'Move side effects to BlocListener or use BlocConsumer.',
+    correctionMessage: 'Move side effects (navigation, snackbars, API calls) to BlocListener or use BlocConsumer to separate rebuilds from one-time actions.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 

@@ -63,7 +63,7 @@ class PreferRelativeImportsRule extends SaropaLintRule {
     problemMessage:
         '[prefer_relative_imports] Use relative imports instead of absolute package imports.',
     correctionMessage:
-        'Consider using a relative import path for files within the same package.',
+        'Relative imports make refactoring easier and clearly signal local dependencies within the package.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -247,7 +247,7 @@ class PreferOneWidgetPerFileRule extends SaropaLintRule {
     problemMessage:
         '[prefer_one_widget_per_file] Multiple widget classes defined in a single file.',
     correctionMessage:
-        'Consider moving each widget class to its own file for better organization.',
+        'Move each widget class to its own file so file names map directly to widget names for faster navigation.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -333,7 +333,8 @@ class PreferArrowFunctionsRule extends SaropaLintRule {
     name: 'prefer_arrow_functions',
     problemMessage:
         '[prefer_arrow_functions] Function body contains only a return statement; use arrow syntax.',
-    correctionMessage: 'Convert to arrow function: => expression',
+    correctionMessage:
+        'Convert to arrow syntax (=> expression) to signal a pure, single-expression return and reduce visual noise.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -514,9 +515,9 @@ class PreferAllNamedParametersRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_all_named_parameters',
     problemMessage:
-        '[prefer_all_named_parameters] Function has $_threshold or more positional parameters; consider using named parameters.',
+        '[prefer_all_named_parameters] Function has $_threshold or more positional parameters that lack self-documenting call sites.',
     correctionMessage:
-        'Convert positional parameters to named parameters for clarity.',
+        'Convert positional parameters to named parameters so call sites are self-documenting and order-independent.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -633,7 +634,8 @@ class PreferTrailingCommaAlwaysRule extends SaropaLintRule {
     name: 'prefer_trailing_comma_always',
     problemMessage:
         '[prefer_trailing_comma_always] Multi-line construct should have a trailing comma.',
-    correctionMessage: 'Add a trailing comma for consistent formatting.',
+    correctionMessage:
+        'Add a trailing comma so dart format keeps each argument on its own line, producing cleaner git diffs.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -832,9 +834,9 @@ class PreferPrivateUnderscorePrefixRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_private_underscore_prefix',
     problemMessage:
-        '[prefer_private_underscore_prefix] Instance field should be private (prefixed with underscore).',
+        '[prefer_private_underscore_prefix] Instance field is public without documentation, exposing internal state.',
     correctionMessage:
-        'Consider making this field private and providing a getter if needed.',
+        'Prefix with underscore to enforce encapsulation, then expose via a getter if external access is needed.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -973,7 +975,7 @@ class PreferWidgetMethodsOverClassesRule extends SaropaLintRule {
     problemMessage:
         '[prefer_widget_methods_over_classes] Simple widget class could be a method in the parent widget.',
     correctionMessage:
-        'Consider converting to a build method for less boilerplate.',
+        'Convert to a build method in the parent widget to eliminate class boilerplate and access parent state directly.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -1088,7 +1090,8 @@ class PreferExplicitTypesRule extends SaropaLintRule {
     name: 'prefer_explicit_types',
     problemMessage:
         '[prefer_explicit_types] Use explicit type annotation instead of var.',
-    correctionMessage: 'Replace var with the explicit type.',
+    correctionMessage:
+        'Replace var with the explicit type annotation so the declared type is visible without hovering or reading the initializer.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -1180,9 +1183,9 @@ class PreferClassOverRecordReturnRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_class_over_record_return',
     problemMessage:
-        '[prefer_class_over_record_return] Method returns a record; consider using a dedicated class.',
+        '[prefer_class_over_record_return] Method returns a record type, which lacks named fields and dedicated methods.',
     correctionMessage:
-        'Create a class with named fields for better maintainability.',
+        'Create a class with named fields for better IDE support, type documentation, and long-term maintainability.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -1276,9 +1279,9 @@ class PreferInlineCallbacksRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_inline_callbacks',
     problemMessage:
-        '[prefer_inline_callbacks] Callback references a method; consider inlining for locality.',
+        '[prefer_inline_callbacks] Callback references a separate method, forcing readers to jump away to understand behavior.',
     correctionMessage:
-        'Inline simple callbacks to keep behavior close to its usage.',
+        'Inline the callback body at the call site so the behavior is visible where the widget is constructed.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -1370,7 +1373,8 @@ class PreferSingleQuotesRule extends SaropaLintRule {
     name: 'prefer_single_quotes',
     problemMessage:
         '[prefer_single_quotes] Use single quotes instead of double quotes for strings.',
-    correctionMessage: "Replace double quotes with single quotes: 'string'",
+    correctionMessage:
+        "Replace double quotes with single quotes to follow Dart style conventions and maintain codebase consistency.",
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -1497,7 +1501,8 @@ class PreferTodoFormatRule extends SaropaLintRule {
     name: 'prefer_todo_format',
     problemMessage:
         '[prefer_todo_format] TODO comment should follow format: TODO(author): description',
-    correctionMessage: 'Add author name in parentheses: TODO(author): ...',
+    correctionMessage:
+        'Add author name in parentheses: TODO(author): ... so the TODO is trackable and searchable by owner.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -1591,7 +1596,8 @@ class PreferFixmeFormatRule extends SaropaLintRule {
     name: 'prefer_fixme_format',
     problemMessage:
         '[prefer_fixme_format] FIXME comment should follow format: FIXME(author): description',
-    correctionMessage: 'Add author name in parentheses: FIXME(author): ...',
+    correctionMessage:
+        'Add author name in parentheses: FIXME(author): ... so the issue is trackable and searchable by owner.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -1682,7 +1688,8 @@ class PreferSentenceCaseCommentsRule extends SaropaLintRule {
     name: 'prefer_sentence_case_comments',
     problemMessage:
         '[prefer_sentence_case_comments] Comment should start with a capital letter.',
-    correctionMessage: 'Capitalize the first letter of the comment.',
+    correctionMessage:
+        'Capitalize the first letter of the comment to maintain sentence-case consistency across the codebase.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -2972,7 +2979,8 @@ class PreferDocCommentsOverRegularRule extends SaropaLintRule {
     name: 'prefer_doc_comments_over_regular',
     problemMessage:
         '[prefer_doc_comments_over_regular] Use doc comments (///) instead of regular comments (//) for public API documentation.',
-    correctionMessage: 'Replace // with /// for documentation comments.',
+    correctionMessage:
+        'Replace // with /// so the comment appears in IDE hover docs and can be extracted by dartdoc for API reference.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -3889,7 +3897,8 @@ class ArgumentsOrderingRule extends SaropaLintRule {
     name: 'prefer_arguments_ordering',
     problemMessage:
         '[prefer_arguments_ordering] Named arguments should be in alphabetical order.',
-    correctionMessage: 'Reorder named arguments alphabetically.',
+    correctionMessage:
+        'Reorder named arguments alphabetically so reviewers can quickly spot missing or duplicate arguments.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 

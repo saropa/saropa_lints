@@ -1940,9 +1940,9 @@ class RequireIosPrivacyManifestRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_ios_privacy_manifest',
     problemMessage:
-        '[require_ios_privacy_manifest] API requires iOS Privacy Manifest entry (iOS 17+). Consequence: Missing manifest entries can cause App Store rejection or runtime errors on iOS.',
+        '[require_ios_privacy_manifest] API requires an iOS Privacy Manifest entry (iOS 17+). Missing PrivacyInfo.xcprivacy declarations for required-reason APIs will cause automatic App Store rejection during review, block new releases, and may trigger runtime permission failures on user devices.',
     correctionMessage:
-        'Add PrivacyInfo.xcprivacy with required reason API declarations. This is required for App Store approval and proper app functioning.',
+        'Add a PrivacyInfo.xcprivacy file with the required reason API declarations. This is mandatory for App Store approval and correct runtime behavior on iOS 17+.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -5512,9 +5512,9 @@ class RequireIosCallkitIntegrationRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_ios_callkit_integration',
     problemMessage:
-        '[require_ios_callkit_integration] VoIP call handling detected. iOS requires CallKit for native call UI. Without CallKit, incoming calls fail to show on lock screen and your app will be rejected from the App Store.',
+        '[require_ios_callkit_integration] VoIP call handling detected. iOS requires CallKit integration for native call UI. Without CallKit, incoming calls will not appear on the lock screen, call audio routing will fail, and Apple will reject your app from the App Store during review.',
     correctionMessage:
-        'Implement CallKit using flutter_callkit_incoming or similar package. This ensures compliance and a native call experience.',
+        'Integrate CallKit using flutter_callkit_incoming or a similar package to ensure App Store compliance and a native call experience on iOS.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
