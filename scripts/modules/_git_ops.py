@@ -95,7 +95,7 @@ def git_commit_and_push(
         if not _push_with_retry(project_dir, branch):
             return False
     else:
-        print_warning("No changes to commit.")
+        print_success("No changes to commit.")
 
     return True
 
