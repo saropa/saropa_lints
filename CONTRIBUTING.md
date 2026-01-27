@@ -156,6 +156,29 @@ Set<FileType>? get applicableFileTypes => {FileType.widget};
 | `service` | Service/repository files |
 | `general` | Default for unclassified files |
 
+#### Test File Handling
+
+Rules skip test files by default (`TestRelevance.never`). Override `testRelevance` to change behavior:
+
+```dart
+// Rule that should also lint test code (e.g., async safety, disposal)
+@override
+TestRelevance get testRelevance => TestRelevance.always;
+
+// Rule that only applies to test files (e.g., assertion patterns, mock usage)
+@override
+TestRelevance get testRelevance => TestRelevance.testOnly;
+```
+
+| Value | Behavior | Use for |
+|-------|----------|---------|
+| `never` | Skip test files (default) | Production-focused rules |
+| `always` | Run on all files including tests | Universal code quality rules |
+| `testOnly` | Run only on test files | Test-specific best practices |
+
+> **Backwards compatibility:** Rules using `applicableFileTypes => {FileType.test}` are
+> automatically treated as `TestRelevance.testOnly`. No migration required.
+
 **Example: A complete widget-specific rule**
 
 ```dart

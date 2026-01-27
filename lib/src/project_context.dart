@@ -512,9 +512,7 @@ class FileTypeDetector {
     final types = <FileType>{};
 
     // Path-based detection (fast)
-    if (normalizedPath.endsWith('_test.dart') ||
-        normalizedPath.contains('/test/') ||
-        normalizedPath.contains('/integration_test/')) {
+    if (isTestPath(normalizedPath)) {
       types.add(FileType.test);
     }
 
@@ -548,6 +546,18 @@ class FileTypeDetector {
 
     _cache[normalizedPath] = types;
     return types;
+  }
+
+  /// Fast path-only check for test files.
+  ///
+  /// Expects a normalized path (forward slashes). Matches:
+  /// - `*_test.dart` files
+  /// - Files in `/test/`, `/test_driver/`, or `/integration_test/` directories
+  static bool isTestPath(String normalizedPath) {
+    return normalizedPath.endsWith('_test.dart') ||
+        normalizedPath.contains('/test/') ||
+        normalizedPath.contains('/test_driver/') ||
+        normalizedPath.contains('/integration_test/');
   }
 
   /// Check if file is a specific type.
