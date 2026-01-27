@@ -16,6 +16,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **File health top offenders**: The "Files needing quick fixes" audit section now lists the top 5 worst files sorted by fix coverage, showing fixes/rules and percentage.
 - **Doc reference auto-fix in publish pipeline**: The `--fix-docs` flag and Step 6 analysis now detect and auto-fix unresolvable `[reference]` patterns in DartDoc comments (OWASP codes, file names, snake_case rule names) alongside the existing angle bracket fixer.
 
+### Changed
+
+- **Improved DX messages for 8 rules**: Expanded `problemMessage` and `correctionMessage` text across `notification_rules`, `performance_rules`, `qr_scanner_rules`, `resource_management_rules`, `security_rules`, and `state_management_rules` to explain user-facing consequences and provide more specific fix guidance.
+
 ### Fixed
 
 - **20 unresolved doc reference warnings**: Escaped non-symbol references in DartDoc comments (OWASP codes, rule names, Flutter widget names, file names) that `dart doc` could not resolve, eliminating all documentation generation warnings.
