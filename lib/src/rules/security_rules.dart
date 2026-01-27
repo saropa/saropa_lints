@@ -6816,9 +6816,9 @@ class AvoidEncryptionKeyInMemoryRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_encryption_key_in_memory',
     problemMessage:
-        '[avoid_encryption_key_in_memory] Encryption key stored as class field. Can be extracted from memory.',
+        '[avoid_encryption_key_in_memory] Encryption key stored as a persistent class field remains in process memory for the lifetime of the object. Memory dumps, debugging tools, or memory-scanning malware can extract the key, compromising all data encrypted with it. Keys in memory survive garbage collection and are visible in heap snapshots.',
     correctionMessage:
-        'Load keys on demand from secure storage and clear after use.',
+        'Load encryption keys on demand from secure storage, use them immediately for the operation, and clear the variable after use to minimize the exposure window.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
