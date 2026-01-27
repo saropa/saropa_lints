@@ -1065,9 +1065,9 @@ class AvoidImagePickerWithoutSourceRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_image_picker_without_source',
     problemMessage:
-        '[avoid_image_picker_without_source] ImagePicker without source shows blank picker on some devices. Users will see an empty dialog and be unable to select images.',
+        '[avoid_image_picker_without_source] ImagePicker called without specifying an ImageSource shows a blank or empty picker dialog on some Android devices and older iOS versions. Users see a non-functional dialog and cannot select or capture images, resulting in a broken feature that provides no error feedback or alternative selection path.',
     correctionMessage:
-        'Specify source: ImageSource.camera or ImageSource.gallery.',
+        'Explicitly specify source: ImageSource.camera or ImageSource.gallery, or present a chooser dialog that lets the user pick their preferred image source.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 

@@ -2509,9 +2509,9 @@ class AvoidClosureMemoryLeakRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_closure_memory_leak',
     problemMessage:
-        '[avoid_closure_memory_leak] Closure capturing setState keeps the StatefulWidget in memory after disposal. The parent widget tree leaks memory, and setState on unmounted widgets crashes the app.',
+        '[avoid_closure_memory_leak] Closure capturing setState retains a strong reference to the State object, preventing garbage collection after the widget is disposed. The entire parent widget subtree leaks memory, and calling setState on an unmounted widget throws a framework error that crashes the app during subsequent navigation.',
     correctionMessage:
-        'Store subscription and cancel in dispose(), check mounted before setState.',
+        'Store the subscription in a field, cancel it in dispose(), and add a mounted check before calling setState to prevent leaks and post-disposal crashes.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -3186,9 +3186,9 @@ class RequireCorsHandlingRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_cors_handling',
     problemMessage:
-        '[require_cors_handling] HTTP calls on web fail silently without CORS headers from the server.',
+        '[require_cors_handling] HTTP calls from a Flutter web app fail silently without proper CORS headers from the server. The browser blocks cross-origin requests by default, causing network errors that prevent data loading, authentication, and API communication. Users see blank screens or broken functionality with no clear error message.',
     correctionMessage:
-        'Configure server to return Access-Control-Allow-Origin header or use a proxy.',
+        'Configure the server to return Access-Control-Allow-Origin headers for your app domain, or route requests through a CORS proxy during development.',
     errorSeverity: DiagnosticSeverity.ERROR,
   );
 
@@ -3775,9 +3775,9 @@ class AvoidBlockingDatabaseUiRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_blocking_database_ui',
     problemMessage:
-        '[avoid_blocking_database_ui] Database operation in build method may block UI thread.',
+        '[avoid_blocking_database_ui] Database operation executed in build() or on the main UI thread blocks rendering until the query completes. Users experience frozen screens, unresponsive touch input, and dropped animation frames. Long-running queries can trigger ANR dialogs on Android and watchdog termination on iOS.',
     correctionMessage:
-        'Load data in initState or use FutureBuilder/StreamBuilder.',
+        'Move database operations to initState(), a FutureBuilder, or StreamBuilder so queries run asynchronously without blocking the UI rendering pipeline.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -3957,9 +3957,9 @@ class AvoidRebuildOnScrollRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_rebuild_on_scroll',
     problemMessage:
-        '[avoid_rebuild_on_scroll] Scroll listener in build() is added on every rebuild. This causes memory leaks and duplicate callbacks that compound over time, leading to jank and crashes.',
+        '[avoid_rebuild_on_scroll] Scroll listener registered inside build() is re-added on every widget rebuild without removing the previous one. Duplicate listeners accumulate over time, firing multiple callbacks per scroll event, causing memory leaks, compounding performance degradation, and eventually crashes from excessive callback execution.',
     correctionMessage:
-        'Register listener once in initState() and remove in dispose().',
+        'Register the scroll listener once in initState() and remove it in dispose() to prevent listener accumulation and ensure proper cleanup on widget destruction.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
