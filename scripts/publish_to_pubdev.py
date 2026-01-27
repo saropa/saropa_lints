@@ -86,10 +86,12 @@ SCRIPT_VERSION = "4.0"
 # =============================================================================
 
 _REQUIRED_MODULES = [
+    "modules/__init__.py",
     "modules/_utils.py",
+    "modules/_audit_checks.py",
+    "modules/_audit_dx.py",
     "modules/_audit.py",
     "modules/_tier_integrity.py",
-    "modules/__init__.py",
 ]
 
 
