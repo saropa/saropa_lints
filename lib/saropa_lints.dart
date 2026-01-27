@@ -50,7 +50,10 @@ export 'package:saropa_lints/src/saropa_lint_rule.dart'
         RuleTimingRecord,
         RuleTimingTracker,
         SaropaLintRule,
+        ProgressTrackerData,
+        TestRelevance,
         ViolationRecord;
+export 'package:saropa_lints/src/report/analysis_reporter.dart';
 export 'package:saropa_lints/src/baseline/baseline_config.dart';
 export 'package:saropa_lints/src/baseline/baseline_date.dart';
 export 'package:saropa_lints/src/baseline/baseline_file.dart';

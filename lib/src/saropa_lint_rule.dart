@@ -11,6 +11,7 @@ import 'package:custom_lint_builder/custom_lint_builder.dart';
 
 import 'baseline/baseline_manager.dart';
 import 'ignore_utils.dart';
+import 'report/analysis_reporter.dart';
 import 'owasp/owasp.dart';
 import 'project_context.dart';
 import 'tiers.dart' show essentialRules;
@@ -516,6 +517,19 @@ class ProgressTracker {
     }
   }
 
+  /// Get a snapshot of all tracking data for report generation.
+  static ProgressTrackerData get reportData => ProgressTrackerData(
+        filesAnalyzed: _seenFiles.length,
+        filesWithIssues: _filesWithIssues,
+        violationsFound: _violationsFound,
+        errorCount: _errorCount,
+        warningCount: _warningCount,
+        infoCount: _infoCount,
+        issuesByFile: Map<String, int>.unmodifiable(_issuesByFile),
+        issuesByRule: Map<String, int>.unmodifiable(_issuesByRule),
+        ruleSeverities: Map<String, String>.unmodifiable(_ruleSeverities),
+      );
+
   /// Reset tracking state (useful between analysis runs).
   static void reset() {
     _seenFiles.clear();
@@ -537,6 +551,31 @@ class ProgressTracker {
     _ruleSeverities.clear();
     _rateSamples.clear();
   }
+}
+
+/// Immutable snapshot of [ProgressTracker] data for report generation.
+class ProgressTrackerData {
+  const ProgressTrackerData({
+    required this.filesAnalyzed,
+    required this.filesWithIssues,
+    required this.violationsFound,
+    required this.errorCount,
+    required this.warningCount,
+    required this.infoCount,
+    required this.issuesByFile,
+    required this.issuesByRule,
+    required this.ruleSeverities,
+  });
+
+  final int filesAnalyzed;
+  final int filesWithIssues;
+  final int violationsFound;
+  final int errorCount;
+  final int warningCount;
+  final int infoCount;
+  final Map<String, int> issuesByFile;
+  final Map<String, int> issuesByRule;
+  final Map<String, String> ruleSeverities;
 }
 
 /// Tracks cumulative timing for each rule across all files.
@@ -1034,6 +1073,41 @@ enum RuleTier {
   stylistic,
 }
 
+/// Controls how a lint rule interacts with test files.
+///
+/// Most lint rules enforce production code patterns that are irrelevant
+/// or counterproductive in test files. For example, hardcoded strings,
+/// magic numbers, and missing documentation are expected in tests.
+///
+/// By default, rules skip test files entirely ([never]). Override
+/// [SaropaLintRule.testRelevance] to change this behavior.
+///
+/// Migration from `skipTestFiles`:
+/// - `skipTestFiles => true` is now the default ([never])
+/// - `skipTestFiles => false` becomes [always]
+/// - `applicableFileTypes => {FileType.test}` becomes [testOnly]
+enum TestRelevance {
+  /// Rule does NOT run on test files.
+  ///
+  /// This is the default. Use for production-focused rules:
+  /// hardcoded config, magic numbers, security credentials,
+  /// accessibility labels, documentation requirements, etc.
+  never,
+
+  /// Rule runs on ALL files including test files.
+  ///
+  /// Use for universal code quality rules that matter everywhere:
+  /// empty catch blocks, unused imports, missing dispose,
+  /// naming conventions, async safety, etc.
+  always,
+
+  /// Rule runs ONLY on test files.
+  ///
+  /// Use for test-specific rules: test structure, mock usage,
+  /// assertion patterns, test naming, etc.
+  testOnly,
+}
+
 /// Tracks lint violations by impact level for summary reporting.
 ///
 /// Usage:
@@ -1521,10 +1595,24 @@ abstract class SaropaLintRule extends DartLintRule {
   /// Default: `true` - Generated code can't be fixed manually.
   bool get skipGeneratedCode => true;
 
+  /// How this rule relates to test files.
+  ///
+  /// Override to control test file behavior:
+  /// - [TestRelevance.never]: Skip test files (default)
+  /// - [TestRelevance.always]: Run on all files including tests
+  /// - [TestRelevance.testOnly]: Run ONLY on test files
+  ///
+  /// **Note:** Rules using `applicableFileTypes => {FileType.test}` are
+  /// automatically treated as [TestRelevance.testOnly] for backwards
+  /// compatibility, so they do NOT need to override this.
+  TestRelevance get testRelevance => TestRelevance.never;
+
   /// Whether to skip test files (*_test.dart, test/**).
   ///
-  /// Default: `false` - Most rules should run in tests too.
-  /// Override to `true` for rules that don't apply to test code.
+  /// @deprecated Use [testRelevance] instead:
+  /// - `skipTestFiles => true` is now the default ([TestRelevance.never])
+  /// - `skipTestFiles => false` becomes `testRelevance => TestRelevance.always`
+  @Deprecated('Use testRelevance instead. See TestRelevance enum.')
   bool get skipTestFiles => false;
 
   /// Whether to skip example files (example/**).
@@ -1580,6 +1668,20 @@ abstract class SaropaLintRule extends DartLintRule {
     '.module.dart',
   };
 
+  /// Resolves the effective test relevance, accounting for backwards
+  /// compatibility with [applicableFileTypes].
+  ///
+  /// Priority:
+  /// 1. [applicableFileTypes] containing [FileType.test] => [testOnly]
+  /// 2. [testRelevance] getter value (default: [TestRelevance.never])
+  TestRelevance get _effectiveTestRelevance {
+    final applicable = applicableFileTypes;
+    if (applicable != null && applicable.contains(FileType.test)) {
+      return TestRelevance.testOnly;
+    }
+    return testRelevance;
+  }
+
   /// Check if a file path should be skipped based on context settings.
   bool _shouldSkipFile(String path) {
     // Normalize path separators
@@ -1618,15 +1720,16 @@ abstract class SaropaLintRule extends DartLintRule {
       // This is handled separately via content-based detection
     }
 
-    // Check test files
-    if (skipTestFiles) {
-      if (normalizedPath.endsWith('_test.dart') ||
-          normalizedPath.contains('/test/') ||
-          normalizedPath.contains('/test_driver/') ||
-          normalizedPath.contains('/integration_test/')) {
-        return true;
-      }
+    // Check test files using TestRelevance
+    final isTest = FileTypeDetector.isTestPath(normalizedPath);
+    final relevance = _effectiveTestRelevance;
+    if (relevance == TestRelevance.testOnly && !isTest) {
+      return true; // Skip non-test files for test-only rules
     }
+    if (relevance == TestRelevance.never && isTest) {
+      return true; // Skip test files (default)
+    }
+    // TestRelevance.always: no skip based on test status
 
     // Check example files
     if (skipExampleFiles) {
@@ -1856,6 +1959,8 @@ abstract class SaropaLintRule extends DartLintRule {
         IncrementalAnalysisTracker.setProjectRoot(projectRoot);
         // Initialize git-aware prioritization for faster feedback on edited files
         GitAwarePriority.initialize(projectRoot);
+        // Initialize report writer for automatic report generation
+        AnalysisReporter.initialize(projectRoot);
       }
     }
 
@@ -2214,6 +2319,9 @@ class SaropaDiagnosticReporter {
     // Track for progress reporting with severity
     final severity = code.errorSeverity.name;
     ProgressTracker.recordViolation(severity: severity, ruleName: _ruleName);
+
+    // Schedule report file writing (debounced)
+    AnalysisReporter.scheduleWrite();
   }
 
   /// Get approximate line number from an AST node.

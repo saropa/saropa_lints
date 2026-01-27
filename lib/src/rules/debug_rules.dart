@@ -532,7 +532,7 @@ class PreferDebugPrintRule extends SaropaLintRule {
       if (node.target != null) return;
 
       // Skip if inside a test file - print is often acceptable there
-      // (handled by skipTestFiles if enabled on the rule)
+      // (handled by testRelevance - default skips test files)
 
       reporter.atNode(node, code);
     });
