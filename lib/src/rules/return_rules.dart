@@ -36,7 +36,8 @@ class AvoidReturningCascadesRule extends SaropaLintRule {
     name: 'avoid_returning_cascades',
     problemMessage:
         '[avoid_returning_cascades] Return statement contains a cascade expression (..operator), which obscures the actual return value and can confuse readers about whether the returned object is the cascade target or the result of the last cascade operation. Separating the cascade from the return makes the control flow explicit and easier to debug.',
-    correctionMessage: 'Assign the cascade result to a variable first, then return the variable on a separate line.',
+    correctionMessage:
+        'Assign the cascade result to a variable first, then return the variable on a separate line.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 

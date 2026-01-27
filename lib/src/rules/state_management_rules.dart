@@ -6939,7 +6939,8 @@ class AvoidGetxRxInsideBuildRule extends SaropaLintRule {
     name: 'avoid_getx_rx_inside_build',
     problemMessage:
         '[avoid_getx_rx_inside_build] Creating .obs reactive variables inside build() allocates a new Rx instance on every rebuild. Each instance leaks because it is never disposed, and the widget observes a fresh variable each time, losing all previous state and accumulating orphaned subscriptions.',
-    correctionMessage: 'Move reactive .obs variables into a GetxController and access them via GetBuilder or Obx to preserve state across rebuilds.',
+    correctionMessage:
+        'Move reactive .obs variables into a GetxController and access them via GetBuilder or Obx to preserve state across rebuilds.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -7008,7 +7009,8 @@ class AvoidMutableRxVariablesRule extends SaropaLintRule {
     name: 'avoid_mutable_rx_variables',
     problemMessage:
         '[avoid_mutable_rx_variables] Reassigning an Rx variable with = replaces the entire reactive wrapper, breaking all existing Obx listeners that still reference the old instance. The build method stops receiving updates because child widgets observe a stale object, leading to a frozen interface that appears unresponsive.',
-    correctionMessage: 'Use .value = or callable syntax to update the Rx variable without replacing the reactive wrapper that Obx listeners depend on.',
+    correctionMessage:
+        'Use .value = or callable syntax to update the Rx variable without replacing the reactive wrapper that Obx listeners depend on.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -7554,7 +7556,8 @@ class AvoidListenInAsyncRule extends SaropaLintRule {
     name: 'avoid_listen_in_async',
     problemMessage:
         '[avoid_listen_in_async] Using context.watch() inside an async callback triggers widget rebuilds during asynchronous execution, creating stale closures that capture outdated state. This causes data races where async operations complete with wrong values, leading to corrupted state or duplicate side effects.',
-    correctionMessage: 'Replace context.watch() with context.read() in async callbacks to capture the current value without subscribing to rebuilds.',
+    correctionMessage:
+        'Replace context.watch() with context.read() in async callbacks to capture the current value without subscribing to rebuilds.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -9286,7 +9289,8 @@ class AvoidProviderInInitStateRule extends SaropaLintRule {
     name: 'avoid_provider_in_init_state',
     problemMessage:
         '[avoid_provider_in_init_state] Accessing Provider in initState() may fail because the widget context is not fully mounted in the element tree. This can throw a ProviderNotFoundException or return stale data, causing initialization logic to operate on incorrect values or crash on first render.',
-    correctionMessage: 'Move Provider access to didChangeDependencies() where the BuildContext is fully mounted and InheritedWidget lookups are safe.',
+    correctionMessage:
+        'Move Provider access to didChangeDependencies() where the BuildContext is fully mounted and InheritedWidget lookups are safe.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -10098,7 +10102,8 @@ class PreferBlocListenerForSideEffectsRule extends SaropaLintRule {
     name: 'prefer_bloc_listener_for_side_effects',
     problemMessage:
         '[prefer_bloc_listener_for_side_effects] Side effects inside BlocBuilder execute on every widget rebuild, causing user-facing errors like duplicate navigation pushes, multiple snackbars stacking on screen, or repeated API calls that waste bandwidth and may corrupt server-side state.',
-    correctionMessage: 'Move side effects (navigation, snackbars, API calls) to BlocListener or use BlocConsumer to separate rebuilds from one-time actions.',
+    correctionMessage:
+        'Move side effects (navigation, snackbars, API calls) to BlocListener or use BlocConsumer to separate rebuilds from one-time actions.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
