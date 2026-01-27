@@ -49,8 +49,8 @@ export 'package:saropa_lints/src/saropa_lint_rule.dart'
         RuleTier,
         RuleTimingRecord,
         RuleTimingTracker,
-        SaropaLintRule,
         ProgressTrackerData,
+        SaropaLintRule,
         TestRelevance,
         ViolationRecord;
 export 'package:saropa_lints/src/report/analysis_reporter.dart';
