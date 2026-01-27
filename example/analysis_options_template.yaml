@@ -842,6 +842,11 @@ custom_lint:
     - avoid_hardcoded_config: false              # WARNING - hardcoded URLs and keys (v4.1.6)
     - avoid_hardcoded_config_test: false         # INFO - hardcoded config in test files (v4.8.2)
     - avoid_mixed_environments: false            # ERROR - prod/dev config mismatch (v4.1.6)
+    # OWASP M2 Supply Chain Security
+    - avoid_dynamic_code_loading: false          # ERROR - dynamic code loading via Isolate.spawnUri (OWASP M2)
+    - avoid_unverified_native_library: false     # ERROR - unverified native library loading (OWASP M2)
+    # OWASP M7 Binary Protections
+    - avoid_hardcoded_signing_config: false      # WARNING - signing config in source code (OWASP M7)
 
     # =========================================================================
     # EQUATABLE (v2.3.9)

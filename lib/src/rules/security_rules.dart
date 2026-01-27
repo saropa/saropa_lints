@@ -783,7 +783,7 @@ class AvoidEvalLikePatternsRule extends SaropaLintRule {
 
   @override
   OwaspMapping get owasp => const OwaspMapping(
-        mobile: <OwaspMobile>{OwaspMobile.m4},
+        mobile: <OwaspMobile>{OwaspMobile.m4, OwaspMobile.m7},
         web: <OwaspWeb>{OwaspWeb.a03},
       );
 
@@ -869,6 +869,505 @@ class _AddTodoForEvalPatternFix extends DartFix {
         builder.addSimpleInsertion(
           node.offset,
           '// HACK: remove dart:mirrors usage for security\n',
+        );
+      });
+    });
+  }
+}
+
+/// Warns when code is loaded dynamically at runtime, bypassing compile-time
+/// dependency verification.
+///
+/// Dynamic code loading via `Isolate.spawnUri()` or runtime package management
+/// commands allows execution of unverified code, creating supply chain attack
+/// vectors. Attackers can inject malicious code through compromised URIs or
+/// package sources.
+///
+/// **BAD:**
+/// ```dart
+/// // Loading code from a dynamic URI
+/// await Isolate.spawnUri(Uri.parse(userUrl), [], null);
+///
+/// // Running package management at runtime
+/// await Process.run('pub', ['get']);
+/// await Process.run('flutter', ['pub', 'add', 'malicious_pkg']);
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// // Use static imports for all code dependencies
+/// import 'package:myapp/worker.dart';
+///
+/// // Use Isolate.run for compute-heavy tasks
+/// final result = await Isolate.run(() => heavyComputation());
+///
+/// // Use Isolate.spawn with static entry points
+/// await Isolate.spawn(staticEntryPoint, message);
+/// ```
+///
+/// **OWASP:** [M2:Inadequate-Supply-Chain-Security]
+class AvoidDynamicCodeLoadingRule extends SaropaLintRule {
+  const AvoidDynamicCodeLoadingRule() : super(code: _code);
+
+  /// Runtime code loading enables supply chain attacks.
+  /// Each occurrence is a critical security vulnerability.
+  @override
+  LintImpact get impact => LintImpact.critical;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  @override
+  OwaspMapping get owasp => const OwaspMapping(
+        mobile: <OwaspMobile>{OwaspMobile.m2},
+      );
+
+  @override
+  Set<String>? get requiredPatterns => const <String>{'Isolate', 'Process'};
+
+  static const LintCode _code = LintCode(
+    name: 'avoid_dynamic_code_loading',
+    problemMessage:
+        '[avoid_dynamic_code_loading] Dynamic code loading at runtime '
+        'bypasses compile-time dependency verification, allowing execution '
+        'of unverified code and creating supply chain attack vectors.',
+    correctionMessage:
+        'Use static imports for all code dependencies. For background '
+        'computation, use Isolate.run() or Isolate.spawn() with static '
+        'entry points instead of Isolate.spawnUri().',
+    errorSeverity: DiagnosticSeverity.ERROR,
+  );
+
+  /// Package manager executables to detect.
+  static const Set<String> _packageManagers = <String>{
+    'pub',
+    'dart',
+    'flutter',
+    'npm',
+    'npx',
+    'yarn',
+    'pnpm',
+    'pip',
+    'gem',
+    'bundle',
+    'cargo',
+  };
+
+  /// Package management subcommands that modify dependencies.
+  static const Set<String> _installCommands = <String>{
+    'get',
+    'add',
+    'install',
+    'update',
+    'upgrade',
+    'pub',
+  };
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      final String methodName = node.methodName.name;
+      final Expression? target = node.target;
+      if (target == null) return;
+
+      final String targetSource = target.toSource();
+
+      // Detect Isolate.spawnUri() - all calls are flagged
+      if (methodName == 'spawnUri' && targetSource == 'Isolate') {
+        reporter.atNode(node, code);
+        return;
+      }
+
+      // Detect Process.run() / Process.start() with package management
+      if ((methodName == 'run' || methodName == 'start') &&
+          targetSource == 'Process') {
+        _checkForPackageManagement(node, reporter);
+      }
+    });
+  }
+
+  void _checkForPackageManagement(
+    MethodInvocation node,
+    SaropaDiagnosticReporter reporter,
+  ) {
+    final NodeList<Expression> args = node.argumentList.arguments;
+    if (args.isEmpty) return;
+
+    final Expression firstArg = args.first;
+    if (firstArg is! StringLiteral) return;
+
+    final String? executable = firstArg.stringValue;
+    if (executable == null) return;
+
+    if (!_packageManagers.contains(executable)) return;
+
+    // Check if second argument contains install-like commands
+    if (args.length < 2) return;
+    final Expression secondArg = args[1];
+    if (secondArg is! ListLiteral) return;
+
+    for (final CollectionElement element in secondArg.elements) {
+      if (element is! Expression) continue;
+      if (element is StringLiteral) {
+        final String? value = element.stringValue;
+        if (value != null && _installCommands.contains(value)) {
+          reporter.atNode(node, code);
+          return;
+        }
+      }
+    }
+  }
+
+  @override
+  List<Fix> getFixes() => <Fix>[_AddTodoForDynamicCodeLoadingFix()];
+}
+
+class _AddTodoForDynamicCodeLoadingFix extends DartFix {
+  @override
+  void run(
+    CustomLintResolver resolver,
+    ChangeReporter reporter,
+    CustomLintContext context,
+    AnalysisError analysisError,
+    List<AnalysisError> others,
+  ) {
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
+
+      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
+        message: 'Add HACK comment for dynamic code loading',
+        priority: 1,
+      );
+
+      changeBuilder.addDartFileEdit((builder) {
+        // Find the start of the statement
+        AstNode? statement = node.parent;
+        while (statement != null && statement is! ExpressionStatement) {
+          statement = statement.parent;
+        }
+        final int offset = statement?.offset ?? node.offset;
+
+        builder.addSimpleInsertion(
+          offset,
+          '// HACK: replace dynamic code loading with static imports\n',
+        );
+      });
+    });
+  }
+}
+
+/// Warns when native libraries are loaded from dynamic or absolute paths.
+///
+/// Loading native libraries via `DynamicLibrary.open()` with non-constant or
+/// path-containing arguments bypasses Dart's package management, allowing
+/// attackers to substitute malicious native libraries.
+///
+/// **BAD:**
+/// ```dart
+/// // Dynamic path - attacker can control library location
+/// DynamicLibrary.open(userProvidedPath);
+///
+/// // Absolute path - can be replaced on compromised device
+/// DynamicLibrary.open('/usr/lib/libcrypto.so');
+///
+/// // Relative path with directory traversal
+/// DynamicLibrary.open('../libs/libfoo.dylib');
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// // Bundled library name - loaded from app package
+/// DynamicLibrary.open('libfoo.dylib');
+///
+/// // Process library (current process)
+/// DynamicLibrary.process();
+///
+/// // Executable library
+/// DynamicLibrary.executable();
+/// ```
+///
+/// **OWASP:** [M2:Inadequate-Supply-Chain-Security]
+class AvoidUnverifiedNativeLibraryRule extends SaropaLintRule {
+  const AvoidUnverifiedNativeLibraryRule() : super(code: _code);
+
+  /// Loading unverified native code enables supply chain attacks.
+  @override
+  LintImpact get impact => LintImpact.critical;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  @override
+  OwaspMapping get owasp => const OwaspMapping(
+        mobile: <OwaspMobile>{OwaspMobile.m2},
+      );
+
+  @override
+  Set<String>? get requiredPatterns => const <String>{'DynamicLibrary'};
+
+  static const LintCode _code = LintCode(
+    name: 'avoid_unverified_native_library',
+    problemMessage:
+        '[avoid_unverified_native_library] Loading native libraries from '
+        'dynamic or absolute paths bypasses package verification, allowing '
+        'attackers to substitute malicious native code.',
+    correctionMessage:
+        'Use library names without paths (e.g., \'libfoo.so\') to load '
+        'from verified app bundle resources. Avoid loading from dynamic '
+        'paths or user-provided locations.',
+    errorSeverity: DiagnosticSeverity.ERROR,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      if (node.methodName.name != 'open') return;
+
+      final Expression? target = node.target;
+      if (target == null) return;
+      if (target.toSource() != 'DynamicLibrary') return;
+
+      final NodeList<Expression> args = node.argumentList.arguments;
+      if (args.isEmpty) return;
+
+      final Expression firstArg = args.first;
+
+      // Non-constant argument (variable, interpolation, etc.)
+      if (firstArg is! SimpleStringLiteral) {
+        reporter.atNode(node, code);
+        return;
+      }
+
+      // String literal with path separators or traversal
+      final String value = firstArg.value;
+      if (value.contains('/') || value.contains(r'\') || value.contains('..')) {
+        reporter.atNode(node, code);
+      }
+    });
+  }
+
+  @override
+  List<Fix> getFixes() => <Fix>[_AddTodoForUnverifiedNativeLibraryFix()];
+}
+
+class _AddTodoForUnverifiedNativeLibraryFix extends DartFix {
+  @override
+  void run(
+    CustomLintResolver resolver,
+    ChangeReporter reporter,
+    CustomLintContext context,
+    AnalysisError analysisError,
+    List<AnalysisError> others,
+  ) {
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
+
+      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
+        message: 'Add HACK comment for unverified native library',
+        priority: 1,
+      );
+
+      changeBuilder.addDartFileEdit((builder) {
+        AstNode? statement = node.parent;
+        while (statement != null && statement is! ExpressionStatement) {
+          statement = statement.parent;
+        }
+        final int offset = statement?.offset ?? node.offset;
+
+        builder.addSimpleInsertion(
+          offset,
+          '// HACK: use bundled library name without path\n',
+        );
+      });
+    });
+  }
+}
+
+/// Warns when signing configuration (keystore paths, passwords, aliases)
+/// is hardcoded in source code.
+///
+/// Hardcoded signing configuration is extractable from compiled binaries
+/// via reverse engineering, enabling attackers to sign malicious builds
+/// or access signing infrastructure.
+///
+/// **BAD:**
+/// ```dart
+/// const keystorePath = '/path/to/release.keystore';
+/// const storePassword = 'mySecretPassword';
+/// const keyAlias = 'upload';
+/// final config = 'key.properties';
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// final keystorePath = Platform.environment['KEYSTORE_PATH'];
+/// final storePassword = Platform.environment['STORE_PASSWORD'];
+/// final keyAlias = Platform.environment['KEY_ALIAS'];
+/// ```
+///
+/// **OWASP:** [M7:Insufficient-Binary-Protections]
+class AvoidHardcodedSigningConfigRule extends SaropaLintRule {
+  const AvoidHardcodedSigningConfigRule() : super(code: _code);
+
+  /// Signing config in source code aids reverse engineering.
+  @override
+  LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  @override
+  OwaspMapping get owasp => const OwaspMapping(
+        mobile: <OwaspMobile>{OwaspMobile.m7},
+      );
+
+  @override
+  Set<String>? get requiredPatterns => const <String>{
+        'keystore',
+        'jks',
+        'signing',
+        'storePassword',
+        'keyPassword',
+        'keyAlias',
+        'key.properties',
+      };
+
+  static const LintCode _code = LintCode(
+    name: 'avoid_hardcoded_signing_config',
+    problemMessage:
+        '[avoid_hardcoded_signing_config] Hardcoding keystore paths, '
+        'passwords, or signing configuration in source code exposes them '
+        'to reverse engineering. These values are extractable from compiled '
+        'binaries and enable attackers to sign malicious builds.',
+    correctionMessage:
+        'Store signing configuration in environment variables or secure '
+        'CI/CD secrets. Use Platform.environment or load from external '
+        'configuration files excluded from version control.',
+    errorSeverity: DiagnosticSeverity.WARNING,
+  );
+
+  /// Patterns in string literals that indicate signing configuration.
+  static const Set<String> _signingStringPatterns = <String>{
+    '.keystore',
+    '.jks',
+    'key.properties',
+    'signingconfig',
+    'storepassword',
+    'keypassword',
+    'keyalias',
+  };
+
+  /// Variable name patterns that indicate signing configuration.
+  ///
+  /// Note: `storepassword` and `keypassword` are intentionally excluded
+  /// because [AvoidHardcodedCredentialsRule] already detects any variable
+  /// containing `password` at ERROR severity.
+  static const Set<String> _signingVarPatterns = <String>{
+    'keystore',
+    'keystorepath',
+    'keyalias',
+    'signingconfig',
+  };
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    // Check string literals for signing-related content
+    context.registry.addSimpleStringLiteral((SimpleStringLiteral node) {
+      // Skip import URIs
+      if (node.parent is ImportDirective || node.parent is ExportDirective) {
+        return;
+      }
+
+      final String lower = node.value.toLowerCase();
+      for (final String pattern in _signingStringPatterns) {
+        if (lower.contains(pattern)) {
+          reporter.atNode(node, code);
+          return;
+        }
+      }
+    });
+
+    // Check variable names with signing-related names assigned strings
+    context.registry.addVariableDeclaration((VariableDeclaration node) {
+      final String varName = node.name.lexeme.toLowerCase();
+
+      final bool isSigningVar = _signingVarPatterns.any(varName.contains);
+      if (!isSigningVar) return;
+
+      final Expression? initializer = node.initializer;
+      if (initializer is StringLiteral) {
+        final String? value = initializer.stringValue;
+        if (value != null && value.isNotEmpty) {
+          reporter.atNode(node, code);
+        }
+      }
+    });
+  }
+
+  @override
+  List<Fix> getFixes() => <Fix>[_AddTodoForHardcodedSigningConfigFix()];
+}
+
+class _AddTodoForHardcodedSigningConfigFix extends DartFix {
+  @override
+  void run(
+    CustomLintResolver resolver,
+    ChangeReporter reporter,
+    CustomLintContext context,
+    AnalysisError analysisError,
+    List<AnalysisError> others,
+  ) {
+    context.registry.addSimpleStringLiteral((SimpleStringLiteral node) {
+      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
+
+      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
+        message: 'Add comment to use environment variable',
+        priority: 1,
+      );
+
+      changeBuilder.addDartFileEdit((builder) {
+        AstNode? statement = node.parent;
+        while (statement != null &&
+            statement is! VariableDeclarationStatement &&
+            statement is! ExpressionStatement) {
+          statement = statement.parent;
+        }
+        final int offset = statement?.offset ?? node.offset;
+
+        builder.addSimpleInsertion(
+          offset,
+          '// HACK: use Platform.environment or CI/CD secrets instead\n',
+        );
+      });
+    });
+
+    context.registry.addVariableDeclaration((VariableDeclaration node) {
+      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
+
+      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
+        message: 'Add comment to use environment variable',
+        priority: 1,
+      );
+
+      changeBuilder.addDartFileEdit((builder) {
+        AstNode? statement = node.parent?.parent;
+        final int offset = statement?.offset ?? node.offset;
+
+        builder.addSimpleInsertion(
+          offset,
+          '// HACK: use Platform.environment or CI/CD secrets instead\n',
         );
       });
     });

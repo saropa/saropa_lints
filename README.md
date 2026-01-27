@@ -94,18 +94,20 @@ Security rules are mapped to **OWASP Mobile Top 10 (2024)** and **OWASP Top 10 (
 - **Risk categorization** aligned with industry standards
 - **Coverage analysis** across OWASP categories
 
-| OWASP Mobile        | Coverage | OWASP Web                  | Coverage  |
-| ------------------- | -------- | -------------------------- | --------- |
-| M1 Credential Usage | 5+ rules | A01 Broken Access Control  | 4+ rules  |
-| M3 Authentication   | 5+ rules | A02 Cryptographic Failures | 10+ rules |
-| M4 Input Validation | 6+ rules | A03 Injection              | 6+ rules  |
-| M5 Communication    | 2+ rules | A05 Misconfiguration       | 4+ rules  |
-| M6 Privacy Controls | 5+ rules | A07 Authentication         | 8+ rules  |
-| M8 Misconfiguration | 4+ rules | A09 Logging Failures       | 2+ rules  |
-| M9 Data Storage     | 7+ rules |                            |           |
-| M10 Cryptography    | 4+ rules |                            |           |
+| OWASP Mobile          | Coverage | OWASP Web                  | Coverage  |
+| --------------------- | -------- | -------------------------- | --------- |
+| M1 Credential Usage   | 5+ rules | A01 Broken Access Control  | 4+ rules  |
+| M2 Supply Chain       | 2+ rules | A02 Cryptographic Failures | 10+ rules |
+| M3 Authentication     | 5+ rules | A03 Injection              | 6+ rules  |
+| M4 Input Validation   | 6+ rules | A05 Misconfiguration       | 4+ rules  |
+| M5 Communication      | 2+ rules | A07 Authentication         | 8+ rules  |
+| M6 Privacy Controls   | 5+ rules | A09 Logging Failures       | 2+ rules  |
+| M7 Binary Protections | 2+ rules |                            |           |
+| M8 Misconfiguration   | 4+ rules |                            |           |
+| M9 Data Storage       | 7+ rules |                            |           |
+| M10 Cryptography      | 4+ rules |                            |           |
 
-**Gaps**: M2 (Supply Chain) and M7 (Binary Protection) require separate tooling — dependency scanners and build-time protections. A06 (Outdated Components) similarly requires dependency scanning.
+**Gaps**: A06 (Outdated Components) requires dependency scanning tooling.
 
 Rules expose their OWASP mapping programmatically:
 
