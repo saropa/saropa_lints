@@ -146,7 +146,6 @@ if not check_modules_exist():
     sys.exit(1)
 
 
-# Now safe to import from modules
 from scripts.modules._utils import (
     Color,
     ExitCode,
