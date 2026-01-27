@@ -1184,11 +1184,11 @@ class RequireAnimationStatusListenerRule extends SaropaLintRule {
 /// Overlapping animations on the same property fight each other,
 /// causing jitter and unpredictable behavior. This rule detects nested
 /// transition widgets that animate the same property:
-/// - [ScaleTransition] → scale
-/// - [FadeTransition] → opacity
-/// - [SlideTransition] → position
-/// - [RotationTransition] → rotation
-/// - [SizeTransition] → size (axis-aware: vertical = height, horizontal = width)
+/// - `ScaleTransition` → scale
+/// - `FadeTransition` → opacity
+/// - `SlideTransition` → position
+/// - `RotationTransition` → rotation
+/// - `SizeTransition` → size (axis-aware: vertical = height, horizontal = width)
 ///
 /// **BAD:** Nested transitions animating the same property
 /// ```dart

@@ -1794,8 +1794,8 @@ class PreferAddAllRule extends SaropaLintRule {
 /// **Quick fix available:** Removes the duplicate element.
 ///
 /// See also:
-/// - [avoid_duplicate_string_elements] for string duplicates
-/// - [avoid_duplicate_object_elements] for other duplicates
+/// - `avoid_duplicate_string_elements` for string duplicates
+/// - `avoid_duplicate_object_elements` for other duplicates
 class AvoidDuplicateNumberElementsRule extends SaropaLintRule {
   const AvoidDuplicateNumberElementsRule() : super(code: _code);
 
@@ -1865,8 +1865,8 @@ class AvoidDuplicateNumberElementsRule extends SaropaLintRule {
 /// **Quick fix available:** Removes the duplicate element.
 ///
 /// See also:
-/// - [avoid_duplicate_number_elements] for numeric duplicates
-/// - [avoid_duplicate_object_elements] for other duplicates
+/// - `avoid_duplicate_number_elements` for numeric duplicates
+/// - `avoid_duplicate_object_elements` for other duplicates
 class AvoidDuplicateStringElementsRule extends SaropaLintRule {
   const AvoidDuplicateStringElementsRule() : super(code: _code);
 
@@ -1935,8 +1935,8 @@ class AvoidDuplicateStringElementsRule extends SaropaLintRule {
 /// **Quick fix available:** Removes the duplicate element.
 ///
 /// See also:
-/// - [avoid_duplicate_number_elements] for numeric duplicates
-/// - [avoid_duplicate_string_elements] for string duplicates
+/// - `avoid_duplicate_number_elements` for numeric duplicates
+/// - `avoid_duplicate_string_elements` for string duplicates
 class AvoidDuplicateObjectElementsRule extends SaropaLintRule {
   const AvoidDuplicateObjectElementsRule() : super(code: _code);
 

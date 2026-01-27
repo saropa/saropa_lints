@@ -905,7 +905,7 @@ class _AddTodoForEvalPatternFix extends DartFix {
 /// await Isolate.spawn(staticEntryPoint, message);
 /// ```
 ///
-/// **OWASP:** [M2:Inadequate-Supply-Chain-Security]
+/// **OWASP:** `M2:Inadequate-Supply-Chain-Security`
 class AvoidDynamicCodeLoadingRule extends SaropaLintRule {
   const AvoidDynamicCodeLoadingRule() : super(code: _code);
 
@@ -1090,7 +1090,7 @@ class _AddTodoForDynamicCodeLoadingFix extends DartFix {
 /// DynamicLibrary.executable();
 /// ```
 ///
-/// **OWASP:** [M2:Inadequate-Supply-Chain-Security]
+/// **OWASP:** `M2:Inadequate-Supply-Chain-Security`
 class AvoidUnverifiedNativeLibraryRule extends SaropaLintRule {
   const AvoidUnverifiedNativeLibraryRule() : super(code: _code);
 
@@ -1213,7 +1213,7 @@ class _AddTodoForUnverifiedNativeLibraryFix extends DartFix {
 /// final keyAlias = Platform.environment['KEY_ALIAS'];
 /// ```
 ///
-/// **OWASP:** [M7:Insufficient-Binary-Protections]
+/// **OWASP:** `M7:Insufficient-Binary-Protections`
 class AvoidHardcodedSigningConfigRule extends SaropaLintRule {
   const AvoidHardcodedSigningConfigRule() : super(code: _code);
 
@@ -3605,10 +3605,10 @@ class _AddSecureKeyboardSettingsFix extends DartFix {
 /// }
 /// ```
 ///
-/// **OWASP:** [M4:Insufficient-Input-Output-Validation], [A01:Broken-Access],
-/// [A03:Injection]
+/// **OWASP:** `M4:Insufficient-Input-Output-Validation`, `A01:Broken-Access`,
+/// `A03:Injection`
 ///
-/// See also: [require_file_path_sanitization] for a similar rule.
+/// See also: `require_file_path_sanitization` for a similar rule.
 class AvoidPathTraversalRule extends SaropaLintRule {
   const AvoidPathTraversalRule() : super(code: _code);
 
