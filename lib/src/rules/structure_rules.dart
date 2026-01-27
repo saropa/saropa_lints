@@ -366,8 +366,7 @@ class AvoidGlobalStateRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_global_state',
-    problemMessage:
-        '[avoid_global_state] Mutable global state detected. '
+    problemMessage: '[avoid_global_state] Mutable global state detected. '
         'Top-level mutable variables create hidden dependencies between functions, make unit testing unreliable '
         'because tests share state, and cause race conditions in concurrent or isolate-based code.',
     correctionMessage:
@@ -596,8 +595,7 @@ class AvoidLongFilesRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_long_length_files',
-    problemMessage:
-        '[avoid_long_length_files] File exceeds $_maxLines lines. '
+    problemMessage: '[avoid_long_length_files] File exceeds $_maxLines lines. '
         'Files this long are difficult to navigate, increase code review time, '
         'and frequently indicate that the file handles multiple unrelated concerns.',
     correctionMessage:
