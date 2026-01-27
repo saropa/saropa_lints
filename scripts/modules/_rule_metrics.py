@@ -1,10 +1,11 @@
 """
-Lint rule counting and test coverage metrics.
+Lint rule counting, test coverage metrics, and README badge sync.
 
-Provides rule/category/fixture counts and a visual coverage report
-used by the publish workflow's summary output.
+Provides rule/category/fixture counts, a visual coverage report,
+and automatic README.md badge synchronisation used by the publish
+workflow.
 
-Version:   1.0
+Version:   2.0
 Author:    Saropa
 Copyright: (c) 2025-2026 Saropa
 """
@@ -17,6 +18,8 @@ from pathlib import Path
 from scripts.modules._utils import (
     Color,
     print_colored,
+    print_success,
+    print_warning,
 )
 
 _RULE_CLASS_RE = re.compile(
@@ -133,3 +136,123 @@ def display_test_coverage(project_dir: Path) -> None:
                 row_color,
             )
         print()
+
+
+# =============================================================================
+# README BADGE SYNC
+# =============================================================================
+
+_VERSION_BADGE_RE = re.compile(r"(badge/pub-)[^-]+(-blue)")
+_RULES_BADGE_RE = re.compile(r"(badge/rules-)(\d+)(%2B)")
+_TIER_ESSENTIAL_RE = re.compile(r"(`essential`: ~)\d+")
+_TIER_RECOMMENDED_RE = re.compile(r"(`recommended`: ~)\d+")
+_TIER_PROFESSIONAL_RE = re.compile(r"(`professional`: ~)\d+")
+_TIER_COMP_INSANITY_RE = re.compile(r"(`comprehensive`/`insanity`: )\d+\+")
+
+
+def _round_tier_count(count: int) -> int:
+    """Round a cumulative tier count for display with ``~`` prefix.
+
+    Provides stable display values that don't change on every publish.
+    Counts >= 1000 round to nearest 100; smaller counts round to
+    nearest 50.
+
+    Examples::
+
+        _round_tier_count(263)  → 250
+        _round_tier_count(797)  → 800
+        _round_tier_count(1423) → 1400
+    """
+    if count >= 1000:
+        return round(count / 100) * 100
+    return round(count / 50) * 50
+
+
+def sync_readme_badges(
+    project_dir: Path,
+    version: str,
+    rule_count: int,
+) -> bool:
+    """Sync version, total rule count, and tier counts in README.md.
+
+    Updates:
+    - Version badge (``pub-X.Y.Z-blue``)
+    - Rules badge (``rules-NNNN%2B``)
+    - Prose references to total rule count (``NNNN+``)
+    - Per-tier cumulative counts (``~NNN`` and ``NNN+``)
+
+    Returns:
+        True always (warnings logged if README missing).
+    """
+    readme_path = project_dir / "README.md"
+    if not readme_path.exists():
+        print_warning("README.md not found, skipping badge sync")
+        return True
+
+    content = readme_path.read_text(encoding="utf-8")
+    original = content
+
+    # --- Extract old total from rules badge ---
+    old_match = _RULES_BADGE_RE.search(content)
+    old_count = int(old_match.group(2)) if old_match else None
+
+    # --- Version badge ---
+    content = _VERSION_BADGE_RE.sub(rf"\g<1>{version}\g<2>", content)
+
+    # --- Rules badge ---
+    content = _RULES_BADGE_RE.sub(
+        rf"\g<1>{rule_count}\g<3>", content
+    )
+
+    # --- Prose total count (e.g. "1677+" → "1682+") ---
+    # Safe as global replace: badge URLs use %2B (not +), and tier
+    # counts are different numbers corrected by _sync_tier_counts below.
+    if old_count is not None and old_count != rule_count:
+        content = content.replace(f"{old_count}+", f"{rule_count}+")
+
+    # --- Per-tier cumulative counts ---
+    content = _sync_tier_counts(project_dir, content)
+
+    if content == original:
+        print_success("README badges already up to date")
+        return True
+
+    readme_path.write_text(content, encoding="utf-8")
+    print_success(
+        f"Synced README badges (v{version}, {rule_count}+ rules)"
+    )
+    return True
+
+
+def _sync_tier_counts(project_dir: Path, content: str) -> str:
+    """Replace per-tier cumulative counts in *content*."""
+    from scripts.modules._audit_checks import get_tier_stats
+
+    tiers_path = project_dir / "lib" / "src" / "tiers.dart"
+    if not tiers_path.exists():
+        print_warning("tiers.dart not found, skipping tier sync")
+        return content
+
+    stats = get_tier_stats(tiers_path)
+
+    # Cumulative counts (tiers are exclusive; sum them up)
+    essential = stats.counts.get("essential", 0)
+    recommended = essential + stats.counts.get("recommended", 0)
+    professional = recommended + stats.counts.get("professional", 0)
+    comprehensive = professional + stats.counts.get("comprehensive", 0)
+    insanity = comprehensive + stats.counts.get("insanity", 0)
+
+    content = _TIER_ESSENTIAL_RE.sub(
+        rf"\g<1>{_round_tier_count(essential)}", content
+    )
+    content = _TIER_RECOMMENDED_RE.sub(
+        rf"\g<1>{_round_tier_count(recommended)}", content
+    )
+    content = _TIER_PROFESSIONAL_RE.sub(
+        rf"\g<1>{_round_tier_count(professional)}", content
+    )
+    content = _TIER_COMP_INSANITY_RE.sub(
+        rf"\g<1>{insanity}+", content
+    )
+
+    return content
