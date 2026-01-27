@@ -367,10 +367,19 @@ String? _getDisposeMethodBody(ClassDeclaration node) {
 }
 
 /// Helper to check if a field is disposed in the dispose body.
+///
+/// Recognizes direct `.dispose()` calls and method names containing "dispose"
+/// (e.g., `.disposeSafe()`, `.safeDispose()`), with both `.` and `?.` syntax.
 bool _isFieldDisposed(String fieldName, String? disposeBody) {
   if (disposeBody == null) return false;
-  return disposeBody.contains('$fieldName.dispose(') ||
-      disposeBody.contains('$fieldName?.dispose(');
+
+  // Match fieldName.dispose( or fieldName?.dispose(
+  // Also match fieldName.xxxDisposezzz( or fieldName?.xxxDisposezzz(
+  final RegExp disposePattern = RegExp(
+    '${RegExp.escape(fieldName)}\\??\\.' // fieldName. or fieldName?.
+    r'\w*[Dd]ispose\w*\(', // any method containing "dispose"
+  );
+  return disposePattern.hasMatch(disposeBody);
 }
 
 /// Helper to report undisposed fields.
@@ -1284,18 +1293,27 @@ class _SubscriptionField {
 // Part 2: Additional Dispose Pattern Rules
 // =============================================================================
 
-/// Warns when ChangeNotifier is not disposed.
+/// Warns when an owned ChangeNotifier-derived field is not disposed.
 ///
 /// Alias: dispose_change_notifier, change_notifier_leak
 ///
-/// ChangeNotifier maintains a list of listeners that must be cleared.
-/// Not disposing can cause memory leaks and stale listener callbacks.
+/// Covers: ChangeNotifier, ValueNotifier, ScrollController,
+/// AnimationController, FocusNode. Other controller types
+/// (TextEditingController, PageController, TabController) have dedicated
+/// rules and are excluded to avoid duplicate violations.
+///
+/// Only flags fields that are **owned** by this class — i.e., initialized
+/// inline with a constructor call or assigned in `initState`. Fields received
+/// from callbacks, parameters, or external sources are not flagged.
+///
+/// Disposal is recognized via direct `.dispose()` calls as well as method
+/// names containing "dispose" (e.g., `.disposeSafe()`, `.safeDispose()`).
 ///
 /// **BAD:**
 /// ```dart
 /// class _MyWidgetState extends State<MyWidget> {
 ///   final MyNotifier _notifier = MyNotifier();
-///   // Missing dispose!
+///   // Missing dispose — listeners leak!
 /// }
 /// ```
 ///
@@ -1332,14 +1350,14 @@ class RequireChangeNotifierDisposeRule extends SaropaLintRule {
     errorSeverity: DiagnosticSeverity.ERROR,
   );
 
+  // Types with dedicated disposal rules (RequireTextEditingControllerDisposeRule,
+  // RequirePageControllerDisposeRule, RequireTabControllerDisposeRule) are
+  // excluded to avoid duplicate violations.
   static const Set<String> _changeNotifierTypes = <String>{
     'ChangeNotifier',
     'ValueNotifier',
-    'TextEditingController',
     'ScrollController',
     'AnimationController',
-    'TabController',
-    'PageController',
     'FocusNode',
   };
 
@@ -1352,22 +1370,11 @@ class RequireChangeNotifierDisposeRule extends SaropaLintRule {
     context.registry.addClassDeclaration((ClassDeclaration node) {
       if (!_extendsState(node)) return;
 
-      // Find ChangeNotifier-derived fields
+      // Find owned ChangeNotifier-derived fields using the same
+      // ownership detection as sibling disposal rules
       final List<String> notifierFields = <String>[];
-      for (final ClassMember member in node.members) {
-        if (member is FieldDeclaration) {
-          final String? typeName = member.fields.type?.toSource();
-          if (typeName != null) {
-            for (final String notifierType in _changeNotifierTypes) {
-              if (typeName.contains(notifierType)) {
-                for (final VariableDeclaration variable
-                    in member.fields.variables) {
-                  notifierFields.add(variable.name.lexeme);
-                }
-              }
-            }
-          }
-        }
+      for (final String notifierType in _changeNotifierTypes) {
+        notifierFields.addAll(_findOwnedFieldsOfType(node, notifierType));
       }
 
       if (notifierFields.isEmpty) return;
