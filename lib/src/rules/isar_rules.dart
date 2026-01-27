@@ -960,10 +960,12 @@ class RequireIsarInspectorDebugOnlyRule extends SaropaLintRule {
 // Isar Clear in Production Rule
 // =============================================================================
 
-/// Warns when isar.clear() is called without a debug guard.
+/// Warns when `Isar.clear()` is called without a debug mode guard.
 ///
-/// clear() deletes ALL data in the database. This should never
-/// happen in production accidentally.
+/// `Isar.clear()` deletes ALL data in the database. This should never
+/// happen in production accidentally. Only flags `.clear()` on receivers
+/// whose static type is `Isar` — does not flag `Map.clear()`,
+/// `List.clear()`, `Set.clear()`, or other collection types.
 ///
 /// **BAD:**
 /// ```dart
@@ -1002,6 +1004,13 @@ class AvoidIsarClearInProductionRule extends SaropaLintRule {
   ) {
     context.registry.addMethodInvocation((MethodInvocation node) {
       if (node.methodName.name != 'clear') return;
+
+      // Verify the receiver is an Isar instance to avoid false positives
+      // on Map.clear(), List.clear(), Set.clear(), etc.
+      final Expression? target = node.target;
+      if (target == null) return;
+      final String? typeName = target.staticType?.element?.name;
+      if (typeName != 'Isar') return;
 
       // Check if inside mode constant guard
       AstNode? parent = node.parent;

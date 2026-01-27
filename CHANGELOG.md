@@ -21,6 +21,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- **`avoid_isar_clear_in_production` false positive on non-Isar types**: The rule previously flagged every `.clear()` call regardless of receiver type, producing ERROR-severity false positives on `Map.clear()`, `List.clear()`, `Set.clear()`, `TextEditingController.clear()`, and any other class with a `clear()` method. Now uses static type checking to verify the receiver is an `Isar` instance before reporting.
 - **`require_error_case_tests` false positives**: Expanded test name keyword detection to recognize boundary/defensive test patterns (`null`, `empty`, `boundary`, `edge`, `negative`, `fallback`, `missing`) in addition to error keywords. Updated correction message to acknowledge that test files for pure enums, defensive try/catch code, and non-nullable extension methods legitimately have no error-throwing paths.
 - **`prefer_setup_teardown` false positive on independent locals**: The rule no longer flags repeated primitive variable declarations (`int count = 0`, `const int iterations = 1000`) as duplicated setup code. Simple literal initializations and const declarations are now excluded from the setup signature comparison, so only meaningful setup (object construction, service initialization) triggers the suggestion.
 
