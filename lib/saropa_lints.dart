@@ -239,7 +239,9 @@ final List<LintRule Function()> _allRuleFactories = <LintRule Function()>[
   AvoidUnsafeWhereMethodsRule.new,
   PreferWhereOrNullRule.new,
   PreferNamedBooleanParametersRule.new,
-  // PreferEarlyReturnRule(), // Hidden in all_rules.dart
+  PreferEarlyReturnRule.new,
+  PreferMutableCollectionsRule.new,
+  PreferRecordOverEquatableRule.new,
   AvoidFlexibleOutsideFlexRule.new,
   ProperSuperCallsRule.new,
   AvoidNestedAssignmentsRule.new,
