@@ -4,13 +4,14 @@ Custom lint rules for Dart & Flutter static analysis.
 
 ## Configuration
 
-Add to your `analysis_options.yaml`:
+Generate your configuration with the CLI tool:
 
-```yaml
-custom_lint:
-  saropa_lints:
-    tier: recommended  # essential | recommended | professional | comprehensive | insanity
+```bash
+dart run saropa_lints:init --tier recommended
 ```
+
+Available tiers: `essential` (1), `recommended` (2), `professional` (3),
+`comprehensive` (4), `insanity` (5).
 
 ## Tiers
 
