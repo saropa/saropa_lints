@@ -4,34 +4,28 @@
 ///
 /// ## Configuration
 ///
-/// Add to your `analysis_options.yaml`:
+/// Generate your configuration with the CLI tool:
 ///
-/// ```yaml
-/// custom_lint:
-///   saropa_lints:
-///     tier: recommended  # essential | recommended | professional | comprehensive | insanity
+/// ```bash
+/// dart run saropa_lints:init --tier comprehensive
 /// ```
 ///
-/// Available tiers:
-/// - `essential`: Critical rules (~45) - prevents crashes, security issues
-/// - `recommended`: Essential + common mistakes (~150) - default for most teams
-/// - `professional`: Recommended + architecture/testing (~350) - enterprise teams
-/// - `comprehensive`: Professional + thorough coverage (~700) - quality obsessed
-/// - `insanity`: Everything (~475+) - greenfield projects
+/// This generates `analysis_options.yaml` with explicit rule lists.
+/// See [BROKEN_TIERS.md] for why YAML-based tier config is not supported.
 ///
-/// You can also enable/disable individual rules.
+/// Available tiers: `essential` (1), `recommended` (2),
+/// `professional` (3), `comprehensive` (4), `insanity` (5).
 ///
-/// **IMPORTANT:** Rules must use YAML list format (with `-` prefix):
+/// You can also enable/disable individual rules in the generated file:
 ///
 /// ```yaml
 /// custom_lint:
-///   saropa_lints:
-///     tier: recommended
 ///   rules:
 ///     - avoid_debug_print: false  # disable a rule
-///     - no_magic_number: true     # enable a rule not in your tier
+///     - no_magic_number: true     # enable a rule
 /// ```
 ///
+/// **IMPORTANT:** Rules must use YAML list format (with `-` prefix).
 /// Map format (without `-`) is silently ignored by custom_lint!
 library;
 
@@ -604,6 +598,9 @@ final List<LintRule Function()> _allRuleFactories = <LintRule Function()>[
   AvoidWebViewJavaScriptEnabledRule.new,
   RequireBiometricFallbackRule.new,
   AvoidEvalLikePatternsRule.new,
+  AvoidDynamicCodeLoadingRule.new,
+  AvoidUnverifiedNativeLibraryRule.new,
+  AvoidHardcodedSigningConfigRule.new,
   RequireCertificatePinningRule.new,
   AvoidTokenInUrlRule.new,
   AvoidGenericKeyInUrlRule.new,
@@ -2262,13 +2259,12 @@ int? _cachedRulesHash;
 class _SaropaLints extends PluginBase {
   @override
   List<LintRule> getLintRules(CustomLintConfigs configs) {
-    // Read tier configuration from custom_lint.yaml:
-    // custom_lint:
-    //   saropa_lints:
-    //     tier: recommended
-    //     baseline:
-    //       file: "saropa_baseline.json"
-    //       paths: ["lib/legacy/"]
+    // Tier configuration: custom_lint does not support arbitrary plugin
+    // config keys, so YAML-based tier selection is unreliable. The
+    // recommended approach is `dart run saropa_lints:init --tier <name>`
+    // which generates explicit rule lists. This fallback reads from
+    // configs.rules['saropa_lints'] in case a user added it as a rule
+    // entry, but it will almost always be null (defaulting to essential).
     final LintOptions? saropaConfig = configs.rules['saropa_lints'];
     final String tier = saropaConfig?.json['tier'] as String? ?? 'essential';
     final bool enableAll = configs.enableAllLintRules == true;

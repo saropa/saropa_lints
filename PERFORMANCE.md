@@ -205,15 +205,12 @@ jobs:
 
 Use different tiers for local development vs CI:
 
-```yaml
-# Local: analysis_options.yaml
-custom_lint:
-  saropa_lints:
-    tier: essential # Fast feedback loop
+```bash
+# Local: Fast feedback loop (~340 rules)
+dart run saropa_lints:init --tier essential
 
-
-# CI: Override with comprehensive checking
-# Set via environment or separate config
+# CI: Thorough checking (~1620 rules)
+dart run saropa_lints:init --tier comprehensive -o analysis_options.ci.yaml
 ```
 
 ---
@@ -282,18 +279,15 @@ dart run saropa_lints:baseline
 
 ### Full Configuration
 
-```yaml
-custom_lint:
-  saropa_lints:
-    tier: professional
-    baseline:
-      file: "saropa_baseline.json" # Specific violations
-      date: "2025-01-15" # Code unchanged since date
-      paths: # Directories to ignore
-        - "lib/legacy/"
-        - "lib/deprecated/"
-        - "**/generated/"
-      only_impacts: [low, medium] # Keep seeing critical/high
+Generate tier config and baseline via CLI (YAML-based tier/baseline config
+is not supported by custom_lint):
+
+```bash
+# Generate rule config for your tier
+dart run saropa_lints:init --tier professional
+
+# Generate baseline to suppress legacy violations
+dart run saropa_lints:baseline
 ```
 
 ### Workflow
@@ -328,9 +322,9 @@ See [README.md](README.md#baseline-for-brownfield-projects) for full documentati
 # Time the full analysis
 time dart run custom_lint
 
-# Compare tiers
-time dart run custom_lint  # with tier: essential
-time dart run custom_lint  # with tier: professional
+# Compare tiers (generate config first with: dart run saropa_lints:init --tier <name>)
+time dart run custom_lint  # after init --tier essential
+time dart run custom_lint  # after init --tier professional
 ```
 
 ### Expected Performance
