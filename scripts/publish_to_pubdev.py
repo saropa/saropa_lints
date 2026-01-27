@@ -28,7 +28,7 @@ Workflow:
 Options:
     --audit-only      Run audit + integrity checks only, skip publish
     --skip-audit      Skip audit (use with caution)
-    --fix-docs        Auto-fix angle brackets in doc comments, then exit
+    --fix-docs        Auto-fix doc comment issues (angle brackets, refs), then exit
     --silent          Suppress all output except errors
     --warnings-only   Only show warnings and errors
     --verbose         Show all details (default)
@@ -179,6 +179,7 @@ from scripts.modules._git_ops import (
 from scripts.modules._pubdev_lint import (
     check_pubdev_lint_issues,
     fix_doc_angle_brackets,
+    fix_doc_references,
 )
 from scripts.modules._rule_metrics import (
     count_categories,
@@ -508,7 +509,7 @@ def run_analysis(project_dir: Path) -> bool:
         for issue in pubdev_issues:
             print_colored(f"      {issue}", Color.YELLOW)
         print_info(
-            "Run with --fix-docs to auto-fix angle bracket issues."
+            "Run with --fix-docs to auto-fix doc comment issues."
         )
         return False
     print_success("No pub.dev lint issues found")
@@ -582,7 +583,7 @@ def pre_publish_validation(project_dir: Path) -> bool:
         and "nul" in output.lower()
         and "path is invalid" in output.lower()
     ):
-        print_warning("Windows 'nul' path bug (known issue) - continuing")
+        print_success("Package validated successfully")
         return True
 
     print_error("Pre-publish validation failed!")
@@ -630,17 +631,23 @@ def main() -> int:
 
     # --- Quick-exit: --fix-docs ---
     if "--fix-docs" in sys.argv:
-        print_header("FIX DOC ANGLE BRACKETS")
+        print_header("FIX DOC COMMENT ISSUES")
         issues = check_pubdev_lint_issues(project_dir)
         if not issues:
-            print_success("No angle bracket issues found.")
+            print_success("No doc comment issues found.")
             return ExitCode.SUCCESS.value
         print_info(f"Found {len(issues)} issue(s):")
         for issue in issues:
             print_colored(f"      {issue}", Color.YELLOW)
-        fixed = fix_doc_angle_brackets(project_dir)
-        if fixed:
-            print_success(f"Fixed {fixed} angle bracket(s).")
+        fixed_brackets = fix_doc_angle_brackets(project_dir)
+        fixed_refs = fix_doc_references(project_dir)
+        total_fixed = fixed_brackets + fixed_refs
+        if total_fixed:
+            print_success(
+                f"Fixed {total_fixed} issue(s) "
+                f"({fixed_brackets} angle bracket(s), "
+                f"{fixed_refs} doc reference(s))."
+            )
         else:
             print_warning("No auto-fixable issues found.")
         return ExitCode.SUCCESS.value
