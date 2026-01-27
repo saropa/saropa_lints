@@ -137,15 +137,22 @@ def get_registered_rule_names(
         file_contents[dart_file.name] = dart_file.read_text(encoding="utf-8")
 
     # Step 3: Resolve each class name to its _code rule name
+    #
     # Matches: static const [LintCode] _code = LintCode(name: 'rule_name',
     # Also handles: name: _name (variable reference)
+    #
+    # NOTE: Uses _code\w* (not _code) to match variant field names:
+    #   _codeField, _codeMethod  (PreferWidgetPrivateMembersRule)
+    #   _codeDoubleNegation, _codeDeMorgan  (PreferSimplerBooleanExpressionsRule)
+    # Without \w*, rules using these names appear as "phantom" because
+    # the regex can't resolve their class to a rule name.
     code_literal = re.compile(
-        r"static const (?:LintCode )?_code\s*=\s*LintCode\(\s*"
+        r"static const (?:LintCode )?_code\w*\s*=\s*LintCode\(\s*"
         r"name:\s*'([a-z_0-9]+)',",
         re.DOTALL,
     )
     code_variable = re.compile(
-        r"static const (?:LintCode )?_code\s*=\s*LintCode\(\s*"
+        r"static const (?:LintCode )?_code\w*\s*=\s*LintCode\(\s*"
         r"name:\s*(_\w+),",
         re.DOTALL,
     )
@@ -264,6 +271,28 @@ def get_opinionated_prefer_rules(rules_dir: Path) -> set[str]:
     in stylisticRules. Non-prefer opinionated rules (avoid_*, require_*)
     are case-by-case and not enforced here.
 
+    IMPORTANT: Uses class-scoped searching to associate each impact
+    getter with its own class's LintCode name. The previous approach
+    searched backward from each ``LintImpact.opinionated`` occurrence
+    for the nearest ``name:`` pattern, but in SaropaLintRule classes
+    the field order is typically::
+
+        class FooRule extends SaropaLintRule {
+          const FooRule() : super(code: _code);
+          LintImpact get impact => LintImpact.opinionated;  // ← here
+          static const LintCode _code = LintCode(
+            name: 'foo_rule',  // ← name is AFTER impact
+
+    Because ``name:`` appears AFTER the impact getter, a backward
+    search crosses into the previous class and picks up the wrong
+    rule name. For example, if class A has ``name: 'prefer_foo'``
+    and class B below it has ``LintImpact.opinionated``, the backward
+    search from B's impact finds A's name — a false positive.
+
+    The fix: find each class boundary first, then check impact and
+    name within the same class body. This is the same approach used
+    by ``get_owasp_coverage()`` in ``_audit.py``.
+
     Args:
         rules_dir: Path to lib/src/rules/ directory.
 
@@ -275,21 +304,37 @@ def get_opinionated_prefer_rules(rules_dir: Path) -> set[str]:
     impact_pattern = re.compile(
         r"LintImpact get impact => LintImpact\.opinionated;"
     )
+    class_pattern = re.compile(
+        r"class\s+\w+\s+extends\s+\w+LintRule"
+    )
 
     for dart_file in rules_dir.glob("*.dart"):
         if dart_file.name == "all_rules.dart":
             continue
         content = dart_file.read_text(encoding="utf-8")
 
-        for match in impact_pattern.finditer(content):
-            # Search backwards from the impact getter to find the
-            # nearest preceding rule name (from LintCode definition).
-            pre_content = content[: match.start()]
-            name_matches = list(name_pattern.finditer(pre_content))
-            if name_matches:
-                rule_name = name_matches[-1].group(1)
+        # Find each class boundary, then check within it
+        class_starts = [m.start() for m in class_pattern.finditer(content)]
+
+        for idx, start in enumerate(class_starts):
+            # Class body extends to next class or end of file
+            end = (
+                class_starts[idx + 1]
+                if idx + 1 < len(class_starts)
+                else len(content)
+            )
+            class_body = content[start:end]
+
+            # Only care about classes with opinionated impact
+            if not impact_pattern.search(class_body):
+                continue
+
+            # Find rule name(s) within this class body
+            for name_match in name_pattern.finditer(class_body):
+                rule_name = name_match.group(1)
                 if rule_name.startswith("prefer_"):
                     opinionated_prefer.add(rule_name)
+                    break  # One name per class is enough
 
     return opinionated_prefer
 
