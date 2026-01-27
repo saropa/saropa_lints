@@ -225,9 +225,6 @@ class NoMagicNumberRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.medium;
 
-  @override
-  bool get skipTestFiles => true;
-
   static const LintCode _code = LintCode(
     name: 'no_magic_number',
     problemMessage: '[no_magic_number] Avoid magic numbers.',
@@ -297,9 +294,6 @@ class NoMagicStringRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
-
-  @override
-  bool get skipTestFiles => true;
 
   static const LintCode _code = LintCode(
     name: 'no_magic_string',
@@ -713,7 +707,7 @@ class AvoidDigitSeparatorsRule extends SaropaLintRule {
 /// Warns when magic numbers are used in test files.
 ///
 /// **Context**: This is the test-specific variant of `no_magic_number`, which
-/// skips test files entirely via `skipTestFiles: true`. The production rule
+/// skips test files entirely (default `TestRelevance.never`). The production rule
 /// enforces strict avoidance of magic numbers in application code, while this
 /// rule provides appropriate, relaxed enforcement for test code.
 ///
@@ -960,7 +954,7 @@ class _NoMagicNumberInTestsFix extends DartFix {
 /// Warns when magic strings are used in test files.
 ///
 /// **Context**: This is the test-specific variant of `no_magic_string`, which
-/// skips test files entirely via `skipTestFiles: true`. The production rule
+/// skips test files entirely (default `TestRelevance.never`). The production rule
 /// enforces strict avoidance of magic strings in application code, while this
 /// rule provides appropriate, relaxed enforcement for test code.
 ///

@@ -517,10 +517,14 @@ Rules automatically skip files that can't be manually fixed:
 | --------------------------------------------- | ------------------------------------- |
 | `*.g.dart`, `*.freezed.dart`, `*.gen.dart`    | Yes (generated code)                  |
 | `*_fixture.dart`, `fixture/**`, `fixtures/**` | Yes (test fixtures)                   |
-| `*_test.dart`, `test/**`                      | No (override with `skipTestFiles`)    |
+| `*_test.dart`, `test/**`                      | Yes (override with `testRelevance`)   |
 | `example/**`                                  | No (override with `skipExampleFiles`) |
 
-This reduces noise from generated code and intentionally "bad" fixture files.
+Test files are skipped by default because most production-focused rules generate noise in test code. Override `testRelevance` to change behavior per rule:
+
+- `TestRelevance.never` — skip test files (default)
+- `TestRelevance.always` — run on all files including tests
+- `TestRelevance.testOnly` — run only on test files
 
 ## Limitations
 

@@ -133,9 +133,6 @@ class AvoidUrlLauncherSimulatorTestsRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   @override
-  bool get skipTestFiles => false; // This rule specifically targets test files
-
-  @override
   Set<FileType>? get applicableFileTypes => {FileType.test};
 
   static const LintCode _code = LintCode(
