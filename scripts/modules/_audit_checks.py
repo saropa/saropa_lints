@@ -668,11 +668,26 @@ def print_file_health(file_stats: list[FileStats]) -> None:
             f"    Files with no rules: {len(empty_files)}", Color.DIM
         )
 
-    low_fix = [s for s in file_stats if s.rules >= 5 and s.fix_coverage < 10]
+    low_fix = sorted(
+        [s for s in file_stats if s.rules >= 5 and s.fix_coverage < 10],
+        key=lambda s: (s.fix_coverage, -s.rules),
+    )
     if low_fix:
         print_colored(
             f"    Files needing quick fixes: {len(low_fix)}", Color.YELLOW
         )
+        for s in low_fix[:5]:
+            pct = f"{s.fix_coverage:.0f}%"
+            print(
+                f"      {Color.YELLOW.value}{s.name:<45}{Color.RESET.value} "
+                f"{s.fixes}/{s.rules} fixes ({pct})"
+            )
+        if len(low_fix) > 5:
+            print(
+                f"      {Color.DIM.value}"
+                f"... and {len(low_fix) - 5} more"
+                f"{Color.RESET.value}"
+            )
 
 
 def print_orphan_analysis(
