@@ -4914,9 +4914,9 @@ class PreferWebViewJavaScriptDisabledRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_webview_javascript_disabled',
     problemMessage:
-        '[prefer_webview_javascript_disabled] WebView with JavaScript enabled expands attack surface. Malicious scripts can steal data, access device APIs, or execute arbitrary code.',
+        '[prefer_webview_javascript_disabled] WebView with JavaScript enabled expands the attack surface for cross-site scripting and remote code execution. Malicious scripts can steal authentication tokens, access device APIs through JavaScript bridges, read local storage, and exfiltrate user data to attacker-controlled servers without detection.',
     correctionMessage:
-        'Add javascriptMode: JavascriptMode.disabled or javaScriptEnabled: false.',
+        'Set javaScriptEnabled: false or javascriptMode: JavascriptMode.disabled unless JavaScript is required, and restrict content to trusted HTTPS sources only.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -5141,9 +5141,9 @@ class RequireWebViewErrorHandlingRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_webview_error_handling',
     problemMessage:
-        '[require_webview_error_handling] WebView without error handler. Network failures show blank page.',
+        '[require_webview_error_handling] WebView without an error handler displays a blank white page when network requests fail, SSL errors occur, or resources cannot be loaded. Users see no feedback about what went wrong and have no way to retry, creating a confusing and broken experience that appears as an app crash.',
     correctionMessage:
-        'Add onWebResourceError, onLoadError, or onReceivedError callback.',
+        'Add an onWebResourceError or onLoadError callback that displays a user-friendly error message with a retry option when WebView content fails to load.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -5652,9 +5652,9 @@ class RequireHttpsOnlyRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_https_only',
     problemMessage:
-        '[require_https_only] HTTP URL detected. HTTP traffic is unencrypted and vulnerable to interception.',
+        '[require_https_only] HTTP URL detected in network request. Unencrypted HTTP traffic is vulnerable to interception, modification, and eavesdropping by any attacker on the network path. Sensitive data including credentials, personal information, and session tokens transmitted over HTTP can be silently captured in plaintext.',
     correctionMessage:
-        'Replace http:// with https:// for secure communication.',
+        'Replace http:// with https:// to encrypt all network traffic and prevent man-in-the-middle attacks, data interception, and content tampering.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -6295,9 +6295,9 @@ class RequireCatchLoggingRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_catch_logging',
     problemMessage:
-        '[require_catch_logging] Catch block without logging or rethrowing. Security events may go undetected.',
+        '[require_catch_logging] Catch block swallows the exception without logging or rethrowing. Security-relevant errors such as authentication failures, permission violations, and data corruption go completely undetected. This prevents incident response, makes debugging production issues impossible, and hides potential attack activity.',
     correctionMessage:
-        'Log the exception with logger.error() or rethrow to ensure visibility.',
+        'Log the exception with a structured logger (e.g., logger.error(message, error, stackTrace)) or rethrow to ensure errors are visible for debugging and monitoring.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 

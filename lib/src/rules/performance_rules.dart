@@ -2245,9 +2245,9 @@ class AvoidCallingOfInBuildRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_calling_of_in_build',
     problemMessage:
-        '[avoid_calling_of_in_build] Multiple .of(context) calls walk the widget tree repeatedly on every rebuild. This adds unnecessary overhead that slows down frame rendering.',
+        '[avoid_calling_of_in_build] Multiple .of(context) lookups walk the InheritedWidget ancestor chain on every rebuild call. Each lookup traverses the widget tree upward, adding cumulative overhead that slows frame rendering. This is especially costly when called multiple times in a single build method for the same provider type.',
     correctionMessage:
-        'Cache result in a local variable: final theme = Theme.of(context);',
+        'Cache the lookup result in a local variable at the top of build(): final theme = Theme.of(context); then reference the variable throughout the method.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -2342,9 +2342,9 @@ class RequireImageCacheManagementRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_image_cache_management',
     problemMessage:
-        '[require_image_cache_management] Loading many images without cache management causes unbounded memory growth.',
+        '[require_image_cache_management] Loading many images without cache management causes unbounded memory growth. The default ImageCache retains decoded images indefinitely, and without explicit eviction, memory usage climbs until the OS kills the app. Users on devices with limited RAM will experience crashes and degraded multitasking.',
     correctionMessage:
-        'Call PaintingBinding.instance.imageCache.evict(url) in dispose().',
+        'Call PaintingBinding.instance.imageCache.evict(url) in dispose() or set imageCache.maximumSize to limit retained images and prevent unbounded memory growth.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -2413,8 +2413,9 @@ class AvoidMemoryIntensiveOperationsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_memory_intensive_operations',
     problemMessage:
-        '[avoid_memory_intensive_operations] String concatenation in loop causes O(n²) memory allocation.',
-    correctionMessage: 'Use StringBuffer for building strings in loops.',
+        '[avoid_memory_intensive_operations] String concatenation using += inside a loop creates a new String object on every iteration, resulting in O(n squared) memory allocations. Each iteration copies the entire accumulated string, causing excessive garbage collection pressure, UI thread pauses, and visible jank in animations or scrolling.',
+    correctionMessage:
+        'Use StringBuffer to build strings incrementally inside loops. StringBuffer.write() appends in-place without creating intermediate String copies, reducing allocation to O(n).',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
