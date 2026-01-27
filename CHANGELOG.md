@@ -14,6 +14,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - **Test coverage top offenders report**: The publish workflow's test coverage summary now lists the 10 worst categories ranked by untested rule count, color-coded by severity.
 - **File health top offenders**: The "Files needing quick fixes" audit section now lists the top 5 worst files sorted by fix coverage, showing fixes/rules and percentage.
+- **Doc reference auto-fix in publish pipeline**: The `--fix-docs` flag and Step 6 analysis now detect and auto-fix unresolvable `[reference]` patterns in DartDoc comments (OWASP codes, file names, snake_case rule names) alongside the existing angle bracket fixer.
 
 ### Fixed
 
