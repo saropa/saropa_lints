@@ -184,6 +184,7 @@ from scripts.modules._rule_metrics import (
     count_categories,
     count_rules,
     display_test_coverage,
+    sync_readme_badges,
 )
 from scripts.modules._version_changelog import (
     display_changelog,
@@ -761,6 +762,8 @@ def main() -> int:
 
     if not run_tests(project_dir):
         exit_with_error("Tests failed.", ExitCode.TEST_FAILED)
+
+    sync_readme_badges(project_dir, version, rule_count)
 
     if not run_format(project_dir):
         exit_with_error("Formatting failed.", ExitCode.VALIDATION_FAILED)
