@@ -2593,20 +2593,33 @@ class _AddPumpAndSettleTodoFix extends DartFix {
   }
 }
 
-/// Warns when test files don't include error case tests.
+/// Warns when test files don't include error case or boundary tests.
 ///
-/// Happy path tests are insufficient. Tests should verify that errors are
-/// thrown for invalid input, network failures, and permission denials.
+/// Happy-path-only tests miss critical edge cases. Tests should verify
+/// error handling, boundary conditions, or defensive behavior. The rule
+/// detects error-case testing via:
+///
+/// - **Matcher calls**: `throwsA`, `throwsException`, `throwsArgumentError`,
+///   `throwsStateError`, `throwsFormatException`, etc.
+/// - **Expect patterns**: `expect(..., isA<Exception>())`,
+///   `expect(..., isA<Error>())`, or `throwsA` inside `expect`.
+/// - **Test name keywords**: `throw`, `error`, `fail`, `invalid`,
+///   `exception`, `null`, `empty`, `boundary`, `edge`, `negative`,
+///   `fallback`, `missing`.
+///
+/// If the source code under test has no error-throwing paths (e.g. pure
+/// enums with exhaustive switches, defensive try/catch with fallback
+/// returns, extension methods on non-nullable types), suppress with
+/// `// ignore_for_file: require_error_case_tests`.
 ///
 /// **BAD:**
 /// ```dart
-/// // user_service_test.dart
+/// // user_service_test.dart - only happy path
 /// void main() {
 ///   test('login returns user', () async {
 ///     final user = await service.login('valid@email.com', 'password');
 ///     expect(user.name, isNotEmpty);
 ///   });
-///   // No tests for invalid credentials, network errors, etc.
 /// }
 /// ```
 ///
@@ -2625,9 +2638,9 @@ class _AddPumpAndSettleTodoFix extends DartFix {
 ///     );
 ///   });
 ///
-///   test('login throws on network error', () async {
-///     mockNetwork.simulateError();
-///     expect(() => service.login('a@b.com', 'p'), throwsA(isA<NetworkException>()));
+///   test('returns null for missing user', () async {
+///     final user = await service.findUser('nonexistent');
+///     expect(user, isNull);
 ///   });
 /// }
 /// ```
@@ -2649,7 +2662,10 @@ class RequireErrorCaseTestsRule extends SaropaLintRule {
     problemMessage:
         '[require_error_case_tests] Test file has no error case tests. Consider adding tests for exceptions.',
     correctionMessage:
-        'Add tests using throwsA(), throwsException, or expect(..., isA<Exception>()).',
+        'Add tests using throwsA(), throwsException, or expect(..., isA<Exception>()). '
+        'If the source code has no error-throwing paths (e.g. pure enums, '
+        'defensive try/catch with fallback returns), suppress with '
+        '// ignore_for_file: require_error_case_tests.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -2697,15 +2713,15 @@ class RequireErrorCaseTestsRule extends SaropaLintRule {
       // Check for expect with isA<*Exception>
       if (methodName == 'expect') {
         final String source = node.toSource();
-        if (source.contains('isA<') && source.contains('Exception') ||
-            source.contains('isA<') && source.contains('Error') ||
+        if ((source.contains('isA<') && source.contains('Exception')) ||
+            (source.contains('isA<') && source.contains('Error')) ||
             source.contains('throwsA')) {
           hasErrorCaseTest = true;
           return;
         }
       }
 
-      // Check for test names that suggest error testing
+      // Check for test names that suggest error or boundary testing
       if (methodName == 'test' || methodName == 'testWidgets') {
         final ArgumentList args = node.argumentList;
         if (args.arguments.isNotEmpty) {
@@ -2714,7 +2730,14 @@ class RequireErrorCaseTestsRule extends SaropaLintRule {
               firstArg.contains('error') ||
               firstArg.contains('fail') ||
               firstArg.contains('invalid') ||
-              firstArg.contains('exception')) {
+              firstArg.contains('exception') ||
+              firstArg.contains('null') ||
+              firstArg.contains('empty') ||
+              firstArg.contains('boundary') ||
+              firstArg.contains('edge') ||
+              firstArg.contains('negative') ||
+              firstArg.contains('fallback') ||
+              firstArg.contains('missing')) {
             hasErrorCaseTest = true;
           }
         }
@@ -2918,11 +2941,8 @@ class PreferSetupTeardownRule extends SaropaLintRule {
         final statements = body.block.statements;
         if (statements.isEmpty) continue;
 
-        // Get first 1-2 statements as setup signature
-        final setupSignature = statements
-            .take(2)
-            .map((s) => s.toSource().replaceAll(RegExp(r'\s+'), ' '))
-            .join(';');
+        final setupSignature = _buildSetupSignature(statements);
+        if (setupSignature == null) continue;
 
         firstStatementCounts[setupSignature] =
             (firstStatementCounts[setupSignature] ?? 0) + 1;
@@ -2942,10 +2962,7 @@ class PreferSetupTeardownRule extends SaropaLintRule {
             final statements = body.block.statements;
             if (statements.isEmpty) continue;
 
-            final setupSignature = statements
-                .take(2)
-                .map((s) => s.toSource().replaceAll(RegExp(r'\s+'), ' '))
-                .join(';');
+            final setupSignature = _buildSetupSignature(statements);
 
             if (setupSignature == entry.key) {
               reporter.atNode(testCall, code);
@@ -2956,6 +2973,44 @@ class PreferSetupTeardownRule extends SaropaLintRule {
         }
       }
     });
+  }
+
+  /// Builds a normalized signature from the first 1-2 meaningful statements,
+  /// skipping simple local initializations (primitives, constants, literals).
+  /// Returns null if no meaningful setup statements remain.
+  String? _buildSetupSignature(NodeList<Statement> statements) {
+    final meaningful =
+        statements.where((s) => !_isSimpleLocalInit(s)).take(2).toList();
+    if (meaningful.isEmpty) return null;
+
+    return meaningful
+        .map((s) => s.toSource().replaceAll(RegExp(r'\s+'), ' '))
+        .join(';');
+  }
+
+  /// Returns true if the statement is a simple local variable initialization
+  /// that should not be considered setup code for setUp() extraction.
+  ///
+  /// Excludes const declarations and variable declarations where all
+  /// initializers are simple literals (int, double, bool, string, null).
+  bool _isSimpleLocalInit(Statement statement) {
+    if (statement is! VariableDeclarationStatement) return false;
+    if (statement.variables.isConst) return true;
+
+    for (final variable in statement.variables.variables) {
+      final initializer = variable.initializer;
+      if (initializer == null) continue;
+      if (!_isSimpleLiteral(initializer)) return false;
+    }
+    return true;
+  }
+
+  bool _isSimpleLiteral(Expression expression) {
+    return expression is IntegerLiteral ||
+        expression is DoubleLiteral ||
+        expression is BooleanLiteral ||
+        expression is SimpleStringLiteral ||
+        expression is NullLiteral;
   }
 
   FunctionExpression? _getTestCallback(MethodInvocation testCall) {

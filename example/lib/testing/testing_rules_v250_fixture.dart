@@ -67,6 +67,28 @@ void goodWithSetUp() {
   });
 }
 
+// OK: Independent primitive locals should not trigger prefer_setup_teardown.
+// Each test declares its own counter/constant — these are not shared setup.
+void goodRepeatedPrimitiveLocals() {
+  test('default probability', () {
+    int trueCount = 0;
+    const int iterations = 1000;
+    // ... loop and assertions
+  });
+
+  test('low probability', () {
+    int trueCount = 0;
+    const int iterations = 1000;
+    // ... loop and assertions
+  });
+
+  test('high probability', () {
+    int trueCount = 0;
+    const int iterations = 1000;
+    // ... loop and assertions
+  });
+}
+
 // =========================================================================
 // require_test_description_convention
 // =========================================================================
