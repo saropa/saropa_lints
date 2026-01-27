@@ -735,9 +735,9 @@ class AvoidNotificationSameIdRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_notification_same_id',
     problemMessage:
-        '[avoid_notification_same_id] Static notification ID causes newer notifications to silently replace older ones. Users will miss important alerts and messages without any indication.',
+        '[avoid_notification_same_id] Static or hardcoded notification ID causes newer notifications to silently replace older ones using the same identifier. Users will miss important alerts, messages, and time-sensitive updates without any indication that previous notifications were overwritten, leading to lost information and degraded communication reliability.',
     correctionMessage:
-        'Generate unique IDs per notification: DateTime.now().millisecondsSinceEpoch.',
+        'Generate a unique ID per notification using DateTime.now().millisecondsSinceEpoch or an incrementing counter to prevent silent notification replacement.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 

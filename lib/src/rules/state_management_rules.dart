@@ -52,8 +52,9 @@ class RequireNotifyListenersRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_notify_listeners',
     problemMessage:
-        '[require_notify_listeners] ChangeNotifier method modifies state but does not call notifyListeners.',
-    correctionMessage: 'Add notifyListeners() after state modifications.',
+        '[require_notify_listeners] ChangeNotifier method modifies state properties but does not call notifyListeners(). Widgets listening to this notifier will not rebuild to reflect the updated state, displaying stale data to the user. This creates silent data synchronization bugs that are difficult to diagnose because the state appears correct in debug tools.',
+    correctionMessage:
+        'Add notifyListeners() as the last statement in every method that modifies observable state properties to trigger dependent widget rebuilds.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
