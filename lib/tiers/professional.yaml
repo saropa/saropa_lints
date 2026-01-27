@@ -166,7 +166,6 @@ custom_lint:
     avoid_unused_parameters: true
     avoid_duplicate_cascades: true
     avoid_complex_conditions: true
-    prefer_early_return: true
     avoid_recursive_calls: true
     avoid_recursive_tostring: true
     avoid_missed_calls: true
