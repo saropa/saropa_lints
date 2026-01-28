@@ -9,7 +9,24 @@ Dates are not included in version headers — [pub.dev](https://pub.dev/packages
 > See [CHANGELOG_ARCHIVE.md](./CHANGELOG_ARCHIVE.md) for versions 0.1.0 through 4.6.2.
 
 ---
-## [4.9.0] - Current
+## [4.9.1] - Current
+
+### Added
+
+- **In-place progress bar with colors**: Terminal output now shows a visual progress bar (`████████░░░░`) that updates in-place instead of scrolling thousands of lines. Includes color coding (green for progress, red/yellow for issues, cyan for file counts), ETA display, and current file indicator. Cross-platform color detection for Windows Terminal, ConEmu, and Unix terminals. Disable with `SAROPA_LINTS_PROGRESS=false`.
+
+- **Issue limit for large codebases**: New `max_issues` setting (default: 1000) stops running WARNING/INFO rules after the limit is reached, providing real speedup on legacy projects. ERROR-severity rules always run regardless of limit. Configure in `analysis_options_custom.yaml`:
+  ```yaml
+  max_issues: 500  # Or 0 for unlimited
+  ```
+  The init command now generates this file automatically with sensible defaults.
+
+### Changed
+
+- **Summary output reduced**: Final summary now shows top 5 files/rules instead of 10, with color-coded severity indicators and slow file tracking (files taking >2s are reported at the end instead of interrupting progress).
+
+---
+## [4.9.0]
 
 ### Added
 

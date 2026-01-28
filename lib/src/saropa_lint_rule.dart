@@ -129,10 +129,44 @@ final bool _progressEnabled =
             'false';
 
 // =============================================================================
+// TERMINAL COLOR SUPPORT
+// =============================================================================
+
+/// Detects if the terminal supports ANSI colors.
+bool get _supportsColor {
+  if (Platform.environment.containsKey('NO_COLOR')) return false;
+  if (Platform.environment.containsKey('FORCE_COLOR')) return true;
+  if (!stderr.hasTerminal) return false;
+
+  if (Platform.isWindows) {
+    final term = Platform.environment['TERM'];
+    final wtSession = Platform.environment['WT_SESSION'];
+    final conEmu = Platform.environment['ConEmuANSI'];
+    return wtSession != null || conEmu == 'ON' || term == 'xterm';
+  }
+  return true;
+}
+
+/// ANSI color codes for progress display.
+class _ProgressColors {
+  static String get reset => _supportsColor ? '\x1B[0m' : '';
+  static String get bold => _supportsColor ? '\x1B[1m' : '';
+  static String get dim => _supportsColor ? '\x1B[2m' : '';
+  static String get red => _supportsColor ? '\x1B[31m' : '';
+  static String get green => _supportsColor ? '\x1B[32m' : '';
+  static String get yellow => _supportsColor ? '\x1B[33m' : '';
+  static String get blue => _supportsColor ? '\x1B[34m' : '';
+  static String get cyan => _supportsColor ? '\x1B[36m' : '';
+  static String get brightGreen => _supportsColor ? '\x1B[92m' : '';
+  static String get clearLine => _supportsColor ? '\x1B[2K\r' : '\r';
+}
+
+// =============================================================================
 // PROGRESS TRACKING (User Feedback)
 // =============================================================================
 //
 // Tracks analysis progress to show the user that the linter is working.
+// Uses in-place updates with a visual progress bar (no scrolling).
 // Enabled by default. Disable via environment variable:
 //   dart run custom_lint --define=SAROPA_LINTS_PROGRESS=false
 //
@@ -176,6 +210,14 @@ class ProgressTracker {
   static final List<double> _rateSamples = [];
   static const int _maxRateSamples = 5;
 
+  // Track slow files (> 2 seconds) for summary
+  static final Map<String, int> _slowFiles = {}; // file -> seconds
+
+  // Issue limit tracking
+  static int _maxIssues = 1000; // Default limit (0 = unlimited)
+  static bool _limitReached = false;
+  static int _issuesAfterLimit = 0; // Count of issues we stopped tracking
+
   // Total enabled rules (set from plugin entry point)
   static int _totalEnabledRules = 0;
 
@@ -183,6 +225,22 @@ class ProgressTracker {
   static void setEnabledRuleCount(int count) {
     _totalEnabledRules = count;
   }
+
+  /// Set the maximum number of issues to report.
+  ///
+  /// Configure in `analysis_options_custom.yaml`:
+  /// ```yaml
+  /// max_issues: 500  # Stop after 500 issues (default: 1000, 0 = unlimited)
+  /// ```
+  ///
+  /// Once the limit is reached, non-ERROR rules stop running entirely.
+  /// ERROR-severity rules always run to catch critical issues.
+  static void setMaxIssues(int limit) {
+    _maxIssues = limit;
+  }
+
+  /// Returns true if issue limit has been reached.
+  static bool get isLimitReached => _limitReached;
 
   /// Interval between progress reports (in files or time).
   static const int _fileInterval = 10; // More frequent updates
@@ -229,17 +287,34 @@ class ProgressTracker {
   /// Record a violation found for the current file.
   /// [severity] should be 'ERROR', 'WARNING', or 'INFO'
   /// [ruleName] is the lint rule that triggered
+  ///
+  /// ERROR severity issues are ALWAYS fully tracked (no limit).
+  /// The limit only applies to WARNING/INFO to ensure critical issues
+  /// are never lost in favor of formatting nits.
   static void recordViolation({String? severity, String? ruleName}) {
     _violationsFound++;
+    final severityUpper = severity?.toUpperCase();
+    final isError = severityUpper == 'ERROR';
 
-    // Track by severity
-    switch (severity?.toUpperCase()) {
+    // Track by severity (always counted, regardless of limit)
+    switch (severityUpper) {
       case 'ERROR':
         _errorCount++;
       case 'WARNING':
         _warningCount++;
       case 'INFO':
         _infoCount++;
+    }
+
+    // ERROR severity ALWAYS gets full tracking - critical issues never skipped
+    // Limit only applies to WARNING/INFO (formatting, style, etc.)
+    final nonErrorCount = _warningCount + _infoCount;
+    if (!isError && _maxIssues > 0 && nonErrorCount > _maxIssues) {
+      if (!_limitReached) {
+        _limitReached = true;
+      }
+      _issuesAfterLimit++;
+      return; // Skip detailed tracking for non-critical issues after limit
     }
 
     // Track by file
@@ -254,8 +329,8 @@ class ProgressTracker {
     // Track by rule
     if (ruleName != null) {
       _issuesByRule[ruleName] = (_issuesByRule[ruleName] ?? 0) + 1;
-      if (severity != null) {
-        _ruleSeverities[ruleName] = severity.toUpperCase();
+      if (severityUpper != null) {
+        _ruleSeverities[ruleName] = severityUpper;
       }
     }
   }
@@ -282,13 +357,11 @@ class ProgressTracker {
     final wasNew = _seenFiles.add(path);
 
     if (wasNew) {
-      // Report long-running files (> 2 seconds on previous file)
+      // Track long-running files (> 2 seconds) for summary report
       if (_currentFile != null && _currentFileStart != null) {
         final fileTime = now.difference(_currentFileStart!);
         if (fileTime.inSeconds >= 2) {
-          final shortName = _currentFile!.split('/').last.split('\\').last;
-          // Use stderr to avoid custom_lint rule name prefix
-          stderr.writeln('⏱️  Slow: $shortName (${fileTime.inSeconds}s)');
+          _slowFiles[_currentFile!] = fileTime.inSeconds;
         }
       }
 
@@ -350,9 +423,21 @@ class ProgressTracker {
     // Extract just the filename from the last seen file for context
     final lastFile = _seenFiles.last;
     final shortName = lastFile.split('/').last.split('\\').last;
+    // Truncate long filenames
+    final displayName =
+        shortName.length > 25 ? '${shortName.substring(0, 22)}...' : shortName;
 
-    // Calculate file progress percentage and ETA
-    String progressStr;
+    // Aliases for cleaner code
+    final reset = _ProgressColors.reset;
+    final bold = _ProgressColors.bold;
+    final dim = _ProgressColors.dim;
+    final red = _ProgressColors.red;
+    final green = _ProgressColors.green;
+    final yellow = _ProgressColors.yellow;
+    final cyan = _ProgressColors.cyan;
+    final brightGreen = _ProgressColors.brightGreen;
+    final clearLine = _ProgressColors.clearLine;
+
     if (_discoveredFromFiles && _totalExpectedFiles > 0) {
       final percent =
           (fileCount * 100 / _totalExpectedFiles).clamp(0, 100).round();
@@ -360,22 +445,55 @@ class ProgressTracker {
           (_totalExpectedFiles - fileCount).clamp(0, _totalExpectedFiles);
       final etaSeconds =
           filesPerSec > 0 ? (remaining / filesPerSec).round() : 0;
-      progressStr =
-          '$fileCount/$_totalExpectedFiles files ($percent%) ETA ${_formatDuration(etaSeconds)}';
+
+      // Visual progress bar (20 chars wide)
+      const barWidth = 20;
+      final filled = (percent * barWidth / 100).round();
+      final empty = barWidth - filled;
+      final bar = '$brightGreen${'█' * filled}$dim${'░' * empty}$reset';
+
+      // Color-code issues count (show limit indicator if reached)
+      final issuesColor = _violationsFound == 0
+          ? green
+          : _errorCount > 0
+              ? red
+              : yellow;
+      final issuesDisplay =
+          _limitReached ? '$_maxIssues+' : '$_violationsFound';
+      final issuesStr = '$issuesColor$issuesDisplay$reset';
+
+      // Build compact status line
+      final status = StringBuffer()
+        ..write(clearLine)
+        ..write('$bar $bold$percent%$reset ')
+        ..write('$dim│$reset ')
+        ..write('$cyan$fileCount$reset/$dim$_totalExpectedFiles$reset ')
+        ..write('$dim│$reset ')
+        ..write('$issuesStr issues ')
+        ..write('$dim│$reset ')
+        ..write('ETA $yellow${_formatDuration(etaSeconds)}$reset ')
+        ..write('$dim│$reset ')
+        ..write('$dim$displayName$reset');
+
+      // Write in-place (no newline)
+      stderr.write(status.toString());
     } else {
-      progressStr = '$fileCount files';
+      // No file count known - simpler output
+      final status = StringBuffer()
+        ..write(clearLine)
+        ..write('$cyan⠿$reset ')
+        ..write('$bold$fileCount$reset files ')
+        ..write('$dim│$reset ')
+        ..write('${_formatDuration(elapsed.inSeconds)} ')
+        ..write('$dim│$reset ')
+        ..write('${filesPerSec.round()}/s ')
+        ..write('$dim│$reset ')
+        ..write('$_violationsFound issues ')
+        ..write('$dim│$reset ')
+        ..write('$dim$displayName$reset');
+
+      stderr.write(status.toString());
     }
-
-    // Build rules segment if rule count is known
-    final rulesStr =
-        _totalEnabledRules > 0 ? ' | $_totalEnabledRules rules' : '';
-
-    // Use stderr to avoid custom_lint rule name prefix
-    // Format: progress | time | rate | issues | rules | current file
-    stderr.writeln(
-      '📊 $progressStr | ${_formatDuration(elapsed.inSeconds)} | '
-      '${filesPerSec.round()}/s | $_violationsFound issues$rulesStr | $shortName',
-    );
   }
 
   /// Report final summary when analysis completes.
@@ -386,72 +504,128 @@ class ProgressTracker {
     final fileCount = _seenFiles.length;
     final filesPerSec = _calculateFilesPerSec(fileCount, elapsed);
 
+    // Color aliases
+    final reset = _ProgressColors.reset;
+    final bold = _ProgressColors.bold;
+    final dim = _ProgressColors.dim;
+    final red = _ProgressColors.red;
+    final green = _ProgressColors.green;
+    final yellow = _ProgressColors.yellow;
+    final cyan = _ProgressColors.cyan;
+    final clearLine = _ProgressColors.clearLine;
+
     final buf = StringBuffer();
 
-    // Header
+    // Clear progress line and add header
+    buf.write(clearLine);
     buf.writeln();
-    buf.writeln('${'═' * 70}');
-    buf.writeln('📋 SAROPA LINTS ANALYSIS COMPLETE');
-    buf.writeln('${'═' * 70}');
+    buf.writeln('$cyan${'═' * 70}$reset');
+    buf.writeln('$bold  ✓ SAROPA LINTS ANALYSIS COMPLETE$reset');
+    buf.writeln('$cyan${'═' * 70}$reset');
 
-    // Overview
+    // Overview with color
     buf.writeln();
+    final rulesStr =
+        _totalEnabledRules > 0 ? ' with $_totalEnabledRules rules' : '';
     buf.writeln(
-        '📁 Files: $fileCount analyzed in ${_formatDuration(elapsed.inSeconds)} (${filesPerSec.round()}/s)');
+        '  $dim📁$reset Files: $bold$fileCount$reset analyzed$rulesStr in $cyan${_formatDuration(elapsed.inSeconds)}$reset (${filesPerSec.round()}/s)');
+
+    final issuePercent =
+        fileCount > 0 ? (_filesWithIssues * 100 / fileCount).round() : 0;
+    final issueColor = _filesWithIssues == 0 ? green : yellow;
     buf.writeln(
-        '📄 Files with issues: $_filesWithIssues (${fileCount > 0 ? (_filesWithIssues * 100 / fileCount).round() : 0}%)');
+        '  $dim📄$reset Files with issues: $issueColor$_filesWithIssues$reset ($issuePercent%)');
 
-    // Severity breakdown
-    buf.writeln();
-    buf.writeln('${'─' * 70}');
-    buf.writeln('🎯 ISSUES BY SEVERITY');
-    buf.writeln('${'─' * 70}');
-    if (_errorCount > 0) buf.writeln('  🔴 Errors:   $_errorCount');
-    if (_warningCount > 0) buf.writeln('  🟡 Warnings: $_warningCount');
-    if (_infoCount > 0) buf.writeln('  🔵 Info:     $_infoCount');
-    buf.writeln('  ── Total:    $_violationsFound');
+    // Warning if issue limit was reached (only applies to warnings/info, not errors)
+    if (_limitReached) {
+      buf.writeln();
+      buf.writeln(
+          '$yellow  ⚠️  Limit reached: $_maxIssues warnings/info. Skipping remaining non-error rules.$reset');
+      buf.writeln(
+          '$dim     All $_errorCount errors fully checked. $_issuesAfterLimit warning/info rules skipped.$reset');
+      buf.writeln(
+          '$dim     To adjust: echo "max_issues: 2000" > analysis_options_custom.yaml$reset');
+    }
 
-    // Top offending files (max 10)
+    // Severity breakdown (only if there are issues)
+    if (_violationsFound > 0) {
+      buf.writeln();
+      buf.writeln('$dim${'─' * 70}$reset');
+      buf.writeln('  $bold ISSUES BY SEVERITY$reset');
+      buf.writeln('$dim${'─' * 70}$reset');
+      if (_errorCount > 0) {
+        buf.writeln('    $red●$reset Errors:   $bold$_errorCount$reset');
+      }
+      if (_warningCount > 0) {
+        buf.writeln('    $yellow●$reset Warnings: $bold$_warningCount$reset');
+      }
+      if (_infoCount > 0) {
+        buf.writeln('    $cyan●$reset Info:     $bold$_infoCount$reset');
+      }
+      buf.writeln('    $dim──$reset Total:    $bold$_violationsFound$reset');
+    } else {
+      buf.writeln();
+      buf.writeln('  $green✓ No issues found!$reset');
+    }
+
+    // Top offending files (max 5 to keep summary compact)
     if (_issuesByFile.isNotEmpty) {
       final sortedFiles = _issuesByFile.entries.toList()
         ..sort((a, b) => b.value.compareTo(a.value));
-      final topFiles = sortedFiles.take(10);
+      final topFiles = sortedFiles.take(5);
 
       buf.writeln();
-      buf.writeln('${'─' * 70}');
-      buf.writeln('📂 TOP FILES WITH ISSUES');
-      buf.writeln('${'─' * 70}');
+      buf.writeln('$dim${'─' * 70}$reset');
+      buf.writeln('  $bold TOP FILES WITH ISSUES$reset');
+      buf.writeln('$dim${'─' * 70}$reset');
       for (final entry in topFiles) {
         final shortName = entry.key.split('/').last.split('\\').last;
         buf.writeln(
-            '  ${entry.value.toString().padLeft(4)} issues  $shortName');
+            '    $yellow${entry.value.toString().padLeft(3)}$reset issues  $dim$shortName$reset');
       }
     }
 
-    // Top triggered rules (max 10)
+    // Top triggered rules (max 5 to keep summary compact)
     if (_issuesByRule.isNotEmpty) {
       final sortedRules = _issuesByRule.entries.toList()
         ..sort((a, b) => b.value.compareTo(a.value));
-      final topRules = sortedRules.take(10);
+      final topRules = sortedRules.take(5);
 
       buf.writeln();
-      buf.writeln('${'─' * 70}');
-      buf.writeln('📏 TOP TRIGGERED RULES');
-      buf.writeln('${'─' * 70}');
+      buf.writeln('$dim${'─' * 70}$reset');
+      buf.writeln('  $bold TOP TRIGGERED RULES$reset');
+      buf.writeln('$dim${'─' * 70}$reset');
       for (final entry in topRules) {
         final severity = _ruleSeverities[entry.key] ?? '?';
-        final icon = severity == 'ERROR'
-            ? '🔴'
+        final severityColor = severity == 'ERROR'
+            ? red
             : severity == 'WARNING'
-                ? '🟡'
-                : '🔵';
+                ? yellow
+                : cyan;
         buf.writeln(
-            '  $icon ${entry.value.toString().padLeft(4)}x  ${entry.key}');
+            '    $severityColor●$reset ${entry.value.toString().padLeft(3)}x  $dim${entry.key}$reset');
+      }
+    }
+
+    // Slow files (if any took > 2 seconds)
+    if (_slowFiles.isNotEmpty) {
+      final sortedSlow = _slowFiles.entries.toList()
+        ..sort((a, b) => b.value.compareTo(a.value));
+      final topSlow = sortedSlow.take(5);
+
+      buf.writeln();
+      buf.writeln('$dim${'─' * 70}$reset');
+      buf.writeln(
+          '  $bold ⏱️  SLOW FILES$reset $dim(>${_slowFiles.length} files took >2s)$reset');
+      buf.writeln('$dim${'─' * 70}$reset');
+      for (final entry in topSlow) {
+        final shortName = entry.key.split('/').last.split('\\').last;
+        buf.writeln('    $yellow${entry.value}s$reset  $dim$shortName$reset');
       }
     }
 
     buf.writeln();
-    buf.writeln('${'═' * 70}');
+    buf.writeln('$cyan${'═' * 70}$reset');
 
     stderr.writeln(buf.toString());
 
@@ -552,6 +726,10 @@ class ProgressTracker {
     _issuesByRule.clear();
     _ruleSeverities.clear();
     _rateSamples.clear();
+    _slowFiles.clear();
+    _limitReached = false;
+    _issuesAfterLimit = 0;
+    // Note: _maxIssues is not reset - it's config, not state
   }
 }
 
@@ -1963,6 +2141,17 @@ abstract class SaropaLintRule extends DartLintRule {
   ) {
     // Check if rule is disabled
     if (isDisabled) return;
+
+    // =========================================================================
+    // ISSUE LIMIT CHECK (Performance Optimization)
+    // =========================================================================
+    // After hitting the warning/info limit, skip non-ERROR rules entirely.
+    // This provides real speedup on legacy codebases with many issues.
+    // ERROR-severity rules always run (security, crashes, etc.)
+    if (ProgressTracker.isLimitReached &&
+        code.errorSeverity != DiagnosticSeverity.ERROR) {
+      return;
+    }
 
     // =========================================================================
     // SLOW RULE DEFERRAL (Performance Optimization)
