@@ -8,8 +8,17 @@ Dates are not included in version headers — [pub.dev](https://pub.dev/packages
 > **Looking for older changes?** \
 > See [CHANGELOG_ARCHIVE.md](./CHANGELOG_ARCHIVE.md) for versions 0.1.0 through 4.6.2.
 
+** See the current published changelog: [saropa_lints/changelog](https://pub.dev/packages/saropa_lints/changelog)
+
 ---
-## [4.9.1] - Current
+## [4.9.2] - Current
+
+### Added
+
+- **Dynamic version detection in init**: The `init` command now reads the version from `pubspec.yaml` at runtime instead of using a hardcoded constant. Also displays the package source (local path vs pub.dev) to help diagnose version mismatches.
+
+---
+## [4.9.1]
 
 ### Added
 
