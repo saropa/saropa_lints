@@ -298,8 +298,8 @@ Map<String, _RuleMetadata> _getRuleMetadata() {
   return _ruleMetadataCache!;
 }
 
-/// Gets a short problem message (truncated for YAML comment).
-String _getShortProblemMessage(String ruleName) {
+/// Gets the problem message for a rule (for YAML comment).
+String _getProblemMessage(String ruleName) {
   final metadata = _getRuleMetadata()[ruleName];
   if (metadata == null) return '';
 
@@ -309,12 +309,6 @@ String _getShortProblemMessage(String ruleName) {
   final prefixMatch = RegExp(r'^\[[\w_]+\]\s*').firstMatch(msg);
   if (prefixMatch != null) {
     msg = msg.substring(prefixMatch.end);
-  }
-
-  // Truncate to reasonable length for YAML comment
-  const maxLength = 60;
-  if (msg.length > maxLength) {
-    msg = '${msg.substring(0, maxLength - 3)}...';
   }
 
   return msg;
@@ -916,7 +910,7 @@ String _generateCustomLintYaml({
       ..sort();
     for (final String rule in sortedCustomizations) {
       final bool enabled = userCustomizations[rule]!;
-      final String msg = _getShortProblemMessage(rule);
+      final String msg = _getProblemMessage(rule);
       final String severity = _getRuleSeverity(rule);
       buffer.writeln('    - $rule: $enabled  # [$severity] $msg');
     }
@@ -966,7 +960,7 @@ String _generateCustomLintYaml({
         '    # --- TIER $tierNum: $tierName (${rules.length} rules) ---');
     buffer.writeln('    #');
     for (final String rule in rules) {
-      final String msg = _getShortProblemMessage(rule);
+      final String msg = _getProblemMessage(rule);
       final String severity = _getRuleSeverity(rule);
       buffer.writeln('    - $rule: true  # [$severity] $msg');
     }
@@ -994,7 +988,7 @@ String _generateCustomLintYaml({
           '    # └───────────────────────────────────────────────────────────────────────┘');
       buffer.writeln('    #');
       for (final String rule in stylisticEnabled) {
-        final String msg = _getShortProblemMessage(rule);
+        final String msg = _getProblemMessage(rule);
         buffer.writeln('    - $rule: true  # $msg');
       }
       buffer.writeln('');
@@ -1010,7 +1004,7 @@ String _generateCustomLintYaml({
           '    # └───────────────────────────────────────────────────────────────────────┘');
       buffer.writeln('    #');
       for (final String rule in stylisticDisabled) {
-        final String msg = _getShortProblemMessage(rule);
+        final String msg = _getProblemMessage(rule);
         buffer.writeln('    - $rule: false  # $msg');
       }
       buffer.writeln('');
@@ -1056,7 +1050,7 @@ String _generateCustomLintYaml({
           '    # └ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ┘');
       buffer.writeln('    #');
       for (final String rule in rules) {
-        final String msg = _getShortProblemMessage(rule);
+        final String msg = _getProblemMessage(rule);
         final String severity = _getRuleSeverity(rule);
         buffer.writeln('    - $rule: false  # [$severity] $msg');
       }
