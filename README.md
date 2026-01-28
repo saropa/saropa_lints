@@ -2,9 +2,26 @@
 
 # Saropa Lints
 
+<!-- CI/CD & Build Status -->
 [![ci](https://github.com/saropa/saropa_lints/actions/workflows/ci.yml/badge.svg)](https://github.com/saropa/saropa_lints/actions/workflows/ci.yml)
-[![pub package](https://img.shields.io/badge/pub-4.8.7-blue)](https://pub.dev/packages/saropa_lints)
-[![pub points](https://img.shields.io/pub/points/saropa_lints)](https://pub.dev/packages/saropa_lints/score)
+
+<!-- Pub.dev Metrics (Auto-updating) -->
+[![pub package](https://img.shields.io/pub/v/saropa_lints.svg?logo=dart&label=pub)](https://pub.dev/packages/saropa_lints)
+[![pub points](https://img.shields.io/pub/points/saropa_lints?logo=dart)](https://pub.dev/packages/saropa_lints/score)
+[![popularity](https://img.shields.io/pub/popularity/saropa_lints?logo=dart)](https://pub.dev/packages/saropa_lints/score)
+[![likes](https://img.shields.io/pub/likes/saropa_lints?logo=dart&color=red)](https://pub.dev/packages/saropa_lints/score)
+
+<!-- GitHub Activity -->
+[![GitHub stars](https://img.shields.io/github/stars/saropa/saropa_lints?style=social)](https://github.com/saropa/saropa_lints)
+[![GitHub forks](https://img.shields.io/github/forks/saropa/saropa_lints?style=social)](https://github.com/saropa/saropa_lints)
+[![GitHub last commit](https://img.shields.io/github/last-commit/saropa/saropa_lints)](https://github.com/saropa/saropa_lints/commits)
+[![GitHub issues](https://img.shields.io/github/issues/saropa/saropa_lints)](https://github.com/saropa/saropa_lints/issues)
+
+<!-- Technical Info -->
+[![Dart SDK Version](https://badgen.net/pub/sdk-version/saropa_lints)](https://pub.dev/packages/saropa_lints)
+[![Flutter Platform](https://img.shields.io/badge/platform-flutter-ff69b4.svg?logo=flutter)](https://flutter.dev/)
+
+<!-- Custom Badges -->
 [![rules](https://img.shields.io/badge/rules-1678%2B-4B0082)](https://github.com/saropa/saropa_lints/blob/main/doc/rules/README.md)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 [![style: saropa lints](https://img.shields.io/badge/style-saropa__lints-4B0082.svg)](https://pub.dev/packages/saropa_lints)
