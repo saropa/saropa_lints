@@ -823,30 +823,33 @@ Map<String, bool> _extractOverridesFromFile(File file, Set<String> allRules) {
 void _createCustomOverridesFile(File file) {
   final content = '''
 # ╔═══════════════════════════════════════════════════════════════════════════╗
-# ║                    CUSTOM RULE OVERRIDES                                  ║
+# ║                    SAROPA LINTS CUSTOM CONFIG                             ║
 # ║                                                                           ║
-# ║  Rules in this file are ALWAYS applied, even when using --reset.         ║
+# ║  Settings in this file are ALWAYS applied, even when using --reset.      ║
 # ║  Use this for project-specific customizations that should persist.       ║
 # ╚═══════════════════════════════════════════════════════════════════════════╝
-#
-# FORMAT: Add rules with true/false values. All formats below are supported:
-#
-#   rule_name: false                    # Simple format
-#   - rule_name: false                  # With hyphen (YAML list style)
-#   - rule_name: false  # Comment here  # With trailing comment
+
+# ─────────────────────────────────────────────────────────────────────────────
+# ANALYSIS SETTINGS
+# ─────────────────────────────────────────────────────────────────────────────
+# max_issues: Maximum warnings/info to track in detail (errors always tracked)
+#   - Default: 1000
+#   - Set to 0 for unlimited
+#   - Lower values = faster analysis on legacy codebases
+
+max_issues: 1000
+
+# ─────────────────────────────────────────────────────────────────────────────
+# RULE OVERRIDES
+# ─────────────────────────────────────────────────────────────────────────────
+# FORMAT: rule_name: true/false
 #
 # EXAMPLES:
-#
-#   # Disable specific rules for this project:
 #   - avoid_print: false                # Allow print statements
 #   - avoid_null_assertion: false       # Allow ! operator
+#   - prefer_const_constructors: true   # Force-enable regardless of tier
 #
-#   # Force-enable rules regardless of tier:
-#   - prefer_const_constructors: true   # Always require const
-#
-# ─────────────────────────────────────────────────────────────────────────────
 # Add your custom rule overrides below:
-# ─────────────────────────────────────────────────────────────────────────────
 
 ''';
 
@@ -892,6 +895,9 @@ String _generateCustomLintYaml({
   buffer.writeln(
       '  #   5. insanity     - All rules (pedantic, highly opinionated)');
   buffer.writeln('  #   +  stylistic    - Opt-in only (formatting, ordering)');
+  buffer.writeln('  #');
+  buffer.writeln(
+      '  # Settings (max_issues, baseline) are in analysis_options_custom.yaml');
   buffer.writeln(
       '  # ═══════════════════════════════════════════════════════════════════════');
   buffer.writeln('');

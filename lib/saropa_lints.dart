@@ -29,6 +29,8 @@
 /// Map format (without `-`) is silently ignored by custom_lint!
 library;
 
+import 'dart:io' show File;
+
 import 'package:custom_lint_builder/custom_lint_builder.dart';
 
 import 'package:saropa_lints/src/baseline/baseline_config.dart';
@@ -2429,6 +2431,15 @@ class _SaropaLints extends PluginBase {
     }
 
     // =========================================================================
+    // ISSUE LIMIT CONFIGURATION
+    // =========================================================================
+    // Configure maximum issues to report before stopping detailed tracking.
+    // Read from analysis_options_custom.yaml in project root:
+    //   max_issues: 500  # default: 1000, 0 = unlimited
+    // This file is read directly (not via custom_lint config).
+    _loadMaxIssuesConfig();
+
+    // =========================================================================
     // PERFORMANCE INFRASTRUCTURE INITIALIZATION
     // =========================================================================
     // Initialize caches, string interning, and memory management on first run.
@@ -2607,6 +2618,33 @@ void _checkConflictingRules(List<LintRule> enabledRules) {
         'These rules have opposite effects - disable one.',
       );
     }
+  }
+}
+
+/// Load max_issues config from analysis_options_custom.yaml.
+///
+/// Reads directly from the project's custom config file:
+/// ```yaml
+/// # In analysis_options_custom.yaml
+/// max_issues: 500  # Limit warning/info tracking (errors always tracked)
+/// ```
+void _loadMaxIssuesConfig() {
+  try {
+    final customConfigFile = File('analysis_options_custom.yaml');
+    if (!customConfigFile.existsSync()) return;
+
+    final content = customConfigFile.readAsStringSync();
+    // Simple regex to extract max_issues value
+    // Matches: max_issues: 500 or max_issues:500
+    final match = RegExp(r'max_issues:\s*(\d+)').firstMatch(content);
+    if (match != null) {
+      final value = int.tryParse(match.group(1)!);
+      if (value != null) {
+        ProgressTracker.setMaxIssues(value);
+      }
+    }
+  } catch (_) {
+    // Silently ignore - use default if config can't be read
   }
 }
 
