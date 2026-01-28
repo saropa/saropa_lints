@@ -1,7 +1,7 @@
 // ignore_for_file: always_specify_types, depend_on_referenced_packages, unused_element
 
 import 'dart:developer' as developer;
-import 'dart:io' show Directory, File, Platform, stderr;
+import 'dart:io' show Directory, File, Platform, stderr, stdout;
 
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/token.dart';
@@ -158,7 +158,9 @@ class _ProgressColors {
   static String get blue => _supportsColor ? '\x1B[34m' : '';
   static String get cyan => _supportsColor ? '\x1B[36m' : '';
   static String get brightGreen => _supportsColor ? '\x1B[92m' : '';
-  static String get clearLine => _supportsColor ? '\x1B[2K\r' : '\r';
+
+  /// Clear line: use cursor-to-start + spaces approach for broader compatibility.
+  static String get clearLine => '\r${' ' * 80}\r';
 }
 
 // =============================================================================
@@ -422,10 +424,7 @@ class ProgressTracker {
 
     // Extract just the filename from the last seen file for context
     final lastFile = _seenFiles.last;
-    final shortName = lastFile.split('/').last.split('\\').last;
-    // Truncate long filenames
-    final displayName =
-        shortName.length > 25 ? '${shortName.substring(0, 22)}...' : shortName;
+    final displayName = lastFile.split('/').last.split('\\').last;
 
     // Aliases for cleaner code
     final reset = _ProgressColors.reset;
@@ -462,37 +461,40 @@ class ProgressTracker {
           _limitReached ? '$_maxIssues+' : '$_violationsFound';
       final issuesStr = '$issuesColor$issuesDisplay$reset';
 
-      // Build compact status line
+      // Build compact status line with clear labels
       final status = StringBuffer()
         ..write(clearLine)
         ..write('$bar $bold$percent%$reset ')
         ..write('$dim│$reset ')
-        ..write('$cyan$fileCount$reset/$dim$_totalExpectedFiles$reset ')
+        ..write(
+            '${dim}Files:$reset $cyan$fileCount$reset/$dim$_totalExpectedFiles$reset ')
         ..write('$dim│$reset ')
-        ..write('$issuesStr issues ')
+        ..write('${dim}Issues:$reset $issuesStr ')
         ..write('$dim│$reset ')
-        ..write('ETA $yellow${_formatDuration(etaSeconds)}$reset ')
+        ..write('${dim}ETA:$reset $yellow${_formatDuration(etaSeconds)}$reset ')
         ..write('$dim│$reset ')
         ..write('$dim$displayName$reset');
 
-      // Write in-place (no newline)
-      stderr.write(status.toString());
+      // Write in-place (no newline) - use stdout for better terminal compat
+      stdout.write(status.toString());
+      stdout.flush();
     } else {
-      // No file count known - simpler output
+      // No file count known - simpler output with labels
       final status = StringBuffer()
         ..write(clearLine)
         ..write('$cyan⠿$reset ')
-        ..write('$bold$fileCount$reset files ')
+        ..write('${dim}Files:$reset $bold$fileCount$reset ')
         ..write('$dim│$reset ')
-        ..write('${_formatDuration(elapsed.inSeconds)} ')
+        ..write('${dim}Time:$reset ${_formatDuration(elapsed.inSeconds)} ')
         ..write('$dim│$reset ')
-        ..write('${filesPerSec.round()}/s ')
+        ..write('${dim}Rate:$reset ${filesPerSec.round()}/s ')
         ..write('$dim│$reset ')
-        ..write('$_violationsFound issues ')
+        ..write('${dim}Issues:$reset $_violationsFound ')
         ..write('$dim│$reset ')
         ..write('$dim$displayName$reset');
 
-      stderr.write(status.toString());
+      stdout.write(status.toString());
+      stdout.flush();
     }
   }
 
