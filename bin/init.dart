@@ -84,8 +84,66 @@ import 'package:saropa_lints/saropa_lints.dart'
     show RuleTier, SaropaLintRule, allSaropaRules;
 import 'package:saropa_lints/src/tiers.dart' as tiers;
 
-/// Package version - update when releasing.
-const String _version = '4.7.3';
+/// Get package version from pubspec.yaml at runtime.
+String _getPackageVersion() {
+  try {
+    // Get the directory where this script is located
+    final scriptUri = Platform.script;
+    final packageDir = _findPackageRoot(scriptUri);
+    if (packageDir != null) {
+      final pubspecFile = File('$packageDir/pubspec.yaml');
+      if (pubspecFile.existsSync()) {
+        final content = pubspecFile.readAsStringSync();
+        final match =
+            RegExp(r'^version:\s*(.+)$', multiLine: true).firstMatch(content);
+        if (match != null) {
+          return match.group(1)!.trim();
+        }
+      }
+    }
+  } catch (_) {}
+  return 'unknown';
+}
+
+/// Find the package root directory from script URI.
+String? _findPackageRoot(Uri scriptUri) {
+  // For file:// URIs, go up from bin/ to package root
+  if (scriptUri.scheme == 'file') {
+    final scriptPath = scriptUri.toFilePath();
+    final binDir = Directory(scriptPath).parent;
+    if (binDir.path.endsWith('bin')) {
+      return binDir.parent.path;
+    }
+    return binDir.path;
+  }
+  // For package: URIs, try to find from .dart_tool/package_config.json
+  return null;
+}
+
+/// Detect where the saropa_lints package is loaded from.
+String _getPackageSource() {
+  try {
+    final packageConfigFile = File('.dart_tool/package_config.json');
+    if (packageConfigFile.existsSync()) {
+      final content = packageConfigFile.readAsStringSync();
+      // Look for saropa_lints entry
+      final match = RegExp(
+        r'"name":\s*"saropa_lints"[^}]*"rootUri":\s*"([^"]+)"',
+      ).firstMatch(content);
+      if (match != null) {
+        final rootUri = match.group(1)!;
+        if (rootUri.startsWith('file://') || rootUri.startsWith('../')) {
+          // Local path dependency
+          return 'local: $rootUri';
+        } else if (rootUri.contains('.pub-cache')) {
+          return 'pub.dev';
+        }
+        return rootUri;
+      }
+    }
+  } catch (_) {}
+  return 'unknown';
+}
 
 // ---------------------------------------------------------------------------
 // Log buffer for detailed report file
@@ -380,9 +438,15 @@ Future<void> main(List<String> args) async {
       '${now.year}${now.month.toString().padLeft(2, '0')}${now.day.toString().padLeft(2, '0')}_'
       '${now.hour.toString().padLeft(2, '0')}${now.minute.toString().padLeft(2, '0')}${now.second.toString().padLeft(2, '0')}';
 
+  // Get version and source info early for logging
+  final version = _getPackageVersion();
+  final source = _getPackageSource();
+
   // Add header to log buffer
   _logBuffer.writeln('=' * 80);
   _logBuffer.writeln('SAROPA LINTS CONFIGURATION LOG');
+  _logBuffer.writeln('Version: $version');
+  _logBuffer.writeln('Source: $source');
   _logBuffer.writeln('Generated: ${now.toIso8601String()}');
   _logBuffer.writeln('Arguments: ${args.join(' ')}');
   _logBuffer.writeln('=' * 80);
@@ -395,12 +459,8 @@ Future<void> main(List<String> args) async {
   }
 
   _logTerminal('');
-  _logTerminal(
-      '${_Colors.bold}╔══════════════════════════════════════════════════════════╗${_Colors.reset}');
-  _logTerminal(
-      '${_Colors.bold}║     ${_Colors.cyan}SAROPA LINTS${_Colors.reset}${_Colors.bold} Configuration Generator      v$_version  ║${_Colors.reset}');
-  _logTerminal(
-      '${_Colors.bold}╚══════════════════════════════════════════════════════════╝${_Colors.reset}');
+  _logTerminal('${_Colors.cyan}SAROPA LINTS${_Colors.reset} v$version');
+  _logTerminal('${_Colors.dim}Source: $source${_Colors.reset}');
   _logTerminal('');
 
   // Resolve tier (handle numeric input)
