@@ -4272,7 +4272,7 @@ class RequireUrlValidationRule extends SaropaLintRule {
     problemMessage:
         '[require_url_validation] Uri.parse on user input without scheme validation enables SSRF attacks. Attackers can make your app connect to internal servers, databases, or use malicious protocols to exfiltrate data.',
     correctionMessage:
-        'Validate url.scheme is https/http before making requests.',
+        'Validate url.scheme is https or http before making requests, and reject file://, data://, and other dangerous schemes that could access local resources.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -5886,7 +5886,7 @@ class AvoidUnsafeDeserializationRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_unsafe_deserialization',
     problemMessage:
-        '[avoid_unsafe_deserialization] Unvalidated JSON from untrusted sources can crash the app or inject malicious data. Attackers can exploit this to corrupt state or trigger unexpected behavior.',
+        '[avoid_unsafe_deserialization] Unvalidated JSON from untrusted sources can crash the app, inject malicious data, or corrupt application state. Attackers can exploit this vulnerability to trigger unexpected behavior, bypass security checks, or cause data loss by crafting malicious payloads.',
     correctionMessage:
         'Validate JSON structure with pattern matching or deserialize into typed model classes.',
     errorSeverity: DiagnosticSeverity.WARNING,

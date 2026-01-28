@@ -930,7 +930,7 @@ class RequireWorkmanagerConstraintsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_workmanager_constraints',
     problemMessage:
-        '[require_workmanager_constraints] WorkManager task registered without constraints runs unconditionally regardless of network availability, battery level, or charging state. This drains battery during low-power conditions, consumes metered mobile data, and causes failed network requests when connectivity is unavailable, wasting system resources.',
+        '[require_workmanager_constraints] WorkManager task registered without constraints runs unconditionally regardless of network availability, battery level, or charging state. This drains battery during low-power conditions, consumes metered mobile data, and causes failed network connection requests when connectivity is unavailable, wasting battery, memory, and processing resources.',
     correctionMessage:
         'Add Constraints(networkType: NetworkType.connected) and optionally requiresBatteryNotLow or requiresCharging to control when background tasks execute.',
     errorSeverity: DiagnosticSeverity.WARNING,

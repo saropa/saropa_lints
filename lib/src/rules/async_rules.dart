@@ -82,7 +82,7 @@ class AvoidFutureToStringRule extends SaropaLintRule {
     problemMessage:
         "[avoid_future_tostring] Future.toString() returns 'Instance of Future', not the resolved value. Logs show useless output, error messages fail to include actual data, and debugging async code becomes nearly impossible.",
     correctionMessage:
-        'Use await to get the value first: (await future).toString().',
+        'Use await to get the resolved value first: (await future).toString(). Only call toString() after the Future has completed to log meaningful information.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -489,7 +489,7 @@ class AvoidUnassignedStreamSubscriptionsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_unassigned_stream_subscriptions',
     problemMessage:
-        '[avoid_unassigned_stream_subscriptions] Stream subscription created by listen() is not assigned to a variable. Without a reference to the StreamSubscription, you cannot cancel it during dispose, which causes memory leaks, prevents garbage collection, and allows callbacks to fire after the widget or object has been destroyed.',
+        '[avoid_unassigned_stream_subscriptions] Stream subscription created by listen() is not assigned to a variable. Without a reference to the StreamSubscription, you cannot cancel it during dispose, which causes memory leaks, prevents garbage collection, and allows callbacks to fire after the StatefulWidget has been destroyed and unmounted from the widget tree.',
     correctionMessage:
         'Assign to variable: final sub = stream.listen(...); then sub.cancel() in dispose.',
     errorSeverity: DiagnosticSeverity.WARNING,
