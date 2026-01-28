@@ -140,6 +140,7 @@
     "prefs",
     "prereqs",
     "pubdev",
+    "pubignore",
     "pubspec",
     "pycache",
     "realtime",
