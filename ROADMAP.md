@@ -1,203 +1,26 @@
 # Roadmap: Aiming for 2,000 Lint Rules
 <!-- cspell:disable -->
 
-## Current Status
+See [CHANGELOG.md](CHANGELOG.md) for implemented rules. Goal: 2000 rules.
 
-See [CHANGELOG.md](https://github.com/saropa/saropa_lints/blob/main/CHANGELOG.md) for implemented rules. Goal: 2000 rules.
+> **When implementing**: Remove from ROADMAP, add to CHANGELOG, register in `all_rules.dart` + `tiers.dart`. See [CONTRIBUTING.md](CONTRIBUTING.md).
 
-> **Deferred Rules**: Rules requiring cross-file analysis, heuristic detection, or YAML parsing have been moved to [ROADMAP_DEFERRED.md](ROADMAP_DEFERRED.md).
+> **Deferred rules**: Cross-file analysis, heuristics, YAML parsing → [ROADMAP_DEFERRED.md](ROADMAP_DEFERRED.md)
 
-## Maintenance Rules
+### Legend
 
-**IMPORTANT: When a rule is implemented:**
+| Emoji | Meaning |
+|-------|---------|
+| 🚨 / ⚠️ / ℹ️ | ERROR / WARNING / INFO severity |
+| ⭐ | Next in line for implementation |
+| 🐙 | [GitHub issue](https://github.com/saropa/saropa_lints/issues) |
+| 💡 | [Discussion](https://github.com/saropa/saropa_lints/discussions) |
 
-1. **REMOVE the rule from this ROADMAP entirely** - do NOT mark it with ✅ or "DONE"
-2. **Document aliases in the rule's doc header** - not here in ROADMAP
-   - Example: `/// Alias: require_props_consistency` in the rule's Dart file
-3. **Add to CHANGELOG.md** under the appropriate version
-4. **Register in saropa_lints.dart** and **tiers.dart**
+**Tiers**: Essential (1) → Recommended (2) → Professional (3) → Comprehensive (4) → Insanity (5)
 
-This ROADMAP is for **planned/unimplemented rules only**.
-
-## Implementation Difficulty Warning
-
-> **Not all rules are created equal.** Rules that appear simple often require multiple revisions due to false positives from heuristic-based detection.
-
-### Truly Easy Rules (low false-positive risk)
-- Match **exact API/method names**: `jsonDecode()`, `DateTime.parse()`
-- Check **specific named parameters**: `shrinkWrap: true`, `autoPlay: true`
-- Detect **missing required parameters**: `Image.network` without `errorBuilder`
-- Match **constructor + dispose pattern**: `ScrollController` without `dispose()`
-
-### Deceptively Hard Rules (high false-positive risk)
-- **Variable name heuristics**: `money`, `price`, `token` → matches `audioVolume`, `cadence`, `tokenizer`
-- **Generic terms**: `cost`, `fee`, `balance` have many non-target meanings
-- **Short abbreviations**: `iv` matches `activity`, `private`, `derivative`
-- **String content analysis**: Must distinguish `$password` from `${password.length}`
-
-**See [CONTRIBUTING.md](CONTRIBUTING.md#avoiding-false-positives-critical)** for detailed guidance on avoiding false positives.
-
-### Legend (used in rule descriptions below)
-
-#### Severity Emojis
-
-| Emoji | Severity | Meaning |
-|-------|----------|---------|
-| 🚨 | ERROR | Critical issue that must be fixed |
-| ⚠️ | WARNING | Important issue that should be addressed |
-| ℹ️ | INFO | Informational suggestion or best practice |
-
-#### Complexity/Risk Markers
-
-| Marker | Emoji | Meaning | Example Pattern |
-|--------|-------|---------|-----------------|
-| — | — | Safe: Exact API/parameter matching | `Image.network` without `errorBuilder` |
-| `[CONTEXT]` | 🎯 | Needs build/test context detection | Detect if inside `build()` method |
-| `[HEURISTIC]` | 🧠 | Variable name or string pattern matching | Detect "money" in variable names |
-| `[CROSS-FILE]` | 🚫 | Requires analysis across multiple files | Check if type is registered elsewhere |
-| `[TOO-COMPLEX]` | 🔮 | Pattern too abstract for reliable AST detection | Detect "loading state" or "user feedback" generically |
-| `[PUBSPEC]` | 📦 | Requires pubspec.yaml analysis (not Dart AST) | Check package versions, detect deprecated packages |
-
-#### Tracking Markers
-
-| Emoji | Meaning | Example |
-|-------|---------|---------|
-| ⭐ | Next in Line for Implementation | ℹ️⭐ `prefer_permission_request_in_context` |
-| 🐙 | Tracked as GitHub issue | [#0000](https://github.com/saropa/saropa_lints/issues/0000) |
-| 💡 | Planned enhancement tracked as GitHub Discussion | [Discussion: Diagnostic Statistics](https://github.com/saropa/saropa_lints/discussions/000) |
-
-#### Tier Definitions
-
-| Tier | Name | Description |
-|------|------|-------------|
-| 1 | Essential | Critical rules that prevent crashes, data loss, and security holes |
-| 2 | Recommended | Essential + common mistakes, performance basics, accessibility basics |
-| 3 | Professional | Recommended + architecture, testing, maintainability |
-| 4 | Comprehensive | Professional + documentation, style, edge cases |
-| 5 | Insanity | Everything. For the truly obsessive |
-
-#### Example Usage
-
-Multiple emojis can be combined: `| 🚨🚫 \`rule_name\` | Tier | ERROR | \`[CROSS-FILE]\` Description |`
-
-## Quick Fix Implementation Plan
-
-**Target: 90% of rules with useful quick fixes that DO NOT break apps.**
-
-### Guiding Principles
-
-1. **Safety first**: A fix that breaks code is worse than no fix. When in doubt, don't add a fix.
-2. **No HACK comments**: `// HACK: fix this manually` adds no value. Either fix it properly or don't add a fix.
-3. **Context matters**: The "correct" fix often depends on surrounding code that the AST doesn't reveal.
-4. **Multiple valid fixes**: When there are several correct approaches, offer multiple fix options or skip the fix.
-
-### Fix Categories by Feasibility
-
-#### Category A: Safe Transformations (Target: 100% coverage)
-
-These fixes have exactly one correct transformation and cannot break code:
-
-| Pattern | Example Rule | Fix |
-|---------|--------------|-----|
-| Operator replacement | `prefer_not_equals` | `!(a == b)` → `a != b` |
-| Constant replacement | `prefer_const_constructor` | Add `const` keyword |
-| Remove redundant code | `unnecessary_this` | Remove `this.` prefix |
-| Add missing keyword | `prefer_final_locals` | Add `final` keyword |
-| Invert condition | `prefer_if_null_operators` | `x != null ? x : y` → `x ?? y` |
-| Simplify expression | `prefer_is_empty` | `list.length == 0` → `list.isEmpty` |
-
-#### Category B: Contextual Transformations (Target: 80% coverage)
-
-These fixes are correct in most contexts but need validation:
-
-| Pattern | Context Check Required | Fix |
-|---------|----------------------|-----|
-| Add `await` | Function must be `async` | Insert `await` (only if already async) |
-| Add `await` | Function is sync lifecycle method | Offer `unawaited()` with import |
-| Wrap with widget | Must maintain child relationship | Wrap expression, preserve indentation |
-| Add parameter | Default value must be sensible | Add parameter with documented default |
-| Add null check | Must not change semantics | Add `?.` or `?? defaultValue` |
-
-**Implementation approach:**
-1. Check preconditions in the fix's `run()` method
-2. If preconditions not met, don't apply the fix (return early)
-3. Document which contexts the fix handles in the rule's doc comment
-
-#### Category C: Multi-Choice Fixes (Target: 50% coverage)
-
-Multiple valid fixes exist; offer choices or pick the safest:
-
-| Scenario | Options | Approach |
-|----------|---------|----------|
-| Dispose missing | Add to existing `dispose()` vs create override | Check if `dispose()` exists; add appropriately |
-| Error handling | try-catch vs `.catchError()` vs `.onError` | Offer multiple fix options in IDE |
-| Async in sync context | `unawaited()` vs extract to async method vs `.then()` | Offer options; `unawaited()` as default |
-| Missing import | Multiple packages export same symbol | Don't auto-import; leave to IDE |
-
-#### Category D: Human Judgment Required (Target: 0% fix coverage)
-
-Do NOT add fixes for these. Document why in the rule's doc comment:
-
-| Scenario | Why No Fix |
-|----------|-----------|
-| Architecture decisions | "Extract to service" - where? which service? |
-| Business logic | "Add validation" - what validation logic? |
-| Naming conventions | "Use descriptive name" - that's subjective |
-| Complex refactoring | "Split large class" - how to split? |
-| Cross-file changes | "Move to separate file" - what filename? |
-
-### Implementation Phases
-
-#### Phase 1: Category A Rules (Safe Transformations)
-
-Audit all rules to identify Category A patterns. These can be implemented quickly with high confidence:
-
-- [ ] Audit `stylistic_rules.dart` - many are simple transformations
-- [ ] Audit `unnecessary_code_rules.dart` - removal/simplification patterns
-- [ ] Audit `formatting_rules.dart` - whitespace/keyword additions
-- [ ] Audit `equality_rules.dart` - operator replacements
-
-#### Phase 2: Category B Rules (Contextual Transformations)
-
-Create helper utilities for common context checks:
-
-- [ ] `isInAsyncFunction(node)` - check if containing function is async
-- [ ] `isInLifecycleMethod(node)` - check if in initState/dispose/build
-- [ ] `hasExistingDispose(classNode)` - check for dispose override
-- [ ] `getContainingWidget(node)` - find enclosing widget class
-
-Then implement fixes that use these utilities.
-
-#### Phase 3: Category C Rules (Multi-Choice)
-
-For rules where multiple fixes are valid:
-
-- [ ] Implement `getFixes()` returning multiple `Fix` instances
-- [ ] Each fix has distinct `message` explaining the approach
-- [ ] User chooses in IDE quick-fix menu
-
-#### Phase 4: Documentation
-
-For Category D rules (no fix possible):
-
-- [ ] Add `/// **No quick fix**: [reason]` to doc comments
-- [ ] Ensure `correctionMessage` gives actionable human guidance
-
-### Safety Checklist for Every Fix
-
-Before merging any fix:
-
-- [ ] **Does not delete code** (comment out instead, if removal needed)
-- [ ] **Does not change runtime behavior** (except to fix the lint issue)
-- [ ] **Does not add imports** (unless absolutely required and unambiguous)
-- [ ] **Works in edge cases** (empty files, nested structures, generated code)
-- [ ] **Tested in example fixtures** (both success and failure cases)
+---
 
 ## Part 1: Detailed Rule Specifications
-
-### 1.1 Widget Rules
-
-### 1.2 State Management
 
 ### 1.3 Performance Rules
 
@@ -440,13 +263,7 @@ Before merging any fix:
 | ℹ️🐙 [`require_log_level_for_production`](https://github.com/saropa/saropa_lints/issues/27) | Professional | INFO | Debug logs in production waste resources. Detect verbose logging without level checks. |
 | ℹ️ `avoid_expensive_log_string_construction` | Professional | INFO | Don't build expensive strings for logs that won't print. Detect string interpolation in log calls without level guard. |
 
-### 1.37 Caching Rules
-
-| Rule Name | Tier | Severity | Description |
-|-----------|------|----------|-------------|
-| ⚠️🎯 `avoid_cache_in_build` | Essential | WARNING | `[CONTEXT]` Cache lookups in build() may be expensive. Detect cache operations inside build methods. |
-
-### 1.38 Pagination Rules
+### 1.37 Pagination Rules
 
 | Rule Name | Tier | Severity | Description |
 |-----------|------|----------|-------------|
@@ -472,13 +289,7 @@ Before merging any fix:
 |-----------|------|----------|-------------|
 | ⚠️⭐ `require_rtl_layout_support` | Recommended | WARNING | RTL languages need directional awareness. Detect hardcoded left/right in layouts without Directionality check. |
 
-### 1.47 Snackbar & Toast Rules
-
-| Rule Name | Tier | Severity | Description |
-|-----------|------|----------|-------------|
-| ℹ️🧠 `require_snackbar_duration_consideration` | Recommended | INFO | `[HEURISTIC]` Important messages need longer duration. Detect SnackBar without explicit duration for important content. |
-
-### 1.49 Stepper & Multi-step Flow Rules
+### 1.47 Stepper & Multi-step Flow Rules
 
 | Rule Name | Tier | Severity | Description |
 |-----------|------|----------|-------------|
@@ -855,14 +666,12 @@ Rules for popular Flutter packages based on common gotchas, anti-patterns, and b
 
 | Rule Name | Tier | Severity | Description |
 |-----------|------|----------|-------------|
-| ℹ️🧠 `require_bloc_one_per_feature` | Professional | INFO | `[HEURISTIC]` Each feature should have its own Bloc. Detect single Bloc handling unrelated events. |
 | ⚠️ `avoid_behavior_subject_last_value` | Professional | WARNING | BehaviorSubject retains value after close. Use PublishSubject when appropriate. |
 
 ### 5.6 GetX Anti-Pattern Rules
 
 | Rule Name | Tier | Severity | Description |
 |-----------|------|----------|-------------|
-| ℹ️🧠 `avoid_getx_for_everything` | Professional | INFO | `[HEURISTIC]` GetX shouldn't be used for all patterns. Detect project over-reliance on GetX. |
 | ℹ️ `prefer_getx_builder_over_obx` | Recommended | INFO | GetBuilder is more explicit than Obx for state. Detect mixed patterns. |
 | ⚠️⭐ `avoid_getx_static_get` | Professional | WARNING | Get.find() is hard to test. Prefer constructor injection. Detect Get.find in methods. |
 | ⚠️ `avoid_getx_rx_nested_obs` | Professional | WARNING | Nested .obs creates complex reactive trees. Detect Rx<List<Rx<Type>>>. |
@@ -925,7 +734,6 @@ Rules for popular Flutter packages based on common gotchas, anti-patterns, and b
 
 | Rule Name | Tier | Severity | Description |
 |-----------|------|----------|-------------|
-| ⚠️🧠 `avoid_notification_overload` | Recommended | WARNING | `[HEURISTIC]` Too many notifications annoy users. Detect high-frequency notification calls. |
 | ℹ️ `prefer_notification_custom_sound | Professional | INFO | Important notifications may need custom sound. Document sound configuration. |
 
 ### 5.15 connectivity_plus Rules
@@ -1123,23 +931,16 @@ Rules for popular Flutter packages based on common gotchas, anti-patterns, and b
 
 | Rule Name | Tier | Severity | Description |
 |-----------|------|----------|-------------|
-| ℹ️🧠 `prefer_feature_folders` | Professional | INFO | `[HEURISTIC]` Organize by feature, not type. Detect flat structure with many files. |
 | ℹ️ `prefer_composition_over_inheritance` | Professional | INFO | Use composition for flexibility. Detect deep inheritance hierarchies. |
 | ℹ️ `require_barrel_files` | Professional | INFO | Use barrel files for exports. Detect multiple individual imports. |
 | ℹ️ `require_interface_for_dependency` | Professional | INFO | Use interfaces for testability. Detect concrete class dependencies. |
-| ℹ️🧠 `avoid_util_class | Professional | INFO | `[HEURISTIC]` Util classes are code smells. Detect classes named Util/Helper. |
 | ℹ️ `prefer_extension_methods` | Professional | INFO | Use extensions for type-specific utilities. Detect static methods that could be extensions. |
-| ℹ️🧠 `require_single_responsibility` | Professional | INFO | `[HEURISTIC]` Classes should have one responsibility. Detect mixed concerns. |
 
 ### 5.39 Caching Strategy Rules
 
 | Rule Name | Tier | Severity | Description |
 |-----------|------|----------|-------------|
-| ⚠️🧠 `require_cache_invalidation` | Essential | WARNING | `[HEURISTIC]` Caches need invalidation strategy. Detect cache without clear/invalidate. |
 | ℹ️ `prefer_lru_cache` | Professional | INFO | Use LRU for memory-bounded cache. Detect Map used as cache without eviction. |
-| ⚠️🧠🐙 [`require_cache_invalidation`](https://github.com/saropa/saropa_lints/issues/38) | Essential | WARNING | `[HEURISTIC]` Caches need invalidation strategy. Detect cache without clear/invalidate. |
-| ⚠️🧠🐙 [`require_cache_ttl`](https://github.com/saropa/saropa_lints/issues/39) | Recommended | WARNING | `[HEURISTIC]` Caches need TTL. Detect cache entry without expiration. |
-| ⚠️🧠 `avoid_over_caching` | Professional | WARNING | `[HEURISTIC]` Not everything needs caching. Detect excessive cache usage. |
 | ℹ️ `prefer_stale_while_revalidate` | Professional | INFO | Show stale data while refreshing. Detect blocking refresh pattern. |
 | ⚠️ `avoid_cache_stampede` | Professional | WARNING | Prevent thundering herd on cache miss. Detect cache without locking. |
 | ℹ️ `prefer_disk_cache_for_persistence` | Professional | INFO | Use disk cache for persistence across sessions. Detect memory-only cache for persistent data. |
@@ -1149,7 +950,6 @@ Rules for popular Flutter packages based on common gotchas, anti-patterns, and b
 | Rule Name | Tier | Severity | Description |
 |-----------|------|----------|-------------|
 | ℹ️ `prefer_log_levels` | Professional | INFO | Use log levels appropriately. Detect single log level usage. |
-| ⚠️🧠 `avoid_excessive_logging` | Professional | WARNING | `[HEURISTIC]` Too much logging impacts performance. Detect high-frequency log calls. |
 | ℹ️ `prefer_conditional_logging` | Professional | INFO | Expensive log message construction should be conditional. Detect expensive string in log. |
 | ℹ️ `require_error_context_in_logs` | Professional | INFO | Errors need context for debugging. Detect error log without context. |
 | ℹ️ `prefer_log_timestamp` | Professional | INFO | Include timestamps in logs. Detect logs without time information. |
@@ -1168,7 +968,6 @@ Rules for popular Flutter packages based on common gotchas, anti-patterns, and b
 | Rule Name | Tier | Severity | Description |
 |-----------|------|----------|-------------|
 | ℹ️ `prefer_injectable_package` | Professional | INFO | Use code generation for DI. Detect manual registration boilerplate. |
-| ⚠️🧠 `avoid_service_locator_abuse` | Professional | WARNING | `[HEURISTIC]` Don't use GetIt everywhere. Detect GetIt.I in business logic. |
 | ℹ️ `require_di_module_separation` | Professional | INFO | Separate DI configuration into modules. Detect monolithic registration. |
 
 ### 5.43 Accessibility Advanced Rules
@@ -1177,7 +976,6 @@ Rules for popular Flutter packages based on common gotchas, anti-patterns, and b
 |-----------|------|----------|-------------|
 | ⚠️ `require_text_scale_factor_awareness` | Essential | WARNING | UI should handle text scaling. Detect fixed-size text containers. |
 | ⚠️🐙 [`require_text_scale_factor_awareness`](https://github.com/saropa/saropa_lints/issues/42) | Essential | WARNING | UI should handle text scaling. Detect fixed-size text containers. |
-| ⚠️🧠🐙 [`avoid_insufficient_contrast`](https://github.com/saropa/saropa_lints/issues/43) | Essential | WARNING | `[HEURISTIC]` Text needs sufficient contrast. Detect low contrast color combinations. |
 | ℹ️🐙 [`require_focus_order`](https://github.com/saropa/saropa_lints/issues/44) | Professional | INFO | Ensure logical focus order. Detect FocusTraversalGroup misconfiguration. |
 | ℹ️🐙 [`require_reduced_motion_support`](https://github.com/saropa/saropa_lints/issues/45) | Recommended | INFO | Check MediaQuery.disableAnimations. Detect animations without reduced motion check. |
 | ℹ️🐙 [`prefer_readable_line_length`](https://github.com/saropa/saropa_lints/issues/46) | Professional | INFO | Lines shouldn't exceed ~80 characters. Detect wide text without constraints. |
@@ -1208,7 +1006,6 @@ Rules for popular Flutter packages based on common gotchas, anti-patterns, and b
 | Rule Name | Tier | Severity | Description |
 |-----------|------|----------|-------------|
 | ⚠️ `avoid_deep_nesting` | Professional | WARNING | Widgets shouldn't nest too deeply. Detect nesting >10 levels. |
-| ℹ️🧠 `prefer_extract_widget` | Professional | INFO | `[HEURISTIC]` Large build methods should be split. Detect build >100 lines. |
 | ⚠️ `avoid_repeated_widget_creation` | Professional | WARNING | Cache widget references when possible. Detect identical widgets created in loop. |
 | ℹ️ `prefer_builder_pattern` | Professional | INFO | Use Builder for context-dependent children. Detect context issues. |
 | ℹ️ `prefer_sliver_for_mixed_scroll` | Professional | INFO | Use slivers for mixed scrollable content. Detect nested scrollables. |
