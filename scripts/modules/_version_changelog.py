@@ -75,7 +75,10 @@ def validate_changelog_version(
 
 
 def display_changelog(project_dir: Path) -> str | None:
-    """Display the latest changelog entry.
+    """Display a summary of the latest changelog entry.
+
+    Shows counts by section type (Added, Changed, Fixed, etc.)
+    and warns if no items are found.
 
     Returns:
         The latest changelog entry text, or None if not found.
@@ -92,16 +95,42 @@ def display_changelog(project_dir: Path) -> str | None:
         re.MULTILINE | re.DOTALL,
     )
 
-    if match:
-        latest_entry = match.group(1).strip()
-        print()
-        print_colored("  CHANGELOG (latest entry):", Color.WHITE)
-        print_colored("  " + "-" * 50, Color.CYAN)
-        for line in latest_entry.split("\n"):
-            print_colored(f"  {line}", Color.CYAN)
-        print_colored("  " + "-" * 50, Color.CYAN)
-        print()
-        return latest_entry
+    if not match:
+        print_warning("Could not parse CHANGELOG.md")
+        return None
 
-    print_warning("Could not parse CHANGELOG.md")
-    return None
+    latest_entry = match.group(1).strip()
+
+    # Count items by section type
+    section_counts: dict[str, int] = {}
+    current_section = None
+    for line in latest_entry.split("\n"):
+        # Detect section headers like "### Added", "### Changed"
+        section_match = re.match(r"^###\s+(\w+)", line)
+        if section_match:
+            current_section = section_match.group(1)
+            section_counts.setdefault(current_section, 0)
+        # Count bullet points
+        elif current_section and re.match(r"^\s*-\s+", line):
+            section_counts[current_section] += 1
+
+    total_items = sum(section_counts.values())
+
+    print()
+    print_colored("  CHANGELOG:", Color.WHITE)
+
+    if total_items == 0:
+        print_warning("No items in latest changelog entry!")
+    else:
+        # Display summary by type
+        summary_parts = []
+        for section, count in section_counts.items():
+            summary_parts.append(f"{count} {section}")
+        print_colored(f"      {', '.join(summary_parts)}", Color.CYAN)
+
+    print_colored(
+        f"      See: CHANGELOG.md",
+        Color.DIM,
+    )
+    print()
+    return latest_entry
