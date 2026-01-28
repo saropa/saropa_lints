@@ -3265,8 +3265,8 @@ class PreferDeferredLoadingWebRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_deferred_loading_web',
     problemMessage:
-        '[prefer_deferred_loading_web] Consider deferred loading for large packages on web.',
-    correctionMessage: 'Use "deferred as" import for better web load times.',
+        '[prefer_deferred_loading_web] Large package imported eagerly increases initial bundle size.',
+    correctionMessage: 'Use "deferred as" import to reduce initial load time.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -3346,7 +3346,7 @@ class RequireMenuBarForDesktopRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_menu_bar_for_desktop',
     problemMessage:
-        '[require_menu_bar_for_desktop] Desktop app should have a PlatformMenuBar.',
+        '[require_menu_bar_for_desktop] Desktop app without PlatformMenuBar lacks standard keyboard shortcuts.',
     correctionMessage: 'Add PlatformMenuBar for standard desktop experience.',
     errorSeverity: DiagnosticSeverity.INFO,
   );

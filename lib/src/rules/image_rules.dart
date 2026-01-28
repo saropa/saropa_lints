@@ -1,5 +1,8 @@
+// ignore_for_file: deprecated_member_use
+
 import 'package:analyzer/dart/ast/ast.dart';
-import 'package:analyzer/error/error.dart' show DiagnosticSeverity;
+import 'package:analyzer/error/error.dart'
+    show AnalysisError, DiagnosticSeverity;
 import 'package:custom_lint_builder/custom_lint_builder.dart';
 import 'package:saropa_lints/src/saropa_lint_rule.dart';
 
@@ -310,7 +313,7 @@ class PreferImageSizeConstraintsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_image_size_constraints',
     problemMessage:
-        '[prefer_image_size_constraints] Consider adding cacheWidth/cacheHeight for memory optimization.',
+        '[prefer_image_size_constraints] Missing cacheWidth/cacheHeight decodes full resolution into memory.',
     correctionMessage:
         'Set cacheWidth/cacheHeight to avoid decoding at full resolution.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -351,6 +354,39 @@ class PreferImageSizeConstraintsRule extends SaropaLintRule {
       if ((hasWidth || hasHeight) && !hasCacheWidth && !hasCacheHeight) {
         reporter.atNode(node.constructorName, code);
       }
+    });
+  }
+
+  @override
+  List<Fix> getFixes() => <Fix>[_PreferImageSizeConstraintsFix()];
+}
+
+class _PreferImageSizeConstraintsFix extends DartFix {
+  @override
+  void run(
+    CustomLintResolver resolver,
+    ChangeReporter reporter,
+    CustomLintContext context,
+    AnalysisError analysisError,
+    List<AnalysisError> others,
+  ) {
+    context.registry.addInstanceCreationExpression((
+      InstanceCreationExpression node,
+    ) {
+      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
+
+      final changeBuilder = reporter.createChangeBuilder(
+        message: 'Add cacheWidth and cacheHeight',
+        priority: 80,
+      );
+
+      changeBuilder.addDartFileEdit((builder) {
+        final args = node.argumentList;
+        builder.addSimpleInsertion(
+          args.arguments.last.end,
+          ', cacheWidth: 200, cacheHeight: 200',
+        );
+      });
     });
   }
 }
@@ -463,7 +499,7 @@ class RequireImageLoadingPlaceholderRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_image_loading_placeholder',
     problemMessage:
-        '[require_image_loading_placeholder] Image.network should have a loadingBuilder for UX feedback.',
+        '[require_image_loading_placeholder] Image.network without loadingBuilder shows blank space during load.',
     correctionMessage: 'Add loadingBuilder to show progress while loading.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -838,6 +874,39 @@ class RequireCachedImageDimensionsRule extends SaropaLintRule {
       }
     });
   }
+
+  @override
+  List<Fix> getFixes() => <Fix>[_RequireCachedImageDimensionsFix()];
+}
+
+class _RequireCachedImageDimensionsFix extends DartFix {
+  @override
+  void run(
+    CustomLintResolver resolver,
+    ChangeReporter reporter,
+    CustomLintContext context,
+    AnalysisError analysisError,
+    List<AnalysisError> others,
+  ) {
+    context.registry.addInstanceCreationExpression((
+      InstanceCreationExpression node,
+    ) {
+      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
+
+      final changeBuilder = reporter.createChangeBuilder(
+        message: 'Add memCacheWidth and memCacheHeight',
+        priority: 80,
+      );
+
+      changeBuilder.addDartFileEdit((builder) {
+        final args = node.argumentList;
+        builder.addSimpleInsertion(
+          args.arguments.last.end,
+          ', memCacheWidth: 300, memCacheHeight: 300',
+        );
+      });
+    });
+  }
 }
 
 /// Warns when CachedNetworkImage is used without placeholder.
@@ -1123,6 +1192,39 @@ class PreferCachedImageFadeAnimationRule extends SaropaLintRule {
       }
     });
   }
+
+  @override
+  List<Fix> getFixes() => <Fix>[_PreferCachedImageFadeAnimationFix()];
+}
+
+class _PreferCachedImageFadeAnimationFix extends DartFix {
+  @override
+  void run(
+    CustomLintResolver resolver,
+    ChangeReporter reporter,
+    CustomLintContext context,
+    AnalysisError analysisError,
+    List<AnalysisError> others,
+  ) {
+    context.registry.addInstanceCreationExpression((
+      InstanceCreationExpression node,
+    ) {
+      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
+
+      final changeBuilder = reporter.createChangeBuilder(
+        message: 'Add fadeInDuration',
+        priority: 80,
+      );
+
+      changeBuilder.addDartFileEdit((builder) {
+        final args = node.argumentList;
+        builder.addSimpleInsertion(
+          args.arguments.last.end,
+          ', fadeInDuration: const Duration(milliseconds: 300)',
+        );
+      });
+    });
+  }
 }
 
 // =============================================================================
@@ -1315,7 +1417,7 @@ class PreferImagePickerRequestFullMetadataRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_image_picker_request_full_metadata',
     problemMessage:
-        '[prefer_image_picker_request_full_metadata] pickImage without requestFullMetadata. Consider setting false for privacy.',
+        '[prefer_image_picker_request_full_metadata] pickImage collects EXIF metadata (GPS, timestamps) by default.',
     correctionMessage:
         'Add requestFullMetadata: false if EXIF data (GPS, timestamps) not needed.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -1363,6 +1465,44 @@ class PreferImagePickerRequestFullMetadataRule extends SaropaLintRule {
       if (!hasRequestFullMetadata) {
         reporter.atNode(node.methodName, code);
       }
+    });
+  }
+
+  @override
+  List<Fix> getFixes() => <Fix>[_PreferImagePickerRequestFullMetadataFix()];
+}
+
+class _PreferImagePickerRequestFullMetadataFix extends DartFix {
+  @override
+  void run(
+    CustomLintResolver resolver,
+    ChangeReporter reporter,
+    CustomLintContext context,
+    AnalysisError analysisError,
+    List<AnalysisError> others,
+  ) {
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
+
+      final changeBuilder = reporter.createChangeBuilder(
+        message: 'Add requestFullMetadata: false',
+        priority: 80,
+      );
+
+      changeBuilder.addDartFileEdit((builder) {
+        final args = node.argumentList;
+        if (args.arguments.isEmpty) {
+          builder.addSimpleInsertion(
+            args.leftParenthesis.end,
+            'requestFullMetadata: false',
+          );
+        } else {
+          builder.addSimpleInsertion(
+            args.arguments.last.end,
+            ', requestFullMetadata: false',
+          );
+        }
+      });
     });
   }
 }
@@ -1459,6 +1599,44 @@ class AvoidImagePickerLargeFilesRule extends SaropaLintRule {
       if (!hasCompression) {
         reporter.atNode(node.methodName, code);
       }
+    });
+  }
+
+  @override
+  List<Fix> getFixes() => <Fix>[_AvoidImagePickerLargeFilesFix()];
+}
+
+class _AvoidImagePickerLargeFilesFix extends DartFix {
+  @override
+  void run(
+    CustomLintResolver resolver,
+    ChangeReporter reporter,
+    CustomLintContext context,
+    AnalysisError analysisError,
+    List<AnalysisError> others,
+  ) {
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
+
+      final changeBuilder = reporter.createChangeBuilder(
+        message: 'Add imageQuality: 85',
+        priority: 80,
+      );
+
+      changeBuilder.addDartFileEdit((builder) {
+        final args = node.argumentList;
+        if (args.arguments.isEmpty) {
+          builder.addSimpleInsertion(
+            args.leftParenthesis.end,
+            'imageQuality: 85',
+          );
+        } else {
+          builder.addSimpleInsertion(
+            args.arguments.last.end,
+            ', imageQuality: 85',
+          );
+        }
+      });
     });
   }
 }
@@ -1603,6 +1781,39 @@ class RequireImageCacheDimensionsRule extends SaropaLintRule {
       if (!hasCacheDimensions) {
         reporter.atNode(node.constructorName, code);
       }
+    });
+  }
+
+  @override
+  List<Fix> getFixes() => <Fix>[_RequireImageCacheDimensionsFix()];
+}
+
+class _RequireImageCacheDimensionsFix extends DartFix {
+  @override
+  void run(
+    CustomLintResolver resolver,
+    ChangeReporter reporter,
+    CustomLintContext context,
+    AnalysisError analysisError,
+    List<AnalysisError> others,
+  ) {
+    context.registry.addInstanceCreationExpression((
+      InstanceCreationExpression node,
+    ) {
+      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
+
+      final changeBuilder = reporter.createChangeBuilder(
+        message: 'Add cacheWidth and cacheHeight',
+        priority: 80,
+      );
+
+      changeBuilder.addDartFileEdit((builder) {
+        final args = node.argumentList;
+        builder.addSimpleInsertion(
+          args.arguments.last.end,
+          ', cacheWidth: 400, cacheHeight: 400',
+        );
+      });
     });
   }
 }

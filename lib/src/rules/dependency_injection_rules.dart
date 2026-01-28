@@ -8,7 +8,8 @@ library;
 
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
-import 'package:analyzer/error/error.dart' show DiagnosticSeverity;
+import 'package:analyzer/error/error.dart'
+    show AnalysisError, DiagnosticSeverity;
 import 'package:custom_lint_builder/custom_lint_builder.dart';
 
 import '../saropa_lint_rule.dart';
@@ -466,6 +467,48 @@ class AvoidSingletonForScopedDependenciesRule extends SaropaLintRule {
       }
     });
   }
+
+  @override
+  List<Fix> getFixes() => <Fix>[_AvoidSingletonForScopedDependenciesFix()];
+}
+
+class _AvoidSingletonForScopedDependenciesFix extends DartFix {
+  @override
+  void run(
+    CustomLintResolver resolver,
+    ChangeReporter reporter,
+    CustomLintContext context,
+    AnalysisError analysisError,
+    List<AnalysisError> others,
+  ) {
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
+      if (node.methodName.name != 'registerSingleton') return;
+
+      final changeBuilder = reporter.createChangeBuilder(
+        message: 'Change to registerFactory',
+        priority: 80,
+      );
+
+      changeBuilder.addDartFileEdit((builder) {
+        builder.addSimpleReplacement(
+          node.methodName.sourceRange,
+          'registerFactory',
+        );
+        // Also need to wrap the argument in a factory function
+        final args = node.argumentList.arguments;
+        if (args.isNotEmpty) {
+          final firstArg = args.first;
+          if (firstArg is! NamedExpression) {
+            builder.addSimpleReplacement(
+              firstArg.sourceRange,
+              '() => ${firstArg.toSource()}',
+            );
+          }
+        }
+      });
+    });
+  }
 }
 
 /// Warns when circular dependencies are detected in DI registration.
@@ -722,6 +765,58 @@ class RequireTypedDiRegistrationRule extends SaropaLintRule {
       }
     });
   }
+
+  @override
+  List<Fix> getFixes() => <Fix>[_RequireTypedDiRegistrationFix()];
+}
+
+class _RequireTypedDiRegistrationFix extends DartFix {
+  @override
+  void run(
+    CustomLintResolver resolver,
+    ChangeReporter reporter,
+    CustomLintContext context,
+    AnalysisError analysisError,
+    List<AnalysisError> others,
+  ) {
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
+
+      // Try to infer type from the argument
+      final args = node.argumentList.arguments;
+      if (args.isEmpty) return;
+
+      String? inferredType;
+      final firstArg = args.first;
+
+      if (firstArg is InstanceCreationExpression) {
+        inferredType = firstArg.constructorName.type.name.lexeme;
+      } else if (firstArg is FunctionExpression) {
+        // For factory functions, try to get return type
+        final body = firstArg.body;
+        if (body is ExpressionFunctionBody) {
+          final expr = body.expression;
+          if (expr is InstanceCreationExpression) {
+            inferredType = expr.constructorName.type.name.lexeme;
+          }
+        }
+      }
+
+      if (inferredType == null) return;
+
+      final changeBuilder = reporter.createChangeBuilder(
+        message: 'Add type parameter <$inferredType>',
+        priority: 80,
+      );
+
+      changeBuilder.addDartFileEdit((builder) {
+        builder.addSimpleInsertion(
+          node.methodName.end,
+          '<$inferredType>',
+        );
+      });
+    });
+  }
 }
 
 /// Warns when a function literal is passed to registerSingleton.
@@ -792,6 +887,37 @@ class AvoidFunctionsInRegisterSingletonRule extends SaropaLintRule {
       if (firstArg is FunctionExpression) {
         reporter.atNode(firstArg, code);
       }
+    });
+  }
+
+  @override
+  List<Fix> getFixes() => <Fix>[_AvoidFunctionsInRegisterSingletonFix()];
+}
+
+class _AvoidFunctionsInRegisterSingletonFix extends DartFix {
+  @override
+  void run(
+    CustomLintResolver resolver,
+    ChangeReporter reporter,
+    CustomLintContext context,
+    AnalysisError analysisError,
+    List<AnalysisError> others,
+  ) {
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
+      if (node.methodName.name != 'registerSingleton') return;
+
+      final changeBuilder = reporter.createChangeBuilder(
+        message: 'Change to registerLazySingleton',
+        priority: 80,
+      );
+
+      changeBuilder.addDartFileEdit((builder) {
+        builder.addSimpleReplacement(
+          node.methodName.sourceRange,
+          'registerLazySingleton',
+        );
+      });
     });
   }
 }
@@ -1681,6 +1807,49 @@ class PreferLazySingletonRegistrationRule extends SaropaLintRule {
       if (_expensiveServicePattern.hasMatch(argSource)) {
         reporter.atNode(node, code);
       }
+    });
+  }
+
+  @override
+  List<Fix> getFixes() => <Fix>[_PreferLazySingletonRegistrationFix()];
+}
+
+class _PreferLazySingletonRegistrationFix extends DartFix {
+  @override
+  void run(
+    CustomLintResolver resolver,
+    ChangeReporter reporter,
+    CustomLintContext context,
+    AnalysisError analysisError,
+    List<AnalysisError> others,
+  ) {
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
+      if (node.methodName.name != 'registerSingleton') return;
+
+      final changeBuilder = reporter.createChangeBuilder(
+        message: 'Change to registerLazySingleton',
+        priority: 80,
+      );
+
+      changeBuilder.addDartFileEdit((builder) {
+        // Change method name
+        builder.addSimpleReplacement(
+          node.methodName.sourceRange,
+          'registerLazySingleton',
+        );
+        // Wrap argument in factory function
+        final args = node.argumentList.arguments;
+        if (args.isNotEmpty) {
+          final firstArg = args.first;
+          if (firstArg is! NamedExpression && firstArg is! FunctionExpression) {
+            builder.addSimpleReplacement(
+              firstArg.sourceRange,
+              '() => ${firstArg.toSource()}',
+            );
+          }
+        }
+      });
     });
   }
 }
