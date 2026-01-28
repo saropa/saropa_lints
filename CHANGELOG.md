@@ -9,7 +9,14 @@ Dates are not included in version headers — [pub.dev](https://pub.dev/packages
 > See [CHANGELOG_ARCHIVE.md](./CHANGELOG_ARCHIVE.md) for versions 0.1.0 through 4.2.0.
 
 ---
-## [4.8.8] - Current
+## [4.9.0] - Current
+
+### Added
+
+- **Automatic ignore quick fixes for all rules**: Every rule extending `SaropaLintRule` now automatically provides two quick fixes: "Ignore 'rule_name' for this line" (inserts `// ignore: rule_name` above the violation with matching indentation) and "Ignore 'rule_name' for this file" (inserts `// ignore_for_file: rule_name` after header comments). This enables one-click suppression for any lint violation. Rules can disable this via `includeIgnoreFixes => false` for critical security rules. New `customFixes` getter allows rules to provide specific fixes while retaining ignore fixes. Insertion logic respects existing ignore_for_file comments (groups them together) and copyright/license headers (inserts after, not before).
+
+---
+## [4.8.8]
 
 ### Added
 
