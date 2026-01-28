@@ -3,6 +3,7 @@
 ## Project
 
 - [saropa_lints on pub.dev](https://pub.dev/packages/saropa_lints)
+- [saropa_lints CHANGELOG on pub.dev](https://pub.dev/packages/saropa_lints/changelog)
 - [GitHub Repository](https://github.com/saropa/saropa_lints)
 - [Issue Tracker](https://github.com/saropa/saropa_lints/issues)
 - [Saropa Website](https://saropa.com/)
