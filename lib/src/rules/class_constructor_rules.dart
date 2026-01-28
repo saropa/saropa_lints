@@ -3,7 +3,8 @@
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/token.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
-import 'package:analyzer/error/error.dart' show DiagnosticSeverity;
+import 'package:analyzer/error/error.dart'
+    show AnalysisError, DiagnosticSeverity;
 import 'package:custom_lint_builder/custom_lint_builder.dart';
 
 import '../saropa_lint_rule.dart';
@@ -573,6 +574,9 @@ class PreferConstStringListRule extends SaropaLintRule {
     });
   }
 
+  @override
+  List<Fix> getFixes() => <Fix>[_PreferConstStringListFix()];
+
   /// Check if a node is within a const context (const declaration,
   /// const constructor, enum body, etc.)
   bool _isInConstContext(AstNode node) {
@@ -686,6 +690,9 @@ class PreferDeclaringConstConstructorRule extends SaropaLintRule {
       }
     });
   }
+
+  @override
+  List<Fix> getFixes() => <Fix>[_PreferDeclaringConstConstructorFix()];
 }
 
 /// Warns when extension type representation fields are public.
@@ -1007,6 +1014,9 @@ class PreferFinalClassRule extends SaropaLintRule {
       }
     });
   }
+
+  @override
+  List<Fix> getFixes() => <Fix>[_PreferFinalClassFix()];
 }
 
 /// Warns when an abstract class with only abstract members could be `interface`.
@@ -1103,6 +1113,9 @@ class PreferInterfaceClassRule extends SaropaLintRule {
       }
     });
   }
+
+  @override
+  List<Fix> getFixes() => <Fix>[_PreferInterfaceClassFix()];
 }
 
 /// Warns when an abstract class with implementation could be `base`.
@@ -1202,6 +1215,139 @@ class PreferBaseClassRule extends SaropaLintRule {
       if (hasAbstractMember && hasConcreteImplementation) {
         reporter.atToken(node.name, code);
       }
+    });
+  }
+
+  @override
+  List<Fix> getFixes() => <Fix>[_PreferBaseClassFix()];
+}
+
+// =============================================================================
+// QUICK FIXES
+// =============================================================================
+
+class _PreferConstStringListFix extends DartFix {
+  @override
+  void run(
+    CustomLintResolver resolver,
+    ChangeReporter reporter,
+    CustomLintContext context,
+    AnalysisError analysisError,
+    List<AnalysisError> others,
+  ) {
+    context.registry.addListLiteral((ListLiteral node) {
+      if (!analysisError.sourceRange.intersects(node.sourceRange)) return;
+
+      final changeBuilder = reporter.createChangeBuilder(
+        message: 'Add const keyword',
+        priority: 80,
+      );
+
+      changeBuilder.addDartFileEdit((builder) {
+        builder.addSimpleInsertion(node.offset, 'const ');
+      });
+    });
+  }
+}
+
+class _PreferDeclaringConstConstructorFix extends DartFix {
+  @override
+  void run(
+    CustomLintResolver resolver,
+    ChangeReporter reporter,
+    CustomLintContext context,
+    AnalysisError analysisError,
+    List<AnalysisError> others,
+  ) {
+    context.registry.addConstructorDeclaration((ConstructorDeclaration node) {
+      if (!analysisError.sourceRange.intersects(node.sourceRange)) return;
+
+      final changeBuilder = reporter.createChangeBuilder(
+        message: 'Add const keyword',
+        priority: 80,
+      );
+
+      changeBuilder.addDartFileEdit((builder) {
+        builder.addSimpleInsertion(node.offset, 'const ');
+      });
+    });
+  }
+}
+
+class _PreferFinalClassFix extends DartFix {
+  @override
+  void run(
+    CustomLintResolver resolver,
+    ChangeReporter reporter,
+    CustomLintContext context,
+    AnalysisError analysisError,
+    List<AnalysisError> others,
+  ) {
+    context.registry.addClassDeclaration((ClassDeclaration node) {
+      if (!analysisError.sourceRange.intersects(node.sourceRange)) return;
+
+      final changeBuilder = reporter.createChangeBuilder(
+        message: 'Add final modifier',
+        priority: 80,
+      );
+
+      changeBuilder.addDartFileEdit((builder) {
+        builder.addSimpleInsertion(node.classKeyword.offset, 'final ');
+      });
+    });
+  }
+}
+
+class _PreferInterfaceClassFix extends DartFix {
+  @override
+  void run(
+    CustomLintResolver resolver,
+    ChangeReporter reporter,
+    CustomLintContext context,
+    AnalysisError analysisError,
+    List<AnalysisError> others,
+  ) {
+    context.registry.addClassDeclaration((ClassDeclaration node) {
+      if (!analysisError.sourceRange.intersects(node.sourceRange)) return;
+
+      final changeBuilder = reporter.createChangeBuilder(
+        message: 'Add interface modifier',
+        priority: 80,
+      );
+
+      changeBuilder.addDartFileEdit((builder) {
+        // Insert before 'abstract' keyword if present, else before 'class'
+        final insertOffset =
+            node.abstractKeyword?.offset ?? node.classKeyword.offset;
+        builder.addSimpleInsertion(insertOffset, 'interface ');
+      });
+    });
+  }
+}
+
+class _PreferBaseClassFix extends DartFix {
+  @override
+  void run(
+    CustomLintResolver resolver,
+    ChangeReporter reporter,
+    CustomLintContext context,
+    AnalysisError analysisError,
+    List<AnalysisError> others,
+  ) {
+    context.registry.addClassDeclaration((ClassDeclaration node) {
+      if (!analysisError.sourceRange.intersects(node.sourceRange)) return;
+
+      final changeBuilder = reporter.createChangeBuilder(
+        message: 'Add base modifier',
+        priority: 80,
+      );
+
+      changeBuilder.addDartFileEdit((builder) {
+        // Insert before 'abstract' keyword if present, else before 'class'
+        final insertOffset =
+            node.abstractKeyword?.offset ?? node.classKeyword.offset;
+        builder.addSimpleInsertion(insertOffset, 'base ');
+      });
     });
   }
 }
