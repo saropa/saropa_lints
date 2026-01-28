@@ -192,11 +192,30 @@ This section consolidates all rules that are deferred or marked as too complex f
 | `require_refresh_completion_feedback` | TOO-COMPLEX | "Visible change" detection is runtime |
 | `require_infinite_scroll_end_indicator` | TOO-COMPLEX | Scroll + hasMore + indicator is complex |
 
-### Deferred: Heuristic Variable Name Detection
+### Deferred: Context Detection Rules
+
+| Rule | Reason | Description |
+|------|--------|-------------|
+| `avoid_cache_in_build` | CONTEXT | Cache lookups in build() may be expensive. Requires detecting build method context. |
+
+### Deferred: Heuristic Detection Rules
 
 | Rule | Reason | Description |
 |------|--------|-------------|
 | `require_snackbar_duration_consideration` | HEURISTIC | "Important content" is subjective |
+| `require_bloc_one_per_feature` | HEURISTIC | Each feature should have its own Bloc. Detecting "unrelated events" is subjective. |
+| `avoid_getx_for_everything` | HEURISTIC | GetX shouldn't be used for all patterns. "Over-reliance" is subjective. |
+| `avoid_notification_overload` | HEURISTIC | Too many notifications annoy users. "High-frequency" is subjective. |
+| `prefer_feature_folders` | HEURISTIC | Organize by feature, not type. "Flat structure with many files" is heuristic. |
+| `avoid_util_class` | HEURISTIC | Util classes are code smells. Name matching "Util/Helper" is heuristic. |
+| `require_single_responsibility` | HEURISTIC | Classes should have one responsibility. "Mixed concerns" is subjective. |
+| `require_cache_invalidation` | HEURISTIC | Caches need invalidation strategy. [GitHub #38](https://github.com/saropa/saropa_lints/issues/38) |
+| `require_cache_ttl` | HEURISTIC | Caches need TTL. [GitHub #39](https://github.com/saropa/saropa_lints/issues/39) |
+| `avoid_over_caching` | HEURISTIC | Not everything needs caching. "Excessive cache usage" is subjective. |
+| `avoid_excessive_logging` | HEURISTIC | Too much logging impacts performance. "High-frequency log calls" is heuristic. |
+| `avoid_service_locator_abuse` | HEURISTIC | Don't use GetIt everywhere. "Business logic" detection is heuristic. |
+| `avoid_insufficient_contrast` | HEURISTIC | Text needs sufficient contrast. [GitHub #43](https://github.com/saropa/saropa_lints/issues/43) |
+| `prefer_extract_widget` | HEURISTIC | Large build methods should be split. "Build >100 lines" is arbitrary. |
 
 ### Deferred: Cross-File Analysis Required
 
