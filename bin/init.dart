@@ -172,8 +172,6 @@ class _Colors {
 /// Color helpers for consistent styling.
 String _success(String text) => '${_Colors.green}$text${_Colors.reset}';
 String _error(String text) => '${_Colors.red}$text${_Colors.reset}';
-String _warning(String text) => '${_Colors.yellow}$text${_Colors.reset}';
-String _highlight(String text) => '${_Colors.bold}$text${_Colors.reset}';
 String _tierColor(String tier) {
   switch (tier) {
     case 'essential':
@@ -445,93 +443,48 @@ Future<void> main(List<String> args) async {
   Map<String, bool> permanentOverrides = <String, bool>{};
 
   if (overridesFile.existsSync()) {
-    _logTerminal(
-        '${_Colors.cyan}📌 Found custom overrides: ${overridesFile.absolute.path}${_Colors.reset}');
     permanentOverrides = _extractOverridesFromFile(overridesFile, allRules);
-    if (permanentOverrides.isNotEmpty) {
-      _logTerminal(
-          '${_Colors.dim}  ${permanentOverrides.length} custom rules loaded${_Colors.reset}');
-    }
+    // Ensure max_issues setting exists in file (added in v4.9.1)
+    _ensureMaxIssuesSetting(overridesFile);
   } else {
     // Create the custom overrides file with a helpful header
     _createCustomOverridesFile(overridesFile);
     _logTerminal(
-        '${_Colors.green}✓ Created: ${overridesFile.absolute.path}${_Colors.reset}');
-    _logTerminal(
-        '${_Colors.dim}  Add your permanent rule overrides to this file${_Colors.reset}');
+        '${_Colors.green}✓ Created:${_Colors.reset} analysis_options_custom.yaml');
   }
 
   // Read existing config and extract user customizations
   final File outputFile = File(cliArgs.outputPath);
-  final String absolutePath = outputFile.absolute.path;
   Map<String, bool> userCustomizations = <String, bool>{};
   String existingContent = '';
 
-  _logTerminal('${_Colors.dim}Reading: $absolutePath${_Colors.reset}');
-
   if (outputFile.existsSync()) {
     existingContent = outputFile.readAsStringSync();
-    _logTerminal(
-        '${_Colors.dim}  File size: ${existingContent.length} bytes${_Colors.reset}');
 
     if (!cliArgs.reset) {
-      // Extract existing rule customizations from custom_lint.rules
-      // Only rules in the USER CUSTOMIZATIONS section are preserved
       userCustomizations = _extractUserCustomizations(
         existingContent,
         allRules,
       );
 
-      // Debug: show where customizations section was found
-      final hasSection = existingContent.contains('USER CUSTOMIZATIONS');
-      _logTerminal(
-          '${_Colors.dim}  USER CUSTOMIZATIONS section: ${hasSection ? 'found' : 'not found'}${_Colors.reset}');
-
-      if (userCustomizations.isNotEmpty) {
-        // Warn if suspiciously many customizations (likely corrupted from buggy run)
-        if (userCustomizations.length > 50) {
-          _logTerminal('');
-          _logTerminal(
-              '${_Colors.red}⚠ WARNING: Found ${userCustomizations.length} user customizations!${_Colors.reset}');
-          _logTerminal(
-              '${_Colors.yellow}  This is unusually high and may indicate a corrupted config.${_Colors.reset}');
-          _logTerminal(
-              '${_Colors.yellow}  The USER CUSTOMIZATIONS section contains rules that should be in tier sections.${_Colors.reset}');
-          _logTerminal(
-              '${_Colors.yellow}  Consider running with --reset to start fresh:${_Colors.reset}');
-          _logTerminal(
-              '${_Colors.cyan}    dart run saropa_lints:init --tier ${cliArgs.tier} --reset${_Colors.reset}');
-        } else {
-          _logTerminal('');
-          _logTerminal(
-              '${_Colors.yellow}⚡ Preserving ${userCustomizations.length} user customizations:${_Colors.reset}');
-          for (final MapEntry<String, bool> entry
-              in userCustomizations.entries) {
-            final color = entry.value ? _Colors.green : _Colors.red;
-            _logTerminal(
-                '  ${_Colors.dim}•${_Colors.reset} ${entry.key}: $color${entry.value}${_Colors.reset}');
-          }
-        }
+      // Warn if suspiciously many customizations (likely corrupted)
+      if (userCustomizations.length > 50) {
+        _logTerminal(
+            '${_Colors.red}⚠ ${userCustomizations.length} customizations found - consider --reset${_Colors.reset}');
       }
     } else {
       _logTerminal(
-          '${_Colors.yellow}⚠ --reset specified: discarding user customizations${_Colors.reset}');
+          '${_Colors.yellow}⚠ --reset: discarding customizations${_Colors.reset}');
     }
 
-    _logTerminal('');
-    _logTerminal(
-        '${_Colors.yellow}⚠ Warning: ${cliArgs.outputPath} already exists.${_Colors.reset}');
-
-    // Create timestamped backup using same timestamp as log file
+    // Create backup silently
     final outputDir = outputFile.parent.path;
     final outputName = cliArgs.outputPath.split('/').last.split('\\').last;
     final backupPath = '$outputDir/${_logTimestamp}_$outputName.bak';
-
-    _logTerminal('${_Colors.dim}  Backing up to: $backupPath${_Colors.reset}');
     try {
       outputFile.copySync(backupPath);
-    } on Exception catch (e) {
-      _logTerminal(_error('✗ Failed to backup file: $e'));
+    } on Exception catch (_) {
+      // Backup failed - continue anyway
     }
   }
 
@@ -569,58 +522,17 @@ Future<void> main(List<String> args) async {
     enabledByTierCount[tierName] = (enabledByTierCount[tierName] ?? 0) + 1;
   }
 
+  // Compact summary
   _logTerminal('');
+  final customCount = userCustomizations.length;
+  final customStr = customCount > 0
+      ? ' ${_Colors.dim}(+$customCount custom)${_Colors.reset}'
+      : '';
   _logTerminal(
-      '${_Colors.bold}┌─────────────────────────────────────────────────────────┐${_Colors.reset}');
+      '${_Colors.bold}Rules:${_Colors.reset} ${_success('${finalEnabled.length} enabled')} / ${_error('${finalDisabled.length} disabled')}$customStr');
   _logTerminal(
-      '${_Colors.bold}│                     RULES SUMMARY                       │${_Colors.reset}');
-  _logTerminal(
-      '${_Colors.bold}└─────────────────────────────────────────────────────────┘${_Colors.reset}');
+      '${_Colors.bold}Severity:${_Colors.reset} ${_Colors.red}${enabledBySeverity['ERROR']} errors${_Colors.reset} · ${_Colors.yellow}${enabledBySeverity['WARNING']} warnings${_Colors.reset} · ${_Colors.cyan}${enabledBySeverity['INFO']} info${_Colors.reset}');
   _logTerminal('');
-  _logTerminal(
-      '  ${_Colors.bold}Total rules:${_Colors.reset} ${allRules.length}');
-  _logTerminal('  ${_success('✓ Enabled:')} ${finalEnabled.length}');
-  _logTerminal('  ${_error('✗ Disabled:')} ${finalDisabled.length}');
-  _logTerminal(
-      '  ${_warning('⚡ User customizations:')} ${userCustomizations.length}');
-  _logTerminal('');
-
-  // Enabled by tier breakdown
-  _logTerminal('  ${_Colors.bold}Enabled by tier:${_Colors.reset}');
-  for (final tierName in [
-    'essential',
-    'recommended',
-    'professional',
-    'comprehensive',
-    'insanity'
-  ]) {
-    final count = enabledByTierCount[tierName] ?? 0;
-    if (count > 0) {
-      _logTerminal('    ${_tierColor(tierName)}: $count rules');
-    }
-  }
-  final stylisticCount = enabledByTierCount['stylistic'] ?? 0;
-  if (stylisticCount > 0 || cliArgs.includeStylistic) {
-    _logTerminal(
-        '    ${_tierColor('stylistic')}: $stylisticCount rules ${cliArgs.includeStylistic ? '(included)' : '(opt-in)'}');
-  }
-  _logTerminal('');
-
-  // Enabled by severity breakdown
-  _logTerminal('  ${_Colors.bold}Enabled by severity:${_Colors.reset}');
-  _logTerminal(
-      '    ${_Colors.red}ERROR:${_Colors.reset}   ${enabledBySeverity['ERROR']}');
-  _logTerminal(
-      '    ${_Colors.yellow}WARNING:${_Colors.reset} ${enabledBySeverity['WARNING']}');
-  _logTerminal(
-      '    ${_Colors.cyan}INFO:${_Colors.reset}    ${enabledBySeverity['INFO']}');
-  _logTerminal('');
-
-  if (!cliArgs.includeStylistic) {
-    _logTerminal(
-        '  ${_Colors.dim}ℹ Stylistic rules disabled by default. Use --stylistic to enable.${_Colors.reset}');
-    _logTerminal('');
-  }
 
   // Generate the new custom_lint section with proper formatting
   final String customLintYaml = _generateCustomLintYaml(
@@ -668,31 +580,13 @@ Future<void> main(List<String> args) async {
   }
 
   _logTerminal('');
-  _logTerminal(
-      '${_Colors.bold}┌─────────────────────────────────────────────────────────┐${_Colors.reset}');
-  _logTerminal(
-      '${_Colors.bold}│                      NEXT STEPS                         │${_Colors.reset}');
-  _logTerminal(
-      '${_Colors.bold}└─────────────────────────────────────────────────────────┘${_Colors.reset}');
-  _logTerminal('');
-  _logTerminal(
-      '  ${_Colors.cyan}1.${_Colors.reset} Review the generated configuration');
-  _logTerminal(
-      '  ${_Colors.cyan}2.${_Colors.reset} Run: ${_highlight('dart run custom_lint')}');
-  _logTerminal(
-      '  ${_Colors.cyan}3.${_Colors.reset} Customize rules as needed (change true to false)');
-  _logTerminal('');
-  _logTerminal(
-      '${_Colors.dim}To change tiers later, run this command again with a different --tier${_Colors.reset}');
-  _logTerminal('');
 
   // Write detailed log file (unless dry-run)
   if (!cliArgs.dryRun) {
     _writeLogFile();
 
     // Ask user if they want to run analysis
-    stdout
-        .write('\n🔍 ${_Colors.cyan}Run analysis now? [y/N]: ${_Colors.reset}');
+    stdout.write('${_Colors.cyan}Run analysis now? [y/N]: ${_Colors.reset}');
     final response = stdin.readLineSync()?.toLowerCase().trim() ?? '';
 
     if (response == 'y' || response == 'yes') {
@@ -823,34 +717,83 @@ Map<String, bool> _extractOverridesFromFile(File file, Set<String> allRules) {
 void _createCustomOverridesFile(File file) {
   final content = '''
 # ╔═══════════════════════════════════════════════════════════════════════════╗
-# ║                    CUSTOM RULE OVERRIDES                                  ║
+# ║                    SAROPA LINTS CUSTOM CONFIG                             ║
 # ║                                                                           ║
-# ║  Rules in this file are ALWAYS applied, even when using --reset.         ║
+# ║  Settings in this file are ALWAYS applied, even when using --reset.      ║
 # ║  Use this for project-specific customizations that should persist.       ║
 # ╚═══════════════════════════════════════════════════════════════════════════╝
-#
-# FORMAT: Add rules with true/false values. All formats below are supported:
-#
-#   rule_name: false                    # Simple format
-#   - rule_name: false                  # With hyphen (YAML list style)
-#   - rule_name: false  # Comment here  # With trailing comment
+
+# ─────────────────────────────────────────────────────────────────────────────
+# ANALYSIS SETTINGS
+# ─────────────────────────────────────────────────────────────────────────────
+# max_issues: Maximum warnings/info to track in detail (errors always tracked)
+#   - Default: 1000
+#   - Set to 0 for unlimited
+#   - Lower values = faster analysis on legacy codebases
+
+max_issues: 1000
+
+# ─────────────────────────────────────────────────────────────────────────────
+# RULE OVERRIDES
+# ─────────────────────────────────────────────────────────────────────────────
+# FORMAT: rule_name: true/false
 #
 # EXAMPLES:
-#
-#   # Disable specific rules for this project:
 #   - avoid_print: false                # Allow print statements
 #   - avoid_null_assertion: false       # Allow ! operator
+#   - prefer_const_constructors: true   # Force-enable regardless of tier
 #
-#   # Force-enable rules regardless of tier:
-#   - prefer_const_constructors: true   # Always require const
-#
-# ─────────────────────────────────────────────────────────────────────────────
 # Add your custom rule overrides below:
-# ─────────────────────────────────────────────────────────────────────────────
 
 ''';
 
   file.writeAsStringSync(content);
+}
+
+/// Ensure max_issues setting exists in an existing custom config file.
+///
+/// Added in v4.9.1 - older files won't have this setting, so we add it
+/// at the top of the file if missing.
+void _ensureMaxIssuesSetting(File file) {
+  final content = file.readAsStringSync();
+
+  // Check if max_issues already exists
+  if (RegExp(r'^max_issues:\s*\d+', multiLine: true).hasMatch(content)) {
+    return; // Already has the setting
+  }
+
+  // Add max_issues at the top, after any existing header comments
+  final settingBlock = '''
+# ─────────────────────────────────────────────────────────────────────────────
+# ANALYSIS SETTINGS (added in v4.9.1)
+# ─────────────────────────────────────────────────────────────────────────────
+# max_issues: Maximum warnings/info to track in detail (errors always tracked)
+#   - Default: 1000
+#   - Set to 0 for unlimited
+#   - Lower values = faster analysis on legacy codebases
+
+max_issues: 1000
+
+''';
+
+  // Find where to insert - after the header box if present, else at top
+  final headerEndMatch = RegExp(r'╚[═]+╝\n*').firstMatch(content);
+  String newContent;
+  if (headerEndMatch != null) {
+    // Insert after the header box
+    final insertPos = headerEndMatch.end;
+    newContent = content.substring(0, insertPos) +
+        '\n' +
+        settingBlock +
+        content.substring(insertPos);
+  } else {
+    // No header box, insert at top
+    newContent = settingBlock + content;
+  }
+
+  file.writeAsStringSync(newContent);
+  _logTerminal(
+      '${_Colors.green}✓ Added max_issues setting to ${file.path}${_Colors.reset}');
 }
 
 /// Generate the custom_lint YAML section with proper formatting.
@@ -892,6 +835,9 @@ String _generateCustomLintYaml({
   buffer.writeln(
       '  #   5. insanity     - All rules (pedantic, highly opinionated)');
   buffer.writeln('  #   +  stylistic    - Opt-in only (formatting, ordering)');
+  buffer.writeln('  #');
+  buffer.writeln(
+      '  # Settings (max_issues, baseline) are in analysis_options_custom.yaml');
   buffer.writeln(
       '  # ═══════════════════════════════════════════════════════════════════════');
   buffer.writeln('');
