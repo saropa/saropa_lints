@@ -7,7 +7,8 @@
 library;
 
 import 'package:analyzer/dart/ast/ast.dart';
-import 'package:analyzer/error/error.dart' show DiagnosticSeverity;
+import 'package:analyzer/error/error.dart'
+    show AnalysisError, DiagnosticSeverity;
 import 'package:custom_lint_builder/custom_lint_builder.dart';
 
 import '../saropa_lint_rule.dart';
@@ -270,6 +271,67 @@ class RequireDirectionalWidgetsRule extends SaropaLintRule {
       }
     });
   }
+
+  @override
+  List<Fix> getFixes() => [_RequireDirectionalWidgetsFix()];
+}
+
+/// Quick fix for [RequireDirectionalWidgetsRule].
+///
+/// Converts `EdgeInsets.only(left: x, right: y)` to
+/// `EdgeInsetsDirectional.only(start: x, end: y)` for RTL language support.
+class _RequireDirectionalWidgetsFix extends DartFix {
+  @override
+  void run(
+    CustomLintResolver resolver,
+    ChangeReporter reporter,
+    CustomLintContext context,
+    AnalysisError analysisError,
+    List<AnalysisError> others,
+  ) {
+    context.registry.addInstanceCreationExpression((
+      InstanceCreationExpression node,
+    ) {
+      if (!analysisError.sourceRange.intersects(node.sourceRange)) return;
+
+      final String constructorSource = node.constructorName.toSource();
+
+      // Fix EdgeInsets.only to EdgeInsetsDirectional.only
+      if (constructorSource.contains('EdgeInsets.only')) {
+        final changeBuilder = reporter.createChangeBuilder(
+          message: 'Convert to EdgeInsetsDirectional with start/end',
+          priority: 80,
+        );
+
+        changeBuilder.addDartFileEdit((builder) {
+          // Replace EdgeInsets with EdgeInsetsDirectional
+          final constructorName = node.constructorName;
+          builder.addSimpleReplacement(
+            constructorName.sourceRange,
+            'EdgeInsetsDirectional.only',
+          );
+
+          // Replace left/right with start/end in arguments
+          for (final arg in node.argumentList.arguments) {
+            if (arg is NamedExpression) {
+              final paramName = arg.name.label.name;
+              if (paramName == 'left') {
+                builder.addSimpleReplacement(
+                  arg.name.label.sourceRange,
+                  'start',
+                );
+              } else if (paramName == 'right') {
+                builder.addSimpleReplacement(
+                  arg.name.label.sourceRange,
+                  'end',
+                );
+              }
+            }
+          }
+        });
+      }
+    });
+  }
 }
 
 /// Warns when plural forms are not handled correctly.
@@ -428,6 +490,9 @@ class AvoidHardcodedLocaleRule extends SaropaLintRule {
       }
     });
   }
+
+  // Note: No quick fix provided - the correct replacement depends on context
+  // (BuildContext availability, variable naming preferences, etc.)
 }
 
 /// Warns when string concatenation is used for sentences.
@@ -790,6 +855,47 @@ class PreferIntlNameRule extends SaropaLintRule {
     }
     return false;
   }
+
+  @override
+  List<Fix> getFixes() => [_PreferIntlNameFix()];
+}
+
+/// Quick fix for [PreferIntlNameRule].
+///
+/// Adds `name: 'messageName'` parameter to `Intl.message()` calls.
+/// The user should customize the name to match the message purpose.
+class _PreferIntlNameFix extends DartFix {
+  @override
+  void run(
+    CustomLintResolver resolver,
+    ChangeReporter reporter,
+    CustomLintContext context,
+    AnalysisError analysisError,
+    List<AnalysisError> others,
+  ) {
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      if (!analysisError.sourceRange.intersects(node.sourceRange)) return;
+
+      // Check if it's Intl.message
+      final Expression? target = node.target;
+      if (target is! SimpleIdentifier || target.name != 'Intl') return;
+      if (node.methodName.name != 'message') return;
+
+      final changeBuilder = reporter.createChangeBuilder(
+        message: 'Add name parameter',
+        priority: 80,
+      );
+
+      changeBuilder.addDartFileEdit((builder) {
+        final args = node.argumentList.arguments;
+        if (args.isEmpty) return;
+
+        // Add name parameter after the first argument
+        final insertOffset = args.first.end;
+        builder.addSimpleInsertion(insertOffset, ", name: 'messageName'");
+      });
+    });
+  }
 }
 
 /// Warns when Intl.message lacks a description parameter.
@@ -861,6 +967,51 @@ class PreferProvidingIntlDescriptionRule extends SaropaLintRule {
       }
     }
     return false;
+  }
+
+  @override
+  List<Fix> getFixes() => [_PreferProvidingIntlDescriptionFix()];
+}
+
+/// Quick fix for [PreferProvidingIntlDescriptionRule].
+///
+/// Adds `desc: 'TODO: Add description for translators'` parameter to
+/// `Intl.message()` calls. The TODO reminds developers to provide context.
+class _PreferProvidingIntlDescriptionFix extends DartFix {
+  @override
+  void run(
+    CustomLintResolver resolver,
+    ChangeReporter reporter,
+    CustomLintContext context,
+    AnalysisError analysisError,
+    List<AnalysisError> others,
+  ) {
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      if (!analysisError.sourceRange.intersects(node.sourceRange)) return;
+
+      // Check if it's Intl.message
+      final Expression? target = node.target;
+      if (target is! SimpleIdentifier || target.name != 'Intl') return;
+      if (node.methodName.name != 'message') return;
+
+      final changeBuilder = reporter.createChangeBuilder(
+        message: 'Add desc parameter',
+        priority: 80,
+      );
+
+      changeBuilder.addDartFileEdit((builder) {
+        final args = node.argumentList.arguments;
+        if (args.isEmpty) return;
+
+        // Add desc parameter after the last argument
+        final lastArg = args.last;
+        final insertOffset = lastArg.end;
+        builder.addSimpleInsertion(
+          insertOffset,
+          ", desc: 'TODO: Add description for translators'",
+        );
+      });
+    });
   }
 }
 
@@ -940,6 +1091,51 @@ class PreferProvidingIntlExamplesRule extends SaropaLintRule {
       }
     }
     return false;
+  }
+
+  @override
+  List<Fix> getFixes() => [_PreferProvidingIntlExamplesFix()];
+}
+
+/// Quick fix for [PreferProvidingIntlExamplesRule].
+///
+/// Adds `examples: const {}` parameter to `Intl.message()` calls.
+/// The user should populate the map with placeholder examples.
+class _PreferProvidingIntlExamplesFix extends DartFix {
+  @override
+  void run(
+    CustomLintResolver resolver,
+    ChangeReporter reporter,
+    CustomLintContext context,
+    AnalysisError analysisError,
+    List<AnalysisError> others,
+  ) {
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      if (!analysisError.sourceRange.intersects(node.sourceRange)) return;
+
+      // Check if it's Intl.message
+      final Expression? target = node.target;
+      if (target is! SimpleIdentifier || target.name != 'Intl') return;
+      if (node.methodName.name != 'message') return;
+
+      final changeBuilder = reporter.createChangeBuilder(
+        message: 'Add examples parameter',
+        priority: 80,
+      );
+
+      changeBuilder.addDartFileEdit((builder) {
+        final args = node.argumentList.arguments;
+        if (args.isEmpty) return;
+
+        // Add examples parameter after the last argument
+        final lastArg = args.last;
+        final insertOffset = lastArg.end;
+        builder.addSimpleInsertion(
+          insertOffset,
+          ", examples: const {}",
+        );
+      });
+    });
   }
 }
 

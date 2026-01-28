@@ -7,6 +7,19 @@ Dates are not included in version headers — [pub.dev](https://pub.dev/packages
 
 > **Looking for older changes?** \
 > See [CHANGELOG_ARCHIVE.md](./CHANGELOG_ARCHIVE.md) for versions 0.1.0 through 4.2.0.
+
+---
+## [4.8.8] - Current
+
+### Added
+
+- **Quick fixes for 9 rules**: Added automated quick fix support for frequently triggered rules to enable one-click corrections. Internationalization: `require_directional_widgets` (converts `EdgeInsets.only(left: x)` → `EdgeInsetsDirectional.only(start: x)` for RTL support), `prefer_intl_name` (adds `name` parameter to `Intl.message()`), `prefer_providing_intl_description` (adds `desc` parameter with TODO), `prefer_providing_intl_examples` (adds `examples` parameter). Stylistic: `prefer_double_quotes` (converts single quotes to double quotes), `prefer_object_over_dynamic` (replaces `dynamic` → `Object?`), `prefer_dynamic_over_object` (replaces `Object?` → `dynamic`). Hive: `prefer_hive_lazy_box` (converts `Hive.openBox()` → `Hive.openLazyBox()` for large collections). Logging: `prefer_logger_over_print` (replaces `print()` → `log()` from dart:developer). All fixes include comprehensive documentation and preserve code formatting.
+
+### Changed
+
+- **README badges upgraded**: Replaced static badges with dynamic, auto-updating badges organized into logical groups (CI/CD, pub.dev metrics, GitHub activity, technical info). Added popularity, likes, stars, forks, last commit, issues count, Dart SDK version, and Flutter platform badges with appropriate logos. The pub version badge now auto-updates from pub.dev, eliminating the need for manual version updates in documentation.
+- **DX message quality improvements for 24 critical/high impact rules**: Achieved 100% pass rate (293/293 high, 61/61 critical) for developer experience message quality audit. Fixed missing consequences (added security/accessibility impact statements), expanded too-short messages to meet 180+ character requirement (added specific failure scenarios and technical details), replaced generic terms with specific types (e.g., "controller" → "animation controller", "widget" → "StatefulWidget", "resource" → "memory and processing resources"), and enhanced correction messages to meet 80+ character requirement with actionable guidance. Affected rules: `avoid_deep_link_sensitive_params`, `avoid_color_only_indicators`, `require_cached_image_dimensions`, `avoid_image_picker_large_files`, `require_notification_initialize_per_platform`, `avoid_unsafe_deserialization`, `require_image_semantics`, `require_vsync_mixin`, `avoid_unassigned_stream_subscriptions`, `avoid_obs_outside_controller`, `require_key_for_collection`, `require_workmanager_constraints`, `prefer_riverpod_auto_dispose`, `require_test_widget_pump`, `avoid_notification_payload_sensitive`, `require_url_validation`, `avoid_bloc_context_dependency`, `avoid_provider_value_rebuild`, `avoid_riverpod_notifier_in_build`, `avoid_bloc_business_logic_in_ui`, `require_mock_http_client`, `avoid_dynamic_json_access`, `require_enum_unknown_value`, `avoid_future_tostring`.
+
 ---
 ## [4.8.7]
 
