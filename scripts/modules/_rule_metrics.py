@@ -1,11 +1,11 @@
 """
-Lint rule counting, test coverage metrics, and README badge sync.
+Lint rule counting, test coverage metrics, roadmap summary, and README badge sync.
 
 Provides rule/category/fixture counts, a visual coverage report,
-and automatic README.md badge synchronisation used by the publish
-workflow.
+roadmap remaining items summary, and automatic README.md badge
+synchronisation used by the publish workflow.
 
-Version:   2.0
+Version:   2.1
 Author:    Saropa
 Copyright: (c) 2025-2026 Saropa
 """
@@ -15,9 +15,14 @@ from __future__ import annotations
 import re
 from pathlib import Path
 
+from collections import defaultdict
+from dataclasses import dataclass, field
+from typing import NamedTuple
+
 from scripts.modules._utils import (
     Color,
     print_colored,
+    print_header,
     print_success,
     print_warning,
 )
@@ -54,8 +59,34 @@ def count_categories(project_dir: Path) -> int:
     )
 
 
+# Bar chart characters (used by multiple displays)
+_BAR_FILLED = "█"
+_BAR_EMPTY = "░"
+_BAR_WIDTH = 20
+
+
+def _make_bar(value: int, max_value: int, width: int = _BAR_WIDTH) -> str:
+    """Create a proportional bar chart string."""
+    if max_value <= 0:
+        return _BAR_EMPTY * width
+    filled = int((value / max_value) * width)
+    filled = min(filled, width)
+    return _BAR_FILLED * filled + _BAR_EMPTY * (width - filled)
+
+
+def _make_progress_bar(
+    done: int, total: int, width: int = _BAR_WIDTH
+) -> str:
+    """Create a progress bar showing done/total as filled/empty."""
+    if total <= 0:
+        return _BAR_EMPTY * width
+    filled = int((done / total) * width)
+    filled = min(filled, width)
+    return _BAR_FILLED * filled + _BAR_EMPTY * (width - filled)
+
+
 def display_test_coverage(project_dir: Path) -> None:
-    """Display test coverage report with emphasis on low coverage."""
+    """Display test coverage report with bar chart visualization."""
     rules_dir = project_dir / "lib" / "src" / "rules"
     example_dir = project_dir / "example" / "lib"
     if not rules_dir.exists():
@@ -87,42 +118,45 @@ def display_test_coverage(project_dir: Path) -> None:
         (total_fixtures / total_rules * 100) if total_rules > 0 else 0
     )
 
-    print()
-    print_colored("  Test Coverage Report:", Color.WHITE)
-    print_colored("  " + "-" * 50, Color.CYAN)
-
+    # Determine status color
     if coverage_pct < 10:
-        color, status = Color.RED, "CRITICAL"
+        status_color, status = Color.RED, "CRITICAL"
     elif coverage_pct < 30:
-        color, status = Color.YELLOW, "LOW"
+        status_color, status = Color.YELLOW, "LOW"
     elif coverage_pct < 70:
-        color, status = Color.CYAN, "MODERATE"
+        status_color, status = Color.CYAN, "MODERATE"
     else:
-        color, status = Color.GREEN, "GOOD"
+        status_color, status = Color.GREEN, "GOOD"
 
+    print()
+    print_colored("  ▶ Test Coverage", Color.WHITE)
+    print()
+
+    # Overall bar
+    bar = _make_progress_bar(total_fixtures, total_rules)
     print_colored(
-        f"      Overall: {total_fixtures}/{total_rules} "
-        f"({coverage_pct:.1f}%) - {status}",
-        color,
+        f"    Overall      {bar}  {total_fixtures:>4d}/{total_rules:<4d} "
+        f"({coverage_pct:5.1f}%) {status}",
+        status_color,
     )
-    print_colored("  " + "-" * 50, Color.CYAN)
 
-    # Top 10 worst offenders ranked by untested rule count
+    # Top 5 worst offenders
     ranked = sorted(
         category_details,
         key=lambda c: c[1] - c[2],
         reverse=True,
-    )[:10]
+    )[:5]
 
     if ranked and ranked[0][1] - ranked[0][2] > 0:
         print()
-        print_colored("  Top offenders (by untested rules):", Color.WHITE)
-        print()
+        print_colored("    Lowest coverage:", Color.WHITE)
+        max_rules = max(c[1] for c in ranked)
         for category, rules, fixtures in ranked:
             untested = rules - fixtures
             if untested <= 0:
                 break
             pct = (fixtures / rules * 100) if rules > 0 else 0
+            bar = _make_progress_bar(fixtures, rules)
             if pct < 10:
                 row_color = Color.RED
             elif pct < 30:
@@ -130,12 +164,196 @@ def display_test_coverage(project_dir: Path) -> None:
             else:
                 row_color = Color.CYAN
             print_colored(
-                f"      {category:<30s} "
-                f"{untested:>4d} untested / {rules:>4d} "
-                f"({pct:5.1f}% covered)",
+                f"    {category:<14s} {bar}  {fixtures:>3d}/{rules:<3d} "
+                f"({pct:5.1f}%)",
                 row_color,
             )
-        print()
+    print()
+
+
+# =============================================================================
+# ROADMAP SUMMARY
+# =============================================================================
+
+
+# Severity emoji labels and ASCII fallbacks
+_SEVERITY_LABELS = {
+    "🚨": ("ERROR", "[!]"),
+    "⚠️": ("WARNING", "[W]"),
+    "ℹ️": ("INFO", "[i]"),
+}
+
+
+@dataclass
+class RoadmapSummary:
+    """Summary of rules remaining to implement from roadmaps."""
+
+    roadmap_total: int = 0
+    deferred_total: int = 0
+    roadmap_by_severity: dict[str, int] = field(default_factory=dict)
+    deferred_by_severity: dict[str, int] = field(default_factory=dict)
+
+    @property
+    def grand_total(self) -> int:
+        """Total remaining rules across both roadmaps."""
+        return self.roadmap_total + self.deferred_total
+
+
+# Patterns for parsing roadmap markdown
+# Match rule name in backticks, capture the actual rule name
+_TABLE_RULE_RE = re.compile(
+    r"^\|\s*([^\|]*)`([a-z_]+)`[^\|]*\|",  # Prefix (emojis) + rule name
+    re.MULTILINE,
+)
+
+
+def _count_roadmap_rules_by_severity(
+    file_path: Path,
+) -> tuple[int, dict[str, int]]:
+    """Count unique rules in a roadmap file by severity emoji.
+
+    Deduplicates rules that appear multiple times (e.g., with and without
+    GitHub issue links) by tracking rule names globally.
+
+    Returns:
+        Tuple of (total_count, dict mapping severity emoji to count).
+    """
+    if not file_path.exists():
+        return 0, {}
+
+    content = file_path.read_text(encoding="utf-8")
+    lines = content.split("\n")
+
+    # Track unique rule names to avoid double-counting
+    seen_rules: set[str] = set()
+    severity_counts: dict[str, int] = {"🚨": 0, "⚠️": 0, "ℹ️": 0}
+
+    for line in lines:
+        # Check for table row with rule
+        if not line.startswith("|") or "`" not in line:
+            continue
+        # Skip header rows
+        if "Rule Name" in line or ("Rule" in line and "Tier" in line):
+            continue
+        # Skip separator rows
+        if "---" in line:
+            continue
+
+        # Extract rule name and prefix (which contains severity emoji)
+        rule_match = _TABLE_RULE_RE.match(line)
+        if rule_match:
+            prefix = rule_match.group(1)
+            rule_name = rule_match.group(2)
+
+            # Skip if already seen
+            if rule_name in seen_rules:
+                continue
+            seen_rules.add(rule_name)
+
+            # Determine severity from emoji in prefix
+            if "🚨" in prefix:
+                severity_counts["🚨"] += 1
+            elif "⚠️" in prefix:
+                severity_counts["⚠️"] += 1
+            else:
+                # Default to INFO for rules without explicit severity
+                severity_counts["ℹ️"] += 1
+
+    total = sum(severity_counts.values())
+    return total, severity_counts
+
+
+def get_roadmap_summary(project_dir: Path) -> RoadmapSummary:
+    """Parse ROADMAP.md and ROADMAP_DEFERRED.md to get remaining work summary.
+
+    Returns:
+        RoadmapSummary with counts by severity.
+    """
+    roadmap_path = project_dir / "ROADMAP.md"
+    deferred_path = project_dir / "ROADMAP_DEFERRED.md"
+
+    # Count rules by severity in each file
+    roadmap_total, roadmap_sev = _count_roadmap_rules_by_severity(roadmap_path)
+    deferred_total, deferred_sev = _count_roadmap_rules_by_severity(
+        deferred_path
+    )
+
+    return RoadmapSummary(
+        roadmap_total=roadmap_total,
+        deferred_total=deferred_total,
+        roadmap_by_severity=roadmap_sev,
+        deferred_by_severity=deferred_sev,
+    )
+
+
+def _format_severity_row(
+    emoji: str, count: int, total: int, max_count: int
+) -> str:
+    """Format a severity row with label, bar chart, and stats."""
+    label, ascii_fallback = _SEVERITY_LABELS.get(emoji, ("OTHER", "[?]"))
+    pct = (count / total * 100) if total > 0 else 0
+    bar = _make_bar(count, max_count)
+    return f"    {label:<12s} {bar}  {count:>4d} ({pct:5.1f}%)"
+
+
+def display_roadmap_summary(project_dir: Path) -> None:
+    """Display a summary of rules remaining to implement."""
+    summary = get_roadmap_summary(project_dir)
+
+    print()
+    print_header("ROADMAP SUMMARY")
+
+    # Find max count for bar scaling
+    roadmap_max = max(summary.roadmap_by_severity.values(), default=1)
+    deferred_max = max(summary.deferred_by_severity.values(), default=1)
+
+    # ROADMAP.md breakdown by severity
+    print()
+    print_colored(
+        f"  ▶ ROADMAP.md ({summary.roadmap_total} implementable rules)",
+        Color.WHITE,
+    )
+    print()
+    for emoji in ["🚨", "⚠️", "ℹ️"]:
+        count = summary.roadmap_by_severity.get(emoji, 0)
+        row = _format_severity_row(emoji, count, summary.roadmap_total, roadmap_max)
+        # Color by severity
+        if emoji == "🚨":
+            color = Color.RED
+        elif emoji == "⚠️":
+            color = Color.YELLOW
+        else:
+            color = Color.CYAN
+        print_colored(row, color)
+
+    # ROADMAP_DEFERRED.md breakdown by severity
+    print()
+    print_colored(
+        f"  ▶ ROADMAP_DEFERRED.md ({summary.deferred_total} blocked rules)",
+        Color.WHITE,
+    )
+    print()
+    for emoji in ["🚨", "⚠️", "ℹ️"]:
+        count = summary.deferred_by_severity.get(emoji, 0)
+        row = _format_severity_row(
+            emoji, count, summary.deferred_total, deferred_max
+        )
+        # Color by severity
+        if emoji == "🚨":
+            color = Color.RED
+        elif emoji == "⚠️":
+            color = Color.YELLOW
+        else:
+            color = Color.CYAN
+        print_colored(row, color)
+
+    # Summary totals
+    print()
+    print_colored(
+        f"    Total remaining: {summary.grand_total} rules",
+        Color.WHITE,
+    )
+    print()
 
 
 # =============================================================================

@@ -2,13 +2,17 @@
 
 # Saropa Lints
 
+Catch memory leaks, security vulnerabilities, and runtime crashes that standard linters miss. Developed by [Saropa][saropa_link] to make the world of Dart & Flutter better, one fix at a time.
+
+[saropa_link]: https://saropa.com
+
 <!-- CI/CD & Build Status -->
 [![ci](https://github.com/saropa/saropa_lints/actions/workflows/ci.yml/badge.svg)](https://github.com/saropa/saropa_lints/actions/workflows/ci.yml)
 
 <!-- Pub.dev Metrics (Auto-updating) -->
 [![pub package](https://img.shields.io/pub/v/saropa_lints.svg?logo=dart&label=pub)](https://pub.dev/packages/saropa_lints)
 [![pub points](https://img.shields.io/pub/points/saropa_lints?logo=dart)](https://pub.dev/packages/saropa_lints/score)
-[![popularity](https://img.shields.io/pub/popularity/saropa_lints?logo=dart)](https://pub.dev/packages/saropa_lints/score)
+<!-- NO LONGER AVAILABLE [![popularity](https://img.shields.io/pub/popularity/saropa_lints?logo=dart)](https://pub.dev/packages/saropa_lints/score) -->
 [![likes](https://img.shields.io/pub/likes/saropa_lints?logo=dart&color=red)](https://pub.dev/packages/saropa_lints/score)
 
 <!-- GitHub Activity -->
@@ -25,11 +29,6 @@
 [![rules](https://img.shields.io/badge/rules-1678%2B-4B0082)](https://github.com/saropa/saropa_lints/blob/main/doc/rules/README.md)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 [![style: saropa lints](https://img.shields.io/badge/style-saropa__lints-4B0082.svg)](https://pub.dev/packages/saropa_lints)
-
-Developed by [Saropa][saropa_link]. Making the world of Dart & Flutter better, one lint at a time.
-
-[saropa_link]: https://saropa.com
-license
 
 > 💬 **Have feedback on Saropa Lints?** Share it by [opening an issue](https://github.com/saropa/saropa_lints/issues/new) on GitHub!
 
@@ -886,6 +885,7 @@ Contact: [saropa.com](https://saropa.com) | [services@saropa.com](mailto:service
 | [README_STYLISTIC.md](https://github.com/saropa/saropa_lints/blob/main/README_STYLISTIC.md)           | 100+ optional stylistic rules with examples   |
 | [PERFORMANCE.md](https://github.com/saropa/saropa_lints/blob/main/PERFORMANCE.md)                     | Performance optimization guide and profiling  |
 | [ROADMAP.md](https://github.com/saropa/saropa_lints/blob/main/ROADMAP.md)                             | Planned rules and project direction           |
+| [ROADMAP_DEFERRED.md](https://github.com/saropa/saropa_lints/blob/main/ROADMAP_DEFERRED.md)           | Deferred rules (cross-file, heuristic)        |
 | [CONTRIBUTING.md](https://github.com/saropa/saropa_lints/blob/main/CONTRIBUTING.md)                   | How to contribute rules and report issues     |
 | [CHANGELOG.md](https://github.com/saropa/saropa_lints/blob/main/CHANGELOG.md)                         | Version history and release notes             |
 | [SECURITY.md](https://github.com/saropa/saropa_lints/blob/main/SECURITY.md)                           | Security policy and reporting vulnerabilities |
