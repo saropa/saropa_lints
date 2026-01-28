@@ -10,6 +10,7 @@ import 'package:analyzer/error/listener.dart';
 import 'package:custom_lint_builder/custom_lint_builder.dart';
 
 import 'baseline/baseline_manager.dart';
+import 'ignore_fixes.dart';
 import 'ignore_utils.dart';
 import 'report/analysis_reporter.dart';
 import 'owasp/owasp.dart';
@@ -17,6 +18,7 @@ import 'project_context.dart';
 import 'tiers.dart' show essentialRules;
 
 // Re-export types needed by rule implementations
+export 'ignore_fixes.dart' show AddIgnoreCommentFix, AddIgnoreForFileFix;
 export 'owasp/owasp.dart' show OwaspMapping, OwaspMobile, OwaspWeb;
 export 'project_context.dart'
     show
@@ -1373,6 +1375,65 @@ abstract class SaropaLintRule extends DartLintRule {
   /// - Risk categorization aligned with industry standards
   /// - Coverage analysis across OWASP categories
   OwaspMapping? get owasp => null;
+
+  // ============================================================
+  // Quick Fixes (Automatic Ignore Suppression)
+  // ============================================================
+
+  /// Rule-specific quick fixes.
+  ///
+  /// Override this getter to provide custom fixes for your rule.
+  /// These are combined with the automatic ignore fixes.
+  ///
+  /// Example:
+  /// ```dart
+  /// @override
+  /// List<Fix> get customFixes => [_MyRuleSpecificFix()];
+  /// ```
+  ///
+  /// Default: empty list (only ignore fixes provided)
+  List<Fix> get customFixes => const <Fix>[];
+
+  /// Whether to include automatic "ignore" quick fixes.
+  ///
+  /// When `true` (default), every rule automatically gets two quick fixes:
+  /// - "Ignore 'rule_name' for this line" - adds `// ignore: rule_name`
+  /// - "Ignore 'rule_name' for this file" - adds `// ignore_for_file: rule_name`
+  ///
+  /// Set to `false` for rules where suppression should not be offered
+  /// (e.g., critical security rules).
+  ///
+  /// Example:
+  /// ```dart
+  /// @override
+  /// bool get includeIgnoreFixes => false; // Don't allow suppression
+  /// ```
+  bool get includeIgnoreFixes => true;
+
+  /// Returns the complete list of quick fixes for this rule.
+  ///
+  /// By default, this combines [customFixes] with automatic ignore fixes
+  /// (if [includeIgnoreFixes] is `true`).
+  ///
+  /// **For new rules:** Override [customFixes] to add rule-specific fixes.
+  ///
+  /// **For existing rules:** If you override `getFixes()` directly, you can
+  /// call `super.getFixes()` to include the ignore fixes:
+  /// ```dart
+  /// @override
+  /// List<Fix> getFixes() => [...super.getFixes(), _MyCustomFix()];
+  /// ```
+  @override
+  List<Fix> getFixes() {
+    final fixes = <Fix>[...customFixes];
+    if (includeIgnoreFixes) {
+      fixes.addAll(<Fix>[
+        AddIgnoreCommentFix(code.name),
+        AddIgnoreForFileFix(code.name),
+      ]);
+    }
+    return fixes;
+  }
 
   // ============================================================
   // File Type Filtering (Performance Optimization)
