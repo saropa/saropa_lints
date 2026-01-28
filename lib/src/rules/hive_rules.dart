@@ -668,7 +668,7 @@ class PreferLazyBoxForLargeRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_lazy_box_for_large',
     problemMessage:
-        '[prefer_lazy_box_for_large] Large collection uses regular Hive box. Consider openLazyBox for memory.',
+        '[prefer_lazy_box_for_large] Regular box loads all entries into memory at once.',
     correctionMessage:
         'Use Hive.openLazyBox() for collections that may grow large.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -1362,7 +1362,7 @@ class PreferHiveValueListenableRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_hive_value_listenable',
     problemMessage:
-        '[prefer_hive_value_listenable] setState after Hive put/delete. Consider using box.listenable().',
+        '[prefer_hive_value_listenable] Manual setState after Hive changes is error-prone.',
     correctionMessage:
         'Use ValueListenableBuilder with box.listenable() for reactive UI.',
     errorSeverity: DiagnosticSeverity.INFO,

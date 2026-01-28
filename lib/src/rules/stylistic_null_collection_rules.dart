@@ -1,8 +1,10 @@
-// ignore_for_file: depend_on_referenced_packages
+// ignore_for_file: depend_on_referenced_packages, deprecated_member_use
 
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/token.dart';
-import 'package:analyzer/error/error.dart' show DiagnosticSeverity;
+import 'package:analyzer/error/error.dart'
+    show AnalysisError, DiagnosticSeverity;
+import 'package:analyzer/source/source_range.dart';
 import 'package:custom_lint_builder/custom_lint_builder.dart';
 
 import '../saropa_lint_rule.dart';
@@ -250,6 +252,62 @@ class PreferIfNullOverTernaryRule extends SaropaLintRule {
       }
     });
   }
+
+  @override
+  List<Fix> getFixes() => <Fix>[_PreferIfNullOverTernaryFix()];
+}
+
+class _PreferIfNullOverTernaryFix extends DartFix {
+  @override
+  void run(
+    CustomLintResolver resolver,
+    ChangeReporter reporter,
+    CustomLintContext context,
+    AnalysisError analysisError,
+    List<AnalysisError> others,
+  ) {
+    context.registry.addConditionalExpression((ConditionalExpression node) {
+      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
+
+      final condition = node.condition;
+      if (condition is! BinaryExpression) return;
+
+      final op = condition.operator.type;
+      if (op != TokenType.EQ_EQ && op != TokenType.BANG_EQ) return;
+
+      // Get the checked expression and default value
+      Expression? checkedExpr;
+      Expression? defaultExpr;
+
+      if (condition.rightOperand is NullLiteral) {
+        checkedExpr = condition.leftOperand;
+      } else if (condition.leftOperand is NullLiteral) {
+        checkedExpr = condition.rightOperand;
+      }
+
+      if (checkedExpr == null) return;
+
+      if (op == TokenType.BANG_EQ) {
+        // x != null ? x : default
+        defaultExpr = node.elseExpression;
+      } else {
+        // x == null ? default : x
+        defaultExpr = node.thenExpression;
+      }
+
+      final changeBuilder = reporter.createChangeBuilder(
+        message: 'Replace with ?? operator',
+        priority: 80,
+      );
+
+      changeBuilder.addDartFileEdit((builder) {
+        builder.addSimpleReplacement(
+          node.sourceRange,
+          '${checkedExpr!.toSource()} ?? ${defaultExpr!.toSource()}',
+        );
+      });
+    });
+  }
 }
 
 /// Warns when ?? is used instead of explicit ternary (opposite rule).
@@ -303,6 +361,40 @@ class PreferTernaryOverIfNullRule extends SaropaLintRule {
       if (node.operator.type == TokenType.QUESTION_QUESTION) {
         reporter.atNode(node, code);
       }
+    });
+  }
+
+  @override
+  List<Fix> getFixes() => <Fix>[_PreferTernaryOverIfNullFix()];
+}
+
+class _PreferTernaryOverIfNullFix extends DartFix {
+  @override
+  void run(
+    CustomLintResolver resolver,
+    ChangeReporter reporter,
+    CustomLintContext context,
+    AnalysisError analysisError,
+    List<AnalysisError> others,
+  ) {
+    context.registry.addBinaryExpression((BinaryExpression node) {
+      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
+      if (node.operator.type != TokenType.QUESTION_QUESTION) return;
+
+      final left = node.leftOperand.toSource();
+      final right = node.rightOperand.toSource();
+
+      final changeBuilder = reporter.createChangeBuilder(
+        message: 'Replace with ternary expression',
+        priority: 80,
+      );
+
+      changeBuilder.addDartFileEdit((builder) {
+        builder.addSimpleReplacement(
+          node.sourceRange,
+          '$left != null ? $left : $right',
+        );
+      });
     });
   }
 }
@@ -439,6 +531,47 @@ class PreferNullableOverLateRule extends SaropaLintRule {
           reporter.atNode(variable, code);
         }
       }
+    });
+  }
+
+  @override
+  List<Fix> getFixes() => <Fix>[_PreferNullableOverLateFix()];
+}
+
+class _PreferNullableOverLateFix extends DartFix {
+  @override
+  void run(
+    CustomLintResolver resolver,
+    ChangeReporter reporter,
+    CustomLintContext context,
+    AnalysisError analysisError,
+    List<AnalysisError> others,
+  ) {
+    context.registry.addFieldDeclaration((FieldDeclaration node) {
+      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
+      if (node.fields.lateKeyword == null) return;
+
+      final type = node.fields.type;
+      if (type == null) return;
+
+      final typeStr = type.toSource();
+      // Skip if already nullable
+      if (typeStr.endsWith('?')) return;
+
+      final changeBuilder = reporter.createChangeBuilder(
+        message: 'Replace late with nullable type',
+        priority: 80,
+      );
+
+      changeBuilder.addDartFileEdit((builder) {
+        // Remove the 'late ' keyword
+        final lateKeyword = node.fields.lateKeyword!;
+        builder.addDeletion(
+          SourceRange(lateKeyword.offset, lateKeyword.length + 1),
+        );
+        // Add ? to the type
+        builder.addSimpleInsertion(type.end, '?');
+      });
     });
   }
 }
@@ -760,6 +893,53 @@ class PreferWhereTypeOverWhereIsRule extends SaropaLintRule {
 
       // It's a where((e) => e is T) pattern
       reporter.atNode(node, code);
+    });
+  }
+
+  @override
+  List<Fix> getFixes() => <Fix>[_PreferWhereTypeOverWhereIsFix()];
+}
+
+class _PreferWhereTypeOverWhereIsFix extends DartFix {
+  @override
+  void run(
+    CustomLintResolver resolver,
+    ChangeReporter reporter,
+    CustomLintContext context,
+    AnalysisError analysisError,
+    List<AnalysisError> others,
+  ) {
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
+      if (node.methodName.name != 'where') return;
+
+      final args = node.argumentList.arguments;
+      if (args.length != 1) return;
+
+      final arg = args.first;
+      if (arg is! FunctionExpression) return;
+
+      final body = arg.body;
+      if (body is! ExpressionFunctionBody) return;
+
+      final expr = body.expression;
+      if (expr is! IsExpression) return;
+
+      // Get the type being checked
+      final typeStr = expr.type.toSource();
+
+      final changeBuilder = reporter.createChangeBuilder(
+        message: 'Replace with whereType<$typeStr>()',
+        priority: 80,
+      );
+
+      changeBuilder.addDartFileEdit((builder) {
+        builder.addSimpleReplacement(
+          SourceRange(node.methodName.offset,
+              node.argumentList.end - node.methodName.offset),
+          'whereType<$typeStr>()',
+        );
+      });
     });
   }
 }

@@ -4237,9 +4237,9 @@ class PreferNotifierOverStateRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_notifier_over_state',
     problemMessage:
-        '[prefer_notifier_over_state] StateProvider allows uncontrolled state mutation. Consider Notifier.',
+        '[prefer_notifier_over_state] StateProvider exposes raw state to uncontrolled mutation.',
     correctionMessage:
-        'Use NotifierProvider for encapsulated business logic and better testability.',
+        'Use NotifierProvider for encapsulated business logic and testability.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 

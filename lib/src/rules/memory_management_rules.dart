@@ -416,7 +416,7 @@ class PreferWeakReferencesForCacheRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_weak_references_for_cache',
     problemMessage:
-        '[prefer_weak_references_for_cache] Consider using WeakReference for cache entries.',
+        '[prefer_weak_references_for_cache] Strong cache references prevent garbage collection under memory pressure.',
     correctionMessage:
         'WeakReference allows garbage collection under memory pressure.',
     errorSeverity: DiagnosticSeverity.INFO,
