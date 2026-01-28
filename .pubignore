@@ -1,5 +1,14 @@
 # Exclude files that break pub.dev analysis or shouldn't be published
 
+# The .pubignore file tells pub publish which files to exclude when publishing your package to pub.dev.
+
+# How it works:
+
+# Similar to .gitignore, but specifically for publishing
+# Files listed here won't be included in the published package
+# Keeps your published package smaller and cleaner
+# Prevents development-only files from being uploaded
+
 # Generated API documentation (pub.dev generates its own)
 doc/api/
 dartdoc-log.txt
