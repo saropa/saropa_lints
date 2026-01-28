@@ -84,27 +84,9 @@ import 'package:saropa_lints/saropa_lints.dart'
     show RuleTier, SaropaLintRule, allSaropaRules;
 import 'package:saropa_lints/src/tiers.dart' as tiers;
 
-/// Get package version by finding saropa_lints location from package_config.json.
-String _getPackageVersion() {
-  try {
-    final packageDir = _findSaropaLintsRoot();
-    if (packageDir != null) {
-      final pubspecFile = File('$packageDir/pubspec.yaml');
-      if (pubspecFile.existsSync()) {
-        final content = pubspecFile.readAsStringSync();
-        final match =
-            RegExp(r'^version:\s*(.+)$', multiLine: true).firstMatch(content);
-        if (match != null) {
-          return match.group(1)!.trim();
-        }
-      }
-    }
-  } catch (_) {}
-  return 'unknown';
-}
-
-/// Find saropa_lints package root from .dart_tool/package_config.json.
-String? _findSaropaLintsRoot() {
+/// Get saropa_lints rootUri from .dart_tool/package_config.json.
+/// Returns null if not found. Used by both version and source detection.
+String? _getSaropaLintsRootUri() {
   try {
     final packageConfigFile = File('.dart_tool/package_config.json');
     if (!packageConfigFile.existsSync()) return null;
@@ -114,44 +96,53 @@ String? _findSaropaLintsRoot() {
       r'"name":\s*"saropa_lints"[^}]*"rootUri":\s*"([^"]+)"',
     ).firstMatch(content);
 
-    if (match == null) return null;
-
-    final rootUri = match.group(1)!;
-    if (rootUri.startsWith('file://')) {
-      // Absolute file URI - convert to path
-      return Uri.parse(rootUri).toFilePath();
-    } else if (rootUri.startsWith('../')) {
-      // Relative path from .dart_tool directory
-      final dartToolDir = Directory('.dart_tool').absolute.path;
-      return Directory('$dartToolDir/$rootUri').absolute.path;
-    }
+    return match?.group(1);
   } catch (_) {}
   return null;
 }
 
-/// Detect where the saropa_lints package is loaded from.
-String _getPackageSource() {
+/// Convert rootUri to absolute file path.
+String? _rootUriToPath(String rootUri) {
+  if (rootUri.startsWith('file://')) {
+    return Uri.parse(rootUri).toFilePath();
+  } else if (rootUri.startsWith('../')) {
+    final dartToolDir = Directory('.dart_tool').absolute.path;
+    return Directory('$dartToolDir/$rootUri').absolute.path;
+  }
+  return null;
+}
+
+/// Get package version by reading pubspec.yaml from package location.
+String _getPackageVersion() {
   try {
-    final packageConfigFile = File('.dart_tool/package_config.json');
-    if (packageConfigFile.existsSync()) {
-      final content = packageConfigFile.readAsStringSync();
-      // Look for saropa_lints entry
-      final match = RegExp(
-        r'"name":\s*"saropa_lints"[^}]*"rootUri":\s*"([^"]+)"',
-      ).firstMatch(content);
-      if (match != null) {
-        final rootUri = match.group(1)!;
-        if (rootUri.startsWith('file://') || rootUri.startsWith('../')) {
-          // Local path dependency
-          return 'local: $rootUri';
-        } else if (rootUri.contains('.pub-cache')) {
-          return 'pub.dev';
-        }
-        return rootUri;
-      }
-    }
+    final rootUri = _getSaropaLintsRootUri();
+    if (rootUri == null) return 'unknown';
+
+    final packageDir = _rootUriToPath(rootUri);
+    if (packageDir == null) return 'unknown';
+
+    final pubspecFile = File('$packageDir/pubspec.yaml');
+    if (!pubspecFile.existsSync()) return 'unknown';
+
+    final content = pubspecFile.readAsStringSync();
+    final match =
+        RegExp(r'^version:\s*(.+)$', multiLine: true).firstMatch(content);
+    return match?.group(1)?.trim() ?? 'unknown';
   } catch (_) {}
   return 'unknown';
+}
+
+/// Detect where the saropa_lints package is loaded from.
+String _getPackageSource() {
+  final rootUri = _getSaropaLintsRootUri();
+  if (rootUri == null) return 'unknown';
+
+  if (rootUri.startsWith('file://') || rootUri.startsWith('../')) {
+    return 'local: $rootUri';
+  } else if (rootUri.contains('.pub-cache')) {
+    return 'pub.dev';
+  }
+  return rootUri;
 }
 
 // ---------------------------------------------------------------------------
