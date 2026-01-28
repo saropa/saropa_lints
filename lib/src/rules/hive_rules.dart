@@ -8,7 +8,8 @@ library;
 
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
-import 'package:analyzer/error/error.dart' show DiagnosticSeverity;
+import 'package:analyzer/error/error.dart'
+    show AnalysisError, DiagnosticSeverity;
 import 'package:custom_lint_builder/custom_lint_builder.dart';
 
 import '../saropa_lint_rule.dart';
@@ -1495,6 +1496,45 @@ class PreferHiveLazyBoxRule extends SaropaLintRule {
       'transaction',
     ];
     return largeCollectionHints.any((hint) => name.contains(hint));
+  }
+
+  @override
+  List<Fix> getFixes() => [_PreferHiveLazyBoxFix()];
+}
+
+/// Quick fix for [PreferHiveLazyBoxRule].
+///
+/// Replaces `Hive.openBox()` with `Hive.openLazyBox()` for better memory
+/// efficiency with large collections. LazyBox loads entries on demand rather
+/// than loading everything into memory at once.
+class _PreferHiveLazyBoxFix extends DartFix {
+  @override
+  void run(
+    CustomLintResolver resolver,
+    ChangeReporter reporter,
+    CustomLintContext context,
+    AnalysisError analysisError,
+    List<AnalysisError> others,
+  ) {
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      if (!analysisError.sourceRange.intersects(node.sourceRange)) return;
+
+      final target = node.target;
+      if (target is! SimpleIdentifier || target.name != 'Hive') return;
+      if (node.methodName.name != 'openBox') return;
+
+      final changeBuilder = reporter.createChangeBuilder(
+        message: 'Replace openBox with openLazyBox',
+        priority: 80,
+      );
+
+      changeBuilder.addDartFileEdit((builder) {
+        builder.addSimpleReplacement(
+          node.methodName.sourceRange,
+          'openLazyBox',
+        );
+      });
+    });
   }
 }
 

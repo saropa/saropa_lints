@@ -1,5 +1,6 @@
 import 'package:analyzer/dart/ast/ast.dart';
-import 'package:analyzer/error/error.dart' show DiagnosticSeverity;
+import 'package:analyzer/error/error.dart'
+    show AnalysisError, DiagnosticSeverity;
 import 'package:custom_lint_builder/custom_lint_builder.dart';
 import 'package:saropa_lints/src/saropa_lint_rule.dart';
 
@@ -621,6 +622,41 @@ class PreferLoggerOverPrintRule extends SaropaLintRule {
       if (node.target != null) return;
 
       reporter.atNode(node.methodName, code);
+    });
+  }
+
+  @override
+  List<Fix> getFixes() => [_PreferLoggerOverPrintFix()];
+}
+
+/// Quick fix for [PreferLoggerOverPrintRule].
+///
+/// Replaces `print()` with `log()` from dart:developer for better logging
+/// control. Note: Users will need to add `import 'dart:developer';` manually.
+/// Example: `print('message')` → `log('message')`
+class _PreferLoggerOverPrintFix extends DartFix {
+  @override
+  void run(
+    CustomLintResolver resolver,
+    ChangeReporter reporter,
+    CustomLintContext context,
+    AnalysisError analysisError,
+    List<AnalysisError> others,
+  ) {
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      if (!analysisError.sourceRange.intersects(node.sourceRange)) return;
+      if (node.methodName.name != 'print') return;
+      if (node.target != null) return;
+
+      final changeBuilder = reporter.createChangeBuilder(
+        message: 'Replace print with log from dart:developer',
+        priority: 80,
+      );
+
+      changeBuilder.addDartFileEdit((builder) {
+        // Replace print with log
+        builder.addSimpleReplacement(node.methodName.sourceRange, 'log');
+      });
     });
   }
 }
