@@ -84,12 +84,10 @@ import 'package:saropa_lints/saropa_lints.dart'
     show RuleTier, SaropaLintRule, allSaropaRules;
 import 'package:saropa_lints/src/tiers.dart' as tiers;
 
-/// Get package version from pubspec.yaml at runtime.
+/// Get package version by finding saropa_lints location from package_config.json.
 String _getPackageVersion() {
   try {
-    // Get the directory where this script is located
-    final scriptUri = Platform.script;
-    final packageDir = _findPackageRoot(scriptUri);
+    final packageDir = _findSaropaLintsRoot();
     if (packageDir != null) {
       final pubspecFile = File('$packageDir/pubspec.yaml');
       if (pubspecFile.existsSync()) {
@@ -105,18 +103,29 @@ String _getPackageVersion() {
   return 'unknown';
 }
 
-/// Find the package root directory from script URI.
-String? _findPackageRoot(Uri scriptUri) {
-  // For file:// URIs, go up from bin/ to package root
-  if (scriptUri.scheme == 'file') {
-    final scriptPath = scriptUri.toFilePath();
-    final binDir = Directory(scriptPath).parent;
-    if (binDir.path.endsWith('bin')) {
-      return binDir.parent.path;
+/// Find saropa_lints package root from .dart_tool/package_config.json.
+String? _findSaropaLintsRoot() {
+  try {
+    final packageConfigFile = File('.dart_tool/package_config.json');
+    if (!packageConfigFile.existsSync()) return null;
+
+    final content = packageConfigFile.readAsStringSync();
+    final match = RegExp(
+      r'"name":\s*"saropa_lints"[^}]*"rootUri":\s*"([^"]+)"',
+    ).firstMatch(content);
+
+    if (match == null) return null;
+
+    final rootUri = match.group(1)!;
+    if (rootUri.startsWith('file://')) {
+      // Absolute file URI - convert to path
+      return Uri.parse(rootUri).toFilePath();
+    } else if (rootUri.startsWith('../')) {
+      // Relative path from .dart_tool directory
+      final dartToolDir = Directory('.dart_tool').absolute.path;
+      return Directory('$dartToolDir/$rootUri').absolute.path;
     }
-    return binDir.path;
-  }
-  // For package: URIs, try to find from .dart_tool/package_config.json
+  } catch (_) {}
   return null;
 }
 
