@@ -1,6 +1,5 @@
-// ignore_for_file: always_specify_types
+// ignore_for_file: always_specify_types, deprecated_member_use
 
-// ignore: deprecated_member_use
 import 'package:analyzer/error/error.dart' show AnalysisError;
 import 'package:custom_lint_builder/custom_lint_builder.dart';
 
