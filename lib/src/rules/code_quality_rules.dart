@@ -1124,9 +1124,9 @@ class MissingUseResultAnnotationRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'missing_use_result_annotation',
     problemMessage:
-        '[missing_use_result_annotation] Function returns a value that might be ignored. Consider adding @useResult.',
+        '[missing_use_result_annotation] Function returns a value without @useResult annotation. Callers may accidentally ignore the return value, leading to missed error handling, lost data transformations, or incorrectly assuming the function has side effects when it does not.',
     correctionMessage:
-        'Add @useResult annotation to indicate return value should be used.',
+        'Add @useResult annotation above the function declaration to signal that the returned value must be used. Include a reason parameter explaining what happens if the value is ignored.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -1472,8 +1472,9 @@ class PreferExtractingFunctionCallbacksRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_extracting_function_callbacks',
     problemMessage:
-        '[prefer_extracting_function_callbacks] Consider extracting this callback to a named function.',
-    correctionMessage: 'Extract large inline callbacks to improve readability.',
+        '[prefer_extracting_function_callbacks] Large inline callback detected spanning 10+ lines. Inline callbacks make code harder to read, test in isolation, and reuse across multiple call sites, reducing code maintainability and increasing complexity.',
+    correctionMessage:
+        'Extract this callback to a separate named method or private function. This enables unit testing the logic independently, improves readability by giving the behavior a descriptive name, and allows reuse.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -3225,9 +3226,9 @@ class AvoidDefaultToStringRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_default_tostring',
     problemMessage:
-        '[avoid_default_tostring] Class should override toString() for better debugging.',
+        '[avoid_default_tostring] Class relies on default toString() implementation which returns unhelpful output like "Instance of \'ClassName\'". During debugging, logging, or error messages, developers see meaningless object identifiers instead of the actual state values needed to diagnose issues.',
     correctionMessage:
-        'Add a toString() method that returns meaningful information.',
+        'Override toString() to return a string representation of the object\'s key fields and current state. Format as "ClassName(field1: value1, field2: value2)" for easy inspection during debugging.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -4837,9 +4838,9 @@ class PreferBytesBuilderRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_bytes_builder',
     problemMessage:
-        '[prefer_bytes_builder] Consider using BytesBuilder for byte list operations.',
+        '[prefer_bytes_builder] List<int> with repeated addAll operations detected. Each addAll call may trigger memory reallocation and copying, causing O(n²) performance when building large byte arrays, resulting in slow processing and excessive memory churn.',
     correctionMessage:
-        'BytesBuilder is more efficient for building byte arrays.',
+        'Replace with BytesBuilder which preallocates memory efficiently and avoids repeated copying. Use BytesBuilder.add() or addByte() to accumulate bytes, then call toBytes() once at the end for O(n) performance.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -5024,8 +5025,9 @@ class PreferShorthandsWithEnumsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_shorthands_with_enums',
     problemMessage:
-        '[prefer_shorthands_with_enums] Consider using enum shorthand.',
-    correctionMessage: 'Simplify the enum access pattern.',
+        '[prefer_shorthands_with_enums] Enum accessed using verbose qualification (EnumType.enumValue) where shorthand (.enumValue) is available. This adds unnecessary repetition, makes code harder to read, and increases the chance of errors when refactoring enum names.',
+    correctionMessage:
+        'Use the shorthand enum syntax by omitting the enum type prefix. Within contexts that accept the enum type, write .enumValue instead of EnumType.enumValue for cleaner, more maintainable code.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -5081,8 +5083,9 @@ class PreferShorthandsWithStaticFieldsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_shorthands_with_static_fields',
     problemMessage:
-        '[prefer_shorthands_with_static_fields] Consider using static field directly.',
-    correctionMessage: 'Access the static field directly instead of searching.',
+        '[prefer_shorthands_with_static_fields] Static field accessed through unnecessary collection search (firstWhere, where) when direct access is available. This wastes CPU cycles iterating through values and makes code less efficient and harder to understand.',
+    correctionMessage:
+        'Replace the collection search with direct static field access (e.g., Colors.red instead of Colors.values.firstWhere((c) => c == Colors.red)). Direct access is instant, clearer, and cannot fail.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -5202,8 +5205,9 @@ class PassOptionalArgumentRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'pass_optional_argument',
     problemMessage:
-        '[pass_optional_argument] Consider passing the optional argument explicitly.',
-    correctionMessage: 'Passing optional arguments can improve code clarity.',
+        '[pass_optional_argument] Function call omits important optional parameter, relying on default value. Future readers must hunt for the function definition to understand the omitted behavior, making code harder to comprehend and maintain at the call site.',
+    correctionMessage:
+        'Explicitly pass the optional parameter with its intended value, even if it matches the default. This documents your intent at the call site and prevents confusion if the default changes, improving code clarity.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -5335,8 +5339,9 @@ class PreferSwitchExpressionRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_switch_expression',
     problemMessage:
-        '[prefer_switch_expression] Consider using a switch expression instead.',
-    correctionMessage: 'Switch expressions are more concise for value mapping.',
+        '[prefer_switch_expression] Switch statement with only return/assignment detected. Using statement syntax for simple value mapping adds unnecessary boilerplate (break statements, case keywords) and makes the code more verbose and harder to scan.',
+    correctionMessage:
+        'Replace with a switch expression that directly produces the mapped value. Switch expressions are more concise, cannot forget break statements, and guarantee exhaustiveness checking, reducing bugs and improving readability.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -5441,8 +5446,9 @@ class PreferSwitchWithEnumsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_switch_with_enums',
     problemMessage:
-        '[prefer_switch_with_enums] Consider using switch statement for enum comparisons.',
-    correctionMessage: 'Switch provides exhaustiveness checking for enums.',
+        '[prefer_switch_with_enums] Enum compared using if-else chain instead of switch statement. Without exhaustiveness checking, adding new enum values will not trigger compile errors in this code location, allowing silent bugs where new cases are unhandled.',
+    correctionMessage:
+        'Replace the if-else chain with a switch statement over the enum. The compiler will verify all enum values are handled and flag warnings when you add new enum cases, preventing missed implementations.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -5561,9 +5567,9 @@ class PreferSwitchWithSealedClassesRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_switch_with_sealed_classes',
     problemMessage:
-        '[prefer_switch_with_sealed_classes] Consider using switch with sealed class for exhaustiveness.',
+        '[prefer_switch_with_sealed_classes] Sealed class handled with if-else or type checks instead of switch. Missing exhaustiveness verification allows unhandled subtypes to silently pass through, causing runtime errors or incorrect behavior when new subtypes are added.',
     correctionMessage:
-        'Switch provides exhaustiveness checking for sealed classes.',
+        'Replace with a switch statement using pattern matching on the sealed class subtypes. The compiler enforces that all possible subtypes are handled, preventing bugs when the sealed class hierarchy grows.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -5734,8 +5740,9 @@ class PreferUnwrappingFutureOrRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_unwrapping_future_or',
     problemMessage:
-        '[prefer_unwrapping_future_or] Consider using async/await instead of FutureOr handling.',
-    correctionMessage: 'Async/await simplifies FutureOr handling.',
+        '[prefer_unwrapping_future_or] FutureOr type detected requiring manual type checking and unwrapping. This forces runtime type inspection (is Future checks) and adds branching complexity, making the code harder to understand and more error-prone.',
+    correctionMessage:
+        'Convert the function to async and use await to unwrap values uniformly. Async/await eliminates the need for runtime type checking, produces cleaner control flow, and ensures consistent handling of both synchronous and asynchronous values.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 

@@ -1727,8 +1727,9 @@ class PreferConditionalExpressionsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_conditional_expressions',
     problemMessage:
-        '[prefer_conditional_expressions] Consider using a conditional expression.',
-    correctionMessage: 'Use condition ? thenValue : elseValue.',
+        '[prefer_conditional_expressions] if-else statement used only to assign or return different values. Using statement syntax for simple value selection adds unnecessary lines and nesting, making the code more verbose and harder to scan quickly.',
+    correctionMessage:
+        'Replace with a conditional expression (condition ? thenValue : elseValue) for concise value selection. Ternary expressions make the intent clear, reduce nesting levels, and improve code density for simple branching.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 

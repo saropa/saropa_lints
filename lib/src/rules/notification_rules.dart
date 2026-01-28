@@ -181,7 +181,7 @@ class AvoidNotificationPayloadSensitiveRule extends SaropaLintRule {
     problemMessage:
         '[avoid_notification_payload_sensitive] Sensitive data in notifications exposes passwords, tokens, or PII on the lock screen. Anyone nearby can read this information without unlocking the device, creating a security vulnerability.',
     correctionMessage:
-        'Use generic messages like "New message received" instead of actual content.',
+        'Use generic messages like "New message received" instead of actual content, and require user authentication before displaying sensitive details inside the app.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -394,7 +394,7 @@ class RequireNotificationInitializePerPlatformRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_notification_initialize_per_platform',
     problemMessage:
-        '[require_notification_initialize_per_platform] Missing platform settings causes notifications to fail silently. Users on the unsupported platform will never receive notifications.',
+        '[require_notification_initialize_per_platform] Missing platform-specific initialization settings (android: or iOS: parameters) causes notifications to fail silently, breaking critical app functionality. Users on the unconfigured platform will never receive time-sensitive alerts, security notifications, or important updates.',
     correctionMessage:
         'Add both android: and iOS: parameters to ensure notifications work on all platforms.',
     errorSeverity: DiagnosticSeverity.WARNING,
