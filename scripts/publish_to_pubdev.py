@@ -180,6 +180,7 @@ from scripts.modules._pubdev_lint import (
 from scripts.modules._rule_metrics import (
     count_categories,
     count_rules,
+    display_roadmap_summary,
     display_test_coverage,
     sync_readme_badges,
 )
@@ -713,6 +714,7 @@ def main() -> int:
 
     display_changelog(project_dir)
     display_test_coverage(project_dir)
+    display_roadmap_summary(project_dir)
 
     # --- Step 1: Pre-publish audits (unless --skip-audit) ---
     audit_only = "--audit-only" in sys.argv
