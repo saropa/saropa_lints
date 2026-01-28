@@ -1,8 +1,10 @@
-// ignore_for_file: depend_on_referenced_packages
+// ignore_for_file: depend_on_referenced_packages, deprecated_member_use
 
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/token.dart';
-import 'package:analyzer/error/error.dart' show DiagnosticSeverity;
+import 'package:analyzer/error/error.dart'
+    show AnalysisError, DiagnosticSeverity;
+import 'package:analyzer/source/source_range.dart';
 import 'package:custom_lint_builder/custom_lint_builder.dart';
 
 import '../saropa_lint_rule.dart';
@@ -885,6 +887,9 @@ class PreferAsyncOnlyWhenAwaitingRule extends SaropaLintRule {
       }
     });
   }
+
+  @override
+  List<Fix> getFixes() => <Fix>[_PreferAsyncOnlyWhenAwaitingFix()];
 }
 
 /// Warns when await is preferred over .then() chains.
@@ -1069,6 +1074,43 @@ class PreferSyncOverAsyncWhereSimpleRule extends SaropaLintRule {
       if (!_containsAwaitExpression(stmt.expression!)) {
         reporter.atNode(body, code);
       }
+    });
+  }
+}
+
+// =============================================================================
+// QUICK FIXES
+// =============================================================================
+
+class _PreferAsyncOnlyWhenAwaitingFix extends DartFix {
+  @override
+  void run(
+    CustomLintResolver resolver,
+    ChangeReporter reporter,
+    CustomLintContext context,
+    AnalysisError analysisError,
+    List<AnalysisError> others,
+  ) {
+    context.registry.addFunctionBody((FunctionBody node) {
+      if (!analysisError.sourceRange.intersects(node.sourceRange)) return;
+      if (node is! BlockFunctionBody) return;
+      if (!node.isAsynchronous) return;
+
+      final changeBuilder = reporter.createChangeBuilder(
+        message: 'Remove async keyword',
+        priority: 80,
+      );
+
+      changeBuilder.addDartFileEdit((builder) {
+        // Find and remove the 'async' keyword
+        final keyword = node.keyword;
+        if (keyword != null && keyword.lexeme == 'async') {
+          // Remove 'async ' (including the trailing space)
+          builder.addDeletion(
+            SourceRange(keyword.offset, keyword.length + 1),
+          );
+        }
+      });
     });
   }
 }

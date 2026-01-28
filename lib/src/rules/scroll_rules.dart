@@ -8,7 +8,8 @@ library;
 
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
-import 'package:analyzer/error/error.dart' show DiagnosticSeverity;
+import 'package:analyzer/error/error.dart'
+    show AnalysisError, DiagnosticSeverity;
 import 'package:custom_lint_builder/custom_lint_builder.dart';
 
 import '../saropa_lint_rule.dart';
@@ -613,6 +614,9 @@ class AvoidRefreshWithoutAwaitRule extends SaropaLintRule {
       }
     });
   }
+
+  @override
+  List<Fix> getFixes() => <Fix>[_AvoidRefreshWithoutAwaitFix()];
 }
 
 /// Warns when multiple widgets have autofocus: true.
@@ -975,6 +979,9 @@ class PreferItemExtentRule extends SaropaLintRule {
       }
     });
   }
+
+  @override
+  List<Fix> getFixes() => <Fix>[_PreferItemExtentFix()];
 }
 
 /// Warns when ListView doesn't use prototypeItem for consistent sizing.
@@ -1049,6 +1056,9 @@ class PreferPrototypeItemRule extends SaropaLintRule {
       }
     });
   }
+
+  @override
+  List<Fix> getFixes() => <Fix>[_PreferPrototypeItemFix()];
 }
 
 /// Warns when ReorderableListView items don't have keys.
@@ -1189,6 +1199,9 @@ class RequireKeyForReorderableRule extends SaropaLintRule {
     }
     return false;
   }
+
+  @override
+  List<Fix> getFixes() => <Fix>[_RequireKeyForReorderableFix()];
 }
 
 class _ReturnKeyVisitor extends RecursiveAstVisitor<void> {
@@ -1305,6 +1318,162 @@ class RequireAddAutomaticKeepAlivesOffRule extends SaropaLintRule {
           reporter.atNode(node.constructorName, code);
         }
       }
+    });
+  }
+
+  @override
+  List<Fix> getFixes() => <Fix>[_RequireAddAutomaticKeepAlivesOffFix()];
+}
+
+// =============================================================================
+// QUICK FIXES
+// =============================================================================
+
+class _AvoidRefreshWithoutAwaitFix extends DartFix {
+  @override
+  void run(
+    CustomLintResolver resolver,
+    ChangeReporter reporter,
+    CustomLintContext context,
+    AnalysisError analysisError,
+    List<AnalysisError> others,
+  ) {
+    context.registry.addNamedExpression((NamedExpression node) {
+      if (!analysisError.sourceRange.intersects(node.sourceRange)) return;
+      if (node.name.label.name != 'onRefresh') return;
+
+      final Expression value = node.expression;
+      if (value is! FunctionExpression) return;
+
+      final changeBuilder = reporter.createChangeBuilder(
+        message: 'Make callback async',
+        priority: 80,
+      );
+
+      changeBuilder.addDartFileEdit((builder) {
+        // Insert 'async ' before the function body
+        final body = value.body;
+        builder.addSimpleInsertion(body.offset, 'async ');
+      });
+    });
+  }
+}
+
+class _PreferItemExtentFix extends DartFix {
+  @override
+  void run(
+    CustomLintResolver resolver,
+    ChangeReporter reporter,
+    CustomLintContext context,
+    AnalysisError analysisError,
+    List<AnalysisError> others,
+  ) {
+    context.registry
+        .addInstanceCreationExpression((InstanceCreationExpression node) {
+      if (!analysisError.sourceRange.intersects(node.sourceRange)) return;
+
+      final changeBuilder = reporter.createChangeBuilder(
+        message: 'Add itemExtent parameter',
+        priority: 80,
+      );
+
+      changeBuilder.addDartFileEdit((builder) {
+        // Find the end of argument list before the closing paren
+        final args = node.argumentList;
+        final insertOffset = args.rightParenthesis.offset;
+        // Add comma if there are existing arguments
+        final prefix = args.arguments.isNotEmpty ? ', ' : '';
+        builder.addSimpleInsertion(insertOffset,
+            '${prefix}itemExtent: 56.0 /* TODO: adjust height */');
+      });
+    });
+  }
+}
+
+class _PreferPrototypeItemFix extends DartFix {
+  @override
+  void run(
+    CustomLintResolver resolver,
+    ChangeReporter reporter,
+    CustomLintContext context,
+    AnalysisError analysisError,
+    List<AnalysisError> others,
+  ) {
+    context.registry
+        .addInstanceCreationExpression((InstanceCreationExpression node) {
+      if (!analysisError.sourceRange.intersects(node.sourceRange)) return;
+
+      final changeBuilder = reporter.createChangeBuilder(
+        message: 'Add prototypeItem parameter',
+        priority: 80,
+      );
+
+      changeBuilder.addDartFileEdit((builder) {
+        final args = node.argumentList;
+        final insertOffset = args.rightParenthesis.offset;
+        final prefix = args.arguments.isNotEmpty ? ', ' : '';
+        builder.addSimpleInsertion(insertOffset,
+            '${prefix}prototypeItem: const SizedBox(height: 56) /* TODO: adjust */');
+      });
+    });
+  }
+}
+
+class _RequireKeyForReorderableFix extends DartFix {
+  @override
+  void run(
+    CustomLintResolver resolver,
+    ChangeReporter reporter,
+    CustomLintContext context,
+    AnalysisError analysisError,
+    List<AnalysisError> others,
+  ) {
+    context.registry
+        .addInstanceCreationExpression((InstanceCreationExpression node) {
+      if (!analysisError.sourceRange.intersects(node.sourceRange)) return;
+
+      final changeBuilder = reporter.createChangeBuilder(
+        message: 'Add key parameter',
+        priority: 80,
+      );
+
+      changeBuilder.addDartFileEdit((builder) {
+        final args = node.argumentList;
+        // Insert key as first argument
+        final insertOffset = args.leftParenthesis.offset + 1;
+        final suffix = args.arguments.isNotEmpty ? ', ' : '';
+        builder.addSimpleInsertion(
+            insertOffset, 'key: ValueKey(/* TODO: unique id */)$suffix');
+      });
+    });
+  }
+}
+
+class _RequireAddAutomaticKeepAlivesOffFix extends DartFix {
+  @override
+  void run(
+    CustomLintResolver resolver,
+    ChangeReporter reporter,
+    CustomLintContext context,
+    AnalysisError analysisError,
+    List<AnalysisError> others,
+  ) {
+    context.registry
+        .addInstanceCreationExpression((InstanceCreationExpression node) {
+      if (!analysisError.sourceRange.intersects(node.sourceRange)) return;
+
+      final changeBuilder = reporter.createChangeBuilder(
+        message: 'Add addAutomaticKeepAlives: false',
+        priority: 80,
+      );
+
+      changeBuilder.addDartFileEdit((builder) {
+        final args = node.argumentList;
+        final insertOffset = args.rightParenthesis.offset;
+        final prefix = args.arguments.isNotEmpty ? ', ' : '';
+        builder.addSimpleInsertion(
+            insertOffset, '${prefix}addAutomaticKeepAlives: false');
+      });
     });
   }
 }
