@@ -40,3 +40,4 @@ custom_lint.log
 *.bak
 BROKEN_TIERS.md
 temp_output.txt
+custom_lint.log
