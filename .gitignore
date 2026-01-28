@@ -1,11 +1,22 @@
-# Generated API documentation (pub.dev generates its own)
-doc/api/
-
 # Dart/Flutter
 .dart_tool/
 .packages
 build/
 pubspec.lock
+
+# Generated API documentation
+doc/api/
+
+# Log files
+*.log
+
+# Temporary/generated files
+*.bak
+nul
+tmp_implemented.txt
+temp_output.txt
+dx_full.txt
+dx_audit_output.txt
 
 # IDE
 .idea/
@@ -16,29 +27,22 @@ pubspec.lock
 .DS_Store
 Thumbs.db
 
-# Claude Code personal preferences (keep local only)
+# Claude Code (local only)
+/.claude
 .claude/settings.local.json
+CLAUDE.md
 CLAUDE.local.md
+CLAUDE_SETUP.md
+CODEBASE_INDEX.md
+CODE_INDEX.md
+BROKEN_TIERS.md
 
 # Articles (not part of the package)
 articles/
 __pycache__/
 
-# Generated reports
+# Reports
 reports/
-nul
-tmp_implemented.txt
-example/custom_lint.log
-/.claude
-CLAUDE.md
-CLAUDE_SETUP.md
-CODEBASE_INDEX.md
-CODE_INDEX.md
-dx_full.txt
-dx_audit_output.txt
-dartdoc-log.txt
-custom_lint.log
-*.bak
-BROKEN_TIERS.md
-temp_output.txt
+
+# Other local config
 analysis_options_custom.yaml
