@@ -1,7 +1,8 @@
 // ignore_for_file: depend_on_referenced_packages
 
 import 'package:analyzer/dart/ast/ast.dart';
-import 'package:analyzer/error/error.dart' show DiagnosticSeverity;
+import 'package:analyzer/error/error.dart'
+    show AnalysisError, DiagnosticSeverity;
 import 'package:custom_lint_builder/custom_lint_builder.dart';
 
 import '../saropa_lint_rule.dart';
@@ -189,6 +190,42 @@ class PreferDoubleQuotesRule extends SaropaLintRule {
       if (lexeme.startsWith("'") && !lexeme.contains('"')) {
         reporter.atNode(node, code);
       }
+    });
+  }
+
+  @override
+  List<Fix> getFixes() => [_PreferDoubleQuotesFix()];
+}
+
+/// Quick fix for [PreferDoubleQuotesRule].
+///
+/// Converts single-quoted strings to double-quoted strings.
+/// Example: `'hello'` → `"hello"`
+class _PreferDoubleQuotesFix extends DartFix {
+  @override
+  void run(
+    CustomLintResolver resolver,
+    ChangeReporter reporter,
+    CustomLintContext context,
+    AnalysisError analysisError,
+    List<AnalysisError> others,
+  ) {
+    context.registry.addSimpleStringLiteral((node) {
+      if (!analysisError.sourceRange.intersects(node.sourceRange)) return;
+
+      final lexeme = node.literal.lexeme;
+      if (!lexeme.startsWith("'")) return;
+
+      final changeBuilder = reporter.createChangeBuilder(
+        message: 'Convert to double quotes',
+        priority: 80,
+      );
+
+      changeBuilder.addDartFileEdit((builder) {
+        // Replace ' with " at start and end
+        final newString = '"${node.value}"';
+        builder.addSimpleReplacement(node.sourceRange, newString);
+      });
     });
   }
 }
@@ -863,6 +900,38 @@ class PreferObjectOverDynamicRule extends SaropaLintRule {
       }
     });
   }
+
+  @override
+  List<Fix> getFixes() => [_PreferObjectOverDynamicFix()];
+}
+
+/// Quick fix for [PreferObjectOverDynamicRule].
+///
+/// Replaces `dynamic` type with `Object?` for better type safety.
+/// Example: `dynamic value` → `Object? value`
+class _PreferObjectOverDynamicFix extends DartFix {
+  @override
+  void run(
+    CustomLintResolver resolver,
+    ChangeReporter reporter,
+    CustomLintContext context,
+    AnalysisError analysisError,
+    List<AnalysisError> others,
+  ) {
+    context.registry.addNamedType((node) {
+      if (!analysisError.sourceRange.intersects(node.sourceRange)) return;
+      if (node.name.lexeme != 'dynamic') return;
+
+      final changeBuilder = reporter.createChangeBuilder(
+        message: 'Replace dynamic with Object?',
+        priority: 80,
+      );
+
+      changeBuilder.addDartFileEdit((builder) {
+        builder.addSimpleReplacement(node.sourceRange, 'Object?');
+      });
+    });
+  }
 }
 
 /// Warns when `Object?` is used instead of `dynamic` (opposite).
@@ -911,6 +980,38 @@ class PreferDynamicOverObjectRule extends SaropaLintRule {
       if (node.name.lexeme == 'Object' && node.question != null) {
         reporter.atNode(node, code);
       }
+    });
+  }
+
+  @override
+  List<Fix> getFixes() => [_PreferDynamicOverObjectFix()];
+}
+
+/// Quick fix for [PreferDynamicOverObjectRule].
+///
+/// Replaces `Object?` type with `dynamic` for more flexible typing.
+/// Example: `Object? value` → `dynamic value`
+class _PreferDynamicOverObjectFix extends DartFix {
+  @override
+  void run(
+    CustomLintResolver resolver,
+    ChangeReporter reporter,
+    CustomLintContext context,
+    AnalysisError analysisError,
+    List<AnalysisError> others,
+  ) {
+    context.registry.addNamedType((node) {
+      if (!analysisError.sourceRange.intersects(node.sourceRange)) return;
+      if (node.name.lexeme != 'Object' || node.question == null) return;
+
+      final changeBuilder = reporter.createChangeBuilder(
+        message: 'Replace Object? with dynamic',
+        priority: 80,
+      );
+
+      changeBuilder.addDartFileEdit((builder) {
+        builder.addSimpleReplacement(node.sourceRange, 'dynamic');
+      });
     });
   }
 }
