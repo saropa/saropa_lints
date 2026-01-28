@@ -2065,7 +2065,7 @@ class PreferWildcardForUnusedParamRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_wildcard_for_unused_param',
     problemMessage:
-        '[prefer_wildcard_for_unused_param] Parameter is unused. Consider using _ wildcard (Dart 3.7+).',
+        '[prefer_wildcard_for_unused_param] Unused parameter obscures intent. Use _ wildcard (Dart 3.7+).',
     correctionMessage:
         'Replace with _ to indicate the parameter is intentionally unused.',
     errorSeverity: DiagnosticSeverity.INFO,
