@@ -7,23 +7,20 @@ It gates publishing behind comprehensive audit checks, including
 tier integrity verification.
 
 Workflow:
-    Step 0:  Check that module scripts exist in scripts/modules/
-    Step 0a: Run tier integrity checks (BLOCKING)
-    Step 0b: Run full rule audit (BLOCKING on duplicates)
-    Step 0c: Prompt Y/N to continue to publish
-    Step 1:  Check prerequisites (flutter, git, gh)
-    Step 2:  Validate working tree
-    Step 3:  Check remote sync
-    Step 4:  Run tests
-    Step 5:  Format code
-    Step 6:  Run static analysis
-    Step 7:  Validate CHANGELOG.md
-    Step 8:  Generate documentation
-    Step 9:  Pre-publish validation (dart pub publish --dry-run)
-    Step 10: Commit and push
-    Step 11: Create git tag
-    Step 12: Publish via GitHub Actions
-    Step 13: Create GitHub release
+    Step 1:  Pre-publish audit (tier integrity, duplicates, quality checks)
+    Step 2:  Check prerequisites (flutter, git, gh)
+    Step 3:  Validate working tree
+    Step 4:  Check remote sync
+    Step 5:  Run tests
+    Step 6:  Format code
+    Step 7:  Run static analysis
+    Step 8:  Validate CHANGELOG.md
+    Step 9:  Generate documentation
+    Step 10: Pre-publish validation (dart pub publish --dry-run)
+    Step 11: Commit and push
+    Step 12: Create git tag
+    Step 13: Publish via GitHub Actions
+    Step 14: Create GitHub release
 
 Options:
     --audit-only      Run audit + integrity checks only, skip publish
@@ -118,24 +115,24 @@ def check_modules_exist() -> bool:
         pass
 
     scripts_dir = Path(__file__).resolve().parent
-    all_found = True
+    missing: list[str] = []
 
     for module_rel in _REQUIRED_MODULES:
         module_path = scripts_dir / module_rel
-        if module_path.exists():
-            print(f"  [OK] Module found: {module_rel}")
-        else:
-            print(f"  [MISSING] Module MISSING: {module_rel}")
-            all_found = False
+        if not module_path.exists():
+            missing.append(module_rel)
 
-    if not all_found:
+    if missing:
+        for m in missing:
+            print(f"  [MISSING] Module MISSING: {m}")
         print()
         print("  ERROR: Required modules are missing from scripts/modules/.")
         print("  Ensure the following files exist:")
-        for m in _REQUIRED_MODULES:
+        for m in missing:
             print(f"    scripts/{m}")
+        return False
 
-    return all_found
+    return True
 
 
 # =============================================================================
@@ -270,8 +267,8 @@ def run_pre_publish_audits(project_dir: Path) -> bool:
 
 
 def check_prerequisites() -> bool:
-    """Step 1: Check that required tools are available."""
-    print_header("STEP 1: CHECKING PREREQUISITES")
+    """Step 2: Check that required tools are available."""
+    print_header("STEP 2: CHECKING PREREQUISITES")
 
     tools = [
         ("flutter", "Install from https://flutter.dev"),
@@ -291,12 +288,12 @@ def check_prerequisites() -> bool:
 
 
 def check_working_tree(project_dir: Path) -> tuple[bool, bool]:
-    """Step 2: Check working tree status.
+    """Step 3: Check working tree status.
 
     Returns:
         (ok, has_uncommitted_changes)
     """
-    print_header("STEP 2: CHECKING WORKING TREE")
+    print_header("STEP 3: CHECKING WORKING TREE")
 
     use_shell = get_shell_mode()
     result = subprocess.run(
@@ -328,8 +325,8 @@ def check_working_tree(project_dir: Path) -> tuple[bool, bool]:
 
 
 def check_remote_sync(project_dir: Path, branch: str) -> bool:
-    """Step 3: Check if local branch is in sync with remote."""
-    print_header("STEP 3: CHECKING REMOTE SYNC")
+    """Step 4: Check if local branch is in sync with remote."""
+    print_header("STEP 4: CHECKING REMOTE SYNC")
 
     use_shell = get_shell_mode()
 
@@ -398,8 +395,8 @@ def check_remote_sync(project_dir: Path, branch: str) -> bool:
 
 
 def run_tests(project_dir: Path) -> bool:
-    """Step 4: Run flutter test and custom_lint tests."""
-    print_header("STEP 4: RUNNING TESTS")
+    """Step 5: Run flutter test and custom_lint tests."""
+    print_header("STEP 5: RUNNING TESTS")
 
     test_dir = project_dir / "test"
     if test_dir.exists():
@@ -455,8 +452,8 @@ def run_tests(project_dir: Path) -> bool:
 
 
 def run_format(project_dir: Path) -> bool:
-    """Step 5: Run dart format."""
-    print_header("STEP 5: FORMATTING CODE")
+    """Step 6: Run dart format."""
+    print_header("STEP 6: FORMATTING CODE")
 
     use_shell = get_shell_mode()
 
@@ -499,8 +496,8 @@ def run_format(project_dir: Path) -> bool:
 
 
 def run_analysis(project_dir: Path) -> bool:
-    """Step 6: Run static analysis."""
-    print_header("STEP 6: RUNNING STATIC ANALYSIS")
+    """Step 7: Run static analysis."""
+    print_header("STEP 7: RUNNING STATIC ANALYSIS")
 
     print_info("Checking for pub.dev lint issues...")
     pubdev_issues = check_pubdev_lint_issues(project_dir)
@@ -545,8 +542,8 @@ def run_analysis(project_dir: Path) -> bool:
 def validate_changelog(
     project_dir: Path, version: str
 ) -> tuple[bool, str]:
-    """Step 7: Validate version in CHANGELOG and get release notes."""
-    print_header("STEP 7: VALIDATING CHANGELOG")
+    """Step 8: Validate version in CHANGELOG and get release notes."""
+    print_header("STEP 8: VALIDATING CHANGELOG")
 
     release_notes = validate_changelog_version(project_dir, version)
     if release_notes is None:
@@ -575,15 +572,15 @@ def validate_changelog(
 
 
 def generate_docs(project_dir: Path) -> bool:
-    """Step 8: Generate documentation."""
-    print_header("STEP 8: GENERATING DOCUMENTATION")
+    """Step 9: Generate documentation."""
+    print_header("STEP 9: GENERATING DOCUMENTATION")
     result = run_command(["dart", "doc"], project_dir, "Generating docs")
     return result.returncode == 0
 
 
 def pre_publish_validation(project_dir: Path) -> bool:
-    """Step 9: Run dart pub publish --dry-run."""
-    print_header("STEP 9: PRE-PUBLISH VALIDATION")
+    """Step 10: Run dart pub publish --dry-run."""
+    print_header("STEP 10: PRE-PUBLISH VALIDATION")
 
     print_info("Running 'dart pub publish --dry-run'...")
     use_shell = get_shell_mode()
@@ -631,8 +628,6 @@ def main() -> int:
     set_output_level(_parse_output_level())
 
     show_saropa_logo()
-    print_colored(f"  Saropa Lints publisher v{SCRIPT_VERSION}", Color.MAGENTA)
-    print()
 
     # --- Find project ---
     project_dir = get_project_dir()
@@ -700,7 +695,7 @@ def main() -> int:
             ExitCode.CHANGELOG_FAILED,
         )
 
-    print_header("SAROPA LINTS PUBLISHER")
+    print_header(f"SAROPA LINTS PUBLISHER v{SCRIPT_VERSION}")
     print_colored("  Package Information:", Color.WHITE)
     print_colored(f"      Name:       {package_name}", Color.CYAN)
     print_colored(f"      Version:    {version}", Color.CYAN)
@@ -719,12 +714,12 @@ def main() -> int:
     display_changelog(project_dir)
     display_test_coverage(project_dir)
 
-    # --- Step 0: Pre-publish audits (unless --skip-audit) ---
+    # --- Step 1: Pre-publish audits (unless --skip-audit) ---
     audit_only = "--audit-only" in sys.argv
     skip_audit = "--skip-audit" in sys.argv
 
     if not skip_audit:
-        print_header("STEP 0: PRE-PUBLISH AUDIT")
+        print_header("STEP 1: PRE-PUBLISH AUDIT")
         if not run_pre_publish_audits(project_dir):
             exit_with_error(
                 "Pre-publish audit failed. Fix issues before publishing.",

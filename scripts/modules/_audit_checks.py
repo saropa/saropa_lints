@@ -324,11 +324,21 @@ def get_implemented_rules(
 
 
 def get_roadmap_rules(roadmap_path: Path) -> set[str]:
-    """Extract rule names from ROADMAP.md table entries."""
+    """Extract rule names from ROADMAP.md and ROADMAP_DEFERRED.md table entries."""
     rules: set[str] = set()
     pattern = re.compile(r"^\|\s*`([a-z0-9_]+)`\s*\|", re.MULTILINE)
-    content = roadmap_path.read_text(encoding="utf-8")
-    rules.update(pattern.findall(content))
+
+    # Read main ROADMAP.md
+    if roadmap_path.exists():
+        content = roadmap_path.read_text(encoding="utf-8")
+        rules.update(pattern.findall(content))
+
+    # Also read ROADMAP_DEFERRED.md if it exists
+    deferred_path = roadmap_path.parent / "ROADMAP_DEFERRED.md"
+    if deferred_path.exists():
+        content = deferred_path.read_text(encoding="utf-8")
+        rules.update(pattern.findall(content))
+
     return rules
 
 
@@ -500,9 +510,7 @@ def find_orphan_rules(
 
 def print_duplicate_report(duplicates: dict) -> None:
     """Print report of duplicate class names, rule names, and aliases."""
-    from scripts.modules._utils import print_section
-
-    print_section("Duplicate Rule/Class/Alias Check")
+    print_subheader("Duplicate Rule/Class/Alias Check")
     any_duplicates = False
     for kind, dups in [
         ("Class names", duplicates["class_names"]),
@@ -645,11 +653,12 @@ def print_quality_metrics(
 
 
 def print_file_health(file_stats: list[FileStats]) -> None:
-    """Print file health analysis."""
-    print_subheader("File Health")
+    """Print file health analysis in two sections."""
     if not file_stats:
         return
 
+    # Section 1: File sizes
+    print_subheader("File Sizes")
     sorted_by_rules = sorted(
         file_stats, key=lambda s: s.rules, reverse=True
     )
@@ -661,13 +670,15 @@ def print_file_health(file_stats: list[FileStats]) -> None:
             f"{s.rules:>3} rules"
         )
 
-    print()
     empty_files = [s for s in file_stats if s.rules == 0]
     if empty_files:
+        print()
         print_colored(
             f"    Files with no rules: {len(empty_files)}", Color.DIM
         )
 
+    # Section 2: Quick fix coverage
+    print_subheader("Quick Fix Coverage")
     low_fix = sorted(
         [s for s in file_stats if s.rules >= 5 and s.fix_coverage < 10],
         key=lambda s: (s.fix_coverage, -s.rules),
@@ -688,6 +699,8 @@ def print_file_health(file_stats: list[FileStats]) -> None:
                 f"... and {len(low_fix) - 5} more"
                 f"{Color.RESET.value}"
             )
+    else:
+        print_success("All files have adequate quick fix coverage")
 
 
 def print_orphan_analysis(
