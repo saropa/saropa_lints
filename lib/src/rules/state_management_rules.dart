@@ -4484,9 +4484,9 @@ class AvoidObsOutsideControllerRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_obs_outside_controller',
     problemMessage:
-        '[avoid_obs_outside_controller] .obs used outside a GetxController or GetxService creates observables without proper lifecycle management. These observables cause memory leaks because they are never disposed when the widget tree rebuilds.',
+        '[avoid_obs_outside_controller] .obs used outside a Getx stream controller (GetxController or GetxService) creates observables without proper lifecycle management. These observables cause memory leaks because they are never disposed when the widget tree rebuilds.',
     correctionMessage:
-        'Move observable state into a GetxController or GetxService, where onClose() automatically disposes Rx subscriptions and prevents memory leaks.',
+        'Move observable state into a GetxController or GetxService, where onClose() automatically disposes Rx stream subscriptions and prevents memory leaks.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -10291,7 +10291,7 @@ class AvoidBlocContextDependencyRule extends SaropaLintRule {
     problemMessage:
         '[avoid_bloc_context_dependency] Bloc depending on BuildContext couples business logic to the UI layer. This makes the Bloc untestable in isolation, prevents reuse across widgets, and can cause crashes when the context becomes invalid after the widget is removed from the tree.',
     correctionMessage:
-        'Inject dependencies through constructor instead of passing context.',
+        'Inject dependencies through the constructor instead of passing BuildContext, keeping business logic independent from the UI layer for better testability.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -10383,7 +10383,7 @@ class AvoidProviderValueRebuildRule extends SaropaLintRule {
     problemMessage:
         '[avoid_provider_value_rebuild] Provider.value with inline object creation recreates the notifier on every widget build. This discards accumulated user data, resets form state, and can trigger infinite rebuild loops that freeze the UI as each rebuild creates a new instance that triggers another rebuild.',
     correctionMessage:
-        'Use existing instance with Provider.value or use Provider constructor.',
+        'Store the notifier instance in a variable and reuse it with Provider.value, or use the Provider constructor to create and manage the instance lifecycle automatically.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -10472,7 +10472,7 @@ class AvoidRiverpodNotifierInBuildRule extends SaropaLintRule {
     problemMessage:
         '[avoid_riverpod_notifier_in_build] Creating a Riverpod Notifier inside the build method reinstantiates it on every widget rebuild, discarding all accumulated state. Users experience lost form input, reset scroll positions, and flickering UI as the notifier repeatedly initializes from scratch.',
     correctionMessage:
-        'Define the provider outside the widget and use ref.watch() to access it.',
+        'Define the provider outside the widget class (at the file level as a global) and use ref.watch() to access it, ensuring stable state across rebuilds.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -10656,7 +10656,7 @@ class AvoidBlocBusinessLogicInUiRule extends SaropaLintRule {
     problemMessage:
         '[avoid_bloc_business_logic_in_ui] UI code such as showDialog or Navigator calls inside a Bloc breaks separation of concerns and makes the Bloc untestable without a widget tree. Business logic becomes coupled to the UI framework, preventing reuse across platforms and complicating unit testing.',
     correctionMessage:
-        'Emit a state instead and handle the UI action in BlocListener.',
+        'Emit a state representing the UI action (e.g., ShowDialogState or NavigateState) and handle the actual UI change in a BlocListener within the widget layer.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 

@@ -55,7 +55,7 @@ class RequireVsyncMixinRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_vsync_mixin',
     problemMessage:
-        '[require_vsync_mixin] AnimationController is missing a vsync parameter. Without vsync, animations run without frame synchronization, causing visual tearing, wasted CPU cycles, and degraded user experience. This can lead to janky motion and battery drain, especially on mobile devices. Always provide vsync: this and mix in SingleTickerProviderStateMixin to ensure smooth, efficient animations and proper resource management.',
+        '[require_vsync_mixin] AnimationController is missing a vsync parameter. Without vsync, animations run without frame synchronization, causing visual tearing, wasted CPU cycles, and degraded user experience. This can lead to janky motion and battery drain, especially on mobile devices. Always provide vsync: this and mix in SingleTickerProviderStateMixin to ensure smooth, efficient animations and proper animation controller lifecycle management.',
     correctionMessage:
         'Add vsync: this and mix in SingleTickerProviderStateMixin to synchronize animation frames with the display refresh rate, preventing unnecessary CPU and memory usage.',
     errorSeverity: DiagnosticSeverity.ERROR,
@@ -1128,8 +1128,9 @@ class RequireAnimationStatusListenerRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_animation_status_listener',
     problemMessage:
-        '[require_animation_status_listener] One-shot animation should have StatusListener for completion.',
-    correctionMessage: 'Add addStatusListener to handle animation completion.',
+        '[require_animation_status_listener] AnimationController.forward() called without addStatusListener to detect completion. The animation will run but your application cannot respond when it finishes, preventing cleanup, sequencing, or triggering follow-up actions.',
+    correctionMessage:
+        'Add controller.addStatusListener and check for AnimationStatus.completed or AnimationStatus.dismissed to execute code when the animation finishes, enabling proper resource management and action sequencing.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 

@@ -1240,9 +1240,9 @@ class PreferRiverpodAutoDisposeRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_riverpod_auto_dispose',
     problemMessage:
-        '[prefer_riverpod_auto_dispose] Provider declared without the autoDispose modifier retains its state and resources indefinitely even after all listening widgets are destroyed. This causes memory leaks, stale data accumulation, and unnecessary background computation that grows over the app lifetime, degrading performance progressively.',
+        '[prefer_riverpod_auto_dispose] Provider declared without the autoDispose modifier retains its state and resources indefinitely even after all listening child widgets are destroyed from the widget tree. This causes memory leaks, stale data accumulation, and unnecessary background computation that grows over the app lifetime, degrading performance progressively.',
     correctionMessage:
-        'Add the .autoDispose modifier to the provider declaration (e.g., StateProvider.autoDispose<T>) so resources are released when no widget is actively listening.',
+        'Add the .autoDispose modifier to the provider declaration (e.g., StateProvider.autoDispose<T>) so resources are released when no consumer is actively listening.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 

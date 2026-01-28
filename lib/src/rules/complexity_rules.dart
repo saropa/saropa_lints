@@ -609,8 +609,9 @@ class BinaryExpressionOperandOrderRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'binary_expression_operand_order',
     problemMessage:
-        '[binary_expression_operand_order] Consider reordering operands for readability.',
-    correctionMessage: 'Place the variable on the left side of the comparison.',
+        '[binary_expression_operand_order] Constant placed on the left side of equality comparison (Yoda conditions). This reverses the natural reading order, making code harder to understand and increasing cognitive load when scanning through multiple comparisons.',
+    correctionMessage:
+        'Place the variable or expression on the left side and the constant on the right (e.g., "status == 200" instead of "200 == status") to match natural language order and improve readability.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -650,8 +651,9 @@ class PreferMovingToVariableRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_moving_to_variable',
     problemMessage:
-        '[prefer_moving_to_variable] Consider extracting repeated expression to a variable.',
-    correctionMessage: 'Extract to a local variable to avoid repetition.',
+        '[prefer_moving_to_variable] Expression repeated multiple times within the same scope. Repeated expressions waste CPU recalculating the same value, make code harder to maintain when the logic changes, and increase the chance of typos creating subtle bugs.',
+    correctionMessage:
+        'Extract the repeated expression into a descriptive local variable calculated once and reused. This improves performance, makes the code DRY (Don\'t Repeat Yourself), and ensures consistency if the expression value is used multiple times.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 

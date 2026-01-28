@@ -1113,7 +1113,7 @@ class AvoidDeepLinkSensitiveParamsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_deep_link_sensitive_params',
     problemMessage:
-        '[avoid_deep_link_sensitive_params] Deep link query parameter contains sensitive data (password, token, secret, API key, or credential). Deep link URLs are recorded in system logs, browser history, HTTP referrer headers, and analytics platforms, permanently exposing credentials to anyone with access to those logs or the device history.',
+        '[avoid_deep_link_sensitive_params] Deep link query parameter contains sensitive data (password, token, secret, API key, or credential), creating a security breach. Deep link URLs are recorded in system logs, browser history, HTTP referrer headers, and analytics platforms, permanently exposing credentials to attackers who gain access to those logs or the device history.',
     correctionMessage:
         'Remove sensitive parameters from deep link URLs and exchange them server-side using a one-time token or secure session instead of transmitting credentials in the URL.',
     errorSeverity: DiagnosticSeverity.ERROR,
