@@ -1,3 +1,5 @@
+// ignore_for_file: deprecated_member_use
+
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/error/error.dart'
     show AnalysisError, DiagnosticSeverity;
@@ -208,6 +210,8 @@ class RequireCustomPainterShouldRepaintRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+
+  // cspell:ignore shouldrepaint
 
   static const LintCode _code = LintCode(
     name: 'require_custom_painter_shouldrepaint',
@@ -693,6 +697,7 @@ class PreferItemExtentWhenKnownRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.low;
 
+  // cspell:ignore itemextent
   static const LintCode _code = LintCode(
     name: 'prefer_itemextent_when_known',
     problemMessage:
@@ -974,6 +979,7 @@ class RequireEmptyResultsStateRule extends SaropaLintRule {
       AstNode? current = node.parent;
       while (current != null) {
         final source = current.toSource().toLowerCase();
+        // cspell:ignore isnotempty
         if (source.contains('.isempty') || source.contains('.isnotempty')) {
           return; // Has empty check
         }
@@ -1072,6 +1078,7 @@ class RequireSearchLoadingIndicatorRule extends SaropaLintRule {
 
         // Check if it sets loading state
         if (!callbackSource.contains('loading') &&
+            // cspell:ignore isloading
             !callbackSource.contains('isloading') &&
             !callbackSource.contains('isSearching')) {
           reporter.atNode(arg, code);
@@ -1256,6 +1263,8 @@ class RequirePaginationLoadingStateRule extends SaropaLintRule {
 
       final builderSource = itemBuilderArg.expression.toSource().toLowerCase();
 
+      // cspell:ignore loadmore fetchmore nextpage loadnext
+
       // Check for pagination pattern (loadMore, fetchMore, nextPage)
       final hasPagination = builderSource.contains('loadmore') ||
           builderSource.contains('fetchmore') ||
@@ -1356,6 +1365,9 @@ class RequireWebViewProgressIndicatorRule extends SaropaLintRule {
     'InAppWebView',
     'WebViewX',
   };
+
+  // cspell:ignore onloadprogress onpagestarted loadingbuilder progressindicator
+  // cspell:ignore onprogresschanged onloadstart
 
   static const Set<String> _progressParams = <String>{
     'onprogress',
