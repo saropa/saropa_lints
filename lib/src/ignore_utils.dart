@@ -198,6 +198,7 @@ class IgnoreUtils {
 
     // Walk up the parent chain to find comments on ancestor expressions
     AstNode? current = node.parent;
+    Statement? containingStatement;
     while (current != null) {
       if (_hasValidLeadingIgnoreComment(
         current.beginToken,
@@ -207,13 +208,27 @@ class IgnoreUtils {
       )) {
         return true;
       }
-      // Stop at statement level - don't go higher
-      if (current is Statement) break;
+
+      // Track the containing statement
+      if (current is Statement) {
+        containingStatement = current;
+        break;
+      }
+
       current = current.parent;
     }
 
-    // Check for trailing same-line comments
+    // Check for trailing same-line comments on the node itself
     if (_hasTrailingIgnoreComment(node, ruleName)) return true;
+
+    // IMPORTANT: Also check trailing comments on the containing statement
+    // This handles cases like: final x = 'value'; // ignore: rule
+    // where the comment is at the end of the statement, not immediately after the value
+    if (containingStatement != null) {
+      if (_hasTrailingIgnoreComment(containingStatement, ruleName)) {
+        return true;
+      }
+    }
 
     return false;
   }
@@ -322,7 +337,8 @@ class IgnoreUtils {
     // Walk forward through tokens looking for trailing comments on same line
     Token? currentToken = node.endToken.next;
     int tokensChecked = 0;
-    const maxTokensToCheck = 5; // Limit to avoid unbounded search
+    const maxTokensToCheck =
+        10; // Increased limit to find trailing comments further away
 
     while (currentToken != null && tokensChecked < maxTokensToCheck) {
       // Check this token's precedingComments
@@ -356,12 +372,7 @@ class IgnoreUtils {
     int targetLine,
     LineInfo lineInfo,
   ) {
-    // If the token itself is past our target line, stop searching
-    final tokenLine = lineInfo.getLocation(token.offset).lineNumber;
-    if (tokenLine > targetLine + 1) {
-      return _CommentCheckResult.pastLine;
-    }
-
+    // First, check if this token has any comments on the target line
     Token? comment = token.precedingComments;
     while (comment != null) {
       final commentLine = lineInfo.getLocation(comment.offset).lineNumber;
@@ -378,6 +389,15 @@ class IgnoreUtils {
 
       comment = comment.next;
     }
+
+    // After checking comments, if the token itself is past our target line, stop searching
+    // Note: We check this AFTER examining comments because trailing comments on line N
+    // are often attached as precedingComments to the first token of line N+1
+    final tokenLine = lineInfo.getLocation(token.offset).lineNumber;
+    if (tokenLine > targetLine + 1) {
+      return _CommentCheckResult.pastLine;
+    }
+
     return _CommentCheckResult.notFound;
   }
 }
