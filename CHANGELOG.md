@@ -11,7 +11,18 @@ Dates are not included in version headers — [pub.dev](https://pub.dev/packages
 ** See the current published changelog: [saropa_lints/changelog](https://pub.dev/packages/saropa_lints/changelog)
 
 ---
-## [4.9.2] - Current
+## [4.9.3] - Current
+
+### Fixed
+
+- **Progress bar terminal compatibility**: Use stdout with space-overwrite approach instead of ANSI escape codes for broader terminal support. Added clear labels (`Files:`, `Issues:`, `ETA:`) to progress output for clarity.
+
+- **Version detection when run from other projects**: Fixed `init` command showing "vunknown" when run via `dart run saropa_lints:init` from dependent projects. Now correctly reads version from package location found in `package_config.json`.
+
+- **Full filenames in progress**: Removed truncation of long filenames in progress display.
+
+---
+## [4.9.2]
 
 ### Added
 
