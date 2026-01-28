@@ -641,7 +641,7 @@ class PreferSqfliteBatchRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_sqflite_batch',
     problemMessage:
-        '[prefer_sqflite_batch] Database insert in loop. Use batch operations for better performance.',
+        '[prefer_sqflite_batch] Database insert in loop reduces throughput by 10-100x.',
     correctionMessage: 'Use db.batch() with batch.insert() and batch.commit().',
     errorSeverity: DiagnosticSeverity.INFO,
   );

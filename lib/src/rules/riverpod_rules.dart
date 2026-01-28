@@ -714,7 +714,7 @@ class PreferImmutableProviderArgumentsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_immutable_provider_arguments',
     problemMessage:
-        '[prefer_immutable_provider_arguments] Provider arguments should be immutable.',
+        '[prefer_immutable_provider_arguments] Mutable provider arguments cause unpredictable rebuilds.',
     correctionMessage: 'Use final for provider arguments.',
     errorSeverity: DiagnosticSeverity.INFO,
   );

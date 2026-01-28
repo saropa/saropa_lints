@@ -1931,7 +1931,7 @@ class RequireSvgErrorHandlerRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_svg_error_handler',
     problemMessage:
-        '[require_svg_error_handler] SvgPicture should have an errorBuilder callback.',
+        '[require_svg_error_handler] SvgPicture without errorBuilder shows blank on invalid SVG.',
     correctionMessage: 'Add errorBuilder to handle SVG loading failures.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );

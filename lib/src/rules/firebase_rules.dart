@@ -767,7 +767,7 @@ class RequireDatabaseIndexRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_database_index',
     problemMessage:
-        '[require_database_index] Database query on non-indexed field. Add @Index for better performance.',
+        '[require_database_index] Query on non-indexed field causes full table scan.',
     correctionMessage:
         'Add @Index() annotation to fields used in queries and filters.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -1164,7 +1164,7 @@ class PreferFirestoreBatchWriteRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_firestore_batch_write',
     problemMessage:
-        '[prefer_firestore_batch_write] Multiple individual Firestore writes should be batched.',
+        '[prefer_firestore_batch_write] Individual writes increase latency and billing costs.',
     correctionMessage: 'Use WriteBatch for multiple related write operations.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -1736,7 +1736,7 @@ class PreferMarkerClusteringRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_marker_clustering',
     problemMessage:
-        '[prefer_marker_clustering] Consider using marker clustering for better performance.',
+        '[prefer_marker_clustering] Many markers cause frame drops and memory issues.',
     correctionMessage: 'Use marker clustering library for many markers.',
     errorSeverity: DiagnosticSeverity.INFO,
   );

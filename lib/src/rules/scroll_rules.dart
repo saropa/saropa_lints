@@ -934,7 +934,7 @@ class PreferItemExtentRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_item_extent',
     problemMessage:
-        '[prefer_item_extent] ListView with uniform items should specify itemExtent for better performance.',
+        '[prefer_item_extent] ListView without itemExtent recalculates layout on every scroll.',
     correctionMessage:
         'Add itemExtent parameter if all items have the same height.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -1010,7 +1010,7 @@ class PreferPrototypeItemRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_prototype_item',
     problemMessage:
-        '[prefer_prototype_item] Consider using prototypeItem for ListView with consistent item sizes.',
+        '[prefer_prototype_item] ListView.builder without prototypeItem measures each child separately.',
     correctionMessage:
         'Add prototypeItem parameter if items have consistent dimensions.',
     errorSeverity: DiagnosticSeverity.INFO,

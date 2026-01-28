@@ -708,7 +708,7 @@ class RequireBiometricFallbackRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_biometric_fallback',
     problemMessage:
-        '[require_biometric_fallback] Biometric authentication should have a fallback mechanism.',
+        '[require_biometric_fallback] Biometric-only auth locks out users with damaged sensors.',
     correctionMessage:
         'Set biometricOnly to false or provide an alternative auth method.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -3251,7 +3251,7 @@ class PreferDataMaskingRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_data_masking',
     problemMessage:
-        '[prefer_data_masking] Sensitive data displayed without masking. Consider partial masking.',
+        '[prefer_data_masking] Unmasked sensitive data visible in UI and screenshots.',
     correctionMessage:
         'Mask sensitive data: "****-****-****-1234" instead of full number.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -3358,7 +3358,7 @@ class AvoidScreenshotSensitiveRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_screenshot_sensitive',
     problemMessage:
-        '[avoid_screenshot_sensitive] Sensitive screen without screenshot protection. Consider FLAG_SECURE.',
+        '[avoid_screenshot_sensitive] Sensitive screen allows screenshots and screen recording.',
     correctionMessage:
         'Use FlutterWindowManager.addFlags(FLAG_SECURE) for sensitive screens.',
     errorSeverity: DiagnosticSeverity.INFO,

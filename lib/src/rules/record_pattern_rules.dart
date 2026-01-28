@@ -889,8 +889,8 @@ class MoveRecordsToTypedefsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'move_records_to_typedefs',
     problemMessage:
-        '[move_records_to_typedefs] Record with >$_maxInlineFields fields should be a typedef.',
-    correctionMessage: 'Extract to a typedef for better readability.',
+        '[move_records_to_typedefs] Inline record with >$_maxInlineFields fields reduces readability.',
+    correctionMessage: 'Extract to a typedef for reuse and documentation.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -939,7 +939,7 @@ class PatternFieldsOrderingRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_sorted_pattern_fields',
     problemMessage:
-        '[prefer_sorted_pattern_fields] Pattern fields should be in alphabetical order.',
+        '[prefer_sorted_pattern_fields] Unsorted pattern fields slow code review and refactoring.',
     correctionMessage: 'Reorder pattern fields alphabetically.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -1004,7 +1004,7 @@ class PreferSimplerPatternsNullCheckRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_simpler_patterns_null_check',
     problemMessage:
-        '[prefer_simpler_patterns_null_check] Consider simpler null check pattern.',
+        '[prefer_simpler_patterns_null_check] Verbose null check pattern reduces readability.',
     correctionMessage: 'Use != null or final instead of var for null checks.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -1117,7 +1117,7 @@ class RecordFieldsOrderingRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_sorted_record_fields',
     problemMessage:
-        '[prefer_sorted_record_fields] Record named fields should be in alphabetical order.',
+        '[prefer_sorted_record_fields] Unsorted record fields slow code review and refactoring.',
     correctionMessage: 'Reorder fields alphabetically.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
