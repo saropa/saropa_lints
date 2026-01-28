@@ -622,8 +622,9 @@ class PreferNullObjectPatternRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_null_object_pattern',
     problemMessage:
-        '[prefer_null_object_pattern] Consider using null object pattern for optional dependency.',
-    correctionMessage: 'Provide a no-op implementation instead of using null.',
+        '[prefer_null_object_pattern] Optional dependency (Logger, Analytics, etc.) registered as nullable type. Callers must perform null checks before every use, scattering defensive code throughout the application and increasing the risk of NullPointerExceptions.',
+    correctionMessage:
+        'Implement a no-op or stub version of the dependency interface and register it instead of null. This eliminates null checks at call sites while preserving the optional behavior through safe default implementation.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -690,9 +691,9 @@ class RequireTypedDiRegistrationRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_typed_di_registration',
     problemMessage:
-        '[require_typed_di_registration] DI registration should have explicit type parameter.',
+        '[require_typed_di_registration] Dependency injection registration lacks explicit type parameter, relying on type inference. Type inference can fail or infer incorrect types when implementations differ from interfaces, causing runtime resolution errors that could be caught at compile time.',
     correctionMessage:
-        'Add type parameter like registerSingleton<Type>(instance).',
+        'Add explicit type parameter to the registration method (e.g., registerSingleton<UserRepository>(UserRepositoryImpl())) to document the registered type and catch mismatches early during development.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -1650,9 +1651,9 @@ class PreferLazySingletonRegistrationRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_lazy_singleton_registration',
     problemMessage:
-        '[prefer_lazy_singleton_registration] Eager singleton registration. Consider lazy registration.',
+        '[prefer_lazy_singleton_registration] Expensive service (Database, Analytics, Cache) registered as eager singleton. The service initializes immediately at app startup, slowing down launch time and consuming resources even if the service is never used during the session.',
     correctionMessage:
-        'Use registerLazySingleton(() => Service()) for deferred initialization.',
+        'Replace registerSingleton with registerLazySingleton(() => Service()) to defer initialization until first access. This improves app startup time and reduces memory usage when features are conditionally accessed.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 

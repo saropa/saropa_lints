@@ -871,7 +871,8 @@ class AvoidDynamicJsonAccessRule extends SaropaLintRule {
     name: 'avoid_dynamic_json_access',
     problemMessage:
         '[avoid_dynamic_json_access] Chained dynamic JSON access without null checks throws NoSuchMethodError at runtime when any intermediate key is missing or null. This causes unhandled crashes in production when API responses deviate from the expected schema, with no compile-time safety net.',
-    correctionMessage: 'Use null-aware operators or validate each level.',
+    correctionMessage:
+        'Use null-aware operators (?.) for safe access, or validate each level exists before accessing nested properties to prevent runtime crashes.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -1137,7 +1138,8 @@ class RequireEnumUnknownValueRule extends SaropaLintRule {
     name: 'require_enum_unknown_value',
     problemMessage:
         '[require_enum_unknown_value] Enum parsing without a fallback value throws an ArgumentError when the input string does not match any enum member. Backend API changes or new enum values added server-side will crash the app in production for all users until a client update is deployed.',
-    correctionMessage: 'Add fallback value or use tryByName pattern.',
+    correctionMessage:
+        'Add a fallback enum value (e.g., .unknown) using the orElse parameter, or use MyEnum.values.tryByName() to safely handle unknown values.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 

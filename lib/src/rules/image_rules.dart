@@ -796,7 +796,7 @@ class RequireCachedImageDimensionsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_cached_image_dimensions',
     problemMessage:
-        '[require_cached_image_dimensions] CachedNetworkImage without cache dimensions. Large images cause OOM. Consequence: Loading large images without cache limits can cause out-of-memory errors and app crashes.',
+        '[require_cached_image_dimensions] CachedNetworkImage without cache dimensions loads full-resolution images into memory, causing out-of-memory errors and app crashes on devices with limited RAM. Large images (such as high-resolution photos from modern cameras) can consume hundreds of megabytes when decoded, quickly exhausting available memory.',
     correctionMessage:
         'Add memCacheWidth/memCacheHeight to limit decoded image size. This reduces memory usage and prevents crashes.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -1410,7 +1410,7 @@ class AvoidImagePickerLargeFilesRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_image_picker_large_files',
     problemMessage:
-        '[avoid_image_picker_large_files] pickImage without imageQuality. Raw photos can be 10+ MB. Consequence: Large images slow down uploads, waste bandwidth, and may cause app crashes.',
+        '[avoid_image_picker_large_files] pickImage without imageQuality allows raw photos that can be 10+ MB in size, creating slow uploads and wasteful bandwidth consumption. Large image files cause network timeouts, drain battery, consume expensive mobile data, and may trigger out-of-memory errors when the app attempts to process them.',
     correctionMessage:
         'Add imageQuality (e.g., 85) to compress images and reduce file size. This improves performance and reliability.',
     errorSeverity: DiagnosticSeverity.WARNING,

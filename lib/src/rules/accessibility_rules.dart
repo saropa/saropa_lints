@@ -358,7 +358,7 @@ class AvoidColorOnlyIndicatorsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_color_only_indicators',
     problemMessage:
-        '[avoid_color_only_indicators] Color-only status indicator excludes approximately 8% of men and 0.5% of women who have color vision deficiency and cannot distinguish red from green. Relying solely on color to convey meaning violates WCAG 1.4.1 (Use of Color), which requires a secondary visual cue such as an icon, text label, or pattern to communicate status information.',
+        '[avoid_color_only_indicators] Color-only status indicator fails for approximately 8% of men and 0.5% of women who have color vision deficiency and cannot distinguish red from green, making the UI completely inaccessible to colorblind users. Relying solely on color to convey meaning violates WCAG 1.4.1 (Use of Color), which requires a secondary visual cue such as an icon, text label, or pattern to communicate status information.',
     correctionMessage:
         'Add a secondary visual cue alongside the color, such as Icon(isError ? Icons.error : Icons.check), a text label, or a distinct shape to convey status.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -1158,7 +1158,7 @@ class RequireImageSemanticsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_image_semantics',
     problemMessage:
-        '[require_image_semantics] Image widget lacks a semanticLabel parameter. Screen readers cannot describe this image to users with visual impairments, making the content inaccessible. This violates WCAG 1.1.1 (Non-text Content) and may exclude your app from accessibility-mandated markets.',
+        '[require_image_semantics] Image constructor lacks a semanticLabel parameter. Screen readers cannot describe this image to users with visual impairments, making the content inaccessible. This violates WCAG 1.1.1 (Non-text Content) and may exclude your app from accessibility-mandated markets.',
     correctionMessage:
         "Add semanticLabel: 'description' or excludeFromSemantics: true for decorative images.",
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -2331,9 +2331,9 @@ class AvoidSemanticsExclusionRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_semantics_exclusion',
     problemMessage:
-        '[avoid_semantics_exclusion] excludeFromSemantics: true should have a comment explaining why.',
+        '[avoid_semantics_exclusion] excludeFromSemantics: true detected without accompanying documentation. Screen reader users will encounter hidden content without understanding why it was excluded, making it difficult to debug accessibility issues or verify the exclusion was intentional.',
     correctionMessage:
-        'Add a comment explaining why this is decorative content.',
+        'Add a comment above this widget explaining why it is decorative or redundant content that screen readers should skip. Include the semantic information provided by surrounding context.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -2403,9 +2403,9 @@ class PreferMergeSemanticsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_merge_semantics',
     problemMessage:
-        '[prefer_merge_semantics] Icon + Text should be wrapped in MergeSemantics.',
+        '[prefer_merge_semantics] Row or Column containing Icon and Text detected without MergeSemantics wrapper. Screen readers will announce each element separately instead of as a single cohesive label, forcing users to piece together fragmented information.',
     correctionMessage:
-        'Wrap Row/Column with MergeSemantics for unified screen reader output.',
+        'Wrap the Row or Column with MergeSemantics to combine the icon and text into a single unified announcement for screen readers, improving comprehension and navigation efficiency.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -2510,9 +2510,9 @@ class RequireFocusIndicatorRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_focus_indicator',
     problemMessage:
-        '[require_focus_indicator] Interactive widget should have visible focus indicator.',
+        '[require_focus_indicator] GestureDetector or InkWell lacks visible focus indicator. Keyboard and assistive technology users cannot determine which element currently has focus, preventing effective navigation and interaction with your application.',
     correctionMessage:
-        'Wrap in Focus widget and show visual feedback on focus.',
+        'Wrap the interactive widget in a Focus widget with a FocusNode, then show visual feedback (border, background color, or outline) when hasFocus is true to indicate keyboard focus state.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -2760,8 +2760,9 @@ class PreferAdequateSpacingRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_adequate_spacing',
     problemMessage:
-        '[prefer_adequate_spacing] Adjacent touch targets should have spacing between them.',
-    correctionMessage: 'Add SizedBox(width/height: 8) between touch targets.',
+        '[prefer_adequate_spacing] Adjacent interactive buttons detected without spacing. Users may accidentally tap the wrong button, especially those with motor impairments or using touch interfaces where precision is limited.',
+    correctionMessage:
+        'Add SizedBox(width: 8) or SizedBox(height: 8) between adjacent touch targets to provide adequate spacing and reduce accidental taps. Consider 16px spacing for better accessibility compliance.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 

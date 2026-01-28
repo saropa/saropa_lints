@@ -1192,8 +1192,9 @@ class RequireEquatableCopyWithRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_equatable_copy_with',
     problemMessage:
-        '[require_equatable_copy_with] Equatable class should have a copyWith method.',
-    correctionMessage: 'Add copyWith method to easily create modified copies.',
+        '[require_equatable_copy_with] Equatable class lacks copyWith method. Without copyWith, creating modified copies requires manually constructing new instances with all fields, leading to verbose code and errors when fields are added or removed from the class.',
+    correctionMessage:
+        'Add a copyWith method that accepts optional named parameters for each field and returns a new instance. This enables concise immutable updates and maintains compatibility when the class structure evolves.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -1568,9 +1569,9 @@ class PreferUnmodifiableCollectionsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_unmodifiable_collections',
     problemMessage:
-        '[prefer_unmodifiable_collections] Collection field may be mutated externally. Consider making unmodifiable.',
+        '[prefer_unmodifiable_collections] Equatable class exposes mutable collection field. External code can modify the collection contents without creating a new instance, breaking Equatable\'s equality contract and causing inconsistent state where equal objects have different contents.',
     correctionMessage:
-        'Use List.unmodifiable(), Map.unmodifiable(), or UnmodifiableSetView().',
+        'Wrap the collection in List.unmodifiable(), Map.unmodifiable(), or UnmodifiableSetView() to prevent external modifications. This enforces immutability and preserves Equatable semantics while still allowing read access.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 

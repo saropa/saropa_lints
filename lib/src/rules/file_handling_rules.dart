@@ -144,8 +144,9 @@ class RequirePdfErrorHandlingRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_pdf_error_handling',
     problemMessage:
-        '[require_pdf_error_handling] PDF loading should have error handling.',
-    correctionMessage: 'Wrap PDF loading in try-catch block.',
+        '[require_pdf_error_handling] PDF loading operation lacks try-catch error handling. PDF files can be corrupted, missing, or have invalid format. Without error handling, failures crash the application instead of showing user-friendly error messages.',
+    correctionMessage:
+        'Wrap the PDF loading call in a try-catch block to handle FormatException, FileSystemException, and other errors gracefully. Display appropriate user feedback and prevent app crashes when PDF loading fails.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 

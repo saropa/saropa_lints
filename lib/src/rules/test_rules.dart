@@ -2976,7 +2976,7 @@ class RequireMockHttpClientRule extends SaropaLintRule {
     problemMessage:
         '[require_mock_http_client] Real HTTP calls in tests create network dependencies that cause flaky failures and slow CI pipelines. Tests become non-deterministic, failing on timeout when servers are slow and passing inconsistently across environments, making test results unreliable for merge decisions.',
     correctionMessage:
-        'Use MockClient or mock the HTTP layer for deterministic tests.',
+        'Use MockClient from the http package or inject a mock HTTP implementation to create fast, deterministic tests that run reliably without network access.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -3072,7 +3072,7 @@ class RequireTestWidgetPumpRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_test_widget_pump',
     problemMessage:
-        '[require_test_widget_pump] After simulating a tap or text entry in a widget test, failing to call pump() or pumpAndSettle() means the UI will not update, so your test may pass even though the user experience is broken. Always process pending events to ensure your test reflects real app behavior.',
+        '[require_test_widget_pump] After simulating a tap or text entry in a widget test, failing to call pump() or pumpAndSettle() means the widget tree will not rebuild, so your test may pass even though the user experience is broken. Always process pending build events to ensure your test reflects real app behavior.',
     correctionMessage:
         'After calling tester.tap() or tester.enterText(), always call await tester.pump() or await tester.pumpAndSettle() to process UI changes and verify correct behavior.',
     errorSeverity: DiagnosticSeverity.ERROR,

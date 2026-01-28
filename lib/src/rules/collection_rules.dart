@@ -2596,7 +2596,7 @@ class RequireKeyForCollectionRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_key_for_collection',
     problemMessage:
-        '[require_key_for_collection] List items in dynamic collections (ListView, GridView, etc.) must have a Key to preserve widget state (e.g., TextField input, animations) when the list reorders or updates. Missing keys can cause UI bugs, loss of user input, broken animations, and confusing user experiences. This is a common source of hard-to-debug Flutter UI issues.',
+        '[require_key_for_collection] List items in dynamic collections (ListView, GridView, etc.) must have a Key to preserve child widget state (e.g., TextField input, animations) when the list reorders or updates. Missing keys can cause UI bugs, loss of user input, broken animations, and confusing user experiences. This is a common source of hard-to-debug Flutter widget tree issues.',
     correctionMessage:
         'Add a Key (such as ValueKey, ObjectKey, or UniqueKey) to each list item. Ensure the key is unique and stable for each item, especially when items are reordered or updated. Document key usage in your builder methods to prevent state loss.',
     errorSeverity: DiagnosticSeverity.WARNING,
