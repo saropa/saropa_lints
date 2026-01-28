@@ -327,12 +327,9 @@ def print_dx_audit_report(
             if m.dx_issues:
                 needs_work_by_impact[m.impact].append(m)
 
-    needs_work = [
-        m
-        for m in messages
-        if m.impact in ("critical", "high") and m.dx_issues
-    ]
-    impact_priority = {"critical": 0, "high": 1}
+    # Collect ALL rules needing work, across all impact levels
+    needs_work = [m for m in messages if m.dx_issues]
+    impact_priority = {"critical": 0, "high": 1, "medium": 2, "low": 3}
     needs_work.sort(
         key=lambda m: (impact_priority.get(m.impact, 99), m.dx_score)
     )
@@ -366,31 +363,55 @@ def print_dx_audit_report(
             f"{pct_color.value}({pct:>5.1f}%){Color.RESET.value}"
         )
 
-    limit = 25 if not show_all else len(needs_work)
-    shown = needs_work[:limit]
+    # Group rules by their primary issue
+    issues_to_rules: dict[str, list[RuleMessage]] = {}
+    for m in needs_work:
+        if m.dx_issues:
+            issue = m.dx_issues[0]
+            issues_to_rules.setdefault(issue, []).append(m)
 
-    if shown:
+    # Sort issues by count (descending) to show most common first
+    sorted_issues = sorted(
+        issues_to_rules.items(), key=lambda x: -len(x[1])
+    )
+
+    if sorted_issues:
         print()
-        print_colored("    Worst offenders (critical/high):", Color.DIM)
-        for m in shown:
-            if m.impact == "critical":
+        print_colored("    Issues by type:", Color.DIM)
+        limit = 10 if not show_all else len(sorted_issues)
+        for issue, rules in sorted_issues[:limit]:
+            count = len(rules)
+            # Color by worst impact in this group
+            worst_impact = min(
+                rules, key=lambda r: impact_priority.get(r.impact, 99)
+            ).impact
+            if worst_impact == "critical":
                 impact_color = Color.RED
-            elif m.impact == "high":
+            elif worst_impact == "high":
                 impact_color = Color.YELLOW
-            else:
+            elif worst_impact == "medium":
                 impact_color = Color.WHITE
-            issue_preview = m.dx_issues[0] if m.dx_issues else ""
+            else:
+                impact_color = Color.DIM
+
             print(
-                f"      {impact_color.value}{m.dx_score:>3}"
-                f"{Color.RESET.value} "
-                f"{m.name:<40} "
-                f"{Color.DIM.value}{issue_preview[:30]}{Color.RESET.value}"
+                f"      {impact_color.value}{count:>3} rules"
+                f"{Color.RESET.value}: {issue}"
+            )
+            # Show up to 3 example rule names
+            examples = [r.name for r in rules[:3]]
+            if count > 3:
+                examples.append(f"... +{count - 3} more")
+            print(
+                f"          {Color.DIM.value}"
+                f"{', '.join(examples)}{Color.RESET.value}"
             )
 
-        if len(needs_work) > limit:
+        if len(sorted_issues) > limit:
+            remaining = len(sorted_issues) - limit
             print()
             print_info(
-                f"{len(needs_work) - limit} more in report "
+                f"{remaining} more issue types in report "
                 f"(--dx-all to show all)"
             )
 
