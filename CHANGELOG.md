@@ -17,6 +17,10 @@ Dates are not included in version headers — [pub.dev](https://pub.dev/packages
 
 - **Dynamic version detection in init**: The `init` command now reads the version from `pubspec.yaml` at runtime instead of using a hardcoded constant. Also displays the package source (local path vs pub.dev) to help diagnose version mismatches.
 
+### Changed
+
+- **Full problem messages in generated config**: The `init` command now outputs complete rule descriptions in `analysis_options.yaml` comments instead of truncating at 60 characters. This improves searchability when looking for specific rule behaviors.
+
 ---
 ## [4.9.1]
 

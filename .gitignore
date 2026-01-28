@@ -35,9 +35,10 @@ CLAUDE_SETUP.md
 CODEBASE_INDEX.md
 CODE_INDEX.md
 dx_full.txt
+dx_audit_output.txt
 dartdoc-log.txt
 custom_lint.log
 *.bak
 BROKEN_TIERS.md
 temp_output.txt
-custom_lint.log
+analysis_options_custom.yaml
