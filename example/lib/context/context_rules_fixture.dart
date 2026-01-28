@@ -497,6 +497,60 @@ class GoodContextInNestedTryCatch {
   }
 }
 
+// GOOD: Nullable-safe mounted check in static method (Bug Report Case 2)
+// Tests that context?.mounted ?? false pattern is recognized
+class GoodNullableSafeMountedCheck {
+  static Future<bool> apiFetchContactVideos({
+    required ContactModel contact,
+    BuildContext? context,
+  }) async {
+    try {
+      await Future.value('data');
+      return true;
+    } on Object catch (error, stack) {
+      // This nullable-safe pattern should NOT trigger lint
+      // context?.mounted ?? false ? context : null is functionally equivalent to
+      // context.mounted ? context : null for nullable context
+      debugException(error, stack,
+          context: context?.mounted ?? false ? context : null);
+      return false;
+    }
+  }
+}
+
+// GOOD: Ternary guard in catch block with named parameters (Bug Report Case 1)
+// Tests that ternary guards work in catch blocks with complex parameter passing
+class GoodTernaryInCatchBlockNamedParams extends StatefulWidget {
+  const GoodTernaryInCatchBlockNamedParams({super.key});
+
+  @override
+  State<GoodTernaryInCatchBlockNamedParams> createState() =>
+      _GoodTernaryInCatchBlockNamedParamsState();
+}
+
+class _GoodTernaryInCatchBlockNamedParamsState
+    extends State<GoodTernaryInCatchBlockNamedParams> {
+  Future<bool> showDialogAddContact({
+    FamilyGroupModel? familyGroup,
+  }) async {
+    try {
+      return await showDialogCommon(
+        context: context,
+        child: Container(),
+      );
+    } on Object catch (error, stack) {
+      // This ternary pattern in catch block should NOT trigger lint
+      // Even when passed as named argument in function call
+      debugException(error, stack,
+          contact: this, context: context.mounted ? context : null);
+      return false;
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) => Container();
+}
+
 // BAD: Unguarded context after await inside try-catch
 class BadContextInTryCatchUnguarded {
   // ignore: avoid_context_in_async_static
@@ -512,7 +566,12 @@ class BadContextInTryCatchUnguarded {
 }
 
 // Helper for test
-void debugException(Object e, {BuildContext? context}) {}
+void debugException(
+  Object e, {
+  StackTrace? stack,
+  dynamic contact,
+  BuildContext? context,
+}) {}
 
 // =========================================================================
 // avoid_context_in_async_static (Recommended/WARNING)
@@ -629,4 +688,16 @@ class NavigatorState extends State {
 
   @override
   Widget build(BuildContext context) => Container();
+}
+
+// Helper classes for bug report test cases
+class ContactModel {}
+
+class FamilyGroupModel {}
+
+Future<bool> showDialogCommon({
+  required BuildContext context,
+  required Widget child,
+}) async {
+  return true;
 }

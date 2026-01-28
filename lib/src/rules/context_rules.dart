@@ -814,6 +814,12 @@ class _StaticContextUsageFinder extends RecursiveAstVisitor<void> {
         return;
       }
 
+      // Safe: context?.mounted check (nullable-aware mounted check)
+      if (parent is PropertyAccess && parent.propertyName.name == 'mounted') {
+        super.visitSimpleIdentifier(node);
+        return;
+      }
+
       // Safe: context in then-branch of `context.mounted ? context : ...`
       if (_isInMountedGuardedTernary(node)) {
         super.visitSimpleIdentifier(node);
@@ -882,12 +888,32 @@ class _StaticContextUsageFinder extends RecursiveAstVisitor<void> {
   }
 
   /// Checks if expression is context.mounted or mounted.
+  ///
+  /// Recognizes patterns:
+  /// - `context.mounted` (PrefixedIdentifier)
+  /// - `mounted` (SimpleIdentifier in State class)
+  /// - `context?.mounted ?? false` (nullable-safe pattern)
   bool _isMountedCheck(Expression expr) {
     if (expr is PrefixedIdentifier && expr.identifier.name == 'mounted') {
       return contextParamNames.contains(expr.prefix.name);
     }
     if (expr is SimpleIdentifier && expr.name == 'mounted') {
       return true;
+    }
+    // context?.mounted ?? false (nullable-safe pattern)
+    if (expr is BinaryExpression &&
+        expr.operator.type == TokenType.QUESTION_QUESTION) {
+      final left = expr.leftOperand;
+      // Check if left side is context?.mounted (PropertyAccess)
+      if (left is PropertyAccess) {
+        if (left.propertyName.name == 'mounted' && left.isNullAware) {
+          // Verify the target is one of our context parameters
+          final target = left.target;
+          if (target is SimpleIdentifier) {
+            return contextParamNames.contains(target.name);
+          }
+        }
+      }
     }
     return false;
   }

@@ -7,6 +7,13 @@ Dates are not included in version headers — [pub.dev](https://pub.dev/packages
 
 > **Looking for older changes?** \
 > See [CHANGELOG_ARCHIVE.md](./CHANGELOG_ARCHIVE.md) for versions 0.1.0 through 4.2.0.
+---
+## [4.8.7]
+
+### Fixed
+
+- **`avoid_context_across_async` and `avoid_context_after_await_in_static` false positives on mounted ternary guards**: Fixed two issues where safe mounted guard patterns were incorrectly flagged: (1) Ternary guards in catch blocks (`context.mounted ? context : null`) were not detected due to premature AST traversal termination at statement boundaries. (2) Nullable-safe mounted checks (`context?.mounted ?? false ? context : null`) were not recognized. Both patterns now correctly suppress violations.
+- **Trailing ignore comments now work for all rules**: Fixed critical bug in `IgnoreUtils._checkTokenCommentsOnLine()` where trailing `// ignore:` comments (same-line format: `final x = y; // ignore: rule_name`) were not detected. Root cause: the function checked if the token was past the target line before examining the token's preceding comments, causing it to miss trailing comments attached to the next line's first token (a common Dart tokenization pattern). The fix reorders the logic to examine comments first, then check token position. Also added statement-level trailing comment detection for cases where the comment is at the end of a statement rather than immediately after the expression. Now properly detects both leading (`// ignore:` on preceding line) and trailing (`// ignore:` on same line) ignore patterns for all rule name formats (underscores and hyphens). Affects all 1677 saropa_lints rules.
 
 ---
 ## [4.8.6]

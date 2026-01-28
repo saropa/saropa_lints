@@ -258,6 +258,11 @@ class ContextUsageFinder extends RecursiveAstVisitor<void> {
         super.visitSimpleIdentifier(node);
         return;
       }
+      // Skip if part of nullable mounted check (context?.mounted is safe)
+      if (parent is PropertyAccess && parent.propertyName.name == 'mounted') {
+        super.visitSimpleIdentifier(node);
+        return;
+      }
 
       // Skip if inside a mounted guard: if (context.mounted) { ... }
       // This handles nested guards inside other statements, e.g.:
@@ -296,14 +301,19 @@ class ContextUsageFinder extends RecursiveAstVisitor<void> {
         }
         return false;
       }
-      // Stop at statement boundaries
-      if (current is Statement) break;
+      // Continue searching up the AST tree (don't stop at statement boundaries)
+      // This allows detection in catch blocks and other complex expressions
       current = current.parent;
     }
     return false;
   }
 
   /// Checks if expression is context.mounted or mounted.
+  ///
+  /// Recognizes patterns:
+  /// - `context.mounted` (PrefixedIdentifier)
+  /// - `mounted` (SimpleIdentifier in State class)
+  /// - `context?.mounted ?? false` (nullable-safe pattern)
   bool _isMountedCheck(Expression expr) {
     // context.mounted
     if (expr is PrefixedIdentifier && expr.identifier.name == 'mounted') {
@@ -312,6 +322,17 @@ class ContextUsageFinder extends RecursiveAstVisitor<void> {
     // mounted (bare identifier in State class)
     if (expr is SimpleIdentifier && expr.name == 'mounted') {
       return true;
+    }
+    // context?.mounted ?? false (nullable-safe pattern)
+    if (expr is BinaryExpression &&
+        expr.operator.type == TokenType.QUESTION_QUESTION) {
+      final left = expr.leftOperand;
+      // Check if left side is context?.mounted (PropertyAccess)
+      if (left is PropertyAccess) {
+        if (left.propertyName.name == 'mounted' && left.isNullAware) {
+          return true;
+        }
+      }
     }
     return false;
   }
