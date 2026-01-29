@@ -11,7 +11,18 @@ Dates are not included in version headers — [pub.dev](https://pub.dev/packages
 ** See the current published changelog: [saropa_lints/changelog](https://pub.dev/packages/saropa_lints/changelog)
 
 ---
-## [4.9.3] - Current
+## [4.9.4] - Current
+
+### Changed
+
+    Strict Isar migration safety: Replaced require_isar_non_nullable_migration with require_isar_nullable_field. The previous rule allowed non-nullable fields if they had default values, but Isar bypasses constructors/initializers during hydration, leading to crashes on legacy data. The new rule mandates that all fields in @collection classes (except Id) must be nullable (String?) to strictly prevent TypeError during version upgrades.
+
+### Added
+
+    Auto-fix for Isar fields: Added dart fix support for the new require_isar_nullable_field rule to automatically append ? to non-nullable fields in Isar collections.
+
+---
+## [4.9.3]
 
 ### Fixed
 
