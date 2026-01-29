@@ -609,7 +609,7 @@ const Set<String> recommendedOnlyRules = <String>{
   'prefer_single_container',
   'prefer_api_pagination',
 
-   // Database (Isar)
+  // Database (Isar)
   'require_isar_nullable_field',
 
   // BuildContext Safety (Recommended)
