@@ -51,7 +51,7 @@ custom_lint:
   #
   # Settings (max_issues, baseline) are in analysis_options_custom.yaml
   # ═══════════════════════════════════════════════════════════════════════
-
+  # cspell:disable
   rules:
     #
     # ════════════════════════════════════════════════════════════════════════════
@@ -1421,7 +1421,8 @@ custom_lint:
     - require_isar_close_on_dispose: true  # [WARNING] If you do not close the Isar instance in dispose(), file handles and system resources will leak. This can cause database corruption, prevent reopening the database, and lead to crashes or data loss on app restart.
     - require_isar_inspector_debug_only: true  # [WARNING] Enabling Isar Inspector in production exposes internal database details and can create security risks or performance issues. Inspector should only be enabled in debug mode to protect user data and app integrity.
     - require_isar_links_load: true  # [ERROR] Accessing IsarLinks without calling load() first will return incorrect or empty results. This leads to subtle data bugs, such as missing related records, and can break app features that depend on linked data.
-    - require_isar_non_nullable_migration: true  # [ERROR] Making a field non-nullable without a default value will break migrations: existing database records that contain null values for this field will cause runtime deserialization errors, data loss, or schema upgrade failures when the app is updated.
+    # DEPRECATED - require_isar_non_nullable_migration: true  # [ERROR] Making a field non-nullable without a default value will break migrations: existing database records that contain null values for this field will cause runtime deserialization errors, data loss, or schema upgrade failures when the app is updated.
+    - require_isar_nullable_field: true  # [ERROR] Isar TypeAdapters bypass constructors during hydration. Non-nullable fields trigger fatal TypeErrors when encountering NULL values from legacy disk records.
     - require_isolate_for_heavy: true  # [WARNING] Heavy computation such as JSON decoding, image processing, or data parsing runs on the main thread, blocking the UI event loop. This prevents frame rendering, freezes animations, and makes the app unresponsive to user input. On lower-end devices, operations exceeding 16ms per frame cause visible stutter and dropped frames that degrade the user experience.
     - require_isolate_kill: true  # [WARNING] Unkilled Isolate continues consuming CPU and memory, and may send messages to disposed handlers causing crashes.
     - require_item_extent_for_large_lists: true  # [INFO] ListView with many items but no itemExtent forces Flutter to lay out every child widget to calculate scroll extent. This causes expensive initial rendering, prevents efficient jump-to-index operations, and degrades scroll bar accuracy, resulting in slow list initialization and janky scrolling.

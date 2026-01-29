@@ -609,6 +609,9 @@ const Set<String> recommendedOnlyRules = <String>{
   'prefer_single_container',
   'prefer_api_pagination',
 
+   // Database (Isar)
+  'require_isar_nullable_field',
+
   // BuildContext Safety (Recommended)
   // 'prefer_rethrow_over_throw_e' moved to stylisticRules (opinionated)
   'avoid_context_in_async_static', // WARNING - async static with context
@@ -2320,7 +2323,6 @@ const Set<String> professionalOnlyRules = <String>{
   'require_isar_close_on_dispose',
   'require_isar_inspector_debug_only',
   'require_isar_links_load',
-  'require_isar_non_nullable_migration',
   'require_notification_initialize_per_platform',
   'require_notification_permission_android13',
   'require_permission_denied_handling',
