@@ -2308,7 +2308,7 @@ final List<LintRule Function()> _allRuleFactories = <LintRule Function()>[
   RequireIsarIdFieldRule.new,
   RequireIsarInspectorDebugOnlyRule.new,
   RequireIsarLinksLoadRule.new,
-  RequireIsarNonNullableMigrationRule.new,
+  RequireIsarNullableFieldRule.new,
   RequireNotificationHandlerTopLevelRule.new,
   RequireNotificationInitializePerPlatformRule.new,
   RequireNotificationPermissionAndroid13Rule.new,
