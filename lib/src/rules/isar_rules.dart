@@ -7,8 +7,7 @@
 library;
 
 import 'package:analyzer/dart/ast/ast.dart';
-import 'package:analyzer/error/error.dart'
-    show AnalysisError, DiagnosticSeverity;
+import 'package:analyzer/error/error.dart' show AnalysisError, DiagnosticSeverity;
 import 'package:analyzer/source/source_range.dart';
 import 'package:custom_lint_builder/custom_lint_builder.dart';
 
@@ -143,8 +142,7 @@ class AvoidIsarEnumFieldRule extends SaropaLintRule {
   }
 
   /// Check a field declaration for enum type usage
-  void _checkFieldDeclaration(
-      FieldDeclaration node, SaropaDiagnosticReporter reporter) {
+  void _checkFieldDeclaration(FieldDeclaration node, SaropaDiagnosticReporter reporter) {
     // Skip if field has @ignore annotation
     if (_hasIgnoreAnnotation(node)) {
       return;
@@ -216,9 +214,8 @@ class _AvoidIsarEnumFieldFix extends DartFix {
       if (type is! NamedType) return;
 
       final VariableDeclaration variable = node.fields.variables.first;
-      final ClassDeclaration? clazz = node.parent is ClassDeclaration
-          ? node.parent as ClassDeclaration
-          : null;
+      final ClassDeclaration? clazz =
+          node.parent is ClassDeclaration ? node.parent as ClassDeclaration : null;
       if (clazz == null || !_hasCollectionAnnotation(clazz)) return;
 
       final bool isNullable = type.question != null;
@@ -271,8 +268,8 @@ class _AvoidIsarEnumFieldFix extends DartFix {
         if (isNullable) {
           buffer.writeln('$indent  if (value == null) return $cacheFieldName;');
           buffer.writeln('$indent  try {');
-          buffer.writeln(
-              '$indent    return $cacheFieldName ??= $enumTypeBase.values.byName(value);');
+          buffer
+              .writeln('$indent    return $cacheFieldName ??= $enumTypeBase.values.byName(value);');
           buffer.writeln('$indent  } on ArgumentError {');
           buffer.writeln('$indent    return null;');
           buffer.writeln('$indent  }');
@@ -284,11 +281,10 @@ class _AvoidIsarEnumFieldFix extends DartFix {
               "$indent    throw StateError('$stringFieldName is null for $variableName');");
           buffer.writeln('$indent  }');
           buffer.writeln('$indent  try {');
-          buffer.writeln(
-              '$indent    return $cacheFieldName ??= $enumTypeBase.values.byName(value);');
+          buffer
+              .writeln('$indent    return $cacheFieldName ??= $enumTypeBase.values.byName(value);');
           buffer.writeln('$indent  } on ArgumentError {');
-          buffer.writeln(
-              "$indent    throw StateError('Invalid $enumTypeBase value: \$value');");
+          buffer.writeln("$indent    throw StateError('Invalid $enumTypeBase value: \$value');");
           buffer.writeln('$indent  }');
         }
         buffer.writeln('$indent}');
@@ -612,8 +608,7 @@ class RequireIsarCloseOnDisposeRule extends SaropaLintRule {
 
       final disposeBody = disposeMethod.body.toSource();
       for (final field in isarFields) {
-        if (!disposeBody.contains('$field.close()') &&
-            !disposeBody.contains('$field?.close()')) {
+        if (!disposeBody.contains('$field.close()') && !disposeBody.contains('$field?.close()')) {
           reporter.atNode(disposeMethod, code);
         }
       }
@@ -754,8 +749,7 @@ class AvoidIsarTransactionNestingRule extends SaropaLintRule {
             final invocation = funcParent.parent;
             if (invocation is MethodInvocation) {
               final invokeMethod = invocation.methodName.name;
-              if (invokeMethod == 'writeTxn' ||
-                  invokeMethod == 'writeTxnSync') {
+              if (invokeMethod == 'writeTxn' || invokeMethod == 'writeTxnSync') {
                 // We're inside a writeTxn callback, now check if node is also writeTxn
                 if (node != invocation) {
                   reporter.atNode(node.methodName, code);
@@ -822,9 +816,7 @@ class PreferIsarBatchOperationsRule extends SaropaLintRule {
       // Check if we're inside a for loop
       AstNode? parent = node.parent;
       while (parent != null) {
-        if (parent is ForStatement ||
-            parent is ForElement ||
-            parent is ForEachParts) {
+        if (parent is ForStatement || parent is ForElement || parent is ForEachParts) {
           reporter.atNode(node.methodName, code);
           return;
         }
@@ -1151,8 +1143,7 @@ class PreferIsarQueryStreamRule extends SaropaLintRule {
     SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
-    context.registry
-        .addInstanceCreationExpression((InstanceCreationExpression node) {
+    context.registry.addInstanceCreationExpression((InstanceCreationExpression node) {
       // Check for Timer.periodic
       final constructorName = node.constructorName.toString();
       if (!constructorName.contains('Timer.periodic')) return;
@@ -1371,8 +1362,7 @@ class AvoidIsarEmbeddedLargeObjectsRule extends SaropaLintRule {
       if (type is NamedType) {
         final typeName = type.name.lexeme;
         // Skip simple types
-        if (!{'String', 'int', 'double', 'bool', 'DateTime'}
-            .contains(typeName)) {
+        if (!{'String', 'int', 'double', 'bool', 'DateTime'}.contains(typeName)) {
           reporter.atNode(node.fields, code);
         }
       }
@@ -1422,8 +1412,7 @@ class PreferIsarLazyLinksRule extends SaropaLintRule {
     SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
-    context.registry
-        .addInstanceCreationExpression((InstanceCreationExpression node) {
+    context.registry.addInstanceCreationExpression((InstanceCreationExpression node) {
       final type = node.constructorName.type;
       final typeName = type.name2.lexeme;
       if (typeName != 'IsarLinks') return;
@@ -1493,20 +1482,102 @@ class AvoidIsarSchemaBreakingChangesRule extends SaropaLintRule {
   }
 }
 
+// // =============================================================================
+// // Isar Non-Nullable Migration Rule
+// // =============================================================================
+
+// /// Warns when Isar fields are non-nullable without a default value.
+// ///
+// /// Changing a nullable field to non-nullable requires a default value
+// /// for existing data.
+// ///
+// /// **BAD:**
+// /// ```dart
+// /// @collection
+// /// class User {
+// ///   String name = '';  // What about existing null values?
+// /// }
+// /// ```
+// ///
+// /// **GOOD:**
+// /// ```dart
+// /// @collection
+// /// class User {
+// ///   String? name;  // Keep nullable
+// ///   // OR use migration to handle existing nulls
+// /// }
+// /// ```
+// class RequireIsarNonNullableMigrationRule extends SaropaLintRule {
+//   const RequireIsarNonNullableMigrationRule() : super(code: _code);
+
+//   @override
+//   LintImpact get impact => LintImpact.high;
+
+//   @override
+//   RuleCost get cost => RuleCost.medium;
+
+//   static const LintCode _code = LintCode(
+//     name: 'require_isar_non_nullable_migration',
+//     problemMessage:
+//         '[require_isar_non_nullable_migration] Making a field non-nullable without a default value will break migrations: existing database records that contain null values for this field will cause runtime deserialization errors, data loss, or schema upgrade failures when the app is updated.',
+//     correctionMessage:
+//         'Either keep the field nullable or provide a default value to ensure safe migrations, prevent data loss, and avoid runtime deserialization errors.',
+//     errorSeverity: DiagnosticSeverity.ERROR,
+//   );
+
+//   @override
+//   void runWithReporter(
+//     CustomLintResolver resolver,
+//     SaropaDiagnosticReporter reporter,
+//     CustomLintContext context,
+//   ) {
+//     context.registry.addClassDeclaration((ClassDeclaration node) {
+//       bool hasCollection = false;
+//       for (final annotation in node.metadata) {
+//         if (annotation.name.name.toLowerCase() == 'collection') {
+//           hasCollection = true;
+//           break;
+//         }
+//       }
+
+//       if (!hasCollection) return;
+
+//       for (final member in node.members) {
+//         if (member is FieldDeclaration) {
+//           // Skip Id field
+//           final type = member.fields.type;
+//           if (type is NamedType && type.name.lexeme == 'Id') continue;
+
+//           // Check for non-nullable fields without initializers
+//           if (type is NamedType && type.question == null) {
+//             for (final variable in member.fields.variables) {
+//               if (variable.initializer == null) {
+//                 // Non-nullable without default - potential migration issue
+//                 reporter.atNode(variable, code);
+//               }
+//             }
+//           }
+//         }
+//       }
+//     });
+//   }
+// }
+
 // =============================================================================
-// Isar Non-Nullable Migration Rule
+// Isar Nullable Field Rule (Replaces Non-Nullable Migration)
 // =============================================================================
 
-/// Warns when Isar fields are non-nullable without a default value.
+/// Enforces nullable types for all Isar fields to prevent migration crashes.
 ///
-/// Changing a nullable field to non-nullable requires a default value
-/// for existing data.
+/// Isar TypeAdapters bypass Dart constructors during hydration. If a field
+/// is non-nullable but the disk record is from an older version (NULL),
+/// the app will crash with a fatal TypeError.
 ///
 /// **BAD:**
 /// ```dart
 /// @collection
 /// class User {
-///   String name = '';  // What about existing null values?
+///   String name = 'default';  // Crash if loading old record!
 /// }
 /// ```
 ///
@@ -1514,12 +1585,11 @@ class AvoidIsarSchemaBreakingChangesRule extends SaropaLintRule {
 /// ```dart
 /// @collection
 /// class User {
-///   String? name;  // Keep nullable
-///   // OR use migration to handle existing nulls
+///   String? name;  // Safe
 /// }
 /// ```
-class RequireIsarNonNullableMigrationRule extends SaropaLintRule {
-  const RequireIsarNonNullableMigrationRule() : super(code: _code);
+class RequireIsarNullableFieldRule extends SaropaLintRule {
+  const RequireIsarNullableFieldRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.high;
@@ -1528,11 +1598,11 @@ class RequireIsarNonNullableMigrationRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'require_isar_non_nullable_migration',
+    name: 'require_isar_nullable_field',
     problemMessage:
-        '[require_isar_non_nullable_migration] Making a field non-nullable without a default value will break migrations: existing database records that contain null values for this field will cause runtime deserialization errors, data loss, or schema upgrade failures when the app is updated.',
+        '[require_isar_nullable_field] Isar TypeAdapters bypass constructors during hydration. Non-nullable fields trigger fatal TypeErrors when encountering NULL values from legacy disk records created in previous app versions where the field did not exist.',
     correctionMessage:
-        'Either keep the field nullable or provide a default value to ensure safe migrations, prevent data loss, and avoid runtime deserialization errors.',
+        'Convert the field to a nullable type (e.g., String?). This ensures the database safely loads legacy records. Handle the null state via a Domain Mapper or Repository to maintain strict application logic safely.',
     errorSeverity: DiagnosticSeverity.ERROR,
   );
 
@@ -1543,6 +1613,7 @@ class RequireIsarNonNullableMigrationRule extends SaropaLintRule {
     CustomLintContext context,
   ) {
     context.registry.addClassDeclaration((ClassDeclaration node) {
+      // 1. Check for @collection annotation
       bool hasCollection = false;
       for (final annotation in node.metadata) {
         if (annotation.name.name.toLowerCase() == 'collection') {
@@ -1550,26 +1621,60 @@ class RequireIsarNonNullableMigrationRule extends SaropaLintRule {
           break;
         }
       }
-
       if (!hasCollection) return;
 
       for (final member in node.members) {
         if (member is FieldDeclaration) {
-          // Skip Id field
+          // 2. Skip fields with @ignore
+          bool isIgnored = false;
+          for (final annotation in member.metadata) {
+            if (annotation.name.name.toLowerCase() == 'ignore') {
+              isIgnored = true;
+              break;
+            }
+          }
+          if (isIgnored) continue;
+
           final type = member.fields.type;
+
+          // 3. Skip Id field (Isar handles internally)
           if (type is NamedType && type.name.lexeme == 'Id') continue;
 
-          // Check for non-nullable fields without initializers
+          // 4. Enforce Nullability
+          // We check if the type definition lacks the '?' question mark.
+          // We do NOT check for initializers anymore, as they are ignored by Isar readers.
           if (type is NamedType && type.question == null) {
-            for (final variable in member.fields.variables) {
-              if (variable.initializer == null) {
-                // Non-nullable without default - potential migration issue
-                reporter.atNode(variable, code);
-              }
-            }
+            reporter.atNode(type, _code);
           }
         }
       }
+    });
+  }
+
+  @override
+  List<Fix> getFixes() => [_MakeNullableFix()];
+}
+
+class _MakeNullableFix extends DartFix {
+  @override
+  void run(
+    CustomLintResolver resolver,
+    ChangeReporter reporter,
+    CustomLintContext context,
+    AnalysisError error,
+    List<AnalysisError> others,
+  ) {
+    context.registry.addNamedType((node) {
+      if (!error.sourceRange.intersects(node.sourceRange)) return;
+
+      final changeBuilder = reporter.createChangeBuilder(
+        message: 'Make field nullable for migration safety',
+        priority: 1,
+      );
+
+      changeBuilder.addDartFileEdit((builder) {
+        builder.addSimpleInsertion(node.end, '?');
+      });
     });
   }
 }
@@ -1625,8 +1730,7 @@ class PreferIsarCompositeIndexRule extends SaropaLintRule {
     context.registry.addMethodInvocation((MethodInvocation node) {
       // Check for chained filter conditions
       final methodName = node.methodName.name;
-      if (!methodName.endsWith('EqualTo') &&
-          !methodName.endsWith('StartsWith')) {
+      if (!methodName.endsWith('EqualTo') && !methodName.endsWith('StartsWith')) {
         return;
       }
 
@@ -1634,8 +1738,7 @@ class PreferIsarCompositeIndexRule extends SaropaLintRule {
       final parent = node.parent;
       if (parent is MethodInvocation) {
         final parentMethod = parent.methodName.name;
-        if (parentMethod.endsWith('EqualTo') ||
-            parentMethod.endsWith('StartsWith')) {
+        if (parentMethod.endsWith('EqualTo') || parentMethod.endsWith('StartsWith')) {
           reporter.atNode(node.methodName, code);
         }
       }
@@ -1697,8 +1800,7 @@ class AvoidIsarStringContainsWithoutIndexRule extends SaropaLintRule {
           methodName == 'contains') {
         // Check if this is in a filter context
         final targetSource = node.target?.toSource() ?? '';
-        if (targetSource.contains('filter()') ||
-            targetSource.contains('.filter')) {
+        if (targetSource.contains('filter()') || targetSource.contains('.filter')) {
           reporter.atNode(node.methodName, code);
         }
       }
