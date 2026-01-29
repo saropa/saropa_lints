@@ -1,0 +1,183 @@
+[{
+	"resource": "/D:/src/contacts/lib/components/contact_issues/audit_panel_website_insecure.dart",
+	"owner": "_generated_diagnostic_collection_name_#2",
+	"code": "require_https_over_http",
+	"severity": 8,
+	"message": "[require_https_over_http] HTTP transmits data in plain text. Attackers can intercept credentials, tokens, and user data.\nReplace http:// with https://.",
+	"source": "dart",
+	"startLineNumber": 91,
+	"startColumn": 77,
+	"endLineNumber": 91,
+	"endColumn": 86,
+	"modelVersionId": 1,
+	"origin": "extHost1"
+}]
+
+// ignore_for_file: require_https_over_http // we report http insecure links here
+import 'package:collection/collection.dart';
+import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:saropa/components/contact_issues/audit_loading.dart';
+import 'package:saropa/components/contact_issues/contact_issue_notice.dart';
+import 'package:saropa/components/contact_issues/contact_issue_widget.dart';
+import 'package:saropa/components/primitive/deferred_loading/common_visibility_builder.dart';
+import 'package:saropa/components/primitive/empty_widget.dart';
+import 'package:saropa/models/contact/contact_model.dart';
+import 'package:saropa/models/web/audio_visual_item.dart';
+import 'package:saropa/models/web/payment_item.dart';
+import 'package:saropa/models/web/social_media_item.dart';
+import 'package:saropa/models/web/website_item.dart';
+import 'package:saropa/theme/theme_common_color.dart';
+import 'package:saropa/theme/theme_common_icon.dart';
+import 'package:saropa/theme/theme_common_space.dart';
+import 'package:saropa/utils/_dev/debug.dart';
+import 'package:saropa/utils/contact_issues/contact_issue_contact_details_utils.dart';
+import 'package:saropa/utils/layout/widget_wrapper_utils.dart';
+import 'package:saropa_dart_utils/saropa_dart_utils.dart';
+
+class AuditPanelWebsiteInsecure extends StatelessWidget {
+  const AuditPanelWebsiteInsecure({
+    required this.contacts,
+    this.showExpander = true,
+    this.isInitiallyExpanded = false,
+    this.isLoading = false,
+    // deferred loading
+    this.isDetectVisible = true,
+    this.showEmpty = true,
+    super.key,
+  });
+
+  final List<ContactModel>? contacts;
+  final bool showExpander;
+  final bool isInitiallyExpanded;
+
+  final bool isLoading;
+  final bool isDetectVisible;
+  final bool showEmpty;
+
+  static const String title = 'Insecure Websites';
+
+  static const IconData icon = FontAwesomeIcons.lightDiamondExclamation;
+
+  static int? count(List<ContactModel>? contacts) => contacts?.auditWebsiteInsecureCount();
+
+  @override
+  Widget build(BuildContext context) {
+    try {
+      return CommonVisibilityBuilder(
+        isDetectVisible: isDetectVisible,
+        isLoading: isLoading,
+        loadingWidget: AuditLoading(
+          isInitiallyExpanded: isInitiallyExpanded,
+          title: title,
+          icon: icon,
+        ),
+        builder: (BuildContext context) {
+          final List<ContactModel>? filtered = contacts?.auditWebsiteInsecureList();
+
+          final int count = filtered?.length ?? 0;
+          if (!showEmpty && count <= 0) {
+            return emptyWidget;
+          }
+
+          if (DebugType.Audit.isDebug) {
+            debug('[count]: `$count`');
+          }
+
+          // will show the zero-items notice
+          final Widget auditList;
+          if (count.isZeroOrNegative) {
+            auditList = const ContactIssueNotice('All websites are secure');
+          } else {
+            auditList = Column(
+              spacing: ThemeCommonSpace.Medium.size,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget?>[
+                ...filtered!.map((ContactModel contact) {
+                  final WebsiteItem? firstInvalidWebsite = contact.hasAnyWebsite
+                      ? contact.websites?.firstWhereOrNull(
+                          (WebsiteItem website) =>
+                              website.url.isNotNullOrEmpty && !website.isSecure,
+                        )
+                      : null;
+                  if (firstInvalidWebsite != null) {
+                    return ContactIssueWidget(
+                      contact: contact,
+                      suggestionText: firstInvalidWebsite.url?.replaceFirst('http://', 'https://'),
+                    );
+                  }
+
+                  final SocialMediaItem? firstInvalidSocialMedia = contact.hasAnySocialMedia
+                      ? contact.socialMedias?.firstWhereOrNull(
+                          (SocialMediaItem social) =>
+                              social.url.isNotNullOrEmpty && !social.isSecure,
+                        )
+                      : null;
+                  if (firstInvalidSocialMedia != null) {
+                    return ContactIssueWidget(
+                      contact: contact,
+                      // phone numbers may have brackets
+                      suggestionText: firstInvalidSocialMedia.url?.replaceFirst(
+                        'http://',
+                        'https://',
+                      ),
+                    );
+                  }
+
+                  final PaymentItem? firstInvalidPayment = contact.hasAnyPayment
+                      ? contact.payments?.firstWhereOrNull(
+                          (PaymentItem payment) =>
+                              payment.url.isNotNullOrEmpty && !payment.isSecure,
+                        )
+                      : null;
+                  if (firstInvalidPayment != null) {
+                    return ContactIssueWidget(
+                      contact: contact,
+                      suggestionText: firstInvalidPayment.url!.replaceFirst('http://', 'https://'),
+                    );
+                  }
+
+                  final AudioVisualItem? firstInvalidAudioVisual = contact.hasAnyAudioVisual
+                      ? contact.audioVisuals?.firstWhereOrNull(
+                          (AudioVisualItem audioVisual) =>
+                              audioVisual.url.isNotNullOrEmpty && !audioVisual.isSecure,
+                        )
+                      : null;
+                  if (firstInvalidAudioVisual != null) {
+                    return ContactIssueWidget(
+                      contact: contact,
+                      suggestionText: firstInvalidAudioVisual.url!.replaceFirst(
+                        'http://',
+                        'https://',
+                      ),
+                    );
+                  }
+
+                  // no error found
+                  return null;
+                }),
+              ].nonNulls.toList(),
+            );
+          }
+
+          // expander
+          if (showExpander) {
+            return auditList.withExpansionTile(
+              isInitiallyExpanded: isInitiallyExpanded,
+              title: title,
+              icon: count.isZeroOrNegative ? ThemeCommonIcon.CheckTickYesSuccess.icon : icon,
+              count: count,
+              borderColorCommon: count > 0 ? ThemeCommonColor.StatusAmberWarning : null,
+            );
+          }
+
+          // no expander
+          return auditList;
+        },
+      );
+    } on Object catch (error, stack) {
+      debugException(error, stack, context: context.mounted ? context : null);
+      return emptyWidget;
+    }
+  }
+}
