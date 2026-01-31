@@ -68,6 +68,53 @@ class IgnoreUtils {
   /// Example: `no_empty_block` -> `no-empty-block`
   static String toHyphenated(String ruleName) => ruleName.replaceAll('_', '-');
 
+  /// Checks if a rule is suppressed at the file level via
+  /// `// ignore_for_file:` directive.
+  ///
+  /// Searches the raw file content for an `ignore_for_file:` comment
+  /// containing the given [ruleName] (supports both underscore and hyphen
+  /// formats). Returns `true` if the entire file should be skipped.
+  ///
+  /// This is intentionally a string-based search on file content rather
+  /// than an AST walk, for performance — it runs once per rule per file
+  /// before any AST callbacks are registered.
+  static bool isIgnoredForFile(String fileContent, String ruleName) {
+    // Fast pre-check avoids regex compilation for the common case
+    if (!fileContent.contains('ignore_for_file:')) return false;
+
+    final hyphenatedName = toHyphenated(ruleName);
+
+    // Match the rule name inside an ignore_for_file comment.
+    // Uses \b word boundaries to avoid matching substrings
+    // (e.g., `avoid_print` must not match `avoid_print_in_production`).
+    final pattern = RegExp(
+      r'//\s*ignore_for_file\s*:[^\n]*\b(?:'
+      '${RegExp.escape(ruleName)}'
+      '|'
+      '${RegExp.escape(hyphenatedName)}'
+      r')\b',
+    );
+    return pattern.hasMatch(fileContent);
+  }
+
+  /// Pattern that matches `// ignore:` or `// ignore_for_file:` comments
+  /// with a trailing `//` comment or ` - ` explanation after the rule names.
+  ///
+  /// `custom_lint_builder` parses everything after the colon as rule names
+  /// (splitting on commas), so trailing text like
+  /// `// ignore: my_rule // reason` or `// ignore: my_rule - reason`
+  /// causes the framework to store the extra text as part of the rule code,
+  /// breaking the `Set.contains()` lookup.
+  static final RegExp trailingCommentOnIgnore = RegExp(
+    r'//\s*ignore(?:_for_file)?\s*:'
+    r'(?:'
+    r'[^/\n]+//[^\n]*' // trailing // comment
+    r'|'
+    r'[^\n]*?\s+-\s+\S[^\n]*' // trailing - separator
+    r')$',
+    multiLine: true,
+  );
+
   /// Checks if a token has preceding comments containing an ignore directive
   /// for the given rule name (supports both underscore and hyphen formats).
   static bool hasIgnoreCommentOnToken(Token? token, String ruleName) {

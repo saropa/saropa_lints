@@ -495,16 +495,39 @@ Future<void> main(List<String> args) async {
   // Read or create custom overrides file (survives --reset)
   final File overridesFile = File('analysis_options_custom.yaml');
   Map<String, bool> permanentOverrides = <String, bool>{};
+  Map<String, bool> platformSettings = Map<String, bool>.of(
+    tiers.defaultPlatforms,
+  );
 
   if (overridesFile.existsSync()) {
     permanentOverrides = _extractOverridesFromFile(overridesFile, allRules);
     // Ensure max_issues setting exists in file (added in v4.9.1)
     _ensureMaxIssuesSetting(overridesFile);
+    // Ensure platforms setting exists in file
+    _ensurePlatformsSetting(overridesFile);
+    platformSettings = _extractPlatformsFromFile(overridesFile);
   } else {
     // Create the custom overrides file with a helpful header
     _createCustomOverridesFile(overridesFile);
     _logTerminal(
         '${_Colors.green}✓ Created:${_Colors.reset} analysis_options_custom.yaml');
+  }
+
+  // Apply platform filtering - disable rules for disabled platforms
+  final Set<String> platformDisabledRules =
+      tiers.getRulesDisabledByPlatforms(platformSettings);
+
+  if (platformDisabledRules.isNotEmpty) {
+    finalEnabled = finalEnabled.difference(platformDisabledRules);
+    finalDisabled = finalDisabled.union(platformDisabledRules);
+
+    final disabledPlatforms = platformSettings.entries
+        .where((e) => !e.value)
+        .map((e) => e.key)
+        .toList();
+    _logTerminal('${_Colors.yellow}Platforms disabled:${_Colors.reset} '
+        '${disabledPlatforms.join(', ')} '
+        '${_Colors.dim}(${platformDisabledRules.length} rules affected)${_Colors.reset}');
   }
 
   // Read existing config and extract user customizations
@@ -529,16 +552,6 @@ Future<void> main(List<String> args) async {
     } else {
       _logTerminal(
           '${_Colors.yellow}⚠ --reset: discarding customizations${_Colors.reset}');
-    }
-
-    // Create backup silently
-    final outputDir = outputFile.parent.path;
-    final outputName = cliArgs.outputPath.split('/').last.split('\\').last;
-    final backupPath = '$outputDir/${_logTimestamp}_$outputName.bak';
-    try {
-      outputFile.copySync(backupPath);
-    } on Exception catch (_) {
-      // Backup failed - continue anyway
     }
   }
 
@@ -596,6 +609,7 @@ Future<void> main(List<String> args) async {
     userCustomizations: userCustomizations,
     allRules: allRules,
     includeStylistic: cliArgs.includeStylistic,
+    platformSettings: platformSettings,
   );
 
   // Replace custom_lint section in existing content, preserving everything else
@@ -624,13 +638,29 @@ Future<void> main(List<String> args) async {
     return;
   }
 
-  try {
-    outputFile.writeAsStringSync(newContent);
-    _logTerminal('${_success('✓ Written to:')} ${cliArgs.outputPath}');
-  } on Exception catch (e) {
-    _logTerminal(_error('✗ Failed to write file: $e'));
-    exitCode = 2;
-    return;
+  // Skip writing if the file content hasn't changed
+  if (newContent == existingContent) {
+    _logTerminal(
+        '${_Colors.dim}✓ No changes needed: ${cliArgs.outputPath}${_Colors.reset}');
+  } else {
+    // Create backup before overwriting
+    try {
+      final outputDir = outputFile.parent.path;
+      final outputName = cliArgs.outputPath.split('/').last.split('\\').last;
+      final backupPath = '$outputDir/${_logTimestamp}_$outputName.bak';
+      outputFile.copySync(backupPath);
+    } on Exception catch (_) {
+      // Backup failed - continue anyway
+    }
+
+    try {
+      outputFile.writeAsStringSync(newContent);
+      _logTerminal('${_success('✓ Written to:')} ${cliArgs.outputPath}');
+    } on Exception catch (e) {
+      _logTerminal(_error('✗ Failed to write file: $e'));
+      exitCode = 2;
+      return;
+    }
   }
 
   _logTerminal('');
@@ -788,6 +818,26 @@ void _createCustomOverridesFile(File file) {
 max_issues: 1000
 
 # ─────────────────────────────────────────────────────────────────────────────
+# PLATFORM SETTINGS
+# ─────────────────────────────────────────────────────────────────────────────
+# Disable platforms your project doesn't target.
+# Rules specific to disabled platforms will be automatically disabled.
+# Only ios and android are enabled by default.
+#
+# EXAMPLES:
+#   - Web-only project: set ios, android, macos, windows, linux to false; web to true
+#   - All platforms: set all to true
+#   - Desktop app: set macos, windows, linux to true
+
+platforms:
+  ios: true
+  android: true
+  macos: false
+  web: false
+  windows: false
+  linux: false
+
+# ─────────────────────────────────────────────────────────────────────────────
 # RULE OVERRIDES
 # ─────────────────────────────────────────────────────────────────────────────
 # FORMAT: rule_name: true/false
@@ -850,6 +900,110 @@ max_issues: 1000
       '${_Colors.green}✓ Added max_issues setting to ${file.path}${_Colors.reset}');
 }
 
+/// Ensure platforms setting exists in an existing custom config file.
+///
+/// Older files won't have this setting, so we add it after the
+/// max_issues setting if missing.
+void _ensurePlatformsSetting(File file) {
+  final content = file.readAsStringSync();
+
+  // Check if platforms section already exists
+  if (RegExp(r'^platforms:', multiLine: true).hasMatch(content)) {
+    return; // Already has the setting
+  }
+
+  const settingBlock = '''
+# ─────────────────────────────────────────────────────────────────────────────
+# PLATFORM SETTINGS
+# ─────────────────────────────────────────────────────────────────────────────
+# Disable platforms your project doesn't target.
+# Only ios and android are enabled by default.
+
+platforms:
+  ios: true
+  android: true
+  macos: false
+  web: false
+  windows: false
+  linux: false
+
+''';
+
+  // Insert after max_issues line if present, else after header
+  final maxIssuesMatch = RegExp(r'max_issues:\s*\d+\n*').firstMatch(content);
+  String newContent;
+  if (maxIssuesMatch != null) {
+    final insertPos = maxIssuesMatch.end;
+    newContent = content.substring(0, insertPos) +
+        '\n' +
+        settingBlock +
+        content.substring(insertPos);
+  } else {
+    final headerEndMatch = RegExp(r'╚[═]+╝\n*').firstMatch(content);
+    if (headerEndMatch != null) {
+      final insertPos = headerEndMatch.end;
+      newContent = content.substring(0, insertPos) +
+          '\n' +
+          settingBlock +
+          content.substring(insertPos);
+    } else {
+      newContent = settingBlock + content;
+    }
+  }
+
+  file.writeAsStringSync(newContent);
+  _logTerminal(
+      '${_Colors.green}✓ Added platforms setting to ${file.path}${_Colors.reset}');
+}
+
+/// Extract platform settings from analysis_options_custom.yaml.
+///
+/// Returns a map of platform name to enabled status.
+/// Defaults to [tiers.defaultPlatforms] if not specified (ios and android
+/// enabled, others disabled).
+///
+/// Supports format:
+/// ```yaml
+/// platforms:
+///   ios: true
+///   android: false
+///   web: true
+/// ```
+Map<String, bool> _extractPlatformsFromFile(File file) {
+  final Map<String, bool> platforms = Map<String, bool>.of(
+    tiers.defaultPlatforms,
+  );
+
+  if (!file.existsSync()) return platforms;
+
+  final content = file.readAsStringSync();
+
+  // Find the platforms: section
+  final sectionMatch =
+      RegExp(r'^platforms:\s*$', multiLine: true).firstMatch(content);
+  if (sectionMatch == null) return platforms;
+
+  // Extract indented entries after platforms:
+  final afterSection = content.substring(sectionMatch.end);
+
+  final platformPattern = RegExp(
+    r'^\s+(ios|android|macos|web|windows|linux):\s*(true|false)',
+    multiLine: true,
+  );
+
+  for (final match in platformPattern.allMatches(afterSection)) {
+    // Stop if we hit a non-indented line (next section)
+    final beforeMatch = afterSection.substring(0, match.start);
+    if (RegExp(r'^\S', multiLine: true).hasMatch(beforeMatch)) break;
+
+    final name = match.group(1)!;
+    final enabled = match.group(2) == 'true';
+    platforms[name] = enabled;
+  }
+
+  return platforms;
+}
+
 /// Generate the custom_lint YAML section with proper formatting.
 ///
 /// Organizes rules by tier with problem message comments.
@@ -860,6 +1014,7 @@ String _generateCustomLintYaml({
   required Map<String, bool> userCustomizations,
   required Set<String> allRules,
   required bool includeStylistic,
+  required Map<String, bool> platformSettings,
 }) {
   final StringBuffer buffer = StringBuffer();
   final customizedRuleNames = userCustomizations.keys.toSet();
@@ -890,8 +1045,19 @@ String _generateCustomLintYaml({
       '  #   5. insanity     - All rules (pedantic, highly opinionated)');
   buffer.writeln('  #   +  stylistic    - Opt-in only (formatting, ordering)');
   buffer.writeln('  #');
+
+  // Show platform status
+  final disabledPlatforms = platformSettings.entries
+      .where((e) => !e.value)
+      .map((e) => e.key)
+      .toList();
+  if (disabledPlatforms.isNotEmpty) {
+    buffer.writeln('  # Disabled platforms: ${disabledPlatforms.join(', ')}');
+    buffer.writeln('  #');
+  }
+
   buffer.writeln(
-      '  # Settings (max_issues, baseline) are in analysis_options_custom.yaml');
+      '  # Settings (max_issues, platforms) are in analysis_options_custom.yaml');
   buffer.writeln(
       '  # ═══════════════════════════════════════════════════════════════════════');
   buffer.writeln('');
