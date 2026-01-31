@@ -5,6 +5,7 @@ import 'package:analyzer/dart/ast/token.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
 import 'package:analyzer/error/error.dart'
     show AnalysisError, DiagnosticSeverity;
+import 'package:analyzer/source/source_range.dart';
 import 'package:custom_lint_builder/custom_lint_builder.dart';
 
 import '../saropa_lint_rule.dart';
@@ -2340,6 +2341,43 @@ class AvoidSizedBoxExpandRule extends SaropaLintRule {
 /// SelectableText('Very long paragraph...')
 /// ```
 
+/// Warns when Row or Column children alternate between content widgets and
+/// identical spacer widgets (SizedBox or Spacer), suggesting the `spacing`
+/// parameter instead.
+///
+/// Modern Flutter's Row and Column support a `spacing` parameter that adds
+/// uniform space between children automatically, eliminating manual spacers.
+///
+/// Only flags when the children follow an alternating pattern:
+/// `[content, spacer, content, spacer, content, ...]` where all spacers are
+/// identical (same type and same size value).
+///
+/// ### Example
+///
+/// #### BAD:
+/// ```dart
+/// Column(
+///   children: [
+///     Text('Hello'),
+///     SizedBox(height: 8),
+///     Text('World'),
+///     SizedBox(height: 8),
+///     Text('!'),
+///   ],
+/// )
+/// ```
+///
+/// #### GOOD:
+/// ```dart
+/// Column(
+///   spacing: 8,
+///   children: [
+///     Text('Hello'),
+///     Text('World'),
+///     Text('!'),
+///   ],
+/// )
+/// ```
 class PreferSpacingOverSizedBoxRule extends SaropaLintRule {
   const PreferSpacingOverSizedBoxRule() : super(code: _code);
 
@@ -2355,13 +2393,17 @@ class PreferSpacingOverSizedBoxRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_spacing_over_sizedbox',
-    problemMessage:
-        '[prefer_spacing_over_sizedbox] Use spacing parameter instead of SizedBox for spacing.',
-    correctionMessage: 'Row/Column support spacing since Flutter 3.10.',
+    problemMessage: '[prefer_spacing_over_sizedbox] Use the spacing parameter '
+        'instead of spacer widgets between children.',
+    correctionMessage: 'Remove spacer children and add spacing: <value> to the '
+        'Row/Column constructor.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
-  static const Set<String> _flexWidgets = <String>{'Row', 'Column', 'Wrap'};
+  static const Set<String> _flexWidgets = <String>{'Row', 'Column'};
+
+  @override
+  List<Fix> getFixes() => <Fix>[_PreferSpacingOverSizedBoxFix()];
 
   @override
   void runWithReporter(
@@ -2374,48 +2416,113 @@ class PreferSpacingOverSizedBoxRule extends SaropaLintRule {
       final String typeName = node.constructorName.type.name.lexeme;
       if (!_flexWidgets.contains(typeName)) return;
 
-      bool hasSpacing = false;
-      Expression? childrenArg;
-
-      for (final Expression arg in node.argumentList.arguments) {
-        if (arg is NamedExpression) {
-          if (arg.name.label.name == 'spacing') hasSpacing = true;
-          if (arg.name.label.name == 'children') childrenArg = arg.expression;
-        }
+      if (_hasSpacingParam(node) || !_hasAlternatingSpacers(node, typeName)) {
+        return;
       }
 
-      if (hasSpacing || childrenArg == null) return;
-
-      if (childrenArg is ListLiteral) {
-        final List<CollectionElement> elements = childrenArg.elements;
-        if (elements.length < 3) return;
-
-        int sizedBoxCount = 0;
-        double? consistentSize;
-        bool isConsistent = true;
-
-        for (final CollectionElement element in elements) {
-          if (element is Expression) {
-            final double? size = _getSizedBoxSize(element, typeName);
-            if (size != null) {
-              sizedBoxCount++;
-              if (consistentSize == null) {
-                consistentSize = size;
-              } else if (consistentSize != size) {
-                isConsistent = false;
-              }
-            }
-          }
-        }
-
-        if (sizedBoxCount >= 2 && isConsistent) {
-          reporter.atNode(node.constructorName, code);
-        }
-      }
+      reporter.atNode(node.constructorName, code);
     });
   }
 
-  double? _getSizedBoxSize(Expression expr, String parentType) {
+  static bool _hasSpacingParam(InstanceCreationExpression node) {
+    for (final Expression arg in node.argumentList.arguments) {
+      if (arg is NamedExpression && arg.name.label.name == 'spacing') {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  /// Checks if children follow [content, spacer, content, spacer, ...] pattern
+  /// with all spacers being identical.
+  static bool _hasAlternatingSpacers(
+    InstanceCreationExpression node,
+    String typeName,
+  ) {
+    final ListLiteral? childrenList = _getChildrenList(node);
+    if (childrenList == null) return false;
+
+    final List<CollectionElement> elements = childrenList.elements;
+
+    // Need at least 3 elements: content, spacer, content
+    if (elements.length < 3 || elements.length.isEven) return false;
+
+    String? spacerSource;
+
+    for (int i = 0; i < elements.length; i++) {
+      final CollectionElement element = elements[i];
+
+      // Spread elements break the pattern
+      if (element is! Expression) return false;
+
+      if (i.isOdd) {
+        // Odd-indexed: must be a spacer
+        final String? source = _getSpacerSource(element, typeName);
+        if (source == null) return false;
+
+        if (spacerSource == null) {
+          spacerSource = source;
+        } else if (spacerSource != source) {
+          return false; // Different spacers
+        }
+      } else {
+        // Even-indexed: must NOT be a spacer
+        if (_getSpacerSource(element, typeName) != null) return false;
+      }
+    }
+
+    return spacerSource != null;
+  }
+
+  static ListLiteral? _getChildrenList(InstanceCreationExpression node) {
+    for (final Expression arg in node.argumentList.arguments) {
+      if (arg is NamedExpression && arg.name.label.name == 'children') {
+        final Expression value = arg.expression;
+        if (value is ListLiteral) return value;
+      }
+    }
+    return null;
+  }
+
+  /// Returns the source text of a spacer expression for comparison,
+  /// or null if the expression is not a spacer.
+  static String? _getSpacerSource(Expression expr, String parentType) {
+    if (expr is! InstanceCreationExpression) return null;
+
+    final String name = expr.constructorName.type.name.lexeme;
+
+    if (name == 'Spacer') {
+      // Spacer() with no arguments or only default flex
+      return expr.toSource();
+    }
+
+    if (name == 'SizedBox') {
+      // Must not have a child
+      bool hasChild = false;
+      bool hasRelevantDimension = false;
+
+      final String expectedArg = parentType == 'Column' ? 'height' : 'width';
+
+      for (final Expression arg in expr.argumentList.arguments) {
+        if (arg is NamedExpression) {
+          if (arg.name.label.name == 'child') {
+            hasChild = true;
+          } else if (arg.name.label.name == expectedArg) {
+            hasRelevantDimension = true;
+          }
+        }
+      }
+
+      if (hasChild || !hasRelevantDimension) return null;
+
+      return expr.toSource();
+    }
+
+    return null;
+  }
+
+  /// Extracts the spacing value source text from a spacer expression.
+  static String? _getSpacingValue(Expression expr, String parentType) {
     if (expr is! InstanceCreationExpression) return null;
 
     final String name = expr.constructorName.type.name.lexeme;
@@ -2424,21 +2531,89 @@ class PreferSpacingOverSizedBoxRule extends SaropaLintRule {
     final String expectedArg = parentType == 'Column' ? 'height' : 'width';
 
     for (final Expression arg in expr.argumentList.arguments) {
-      if (arg is NamedExpression) {
-        if (arg.name.label.name == 'child') {
-          return null; // Has child, not spacer
-        }
-        if (arg.name.label.name == expectedArg) {
-          final Expression valueExpr = arg.expression;
-          if (valueExpr is IntegerLiteral) {
-            return valueExpr.value?.toDouble();
-          } else if (valueExpr is DoubleLiteral) {
-            return valueExpr.value;
-          }
-        }
+      if (arg is NamedExpression && arg.name.label.name == expectedArg) {
+        return arg.expression.toSource();
       }
     }
     return null;
+  }
+}
+
+class _PreferSpacingOverSizedBoxFix extends DartFix {
+  @override
+  void run(
+    CustomLintResolver resolver,
+    ChangeReporter reporter,
+    CustomLintContext context,
+    AnalysisError analysisError,
+    List<AnalysisError> others,
+  ) {
+    context.registry
+        .addInstanceCreationExpression((InstanceCreationExpression node) {
+      if (!analysisError.sourceRange.intersects(node.sourceRange)) return;
+
+      final String typeName = node.constructorName.type.name.lexeme;
+      if (!PreferSpacingOverSizedBoxRule._flexWidgets.contains(typeName)) {
+        return;
+      }
+
+      final ListLiteral? childrenList =
+          PreferSpacingOverSizedBoxRule._getChildrenList(node);
+      if (childrenList == null) return;
+
+      final List<CollectionElement> elements = childrenList.elements;
+      if (elements.length < 3) return;
+
+      // Get spacing value from first spacer (index 1)
+      final Expression firstSpacer = elements[1] as Expression;
+      final String? spacingValue =
+          PreferSpacingOverSizedBoxRule._getSpacingValue(
+        firstSpacer,
+        typeName,
+      );
+
+      // Only auto-fix SizedBox spacers where we can extract the value
+      if (spacingValue == null) return;
+
+      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
+        message: 'Use spacing: $spacingValue parameter',
+        priority: 80,
+      );
+
+      changeBuilder.addDartFileEdit((builder) {
+        // Add spacing parameter after the constructor name
+        builder.addSimpleInsertion(
+          node.constructorName.end,
+          '(spacing: $spacingValue,',
+        );
+
+        // Remove the opening paren that was already there
+        builder.addDeletion(
+          SourceRange(node.argumentList.offset, 1),
+        );
+
+        // Remove spacer children (odd-indexed elements)
+        for (int i = elements.length - 2; i >= 1; i -= 2) {
+          final int start = _getRemovalStart(elements, i);
+          final int end = _getRemovalEnd(elements, i);
+          builder.addDeletion(SourceRange(start, end - start));
+        }
+      });
+    });
+  }
+
+  /// Gets the start offset for removing a spacer, including leading comma
+  /// and whitespace.
+  int _getRemovalStart(List<CollectionElement> elements, int index) {
+    // Remove from end of previous element (after the comma)
+    final CollectionElement prev = elements[index - 1];
+    return prev.end;
+  }
+
+  /// Gets the end offset for removing a spacer, including trailing comma.
+  int _getRemovalEnd(List<CollectionElement> elements, int index) {
+    final CollectionElement next = elements[index + 1];
+    return next.offset;
   }
 }
 

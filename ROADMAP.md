@@ -432,7 +432,6 @@ See [CHANGELOG.md](CHANGELOG.md) for implemented rules. Goal: 2000 rules.
 | ⚠️ `avoid_collection_mutating_methods` | Professional | WARNING | Avoid methods that mutate collections in place. |
 | ⚠️ `avoid_missing_controller` | Essential | WARNING | Widgets requiring controllers should have them provided. |
 | ℹ️ `avoid_unnecessary_null_aware_elements` | Recommended | INFO | Null-aware elements in collections that can't be null. |
-| ℹ️⭐ `prefer_spacing` | Recommended | INFO | Use Spacing widget (or SizedBox) for consistent spacing. |
 | ℹ️ `use_closest_build_context` | Professional | INFO | Use the closest available BuildContext for better performance. |
 
 ---
