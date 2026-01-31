@@ -1991,8 +1991,9 @@ class AvoidUnrestrictedTextFieldLengthRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_unrestricted_text_field_length',
     problemMessage:
-        '[avoid_unrestricted_text_field_length] TextField should have maxLength to prevent excessive input.',
-    correctionMessage: 'Add maxLength parameter to limit input length.',
+        '[avoid_unrestricted_text_field_length] TextField without maxLength allows unbounded input, enabling users to paste megabytes of text that can freeze the UI, exhaust memory, and create oversized payloads for backend APIs. Setting maxLength protects against denial-of-service scenarios and enforces data integrity constraints.',
+    correctionMessage:
+        'Add the maxLength parameter with a reasonable limit (e.g. maxLength: 500) and optionally set maxLengthEnforcement to control truncation behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -2053,9 +2054,9 @@ class PreferScaffoldMessengerMaybeOfRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_scaffold_messenger_maybeof',
     problemMessage:
-        '[prefer_scaffold_messenger_maybeof] Consider using ScaffoldMessenger.maybeOf for safer access.',
+        '[prefer_scaffold_messenger_maybeof] ScaffoldMessenger.of throws a FlutterError if no ScaffoldMessenger ancestor exists, crashing the app in contexts like dialogs, overlays, or tests without a Scaffold. Using maybeOf returns null instead, allowing graceful fallback when the messenger is unavailable.',
     correctionMessage:
-        'Use maybeOf to handle cases where ScaffoldMessenger might not be available.',
+        'Replace ScaffoldMessenger.of(context) with ScaffoldMessenger.maybeOf(context) and handle the null case, or verify the context has a Scaffold ancestor before calling .of.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -2110,8 +2111,9 @@ class AvoidFormWithoutKeyRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_form_without_key',
     problemMessage:
-        '[avoid_form_without_key] Form widget should have a GlobalKey for validation.',
-    correctionMessage: 'Add a GlobalKey<FormState> to the Form widget.',
+        '[avoid_form_without_key] Form widget without a GlobalKey<FormState> makes it impossible to call validate(), save(), or reset() on the form state programmatically. Without a key, you cannot trigger field validation on submit, retrieve form values, or reset the form to its initial state.',
+    correctionMessage:
+        'Create a GlobalKey<FormState> field (e.g. final _formKey = GlobalKey<FormState>()) and pass it to the Form widget via the key parameter.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -2177,9 +2179,9 @@ class AvoidMediaQueryInBuildRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_mediaquery_in_build',
     problemMessage:
-        '[avoid_mediaquery_in_build] Use specific MediaQuery methods instead of MediaQuery.of.',
+        '[avoid_mediaquery_in_build] MediaQuery.of(context) subscribes to all MediaQueryData changes (size, padding, orientation, brightness, text scaling), causing unnecessary rebuilds when only one property is needed. Specific accessors like sizeOf or paddingOf subscribe to only the relevant property, significantly reducing rebuild frequency.',
     correctionMessage:
-        'Use MediaQuery.sizeOf, MediaQuery.paddingOf, etc. for better performance.',
+        'Replace MediaQuery.of(context).size with MediaQuery.sizeOf(context), .padding with MediaQuery.paddingOf(context), etc. These targeted methods were added in Flutter 3.10.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -2236,8 +2238,9 @@ class PreferCachedNetworkImageRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_cached_network_image',
     problemMessage:
-        '[prefer_cached_network_image] Consider using CachedNetworkImage for better caching.',
-    correctionMessage: 'Replace Image.network with CachedNetworkImage package.',
+        '[prefer_cached_network_image] Image.network re-downloads images every time the widget rebuilds or the user navigates back to the screen, wasting bandwidth and causing visible loading flicker. CachedNetworkImage persists images to disk, loads them instantly on subsequent visits, and supports placeholder and error widgets out of the box.',
+    correctionMessage:
+        'Replace Image.network(url) with CachedNetworkImage(imageUrl: url) from the cached_network_image package, and add placeholder/errorWidget parameters for loading feedback.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -2295,8 +2298,9 @@ class AvoidStatefulWidgetInListRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_stateful_widget_in_list',
     problemMessage:
-        '[avoid_stateful_widget_in_list] Creating StatefulWidget in list builder can cause state loss.',
-    correctionMessage: 'Use keys or consider StatelessWidget for list items.',
+        '[avoid_stateful_widget_in_list] StatefulWidget created inside a ListView.builder callback loses its State when scrolled off-screen and recreated, causing input fields to reset, animations to restart, and expanded/collapsed states to revert. The framework cannot preserve State for widgets without stable keys in a lazily-built list.',
+    correctionMessage:
+        'Add a ValueKey with a stable identifier (e.g. item.id) to the StatefulWidget, or lift mutable state out of the list item into a parent state manager.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -2376,9 +2380,9 @@ class AvoidEmptyTextWidgetsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_empty_text_widgets',
     problemMessage:
-        '[avoid_empty_text_widgets] Avoid using Text widget with empty string.',
+        "[avoid_empty_text_widgets] Text widget with an empty string ('') still occupies space based on the inherited text style's line height, creating invisible layout artifacts. It also participates in accessibility announcements, confusing screen readers with blank text nodes that convey no information.",
     correctionMessage:
-        'Use SizedBox.shrink() or remove the widget if no text is needed.',
+        'Replace Text(\'\') with SizedBox.shrink() for a zero-size placeholder, or remove the widget entirely if conditional display is intended.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -2483,9 +2487,9 @@ class AvoidFontWeightAsNumberRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_font_weight_as_number',
     problemMessage:
-        '[avoid_font_weight_as_number] Use named FontWeight constants instead of numeric values.',
+        '[avoid_font_weight_as_number] Numeric FontWeight values like w400 or w700 are less readable and harder to maintain than their named equivalents. Named constants (normal, bold) convey semantic intent, reduce lookup effort during code review, and align with design system terminology used by designers.',
     correctionMessage:
-        'Replace FontWeight.w400 with FontWeight.normal, w700 with FontWeight.bold, etc.',
+        'Replace numeric FontWeight values with named constants: w100=thin, w200=extraLight, w300=light, w400=normal, w500=medium, w600=semiBold, w700=bold, w800=extraBold, w900=black.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -2577,9 +2581,9 @@ class AvoidMultipleMaterialAppsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_multiple_material_apps',
     problemMessage:
-        '[avoid_multiple_material_apps] Multiple MaterialApp widgets detected in widget tree.',
+        '[avoid_multiple_material_apps] Multiple MaterialApp (or CupertinoApp) widgets in the tree create separate Navigator stacks, separate Theme contexts, and independent Locale/MediaQuery scopes. This breaks navigation (pushNamed cannot reach routes in the other app), causes theme inconsistencies, and doubles memory usage for shared resources.',
     correctionMessage:
-        'Use only one MaterialApp at the root of your application.',
+        'Keep a single MaterialApp at the root. For sub-navigators, use Navigator widgets or a nested Router instead of adding another MaterialApp.',
     errorSeverity: DiagnosticSeverity.ERROR,
   );
 
@@ -2661,9 +2665,9 @@ class AvoidRawKeyboardListenerRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_raw_keyboard_listener',
     problemMessage:
-        '[avoid_raw_keyboard_listener] RawKeyboardListener is deprecated. Use KeyboardListener instead.',
+        '[avoid_raw_keyboard_listener] RawKeyboardListener is deprecated since Flutter 3.18. It uses the legacy RawKeyEvent system that does not correctly handle key mapping across platforms, missing modifier keys and producing inconsistent key codes. The replacement KeyboardListener uses the modern KeyEvent system with proper platform key mapping.',
     correctionMessage:
-        'Replace RawKeyboardListener with KeyboardListener or Focus.',
+        'Replace RawKeyboardListener with KeyboardListener (or Focus with onKeyEvent) which uses the modern HardwareKeyboard / KeyEvent API for correct cross-platform input handling.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -2751,8 +2755,9 @@ class AvoidImageRepeatRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_image_repeat',
     problemMessage:
-        '[avoid_image_repeat] ImageRepeat is rarely needed and may indicate a design issue.',
-    correctionMessage: 'Consider removing repeat or using a pattern approach.',
+        '[avoid_image_repeat] ImageRepeat tiles the image across the available space, which is rarely the intended behavior for photos or icons and usually signals a misconfigured decoration. Tiled images consume additional GPU memory for the repeated texture and can produce visual artifacts at tile boundaries on different screen densities.',
+    correctionMessage:
+        'Remove the repeat parameter (defaults to ImageRepeat.noRepeat), or if tiling is intentional, use a dedicated pattern asset designed for seamless repetition.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -2795,8 +2800,9 @@ class AvoidIconSizeOverrideRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_icon_size_override',
     problemMessage:
-        '[avoid_icon_size_override] Avoid overriding icon size directly. Use IconTheme.',
-    correctionMessage: 'Wrap icons in IconTheme for consistent sizing.',
+        '[avoid_icon_size_override] Setting icon size directly on individual Icon widgets scatters sizing values throughout the codebase, causing inconsistencies when the design system changes. IconTheme provides a single point of control for icon sizing within a subtree, keeping all icons consistent and easier to update.',
+    correctionMessage:
+        'Remove the size parameter from the Icon widget and wrap the relevant subtree with IconTheme(data: IconThemeData(size: 24), child: ...) for centralized sizing.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -2858,9 +2864,9 @@ class PreferInkwellOverGestureRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_inkwell_over_gesture',
     problemMessage:
-        '[prefer_inkwell_over_gesture] Use InkWell instead of GestureDetector for tap feedback.',
+        '[prefer_inkwell_over_gesture] GestureDetector with onTap provides no visual feedback when tapped, leaving users unsure whether their tap registered. InkWell produces the Material Design ripple effect that confirms interaction, improving perceived responsiveness and matching platform conventions users expect.',
     correctionMessage:
-        'Replace GestureDetector with InkWell for ripple effect.',
+        'Replace GestureDetector(onTap: ...) with InkWell(onTap: ...) to get built-in ripple feedback. Ensure a Material ancestor exists in the tree for the ripple to render.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -2980,8 +2986,9 @@ class AvoidFittedBoxForTextRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_fitted_box_for_text',
     problemMessage:
-        '[avoid_fitted_box_for_text] Avoid using FittedBox to scale Text widgets.',
-    correctionMessage: 'Use maxLines and overflow for text handling.',
+        '[avoid_fitted_box_for_text] FittedBox scales Text widgets uniformly, shrinking the entire text to fit the container. This ignores the user accessibility text scaling preference, can render text unreadably small on narrow screens, and defeats the purpose of responsive text layout. Use text-specific overflow handling instead.',
+    correctionMessage:
+        'Remove FittedBox and use maxLines with TextOverflow.ellipsis to handle long text, or use AutoSizeText for controlled text scaling that respects minimum font sizes.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -3049,8 +3056,9 @@ class AvoidOpacityAnimationRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_opacity_animation',
     problemMessage:
-        '[avoid_opacity_animation] Use FadeTransition instead of animating Opacity.',
-    correctionMessage: 'FadeTransition is more performant for animations.',
+        '[avoid_opacity_animation] Animating the Opacity widget via setState triggers a full rebuild of the child subtree on every frame, which is expensive for complex children. FadeTransition applies opacity changes directly on the compositing layer without rebuilding, achieving the same visual effect with significantly less CPU and GPU overhead.',
+    correctionMessage:
+        'Replace the Opacity widget with FadeTransition(opacity: animation, child: ...) driven by an AnimationController, so opacity changes happen at the compositing layer.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -3150,8 +3158,9 @@ class PreferSelectableTextRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_selectable_text',
     problemMessage:
-        '[prefer_selectable_text] Consider using SelectableText for long content.',
-    correctionMessage: 'SelectableText allows users to copy text.',
+        '[prefer_selectable_text] Long-form text displayed with the Text widget cannot be selected or copied by users, frustrating those who need to copy error messages, addresses, phone numbers, or reference codes. SelectableText enables native text selection with copy support at no additional performance cost.',
+    correctionMessage:
+        'Replace Text with SelectableText for content users may want to copy (errors, IDs, addresses, etc.). Use SelectableText.rich for styled spans.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -3243,9 +3252,9 @@ class AvoidMaterial2FallbackRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_material2_fallback',
     problemMessage:
-        '[avoid_material2_fallback] Avoid explicitly disabling Material 3.',
+        '[avoid_material2_fallback] Explicitly setting useMaterial3: false forces the app back to the deprecated Material 2 design system, which will receive no new component updates or accessibility improvements. Material 2 components may also be removed in future Flutter releases, creating a migration burden.',
     correctionMessage:
-        'Remove useMaterial3: false or set to true. M3 is the default since Flutter 3.16.',
+        'Remove useMaterial3: false (M3 is the default since Flutter 3.16) or set it to true. Migrate M2-specific theming to M3 ColorScheme and typography.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -3421,10 +3430,9 @@ class PreferCarouselViewRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_carousel_view',
     problemMessage:
-        '[prefer_carousel_view] Consider using built-in CarouselView instead of third-party carousel.',
+        '[prefer_carousel_view] Third-party carousel package adds dependency maintenance overhead, increases app size, and may not follow Material 3 design guidelines. The built-in CarouselView widget (Flutter 3.24+) provides standard M3 carousel behavior with accessibility support, animation curves, and theme integration out of the box.',
     correctionMessage:
-        'CarouselView is available in Flutter 3.24+ and provides '
-        'standard M3 carousel behavior.',
+        'Replace the third-party carousel with CarouselView(children: items) from the Flutter framework. It supports item extent, shrink extent, and standard scroll physics.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -3524,9 +3532,9 @@ class PreferSearchAnchorRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_search_anchor',
     problemMessage:
-        '[prefer_search_anchor] Consider using SearchAnchor instead of showSearch/SearchDelegate.',
-    correctionMessage: 'SearchAnchor provides a modern M3 search pattern '
-        '(Flutter 3.10+).',
+        '[prefer_search_anchor] showSearch with SearchDelegate uses an imperative API that bypasses the widget tree, cannot access InheritedWidgets from the parent context, and follows Material 2 patterns. SearchAnchor (Flutter 3.10+) provides a declarative, widget-based search with full M3 styling and theme integration.',
+    correctionMessage:
+        'Replace showSearch/SearchDelegate with SearchAnchor and SearchAnchor.bar, which integrate into the widget tree and support suggestionsBuilder for async search results.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -3600,9 +3608,9 @@ class PreferTapRegionForDismissRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_tap_region_for_dismiss',
     problemMessage:
-        '[prefer_tap_region_for_dismiss] Consider using TapRegion for tap-outside-to-dismiss patterns.',
+        '[prefer_tap_region_for_dismiss] Manual tap-outside detection using GestureDetector or Focus requires tracking tap locations and comparing against widget bounds, which is error-prone and breaks with nested interactive elements. TapRegion (Flutter 3.10+) handles this pattern correctly out of the box, including group regions for linked elements.',
     correctionMessage:
-        'TapRegion provides onTapOutside callback (Flutter 3.10+).',
+        'Wrap the dismissible content with TapRegion(onTapOutside: (_) => dismiss()) for reliable tap-outside detection. Use TapRegion.groupId to link multiple regions.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
