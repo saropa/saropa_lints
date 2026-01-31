@@ -1,3 +1,5 @@
+// ignore_for_file: deprecated_member_use
+
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/error/error.dart' show DiagnosticSeverity;
 import 'package:custom_lint_builder/custom_lint_builder.dart';
@@ -166,6 +168,9 @@ class RequirePdfErrorHandlingRule extends SaropaLintRule {
     'PDFView',
     'PdfViewer',
   };
+
+  @override
+  List<Fix> get customFixes => [WrapInTryCatchFix()];
 
   @override
   void runWithReporter(
@@ -574,6 +579,9 @@ class RequireSqfliteErrorHandlingRule extends SaropaLintRule {
     'rawDelete',
     'execute',
   };
+
+  @override
+  List<Fix> get customFixes => [WrapInTryCatchFix()];
 
   @override
   void runWithReporter(
