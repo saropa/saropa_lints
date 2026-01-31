@@ -39,6 +39,8 @@ Dates are not included in version headers — [pub.dev](https://pub.dev/packages
 
 - **DX message quality for widget_patterns_rules**: Expanded `problemMessage` and `correctionMessage` text for all 87 rules in `widget_patterns_rules.dart`. Messages now explain consequences, remove vague language ("Avoid", "Consider", "best practices"), and meet minimum length thresholds for the DX audit.
 
+- **DX message quality for code_quality_rules**: Expanded `problemMessage` and `correctionMessage` text for 50 rules in `code_quality_rules.dart`. Removes "Avoid" prefixes, explains consequences of each detected issue, and brings short messages above the 150-character minimum threshold.
+
 - **`prefer_spacing_over_sizedbox` rule rewritten**: Now detects the alternating `[content, spacer, content, ...]` pattern in Row/Column children instead of just counting SizedBox widgets. Also detects `Spacer()` widgets, removed false `Wrap` support, and added a quick fix that inserts the `spacing` parameter and removes spacer children.
 
 ### Changed
