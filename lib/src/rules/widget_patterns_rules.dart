@@ -26,7 +26,7 @@ class AvoidIncorrectImageOpacityRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_incorrect_image_opacity',
     problemMessage:
-        '[avoid_incorrect_image_opacity] Wrapping an Image widget in an Opacity widget is inefficient and can cause performance issues, as it requires the image to be composited offscreen. Instead, use the Image widget’s color and colorBlendMode properties to achieve opacity effects directly, which is more performant and recommended by Flutter best practices.',
+        '[avoid_incorrect_image_opacity] Wrapping an Image widget in an Opacity widget is inefficient because it forces the framework to allocate an offscreen buffer, render the image into it, and then composite the buffer with reduced alpha. This extra compositing pass increases GPU memory usage and slows frame rendering, especially on lower-end devices. The Image widget natively supports opacity through its color and colorBlendMode properties, which apply the alpha during the image decode stage without an extra compositing layer.',
     correctionMessage:
         'Replace Opacity(child: Image(...)) with Image(..., color: color.withOpacity(x), colorBlendMode: BlendMode.modulate) to apply opacity efficiently. This avoids unnecessary compositing and improves rendering performance. See Flutter documentation for details on image opacity handling.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -3719,9 +3719,9 @@ class RequireTextOverflowHandlingRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_text_overflow_handling',
     problemMessage:
-        '[require_text_overflow_handling] Text with dynamic content should have overflow handling to prevent layout issues.',
+        '[require_text_overflow_handling] Text displaying dynamic content (user input, API data, translations) without overflow handling can break layouts when the text is longer than expected. Unbounded text pushes sibling widgets off-screen, triggers RenderFlex overflow errors in Row/Column contexts, and creates inconsistent UI across locales with varying text lengths.',
     correctionMessage:
-        'Add overflow: TextOverflow.ellipsis and/or maxLines: 1 parameter.',
+        'Add overflow: TextOverflow.ellipsis and maxLines to limit visible lines, or wrap in Expanded/Flexible within Row/Column to constrain the available width.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -3864,9 +3864,9 @@ class RequireImageErrorBuilderRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_image_error_builder',
     problemMessage:
-        '[require_image_error_builder] Network image should have an errorBuilder.',
+        '[require_image_error_builder] Network image without errorBuilder shows a broken image icon or blank space when the URL is invalid, the server is down, or the network is unavailable. This creates a poor user experience with no indication of what went wrong and no way to retry loading the image.',
     correctionMessage:
-        'Add errorBuilder to handle image loading failures gracefully.',
+        'Add errorBuilder: (context, error, stackTrace) => FallbackWidget() to display a placeholder icon, error message, or retry button when image loading fails.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -3943,9 +3943,9 @@ class RequireImageDimensionsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_image_dimensions',
     problemMessage:
-        '[require_image_dimensions] Network image should specify width and height to prevent layout shifts.',
+        '[require_image_dimensions] Network image without explicit dimensions causes layout shifts (CLS) when the image loads, as the widget expands from zero to the image size. This pushes surrounding content around, creates a jarring user experience, and negatively impacts web Core Web Vitals scores.',
     correctionMessage:
-        'Add width and height, or wrap in SizedBox with dimensions.',
+        'Set width and height on the Image widget matching the expected aspect ratio, or wrap it in a SizedBox/AspectRatio with fixed dimensions to reserve space before the image loads.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -4079,9 +4079,9 @@ class RequirePlaceholderForNetworkRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_placeholder_for_network',
     problemMessage:
-        '[require_placeholder_for_network] Network image should have a placeholder or loadingBuilder.',
+        '[require_placeholder_for_network] Network image without a placeholder or loadingBuilder shows blank space while the image downloads, giving users no indication that content is loading. On slow connections this blank period can last several seconds, making the UI appear broken or unresponsive.',
     correctionMessage:
-        'Add loadingBuilder or placeholder to show feedback during loading.',
+        'Add loadingBuilder to show a progress indicator during download, or use a placeholder image (e.g. a low-res thumbnail or shimmer effect) to indicate loading state.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -4171,9 +4171,9 @@ class PreferTextThemeRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_text_theme',
     problemMessage:
-        '[prefer_text_theme] Consider using Theme.textTheme instead of hardcoded TextStyle.',
+        '[prefer_text_theme] Hardcoded TextStyle with inline fontSize, fontWeight, and color values scatters typography decisions throughout the codebase. When the design system changes, every hardcoded style must be found and updated manually. Theme.textTheme centralizes typography so that a single theme change propagates consistently to all text widgets.',
     correctionMessage:
-        'Use Theme.of(context).textTheme.* for consistent typography.',
+        'Replace the inline TextStyle with Theme.of(context).textTheme.bodyMedium (or the appropriate text style) and use copyWith for minor overrides.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -4254,9 +4254,9 @@ class AvoidGestureWithoutBehaviorRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_gesture_without_behavior',
     problemMessage:
-        '[avoid_gesture_without_behavior] GestureDetector should specify HitTestBehavior.',
+        '[avoid_gesture_without_behavior] GestureDetector without explicit HitTestBehavior defaults to deferToChild, which only detects taps on painted pixels of the child. Empty areas within the GestureDetector bounds are ignored, causing missed taps that confuse users. Specifying the behavior makes the tap target boundaries explicit and predictable.',
     correctionMessage:
-        'Add behavior: HitTestBehavior.opaque (or translucent/deferToChild).',
+        'Add behavior: HitTestBehavior.opaque to detect taps on the full bounding box, or .translucent to detect taps while allowing pass-through to widgets behind.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -4315,9 +4315,9 @@ class AvoidDoubleTapSubmitRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_double_tap_submit',
     problemMessage:
-        '[avoid_double_tap_submit] Button may allow double-tap submissions.',
+        '[avoid_double_tap_submit] Submit button without double-tap protection can fire the onPressed callback multiple times before the first submission completes. This causes duplicate API requests, duplicate database entries, double charges in payment flows, and race conditions that corrupt application state.',
     correctionMessage:
-        'Disable the button during submission or use a debounce mechanism.',
+        'Set onPressed to null (disabling the button) while the async operation is in progress, or use a debounce/throttle mechanism to ignore rapid successive taps.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -4430,9 +4430,9 @@ class PreferCursorForButtonsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_cursor_for_buttons',
     problemMessage:
-        '[prefer_cursor_for_buttons] Interactive widget should specify mouse cursor for web.',
+        '[prefer_cursor_for_buttons] Interactive widget on web/desktop without a pointer cursor leaves the default arrow cursor, giving users no visual indication that the element is clickable. This violates web platform conventions and reduces discoverability of interactive elements, especially for GestureDetector-based custom buttons.',
     correctionMessage:
-        'Add mouseCursor: SystemMouseCursors.click (or similar).',
+        'Add mouseCursor: SystemMouseCursors.click to GestureDetector or InkWell widgets that act as buttons. Built-in Material buttons handle this automatically.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -4513,8 +4513,9 @@ class RequireHoverStatesRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_hover_states',
     problemMessage:
-        '[require_hover_states] Interactive widget should handle hover state for web/desktop.',
-    correctionMessage: 'Add onHover callback for visual feedback.',
+        '[require_hover_states] Interactive widget on web/desktop without hover feedback feels unresponsive to mouse users. Hover states are a fundamental interaction pattern on these platforms, signaling clickability and providing visual confirmation that the cursor is over the target. Missing hover states make the app feel like a mobile port rather than a native desktop experience.',
+    correctionMessage:
+        'Add onHover callback to change visual state (e.g. elevation, background color, or border) when the mouse enters the widget. Material widgets like ElevatedButton handle this automatically.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -4597,9 +4598,9 @@ class RequireButtonLoadingStateRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_button_loading_state',
     problemMessage:
-        '[require_button_loading_state] Async button should show loading state.',
+        '[require_button_loading_state] Button triggering an async operation without a loading state indicator leaves users unsure whether their tap was registered. They may tap again (causing duplicate requests), navigate away (abandoning the operation), or assume the app is frozen. A loading state provides essential feedback for async interactions.',
     correctionMessage:
-        'Disable button and show loading indicator during async operations.',
+        'Show a CircularProgressIndicator and set onPressed to null while the async operation runs. Restore the button when the operation completes or fails.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -4705,9 +4706,9 @@ class AvoidHardcodedTextStylesRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_hardcoded_text_styles',
     problemMessage:
-        '[avoid_hardcoded_text_styles] Avoid inline TextStyle with hardcoded values.',
+        '[avoid_hardcoded_text_styles] Inline TextStyle with hardcoded fontSize, fontWeight, and color values creates scattered styling that drifts from the design system over time. Every hardcoded style must be updated individually when the design changes, and inconsistencies between screens become difficult to detect during code review.',
     correctionMessage:
-        'Use Theme.of(context).textTheme or define styles in a central location.',
+        'Use Theme.of(context).textTheme (e.g. bodyMedium, titleLarge) for standard styles and .copyWith() for minor overrides. Define custom styles in a centralized theme extension.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -4797,9 +4798,9 @@ class RequireRefreshIndicatorRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_refresh_indicator',
     problemMessage:
-        '[require_refresh_indicator] List showing remote data should have RefreshIndicator for pull-to-refresh.',
+        '[require_refresh_indicator] List displaying remote data without pull-to-refresh forces users to navigate away and back to see updated content. This common UX pattern is expected on both platforms, and its absence makes the app feel unresponsive when data becomes stale. Users have no self-service way to recover from a failed initial load.',
     correctionMessage:
-        'Wrap with RefreshIndicator(onRefresh: () => fetch(), child: ...).',
+        'Wrap the scrollable list with RefreshIndicator(onRefresh: () async => fetchData(), child: listView) to enable pull-to-refresh for data refresh.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -4893,8 +4894,9 @@ class RequireDefaultTextStyleRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_default_text_style',
     problemMessage:
-        '[require_default_text_style] Multiple Text widgets with same style - use DefaultTextStyle.',
-    correctionMessage: 'Wrap with DefaultTextStyle to share common styles.',
+        '[require_default_text_style] Multiple sibling Text widgets repeat the same TextStyle, creating redundant style objects and making future style changes error-prone since each instance must be updated independently. DefaultTextStyle applies a shared style to all descendant Text widgets automatically, keeping the code DRY and consistent.',
+    correctionMessage:
+        'Wrap the parent widget with DefaultTextStyle(style: sharedStyle, child: ...) and remove individual style parameters from child Text widgets that use the common style.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -4971,8 +4973,9 @@ class PreferAssetImageForLocalRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_asset_image_for_local',
     problemMessage:
-        '[prefer_asset_image_for_local] Use AssetImage for bundled assets, not FileImage.',
-    correctionMessage: 'Replace FileImage with AssetImage or Image.asset().',
+        '[prefer_asset_image_for_local] FileImage reads from the device filesystem at runtime and is intended for user-generated content, not bundled assets. Using FileImage for assets bypasses Flutter asset resolution (density variants, locale fallbacks), is not supported on web, and fails if the file path does not exist on the target device.',
+    correctionMessage:
+        'Replace FileImage with AssetImage or use Image.asset() to load bundled assets through the Flutter asset pipeline with proper resolution-aware variant selection.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -5040,8 +5043,9 @@ class PreferFitCoverForBackgroundRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_fit_cover_for_background',
     problemMessage:
-        '[prefer_fit_cover_for_background] Background images should use BoxFit.cover.',
-    correctionMessage: 'Add fit: BoxFit.cover to DecorationImage.',
+        '[prefer_fit_cover_for_background] Background DecorationImage without BoxFit.cover may show letterboxing, stretching, or empty space around the image on different screen aspect ratios. BoxFit.cover ensures the image fills the entire container while maintaining its aspect ratio, which is the standard behavior for background images.',
+    correctionMessage:
+        'Add fit: BoxFit.cover to DecorationImage so the image fills the container on all screen sizes without distortion. Crop alignment defaults to center.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -5115,9 +5119,9 @@ class RequireDisabledStateRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_disabled_state',
     problemMessage:
-        '[require_disabled_state] Consider customizing disabled style for design consistency.',
+        '[require_disabled_state] Button without custom disabled styling uses the framework default gray appearance, which may not match your app design system or provide sufficient contrast. Customizing the disabled state ensures visual consistency, communicates the disabled status clearly, and maintains your brand identity across all button states.',
     correctionMessage:
-        'Add style with disabledBackgroundColor/disabledForegroundColor.',
+        'Add a ButtonStyle with disabledBackgroundColor and disabledForegroundColor via styleFrom or the theme, ensuring disabled buttons match your design system.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -5205,8 +5209,9 @@ class RequireDragFeedbackRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_drag_feedback',
     problemMessage:
-        '[require_drag_feedback] Draggable should have feedback widget.',
-    correctionMessage: 'Add feedback: Widget to show during drag.',
+        '[require_drag_feedback] Draggable without a feedback widget shows no visual representation of the dragged item under the user finger/cursor. The original child disappears (replaced by childWhenDragging or nothing) while the drag area appears empty, making it impossible for the user to see what they are dragging or where to drop it.',
+    correctionMessage:
+        'Add a feedback parameter with a widget representing the dragged item (e.g. a semi-transparent copy of the child or a Material-elevated card).',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -5277,8 +5282,9 @@ class AvoidGestureConflictRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_gesture_conflict',
     problemMessage:
-        '[avoid_gesture_conflict] Nested GestureDetector widgets may cause gesture conflicts.',
-    correctionMessage: 'Consolidate gesture handling or use behavior property.',
+        '[avoid_gesture_conflict] Nested GestureDetector widgets compete in the gesture arena, causing unpredictable behavior where the inner detector wins some gestures and the outer wins others depending on timing. This leads to missed taps, swallowed swipes, and inconsistent interaction behavior that is difficult to debug.',
+    correctionMessage:
+        'Consolidate gesture handling into a single GestureDetector, or use RawGestureDetector with a custom gesture factory to coordinate nested gesture recognition explicitly.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -5337,9 +5343,9 @@ class AvoidLargeImagesInMemoryRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_large_images_in_memory',
     problemMessage:
-        '[avoid_large_images_in_memory] Image should specify size constraints to save memory.',
+        '[avoid_large_images_in_memory] Image loaded without size constraints decodes at full resolution into GPU memory regardless of display size. A single uncompressed 4K image can consume 30-50 MB of memory, and lists of such images quickly exhaust available memory, causing OOM crashes on mobile devices.',
     correctionMessage:
-        'Add width/height and cacheWidth/cacheHeight parameters.',
+        'Add width/height to constrain display size and cacheWidth/cacheHeight to limit decode resolution. Set cacheWidth to displayWidth * devicePixelRatio.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -5421,8 +5427,9 @@ class PreferActionsAndShortcutsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_actions_and_shortcuts',
     problemMessage:
-        '[prefer_actions_and_shortcuts] Use Actions/Shortcuts system instead of RawKeyboardListener.',
-    correctionMessage: 'Replace with Shortcuts and Actions widgets.',
+        '[prefer_actions_and_shortcuts] RawKeyboardListener requires manual key code matching and does not integrate with the Flutter intent system, making keyboard shortcuts invisible to accessibility tools and impossible to discover via keyboard shortcut overlays. The Actions/Shortcuts system provides composable, discoverable, and testable keyboard handling.',
+    correctionMessage:
+        'Replace with Shortcuts(shortcuts: {key: intent}, child: Actions(actions: {Intent: CallbackAction(...)}, child: ...)) for declarative keyboard handling.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -5470,8 +5477,9 @@ class RequireLongPressCallbackRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_long_press_callback',
     problemMessage:
-        '[require_long_press_callback] Consider adding onLongPress for context menu.',
-    correctionMessage: 'Add onLongPress callback for additional actions.',
+        '[require_long_press_callback] Interactive list item without onLongPress misses a standard mobile interaction pattern for secondary actions. Users expect long-press to reveal context menus, selection mode, or additional options. Omitting this leaves no discoverable path to bulk actions like delete, share, or move.',
+    correctionMessage:
+        'Add onLongPress callback to show a context menu (showMenu), enter selection mode, or trigger a bottom sheet with secondary actions for the item.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -5555,8 +5563,9 @@ class AvoidFindChildInBuildRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_find_child_in_build',
     problemMessage:
-        '[avoid_find_child_in_build] findChildIndexCallback should not be created in build.',
-    correctionMessage: 'Extract callback to a field or use memoization.',
+        '[avoid_find_child_in_build] Creating findChildIndexCallback as a new closure inside the build method allocates a new function object on every rebuild. Since SliverChildBuilderDelegate uses this callback to optimize child reordering, a new instance defeats the identity check and forces unnecessary child lookups on every frame.',
+    correctionMessage:
+        'Extract findChildIndexCallback to a final field, a static method, or a top-level function so the same instance is reused across rebuilds.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -5698,8 +5707,9 @@ class RequireFormValidationRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_form_validation',
     problemMessage:
-        '[require_form_validation] TextFormField in Form should have a validator.',
-    correctionMessage: 'Add validator: (value) => ... to validate input.',
+        '[require_form_validation] TextFormField inside a Form without a validator function bypasses the form validation pipeline entirely. Calling formKey.currentState.validate() will always return true for this field, allowing invalid or empty input to reach the backend, causing data integrity issues and poor user feedback.',
+    correctionMessage:
+        'Add a validator parameter (e.g. validator: (value) => value?.isEmpty ?? true ? \"Required field\" : null) to participate in Form.validate() calls.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -5795,9 +5805,9 @@ class RequireThemeColorFromSchemeRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_theme_color_from_scheme',
     problemMessage:
-        '[require_theme_color_from_scheme] Hardcoded color breaks theming. Use Theme.of(context).colorScheme.',
+        '[require_theme_color_from_scheme] Hardcoded Color value (e.g. Colors.blue, Color(0xFF...)) does not adapt to light/dark theme, high-contrast mode, or dynamic color (Material You). This breaks theming consistency and accessibility, as the color may become unreadable against the themed background in alternate modes.',
     correctionMessage:
-        'Replace with colorScheme.primary, .secondary, .surface, etc.',
+        'Replace with Theme.of(context).colorScheme.primary, .secondary, .surface, .onSurface, etc. to use theme-aware colors that adapt to light/dark mode automatically.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -5898,9 +5908,9 @@ class PreferColorSchemeFromSeedRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_color_scheme_from_seed',
     problemMessage:
-        '[prefer_color_scheme_from_seed] Manual ColorScheme is error-prone. Use ColorScheme.fromSeed.',
+        '[prefer_color_scheme_from_seed] Manually constructing a ColorScheme requires specifying 20+ color roles with correct contrast ratios. Missing or mismatched colors cause poor contrast, invisible text, or WCAG accessibility failures. ColorScheme.fromSeed algorithmically generates all roles from a single seed color with guaranteed accessibility compliance.',
     correctionMessage:
-        'ColorScheme.fromSeed(seedColor: yourPrimary) generates accessible palettes.',
+        'Replace the manual ColorScheme constructor with ColorScheme.fromSeed(seedColor: primaryColor) to generate a complete, accessible palette automatically.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -5991,9 +6001,9 @@ class PreferRichTextForComplexRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_rich_text_for_complex',
     problemMessage:
-        '[prefer_rich_text_for_complex] Multiple Text widgets in row could be combined with Text.rich.',
+        '[prefer_rich_text_for_complex] Multiple Text widgets in a Row create separate text layout blocks that cannot wrap as a single paragraph. If the combined text exceeds the available width, each Text clips or overflows independently instead of wrapping naturally. Text.rich with multiple TextSpan children lays out as a single text block with proper line wrapping.',
     correctionMessage:
-        'Use Text.rich with TextSpan children for better performance and line wrapping.',
+        'Replace the Row of Text widgets with a single Text.rich(TextSpan(children: [TextSpan(...), TextSpan(...)])) for unified text layout and natural line wrapping.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -6164,9 +6174,9 @@ class AvoidBrightnessCheckForThemeRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_brightness_check_for_theme',
     problemMessage:
-        '[avoid_brightness_check_for_theme] Avoid checking brightness manually. Use colorScheme instead.',
+        '[avoid_brightness_check_for_theme] Manually checking Theme.of(context).brightness to pick light/dark colors bypasses the colorScheme system, which already provides semantically correct colors for each theme mode. Brightness checks are fragile, miss high-contrast mode, and scatter color logic throughout the codebase instead of centralizing it in the theme.',
     correctionMessage:
-        'Replace brightness checks with colorScheme.onSurface, colorScheme.surface, etc.',
+        'Replace brightness-conditional colors with colorScheme properties (e.g. colorScheme.onSurface, colorScheme.surface) that automatically adapt to light, dark, and high-contrast modes.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -6230,9 +6240,9 @@ class RequireSafeAreaHandlingRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_safe_area_handling',
     problemMessage:
-        '[require_safe_area_handling] Scaffold body should handle safe areas for notches and home indicators.',
+        '[require_safe_area_handling] Scaffold body without safe area handling allows content to render behind device notches, camera cutouts, rounded corners, and home indicators. On modern devices with non-rectangular displays, this causes text and interactive elements to be obscured or unreachable.',
     correctionMessage:
-        'Wrap body content with SafeArea or use MediaQuery.padding.',
+        'Wrap the Scaffold body with SafeArea, or use MediaQuery.paddingOf(context) to manually inset content away from system UI intrusions.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -6351,7 +6361,7 @@ class PreferCupertinoForIosFeelRule extends SaropaLintRule {
     problemMessage:
         '[prefer_cupertino_for_ios_feel] Material widget has Cupertino equivalent for native iOS feel.',
     correctionMessage:
-        'Consider using Cupertino version or adaptive widget on iOS.',
+        'Use the Cupertino equivalent (e.g. CupertinoAlertDialog, CupertinoButton) or an adaptive widget (.adaptive constructor) to provide native iOS look and feel.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -6425,9 +6435,9 @@ class PreferUrlStrategyForWebRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_url_strategy_for_web',
     problemMessage:
-        '[prefer_url_strategy_for_web] Web app should use path URL strategy for clean URLs and SEO.',
+        '[prefer_url_strategy_for_web] Flutter web defaults to hash-based URLs (e.g. /#/page) which are unfriendly to search engines, break social media link previews, and look unprofessional. Path-based URLs (/page) enable proper SEO indexing, shareable deep links, and server-side routing support.',
     correctionMessage:
-        'Call usePathUrlStrategy() before runApp() for clean URLs.',
+        'Call usePathUrlStrategy() before runApp() in main(), or configure url_strategy in your router package to produce clean path-based URLs.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -6501,8 +6511,9 @@ class RequireWindowSizeConstraintsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_window_size_constraints',
     problemMessage:
-        '[require_window_size_constraints] Desktop app should set minimum window size constraints.',
-    correctionMessage: 'Use window_manager or similar to set setMinimumSize().',
+        '[require_window_size_constraints] Desktop app without minimum window size allows users to resize the window below the minimum layout dimensions, causing text overflow, clipped buttons, and broken layouts. Setting a minimum size prevents the window from reaching dimensions where the UI cannot function properly.',
+    correctionMessage:
+        'Use the window_manager package to call setMinimumSize(Size(minWidth, minHeight)) during app initialization, based on your minimum supported layout dimensions.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -6598,7 +6609,7 @@ class PreferKeyboardShortcutsRule extends SaropaLintRule {
     problemMessage:
         '[prefer_keyboard_shortcuts] Desktop app should implement keyboard shortcuts for common actions.',
     correctionMessage:
-        'Add Shortcuts and Actions widgets for Ctrl+S, Ctrl+Z, etc.',
+        'Add Shortcuts and Actions widgets for standard keyboard shortcuts (Ctrl+S save, Ctrl+Z undo, Ctrl+C copy, etc.) to match desktop user expectations.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -6703,10 +6714,9 @@ class AvoidNullableWidgetMethodsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_nullable_widget_methods',
     problemMessage:
-        '[avoid_nullable_widget_methods] Avoid methods that return nullable Widget? types.',
+        '[avoid_nullable_widget_methods] A method returning Widget? forces every call site to handle the null case, which clutters the widget tree with null checks and ternary expressions. Nullable widget returns also break composability because parent widgets expecting a non-null child cannot directly use the result. Returning a placeholder widget such as SizedBox.shrink() for empty states keeps the return type non-nullable and makes the widget tree consistent and predictable.',
     correctionMessage:
-        'Return SizedBox.shrink() instead of null, or use conditional '
-        'rendering in the parent widget.',
+        'Return SizedBox.shrink() instead of null for empty states, or move the null check to the call site using conditional rendering (e.g. if (show) widget else SizedBox.shrink()).',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -6789,8 +6799,9 @@ class PreferActionButtonTooltipRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_action_button_tooltip',
     problemMessage:
-        '[prefer_action_button_tooltip] IconButton should have a tooltip for accessibility.',
-    correctionMessage: 'Add tooltip parameter to describe the button action.',
+        '[prefer_action_button_tooltip] IconButton without a tooltip is inaccessible to screen reader users who cannot see the icon and have no text description of the button action. Tooltips also appear on long-press (mobile) and hover (desktop), providing discoverability for all users, not just those using assistive technology.',
+    correctionMessage:
+        'Add tooltip: \"Description of action\" to the IconButton so screen readers can announce the button purpose and hover/long-press shows a label.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -6864,7 +6875,8 @@ class PreferVoidCallbackRule extends SaropaLintRule {
     name: 'prefer_void_callback',
     problemMessage:
         '[prefer_void_callback] Use VoidCallback instead of void Function().',
-    correctionMessage: 'Replace with VoidCallback typedef.',
+    correctionMessage:
+        'Replace void Function() with VoidCallback for consistency. Use ValueChanged<T> for void Function(T) and ValueGetter<T> for T Function().',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -6972,7 +6984,7 @@ class RequireOrientationHandlingRule extends SaropaLintRule {
     problemMessage:
         '[require_orientation_handling] MaterialApp without orientation handling. May break in landscape.',
     correctionMessage:
-        'Use SystemChrome.setPreferredOrientations or OrientationBuilder.',
+        'Call SystemChrome.setPreferredOrientations in main() to lock orientation, or use OrientationBuilder/LayoutBuilder to provide responsive layouts for both portrait and landscape.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -7056,7 +7068,7 @@ class RequireWebRendererAwarenessRule extends SaropaLintRule {
     problemMessage:
         '[require_web_renderer_awareness] kIsWeb check without renderer consideration. Behavior may vary.',
     correctionMessage:
-        'Consider if code depends on HTML vs CanvasKit renderer.',
+        'Check if the web-specific code depends on HTML DOM access (HTML renderer only) or canvas features (CanvasKit only). Use dart:js_interop or conditional imports for renderer-specific behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -7270,9 +7282,9 @@ class RequireTextFormFieldInFormRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_text_form_field_in_form',
     problemMessage:
-        '[require_text_form_field_in_form] TextFormField should be inside a Form widget for validation to work.',
+        '[require_text_form_field_in_form] TextFormField outside a Form ancestor cannot participate in form-level validation. Calling formKey.currentState.validate() will not reach this field, and its validator callback will never execute. The field behaves identically to a plain TextField but misleads readers into thinking validation is wired up.',
     correctionMessage:
-        'Wrap with Form widget or use TextField if no validation needed.',
+        'Wrap the TextFormField and its siblings in a Form widget with a GlobalKey<FormState>, or replace it with TextField if form-level validation is not needed.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -7462,9 +7474,9 @@ class RequireAnimatedBuilderChildRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_animated_builder_child',
     problemMessage:
-        '[require_animated_builder_child] AnimatedBuilder should use child parameter for static widgets.',
+        '[require_animated_builder_child] AnimatedBuilder without a child parameter rebuilds the entire subtree on every animation frame. Static widgets that do not depend on the animation value are needlessly reconstructed 60 times per second, wasting CPU cycles and causing jank in complex widget trees.',
     correctionMessage:
-        'Move static widgets to child parameter to avoid rebuilds.',
+        'Move static widgets to the child parameter of AnimatedBuilder. The child is built once and passed to the builder callback, avoiding reconstruction on each frame.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -7536,8 +7548,9 @@ class RequireRethrowPreserveStackRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_rethrow_preserve_stack',
     problemMessage:
-        '[require_rethrow_preserve_stack] throw e loses stack trace. Use rethrow instead.',
-    correctionMessage: 'Replace "throw e" with "rethrow".',
+        '[require_rethrow_preserve_stack] Using \"throw e\" in a catch block creates a new stack trace starting from the throw site, discarding the original stack trace that shows where the error actually occurred. This makes debugging significantly harder because the error origin is lost. The rethrow keyword preserves the original stack trace.',
+    correctionMessage:
+        'Replace \"throw e\" with \"rethrow\" to preserve the original stack trace. If you need to wrap the error, throw a new exception with the original as the cause.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -7737,9 +7750,9 @@ class AvoidLateWithoutGuaranteeRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_late_without_guarantee',
     problemMessage:
-        '[avoid_late_without_guarantee] late field may cause LateInitializationError if accessed before init.',
+        '[avoid_late_without_guarantee] late field throws a LateInitializationError at runtime if accessed before assignment, and Dart provides no compile-time guarantee that initialization has occurred. This creates a hidden crash risk that is difficult to catch in testing and may only surface in specific user flows or edge cases.',
     correctionMessage:
-        'Consider using nullable type or ensure init in initState/constructor.',
+        'Use a nullable type with null checks for fields that may not be initialized, or ensure initialization in the constructor or initState where the framework guarantees execution order.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -8278,9 +8291,9 @@ class RequireLocaleForTextRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_locale_for_text',
     problemMessage:
-        '[require_locale_for_text] Text formatting without explicit locale may vary by device.',
+        '[require_locale_for_text] Text formatting methods (toUpperCase, toLowerCase, number formatting) without an explicit locale use the device default, producing different results across regions. For example, Turkish locale uppercases \"i\" to \"I\" (with a dot), breaking string comparisons and identifiers unexpectedly.',
     correctionMessage:
-        'Provide explicit locale parameter for consistent formatting across devices.',
+        'Pass an explicit locale parameter to text formatting calls, or use toUpperCase() only on ASCII-known strings. Use intl package for locale-aware number and date formatting.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -8376,9 +8389,9 @@ class RequireDialogBarrierConsiderationRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_dialog_barrier_consideration',
     problemMessage:
-        '[require_dialog_barrier_consideration] Destructive dialog without explicit barrierDismissible.',
+        '[require_dialog_barrier_consideration] Destructive confirmation dialog (delete, remove, logout) defaults to barrierDismissible: true, allowing users to accidentally dismiss the dialog by tapping outside. This can silently skip the confirmation step, or worse, leave the user unsure whether the action was confirmed or cancelled.',
     correctionMessage:
-        'Set barrierDismissible: false for destructive confirmation dialogs.',
+        'Set barrierDismissible: false on destructive confirmation dialogs so users must explicitly tap a button to confirm or cancel the action.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -8458,7 +8471,7 @@ class PreferFeatureFolderStructureRule extends SaropaLintRule {
     problemMessage:
         '[prefer_feature_folder_structure] File in type-based folder. Consider feature-based organization.',
     correctionMessage:
-        'Group files by feature (features/auth/) instead of type (blocs/, models/).',
+        'Group related files by feature (e.g. features/auth/login_bloc.dart, features/auth/login_screen.dart) so all code for a feature is co-located and can be modified, tested, and deleted as a unit.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
