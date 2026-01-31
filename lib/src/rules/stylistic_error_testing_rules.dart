@@ -1,7 +1,8 @@
-// ignore_for_file: depend_on_referenced_packages
+// ignore_for_file: depend_on_referenced_packages, deprecated_member_use
 
 import 'package:analyzer/dart/ast/ast.dart';
-import 'package:analyzer/error/error.dart' show DiagnosticSeverity;
+import 'package:analyzer/error/error.dart'
+    show AnalysisError, DiagnosticSeverity;
 import 'package:custom_lint_builder/custom_lint_builder.dart';
 
 import '../saropa_lint_rule.dart';
@@ -403,6 +404,9 @@ class PreferCatchOverOnRule extends SaropaLintRule {
   );
 
   @override
+  List<Fix> get customFixes => [_RemoveOnClauseFix()];
+
+  @override
   void runWithReporter(
     CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
@@ -413,6 +417,44 @@ class PreferCatchOverOnRule extends SaropaLintRule {
       if (node.exceptionType != null) {
         reporter.atNode(node, code);
       }
+    });
+  }
+}
+
+class _RemoveOnClauseFix extends DartFix {
+  @override
+  void run(
+    CustomLintResolver resolver,
+    ChangeReporter reporter,
+    CustomLintContext context,
+    AnalysisError analysisError,
+    List<AnalysisError> others,
+  ) {
+    context.registry.addCatchClause((CatchClause node) {
+      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
+      if (node.exceptionType == null) return;
+
+      final String source = node.toSource();
+
+      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
+        message: 'Remove on clause',
+        priority: 1,
+      );
+
+      changeBuilder.addDartFileEdit((builder) {
+        String newSource;
+        if (node.catchKeyword != null) {
+          // on Type catch (e) { ... } → catch (e) { ... }
+          final int relOffset = node.catchKeyword!.offset - node.offset;
+          newSource = source.substring(relOffset);
+        } else {
+          // on Type { ... } → catch (e) { ... }
+          final int bodyOffset = node.body.offset - node.offset;
+          newSource = 'catch (e) ${source.substring(bodyOffset)}';
+        }
+
+        builder.addSimpleReplacement(node.sourceRange, newSource);
+      });
     });
   }
 }
@@ -655,6 +697,9 @@ class PreferExpectOverAssertInTestsRule extends SaropaLintRule {
         'Use expect() for assertions in tests. Example: expect(user.name, "John"). This provides better error messages and matchers than assert.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
+
+  @override
+  List<Fix> get customFixes => [_ReplaceAssertWithExpectFix()];
 
   @override
   void runWithReporter(
@@ -1012,6 +1057,35 @@ class PreferTestNameDescriptiveRule extends SaropaLintRule {
       if (testName.contains('should') && testName.contains('when')) {
         reporter.atNode(nameArg, code);
       }
+    });
+  }
+}
+
+class _ReplaceAssertWithExpectFix extends DartFix {
+  @override
+  void run(
+    CustomLintResolver resolver,
+    ChangeReporter reporter,
+    CustomLintContext context,
+    AnalysisError analysisError,
+    List<AnalysisError> others,
+  ) {
+    context.registry.addAssertStatement((AssertStatement node) {
+      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
+
+      final String condition = node.condition.toSource();
+
+      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
+        message: 'Replace with expect()',
+        priority: 1,
+      );
+
+      changeBuilder.addDartFileEdit((builder) {
+        builder.addSimpleReplacement(
+          node.sourceRange,
+          'expect($condition, isTrue);',
+        );
+      });
     });
   }
 }

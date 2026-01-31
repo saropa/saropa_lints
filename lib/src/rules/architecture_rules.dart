@@ -7,7 +7,8 @@
 library;
 
 import 'package:analyzer/dart/ast/ast.dart';
-import 'package:analyzer/error/error.dart' show DiagnosticSeverity;
+import 'package:analyzer/error/error.dart'
+    show AnalysisError, DiagnosticSeverity;
 import 'package:custom_lint_builder/custom_lint_builder.dart';
 
 import '../saropa_lint_rule.dart';
@@ -639,6 +640,9 @@ class AvoidTouchOnlyGesturesRule extends SaropaLintRule {
   );
 
   @override
+  List<Fix> get customFixes => [_AddLongPressFix()];
+
+  @override
   void runWithReporter(
     CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
@@ -672,6 +676,41 @@ class AvoidTouchOnlyGesturesRule extends SaropaLintRule {
       if (hasOnTap && !hasSecondaryOrHover) {
         reporter.atNode(node.constructorName, code);
       }
+    });
+  }
+}
+
+class _AddLongPressFix extends DartFix {
+  @override
+  void run(
+    CustomLintResolver resolver,
+    ChangeReporter reporter,
+    CustomLintContext context,
+    AnalysisError analysisError,
+    List<AnalysisError> others,
+  ) {
+    context.registry.addInstanceCreationExpression((
+      InstanceCreationExpression node,
+    ) {
+      if (!node.constructorName.sourceRange
+          .intersects(analysisError.sourceRange)) {
+        return;
+      }
+
+      final NodeList<Expression> args = node.argumentList.arguments;
+      if (args.isEmpty) return;
+
+      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
+        message: 'Add onLongPress callback',
+        priority: 1,
+      );
+
+      changeBuilder.addDartFileEdit((builder) {
+        builder.addSimpleInsertion(
+          args.last.end,
+          ',\nonLongPress: () { /* TODO: Handle long press */ }',
+        );
+      });
     });
   }
 }

@@ -18,7 +18,8 @@ import 'project_context.dart';
 import 'tiers.dart' show essentialRules;
 
 // Re-export types needed by rule implementations
-export 'ignore_fixes.dart' show AddIgnoreCommentFix, AddIgnoreForFileFix;
+export 'ignore_fixes.dart'
+    show AddIgnoreCommentFix, AddIgnoreForFileFix, WrapInTryCatchFix;
 export 'owasp/owasp.dart' show OwaspMapping, OwaspMobile, OwaspWeb;
 export 'project_context.dart'
     show

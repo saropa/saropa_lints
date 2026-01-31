@@ -1,5 +1,8 @@
+// ignore_for_file: deprecated_member_use
+
 import 'package:analyzer/dart/ast/ast.dart';
-import 'package:analyzer/error/error.dart' show DiagnosticSeverity;
+import 'package:analyzer/error/error.dart'
+    show AnalysisError, DiagnosticSeverity;
 import 'package:custom_lint_builder/custom_lint_builder.dart';
 import 'package:saropa_lints/src/saropa_lint_rule.dart';
 
@@ -45,6 +48,9 @@ class AvoidBluetoothScanWithoutTimeoutRule extends SaropaLintRule {
   };
 
   @override
+  List<Fix> get customFixes => [_AddScanTimeoutFix()];
+
+  @override
   void runWithReporter(
     CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
@@ -66,6 +72,46 @@ class AvoidBluetoothScanWithoutTimeoutRule extends SaropaLintRule {
       if (!hasTimeout) {
         reporter.atNode(node.methodName, code);
       }
+    });
+  }
+}
+
+class _AddScanTimeoutFix extends DartFix {
+  @override
+  void run(
+    CustomLintResolver resolver,
+    ChangeReporter reporter,
+    CustomLintContext context,
+    AnalysisError analysisError,
+    List<AnalysisError> others,
+  ) {
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      if (!node.methodName.sourceRange.intersects(analysisError.sourceRange)) {
+        return;
+      }
+
+      final NodeList<Expression> args = node.argumentList.arguments;
+
+      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
+        message: 'Add timeout: Duration(seconds: 10)',
+        priority: 1,
+      );
+
+      changeBuilder.addDartFileEdit((builder) {
+        final int insertOffset = node.argumentList.rightParenthesis.offset;
+
+        if (args.isEmpty) {
+          builder.addSimpleInsertion(
+            insertOffset,
+            'timeout: const Duration(seconds: 10)',
+          );
+        } else {
+          builder.addSimpleInsertion(
+            insertOffset,
+            ', timeout: const Duration(seconds: 10)',
+          );
+        }
+      });
     });
   }
 }
@@ -729,6 +775,9 @@ class RequireGeolocatorErrorHandlingRule extends SaropaLintRule {
         'Wrap location requests in try-catch blocks to handle errors such as permission denial, hardware failure, or service unavailability. Provide user feedback and fallback logic to maintain a robust and user-friendly experience.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
+
+  @override
+  List<Fix> get customFixes => [WrapInTryCatchFix()];
 
   @override
   void runWithReporter(
