@@ -21,6 +21,11 @@
         "title": "Run Saropa Lints",
         "icon": "$(bug)",
         "category": "Saropa"
+      },
+      {
+        "command": "saropa-lints.scanPath",
+        "title": "Scan with Saropa Lints",
+        "category": "Saropa"
       }
     ],
     "keybindings": [
@@ -37,6 +42,13 @@
           "command": "saropa-lints.run",
           "group": "navigation",
           "when": "resourceExtname == .dart"
+        }
+      ],
+      "explorer/context": [
+        {
+          "command": "saropa-lints.scanPath",
+          "group": "7_modification",
+          "when": "resourceExtname == .dart || explorerResourceIsFolder"
         }
       ]
     }

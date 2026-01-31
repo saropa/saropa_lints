@@ -156,6 +156,7 @@ const Set<String> stylisticRules = <String>{
   'prefer_nullable_over_late',
   'prefer_object_over_dynamic',
   'prefer_on_over_catch',
+  'prefer_positive_conditions',
   'prefer_positive_conditions_first',
   'prefer_required_before_optional',
   'prefer_richtext_over_text_rich',
@@ -601,6 +602,9 @@ const Set<String> essentialRules = <String>{
 /// Recommended tier rules - Essential + common mistakes, performance basics.
 /// Catches bugs that don't immediately crash but cause poor UX, sluggish performance.
 const Set<String> recommendedOnlyRules = <String>{
+  // Suppression comment validation
+  'avoid_ignore_trailing_comment',
+
   // Moved from Essential (style/quality, not crash prevention)
   'prefer_list_first',
   'prefer_list_last',
@@ -622,7 +626,6 @@ const Set<String> recommendedOnlyRules = <String>{
 
   // Performance
   'avoid_expensive_build',
-  'prefer_const_child_widgets',
   'avoid_listview_without_item_extent',
   'avoid_shrink_wrap_in_lists',
   'avoid_mediaquery_in_build',
@@ -2539,4 +2542,280 @@ Set<String> getAllDefinedRules() {
       .union(comprehensiveOnlyRules)
       .union(insanityOnlyRules)
       .union(stylisticRules);
+}
+
+// =========================================================================
+// PLATFORM RULE SETS
+// =========================================================================
+// Rules specific to each target platform. Orthogonal to tiers.
+//
+// A rule can appear in multiple platform sets (e.g., Apple Sign In is both
+// iOS and macOS). A rule is disabled only when ALL its platforms are disabled.
+//
+// General cross-platform rules (require_platform_check, etc.) are NOT in
+// any platform set -- they remain always-on regardless of platform config.
+// =========================================================================
+
+/// Rules specific to the iOS platform.
+const Set<String> iosPlatformRules = <String>{
+  // Essential
+  'require_https_for_ios',
+  'require_ios_permission_description',
+  'require_ios_privacy_manifest',
+  'require_ios_app_tracking_transparency',
+  'require_ios_face_id_usage_description',
+  'avoid_ios_in_app_browser_for_auth',
+  'require_ios_local_notification_permission',
+  'require_ios_healthkit_authorization',
+  'require_ios_receipt_validation',
+  'require_ios_data_protection',
+  'require_ios_keychain_for_credentials',
+  'avoid_long_running_isolates', // iOS kills isolates after 30s
+
+  // Recommended
+  'prefer_ios_safe_area',
+  'avoid_ios_hardcoded_status_bar',
+  'require_ios_platform_check',
+  'avoid_ios_background_fetch_abuse',
+  'avoid_ios_13_deprecations',
+  'avoid_ios_simulator_only_code',
+  'require_ios_minimum_version_check',
+  'require_ios_photo_library_add_usage',
+  'require_ios_app_review_prompt_timing',
+  'require_ios_push_notification_capability',
+  'avoid_ios_hardcoded_device_model',
+  'require_ios_app_group_capability',
+  'avoid_ios_continuous_location_tracking',
+  'require_ios_lifecycle_handling',
+  'require_ios_nfc_capability_check',
+  'require_ios_callkit_integration',
+  'require_ios_photo_library_limited_access',
+  'require_ios_method_channel_cleanup',
+  'avoid_ios_force_unwrap_in_callbacks',
+  'require_ios_deployment_target_consistency',
+  'require_ios_dynamic_island_safe_zones',
+  'require_ios_low_power_mode_handling',
+  'require_ios_accessibility_large_text',
+  'avoid_ios_hardcoded_keyboard_height',
+  'require_ios_multitasking_support',
+  'avoid_ios_battery_drain_patterns',
+  'avoid_ios_wifi_only_assumption',
+  'require_image_picker_permission_ios',
+  'require_permission_plist_ios',
+  'require_url_launcher_schemes_ios',
+
+  // Professional
+  'prefer_ios_storekit2',
+  'require_ios_background_mode',
+  'avoid_ios_deprecated_uikit',
+  'require_ios_keychain_accessibility',
+  'avoid_ios_hardcoded_bundle_id',
+  'require_ios_ats_exception_documentation',
+  'require_ios_siri_intent_definition',
+  'require_ios_widget_extension_capability',
+  'require_ios_database_conflict_resolution',
+  'require_ios_background_audio_capability',
+  'require_ios_app_clip_size_limit',
+  'require_ios_keychain_sync_awareness',
+  'require_ios_share_sheet_uti_declaration',
+  'require_ios_icloud_kvstore_limitations',
+  'require_ios_orientation_handling',
+  'require_ios_universal_links_domain_matching',
+  'require_ios_carplay_setup',
+  'require_ios_live_activities_setup',
+  'require_ios_pasteboard_privacy_handling',
+  'require_ios_background_refresh_declaration',
+  'require_ios_scene_delegate_awareness',
+  'require_ios_review_prompt_frequency',
+  'require_ios_certificate_pinning',
+  'require_ios_biometric_fallback',
+  'avoid_ios_misleading_push_notifications',
+  'require_ios_entitlements',
+  'require_ios_launch_storyboard',
+  'require_ios_version_check',
+  'require_ios_focus_mode_awareness',
+  'require_ios_quick_note_awareness',
+  'avoid_ios_debug_code_in_release',
+  'prefer_ios_app_intents_framework',
+  'prefer_ios_context_menu',
+  'prefer_ios_handoff_support',
+  'prefer_ios_haptic_feedback',
+  'prefer_ios_spotlight_indexing',
+  'require_ios_accessibility_labels',
+  'require_ios_age_rating_consideration',
+  'require_ios_promotion_display_support',
+  'require_ios_voiceover_gesture_compatibility',
+  'prefer_cupertino_for_ios',
+  'prefer_cupertino_for_ios_feel',
+};
+
+/// Rules specific to the Android platform.
+const Set<String> androidPlatformRules = <String>{
+  // Essential
+  'require_notification_channel_android',
+  'require_android_permission_request',
+  'prefer_pending_intent_flags',
+  'avoid_android_cleartext_traffic',
+
+  // Recommended
+  'require_android_12_splash',
+  'require_image_picker_permission_android',
+  'require_permission_manifest_android',
+  'require_url_launcher_queries_android',
+  'require_notification_permission_android13',
+
+  // Professional
+  'avoid_android_task_affinity_default',
+  'require_android_backup_rules',
+};
+
+/// Rules specific to the macOS platform.
+const Set<String> macosPlatformRules = <String>{
+  // Essential
+  'avoid_macos_catalyst_unsupported_apis',
+  'require_macos_notarization_ready',
+
+  // Recommended
+  'require_macos_window_size_constraints',
+  'require_macos_sandbox_entitlements',
+  'avoid_macos_full_disk_access',
+  'require_macos_sandbox_exceptions',
+  'avoid_macos_hardened_runtime_violations',
+  'require_macos_app_transport_security',
+
+  // Professional
+  'require_macos_file_access_intent',
+  'avoid_macos_deprecated_security_apis',
+  'require_macos_hardened_runtime',
+  'require_macos_window_restoration',
+  'require_macos_entitlements',
+  'prefer_macos_keyboard_shortcuts',
+  'prefer_macos_menu_bar_integration',
+};
+
+/// Rules specific to the Web platform.
+const Set<String> webPlatformRules = <String>{
+  // Essential
+  'avoid_platform_channel_on_web',
+  'avoid_web_only_dependencies',
+  'require_cors_handling',
+
+  // Recommended
+  'avoid_secure_storage_on_web',
+  'prefer_deferred_loading_web',
+
+  // Professional
+  'prefer_url_strategy_for_web',
+  'require_web_renderer_awareness',
+
+  // Comprehensive
+  'avoid_isar_web_limitations',
+};
+
+/// Rules specific to the Windows platform.
+///
+/// Currently empty - populated as Windows-specific rules are added.
+const Set<String> windowsPlatformRules = <String>{};
+
+/// Rules specific to the Linux platform.
+///
+/// Currently empty - populated as Linux-specific rules are added.
+const Set<String> linuxPlatformRules = <String>{};
+
+/// Rules shared by Apple platforms (iOS + macOS).
+///
+/// These appear in both [iosPlatformRules] and [macosPlatformRules] via
+/// the [platformRuleSets] map lookup, but are defined here for clarity.
+const Set<String> _applePlatformRules = <String>{
+  'require_apple_signin_nonce',
+  'require_apple_sign_in',
+};
+
+/// Rules shared by desktop platforms (macOS, Windows, Linux).
+const Set<String> _desktopPlatformRules = <String>{
+  'require_menu_bar_for_desktop',
+  'require_window_close_confirmation',
+  'require_window_size_constraints',
+  'prefer_native_file_dialogs',
+  'avoid_touch_only_gestures',
+};
+
+/// All platform sets keyed by platform name.
+///
+/// Each platform's effective rules include the platform-specific set plus
+/// any shared sets (Apple, desktop) that apply.
+Map<String, Set<String>> get platformRuleSets => {
+      'ios': iosPlatformRules.union(_applePlatformRules),
+      'android': androidPlatformRules,
+      'macos': macosPlatformRules
+          .union(_applePlatformRules)
+          .union(_desktopPlatformRules),
+      'web': webPlatformRules,
+      'windows': windowsPlatformRules.union(_desktopPlatformRules),
+      'linux': linuxPlatformRules.union(_desktopPlatformRules),
+    };
+
+/// All supported platform names.
+const List<String> allPlatforms = <String>[
+  'ios',
+  'android',
+  'macos',
+  'web',
+  'windows',
+  'linux',
+];
+
+/// Default platform settings.
+///
+/// Only iOS and Android are enabled by default since most Flutter projects
+/// target mobile. Users can enable additional platforms in
+/// `analysis_options_custom.yaml`.
+const Map<String, bool> defaultPlatforms = <String, bool>{
+  'ios': true,
+  'android': true,
+  'macos': false,
+  'web': false,
+  'windows': false,
+  'linux': false,
+};
+
+/// Returns the set of rules that should be disabled based on
+/// disabled platforms.
+///
+/// A rule is disabled if ALL platforms it belongs to are disabled.
+/// If a rule appears in multiple platform sets (e.g., Apple Sign In
+/// is in both iOS and macOS), it stays enabled as long as at least
+/// one of its platforms is enabled.
+///
+/// Rules not in any platform set are never affected.
+Set<String> getRulesDisabledByPlatforms(Map<String, bool> platforms) {
+  final disabledPlatforms =
+      platforms.entries.where((e) => !e.value).map((e) => e.key).toSet();
+
+  if (disabledPlatforms.isEmpty) return const <String>{};
+
+  final enabledPlatforms =
+      platforms.entries.where((e) => e.value).map((e) => e.key).toSet();
+
+  final Set<String> rulesToDisable = <String>{};
+  final sets = platformRuleSets;
+
+  for (final platform in disabledPlatforms) {
+    final rules = sets[platform] ?? const <String>{};
+    for (final rule in rules) {
+      // Check if this rule is still relevant via another enabled platform
+      bool stillRelevant = false;
+      for (final enabledPlatform in enabledPlatforms) {
+        if (sets[enabledPlatform]?.contains(rule) ?? false) {
+          stillRelevant = true;
+          break;
+        }
+      }
+      if (!stillRelevant) {
+        rulesToDisable.add(rule);
+      }
+    }
+  }
+
+  return rulesToDisable;
 }

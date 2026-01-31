@@ -9,6 +9,7 @@ import 'package:analyzer/dart/element/type.dart';
 import 'package:analyzer/error/error.dart'
     show AnalysisError, DiagnosticSeverity;
 
+import '../ignore_utils.dart';
 import '../saropa_lint_rule.dart';
 import 'package:custom_lint_builder/custom_lint_builder.dart';
 
@@ -7948,5 +7949,160 @@ class _PreferReturningConditionalExpressionsFix extends DartFix {
       }
     }
     return null;
+  }
+}
+
+/// Warns when `// ignore:` or `// ignore_for_file:` has a trailing `//`
+/// comment after the rule names.
+///
+/// The `custom_lint_builder` framework parses everything after the colon as
+/// rule names (splitting on commas and trimming). A trailing comment causes
+/// the last rule name to include the comment text, so the framework's
+/// `codes.contains('rule_name')` check silently fails.
+///
+/// **BAD:**
+/// ```dart
+/// // ignore_for_file: my_rule // reason why we ignore
+/// // ignore: my_rule // no web support needed
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// // reason why we ignore
+/// // ignore_for_file: my_rule
+/// // no web support needed
+/// // ignore: my_rule
+/// ```
+class AvoidIgnoreTrailingCommentRule extends SaropaLintRule {
+  const AvoidIgnoreTrailingCommentRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  static const LintCode _code = LintCode(
+    name: 'avoid_ignore_trailing_comment',
+    problemMessage: '[avoid_ignore_trailing_comment] '
+        'Trailing comment breaks ignore suppression.',
+    correctionMessage:
+        'Move the comment to the line above the ignore directive.',
+    errorSeverity: DiagnosticSeverity.WARNING,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addCompilationUnit((CompilationUnit unit) {
+      Token? token = unit.beginToken;
+
+      while (token != null && !token.isEof) {
+        Token? comment = token.precedingComments;
+        while (comment != null) {
+          if (_hasTrailingComment(comment.lexeme)) {
+            reporter.atOffset(
+              offset: comment.offset,
+              length: comment.length,
+              errorCode: code,
+            );
+          }
+          comment = comment.next;
+        }
+        token = token.next;
+      }
+    });
+  }
+
+  @override
+  List<Fix> getFixes() => <Fix>[_MoveTrailingCommentFix()];
+
+  static bool _hasTrailingComment(String lexeme) {
+    return IgnoreUtils.trailingCommentOnIgnore.hasMatch(lexeme);
+  }
+
+  /// Splits a comment like `// ignore: rule // reason` or
+  /// `// ignore: rule - reason` into the directive and trailing parts.
+  ///
+  /// The trailing part is always normalized to a `// ` comment.
+  /// Returns `null` if no trailing comment or separator is found.
+  static ({String directive, String trailing})? splitParts(String lexeme) {
+    final colonIndex = lexeme.indexOf(':');
+    if (colonIndex < 0) return null;
+
+    final afterColon = lexeme.substring(colonIndex + 1);
+
+    // Check for trailing // comment first (higher priority)
+    final trailingSlashIndex = afterColon.indexOf('//');
+    if (trailingSlashIndex >= 0) {
+      final directive =
+          lexeme.substring(0, colonIndex + 1 + trailingSlashIndex).trimRight();
+      final trailing = afterColon.substring(trailingSlashIndex).trim();
+      return (directive: directive, trailing: trailing);
+    }
+
+    // Check for trailing - separator (space-hyphen-space)
+    final dashMatch = RegExp(r'\s+-\s+').firstMatch(afterColon);
+    if (dashMatch != null) {
+      final directive =
+          lexeme.substring(0, colonIndex + 1 + dashMatch.start).trimRight();
+      final text = afterColon.substring(dashMatch.end).trim();
+      if (text.isEmpty) return null;
+      return (directive: directive, trailing: '// $text');
+    }
+
+    return null;
+  }
+}
+
+class _MoveTrailingCommentFix extends DartFix {
+  @override
+  void run(
+    CustomLintResolver resolver,
+    ChangeReporter reporter,
+    CustomLintContext context,
+    AnalysisError analysisError,
+    List<AnalysisError> others,
+  ) {
+    context.registry.addCompilationUnit((CompilationUnit unit) {
+      Token? token = unit.beginToken;
+
+      while (token != null && !token.isEof) {
+        Token? comment = token.precedingComments;
+        while (comment != null) {
+          if (comment.offset == analysisError.offset) {
+            _applyFix(comment, analysisError, reporter);
+            return;
+          }
+          comment = comment.next;
+        }
+        token = token.next;
+      }
+    });
+  }
+
+  void _applyFix(
+    Token comment,
+    AnalysisError error,
+    ChangeReporter reporter,
+  ) {
+    final parts = AvoidIgnoreTrailingCommentRule.splitParts(
+      comment.lexeme,
+    );
+    if (parts == null) return;
+
+    final replacement = '${parts.trailing}\n${parts.directive}';
+
+    final changeBuilder = reporter.createChangeBuilder(
+      message: 'Move comment above directive',
+      priority: 80,
+    );
+
+    changeBuilder.addDartFileEdit((builder) {
+      builder.addSimpleReplacement(error.sourceRange, replacement);
+    });
   }
 }

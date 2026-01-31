@@ -1,7 +1,8 @@
-// ignore_for_file: depend_on_referenced_packages
+// ignore_for_file: depend_on_referenced_packages, deprecated_member_use
 
 import 'package:analyzer/dart/ast/ast.dart';
-import 'package:analyzer/error/error.dart' show DiagnosticSeverity;
+import 'package:analyzer/error/error.dart'
+    show AnalysisError, DiagnosticSeverity;
 import 'package:custom_lint_builder/custom_lint_builder.dart';
 
 import '../saropa_lint_rule.dart';
@@ -93,6 +94,45 @@ class PreferSizedBoxOverContainerRule extends SaropaLintRule {
       }
     });
   }
+
+  @override
+  List<Fix> get customFixes => <Fix>[_PreferSizedBoxOverContainerFix()];
+}
+
+class _PreferSizedBoxOverContainerFix extends DartFix {
+  @override
+  void run(
+    CustomLintResolver resolver,
+    ChangeReporter reporter,
+    CustomLintContext context,
+    AnalysisError analysisError,
+    List<AnalysisError> others,
+  ) {
+    context.registry
+        .addInstanceCreationExpression((InstanceCreationExpression node) {
+      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
+      if (node.constructorName.type.element?.name != 'Container') return;
+
+      final constPrefix = node.keyword?.lexeme == 'const' ? 'const ' : '';
+      final args = _extractNamedArgs(node);
+      final newArgs = <String>[];
+      if (args.containsKey('key')) newArgs.add('key: ${args['key']}');
+      if (args.containsKey('width')) newArgs.add('width: ${args['width']}');
+      if (args.containsKey('height')) newArgs.add('height: ${args['height']}');
+      if (args.containsKey('child')) newArgs.add('child: ${args['child']}');
+
+      final changeBuilder = reporter.createChangeBuilder(
+        message: 'Replace with SizedBox',
+        priority: 80,
+      );
+      changeBuilder.addDartFileEdit((builder) {
+        builder.addSimpleReplacement(
+          node.sourceRange,
+          '${constPrefix}SizedBox(${newArgs.join(', ')})',
+        );
+      });
+    });
+  }
 }
 
 /// Warns when SizedBox is used instead of Container (opposite rule).
@@ -155,6 +195,46 @@ class PreferContainerOverSizedBoxRule extends SaropaLintRule {
       if (namedConstructor == 'shrink' || namedConstructor == 'expand') return;
 
       reporter.atNode(node, code);
+    });
+  }
+
+  @override
+  List<Fix> get customFixes => <Fix>[_PreferContainerOverSizedBoxFix()];
+}
+
+class _PreferContainerOverSizedBoxFix extends DartFix {
+  @override
+  void run(
+    CustomLintResolver resolver,
+    ChangeReporter reporter,
+    CustomLintContext context,
+    AnalysisError analysisError,
+    List<AnalysisError> others,
+  ) {
+    context.registry
+        .addInstanceCreationExpression((InstanceCreationExpression node) {
+      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
+      if (node.constructorName.type.element?.name != 'SizedBox') return;
+      if (node.constructorName.name?.name != null) return;
+
+      final constPrefix = node.keyword?.lexeme == 'const' ? 'const ' : '';
+      final args = _extractNamedArgs(node);
+      final newArgs = <String>[];
+      if (args.containsKey('key')) newArgs.add('key: ${args['key']}');
+      if (args.containsKey('width')) newArgs.add('width: ${args['width']}');
+      if (args.containsKey('height')) newArgs.add('height: ${args['height']}');
+      if (args.containsKey('child')) newArgs.add('child: ${args['child']}');
+
+      final changeBuilder = reporter.createChangeBuilder(
+        message: 'Replace with Container',
+        priority: 80,
+      );
+      changeBuilder.addDartFileEdit((builder) {
+        builder.addSimpleReplacement(
+          node.sourceRange,
+          '${constPrefix}Container(${newArgs.join(', ')})',
+        );
+      });
     });
   }
 }
@@ -369,6 +449,58 @@ class PreferEdgeInsetsSymmetricRule extends SaropaLintRule {
       }
     });
   }
+
+  @override
+  List<Fix> get customFixes => <Fix>[_PreferEdgeInsetsSymmetricFix()];
+}
+
+class _PreferEdgeInsetsSymmetricFix extends DartFix {
+  @override
+  void run(
+    CustomLintResolver resolver,
+    ChangeReporter reporter,
+    CustomLintContext context,
+    AnalysisError analysisError,
+    List<AnalysisError> others,
+  ) {
+    context.registry
+        .addInstanceCreationExpression((InstanceCreationExpression node) {
+      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
+      if (node.constructorName.type.element?.name != 'EdgeInsets') return;
+      if (node.constructorName.name?.name != 'only') return;
+
+      final args = _extractNamedArgs(node);
+      final left = args['left'];
+      final right = args['right'];
+      final top = args['top'];
+      final bottom = args['bottom'];
+
+      // Only offer fix when all present pairs are symmetric
+      final hasH = left != null && right != null;
+      final hasV = top != null && bottom != null;
+      if (hasH && left != right) return;
+      if (hasV && top != bottom) return;
+      // Reject unpaired sides (e.g., left without right)
+      if ((left == null) != (right == null)) return;
+      if ((top == null) != (bottom == null)) return;
+
+      final constPrefix = node.keyword?.lexeme == 'const' ? 'const ' : '';
+      final newArgs = <String>[];
+      if (hasH) newArgs.add('horizontal: $left');
+      if (hasV) newArgs.add('vertical: $top');
+
+      final changeBuilder = reporter.createChangeBuilder(
+        message: 'Replace with EdgeInsets.symmetric()',
+        priority: 80,
+      );
+      changeBuilder.addDartFileEdit((builder) {
+        builder.addSimpleReplacement(
+          node.sourceRange,
+          '${constPrefix}EdgeInsets.symmetric(${newArgs.join(', ')})',
+        );
+      });
+    });
+  }
 }
 
 /// Warns when EdgeInsets.symmetric() is used instead of .only() (opposite rule).
@@ -429,6 +561,53 @@ class PreferEdgeInsetsOnlyRule extends SaropaLintRule {
       if (constructorName == 'EdgeInsets' && namedConstructor == 'symmetric') {
         reporter.atNode(node, code);
       }
+    });
+  }
+
+  @override
+  List<Fix> get customFixes => <Fix>[_PreferEdgeInsetsOnlyFix()];
+}
+
+class _PreferEdgeInsetsOnlyFix extends DartFix {
+  @override
+  void run(
+    CustomLintResolver resolver,
+    ChangeReporter reporter,
+    CustomLintContext context,
+    AnalysisError analysisError,
+    List<AnalysisError> others,
+  ) {
+    context.registry
+        .addInstanceCreationExpression((InstanceCreationExpression node) {
+      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
+      if (node.constructorName.type.element?.name != 'EdgeInsets') return;
+      if (node.constructorName.name?.name != 'symmetric') return;
+
+      final args = _extractNamedArgs(node);
+      final horizontal = args['horizontal'];
+      final vertical = args['vertical'];
+
+      final constPrefix = node.keyword?.lexeme == 'const' ? 'const ' : '';
+      final newArgs = <String>[];
+      if (horizontal != null) {
+        newArgs.add('left: $horizontal');
+        newArgs.add('right: $horizontal');
+      }
+      if (vertical != null) {
+        newArgs.add('top: $vertical');
+        newArgs.add('bottom: $vertical');
+      }
+
+      final changeBuilder = reporter.createChangeBuilder(
+        message: 'Replace with EdgeInsets.only()',
+        priority: 80,
+      );
+      changeBuilder.addDartFileEdit((builder) {
+        builder.addSimpleReplacement(
+          node.sourceRange,
+          '${constPrefix}EdgeInsets.only(${newArgs.join(', ')})',
+        );
+      });
     });
   }
 }
@@ -507,6 +686,50 @@ class PreferBorderRadiusCircularRule extends SaropaLintRule {
       }
     });
   }
+
+  @override
+  List<Fix> get customFixes => <Fix>[_PreferBorderRadiusCircularFix()];
+}
+
+class _PreferBorderRadiusCircularFix extends DartFix {
+  @override
+  void run(
+    CustomLintResolver resolver,
+    ChangeReporter reporter,
+    CustomLintContext context,
+    AnalysisError analysisError,
+    List<AnalysisError> others,
+  ) {
+    context.registry
+        .addInstanceCreationExpression((InstanceCreationExpression node) {
+      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
+      if (node.constructorName.type.element?.name != 'BorderRadius') return;
+      if (node.constructorName.name?.name != 'all') return;
+
+      final args = node.argumentList.arguments;
+      if (args.length != 1) return;
+      final arg = args.first;
+      if (arg is! InstanceCreationExpression) return;
+      if (arg.constructorName.type.element?.name != 'Radius') return;
+      if (arg.constructorName.name?.name != 'circular') return;
+
+      // Extract the radius value from Radius.circular(X)
+      final innerArgs = arg.argumentList.arguments;
+      if (innerArgs.length != 1) return;
+      final radiusValue = innerArgs.first.toSource();
+
+      final changeBuilder = reporter.createChangeBuilder(
+        message: 'Replace with BorderRadius.circular()',
+        priority: 80,
+      );
+      changeBuilder.addDartFileEdit((builder) {
+        builder.addSimpleReplacement(
+          node.sourceRange,
+          'BorderRadius.circular($radiusValue)',
+        );
+      });
+    });
+  }
 }
 
 /// Warns when Flexible(fit: FlexFit.tight) is used instead of Expanded.
@@ -579,6 +802,45 @@ class PreferExpandedOverFlexibleRule extends SaropaLintRule {
       }
     });
   }
+
+  @override
+  List<Fix> get customFixes => <Fix>[_PreferExpandedOverFlexibleFix()];
+}
+
+class _PreferExpandedOverFlexibleFix extends DartFix {
+  @override
+  void run(
+    CustomLintResolver resolver,
+    ChangeReporter reporter,
+    CustomLintContext context,
+    AnalysisError analysisError,
+    List<AnalysisError> others,
+  ) {
+    context.registry
+        .addInstanceCreationExpression((InstanceCreationExpression node) {
+      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
+      if (node.constructorName.type.element?.name != 'Flexible') return;
+
+      final constPrefix = node.keyword?.lexeme == 'const' ? 'const ' : '';
+      final args = _extractNamedArgs(node);
+      // Remove 'fit' and keep everything else
+      final newArgs = <String>[];
+      if (args.containsKey('key')) newArgs.add('key: ${args['key']}');
+      if (args.containsKey('flex')) newArgs.add('flex: ${args['flex']}');
+      if (args.containsKey('child')) newArgs.add('child: ${args['child']}');
+
+      final changeBuilder = reporter.createChangeBuilder(
+        message: 'Replace with Expanded',
+        priority: 80,
+      );
+      changeBuilder.addDartFileEdit((builder) {
+        builder.addSimpleReplacement(
+          node.sourceRange,
+          '${constPrefix}Expanded(${newArgs.join(', ')})',
+        );
+      });
+    });
+  }
 }
 
 /// Warns when Expanded is used instead of Flexible (opposite rule).
@@ -637,6 +899,45 @@ class PreferFlexibleOverExpandedRule extends SaropaLintRule {
       if (constructorName == 'Expanded') {
         reporter.atNode(node, code);
       }
+    });
+  }
+
+  @override
+  List<Fix> get customFixes => <Fix>[_PreferFlexibleOverExpandedFix()];
+}
+
+class _PreferFlexibleOverExpandedFix extends DartFix {
+  @override
+  void run(
+    CustomLintResolver resolver,
+    ChangeReporter reporter,
+    CustomLintContext context,
+    AnalysisError analysisError,
+    List<AnalysisError> others,
+  ) {
+    context.registry
+        .addInstanceCreationExpression((InstanceCreationExpression node) {
+      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
+      if (node.constructorName.type.element?.name != 'Expanded') return;
+
+      final constPrefix = node.keyword?.lexeme == 'const' ? 'const ' : '';
+      final args = _extractNamedArgs(node);
+      final newArgs = <String>[];
+      if (args.containsKey('key')) newArgs.add('key: ${args['key']}');
+      newArgs.add('fit: FlexFit.tight');
+      if (args.containsKey('flex')) newArgs.add('flex: ${args['flex']}');
+      if (args.containsKey('child')) newArgs.add('child: ${args['child']}');
+
+      final changeBuilder = reporter.createChangeBuilder(
+        message: 'Replace with Flexible',
+        priority: 80,
+      );
+      changeBuilder.addDartFileEdit((builder) {
+        builder.addSimpleReplacement(
+          node.sourceRange,
+          '${constPrefix}Flexible(${newArgs.join(', ')})',
+        );
+      });
     });
   }
 }
@@ -794,4 +1095,20 @@ class PreferExplicitColorsRule extends SaropaLintRule {
       }
     });
   }
+}
+
+// =============================================================================
+// Shared helpers for quick fixes
+// =============================================================================
+
+/// Extracts named arguments from an [InstanceCreationExpression] as a map
+/// of argument name to source text.
+Map<String, String> _extractNamedArgs(InstanceCreationExpression node) {
+  final args = <String, String>{};
+  for (final arg in node.argumentList.arguments) {
+    if (arg is NamedExpression) {
+      args[arg.name.label.name] = arg.expression.toSource();
+    }
+  }
+  return args;
 }

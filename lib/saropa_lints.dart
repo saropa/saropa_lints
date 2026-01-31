@@ -29,7 +29,7 @@
 /// Map format (without `-`) is silently ignored by custom_lint!
 library;
 
-import 'dart:io' show File;
+import 'dart:io' show Directory, File;
 
 import 'package:custom_lint_builder/custom_lint_builder.dart';
 
@@ -101,10 +101,51 @@ export 'package:saropa_lints/src/project_context.dart'
 List<LintRule> get allSaropaRules =>
     _ruleFactories.values.map((f) => f()).toList();
 
+/// Cached package version resolved from pubspec.yaml at runtime.
+String? _resolvedVersion;
+
+/// Reads the saropa_lints version from pubspec.yaml via the consumer
+/// project's `.dart_tool/package_config.json`. Falls back to `'unknown'`.
+String get saropaLintsVersion => _resolvedVersion ??= _resolveVersion();
+
+String _resolveVersion() {
+  try {
+    final configFile = File('.dart_tool/package_config.json');
+    if (!configFile.existsSync()) return 'unknown';
+
+    final config = configFile.readAsStringSync();
+    final uriMatch = RegExp(
+      r'"name":\s*"saropa_lints"[^}]*"rootUri":\s*"([^"]+)"',
+    ).firstMatch(config);
+    final rootUri = uriMatch?.group(1);
+    if (rootUri == null) return 'unknown';
+
+    // Resolve rootUri to an absolute directory path.
+    final String packageDir;
+    if (rootUri.startsWith('file://')) {
+      packageDir = Uri.parse(rootUri).toFilePath();
+    } else if (rootUri.startsWith('../')) {
+      final dartToolDir = Directory('.dart_tool').absolute.path;
+      packageDir = Directory('$dartToolDir/$rootUri').absolute.path;
+    } else {
+      return 'unknown';
+    }
+
+    final pubspec = File('$packageDir/pubspec.yaml');
+    if (!pubspec.existsSync()) return 'unknown';
+
+    final versionMatch = RegExp(r'^version:\s*(.+)$', multiLine: true)
+        .firstMatch(pubspec.readAsStringSync());
+    return versionMatch?.group(1)?.trim() ?? 'unknown';
+  } catch (_) {
+    return 'unknown';
+  }
+}
+
 /// Entry point for custom_lint
 PluginBase createPlugin() {
   // ignore: avoid_print
-  print('[saropa_lints] createPlugin() called - version 4.8.0');
+  print('[saropa_lints] createPlugin() called - version $saropaLintsVersion');
   return _SaropaLints();
 }
 
@@ -615,7 +656,7 @@ final List<LintRule Function()> _allRuleFactories = <LintRule Function()>[
   // Performance rules (NEW)
   RequireKeysInAnimatedListsRule.new,
   AvoidExpensiveBuildRule.new,
-  PreferConstChildWidgetsRule.new,
+  // PreferConstChildWidgetsRule.new,
   AvoidSynchronousFileIoRule.new,
   PreferComputeForHeavyWorkRule.new,
   AvoidObjectCreationInHotLoopsRule.new,
@@ -877,6 +918,7 @@ final List<LintRule Function()> _allRuleFactories = <LintRule Function()>[
   PreferSingleExitPointRule.new,
   PreferGuardClausesRule.new,
   PreferPositiveConditionsFirstRule.new,
+  PreferPositiveConditionsRule.new,
   PreferSwitchStatementRule.new,
   PreferCascadeOverChainedRule.new,
   PreferChainedOverCascadeRule.new,
@@ -1716,6 +1758,8 @@ final List<LintRule Function()> _allRuleFactories = <LintRule Function()>[
   AvoidApiKeyInCodeRule.new,
   AvoidStoringSensitiveUnencryptedRule.new,
 
+  AvoidIgnoreTrailingCommentRule.new,
+
   // OWASP Coverage Gap Rules (v3.2.0)
   AvoidIgnoringSslErrorsRule.new,
   RequireHttpsOnlyRule.new,
@@ -2524,6 +2568,25 @@ class _SaropaLints extends PluginBase {
     final List<LintRule> filteredRules = getRulesFromRegistry(enabledRuleNames);
 
     // =========================================================================
+    // UNRESOLVABLE RULE DETECTION (Diagnostic)
+    // =========================================================================
+    // Warn about rules listed in tier definitions or explicit config but
+    // missing from _ruleFactories. This catches orphaned entries that cause
+    // the init command's rule count to diverge from the plugin's loaded count.
+    final Set<String> loadedNames =
+        filteredRules.map((LintRule r) => r.code.name).toSet();
+    final Set<String> unresolvable = enabledRuleNames.difference(loadedNames);
+    if (unresolvable.isNotEmpty) {
+      // ignore: avoid_print
+      print(
+        '[saropa_lints] WARNING: ${unresolvable.length} rule(s) could not be '
+        'resolved (defined in tier/config but missing from rule registry): '
+        '${unresolvable.take(10).join(', ')}'
+        '${unresolvable.length > 10 ? '...' : ''}',
+      );
+    }
+
+    // =========================================================================
     // RULE PRIORITY ORDERING (Performance Optimization)
     // =========================================================================
     // Sort rules by estimated execution cost so fast rules run first.
@@ -2574,15 +2637,42 @@ class _SaropaLints extends PluginBase {
     _cachedEnableAll = enableAll;
     _cachedRulesHash = rulesHash;
 
+    // Infer the effective tier from the final enabled rule set so the log
+    // message reflects reality (the YAML `tier` field is almost always null,
+    // defaulting to 'essential', while the actual rules come from explicit
+    // overrides generated by `dart run saropa_lints:init`).
+    final String effectiveTier =
+        enableAll ? 'all' : _inferEffectiveTier(enabledRuleNames);
+
     // Debug: show rule count to help diagnose "No issues found" problems
     // ignore: avoid_print
     print(
-        '[saropa_lints] Loaded ${filteredRules.length} rules (tier: $tier, enableAll: $enableAll)');
+        '[saropa_lints] Loaded ${filteredRules.length} rules (tier: $effectiveTier, enableAll: $enableAll)');
 
     // Tell progress tracker how many rules are active
     ProgressTracker.setEnabledRuleCount(filteredRules.length);
 
     return filteredRules;
+  }
+
+  /// Infers the effective tier by finding the highest tier whose rules are
+  /// all present in [enabledRuleNames].
+  String _inferEffectiveTier(Set<String> enabledRuleNames) {
+    // Check from highest to lowest — first full match wins.
+    const tiers = [
+      'insanity',
+      'comprehensive',
+      'professional',
+      'recommended',
+      'essential',
+    ];
+    for (final candidate in tiers) {
+      final tierRules = getRulesForTier(candidate);
+      if (tierRules.difference(enabledRuleNames).isEmpty) {
+        return candidate;
+      }
+    }
+    return 'custom';
   }
 }
 

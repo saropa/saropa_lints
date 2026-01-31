@@ -15,7 +15,7 @@ Dates are not included in version headers — [pub.dev](https://pub.dev/packages
 
 ### Added
 
-- **Platform configuration in `analysis_options_custom.yaml`**: New `platforms:` section lets you disable lint rules for platforms your project doesn't target. Set `ios: false`, `android: false`, `macos: false`, `web: false`, `windows: false`, or `linux: false` to automatically disable all rules specific to that platform. All platforms default to `true`. Rules shared across multiple platforms (e.g., Apple Sign In applies to both iOS and macOS) stay enabled as long as at least one of their platforms is active. User overrides still take precedence over platform filtering.
+- **Platform configuration in `analysis_options_custom.yaml`**: New `platforms:` section lets you disable lint rules for platforms your project doesn't target. Only `ios` and `android` are enabled by default — enable `macos`, `web`, `windows`, or `linux` if your project targets those platforms. Rules shared across multiple platforms (e.g., Apple Sign In applies to both iOS and macOS) stay enabled as long as at least one of their platforms is active. User overrides still take precedence over platform filtering.
 
 - **Platform migration for existing configs**: Running `dart run saropa_lints:init` on projects with an existing `analysis_options_custom.yaml` automatically adds the `platforms:` section if missing, without disturbing existing settings.
 

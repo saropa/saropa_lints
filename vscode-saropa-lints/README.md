@@ -7,6 +7,7 @@ A simple VS Code extension that adds a button and keyboard shortcut to run Sarop
 - **Status bar button**: Click "Lints" in the status bar to run custom lints
 - **Editor title button**: A search icon appears in the editor title bar when viewing Dart files
 - **Keyboard shortcut**: `Ctrl+Shift+B` (or `Cmd+Shift+B` on Mac) runs the lints
+- **Scan file or folder**: Right-click any `.dart` file or folder in the Explorer and select "Scan with Saropa Lints" to instantly see all diagnostics for that path
 
 ## Installation
 
@@ -39,6 +40,14 @@ Then restart VS Code.
 1. Open a Dart/Flutter project that uses `saropa_lints`
 2. Click the "Lints" button in the status bar, or press `Ctrl+Shift+B`
 3. View results in the Problems panel (`Ctrl+Shift+M`)
+
+### Scan a specific file or folder
+
+1. Right-click a `.dart` file or any folder in the Explorer sidebar
+2. Select "Scan with Saropa Lints"
+3. Results appear instantly in the Saropa Lints output channel
+
+This uses diagnostics already computed by the Dart analysis server — no re-scanning required.
 
 ## Requirements
 

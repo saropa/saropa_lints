@@ -698,7 +698,6 @@ custom_lint:
     avoid_synchronous_file_io: false # Sync file I/O blocks UI. [HIGH]
     avoid_object_creation_in_hot_loops: false # Object in loop causes GC pressure. [MEDIUM]
     avoid_excessive_widget_depth: false # Widget tree too deep. [MEDIUM]
-    prefer_const_child_widgets: false # Child widgets could be const. [MEDIUM]
     prefer_compute_for_heavy_work: false # Heavy work should use Isolate. [MEDIUM]
     prefer_cached_getter: false # Getter called multiple times. [LOW]
     require_item_extent_for_large_lists: false # Large lists need itemExtent. [LOW]
