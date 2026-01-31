@@ -1123,8 +1123,9 @@ class AvoidNestedSwitchExpressionsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_nested_switch_expressions',
     problemMessage:
-        '[avoid_nested_switch_expressions] Avoid nested switch expressions.',
-    correctionMessage: 'Extract the inner switch to a separate function.',
+        '[avoid_nested_switch_expressions] Switch expression contains another switch expression, creating multi-level branching that is extremely difficult to read and reason about. Each nesting level multiplies the number of result paths, making the expression fragile and hard to maintain.',
+    correctionMessage:
+        'Extract the inner switch expression into a named helper function that returns the computed value, keeping each switch flat and independently testable.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -1176,8 +1177,10 @@ class AvoidNestedTryRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_nested_try',
-    problemMessage: '[avoid_nested_try] Avoid nested try statements.',
-    correctionMessage: 'Extract the inner try to a separate method.',
+    problemMessage:
+        '[avoid_nested_try] Try-catch block nested inside another try-catch, creating layered error handling that is difficult to trace. Nested try blocks obscure which catch clause handles which error, increasing the risk of swallowing exceptions or applying the wrong recovery logic.',
+    correctionMessage:
+        'Extract the inner try-catch into a separate method with a clear name that describes its error handling responsibility, keeping each try block focused on one concern.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -1231,8 +1234,9 @@ class AvoidRedundantElseRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_redundant_else',
     problemMessage:
-        '[avoid_redundant_else] Else is redundant after return/throw/break/continue.',
-    correctionMessage: 'Remove the else clause and un-indent the code.',
+        '[avoid_redundant_else] Else clause follows a branch that already exits via return, throw, break, or continue. The else keyword is redundant because the code after the if block only runs when the condition is false, adding unnecessary nesting and indentation.',
+    correctionMessage:
+        'Remove the else clause and un-indent the code so it runs at the same level as the if block, reducing nesting depth and improving readability.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -1306,9 +1310,9 @@ class AvoidUnconditionalBreakRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_unconditional_break',
     problemMessage:
-        '[avoid_unconditional_break] Unconditional break/continue makes loop execute at most once.',
+        '[avoid_unconditional_break] Unconditional break or continue at the start of a loop body causes the loop to execute at most once. This defeats the purpose of the loop construct and usually indicates a logic error where a condition was accidentally omitted.',
     correctionMessage:
-        'Add a condition before break/continue or remove the loop.',
+        'Wrap the break/continue in a conditional check, or remove the loop entirely if only one iteration is intended.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -1385,8 +1389,9 @@ class AvoidUnnecessaryConditionalsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_unnecessary_conditionals',
     problemMessage:
-        '[avoid_unnecessary_conditionals] Condition is unnecessary (always true or always false).',
-    correctionMessage: 'Remove the conditional or fix the condition.',
+        '[avoid_unnecessary_conditionals] Conditional expression or if statement has a condition that always evaluates to the same boolean value. The unnecessary branch adds dead code that will never execute, and it misleads readers into thinking the outcome can vary at runtime.',
+    correctionMessage:
+        'Remove the conditional and keep only the reachable branch, or replace the constant condition with the intended dynamic expression.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -1452,8 +1457,9 @@ class AvoidUnnecessaryContinueRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_unnecessary_continue',
     problemMessage:
-        '[avoid_unnecessary_continue] Redundant continue statement at end of loop body.',
-    correctionMessage: 'Remove the continue statement.',
+        '[avoid_unnecessary_continue] Continue statement at the end of a loop body has no effect because the loop would proceed to the next iteration anyway. The redundant statement adds noise and can mislead readers into thinking it skips code that follows.',
+    correctionMessage:
+        'Remove the continue statement entirely. The loop will naturally proceed to the next iteration at the end of the body without it.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -1526,8 +1532,10 @@ class AvoidUnnecessaryIfRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_unnecessary_if',
-    problemMessage: '[avoid_unnecessary_if] Unnecessary if statement.',
-    correctionMessage: 'Simplify by returning the condition directly.',
+    problemMessage:
+        '[avoid_unnecessary_if] If statement returns true in one branch and false in the other, which is equivalent to returning the condition expression directly. The extra branching adds visual complexity without changing the result.',
+    correctionMessage:
+        'Replace the if/else with a direct return of the condition (e.g. return condition;) or its negation (return !condition;) for clarity.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -1613,8 +1621,9 @@ class NoEqualConditionsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'no_equal_conditions',
     problemMessage:
-        '[no_equal_conditions] Duplicate condition in if-else chain.',
-    correctionMessage: 'This condition was already checked above.',
+        '[no_equal_conditions] Same condition appears more than once in an if/else-if chain. The duplicate branch is unreachable because the first occurrence already handles all cases where the condition is true, making the repeated check dead code.',
+    correctionMessage:
+        'Remove the duplicate condition and its branch, or correct the expression if a different condition was intended.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -1683,8 +1692,9 @@ class NoEqualThenElseRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'no_equal_then_else',
     problemMessage:
-        '[no_equal_then_else] If and else branches have identical code.',
-    correctionMessage: 'Remove the condition and keep only the common code.',
+        '[no_equal_then_else] If and else branches contain identical code, so the condition has no effect on behavior. The branch structure misleads readers into thinking different paths produce different results, when in fact the outcome is the same regardless of the condition.',
+    correctionMessage:
+        'Remove the if/else entirely and keep only the common code. If different behavior was intended, correct one of the branches.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -1822,9 +1832,9 @@ class PreferCorrectSwitchLengthRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_correct_switch_length',
     problemMessage:
-        '[prefer_correct_switch_length] Switch statement has too few cases.',
+        '[prefer_correct_switch_length] Switch statement has fewer cases than the minimum threshold, making the switch overhead unnecessary. A switch with one or two cases is more verbosely expressed than an equivalent if/else and adds boilerplate (case, break) without benefit.',
     correctionMessage:
-        'Consider using an if-else statement for $_minCases or fewer cases.',
+        'Replace the switch with an if/else statement for simple branching, or add the missing cases if the switch is incomplete.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -1878,8 +1888,9 @@ class PreferReturningConditionalsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_returning_conditionals',
     problemMessage:
-        '[prefer_returning_conditionals] Return the condition directly instead of true/false.',
-    correctionMessage: 'Simplify by returning the condition expression.',
+        '[prefer_returning_conditionals] Function returns true in one branch and false in the other, which is equivalent to returning the condition expression directly. The extra if/else adds lines and nesting without changing the computed boolean result.',
+    correctionMessage:
+        'Replace the if/else with return condition; (or return !condition; if the branches are swapped) to communicate the intent more concisely.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -1975,8 +1986,9 @@ class PreferReturningConditionRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_returning_condition',
     problemMessage:
-        '[prefer_returning_condition] Prefer returning the condition directly.',
-    correctionMessage: 'Replace if-else with direct return of the condition.',
+        '[prefer_returning_condition] Variable assigned true or false in separate branches, then returned. The intermediate variable and branching add unnecessary steps when the condition expression itself is the desired boolean result.',
+    correctionMessage:
+        'Return the condition expression directly instead of assigning to a temporary variable, reducing the code to a single return statement.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -2061,9 +2073,9 @@ class PreferWhenGuardOverIfRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_when_guard_over_if',
     problemMessage:
-        '[prefer_when_guard_over_if] Switch case with if statement could use a when guard.',
+        '[prefer_when_guard_over_if] Switch case body starts with an if statement that could be expressed as a when guard on the case pattern. Moving the condition into the when clause reduces nesting and lets the switch handle the filtering directly.',
     correctionMessage:
-        'Use "case pattern when condition:" instead of nested if.',
+        'Replace the nested if with a when guard: change "case pattern:" + if (condition) to "case pattern when condition:" for flatter, more readable switch cases.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -2157,9 +2169,9 @@ class PreferSimplerBooleanExpressionsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_simpler_boolean_expressions',
     problemMessage:
-        '[prefer_simpler_boolean_expressions] Boolean expression can be simplified.',
+        '[prefer_simpler_boolean_expressions] Boolean expression contains redundant negations or can be reduced using De Morgan\'s law. Complex negated compound expressions are harder to read and more error-prone during modification than their simplified equivalents.',
     correctionMessage:
-        'Apply De Morgan\'s law or remove double negation for clearer code.',
+        'Simplify using De Morgan\'s law: !(a && b) becomes !a || !b, !(a || b) becomes !a && !b. Remove double negations (!!x becomes x).',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -2237,8 +2249,9 @@ class PreferSimplerBooleanExpressionsRule extends SaropaLintRule {
   static const LintCode _codeDoubleNegation = LintCode(
     name: 'prefer_simpler_boolean_expressions',
     problemMessage:
-        '[prefer_simpler_boolean_expressions] Double negation (!!x) can be simplified to x.',
-    correctionMessage: 'Remove the double negation.',
+        '[prefer_simpler_boolean_expressions] Double negation (!!x) applied to a boolean expression, which cancels out and returns the original value. The redundant negations add visual complexity without changing the result and may confuse readers into thinking a type coercion is intended.',
+    correctionMessage:
+        'Remove both negation operators to use the boolean expression directly (!!x becomes x), keeping the code concise and clear.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
