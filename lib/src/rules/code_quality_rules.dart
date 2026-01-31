@@ -38,8 +38,10 @@ class AvoidAdjacentStringsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_adjacent_strings',
-    problemMessage: '[avoid_adjacent_strings] Avoid using adjacent strings.',
-    correctionMessage: 'Combine into a single string or use concatenation.',
+    problemMessage:
+        '[avoid_adjacent_strings] Adjacent string literals detected without an explicit concatenation operator. Dart implicitly joins adjacent strings, which can mask accidental line breaks or missing commas in list literals, leading to silently merged values that are difficult to debug.',
+    correctionMessage:
+        'Combine into a single string literal, use the + operator for explicit concatenation, or use string interpolation to make the intent clear.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -69,8 +71,9 @@ class AvoidEnumValuesByIndexRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_enum_values_by_index',
     problemMessage:
-        '[avoid_enum_values_by_index] Avoid accessing enum values by index.',
-    correctionMessage: 'Use EnumName.byName() or switch on specific values.',
+        '[avoid_enum_values_by_index] Enum value accessed by numeric index on the .values list. If enum members are reordered or new values are inserted, the index silently resolves to the wrong constant, causing incorrect behavior that the compiler cannot catch.',
+    correctionMessage:
+        'Use EnumName.values.byName() for string-based lookup, or switch on specific enum values to get compile-time exhaustiveness checking.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -133,8 +136,10 @@ class AvoidIncorrectUriRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_incorrect_uri',
-    problemMessage: '[avoid_incorrect_uri] URI string appears to be malformed.',
-    correctionMessage: 'Check the URI for syntax errors.',
+    problemMessage:
+        '[avoid_incorrect_uri] URI string appears to be malformed or contains invalid characters. Malformed URIs cause runtime exceptions when parsed by Uri.parse(), leading to unhandled errors in network requests, routing logic, or deep link handling.',
+    correctionMessage:
+        'Verify the URI syntax matches RFC 3986, ensure special characters are percent-encoded, and test with Uri.parse() to confirm validity.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -226,9 +231,10 @@ class AvoidLateKeywordRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_late_keyword',
-    problemMessage: "[avoid_late_keyword] Avoid using 'late' keyword.",
+    problemMessage:
+        "[avoid_late_keyword] Field declared with the 'late' keyword defers initialization checking to runtime. If the field is accessed before assignment, Dart throws a LateInitializationError that crashes the app, bypassing the null safety guarantees the type system provides at compile time.",
     correctionMessage:
-        'Use nullable type with null check, or initialize in constructor.',
+        'Use a nullable type with a null check, provide a default value, or initialize the field in the constructor to keep initialization errors visible at compile time.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -281,8 +287,9 @@ class AvoidMissedCallsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_missed_calls',
     problemMessage:
-        '[avoid_missed_calls] Function reference passed to print. Did you mean to call it?',
-    correctionMessage: 'Add parentheses () to call the function.',
+        '[avoid_missed_calls] Function reference passed without parentheses where a call was likely intended. Without the () invocation, the function is not executed and the reference is silently discarded, meaning the intended side effect or return value is lost.',
+    correctionMessage:
+        'Add parentheses () to invoke the function, or if the reference is intentional, assign it to a variable with an explicit function type.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -446,8 +453,9 @@ class AvoidPassingSelfAsArgumentRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_passing_self_as_argument',
     problemMessage:
-        '[avoid_passing_self_as_argument] Object is passed as argument to its own method.',
-    correctionMessage: 'Avoid passing an object to its own method.',
+        '[avoid_passing_self_as_argument] Object passed as an argument to its own method, creating a self-referential call. This pattern often indicates a logic error and can lead to infinite recursion, stack overflow, or unexpected mutation of the object state during method execution.',
+    correctionMessage:
+        'Extract the shared logic into a separate method, pass a different object, or restructure the call to eliminate the self-reference.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -519,9 +527,9 @@ class AvoidRecursiveCallsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_recursive_calls',
     problemMessage:
-        '[avoid_recursive_calls] Function contains a recursive call to itself.',
+        '[avoid_recursive_calls] Function contains a direct recursive call to itself. Without a guaranteed base case or depth limit, unbounded recursion exhausts the call stack and crashes the application with a StackOverflowError, which cannot be caught in Dart.',
     correctionMessage:
-        'Ensure proper base case exists or consider using iteration.',
+        'Verify a terminating base case exists for all input paths, or convert the recursion to an iterative approach using a loop or explicit stack.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -613,9 +621,9 @@ class AvoidRecursiveToStringRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_recursive_tostring',
     problemMessage:
-        '[avoid_recursive_tostring] toString() method calls itself recursively.',
+        '[avoid_recursive_tostring] toString() method references itself through \$this or this.toString(), creating infinite recursion. The runtime repeatedly invokes toString() until the call stack overflows, crashing the application with an unrecoverable StackOverflowError.',
     correctionMessage:
-        'Avoid using \$this or this.toString() inside toString().',
+        'Reference individual fields directly (e.g. \$name, \$id) instead of \$this, or build the string using a StringBuffer to control the representation explicitly.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -700,9 +708,9 @@ class AvoidReferencingDiscardedVariablesRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_referencing_discarded_variables',
     problemMessage:
-        '[avoid_referencing_discarded_variables] Avoid referencing variables marked as discarded.',
+        '[avoid_referencing_discarded_variables] Variable prefixed with underscore is referenced after declaration. The underscore prefix signals that the value is intentionally discarded, so reading it later contradicts the naming convention and confuses developers who expect underscore-prefixed variables to be unused.',
     correctionMessage:
-        'Variables starting with _ should not be used. Rename the variable.',
+        'Rename the variable without the underscore prefix if it is actually used, or remove the reference if the variable should remain discarded.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -782,9 +790,9 @@ class AvoidRedundantPragmaInlineRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_redundant_pragma_inline',
     problemMessage:
-        '[avoid_redundant_pragma_inline] Pragma inline may be redundant for trivial methods.',
+        '[avoid_redundant_pragma_inline] Pragma inline annotation applied to a trivial method that the compiler already inlines automatically. Redundant annotations add noise to the codebase, and overusing pragma inline can prevent the compiler from making better optimization decisions.',
     correctionMessage:
-        'Remove pragma for simple getters/methods that inline automatically.',
+        'Remove the @pragma(vm:prefer-inline) annotation from simple getters, setters, and one-line methods that the compiler inlines by default.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -907,8 +915,10 @@ class AvoidUnknownPragmaRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_unknown_pragma',
-    problemMessage: '[avoid_unknown_pragma] Unknown pragma annotation.',
-    correctionMessage: 'Use a known pragma value or remove the annotation.',
+    problemMessage:
+        '[avoid_unknown_pragma] Unrecognized pragma annotation detected. Unknown pragmas are silently ignored by the Dart compiler, which means the intended optimization or behavior hint has no effect and may mislead developers into thinking the code is optimized when it is not.',
+    correctionMessage:
+        'Use a recognized pragma value such as vm:prefer-inline, vm:never-inline, or dart2js:tryInline, or remove the annotation entirely.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -986,9 +996,10 @@ class AvoidUnusedParametersRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_unused_parameters',
-    problemMessage: '[avoid_unused_parameters] Parameter is never used.',
+    problemMessage:
+        '[avoid_unused_parameters] Function parameter is declared but never referenced in the function body. Unused parameters add cognitive overhead for callers who must provide a value that has no effect, and they mask API design issues where the parameter should have been removed or the implementation is incomplete.',
     correctionMessage:
-        'Remove the parameter or prefix with underscore if intentionally unused.',
+        'Remove the parameter from the function signature, or prefix it with an underscore to indicate it is intentionally unused for interface conformance.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -1091,9 +1102,9 @@ class AvoidWeakCryptographicAlgorithmsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_weak_cryptographic_algorithms',
     problemMessage:
-        '[avoid_weak_cryptographic_algorithms] Weak cryptographic algorithm detected.',
+        '[avoid_weak_cryptographic_algorithms] Weak or deprecated cryptographic algorithm detected (e.g. MD5, SHA-1). These algorithms have known collision vulnerabilities that allow attackers to forge hashes, compromising data integrity verification, password storage, and digital signature validation.',
     correctionMessage:
-        'Use stronger algorithms like SHA-256 or SHA-512 instead.',
+        'Replace with a stronger algorithm such as SHA-256, SHA-512, or bcrypt for password hashing. Use the crypto or pointycastle package for secure implementations.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -1208,8 +1219,9 @@ class NoObjectDeclarationRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'no_object_declaration',
     problemMessage:
-        '[no_object_declaration] Avoid declaring members with type Object.',
-    correctionMessage: 'Use a more specific type or generics.',
+        '[no_object_declaration] Member declared with type Object, which erases all type information. Accessing any property or method requires an unsafe downcast, bypassing compile-time type checking and risking runtime cast errors that could have been prevented with a more specific type.',
+    correctionMessage:
+        'Replace Object with the most specific type that applies, use generics to preserve type information, or use a sealed class hierarchy for known subtypes.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -1259,8 +1271,9 @@ class PreferBothInliningAnnotationsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_both_inlining_annotations',
     problemMessage:
-        '[prefer_both_inlining_annotations] Use both VM and dart2js inlining pragmas.',
-    correctionMessage: 'Add matching dart2js:tryInline or vm:prefer-inline.',
+        '[prefer_both_inlining_annotations] Only one inlining pragma is present, but the Dart VM and dart2js compilers use different annotations. Without both vm:prefer-inline and dart2js:tryInline, the function is only inlined on one platform, leaving the other without the intended optimization.',
+    correctionMessage:
+        'Add the missing counterpart annotation: use @pragma(dart2js:tryInline) alongside @pragma(vm:prefer-inline), or vice versa.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -1338,9 +1351,9 @@ class PreferDedicatedMediaQueryMethodRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_dedicated_media_query_method',
     problemMessage:
-        '[prefer_dedicated_media_query_method] Prefer dedicated MediaQuery method.',
+        '[prefer_dedicated_media_query_method] MediaQuery.of(context) accessed for a single property. This registers a dependency on the entire MediaQueryData object, causing the widget to rebuild whenever any media query value changes (orientation, padding, text scale), even if only one property is needed.',
     correctionMessage:
-        'Use MediaQuery.sizeOf(context), MediaQuery.paddingOf(context), etc.',
+        'Use the dedicated method such as MediaQuery.sizeOf(context), MediaQuery.paddingOf(context), or MediaQuery.textScaleFactorOf(context) to depend only on the specific property.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -1405,9 +1418,9 @@ class PreferEnumsByNameRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_enums_by_name',
     problemMessage:
-        '[prefer_enums_by_name] Use Enum.values.byName() instead of firstWhere with name comparison.',
+        '[prefer_enums_by_name] Enum lookup uses firstWhere with name comparison instead of the built-in byName() method. The manual approach is more verbose, less readable, and throws a generic StateError on mismatch instead of the descriptive ArgumentError that byName() provides.',
     correctionMessage:
-        'Replace .firstWhere((e) => e.name == x) with .byName(x).',
+        'Replace .firstWhere((e) => e.name == x) with .byName(x) for cleaner code and a more descriptive error message on lookup failure.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -1536,8 +1549,9 @@ class PreferNullAwareSpreadRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_null_aware_spread',
     problemMessage:
-        '[prefer_null_aware_spread] Use null-aware spread (...?) for nullable collections.',
-    correctionMessage: 'Replace with ...?nullableCollection.',
+        '[prefer_null_aware_spread] Nullable collection spread without null-aware operator. Spreading a nullable list or set without ...? throws a runtime TypeError when the value is null, crashing the collection literal construction instead of gracefully contributing zero elements.',
+    correctionMessage:
+        'Replace ...nullableCollection with ...?nullableCollection so that null values are treated as empty and contribute no elements to the result.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -1618,8 +1632,9 @@ class PreferVisibleForTestingOnMembersRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_visible_for_testing_on_members',
     problemMessage:
-        '[prefer_visible_for_testing_on_members] Test helper members should use @visibleForTesting.',
-    correctionMessage: 'Add @visibleForTesting annotation.',
+        '[prefer_visible_for_testing_on_members] Member exposed solely for testing lacks the @visibleForTesting annotation. Without the annotation, the analyzer cannot warn when production code accidentally calls the test-only member, breaking the intended encapsulation boundary.',
+    correctionMessage:
+        'Add the @visibleForTesting annotation from package:meta so the analyzer flags any non-test usage of this member as a warning.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
