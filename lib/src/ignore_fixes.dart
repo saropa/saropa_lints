@@ -1,5 +1,6 @@
 // ignore_for_file: always_specify_types, deprecated_member_use
 
+import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/error/error.dart' show AnalysisError;
 import 'package:custom_lint_builder/custom_lint_builder.dart';
 
@@ -159,5 +160,71 @@ class AddIgnoreForFileFix extends DartFix {
       r'//\s*ignore_for_file\s*:.*\b' + RegExp.escape(ruleName) + r'\b',
     );
     return pattern.hasMatch(content);
+  }
+}
+
+/// Quick fix that wraps a method invocation's enclosing statement
+/// in a try-catch block.
+///
+/// Used by rules that require error handling around operations
+/// (database calls, PDF loading, location requests, etc.).
+class WrapInTryCatchFix extends DartFix {
+  @override
+  void run(
+    CustomLintResolver resolver,
+    ChangeReporter reporter,
+    CustomLintContext context,
+    AnalysisError analysisError,
+    List<AnalysisError> others,
+  ) {
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
+
+      final stmt = _findEnclosingStatement(node);
+      if (stmt == null) return;
+
+      final source = resolver.source.contents.data;
+      final indent = _getStatementIndent(source, stmt.offset);
+      final stmtSource = stmt.toSource();
+
+      final changeBuilder = reporter.createChangeBuilder(
+        message: 'Wrap in try-catch',
+        priority: 1,
+      );
+
+      changeBuilder.addDartFileEdit((builder) {
+        builder.addSimpleReplacement(
+          stmt.sourceRange,
+          'try {\n'
+          '$indent  $stmtSource\n'
+          '$indent} catch (e) {\n'
+          '$indent  // TODO: Handle error\n'
+          '$indent}',
+        );
+      });
+    });
+  }
+
+  /// Walks up the AST to find the nearest enclosing statement.
+  Statement? _findEnclosingStatement(AstNode node) {
+    AstNode? current = node.parent;
+    while (current != null) {
+      if (current is ExpressionStatement ||
+          current is VariableDeclarationStatement ||
+          current is ReturnStatement) {
+        return current as Statement;
+      }
+      current = current.parent;
+    }
+    return null;
+  }
+
+  /// Returns the leading whitespace before the statement on its line.
+  String _getStatementIndent(String source, int stmtOffset) {
+    int lineStart = stmtOffset;
+    while (lineStart > 0 && source[lineStart - 1] != '\n') {
+      lineStart--;
+    }
+    return source.substring(lineStart, stmtOffset);
   }
 }
