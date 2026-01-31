@@ -1114,3 +1114,255 @@ class _PreferAsyncOnlyWhenAwaitingFix extends DartFix {
     });
   }
 }
+
+// =============================================================================
+// POSITIVE CONDITIONS RULE
+// =============================================================================
+
+/// Returns true if [expr] is a simple operand safe to flip with `!`.
+///
+/// Accepts identifiers, property access, method calls, and index access.
+/// Rejects binary expressions, prefix expressions, parenthesized expressions,
+/// and other compound forms that would require De Morgan's or deeper rewrites.
+bool _isSimpleOperand(Expression expr) {
+  return expr is SimpleIdentifier ||
+      expr is PrefixedIdentifier ||
+      expr is PropertyAccess ||
+      expr is MethodInvocation ||
+      expr is IndexExpression ||
+      expr is FunctionExpressionInvocation;
+}
+
+/// Inverts a simple negative condition to its positive form.
+///
+/// Returns `null` if the condition is not a supported negation pattern.
+/// - `!simpleExpr` → `simpleExpr`
+/// - `a != b` → `a == b`
+String? _invertSimpleCondition(Expression condition) {
+  // !expr → expr
+  if (condition is PrefixExpression &&
+      condition.operator.type == TokenType.BANG) {
+    if (!_isSimpleOperand(condition.operand)) return null;
+    return condition.operand.toSource();
+  }
+
+  // a != b → a == b
+  if (condition is BinaryExpression &&
+      condition.operator.type == TokenType.BANG_EQ) {
+    final left = condition.leftOperand.toSource();
+    final right = condition.rightOperand.toSource();
+    return '$left == $right';
+  }
+
+  return null;
+}
+
+/// Warns when an if/else or ternary uses a negative condition.
+///
+/// This is an **opinionated rule** - not included in any tier by default.
+///
+/// Positive conditions are easier to read. When both branches exist, prefer
+/// the positive test so the "happy path" appears first.
+///
+/// Only flags straightforward negations (`!expr` where expr is simple, or
+/// `a != b`). Compound conditions with `&&`, `||`, or nested negations are
+/// intentionally skipped.
+///
+/// **Pros of positive conditions:**
+/// - Easier to read and reason about
+/// - "Happy path" appears first in the code
+/// - Reduces cognitive load from double-negatives
+///
+/// **Cons (why some teams allow negative first):**
+/// - Sometimes the negative case IS the important one
+/// - Refactoring may break git blame
+/// - Team familiarity with existing patterns
+///
+/// ### Example
+///
+/// #### BAD (with this rule enabled):
+/// ```dart
+/// if (!isValid) {
+///   showError();
+/// } else {
+///   proceed();
+/// }
+///
+/// final label = status != null ? status.name : 'unknown';
+/// ```
+///
+/// #### GOOD:
+/// ```dart
+/// if (isValid) {
+///   proceed();
+/// } else {
+///   showError();
+/// }
+///
+/// final label = status == null ? 'unknown' : status.name;
+/// ```
+class PreferPositiveConditionsRule extends SaropaLintRule {
+  const PreferPositiveConditionsRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.opinionated;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  static const LintCode _code = LintCode(
+    name: 'prefer_positive_conditions',
+    problemMessage:
+        '[prefer_positive_conditions] Prefer a positive condition with '
+        'the branches swapped for readability.',
+    correctionMessage: 'Invert the condition to its positive form and swap the '
+        'then/else branches.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    _checkIfStatements(context, reporter);
+    _checkTernaryExpressions(context, reporter);
+  }
+
+  void _checkIfStatements(
+    CustomLintContext context,
+    SaropaDiagnosticReporter reporter,
+  ) {
+    context.registry.addIfStatement((IfStatement node) {
+      // Must have an else branch to swap with
+      final elseStmt = node.elseStatement;
+      if (elseStmt == null) return;
+
+      // Skip else-if chains — too complex
+      if (elseStmt is IfStatement) return;
+
+      if (_isNegativeCondition(node.expression)) {
+        reporter.atNode(node.expression, code);
+      }
+    });
+  }
+
+  void _checkTernaryExpressions(
+    CustomLintContext context,
+    SaropaDiagnosticReporter reporter,
+  ) {
+    context.registry.addConditionalExpression((ConditionalExpression node) {
+      if (_isNegativeCondition(node.condition)) {
+        reporter.atNode(node.condition, code);
+      }
+    });
+  }
+
+  static bool _isNegativeCondition(Expression condition) {
+    // Case 1: !simpleExpr
+    if (condition is PrefixExpression &&
+        condition.operator.type == TokenType.BANG) {
+      return _isSimpleOperand(condition.operand);
+    }
+
+    // Case 2: a != b  (top-level only — no compound)
+    if (condition is BinaryExpression &&
+        condition.operator.type == TokenType.BANG_EQ) {
+      return true;
+    }
+
+    return false;
+  }
+
+  @override
+  List<Fix> get customFixes => <Fix>[
+        _PreferPositiveConditionsIfElseFix(),
+        _PreferPositiveConditionsTernaryFix(),
+      ];
+}
+
+// -----------------------------------------------------------------------------
+// Quick fix: swap if/else branches and invert condition
+// -----------------------------------------------------------------------------
+
+class _PreferPositiveConditionsIfElseFix extends DartFix {
+  @override
+  void run(
+    CustomLintResolver resolver,
+    ChangeReporter reporter,
+    CustomLintContext context,
+    AnalysisError analysisError,
+    List<AnalysisError> others,
+  ) {
+    context.registry.addIfStatement((IfStatement node) {
+      // Match on the condition, not the full statement, to avoid
+      // accidentally matching a parent if-statement in nested cases.
+      if (!node.expression.sourceRange.intersects(analysisError.sourceRange)) {
+        return;
+      }
+
+      final elseStmt = node.elseStatement;
+      if (elseStmt == null || elseStmt is IfStatement) return;
+
+      final String? inverted = _invertSimpleCondition(node.expression);
+      if (inverted == null) return;
+
+      final String thenSource = node.thenStatement.toSource();
+      final String elseSource = elseStmt.toSource();
+
+      final changeBuilder = reporter.createChangeBuilder(
+        message: 'Invert condition and swap branches',
+        priority: 80,
+      );
+
+      changeBuilder.addDartFileEdit((builder) {
+        builder.addSimpleReplacement(
+          node.sourceRange,
+          'if ($inverted) $elseSource else $thenSource',
+        );
+      });
+    });
+  }
+}
+
+// -----------------------------------------------------------------------------
+// Quick fix: swap ternary branches and invert condition
+// -----------------------------------------------------------------------------
+
+class _PreferPositiveConditionsTernaryFix extends DartFix {
+  @override
+  void run(
+    CustomLintResolver resolver,
+    ChangeReporter reporter,
+    CustomLintContext context,
+    AnalysisError analysisError,
+    List<AnalysisError> others,
+  ) {
+    context.registry.addConditionalExpression((ConditionalExpression node) {
+      // Match on the condition, not the full ternary, to avoid
+      // accidentally matching a parent ternary in nested cases.
+      if (!node.condition.sourceRange.intersects(analysisError.sourceRange)) {
+        return;
+      }
+
+      final String? inverted = _invertSimpleCondition(node.condition);
+      if (inverted == null) return;
+
+      final String thenSource = node.thenExpression.toSource();
+      final String elseSource = node.elseExpression.toSource();
+
+      final changeBuilder = reporter.createChangeBuilder(
+        message: 'Invert condition and swap branches',
+        priority: 80,
+      );
+
+      changeBuilder.addDartFileEdit((builder) {
+        builder.addSimpleReplacement(
+          node.sourceRange,
+          '$inverted ? $elseSource : $thenSource',
+        );
+      });
+    });
+  }
+}

@@ -14,7 +14,6 @@ custom_lint:
     # PERFORMANCE - Faster app, better battery
     # =========================================================================
     avoid_expensive_build: true
-    prefer_const_child_widgets: true
     avoid_listview_without_item_extent: true
     avoid_shrink_wrap_in_lists: true
     avoid_mediaquery_in_build: true

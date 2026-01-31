@@ -2,6 +2,7 @@ import 'package:analyzer/dart/analysis/utilities.dart';
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
 import 'package:saropa_lints/src/ignore_utils.dart';
+import 'package:saropa_lints/src/rules/code_quality_rules.dart';
 import 'package:test/test.dart';
 
 /// Helper to parse Dart code and return the compilation unit.
@@ -60,6 +61,321 @@ void main() {
 
       test('returns same string when no underscores', () {
         expect(IgnoreUtils.toHyphenated('simple'), 'simple');
+      });
+    });
+
+    group('isIgnoredForFile', () {
+      test('detects ignore_for_file with underscore format', () {
+        const content = '''
+// ignore_for_file: require_https_over_http
+import 'dart:core';
+void main() {}
+''';
+        expect(
+          IgnoreUtils.isIgnoredForFile(content, 'require_https_over_http'),
+          isTrue,
+        );
+      });
+
+      test('detects ignore_for_file with hyphen format', () {
+        const content = '''
+// ignore_for_file: require-https-over-http
+import 'dart:core';
+void main() {}
+''';
+        expect(
+          IgnoreUtils.isIgnoredForFile(content, 'require_https_over_http'),
+          isTrue,
+        );
+      });
+
+      test('detects rule when trailing comment follows directive', () {
+        const content = '''
+// ignore_for_file: require_https_over_http // we report http insecure links here
+import 'dart:core';
+void main() {}
+''';
+        expect(
+          IgnoreUtils.isIgnoredForFile(content, 'require_https_over_http'),
+          isTrue,
+        );
+      });
+
+      test('detects rule among comma-separated list', () {
+        const content = '''
+// ignore_for_file: rule_a, require_https_over_http, rule_b
+void main() {}
+''';
+        expect(
+          IgnoreUtils.isIgnoredForFile(content, 'require_https_over_http'),
+          isTrue,
+        );
+      });
+
+      test('returns false when no ignore_for_file present', () {
+        const content = '''
+import 'dart:core';
+void main() {}
+''';
+        expect(
+          IgnoreUtils.isIgnoredForFile(content, 'require_https_over_http'),
+          isFalse,
+        );
+      });
+
+      test('returns false for different rule name', () {
+        const content = '''
+// ignore_for_file: other_rule
+void main() {}
+''';
+        expect(
+          IgnoreUtils.isIgnoredForFile(content, 'require_https_over_http'),
+          isFalse,
+        );
+      });
+
+      test('does not match partial rule name as substring', () {
+        const content = '''
+// ignore_for_file: require_https_over_http_v2
+void main() {}
+''';
+        expect(
+          IgnoreUtils.isIgnoredForFile(content, 'require_https_over_http'),
+          isFalse,
+        );
+      });
+
+      test('does not match rule name that is a prefix', () {
+        const content = '''
+// ignore_for_file: require_https
+void main() {}
+''';
+        expect(
+          IgnoreUtils.isIgnoredForFile(content, 'require_https_over_http'),
+          isFalse,
+        );
+      });
+
+      test('handles multiple ignore_for_file directives', () {
+        const content = '''
+// ignore_for_file: rule_a
+// ignore_for_file: require_https_over_http
+void main() {}
+''';
+        expect(
+          IgnoreUtils.isIgnoredForFile(content, 'require_https_over_http'),
+          isTrue,
+        );
+        expect(
+          IgnoreUtils.isIgnoredForFile(content, 'rule_a'),
+          isTrue,
+        );
+      });
+
+      test('handles extra whitespace in directive', () {
+        const content = '''
+//   ignore_for_file:   require_https_over_http
+void main() {}
+''';
+        expect(
+          IgnoreUtils.isIgnoredForFile(content, 'require_https_over_http'),
+          isTrue,
+        );
+      });
+
+      test('detects directive in middle of file', () {
+        const content = '''
+import 'dart:core';
+// ignore_for_file: require_https_over_http
+void main() {}
+''';
+        expect(
+          IgnoreUtils.isIgnoredForFile(content, 'require_https_over_http'),
+          isTrue,
+        );
+      });
+
+      test('ignores line-level ignore directive', () {
+        const content = '''
+void main() {
+  // ignore: require_https_over_http
+  final x = 'http://example.com';
+}
+''';
+        expect(
+          IgnoreUtils.isIgnoredForFile(content, 'require_https_over_http'),
+          isFalse,
+        );
+      });
+    });
+
+    group('trailingCommentOnIgnore', () {
+      test('matches ignore_for_file with trailing comment', () {
+        const line =
+            '// ignore_for_file: require_https_over_http // reason here';
+        expect(
+          IgnoreUtils.trailingCommentOnIgnore.hasMatch(line),
+          isTrue,
+        );
+      });
+
+      test('matches ignore with trailing comment', () {
+        const line =
+            '// ignore: avoid_platform_channel_on_web // no web support';
+        expect(
+          IgnoreUtils.trailingCommentOnIgnore.hasMatch(line),
+          isTrue,
+        );
+      });
+
+      test('does not match ignore_for_file without trailing comment', () {
+        const line = '// ignore_for_file: require_https_over_http';
+        expect(
+          IgnoreUtils.trailingCommentOnIgnore.hasMatch(line),
+          isFalse,
+        );
+      });
+
+      test('does not match ignore without trailing comment', () {
+        const line = '// ignore: my_rule';
+        expect(
+          IgnoreUtils.trailingCommentOnIgnore.hasMatch(line),
+          isFalse,
+        );
+      });
+
+      test('does not match comma-separated rules without comment', () {
+        const line = '// ignore_for_file: rule_a, rule_b';
+        expect(
+          IgnoreUtils.trailingCommentOnIgnore.hasMatch(line),
+          isFalse,
+        );
+      });
+
+      test('matches when trailing comment follows comma-separated rules', () {
+        const line = '// ignore_for_file: rule_a, rule_b // some reason';
+        expect(
+          IgnoreUtils.trailingCommentOnIgnore.hasMatch(line),
+          isTrue,
+        );
+      });
+
+      test('does not match plain comment', () {
+        const line = '// this is just a normal comment';
+        expect(
+          IgnoreUtils.trailingCommentOnIgnore.hasMatch(line),
+          isFalse,
+        );
+      });
+
+      test('matches ignore with dash separator', () {
+        const line = '// ignore: my_rule - no web support needed';
+        expect(
+          IgnoreUtils.trailingCommentOnIgnore.hasMatch(line),
+          isTrue,
+        );
+      });
+
+      test('matches ignore_for_file with dash separator', () {
+        const line =
+            '// ignore_for_file: require_https_over_http - reports http links';
+        expect(
+          IgnoreUtils.trailingCommentOnIgnore.hasMatch(line),
+          isTrue,
+        );
+      });
+
+      test('does not match hyphenated rule name without separator', () {
+        const line = '// ignore: avoid-print';
+        expect(
+          IgnoreUtils.trailingCommentOnIgnore.hasMatch(line),
+          isFalse,
+        );
+      });
+
+      test('matches dash separator with hyphenated rule name', () {
+        const line = '// ignore: avoid-print - not needed in production';
+        expect(
+          IgnoreUtils.trailingCommentOnIgnore.hasMatch(line),
+          isTrue,
+        );
+      });
+    });
+
+    group('splitParts', () {
+      test('splits ignore_for_file directive and trailing comment', () {
+        final result = AvoidIgnoreTrailingCommentRule.splitParts(
+          '// ignore_for_file: my_rule // reason here',
+        );
+        expect(result, isNotNull);
+        expect(result!.directive, '// ignore_for_file: my_rule');
+        expect(result.trailing, '// reason here');
+      });
+
+      test('splits ignore directive and trailing comment', () {
+        final result = AvoidIgnoreTrailingCommentRule.splitParts(
+          '// ignore: my_rule // no web support',
+        );
+        expect(result, isNotNull);
+        expect(result!.directive, '// ignore: my_rule');
+        expect(result.trailing, '// no web support');
+      });
+
+      test('splits with comma-separated rules', () {
+        final result = AvoidIgnoreTrailingCommentRule.splitParts(
+          '// ignore_for_file: rule_a, rule_b // some reason',
+        );
+        expect(result, isNotNull);
+        expect(result!.directive, '// ignore_for_file: rule_a, rule_b');
+        expect(result.trailing, '// some reason');
+      });
+
+      test('returns null when no trailing comment', () {
+        final result = AvoidIgnoreTrailingCommentRule.splitParts(
+          '// ignore_for_file: my_rule',
+        );
+        expect(result, isNull);
+      });
+
+      test('returns null when no colon', () {
+        final result = AvoidIgnoreTrailingCommentRule.splitParts(
+          '// just a comment',
+        );
+        expect(result, isNull);
+      });
+
+      test('splits ignore directive with dash separator', () {
+        final result = AvoidIgnoreTrailingCommentRule.splitParts(
+          '// ignore: my_rule - no web support needed',
+        );
+        expect(result, isNotNull);
+        expect(result!.directive, '// ignore: my_rule');
+        expect(result.trailing, '// no web support needed');
+      });
+
+      test('splits ignore_for_file with dash separator', () {
+        final result = AvoidIgnoreTrailingCommentRule.splitParts(
+          '// ignore_for_file: rule_a - reports http links',
+        );
+        expect(result, isNotNull);
+        expect(result!.directive, '// ignore_for_file: rule_a');
+        expect(result.trailing, '// reports http links');
+      });
+
+      test('splits hyphenated rule name with dash separator', () {
+        final result = AvoidIgnoreTrailingCommentRule.splitParts(
+          '// ignore: avoid-print - not needed here',
+        );
+        expect(result, isNotNull);
+        expect(result!.directive, '// ignore: avoid-print');
+        expect(result.trailing, '// not needed here');
+      });
+
+      test('returns null for hyphenated rule name without separator', () {
+        final result = AvoidIgnoreTrailingCommentRule.splitParts(
+          '// ignore: avoid-print',
+        );
+        expect(result, isNull);
       });
     });
 

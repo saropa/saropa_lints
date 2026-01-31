@@ -2191,6 +2191,16 @@ abstract class SaropaLintRule extends DartLintRule {
     final content = resolver.source.contents.data;
 
     // =========================================================================
+    // FILE-LEVEL IGNORE CHECK
+    // =========================================================================
+    // Respect `// ignore_for_file: rule_name` directives. This check runs
+    // once per rule per file, before any AST callbacks, so the entire rule
+    // is skipped efficiently when the file opts out.
+    if (IgnoreUtils.isIgnoredForFile(content, code.name)) {
+      return;
+    }
+
+    // =========================================================================
     // CONTENT-BASED GENERATED FILE DETECTION (Performance Optimization)
     // =========================================================================
     // Some generated files don't have a recognizable suffix. Detect them by

@@ -271,6 +271,37 @@ To change tiers, re-run the init tool:
 dart run saropa_lints:init --tier professional
 ```
 
+### Platform configuration
+
+The `analysis_options_custom.yaml` file includes a `platforms` section that controls which platform-specific rules are active. Only iOS and Android are enabled by default. Enable additional platforms your project targets:
+
+```yaml
+# In analysis_options_custom.yaml
+platforms:
+  ios: true         # enabled by default
+  android: true     # enabled by default
+  macos: false      # enable if targeting macOS
+  web: false        # enable if targeting web
+  windows: false    # enable if targeting Windows
+  linux: false      # enable if targeting Linux
+```
+
+When a platform is set to `false`, all rules specific to that platform are moved to the disabled section. Rules shared between multiple platforms (e.g., Apple Sign In rules for iOS + macOS) are only disabled when **all** their platforms are disabled.
+
+**User overrides always win** — if you force-enable a rule in the overrides section, it stays enabled even if its platform is disabled.
+
+The `init` tool logs which platforms are disabled and how many rules are affected:
+
+```
+Platforms disabled: web, windows, linux (23 rules affected)
+```
+
+To apply platform changes, re-run init:
+
+```bash
+dart run saropa_lints:init
+```
+
 ### Config key names and aliases
 
 Rule config keys match the rule name shown in lint messages (the part in `[brackets]`):

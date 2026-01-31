@@ -594,7 +594,6 @@ custom_lint:
     - prefer_change_notifier_proxy_provider: true  # [INFO] ChangeNotifierProvider.create accesses another provider. Use ChangeNotifierProxyProvider instead.
     - prefer_clip_behavior: true  # [INFO] Consider specifying clipBehavior for performance.
     - prefer_clipboard_feedback: true  # [INFO] Clipboard.setData should provide user feedback.
-    - prefer_const_child_widgets: true  # [INFO] Non-const child list recreates widget instances on every build, preventing Flutter rebuild optimizations.
     - prefer_const_widgets_in_lists: true  # [INFO] Widget list recreated on every rebuild. If elements are constant, the entire list can be const.
     - prefer_constrained_box_over_container: true  # [INFO] Container with only constraints should use ConstrainedBox instead.
     - prefer_consumer_over_provider_of: true  # [INFO] Provider.of in build. Use Consumer for granular rebuilds.

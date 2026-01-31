@@ -1636,7 +1636,10 @@ class RequireIsarNullableFieldRule extends SaropaLintRule {
 
       for (final member in node.members) {
         if (member is FieldDeclaration) {
-          // 2. Skip fields with @ignore
+          // 2. Skip static fields (not persisted by Isar)
+          if (member.isStatic) continue;
+
+          // 3. Skip fields with @ignore
           bool isIgnored = false;
           for (final annotation in member.metadata) {
             if (annotation.name.name.toLowerCase() == 'ignore') {
@@ -1648,10 +1651,10 @@ class RequireIsarNullableFieldRule extends SaropaLintRule {
 
           final type = member.fields.type;
 
-          // 3. Skip Id field (Isar handles internally)
+          // 4. Skip Id field (Isar handles internally)
           if (type is NamedType && type.name.lexeme == 'Id') continue;
 
-          // 4. Enforce Nullability
+          // 5. Enforce Nullability
           // We check if the type definition lacks the '?' question mark.
           // We do NOT check for initializers anymore, as they are ignored by Isar readers.
           if (type is NamedType && type.question == null) {
