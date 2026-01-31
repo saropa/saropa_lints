@@ -11,7 +11,58 @@ Dates are not included in version headers — [pub.dev](https://pub.dev/packages
 ** See the current published changelog: [saropa_lints/changelog](https://pub.dev/packages/saropa_lints/changelog)
 
 ---
-## [4.9.4] - Current
+## [4.9.5] - Current
+
+### Added
+
+- **Platform configuration in `analysis_options_custom.yaml`**: New `platforms:` section lets you disable lint rules for platforms your project doesn't target. Set `ios: false`, `android: false`, `macos: false`, `web: false`, `windows: false`, or `linux: false` to automatically disable all rules specific to that platform. All platforms default to `true`. Rules shared across multiple platforms (e.g., Apple Sign In applies to both iOS and macOS) stay enabled as long as at least one of their platforms is active. User overrides still take precedence over platform filtering.
+
+- **Platform migration for existing configs**: Running `dart run saropa_lints:init` on projects with an existing `analysis_options_custom.yaml` automatically adds the `platforms:` section if missing, without disturbing existing settings.
+
+### Removed
+
+- **Removed rule: `prefer_const_child_widgets`**: Redundant. When the parent widget is `const`, Dart's const context propagation already makes all children implicitly `const` — there is no additional performance benefit. When the parent is non-const, the built-in `prefer_const_literals_to_create_immutables` lint already covers the same case.
+
+### Fixed
+
+- **`init` created backup files even when nothing changed**: Running `dart run saropa_lints:init` repeatedly created a timestamped `.bak` file on every invocation, even when the output content was identical. Backups are now only created when the file content has actually changed.
+
+- **Plugin tier logging always showed `essential`**: The `getLintRules()` log message reported `tier: essential` regardless of the actual tier configured via `dart run saropa_lints:init`. The plugin read tier from a YAML key that the init command never wrote, so it always fell back to `essential`. Now infers the effective tier by comparing the final enabled rule set against each tier's definition, reporting the correct tier (e.g., `tier: professional`).
+
+- **`// ignore_for_file:` directives now respected**: File-level ignore directives were not being checked by custom lint rules. Rules still fired even when `// ignore_for_file: rule_name` was present. The check now runs once per rule per file before any AST callbacks, efficiently skipping the entire rule when the file opts out. Supports both underscore (`rule_name`) and hyphen (`rule-name`) formats.
+
+- **Unresolvable rules now reported**: Rules defined in tier configurations or explicit YAML overrides but missing from the rule factory registry are now logged as warnings during plugin initialization. This makes the rule count mismatch between `init` and the plugin visible (e.g., `WARNING: 18 rule(s) could not be resolved`).
+
+- **`require_isar_nullable_field` false positive on static fields**: The rule incorrectly flagged `static` fields in `@collection` classes. Static fields are not persisted by Isar and should be skipped.
+
+### Improved
+
+- **DX message quality for widget_patterns_rules**: Expanded `problemMessage` and `correctionMessage` text for all 87 rules in `widget_patterns_rules.dart`. Messages now explain consequences, remove vague language ("Avoid", "Consider", "best practices"), and meet minimum length thresholds for the DX audit.
+
+- **`prefer_spacing_over_sizedbox` rule rewritten**: Now detects the alternating `[content, spacer, content, ...]` pattern in Row/Column children instead of just counting SizedBox widgets. Also detects `Spacer()` widgets, removed false `Wrap` support, and added a quick fix that inserts the `spacing` parameter and removes spacer children.
+
+### Changed
+
+- **`init` skips writing unchanged `analysis_options.yaml`**: Running `dart run saropa_lints:init` with the same tier and options no longer overwrites the file if the content is identical. Shows `✓ No changes needed` instead.
+
+- **Plugin version now read dynamically from `pubspec.yaml`**: The version in `createPlugin()` was hardcoded at `4.8.0` and never updated. Replaced with a lazy resolver that reads the actual version from `pubspec.yaml` via `.dart_tool/package_config.json` at runtime. Works for both path dependencies and pub cache installs. The version string never needs manual updates again.
+
+### Added
+
+- **New rule: `avoid_ignore_trailing_comment`** (Recommended tier, WARNING): Warns when `// ignore:` or `// ignore_for_file:` directives have trailing text after the rule names — either a `//` comment or a ` - ` explanation. The `custom_lint_builder` framework uses exact string matching on rule codes, so any trailing text silently breaks suppression. Quick fix moves the text to a `//` comment on the line above the directive.
+
+- **New rule: `prefer_positive_conditions`** (Stylistic, INFO): Warns when an if/else or ternary uses a negative condition (`!expr` or `!=`) that can be flipped to a positive form with branches swapped. Only flags straightforward cases — skips compound conditions, else-if chains, and complex negations. Quick fix available to invert the condition and swap both branches.
+
+- **New rule: `prefer_positive_conditions_first`** (Stylistic, INFO): Warns when guard clauses use negated conditions (`== null`, `!expr`) with early returns, pushing the happy path deeper into the function. Suggests restructuring to place the positive condition first. Opinionated — not included in any tier by default.
+
+- **New rule: `missing_use_result_annotation`** (Comprehensive tier, INFO): Warns when a function returns a value without `@useResult` annotation. Callers may accidentally ignore the return value, leading to missed error handling or lost data transformations.
+
+- **VS Code extension: Scan file or folder**: Right-click any `.dart` file or folder in the Explorer sidebar and select "Scan with Saropa Lints" to instantly see all diagnostics for that path. Uses diagnostics already computed by the Dart analysis server — no re-scanning required.
+
+- **Quick fixes for 7 stylistic widget rules**: Added one-click fixes for `prefer_sizedbox_over_container`, `prefer_container_over_sizedbox`, `prefer_borderradius_circular`, `prefer_expanded_over_flexible`, `prefer_flexible_over_expanded`, `prefer_edgeinsets_symmetric`, and `prefer_edgeinsets_only`. Each fix handles const preservation and argument reordering.
+
+---
+## [4.9.4]
 
 ### Changed
 
