@@ -3493,8 +3493,10 @@ class AvoidUnnecessaryStatementsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_unnecessary_statements',
-    problemMessage: '[avoid_unnecessary_statements] Statement has no effect.',
-    correctionMessage: 'Remove the unnecessary statement or use its value.',
+    problemMessage:
+        '[avoid_unnecessary_statements] Statement produces a value or expression result that is never used and has no side effects. Dead statements clutter the code, mislead readers into thinking meaningful work is being done, and may indicate a missing assignment or function call.',
+    correctionMessage:
+        'Remove the statement if it is truly unused, assign the result to a variable, or call the intended method to produce the expected side effect.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -3544,8 +3546,10 @@ class AvoidUnusedAssignmentRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_unused_assignment',
-    problemMessage: '[avoid_unused_assignment] Assignment may be unused.',
-    correctionMessage: 'Remove the unused assignment or use the variable.',
+    problemMessage:
+        '[avoid_unused_assignment] Variable is assigned a value that is never read before being overwritten or going out of scope. The assignment wastes computation, and the unused result often signals a logic error where the value was meant to be used in a subsequent expression or return statement.',
+    correctionMessage:
+        'Remove the assignment if the value is not needed, or use the variable in the intended expression. Check for missing return statements or conditional branches.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -3619,8 +3623,10 @@ class AvoidUnusedInstancesRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_unused_instances',
-    problemMessage: '[avoid_unused_instances] Instance created but not used.',
-    correctionMessage: 'Assign the instance to a variable or remove it.',
+    problemMessage:
+        '[avoid_unused_instances] Object instance created but never assigned to a variable or used in an expression. The constructor runs its side effects (if any) but the resulting object is immediately garbage-collected, wasting memory allocation and usually indicating a missing assignment.',
+    correctionMessage:
+        'Assign the instance to a variable for later use, pass it directly as an argument, or remove the creation entirely if the side effects are not needed.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -3653,8 +3659,9 @@ class AvoidUnusedAfterNullCheckRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_unused_after_null_check',
     problemMessage:
-        '[avoid_unused_after_null_check] Variable is null-checked but not used in the body.',
-    correctionMessage: 'Use the variable or simplify the condition.',
+        '[avoid_unused_after_null_check] Variable is null-checked in a condition but never referenced inside the guarded block. The null check suggests the variable should be used, so the missing reference likely indicates a logic error where the intended usage was accidentally omitted.',
+    correctionMessage:
+        'Reference the variable inside the guarded block where the null check applies, or remove the null check entirely if the variable is genuinely not needed.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -3733,9 +3740,9 @@ class AvoidWildcardCasesWithEnumsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_wildcard_cases_with_enums',
     problemMessage:
-        '[avoid_wildcard_cases_with_enums] Avoid using default/wildcard case with enums.',
+        '[avoid_wildcard_cases_with_enums] Switch on an enum uses a default or wildcard case, suppressing exhaustiveness checking. When new enum values are added, the compiler will not flag this switch as incomplete, allowing the new case to silently fall into the default branch instead of being explicitly handled.',
     correctionMessage:
-        'Handle all enum values explicitly for exhaustiveness checking.',
+        'Remove the default/wildcard case and add explicit case clauses for every enum value so the compiler reports an error when new values are introduced.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -3798,9 +3805,9 @@ class FunctionAlwaysReturnsSameValueRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'function_always_returns_same_value',
     problemMessage:
-        '[function_always_returns_same_value] Function always returns the same value.',
+        '[function_always_returns_same_value] Function returns the same value on every code path regardless of input. The function body adds complexity without varying the output, suggesting the logic branches are incomplete or the function should be replaced by a constant.',
     correctionMessage:
-        'Consider returning a constant or simplifying the function.',
+        'Replace the function with a constant or static field if the value is truly fixed, or add the missing branches that return different values based on input.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -3876,8 +3883,9 @@ class NoEqualNestedConditionsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'no_equal_nested_conditions',
     problemMessage:
-        '[no_equal_nested_conditions] Nested condition is identical to outer condition.',
-    correctionMessage: 'Remove the redundant nested condition.',
+        '[no_equal_nested_conditions] Inner condition is identical to an enclosing outer condition. The nested check is always true at that point because the outer condition already guarantees it, making the inner branch redundant dead logic that adds nesting depth without any behavioral effect.',
+    correctionMessage:
+        'Remove the redundant nested condition and keep only the code inside it, since the outer condition already provides the same guarantee.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -3934,8 +3942,9 @@ class NoEqualSwitchCaseRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'no_equal_switch_case',
     problemMessage:
-        '[no_equal_switch_case] Switch cases have identical bodies.',
-    correctionMessage: 'Combine cases or extract common code.',
+        '[no_equal_switch_case] Multiple switch cases contain identical body code. Duplicated case logic increases maintenance cost because changes must be applied to every copy, and missed updates cause inconsistent behavior across cases that should be equivalent.',
+    correctionMessage:
+        'Combine the cases using comma-separated patterns (case a, b:) or extract the shared logic into a helper method referenced by each case.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -3993,9 +4002,9 @@ class PreferAnyOrEveryRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_any_or_every',
     problemMessage:
-        '[prefer_any_or_every] Use any() or every() instead of where().isEmpty.',
+        '[prefer_any_or_every] Collection filtered with where() only to check isEmpty/isNotEmpty. The where() call creates an intermediate lazy iterable and allocates a closure, while any() and every() short-circuit on the first matching element without creating intermediate objects.',
     correctionMessage:
-        'Replace where().isEmpty with !any() or where().isNotEmpty with any().',
+        'Replace where(predicate).isEmpty with !any(predicate), and where(predicate).isNotEmpty with any(predicate) for clearer intent and better performance.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -4045,8 +4054,9 @@ class PreferForInRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_for_in',
     problemMessage:
-        '[prefer_for_in] Index-based loop can be replaced with for-in.',
-    correctionMessage: 'Use for-in loop for cleaner iteration.',
+        '[prefer_for_in] Index-based for loop iterates over a collection using an index variable that is only used to access list[i]. The index adds an extra variable to track, risks off-by-one errors in the bounds condition, and obscures the intent of iterating over elements.',
+    correctionMessage:
+        'Replace the index-based loop with a for-in loop (for (final item in list)) to iterate directly over elements without managing an index variable.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -4117,8 +4127,10 @@ class AvoidDuplicatePatternsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_duplicate_patterns',
-    problemMessage: '[avoid_duplicate_patterns] Duplicate pattern detected.',
-    correctionMessage: 'Remove or combine the duplicate patterns.',
+    problemMessage:
+        '[avoid_duplicate_patterns] Same pattern appears multiple times in a switch or if-case chain. Duplicate patterns mean the second occurrence is unreachable dead code because the first match always wins, indicating a copy-paste error or incomplete refactoring.',
+    correctionMessage:
+        'Remove the duplicate pattern clause, or if different handling is intended, adjust the pattern to be distinct so both branches are reachable.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -4169,8 +4181,9 @@ class AvoidNestedExtensionTypesRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_nested_extension_types',
     problemMessage:
-        '[avoid_nested_extension_types] Extension type contains another extension type.',
-    correctionMessage: 'Consider using the underlying type directly.',
+        '[avoid_nested_extension_types] Extension type wraps another extension type, creating multiple layers of zero-cost abstraction. Each layer adds indirection to the representation type, making the code harder to reason about and increasing the chance of applying the wrong extension methods to the underlying value.',
+    correctionMessage:
+        'Use the underlying representation type directly in the outer extension type to flatten the abstraction and reduce confusion about which methods are available.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -4219,9 +4232,9 @@ class AvoidSlowCollectionMethodsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_slow_collection_methods',
     problemMessage:
-        '[avoid_slow_collection_methods] Using sync* generator for simple collection may be slow.',
+        '[avoid_slow_collection_methods] sync* generator used for a simple collection that yields a small, fixed number of elements. Generator functions have overhead from creating state machines and lazy iterables that exceeds the cost of building a plain list for small collections.',
     correctionMessage:
-        'Consider returning a List directly for small collections.',
+        'Return a List literal directly (e.g. [a, b, c]) for small fixed collections. Reserve sync* generators for large or computed sequences where lazy evaluation provides a real benefit.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -4294,8 +4307,9 @@ class AvoidUnassignedFieldsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_unassigned_fields',
     problemMessage:
-        '[avoid_unassigned_fields] Field may never be assigned a value.',
-    correctionMessage: 'Initialize the field or ensure it is assigned.',
+        '[avoid_unassigned_fields] Field declared without an initializer and no constructor or method assigns it a value. Reading this field returns the default value (null for nullable types), which may cause unexpected NullPointerExceptions or logic errors if the caller expects a meaningful value.',
+    correctionMessage:
+        'Add an initializer at the declaration site, assign the field in the constructor, or mark it as late if initialization is deferred to a lifecycle method.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
