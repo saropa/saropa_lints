@@ -997,7 +997,7 @@ class AvoidUnusedParametersRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_unused_parameters',
     problemMessage:
-        '[avoid_unused_parameters] Function parameter is declared but never referenced in the function body. Unused parameters add cognitive overhead for callers who must provide a value that has no effect, and they mask API design issues where the parameter should have been removed or the implementation is incomplete.',
+        '[avoid_unused_parameters] Function parameter is declared but never referenced in the function body. Unused parameters add cognitive overhead for callers who must provide a value that has no effect, and they mask API design issues where the parameter needs to be removed or the implementation is incomplete.',
     correctionMessage:
         'Remove the parameter from the function signature, or prefix it with an underscore to indicate it is intentionally unused for interface conformance.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -3035,7 +3035,7 @@ class FunctionAlwaysReturnsNullRule extends SaropaLintRule {
     problemMessage:
         '[function_always_returns_null] Function returns null on every code path, making the return type effectively void. Callers that check or use the return value are performing dead logic, and the nullable return type misleads developers into thinking the function can return meaningful data.',
     correctionMessage:
-        'Consider changing return type to void or returning meaningful values.',
+        'Change the return type to void if the function is purely side-effecting, or add meaningful return values for different code paths to make the function useful to callers.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -3188,9 +3188,9 @@ class AvoidAccessingCollectionsByConstantIndexRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_accessing_collections_by_constant_index',
     problemMessage:
-        '[avoid_accessing_collections_by_constant_index] Collection accessed by a constant index inside a loop body. This retrieves the same element on every iteration, which is wasteful and usually indicates a logic error where the loop variable should have been used as the index instead.',
+        '[avoid_accessing_collections_by_constant_index] Collection accessed by a constant index inside a loop body. This retrieves the same element on every iteration, which is wasteful and usually indicates a logic error where the loop variable was intended as the index instead.',
     correctionMessage:
-        'Use the loop variable or extract the element before the loop.',
+        'Replace the constant index with the loop variable, or extract the element into a local variable before the loop to make the single-access intent explicit.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -3659,7 +3659,7 @@ class AvoidUnusedAfterNullCheckRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_unused_after_null_check',
     problemMessage:
-        '[avoid_unused_after_null_check] Variable is null-checked in a condition but never referenced inside the guarded block. The null check suggests the variable should be used, so the missing reference likely indicates a logic error where the intended usage was accidentally omitted.',
+        '[avoid_unused_after_null_check] Variable is null-checked in a condition but never referenced inside the guarded block. The null check implies the variable is needed, so the missing reference likely indicates a logic error where the intended usage was accidentally omitted.',
     correctionMessage:
         'Reference the variable inside the guarded block where the null check applies, or remove the null check entirely if the variable is genuinely not needed.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -3805,7 +3805,7 @@ class FunctionAlwaysReturnsSameValueRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'function_always_returns_same_value',
     problemMessage:
-        '[function_always_returns_same_value] Function returns the same value on every code path regardless of input. The function body adds complexity without varying the output, suggesting the logic branches are incomplete or the function should be replaced by a constant.',
+        '[function_always_returns_same_value] Function returns the same value on every code path regardless of input. The function body adds complexity without varying the output, suggesting the logic branches are incomplete or the function can be replaced by a constant.',
     correctionMessage:
         'Replace the function with a constant or static field if the value is truly fixed, or add the missing branches that return different values based on input.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -3942,7 +3942,7 @@ class NoEqualSwitchCaseRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'no_equal_switch_case',
     problemMessage:
-        '[no_equal_switch_case] Multiple switch cases contain identical body code. Duplicated case logic increases maintenance cost because changes must be applied to every copy, and missed updates cause inconsistent behavior across cases that should be equivalent.',
+        '[no_equal_switch_case] Multiple switch cases contain identical body code. Duplicated case logic increases maintenance cost because changes must be applied to every copy, and missed updates cause inconsistent behavior across cases that are meant to be equivalent.',
     correctionMessage:
         'Combine the cases using comma-separated patterns (case a, b:) or extract the shared logic into a helper method referenced by each case.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -4420,8 +4420,9 @@ class AvoidUnassignedLateFieldsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_unassigned_late_fields',
     problemMessage:
-        '[avoid_unassigned_late_fields] Late field may never be assigned.',
-    correctionMessage: 'Ensure the late field is assigned before use.',
+        '[avoid_unassigned_late_fields] Late field has no assignment in any constructor, initializer, or lifecycle method. Accessing an unassigned late field throws a LateInitializationError at runtime, crashing the app at a point that the compiler cannot check statically.',
+    correctionMessage:
+        'Assign the field in the constructor, an initializer list, or a lifecycle method such as initState(). If initialization is conditional, use a nullable type instead of late.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -4495,8 +4496,9 @@ class AvoidUnnecessaryLateFieldsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_unnecessary_late_fields',
     problemMessage:
-        '[avoid_unnecessary_late_fields] Late keyword is unnecessary when field is assigned in constructor.',
-    correctionMessage: 'Remove the late keyword.',
+        '[avoid_unnecessary_late_fields] Field marked as late but already assigned in the constructor or initializer list. The late keyword is redundant here and misleads readers into thinking initialization is deferred, while also disabling the compile-time guarantee that the field is always initialized.',
+    correctionMessage:
+        'Remove the late keyword since the field is already assigned during construction. This restores compile-time initialization checking and clarifies the intent.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -4591,8 +4593,9 @@ class AvoidUnnecessaryNullableFieldsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_unnecessary_nullable_fields',
     problemMessage:
-        '[avoid_unnecessary_nullable_fields] Nullable field appears to always have a non-null value.',
-    correctionMessage: 'Consider making the field non-nullable.',
+        '[avoid_unnecessary_nullable_fields] Nullable field is always assigned a non-null value across all constructors and assignment sites. The unnecessary nullable type forces every read site to handle null even though it can never occur, adding redundant null checks and obscuring the actual data flow.',
+    correctionMessage:
+        'Change the field type to non-nullable and remove the ? suffix. Add null checks only if a future code path genuinely needs to store null.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -4708,9 +4711,9 @@ class AvoidUnnecessaryPatternsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_unnecessary_patterns',
     problemMessage:
-        '[avoid_unnecessary_patterns] Pattern does not affect type narrowing.',
+        '[avoid_unnecessary_patterns] Pattern matching syntax used where it does not narrow types or destructure values. The pattern adds syntactic complexity without any type-safety benefit, making the code harder to read compared to a plain variable declaration or assignment.',
     correctionMessage:
-        'Remove the unnecessary pattern or use a simple assignment.',
+        'Replace the pattern with a simple variable declaration or assignment. Use pattern matching only when it provides destructuring or type narrowing.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -4766,8 +4769,9 @@ class AvoidWildcardCasesWithSealedClassesRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_wildcard_cases_with_sealed_classes',
     problemMessage:
-        '[avoid_wildcard_cases_with_sealed_classes] Avoid using default/wildcard case with sealed classes.',
-    correctionMessage: 'Handle all sealed class subtypes explicitly.',
+        '[avoid_wildcard_cases_with_sealed_classes] Switch on a sealed class uses a default or wildcard case, suppressing exhaustiveness checking. When new subtypes are added to the sealed hierarchy, the compiler will not flag this switch as incomplete, allowing unhandled subtypes to silently fall through.',
+    correctionMessage:
+        'Remove the default/wildcard case and add explicit case clauses for every sealed subtype so the compiler reports an error when new subtypes are introduced.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -4833,8 +4837,9 @@ class NoEqualSwitchExpressionCasesRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'no_equal_switch_expression_cases',
     problemMessage:
-        '[no_equal_switch_expression_cases] Switch expression cases have identical results.',
-    correctionMessage: 'Combine patterns or extract common result.',
+        '[no_equal_switch_expression_cases] Multiple switch expression cases produce identical result values. Duplicate results increase maintenance cost because changes must be applied to every copy, and they obscure whether the cases were truly intended to behave the same.',
+    correctionMessage:
+        'Combine the cases using comma-separated patterns (case a, b => result) or extract the shared value into a named constant.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -4935,8 +4940,9 @@ class PreferPushingConditionalExpressionsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_pushing_conditional_expressions',
     problemMessage:
-        '[prefer_pushing_conditional_expressions] Conditional expression can be pushed into arguments.',
-    correctionMessage: 'Move the condition into the differing argument.',
+        '[prefer_pushing_conditional_expressions] Conditional expression wraps an entire constructor or function call where only one argument differs between branches. This duplicates the call site, making it harder to see what actually varies and increasing the risk of inconsistent changes.',
+    correctionMessage:
+        'Move the conditional expression inside the single differing argument so the constructor or function call appears once with all shared arguments visible.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -5005,8 +5011,9 @@ class PreferShorthandsWithConstructorsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_shorthands_with_constructors',
     problemMessage:
-        '[prefer_shorthands_with_constructors] Constructor call can use .new shorthand.',
-    correctionMessage: 'Replace lambda with ClassName.new.',
+        '[prefer_shorthands_with_constructors] Lambda wraps a constructor call without adding any logic (e.g. (x) => MyClass(x)). The closure allocates an extra function object on each evaluation and obscures the simple delegation, making the code harder to read at a glance.',
+    correctionMessage:
+        'Replace the lambda with a constructor tear-off (ClassName.new) to eliminate the wrapper function and communicate the delegation intent directly.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -5183,9 +5190,9 @@ class PassCorrectAcceptedTypeRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'pass_correct_accepted_type',
     problemMessage:
-        '[pass_correct_accepted_type] Parameter type does not match accepted type annotation.',
+        '[pass_correct_accepted_type] Argument type does not match the parameter type declared by the @Accept annotation. Passing an incompatible type circumvents the annotation contract, which may cause runtime cast failures or incorrect behavior in the called function.',
     correctionMessage:
-        'Ensure the parameter type matches the @Accept annotation.',
+        'Change the argument to match the type declared in the @Accept annotation, or update the annotation if the accepted type has intentionally changed.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -5309,8 +5316,9 @@ class PreferSingleDeclarationPerFileRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_single_declaration_per_file',
     problemMessage:
-        '[prefer_single_declaration_per_file] File contains multiple top-level declarations.',
-    correctionMessage: 'Consider splitting into separate files.',
+        '[prefer_single_declaration_per_file] File contains multiple top-level class, enum, or extension declarations. Combining unrelated declarations in one file makes it harder to locate definitions, increases merge conflicts when multiple developers edit the same file, and breaks the convention of one-declaration-per-file.',
+    correctionMessage:
+        'Split each top-level declaration into its own file, named after the declaration (e.g. my_class.dart for MyClass), to improve discoverability and reduce merge conflicts.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -5685,8 +5693,10 @@ class PreferTestMatchersRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_test_matchers',
-    problemMessage: '[prefer_test_matchers] Use a more specific test matcher.',
-    correctionMessage: 'Specific matchers provide better error messages.',
+    problemMessage:
+        '[prefer_test_matchers] Generic expect(value, equals(x)) or expect(value, isTrue) used where a more specific matcher exists. Specific matchers produce clearer failure messages that show the actual vs expected difference, reducing debugging time when tests fail.',
+    correctionMessage:
+        'Replace with the appropriate specific matcher (e.g. expect(list, contains(x)), expect(map, containsPair(k, v)), expect(fn, throwsA(isA<MyError>()))) for better diagnostics.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -5878,8 +5888,9 @@ class AvoidInferrableTypeArgumentsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_inferred_type_arguments',
     problemMessage:
-        '[prefer_inferred_type_arguments] Generic type matches inference.',
-    correctionMessage: 'Remove redundant type arguments that can be inferred.',
+        '[prefer_inferred_type_arguments] Explicit generic type arguments match what the compiler already infers from context. Redundant type parameters add visual noise without providing additional type safety, and they must be manually updated if the underlying types change.',
+    correctionMessage:
+        'Remove the explicit type arguments and let the compiler infer them. This reduces verbosity and keeps the code in sync with the actual types automatically.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -5960,8 +5971,9 @@ class AvoidPassingDefaultValuesRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_passing_default_values',
     problemMessage:
-        '[avoid_passing_default_values] Empty collection argument is likely the default value.',
-    correctionMessage: 'Omit the argument to use the default value.',
+        '[avoid_passing_default_values] Argument explicitly passes a value that matches the parameter default (e.g. empty list, false, 0). Passing the default adds noise to the call site without changing behavior, and if the library updates its default, this call site will not benefit from the change.',
+    correctionMessage:
+        'Omit the argument to use the default value. This keeps call sites concise and automatically picks up any default changes from the callee.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -6022,8 +6034,9 @@ class AvoidShadowedExtensionMethodsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_shadowed_extension_methods',
     problemMessage:
-        '[avoid_shadowed_extension_methods] Extension method shadows class method.',
-    correctionMessage: 'Rename the extension method to avoid shadowing.',
+        '[avoid_shadowed_extension_methods] Extension method has the same name as an instance method on the target class. The instance method always takes precedence, so the extension method is never called through normal dispatch, making it dead code that misleads developers.',
+    correctionMessage:
+        'Rename the extension method to a unique name, or remove it if the instance method already provides the needed behavior.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -6092,9 +6105,9 @@ class AvoidUnnecessaryLocalLateRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_unnecessary_local_late',
     problemMessage:
-        '[avoid_unnecessary_local_late] Late variable initialized immediately.',
+        '[avoid_unnecessary_local_late] Local variable declared as late but assigned a value on the same line. The late keyword is designed for deferred initialization, so using it on an immediately initialized variable is misleading and disables the compile-time check that ensures the variable is assigned.',
     correctionMessage:
-        'Remove the late keyword for immediately initialized variables.',
+        'Remove the late keyword and keep the immediate initializer. Use final or var to declare the variable with full compile-time initialization safety.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -6151,8 +6164,9 @@ class MatchBaseClassDefaultValueRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'match_base_class_default_value',
     problemMessage:
-        '[match_base_class_default_value] Override has non-standard default value.',
-    correctionMessage: 'Verify this matches the parent class default value.',
+        '[match_base_class_default_value] Overridden method parameter has a different default value than the parent class. Callers using the parent type see the parent default, while callers using the subtype see the override default, creating inconsistent behavior depending on the variable type.',
+    correctionMessage:
+        'Match the parent class default value exactly, or remove the default to inherit it. If a different default is intentional, document why the override diverges.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -6252,9 +6266,10 @@ class MoveVariableCloserToUsageRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'move_variable_closer_to_its_usage',
-    problemMessage: '[move_variable_closer_to_its_usage] Scope analysis.',
+    problemMessage:
+        '[move_variable_closer_to_its_usage] Variable declared far from its first use, with many unrelated statements in between. This forces readers to hold the variable in memory while reading irrelevant code, reducing comprehension and increasing the risk of accidental reuse or shadowing.',
     correctionMessage:
-        'Consider moving the variable declaration closer to its first use.',
+        'Move the variable declaration to just before its first usage. This narrows the scope, improves readability, and makes the data flow easier to follow.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -6362,8 +6377,9 @@ class MoveVariableOutsideIterationRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'move_variable_outside_iteration',
     problemMessage:
-        '[move_variable_outside_iteration] Loop invariant code motion.',
-    correctionMessage: 'Move the variable declaration outside the loop.',
+        '[move_variable_outside_iteration] Variable declared and assigned inside a loop body produces the same value on every iteration. Recreating the same object or computing the same expression repeatedly wastes CPU cycles and puts unnecessary pressure on the garbage collector.',
+    correctionMessage:
+        'Move the variable declaration above the loop so it is computed once and reused on each iteration, reducing allocation overhead and improving clarity.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -6461,9 +6477,9 @@ class PreferOverridingParentEqualityRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_overriding_parent_equality',
     problemMessage:
-        '[prefer_overriding_parent_equality] == implementation consistency.',
+        '[prefer_overriding_parent_equality] Subclass overrides == without incorporating the parent class equality check. If the parent class compares fields that the subclass ignores, two objects may be considered equal even though their parent fields differ, breaking the transitivity contract of ==.',
     correctionMessage:
-        'Consider calling super.== or checking parent class equality.',
+        'Call super == other as part of the equality check, or explicitly compare all parent fields alongside the subclass fields to ensure consistent equality behavior.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -6581,8 +6597,10 @@ class PreferSpecificCasesFirstRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_specific_cases_first',
-    problemMessage: '[prefer_specific_cases_first] Switch case specificity.',
-    correctionMessage: 'Place more specific cases before general ones.',
+    problemMessage:
+        '[prefer_specific_cases_first] General switch case appears before a more specific case. In Dart, the first matching case wins, so a broad pattern placed early shadows narrower patterns below it, making those specific cases unreachable dead code.',
+    correctionMessage:
+        'Reorder the cases so more specific patterns appear first and general catch-all patterns appear last, ensuring every case is reachable.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -6674,9 +6692,10 @@ class UseExistingDestructuringRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'use_existing_destructuring',
-    problemMessage: '[use_existing_destructuring] Redundant property access.',
+    problemMessage:
+        '[use_existing_destructuring] Property accessed through the original object despite an existing destructured variable that already holds the same value. The redundant access obscures the data flow and ignores the destructuring that was set up to simplify property access.',
     correctionMessage:
-        'Use the destructured variable instead of accessing the property.',
+        'Replace the property access with the destructured variable name. This communicates that the value was already extracted and avoids redundant lookups.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -6788,9 +6807,10 @@ class UseExistingVariableRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'use_existing_variable',
-    problemMessage: '[use_existing_variable] Redundant variable creation.',
+    problemMessage:
+        '[use_existing_variable] New variable created with the same value as an existing in-scope variable. The duplicate adds an unnecessary name to the scope, increases cognitive load, and risks divergence if one copy is later modified while the other is not.',
     correctionMessage:
-        'Use the existing variable instead of creating a duplicate.',
+        'Reference the existing variable directly instead of creating a new one. If a different name is needed for clarity, consider renaming the original.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -7086,7 +7106,8 @@ class PreferTypedefsForCallbacksRule extends SaropaLintRule {
     name: 'prefer_typedefs_for_callbacks',
     problemMessage:
         '[prefer_typedefs_for_callbacks] Inline function type could be a typedef.',
-    correctionMessage: 'Create a typedef for this callback type.',
+    correctionMessage:
+        'Create a named typedef for this callback signature and reference it by name, improving readability and allowing reuse across multiple parameters.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -7138,8 +7159,9 @@ class PreferRedirectingSuperclassConstructorRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_redirecting_superclass_constructor',
     problemMessage:
-        '[prefer_redirecting_superclass_constructor] Consider using super parameters.',
-    correctionMessage: 'Use super.paramName instead of super(paramName).',
+        '[prefer_redirecting_superclass_constructor] Constructor forwards parameters to super() without modification, which can be simplified with Dart 3 super parameters.',
+    correctionMessage:
+        'Replace the explicit super(paramName) call with super.paramName in the parameter list to reduce boilerplate and keep the forwarding relationship visible in the signature.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -7208,8 +7230,9 @@ class AvoidEmptyBuildWhenRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_empty_build_when',
     problemMessage:
-        '[avoid_empty_build_when] buildWhen always returns true, defeating optimization.',
-    correctionMessage: 'Add meaningful comparison or remove buildWhen.',
+        '[avoid_empty_build_when] buildWhen callback always returns true, which is the default behavior. The callback adds code without filtering any rebuilds, defeating the purpose of the optimization that buildWhen provides in BlocBuilder and BlocListener.',
+    correctionMessage:
+        'Add a meaningful state comparison that returns false for states that do not require a rebuild, or remove buildWhen entirely to use the default behavior.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -7282,7 +7305,8 @@ class PreferUsePrefixRule extends SaropaLintRule {
     name: 'prefer_use_prefix',
     problemMessage:
         '[prefer_use_prefix] Custom hook should start with "use" prefix.',
-    correctionMessage: 'Rename function to useYourHookName.',
+    correctionMessage:
+        'Rename the function to start with "use" (e.g. useMyHook) following the hooks convention, so it is recognizable as a hook and subject to hook linting rules.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -7382,9 +7406,9 @@ class PreferLateFinalRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_late_final',
     problemMessage:
-        '[prefer_late_final] Late variable is never reassigned. Consider using late final.',
+        '[prefer_late_final] Late variable is never reassigned after its initial assignment, so it can be declared as late final for stronger immutability guarantees.',
     correctionMessage:
-        'Use late final for variables that are only assigned once.',
+        'Change late to late final so that any accidental reassignment is caught at compile time, preventing unintended state mutations.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -7539,9 +7563,9 @@ class AvoidLateForNullableRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_late_for_nullable',
     problemMessage:
-        '[avoid_late_for_nullable] Avoid using late for nullable types. Use nullable without late instead.',
+        '[avoid_late_for_nullable] Nullable type declared with late keyword. Since the type already accepts null, the late keyword adds no initialization safety and instead introduces a hidden crash path: accessing the variable before assignment throws LateInitializationError rather than returning null.',
     correctionMessage:
-        'Remove late keyword and use null checks, or ensure value is always initialized.',
+        'Remove the late keyword and rely on the nullable type (T?) with null checks. The variable will default to null until explicitly assigned, which is safer and more predictable.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -7632,7 +7656,7 @@ class PreferDotShorthandRule extends SaropaLintRule {
     problemMessage:
         '[prefer_dot_shorthand] Enum value could use dot shorthand (.value) in Dart 3.',
     correctionMessage:
-        'Replace EnumType.value with .value when type is inferred.',
+        'Replace the fully qualified EnumType.value with .value where the type is already known from context, reducing verbosity while keeping the code type-safe.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -7720,7 +7744,7 @@ class NoBooleanLiteralCompareRule extends SaropaLintRule {
     problemMessage:
         '[no_boolean_literal_compare] Unnecessary comparison to boolean literal.',
     correctionMessage:
-        'Use the boolean expression directly: x instead of x == true, '
+        'Use the boolean expression directly: write x instead of x == true, and !x instead of x == false. '
         '!x instead of x == false.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -7880,7 +7904,7 @@ class PreferReturningConditionalExpressionsRule extends SaropaLintRule {
     problemMessage:
         '[prefer_returning_conditional_expressions] If/else with only return statements can be simplified to ternary.',
     correctionMessage:
-        'Use return condition ? valueA : valueB; or return condition;',
+        'Collapse to return condition ? valueA : valueB; for value returns, or return condition; when directly returning a boolean expression.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
