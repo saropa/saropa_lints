@@ -260,9 +260,9 @@ class AvoidUnnecessaryGestureDetectorRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_unnecessary_gesture_detector',
     problemMessage:
-        '[avoid_unnecessary_gesture_detector] GestureDetector has no gesture callbacks defined.',
+        '[avoid_unnecessary_gesture_detector] GestureDetector wraps a child widget but has no gesture callbacks (onTap, onDoubleTap, onLongPress, etc.) defined, making it a redundant wrapper that adds an unnecessary layer to the widget tree and confuses maintainers reading the code.',
     correctionMessage:
-        'Add gesture callbacks or remove the GestureDetector wrapper.',
+        'Add at least one gesture callback (e.g. onTap, onLongPress) or remove the GestureDetector wrapper entirely to simplify the widget tree.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -392,8 +392,9 @@ class PreferDefineHeroTagRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_define_hero_tag',
     problemMessage:
-        '[prefer_define_hero_tag] Hero widget should have an explicit tag.',
-    correctionMessage: 'Add a tag parameter to the Hero widget.',
+        '[prefer_define_hero_tag] Hero widget without an explicit tag defaults to the widget itself, causing conflicts when multiple Hero widgets exist on the same screen. Duplicate tags trigger runtime assertion errors that crash the app during navigation transitions.',
+    correctionMessage:
+        'Add a unique tag parameter to the Hero widget, such as a String constant or identifier that distinguishes it from other Hero widgets on the same route.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -432,8 +433,9 @@ class PreferExtractingCallbacksRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_extracting_callbacks',
     problemMessage:
-        '[prefer_extracting_callbacks] Consider extracting this callback to a method.',
-    correctionMessage: 'Extract long callbacks to named methods.',
+        '[prefer_extracting_callbacks] Inline callback exceeds a reasonable length, reducing readability and making the build method harder to maintain. Long inline closures obscure widget structure, complicate debugging, and prevent reuse of the callback logic across widgets.',
+    correctionMessage:
+        'Extract the callback body into a named method on the widget or state class. This improves readability, enables reuse, and simplifies testing.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -481,8 +483,9 @@ class PreferSingleWidgetPerFileRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_single_widget_per_file',
     problemMessage:
-        '[prefer_single_widget_per_file] File contains multiple public widget classes.',
-    correctionMessage: 'Move each public widget to its own file.',
+        '[prefer_single_widget_per_file] File contains multiple public widget classes, making it harder to locate widgets by filename, increasing merge conflicts in team environments, and complicating code navigation. Each public widget deserves its own file for discoverability and maintainability.',
+    correctionMessage:
+        'Move each public widget class to its own file named after the widget (e.g. my_widget.dart). Keep private helper widgets in the same file as the public widget they support.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -554,9 +557,10 @@ class PreferTextRichRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_text_rich',
-    problemMessage: '[prefer_text_rich] Prefer Text.rich over RichText widget.',
+    problemMessage:
+        '[prefer_text_rich] RichText widget does not inherit DefaultTextStyle or respect textScaler from the widget tree, causing inconsistent text rendering across the app. Text.rich provides the same TextSpan capabilities while automatically inheriting the ambient text style and scaling settings.',
     correctionMessage:
-        'Use Text.rich(TextSpan(...)) instead of RichText(text: TextSpan(...)).',
+        'Replace RichText(text: TextSpan(...)) with Text.rich(TextSpan(...)) to inherit DefaultTextStyle and textScaler from the widget tree automatically.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -600,16 +604,18 @@ class PreferWidgetPrivateMembersRule extends SaropaLintRule {
   static const LintCode _codeField = LintCode(
     name: 'prefer_widget_private_members',
     problemMessage:
-        '[prefer_widget_private_members] Widget field should be final.',
-    correctionMessage: 'Make the field final or private.',
+        '[prefer_widget_private_members] Non-final public field in a widget class breaks the immutability contract of Flutter widgets. Mutable widget fields can cause unpredictable rebuilds, stale state, and hard-to-trace rendering bugs because the framework assumes widgets are immutable after construction.',
+    correctionMessage:
+        'Make the field final (preferred) or private with an underscore prefix. Widget fields should be set only via the constructor.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
   static const LintCode _codeMethod = LintCode(
     name: 'prefer_widget_private_members',
     problemMessage:
-        '[prefer_widget_private_members] Consider making this helper method private in Widget class.',
-    correctionMessage: 'Prefix with underscore to make private.',
+        '[prefer_widget_private_members] Public helper method in a widget class exposes internal implementation details to consumers. This increases the public API surface, invites unintended coupling, and makes refactoring harder because external code may depend on methods that are not part of the widget contract.',
+    correctionMessage:
+        'Prefix the method name with an underscore to make it private (e.g. _buildHeader), keeping the widget API limited to its constructor parameters.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -743,8 +749,9 @@ class AvoidUncontrolledTextFieldRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_uncontrolled_text_field',
     problemMessage:
-        '[avoid_uncontrolled_text_field] TextField should have a controller for proper state management.',
-    correctionMessage: 'Add a TextEditingController to the TextField.',
+        '[avoid_uncontrolled_text_field] TextField without a TextEditingController loses programmatic access to the input value, making it impossible to pre-fill, clear, validate on demand, or read the text outside of onChanged. This leads to fragile state management and unexpected behavior during form submissions.',
+    correctionMessage:
+        'Create a TextEditingController in initState (and dispose it in dispose), then pass it to the TextField via the controller parameter.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -796,9 +803,9 @@ class AvoidHardcodedAssetPathsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_hardcoded_asset_paths',
     problemMessage:
-        '[avoid_hardcoded_asset_paths] Asset path should not be hardcoded.',
+        '[avoid_hardcoded_asset_paths] Hardcoded asset path string is error-prone: typos produce silent runtime failures, path changes require find-and-replace across the codebase, and the compiler cannot verify the asset exists. Centralized asset references enable compile-time safety and single-source-of-truth for all asset paths.',
     correctionMessage:
-        'Use a constants class or generated assets for asset paths.',
+        'Define asset paths in a constants class or use a code generator like flutter_gen to produce type-safe asset references (e.g. Assets.images.logo).',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -886,8 +893,9 @@ class AvoidPrintInProductionRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_print_in_production',
     problemMessage:
-        '[avoid_print_in_production] Avoid using print() in production code.',
-    correctionMessage: 'Use a proper logging framework instead.',
+        '[avoid_print_in_production] print() call found in production widget code. Print statements bypass structured logging, cannot be filtered by severity, pollute the console in release builds, and may inadvertently leak sensitive data. They also add unnecessary I/O overhead in production.',
+    correctionMessage:
+        'Replace with a logging framework (e.g. package:logging, or debugPrint for debug-only output) that supports log levels and can be silenced in release builds.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -998,8 +1006,9 @@ class AvoidCatchingGenericExceptionRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_catching_generic_exception',
     problemMessage:
-        '[avoid_catching_generic_exception] Avoid catching generic exceptions.',
-    correctionMessage: 'Catch specific exception types instead.',
+        '[avoid_catching_generic_exception] Catching Exception or Object swallows all errors including programming bugs, assertion failures, and unexpected states that should crash visibly. This masks root causes, making bugs harder to diagnose and allowing the app to continue in a corrupted state.',
+    correctionMessage:
+        'Catch specific exception types (e.g. FormatException, HttpException, SocketException) so that unexpected errors propagate and are caught by error reporting.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -1070,8 +1079,9 @@ class AvoidServiceLocatorOveruseRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_service_locator_overuse',
     problemMessage:
-        '[avoid_service_locator_overuse] Service locator call in widget. Prefer constructor injection.',
-    correctionMessage: 'Pass dependencies through the constructor instead.',
+        '[avoid_service_locator_overuse] Service locator (e.g. GetIt.instance) called directly in a widget hides dependencies, makes the widget untestable without the full service container, and couples the UI layer to a specific DI framework. Constructor injection makes dependencies explicit and enables easy mocking in tests.',
+    correctionMessage:
+        'Pass the dependency through the widget constructor or use a DI-aware wrapper (e.g. Provider, Riverpod) so that tests can supply mock implementations without configuring a global container.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -1147,9 +1157,9 @@ class PreferUtcDateTimesRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_utc_datetimes',
     problemMessage:
-        '[prefer_utc_datetimes] Consider using UTC DateTime for storage/transmission.',
+        '[prefer_utc_datetimes] Local DateTime values shift meaning when serialized and deserialized across time zones, causing off-by-hours bugs in timestamps, scheduling, and data synchronization. Storing and transmitting dates in UTC eliminates timezone ambiguity and ensures consistent behavior across devices and servers.',
     correctionMessage:
-        'Use DateTime.now().toUtc() or DateTime.utc() for timestamps.',
+        'Use DateTime.now().toUtc() or DateTime.utc() for timestamps intended for storage, API transmission, or cross-device synchronization. Convert to local time only for display.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -1217,8 +1227,9 @@ class AvoidRegexInLoopRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_regex_in_loop',
     problemMessage:
-        '[avoid_regex_in_loop] RegExp created inside loop. Move it outside for efficiency.',
-    correctionMessage: 'Create the RegExp once outside the loop.',
+        '[avoid_regex_in_loop] RegExp object constructed inside a loop body is re-compiled on every iteration, wasting CPU cycles on repeated pattern parsing. Regex compilation is expensive relative to matching, and this overhead multiplies with large data sets, causing noticeable jank in UI-driven code.',
+    correctionMessage:
+        'Declare the RegExp as a static final field or a local variable above the loop so it is compiled once and reused on each iteration.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -1299,8 +1310,9 @@ class PreferGetterOverMethodRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_getter_over_method',
     problemMessage:
-        '[prefer_getter_over_method] Use a getter instead of a method that returns a value.',
-    correctionMessage: 'Convert to a getter: get name => _name;',
+        '[prefer_getter_over_method] Zero-argument method that returns a value without side effects reads more naturally as a getter. Methods imply computation or side effects, while getters signal a simple property access. Using a getter clarifies intent and aligns with the Dart style guide convention.',
+    correctionMessage:
+        'Convert to a getter (e.g. String get name => _name;). Reserve methods for operations that have side effects or accept parameters.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -1392,8 +1404,9 @@ class AvoidUnusedCallbackParametersRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_unused_callback_parameters',
     problemMessage:
-        '[avoid_unused_callback_parameters] Callback parameter is declared but not used.',
-    correctionMessage: 'Use underscore (_) for unused parameters.',
+        '[avoid_unused_callback_parameters] Callback parameter is declared but never referenced in the closure body, adding visual noise and misleading readers into thinking the value is needed. Unused parameters also trigger analyzer warnings and obscure the actual data flow of the callback.',
+    correctionMessage:
+        'Replace the unused parameter name with an underscore (_) or double underscore (__) to signal that the value is intentionally ignored.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -1469,9 +1482,9 @@ class PreferSemanticWidgetNamesRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_semantic_widget_names',
     problemMessage:
-        '[prefer_semantic_widget_names] Consider using a more semantic widget.',
+        '[prefer_semantic_widget_names] Generic Container widget used where a more specific widget communicates intent. Container combines padding, decoration, alignment, and sizing in one opaque widget, making it unclear which feature is actually needed. Specific widgets like SizedBox, DecoratedBox, Padding, or Align are more readable and more efficient.',
     correctionMessage:
-        'Replace Container with a more specific widget like DecoratedBox, SizedBox, etc.',
+        'Replace Container with the specific widget that matches the intended use: SizedBox for sizing, Padding for padding, DecoratedBox for decoration, or Align for alignment.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -1546,8 +1559,10 @@ class AvoidTextScaleFactorRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_text_scale_factor',
-    problemMessage: '[avoid_text_scale_factor] textScaleFactor is deprecated.',
-    correctionMessage: 'Use textScaler instead of textScaleFactor.',
+    problemMessage:
+        '[avoid_text_scale_factor] textScaleFactor is deprecated since Flutter 3.16. It applies a linear multiplier that cannot express non-linear text scaling used by accessibility settings on modern platforms. The replacement textScaler API supports both linear and non-linear scaling, ensuring correct rendering for users with accessibility needs.',
+    correctionMessage:
+        'Replace textScaleFactor with textScaler: TextScaler.linear(factor), or use MediaQuery.textScalerOf(context) to read the ambient scaler.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -1607,8 +1622,9 @@ class AvoidImageWithoutCacheRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_image_without_cache',
     problemMessage:
-        '[avoid_image_without_cache] Image.network should specify cacheWidth/cacheHeight for memory efficiency.',
-    correctionMessage: 'Add cacheWidth and/or cacheHeight parameters.',
+        '[avoid_image_without_cache] Image.network without cacheWidth or cacheHeight decodes the full-resolution image into memory, even when displayed at a smaller size. A 4000x3000 photo decoded at full resolution consumes ~48 MB of GPU memory, causing excessive memory usage and potential out-of-memory crashes on low-end devices.',
+    correctionMessage:
+        'Add cacheWidth and/or cacheHeight matching the display size (in logical pixels multiplied by devicePixelRatio) so Flutter decodes a smaller image into memory.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -1680,9 +1696,9 @@ class PreferSplitWidgetConstRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_split_widget_const',
     problemMessage:
-        '[prefer_split_widget_const] Large widget subtree could be extracted to a const widget.',
+        '[prefer_split_widget_const] Large widget subtree with all-const children is rebuilt on every parent setState, even though its output never changes. Extracting it into a separate const widget class allows Flutter to skip rebuilding the entire subtree, reducing frame build times and improving scroll performance.',
     correctionMessage:
-        'Extract this subtree to a separate const widget for better performance.',
+        'Extract the static subtree into its own StatelessWidget class with a const constructor, then instantiate it with const in the parent build method.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -1757,8 +1773,9 @@ class AvoidNavigatorPushWithoutRouteNameRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_navigator_push_without_route_name',
     problemMessage:
-        '[avoid_navigator_push_without_route_name] Prefer named routes for better navigation management.',
-    correctionMessage: 'Use Navigator.pushNamed or a routing package.',
+        '[avoid_navigator_push_without_route_name] Anonymous Navigator.push with inline MaterialPageRoute scatters route definitions throughout the codebase, making it impossible to see all routes in one place, complicating deep linking, and preventing analytics from tracking navigation paths by name.',
+    correctionMessage:
+        'Use Navigator.pushNamed with routes defined in a central route table, or adopt a declarative routing package (e.g. go_router) for type-safe navigation.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -1817,8 +1834,9 @@ class AvoidDuplicateWidgetKeysRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_duplicate_widget_keys',
     problemMessage:
-        '[avoid_duplicate_widget_keys] Duplicate widget keys found in list.',
-    correctionMessage: 'Ensure each widget in a list has a unique key.',
+        '[avoid_duplicate_widget_keys] Multiple widgets in a list share the same Key value. Flutter uses keys to match old widgets with new widgets during reconciliation. Duplicate keys cause the framework to reuse the wrong element, leading to stale state, broken animations, and incorrect widget ordering after list mutations.',
+    correctionMessage:
+        'Assign a unique key to each widget in the list, using ValueKey with a stable identifier (e.g. item.id) rather than the list index.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -1907,9 +1925,9 @@ class PreferSafeAreaConsumerRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_safe_area_consumer',
     problemMessage:
-        '[prefer_safe_area_consumer] SafeArea may be redundant when used directly inside Scaffold body.',
+        '[prefer_safe_area_consumer] SafeArea placed directly inside a Scaffold body is often redundant because Scaffold already insets its body below the AppBar and above the BottomNavigationBar. Doubling up on safe area handling wastes vertical space and can push content further from the edges than intended.',
     correctionMessage:
-        'Scaffold already handles safe areas via its appBar and bottomNavigationBar properties.',
+        'Remove SafeArea if the Scaffold has appBar or bottomNavigationBar that already consume safe area insets. Use SafeArea only when the Scaffold body extends behind system UI.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
