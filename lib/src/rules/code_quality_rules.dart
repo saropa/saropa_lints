@@ -1724,8 +1724,9 @@ class AvoidAlwaysNullParametersRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_always_null_parameters',
     problemMessage:
-        '[avoid_always_null_parameters] Parameter is explicitly passed as null.',
-    correctionMessage: 'Omit the parameter instead of passing null explicitly.',
+        '[avoid_always_null_parameters] Parameter is explicitly passed as null at every call site. Passing null as a constant argument adds noise, makes the call site harder to read, and defeats the purpose of optional parameters, which default to null when omitted.',
+    correctionMessage:
+        'Omit the parameter entirely and let the default value apply, or if null has semantic meaning, document why it is passed explicitly.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -1774,8 +1775,9 @@ class AvoidAssigningToStaticFieldRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_assigning_to_static_field',
     problemMessage:
-        '[avoid_assigning_to_static_field] Instance method should not modify static field.',
-    correctionMessage: 'Make the method static or use instance field.',
+        '[avoid_assigning_to_static_field] Instance method modifies a static field, coupling instance behavior to global state. This makes the class unpredictable because any instance can silently alter shared state, causing race conditions in concurrent code and making tests unreliable.',
+    correctionMessage:
+        'Move the assignment to a static method if the modification is class-level, or convert the static field to an instance field if the state should be per-instance.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -1876,8 +1878,9 @@ class AvoidAsyncCallInSyncFunctionRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_async_call_in_sync_function',
     problemMessage:
-        '[avoid_async_call_in_sync_function] Async call in sync function without handling the Future.',
-    correctionMessage: 'Use await, .then(), or unawaited() for the async call.',
+        '[avoid_async_call_in_sync_function] Async function called inside a synchronous function without handling the returned Future. The Future is silently discarded, so any errors thrown by the async operation are swallowed and any result is lost, making failures invisible.',
+    correctionMessage:
+        'Mark the enclosing function as async and await the call, chain with .then()/.catchError() for explicit handling, or wrap with unawaited() to document the intentional fire-and-forget.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -1955,8 +1958,9 @@ class AvoidComplexLoopConditionsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_complex_loop_conditions',
     problemMessage:
-        '[avoid_complex_loop_conditions] Loop condition is too complex.',
-    correctionMessage: 'Extract condition to a boolean variable or method.',
+        '[avoid_complex_loop_conditions] Loop condition contains too many operators or nested expressions, making it difficult to reason about when the loop terminates. Complex conditions increase the risk of off-by-one errors and infinite loops that are hard to diagnose.',
+    correctionMessage:
+        'Extract the condition into a named boolean variable or a separate method with a descriptive name that communicates the loop termination intent.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -2031,8 +2035,9 @@ class AvoidConstantConditionsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_constant_conditions',
     problemMessage:
-        '[avoid_constant_conditions] Condition with constant values can be simplified.',
-    correctionMessage: 'Evaluate the constant expression at compile time.',
+        '[avoid_constant_conditions] Condition evaluates to a compile-time constant, making one branch unreachable dead code. This usually indicates a logic error where the condition was intended to be dynamic, or leftover debugging code that was never cleaned up.',
+    correctionMessage:
+        'Remove the condition and keep only the reachable branch, or replace the constant with the intended dynamic expression that varies at runtime.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -2084,8 +2089,9 @@ class AvoidContradictoryExpressionsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_contradictory_expressions',
     problemMessage:
-        '[avoid_contradictory_expressions] Contradictory conditions detected.',
-    correctionMessage: 'Review the logic - conditions may never be satisfied.',
+        '[avoid_contradictory_expressions] Contradictory conditions detected where two expressions cannot both be true simultaneously. This creates unreachable code paths that silently skip intended logic, indicating a logic error that may cause incorrect behavior or missed edge cases.',
+    correctionMessage:
+        'Review the boolean logic to ensure conditions are compatible, remove the contradictory branch, or correct the expression to reflect the intended behavior.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -2219,9 +2225,9 @@ class AvoidIdenticalExceptionHandlingBlocksRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_identical_exception_handling_blocks',
     problemMessage:
-        '[avoid_identical_exception_handling_blocks] Catch blocks have identical code.',
+        '[avoid_identical_exception_handling_blocks] Multiple catch blocks contain identical handling code. Duplicated exception handling increases maintenance burden because changes must be applied to every copy, and missed updates lead to inconsistent error recovery behavior.',
     correctionMessage:
-        'Combine exception types: on FormatException, IOException catch (e).',
+        'Combine the exception types into a single catch clause (e.g. on FormatException, IOException catch (e)) or extract the shared handling into a helper method.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -2275,8 +2281,9 @@ class AvoidLateFinalReassignmentRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_late_final_reassignment',
     problemMessage:
-        '[avoid_late_final_reassignment] Late final field may be assigned multiple times.',
-    correctionMessage: 'Ensure late final fields are only assigned once.',
+        '[avoid_late_final_reassignment] Late final field has multiple assignment paths, which throws a LateInitializationError at runtime on the second write. The compiler cannot catch this statically, so the crash only surfaces during execution of the specific code path that triggers the duplicate assignment.',
+    correctionMessage:
+        'Ensure the late final field is assigned exactly once across all code paths, or convert it to a non-final late field if reassignment is intentional.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -2371,8 +2378,9 @@ class AvoidMissingCompleterStackTraceRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_missing_completer_stack_trace',
     problemMessage:
-        '[avoid_missing_completer_stack_trace] completeError() called without stack trace.',
-    correctionMessage: 'Pass the stack trace as second argument.',
+        '[avoid_missing_completer_stack_trace] Completer.completeError() called without passing the stack trace as the second argument. Without the original stack trace, error reports show only the completeError() call site instead of the actual failure origin, making debugging asynchronous errors significantly harder.',
+    correctionMessage:
+        'Pass the stack trace as the second argument to completeError(error, stackTrace) to preserve the full async error chain for debugging.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -2407,8 +2415,9 @@ class AvoidMissingEnumConstantInMapRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_missing_enum_constant_in_map',
     problemMessage:
-        '[avoid_missing_enum_constant_in_map] Map may be missing enum constant keys.',
-    correctionMessage: 'Ensure all enum values are present in the map.',
+        '[avoid_missing_enum_constant_in_map] Map literal keyed by enum values does not include all enum constants. When a new enum value is added, this map silently returns null for the missing key instead of producing a compile-time error, leading to unexpected null values or fallback behavior at runtime.',
+    correctionMessage:
+        'Add entries for all enum constants to the map, or use a switch expression with exhaustiveness checking to ensure every enum value is handled.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -2820,8 +2829,9 @@ class AvoidSimilarNamesRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_similar_names',
     problemMessage:
-        '[avoid_similar_names] Variable name is too similar to another.',
-    correctionMessage: 'Use more distinct names to avoid confusion.',
+        '[avoid_similar_names] Variable name differs from another in-scope variable by only one or two characters. Near-identical names increase the risk of accidentally using the wrong variable, producing subtle bugs that pass code review because the names look correct at a glance.',
+    correctionMessage:
+        'Rename one or both variables to be more distinct, using descriptive names that clearly convey their different purposes (e.g. userInput vs validatedInput).',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -2936,8 +2946,9 @@ class AvoidUnnecessaryNullableParametersRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_unnecessary_nullable_parameters',
     problemMessage:
-        '[avoid_unnecessary_nullable_parameters] Nullable parameter is never passed null.',
-    correctionMessage: 'Consider making the parameter non-nullable.',
+        '[avoid_unnecessary_nullable_parameters] Parameter declared as nullable but null is never passed at any call site. The unnecessary nullable type forces every usage within the function body to handle a null case that cannot occur, adding defensive checks and reducing code clarity.',
+    correctionMessage:
+        'Change the parameter type to non-nullable. If null support is needed for future callers, add it when the requirement actually arises rather than preemptively.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -3022,7 +3033,7 @@ class FunctionAlwaysReturnsNullRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'function_always_returns_null',
     problemMessage:
-        '[function_always_returns_null] Function always returns null.',
+        '[function_always_returns_null] Function returns null on every code path, making the return type effectively void. Callers that check or use the return value are performing dead logic, and the nullable return type misleads developers into thinking the function can return meaningful data.',
     correctionMessage:
         'Consider changing return type to void or returning meaningful values.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -3177,7 +3188,7 @@ class AvoidAccessingCollectionsByConstantIndexRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_accessing_collections_by_constant_index',
     problemMessage:
-        '[avoid_accessing_collections_by_constant_index] Accessing collection by constant index inside loop.',
+        '[avoid_accessing_collections_by_constant_index] Collection accessed by a constant index inside a loop body. This retrieves the same element on every iteration, which is wasteful and usually indicates a logic error where the loop variable should have been used as the index instead.',
     correctionMessage:
         'Use the loop variable or extract the element before the loop.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -3289,8 +3300,9 @@ class AvoidDuplicateConstantValuesRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_duplicate_constant_values',
     problemMessage:
-        '[avoid_duplicate_constant_values] Duplicate constant value found.',
-    correctionMessage: 'Reuse the existing constant instead of duplicating.',
+        '[avoid_duplicate_constant_values] Multiple constants share the same value in this scope. Duplicate constant definitions increase maintenance cost because changes must be applied to every copy, and inconsistent updates lead to subtle logic errors when the values diverge.',
+    correctionMessage:
+        'Consolidate duplicates into a single named constant and reference it from all usage sites to ensure changes propagate consistently.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -3348,8 +3360,9 @@ class AvoidDuplicateInitializersRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_duplicate_initializers',
     problemMessage:
-        '[avoid_duplicate_initializers] Duplicate initializer expression.',
-    correctionMessage: 'Extract the common initialization to a variable.',
+        '[avoid_duplicate_initializers] Same initialization expression appears in multiple initializer list entries. Duplicate expressions waste computation, increase the risk of inconsistent updates when one copy is changed but others are missed, and obscure the intended initialization logic.',
+    correctionMessage:
+        'Extract the shared expression into a local variable or factory method and reference it from each initializer to keep the logic in a single place.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -3404,8 +3417,9 @@ class AvoidUnnecessaryOverridesRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_unnecessary_overrides',
     problemMessage:
-        '[avoid_unnecessary_overrides] Override only calls super without additional logic.',
-    correctionMessage: 'Remove the unnecessary override.',
+        '[avoid_unnecessary_overrides] Method override only delegates to super without adding any logic. Unnecessary overrides clutter the class, obscure the inheritance chain, and add a maintenance burden because developers must inspect each override to confirm it does nothing beyond the parent implementation.',
+    correctionMessage:
+        'Remove the override entirely so the parent class implementation is used directly. Add the override back only when custom behavior is actually needed.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
