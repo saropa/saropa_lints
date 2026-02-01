@@ -13,6 +13,9 @@ Dates are not included in version headers — [pub.dev](https://pub.dev/packages
 ---
 ## [4.9.6] - Current
 
+---
+## [4.9.7]
+
 ### Added
 
 - **Quick fixes for 8 rules across 5 files**: Added one-click fixes for `require_deprecation_message` (replace `@deprecated` with `@Deprecated`), `avoid_bluetooth_scan_without_timeout` (add scan timeout parameter), `require_geolocator_error_handling` (wrap in try-catch), `avoid_touch_only_gestures` (add `onLongPress` callback), `prefer_catch_over_on` (remove `on` clause from catch), `prefer_expect_over_assert_in_tests` (replace `assert` with `expect`), `require_pdf_error_handling` and `require_sqflite_error_handling` (wrap in try-catch).
