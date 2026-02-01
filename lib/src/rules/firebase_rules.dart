@@ -8,6 +8,7 @@ library;
 
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
+import 'package:analyzer/dart/element/type.dart';
 import 'package:analyzer/error/error.dart'
     show AnalysisError, DiagnosticSeverity;
 import 'package:custom_lint_builder/custom_lint_builder.dart';
@@ -833,6 +834,9 @@ class RequireDatabaseIndexRule extends SaropaLintRule {
 /// Individual writes are slower and can leave data inconsistent.
 /// Use transactions or batch writes for multiple related changes.
 ///
+/// Uses AST type resolution to distinguish database writes from in-memory
+/// collection operations (List.add, Set.add, Map.put, etc.).
+///
 /// **BAD:**
 /// ```dart
 /// await box.put('user1', user1);
@@ -878,48 +882,94 @@ class PreferTransactionForBatchRule extends SaropaLintRule {
     CustomLintContext context,
   ) {
     context.registry.addMethodDeclaration((MethodDeclaration node) {
-      final FunctionBody body = node.body;
-      final String bodySource = body.toSource();
+      final _DatabaseWriteCounter counter = _DatabaseWriteCounter();
+      node.body.accept(counter);
 
-      // Count individual write operations, excluding batch variants
-      final int putCount = '.put('.allMatches(bodySource).length -
-          '.putIfAbsent('.allMatches(bodySource).length -
-          '.putAll('.allMatches(bodySource).length;
-      final int addCount = '.add('.allMatches(bodySource).length -
-          '.addAll('.allMatches(bodySource).length;
-      final int insertCount = '.insert('.allMatches(bodySource).length -
-          '.insertAll('.allMatches(bodySource).length;
-      final int deleteCount = '.delete('.allMatches(bodySource).length -
-          '.deleteAll('.allMatches(bodySource).length;
-      final int updateCount = '.update('.allMatches(bodySource).length -
-          '.updateAll('.allMatches(bodySource).length;
-      final int setCount = '.set('.allMatches(bodySource).length;
-
-      final int writeOps = putCount +
-          addCount +
-          insertCount +
-          deleteCount +
-          updateCount +
-          setCount;
-
-      // If few writes, not a concern
-      if (writeOps < 3) return;
-
-      // Check if already using transactions/batches
-      if (bodySource.contains('writeTxn') ||
-          bodySource.contains('transaction') ||
-          bodySource.contains('Transaction') ||
-          bodySource.contains('.batch()') ||
-          bodySource.contains('batch.') ||
-          bodySource.contains('Batch') ||
-          bodySource.contains('putAll') ||
-          bodySource.contains('addAll') ||
-          bodySource.contains('insertAll')) {
-        return; // Already using batch/transaction pattern
-      }
+      if (counter.hasTransaction || counter.writeCount < 3) return;
 
       reporter.atNode(node, code);
     });
+  }
+}
+
+/// Walks a method body's AST to count potential database write operations,
+/// skipping known in-memory collection types to avoid false positives.
+class _DatabaseWriteCounter extends RecursiveAstVisitor<void> {
+  int writeCount = 0;
+  bool hasTransaction = false;
+
+  /// Method names that indicate individual write operations.
+  static const Set<String> _writeMethodNames = <String>{
+    'add',
+    'delete',
+    'insert',
+    'put',
+    'set',
+    'update',
+  };
+
+  /// Method names that indicate batch or transaction usage.
+  static const Set<String> _batchMethodNames = <String>{
+    'addAll',
+    'batch',
+    'commit',
+    'deleteAll',
+    'insertAll',
+    'putAll',
+    'transaction',
+    'updateAll',
+    'writeTxn',
+  };
+
+  /// Known in-memory collection types where write-like method names
+  /// are not database operations.
+  static const Set<String> _safeCollectionTypes = <String>{
+    'DoubleLinkedQueue',
+    'HashMap',
+    'HashSet',
+    'Iterable',
+    'LinkedHashMap',
+    'LinkedHashSet',
+    'LinkedList',
+    'List',
+    'ListQueue',
+    'Map',
+    'Queue',
+    'Set',
+    'SplayTreeMap',
+    'SplayTreeSet',
+    'UnmodifiableListView',
+    'UnmodifiableMapView',
+  };
+
+  @override
+  void visitMethodInvocation(MethodInvocation node) {
+    final String name = node.methodName.name;
+
+    if (_batchMethodNames.contains(name)) {
+      hasTransaction = true;
+    }
+
+    if (_writeMethodNames.contains(name)) {
+      _countIfDatabaseTarget(node);
+    }
+
+    super.visitMethodInvocation(node);
+  }
+
+  void _countIfDatabaseTarget(MethodInvocation node) {
+    final Expression? target = node.target;
+    if (target == null) return; // Implicit this — unlikely to be a DB call
+
+    final DartType? type = target.staticType;
+    if (type == null) return; // Unresolvable type — skip to avoid FP
+
+    final String? elementName = type.element?.name;
+    if (elementName == null) return; // dynamic or unresolvable
+
+    if (!_safeCollectionTypes.contains(elementName)) {
+      writeCount++;
+    }
   }
 }
 

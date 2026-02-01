@@ -11,9 +11,16 @@ Dates are not included in version headers — [pub.dev](https://pub.dev/packages
 ** See the current published changelog: [saropa_lints/changelog](https://pub.dev/packages/saropa_lints/changelog)
 
 ---
-## [4.9.8] - Current
+## [4.9.9] - Current
 
 ### Fixed
+
+- **`require_ios_push_notification_capability` false positive on unrelated identifiers**: The rule used substring matching on the target expression's source code to detect push notification class names, but also matched method-name patterns (e.g., `onMessage`) against target source. This caused false positives on classes like `CommonMessagePanel` which contains the substring `onMessage`. Now splits patterns into class names (`FirebaseMessaging`, `OneSignal`, `UNUserNotificationCenter`) and method names (`onMessage`, `getToken`, etc.) — only class names are checked against target source, while method names are matched exactly against the invoked method name only.
+
+- **`require_dispose_pattern` false positive on widget classes**: The rule flagged `StatefulWidget` and `StatelessWidget` subclasses that receive disposable types (e.g., `TextEditingController`) as constructor parameters. Widget classes are immutable and have no `dispose()` method — lifecycle cleanup belongs in the corresponding `State` class, which was already skipped. Now skips `StatefulWidget` and `StatelessWidget` in addition to `State`.
+
+---
+## [4.9.8]
 
 - **`avoid_unguarded_debug` no longer flags `debug()` calls**: The rule previously flagged every bare `debug()` call without a guard or `level:` parameter. The project's `debug()` function is production-safe logging infrastructure with its own level filtering and Crashlytics routing — it does not need external guards. The rule now only flags `debugPrint()`, which bypasses all filtering and writes directly to the console. Also added recognition of `debug*`/`_debug*` method names as implicit guards for `debugPrint()` calls inside debug helper methods.
 
