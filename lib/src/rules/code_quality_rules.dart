@@ -3605,10 +3605,21 @@ class _AssignmentUsageVisitor extends RecursiveAstVisitor<void> {
 
 /// Warns when an instance is created but never used.
 ///
+/// Skips known fire-and-forget constructors (e.g. `Future.delayed`,
+/// `Timer`, `Timer.periodic`) whose side effects are the intended use.
+///
 /// Example of **bad** code:
 /// ```dart
 /// void foo() {
 ///   MyClass();  // Instance created but not used
+/// }
+/// ```
+///
+/// Example of **good** code (not flagged):
+/// ```dart
+/// void foo() {
+///   Future.delayed(Duration(seconds: 1), () => print('done'));
+///   Timer(Duration(seconds: 1), () => print('done'));
 /// }
 /// ```
 class AvoidUnusedInstancesRule extends SaropaLintRule {
@@ -3620,6 +3631,13 @@ class AvoidUnusedInstancesRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+
+  /// Types whose constructors are intentionally used for side effects
+  /// without needing to capture the returned instance.
+  static const Set<String> _fireAndForgetTypes = <String>{
+    'Future',
+    'Timer',
+  };
 
   static const LintCode _code = LintCode(
     name: 'avoid_unused_instances',
@@ -3638,9 +3656,12 @@ class AvoidUnusedInstancesRule extends SaropaLintRule {
   ) {
     context.registry.addExpressionStatement((ExpressionStatement node) {
       final Expression expr = node.expression;
-      if (expr is InstanceCreationExpression) {
-        reporter.atNode(node, code);
-      }
+      if (expr is! InstanceCreationExpression) return;
+
+      final String typeName = expr.constructorName.type.name2.lexeme;
+      if (_fireAndForgetTypes.contains(typeName)) return;
+
+      reporter.atNode(node, code);
     });
   }
 }

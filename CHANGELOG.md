@@ -11,7 +11,19 @@ Dates are not included in version headers — [pub.dev](https://pub.dev/packages
 ** See the current published changelog: [saropa_lints/changelog](https://pub.dev/packages/saropa_lints/changelog)
 
 ---
-## [4.9.6] - Current
+## [4.9.8] - Current
+
+### Fixed
+
+- **`avoid_unguarded_debug` no longer flags `debug()` calls**: The rule previously flagged every bare `debug()` call without a guard or `level:` parameter. The project's `debug()` function is production-safe logging infrastructure with its own level filtering and Crashlytics routing — it does not need external guards. The rule now only flags `debugPrint()`, which bypasses all filtering and writes directly to the console. Also added recognition of `debug*`/`_debug*` method names as implicit guards for `debugPrint()` calls inside debug helper methods.
+
+- **`prefer_dispose_before_new_instance` false positive on `late final` fields**: The rule flagged assignments to `late final` fields in helper methods called from `initState()`. Since `late final` fields can only be assigned once, there is no previous instance to leak. The rule now skips `late final` fields entirely.
+
+- **`avoid_unused_instances` false positive on fire-and-forget constructors**: The rule flagged `Future.delayed(...)`, `Timer(...)`, and similar constructors as unused instances, even though they are intentionally used for side effects without capturing the return value. Added an allowlist for `Future` and `Timer` types to skip the warning for known fire-and-forget patterns.
+
+- **`nullify_after_dispose` false positive on final/non-nullable fields**: The rule flagged disposal calls on fields declared as `final` or with non-nullable types (e.g., `final ScrollController _scrollController`), where setting the field to `null` is impossible. Now skips fields that are `final` or have a non-nullable type, only flagging nullable non-final fields where nullification is actionable.
+
+- **`avoid_change_notifier_in_widget` false positive on non-ChangeNotifier classes**: The rule used substring matching on type names (`Model`, `Controller`, `Notifier`, `ViewModel`), causing false positives on plain data classes like `ContactModel` that don't extend `ChangeNotifier`. Now resolves the actual class hierarchy via the analyzer's type system and checks `allSupertypes` for `ChangeNotifier`. Falls back to name matching (without the overly broad `Model` pattern) only when type resolution is unavailable.
 
 ---
 ## [4.9.7]
