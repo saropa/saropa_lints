@@ -147,27 +147,27 @@ class _CommentOutDebugPrintFix extends DartFix {
   }
 }
 
-/// Warns when `debug()` or `debugPrint()` calls are not guarded by a debug check.
+/// Warns when `debugPrint()` calls are not guarded by a debug check.
 ///
-/// Unguarded debug statements can:
-/// - Clutter production logs/databases
-/// - Expose sensitive information
-/// - Impact performance
+/// The project's `debug()` function is production-safe logging infrastructure
+/// with its own level filtering and Crashlytics routing — it is NOT flagged.
+///
+/// `debugPrint()` bypasses all of that and writes directly to the console,
+/// so it should be guarded to avoid cluttering production output.
 ///
 /// **Guarded patterns (allowed):**
 /// - Inside `if (kDebugMode)` block
 /// - Inside `if (DebugType.*.isDebug)` block
 /// - Inside `if (MainSettings.isDebugMode)` block
 /// - Inside `if (isDebug*)` local variable check
-/// - Has `level: DebugLevels.Warning/Error/Info/Todo` parameter
 /// - Inside exception handler (catch block)
 /// - Inside assert() statement
+/// - Inside a method/function named `debug*` or `_debug*` (debug helpers)
 ///
 /// Example of **bad** code:
 /// ```dart
 /// void someMethod() {
-///   debug('Processing item');  // Unguarded - will run in production
-///   debugPrint('Value: $x');   // Unguarded
+///   debugPrint('Value: $x');  // Unguarded - will print in production
 /// }
 /// ```
 ///
@@ -178,10 +178,8 @@ class _CommentOutDebugPrintFix extends DartFix {
 ///     debugPrint('Value: $x');
 ///   }
 ///
-///   if (DebugType.Activity.isDebug) {
-///     debug('Processing item');
-///   }
-///
+///   // debug() is always allowed — it's production-safe
+///   debug('Missing data');
 ///   debug('Important warning', level: DebugLevels.Warning);
 /// }
 /// ```
@@ -198,9 +196,9 @@ class AvoidUnguardedDebugRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_unguarded_debug',
     problemMessage:
-        '[avoid_unguarded_debug] Debug statement is not guarded by a debug mode check.',
-    correctionMessage: 'Wrap in if (kDebugMode), if (DebugType.*.isDebug), '
-        'or add level: DebugLevels.Warning/Error parameter.',
+        '[avoid_unguarded_debug] debugPrint() is not guarded by a debug mode check.',
+    correctionMessage: 'Wrap in if (kDebugMode) or if (DebugType.*.isDebug). '
+        'Consider using debug() instead, which is production-safe.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -214,43 +212,31 @@ class AvoidUnguardedDebugRule extends SaropaLintRule {
     SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
-    // Check for debug() function calls
+    // Only flag debugPrint() — the project's debug() function is
+    // production-safe logging infrastructure with its own level filtering.
+    // Bare debug() calls are intentional and should not require guards.
+
+    // Check for debugPrint() function calls
     context.registry
         .addFunctionExpressionInvocation((FunctionExpressionInvocation node) {
       final Expression function = node.function;
-      if (function is SimpleIdentifier && function.name == 'debug') {
-        if (!_isGuarded(node) && !_hasDebugLevel(node.argumentList)) {
+      if (function is SimpleIdentifier && function.name == 'debugPrint') {
+        if (!_isGuarded(node)) {
           reporter.atNode(node, code);
         }
       }
     });
 
-    // Check for debug() and debugPrint() method invocations
+    // Check for debugPrint() method invocations
     context.registry.addMethodInvocation((MethodInvocation node) {
       final String methodName = node.methodName.name;
 
-      if (methodName == 'debug' || methodName == 'debugPrint') {
-        if (!_isGuarded(node) && !_hasDebugLevel(node.argumentList)) {
+      if (methodName == 'debugPrint') {
+        if (!_isGuarded(node)) {
           reporter.atNode(node, code);
         }
       }
     });
-  }
-
-  /// Check if the debug call has a level parameter with Warning/Error/Info/Todo
-  bool _hasDebugLevel(ArgumentList args) {
-    for (final Expression arg in args.arguments) {
-      if (arg is NamedExpression && arg.name.label.name == 'level') {
-        final String source = arg.expression.toSource();
-        if (source.contains('DebugLevels.Warning') ||
-            source.contains('DebugLevels.Error') ||
-            source.contains('DebugLevels.Info') ||
-            source.contains('DebugLevels.Todo')) {
-          return true;
-        }
-      }
-    }
-    return false;
   }
 
   /// Check if the node is inside a debug guard
@@ -261,6 +247,21 @@ class AvoidUnguardedDebugRule extends SaropaLintRule {
       // Check for if statement guards
       if (current is IfStatement) {
         if (_isDebugGuardCondition(current.expression)) {
+          return true;
+        }
+      }
+
+      // Check for enclosing method/function named debug* or _debug*
+      // These are debug helper methods that are only called from guarded sites
+      if (current is MethodDeclaration) {
+        final String name = current.name.lexeme;
+        if (name.startsWith('debug') || name.startsWith('_debug')) {
+          return true;
+        }
+      }
+      if (current is FunctionDeclaration) {
+        final String name = current.name.lexeme;
+        if (name.startsWith('debug') || name.startsWith('_debug')) {
           return true;
         }
       }
