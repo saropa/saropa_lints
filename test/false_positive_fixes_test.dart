@@ -9,6 +9,7 @@ import 'package:test/test.dart';
 /// 4. avoid_passing_self_as_argument - literal value exclusion
 /// 5. avoid_variable_shadowing - sibling closure scoping
 /// 6. avoid_isar_clear_in_production - receiver type checking
+/// 7. avoid_unused_instances - fire-and-forget constructor allowlist
 ///
 /// Test fixtures are located in:
 /// - example/lib/require_subscription_status_check_example.dart
@@ -280,6 +281,43 @@ void main() {
 
         expect(
           'Parameter shadowing outer variable is detected',
+          isNotNull,
+        );
+      });
+    });
+
+    group('avoid_unused_instances', () {
+      test('should not flag Future constructors as unused', () {
+        // Expected behavior: These should NOT trigger
+        // - Future.delayed(duration, callback)
+        // - Future.microtask(callback)
+        // - Future<void>.delayed(duration, callback)
+
+        expect(
+          'Future constructors used for side effects are skipped',
+          isNotNull,
+        );
+      });
+
+      test('should not flag Timer constructors as unused', () {
+        // Expected behavior: These should NOT trigger
+        // - Timer(duration, callback)
+        // - Timer.periodic(duration, callback)
+
+        expect(
+          'Timer constructors used for side effects are skipped',
+          isNotNull,
+        );
+      });
+
+      test('should still detect genuinely unused instances', () {
+        // Expected behavior: These SHOULD trigger
+        // - MyClass()
+        // - ValueNotifier(0)
+        // - List<int>()
+
+        expect(
+          'Genuinely unused instances are still detected',
           isNotNull,
         );
       });

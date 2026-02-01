@@ -861,6 +861,134 @@ Future<void> isolateEntry(SendPort sendPort) async {
   final prefs = await SharedPreferences.getInstance();
 }
 
+// =========================================================================
+// prefer_dispose_before_new_instance
+// =========================================================================
+
+// BAD: Reassigning disposable field without calling dispose first
+class BadReassignWidget extends StatefulWidget {
+  const BadReassignWidget({super.key});
+
+  @override
+  State<BadReassignWidget> createState() => _BadReassignWidgetState();
+}
+
+class _BadReassignWidgetState extends State<BadReassignWidget> {
+  TextEditingController? _controller;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = TextEditingController(text: 'initial');
+  }
+
+  void _resetController() {
+    // expect_lint: prefer_dispose_before_new_instance
+    _controller = TextEditingController(text: 'new');
+  }
+
+  @override
+  void dispose() {
+    _controller?.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) => Container();
+}
+
+// GOOD: Disposing before reassignment
+class GoodReassignWidget extends StatefulWidget {
+  const GoodReassignWidget({super.key});
+
+  @override
+  State<GoodReassignWidget> createState() => _GoodReassignWidgetState();
+}
+
+class _GoodReassignWidgetState extends State<GoodReassignWidget> {
+  TextEditingController? _controller;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = TextEditingController(text: 'initial');
+  }
+
+  void _resetController() {
+    _controller?.dispose();
+    _controller = TextEditingController(text: 'new');
+  }
+
+  @override
+  void dispose() {
+    _controller?.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) => Container();
+}
+
+// GOOD: initState is exempted (first-time initialization)
+class GoodInitStateWidget extends StatefulWidget {
+  const GoodInitStateWidget({super.key});
+
+  @override
+  State<GoodInitStateWidget> createState() => _GoodInitStateWidgetState();
+}
+
+class _GoodInitStateWidgetState extends State<GoodInitStateWidget>
+    with SingleTickerProviderStateMixin<GoodInitStateWidget> {
+  AnimationController? _animController;
+
+  @override
+  void initState() {
+    super.initState();
+    _animController = AnimationController(vsync: this, duration: null);
+  }
+
+  @override
+  void dispose() {
+    _animController?.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) => Container();
+}
+
+// GOOD: late final fields can only be assigned once — no old instance to leak
+class GoodLateFinalWidget extends StatefulWidget {
+  const GoodLateFinalWidget({super.key});
+
+  @override
+  State<GoodLateFinalWidget> createState() => _GoodLateFinalWidgetState();
+}
+
+class _GoodLateFinalWidgetState extends State<GoodLateFinalWidget>
+    with SingleTickerProviderStateMixin<GoodLateFinalWidget> {
+  late final AnimationController _animController;
+
+  @override
+  void initState() {
+    super.initState();
+    _initAnimation();
+  }
+
+  void _initAnimation() {
+    _animController = AnimationController(vsync: this, duration: null);
+  }
+
+  @override
+  void dispose() {
+    _animController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) => Container();
+}
+
 // Mock classes
 class Box<T> {}
 
