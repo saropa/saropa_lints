@@ -2541,11 +2541,18 @@ class RequireDisposePatternRule extends SaropaLintRule {
     CustomLintContext context,
   ) {
     context.registry.addClassDeclaration((ClassDeclaration node) {
-      // Skip State classes (handled by other rules)
+      // Skip widget and State classes:
+      // - State classes are handled by other lifecycle rules
+      // - StatefulWidget/StatelessWidget are immutable and receive
+      //   controllers as constructor params (they don't own them)
       final ExtendsClause? extendsClause = node.extendsClause;
       if (extendsClause != null) {
         final String superName = extendsClause.superclass.name.lexeme;
-        if (superName == 'State') return;
+        if (superName == 'State' ||
+            superName == 'StatefulWidget' ||
+            superName == 'StatelessWidget') {
+          return;
+        }
       }
 
       bool hasDisposable = false;

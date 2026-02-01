@@ -3470,16 +3470,25 @@ class RequireIosPushNotificationCapabilityRule extends SaropaLintRule {
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
-  /// Push notification patterns.
-  static const Set<String> _pushPatterns = {
-    'FirebaseMessaging',
+  /// Push notification method name patterns.
+  static const Set<String> _pushMethodPatterns = {
     'getToken',
     'onMessage',
     'onMessageOpenedApp',
     'requestPermission',
+    'registerForRemoteNotifications',
+  };
+
+  /// Push notification class name patterns.
+  ///
+  /// Only these are checked against target source via substring matching.
+  /// Method patterns are NOT checked against target source because they can
+  /// false-positive on unrelated identifiers (e.g. `onMessage` matching
+  /// inside `CommonMessagePanel`).
+  static const Set<String> _pushClassPatterns = {
+    'FirebaseMessaging',
     'UNUserNotificationCenter',
     'OneSignal',
-    'registerForRemoteNotifications',
   };
 
   @override
@@ -3496,18 +3505,19 @@ class RequireIosPushNotificationCapabilityRule extends SaropaLintRule {
       final String methodName = node.methodName.name;
       final Expression? target = node.target;
 
-      // Check method name
-      if (_pushPatterns.contains(methodName)) {
+      // Check method name (exact match)
+      if (_pushMethodPatterns.contains(methodName) ||
+          _pushClassPatterns.contains(methodName)) {
         reporter.atNode(node, code);
         hasReported = true;
         return;
       }
 
-      // Check target
+      // Check target for push notification class names only
       if (target != null) {
         final String targetSource = target.toSource();
-        for (final String pattern in _pushPatterns) {
-          if (targetSource.contains(pattern)) {
+        for (final String className in _pushClassPatterns) {
+          if (targetSource.contains(className)) {
             reporter.atNode(node, code);
             hasReported = true;
             return;
