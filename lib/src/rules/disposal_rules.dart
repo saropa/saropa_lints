@@ -2285,11 +2285,14 @@ class PreferDisposeBeforeNewInstanceRule extends SaropaLintRule {
 
       // Check if fieldName is actually a field of this class
       bool isField = false;
+      bool isLateFinal = false;
       for (final ClassMember member in enclosingClass.members) {
         if (member is FieldDeclaration) {
           for (final VariableDeclaration variable in member.fields.variables) {
             if (variable.name.lexeme == fieldName) {
               isField = true;
+              isLateFinal =
+                  member.fields.lateKeyword != null && member.fields.isFinal;
               break;
             }
           }
@@ -2298,6 +2301,10 @@ class PreferDisposeBeforeNewInstanceRule extends SaropaLintRule {
       }
 
       if (!isField) return;
+
+      // Skip late final fields — they can only be assigned once,
+      // so there is no previous instance to leak.
+      if (isLateFinal) return;
 
       // Check if there's a dispose() call before this assignment in the same block
       final Block? enclosingBlock = _findEnclosingBlock(node);

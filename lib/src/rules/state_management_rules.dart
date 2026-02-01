@@ -9,6 +9,8 @@ library;
 
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
+import 'package:analyzer/dart/element/element.dart';
+import 'package:analyzer/dart/element/type.dart';
 import 'package:analyzer/error/error.dart'
     show AnalysisError, DiagnosticSeverity;
 import 'package:custom_lint_builder/custom_lint_builder.dart';
@@ -3695,14 +3697,8 @@ class AvoidChangeNotifierInWidgetRule extends SaropaLintRule {
     context.registry.addInstanceCreationExpression((
       InstanceCreationExpression node,
     ) {
-      // Check if the created type extends ChangeNotifier
-      final String typeName = node.constructorName.type.name.lexeme;
-
-      // Common ChangeNotifier patterns
-      if (!typeName.contains('Notifier') &&
-          !typeName.contains('Controller') &&
-          !typeName.contains('ViewModel') &&
-          !typeName.contains('Model')) {
+      // Resolve the actual type to check the class hierarchy
+      if (!_isChangeNotifierType(node)) {
         return;
       }
 
@@ -3718,6 +3714,29 @@ class AvoidChangeNotifierInWidgetRule extends SaropaLintRule {
         current = current.parent;
       }
     });
+  }
+
+  /// Check if the constructed type extends ChangeNotifier
+  static bool _isChangeNotifierType(InstanceCreationExpression node) {
+    final Element? element = node.constructorName.type.element;
+    if (element is! InterfaceElement) {
+      // Fall back to name matching when type can't be resolved
+      final String typeName = node.constructorName.type.name.lexeme;
+      return typeName.contains('Notifier') ||
+          typeName.contains('Controller') ||
+          typeName.contains('ViewModel');
+    }
+
+    // Check the class itself and all supertypes
+    if (element.name == 'ChangeNotifier') {
+      return true;
+    }
+    for (final InterfaceType supertype in element.allSupertypes) {
+      if (supertype.element.name == 'ChangeNotifier') {
+        return true;
+      }
+    }
+    return false;
   }
 }
 

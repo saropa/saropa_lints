@@ -1619,8 +1619,14 @@ class NullifyAfterDisposeRule extends SaropaLintRule {
 
       final String fieldName = target.name;
 
-      // Check if this is a nullable call (?.cancel or ?.dispose)
-      // We only suggest nullification for nullable fields
+      // Skip if field is final or non-nullable (can't be set to null)
+      final ClassDeclaration? classNode = _findContainingClass(node);
+      if (classNode != null &&
+          _isFieldFinalOrNonNullable(classNode, fieldName)) {
+        return;
+      }
+
+      // Ensure this is a direct expression statement
       final AstNode? parent = node.parent;
       if (parent is! ExpressionStatement) {
         return;
@@ -1667,6 +1673,44 @@ class NullifyAfterDisposeRule extends SaropaLintRule {
       current = current.parent;
     }
     return null;
+  }
+
+  /// Find the containing class declaration
+  ClassDeclaration? _findContainingClass(AstNode node) {
+    AstNode? current = node.parent;
+    while (current != null) {
+      if (current is ClassDeclaration) {
+        return current;
+      }
+      current = current.parent;
+    }
+    return null;
+  }
+
+  /// Check if a field is final or has a non-nullable type
+  bool _isFieldFinalOrNonNullable(
+    ClassDeclaration classNode,
+    String fieldName,
+  ) {
+    for (final ClassMember member in classNode.members) {
+      if (member is FieldDeclaration) {
+        for (final VariableDeclaration variable in member.fields.variables) {
+          if (variable.name.lexeme == fieldName) {
+            // Final fields can't be reassigned
+            if (member.fields.isFinal) {
+              return true;
+            }
+            // Non-nullable types can't be set to null
+            final TypeAnnotation? type = member.fields.type;
+            if (type is NamedType && type.question == null) {
+              return true;
+            }
+            return false;
+          }
+        }
+      }
+    }
+    return false;
   }
 
   /// Check if the field is set to null after the given statement
