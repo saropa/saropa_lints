@@ -106,6 +106,8 @@ Preferences for Flutter widget patterns. Many come in opposing pairs — choose 
 | `prefer_flexible_over_expanded` | Prefer Flexible for explicit control | `prefer_expanded_over_flexible` |
 | `prefer_material_theme_colors` | Use Theme.of(context) colors | `prefer_explicit_colors` |
 | `prefer_explicit_colors` | Use explicit color values | `prefer_material_theme_colors` |
+| `prefer_clip_r_superellipse` | Use ClipRSuperellipse over ClipRRect (quick fix) | |
+| `prefer_clip_r_superellipse_clipper` | Use ClipRSuperellipse over ClipRRect with custom clipper | |
 
 ### Example: SizedBox vs Container
 
@@ -116,6 +118,25 @@ SizedBox(width: 100, height: 50)  // Preferred
 // prefer_container_over_sizedbox
 Container(width: 100, height: 50)  // Preferred
 ```
+
+### Example: ClipRSuperellipse vs ClipRRect
+
+```dart
+// prefer_clip_r_superellipse (quick fix available)
+ClipRSuperellipse(
+  borderRadius: BorderRadius.circular(10),
+  child: Image.network('url'),
+)
+
+// Instead of:
+ClipRRect(
+  borderRadius: BorderRadius.circular(10),
+  child: Image.network('url'),
+)
+```
+
+> **Note:** Requires Flutter 3.32+. ClipRSuperellipse provides smoother "squircle" corners
+> matching iOS design language. Falls back to standard rounded rectangle on web/desktop.
 
 ---
 

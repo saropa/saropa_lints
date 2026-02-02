@@ -1169,6 +1169,8 @@ custom_lint:
 
     # --- Widget Style Rules (v2.7.0) ---
     - avoid_shrink_wrap_in_scroll: false         # Prefer Slivers over shrinkWrap (reclassified v4.9.11)
+    - prefer_clip_r_superellipse: false          # ClipRSuperellipse over ClipRRect (Flutter 3.32+, quick fix)
+    - prefer_clip_r_superellipse_clipper: false   # ClipRSuperellipse over ClipRRect with custom clipper (Flutter 3.32+)
     - prefer_sized_box_over_container: false     # SizedBox for dimensions only
     - prefer_container_over_sized_box: false     # Opposite - Container consistency
     - prefer_text_rich_over_richtext: false      # Text.rich over RichText

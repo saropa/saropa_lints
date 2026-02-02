@@ -25,6 +25,11 @@ Dates are not included in version headers — [pub.dev](https://pub.dev/packages
 
 - **`prefer_fractional_sizing` false positive in collection contexts**: The rule flagged `MediaQuery.size * fraction` inside `.add()` calls and list literals, where `FractionallySizedBox` cannot work because parent constraints may be unbounded (e.g. widgets assembled into a list for a horizontal `ScrollView`). Now walks up the AST and skips reporting when the expression is inside a `ListLiteral`, `.add()`, or `.insert()` call.
 
+### Added
+
+- **`prefer_clip_r_superellipse`** (stylistic): Suggests `ClipRSuperellipse` instead of `ClipRRect` for smoother rounded corners. Quick fix replaces the widget preserving all arguments. Requires Flutter 3.32+.
+- **`prefer_clip_r_superellipse_clipper`** (stylistic): Suggests `ClipRSuperellipse` instead of `ClipRRect` when a custom clipper is present. No quick fix — `CustomClipper<RRect>` must be manually rewritten as `CustomClipper<RSuperellipse>`.
+
 ### Changed
 
 - **`avoid_shrink_wrap_in_scroll` reclassified as stylistic** (fixes [#75](https://github.com/saropa/saropa_lints/issues/75)): Downgraded from WARNING to INFO and moved from Recommended tier to Stylistic (opinionated). The rule flags every `shrinkWrap: true` unconditionally, but `shrinkWrap` is often required (e.g. `ListView` inside a `Column` with `NeverScrollableScrollPhysics` and bounded `itemCount`). The genuinely dangerous cases are already covered by `avoid_shrinkwrap_in_scrollview` (context-aware, nested-scrollable + physics check) and `avoid_shrink_wrap_expensive` (physics-aware). Updated correction message to acknowledge legitimate use cases. Fixed DartDoc that was a copy-paste error from a Form/validator rule.
