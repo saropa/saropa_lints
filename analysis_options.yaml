@@ -515,7 +515,6 @@ custom_lint:
     - avoid_singlechildscrollview_with_column: true  # [WARNING] SingleChildScrollView with Column may cause layout issues.
     - avoid_small_touch_targets: true  # [INFO] Touch target under 44px violates WCAG 2.5.5 (Target Size). Users with motor impairments, tremors, or limited dexterity will struggle to tap accurately, causing frustration and excluding them from core functionality. The minimum recommended touch target size is 48x48 logical pixels to ensure reliable interaction across all ability levels.
     - avoid_snackbar_in_build: true  # [WARNING] Calling showSnackBar inside build() causes a snackbar to be shown on every rebuild, flooding the user with duplicate messages and overwhelming the snackbar queue. This leads to poor user experience, lost context, and can make the app feel buggy or unresponsive. It may also result in app store rejection for UX violations and negative user reviews due to notification spam.
-    - avoid_stack_overflow: true  # [INFO] Stack children should use Positioned or Align.
     - avoid_stack_without_positioned: true  # [WARNING] Stack child without Positioned. Layout may be unexpected.
     - avoid_state_constructors: true  # [WARNING] State class should not have constructor body.
     - avoid_stateful_test_setup: true  # [WARNING] setUp should not mutate shared state.

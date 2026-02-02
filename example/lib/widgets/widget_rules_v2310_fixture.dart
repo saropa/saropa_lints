@@ -199,11 +199,11 @@ class BadStackWithoutPositioned extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     // BAD: Stack with non-Positioned children, should trigger lint
-    // expect_lint: avoid_stack_without_positioned
     return Stack(
       children: [
         Container(color: Colors.red),
-        Container(color: Colors.blue), // Not positioned!
+        // expect_lint: avoid_stack_without_positioned
+        Text('overlay'), // Not positioned!
       ],
     );
   }
