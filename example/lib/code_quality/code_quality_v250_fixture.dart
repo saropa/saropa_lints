@@ -183,6 +183,71 @@ String goodComplexBranches(bool flag) {
 }
 
 // =========================================================================
+// prefer_late_final
+// =========================================================================
+// Warns when late variables are never reassigned after initial assignment.
+
+// BAD: Late field assigned once from a single call site
+class BadSingleAssignment {
+  // expect_lint: prefer_late_final
+  late String _name;
+
+  void init() {
+    _name = 'value';
+  }
+
+  String get name => _name;
+}
+
+// GOOD: Already late final
+class GoodLateFinal {
+  late final String _name;
+
+  void init() {
+    _name = 'value';
+  }
+
+  String get name => _name;
+}
+
+// OK: Multiple direct assignments - not a candidate
+class OkMultipleAssignments {
+  late String _name;
+
+  void init() {
+    _name = 'initial';
+  }
+
+  void reset() {
+    _name = 'reset';
+  }
+
+  String get name => _name;
+}
+
+// OK: Helper method called from multiple sites - field IS reassigned at runtime
+class OkHelperCalledMultipleTimes {
+  late String _data;
+  final int id;
+
+  OkHelperCalledMultipleTimes(this.id);
+
+  void _fetchData() {
+    _data = 'data_$id';
+  }
+
+  void init() {
+    _fetchData();
+  }
+
+  void refresh() {
+    _fetchData();
+  }
+
+  String get data => _data;
+}
+
+// =========================================================================
 // Mock classes and functions
 // =========================================================================
 
