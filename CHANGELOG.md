@@ -11,7 +11,22 @@ Dates are not included in version headers — [pub.dev](https://pub.dev/packages
 ** See the current published changelog: [saropa_lints/changelog](https://pub.dev/packages/saropa_lints/changelog)
 
 ---
-## [4.9.11] - current
+## [4.9.12] - current
+
+### Fixed
+
+- **`avoid_nested_assignments` false positive on cascade expressions**: The rule flagged idiomatic Dart cascade property setters (`obj..field = value`) as nested assignments. In the AST, cascade sections are `AssignmentExpression` nodes with a `CascadeExpression` parent, which was not in the skip list. Added `CascadeExpression` parent check so cascades are correctly treated as safe sequential assignments.
+
+### Changed
+
+- **DX audit now enforces message length on opinionated rules**: The `_audit_dx.py` scoring previously skipped all length checks for `LintImpact.opinionated` rules (stylistic tier), allowing 30-50 character messages to score 100%. Added 100-character minimum threshold (-10 penalty). Also added "opinionated" to the per-impact breakdown display so these rules appear in the DX report alongside critical/high/medium/low.
+
+- **Improved problemMessage for ~98 stylistic rules**: Expanded short problem messages (many under 50 characters) to include rationale and consequences, matching the quality bar already enforced on critical/high/medium rules. Each message now explains what was detected AND why it matters, giving users enough context to evaluate whether to enable the rule.
+
+- **`init` CLI now outputs ANSI colors on Windows**: The `dart run saropa_lints:init` command previously produced monocolor output on Windows terminals because the color detection was too conservative. Now enables Virtual Terminal Processing via the Windows API (`SetConsoleMode`) at startup, uses `stdout.supportsAnsiEscapes` as the primary check, and detects VS Code's integrated terminal (`TERM_PROGRAM`). Honors `NO_COLOR` and `FORCE_COLOR` environment variables. Color support result is cached for performance.
+
+---
+## [4.9.11]
 
 ### Fixed
 
