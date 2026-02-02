@@ -366,3 +366,103 @@ class _GoodDoubleMountedCheckState extends State<GoodDoubleMountedCheck> {
   @override
   Widget build(BuildContext context) => Text(_data);
 }
+
+// =========================================================================
+// check_mounted_after_async - await showDialog false positive fix
+// =========================================================================
+// When showDialog IS the awaited expression (await showDialog(...)), its own
+// await keyword should not count as a "preceding await". Only a separate
+// earlier await creates an async gap that needs a mounted guard.
+
+// GOOD: await showDialog() as the only await - no preceding async gap
+class GoodAwaitShowDialogOnly extends StatefulWidget {
+  const GoodAwaitShowDialogOnly({super.key});
+
+  @override
+  State<GoodAwaitShowDialogOnly> createState() =>
+      _GoodAwaitShowDialogOnlyState();
+}
+
+class _GoodAwaitShowDialogOnlyState extends State<GoodAwaitShowDialogOnly> {
+  Future<void> openDialog() async {
+    await showDialog(
+      context: context,
+      builder: (_) => const Text('dialog'),
+    ); // No preceding await - should NOT trigger
+  }
+
+  @override
+  Widget build(BuildContext context) => const Text('test');
+}
+
+// BAD: showDialog after a separate await without mounted check
+class BadShowDialogAfterAwait extends StatefulWidget {
+  const BadShowDialogAfterAwait({super.key});
+
+  @override
+  State<BadShowDialogAfterAwait> createState() =>
+      _BadShowDialogAfterAwaitState();
+}
+
+class _BadShowDialogAfterAwaitState extends State<BadShowDialogAfterAwait> {
+  Future<void> loadAndShowDialog() async {
+    await Future.value('data');
+    // expect_lint: check_mounted_after_async
+    showDialog(
+      context: context,
+      builder: (_) => const Text('dialog'),
+    ); // Preceded by a different await - SHOULD trigger
+  }
+
+  @override
+  Widget build(BuildContext context) => const Text('test');
+}
+
+// BAD: await showDialog after a separate await without mounted check
+class BadAwaitShowDialogAfterAwait extends StatefulWidget {
+  const BadAwaitShowDialogAfterAwait({super.key});
+
+  @override
+  State<BadAwaitShowDialogAfterAwait> createState() =>
+      _BadAwaitShowDialogAfterAwaitState();
+}
+
+class _BadAwaitShowDialogAfterAwaitState
+    extends State<BadAwaitShowDialogAfterAwait> {
+  Future<void> loadAndShowDialog() async {
+    await Future.value('data');
+    // expect_lint: check_mounted_after_async
+    await showDialog(
+      context: context,
+      builder: (_) => const Text('dialog'),
+    ); // Preceded by a different await - SHOULD trigger even though also awaited
+  }
+
+  @override
+  Widget build(BuildContext context) => const Text('test');
+}
+
+// GOOD: showDialog after await WITH mounted check
+class GoodShowDialogAfterAwaitWithGuard extends StatefulWidget {
+  const GoodShowDialogAfterAwaitWithGuard({super.key});
+
+  @override
+  State<GoodShowDialogAfterAwaitWithGuard> createState() =>
+      _GoodShowDialogAfterAwaitWithGuardState();
+}
+
+class _GoodShowDialogAfterAwaitWithGuardState
+    extends State<GoodShowDialogAfterAwaitWithGuard> {
+  Future<void> loadAndShowDialog() async {
+    await Future.value('data');
+    if (mounted) {
+      showDialog(
+        context: context,
+        builder: (_) => const Text('dialog'),
+      ); // Protected by mounted check
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) => const Text('test');
+}
