@@ -290,7 +290,7 @@ class RequireTextOverflowInRowRule extends SaropaLintRule {
         '[require_text_overflow_in_row] Text child element inside a Row build tree has no overflow handling. When text content exceeds the available width, Flutter renders yellow and black diagonal overflow stripes that break the visual layout. Users see unreadable, clipped content with an ugly error indicator instead of gracefully truncated or wrapped text.',
     correctionMessage:
         'Add overflow: TextOverflow.ellipsis to the Text widget, or wrap it in an Expanded or Flexible widget to constrain its width within the Row layout.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    errorSeverity: DiagnosticSeverity.WARNING,
   );
 
   @override
@@ -946,7 +946,7 @@ class RequireFormRestorationRule extends SaropaLintRule {
         '[require_form_restoration] Form with 5+ TextEditingController fields lacks RestorationMixin. When the operating system kills the app in the background to reclaim memory, all user input is permanently lost. Users who spent time filling out a lengthy form return to find every field empty and must re-enter all data from scratch.',
     correctionMessage:
         'Add RestorationMixin to the State class and use RestorableTextEditingController fields, or persist draft state to SharedPreferences to prevent data loss.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    errorSeverity: DiagnosticSeverity.WARNING,
   );
 
   @override

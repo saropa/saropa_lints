@@ -383,7 +383,7 @@ class AvoidNullableParametersWithDefaultValuesRule extends SaropaLintRule {
         '[avoid_nullable_parameters_with_default_values] Parameter with default value should not be nullable.',
     correctionMessage:
         'Remove the ? from the type since it has a non-null default.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    errorSeverity: DiagnosticSeverity.INFO,
   );
 
   @override

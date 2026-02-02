@@ -994,7 +994,7 @@ class PreferRecordOverEquatableRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_record_over_equatable',
     problemMessage:
-        '[prefer_record_over_equatable] Simple Equatable class could be replaced with a Dart 3 record.',
+        '[prefer_record_over_equatable] Simple Equatable class with only final fields and no custom methods detected. Dart 3 records provide built-in equality and immutability with far less boilerplate. Replace with a typedef record.',
     correctionMessage:
         'Replace the Equatable subclass with a Dart 3 record: typedef ClassName = ({Type field, ...}); for less boilerplate.',
     errorSeverity: DiagnosticSeverity.INFO,

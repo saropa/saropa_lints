@@ -48,7 +48,7 @@ class RequirePlatformCheckRule extends SaropaLintRule {
         '[require_platform_check] Platform-specific API from dart:io used without a platform guard. On Flutter web, dart:io classes throw UnsupportedError at runtime because they are unavailable in the browser environment. This crashes the app immediately when the code path executes, making the web version completely unusable for affected features.',
     correctionMessage:
         'Guard platform-specific code with if (!kIsWeb) before accessing dart:io APIs, or use conditional imports to provide web-compatible implementations.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    errorSeverity: DiagnosticSeverity.WARNING,
   );
 
   static const Set<String> _platformSpecificClasses = {

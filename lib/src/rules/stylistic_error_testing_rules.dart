@@ -56,7 +56,7 @@ class PreferSpecificExceptionsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_specific_exceptions',
     problemMessage:
-        '[prefer_specific_exceptions] Throw specific exception types instead of generic Exception.',
+        '[prefer_specific_exceptions] A generic Exception is thrown instead of a domain-specific type. Generic exceptions prevent callers from catching specific failures and limit targeted error recovery; define and throw a custom exception class.',
     correctionMessage:
         'Create a custom exception class so callers can catch specific failures and provide targeted error recovery.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -332,7 +332,7 @@ class PreferOnOverCatchRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_on_over_catch',
     problemMessage:
-        '[prefer_on_over_catch] Use "on ExceptionType" instead of bare "catch".',
+        '[prefer_on_over_catch] A bare "catch" clause catches all exception types indiscriminately, which can mask unexpected errors and hinder targeted recovery. Use "on ExceptionType" to restrict handling to known failures.',
     correctionMessage:
         'Add an "on ExceptionType" clause to catch only expected failures and let unexpected errors propagate to the caller.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -512,7 +512,7 @@ class PreferGivenWhenThenCommentsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_given_when_then_comments',
     problemMessage:
-        '[prefer_given_when_then_comments] Use Arrange/Act/Assert or Given/When/Then comments in tests.',
+        '[prefer_given_when_then_comments] Test body has three or more statements but lacks structural comments. Without Arrange/Act/Assert or Given/When/Then markers, readers must infer the setup, action, and verification phases. Add phase comments for clarity.',
     correctionMessage:
         'Add "// Arrange", "// Act", "// Assert" (or Given/When/Then) comments to delineate setup, execution, and verification phases.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -692,7 +692,7 @@ class PreferExpectOverAssertInTestsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_expect_over_assert_in_tests',
     problemMessage:
-        '[prefer_expect_over_assert_in_tests] Use expect() instead of assert() in tests.',
+        '[prefer_expect_over_assert_in_tests] An assert() call was found in test code. Assertions are silently skipped in release mode and provide poor failure messages; use expect() with matchers instead for reliable and descriptive test failures.',
     correctionMessage:
         'Use expect() for assertions in tests. Example: expect(user.name, "John"). This provides better error messages and matchers than assert.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -960,7 +960,7 @@ class PreferTestNameShouldWhenRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_test_name_should_when',
     problemMessage:
-        '[prefer_test_name_should_when] Test names should follow "should X when Y" pattern.',
+        '[prefer_test_name_should_when] Test name does not follow the "should X when Y" pattern, making it harder to understand the expected behavior and triggering condition at a glance. Restructure as "should [behavior] when [condition]".',
     correctionMessage:
         "Rename the test to follow the should-when pattern: test('should [behavior] when [condition]', ...) for clarity.",
     errorSeverity: DiagnosticSeverity.INFO,

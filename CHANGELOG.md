@@ -25,6 +25,8 @@ Dates are not included in version headers — [pub.dev](https://pub.dev/packages
 
 - **`init` CLI now outputs ANSI colors on Windows**: The `dart run saropa_lints:init` command previously produced monocolor output on Windows terminals because the color detection was too conservative. Now enables Virtual Terminal Processing via the Windows API (`SetConsoleMode`) at startup, uses `stdout.supportsAnsiEscapes` as the primary check, and detects VS Code's integrated terminal (`TERM_PROGRAM`). Honors `NO_COLOR` and `FORCE_COLOR` environment variables. Color support result is cached for performance.
 
+- **Aligned DiagnosticSeverity with actual risk across ~28 rules**: Audited all 1,681 rules for severity-vs-impact mismatches. Upgraded 9 crash-path rules from INFO to ERROR (permission failures, missing error boundaries, unhandled navigation results). Upgraded 14 conditional-failure rules from INFO to WARNING (unsafe casts, missing platform checks, unlogged errors). Downgraded 9 style-only rules from WARNING to INFO (naming conventions, test cleanup, empty spreads). Downgraded 2 borderline ERROR rules to WARNING (`avoid_nested_scaffolds`, `require_focus_node_dispose`). Also aligned `LintImpact` for 3 rules whose internal impact level was inconsistent with their crash-path language.
+
 ---
 ## [4.9.11]
 
