@@ -26,7 +26,7 @@ Catch memory leaks, security vulnerabilities, and runtime crashes that standard 
 [![Flutter Platform](https://img.shields.io/badge/platform-flutter-ff69b4.svg?logo=flutter)](https://flutter.dev/)
 
 <!-- Custom Badges -->
-[![rules](https://img.shields.io/badge/rules-1680%2B-4B0082)](https://github.com/saropa/saropa_lints/blob/main/doc/rules/README.md)
+[![rules](https://img.shields.io/badge/rules-1682%2B-4B0082)](https://github.com/saropa/saropa_lints/blob/main/doc/rules/README.md)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 [![style: saropa lints](https://img.shields.io/badge/style-saropa__lints-4B0082.svg)](https://pub.dev/packages/saropa_lints)
 
@@ -137,7 +137,7 @@ print(rule.owasp); // Mobile: M1 | Web: A07
 
 Good options exist, but many are paid or closed-source. We believe these fundamentals should be free and open. A rising tide lifts all boats.
 
-The tier system lets you adopt gradually — start with ~100 critical rules, work up to 1680+ when you're ready.
+The tier system lets you adopt gradually — start with ~100 critical rules, work up to 1682+ when you're ready.
 
 ---
 
@@ -216,7 +216,7 @@ Stylistic rules are orthogonal to correctness. Your code can be perfectly correc
 
 ### Configuration template
 
-See [example/analysis_options_template.yaml](https://github.com/saropa/saropa_lints/blob/main/example/analysis_options_template.yaml) for a complete reference with all 1680+ rules organized by category, tier membership, and examples.
+See [example/analysis_options_template.yaml](https://github.com/saropa/saropa_lints/blob/main/example/analysis_options_template.yaml) for a complete reference with all 1682+ rules organized by category, tier membership, and examples.
 
 ### Using a tier
 
@@ -487,7 +487,7 @@ Examples: `prefer_relative_imports`, `prefer_single_quotes`, `prefer_arrow_funct
 
 ## Performance
 
-Running all 1668+ rules uses significant memory. The tier system helps:
+Running all 1682+ rules uses significant memory. The tier system helps:
 
 - Rules set to `false` are not loaded
 - Start with `essential` or `recommended`
@@ -981,7 +981,7 @@ Built with care by the Flutter community. Questions? Ideas? We'd love to hear fr
 
 > "Quality is not an act, it is a habit." — Aristotle
 
-**saropa_lints** is a comprehensive static analysis package for Flutter and Dart applications. With 1680+ lint rules organized into 5 progressive tiers (and more planned), it catches memory leaks, security vulnerabilities, accessibility violations, and runtime crashes that standard linters miss. Whether you're building a startup MVP or enterprise software, saropa_lints helps you ship more stable, secure, and accessible apps.
+**saropa_lints** is a comprehensive static analysis package for Flutter and Dart applications. With 1682+ lint rules organized into 5 progressive tiers (and more planned), it catches memory leaks, security vulnerabilities, accessibility violations, and runtime crashes that standard linters miss. Whether you're building a startup MVP or enterprise software, saropa_lints helps you ship more stable, secure, and accessible apps.
 
 **Keywords:** Flutter linter, Dart static analysis, custom_lint rules, Flutter code quality, memory leak detection, security scanning, accessibility testing, WCAG compliance, European Accessibility Act, Flutter best practices, Dart analyzer plugin, code review automation, CI/CD linting, Flutter enterprise tools
 

@@ -1098,6 +1098,208 @@ class PreferExplicitColorsRule extends SaropaLintRule {
 }
 
 // =============================================================================
+// CLIP R SUPERELLIPSE RULES - Batch 2
+// =============================================================================
+
+/// Suggests using ClipRSuperellipse instead of ClipRRect for rounded corners.
+///
+/// This is an **opinionated rule** — not included in any tier by default.
+///
+/// ClipRSuperellipse provides smoother, more aesthetically pleasing rounded
+/// corners that match iOS design language (the "squircle" shape). The
+/// superellipse curve creates a more natural transition between straight
+/// edges and rounded corners than circular arcs.
+///
+/// This rule only fires when no custom `clipper` is used, so the quick fix
+/// is a safe drop-in replacement. For custom clippers, see
+/// [PreferClipRSuperellipseClipperRule].
+///
+/// **Requires Flutter 3.32+.** On platforms other than iOS and Android,
+/// ClipRSuperellipse falls back to a standard rounded rectangle.
+///
+/// **Quick fix available:** Replaces `ClipRRect` with `ClipRSuperellipse`,
+/// preserving all arguments (`key`, `borderRadius`, `clipBehavior`, `child`).
+///
+/// ### Example
+///
+/// #### BAD (with this rule enabled):
+/// ```dart
+/// ClipRRect(
+///   borderRadius: BorderRadius.circular(10),
+///   child: Image.network('url'),
+/// )
+/// ```
+///
+/// #### GOOD:
+/// ```dart
+/// ClipRSuperellipse(
+///   borderRadius: BorderRadius.circular(10),
+///   child: Image.network('url'),
+/// )
+/// ```
+class PreferClipRSuperellipseRule extends SaropaLintRule {
+  const PreferClipRSuperellipseRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.opinionated;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.widget};
+
+  static const LintCode _code = LintCode(
+    name: 'prefer_clip_r_superellipse',
+    problemMessage:
+        '[prefer_clip_r_superellipse] Use ClipRSuperellipse instead of ClipRRect for smoother rounded corners.',
+    correctionMessage:
+        'ClipRSuperellipse provides smoother corner transitions matching iOS design language. Requires Flutter 3.32+.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addInstanceCreationExpression((node) {
+      final constructorName = node.constructorName.type.element?.name;
+      if (constructorName != 'ClipRRect') return;
+
+      // Only flag when no custom clipper is used (safe drop-in replacement)
+      final args = node.argumentList.arguments;
+      for (final arg in args) {
+        if (arg is NamedExpression && arg.name.label.name == 'clipper') {
+          return;
+        }
+      }
+
+      reporter.atNode(node, code);
+    });
+  }
+
+  @override
+  List<Fix> get customFixes => <Fix>[_PreferClipRSuperellipseFix()];
+}
+
+class _PreferClipRSuperellipseFix extends DartFix {
+  @override
+  void run(
+    CustomLintResolver resolver,
+    ChangeReporter reporter,
+    CustomLintContext context,
+    AnalysisError analysisError,
+    List<AnalysisError> others,
+  ) {
+    context.registry
+        .addInstanceCreationExpression((InstanceCreationExpression node) {
+      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
+      if (node.constructorName.type.element?.name != 'ClipRRect') return;
+
+      final constPrefix = node.keyword?.lexeme == 'const' ? 'const ' : '';
+      final args = _extractNamedArgs(node);
+      final newArgs = <String>[];
+      if (args.containsKey('key')) newArgs.add('key: ${args['key']}');
+      if (args.containsKey('borderRadius')) {
+        newArgs.add('borderRadius: ${args['borderRadius']}');
+      }
+      if (args.containsKey('clipBehavior')) {
+        newArgs.add('clipBehavior: ${args['clipBehavior']}');
+      }
+      if (args.containsKey('child')) {
+        newArgs.add('child: ${args['child']}');
+      }
+
+      final changeBuilder = reporter.createChangeBuilder(
+        message: 'Replace with ClipRSuperellipse',
+        priority: 80,
+      );
+      changeBuilder.addDartFileEdit((builder) {
+        builder.addSimpleReplacement(
+          node.sourceRange,
+          '${constPrefix}ClipRSuperellipse(${newArgs.join(', ')})',
+        );
+      });
+    });
+  }
+}
+
+/// Suggests using ClipRSuperellipse instead of ClipRRect when a custom
+/// clipper is used.
+///
+/// This is an **opinionated rule** — not included in any tier by default.
+///
+/// Unlike [PreferClipRSuperellipseRule], this rule fires when a custom
+/// `clipper` parameter is present. Because the clipper type differs
+/// (`CustomClipper<RRect>` vs `CustomClipper<RSuperellipse>`), automatic
+/// replacement is not possible — the clipper must be manually rewritten.
+///
+/// No quick fix is provided.
+///
+/// **Requires Flutter 3.32+.**
+///
+/// ### Example
+///
+/// #### BAD (with this rule enabled):
+/// ```dart
+/// ClipRRect(
+///   clipper: MyCustomClipper(),
+///   child: Image.network('url'),
+/// )
+/// ```
+///
+/// #### GOOD:
+/// ```dart
+/// ClipRSuperellipse(
+///   clipper: MyCustomSuperellipseClipper(),
+///   child: Image.network('url'),
+/// )
+/// ```
+class PreferClipRSuperellipseClipperRule extends SaropaLintRule {
+  const PreferClipRSuperellipseClipperRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.opinionated;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.widget};
+
+  static const LintCode _code = LintCode(
+    name: 'prefer_clip_r_superellipse_clipper',
+    problemMessage:
+        '[prefer_clip_r_superellipse_clipper] Consider using ClipRSuperellipse instead of ClipRRect.',
+    correctionMessage:
+        'The custom clipper must be rewritten as CustomClipper<RSuperellipse>. Requires Flutter 3.32+.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addInstanceCreationExpression((node) {
+      final constructorName = node.constructorName.type.element?.name;
+      if (constructorName != 'ClipRRect') return;
+
+      // Only flag when a custom clipper IS used (no auto-fix possible)
+      final hasClipper = node.argumentList.arguments.any(
+        (arg) => arg is NamedExpression && arg.name.label.name == 'clipper',
+      );
+      if (!hasClipper) return;
+
+      reporter.atNode(node, code);
+    });
+  }
+}
+
+// =============================================================================
 // Shared helpers for quick fixes
 // =============================================================================
 
