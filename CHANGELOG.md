@@ -11,6 +11,27 @@ Dates are not included in version headers — [pub.dev](https://pub.dev/packages
 ** See the current published changelog: [saropa_lints/changelog](https://pub.dev/packages/saropa_lints/changelog)
 
 ---
+## [4.9.11] - current
+
+### Fixed
+
+- **`require_auth_check` false positive on Flutter UI functions**: The rule flagged any async function whose name contained a protected keyword (e.g. `settings`, `user`, `profile`) because the return type check `contains('Future')` matched every async function, not just API response handlers. Functions like `showContactSettingsDialog({required BuildContext context})` were incorrectly reported as missing auth checks. Now requires `Response`/`HttpResponse` in the return type or a `Request`/`HttpRequest` parameter to confirm the function is a server-side handler. Also skips Flutter UI function prefixes (`show`, `build`, `init`, `dispose`, `create`, `navigate`, `on`, etc.), private functions, and functions with Flutter UI parameter types (`BuildContext`, `Widget`, etc.). Expanded recognized auth check patterns to include `requireAuth`, `validateToken`, `hasPermission`, `authGuard`, and others.
+
+- **`no_equal_conditions` false positive on `if-case` chains**: The rule flagged `if (x case 1) {} else if (x case 2) {}` as duplicate conditions because it only compared the scrutinee expression (`x`) and ignored the differing `case` pattern values (`1` vs `2`). Each `if-case` branch tests a distinct constant pattern, so they are not duplicates. Now compares the full `if-case` expression including the pattern, not just the scrutinee.
+
+- **`avoid_unsafe_cast` false positive on safe casts**: The rule flagged all non-nullable `as` casts regardless of type safety. Now skips provably safe casts: cast to `Object` (every Dart value is an Object), same-type casts, and upcasts to a supertype (e.g. `int as num`). Fixes false positives on patterns like `error as Object` in catch handlers.
+
+- **`nullify_after_dispose` false positive on debounce/reset patterns**: The rule flagged `.cancel()` calls on nullable `Timer` or `StreamSubscription` fields even when the field was immediately reassigned to a new instance in the same block (e.g., cancel-then-recreate debounce pattern). Since the field is reassigned right after, nullifying it is pointless. Now checks for reassignment after the cancel call and skips reporting when the field receives a new non-null value.
+
+- **`prefer_fractional_sizing` false positive in collection contexts**: The rule flagged `MediaQuery.size * fraction` inside `.add()` calls and list literals, where `FractionallySizedBox` cannot work because parent constraints may be unbounded (e.g. widgets assembled into a list for a horizontal `ScrollView`). Now walks up the AST and skips reporting when the expression is inside a `ListLiteral`, `.add()`, or `.insert()` call.
+
+### Changed
+
+- **`avoid_shrink_wrap_in_scroll` reclassified as stylistic** (fixes [#75](https://github.com/saropa/saropa_lints/issues/75)): Downgraded from WARNING to INFO and moved from Recommended tier to Stylistic (opinionated). The rule flags every `shrinkWrap: true` unconditionally, but `shrinkWrap` is often required (e.g. `ListView` inside a `Column` with `NeverScrollableScrollPhysics` and bounded `itemCount`). The genuinely dangerous cases are already covered by `avoid_shrinkwrap_in_scrollview` (context-aware, nested-scrollable + physics check) and `avoid_shrink_wrap_expensive` (physics-aware). Updated correction message to acknowledge legitimate use cases. Fixed DartDoc that was a copy-paste error from a Form/validator rule.
+
+- Renamed report files from `_saropa_full.log` / `_saropa_summary.md` to `_saropa_lint_report_full.log` / `_saropa_lint_report_summary.log` for clearer identification and consistent `.log` extension
+
+---
 ## [4.9.10]
 
 ### Fixed
