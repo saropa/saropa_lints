@@ -1018,8 +1018,9 @@ class PreferSliverPrefixRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_sliver_prefix',
     problemMessage:
-        '[prefer_sliver_prefix] Sliver widget class should have "Sliver" prefix.',
-    correctionMessage: 'Rename the class to start with "Sliver".',
+        '[prefer_sliver_prefix] Sliver widget class name lacks the conventional "Sliver" prefix. Without this prefix, developers scanning the widget tree cannot quickly distinguish sliver-based widgets from regular box widgets, leading to incorrect usage inside CustomScrollView or other sliver contexts.',
+    correctionMessage:
+        'Rename the class to start with "Sliver" (e.g., SliverHeader instead of Header) to communicate its sliver layout protocol.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -2163,9 +2164,9 @@ class AvoidNestedScaffoldsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_nested_scaffolds',
     problemMessage:
-        '[avoid_nested_scaffolds] Avoid nesting Scaffold widgets inside other Scaffolds.',
+        '[avoid_nested_scaffolds] Nested Scaffold widget detected inside another Scaffold. This creates duplicate app bars, floating action buttons, and bottom navigation, leading to broken layout, gesture conflicts, and a confusing user experience.',
     correctionMessage:
-        'Remove the inner Scaffold and use its content directly.',
+        'Remove the inner Scaffold and use its body content directly. Share app bars and bottom navigation from the outer Scaffold.',
     errorSeverity: DiagnosticSeverity.ERROR,
   );
 
@@ -4273,10 +4274,7 @@ class AvoidShrinkWrapInScrollRule extends SaropaLintRule {
     problemMessage:
         '[avoid_shrink_wrap_in_scroll] shrinkWrap: true causes O(n) layout cost and defeats lazy loading.',
     correctionMessage:
-        'Consider using CustomScrollView with Slivers for better performance. '
-        'If this ListView is inside a Column/Row with a small bounded '
-        'itemCount and NeverScrollableScrollPhysics, shrinkWrap: true is '
-        'acceptable.',
+        'Use CustomScrollView with Slivers for efficient lazy loading. If this ListView is inside a Column/Row with a small bounded itemCount and NeverScrollableScrollPhysics, shrinkWrap: true is acceptable.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -5937,9 +5935,9 @@ class RequirePhysicsForNestedScrollRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_physics_for_nested_scroll',
     problemMessage:
-        '[require_physics_for_nested_scroll] Nested scrollable should have NeverScrollableScrollPhysics.',
+        '[require_physics_for_nested_scroll] Nested scrollable widget lacks NeverScrollableScrollPhysics, causing competing scroll gestures between parent and child. This produces unpredictable scroll behavior, jank, and a confusing user experience where swipes affect the wrong scrollable.',
     correctionMessage:
-        'Add physics: NeverScrollableScrollPhysics() to inner scrollable.',
+        'Add physics: NeverScrollableScrollPhysics() to the inner scrollable so only the parent scrollable responds to user gestures.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 

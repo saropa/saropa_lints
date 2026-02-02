@@ -661,7 +661,7 @@ class PreferExhaustiveEnumsRule extends SaropaLintRule {
     problemMessage:
         '[prefer_exhaustive_enums] Prefer exhaustive enum cases instead of default. Exhaustive cases catch missing logic at compile time and prevent silent failures.',
     correctionMessage:
-        'Exhaustive switches catch missing cases at compile time.',
+        'Remove the default branch and list every enum value explicitly so the compiler flags missing cases after additions.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 

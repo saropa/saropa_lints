@@ -1092,9 +1092,9 @@ class RequireResponseCachingRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_response_caching',
     problemMessage:
-        '[require_response_caching] GET request without caching. Consider caching static data.',
+        '[require_response_caching] GET request without caching. Static or rarely-changing data wastes bandwidth on every call.',
     correctionMessage:
-        'Add response caching with TTL for data that changes infrequently.',
+        'Add response caching with a TTL header or local cache layer for data that changes infrequently to reduce network load.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -1276,9 +1276,9 @@ class AvoidOverFetchingRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_over_fetching',
     problemMessage:
-        '[avoid_over_fetching] Fetching full object but only using few fields. Consider optimizing.',
+        '[avoid_over_fetching] Fetching the full object but only using a few fields, wasting bandwidth and serialization time.',
     correctionMessage:
-        'Use field selection, sparse fieldsets, or dedicated endpoints.',
+        'Use field selection, sparse fieldsets, or a dedicated endpoint to fetch only the fields this call-site actually uses.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 

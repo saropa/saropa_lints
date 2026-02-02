@@ -71,7 +71,7 @@ class PreferInterpolationOverConcatenationRule extends SaropaLintRule {
     problemMessage:
         '[prefer_interpolation_over_concatenation] Use string interpolation instead of concatenation.',
     correctionMessage:
-        'Replace string concatenation with interpolation for readability.',
+        'Replace string concatenation with \$-interpolation for readability and to reduce operator noise.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -128,7 +128,7 @@ class PreferConcatenationOverInterpolationRule extends SaropaLintRule {
     problemMessage:
         '[prefer_concatenation_over_interpolation] Use string concatenation instead of interpolation.',
     correctionMessage:
-        'Replace string interpolation with explicit concatenation.',
+        'Replace \$-interpolation with explicit + concatenation for a consistent string-building style.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -175,7 +175,8 @@ class PreferDoubleQuotesRule extends SaropaLintRule {
     name: 'prefer_double_quotes',
     problemMessage:
         '[prefer_double_quotes] Use double quotes for string literals.',
-    correctionMessage: 'Replace single quotes with double quotes.',
+    correctionMessage:
+        'Replace single quotes with double quotes across all string literals for a consistent codebase style.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -265,7 +266,8 @@ class PreferAbsoluteImportsRule extends SaropaLintRule {
     name: 'prefer_absolute_imports',
     problemMessage:
         '[prefer_absolute_imports] Use absolute package imports instead of relative imports.',
-    correctionMessage: 'Replace relative imports with package imports.',
+    correctionMessage:
+        'Replace relative imports with absolute package: imports so every file references the same canonical path.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -324,7 +326,8 @@ class PreferGroupedImportsRule extends SaropaLintRule {
     name: 'prefer_grouped_imports',
     problemMessage:
         '[prefer_grouped_imports] Group imports by type: dart, package, then relative.',
-    correctionMessage: 'Organize imports into groups separated by blank lines.',
+    correctionMessage:
+        'Organize imports into dart:, package:, and relative groups separated by blank lines for quick scanning.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -398,7 +401,8 @@ class PreferFlatImportsRule extends SaropaLintRule {
     name: 'prefer_flat_imports',
     problemMessage:
         '[prefer_flat_imports] Keep imports in a flat list without grouping.',
-    correctionMessage: 'Remove blank lines between import groups.',
+    correctionMessage:
+        'Remove blank lines between import groups so the entire import block stays compact and alphabetically sorted.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -476,7 +480,8 @@ class PreferFieldsBeforeMethodsRule extends SaropaLintRule {
     name: 'prefer_fields_before_methods',
     problemMessage:
         '[prefer_fields_before_methods] Declare fields before methods in class declarations.',
-    correctionMessage: 'Move field declarations above method declarations.',
+    correctionMessage:
+        'Move field declarations above method declarations so readers see the data model before the behaviour.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -530,7 +535,8 @@ class PreferMethodsBeforeFieldsRule extends SaropaLintRule {
     name: 'prefer_methods_before_fields',
     problemMessage:
         '[prefer_methods_before_fields] Declare methods before fields in class declarations.',
-    correctionMessage: 'Move method declarations above field declarations.',
+    correctionMessage:
+        'Move method declarations above field declarations so the public API is visible before implementation details.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -592,7 +598,8 @@ class PreferStaticMembersFirstRule extends SaropaLintRule {
     name: 'prefer_static_members_first',
     problemMessage:
         '[prefer_static_members_first] Declare static members before instance members in classes.',
-    correctionMessage: 'Move static declarations above instance declarations.',
+    correctionMessage:
+        'Move static declarations above instance declarations to group class-level constants and factories together.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -648,7 +655,8 @@ class PreferInstanceMembersFirstRule extends SaropaLintRule {
     name: 'prefer_instance_members_first',
     problemMessage:
         '[prefer_instance_members_first] Declare instance members before static members in classes.',
-    correctionMessage: 'Move instance declarations above static declarations.',
+    correctionMessage:
+        'Move instance declarations above static declarations so per-object state is visible before shared members.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -704,7 +712,8 @@ class PreferPublicMembersFirstRule extends SaropaLintRule {
     name: 'prefer_public_members_first',
     problemMessage:
         '[prefer_public_members_first] Declare public members before private members in classes.',
-    correctionMessage: 'Move public declarations above private declarations.',
+    correctionMessage:
+        'Move public declarations above private declarations so the external API is visible at the top of the class.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -760,7 +769,8 @@ class PreferPrivateMembersFirstRule extends SaropaLintRule {
     name: 'prefer_private_members_first',
     problemMessage:
         '[prefer_private_members_first] Declare private members before public members in classes.',
-    correctionMessage: 'Move private declarations above public declarations.',
+    correctionMessage:
+        'Move private declarations above public declarations so internal state is defined before the public surface.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -822,7 +832,7 @@ class PreferVarOverExplicitTypeRule extends SaropaLintRule {
     problemMessage:
         '[prefer_var_over_explicit_type] Use var instead of explicit type when type is obvious.',
     correctionMessage:
-        'Replace explicit type annotation with var for local variables.',
+        'Replace the explicit type annotation with var when the right-hand side already makes the type obvious.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -884,7 +894,8 @@ class PreferObjectOverDynamicRule extends SaropaLintRule {
     name: 'prefer_object_over_dynamic',
     problemMessage:
         '[prefer_object_over_dynamic] Use Object? instead of dynamic for unknown types.',
-    correctionMessage: 'Replace dynamic with Object? for better type safety.',
+    correctionMessage:
+        'Replace dynamic with Object? to gain static type-safety while still accepting values of any runtime type.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -966,7 +977,7 @@ class PreferDynamicOverObjectRule extends SaropaLintRule {
     problemMessage:
         '[prefer_dynamic_over_object] Use dynamic instead of Object? for truly dynamic types.',
     correctionMessage:
-        'Replace Object? with dynamic when any operation should be allowed.',
+        'Replace Object? with dynamic when the variable intentionally bypasses static type checks on every access.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -1052,7 +1063,7 @@ class PreferLowerCamelCaseConstantsRule extends SaropaLintRule {
     problemMessage:
         '[prefer_lower_camel_case_constants] Use lowerCamelCase for constant names.',
     correctionMessage:
-        'Rename constant to use lowerCamelCase (e.g., maxRetries).',
+        'Rename the constant to lowerCamelCase (e.g., maxRetries) to match the Dart style-guide convention.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -1121,7 +1132,8 @@ class PreferCamelCaseMethodNamesRule extends SaropaLintRule {
     name: 'prefer_camel_case_method_names',
     problemMessage:
         '[prefer_camel_case_method_names] Use camelCase for method names.',
-    correctionMessage: 'Rename method to use camelCase (e.g., fetchUserData).',
+    correctionMessage:
+        'Rename the method to lowerCamelCase (e.g., fetchUserData) to follow the Dart naming convention.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -1186,7 +1198,8 @@ class PreferDescriptiveVariableNamesRule extends SaropaLintRule {
     name: 'prefer_descriptive_variable_names',
     problemMessage:
         '[prefer_descriptive_variable_names] Use descriptive variable names (at least 3 characters).',
-    correctionMessage: 'Rename variable to be more descriptive.',
+    correctionMessage:
+        'Rename the variable to a descriptive name that communicates its purpose without requiring surrounding context.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -1242,7 +1255,8 @@ class PreferConciseVariableNamesRule extends SaropaLintRule {
     name: 'prefer_concise_variable_names',
     problemMessage:
         '[prefer_concise_variable_names] Use concise variable names (30 characters or less).',
-    correctionMessage: 'Shorten variable name while keeping it descriptive.',
+    correctionMessage:
+        'Shorten the variable name to 30 characters or fewer while still communicating its purpose clearly.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -1300,7 +1314,8 @@ class PreferExplicitThisRule extends SaropaLintRule {
     name: 'prefer_explicit_this',
     problemMessage:
         '[prefer_explicit_this] Use explicit this. prefix for instance field access.',
-    correctionMessage: 'Add this. prefix to instance field references.',
+    correctionMessage:
+        'Add an explicit this. prefix to every instance-field reference so readers can distinguish fields from locals.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -1372,8 +1387,9 @@ class PreferImplicitBooleanComparisonRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_implicit_boolean_comparison',
     problemMessage:
-        '[prefer_implicit_boolean_comparison] Avoid explicit comparison with boolean literals.',
-    correctionMessage: 'Remove == true or == false from boolean expressions.',
+        '[prefer_implicit_boolean_comparison] Explicit comparison with boolean literal is redundant.',
+    correctionMessage:
+        'Remove the redundant == true or == false comparison — the expression is already a bool and reads more naturally.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -1425,7 +1441,7 @@ class PreferExplicitBooleanComparisonRule extends SaropaLintRule {
     problemMessage:
         '[prefer_explicit_boolean_comparison] Use explicit == true comparison for nullable boolean expressions.',
     correctionMessage:
-        'Add == true for clarity when dealing with nullable booleans.',
+        'Add an explicit == true comparison so the nullable bool intent is clear and avoids implicit null-is-false confusion.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 

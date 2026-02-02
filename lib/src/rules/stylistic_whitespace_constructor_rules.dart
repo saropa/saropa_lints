@@ -64,7 +64,8 @@ class PreferNoBlankLineBeforeReturnRule extends SaropaLintRule {
     name: 'prefer_no_blank_line_before_return',
     problemMessage:
         '[prefer_no_blank_line_before_return] Remove the blank line before the return statement.',
-    correctionMessage: 'Keep code compact without unnecessary blank lines.',
+    correctionMessage:
+        'Remove the blank line directly above the return statement to keep the function body compact and readable.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -145,7 +146,8 @@ class PreferBlankLineAfterDeclarationsRule extends SaropaLintRule {
     name: 'prefer_blank_line_after_declarations',
     problemMessage:
         '[prefer_blank_line_after_declarations] Add a blank line after variable declarations.',
-    correctionMessage: 'Separate declarations from logic with a blank line.',
+    correctionMessage:
+        'Insert a blank line after variable declarations to visually separate the setup block from the logic that follows.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -224,7 +226,8 @@ class PreferCompactDeclarationsRule extends SaropaLintRule {
     name: 'prefer_compact_declarations',
     problemMessage:
         '[prefer_compact_declarations] Remove blank line after variable declarations.',
-    correctionMessage: 'Keep declarations close to their usage.',
+    correctionMessage:
+        'Remove the blank line after declarations to keep variable definitions close to the code that uses them.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -302,7 +305,8 @@ class PreferBlankLinesBetweenMembersRule extends SaropaLintRule {
     name: 'prefer_blank_lines_between_members',
     problemMessage:
         '[prefer_blank_lines_between_members] Add a blank line between class members.',
-    correctionMessage: 'Blank lines between members improve readability.',
+    correctionMessage:
+        'Insert a blank line between each class member so fields, methods, and constructors are visually distinct.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -377,7 +381,8 @@ class PreferCompactClassMembersRule extends SaropaLintRule {
     name: 'prefer_compact_class_members',
     problemMessage:
         '[prefer_compact_class_members] Remove blank lines between class members.',
-    correctionMessage: 'Compact members make classes easier to overview.',
+    correctionMessage:
+        'Remove blank lines between class members so the full class definition fits on fewer lines for a quick overview.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -451,7 +456,8 @@ class PreferNoBlankLineInsideBlocksRule extends SaropaLintRule {
     name: 'prefer_no_blank_line_inside_blocks',
     problemMessage:
         '[prefer_no_blank_line_inside_blocks] Remove blank line at start/end of block.',
-    correctionMessage: 'Blocks should not have leading/trailing blank lines.',
+    correctionMessage:
+        'Remove the leading or trailing blank line inside the block body so the code stays compact and consistently indented.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -528,7 +534,8 @@ class PreferSingleBlankLineMaxRule extends SaropaLintRule {
     name: 'prefer_single_blank_line_max',
     problemMessage:
         '[prefer_single_blank_line_max] Use at most one consecutive blank line.',
-    correctionMessage: 'Multiple blank lines waste vertical space.',
+    correctionMessage:
+        'Collapse multiple consecutive blank lines into a single blank line to conserve vertical space in the file.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -604,7 +611,8 @@ class PreferSuperParametersRule extends SaropaLintRule {
     name: 'prefer_super_parameters',
     problemMessage:
         '[prefer_super_parameters] Use super.parameter syntax instead of passing to super().',
-    correctionMessage: 'Dart 3 super parameters reduce boilerplate.',
+    correctionMessage:
+        'Use Dart 3 super-parameter syntax (super.name) to forward constructor arguments without repeating the field name.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -684,7 +692,8 @@ class PreferInitializingFormalsRule extends SaropaLintRule {
     name: 'prefer_initializing_formals',
     problemMessage:
         '[prefer_initializing_formals] Use this.field syntax instead of initializer list.',
-    correctionMessage: 'Initializing formals are more concise.',
+    correctionMessage:
+        'Use this.field syntax in the constructor parameter list to assign the value directly without an initializer body.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -757,7 +766,8 @@ class PreferConstructorBodyAssignmentRule extends SaropaLintRule {
     name: 'prefer_constructor_body_assignment',
     problemMessage:
         '[prefer_constructor_body_assignment] Use explicit initializer instead of this.field syntax.',
-    correctionMessage: 'Explicit initializers allow for validation logic.',
+    correctionMessage:
+        'Assign fields inside the constructor body instead of using this.field to allow validation or transformation logic.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -826,8 +836,9 @@ class PreferFactoryForValidationRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_factory_for_validation',
     problemMessage:
-        '[prefer_factory_for_validation] Consider using factory constructor for validation logic.',
-    correctionMessage: 'Factory constructors can handle validation failures.',
+        '[prefer_factory_for_validation] Use a factory constructor for validation logic instead of constructor assertions.',
+    correctionMessage:
+        'A factory constructor can return null, a cached instance, or a subtype when validation fails, unlike assert.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -913,9 +924,9 @@ class PreferConstructorAssertionRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_constructor_assertion',
     problemMessage:
-        '[prefer_constructor_assertion] Consider using constructor assertion instead of factory.',
+        '[prefer_constructor_assertion] Use a constructor assertion instead of a factory for simple debug-only precondition checks.',
     correctionMessage:
-        'Constructor assertions are simpler for debug validation.',
+        'Constructor assertions run only in debug mode and keep the class constructor simple without a factory indirection.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -989,7 +1000,8 @@ class PreferRequiredBeforeOptionalRule extends SaropaLintRule {
     name: 'prefer_required_before_optional',
     problemMessage:
         '[prefer_required_before_optional] Put required parameters before optional parameters.',
-    correctionMessage: 'Required parameters should come first.',
+    correctionMessage:
+        'Move required parameters before optional ones so callers see mandatory arguments first in the signature.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -1052,7 +1064,8 @@ class PreferGroupedByPurposeRule extends SaropaLintRule {
     name: 'prefer_grouped_by_purpose',
     problemMessage:
         '[prefer_grouped_by_purpose] Group parameters by purpose rather than required/optional.',
-    correctionMessage: 'Consider grouping related parameters together.',
+    correctionMessage:
+        'Group constructor parameters by purpose (e.g., layout, style, callbacks) rather than required-vs-optional ordering.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -1134,7 +1147,8 @@ class PreferRethrowOverThrowERule extends SaropaLintRule {
     name: 'prefer_rethrow_over_throw_e',
     problemMessage:
         '[prefer_rethrow_over_throw_e] Use rethrow instead of throw e to preserve stack trace.',
-    correctionMessage: 'rethrow preserves the original stack trace.',
+    correctionMessage:
+        'Replace throw e with rethrow to preserve the original stack trace instead of resetting it to the current frame.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 

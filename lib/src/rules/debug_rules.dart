@@ -30,7 +30,8 @@ class AlwaysFailRule extends SaropaLintRule {
     name: 'prefer_fail_test_case',
     problemMessage:
         '[prefer_fail_test_case] This custom lint always fails (test hook).',
-    correctionMessage: 'Disable the rule or remove the test lint trigger.',
+    correctionMessage:
+        'This rule always fails by design — it verifies your lint pipeline is active. Seeing this error confirms saropa_lints is running. Remove prefer_fail_test_case from your enabled rules once verified.',
     errorSeverity: DiagnosticSeverity.ERROR,
   );
 

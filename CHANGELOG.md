@@ -32,6 +32,16 @@ Dates are not included in version headers — [pub.dev](https://pub.dev/packages
 
 ### Changed
 
+- **Audit report filenames include project name**: Exported audit reports now include the project name from `pubspec.yaml` in the filename (e.g. `20260202_090730_saropa_lints_full_audit.md` instead of `20260202_090730_full_audit.md`). Applies to both full audit and DX audit reports.
+
+- **DX audit per-tier breakdown**: The DX Message Quality report now includes a "By tier" section showing passing/total counts and percentages for each tier (Essential, Recommended, Professional, Comprehensive, Insanity, Stylistic), color-coded to match the tier distribution display.
+
+- **DX message quality improvements (27 rules)**: Improved problem and correction messages to pass DX audit checks. Essential tier now 159/159 (100%), Stylistic tier 134/134 (100%). Eliminated all "should have" (3), passive voice (2), and "better" (1) violations. Rewrote 4 "Avoid" prefix messages (`avoid_throw_in_finally`, `avoid_test_sleep`, `avoid_nested_scaffolds`, `avoid_inherited_widget_in_initstate`) to state what was detected. Expanded short messages for 15 essential rules including `avoid_unsafe_collection_methods`, `always_remove_listener`, `require_scroll_controller_dispose`, `require_focus_node_dispose`, and others. Fixed curly-quote encoding in `require_animation_disposal` and `avoid_mounted_in_setstate`.
+
+- **DX audit grouping**: Length-based issue categories no longer fragment by exact character count. Rules that are "too short" or have a "correction too short" are now grouped into single buckets per threshold instead of one bucket per distinct length.
+
+- **`analysis_options_custom.yaml` now includes a STYLISTIC RULES section**: All opinionated/stylistic rules are listed by category between PLATFORM SETTINGS and RULE OVERRIDES, with descriptions read from rule metadata. Users can toggle individual rules (`true`/`false`) to opt in without the `--stylistic` flag. Existing files are automatically updated on next `init` run — new rules are added as `false`, existing values are preserved, and rules already in RULE OVERRIDES are skipped.
+
 - **`avoid_shrink_wrap_in_scroll` reclassified as stylistic** (fixes [#75](https://github.com/saropa/saropa_lints/issues/75)): Downgraded from WARNING to INFO and moved from Recommended tier to Stylistic (opinionated). The rule flags every `shrinkWrap: true` unconditionally, but `shrinkWrap` is often required (e.g. `ListView` inside a `Column` with `NeverScrollableScrollPhysics` and bounded `itemCount`). The genuinely dangerous cases are already covered by `avoid_shrinkwrap_in_scrollview` (context-aware, nested-scrollable + physics check) and `avoid_shrink_wrap_expensive` (physics-aware). Updated correction message to acknowledge legitimate use cases. Fixed DartDoc that was a copy-paste error from a Form/validator rule.
 
 - Renamed report files from `_saropa_full.log` / `_saropa_summary.md` to `_saropa_lint_report_full.log` / `_saropa_lint_report_summary.log` for clearer identification and consistent `.log` extension

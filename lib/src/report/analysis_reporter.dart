@@ -8,8 +8,8 @@ import 'package:saropa_lints/src/saropa_lint_rule.dart';
 /// Writes analysis reports to the project's `reports/` directory.
 ///
 /// Automatically generates two timestamped files after each analysis run:
-/// - **Full log** (`_saropa_full.log`): Every violation with location and metadata
-/// - **Summary** (`_saropa_summary.md`): Counts by impact, severity, rule, and file
+/// - **Full log** (`_saropa_lint_report_full.log`): Every violation with location and metadata
+/// - **Summary** (`_saropa_lint_report_summary.log`): Counts by impact, severity, rule, and file
 ///
 /// Reports are triggered via a debounce timer — after 3 seconds of no new
 /// violations, the reporter assumes analysis is complete and writes both files.
@@ -69,8 +69,10 @@ class AnalysisReporter {
         reportsDir.createSync(recursive: true);
       }
 
-      final fullPath = '${reportsDir.path}/${_timestamp}_saropa_full.log';
-      final summaryPath = '${reportsDir.path}/${_timestamp}_saropa_summary.md';
+      final fullPath =
+          '${reportsDir.path}/${_timestamp}_saropa_lint_report_full.log';
+      final summaryPath =
+          '${reportsDir.path}/${_timestamp}_saropa_lint_report_summary.log';
 
       _writeFullLog(fullPath);
       _writeSummary(summaryPath);

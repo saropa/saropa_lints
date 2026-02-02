@@ -881,8 +881,9 @@ class AvoidTestSleepRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_test_sleep',
     problemMessage:
-        '[avoid_test_sleep] Avoid using sleep() or real delays in tests.',
-    correctionMessage: 'Use fakeAsync and async.elapse() for time-based tests.',
+        '[avoid_test_sleep] Real sleep() or Future.delayed() call in test code blocks the test runner, slows the suite, and produces flaky failures when system load varies. Tests with real delays waste CI minutes and give inconsistent results across machines.',
+    correctionMessage:
+        'Replace with fakeAsync and clock.elapse() to simulate time passing instantly, keeping tests fast and deterministic.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -1064,8 +1065,9 @@ class RequireTestKeysRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_test_keys',
     problemMessage:
-        '[require_test_keys] Widget in test should have a Key for findability.',
-    correctionMessage: 'Add key: Key("descriptive_name") to the widget.',
+        '[require_test_keys] Interactive widget in test code lacks a Key, making it difficult to locate with find.byKey() in widget tests. Without a Key, tests rely on fragile finders like find.byType() that break when multiple instances of the same widget type exist in the tree.',
+    correctionMessage:
+        'Add a descriptive Key (e.g., key: Key("submit_button")) so the widget is reliably identifiable in widget test finders.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 

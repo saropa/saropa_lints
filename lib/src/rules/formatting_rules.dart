@@ -768,7 +768,7 @@ class MemberOrderingFormattingRule extends SaropaLintRule {
     problemMessage:
         '[prefer_member_ordering] Class members are not in conventional order.',
     correctionMessage:
-        'Order members: static fields, fields, constructors, methods.',
+        'Reorder class members to follow the conventional layout: static fields, instance fields, constructors, then methods.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 

@@ -388,8 +388,9 @@ class AvoidUnsafeCollectionMethodsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_unsafe_collection_methods',
     problemMessage:
-        '[avoid_unsafe_collection_methods] .first/.last/.single on empty collection throws StateError, crashing the app.',
-    correctionMessage: 'Use .firstOrNull/.lastOrNull or check isEmpty first.',
+        '[avoid_unsafe_collection_methods] Calling .first, .last, or .single on an empty collection throws a StateError at runtime, crashing the app. This is especially dangerous when the collection comes from an API response, database query, or user input where emptiness cannot be guaranteed at compile time.',
+    correctionMessage:
+        'Use .firstOrNull, .lastOrNull, or .singleOrNull from package:collection, or guard with an isEmpty check before accessing.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -998,10 +999,9 @@ class AvoidUnsafeWhereMethodsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_unsafe_where_methods',
     problemMessage:
-        '[avoid_unsafe_where_methods] firstWhere/lastWhere/singleWhere throws if no element matches.',
+        '[avoid_unsafe_where_methods] Calling firstWhere, lastWhere, or singleWhere without an orElse callback throws a StateError when no element matches the predicate. This crashes the app at runtime, especially when filtering data from external sources where matches are not guaranteed.',
     correctionMessage:
-        'Use firstWhereOrNull/lastWhereOrNull/singleWhereOrNull from '
-        'package:collection, or provide an orElse callback.',
+        'Use firstWhereOrNull, lastWhereOrNull, or singleWhereOrNull from package:collection, or provide an orElse callback to handle the no-match case.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 

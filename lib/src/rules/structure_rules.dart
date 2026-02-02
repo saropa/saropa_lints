@@ -2206,8 +2206,10 @@ class AvoidThrowInFinallyRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_throw_in_finally',
-    problemMessage: '[avoid_throw_in_finally] Avoid throw in finally blocks.',
-    correctionMessage: 'Throwing in finally can hide the original exception.',
+    problemMessage:
+        '[avoid_throw_in_finally] Throw statement inside a finally block silently replaces the original exception. If the try block throws an error, the finally throw overwrites it, making the root cause invisible in crash logs and error handlers.',
+    correctionMessage:
+        'Move the throw out of the finally block, or catch and log the finally-block error separately to preserve the original exception.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 

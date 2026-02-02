@@ -767,7 +767,7 @@ class PreferSingleExpectationPerTestRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_single_expectation_per_test',
     problemMessage:
-        '[prefer_single_expectation_per_test] Tests should have a single logical assertion.',
+        '[prefer_single_expectation_per_test] Test contains multiple logical assertions that verify unrelated behaviors.',
     correctionMessage:
         'Split into multiple focused tests, each verifying one behavior, so failures pinpoint exactly which expectation broke.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -961,7 +961,8 @@ class PreferTestNameShouldWhenRule extends SaropaLintRule {
     name: 'prefer_test_name_should_when',
     problemMessage:
         '[prefer_test_name_should_when] Test names should follow "should X when Y" pattern.',
-    correctionMessage: 'Use: test("should [behavior] when [condition]", ...)',
+    correctionMessage:
+        "Rename the test to follow the should-when pattern: test('should [behavior] when [condition]', ...) for clarity.",
     errorSeverity: DiagnosticSeverity.INFO,
   );
 

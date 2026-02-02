@@ -996,7 +996,7 @@ class PreferRecordOverEquatableRule extends SaropaLintRule {
     problemMessage:
         '[prefer_record_over_equatable] Simple Equatable class could be replaced with a Dart 3 record.',
     correctionMessage:
-        'Consider using a record type: typedef ClassName = ({Type field, ...});',
+        'Replace the Equatable subclass with a Dart 3 record: typedef ClassName = ({Type field, ...}); for less boilerplate.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
