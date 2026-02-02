@@ -969,6 +969,9 @@ class AvoidNestedAssignmentsRule extends SaropaLintRule {
       // Skip if parent is VariableDeclaration
       if (parent is VariableDeclaration) return;
 
+      // Skip if parent is CascadeExpression (e.g. obj..field = value)
+      if (parent is CascadeExpression) return;
+
       // Report nested assignment
       reporter.atNode(node, code);
     });
