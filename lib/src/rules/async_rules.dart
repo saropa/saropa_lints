@@ -1427,7 +1427,7 @@ class _ChangeToFutureVoidFunctionFix extends DartFix {
       final String source = node.toSource();
       if (source != 'VoidCallback' && source != 'VoidCallback?') return;
 
-      final bool isNullable = source.endsWith('?');
+      final bool isNullable = node.question != null;
       final String replacement =
           isNullable ? 'Future<void> Function()?' : 'Future<void> Function()';
 
@@ -1496,7 +1496,7 @@ class _ReplaceAsyncCallbackWithFutureVoidFunctionFix extends DartFix {
       final String source = node.toSource();
       if (source != 'AsyncCallback' && source != 'AsyncCallback?') return;
 
-      final bool isNullable = source.endsWith('?');
+      final bool isNullable = node.question != null;
       final String replacement =
           isNullable ? 'Future<void> Function()?' : 'Future<void> Function()';
 
