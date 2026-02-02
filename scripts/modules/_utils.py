@@ -388,6 +388,40 @@ def command_exists(cmd: str) -> bool:
     return shutil.which(cmd) is not None
 
 
+def clear_flutter_lock() -> None:
+    """Remove stale Flutter startup lock if present.
+
+    Flutter uses a lockfile at <sdk>/bin/cache/lockfile to prevent
+    concurrent SDK operations. If a previous process crashed or was
+    killed, this lock can remain and cause subsequent commands to hang
+    with "Waiting for another flutter command to release the startup
+    lock..."
+
+    This function attempts to remove the lockfile. If the lock is
+    actively held by another process, the deletion may fail (Windows)
+    or the active process will re-create it (Unix).
+    """
+    flutter_path = shutil.which("flutter")
+    if not flutter_path:
+        return
+
+    sdk_bin = Path(flutter_path).resolve().parent
+    lockfile = sdk_bin / "cache" / "lockfile"
+
+    if not lockfile.exists():
+        return
+
+    print_warning("Found Flutter startup lock file (stale process?)")
+    try:
+        lockfile.unlink()
+        print_success("Cleared stale Flutter lock file")
+    except OSError:
+        print_warning(
+            "Could not clear lock file. "
+            "Another Flutter process may be running."
+        )
+
+
 # =============================================================================
 # PROJECT DISCOVERY
 # =============================================================================

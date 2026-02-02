@@ -11,7 +11,14 @@ Dates are not included in version headers — [pub.dev](https://pub.dev/packages
 ** See the current published changelog: [saropa_lints/changelog](https://pub.dev/packages/saropa_lints/changelog)
 
 ---
-## [4.9.9] - Current
+## [4.9.10]
+
+### Fixed
+
+- **`prefer_late_final` false positive on helper methods called from multiple sites**: The rule counted assignment AST nodes rather than effective runtime assignments. A late field assigned in a helper method (e.g., `_fetchData()`) that was called from multiple sites (e.g., `initState()` and `didUpdateWidget()`) was incorrectly flagged as single-assignment. Now tracks which methods assign to which fields and counts call sites — if an assigning method is called from N > 1 sites, the field is treated as reassigned.
+
+---
+## [4.9.9]
 
 ### Fixed
 
