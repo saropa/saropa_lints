@@ -7469,12 +7469,21 @@ class PreferLateFinalRule extends SaropaLintRule {
         assignmentCounts[field.name] = hasInitializer ? 1 : 0;
       }
 
+      // Track which methods assign to which fields, so we can check
+      // if those methods are called from multiple sites
+      final Map<String, Set<String>> methodFieldAssignments =
+          <String, Set<String>>{};
+
       // Visit all methods to count assignments
       for (final ClassMember member in node.members) {
         if (member is MethodDeclaration) {
-          member.body.visitChildren(
-            _LateFinalAssignmentCounterVisitor(assignmentCounts),
-          );
+          final _LateFinalAssignmentCounterVisitor visitor =
+              _LateFinalAssignmentCounterVisitor(assignmentCounts);
+          member.body.visitChildren(visitor);
+
+          if (visitor.assignedFields.isNotEmpty) {
+            methodFieldAssignments[member.name.lexeme] = visitor.assignedFields;
+          }
         }
         if (member is ConstructorDeclaration) {
           if (member.body is BlockFunctionBody) {
@@ -7495,6 +7504,15 @@ class PreferLateFinalRule extends SaropaLintRule {
         }
       }
 
+      // Adjust counts for methods called from multiple sites.
+      // A single assignment in a method called N times means the field
+      // is effectively assigned N times at runtime.
+      _adjustForMethodCallSites(
+        node,
+        methodFieldAssignments,
+        assignmentCounts,
+      );
+
       // Report fields that are assigned exactly once
       // Skip never-assigned fields (count == 0) - those are bugs, not candidates
       for (final _LateFinalFieldInfo field in lateFields) {
@@ -7504,6 +7522,46 @@ class PreferLateFinalRule extends SaropaLintRule {
         }
       }
     });
+  }
+
+  /// Counts how many times each assigning method is called within the class.
+  /// If a method that assigns to a late field is called from N > 1 sites,
+  /// adds (N - 1) to the field's assignment count since the AST visitor
+  /// already counted the assignment node once.
+  static void _adjustForMethodCallSites(
+    ClassDeclaration node,
+    Map<String, Set<String>> methodFieldAssignments,
+    Map<String, int> assignmentCounts,
+  ) {
+    if (methodFieldAssignments.isEmpty) return;
+
+    final Map<String, int> methodCallCounts = <String, int>{
+      for (final String name in methodFieldAssignments.keys) name: 0,
+    };
+
+    final _LateFinalMethodCallCounterVisitor callVisitor =
+        _LateFinalMethodCallCounterVisitor(methodCallCounts);
+
+    for (final ClassMember member in node.members) {
+      if (member is MethodDeclaration) {
+        member.body.visitChildren(callVisitor);
+      }
+      if (member is ConstructorDeclaration &&
+          member.body is BlockFunctionBody) {
+        member.body.visitChildren(callVisitor);
+      }
+    }
+
+    for (final MapEntry<String, Set<String>> entry
+        in methodFieldAssignments.entries) {
+      final int callCount = methodCallCounts[entry.key] ?? 0;
+      if (callCount > 1) {
+        for (final String fieldName in entry.value) {
+          assignmentCounts[fieldName] =
+              assignmentCounts[fieldName]! + (callCount - 1);
+        }
+      }
+    }
   }
 }
 
@@ -7523,6 +7581,9 @@ class _LateFinalAssignmentCounterVisitor extends RecursiveAstVisitor<void> {
   _LateFinalAssignmentCounterVisitor(this.counts);
 
   final Map<String, int> counts;
+
+  /// Fields that were assigned in the visited scope.
+  final Set<String> assignedFields = <String>{};
 
   @override
   void visitAssignmentExpression(AssignmentExpression node) {
@@ -7545,9 +7606,35 @@ class _LateFinalAssignmentCounterVisitor extends RecursiveAstVisitor<void> {
 
     if (fieldName != null && counts.containsKey(fieldName)) {
       counts[fieldName] = counts[fieldName]! + 1;
+      assignedFields.add(fieldName);
     }
 
     super.visitAssignmentExpression(node);
+  }
+}
+
+/// Counts calls to specific methods within a class body.
+///
+/// Used by [PreferLateFinalRule] to detect when a method that assigns
+/// to a late field is called from multiple sites, making the field
+/// effectively reassigned at runtime.
+class _LateFinalMethodCallCounterVisitor extends RecursiveAstVisitor<void> {
+  _LateFinalMethodCallCounterVisitor(this.counts);
+
+  final Map<String, int> counts;
+
+  @override
+  void visitMethodInvocation(MethodInvocation node) {
+    final String methodName = node.methodName.name;
+    if (counts.containsKey(methodName)) {
+      final Expression? target = node.target;
+      // Only count calls on this instance (implicit or explicit this)
+      if (target == null || target is ThisExpression) {
+        counts[methodName] = counts[methodName]! + 1;
+      }
+    }
+
+    super.visitMethodInvocation(node);
   }
 }
 

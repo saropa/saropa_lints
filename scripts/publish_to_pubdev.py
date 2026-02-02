@@ -147,6 +147,7 @@ from scripts.modules._utils import (
     Color,
     ExitCode,
     OutputLevel,
+    clear_flutter_lock,
     command_exists,
     enable_ansi_support,
     exit_with_error,
@@ -398,6 +399,8 @@ def check_remote_sync(project_dir: Path, branch: str) -> bool:
 def run_tests(project_dir: Path) -> bool:
     """Step 5: Run flutter test and custom_lint tests."""
     print_header("STEP 5: RUNNING TESTS")
+
+    clear_flutter_lock()
 
     test_dir = project_dir / "test"
     if test_dir.exists():

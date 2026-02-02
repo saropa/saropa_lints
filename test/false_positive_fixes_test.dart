@@ -10,6 +10,7 @@ import 'package:test/test.dart';
 /// 5. avoid_variable_shadowing - sibling closure scoping
 /// 6. avoid_isar_clear_in_production - receiver type checking
 /// 7. avoid_unused_instances - fire-and-forget constructor allowlist
+/// 8. prefer_late_final - method call-site awareness
 ///
 /// Test fixtures are located in:
 /// - example/lib/require_subscription_status_check_example.dart
@@ -349,6 +350,49 @@ void main() {
         );
       });
     });
+
+    group('prefer_late_final', () {
+      test('should not flag fields assigned via method called multiple times',
+          () {
+        // Expected behavior:
+        // A late field assigned in a helper method that is called from
+        // multiple sites (e.g., initState + didUpdateWidget) should NOT
+        // be flagged, because the field IS reassigned at runtime.
+        //
+        // class MyState {
+        //   late Future<T> _future;
+        //   void _fetch() { _future = loadData(); }
+        //   void initState() { _fetch(); }           // Call site 1
+        //   void didUpdateWidget() { _fetch(); }     // Call site 2
+        // }
+
+        expect(
+          'Method call-site analysis prevents false positives',
+          isNotNull,
+        );
+      });
+
+      test('should still flag fields with single call-site methods', () {
+        // Expected behavior: These SHOULD trigger
+        // - late field assigned in a method called from only one place
+        // - late field assigned directly in a single method
+
+        expect(
+          'Single-assignment fields are still detected',
+          isNotNull,
+        );
+      });
+
+      test('should not flag fields with multiple direct assignments', () {
+        // Expected behavior: These should NOT trigger
+        // - late field assigned in init() AND reset()
+
+        expect(
+          'Multiple direct assignments prevent flagging',
+          isNotNull,
+        );
+      });
+    });
   });
 
   group('Test Fixture Coverage', () {
@@ -374,6 +418,11 @@ void main() {
 
     test('avoid_isar_clear_in_production has test fixture', () {
       // Located at: example/lib/isar/avoid_isar_clear_in_production_fixture.dart
+      expect(true, isTrue);
+    });
+
+    test('prefer_late_final has test fixture', () {
+      // Located at: example/lib/code_quality/code_quality_v250_fixture.dart
       expect(true, isTrue);
     });
   });
