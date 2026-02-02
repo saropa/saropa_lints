@@ -15,6 +15,8 @@ Dates are not included in version headers — [pub.dev](https://pub.dev/packages
 
 ### Fixed
 
+- **`avoid_late_for_nullable` false positive on generic inner type nullability**: The rule used string-based detection (`toSource().endsWith('?')`) which could false-positive when `?` appeared on inner generic parameters (e.g., `late Future<String?>` or `late Future<({List<CountryEnum>? countries, int count})>`). Replaced with AST-based `question` token check that only detects nullability on the outer type itself.
+
 - **`avoid_nested_assignments` false positive on cascade expressions**: The rule flagged idiomatic Dart cascade property setters (`obj..field = value`) as nested assignments. In the AST, cascade sections are `AssignmentExpression` nodes with a `CascadeExpression` parent, which was not in the skip list. Added `CascadeExpression` parent check so cascades are correctly treated as safe sequential assignments.
 
 ### Changed
