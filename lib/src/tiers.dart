@@ -1138,7 +1138,6 @@ const Set<String> recommendedOnlyRules = <String>{
   'avoid_hardcoded_text_styles', // INFO - text style theming
   'avoid_large_images_in_memory', // INFO - image memory
   'avoid_map_markers_in_build', // INFO - map marker creation
-  'avoid_stack_overflow', // INFO - recursion depth
   'prefer_clip_behavior', // INFO - clip behavior
   'prefer_deferred_loading_web', // INFO - web bundle splitting
   'prefer_fit_cover_for_background', // INFO - BoxFit.cover
