@@ -43,7 +43,7 @@ class AvoidHardcodedConfigRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_hardcoded_config',
     problemMessage:
-        '[avoid_hardcoded_config] Hardcoded configuration makes code inflexible and deployment-specific.',
+        '[avoid_hardcoded_config] Hardcoded configuration value detected. Embedding URLs, ports, API keys, or feature flags directly in source code makes the app inflexible across environments (dev, staging, production) and forces a rebuild for every configuration change, increasing deployment risk.',
     correctionMessage:
         'Use String.fromEnvironment, dotenv, or a config service for environment-specific values.',
     errorSeverity: DiagnosticSeverity.WARNING,

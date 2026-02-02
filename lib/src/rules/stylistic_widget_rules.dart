@@ -60,7 +60,7 @@ class PreferSizedBoxOverContainerRule extends SaropaLintRule {
     problemMessage:
         '[prefer_sizedbox_over_container] Use SizedBox instead of Container for simple width/height spacing.',
     correctionMessage:
-        'SizedBox is more lightweight and clearer for sizing-only needs.',
+        'Replace Container with SizedBox when you only need width and height \u2014 SizedBox skips the decoration/padding layers.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -176,7 +176,7 @@ class PreferContainerOverSizedBoxRule extends SaropaLintRule {
     problemMessage:
         '[prefer_container_over_sizedbox] Use Container instead of SizedBox for consistency.',
     correctionMessage:
-        'Container provides a consistent API and is easier to extend.',
+        'Replace SizedBox with Container so decoration, padding, or alignment can be added later without a widget swap.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -285,7 +285,7 @@ class PreferTextRichOverRichTextRule extends SaropaLintRule {
     problemMessage:
         '[prefer_text_rich_over_richtext] Use Text.rich() instead of RichText widget.',
     correctionMessage:
-        'Text.rich() inherits DefaultTextStyle and has a simpler API.',
+        'Replace RichText with Text.rich() to inherit the DefaultTextStyle and avoid manually setting the base style.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -345,7 +345,7 @@ class PreferRichTextOverTextRichRule extends SaropaLintRule {
     problemMessage:
         '[prefer_richtext_over_text_rich] Use RichText instead of Text.rich() for explicit control.',
     correctionMessage:
-        'RichText provides explicit control without implicit style inheritance.',
+        'Replace Text.rich() with RichText for full control over the base text style without implicit DefaultTextStyle inheritance.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -409,7 +409,7 @@ class PreferEdgeInsetsSymmetricRule extends SaropaLintRule {
     problemMessage:
         '[prefer_edgeinsets_symmetric] Use EdgeInsets.symmetric() when left/right or top/bottom are equal.',
     correctionMessage:
-        'EdgeInsets.symmetric() is more concise for symmetric padding.',
+        'Replace EdgeInsets.only() with EdgeInsets.symmetric() when horizontal or vertical values are equal, for brevity.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -544,7 +544,7 @@ class PreferEdgeInsetsOnlyRule extends SaropaLintRule {
     problemMessage:
         '[prefer_edgeinsets_only] Use EdgeInsets.only() for explicit side values.',
     correctionMessage:
-        'EdgeInsets.only() is more explicit and easier to modify.',
+        'Replace EdgeInsets.symmetric() with EdgeInsets.only() for explicit per-side values that are easier to adjust independently.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -654,7 +654,8 @@ class PreferBorderRadiusCircularRule extends SaropaLintRule {
     name: 'prefer_borderradius_circular',
     problemMessage:
         '[prefer_borderradius_circular] Use BorderRadius.circular() instead of BorderRadius.all(Radius.circular()).',
-    correctionMessage: 'BorderRadius.circular() is more concise.',
+    correctionMessage:
+        'Replace BorderRadius.all(Radius.circular(r)) with BorderRadius.circular(r) for a shorter single-call equivalent.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -773,7 +774,8 @@ class PreferExpandedOverFlexibleRule extends SaropaLintRule {
     name: 'prefer_expanded_over_flexible',
     problemMessage:
         '[prefer_expanded_over_flexible] Use Expanded instead of Flexible(fit: FlexFit.tight).',
-    correctionMessage: 'Expanded is more concise and idiomatic.',
+    correctionMessage:
+        'Replace Flexible(fit: FlexFit.tight) with Expanded, which is the idiomatic shorthand for tight-fit flex children.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -884,7 +886,7 @@ class PreferFlexibleOverExpandedRule extends SaropaLintRule {
     problemMessage:
         '[prefer_flexible_over_expanded] Use Flexible instead of Expanded for consistency.',
     correctionMessage:
-        'Flexible provides a consistent API and explicit fit parameter.',
+        'Replace Expanded with Flexible(fit: FlexFit.tight) so the fit parameter is always visible and easy to change later.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -986,7 +988,7 @@ class PreferMaterialThemeColorsRule extends SaropaLintRule {
     problemMessage:
         '[prefer_material_theme_colors] Use Theme.of(context).colorScheme instead of hardcoded Colors.',
     correctionMessage:
-        'Theme colors support dark mode and maintain consistency.',
+        'Replace hardcoded Colors.* with Theme.of(context).colorScheme values to support dark mode and keep colors consistent.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -1070,7 +1072,7 @@ class PreferExplicitColorsRule extends SaropaLintRule {
     problemMessage:
         '[prefer_explicit_colors] Use explicit Colors instead of Theme.of(context).colorScheme.',
     correctionMessage:
-        'Explicit colors are more predictable and have no context dependency.',
+        'Replace Theme.of(context).colorScheme with explicit Colors.* values for predictable output without runtime context.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -1272,7 +1274,7 @@ class PreferClipRSuperellipseClipperRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_clip_r_superellipse_clipper',
     problemMessage:
-        '[prefer_clip_r_superellipse_clipper] Consider using ClipRSuperellipse instead of ClipRRect.',
+        '[prefer_clip_r_superellipse_clipper] Use ClipRSuperellipse instead of ClipRRect for smoother continuous corners.',
     correctionMessage:
         'The custom clipper must be rewritten as CustomClipper<RSuperellipse>. Requires Flutter 3.32+.',
     errorSeverity: DiagnosticSeverity.INFO,

@@ -14,6 +14,7 @@ Copyright: (c) 2025-2026 Saropa
 
 from __future__ import annotations
 
+import re
 from dataclasses import dataclass, field
 from datetime import datetime
 from pathlib import Path
@@ -116,10 +117,12 @@ def export_full_audit_report(
     owasp_coverage: OwaspCoverage,
     dx_messages: list[RuleMessage],
     output_dir: Path,
+    project_name: str = "",
 ) -> Path:
     """Export a full audit report to timestamped markdown file."""
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-    output_path = output_dir / f"{timestamp}_full_audit.md"
+    name_part = f"_{project_name}" if project_name else ""
+    output_path = output_dir / f"{timestamp}{name_part}_full_audit.md"
     lines: list[str] = []
     lines.append("# Saropa Lints Full Audit Report\n")
     lines.append(
@@ -213,6 +216,15 @@ def run_full_audit(
     rules_dir = project_dir / "lib" / "src" / "rules"
     tiers_path = project_dir / "lib" / "src" / "tiers.dart"
     roadmap_path = project_dir / "ROADMAP.md"
+    pubspec_path = project_dir / "pubspec.yaml"
+
+    # Read project name for report filenames
+    project_name = ""
+    if pubspec_path.exists():
+        content = pubspec_path.read_text(encoding="utf-8")
+        match = re.search(r"^name:\s*(.+)$", content, re.MULTILINE)
+        if match:
+            project_name = match.group(1).strip()
 
     # ===== GATHER DATA (no printing) =====
     rules, aliases, quick_fixes = get_implemented_rules(rules_dir)
@@ -383,7 +395,11 @@ def run_full_audit(
 
     # DX message audit
     if not skip_dx:
-        print_dx_audit_report(dx_messages, show_all=show_dx_all)
+        print_dx_audit_report(
+            dx_messages,
+            show_all=show_dx_all,
+            tier_rules=tier_stats.rules if tier_stats else None,
+        )
 
         # Export full audit report
         reports_dir = project_dir / "reports"
@@ -402,6 +418,7 @@ def run_full_audit(
             owasp_coverage,
             dx_messages,
             reports_dir,
+            project_name=project_name,
         )
         print()
         print_info(

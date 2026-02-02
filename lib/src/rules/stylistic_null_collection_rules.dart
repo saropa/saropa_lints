@@ -59,7 +59,8 @@ class PreferNullAwareAssignmentRule extends SaropaLintRule {
     name: 'prefer_null_aware_assignment',
     problemMessage:
         '[prefer_null_aware_assignment] Use ??= instead of if-null-then-assign pattern.',
-    correctionMessage: 'Replace with: variable ??= value',
+    correctionMessage:
+        'Replace the if-null-then-assign block with the ??= operator for a single-expression null-coalescing assignment.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -143,7 +144,8 @@ class PreferExplicitNullAssignmentRule extends SaropaLintRule {
     name: 'prefer_explicit_null_assignment',
     problemMessage:
         '[prefer_explicit_null_assignment] Use explicit if-null-then-assign instead of ??=.',
-    correctionMessage: 'Replace with: if (variable == null) variable = value;',
+    correctionMessage:
+        'Replace ??= with an explicit if (variable == null) variable = value; block for step-by-step clarity.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -199,7 +201,8 @@ class PreferIfNullOverTernaryRule extends SaropaLintRule {
     name: 'prefer_if_null_over_ternary',
     problemMessage:
         '[prefer_if_null_over_ternary] Use ?? instead of null-checking ternary expression.',
-    correctionMessage: 'Replace with: value ?? default',
+    correctionMessage:
+        'Replace the ternary null check with the ?? operator, which expresses the same intent in fewer tokens.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -347,7 +350,8 @@ class PreferTernaryOverIfNullRule extends SaropaLintRule {
     name: 'prefer_ternary_over_if_null',
     problemMessage:
         '[prefer_ternary_over_if_null] Use ternary expression instead of ?? for explicit control.',
-    correctionMessage: 'Replace with: value != null ? value : default',
+    correctionMessage:
+        'Replace ?? with an explicit ternary (value != null ? value : fallback) for full control over both branches.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -440,9 +444,9 @@ class PreferLateOverNullableRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_late_over_nullable',
     problemMessage:
-        '[prefer_late_over_nullable] Consider using late instead of nullable for lazily initialized fields.',
+        '[prefer_late_over_nullable] Use late instead of nullable for lazily initialized fields that are always set before first access.',
     correctionMessage:
-        'late avoids null checks if you guarantee initialization before use.',
+        'Declare the field as late to remove null checks — the runtime guarantees a LateInitializationError if read too early.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -515,7 +519,8 @@ class PreferNullableOverLateRule extends SaropaLintRule {
     name: 'prefer_nullable_over_late',
     problemMessage:
         '[prefer_nullable_over_late] Use nullable type instead of late for safer code.',
-    correctionMessage: 'Nullable types prevent LateInitializationError.',
+    correctionMessage:
+        'Use a nullable type instead of late so the compiler enforces a null check at every access, preventing runtime errors.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -621,7 +626,8 @@ class PreferSpreadOverAddAllRule extends SaropaLintRule {
     name: 'prefer_spread_over_addall',
     problemMessage:
         '[prefer_spread_over_addall] Use spread operator [...] instead of addAll().',
-    correctionMessage: 'Spread is more declarative: [...list1, ...list2]',
+    correctionMessage:
+        'Replace addAll() with the spread operator [...list1, ...list2] for a declarative, expression-level merge.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -676,7 +682,8 @@ class PreferAddAllOverSpreadRule extends SaropaLintRule {
     name: 'prefer_addall_over_spread',
     problemMessage:
         '[prefer_addall_over_spread] Use addAll() instead of spread for consistency.',
-    correctionMessage: 'addAll() is more explicit for mutations.',
+    correctionMessage:
+        'Replace the spread operator with addAll() for an explicit imperative mutation that reads naturally in method chains.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -737,7 +744,8 @@ class PreferCollectionIfOverTernaryRule extends SaropaLintRule {
     name: 'prefer_collection_if_over_ternary',
     problemMessage:
         '[prefer_collection_if_over_ternary] Use collection-if instead of ternary with spread.',
-    correctionMessage: 'Replace with: [if (condition) element]',
+    correctionMessage:
+        'Replace the ternary-spread pattern with a collection-if expression: [if (condition) element] for cleaner syntax.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -811,7 +819,8 @@ class PreferTernaryOverCollectionIfRule extends SaropaLintRule {
     name: 'prefer_ternary_over_collection_if',
     problemMessage:
         '[prefer_ternary_over_collection_if] Use ternary spread instead of collection-if.',
-    correctionMessage: 'Replace with: ...(condition ? [element] : [])',
+    correctionMessage:
+        'Replace the collection-if with a ternary-spread expression: ...(condition ? [element] : []) for explicit control.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -866,7 +875,8 @@ class PreferWhereTypeOverWhereIsRule extends SaropaLintRule {
     name: 'prefer_wheretype_over_where_is',
     problemMessage:
         '[prefer_wheretype_over_where_is] Use whereType<T>() instead of where((e) => e is T).',
-    correctionMessage: 'whereType<T>() is more concise and type-safe.',
+    correctionMessage:
+        'Replace where((e) => e is T) with whereType<T>() for concise, type-safe filtering without a manual cast.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -986,7 +996,8 @@ class PreferMapEntriesIterationRule extends SaropaLintRule {
     name: 'prefer_map_entries_iteration',
     problemMessage:
         '[prefer_map_entries_iteration] Use map.entries instead of iterating .keys with lookup.',
-    correctionMessage: 'for (final entry in map.entries) is more efficient.',
+    correctionMessage:
+        'Iterate with map.entries to access key and value in a single lookup instead of re-indexing via map[key].',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -1072,7 +1083,8 @@ class PreferKeysIterationRule extends SaropaLintRule {
     name: 'prefer_keys_with_lookup',
     problemMessage:
         '[prefer_keys_with_lookup] Use map.keys with lookup for consistency.',
-    correctionMessage: 'for (final key in map.keys) is more familiar.',
+    correctionMessage:
+        'Iterate with map.keys and look up each value explicitly for a familiar loop style that matches common patterns.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -1132,7 +1144,8 @@ class PreferMutableCollectionsRule extends SaropaLintRule {
     name: 'prefer_mutable_collections',
     problemMessage:
         '[prefer_mutable_collections] Return mutable collections for flexibility.',
-    correctionMessage: 'Avoid UnmodifiableListView wrapper.',
+    correctionMessage:
+        'Return a plain List, Set, or Map so callers can modify the collection without needing to copy or unwrap it first.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 

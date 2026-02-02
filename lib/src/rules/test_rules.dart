@@ -1452,9 +1452,9 @@ class PreferFakeOverMockRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_fake_over_mock',
     problemMessage:
-        '[prefer_fake_over_mock] Test uses mock with verify(). Consider using a fake for simpler tests.',
+        '[prefer_fake_over_mock] Test uses mock with verify(). A hand-written fake keeps the test simpler and avoids mock-framework coupling.',
     correctionMessage:
-        'Fakes are easier to maintain. Use mocks only when verifying interactions.',
+        'Create a hand-written Fake subclass instead of a Mock — fakes are easier to maintain and do not require verify() calls.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -1664,9 +1664,9 @@ class PreferTestDataBuilderRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_test_data_builder',
     problemMessage:
-        '[prefer_test_data_builder] Complex object construction in test. Consider using builder pattern.',
+        '[prefer_test_data_builder] Complex object construction in test duplicates setup logic across multiple test cases.',
     correctionMessage:
-        'Create a TestDataBuilder class: UserBuilder().withName("Test").build()',
+        "Extract a TestDataBuilder class (e.g., UserBuilder().withName('Test').build()) to share setup logic across tests.",
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
