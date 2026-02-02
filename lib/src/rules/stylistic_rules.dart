@@ -633,7 +633,7 @@ class PreferTrailingCommaAlwaysRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_trailing_comma_always',
     problemMessage:
-        '[prefer_trailing_comma_always] Multi-line construct should have a trailing comma.',
+        '[prefer_trailing_comma_always] Multi-line construct is missing a trailing comma.',
     correctionMessage:
         'Add a trailing comma so dart format keeps each argument on its own line, producing cleaner git diffs.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -2099,7 +2099,7 @@ class PreferScreamingCaseConstantsRule extends SaropaLintRule {
     problemMessage:
         '[prefer_screaming_case_constants] Constants should use SCREAMING_SNAKE_CASE.',
     correctionMessage:
-        'Rename to SCREAMING_SNAKE_CASE: MAX_VALUE instead of maxValue',
+        'Rename the constant to SCREAMING_SNAKE_CASE (e.g., MAX_VALUE instead of maxValue) for visual distinction.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -2250,7 +2250,7 @@ class PreferDescriptiveBoolNamesRule extends SaropaLintRule {
     problemMessage:
         '[prefer_descriptive_bool_names] Boolean should use a descriptive prefix (is, has, can, should, etc.) or action verb.',
     correctionMessage:
-        'Rename with a prefix: isEnabled, hasData, canEdit, shouldUpdate, processData',
+        'Rename with a descriptive prefix: isEnabled, hasData, canEdit, shouldUpdate, or an action verb like processData.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -2522,7 +2522,7 @@ class PreferDescriptiveBoolNamesStrictRule extends SaropaLintRule {
     problemMessage:
         '[prefer_descriptive_bool_names_strict] Boolean should use a descriptive prefix (is, has, can, should, etc.).',
     correctionMessage:
-        'Rename with a prefix: isEnabled, hasData, canEdit, shouldUpdate',
+        'Rename with a descriptive boolean prefix: isEnabled, hasData, canEdit, shouldUpdate, doesExist, or willChange.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -2687,7 +2687,7 @@ class PreferSnakeCaseFilesRule extends SaropaLintRule {
     problemMessage:
         '[prefer_snake_case_files] File name should use snake_case.',
     correctionMessage:
-        'Rename file to snake_case: user_service.dart instead of UserService.dart',
+        'Rename the file to snake_case (e.g., user_service.dart instead of UserService.dart) to follow Dart conventions.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -2848,9 +2848,9 @@ class AvoidSmallTextRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_small_text',
     problemMessage:
-        '[avoid_small_text] Font size is smaller than $_minFontSize. Consider increasing for accessibility.',
+        '[avoid_small_text] Font size is smaller than $_minFontSize, which reduces readability for users with low vision.',
     correctionMessage:
-        'Use a font size of at least $_minFontSize for better readability.',
+        'Use a font size of at least $_minFontSize to meet accessibility readability guidelines for body text.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -3202,7 +3202,7 @@ class PreferStraightApostropheRule extends SaropaLintRule {
     problemMessage:
         "[prefer_straight_apostrophe] Use straight apostrophe (') instead of Right Single Quotation Mark (').",
     correctionMessage:
-        "Replace Right Single Quotation Mark with straight apostrophe or escape it.",
+        "Replace the Right Single Quotation Mark (U+2019) with a straight apostrophe (U+0027) for code consistency.",
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -3333,7 +3333,7 @@ class PreferDocCurlyApostropheRule extends SaropaLintRule {
     problemMessage:
         "[prefer_doc_curly_apostrophe] Use Right Single Quotation Mark (') instead of straight apostrophe (') in documentation.",
     correctionMessage:
-        "Replace straight apostrophe with Right Single Quotation Mark (U+2019).",
+        "Replace the straight apostrophe with a Right Single Quotation Mark (U+2019) for typographic correctness.",
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -3544,7 +3544,7 @@ class PreferDocStraightApostropheRule extends SaropaLintRule {
     problemMessage:
         "[prefer_doc_straight_apostrophe] Use straight apostrophe (') instead of Right Single Quotation Mark (') in documentation.",
     correctionMessage:
-        "Replace Right Single Quotation Mark with straight apostrophe (U+0027).",
+        "Replace the Right Single Quotation Mark (U+2019) with a straight apostrophe (U+0027) for plain-text docs.",
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -3726,7 +3726,7 @@ class PreferCurlyApostropheRule extends SaropaLintRule {
     problemMessage:
         "[prefer_curly_apostrophe] Use Right Single Quotation Mark (') instead of straight apostrophe (') in strings.",
     correctionMessage:
-        "Replace straight apostrophe with Right Single Quotation Mark (U+2019).",
+        "Replace the straight apostrophe with a Right Single Quotation Mark (U+2019) for typographic polish in strings.",
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -3896,7 +3896,7 @@ class ArgumentsOrderingRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_arguments_ordering',
     problemMessage:
-        '[prefer_arguments_ordering] Named arguments should be in alphabetical order.',
+        '[prefer_arguments_ordering] Named arguments are not in alphabetical order.',
     correctionMessage:
         'Reorder named arguments alphabetically so reviewers can quickly spot missing or duplicate arguments.',
     errorSeverity: DiagnosticSeverity.INFO,

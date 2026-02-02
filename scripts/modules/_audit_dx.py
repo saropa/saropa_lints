@@ -147,14 +147,10 @@ class RuleMessage:
 
         # --- Message length (-25/-15) ---
         if len(content) < 180 and self.impact in ("critical", "high"):
-            self.dx_issues.append(
-                f"Too short ({len(content)} chars) - min 180"
-            )
+            self.dx_issues.append("Too short - min 180 chars")
             self.dx_score -= 25
         elif len(content) < 150 and self.impact == "medium":
-            self.dx_issues.append(
-                f"Very short ({len(content)} chars) - min 150"
-            )
+            self.dx_issues.append("Very short - min 150 chars")
             self.dx_score -= 15
 
         # --- Correction message length (-10/-5) ---
@@ -166,13 +162,13 @@ class RuleMessage:
         if self.impact == "critical":
             if corr_len < 100:
                 self.dx_issues.append(
-                    f"Correction too short ({corr_len} chars) - min 100"
+                    "Correction too short - min 100 chars"
                 )
                 self.dx_score -= 10
         else:
             if 0 < corr_len < 80:
                 self.dx_issues.append(
-                    f"Correction too short ({corr_len} chars) - min 80"
+                    "Correction too short - min 80 chars"
                 )
                 self.dx_score -= 5
 
@@ -310,10 +306,109 @@ def extract_rule_messages(rules_dir: Path) -> list[RuleMessage]:
 # =============================================================================
 
 
+_TIER_ORDER = [
+    "essential",
+    "recommended",
+    "professional",
+    "comprehensive",
+    "insanity",
+    "stylistic",
+]
+
+_TIER_COLORS = {
+    "essential": Color.RED,
+    "recommended": Color.YELLOW,
+    "professional": Color.GREEN,
+    "comprehensive": Color.CYAN,
+    "insanity": Color.MAGENTA,
+    "stylistic": Color.BLUE,
+}
+
+
+def _print_dx_by_tier(
+    messages: list[RuleMessage],
+    tier_rules: dict[str, set[str]],
+) -> None:
+    """Print per-tier DX quality breakdown."""
+    # Build reverse lookup: rule name → tier
+    rule_to_tier: dict[str, str] = {}
+    for tier, rules in tier_rules.items():
+        for rule in rules:
+            rule_to_tier[rule] = tier
+
+    # Bucket messages by tier
+    all_by_tier: dict[str, list[RuleMessage]] = {
+        t: [] for t in _TIER_ORDER
+    }
+    all_by_tier["unassigned"] = []
+    needs_work_by_tier: dict[str, list[RuleMessage]] = {
+        t: [] for t in _TIER_ORDER
+    }
+    needs_work_by_tier["unassigned"] = []
+
+    for m in messages:
+        tier = rule_to_tier.get(m.name, "unassigned")
+        all_by_tier.setdefault(tier, []).append(m)
+        if m.dx_issues:
+            needs_work_by_tier.setdefault(tier, []).append(m)
+
+    print()
+    print_colored("    By tier:", Color.DIM)
+    for tier in _TIER_ORDER:
+        total = len(all_by_tier[tier])
+        if total == 0:
+            continue
+        issues = len(needs_work_by_tier[tier])
+        passing = total - issues
+        pct = (passing / total * 100) if total > 0 else 100
+        color = _TIER_COLORS.get(tier, Color.WHITE)
+        pct_color = (
+            Color.GREEN
+            if pct >= 80
+            else Color.YELLOW
+            if pct >= 50
+            else Color.RED
+        )
+        print(
+            f"    {color.value}{tier.capitalize():<14}{Color.RESET.value} "
+            f"{passing:>3}/{total:<3} passing  "
+            f"{pct_color.value}({pct:>5.1f}%){Color.RESET.value}"
+        )
+
+    # Show unassigned if any
+    unassigned_total = len(all_by_tier["unassigned"])
+    if unassigned_total > 0:
+        unassigned_issues = len(needs_work_by_tier["unassigned"])
+        passing = unassigned_total - unassigned_issues
+        pct = (passing / unassigned_total * 100)
+        pct_color = (
+            Color.GREEN
+            if pct >= 80
+            else Color.YELLOW
+            if pct >= 50
+            else Color.RED
+        )
+        print(
+            f"    {Color.DIM.value}{'Unassigned':<14}{Color.RESET.value} "
+            f"{passing:>3}/{unassigned_total:<3} passing  "
+            f"{pct_color.value}({pct:>5.1f}%){Color.RESET.value}"
+        )
+
+
 def print_dx_audit_report(
-    messages: list[RuleMessage], show_all: bool = False
+    messages: list[RuleMessage],
+    show_all: bool = False,
+    tier_rules: dict[str, set[str]] | None = None,
 ) -> int:
-    """Print DX audit report. Returns count of rules needing improvement."""
+    """Print DX audit report. Returns count of rules needing improvement.
+
+    Args:
+        messages: Audited rule messages.
+        show_all: Show all issue types (not just top 10).
+        tier_rules: Optional mapping of tier name to set of rule names.
+            When provided, a per-tier breakdown is printed after the
+            per-impact section.
+    """
     all_by_impact: dict[str, list[RuleMessage]] = {
         "critical": [], "high": [], "medium": [], "low": [],
     }
@@ -362,6 +457,10 @@ def print_dx_audit_report(
             f"{passing:>3}/{total:<3} passing  "
             f"{pct_color.value}({pct:>5.1f}%){Color.RESET.value}"
         )
+
+    # Per-tier breakdown
+    if tier_rules:
+        _print_dx_by_tier(messages, tier_rules)
 
     # Group rules by their primary issue
     issues_to_rules: dict[str, list[RuleMessage]] = {}
@@ -424,7 +523,9 @@ def print_dx_audit_report(
 
 
 def export_dx_report(
-    messages: list[RuleMessage], output_dir: Path
+    messages: list[RuleMessage],
+    output_dir: Path,
+    project_name: str = "",
 ) -> Path:
     """Export DX audit report to timestamped markdown file."""
     needs_work = [
@@ -438,7 +539,8 @@ def export_dx_report(
     )
 
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-    output_path = output_dir / f"{timestamp}_dx_audit.md"
+    name_part = f"_{project_name}" if project_name else ""
+    output_path = output_dir / f"{timestamp}{name_part}_dx_audit.md"
 
     by_file: dict[str, list[RuleMessage]] = {}
     for m in needs_work:

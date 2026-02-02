@@ -2147,8 +2147,9 @@ class AvoidUnnecessaryToListRule extends SaropaLintRule {
 
 /// Warns when API endpoints don't verify authentication.
 ///
-/// All authenticated endpoints should check auth status before
-/// processing. Missing checks expose sensitive data.
+/// Detects server-side request handler functions with protected-sounding
+/// names that lack authentication checks. Uses parameter and return type
+/// analysis to distinguish API endpoints from Flutter UI code.
 ///
 /// **BAD:**
 /// ```dart
@@ -2210,6 +2211,78 @@ class RequireAuthCheckRule extends SaropaLintRule {
     'transaction',
   };
 
+  /// Function name prefixes that indicate Flutter UI code, not API endpoints.
+  static const Set<String> _uiPrefixes = <String>{
+    'show',
+    'build',
+    'init',
+    'dispose',
+    'create',
+    'open',
+    'close',
+    'navigate',
+    'push',
+    'pop',
+    'render',
+    'draw',
+    'paint',
+    'layout',
+    'animate',
+    'on', // onTap, onPressed, onSettingsChanged, etc.
+  };
+
+  /// Parameter type names that indicate Flutter UI context, not API requests.
+  static const Set<String> _uiParamTypes = <String>{
+    'BuildContext',
+    'WidgetTester',
+    'State',
+    'Widget',
+    'Key',
+    'Animation',
+    'ScrollController',
+    'TextEditingController',
+    'FocusNode',
+    'GlobalKey',
+  };
+
+  /// Parameter type names that indicate a server-side request handler.
+  static const Set<String> _requestParamTypes = <String>{
+    'Request',
+    'HttpRequest',
+    'RequestContext',
+    'HttpHeaders',
+    'HttpContext',
+    'RequestHandler',
+  };
+
+  /// Return type keywords that indicate an API response.
+  static const Set<String> _responseReturnTypes = <String>{
+    'Response',
+    'HttpResponse',
+  };
+
+  /// Auth verification patterns found in function bodies.
+  static const Set<String> _authCheckPatterns = <String>{
+    'verifyToken',
+    'authenticate',
+    'Authorization',
+    'isAuthenticated',
+    'checkAuth',
+    'unauthorized',
+    'Unauthorized',
+    'requireAuth',
+    'ensureAuth',
+    'validateToken',
+    'authGuard',
+    'authMiddleware',
+    'verifySession',
+    'checkPermission',
+    'hasPermission',
+    'isAuthorized',
+    'forbidden',
+    'Forbidden',
+  };
+
   @override
   void runWithReporter(
     CustomLintResolver resolver,
@@ -2218,6 +2291,14 @@ class RequireAuthCheckRule extends SaropaLintRule {
   ) {
     context.registry.addFunctionDeclaration((FunctionDeclaration node) {
       final String functionName = node.name.lexeme.toLowerCase();
+
+      // Skip Flutter UI functions by name prefix
+      for (final String prefix in _uiPrefixes) {
+        if (functionName.startsWith(prefix)) return;
+      }
+
+      // Skip private functions (unlikely to be direct API handlers)
+      if (functionName.startsWith('_')) return;
 
       // Check if function name suggests protected endpoint
       bool looksProtected = false;
@@ -2230,32 +2311,76 @@ class RequireAuthCheckRule extends SaropaLintRule {
 
       if (!looksProtected) return;
 
-      // Check return type suggests an API response
+      // Analyze return type - require an API response type
       final TypeAnnotation? returnType = node.returnType;
       if (returnType == null) return;
 
       final String returnTypeStr = returnType.toSource();
-      if (!returnTypeStr.contains('Response') &&
-          !returnTypeStr.contains('Future')) {
-        return;
+      final bool hasResponseReturnType = _responseReturnTypes.any(
+        returnTypeStr.contains,
+      );
+
+      // If return type has no Response indicator, check parameters
+      // to confirm this is actually a server-side handler
+      if (!hasResponseReturnType) {
+        if (!_hasRequestParam(node)) return;
       }
+
+      // Skip if any parameter is a Flutter UI type
+      if (_hasUiParam(node)) return;
 
       // Check if function body has auth verification
       final FunctionBody body = node.functionExpression.body;
       final String bodySource = body.toSource();
 
-      final bool hasAuthCheck = bodySource.contains('verifyToken') ||
-          bodySource.contains('authenticate') ||
-          bodySource.contains('Authorization') ||
-          bodySource.contains('isAuthenticated') ||
-          bodySource.contains('checkAuth') ||
-          bodySource.contains('unauthorized') ||
-          bodySource.contains('Unauthorized');
+      final bool hasAuthCheck = _authCheckPatterns.any(bodySource.contains);
 
       if (!hasAuthCheck) {
         reporter.atToken(node.name, code);
       }
     });
+  }
+
+  /// Returns true if the function has a server-side request parameter.
+  static bool _hasRequestParam(FunctionDeclaration node) {
+    final FormalParameterList? params = node.functionExpression.parameters;
+    if (params == null) return false;
+
+    for (final FormalParameter param in params.parameters) {
+      final String? paramType = _extractParamType(param);
+      if (paramType != null && _requestParamTypes.any(paramType.contains)) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  /// Returns true if the function has a Flutter UI parameter type.
+  static bool _hasUiParam(FunctionDeclaration node) {
+    final FormalParameterList? params = node.functionExpression.parameters;
+    if (params == null) return false;
+
+    for (final FormalParameter param in params.parameters) {
+      final String? paramType = _extractParamType(param);
+      if (paramType != null && _uiParamTypes.any(paramType.contains)) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  /// Extracts the type string from a formal parameter.
+  static String? _extractParamType(FormalParameter param) {
+    if (param is SimpleFormalParameter) {
+      return param.type?.toSource();
+    }
+    if (param is DefaultFormalParameter) {
+      final NormalFormalParameter normalParam = param.parameter;
+      if (normalParam is SimpleFormalParameter) {
+        return normalParam.type?.toSource();
+      }
+    }
+    return null;
   }
 }
 

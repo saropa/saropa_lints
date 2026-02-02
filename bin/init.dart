@@ -367,6 +367,188 @@ const Map<String, String> tierDescriptions = <String, String>{
   'insanity': 'All rules enabled (may have conflicts)',
 };
 
+/// Stylistic rule categories, mirroring the organization in tiers.dart.
+/// Used to generate the STYLISTIC RULES section in analysis_options_custom.yaml.
+const Map<String, List<String>> _stylisticRuleCategories =
+    <String, List<String>>{
+  'Debug/Test utility': <String>[
+    'prefer_fail_test_case',
+  ],
+  'Ordering & Sorting': <String>[
+    'prefer_member_ordering',
+    'prefer_arguments_ordering',
+    'prefer_sorted_members',
+    'prefer_sorted_parameters',
+    'prefer_sorted_pattern_fields',
+    'prefer_sorted_record_fields',
+  ],
+  'Naming conventions': <String>[
+    'prefer_boolean_prefixes',
+    'prefer_no_getter_prefix',
+    'prefer_kebab_tag_name',
+    'prefer_capitalized_comment_start',
+    'prefer_descriptive_bool_names',
+    'prefer_snake_case_files',
+    'prefer_camel_case_method_names',
+    'prefer_exception_suffix',
+    'prefer_error_suffix',
+  ],
+  'Error handling style': <String>[
+    'prefer_catch_over_on',
+  ],
+  'Code style preferences': <String>[
+    'prefer_no_continue_statement',
+    'prefer_single_exit_point',
+    'prefer_wildcard_for_unused_param',
+    'prefer_rethrow_over_throw_e',
+  ],
+  'Function & Parameter style': <String>[
+    'prefer_arrow_functions',
+    'prefer_all_named_parameters',
+    'prefer_inline_callbacks',
+    'avoid_parameter_reassignment',
+  ],
+  'Widget style': <String>[
+    'avoid_shrink_wrap_in_scroll',
+    'prefer_one_widget_per_file',
+    'prefer_widget_methods_over_classes',
+    'prefer_borderradius_circular',
+    'avoid_small_text',
+  ],
+  'Class & Record style': <String>[
+    'prefer_class_over_record_return',
+    'prefer_private_underscore_prefix',
+    'prefer_explicit_this',
+  ],
+  'Formatting': <String>[
+    'prefer_trailing_comma_always',
+  ],
+  'Comments & Documentation': <String>[
+    'prefer_todo_format',
+    'prefer_fixme_format',
+    'prefer_sentence_case_comments',
+    'prefer_period_after_doc',
+    'prefer_doc_comments_over_regular',
+    'prefer_no_commented_out_code',
+  ],
+  'Testing style': <String>[
+    'prefer_expect_over_assert_in_tests',
+  ],
+  'Type argument style (conflicting - choose one)': <String>[
+    'prefer_inferred_type_arguments',
+    'prefer_explicit_type_arguments',
+  ],
+  'Import style (conflicting - choose one)': <String>[
+    'prefer_absolute_imports',
+    'prefer_flat_imports',
+    'prefer_grouped_imports',
+    'prefer_named_imports',
+    'prefer_relative_imports',
+  ],
+  'Quote style (conflicting - choose one)': <String>[
+    'prefer_double_quotes',
+    'prefer_single_quotes',
+  ],
+  'Apostrophe style (conflicting - choose one)': <String>[
+    'prefer_doc_curly_apostrophe',
+    'prefer_doc_straight_apostrophe',
+    'prefer_straight_apostrophe',
+  ],
+  'Member ordering (conflicting - choose one)': <String>[
+    'prefer_static_members_first',
+    'prefer_instance_members_first',
+    'prefer_public_members_first',
+    'prefer_private_members_first',
+  ],
+  'Opinionated prefer_* rules': <String>[
+    'prefer_addall_over_spread',
+    'prefer_async_only_when_awaiting',
+    'prefer_await_over_then',
+    'prefer_blank_line_after_declarations',
+    'prefer_blank_lines_between_members',
+    'prefer_cascade_over_chained',
+    'prefer_chained_over_cascade',
+    'prefer_clip_r_superellipse',
+    'prefer_clip_r_superellipse_clipper',
+    'prefer_collection_if_over_ternary',
+    'prefer_compact_class_members',
+    'prefer_compact_declarations',
+    'prefer_concatenation_over_interpolation',
+    'prefer_concise_variable_names',
+    'prefer_constructor_assertion',
+    'prefer_constructor_body_assignment',
+    'prefer_container_over_sizedbox',
+    'prefer_curly_apostrophe',
+    'prefer_default_enum_case',
+    'prefer_descriptive_bool_names_strict',
+    'prefer_descriptive_variable_names',
+    'prefer_dot_shorthand',
+    'prefer_dynamic_over_object',
+    'prefer_edgeinsets_only',
+    'prefer_edgeinsets_symmetric',
+    'prefer_exhaustive_enums',
+    'prefer_expanded_over_flexible',
+    'prefer_explicit_boolean_comparison',
+    'prefer_explicit_colors',
+    'prefer_explicit_null_assignment',
+    'prefer_explicit_types',
+    'prefer_factory_for_validation',
+    'prefer_fake_over_mock',
+    'prefer_fields_before_methods',
+    'prefer_flexible_over_expanded',
+    'prefer_future_void_function_over_async_callback',
+    'prefer_generic_exception',
+    'prefer_given_when_then_comments',
+    'prefer_grouped_by_purpose',
+    'prefer_grouped_expectations',
+    'prefer_guard_clauses',
+    'prefer_if_null_over_ternary',
+    'prefer_implicit_boolean_comparison',
+    'prefer_initializing_formals',
+    'prefer_interpolation_over_concatenation',
+    'prefer_keys_with_lookup',
+    'prefer_late_over_nullable',
+    'prefer_lower_camel_case_constants',
+    'prefer_map_entries_iteration',
+    'prefer_material_theme_colors',
+    'prefer_methods_before_fields',
+    'prefer_no_blank_line_before_return',
+    'prefer_no_blank_line_inside_blocks',
+    'prefer_null_aware_assignment',
+    'prefer_nullable_over_late',
+    'prefer_object_over_dynamic',
+    'prefer_on_over_catch',
+    'prefer_positive_conditions',
+    'prefer_positive_conditions_first',
+    'prefer_required_before_optional',
+    'prefer_richtext_over_text_rich',
+    'prefer_screaming_case_constants',
+    'prefer_self_documenting_tests',
+    'prefer_single_blank_line_max',
+    'prefer_single_expectation_per_test',
+    'prefer_sizedbox_over_container',
+    'prefer_specific_exceptions',
+    'prefer_spread_over_addall',
+    'prefer_super_parameters',
+    'prefer_switch_statement',
+    'prefer_sync_over_async_where_possible',
+    'prefer_ternary_over_collection_if',
+    'prefer_ternary_over_if_null',
+    'prefer_test_data_builder',
+    'prefer_test_name_descriptive',
+    'prefer_test_name_should_when',
+    'prefer_text_rich_over_richtext',
+    'prefer_then_over_await',
+    'prefer_var_over_explicit_type',
+    'prefer_wheretype_over_where_is',
+  ],
+  'Control flow & collection style': <String>[
+    'prefer_early_return',
+    'prefer_mutable_collections',
+    'prefer_record_over_equatable',
+  ],
+};
+
 // ---------------------------------------------------------------------------
 // Tier functions - read directly from rule classes (single source of truth)
 // ---------------------------------------------------------------------------
@@ -500,12 +682,28 @@ Future<void> main(List<String> args) async {
   );
 
   if (overridesFile.existsSync()) {
-    permanentOverrides = _extractOverridesFromFile(overridesFile, allRules);
-    // Ensure max_issues setting exists in file (added in v4.9.1)
+    // Ensure all sections exist in the file
     _ensureMaxIssuesSetting(overridesFile);
-    // Ensure platforms setting exists in file
     _ensurePlatformsSetting(overridesFile);
+    _ensureStylisticRulesSection(overridesFile);
     platformSettings = _extractPlatformsFromFile(overridesFile);
+
+    // Extract overrides and partition stylistic from non-stylistic
+    final allOverrides = _extractOverridesFromFile(overridesFile, allRules);
+    for (final entry in allOverrides.entries) {
+      if (tiers.stylisticRules.contains(entry.key)) {
+        // Stylistic overrides apply on top of --stylistic flag
+        if (entry.value) {
+          finalEnabled = finalEnabled.union(<String>{entry.key});
+          finalDisabled = finalDisabled.difference(<String>{entry.key});
+        } else {
+          finalEnabled = finalEnabled.difference(<String>{entry.key});
+          finalDisabled = finalDisabled.union(<String>{entry.key});
+        }
+      } else {
+        permanentOverrides[entry.key] = entry.value;
+      }
+    }
   } else {
     // Create the custom overrides file with a helpful header
     _createCustomOverridesFile(overridesFile);
@@ -798,7 +996,12 @@ Map<String, bool> _extractOverridesFromFile(File file, Set<String> allRules) {
 }
 
 /// Create the analysis_options_custom.yaml file with a helpful header.
+///
+/// Includes the STYLISTIC RULES section with all opinionated rules
+/// defaulting to false, organized by category.
 void _createCustomOverridesFile(File file) {
+  final stylisticSection = _buildStylisticSection();
+
   final content = '''
 # ╔═══════════════════════════════════════════════════════════════════════════╗
 # ║                    SAROPA LINTS CUSTOM CONFIG                             ║
@@ -837,7 +1040,7 @@ platforms:
   windows: false
   linux: false
 
-# ─────────────────────────────────────────────────────────────────────────────
+$stylisticSection# ─────────────────────────────────────────────────────────────────────────────
 # RULE OVERRIDES
 # ─────────────────────────────────────────────────────────────────────────────
 # FORMAT: rule_name: true/false
@@ -954,6 +1157,224 @@ platforms:
   file.writeAsStringSync(newContent);
   _logTerminal(
       '${_Colors.green}✓ Added platforms setting to ${file.path}${_Colors.reset}');
+}
+
+/// Builds the STYLISTIC RULES section content for analysis_options_custom.yaml.
+///
+/// Lists all stylistic rules organized by category with problem message
+/// comments. Preserves existing true/false values from [existingValues].
+/// Skips rules in [skipRules] (found elsewhere in the file).
+/// New rules default to `false`.
+String _buildStylisticSection({
+  Map<String, bool> existingValues = const <String, bool>{},
+  Set<String> skipRules = const <String>{},
+}) {
+  final buffer = StringBuffer();
+  buffer.writeln(
+      '# ─────────────────────────────────────────────────────────────────────────────');
+  buffer.writeln('# STYLISTIC RULES');
+  buffer.writeln(
+      '# ─────────────────────────────────────────────────────────────────────────────');
+  buffer.writeln(
+      '# Opinionated formatting, ordering, and naming convention rules.');
+  buffer.writeln(
+      '# These are NOT included in any tier - enable the ones that match your style.');
+  buffer.writeln('# Set to true to enable, false to disable.');
+  buffer.writeln('#');
+  buffer.writeln('# NOTE: Some rules conflict (e.g., prefer_single_quotes vs');
+  buffer.writeln(
+      '# prefer_double_quotes). Only enable one from each conflicting group.');
+  buffer.writeln('');
+
+  final categorizedRules = <String>{};
+
+  for (final entry in _stylisticRuleCategories.entries) {
+    final category = entry.key;
+    final rules = entry.value;
+
+    // Filter out skipped rules
+    final activeRules = rules.where((r) => !skipRules.contains(r)).toList();
+    if (activeRules.isEmpty) continue;
+
+    buffer.writeln('# --- $category ---');
+    for (final rule in activeRules) {
+      final enabled = existingValues[rule] ?? false;
+      final msg = _getProblemMessage(rule);
+      final comment = msg.isNotEmpty ? '  # $msg' : '';
+      buffer.writeln('$rule: $enabled$comment');
+      categorizedRules.add(rule);
+    }
+    buffer.writeln('');
+  }
+
+  // Add any uncategorized stylistic rules (safety net for new rules)
+  final uncategorized = tiers.stylisticRules
+      .difference(categorizedRules)
+      .difference(skipRules)
+      .toList()
+    ..sort();
+
+  if (uncategorized.isNotEmpty) {
+    buffer.writeln('# --- Other stylistic rules ---');
+    for (final rule in uncategorized) {
+      final enabled = existingValues[rule] ?? false;
+      final msg = _getProblemMessage(rule);
+      final comment = msg.isNotEmpty ? '  # $msg' : '';
+      buffer.writeln('$rule: $enabled$comment');
+    }
+    buffer.writeln('');
+  }
+
+  return buffer.toString();
+}
+
+/// Regex matching the STYLISTIC RULES section header.
+final RegExp _stylisticSectionHeader =
+    RegExp(r'# STYLISTIC RULES\s*\n', multiLine: true);
+
+/// Regex matching the RULE OVERRIDES section header.
+final RegExp _ruleOverridesSectionHeader =
+    RegExp(r'# RULE OVERRIDES\s*\n', multiLine: true);
+
+/// Ensure stylistic rules section exists and is complete in the custom
+/// config file. Adds missing rules, preserves existing true/false values.
+/// Skips rules that appear in the RULE OVERRIDES section.
+void _ensureStylisticRulesSection(File file) {
+  final content = file.readAsStringSync();
+
+  // Find rules in the RULE OVERRIDES section (to skip them)
+  final rulesInOverrides = _extractRulesInOverridesSection(content);
+  final skipRules = rulesInOverrides.intersection(tiers.stylisticRules);
+
+  // Check if STYLISTIC RULES section exists
+  final sectionMatch = _stylisticSectionHeader.firstMatch(content);
+
+  if (sectionMatch == null) {
+    // No section yet - insert after platforms section, before RULE OVERRIDES
+    final newSection = _buildStylisticSection(skipRules: skipRules);
+    final insertContent = '\n$newSection';
+
+    // Find insertion point: before RULE OVERRIDES header
+    final overridesHeaderMatch = RegExp(
+      r'# ─+\n# RULE OVERRIDES',
+      multiLine: true,
+    ).firstMatch(content);
+
+    String newContent;
+    if (overridesHeaderMatch != null) {
+      newContent = content.substring(0, overridesHeaderMatch.start) +
+          insertContent +
+          content.substring(overridesHeaderMatch.start);
+    } else {
+      // No RULE OVERRIDES section, append before end
+      newContent = content + insertContent;
+    }
+
+    file.writeAsStringSync(newContent);
+    _logTerminal(
+        '${_Colors.green}✓ Added stylistic rules section to ${file.path}${_Colors.reset}');
+    return;
+  }
+
+  // Section exists - parse existing values and rebuild
+  final existingValues = _extractStylisticSectionValues(content);
+  final newSection = _buildStylisticSection(
+    existingValues: existingValues,
+    skipRules: skipRules,
+  );
+
+  // Find section boundaries
+  final sectionStart = _findStylisticSectionStart(content);
+  final sectionEnd = _findStylisticSectionEnd(content, sectionStart);
+
+  final newContent = content.substring(0, sectionStart) +
+      newSection +
+      content.substring(sectionEnd);
+
+  file.writeAsStringSync(newContent);
+}
+
+/// Find the start of the STYLISTIC RULES section (including the divider).
+int _findStylisticSectionStart(String content) {
+  // Look for the divider line before "# STYLISTIC RULES"
+  final match = RegExp(
+    r'# ─+\n# STYLISTIC RULES',
+    multiLine: true,
+  ).firstMatch(content);
+  return match?.start ?? content.length;
+}
+
+/// Find the end of the STYLISTIC RULES section.
+/// Ends at the next section divider or end of file.
+int _findStylisticSectionEnd(String content, int sectionStart) {
+  // Find the next section header (─── divider) after the STYLISTIC RULES
+  // header itself. Skip the first two divider lines (the section's own header).
+  final afterHeader = content.indexOf('\n', sectionStart);
+  if (afterHeader == -1) return content.length;
+
+  // Skip past the "# STYLISTIC RULES" line and its closing divider
+  final afterSectionHeader =
+      _stylisticSectionHeader.firstMatch(content.substring(afterHeader));
+  final searchFrom = afterSectionHeader != null
+      ? afterHeader + afterSectionHeader.end
+      : afterHeader;
+
+  final nextDivider = RegExp(
+    r'\n# ─+\n# ',
+    multiLine: true,
+  ).firstMatch(content.substring(searchFrom));
+
+  if (nextDivider != null) {
+    return searchFrom + nextDivider.start + 1; // +1 for the leading \n
+  }
+  return content.length;
+}
+
+/// Extract rule name → enabled values from the STYLISTIC RULES section only.
+Map<String, bool> _extractStylisticSectionValues(String content) {
+  final values = <String, bool>{};
+
+  final sectionStart = _findStylisticSectionStart(content);
+  final sectionEnd = _findStylisticSectionEnd(content, sectionStart);
+  final sectionContent = content.substring(sectionStart, sectionEnd);
+
+  final rulePattern = RegExp(
+    r'^([\w_]+):\s*(true|false)',
+    multiLine: true,
+  );
+
+  for (final match in rulePattern.allMatches(sectionContent)) {
+    final ruleName = match.group(1)!;
+    final enabled = match.group(2) == 'true';
+    if (tiers.stylisticRules.contains(ruleName)) {
+      values[ruleName] = enabled;
+    }
+  }
+
+  return values;
+}
+
+/// Extract rule names from the RULE OVERRIDES section.
+Set<String> _extractRulesInOverridesSection(String content) {
+  final rules = <String>{};
+
+  final sectionMatch = _ruleOverridesSectionHeader.firstMatch(content);
+  if (sectionMatch == null) return rules;
+
+  // Content after the RULE OVERRIDES header until end of file
+  // (it's the last section)
+  final afterSection = content.substring(sectionMatch.end);
+
+  final rulePattern = RegExp(
+    r'^([\w_]+):\s*(true|false)',
+    multiLine: true,
+  );
+
+  for (final match in rulePattern.allMatches(afterSection)) {
+    rules.add(match.group(1)!);
+  }
+
+  return rules;
 }
 
 /// Extract platform settings from analysis_options_custom.yaml.

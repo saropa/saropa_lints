@@ -211,6 +211,23 @@ class _GoodGlobalKeyWidgetState extends State<GoodGlobalKeyWidget> {
   Widget build(BuildContext context) => Container();
 }
 
+// GOOD: GlobalKey passed as constructor parameter (pass-through from parent)
+class GoodPassThroughGlobalKeyWidget extends StatefulWidget {
+  const GoodPassThroughGlobalKeyWidget({this.navKey, super.key});
+
+  final GlobalKey<State<StatefulWidget>>? navKey; // Not owned here
+
+  @override
+  State<GoodPassThroughGlobalKeyWidget> createState() =>
+      _GoodPassThroughGlobalKeyWidgetState();
+}
+
+class _GoodPassThroughGlobalKeyWidgetState
+    extends State<GoodPassThroughGlobalKeyWidget> {
+  @override
+  Widget build(BuildContext context) => Container();
+}
+
 // BAD: Static router config
 class AppRouter {
   // expect_lint: avoid_static_route_config

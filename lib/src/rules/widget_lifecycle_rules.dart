@@ -388,7 +388,7 @@ class AvoidMountedInSetStateRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_mounted_in_setstate',
     problemMessage:
-        '[avoid_mounted_in_setstate] Checking the mounted property inside a setState callback is an anti-pattern. If the widget is not mounted, setState should not be called at all. Placing the check inside the callback can lead to subtle bugs and unnecessary state updates, as the widget’s lifecycle should be validated before attempting to update state.',
+        '[avoid_mounted_in_setstate] Checking the mounted property inside a setState callback is an anti-pattern. If the widget is not mounted, setState should not be called at all. Placing the check inside the callback can lead to subtle bugs where partial state updates execute before the mounted check runs.',
     correctionMessage:
         'Always check if the widget is mounted before calling setState, not inside the callback. This ensures state updates are only triggered when the widget is in the tree, preventing runtime errors and unexpected behavior. See Flutter documentation on widget lifecycle and setState usage.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -1643,6 +1643,11 @@ class NullifyAfterDisposeRule extends SaropaLintRule {
         return;
       }
 
+      // Skip if the field is reassigned after cancel (debounce/reset pattern)
+      if (_isReassignedAfter(containingBlock, parent, fieldName)) {
+        return;
+      }
+
       // Report the issue
       reporter.atNode(node, code);
     });
@@ -1741,6 +1746,43 @@ class NullifyAfterDisposeRule extends SaropaLintRule {
           if (leftSide is SimpleIdentifier &&
               leftSide.name == fieldName &&
               rightSide is NullLiteral) {
+            return true;
+          }
+        }
+      }
+    }
+
+    return false;
+  }
+
+  /// Check if the field is reassigned after the given statement
+  /// (e.g., debounce pattern: cancel then create new Timer)
+  bool _isReassignedAfter(
+    Block block,
+    ExpressionStatement disposeStatement,
+    String fieldName,
+  ) {
+    bool foundDisposeStatement = false;
+
+    for (final Statement statement in block.statements) {
+      if (statement == disposeStatement) {
+        foundDisposeStatement = true;
+        continue;
+      }
+
+      if (!foundDisposeStatement) {
+        continue;
+      }
+
+      // Look for reassignment: fieldName = <something>
+      if (statement is ExpressionStatement) {
+        final Expression expression = statement.expression;
+        if (expression is AssignmentExpression) {
+          final Expression leftSide = expression.leftHandSide;
+
+          if (leftSide is SimpleIdentifier &&
+              leftSide.name == fieldName &&
+              expression.rightHandSide is! NullLiteral) {
             return true;
           }
         }
@@ -1953,9 +1995,9 @@ class AlwaysRemoveListenerRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'always_remove_listener',
     problemMessage:
-        '[always_remove_listener] Listener added but may not be removed.',
-    correctionMessage: 'Ensure the listener is removed in dispose() '
-        'to prevent memory leaks.',
+        '[always_remove_listener] Listener added via addListener() but no matching removeListener() call found in dispose(). Orphaned listeners retain references to the widget, preventing garbage collection and causing memory leaks that accumulate as users navigate between screens.',
+    correctionMessage:
+        'Call removeListener() in the dispose() method for every addListener() call to release references and prevent memory leaks.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -2101,9 +2143,9 @@ class RequireAnimationDisposalRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_animation_disposal',
     problemMessage:
-        '[require_animation_disposal] Failing to dispose an AnimationController in the dispose() method causes it to retain resources, listeners, and animation frames, resulting in memory leaks and degraded performance. This is especially problematic in widgets that are frequently created and destroyed, such as in lists or navigation stacks, and can lead to app instability or crashes. Proper disposal is required for robust Flutter apps.',
+        '[require_animation_disposal] Failing to dispose an AnimationController in the dispose() method causes it to retain resources, listeners, and animation frames, resulting in memory leaks and degraded performance. This is especially problematic in widgets that are frequently created and destroyed, such as in lists or navigation stacks, and can lead to app instability or crashes. Dispose every AnimationController to keep Flutter apps robust.',
     correctionMessage:
-        'Always call _controller.dispose() in your widget’s dispose() method before calling super.dispose(). This ensures all resources are released and prevents memory leaks. Audit your codebase for all AnimationController instances and verify they are disposed properly. Document this requirement in your team’s Flutter best practices.',
+        "Call _controller.dispose() in your widget's dispose() method before calling super.dispose(). This releases all resources and prevents memory leaks. Audit your codebase for all AnimationController instances and verify each one is disposed.",
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -2482,8 +2524,9 @@ class AvoidInheritedWidgetInInitStateRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_inherited_widget_in_initstate',
     problemMessage:
-        '[avoid_inherited_widget_in_initstate] Avoid accessing InheritedWidget in initState.',
-    correctionMessage: 'Use didChangeDependencies instead.',
+        '[avoid_inherited_widget_in_initstate] InheritedWidget accessed in initState(), where the widget is not yet fully mounted in the element tree. This call returns stale or missing data and does not subscribe to updates, so the widget never rebuilds when the inherited value changes.',
+    correctionMessage:
+        'Move the InheritedWidget lookup to didChangeDependencies(), which runs after initState and re-runs whenever dependencies change.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -2563,8 +2606,9 @@ class AvoidRecursiveWidgetCallsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_recursive_widget_calls',
     problemMessage:
-        '[avoid_recursive_widget_calls] Widget creates instance of itself, causing infinite recursion.',
-    correctionMessage: 'Remove the recursive widget instantiation.',
+        '[avoid_recursive_widget_calls] Widget build method creates a new instance of itself, triggering infinite recursion. This crashes the app with a stack overflow as Flutter repeatedly builds the same widget, consuming all available stack frames within milliseconds.',
+    correctionMessage:
+        'Extract the repeated content into a separate widget class, or add a depth-limiting condition to terminate the recursion.',
     errorSeverity: DiagnosticSeverity.ERROR,
   );
 
@@ -2647,8 +2691,9 @@ class AvoidUndisposedInstancesRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_undisposed_instances',
     problemMessage:
-        '[avoid_undisposed_instances] Disposable instance may not be properly disposed.',
-    correctionMessage: 'Call dispose() in the dispose method.',
+        '[avoid_undisposed_instances] Disposable object (e.g., TextEditingController, AnimationController, StreamController) created but no matching dispose() call found. Undisposed instances retain listeners, streams, and platform resources, causing memory leaks that grow with each widget rebuild or navigation.',
+    correctionMessage:
+        'Call dispose() on the instance inside the State.dispose() method before calling super.dispose() to release all held resources.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -3127,9 +3172,9 @@ class PassExistingStreamToStreamBuilderRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'pass_existing_stream_to_stream_builder',
     problemMessage:
-        '[pass_existing_stream_to_stream_builder] Creating new Stream in StreamBuilder causes rebuilds.',
+        '[pass_existing_stream_to_stream_builder] New Stream created inline in the StreamBuilder constructor. Every build() call creates a fresh stream, discarding the previous subscription and triggering an infinite rebuild loop as each new stream emits its initial value.',
     correctionMessage:
-        'Store the Stream in a field and pass it to the builder.',
+        'Store the Stream in a field (e.g., a late final or a State variable initialized in initState) and pass the stored reference to StreamBuilder.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -3189,9 +3234,9 @@ class RequireScrollControllerDisposeRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_scroll_controller_dispose',
     problemMessage:
-        '[require_scroll_controller_dispose] ScrollController is not disposed. This causes memory leaks.',
+        '[require_scroll_controller_dispose] ScrollController created but not disposed. Undisposed scroll controllers retain listeners and scroll position state, causing memory leaks that accumulate as users navigate between screens with scrollable content.',
     correctionMessage:
-        'Add _controller.dispose() in the dispose() method before super.dispose().',
+        'Add _controller.dispose() in the State.dispose() method before calling super.dispose() to release scroll position listeners and resources.',
     errorSeverity: DiagnosticSeverity.ERROR,
   );
 
@@ -3414,9 +3459,9 @@ class RequireFocusNodeDisposeRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_focus_node_dispose',
     problemMessage:
-        '[require_focus_node_dispose] FocusNode is not disposed. This causes memory leaks.',
+        '[require_focus_node_dispose] FocusNode created but not disposed. Undisposed focus nodes retain listeners and focus tree references, causing memory leaks and stale focus behavior that accumulates as users navigate between screens with form inputs.',
     correctionMessage:
-        'Add _focusNode.dispose() in the dispose() method before super.dispose().',
+        'Add _focusNode.dispose() in the State.dispose() method before calling super.dispose() to release focus tree references and listeners.',
     errorSeverity: DiagnosticSeverity.ERROR,
   );
 
@@ -4037,10 +4082,12 @@ class _DialogInInitStateVisitor extends RecursiveAstVisitor<void> {
 // avoid_global_keys_in_state
 // =============================================================================
 
-/// GlobalKey fields in StatefulWidget persist across hot reload.
+/// GlobalKey fields created in StatefulWidget persist across hot reload.
 ///
 /// GlobalKeys are expensive and persist state across hot reloads, which can
-/// cause unexpected behavior during development.
+/// cause unexpected behavior during development. However, GlobalKey fields
+/// received as constructor parameters (pass-through references) are fine
+/// since the parent manages the key's lifecycle.
 ///
 /// **BAD:**
 /// ```dart
@@ -4053,6 +4100,14 @@ class _DialogInInitStateVisitor extends RecursiveAstVisitor<void> {
 /// ```dart
 /// class _MyWidgetState extends State<MyWidget> {
 ///   final _formKey = GlobalKey<FormState>();  // Created in State
+/// }
+/// ```
+///
+/// **ALSO GOOD** (pass-through from parent):
+/// ```dart
+/// class NavIcon extends StatefulWidget {
+///   const NavIcon({this.navKey});
+///   final GlobalKey<State<StatefulWidget>>? navKey;  // Not owned here
 /// }
 /// ```
 
@@ -4093,12 +4148,38 @@ class AvoidGlobalKeysInStateRule extends SaropaLintRule {
       final String superclass = extendsClause.superclass.toSource();
       if (!superclass.contains('StatefulWidget')) return;
 
-      // Check fields for GlobalKey
+      // Collect field names set via constructor parameters (this.xxx).
+      // These are pass-through references from the parent, not keys
+      // created by this widget, so they should not be flagged.
+      final Set<String> constructorFieldParams = <String>{};
+      for (final ClassMember member in node.members) {
+        if (member is ConstructorDeclaration) {
+          for (final FormalParameter param in member.parameters.parameters) {
+            final FormalParameter effectiveParam =
+                param is DefaultFormalParameter ? param.parameter : param;
+            if (effectiveParam is FieldFormalParameter) {
+              final Token? name = effectiveParam.name;
+              if (name != null) {
+                constructorFieldParams.add(name.lexeme);
+              }
+            }
+          }
+        }
+      }
+
+      // Check fields for GlobalKey, skip constructor parameters
       for (final ClassMember member in node.members) {
         if (member is FieldDeclaration) {
           final TypeAnnotation? type = member.fields.type;
           if (type != null && type.toSource().contains('GlobalKey')) {
-            reporter.atNode(member, code);
+            // Skip if all variables are constructor parameters
+            final bool isPassThrough = member.fields.variables.every(
+              (VariableDeclaration v) =>
+                  constructorFieldParams.contains(v.name.lexeme),
+            );
+            if (!isPassThrough) {
+              reporter.atNode(member, code);
+            }
           }
         }
       }

@@ -1458,7 +1458,7 @@ class PreferFutureVoidFunctionOverAsyncCallbackRule extends SaropaLintRule {
     problemMessage:
         '[prefer_future_void_function_over_async_callback] Prefer explicit Future<void> Function() instead of AsyncCallback.',
     correctionMessage:
-        'Use Future<void> Function() to avoid Flutter-specific type dependencies.',
+        'Use Future<void> Function() instead of AsyncCallback to keep the signature framework-agnostic and self-documenting.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
