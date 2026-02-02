@@ -30,6 +30,24 @@ def get_version_from_pubspec(pubspec_path: Path) -> str:
     return match.group(1)
 
 
+def _parse_version(version: str) -> tuple[int, ...]:
+    """Parse a version string into a comparable tuple."""
+    return tuple(int(x) for x in version.split("."))
+
+
+def set_version_in_pubspec(pubspec_path: Path, new_version: str) -> None:
+    """Write a new version string into pubspec.yaml."""
+    content = pubspec_path.read_text(encoding="utf-8")
+    updated = re.sub(
+        r"^(version:\s*)\d+\.\d+\.\d+",
+        rf"\g<1>{new_version}",
+        content,
+        count=1,
+        flags=re.MULTILINE,
+    )
+    pubspec_path.write_text(updated, encoding="utf-8")
+
+
 def get_package_name(pubspec_path: Path) -> str:
     """Read package name from pubspec.yaml."""
     content = pubspec_path.read_text(encoding="utf-8")

@@ -1740,17 +1740,21 @@ class CheckMountedAfterAsyncRule extends SaropaLintRule {
   }
 
   bool _hasAwaitBefore(FunctionBody body, AstNode target) {
-    final String bodySource = body.toSource();
-    final int targetOffset = target.offset - body.offset;
+    bool foundAwait = false;
+    bool reachedTarget = false;
 
-    // Ensure we don't exceed the string bounds - toSource() may produce
-    // a different length string than the original source
-    if (targetOffset <= 0 || targetOffset > bodySource.length) {
-      return bodySource.contains('await ');
-    }
+    body.visitChildren(_AwaitBeforeChecker((AwaitExpression awaitNode) {
+      if (reachedTarget) return;
+      if (awaitNode.offset < target.offset) {
+        // Skip the target's own await (e.g., `await showDialog(...)`)
+        if (awaitNode.expression == target) return;
+        foundAwait = true;
+      }
+    }, () {
+      reachedTarget = true;
+    }, target));
 
-    final String beforeTarget = bodySource.substring(0, targetOffset);
-    return beforeTarget.contains('await ');
+    return foundAwait;
   }
 
   bool _hasMountedGuard(FunctionBody body, AstNode target) {

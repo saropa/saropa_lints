@@ -386,7 +386,7 @@ String _getStylisticDescription(String ruleName) {
   return '$problem $correction';
 }
 
-/// Remove rule name prefix if present (e.g., "[rule_name] ...").
+/// Remove rule name prefix if present (e.g., "`rule_name` ...").
 String _stripRulePrefix(String msg) {
   final prefixMatch = RegExp(r'^\[[\w_]+\]\s*').firstMatch(msg);
   if (prefixMatch != null) {
