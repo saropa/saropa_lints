@@ -12,6 +12,7 @@ import 'package:analyzer/error/error.dart'
 import 'package:custom_lint_builder/custom_lint_builder.dart';
 
 import '../saropa_lint_rule.dart';
+import '../type_annotation_utils.dart';
 
 /// Warns when VideoPlayerController or AudioPlayer is not disposed.
 ///
@@ -1132,9 +1133,11 @@ class _AddStreamSubscriptionCancelFix extends DartFix {
       // Find all subscription fields
       for (final ClassMember member in node.members) {
         if (member is FieldDeclaration) {
-          final String? typeName = member.fields.type?.toString();
+          final TypeAnnotation? fieldType = member.fields.type;
+          final String? typeName = fieldType?.toString();
           if (typeName != null && typeName.contains('StreamSubscription')) {
-            final bool isNullable = typeName.endsWith('?');
+            final bool isNullable =
+                fieldType != null && isOuterTypeNullable(fieldType);
             final bool isCollection = _isCollectionType(typeName);
 
             for (final VariableDeclaration variable

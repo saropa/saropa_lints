@@ -7,6 +7,7 @@ import 'package:analyzer/source/source_range.dart';
 import 'package:custom_lint_builder/custom_lint_builder.dart';
 
 import '../saropa_lint_rule.dart';
+import '../type_annotation_utils.dart';
 
 // =============================================================================
 // Shared Utilities
@@ -1291,23 +1292,23 @@ class RequireCopyWithNullHandlingRule extends SaropaLintRule {
       final Set<String> nullableParams = <String>{};
       for (final FormalParameter param in params.parameters) {
         String? paramName;
-        String? typeSource;
+        TypeAnnotation? paramType;
 
         if (param is DefaultFormalParameter) {
           final NormalFormalParameter inner = param.parameter;
           if (inner is SimpleFormalParameter) {
             paramName = inner.name?.lexeme;
-            typeSource = inner.type?.toSource();
+            paramType = inner.type;
           }
         } else if (param is SimpleFormalParameter) {
           paramName = param.name?.lexeme;
-          typeSource = param.type?.toSource();
+          paramType = param.type;
         }
 
-        // Check if type is nullable (ends with ?)
+        // Check if outer type is nullable via AST question token
         if (paramName != null &&
-            typeSource != null &&
-            typeSource.endsWith('?')) {
+            paramType != null &&
+            isOuterTypeNullable(paramType)) {
           nullableParams.add(paramName);
         }
       }

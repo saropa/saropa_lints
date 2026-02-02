@@ -13,6 +13,7 @@ import 'package:analyzer/error/error.dart'
 import 'package:custom_lint_builder/custom_lint_builder.dart';
 
 import '../saropa_lint_rule.dart';
+import '../type_annotation_utils.dart';
 
 // =============================================================================
 // Shared Utilities
@@ -1001,8 +1002,8 @@ class RequireHiveFieldDefaultValueRule extends SaropaLintRule {
       final TypeAnnotation? type = node.fields.type;
       if (type == null) return;
 
-      final String typeSource = type.toSource();
-      if (!typeSource.endsWith('?')) return;
+      // Check if outer type is nullable
+      if (!isOuterTypeNullable(type)) return;
 
       // Check if defaultValue is provided
       final ArgumentList? args = hiveFieldAnnotation.arguments;
@@ -1217,19 +1218,12 @@ class RequireHiveNestedObjectAdapterRule extends SaropaLintRule {
       final TypeAnnotation? type = node.fields.type;
       if (type == null) return;
 
-      String typeSource = type.toSource();
-      // Remove nullability suffix
-      if (typeSource.endsWith('?')) {
-        typeSource = typeSource.substring(0, typeSource.length - 1);
-      }
-
-      // Skip generic types like List<T>, Map<K, V>
-      if (typeSource.contains('<')) {
-        typeSource = typeSource.substring(0, typeSource.indexOf('<'));
-      }
+      // Extract base type name via AST for reliable primitive check
+      if (type is! NamedType) return;
+      final String baseType = type.name.lexeme;
 
       // If it's not a primitive, warn
-      if (!_primitiveTypes.contains(typeSource)) {
+      if (!_primitiveTypes.contains(baseType)) {
         reporter.atNode(node, code);
       }
     });
