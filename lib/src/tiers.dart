@@ -51,6 +51,7 @@ const Set<String> stylisticRules = <String>{
   'avoid_parameter_reassignment',
 
   // === Widget style ===
+  'avoid_shrink_wrap_in_scroll',
   'prefer_one_widget_per_file',
   'prefer_widget_methods_over_classes',
   'prefer_borderradius_circular',
@@ -108,6 +109,8 @@ const Set<String> stylisticRules = <String>{
   'prefer_blank_lines_between_members',
   'prefer_cascade_over_chained',
   'prefer_chained_over_cascade',
+  'prefer_clip_r_superellipse',
+  'prefer_clip_r_superellipse_clipper',
   'prefer_collection_if_over_ternary',
   'prefer_compact_class_members',
   'prefer_compact_declarations',
@@ -1099,7 +1102,6 @@ const Set<String> recommendedOnlyRules = <String>{
   'avoid_layout_builder_in_scrollable', // INFO - layout builder misuse
   'avoid_nested_providers', // INFO - provider nesting
   'avoid_opacity_misuse', // INFO - opacity performance
-  'avoid_shrink_wrap_in_scroll', // INFO - shrinkWrap performance
   'avoid_unbounded_constraints', // INFO - constraint issues
   'avoid_unconstrained_box_misuse', // INFO - UnconstrainedBox misuse
 
