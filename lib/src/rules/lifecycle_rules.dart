@@ -456,3 +456,135 @@ class RequireLateInitializationInInitStateRule extends SaropaLintRule {
     }
   }
 }
+
+/// Warns when State subclasses use Timer or stream subscriptions without
+/// lifecycle handling.
+///
+/// Timer.periodic, Timer() constructor, and .listen() calls in State
+/// subclasses should have corresponding lifecycle handling to pause or
+/// stop background work when the app is not active.
+///
+/// **Note:** StreamBuilder is intentionally not flagged. Flutter's
+/// StreamBuilder manages its own subscription lifecycle through
+/// State.dispose(), so it does not require manual lifecycle handling.
+///
+/// ## Lifecycle Methods
+///
+/// - WidgetsBindingObserver: didChangeAppLifecycleState
+/// - AppLifecycleListener: onStateChange
+///
+/// **Bad:**
+/// ```dart
+/// class _MyState extends State<MyWidget> {
+///   Timer? _timer;
+///   void initState() {
+///     super.initState();
+///     _timer = Timer.periodic(Duration(seconds: 1), (_) => refresh());
+///   }
+/// }
+/// ```
+///
+/// **Good:**
+/// ```dart
+/// class _MyState extends State<MyWidget> with WidgetsBindingObserver {
+///   Timer? _timer;
+///   void didChangeAppLifecycleState(AppLifecycleState state) {
+///     if (state == AppLifecycleState.paused) _timer?.cancel();
+///     else if (state == AppLifecycleState.resumed) _startTimer();
+///   }
+/// }
+/// ```
+class RequireAppLifecycleHandlingRule extends SaropaLintRule {
+  /// Creates a new instance of [RequireAppLifecycleHandlingRule].
+  const RequireAppLifecycleHandlingRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  @override
+  bool get requiresWidgets => true;
+
+  @override
+  List<String> get configAliases =>
+      const <String>['require_ios_lifecycle_handling'];
+
+  static const LintCode _code = LintCode(
+    name: 'require_app_lifecycle_handling',
+    problemMessage:
+        '[require_app_lifecycle_handling] Timer or subscription detected '
+        'without lifecycle handling. '
+        'Stop background work when app is inactive to save battery.',
+    correctionMessage: 'Implement WidgetsBindingObserver and pause/resume in '
+        'didChangeAppLifecycleState, or use AppLifecycleListener.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addClassDeclaration((ClassDeclaration node) {
+      if (!_extendsState(node)) return;
+      if (_hasLifecycleHandling(node)) return;
+      if (_hasBackgroundWork(node)) {
+        reporter.atToken(node.name, code);
+      }
+    });
+  }
+
+  static bool _extendsState(ClassDeclaration node) {
+    final ExtendsClause? extendsClause = node.extendsClause;
+    if (extendsClause == null) return false;
+    return extendsClause.superclass.name.lexeme == 'State';
+  }
+
+  static bool _hasLifecycleHandling(ClassDeclaration node) {
+    final WithClause? withClause = node.withClause;
+    if (withClause != null) {
+      for (final NamedType mixin in withClause.mixinTypes) {
+        if (mixin.name.lexeme == 'WidgetsBindingObserver') return true;
+      }
+    }
+
+    final ImplementsClause? implementsClause = node.implementsClause;
+    if (implementsClause != null) {
+      for (final NamedType interface in implementsClause.interfaces) {
+        if (interface.name.lexeme == 'WidgetsBindingObserver') return true;
+      }
+    }
+
+    for (final ClassMember member in node.members) {
+      if (member is MethodDeclaration &&
+          member.name.lexeme == 'didChangeAppLifecycleState') {
+        return true;
+      }
+      if (member is FieldDeclaration) {
+        final String? typeName = member.fields.type?.toSource();
+        if (typeName != null && typeName.contains('AppLifecycleListener')) {
+          return true;
+        }
+      }
+    }
+
+    return false;
+  }
+
+  static final RegExp _timerConstructorPattern = RegExp(r'\bTimer\(');
+
+  static bool _hasBackgroundWork(ClassDeclaration node) {
+    for (final ClassMember member in node.members) {
+      if (member is MethodDeclaration) {
+        final String bodySource = member.body.toSource();
+        if (bodySource.contains('Timer.periodic')) return true;
+        if (_timerConstructorPattern.hasMatch(bodySource)) return true;
+        if (bodySource.contains('.listen(')) return true;
+      }
+    }
+    return false;
+  }
+}

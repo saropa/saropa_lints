@@ -1877,7 +1877,7 @@ final List<LintRule Function()> _allRuleFactories = <LintRule Function()>[
   RequireIosOrientationHandlingRule.new,
   RequireIosPhotoLibraryLimitedAccessRule.new,
   AvoidIosContinuousLocationTrackingRule.new,
-  RequireIosLifecycleHandlingRule.new,
+  RequireAppLifecycleHandlingRule.new,
   RequireIosPromotionDisplaySupportRule.new,
   RequireIosPasteboardPrivacyHandlingRule.new,
   PreferIosStoreKit2Rule.new,
