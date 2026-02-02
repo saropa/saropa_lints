@@ -19,6 +19,8 @@ Dates are not included in version headers — [pub.dev](https://pub.dev/packages
 
 - **`avoid_nested_assignments` false positive on cascade expressions**: The rule flagged idiomatic Dart cascade property setters (`obj..field = value`) as nested assignments. In the AST, cascade sections are `AssignmentExpression` nodes with a `CascadeExpression` parent, which was not in the skip list. Added `CascadeExpression` parent check so cascades are correctly treated as safe sequential assignments.
 
+- **Audited all string-based nullability checks across 8 rule files**: Replaced fragile `toSource().endsWith('?')` patterns with AST-based `question` token checks in `dependency_injection_rules`, `equatable_rules`, `hive_rules`, `type_safety_rules`, `stylistic_null_collection_rules`, `disposal_rules`, and `async_rules`. Extracted shared `isOuterTypeNullable()` utility to `type_annotation_utils.dart`.
+
 ### Changed
 
 - **DX audit now enforces message length on opinionated rules**: The `_audit_dx.py` scoring previously skipped all length checks for `LintImpact.opinionated` rules (stylistic tier), allowing 30-50 character messages to score 100%. Added 100-character minimum threshold (-10 penalty). Also added "opinionated" to the per-impact breakdown display so these rules appear in the DX report alongside critical/high/medium/low.

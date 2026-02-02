@@ -8,6 +8,7 @@ import 'package:analyzer/source/source_range.dart';
 import 'package:custom_lint_builder/custom_lint_builder.dart';
 
 import '../saropa_lint_rule.dart';
+import '../type_annotation_utils.dart';
 
 // ============================================================================
 // STYLISTIC NULL HANDLING & COLLECTION RULES
@@ -464,9 +465,8 @@ class PreferLateOverNullableRule extends SaropaLintRule {
         final type = node.fields.type;
         if (type == null) continue;
 
-        // Check if type is nullable (ends with ?)
-        final typeStr = type.toString();
-        if (!typeStr.endsWith('?')) continue;
+        // Check if outer type is nullable via AST question token
+        if (!isOuterTypeNullable(type)) continue;
 
         // Skip if already late
         if (node.fields.lateKeyword != null) continue;
@@ -559,9 +559,8 @@ class _PreferNullableOverLateFix extends DartFix {
       final type = node.fields.type;
       if (type == null) return;
 
-      final typeStr = type.toSource();
       // Skip if already nullable
-      if (typeStr.endsWith('?')) return;
+      if (isOuterTypeNullable(type)) return;
 
       final changeBuilder = reporter.createChangeBuilder(
         message: 'Replace late with nullable type',

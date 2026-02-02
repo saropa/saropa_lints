@@ -11,6 +11,7 @@ import 'package:analyzer/error/error.dart'
 
 import '../ignore_utils.dart';
 import '../saropa_lint_rule.dart';
+import '../type_annotation_utils.dart';
 import 'package:custom_lint_builder/custom_lint_builder.dart';
 
 /// Warns against any usage of adjacent strings.
@@ -7692,7 +7693,7 @@ class AvoidLateForNullableRule extends SaropaLintRule {
       if (typeAnnotation == null) return;
 
       // Check outer type nullability via AST question token
-      if (_isOuterTypeNullable(typeAnnotation)) {
+      if (isOuterTypeNullable(typeAnnotation)) {
         reporter.atNode(node, code);
       }
     });
@@ -7705,30 +7706,12 @@ class AvoidLateForNullableRule extends SaropaLintRule {
       if (typeAnnotation == null) return;
 
       // Check outer type nullability via AST question token
-      if (_isOuterTypeNullable(typeAnnotation)) {
+      if (isOuterTypeNullable(typeAnnotation)) {
         for (final VariableDeclaration variable in variables.variables) {
           reporter.atNode(variable, code);
         }
       }
     });
-  }
-
-  /// Checks if the outer type itself is nullable (has a trailing `?`).
-  ///
-  /// Uses the AST `question` token rather than string matching to avoid
-  /// false positives when `?` appears only on inner generic parameters
-  /// (e.g. `Future<String?>` is non-nullable, `Future<String>?` is nullable).
-  static bool _isOuterTypeNullable(TypeAnnotation typeAnnotation) {
-    if (typeAnnotation is NamedType) {
-      return typeAnnotation.question != null;
-    }
-    if (typeAnnotation is GenericFunctionType) {
-      return typeAnnotation.question != null;
-    }
-    if (typeAnnotation is RecordTypeAnnotation) {
-      return typeAnnotation.question != null;
-    }
-    return false;
   }
 }
 
