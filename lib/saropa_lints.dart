@@ -1009,7 +1009,6 @@ final List<LintRule Function()> _allRuleFactories = <LintRule Function()>[
   PreferClipBehaviorRule.new,
   RequireScrollControllerRule.new,
   PreferPositionedDirectionalRule.new,
-  AvoidStackOverflowRule.new,
   RequireFormValidationRule.new,
 
   // High-impact rules (batch 4)
