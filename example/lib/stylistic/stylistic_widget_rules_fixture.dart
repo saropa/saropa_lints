@@ -1,5 +1,5 @@
 // ignore_for_file: unused_local_variable, prefer_const_constructors
-// ignore_for_file: avoid_unnecessary_containers
+// ignore_for_file: avoid_unnecessary_containers, prefer_clip_behavior
 
 import 'package:flutter/material.dart';
 
@@ -244,4 +244,64 @@ class ThemeColorsExamples extends StatelessWidget {
       ],
     );
   }
+}
+
+// =============================================================================
+// prefer_clip_r_superellipse / prefer_clip_r_superellipse_clipper
+// =============================================================================
+
+class ClipRSuperellipseExamples extends StatelessWidget {
+  const ClipRSuperellipseExamples({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        // BAD: ClipRRect without clipper (prefer_clip_r_superellipse)
+        // expect_lint: prefer_clip_r_superellipse
+        ClipRRect(
+          borderRadius: BorderRadius.circular(10),
+          child: Image.network('https://example.com/image.png'),
+        ),
+
+        // BAD: ClipRRect with only child (prefer_clip_r_superellipse)
+        // expect_lint: prefer_clip_r_superellipse
+        ClipRRect(
+          child: Image.network('https://example.com/image.png'),
+        ),
+
+        // BAD: ClipRRect with clipBehavior (prefer_clip_r_superellipse)
+        // expect_lint: prefer_clip_r_superellipse
+        ClipRRect(
+          borderRadius: BorderRadius.circular(10),
+          clipBehavior: Clip.antiAlias,
+          child: Image.network('https://example.com/image.png'),
+        ),
+
+        // GOOD: ClipRSuperellipse (already using preferred widget)
+        ClipRSuperellipse(
+          borderRadius: BorderRadius.circular(10),
+          child: Image.network('https://example.com/image.png'),
+        ),
+
+        // GOOD: ClipRRect with custom clipper (handled by _clipper rule)
+        // expect_lint: prefer_clip_r_superellipse_clipper
+        ClipRRect(
+          clipper: _MyCustomClipper(),
+          child: Image.network('https://example.com/image.png'),
+        ),
+      ],
+    );
+  }
+}
+
+class _MyCustomClipper extends CustomClipper<RRect> {
+  @override
+  RRect getClip(Size size) => RRect.fromRectAndRadius(
+        Offset.zero & size,
+        const Radius.circular(10),
+      );
+
+  @override
+  bool shouldReclip(covariant CustomClipper<RRect> oldClipper) => false;
 }

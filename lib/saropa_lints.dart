@@ -898,6 +898,8 @@ final List<LintRule Function()> _allRuleFactories = <LintRule Function()>[
   PreferFlexibleOverExpandedRule.new,
   PreferMaterialThemeColorsRule.new,
   PreferExplicitColorsRule.new,
+  PreferClipRSuperellipseRule.new,
+  PreferClipRSuperellipseClipperRule.new,
 
   // Null handling & collection stylistic rules (stylistic_null_collection_rules.dart)
   PreferNullAwareAssignmentRule.new,
