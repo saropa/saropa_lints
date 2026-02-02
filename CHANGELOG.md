@@ -11,7 +11,27 @@ Dates are not included in version headers — [pub.dev](https://pub.dev/packages
 ** See the current published changelog: [saropa_lints/changelog](https://pub.dev/packages/saropa_lints/changelog)
 
 ---
-## [4.9.13] - current
+## [4.9.14] - current
+
+### Added
+
+- **9 layout crash detection rules** (Essential tier): Static analysis for Flutter widget hierarchy errors that cause runtime crashes (Red Screen, assertion failures, unbounded constraints):
+  - `avoid_table_cell_outside_table` (ERROR) — TableCell outside Table causes ParentData crash
+  - `avoid_positioned_outside_stack` (ERROR) — Positioned outside Stack causes ParentData crash
+  - `avoid_spacer_in_wrap` (ERROR) — Spacer/Expanded/Flexible in Wrap causes flex paradox crash
+  - `avoid_scrollable_in_intrinsic` (ERROR) — scrollable in IntrinsicHeight/IntrinsicWidth causes geometry loop
+  - `require_baseline_text_baseline` (ERROR) — baseline alignment without textBaseline causes assertion failure; **quick fix**: adds `textBaseline: TextBaseline.alphabetic`
+  - `avoid_unconstrained_dialog_column` (WARNING) — Column in AlertDialog/SimpleDialog without `MainAxisSize.min` can overflow; **quick fix**: adds `mainAxisSize: MainAxisSize.min`
+  - `avoid_unbounded_listview_in_column` (ERROR) — ListView/GridView in Column without Expanded causes unbounded constraints crash; **quick fix**: wraps in `Expanded`
+  - `avoid_textfield_in_row` (ERROR) — TextField in Row without width constraint causes unbounded width crash; **quick fix**: wraps in `Expanded`
+  - `avoid_fixed_size_in_scaffold_body` (WARNING) — Scaffold body Column with TextField but no ScrollView causes keyboard overflow
+
+### Fixed
+
+- **`avoid_expanded_outside_flex` false positive with Wrap**: The rule included `Wrap` in its valid flex parent types, but Wrap does not extend Flex. Expanded/Flexible inside Wrap causes a ParentData crash. Removed `Wrap` from the accepted parent set.
+
+---
+## [4.9.13]
 
 ### Fixed
 

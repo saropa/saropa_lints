@@ -1739,6 +1739,15 @@ final List<LintRule Function()> _allRuleFactories = <LintRule Function()>[
   // Widget rules
   AvoidStackWithoutPositionedRule.new,
   AvoidExpandedOutsideFlexRule.new,
+  AvoidTableCellOutsideTableRule.new,
+  AvoidPositionedOutsideStackRule.new,
+  AvoidSpacerInWrapRule.new,
+  AvoidScrollableInIntrinsicRule.new,
+  RequireBaselineTextBaselineRule.new,
+  AvoidUnconstrainedDialogColumnRule.new,
+  AvoidUnboundedListviewInColumnRule.new,
+  AvoidTextfieldInRowRule.new,
+  AvoidFixedSizeInScaffoldBodyRule.new,
   PreferExpandedAtCallSiteRule.new,
 
   // =========================================================================

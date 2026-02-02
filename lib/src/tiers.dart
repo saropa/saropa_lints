@@ -467,6 +467,15 @@ const Set<String> essentialRules = <String>{
   'require_mock_http_client', // WARNING - test reliability
   'require_image_cache_dimensions', // WARNING - OOM prevention
   'avoid_expanded_outside_flex', // ERROR - runtime crash
+  'avoid_table_cell_outside_table', // ERROR - ParentData crash
+  'avoid_positioned_outside_stack', // ERROR - ParentData crash
+  'avoid_spacer_in_wrap', // ERROR - flex paradox crash
+  'avoid_scrollable_in_intrinsic', // ERROR - geometry loop crash
+  'require_baseline_text_baseline', // ERROR - assertion failure
+  'avoid_unconstrained_dialog_column', // WARNING - probable dialog overflow
+  'avoid_unbounded_listview_in_column', // ERROR - unbounded constraints crash
+  'avoid_textfield_in_row', // ERROR - unbounded width crash
+  'avoid_fixed_size_in_scaffold_body', // WARNING - probable keyboard overflow
 
   'require_test_widget_pump', // ERROR - flaky tests
   'require_hive_adapter_registration_order', // ERROR - runtime crash
