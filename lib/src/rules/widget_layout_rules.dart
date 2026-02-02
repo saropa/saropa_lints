@@ -6116,7 +6116,6 @@ class AvoidExpandedOutsideFlexRule extends SaropaLintRule {
     'Row',
     'Column',
     'Flex',
-    'Wrap',
   };
 
   static const Set<String> _flexChildTypes = <String>{
@@ -6693,3 +6692,1000 @@ class PreferCustomSingleChildLayoutRule extends SaropaLintRule {
 /// final date = DateFormat.yMd('en_US').format(now);
 /// names.sort((a, b) => a.compareTo(b)); // Or use explicit collation
 /// ```
+
+// =========================================================================
+// Shared helper: Widget ancestor walking
+// =========================================================================
+
+/// Result of searching for a widget ancestor in the AST.
+enum _AncestorResult {
+  /// Found the expected parent widget.
+  found,
+
+  /// Found a widget that breaks the expected relationship.
+  wrongParent,
+
+  /// Hit a boundary (method, variable, callback) -- cannot determine.
+  indeterminate,
+
+  /// Reached max depth or top of tree without finding anything.
+  notFound,
+}
+
+/// Walks up the AST from [startNode] looking for a parent widget whose
+/// constructor name is in [targetParents].
+///
+/// Returns [_AncestorResult.found] if a target parent is found.
+/// Returns [_AncestorResult.wrongParent] if a widget in [stopAt] is found
+/// before any target parent.
+/// Returns [_AncestorResult.indeterminate] at method/function/variable
+/// boundaries where the widget may be used correctly at the call site.
+_AncestorResult _findWidgetAncestor(
+  AstNode startNode, {
+  required Set<String> targetParents,
+  Set<String> stopAt = const <String>{},
+  int maxDepth = 20,
+}) {
+  AstNode? current = startNode.parent;
+  int depth = 0;
+
+  while (current != null && depth < maxDepth) {
+    // Stop at variable assignments -- can't track where value is used.
+    if (current is VariableDeclaration) return _AncestorResult.indeterminate;
+
+    // Trust return statements in helper methods (not build).
+    if (current is ReturnStatement) {
+      final method = current.thisOrAncestorOfType<MethodDeclaration>();
+      if (method != null && method.name.lexeme != 'build') {
+        return _AncestorResult.indeterminate;
+      }
+    }
+
+    // Trust collection-building patterns (.generate, .map).
+    if (current is MethodInvocation) {
+      final name = current.methodName.name;
+      if (name == 'generate' || name == 'map') {
+        return _AncestorResult.indeterminate;
+      }
+    }
+
+    // Trust callbacks in collection builders.
+    if (current is FunctionExpression) {
+      final feParent = current.parent;
+      if (feParent is ArgumentList) {
+        final grandparent = feParent.parent;
+        if (grandparent is MethodInvocation) {
+          final name = grandparent.methodName.name;
+          if (name == 'generate' || name == 'map') {
+            return _AncestorResult.indeterminate;
+          }
+        }
+      }
+    }
+
+    // Check widget constructors.
+    if (current is InstanceCreationExpression) {
+      final String parentType = current.constructorName.type.name.lexeme;
+      if (targetParents.contains(parentType)) return _AncestorResult.found;
+      if (stopAt.contains(parentType)) return _AncestorResult.wrongParent;
+    }
+
+    // Stop at method/function boundaries.
+    if (current is MethodDeclaration) {
+      if (current.name.lexeme != 'build') {
+        return _AncestorResult.indeterminate;
+      }
+      break;
+    }
+    if (current is FunctionDeclaration) return _AncestorResult.indeterminate;
+
+    current = current.parent;
+    depth++;
+  }
+
+  return _AncestorResult.notFound;
+}
+
+// =========================================================================
+// Rule: avoid_table_cell_outside_table
+// =========================================================================
+
+/// Warns when `TableCell` is used outside of a `Table` widget.
+///
+/// `TableCell` is a `ParentDataWidget` that requires a `Table` parent
+/// to provide the correct `TableCellParentData`. Using it elsewhere
+/// causes a ParentData crash at runtime.
+///
+/// **BAD:**
+/// ```dart
+/// Column(children: [TableCell(child: Text('x'))]) // Crash!
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// Table(children: [TableRow(children: [TableCell(child: Text('x'))])])
+/// ```
+class AvoidTableCellOutsideTableRule extends SaropaLintRule {
+  const AvoidTableCellOutsideTableRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.critical;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.widget};
+
+  static const LintCode _code = LintCode(
+    name: 'avoid_table_cell_outside_table',
+    problemMessage:
+        '[avoid_table_cell_outside_table] TableCell used outside of a '
+        'Table widget. This causes a ParentData crash at runtime.',
+    correctionMessage:
+        'Place TableCell inside a TableRow within a Table widget.',
+    errorSeverity: DiagnosticSeverity.ERROR,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addInstanceCreationExpression((
+      InstanceCreationExpression node,
+    ) {
+      final String typeName = node.constructorName.type.name.lexeme;
+      if (typeName != 'TableCell') return;
+
+      final result = _findWidgetAncestor(
+        node,
+        targetParents: const <String>{'Table'},
+      );
+
+      if (result == _AncestorResult.found) return;
+      if (result == _AncestorResult.indeterminate) return;
+      reporter.atNode(node.constructorName, code);
+    });
+  }
+}
+
+// =========================================================================
+// Rule: avoid_positioned_outside_stack
+// =========================================================================
+
+/// Warns when `Positioned` is used outside of a `Stack` widget.
+///
+/// `Positioned` is a `ParentDataWidget` that communicates position
+/// coordinates to a `Stack` parent. Using it outside a `Stack` causes
+/// a ParentData crash at runtime.
+///
+/// **BAD:**
+/// ```dart
+/// Column(children: [Positioned(top: 10, child: Text('x'))]) // Crash!
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// Stack(children: [Positioned(top: 10, child: Text('x'))])
+/// ```
+class AvoidPositionedOutsideStackRule extends SaropaLintRule {
+  const AvoidPositionedOutsideStackRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.critical;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.widget};
+
+  static const LintCode _code = LintCode(
+    name: 'avoid_positioned_outside_stack',
+    problemMessage:
+        '[avoid_positioned_outside_stack] Positioned widget used outside '
+        'of a Stack. This causes a ParentData crash at runtime.',
+    correctionMessage: 'Place Positioned widgets only inside a Stack.',
+    errorSeverity: DiagnosticSeverity.ERROR,
+  );
+
+  static const Set<String> _positionedTypes = <String>{
+    'Positioned',
+    'AnimatedPositioned',
+    'PositionedDirectional',
+  };
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addInstanceCreationExpression((
+      InstanceCreationExpression node,
+    ) {
+      final String typeName = node.constructorName.type.name.lexeme;
+      if (!_positionedTypes.contains(typeName)) return;
+
+      final result = _findWidgetAncestor(
+        node,
+        targetParents: const <String>{'Stack', 'IndexedStack'},
+      );
+
+      if (result == _AncestorResult.found) return;
+      if (result == _AncestorResult.indeterminate) return;
+      reporter.atNode(node.constructorName, code);
+    });
+  }
+}
+
+// =========================================================================
+// Rule: avoid_spacer_in_wrap
+// =========================================================================
+
+/// Warns when `Spacer` or `Expanded` is used inside a `Wrap` widget.
+///
+/// `Wrap` does not extend `Flex` and does not support flex-based sizing.
+/// `Spacer` and `Expanded` require a `Flex` parent (Row/Column/Flex)
+/// to calculate their size. Using them inside `Wrap` causes a crash.
+///
+/// **BAD:**
+/// ```dart
+/// Wrap(children: [Text('a'), Spacer(), Text('b')]) // Crash!
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// Wrap(children: [Text('a'), SizedBox(width: 8), Text('b')])
+/// ```
+class AvoidSpacerInWrapRule extends SaropaLintRule {
+  const AvoidSpacerInWrapRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.critical;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.widget};
+
+  static const LintCode _code = LintCode(
+    name: 'avoid_spacer_in_wrap',
+    problemMessage:
+        '[avoid_spacer_in_wrap] Spacer/Expanded inside Wrap causes a '
+        'flex paradox crash. Wrap does not support flex-based sizing.',
+    correctionMessage: 'Use SizedBox or Padding for spacing inside Wrap.',
+    errorSeverity: DiagnosticSeverity.ERROR,
+  );
+
+  static const Set<String> _triggerWidgets = <String>{
+    'Spacer',
+    'Expanded',
+    'Flexible',
+  };
+
+  static const Set<String> _validFlexParents = <String>{
+    'Row',
+    'Column',
+    'Flex',
+  };
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addInstanceCreationExpression((
+      InstanceCreationExpression node,
+    ) {
+      final String typeName = node.constructorName.type.name.lexeme;
+      if (!_triggerWidgets.contains(typeName)) return;
+
+      // Walk up: if we find Wrap before Row/Column/Flex, it's a violation.
+      final result = _findWidgetAncestor(
+        node,
+        targetParents: _validFlexParents,
+        stopAt: const <String>{'Wrap'},
+      );
+
+      if (result == _AncestorResult.wrongParent) {
+        reporter.atNode(node.constructorName, code);
+      }
+    });
+  }
+}
+
+// =========================================================================
+// Rule: avoid_scrollable_in_intrinsic
+// =========================================================================
+
+/// Warns when a scrollable widget is placed inside `IntrinsicHeight` or
+/// `IntrinsicWidth`.
+///
+/// `IntrinsicHeight`/`IntrinsicWidth` require children to report their
+/// "natural" size. Scrollable widgets have no natural size (they are
+/// potentially infinite), causing a geometry loop crash.
+///
+/// **BAD:**
+/// ```dart
+/// IntrinsicHeight(child: ListView(...)) // Crash!
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// SizedBox(height: 200, child: ListView(...))
+/// ```
+class AvoidScrollableInIntrinsicRule extends SaropaLintRule {
+  const AvoidScrollableInIntrinsicRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.critical;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.widget};
+
+  static const LintCode _code = LintCode(
+    name: 'avoid_scrollable_in_intrinsic',
+    problemMessage: '[avoid_scrollable_in_intrinsic] Scrollable widget inside '
+        'IntrinsicHeight/IntrinsicWidth causes a geometry loop crash. '
+        'Scrollables have no natural size.',
+    correctionMessage: 'Use SizedBox with explicit dimensions instead of '
+        'IntrinsicHeight/IntrinsicWidth around scrollable widgets.',
+    errorSeverity: DiagnosticSeverity.ERROR,
+  );
+
+  static const Set<String> _scrollableTypes = <String>{
+    'ListView',
+    'GridView',
+    'CustomScrollView',
+    'SingleChildScrollView',
+    'PageView',
+  };
+
+  static const Set<String> _intrinsicTypes = <String>{
+    'IntrinsicHeight',
+    'IntrinsicWidth',
+  };
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addInstanceCreationExpression((
+      InstanceCreationExpression node,
+    ) {
+      final String typeName = node.constructorName.type.name.lexeme;
+      if (!_scrollableTypes.contains(typeName)) return;
+
+      final result = _findWidgetAncestor(
+        node,
+        targetParents: _intrinsicTypes,
+      );
+
+      // Here, finding the target parent means BAD (scrollable inside intrinsic).
+      if (result == _AncestorResult.found) {
+        reporter.atNode(node.constructorName, code);
+      }
+    });
+  }
+}
+
+// =========================================================================
+// Rule: require_baseline_text_baseline
+// =========================================================================
+
+/// Warns when `Row` or `Column` uses `CrossAxisAlignment.baseline`
+/// without specifying the `textBaseline` property.
+///
+/// Flutter requires a `textBaseline` value to know whether to use
+/// alphabetic or ideographic baseline alignment. Omitting it causes
+/// an assertion failure at runtime.
+///
+/// **BAD:**
+/// ```dart
+/// Row(
+///   crossAxisAlignment: CrossAxisAlignment.baseline,
+///   children: [Text('a'), Text('b')],
+/// ) // Assertion failure!
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// Row(
+///   crossAxisAlignment: CrossAxisAlignment.baseline,
+///   textBaseline: TextBaseline.alphabetic,
+///   children: [Text('a'), Text('b')],
+/// )
+/// ```
+class RequireBaselineTextBaselineRule extends SaropaLintRule {
+  const RequireBaselineTextBaselineRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.critical;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.widget};
+
+  static const LintCode _code = LintCode(
+    name: 'require_baseline_text_baseline',
+    problemMessage:
+        '[require_baseline_text_baseline] CrossAxisAlignment.baseline '
+        'requires a textBaseline property. Omitting it causes an '
+        'assertion failure at runtime.',
+    correctionMessage:
+        'Add textBaseline: TextBaseline.alphabetic (or .ideographic).',
+    errorSeverity: DiagnosticSeverity.ERROR,
+  );
+
+  static const Set<String> _targetWidgets = <String>{'Row', 'Column', 'Flex'};
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addInstanceCreationExpression((
+      InstanceCreationExpression node,
+    ) {
+      final String typeName = node.constructorName.type.name.lexeme;
+      if (!_targetWidgets.contains(typeName)) return;
+
+      bool hasBaseline = false;
+      bool hasTextBaseline = false;
+
+      for (final Expression arg in node.argumentList.arguments) {
+        if (arg is NamedExpression) {
+          final String name = arg.name.label.name;
+          if (name == 'crossAxisAlignment') {
+            final String value = arg.expression.toSource();
+            if (value.contains('baseline')) hasBaseline = true;
+          }
+          if (name == 'textBaseline') hasTextBaseline = true;
+        }
+      }
+
+      if (hasBaseline && !hasTextBaseline) {
+        reporter.atNode(node.constructorName, code);
+      }
+    });
+  }
+
+  @override
+  List<Fix> getFixes() => <Fix>[_RequireBaselineTextBaselineFix()];
+}
+
+class _RequireBaselineTextBaselineFix extends DartFix {
+  @override
+  void run(
+    CustomLintResolver resolver,
+    ChangeReporter reporter,
+    CustomLintContext context,
+    AnalysisError analysisError,
+    List<AnalysisError> others,
+  ) {
+    context.registry.addInstanceCreationExpression((
+      InstanceCreationExpression node,
+    ) {
+      if (!analysisError.sourceRange.intersects(node.sourceRange)) return;
+
+      final changeBuilder = reporter.createChangeBuilder(
+        message: 'Add textBaseline: TextBaseline.alphabetic',
+        priority: 80,
+      );
+
+      changeBuilder.addDartFileEdit((builder) {
+        // Insert textBaseline parameter after crossAxisAlignment
+        for (final Expression arg in node.argumentList.arguments) {
+          if (arg is NamedExpression &&
+              arg.name.label.name == 'crossAxisAlignment') {
+            builder.addSimpleInsertion(
+              arg.end,
+              ', textBaseline: TextBaseline.alphabetic',
+            );
+            return;
+          }
+        }
+      });
+    });
+  }
+}
+
+// =========================================================================
+// Rule: avoid_unconstrained_dialog_column
+// =========================================================================
+
+/// Warns when a `Column` inside an `AlertDialog` or `SimpleDialog` is
+/// missing `mainAxisSize: MainAxisSize.min`.
+///
+/// `Column` defaults to `MainAxisSize.max`, which tries to fill all
+/// available vertical space. Inside a dialog, this pushes buttons
+/// off-screen and causes overflow.
+///
+/// **BAD:**
+/// ```dart
+/// AlertDialog(
+///   content: Column(children: [...]), // Overflows!
+/// )
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// AlertDialog(
+///   content: Column(
+///     mainAxisSize: MainAxisSize.min,
+///     children: [...],
+///   ),
+/// )
+/// ```
+class AvoidUnconstrainedDialogColumnRule extends SaropaLintRule {
+  const AvoidUnconstrainedDialogColumnRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.widget};
+
+  static const LintCode _code = LintCode(
+    name: 'avoid_unconstrained_dialog_column',
+    problemMessage:
+        '[avoid_unconstrained_dialog_column] Column inside a dialog '
+        'without mainAxisSize: MainAxisSize.min can overflow and push '
+        'buttons off-screen.',
+    correctionMessage: 'Add mainAxisSize: MainAxisSize.min to the Column.',
+    errorSeverity: DiagnosticSeverity.WARNING,
+  );
+
+  static const Set<String> _dialogTypes = <String>{
+    'AlertDialog',
+    'SimpleDialog',
+  };
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addInstanceCreationExpression((
+      InstanceCreationExpression node,
+    ) {
+      final String typeName = node.constructorName.type.name.lexeme;
+      if (typeName != 'Column') return;
+
+      // Check if mainAxisSize: MainAxisSize.min is already set.
+      for (final Expression arg in node.argumentList.arguments) {
+        if (arg is NamedExpression && arg.name.label.name == 'mainAxisSize') {
+          if (arg.expression.toSource().contains('min')) return;
+        }
+      }
+
+      // Walk up to find dialog parent.
+      final result = _findWidgetAncestor(
+        node,
+        targetParents: _dialogTypes,
+      );
+
+      if (result == _AncestorResult.found) {
+        reporter.atNode(node.constructorName, code);
+      }
+    });
+  }
+
+  @override
+  List<Fix> getFixes() => <Fix>[_AvoidUnconstrainedDialogColumnFix()];
+}
+
+class _AvoidUnconstrainedDialogColumnFix extends DartFix {
+  @override
+  void run(
+    CustomLintResolver resolver,
+    ChangeReporter reporter,
+    CustomLintContext context,
+    AnalysisError analysisError,
+    List<AnalysisError> others,
+  ) {
+    context.registry.addInstanceCreationExpression((
+      InstanceCreationExpression node,
+    ) {
+      if (!analysisError.sourceRange.intersects(node.sourceRange)) return;
+      if (node.constructorName.type.name.lexeme != 'Column') return;
+
+      final changeBuilder = reporter.createChangeBuilder(
+        message: 'Add mainAxisSize: MainAxisSize.min',
+        priority: 80,
+      );
+
+      changeBuilder.addDartFileEdit((builder) {
+        // Insert as first named argument after opening parenthesis.
+        final int insertOffset = node.argumentList.leftParenthesis.end;
+        builder.addSimpleInsertion(
+          insertOffset,
+          'mainAxisSize: MainAxisSize.min, ',
+        );
+      });
+    });
+  }
+}
+
+// =========================================================================
+// Shared constant: widgets that provide bounded constraints to children
+// =========================================================================
+
+/// Widgets that constrain their child's size, preventing unbounded layout.
+/// Shared by [AvoidUnboundedListviewInColumnRule] and
+/// [AvoidTextfieldInRowRule].
+const Set<String> _constraintWrappers = <String>{
+  'Expanded',
+  'Flexible',
+  'SizedBox',
+  'ConstrainedBox',
+  'LimitedBox',
+};
+
+// =========================================================================
+// Rule: avoid_unbounded_listview_in_column
+// =========================================================================
+
+/// Warns when `ListView`, `GridView`, or `CustomScrollView` is placed
+/// inside a `Column` without being wrapped in `Expanded` or `Flexible`.
+///
+/// `Column` provides unbounded height to its children. Scrollable widgets
+/// try to fill infinite height, causing an unbounded constraints crash.
+///
+/// **BAD:**
+/// ```dart
+/// Column(children: [Text('header'), ListView(...)]) // Crash!
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// Column(children: [Text('header'), Expanded(child: ListView(...))])
+/// ```
+class AvoidUnboundedListviewInColumnRule extends SaropaLintRule {
+  const AvoidUnboundedListviewInColumnRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.critical;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.widget};
+
+  static const LintCode _code = LintCode(
+    name: 'avoid_unbounded_listview_in_column',
+    problemMessage:
+        '[avoid_unbounded_listview_in_column] Scrollable widget inside '
+        'a Column without Expanded/Flexible causes an unbounded '
+        'constraints crash.',
+    correctionMessage:
+        'Wrap the scrollable widget in Expanded or Flexible, or use '
+        'shrinkWrap: true (with performance cost).',
+    errorSeverity: DiagnosticSeverity.ERROR,
+  );
+
+  static const Set<String> _scrollableTypes = <String>{
+    'ListView',
+    'GridView',
+    'CustomScrollView',
+  };
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addInstanceCreationExpression((
+      InstanceCreationExpression node,
+    ) {
+      final String typeName = node.constructorName.type.name.lexeme;
+      if (!_scrollableTypes.contains(typeName)) return;
+
+      // If shrinkWrap: true is set, the scrollable has bounded height.
+      if (_hasShrinkWrap(node)) return;
+
+      // Walk up checking for Column, skipping constraint wrappers.
+      AstNode? current = node.parent;
+      bool wrappedInConstraint = false;
+      int depth = 0;
+
+      while (current != null && depth < 20) {
+        if (current is VariableDeclaration) return;
+        if (current is MethodDeclaration) {
+          if (current.name.lexeme != 'build') return;
+          break;
+        }
+        if (current is FunctionDeclaration) return;
+
+        if (current is InstanceCreationExpression) {
+          final String parentType = current.constructorName.type.name.lexeme;
+          if (_constraintWrappers.contains(parentType)) {
+            wrappedInConstraint = true;
+          }
+          if (parentType == 'Column') {
+            if (!wrappedInConstraint) {
+              reporter.atNode(node.constructorName, code);
+            }
+            return;
+          }
+          // Stop at other scroll containers -- different issue.
+          if (parentType == 'Row' || parentType == 'Flex') return;
+        }
+
+        current = current.parent;
+        depth++;
+      }
+    });
+  }
+
+  @override
+  List<Fix> getFixes() => <Fix>[_WrapInExpandedFix('scrollable widget')];
+
+  static bool _hasShrinkWrap(InstanceCreationExpression node) {
+    for (final Expression arg in node.argumentList.arguments) {
+      if (arg is NamedExpression && arg.name.label.name == 'shrinkWrap') {
+        final String value = arg.expression.toSource();
+        if (value == 'true') return true;
+      }
+    }
+    return false;
+  }
+}
+
+// =========================================================================
+// Rule: avoid_textfield_in_row
+// =========================================================================
+
+/// Warns when `TextField` or `TextFormField` is placed inside a `Row`
+/// without width constraints.
+///
+/// `TextField` tries to expand to fill its parent's width. `Row` provides
+/// unbounded width to its children. This causes an unbounded width crash.
+///
+/// **BAD:**
+/// ```dart
+/// Row(children: [Icon(Icons.search), TextField()]) // Crash!
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// Row(children: [Icon(Icons.search), Expanded(child: TextField())])
+/// ```
+class AvoidTextfieldInRowRule extends SaropaLintRule {
+  const AvoidTextfieldInRowRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.critical;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.widget};
+
+  static const LintCode _code = LintCode(
+    name: 'avoid_textfield_in_row',
+    problemMessage:
+        '[avoid_textfield_in_row] TextField/TextFormField inside a Row '
+        'without width constraints causes an unbounded width crash.',
+    correctionMessage:
+        'Wrap the TextField in Expanded, Flexible, or a fixed-width '
+        'SizedBox.',
+    errorSeverity: DiagnosticSeverity.ERROR,
+  );
+
+  static const Set<String> _textFieldTypes = <String>{
+    'TextField',
+    'TextFormField',
+  };
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addInstanceCreationExpression((
+      InstanceCreationExpression node,
+    ) {
+      final String typeName = node.constructorName.type.name.lexeme;
+      if (!_textFieldTypes.contains(typeName)) return;
+
+      // Walk up checking for Row, skipping constraint wrappers.
+      AstNode? current = node.parent;
+      bool wrappedInConstraint = false;
+      int depth = 0;
+
+      while (current != null && depth < 20) {
+        if (current is VariableDeclaration) return;
+        if (current is MethodDeclaration) {
+          if (current.name.lexeme != 'build') return;
+          break;
+        }
+        if (current is FunctionDeclaration) return;
+
+        if (current is InstanceCreationExpression) {
+          final String parentType = current.constructorName.type.name.lexeme;
+          if (_constraintWrappers.contains(parentType)) {
+            wrappedInConstraint = true;
+          }
+          if (parentType == 'Row') {
+            if (!wrappedInConstraint) {
+              reporter.atNode(node.constructorName, code);
+            }
+            return;
+          }
+          // Stop at Column/Flex -- different axis, not our concern.
+          if (parentType == 'Column' || parentType == 'Flex') return;
+        }
+
+        current = current.parent;
+        depth++;
+      }
+    });
+  }
+
+  @override
+  List<Fix> getFixes() => <Fix>[_WrapInExpandedFix('TextField')];
+}
+
+// =========================================================================
+// Rule: avoid_fixed_size_in_scaffold_body
+// =========================================================================
+
+/// Warns when a `Scaffold` body contains a `Column` with `TextField`
+/// descendants but no `SingleChildScrollView` wrapper.
+///
+/// When the keyboard appears, the `Scaffold` viewport shrinks. If the
+/// body is a `Column` with text input fields and no scroll capability,
+/// the content overflows (yellow/black stripe error).
+///
+/// **BAD:**
+/// ```dart
+/// Scaffold(body: Column(children: [TextField(), TextField()]))
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// Scaffold(body: SingleChildScrollView(child: Column(children: [...])))
+/// ```
+class AvoidFixedSizeInScaffoldBodyRule extends SaropaLintRule {
+  const AvoidFixedSizeInScaffoldBodyRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.widget};
+
+  static const LintCode _code = LintCode(
+    name: 'avoid_fixed_size_in_scaffold_body',
+    problemMessage:
+        '[avoid_fixed_size_in_scaffold_body] Scaffold body has a Column '
+        'with text input fields but no ScrollView. The keyboard will '
+        'cause overflow.',
+    correctionMessage:
+        'Wrap the Column in SingleChildScrollView to handle keyboard '
+        'resize.',
+    errorSeverity: DiagnosticSeverity.WARNING,
+  );
+
+  static const Set<String> _textInputTypes = <String>{
+    'TextField',
+    'TextFormField',
+  };
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addInstanceCreationExpression((
+      InstanceCreationExpression node,
+    ) {
+      final String typeName = node.constructorName.type.name.lexeme;
+      if (typeName != 'Scaffold') return;
+
+      // Find the 'body' argument.
+      for (final Expression arg in node.argumentList.arguments) {
+        if (arg is! NamedExpression) continue;
+        if (arg.name.label.name != 'body') continue;
+
+        final Expression bodyExpr = arg.expression;
+        if (bodyExpr is! InstanceCreationExpression) return;
+
+        final String bodyType = bodyExpr.constructorName.type.name.lexeme;
+
+        // If body is already wrapped in a scroll view, it's fine.
+        if (bodyType == 'SingleChildScrollView') return;
+        if (bodyType == 'CustomScrollView') return;
+        if (bodyType == 'ListView') return;
+
+        // Check if body is a Column containing text input fields.
+        if (bodyType == 'Column' && _containsTextInput(bodyExpr)) {
+          reporter.atNode(bodyExpr.constructorName, code);
+        }
+      }
+    });
+  }
+
+  bool _containsTextInput(InstanceCreationExpression node) {
+    final visitor = _TextInputFinder();
+    node.visitChildren(visitor);
+    return visitor.found;
+  }
+}
+
+class _TextInputFinder extends RecursiveAstVisitor<void> {
+  bool found = false;
+
+  @override
+  void visitInstanceCreationExpression(InstanceCreationExpression node) {
+    if (found) return;
+    final String typeName = node.constructorName.type.name.lexeme;
+    if (AvoidFixedSizeInScaffoldBodyRule._textInputTypes.contains(typeName)) {
+      found = true;
+      return;
+    }
+    super.visitInstanceCreationExpression(node);
+  }
+}
+
+// =========================================================================
+// Shared quick fix: Wrap in Expanded
+// =========================================================================
+
+/// Shared quick fix that wraps a widget in `Expanded(child: ...)`.
+class _WrapInExpandedFix extends DartFix {
+  _WrapInExpandedFix(this._widgetDescription);
+
+  final String _widgetDescription;
+
+  @override
+  void run(
+    CustomLintResolver resolver,
+    ChangeReporter reporter,
+    CustomLintContext context,
+    AnalysisError analysisError,
+    List<AnalysisError> others,
+  ) {
+    context.registry.addInstanceCreationExpression((
+      InstanceCreationExpression node,
+    ) {
+      if (!analysisError.sourceRange.intersects(node.sourceRange)) return;
+
+      final changeBuilder = reporter.createChangeBuilder(
+        message: 'Wrap $_widgetDescription in Expanded',
+        priority: 80,
+      );
+
+      changeBuilder.addDartFileEdit((builder) {
+        builder.addSimpleInsertion(node.offset, 'Expanded(child: ');
+        builder.addSimpleInsertion(node.end, ')');
+      });
+    });
+  }
+}
