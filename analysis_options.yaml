@@ -767,7 +767,7 @@ custom_lint:
     - require_ios_callkit_integration: true  # [WARNING] VoIP call handling detected. iOS requires CallKit integration for native call UI. Without CallKit, incoming calls will not appear on the lock screen, call audio routing will fail, and Apple will reject your app from the App Store during review.
     - require_ios_deployment_target_consistency: true  # [WARNING] API requiring iOS 15+ detected. Ensure minimum deployment target matches or add version guards.
     - require_ios_dynamic_island_safe_zones: true  # [WARNING] Fixed top padding (44pt or 59pt) detected. Dynamic Island height varies by device. Use MediaQuery.padding.top instead.
-    - require_ios_lifecycle_handling: true  # [INFO] Timer or subscription detected without lifecycle handling. Stop background work when app is inactive to save battery.
+    - require_app_lifecycle_handling: true  # [INFO] Timer or subscription detected without lifecycle handling. Stop background work when app is inactive to save battery.
     - require_ios_low_power_mode_handling: true  # [INFO] Heavy animation or background activity detected. Consider checking iOS Low Power Mode and adapting behavior.
     - require_ios_method_channel_cleanup: true  # [WARNING] MethodChannel handler set without cleanup. Set handler to null in dispose() to prevent memory leaks.
     - require_ios_minimum_version_check: true  # [INFO] iOS version-specific API detected. Ensure iOS version is checked before using this API.
