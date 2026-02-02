@@ -414,7 +414,6 @@ custom_lint:
     # FLUTTER PERFORMANCE
     # =========================================================================
     - avoid_listview_without_item_extent: false
-    - avoid_shrink_wrap_in_scroll: false
     - avoid_mediaquery_in_build: false
     - prefer_dedicated_media_query_method: false
     - avoid_layout_builder_misuse: false
@@ -1169,6 +1168,7 @@ custom_lint:
     - prefer_curly_apostrophe: false             # Curly apostrophe in strings
 
     # --- Widget Style Rules (v2.7.0) ---
+    - avoid_shrink_wrap_in_scroll: false         # Prefer Slivers over shrinkWrap (reclassified v4.9.11)
     - prefer_sized_box_over_container: false     # SizedBox for dimensions only
     - prefer_container_over_sized_box: false     # Opposite - Container consistency
     - prefer_text_rich_over_richtext: false      # Text.rich over RichText

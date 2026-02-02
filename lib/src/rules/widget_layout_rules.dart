@@ -3658,25 +3658,49 @@ class PreferFractionalSizingRule extends SaropaLintRule {
       final String rightSource = node.rightOperand.toSource();
 
       // Check for MediaQuery.of(context).size.width * 0.x pattern
-      if ((leftSource.contains('MediaQuery') &&
+      if (!((leftSource.contains('MediaQuery') &&
               leftSource.contains('.size.')) ||
           (rightSource.contains('MediaQuery') &&
-              rightSource.contains('.size.'))) {
-        // Check if multiplying by a fraction
-        if (node.rightOperand is DoubleLiteral) {
-          final double value = (node.rightOperand as DoubleLiteral).value;
-          if (value > 0 && value < 1) {
-            reporter.atNode(node, code);
-          }
-        }
-        if (node.leftOperand is DoubleLiteral) {
-          final double value = (node.leftOperand as DoubleLiteral).value;
-          if (value > 0 && value < 1) {
-            reporter.atNode(node, code);
-          }
-        }
+              rightSource.contains('.size.')))) {
+        return;
       }
+
+      // Check if multiplying by a fraction (0 < value < 1)
+      if (!_isFractionalLiteral(node.rightOperand) &&
+          !_isFractionalLiteral(node.leftOperand)) {
+        return;
+      }
+
+      // Skip collection contexts (list literal, .add(), etc.) where
+      // FractionallySizedBox won't work due to potentially unbounded
+      // parent constraints (e.g. inside a horizontal ScrollView).
+      if (_isInsideCollectionContext(node)) return;
+
+      reporter.atNode(node, code);
     });
+  }
+
+  /// Returns true if [expr] is a double literal between 0 and 1 exclusive.
+  static bool _isFractionalLiteral(Expression expr) {
+    if (expr is! DoubleLiteral) return false;
+    return expr.value > 0 && expr.value < 1;
+  }
+
+  /// Returns true if [node] is inside a collection-building context
+  /// where FractionallySizedBox cannot reliably replace MediaQuery-based
+  /// sizing due to potentially unbounded parent constraints.
+  static bool _isInsideCollectionContext(AstNode node) {
+    AstNode? current = node.parent;
+    while (current != null) {
+      if (current is ListLiteral) return true;
+      if (current is MethodInvocation) {
+        final String name = current.methodName.name;
+        if (name == 'add' || name == 'insert') return true;
+      }
+      if (current is FunctionBody) break;
+      current = current.parent;
+    }
+    return false;
   }
 }
 
@@ -4201,38 +4225,42 @@ class AvoidStackOverflowRule extends SaropaLintRule {
   }
 }
 
-/// Warns when Form with TextFormField doesn't have validators.
+/// Warns when shrinkWrap: true is used on scrollable widgets.
 ///
-/// Forms should validate input for better UX.
+/// shrinkWrap: true causes O(n) layout cost and defeats lazy loading.
+/// However, shrinkWrap is sometimes required (e.g. ListView inside a Column)
+/// and is safe when paired with NeverScrollableScrollPhysics and a small
+/// bounded itemCount. This is a stylistic preference for Slivers over
+/// shrinkWrap — see `avoid_shrinkwrap_in_scrollview` for the context-aware
+/// rule that targets the genuinely dangerous nested-scrollable case.
 ///
 /// **BAD:**
 /// ```dart
-/// Form(
-///   child: TextFormField(
-///     decoration: InputDecoration(labelText: 'Email'),
-///   ),
+/// ListView.builder(
+///   shrinkWrap: true,
+///   itemBuilder: (context, index) => ListTile(title: Text('$index')),
 /// )
 /// ```
 ///
 /// **GOOD:**
 /// ```dart
-/// Form(
-///   child: TextFormField(
-///     decoration: InputDecoration(labelText: 'Email'),
-///     validator: (value) {
-///       if (value?.isEmpty ?? true) return 'Email is required';
-///       return null;
-///     },
-///   ),
+/// CustomScrollView(
+///   slivers: [
+///     SliverList(
+///       delegate: SliverChildBuilderDelegate(
+///         (context, index) => ListTile(title: Text('$index')),
+///       ),
+///     ),
+///   ],
 /// )
 /// ```
 
 class AvoidShrinkWrapInScrollRule extends SaropaLintRule {
   const AvoidShrinkWrapInScrollRule() : super(code: _code);
 
-  /// Code quality issue. Review when count exceeds 100.
+  /// Stylistic preference. Large counts are acceptable.
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.low;
 
   @override
   RuleCost get cost => RuleCost.low;
@@ -4245,9 +4273,11 @@ class AvoidShrinkWrapInScrollRule extends SaropaLintRule {
     problemMessage:
         '[avoid_shrink_wrap_in_scroll] shrinkWrap: true causes O(n) layout cost and defeats lazy loading.',
     correctionMessage:
-        'Use ListView.builder with itemCount for lazy loading, or remove '
-        'shrinkWrap if not needed.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+        'Consider using CustomScrollView with Slivers for better performance. '
+        'If this ListView is inside a Column/Row with a small bounded '
+        'itemCount and NeverScrollableScrollPhysics, shrinkWrap: true is '
+        'acceptable.',
+    errorSeverity: DiagnosticSeverity.INFO,
   );
 
   static const Set<String> _scrollableWidgets = <String>{
