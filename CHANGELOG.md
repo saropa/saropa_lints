@@ -11,7 +11,14 @@ Dates are not included in version headers — [pub.dev](https://pub.dev/packages
 ** See the current published changelog: [saropa_lints/changelog](https://pub.dev/packages/saropa_lints/changelog)
 
 ---
-## [4.9.14] - current
+## [4.9.15]
+
+### Fixed
+
+- **`require_ios_lifecycle_handling` rewritten and renamed to `require_app_lifecycle_handling`**: The rule used file-level string matching, causing false positives when unrelated classes in the same file contained lifecycle keywords. Rewritten with per-class AST detection via `addClassDeclaration` — each `State` subclass is independently checked for `WidgetsBindingObserver` mixin, `didChangeAppLifecycleState` method, and `AppLifecycleListener` fields. Also added one-shot `Timer()` constructor detection with word-boundary regex to avoid false positives from types like `MyTimer`. Renamed to `require_app_lifecycle_handling` (backward-compatible alias preserved) and moved from `ios_rules.dart` to `lifecycle_rules.dart` since the rule is platform-agnostic.
+
+---
+## [4.9.14]
 
 ### Added
 
