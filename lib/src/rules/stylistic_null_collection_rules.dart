@@ -58,7 +58,7 @@ class PreferNullAwareAssignmentRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_null_aware_assignment',
     problemMessage:
-        '[prefer_null_aware_assignment] Use ??= instead of if-null-then-assign pattern.',
+        '[prefer_null_aware_assignment] An if-null-then-assign pattern was detected that can be simplified. Replace the verbose null check and assignment block with the ??= operator for a concise, idiomatic single-expression assignment.',
     correctionMessage:
         'Replace the if-null-then-assign block with the ??= operator for a single-expression null-coalescing assignment.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -143,7 +143,7 @@ class PreferExplicitNullAssignmentRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_explicit_null_assignment',
     problemMessage:
-        '[prefer_explicit_null_assignment] Use explicit if-null-then-assign instead of ??=.',
+        '[prefer_explicit_null_assignment] The ??= operator hides the null-check control flow, making it harder to debug and log. Use an explicit if-null-then-assign block for step-by-step clarity.',
     correctionMessage:
         'Replace ??= with an explicit if (variable == null) variable = value; block for step-by-step clarity.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -200,7 +200,7 @@ class PreferIfNullOverTernaryRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_if_null_over_ternary',
     problemMessage:
-        '[prefer_if_null_over_ternary] Use ?? instead of null-checking ternary expression.',
+        '[prefer_if_null_over_ternary] Null-checking ternary detected where the ?? operator expresses the same intent more concisely. Replace with ?? to reduce verbosity and follow idiomatic Dart conventions.',
     correctionMessage:
         'Replace the ternary null check with the ?? operator, which expresses the same intent in fewer tokens.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -349,7 +349,7 @@ class PreferTernaryOverIfNullRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_ternary_over_if_null',
     problemMessage:
-        '[prefer_ternary_over_if_null] Use ternary expression instead of ?? for explicit control.',
+        '[prefer_ternary_over_if_null] The ?? operator hides the null-check branching logic, reducing visibility into both code paths. Use an explicit ternary (value != null ? value : fallback) for full control over each branch.',
     correctionMessage:
         'Replace ?? with an explicit ternary (value != null ? value : fallback) for full control over both branches.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -518,7 +518,7 @@ class PreferNullableOverLateRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_nullable_over_late',
     problemMessage:
-        '[prefer_nullable_over_late] Use nullable type instead of late for safer code.',
+        '[prefer_nullable_over_late] Field uses late initialization, which risks a LateInitializationError at runtime if read before assignment. Use a nullable type instead so the compiler enforces null checks at every access point.',
     correctionMessage:
         'Use a nullable type instead of late so the compiler enforces a null check at every access, preventing runtime errors.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -625,7 +625,7 @@ class PreferSpreadOverAddAllRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_spread_over_addall',
     problemMessage:
-        '[prefer_spread_over_addall] Use spread operator [...] instead of addAll().',
+        '[prefer_spread_over_addall] Collection uses addAll() instead of the spread operator. The spread syntax [...list1, ...list2] is a declarative, expression-level merge that avoids mutation.',
     correctionMessage:
         'Replace addAll() with the spread operator [...list1, ...list2] for a declarative, expression-level merge.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -681,7 +681,7 @@ class PreferAddAllOverSpreadRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_addall_over_spread',
     problemMessage:
-        '[prefer_addall_over_spread] Use addAll() instead of spread for consistency.',
+        '[prefer_addall_over_spread] The spread operator creates a new list allocation on every use, which can be wasteful for in-place mutations. Use addAll() for an explicit imperative merge that avoids unnecessary copies.',
     correctionMessage:
         'Replace the spread operator with addAll() for an explicit imperative mutation that reads naturally in method chains.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -743,7 +743,7 @@ class PreferCollectionIfOverTernaryRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_collection_if_over_ternary',
     problemMessage:
-        '[prefer_collection_if_over_ternary] Use collection-if instead of ternary with spread.',
+        '[prefer_collection_if_over_ternary] Ternary operator with spread is used to conditionally include collection elements. This pattern is harder to read; use collection-if syntax instead for clearer, more idiomatic Dart.',
     correctionMessage:
         'Replace the ternary-spread pattern with a collection-if expression: [if (condition) element] for cleaner syntax.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -818,7 +818,7 @@ class PreferTernaryOverCollectionIfRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_ternary_over_collection_if',
     problemMessage:
-        '[prefer_ternary_over_collection_if] Use ternary spread instead of collection-if.',
+        '[prefer_ternary_over_collection_if] Collection-if expression could be replaced with a ternary-spread pattern for explicit control over the empty-case branch and consistent syntax.',
     correctionMessage:
         'Replace the collection-if with a ternary-spread expression: ...(condition ? [element] : []) for explicit control.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -874,7 +874,7 @@ class PreferWhereTypeOverWhereIsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_wheretype_over_where_is',
     problemMessage:
-        '[prefer_wheretype_over_where_is] Use whereType<T>() instead of where((e) => e is T).',
+        '[prefer_wheretype_over_where_is] Collection uses where((e) => e is T) for type filtering, which requires a manual cast afterward. Use whereType<T>() instead to filter and cast in one step for cleaner, type-safe code.',
     correctionMessage:
         'Replace where((e) => e is T) with whereType<T>() for concise, type-safe filtering without a manual cast.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -995,7 +995,7 @@ class PreferMapEntriesIterationRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_map_entries_iteration',
     problemMessage:
-        '[prefer_map_entries_iteration] Use map.entries instead of iterating .keys with lookup.',
+        '[prefer_map_entries_iteration] Iterating a map via .keys and then performing a separate map[key] lookup on each iteration duplicates work. Use map.entries to access both key and value in a single pass.',
     correctionMessage:
         'Iterate with map.entries to access key and value in a single lookup instead of re-indexing via map[key].',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -1082,7 +1082,7 @@ class PreferKeysIterationRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_keys_with_lookup',
     problemMessage:
-        '[prefer_keys_with_lookup] Use map.keys with lookup for consistency.',
+        '[prefer_keys_with_lookup] Map iteration uses .entries instead of .keys with explicit lookup. Iterating with .keys and map[key] is a familiar loop pattern that matches common imperative styles.',
     correctionMessage:
         'Iterate with map.keys and look up each value explicitly for a familiar loop style that matches common patterns.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -1143,7 +1143,7 @@ class PreferMutableCollectionsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_mutable_collections',
     problemMessage:
-        '[prefer_mutable_collections] Return mutable collections for flexibility.',
+        '[prefer_mutable_collections] Function returns an unmodifiable collection. Immutable return types force callers to copy the collection before modification, adding allocation overhead and boilerplate.',
     correctionMessage:
         'Return a plain List, Set, or Map so callers can modify the collection without needing to copy or unwrap it first.',
     errorSeverity: DiagnosticSeverity.INFO,

@@ -61,7 +61,7 @@ class PreferRelativeImportsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_relative_imports',
     problemMessage:
-        '[prefer_relative_imports] Use relative imports instead of absolute package imports.',
+        '[prefer_relative_imports] An absolute package import was used for a file within the same package. Relative imports simplify refactoring and clearly signal local dependencies. Replace the absolute import with a relative path.',
     correctionMessage:
         'Relative imports make refactoring easier and clearly signal local dependencies within the package.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -245,7 +245,7 @@ class PreferOneWidgetPerFileRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_one_widget_per_file',
     problemMessage:
-        '[prefer_one_widget_per_file] Multiple widget classes defined in a single file.',
+        '[prefer_one_widget_per_file] Multiple widget classes are defined in a single file, which makes it harder to locate widgets by filename. Move each widget class into its own file so names map directly to files for faster navigation.',
     correctionMessage:
         'Move each widget class to its own file so file names map directly to widget names for faster navigation.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -332,7 +332,7 @@ class PreferArrowFunctionsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_arrow_functions',
     problemMessage:
-        '[prefer_arrow_functions] Function body contains only a return statement; use arrow syntax.',
+        '[prefer_arrow_functions] Function body contains only a single return statement. Block syntax adds unnecessary braces and visual noise for simple expressions; convert to arrow syntax (=>) to signal a pure, single-expression return.',
     correctionMessage:
         'Convert to arrow syntax (=> expression) to signal a pure, single-expression return and reduce visual noise.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -633,7 +633,7 @@ class PreferTrailingCommaAlwaysRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_trailing_comma_always',
     problemMessage:
-        '[prefer_trailing_comma_always] Multi-line construct is missing a trailing comma.',
+        '[prefer_trailing_comma_always] A multi-line argument list or collection is missing a trailing comma. Add one so dart format keeps each element on its own line, producing cleaner diffs and easier reordering.',
     correctionMessage:
         'Add a trailing comma so dart format keeps each argument on its own line, producing cleaner git diffs.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -973,7 +973,7 @@ class PreferWidgetMethodsOverClassesRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_widget_methods_over_classes',
     problemMessage:
-        '[prefer_widget_methods_over_classes] Simple widget class could be a method in the parent widget.',
+        '[prefer_widget_methods_over_classes] Simple widget class with a short build method detected. A separate class adds unnecessary boilerplate when the widget could be a method in the parent, giving direct access to parent state.',
     correctionMessage:
         'Convert to a build method in the parent widget to eliminate class boilerplate and access parent state directly.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -1089,7 +1089,7 @@ class PreferExplicitTypesRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_explicit_types',
     problemMessage:
-        '[prefer_explicit_types] Use explicit type annotation instead of var.',
+        '[prefer_explicit_types] Variable uses var instead of an explicit type annotation. Without a visible type, readers must inspect the right-hand side or hover in the IDE to determine the declared type.',
     correctionMessage:
         'Replace var with the explicit type annotation so the declared type is visible without hovering or reading the initializer.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -1372,7 +1372,7 @@ class PreferSingleQuotesRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_single_quotes',
     problemMessage:
-        '[prefer_single_quotes] Use single quotes instead of double quotes for strings.',
+        '[prefer_single_quotes] Double quotes detected where single quotes would suffice. Prefer single quotes for consistency with Dart style conventions and to reduce visual noise in string literals.',
     correctionMessage:
         "Replace double quotes with single quotes to follow Dart style conventions and maintain codebase consistency.",
     errorSeverity: DiagnosticSeverity.INFO,
@@ -1500,7 +1500,7 @@ class PreferTodoFormatRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_todo_format',
     problemMessage:
-        '[prefer_todo_format] TODO comment should follow format: TODO(author): description',
+        '[prefer_todo_format] TODO comment is missing the required author and description format. Use TODO(author): description so the comment is trackable, searchable, and attributable to an owner.',
     correctionMessage:
         'Add author name in parentheses: TODO(author): ... so the TODO is trackable and searchable by owner.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -1595,7 +1595,7 @@ class PreferFixmeFormatRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_fixme_format',
     problemMessage:
-        '[prefer_fixme_format] FIXME comment should follow format: FIXME(author): description',
+        '[prefer_fixme_format] FIXME comment is missing the required author tag. Without an owner, FIXMEs become orphaned and unactionable; use the format FIXME(author): description so the issue is trackable.',
     correctionMessage:
         'Add author name in parentheses: FIXME(author): ... so the issue is trackable and searchable by owner.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -1687,7 +1687,7 @@ class PreferSentenceCaseCommentsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_sentence_case_comments',
     problemMessage:
-        '[prefer_sentence_case_comments] Comment should start with a capital letter.',
+        '[prefer_sentence_case_comments] Comment starts with a lowercase letter. Inconsistent capitalization in comments reduces readability and gives the codebase an unfinished appearance.',
     correctionMessage:
         'Capitalize the first letter of the comment to maintain sentence-case consistency across the codebase.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -2097,7 +2097,7 @@ class PreferScreamingCaseConstantsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_screaming_case_constants',
     problemMessage:
-        '[prefer_screaming_case_constants] Constants should use SCREAMING_SNAKE_CASE.',
+        '[prefer_screaming_case_constants] Constant name does not use SCREAMING_SNAKE_CASE convention. Without visual distinction, constants blend with regular variables and their immutable intent is lost.',
     correctionMessage:
         'Rename the constant to SCREAMING_SNAKE_CASE (e.g., MAX_VALUE instead of maxValue) for visual distinction.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -2685,7 +2685,7 @@ class PreferSnakeCaseFilesRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_snake_case_files',
     problemMessage:
-        '[prefer_snake_case_files] File name should use snake_case.',
+        '[prefer_snake_case_files] File name does not follow snake_case convention. Non-standard file names break import autocompletion and make the project structure harder to navigate on case-sensitive file systems.',
     correctionMessage:
         'Rename the file to snake_case (e.g., user_service.dart instead of UserService.dart) to follow Dart conventions.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -3200,7 +3200,7 @@ class PreferStraightApostropheRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_straight_apostrophe',
     problemMessage:
-        "[prefer_straight_apostrophe] Use straight apostrophe (') instead of Right Single Quotation Mark (').",
+        "[prefer_straight_apostrophe] A Right Single Quotation Mark (U+2019) was found where a straight apostrophe (U+0027) is expected. Curly quotes cause inconsistent string delimiters and can break tooling. Replace with a straight apostrophe.",
     correctionMessage:
         "Replace the Right Single Quotation Mark (U+2019) with a straight apostrophe (U+0027) for code consistency.",
     errorSeverity: DiagnosticSeverity.INFO,
@@ -3896,7 +3896,7 @@ class ArgumentsOrderingRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_arguments_ordering',
     problemMessage:
-        '[prefer_arguments_ordering] Named arguments are not in alphabetical order.',
+        '[prefer_arguments_ordering] Named arguments are not in alphabetical order. Unsorted arguments force reviewers to scan the entire call site to spot missing or duplicated parameters.',
     correctionMessage:
         'Reorder named arguments alphabetically so reviewers can quickly spot missing or duplicate arguments.',
     errorSeverity: DiagnosticSeverity.INFO,

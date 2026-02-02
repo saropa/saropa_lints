@@ -145,13 +145,16 @@ class RuleMessage:
             self.dx_issues.append("Starts with 'Avoid' - state detected")
             self.dx_score -= 10
 
-        # --- Message length (-25/-15) ---
+        # --- Message length (-25/-15/-10) ---
         if len(content) < 180 and self.impact in ("critical", "high"):
             self.dx_issues.append("Too short - min 180 chars")
             self.dx_score -= 25
         elif len(content) < 150 and self.impact == "medium":
             self.dx_issues.append("Very short - min 150 chars")
             self.dx_score -= 15
+        elif len(content) < 100 and self.impact in ("low", "opinionated"):
+            self.dx_issues.append("Too short - min 100 chars for stylistic")
+            self.dx_score -= 10
 
         # --- Correction message length (-10/-5) ---
         corr_len = (
@@ -411,9 +414,11 @@ def print_dx_audit_report(
     """
     all_by_impact: dict[str, list[RuleMessage]] = {
         "critical": [], "high": [], "medium": [], "low": [],
+        "opinionated": [],
     }
     needs_work_by_impact: dict[str, list[RuleMessage]] = {
         "critical": [], "high": [], "medium": [], "low": [],
+        "opinionated": [],
     }
 
     for m in messages:
@@ -424,7 +429,9 @@ def print_dx_audit_report(
 
     # Collect ALL rules needing work, across all impact levels
     needs_work = [m for m in messages if m.dx_issues]
-    impact_priority = {"critical": 0, "high": 1, "medium": 2, "low": 3}
+    impact_priority = {
+        "critical": 0, "high": 1, "medium": 2, "low": 3, "opinionated": 4,
+    }
     needs_work.sort(
         key=lambda m: (impact_priority.get(m.impact, 99), m.dx_score)
     )
@@ -437,9 +444,10 @@ def print_dx_audit_report(
         "high": Color.YELLOW,
         "medium": Color.WHITE,
         "low": Color.DIM,
+        "opinionated": Color.BLUE,
     }
 
-    for impact in ["critical", "high", "medium", "low"]:
+    for impact in ["critical", "high", "medium", "low", "opinionated"]:
         total = len(all_by_impact[impact])
         issues = len(needs_work_by_impact[impact])
         passing = total - issues
@@ -533,9 +541,11 @@ def export_dx_report(
         for m in messages
         if m.impact in ("critical", "high") and m.dx_issues
     ]
-    impact_order = {"critical": 0, "high": 1, "medium": 2, "low": 3}
+    impact_order = {
+        "critical": 0, "high": 1, "medium": 2, "low": 3, "opinionated": 4,
+    }
     needs_work.sort(
-        key=lambda m: (m.dx_score, impact_order.get(m.impact, 4))
+        key=lambda m: (m.dx_score, impact_order.get(m.impact, 5))
     )
 
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")

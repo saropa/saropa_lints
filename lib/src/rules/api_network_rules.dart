@@ -4090,7 +4090,7 @@ class RequireDioResponseTypeRule extends SaropaLintRule {
         '[require_dio_response_type] Dio download without explicit responseType may corrupt binary data.',
     correctionMessage:
         'Add options: Options(responseType: ResponseType.bytes) for downloads.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    errorSeverity: DiagnosticSeverity.WARNING,
   );
 
   @override

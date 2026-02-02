@@ -766,7 +766,7 @@ class RequireFreezedJsonConverterRule extends SaropaLintRule {
         '[require_freezed_json_converter] Freezed class with DateTime/Color field may need a JsonConverter for correct serialization. Missing converters can cause runtime errors, silent data loss, and broken API contracts. This is a common source of serialization bugs in complex models.',
     correctionMessage:
         'Add @JsonSerializable(converters: [...]) for custom types. Audit all Freezed models for converter coverage and add tests for serialization/deserialization. Document converter logic for maintainability.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    errorSeverity: DiagnosticSeverity.WARNING,
   );
 
   /// Types that typically need converters.
@@ -1327,7 +1327,7 @@ class RequireJsonSchemaValidationRule extends SaropaLintRule {
         'validation. Malformed data may crash the app or cause unexpected behavior.',
     correctionMessage:
         'Validate JSON structure with fromJson in try-catch, or check required fields.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    errorSeverity: DiagnosticSeverity.WARNING,
   );
 
   @override

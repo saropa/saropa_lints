@@ -9050,7 +9050,7 @@ class RequireMacosEntitlementsRule extends SaropaLintRule {
     correctionMessage:
         'Add the required entitlement to macos/Runner/Release.entitlements '
         'and macos/Runner/DebugProfile.entitlements.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    errorSeverity: DiagnosticSeverity.ERROR,
   );
 
   @override

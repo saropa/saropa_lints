@@ -502,7 +502,7 @@ class AvoidTypeCastsRule extends SaropaLintRule {
     problemMessage:
         '[avoid_type_casts] Type cast with "as" may throw at runtime.',
     correctionMessage: 'Use "is" check or pattern matching instead.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    errorSeverity: DiagnosticSeverity.WARNING,
   );
 
   @override

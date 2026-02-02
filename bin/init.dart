@@ -77,6 +77,7 @@ library;
 /// - [PERFORMANCE.md](../PERFORMANCE.md) for performance considerations
 /// - [CONTRIBUTING.md](../CONTRIBUTING.md) for adding new rules
 
+import 'dart:ffi';
 import 'dart:io';
 
 import 'package:custom_lint_builder/custom_lint_builder.dart' show LintRule;
@@ -185,23 +186,74 @@ void _writeLogFile() {
 // Cross-platform ANSI color support
 // ---------------------------------------------------------------------------
 
+/// Enable ANSI virtual terminal processing on Windows 10+.
+///
+/// Windows supports ANSI escape codes but requires enabling
+/// ENABLE_VIRTUAL_TERMINAL_PROCESSING on the console output handle.
+/// Dart's [stdout.supportsAnsiEscapes] only checks the flag; this sets it.
+void _tryEnableAnsiWindows() {
+  if (!Platform.isWindows) return;
+  try {
+    final k = DynamicLibrary.open('kernel32.dll');
+    final getStdHandle =
+        k.lookupFunction<IntPtr Function(Int32), int Function(int)>(
+            'GetStdHandle');
+    final getMode = k.lookupFunction<Int32 Function(IntPtr, Pointer<Uint32>),
+        int Function(int, Pointer<Uint32>)>('GetConsoleMode');
+    final setMode = k.lookupFunction<Int32 Function(IntPtr, Uint32),
+        int Function(int, int)>('SetConsoleMode');
+    final getHeap =
+        k.lookupFunction<IntPtr Function(), int Function()>('GetProcessHeap');
+    final alloc = k.lookupFunction<
+        Pointer<Void> Function(IntPtr, Uint32, IntPtr),
+        Pointer<Void> Function(int, int, int)>('HeapAlloc');
+    final free = k.lookupFunction<Int32 Function(IntPtr, Uint32, Pointer<Void>),
+        int Function(int, int, Pointer<Void>)>('HeapFree');
+
+    final handle = getStdHandle(-11); // STD_OUTPUT_HANDLE
+    final heap = getHeap();
+    final ptr = alloc(heap, 0x08, 4); // HEAP_ZERO_MEMORY, 4 bytes
+    if (ptr.address == 0) return;
+
+    final mode = ptr.cast<Uint32>();
+    if (getMode(handle, mode) != 0) {
+      setMode(
+          handle, mode.value | 0x0004); // ENABLE_VIRTUAL_TERMINAL_PROCESSING
+    }
+    free(heap, 0, ptr);
+  } catch (_) {
+    // VTP unavailable - colors degrade gracefully to plain text
+  }
+}
+
+/// Cached color support result.
+bool? _colorSupportCache;
+
 /// Detects if the terminal supports ANSI colors.
 bool get _supportsColor {
-  // Check for NO_COLOR environment variable (standard)
-  if (Platform.environment.containsKey('NO_COLOR')) return false;
+  return _colorSupportCache ??= _detectColorSupport();
+}
 
-  // Check for FORCE_COLOR
+/// Checks terminal capabilities for ANSI color support.
+bool _detectColorSupport() {
+  // Standard NO_COLOR / FORCE_COLOR environment variables
+  if (Platform.environment.containsKey('NO_COLOR')) return false;
   if (Platform.environment.containsKey('FORCE_COLOR')) return true;
 
-  // Check if stdout is a terminal
+  // Not a terminal (piped, redirected)
   if (!stdout.hasTerminal) return false;
 
-  // Windows: check for newer Windows Terminal or ConEmu
+  // Dart's built-in check (reliable after VTP is enabled on Windows)
+  if (stdout.supportsAnsiEscapes) return true;
+
+  // Windows: detect terminals known to support ANSI
   if (Platform.isWindows) {
-    final term = Platform.environment['TERM'];
-    final wtSession = Platform.environment['WT_SESSION'];
-    final conEmu = Platform.environment['ConEmuANSI'];
-    return wtSession != null || conEmu == 'ON' || term == 'xterm';
+    final env = Platform.environment;
+    return env.containsKey('WT_SESSION') || // Windows Terminal
+        env['ConEmuANSI'] == 'ON' || // ConEmu
+        env['TERM_PROGRAM'] == 'vscode' || // VS Code terminal
+        env.containsKey('ANSICON') || // ANSICON
+        env['TERM'] == 'xterm'; // xterm-compatible
   }
 
   // Unix-like: most terminals support colors
@@ -261,12 +313,14 @@ class _RuleMetadata {
   const _RuleMetadata({
     required this.name,
     required this.problemMessage,
+    required this.correctionMessage,
     required this.severity,
     required this.tier,
   });
 
   final String name;
   final String problemMessage;
+  final String correctionMessage;
   final String severity; // 'ERROR', 'WARNING', 'INFO'
   final RuleTier tier;
 }
@@ -280,6 +334,7 @@ Map<String, _RuleMetadata> _getRuleMetadata() {
     if (rule is SaropaLintRule) {
       final String ruleName = rule.code.name;
       final String message = rule.code.problemMessage;
+      final String correction = rule.code.correctionMessage ?? '';
 
       // Extract severity from LintCode
       final severity = rule.code.errorSeverity.name.toUpperCase();
@@ -290,6 +345,7 @@ Map<String, _RuleMetadata> _getRuleMetadata() {
       _ruleMetadataCache![ruleName] = _RuleMetadata(
         name: ruleName,
         problemMessage: message,
+        correctionMessage: correction,
         severity: severity,
         tier: tier,
       );
@@ -303,14 +359,39 @@ String _getProblemMessage(String ruleName) {
   final metadata = _getRuleMetadata()[ruleName];
   if (metadata == null) return '';
 
-  String msg = metadata.problemMessage;
+  return _stripRulePrefix(metadata.problemMessage);
+}
 
-  // Remove rule name prefix if present (e.g., "[rule_name] ...")
-  final prefixMatch = RegExp(r'^\[[\w_]+\]\s*').firstMatch(msg);
-  if (prefixMatch != null) {
-    msg = msg.substring(prefixMatch.end);
+/// Gets a combined description for a rule (problem + correction).
+///
+/// Used in the stylistic section of analysis_options_custom.yaml where
+/// users need enough context to decide whether to enable each rule.
+/// Falls back to just problemMessage if correctionMessage is empty or
+/// redundant.
+String _getStylisticDescription(String ruleName) {
+  final metadata = _getRuleMetadata()[ruleName];
+  if (metadata == null) return '';
+
+  final problem = _stripRulePrefix(metadata.problemMessage);
+  final correction = _stripRulePrefix(metadata.correctionMessage);
+
+  if (correction.isEmpty) return problem;
+
+  // If correction just restates the problem, skip it
+  if (problem.contains(correction) || correction.contains(problem)) {
+    // Return whichever is longer (more context)
+    return problem.length >= correction.length ? problem : correction;
   }
 
+  return '$problem $correction';
+}
+
+/// Remove rule name prefix if present (e.g., "[rule_name] ...").
+String _stripRulePrefix(String msg) {
+  final prefixMatch = RegExp(r'^\[[\w_]+\]\s*').firstMatch(msg);
+  if (prefixMatch != null) {
+    return msg.substring(prefixMatch.end);
+  }
   return msg;
 }
 
@@ -608,6 +689,9 @@ RuleTier _getTierFromSets(String ruleName) {
 
 /// Main entry point for the CLI tool.
 Future<void> main(List<String> args) async {
+  // Enable ANSI color support on Windows 10+
+  _tryEnableAnsiWindows();
+
   // Initialize log timestamp for report file
   final now = DateTime.now();
   _logTimestamp =
@@ -1199,7 +1283,7 @@ String _buildStylisticSection({
     buffer.writeln('# --- $category ---');
     for (final rule in activeRules) {
       final enabled = existingValues[rule] ?? false;
-      final msg = _getProblemMessage(rule);
+      final msg = _getStylisticDescription(rule);
       final comment = msg.isNotEmpty ? '  # $msg' : '';
       buffer.writeln('$rule: $enabled$comment');
       categorizedRules.add(rule);
@@ -1218,7 +1302,7 @@ String _buildStylisticSection({
     buffer.writeln('# --- Other stylistic rules ---');
     for (final rule in uncategorized) {
       final enabled = existingValues[rule] ?? false;
-      final msg = _getProblemMessage(rule);
+      final msg = _getStylisticDescription(rule);
       final comment = msg.isNotEmpty ? '  # $msg' : '';
       buffer.writeln('$rule: $enabled$comment');
     }

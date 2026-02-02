@@ -189,7 +189,7 @@ class RequireDeprecationMessageRule extends SaropaLintRule {
         '[require_deprecation_message] Deprecated annotation should include migration guidance.',
     correctionMessage:
         'Use @Deprecated("message") with explanation of what to use instead.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    errorSeverity: DiagnosticSeverity.INFO,
   );
 
   @override
