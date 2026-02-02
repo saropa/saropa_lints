@@ -192,11 +192,11 @@ from scripts.modules._rule_metrics import (
     sync_readme_badges,
 )
 from scripts.modules._version_changelog import (
-    _parse_version,
     display_changelog,
     get_latest_changelog_version,
     get_package_name,
     get_version_from_pubspec,
+    parse_version,
     set_version_in_pubspec,
 )
 
@@ -289,7 +289,7 @@ def main() -> int:
             ExitCode.CHANGELOG_FAILED,
         )
     if version != changelog_version:
-        if _parse_version(version) < _parse_version(changelog_version):
+        if parse_version(version) < parse_version(changelog_version):
             print_warning(
                 f"pubspec version ({version}) is behind "
                 f"CHANGELOG ({changelog_version}). Updating pubspec..."

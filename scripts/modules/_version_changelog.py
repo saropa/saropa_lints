@@ -30,7 +30,7 @@ def get_version_from_pubspec(pubspec_path: Path) -> str:
     return match.group(1)
 
 
-def _parse_version(version: str) -> tuple[int, ...]:
+def parse_version(version: str) -> tuple[int, ...]:
     """Parse a version string into a comparable tuple."""
     return tuple(int(x) for x in version.split("."))
 
@@ -45,6 +45,11 @@ def set_version_in_pubspec(pubspec_path: Path, new_version: str) -> None:
         count=1,
         flags=re.MULTILINE,
     )
+    if content == updated:
+        raise ValueError(
+            f"Failed to update version in {pubspec_path} - "
+            "version pattern not found"
+        )
     pubspec_path.write_text(updated, encoding="utf-8")
 
 
