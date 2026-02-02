@@ -1064,7 +1064,7 @@ const Set<String> recommendedOnlyRules = <String>{
   'require_ios_app_group_capability', // INFO - extension data sharing
 
   'avoid_ios_continuous_location_tracking', // INFO - battery optimization
-  'require_ios_lifecycle_handling', // INFO - proper app lifecycle
+  'require_app_lifecycle_handling', // INFO - proper app lifecycle
   'require_ios_nfc_capability_check', // WARNING - device compatibility
   'require_ios_callkit_integration', // WARNING - VoIP requirement
   'require_ios_photo_library_limited_access', // INFO - iOS 14+ handling
@@ -2596,7 +2596,7 @@ const Set<String> iosPlatformRules = <String>{
   'avoid_ios_hardcoded_device_model',
   'require_ios_app_group_capability',
   'avoid_ios_continuous_location_tracking',
-  'require_ios_lifecycle_handling',
+  'require_app_lifecycle_handling',
   'require_ios_nfc_capability_check',
   'require_ios_callkit_integration',
   'require_ios_photo_library_limited_access',
