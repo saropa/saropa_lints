@@ -2167,7 +2167,7 @@ class AvoidNestedScaffoldsRule extends SaropaLintRule {
         '[avoid_nested_scaffolds] Nested Scaffold widget detected inside another Scaffold. This creates duplicate app bars, floating action buttons, and bottom navigation, leading to broken layout, gesture conflicts, and a confusing user experience.',
     correctionMessage:
         'Remove the inner Scaffold and use its body content directly. Share app bars and bottom navigation from the outer Scaffold.',
-    errorSeverity: DiagnosticSeverity.ERROR,
+    errorSeverity: DiagnosticSeverity.WARNING,
   );
 
   @override

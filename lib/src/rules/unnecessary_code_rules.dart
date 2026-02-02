@@ -39,7 +39,7 @@ class AvoidEmptySpreadRule extends SaropaLintRule {
         '[avoid_empty_spread] Empty spread operator (...[] or ...{}) adds nothing to your collection and may confuse readers. This is often a leftover from refactoring or copy-paste and serves no purpose.',
     correctionMessage:
         'Remove the empty spread from your collection literal. Only use spreads when they add elements. Clean up any unnecessary or misleading spread operators for clarity.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    errorSeverity: DiagnosticSeverity.INFO,
   );
 
   @override

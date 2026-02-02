@@ -59,7 +59,7 @@ class RequireConnectivityErrorHandlingRule extends SaropaLintRule {
         'error handling. checkConnectivity() can throw platform exceptions.',
     correctionMessage:
         'Wrap connectivity checks in try-catch to handle platform exceptions.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    errorSeverity: DiagnosticSeverity.WARNING,
   );
 
   @override

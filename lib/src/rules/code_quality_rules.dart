@@ -873,7 +873,7 @@ class AvoidSubstringRule extends SaropaLintRule {
         'are out of bounds.',
     correctionMessage: 'Consider bounds checking or using safer string '
         'manipulation methods.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    errorSeverity: DiagnosticSeverity.WARNING,
   );
 
   @override
@@ -7661,9 +7661,9 @@ class _LateFinalMethodCallCounterVisitor extends RecursiveAstVisitor<void> {
 class AvoidLateForNullableRule extends SaropaLintRule {
   const AvoidLateForNullableRule() : super(code: _code);
 
-  /// Code quality issue - late with nullable is often a code smell.
+  /// Crash path - accessing before assignment throws LateInitializationError.
   @override
-  LintImpact get impact => LintImpact.low;
+  LintImpact get impact => LintImpact.high;
 
   @override
   RuleCost get cost => RuleCost.medium;
@@ -7674,7 +7674,7 @@ class AvoidLateForNullableRule extends SaropaLintRule {
         '[avoid_late_for_nullable] Nullable type declared with late keyword. Since the type already accepts null, the late keyword adds no initialization safety and instead introduces a hidden crash path: accessing the variable before assignment throws LateInitializationError rather than returning null.',
     correctionMessage:
         'Remove the late keyword and rely on the nullable type (T?) with null checks. The variable will default to null until explicitly assigned, which is safer and more predictable.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    errorSeverity: DiagnosticSeverity.ERROR,
   );
 
   @override
@@ -7762,7 +7762,7 @@ class PreferDotShorthandRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_dot_shorthand',
     problemMessage:
-        '[prefer_dot_shorthand] Enum value could use dot shorthand (.value) in Dart 3.',
+        '[prefer_dot_shorthand] Fully qualified enum reference detected where the type is already known from context. Use dot shorthand (.value) available in Dart 3 to reduce verbosity while preserving type safety.',
     correctionMessage:
         'Replace the fully qualified EnumType.value with .value where the type is already known from context, reducing verbosity while keeping the code type-safe.',
     errorSeverity: DiagnosticSeverity.INFO,

@@ -320,7 +320,7 @@ class MatchClassNamePatternRule extends SaropaLintRule {
         '[match_class_name_pattern] Class name does not follow expected pattern.',
     correctionMessage:
         'Rename the class to follow Dart naming conventions. Use UpperCamelCase and include a suffix matching its purpose (e.g., Widget, State, Screen).',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    errorSeverity: DiagnosticSeverity.INFO,
   );
 
   @override

@@ -513,7 +513,7 @@ class RequireAsyncErrorDocumentationRule extends SaropaLintRule {
         '[require_async_error_documentation] Async function with await expressions does not document thrown exceptions or handle errors internally. Unhandled async errors propagate as uncaught Future failures that can crash the app, produce silent data loss, or leave the UI in an inconsistent state with no recovery path.',
     correctionMessage:
         'Add try-catch to handle errors, or document thrown exceptions with /// Throws [ExceptionType]. Example: /// Throws [NetworkException] if the request fails.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    errorSeverity: DiagnosticSeverity.WARNING,
   );
 
   @override
@@ -687,7 +687,7 @@ class RequireErrorBoundaryRule extends SaropaLintRule {
         '[require_error_boundary] Top-level MaterialApp or CupertinoApp is missing an error boundary in its build tree. Without a dedicated error handler, uncaught exceptions will crash the entire application, leaving users with a blank or frozen screen and no recovery path. All production apps must provide a visible fallback UI for unexpected errors.',
     correctionMessage:
         'Add a builder parameter to your MaterialApp or CupertinoApp that wraps the child tree in an ErrorBoundary. Example: builder: (context, child) => ErrorBoundary(child: child!).',
-    errorSeverity: DiagnosticSeverity.INFO,
+    errorSeverity: DiagnosticSeverity.ERROR,
   );
 
   @override
@@ -2250,7 +2250,7 @@ class RequireErrorLoggingRule extends SaropaLintRule {
         '[require_error_logging] Caught error is not logged to any logging framework or crash reporting service. Silent catch blocks make production debugging impossible because errors leave no trace in logs, crash reports, or monitoring dashboards. Without logging, you cannot detect, alert on, or diagnose failures reported by users.',
     correctionMessage:
         'Log the error using a structured logger, debugPrint, or a crash reporting service like Crashlytics. Example: logger.error("Fetch failed", error: e, stackTrace: st);',
-    errorSeverity: DiagnosticSeverity.INFO,
+    errorSeverity: DiagnosticSeverity.WARNING,
   );
 
   /// Method/function names that indicate logging is happening.

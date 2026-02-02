@@ -3462,7 +3462,7 @@ class RequireFocusNodeDisposeRule extends SaropaLintRule {
         '[require_focus_node_dispose] FocusNode created but not disposed. Undisposed focus nodes retain listeners and focus tree references, causing memory leaks and stale focus behavior that accumulates as users navigate between screens with form inputs.',
     correctionMessage:
         'Add _focusNode.dispose() in the State.dispose() method before calling super.dispose() to release focus tree references and listeners.',
-    errorSeverity: DiagnosticSeverity.ERROR,
+    errorSeverity: DiagnosticSeverity.WARNING,
   );
 
   @override

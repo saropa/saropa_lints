@@ -58,7 +58,7 @@ class PreferSizedBoxOverContainerRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_sizedbox_over_container',
     problemMessage:
-        '[prefer_sizedbox_over_container] Use SizedBox instead of Container for simple width/height spacing.',
+        '[prefer_sizedbox_over_container] A Container is used only for width/height sizing, which adds unnecessary decoration and padding layers. Use SizedBox instead for a lighter widget with clearer intent.',
     correctionMessage:
         'Replace Container with SizedBox when you only need width and height \u2014 SizedBox skips the decoration/padding layers.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -174,7 +174,7 @@ class PreferContainerOverSizedBoxRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_container_over_sizedbox',
     problemMessage:
-        '[prefer_container_over_sizedbox] Use Container instead of SizedBox for consistency.',
+        '[prefer_container_over_sizedbox] A SizedBox was used where a Container would provide better consistency and easier future extension. Replace it with a Container to allow adding decoration, padding, or alignment without a widget swap.',
     correctionMessage:
         'Replace SizedBox with Container so decoration, padding, or alignment can be added later without a widget swap.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -283,7 +283,7 @@ class PreferTextRichOverRichTextRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_text_rich_over_richtext',
     problemMessage:
-        '[prefer_text_rich_over_richtext] Use Text.rich() instead of RichText widget.',
+        '[prefer_text_rich_over_richtext] RichText widget does not inherit DefaultTextStyle, requiring manual base style setup. Text.rich() inherits the theme automatically and produces less boilerplate.',
     correctionMessage:
         'Replace RichText with Text.rich() to inherit the DefaultTextStyle and avoid manually setting the base style.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -343,7 +343,7 @@ class PreferRichTextOverTextRichRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_richtext_over_text_rich',
     problemMessage:
-        '[prefer_richtext_over_text_rich] Use RichText instead of Text.rich() for explicit control.',
+        '[prefer_richtext_over_text_rich] Text.rich() inherits DefaultTextStyle implicitly, which can cause unexpected styling. Use RichText instead for explicit control over the base text style without hidden theme inheritance.',
     correctionMessage:
         'Replace Text.rich() with RichText for full control over the base text style without implicit DefaultTextStyle inheritance.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -407,7 +407,7 @@ class PreferEdgeInsetsSymmetricRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_edgeinsets_symmetric',
     problemMessage:
-        '[prefer_edgeinsets_symmetric] Use EdgeInsets.symmetric() when left/right or top/bottom are equal.',
+        '[prefer_edgeinsets_symmetric] EdgeInsets.only() was used with equal left/right or top/bottom values, which adds unnecessary repetition. Use EdgeInsets.symmetric() to express mirrored padding concisely.',
     correctionMessage:
         'Replace EdgeInsets.only() with EdgeInsets.symmetric() when horizontal or vertical values are equal, for brevity.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -542,7 +542,7 @@ class PreferEdgeInsetsOnlyRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_edgeinsets_only',
     problemMessage:
-        '[prefer_edgeinsets_only] Use EdgeInsets.only() for explicit side values.',
+        '[prefer_edgeinsets_only] EdgeInsets.symmetric() hides which sides receive padding, making future per-side adjustments harder. Use EdgeInsets.only() to declare each side explicitly so values can be changed independently.',
     correctionMessage:
         'Replace EdgeInsets.symmetric() with EdgeInsets.only() for explicit per-side values that are easier to adjust independently.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -773,7 +773,7 @@ class PreferExpandedOverFlexibleRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_expanded_over_flexible',
     problemMessage:
-        '[prefer_expanded_over_flexible] Use Expanded instead of Flexible(fit: FlexFit.tight).',
+        '[prefer_expanded_over_flexible] Flexible with fit: FlexFit.tight is equivalent to Expanded, adding unnecessary verbosity. Use Expanded directly for clearer intent and less boilerplate.',
     correctionMessage:
         'Replace Flexible(fit: FlexFit.tight) with Expanded, which is the idiomatic shorthand for tight-fit flex children.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -884,7 +884,7 @@ class PreferFlexibleOverExpandedRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_flexible_over_expanded',
     problemMessage:
-        '[prefer_flexible_over_expanded] Use Flexible instead of Expanded for consistency.',
+        '[prefer_flexible_over_expanded] Expanded widget detected, which hides its fit parameter. Use Flexible with an explicit fit argument instead for greater clarity and easier adjustments to flex behavior.',
     correctionMessage:
         'Replace Expanded with Flexible(fit: FlexFit.tight) so the fit parameter is always visible and easy to change later.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -986,7 +986,7 @@ class PreferMaterialThemeColorsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_material_theme_colors',
     problemMessage:
-        '[prefer_material_theme_colors] Use Theme.of(context).colorScheme instead of hardcoded Colors.',
+        '[prefer_material_theme_colors] Hardcoded Colors.* constant detected in a widget color parameter. Hardcoded colors ignore the active theme and break dark mode support. Use Theme.of(context).colorScheme for consistent theming.',
     correctionMessage:
         'Replace hardcoded Colors.* with Theme.of(context).colorScheme values to support dark mode and keep colors consistent.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -1070,7 +1070,7 @@ class PreferExplicitColorsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_explicit_colors',
     problemMessage:
-        '[prefer_explicit_colors] Use explicit Colors instead of Theme.of(context).colorScheme.',
+        '[prefer_explicit_colors] Theme.of(context).colorScheme requires a BuildContext lookup at runtime, adding indirection. Use explicit Colors constants for predictable output without runtime context dependency.',
     correctionMessage:
         'Replace Theme.of(context).colorScheme with explicit Colors.* values for predictable output without runtime context.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -1154,7 +1154,7 @@ class PreferClipRSuperellipseRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_clip_r_superellipse',
     problemMessage:
-        '[prefer_clip_r_superellipse] Use ClipRSuperellipse instead of ClipRRect for smoother rounded corners.',
+        '[prefer_clip_r_superellipse] ClipRRect uses circular arcs for rounded corners, which produce a visible transition between straight edges and curves. Use ClipRSuperellipse for smoother continuous corners matching iOS design language.',
     correctionMessage:
         'ClipRSuperellipse provides smoother corner transitions matching iOS design language. Requires Flutter 3.32+.',
     errorSeverity: DiagnosticSeverity.INFO,

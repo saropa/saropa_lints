@@ -49,7 +49,7 @@ class AvoidDuplicateTestAssertionsRule extends SaropaLintRule {
         '[avoid_duplicate_test_assertions] Duplicate test assertion detected.',
     correctionMessage:
         'Remove the duplicate assertion or verify different values.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    errorSeverity: DiagnosticSeverity.INFO,
   );
 
   @override
@@ -98,7 +98,7 @@ class AvoidEmptyTestGroupsRule extends SaropaLintRule {
     name: 'avoid_empty_test_groups',
     problemMessage: '[avoid_empty_test_groups] Test group has an empty body.',
     correctionMessage: 'Add tests to the group or remove it.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    errorSeverity: DiagnosticSeverity.INFO,
   );
 
   @override
@@ -623,7 +623,7 @@ class PreferUniqueTestNamesRule extends SaropaLintRule {
     name: 'prefer_unique_test_names',
     problemMessage: '[prefer_unique_test_names] Duplicate test name found.',
     correctionMessage: 'Use a unique name for each test.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    errorSeverity: DiagnosticSeverity.INFO,
   );
 
   @override

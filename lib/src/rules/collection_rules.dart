@@ -1548,7 +1548,7 @@ class PreferIterableOfRule extends SaropaLintRule {
         '[prefer_iterable_of] Using .from() performs a runtime cast on each element, which can silently succeed with wrong types and throw later. The .of() constructor enforces type safety at the call site, catching type mismatches immediately.',
     correctionMessage:
         'Replace .from() with .of() to enforce compile-time type checking and prevent silent runtime cast failures.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    errorSeverity: DiagnosticSeverity.WARNING,
   );
 
   static const Set<String> _collectionTypes = <String>{

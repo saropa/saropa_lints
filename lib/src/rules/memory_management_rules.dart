@@ -52,7 +52,7 @@ class AvoidLargeObjectsInStateRule extends SaropaLintRule {
         '[avoid_large_objects_in_state] Unbounded List, Map, Set, or ByteData field declared in a State class grows without limit as data accumulates. Without pagination or size constraints, this allocates excessive memory that degrades scroll performance, increases garbage collection pressure, and eventually crashes the app with an out-of-memory error on devices with limited RAM.',
     correctionMessage:
         'Use pagination to load data in fixed-size chunks, stream results lazily from the data source, or move large collections to external state management with disposal and lifecycle control.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    errorSeverity: DiagnosticSeverity.ERROR,
   );
 
   static const Set<String> _largeTypePatterns = <String>{
