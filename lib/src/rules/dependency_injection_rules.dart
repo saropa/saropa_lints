@@ -13,6 +13,7 @@ import 'package:analyzer/error/error.dart'
 import 'package:custom_lint_builder/custom_lint_builder.dart';
 
 import '../saropa_lint_rule.dart';
+import '../type_annotation_utils.dart';
 
 /// Warns when service locator is accessed directly in widgets.
 ///
@@ -691,12 +692,10 @@ class PreferNullObjectPatternRule extends SaropaLintRule {
       final TypeAnnotation? type = node.fields.type;
       if (type == null) return;
 
-      final String typeSource = type.toSource();
+      // Check if outer type is nullable
+      if (type is! NamedType || !isOuterTypeNullable(type)) return;
 
-      // Check if it's a nullable optional dependency type
-      if (!typeSource.endsWith('?')) return;
-
-      final String baseType = typeSource.substring(0, typeSource.length - 1);
+      final String baseType = type.name.lexeme;
       for (final String suffix in _optionalDependencySuffixes) {
         if (baseType.endsWith(suffix)) {
           reporter.atNode(node, code);

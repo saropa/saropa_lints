@@ -13,6 +13,7 @@ import 'package:analyzer/error/error.dart'
 import 'package:custom_lint_builder/custom_lint_builder.dart';
 
 import '../saropa_lint_rule.dart';
+import '../type_annotation_utils.dart';
 
 /// Warns when `as` cast is used without null check.
 ///
@@ -351,8 +352,7 @@ class RequireNullSafeExtensionsRule extends SaropaLintRule {
       if (onClause == null) return;
 
       // Check if extending a nullable type
-      final String typeSource = onClause.extendedType.toSource();
-      if (!typeSource.endsWith('?')) return;
+      if (!isOuterTypeNullable(onClause.extendedType)) return;
 
       // Check members for null assertions
       for (final ClassMember member in node.members) {
