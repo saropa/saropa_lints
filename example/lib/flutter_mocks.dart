@@ -88,12 +88,128 @@ class ConstrainedBox extends Widget {
 }
 
 class Column extends Widget {
-  const Column({super.key, List<Widget>? children});
+  const Column({
+    super.key,
+    List<Widget>? children,
+    MainAxisSize mainAxisSize = MainAxisSize.max,
+    CrossAxisAlignment crossAxisAlignment = CrossAxisAlignment.center,
+    TextBaseline? textBaseline,
+  });
 }
 
 class Row extends Widget {
-  const Row({super.key, List<Widget>? children});
+  const Row({
+    super.key,
+    List<Widget>? children,
+    CrossAxisAlignment crossAxisAlignment = CrossAxisAlignment.center,
+    TextBaseline? textBaseline,
+  });
 }
+
+class Flex extends Widget {
+  const Flex({
+    super.key,
+    List<Widget>? children,
+    CrossAxisAlignment crossAxisAlignment = CrossAxisAlignment.center,
+    TextBaseline? textBaseline,
+  });
+}
+
+class Expanded extends Widget {
+  const Expanded({super.key, int flex = 1, required Widget child});
+}
+
+class Flexible extends Widget {
+  const Flexible({super.key, int flex = 1, required Widget child});
+}
+
+class Spacer extends Widget {
+  const Spacer({super.key, int flex = 1});
+}
+
+class Stack extends Widget {
+  const Stack({super.key, List<Widget>? children});
+}
+
+class IndexedStack extends Widget {
+  const IndexedStack({super.key, int? index, List<Widget>? children});
+}
+
+class Positioned extends Widget {
+  const Positioned({
+    super.key,
+    double? left,
+    double? top,
+    double? right,
+    double? bottom,
+    required Widget child,
+  });
+}
+
+class AnimatedPositioned extends Widget {
+  const AnimatedPositioned({
+    super.key,
+    double? left,
+    double? top,
+    required Widget child,
+    required Duration duration,
+  });
+}
+
+class PositionedDirectional extends Widget {
+  const PositionedDirectional({
+    super.key,
+    double? start,
+    double? top,
+    required Widget child,
+  });
+}
+
+class Wrap extends Widget {
+  const Wrap({super.key, List<Widget>? children, double spacing = 0.0});
+}
+
+class Table extends Widget {
+  const Table({super.key, List<TableRow>? children});
+}
+
+class TableRow extends Widget {
+  const TableRow({super.key, List<Widget>? children});
+}
+
+class TableCell extends Widget {
+  const TableCell({super.key, required Widget child});
+}
+
+class IntrinsicHeight extends Widget {
+  const IntrinsicHeight({super.key, Widget? child});
+}
+
+class IntrinsicWidth extends Widget {
+  const IntrinsicWidth({super.key, Widget? child});
+}
+
+class GridView extends Widget {
+  const GridView({super.key, List<Widget>? children, bool shrinkWrap = false});
+  const GridView.builder({
+    super.key,
+    int? itemCount,
+    Widget Function(BuildContext, int)? itemBuilder,
+    required dynamic gridDelegate,
+    bool shrinkWrap = false,
+  });
+}
+
+class LimitedBox extends Widget {
+  const LimitedBox(
+      {super.key, double maxHeight = double.infinity, Widget? child});
+}
+
+enum MainAxisSize { min, max }
+
+enum CrossAxisAlignment { start, end, center, stretch, baseline }
+
+enum TextBaseline { alphabetic, ideographic }
 
 class Text extends Widget {
   const Text(String data, {super.key});
@@ -220,6 +336,10 @@ Future<T?> showDialog<T>({
 class AlertDialog extends Widget {
   const AlertDialog(
       {super.key, Widget? title, Widget? content, List<Widget>? actions});
+}
+
+class SimpleDialog extends Widget {
+  const SimpleDialog({super.key, Widget? title, List<Widget>? children});
 }
 
 // ============================================================================

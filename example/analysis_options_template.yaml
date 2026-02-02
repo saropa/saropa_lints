@@ -471,6 +471,15 @@ custom_lint:
     - avoid_expanded_as_spacer: false
     - avoid_flexible_outside_flex: false
     - avoid_expanded_outside_flex: false         # ERROR - Expanded needs Flex parent (v2.3.10)
+    - avoid_table_cell_outside_table: false      # ERROR - TableCell needs Table parent (v4.9.14)
+    - avoid_positioned_outside_stack: false      # ERROR - Positioned needs Stack parent (v4.9.14)
+    - avoid_spacer_in_wrap: false                # ERROR - Spacer/Expanded crash in Wrap (v4.9.14)
+    - avoid_scrollable_in_intrinsic: false       # ERROR - scrollable in IntrinsicHeight crashes (v4.9.14)
+    - require_baseline_text_baseline: false      # ERROR - baseline alignment needs textBaseline (v4.9.14)
+    - avoid_unconstrained_dialog_column: false   # WARNING - Column in dialog needs MainAxisSize.min (v4.9.14)
+    - avoid_unbounded_listview_in_column: false  # ERROR - ListView in Column needs Expanded (v4.9.14)
+    - avoid_textfield_in_row: false              # ERROR - TextField in Row needs width constraint (v4.9.14)
+    - avoid_fixed_size_in_scaffold_body: false   # WARNING - Scaffold body with TextField needs ScrollView (v4.9.14)
     - prefer_expanded_at_call_site: false        # WARNING - Don't return Expanded from build() (v3.0.0)
     - avoid_stack_without_positioned: false      # WARNING - Stack needs Positioned (v2.3.10)
     - avoid_builder_index_out_of_bounds: false   # WARNING - runtime crash (v2.3.11)
