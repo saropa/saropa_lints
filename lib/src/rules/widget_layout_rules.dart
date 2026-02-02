@@ -4132,100 +4132,6 @@ class PreferPositionedDirectionalRule extends SaropaLintRule {
   }
 }
 
-/// Warns when Stack children may cause overflow without positioning.
-///
-/// Stack children without Positioned/Align may not layout as expected.
-///
-/// **BAD:**
-/// ```dart
-/// Stack(
-///   children: [
-///     Container(color: Colors.red),
-///     Text('Overlay'), // May be positioned unexpectedly
-///   ],
-/// )
-/// ```
-///
-/// **GOOD:**
-/// ```dart
-/// Stack(
-///   children: [
-///     Container(color: Colors.red),
-///     Positioned(bottom: 10, child: Text('Overlay')),
-///   ],
-/// )
-/// ```
-
-class AvoidStackOverflowRule extends SaropaLintRule {
-  const AvoidStackOverflowRule() : super(code: _code);
-
-  /// Code quality issue. Review when count exceeds 100.
-  @override
-  LintImpact get impact => LintImpact.medium;
-
-  @override
-  RuleCost get cost => RuleCost.low;
-
-  @override
-  Set<FileType>? get applicableFileTypes => {FileType.widget};
-
-  static const LintCode _code = LintCode(
-    name: 'avoid_stack_overflow',
-    problemMessage:
-        '[avoid_stack_overflow] Stack children should use Positioned or Align.',
-    correctionMessage: 'Wrap child with Positioned, Align, or Center.',
-    errorSeverity: DiagnosticSeverity.INFO,
-  );
-
-  static const Set<String> _positioningWidgets = <String>{
-    'Positioned',
-    'PositionedDirectional',
-    'Align',
-    'Center',
-  };
-
-  @override
-  void runWithReporter(
-    CustomLintResolver resolver,
-    SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
-  ) {
-    context.registry.addInstanceCreationExpression((
-      InstanceCreationExpression node,
-    ) {
-      final String typeName = node.constructorName.type.name.lexeme;
-      if (typeName != 'Stack') return;
-
-      // Check children
-      for (final Expression arg in node.argumentList.arguments) {
-        if (arg is NamedExpression && arg.name.label.name == 'children') {
-          final Expression childrenExpr = arg.expression;
-          if (childrenExpr is ListLiteral) {
-            // Skip if only one child (stack sizing behavior)
-            if (childrenExpr.elements.length <= 1) return;
-
-            int unpositionedCount = 0;
-            for (final CollectionElement element in childrenExpr.elements) {
-              if (element is InstanceCreationExpression) {
-                final String childType =
-                    element.constructorName.type.name.lexeme;
-                if (!_positioningWidgets.contains(childType)) {
-                  unpositionedCount++;
-                }
-              }
-            }
-
-            // Warn if multiple unpositioned children
-            if (unpositionedCount > 1) {
-              reporter.atNode(node.constructorName, code);
-            }
-          }
-        }
-      }
-    });
-  }
-}
-
 /// Warns when shrinkWrap: true is used on scrollable widgets.
 ///
 /// shrinkWrap: true causes O(n) layout cost and defeats lazy loading.
@@ -5991,33 +5897,32 @@ class RequirePhysicsForNestedScrollRule extends SaropaLintRule {
   }
 }
 
-/// Warns when AnimatedBuilder is missing the child parameter.
+/// Warns when Stack children are not wrapped in Positioned or Align.
 ///
-/// Alias: animated_builder_child, wasteful_animation
+/// Non-first Stack children without explicit positioning use the Stack's
+/// default alignment, which may produce unexpected overlap. The first child
+/// is skipped because it typically defines the Stack's base size.
 ///
-/// AnimatedBuilder should use the child parameter for parts that don't
-/// animate to avoid unnecessary rebuilds.
+/// Common fill widgets (Container, SizedBox, DecoratedBox) are exempt
+/// because they are frequently used as full-size overlays.
 ///
 /// **BAD:**
 /// ```dart
-/// AnimatedBuilder(
-///   animation: _controller,
-///   builder: (context, _) => Container(
-///     transform: Matrix4.rotationZ(_controller.value),
-///     child: const Text('Heavy static widget'),  // Rebuilt every frame!
-///   ),
+/// Stack(
+///   children: [
+///     Container(color: Colors.red),
+///     Text('Overlay'), // Positioned at topStart by default
+///   ],
 /// )
 /// ```
 ///
 /// **GOOD:**
 /// ```dart
-/// AnimatedBuilder(
-///   animation: _controller,
-///   child: const Text('Heavy static widget'),  // Built once
-///   builder: (context, child) => Container(
-///     transform: Matrix4.rotationZ(_controller.value),
-///     child: child,
-///   ),
+/// Stack(
+///   children: [
+///     Container(color: Colors.red),
+///     Positioned(bottom: 10, child: Text('Overlay')),
+///   ],
 /// )
 /// ```
 
