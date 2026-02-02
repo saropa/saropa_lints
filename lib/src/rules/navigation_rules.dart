@@ -669,7 +669,7 @@ class AvoidPopWithoutResultRule extends SaropaLintRule {
         '[avoid_pop_without_result] Navigator.push awaits a result but does not handle the null case when the user dismisses the route by pressing the back button or using a system gesture. Accessing properties on a null result throws a runtime exception that crashes the app. This creates a fragile navigation flow that fails under normal user interaction patterns.',
     correctionMessage:
         'Check if the navigation result is null before accessing its properties, and provide a default value or early return to handle route dismissal without a result.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    errorSeverity: DiagnosticSeverity.ERROR,
   );
 
   @override
@@ -877,7 +877,7 @@ class RequireDeepLinkFallbackRule extends SaropaLintRule {
         '[require_deep_link_fallback] Deep link handler navigates to content without verifying the target exists or is accessible. When a deep link references deleted, restricted, or invalid content, the app either crashes with a null reference error or displays a blank screen. Users tapping expired links in emails, notifications, or shared messages encounter a broken experience.',
     correctionMessage:
         'Add a fallback route or error screen that displays a user-friendly message when deep-linked content is missing, deleted, or inaccessible, with an option to navigate home.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    errorSeverity: DiagnosticSeverity.ERROR,
   );
 
   @override
@@ -2198,9 +2198,9 @@ class _ReplaceWithMaybePopFix extends DartFix {
 class PreferUrlLauncherUriOverStringRule extends SaropaLintRule {
   const PreferUrlLauncherUriOverStringRule() : super(code: _code);
 
-  /// Minor improvement. Track for later review.
+  /// Crash path - malformed URI throws FormatException at runtime.
   @override
-  LintImpact get impact => LintImpact.low;
+  LintImpact get impact => LintImpact.high;
 
   @override
   RuleCost get cost => RuleCost.low;
@@ -2211,7 +2211,7 @@ class PreferUrlLauncherUriOverStringRule extends SaropaLintRule {
         '[prefer_url_launcher_uri_over_string] launchUrl called with Uri.parse() on a string literal instead of constructing a Uri object directly. Uri.parse() defers validation to runtime, where malformed strings throw FormatException and crash the app.',
     correctionMessage:
         'Replace Uri.parse() with Uri.https() or Uri.http() constructors that validate the URL structure at compile time and auto-encode query parameters correctly.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    errorSeverity: DiagnosticSeverity.ERROR,
   );
 
   @override
@@ -2745,7 +2745,7 @@ class RequireGoRouterFallbackRouteRule extends SaropaLintRule {
         '[require_go_router_fallback_route] GoRouter configuration without errorBuilder or errorPageBuilder has no fallback for unmatched routes. When users navigate to a non-existent path via deep link, push notification, or typo, the router throws an unhandled exception that crashes the app instead of showing a helpful error page.',
     correctionMessage:
         'Add errorBuilder: (context, state) => NotFoundPage() or errorPageBuilder to display a user-friendly error screen when navigation targets an undefined route.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    errorSeverity: DiagnosticSeverity.ERROR,
   );
 
   @override

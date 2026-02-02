@@ -87,7 +87,7 @@ class AvoidGenericsShadowingRule extends SaropaLintRule {
     problemMessage:
         '[avoid_generics_shadowing] Generic type parameter shadows a top-level declaration.',
     correctionMessage: 'Rename the generic parameter to avoid shadowing.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    errorSeverity: DiagnosticSeverity.INFO,
   );
 
   static const Set<String> _commonTypes = <String>{
@@ -368,7 +368,7 @@ class AvoidShadowingRule extends SaropaLintRule {
     problemMessage:
         '[avoid_variable_shadowing] Declaration shadows a declaration from an outer scope.',
     correctionMessage: 'Rename the variable to avoid confusion.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    errorSeverity: DiagnosticSeverity.INFO,
   );
 
   @override

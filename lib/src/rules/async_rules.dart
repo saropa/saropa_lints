@@ -3711,7 +3711,7 @@ class PreferBroadcastStreamRule extends SaropaLintRule {
         'Multiple listeners will cause an error.',
     correctionMessage:
         'Use .asBroadcastStream() or StreamController.broadcast().',
-    errorSeverity: DiagnosticSeverity.INFO,
+    errorSeverity: DiagnosticSeverity.WARNING,
   );
 
   @override
