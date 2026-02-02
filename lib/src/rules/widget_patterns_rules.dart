@@ -1009,7 +1009,7 @@ class AvoidCatchingGenericExceptionRule extends SaropaLintRule {
         '[avoid_catching_generic_exception] Catching Exception or Object swallows all errors including programming bugs, assertion failures, and unexpected states that should crash visibly. This masks root causes, making bugs harder to diagnose and allowing the app to continue in a corrupted state.',
     correctionMessage:
         'Catch specific exception types (e.g. FormatException, HttpException, SocketException) so that unexpected errors propagate and are caught by error reporting.',
-    errorSeverity: DiagnosticSeverity.ERROR,
+    errorSeverity: DiagnosticSeverity.WARNING,
   );
 
   @override
@@ -7844,7 +7844,7 @@ class RequireImagePickerPermissionIosRule extends SaropaLintRule {
         'app rejection by App Store or instant crash when accessing photos.',
     correctionMessage:
         'Add NSPhotoLibraryUsageDescription and NSCameraUsageDescription to Info.plist.',
-    errorSeverity: DiagnosticSeverity.ERROR,
+    errorSeverity: DiagnosticSeverity.WARNING,
   );
 
   @override
@@ -7898,7 +7898,7 @@ class RequireImagePickerPermissionAndroidRule extends SaropaLintRule {
         'causes SecurityException crash when user tries to take a photo.',
     correctionMessage:
         'Add <uses-permission android:name="android.permission.CAMERA"/> to manifest.',
-    errorSeverity: DiagnosticSeverity.ERROR,
+    errorSeverity: DiagnosticSeverity.WARNING,
   );
 
   @override
@@ -7953,7 +7953,7 @@ class RequirePermissionManifestAndroidRule extends SaropaLintRule {
         'manifest entry always fails. Feature silently stops working.',
     correctionMessage:
         'Add <uses-permission android:name="android.permission.XXX"/> to manifest.',
-    errorSeverity: DiagnosticSeverity.ERROR,
+    errorSeverity: DiagnosticSeverity.WARNING,
   );
 
   @override
@@ -8007,7 +8007,7 @@ class RequirePermissionPlistIosRule extends SaropaLintRule {
         'Info.plist. App crashes or gets rejected from App Store without them.',
     correctionMessage:
         'Add NSxxxUsageDescription key to Info.plist for each permission.',
-    errorSeverity: DiagnosticSeverity.ERROR,
+    errorSeverity: DiagnosticSeverity.WARNING,
   );
 
   @override
@@ -8065,7 +8065,7 @@ class RequireUrlLauncherQueriesAndroidRule extends SaropaLintRule {
         'canLaunchUrl returns false on Android 11+ even for installed apps.',
     correctionMessage:
         'Add <queries> element with intent filters to AndroidManifest.xml.',
-    errorSeverity: DiagnosticSeverity.ERROR,
+    errorSeverity: DiagnosticSeverity.WARNING,
   );
 
   @override
@@ -8123,7 +8123,7 @@ class RequireUrlLauncherSchemesIosRule extends SaropaLintRule {
         'canLaunchUrl returns false on iOS even for available URL schemes.',
     correctionMessage:
         'Add URL schemes to LSApplicationQueriesSchemes array in Info.plist.',
-    errorSeverity: DiagnosticSeverity.ERROR,
+    errorSeverity: DiagnosticSeverity.WARNING,
   );
 
   @override

@@ -669,7 +669,7 @@ class AvoidPopWithoutResultRule extends SaropaLintRule {
         '[avoid_pop_without_result] Navigator.push awaits a result but does not handle the null case when the user dismisses the route by pressing the back button or using a system gesture. Accessing properties on a null result throws a runtime exception that crashes the app. This creates a fragile navigation flow that fails under normal user interaction patterns.',
     correctionMessage:
         'Check if the navigation result is null before accessing its properties, and provide a default value or early return to handle route dismissal without a result.',
-    errorSeverity: DiagnosticSeverity.ERROR,
+    errorSeverity: DiagnosticSeverity.WARNING,
   );
 
   @override
