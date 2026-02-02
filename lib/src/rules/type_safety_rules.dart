@@ -19,6 +19,11 @@ import '../saropa_lint_rule.dart';
 /// Direct casting with `as` can throw if the value is null or wrong type.
 /// Prefer `is` check first or use `as?` for nullable result.
 ///
+/// Skips provably safe casts:
+/// - Cast to `Object` (every non-null Dart value is an Object)
+/// - Same-type casts (redundant but safe)
+/// - Upcasts to a supertype (e.g. `int as num`)
+///
 /// **BAD:**
 /// ```dart
 /// final widget = context.widget as MyWidget; // Throws if wrong type
@@ -63,13 +68,41 @@ class AvoidUnsafeCastRule extends SaropaLintRule {
       // Skip if it's a nullable cast (as?)
       if (node.type.question != null) return;
 
-      // Check if there's a preceding is-check in the same scope
+      // Skip provably safe casts
+      if (_isSafeCast(node)) return;
+
       final AstNode? parent = node.parent;
       if (parent == null) return;
 
       // Report unsafe cast
       reporter.atNode(node, code);
     });
+  }
+
+  /// Returns true if the cast is provably safe at compile time.
+  bool _isSafeCast(AsExpression node) {
+    final DartType? sourceType = node.expression.staticType;
+    final String targetName = node.type.toSource().replaceAll('?', '');
+
+    // Cast to Object is always safe (every Dart value is an Object)
+    if (targetName == 'Object') return true;
+
+    if (sourceType == null || sourceType is DynamicType) return false;
+
+    // Check if target is the same type or a supertype (upcast)
+    if (sourceType is InterfaceType) {
+      final String? sourceName = sourceType.element.name;
+
+      // Same-type cast is safe
+      if (sourceName == targetName) return true;
+
+      // Upcast to a supertype is safe
+      for (final InterfaceType supertype in sourceType.allSupertypes) {
+        if (supertype.element.name == targetName) return true;
+      }
+    }
+
+    return false;
   }
 }
 
@@ -573,7 +606,8 @@ class PreferExplicitTypeArgumentsRule extends SaropaLintRule {
     name: 'prefer_explicit_type_arguments',
     problemMessage:
         '[prefer_explicit_type_arguments] Generic type without explicit type arguments.',
-    correctionMessage: 'Add explicit type arguments for clarity.',
+    correctionMessage:
+        'Add explicit type arguments to the generic type so that the intended types are visible without relying on inference.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 

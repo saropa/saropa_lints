@@ -939,8 +939,9 @@ class PatternFieldsOrderingRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_sorted_pattern_fields',
     problemMessage:
-        '[prefer_sorted_pattern_fields] Unsorted pattern fields slow code review and refactoring.',
-    correctionMessage: 'Reorder pattern fields alphabetically.',
+        '[prefer_sorted_pattern_fields] Unsorted pattern fields slow code review and make refactoring error-prone. Alphabetical ordering provides a predictable scanning path, reduces merge conflicts when multiple developers modify the same pattern, and makes it easier to spot missing or duplicate fields at a glance.',
+    correctionMessage:
+        'Reorder the pattern fields in alphabetical order. The quick fix can sort them automatically while preserving comments.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -1117,8 +1118,9 @@ class RecordFieldsOrderingRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_sorted_record_fields',
     problemMessage:
-        '[prefer_sorted_record_fields] Unsorted record fields slow code review and refactoring.',
-    correctionMessage: 'Reorder fields alphabetically.',
+        '[prefer_sorted_record_fields] Unsorted record fields slow code review and make refactoring error-prone. Alphabetical ordering provides a predictable scanning path, reduces merge conflicts when multiple developers modify the same record definition, and makes it easier to spot duplicate or missing fields.',
+    correctionMessage:
+        'Reorder the record fields in alphabetical order. The quick fix can sort them automatically while preserving type annotations.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 

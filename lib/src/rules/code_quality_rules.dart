@@ -997,7 +997,7 @@ class AvoidUnusedParametersRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_unused_parameters',
     problemMessage:
-        '[avoid_unused_parameters] Function parameter is declared but never referenced in the function body. Unused parameters add cognitive overhead for callers who must provide a value that has no effect, and they mask API design issues where the parameter needs to be removed or the implementation is incomplete.',
+        '[avoid_unused_parameters] Function parameter is declared but never referenced in the function body. Unused parameters add cognitive overhead for callers who must provide a value that has no effect, and they mask API design issues — either remove the parameter or complete the implementation that was supposed to use it.',
     correctionMessage:
         'Remove the parameter from the function signature, or prefix it with an underscore to indicate it is intentionally unused for interface conformance.',
     errorSeverity: DiagnosticSeverity.INFO,

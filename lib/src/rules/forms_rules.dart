@@ -1418,9 +1418,9 @@ class AvoidKeyboardOverlapRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_keyboard_overlap',
     problemMessage:
-        '[avoid_keyboard_overlap] TextField may be hidden by keyboard. No viewInsets handling found.',
+        '[avoid_keyboard_overlap] TextField may be hidden behind the soft keyboard when no viewInsets handling is detected. Users cannot see what they are typing, leading to input errors, frustration, and accessibility failures on devices where the keyboard covers a large portion of the screen.',
     correctionMessage:
-        'Use SingleChildScrollView or handle MediaQuery.viewInsets.bottom.',
+        'Wrap the form content in a SingleChildScrollView, or use MediaQuery.viewInsets.bottom to add padding that keeps the focused TextField visible.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
