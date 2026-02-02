@@ -2,7 +2,7 @@
 
 <!-- cspell:disable -->
 
-Archived releases 0.1.0 through 4.6.2. See [CHANGELOG.md](./CHANGELOG.md) for the latest versions.
+Archived releases 0.1.0 through 4.6.2. See [CHANGELOG.md](https://github.com/saropa/saropa_lints/blob/main/CHANGELOG.md) for the latest versions.
 
 ---
 ## [4.6.2]
@@ -270,7 +270,7 @@ Archived releases 0.1.0 through 4.6.2. See [CHANGELOG.md](./CHANGELOG.md) for th
   - Added and improved code comments throughout for clarity and maintainability.
   - Help output now documents the new flag and behaviors.
 
-- Migrated rules 4.2.0 and below to [CHANGELOG_ARCHIVE.md](./CHANGELOG_ARCHIVE.md)
+- Migrated rules 4.2.0 and below to [CHANGELOG_ARCHIVE.md](https://github.com/saropa/saropa_lints/blob/main/CHANGELOG_ARCHIVE.md)
 
 #### File Length Rules Renamed (structure_rules.dart)
 

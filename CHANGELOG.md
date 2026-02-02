@@ -6,12 +6,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 Dates are not included in version headers — [pub.dev](https://pub.dev/packages/saropa_lints/changelog) displays publish dates separately.
 
 > **Looking for older changes?** \
-> See [CHANGELOG_ARCHIVE.md](./CHANGELOG_ARCHIVE.md) for versions 0.1.0 through 4.6.2.
+> See [CHANGELOG_ARCHIVE.md](https://github.com/saropa/saropa_lints/blob/main/CHANGELOG_ARCHIVE.md) for versions 0.1.0 through 4.6.2.
 
 ** See the current published changelog: [saropa_lints/changelog](https://pub.dev/packages/saropa_lints/changelog)
 
 ---
-## [4.9.12] - current
+## [4.9.13] - current
+
+### Fixed
+
+- **`check_mounted_after_async` false positive on `await showDialog()`**: The rule flagged `await showDialog(...)` (and `showModalBottomSheet`, `showSnackBar`) as needing a mounted check even when no prior await existed. The `_hasAwaitBefore()` helper searched for `'await '` in the source text before the `MethodInvocation` offset, but when the call was itself the awaited expression (`await showDialog(...)`), its own `await` keyword appeared in that substring. Now uses the parent `AwaitExpression`'s offset when the target is directly awaited, so only genuinely preceding awaits are detected.
+
+---
+## [4.9.12]
 
 ### Fixed
 
@@ -526,4 +533,4 @@ Dates are not included in version headers — [pub.dev](https://pub.dev/packages
 
 ## [4.6.2] and Earlier
 
-For details on the initial release and versions 0.1.0 through 4.6.2, please refer to [CHANGELOG_ARCHIVE.md](./CHANGELOG_ARCHIVE.md).
+For details on the initial release and versions 0.1.0 through 4.6.2, please refer to [CHANGELOG_ARCHIVE.md](https://github.com/saropa/saropa_lints/blob/main/CHANGELOG_ARCHIVE.md).
