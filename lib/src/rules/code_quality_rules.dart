@@ -7691,9 +7691,8 @@ class AvoidLateForNullableRule extends SaropaLintRule {
       final TypeAnnotation? typeAnnotation = fields.type;
       if (typeAnnotation == null) return;
 
-      // Check for nullable type annotation (ends with ?)
-      final String typeStr = typeAnnotation.toSource();
-      if (typeStr.endsWith('?')) {
+      // Check outer type nullability via AST question token
+      if (_isOuterTypeNullable(typeAnnotation)) {
         reporter.atNode(node, code);
       }
     });
@@ -7705,13 +7704,31 @@ class AvoidLateForNullableRule extends SaropaLintRule {
       final TypeAnnotation? typeAnnotation = variables.type;
       if (typeAnnotation == null) return;
 
-      final String typeStr = typeAnnotation.toSource();
-      if (typeStr.endsWith('?')) {
+      // Check outer type nullability via AST question token
+      if (_isOuterTypeNullable(typeAnnotation)) {
         for (final VariableDeclaration variable in variables.variables) {
           reporter.atNode(variable, code);
         }
       }
     });
+  }
+
+  /// Checks if the outer type itself is nullable (has a trailing `?`).
+  ///
+  /// Uses the AST `question` token rather than string matching to avoid
+  /// false positives when `?` appears only on inner generic parameters
+  /// (e.g. `Future<String?>` is non-nullable, `Future<String>?` is nullable).
+  static bool _isOuterTypeNullable(TypeAnnotation typeAnnotation) {
+    if (typeAnnotation is NamedType) {
+      return typeAnnotation.question != null;
+    }
+    if (typeAnnotation is GenericFunctionType) {
+      return typeAnnotation.question != null;
+    }
+    if (typeAnnotation is RecordTypeAnnotation) {
+      return typeAnnotation.question != null;
+    }
+    return false;
   }
 }
 
