@@ -152,6 +152,7 @@ class RequireYieldBetweenDbAwaitsRule extends SaropaLintRule {
     );
   }
 
+  // cspell:ignore stmts
   void _checkBlock(Block block, SaropaDiagnosticReporter reporter) {
     final stmts = block.statements;
     for (int i = 0; i < stmts.length; i++) {
