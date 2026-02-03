@@ -100,6 +100,155 @@ class AuditResult:
 
 
 # =============================================================================
+# REPORT EXPORT — DX helpers
+# =============================================================================
+
+
+def _dx_impact_table(messages: list[RuleMessage]) -> list[str]:
+    """Build DX summary-by-impact markdown table."""
+    impacts = ["critical", "high", "medium", "low", "opinionated"]
+    by_impact: dict[str, list[RuleMessage]] = {i: [] for i in impacts}
+    for m in messages:
+        if m.impact in by_impact:
+            by_impact[m.impact].append(m)
+
+    lines = [
+        "### By Impact\n",
+        "| Impact | Passing | Total | Rate |",
+        "|--------|---------|-------|------|",
+    ]
+    for impact in impacts:
+        total = len(by_impact[impact])
+        failing = sum(1 for m in by_impact[impact] if m.dx_issues)
+        passing = total - failing
+        rate = (passing / total * 100) if total else 100
+        lines.append(
+            f"| {impact.capitalize()} | {passing} | {total} | {rate:.1f}% |"
+        )
+    lines.append("")
+    return lines
+
+
+def _dx_tier_table(
+    messages: list[RuleMessage],
+    tier_rules: dict[str, set[str]],
+) -> list[str]:
+    """Build DX summary-by-tier markdown table."""
+    lines = [
+        "### By Tier\n",
+        "| Tier | Passing | Total | Rate |",
+        "|------|---------|-------|------|",
+    ]
+    for tier in TIERS:
+        tier_names = tier_rules.get(tier, set())
+        tier_msgs = [m for m in messages if m.name in tier_names]
+        total = len(tier_msgs)
+        if total == 0:
+            continue
+        failing = sum(1 for m in tier_msgs if m.dx_issues)
+        passing = total - failing
+        rate = (passing / total * 100) if total else 100
+        lines.append(
+            f"| {tier.capitalize()} | {passing} | {total} | {rate:.1f}% |"
+        )
+    lines.append("")
+    return lines
+
+
+def _dx_issues_table(messages: list[RuleMessage]) -> list[str]:
+    """Build DX issues-by-type markdown table."""
+    issues_to_rules: dict[str, list[RuleMessage]] = {}
+    for m in messages:
+        if m.dx_issues:
+            issues_to_rules.setdefault(m.dx_issues[0], []).append(m)
+
+    if not issues_to_rules:
+        return []
+
+    sorted_issues = sorted(
+        issues_to_rules.items(), key=lambda x: -len(x[1])
+    )
+    lines = [
+        "### Issues by Type\n",
+        "| Count | Issue | Example Rules |",
+        "|-------|-------|---------------|",
+    ]
+    for issue, rules in sorted_issues:
+        count = len(rules)
+        examples = ", ".join(f"`{r.name}`" for r in rules[:3])
+        if count > 3:
+            examples += f", ... +{count - 3} more"
+        lines.append(f"| {count} | {issue} | {examples} |")
+    lines.append("")
+    return lines
+
+
+def _dx_failing_table(
+    messages: list[RuleMessage],
+    tier_rules: dict[str, set[str]],
+) -> list[str]:
+    """Build per-rule failing table sorted by tier then impact."""
+    rule_to_tier: dict[str, str] = {}
+    for tier, rules in tier_rules.items():
+        for rule in rules:
+            rule_to_tier[rule] = tier
+
+    failing = [m for m in messages if m.dx_issues]
+    if not failing:
+        return []
+
+    impact_order = {
+        "critical": 0, "high": 1, "medium": 2,
+        "low": 3, "opinionated": 4,
+    }
+    tier_order = {t: i for i, t in enumerate(TIERS)}
+    failing.sort(key=lambda m: (
+        tier_order.get(rule_to_tier.get(m.name, ""), 99),
+        impact_order.get(m.impact, 99),
+        m.dx_score,
+    ))
+
+    lines = [
+        "### Failing Rules\n",
+        "| Rule | Tier | Impact | Score | Issues |",
+        "|------|------|--------|-------|--------|",
+    ]
+    for m in failing:
+        tier = rule_to_tier.get(m.name, "unassigned")
+        issues = "; ".join(m.dx_issues)
+        lines.append(
+            f"| `{m.name}` | {tier.capitalize()} "
+            f"| {m.impact} | {m.dx_score} | {issues} |"
+        )
+    lines.append("")
+    return lines
+
+
+def _build_dx_section(
+    dx_messages: list[RuleMessage],
+    tier_stats: TierStats | None,
+) -> list[str]:
+    """Build complete DX Message Quality section for audit report."""
+    if not dx_messages:
+        return []
+
+    total_failing = sum(1 for m in dx_messages if m.dx_issues)
+    lines = ["## DX Message Quality\n"]
+    lines.append(f"- **Total rules audited:** {len(dx_messages)}")
+    lines.append(f"- **Rules with issues:** {total_failing}")
+    lines.append(
+        f"- **Rules passing:** {len(dx_messages) - total_failing}"
+    )
+    lines.append("")
+    lines.extend(_dx_impact_table(dx_messages))
+    tier_rules = tier_stats.rules if tier_stats else {}
+    lines.extend(_dx_tier_table(dx_messages, tier_rules))
+    lines.extend(_dx_issues_table(dx_messages))
+    lines.extend(_dx_failing_table(dx_messages, tier_rules))
+    return lines
+
+
+# =============================================================================
 # REPORT EXPORT
 # =============================================================================
 
@@ -177,6 +326,8 @@ def export_full_audit_report(
         f"Web categories covered: {owasp_coverage.web_covered}/10\n"
     )
     lines.append("")
+
+    lines.extend(_build_dx_section(dx_messages, tier_stats))
 
     output_path.write_text("\n".join(lines), encoding="utf-8")
     return output_path
