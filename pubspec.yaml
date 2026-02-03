@@ -3,7 +3,7 @@ name: saropa_lints
 description: >-
   1694 custom lint rules with 284 quick fixes for Flutter and Dart.
   Static analysis for security, accessibility, and performance.
-version: 4.9.15
+version: 4.9.16
 license: MIT
 
 # Project links for pub.dev
