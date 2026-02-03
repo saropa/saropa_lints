@@ -169,7 +169,10 @@ class _ContextUsageVisitor extends RecursiveAstVisitor<void> {
   }
 }
 
-/// Warns when an empty setState callback is used.
+/// Warns when a setState callback body is empty.
+///
+/// An empty `setState(() {})` still triggers a rebuild, but moving state
+/// changes inside the callback makes the intent clearer.
 ///
 /// Example of **bad** code:
 /// ```dart
@@ -199,9 +202,10 @@ class AvoidEmptySetStateRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_empty_setstate',
     problemMessage:
-        '[avoid_empty_setstate] Empty setState callback has no effect.',
-    correctionMessage: 'Add state changes or remove the setState call.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+        '[avoid_empty_setstate] setState callback is empty — state was likely modified before this call.',
+    correctionMessage:
+        'Move state changes inside the callback for clarity, or suppress if intentional.',
+    errorSeverity: DiagnosticSeverity.INFO,
   );
 
   @override

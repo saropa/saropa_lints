@@ -220,7 +220,7 @@ def _parse_output_level() -> OutputLevel:
         return OutputLevel.VERBOSE
     return OutputLevel.VERBOSE  # default
 
-
+# cspell:ignore kbhit getwch
 def _prompt_version(default: str, timeout: int = 30) -> str:
     """Prompt for publish version with timeout.
 

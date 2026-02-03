@@ -129,10 +129,17 @@ class RequireYieldBetweenDbAwaitsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_yield_between_db_awaits',
     problemMessage:
-        '[require_yield_between_db_awaits] Database/IO await without '
-        'yieldToUI() may cause UI jank.',
-    correctionMessage: 'Insert `await DelayUtils.yieldToUI();` after this '
-        'database/IO operation.',
+        '[require_yield_between_db_awaits] Database or heavy I/O await '
+        'without a following yieldToUI() call may block the UI thread and '
+        'cause visible frame drops (jank). Flutter runs Dart code and UI '
+        'rendering on the same isolate, so long-running database reads, '
+        'writes, or file operations starve the framework of time to paint.',
+    correctionMessage:
+        'Insert `await DelayUtils.yieldToUI();` on the line after this '
+        'database/IO operation to give the framework a chance to process '
+        'pending frames before continuing. This keeps animations smooth '
+        'and prevents the user from perceiving the app as frozen or '
+        'unresponsive during data-heavy workflows.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -352,13 +359,16 @@ class _InsertYieldAfterDbAwaitFix extends DartFix {
       final indent = _leadingWhitespace(source, s.offset);
 
       final changeBuilder = reporter.createChangeBuilder(
-        message: 'Insert await DelayUtils.yieldToUI()',
+        message: 'Insert yieldToUI() call after this database/IO await '
+            'to let the UI thread catch up and prevent frame drops',
         priority: 80,
       );
       changeBuilder.addDartFileEdit((builder) {
         builder.addSimpleInsertion(
           s.end,
-          '\n${indent}await DelayUtils.yieldToUI();',
+          '\n'
+          '\n$indent// Let the UI catch up to reduce locks'
+          '\n${indent}await DelayUtils.yieldToUI();\n',
         );
       });
       return;
