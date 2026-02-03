@@ -17,7 +17,7 @@ Dates are not included in version headers — [pub.dev](https://pub.dev/packages
 
 - **New rules: `require_yield_between_db_awaits`, `avoid_return_await_db`**: Two database/IO yield rules that detect missing `yieldToUI()` calls after heavy DB or file I/O awaits. Prevents UI jank caused by blocking the main thread with consecutive database operations. Both rules include quick fixes that insert `await DelayUtils.yieldToUI();` automatically. Heuristic detection covers Isar, sqflite, Hive, and file I/O methods, with configurable target identifiers. Assigned to Recommended tier with WARNING severity.
 
-- **Extracted package rules into dedicated files**: Supabase rules (`require_supabase_error_handling`, `avoid_supabase_anon_key_in_code`, `require_supabase_realtime_unsubscribe`) moved to `supabase_rules.dart`. Workmanager rules (`require_workmanager_constraints`, `require_workmanager_result_return`, `require_workmanager_for_background`) moved to `workmanager_rules.dart`. No behavior changes — rules remain in their original tiers with the same detection logic.
+- **Extracted package rules into dedicated files**: Bloc rules (52) to `bloc_rules.dart`, Provider rules (26) to `provider_rules.dart`, Dio rules (14) to `dio_rules.dart`, SharedPreferences rules (10) to `shared_preferences_rules.dart`, GetIt rules (3) to `get_it_rules.dart`. Also Riverpod rules (37) expanded in `riverpod_rules.dart`, GetX rules (20) expanded in `getx_rules.dart`, Equatable rules in `equatable_rules.dart`. Supabase rules to `supabase_rules.dart`, Workmanager rules to `workmanager_rules.dart`. No behavior changes — rules remain in their original tiers with the same detection logic.
 
 ### Changed
 
@@ -45,9 +45,13 @@ Dates are not included in version headers — [pub.dev](https://pub.dev/packages
 
 - **`require_deep_link_fallback` reduced false positives**: Two improvements: (1) methods returning Widget types (`Widget`, `Future<Widget>`, `PreferredSizeWidget`, etc.) are now skipped as UI builders rather than deep link handlers; (2) a positive body signal check requires at least one deep link pattern (`Uri`, `pathSegments`, `queryParameters`, `Navigator`, `GoRouter`, or navigation calls) before flagging — methods like `linkAccounts()` or `logRouteChange()` that have link/route in their name but no URI parsing or navigation in their body are no longer flagged.
 
-### Archived
+### Removed
 
-- Rules 4.9.0 and older moved to [CHANGELOG_ARCHIVE.md](https://github.com/saropa/saropa_lints/blob/main/CHANGELOG_ARCHIVE.md) 
+- **3 duplicate rules removed**: `require_prefs_key_constants` (duplicate of `require_shared_prefs_key_constants`), `require_equatable_immutable` (duplicate of `avoid_mutable_field_in_equatable`), `avoid_equatable_mutable_collections` (duplicate of `prefer_unmodifiable_collections`). Removed from rule files, `_allRuleFactories`, tiers, and analysis options.
+
+### Archive
+
+- Rules 4.9.0 and older moved to [CHANGELOG_ARCHIVE.md](https://github.com/saropa/saropa_lints/blob/main/CHANGELOG_ARCHIVE.md)
 
 ---
 ## [4.9.15]
