@@ -21,7 +21,6 @@ Workflow:
     Step 12: Create git tag
     Step 13: Publish via GitHub Actions
     Step 14: Create GitHub release
-    Post:    Bump version for next cycle (pubspec + [Unreleased])
 
 Options:
     --audit-only      Run audit + integrity checks only, skip publish
@@ -67,6 +66,7 @@ from __future__ import annotations
 
 import re
 import sys
+import time
 import webbrowser
 from pathlib import Path
 
@@ -166,7 +166,6 @@ from scripts.modules._git_ops import (
     get_current_branch,
     get_remote_url,
     git_commit_and_push,
-    post_publish_commit,
     publish_to_pubdev_step,
     tag_exists_on_remote,
 )
@@ -195,7 +194,6 @@ from scripts.modules._rule_metrics import (
     sync_readme_badges,
 )
 from scripts.modules._version_changelog import (
-    add_unreleased_section,
     display_changelog,
     get_latest_changelog_version,
     get_package_name,
@@ -221,6 +219,53 @@ def _parse_output_level() -> OutputLevel:
     if "--verbose" in sys.argv:
         return OutputLevel.VERBOSE
     return OutputLevel.VERBOSE  # default
+
+
+def _prompt_version(default: str, timeout: int = 30) -> str:
+    """Prompt for publish version with timeout.
+
+    On Windows the default is pre-filled and editable.
+    On Unix it is shown in brackets; press Enter to accept.
+    Returns the default after *timeout* seconds of inactivity.
+    """
+    if sys.platform == "win32":
+        import msvcrt
+
+        sys.stdout.write(f"  Version to publish: {default}")
+        sys.stdout.flush()
+        buffer = list(default)
+        start = time.time()
+        while time.time() - start < timeout:
+            if msvcrt.kbhit():
+                ch = msvcrt.getwch()
+                if ch in ("\r", "\n"):
+                    print()
+                    return "".join(buffer).strip() or default
+                if ch == "\x08":
+                    if buffer:
+                        buffer.pop()
+                        sys.stdout.write("\b \b")
+                        sys.stdout.flush()
+                elif ch == "\x03":
+                    raise KeyboardInterrupt
+                elif ch.isprintable():
+                    buffer.append(ch)
+                    sys.stdout.write(ch)
+                    sys.stdout.flush()
+            time.sleep(0.05)
+        print()
+        return "".join(buffer).strip() or default
+
+    import select
+
+    sys.stdout.write(f"  Version to publish [{default}]: ")
+    sys.stdout.flush()
+    ready, _, _ = select.select([sys.stdin], [], [], timeout)
+    if ready:
+        user_input = sys.stdin.readline().strip()
+        return user_input if user_input else default
+    print()
+    return default
 
 
 # =============================================================================
@@ -277,15 +322,28 @@ def main() -> int:
 
     # --- Package info ---
     package_name = get_package_name(pubspec_path)
-    version = get_version_from_pubspec(pubspec_path)
+    pubspec_version = get_version_from_pubspec(pubspec_path)
     branch = get_current_branch(project_dir)
     remote_url = get_remote_url(project_dir)
+
+    # Default to next patch if current version is already published
+    if tag_exists_on_remote(project_dir, f"v{pubspec_version}"):
+        default_version = increment_patch_version(pubspec_version)
+    else:
+        default_version = pubspec_version
+
+    # Confirm or override publish version
+    version = _prompt_version(default_version)
 
     if not re.match(r"^\d+\.\d+\.\d+$", version):
         exit_with_error(
             f"Invalid version format '{version}'.",
             ExitCode.VALIDATION_FAILED,
         )
+
+    if version != pubspec_version:
+        set_version_in_pubspec(pubspec_path, version)
+        print_success(f"Updated pubspec.yaml to {version}")
 
     # Rename [Unreleased] to this version before validation
     try:
@@ -423,60 +481,42 @@ def main() -> int:
     gh_success, gh_error = create_github_release(
         project_dir, version, release_notes
     )
+    if not gh_success:
+        exit_with_error(
+            f"GitHub release failed: {gh_error}",
+            ExitCode.GITHUB_RELEASE_FAILED,
+        )
 
     # --- Success ---
+    repo_path = extract_repo_path(remote_url)
     print()
     print_colored("=" * 70, Color.GREEN)
     print_colored(
-        f"  PUBLISHED {package_name} v{version} TO PUB.DEV!", Color.GREEN
+        f"  PUBLISHED {package_name} v{version} TO PUB.DEV!",
+        Color.GREEN,
     )
     print_colored("=" * 70, Color.GREEN)
     print()
 
-    repo_path = extract_repo_path(remote_url)
-    print_colored("  Next steps:", Color.WHITE)
     print_colored(
-        f"      Package:  https://pub.dev/packages/{package_name}", Color.CYAN
+        f"      Package:  https://pub.dev/packages/{package_name}",
+        Color.CYAN,
     )
     print_colored(
         f"      Score:    https://pub.dev/packages/{package_name}/score",
         Color.CYAN,
     )
     print_colored(
-        f"      CI:       https://github.com/{repo_path}/actions", Color.CYAN
+        f"      CI:       https://github.com/{repo_path}/actions",
+        Color.CYAN,
     )
-
-    if gh_success:
-        print_colored(
-            f"      Release:  https://github.com/{repo_path}"
-            f"/releases/tag/v{version}",
-            Color.CYAN,
-        )
-    else:
-        print()
-        print_warning(f"GitHub release not created: {gh_error}")
-
-    # --- Post-publish: bump pubspec version for next cycle ---
-    next_version = increment_patch_version(version)
-    print_header(f"POST-PUBLISH: BUMPING VERSION TO {next_version}")
-
-    set_version_in_pubspec(pubspec_path, next_version)
-    print_success(f"Updated pubspec.yaml to {next_version}")
-
-    if add_unreleased_section(changelog_path):
-        print_success("Added [Unreleased] section to CHANGELOG.md")
-
-    if post_publish_commit(project_dir, next_version, branch):
-        print_success(
-            f"Committed and pushed version bump to {next_version}"
-        )
-    else:
-        print_warning(
-            f"Could not commit version bump to {next_version}. "
-            f"Manually commit pubspec.yaml and CHANGELOG.md."
-        )
-
+    print_colored(
+        f"      Release:  https://github.com/{repo_path}"
+        f"/releases/tag/v{version}",
+        Color.CYAN,
+    )
     print()
+
     try:
         webbrowser.open(f"https://pub.dev/packages/{package_name}")
     except Exception:

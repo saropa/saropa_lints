@@ -6827,10 +6827,14 @@ _AncestorResult _findWidgetAncestor(
 }) {
   AstNode? current = startNode.parent;
   int depth = 0;
+  bool passedThroughWidget = false;
 
   while (current != null && depth < maxDepth) {
-    // Stop at variable assignments -- can't track where value is used.
+    // Stop at variable declarations -- can't track where value is used.
     if (current is VariableDeclaration) return _AncestorResult.indeterminate;
+
+    // Stop at assignments -- can't track where the variable ends up.
+    if (current is AssignmentExpression) return _AncestorResult.indeterminate;
 
     // Trust return statements in helper methods (not build).
     if (current is ReturnStatement) {
@@ -6874,11 +6878,20 @@ _AncestorResult _findWidgetAncestor(
           return _AncestorResult.found;
         }
       }
+
+      passedThroughWidget = true;
     }
 
     // Stop at method/function boundaries.
     if (current is MethodDeclaration) {
       if (current.name.lexeme != 'build') {
+        return _AncestorResult.indeterminate;
+      }
+      // In build(): if no intermediate widget constructor was found, the
+      // node is the root widget returned from this build method. Its
+      // eventual parent depends on how the caller places this widget, so
+      // we cannot determine correctness here.
+      if (!passedThroughWidget) {
         return _AncestorResult.indeterminate;
       }
       break;
@@ -7537,6 +7550,24 @@ class AvoidUnboundedListviewInColumnRule extends SaropaLintRule {
         }
         if (current is FunctionDeclaration) return;
 
+        // Stop at callback boundaries — the callback's return value
+        // is placed by the receiving widget, not by the widget's own
+        // ancestors. Skip 'builder' which is the standard Flutter
+        // pass-through pattern (Builder, LayoutBuilder, etc.).
+        if (current is FunctionExpression) {
+          final feParent = current.parent;
+          if (feParent is NamedExpression) {
+            final paramName = feParent.name.label.name;
+            if (paramName != 'builder') {
+              final argList = feParent.parent;
+              if (argList is ArgumentList &&
+                  argList.parent is InstanceCreationExpression) {
+                return;
+              }
+            }
+          }
+        }
+
         if (current is InstanceCreationExpression) {
           final String parentType = current.constructorName.type.name.lexeme;
           if (_constraintWrappers.contains(parentType)) {
@@ -7643,6 +7674,24 @@ class AvoidTextfieldInRowRule extends SaropaLintRule {
           break;
         }
         if (current is FunctionDeclaration) return;
+
+        // Stop at callback boundaries — the callback's return value
+        // is placed by the receiving widget, not by the widget's own
+        // ancestors. Skip 'builder' which is the standard Flutter
+        // pass-through pattern (Builder, LayoutBuilder, etc.).
+        if (current is FunctionExpression) {
+          final feParent = current.parent;
+          if (feParent is NamedExpression) {
+            final paramName = feParent.name.label.name;
+            if (paramName != 'builder') {
+              final argList = feParent.parent;
+              if (argList is ArgumentList &&
+                  argList.parent is InstanceCreationExpression) {
+                return;
+              }
+            }
+          }
+        }
 
         if (current is InstanceCreationExpression) {
           final String parentType = current.constructorName.type.name.lexeme;

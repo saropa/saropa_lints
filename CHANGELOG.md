@@ -11,7 +11,24 @@ Dates are not included in version headers — [pub.dev](https://pub.dev/packages
 ** See the current published changelog: [saropa_lints/changelog](https://pub.dev/packages/saropa_lints/changelog)
 
 ---
-## [Unreleased]
+## [4.9.17]
+
+### Fixed
+
+- **`avoid_positioned_outside_stack` reduced false positives**: Two fixes to `_findWidgetAncestor`: (1) `AssignmentExpression` is now treated as an indeterminate boundary — when `Positioned` is assigned via `x = Positioned(...)` to an already-declared variable that is later used inside a `Stack`, the rule no longer flags it; (2) when the AST walk reaches the enclosing `build()` method without finding a `Stack` and without passing through any intermediate widget constructor, the `Positioned` is the root widget of that `build()` — its eventual parent depends on how the caller places the widget, so the result is now `indeterminate` instead of `notFound`. Also benefits `avoid_table_cell_outside_table` which shares the same ancestor-walking logic.
+- **`avoid_unbounded_listview_in_column` / `avoid_textfield_in_row` reduced false positives**: Both rules now stop the ancestor walk at callback boundaries — when a scrollable widget or text field is inside a named builder callback (e.g. `Autocomplete.optionsViewBuilder`, `SearchAnchor.suggestionsBuilder`, `PopupMenuButton.itemBuilder`), the rule no longer treats the callback's AST ancestors as runtime widget ancestors. The standard `builder` parameter name is excluded from this boundary since widgets like `Builder` and `LayoutBuilder` render their output in place.
+
+### Changed
+
+- **README: Added platform and package configuration documentation**: Expanded the platform configuration section with a table showing rule counts and examples for all 6 platforms (iOS, Android, macOS, Web, Windows, Linux), shared platform groups (Apple, Desktop), and how shared rules are handled. Added a new package configuration section documenting all 21 configurable packages grouped by category (state management, storage, networking, etc.) with full YAML example.
+
+### Package Publishing
+
+- **Publish script: version prompt with timeout**: Script now prompts for the publish version (pre-filled with pubspec value, 30s timeout) allowing major/minor bumps without manual pubspec edits
+- **Publish script: [Unreleased] renamed to version before publishing**: The `[Unreleased]` section in CHANGELOG.md is automatically renamed to the publish version at the start of the workflow
+- **Publish script: duplicate version detection**: Publishing fails immediately if the git tag or GitHub release already exists, instead of continuing silently
+- **Publish script: GitHub release failure is now a blocker**: Script exits on release creation failure instead of warning and continuing to post-publish steps
+- **Publish script: removed automatic post-publish version bump**: The script no longer commits an unpublished version number to the repository after publishing
 
 ---
 ## [4.9.16]
