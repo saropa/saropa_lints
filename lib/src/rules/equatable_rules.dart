@@ -1366,3 +1366,77 @@ class PreferUnmodifiableCollectionsRule extends SaropaLintRule {
     });
   }
 }
+
+// =============================================================================
+// Rules moved from state_management_rules.dart
+// =============================================================================
+
+/// Warns when Equatable class doesn't override props.
+///
+/// Alias: equatable_missing_props, props_override_required
+///
+/// Equatable requires props getter to define which fields affect equality.
+///
+/// **BAD:**
+/// ```dart
+/// class User extends Equatable {
+///   final String name;
+///   // Missing props!
+/// }
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// class User extends Equatable {
+///   final String name;
+///   @override
+///   List<Object?> get props => [name];
+/// }
+/// ```
+class RequireEquatablePropsOverrideRule extends SaropaLintRule {
+  const RequireEquatablePropsOverrideRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.critical;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  static const LintCode _code = LintCode(
+    name: 'require_equatable_props_override',
+    problemMessage:
+        '[require_equatable_props_override] Without props override, equality '
+        'defaults to identity comparison, breaking state deduplication.',
+    correctionMessage: 'Add: List<Object?> get props => [field1, field2];',
+    errorSeverity: DiagnosticSeverity.ERROR,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addClassDeclaration((ClassDeclaration node) {
+      // Check if extends Equatable
+      final extendsClause = node.extendsClause;
+      if (extendsClause == null) return;
+      if (extendsClause.superclass.name.lexeme != 'Equatable') return;
+
+      // Check for props getter
+      bool hasProps = false;
+      for (final member in node.members) {
+        if (member is MethodDeclaration &&
+            member.isGetter &&
+            member.name.lexeme == 'props') {
+          hasProps = true;
+          break;
+        }
+      }
+
+      if (!hasProps) {
+        reporter.atNode(node, code);
+      }
+    });
+  }
+}

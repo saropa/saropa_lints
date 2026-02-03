@@ -1409,7 +1409,6 @@ const Set<String> recommendedOnlyRules = <String>{
   'require_database_close',
   'require_debouncer_cancel',
   'require_dispose_implementation',
-  'require_equatable_immutable',
   'require_equatable_props_override',
   'require_flutter_riverpod_package',
   'require_freezed_arrow_syntax',
@@ -2323,7 +2322,6 @@ const Set<String> professionalOnlyRules = <String>{
   'require_ios_voiceover_gesture_compatibility',
   'require_multi_provider',
   'require_overflow_box_rationale',
-  'require_prefs_key_constants',
   'require_pump_after_interaction',
   'require_response_caching',
   'require_scroll_tests',
@@ -2356,7 +2354,6 @@ const Set<String> professionalOnlyRules = <String>{
   'avoid_cached_isar_stream',
   'avoid_dio_debug_print_production',
   'avoid_dynamic_json_access',
-  'avoid_equatable_mutable_collections',
   'avoid_getx_rx_inside_build',
   'avoid_image_picker_large_files',
   'avoid_isar_schema_breaking_changes',
@@ -2977,9 +2974,7 @@ const Set<String> providerPackageRules = <String>{
   'avoid_listen_in_async',
   'prefer_context_selector',
   'require_provider_generic_type',
-  'require_equatable_immutable',
   'require_equatable_props_override',
-  'avoid_equatable_mutable_collections',
   'avoid_static_state',
   'avoid_provider_in_init_state',
   'prefer_context_read_in_callbacks',
@@ -3084,9 +3079,7 @@ const Set<String> equatablePackageRules = <String>{
   'require_deep_equality_collections',
   'avoid_equatable_datetime',
   'prefer_unmodifiable_collections',
-  'require_equatable_immutable',
   'require_equatable_props_override',
-  'avoid_equatable_mutable_collections',
 };
 
 /// Rules specific to the Freezed code generation package.
@@ -3195,7 +3188,6 @@ const Set<String> sharedPreferencesPackageRules = <String>{
   'require_shared_prefs_prefix',
   'prefer_shared_prefs_async_api',
   'avoid_shared_prefs_in_isolate',
-  'require_prefs_key_constants',
   'avoid_prefs_for_large_data',
   'prefer_typed_prefs_wrapper',
 };

@@ -724,7 +724,6 @@ custom_lint:
     - require_empty_results_state: true  # [INFO] List with search-related name missing empty state check.
     - require_envied_obfuscation: true  # [WARNING] Envied environment variable generated without obfuscation stores secrets as plaintext string constants in the compiled binary. Attackers can extract API keys, database URLs, and authentication tokens using basic reverse engineering tools, enabling unauthorized access to your backend services and third-party APIs.
     - require_equatable_copy_with: true  # [INFO] Equatable class lacks copyWith method. Without copyWith, creating modified copies requires manually constructing new instances with all fields, leading to verbose code and errors when fields are added or removed from the class.
-    - require_equatable_immutable: true  # [ERROR] Mutable fields break equality after modification, causing BlocBuilder to miss state changes.
     - require_equatable_props_override: true  # [ERROR] Without props override, equality defaults to identity comparison, breaking state deduplication.
     - require_error_case_tests: true  # [INFO] Test file has no error case tests. Consider adding tests for exceptions.
     - require_file_exists_check: true  # [INFO] File read operation should check exists() or use try-catch.
@@ -905,7 +904,6 @@ custom_lint:
     - avoid_elevation_opacity_in_dark: true  # [INFO] High elevation (>4) without brightness check. Shadows look poor in dark mode.
     - avoid_encryption_key_in_memory: true  # [INFO] Encryption key stored as a persistent class field remains in process memory for the lifetime of the object. Memory dumps, debugging tools, or memory-scanning malware can extract the key, compromising all data encrypted with it. Keys in memory survive garbage collection and are visible in heap snapshots.
     - avoid_equatable_datetime: true  # [WARNING] DateTime in Equatable props may cause flaky equality checks.
-    - avoid_equatable_mutable_collections: true  # [WARNING] Mutable collections in Equatable classes break equality comparison because list contents can change after the hash code is computed. This causes BLoC state transitions to be silently skipped when props appear unchanged, leaving the UI displaying stale data.
     - avoid_excessive_bottom_nav_items: true  # [INFO] BottomNavigationBar with more than 5 items crowds the UI.
     - avoid_excessive_expressions: true  # [INFO] Expression has excessive complexity (>5 operators).
     - avoid_expanded_as_spacer: true  # [INFO] Use Spacer() instead of Expanded with empty child.
@@ -1450,7 +1448,6 @@ custom_lint:
     - require_platform_check: true  # [INFO] Platform-specific API from dart:io used without a platform guard. On Flutter web, dart:io classes throw UnsupportedError at runtime because they are unavailable in the browser environment. This crashes the app immediately when the code path executes, making the web version completely unusable for affected features.
     - require_plural_handling: true  # [INFO] Simple plural logic fails for many languages (Russian, Arabic have complex plural rules).
     - require_pop_result_type: true  # [INFO] Awaited route push without type parameter. Return type will be dynamic.
-    - require_prefs_key_constants: true  # [INFO] String literal keys cause silent bugs when misspelled and make searching/refactoring keys impossible.
     - require_public_api_documentation: true  # [INFO] Public API should be documented.
     - require_pump_after_interaction: true  # [INFO] Widget test may need pump() or pumpAndSettle() after interaction.
     - require_response_caching: true  # [INFO] GET request without caching. Consider caching static data.
