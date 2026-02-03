@@ -79,10 +79,12 @@ class AvoidDebugPrintRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_debug_print',
-    problemMessage: '[avoid_debug_print] Avoid using debugPrint. '
-        'Use a proper logging solution instead.',
-    correctionMessage: 'Replace debugPrint with a logger that can be '
-        'configured per environment.',
+    problemMessage:
+        '[avoid_debug_print] debugPrint bypasses structured logging, making it impossible to filter, search, or disable output per environment. '
+        'Debug statements left in production code expose internal state to device logs, degrade performance through I/O overhead, and create noise that obscures real issues during troubleshooting.',
+    correctionMessage:
+        'Replace debugPrint with a structured logging package (e.g., logger, logging, or a custom Logger class) that supports log levels, filtering, and environment-aware output. '
+        'This ensures debug output is suppressed in production while remaining available during development.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 

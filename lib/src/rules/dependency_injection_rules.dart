@@ -1560,10 +1560,11 @@ class AvoidDiInWidgetsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_di_in_widgets',
     problemMessage:
-        '[avoid_di_in_widgets] Avoid GetIt.I in widgets. Use Provider or '
-        'InheritedWidget for dependency injection in UI.',
+        '[avoid_di_in_widgets] GetIt.I access in widgets creates hidden dependencies that break testability and widget reuse. '
+        'Direct service locator calls tightly couple widgets to the DI container, making it impossible to substitute mock dependencies in tests and preventing widget extraction to other packages.',
     correctionMessage:
-        'Pass dependencies via constructor or use context.read<T>() instead.',
+        'Pass dependencies via constructor injection or use context-based lookup (e.g., context.read<T>() with Provider, or InheritedWidget). '
+        'This makes dependencies explicit, enables easy mocking in widget tests, and keeps widgets reusable across different dependency configurations.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 

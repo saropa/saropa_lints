@@ -878,8 +878,11 @@ class AvoidNullableAsyncValuePatternRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_nullable_async_value_pattern',
     problemMessage:
-        '[avoid_nullable_async_value_pattern] Avoid nullable access on AsyncValue.',
-    correctionMessage: 'Use when() or map() for safe AsyncValue handling.',
+        '[avoid_nullable_async_value_pattern] Nullable access on AsyncValue bypasses the type system error and loading state handling. '
+        'Accessing .value directly returns null during loading and error states, which can propagate nulls through the UI and hide error conditions that users should see.',
+    correctionMessage:
+        'Use when() or map() to handle all three AsyncValue states (data, loading, error) explicitly. '
+        'This ensures loading indicators are shown, errors are surfaced to the user, and the data path only executes when a value is actually available.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 

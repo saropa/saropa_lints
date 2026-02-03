@@ -618,8 +618,12 @@ class AvoidNestedRecordsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_nested_records',
-    problemMessage: '[avoid_nested_records] Avoid nested record types.',
-    correctionMessage: 'Flatten the record or use a class/typedef instead.',
+    problemMessage:
+        '[avoid_nested_records] Nested record type creates deeply coupled structure that is difficult to read, maintain, and refactor. '
+        'Inner record positions become ambiguous (e.g., value.\$1.\$2), and changes to the inner record layout silently break all access sites without a compile-time error in many cases.',
+    correctionMessage:
+        'Flatten the nested record into a single record with more fields, or extract the inner record into a named typedef or class. '
+        'Named types provide better documentation, enable IDE navigation, and make the structure easier to evolve without breaking callers.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -677,8 +681,11 @@ class AvoidOneFieldRecordsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_one_field_records',
     problemMessage:
-        '[avoid_one_field_records] Avoid records with only one field.',
-    correctionMessage: 'Use the value type directly instead of a record.',
+        '[avoid_one_field_records] Single-field record adds unnecessary wrapping overhead; the value type alone is simpler and equally expressive. '
+        'The extra parentheses and trailing comma add syntactic noise, and the field can only be accessed via positional notation (\$1), which obscures intent compared to a plain variable.',
+    correctionMessage:
+        'Replace the single-field record with the underlying value type directly (e.g., use int instead of (int,)). '
+        'If you need a distinct type for documentation or type safety, consider a typedef or an extension type, which provide naming without runtime overhead.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -717,8 +724,11 @@ class AvoidPositionalRecordFieldAccessRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_positional_record_field_access',
     problemMessage:
-        '[avoid_positional_record_field_access] Avoid accessing positional record fields with \$1, \$2, etc.',
-    correctionMessage: 'Use destructuring or named record fields instead.',
+        '[avoid_positional_record_field_access] Positional record field access (\$1, \$2) is cryptic and forces readers to count positions to understand the code. '
+        'As records grow, positional access becomes increasingly error-prone and makes refactoring dangerous, since reordering fields silently changes which value each accessor returns.',
+    correctionMessage:
+        'Use destructuring to bind record fields to named variables (e.g., final (name, age) = record;) or switch to named record fields (e.g., ({String name, int age})). '
+        'Named access is self-documenting and resilient to field reordering.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -825,8 +835,11 @@ class AvoidSingleFieldDestructuringRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_single_field_destructuring',
     problemMessage:
-        '[avoid_single_field_destructuring] Avoid destructuring for a single field.',
-    correctionMessage: 'Use direct property access instead: final x = obj.x;',
+        '[avoid_single_field_destructuring] Single-field destructuring adds syntactic overhead without the readability benefit of multi-field destructuring. '
+        'The pattern syntax (e.g., final (:name) = obj;) is unfamiliar to many Dart developers and introduces unnecessary complexity when accessing just one property.',
+    correctionMessage:
+        'Use direct property access instead (e.g., final name = obj.name;). Destructuring is most valuable when extracting multiple fields at once. '
+        'For a single field, direct access is simpler, more widely understood, and produces equivalent compiled code.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
