@@ -11,6 +11,14 @@ Dates are not included in version headers — [pub.dev](https://pub.dev/packages
 ** See the current published changelog: [saropa_lints/changelog](https://pub.dev/packages/saropa_lints/changelog)
 
 ---
+## [4.9.18]
+
+### Fixed
+
+- **`avoid_empty_setstate` reduced severity and corrected message**: Changed severity from WARNING to INFO — an empty `setState(() {})` still triggers a rebuild, so the previous message ("has no effect") was factually incorrect. Reworded to acknowledge that state is often modified before the call (e.g. after an async gap with a `mounted` check). This is a valid Flutter pattern, not a bug.
+- **`require_yield_between_db_awaits` improved messages and quick fix**: Expanded `problemMessage` and `correctionMessage` to explain why yielding matters (shared isolate, frame starvation, perceived jank). Quick fix now inserts a blank line, an explanatory comment (`// Let the UI catch up to reduce locks`), the `yieldToUI()` call, and a trailing blank line. Quick fix description also expanded.
+
+---
 ## [4.9.17]
 
 ### Fixed
