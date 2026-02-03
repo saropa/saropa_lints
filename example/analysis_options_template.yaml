@@ -307,7 +307,6 @@ custom_lint:
     # =========================================================================
     - avoid_firestore_unbounded_query: false
     - avoid_database_in_build: false
-    - require_prefs_key_constants: false
     - avoid_secure_storage_on_web: false
     - require_firebase_init_before_use: false
     - require_database_migration: false

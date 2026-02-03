@@ -29,6 +29,7 @@ export 'exception_rules.dart';
 export 'file_handling_rules.dart';
 export 'firebase_rules.dart';
 export 'flame_rules.dart';
+export 'freezed_rules.dart';
 export 'widget_lifecycle_rules.dart';
 export 'widget_layout_rules.dart';
 export 'widget_patterns_rules.dart';
@@ -88,6 +89,11 @@ export 'sqflite_rules.dart';
 export 'db_yield_rules.dart';
 
 // v4.3.0 rule files - package extractions
+export 'bloc_rules.dart';
+export 'dio_rules.dart';
 export 'flutter_hooks_rules.dart';
+export 'get_it_rules.dart';
+export 'provider_rules.dart';
+export 'shared_preferences_rules.dart';
 export 'supabase_rules.dart';
 export 'workmanager_rules.dart';

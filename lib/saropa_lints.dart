@@ -1050,7 +1050,6 @@ final List<LintRule Function()> _allRuleFactories = <LintRule Function()>[
   // New Firebase/storage rules
   AvoidFirestoreUnboundedQueryRule.new,
   AvoidDatabaseInBuildRule.new,
-  RequirePrefsKeyConstantsRule.new,
   AvoidSecureStorageOnWebRule.new,
   IncorrectFirebaseEventNameRule.new,
   IncorrectFirebaseParameterNameRule.new,
@@ -2205,6 +2204,10 @@ final List<LintRule Function()> _allRuleFactories = <LintRule Function()>[
   // Geolocator rules (geolocator_rules.dart)
   RequireGeolocatorBatteryAwarenessRule.new,
 
+  // DB yield rules (db_yield_rules.dart)
+  RequireYieldBetweenDbAwaitsRule.new,
+  AvoidReturnAwaitDbRule.new,
+
   // SQLite rules (sqflite_rules.dart)
   AvoidSqfliteTypeMismatchRule.new,
 
@@ -2261,7 +2264,6 @@ final List<LintRule Function()> _allRuleFactories = <LintRule Function()>[
   AvoidDioWithoutBaseUrlRule.new,
   AvoidDynamicJsonAccessRule.new,
   AvoidDynamicJsonChainsRule.new,
-  AvoidEquatableMutableCollectionsRule.new,
   AvoidFreezedJsonSerializableConflictRule.new,
   AvoidGetxGlobalStateRule.new,
   AvoidGetxRxInsideBuildRule.new,
@@ -2336,7 +2338,6 @@ final List<LintRule Function()> _allRuleFactories = <LintRule Function()>[
   RequireDioSingletonRule.new,
   RequireDisposeImplementationRule.new,
   RequireEnumUnknownValueRule.new,
-  RequireEquatableImmutableRule.new,
   RequireEquatablePropsOverrideRule.new,
   RequireFileHandleCloseRule.new,
   RequireFlutterRiverpodPackageRule.new,
