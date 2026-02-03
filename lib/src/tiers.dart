@@ -2714,12 +2714,12 @@ const Set<String> webPlatformRules = <String>{
   'avoid_secure_storage_on_web',
   'prefer_deferred_loading_web',
   'avoid_gesture_only_interactions',
-  'require_focus_indicator',
   'avoid_hover_only',
 
   // Professional
   'prefer_url_strategy_for_web',
   'require_web_renderer_awareness',
+  'require_focus_indicator',
 
   // Comprehensive
   'avoid_isar_web_limitations',
