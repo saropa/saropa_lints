@@ -32,6 +32,11 @@ Widget testPositionedGood() {
   return Stack(children: [Positioned(top: 10, child: Text('x'))]);
 }
 
+Widget testPositionedInStackSubclassGood() {
+  // Indexer extends Stack -- should not trigger
+  return Indexer(children: [Positioned(top: 10, child: Text('x'))]);
+}
+
 // ============================================================
 // avoid_spacer_in_wrap
 // ============================================================
@@ -165,4 +170,47 @@ Widget testScaffoldBodyGood() {
 Widget testScaffoldBodyNoTextField() {
   // No text fields -- should not trigger
   return Scaffold(body: Column(children: [Text('hello')]));
+}
+
+// ============================================================
+// avoid_unbounded_constraints
+// ============================================================
+
+Widget testUnboundedConstraintsBad() {
+  // expect_lint: avoid_unbounded_constraints
+  return SingleChildScrollView(
+    child: Column(children: [Expanded(child: Text('x'))]),
+  );
+}
+
+Widget testUnboundedConstraintsGoodConstrained() {
+  // ConstrainedBox between Column and scroll view -- OK
+  return SingleChildScrollView(
+    child: ConstrainedBox(
+      constraints: BoxConstraints(maxWidth: 400),
+      child: Column(children: [Expanded(child: Text('x'))]),
+    ),
+  );
+}
+
+Widget testUnboundedConstraintsGoodCrossAxis() {
+  // Row with Expanded in vertical scroll -- cross-axis is bounded, OK
+  return SingleChildScrollView(
+    child: Row(children: [Expanded(child: Text('x'))]),
+  );
+}
+
+Widget testUnboundedConstraintsGoodHorizontalRow() {
+  // Row in horizontal scroll -- axes match but no Expanded child, OK
+  return SingleChildScrollView(
+    scrollDirection: Axis.horizontal,
+    child: Row(children: [Text('a'), Text('b')]),
+  );
+}
+
+Widget testUnboundedConstraintsGoodNoExpandedChild() {
+  // Column in scroll view without Expanded/Flexible children -- OK
+  return SingleChildScrollView(
+    child: Column(children: [Text('a'), Text('b')]),
+  );
 }

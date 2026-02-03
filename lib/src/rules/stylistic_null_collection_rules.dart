@@ -495,6 +495,11 @@ class PreferLateOverNullableRule extends SaropaLintRule {
 /// - Requires null checks
 /// - ! operator usage
 ///
+/// **Exemptions:**
+/// - `late final` with inline initializer (lazy evaluation, zero crash risk)
+/// - Fields in `State` subclasses (Flutter lifecycle guarantees `initState()`
+///   runs before `build()`)
+///
 /// ### Example
 ///
 /// #### BAD (with this rule enabled):
@@ -505,6 +510,9 @@ class PreferLateOverNullableRule extends SaropaLintRule {
 /// #### GOOD:
 /// ```dart
 /// String? _name;
+/// late final ScrollController _ctrl = ScrollController(); // OK: initializer
+/// // In State subclass — OK: assigned in initState()
+/// late Future<List<Item>?> _items;
 /// ```
 class PreferNullableOverLateRule extends SaropaLintRule {
   const PreferNullableOverLateRule() : super(code: _code);
@@ -530,11 +538,34 @@ class PreferNullableOverLateRule extends SaropaLintRule {
     SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
-    context.registry.addFieldDeclaration((node) {
-      if (node.fields.lateKeyword != null) {
-        for (final variable in node.fields.variables) {
-          reporter.atNode(variable, code);
+    context.registry.addFieldDeclaration((FieldDeclaration node) {
+      if (node.fields.lateKeyword == null) return;
+
+      // Exempt: late final with inline initializer — lazy evaluation,
+      // not deferred assignment. No LateInitializationError risk.
+      if (node.fields.isFinal &&
+          node.fields.variables.every(
+            (VariableDeclaration v) => v.initializer != null,
+          )) {
+        return;
+      }
+
+      // Exempt: fields in State subclasses — Flutter lifecycle guarantees
+      // initState() runs before build(), making late assignment safe.
+      AstNode? current = node.parent;
+      while (current != null && current is! ClassDeclaration) {
+        current = current.parent;
+      }
+      if (current is ClassDeclaration) {
+        final ExtendsClause? extendsClause = current.extendsClause;
+        if (extendsClause != null) {
+          final String superclass = extendsClause.superclass.name.lexeme;
+          if (superclass == 'State') return;
         }
+      }
+
+      for (final VariableDeclaration variable in node.fields.variables) {
+        reporter.atNode(variable, code);
       }
     });
   }
