@@ -830,6 +830,8 @@ class PreferShellRouteForPersistentUiRule extends SaropaLintRule {
 /// fallback handling.
 ///
 /// **Skipped patterns** (not deep link handlers):
+/// - Widget builders: methods returning Widget types (including
+///   `Future<Widget>`, `PreferredSizeWidget`, etc.)
 /// - Utility getters: `is*`, `has*`, `check*`, `valid*` prefixes
 /// - State methods: `reset*`, `clear*`, `set*` prefixes
 /// - Simple field returns: `=> _uri`, `=> prefix.uri`
@@ -837,6 +839,8 @@ class PreferShellRouteForPersistentUiRule extends SaropaLintRule {
 /// - URI conversions: `=> url.toUri()`, `=> url?.toUriSafe()`
 /// - Property access: `=> url?.uri`
 /// - Trivial blocks: `{ return _uri; }`, `{ _uri = value; }`
+/// - No deep link signals: body lacks `Uri`, `pathSegments`,
+///   `queryParameters`, `Navigator`, `GoRouter`, or navigation calls
 ///
 /// **BAD:**
 /// ```dart
@@ -897,14 +901,19 @@ class RequireDeepLinkFallbackRule extends SaropaLintRule {
         return;
       }
 
-      // Skip URL utility methods that return String or Uri
-      // These are parsers/converters, not deep link handlers
+      // Skip utility methods that return String, Uri, or Widget types
+      // These are parsers/converters/builders, not deep link handlers
       // e.g., String? accountIdFromUri(Uri uri) - extracts data from URI
       // e.g., Uri? get storedUri - simple getter
+      // e.g., Widget _buildShareLinkButton() - UI builder
+      // e.g., Future<Widget> buildRoutePreview() - async widget builder
+      // e.g., PreferredSizeWidget buildLinkAppBar() - widget subtype
       final String? returnTypeStr = node.returnType?.toSource();
       if (returnTypeStr != null) {
         final String trimmed = returnTypeStr.replaceAll('?', '').trim();
-        if (trimmed == 'String' || trimmed == 'Uri') {
+        if (trimmed == 'String' ||
+            trimmed == 'Uri' ||
+            trimmed.contains('Widget')) {
           return;
         }
       }
@@ -927,7 +936,6 @@ class RequireDeepLinkFallbackRule extends SaropaLintRule {
 
       // Skip utility methods that manage state rather than handle deep links
       // e.g., resetInitialUri(), clearUri(), setRouteUri()
-      // Note: 'get' prefix requires additional body analysis (see below)
       if (methodName.startsWith('reset') ||
           methodName.startsWith('clear') ||
           methodName.startsWith('set')) {
@@ -1014,6 +1022,24 @@ class RequireDeepLinkFallbackRule extends SaropaLintRule {
           }
         }
       }
+
+      // Skip methods whose body has no deep link signals
+      // If the body doesn't parse URIs or navigate, it's not a handler
+      // regardless of method name
+      final bool hasDeepLinkSignal = bodySource.contains('Uri') ||
+          bodySource.contains('pathSegments') ||
+          bodySource.contains('queryParameters') ||
+          bodySource.contains('Navigator') ||
+          bodySource.contains('GoRouter') ||
+          bodySource.contains('.go(') ||
+          bodySource.contains('.goNamed(') ||
+          bodySource.contains('.push(') ||
+          bodySource.contains('.pushNamed(') ||
+          bodySource.contains('.pushReplacement') ||
+          bodySource.contains('getInitialLink') ||
+          bodySource.contains('getInitialUri');
+
+      if (!hasDeepLinkSignal) return;
 
       // Check for fallback patterns
       final bool hasFallback = bodySource.contains('NotFound') ||
