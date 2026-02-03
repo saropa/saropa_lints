@@ -170,9 +170,11 @@ class AvoidTopLevelMembersInTestsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_top_level_members_in_tests',
     problemMessage:
-        '[avoid_top_level_members_in_tests] Avoid public top-level members in test files.',
-    correctionMessage: 'Make the member private by prefixing with underscore, '
-        'or move it to a separate utility file.',
+        '[avoid_top_level_members_in_tests] Public top-level member in test file leaks implementation details and pollutes the library namespace. '
+        'Other files can accidentally import test helpers, creating fragile dependencies on code that was never designed for reuse and may change without notice.',
+    correctionMessage:
+        'Make the member private by prefixing with an underscore (e.g., _createTestWidget()) to prevent accidental imports. '
+        'If the helper is genuinely reusable across multiple test files, extract it to a dedicated test utilities file in the test/ directory.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 

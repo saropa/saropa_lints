@@ -88,9 +88,12 @@ class AvoidReturningVoidRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_returning_void',
-    problemMessage: '[avoid_returning_void] Avoid explicitly returning void.',
+    problemMessage:
+        '[avoid_returning_void] Explicit void return is redundant and can mask accidental side-effect returns. '
+        'Writing return at the end of a void function adds visual noise without changing behavior, and in rare cases may hide a mistaken attempt to return a value from a void-typed function.',
     correctionMessage:
-        'Remove the return statement or use return without a value.',
+        'Remove the explicit return statement entirely, since void functions implicitly return at the end of their body. '
+        'If you need early exit, use a bare return without a value. If you intended to return a result, change the function return type to match.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 

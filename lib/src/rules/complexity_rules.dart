@@ -509,8 +509,9 @@ class AvoidNestedShorthandsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_nested_shorthands',
     problemMessage:
-        '[avoid_nested_shorthands] Avoid nesting shorthand syntax too deeply.',
-    correctionMessage: 'Extract nested expressions to improve readability.',
+        '[avoid_nested_shorthands] Deeply nested shorthand syntax (e.g., cascades inside ternaries inside null-aware operators) reduces readability and makes expressions difficult to understand at a glance. Each nesting level multiplies cognitive load, increasing the risk of logic errors during code review and maintenance.',
+    correctionMessage:
+        'Extract nested expressions into named local variables or helper methods. Each intermediate value should have a descriptive name that communicates its purpose, making the overall logic easier to follow, test, and debug.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 

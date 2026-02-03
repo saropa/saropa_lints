@@ -227,8 +227,12 @@ class NoMagicNumberRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'no_magic_number',
-    problemMessage: '[no_magic_number] Avoid magic numbers.',
-    correctionMessage: 'Extract the number to a named constant.',
+    problemMessage:
+        '[no_magic_number] Unexplained numeric literal makes the code harder to understand, maintain, and update consistently. '
+        'When the same value appears in multiple locations, a typo in one creates a subtle bug. Readers cannot determine whether the number represents a timeout, a threshold, a count, or an index without surrounding context.',
+    correctionMessage:
+        'Extract the number to a named constant (e.g., static const maxRetries = 3) that communicates its purpose. '
+        'Group related constants in a dedicated class or file so they can be updated in one place and are discoverable by other developers.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -297,8 +301,12 @@ class NoMagicStringRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'no_magic_string',
-    problemMessage: '[no_magic_string] Avoid using magic string literals.',
-    correctionMessage: 'Extract the string to a named constant.',
+    problemMessage:
+        '[no_magic_string] Unexplained string literal makes the code harder to understand, maintain, and update consistently. '
+        'Duplicate string values across the codebase lead to inconsistencies when one occurrence is updated but others are missed, causing hard-to-trace bugs in routing, API calls, or status checks.',
+    correctionMessage:
+        'Extract the string to a named constant (e.g., static const kStatusActive = \'active\') that communicates its purpose. '
+        'Group related constants in a dedicated class or file so they can be updated in one place and are discoverable by other developers.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -792,8 +800,11 @@ class NoMagicNumberInTestsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'no_magic_number_in_tests',
     problemMessage:
-        '[no_magic_number_in_tests] Avoid magic numbers in test files.',
-    correctionMessage: 'Extract the number to a named constant.',
+        '[no_magic_number_in_tests] Unexplained numeric literal in test file obscures the purpose of expected values and assertions. '
+        'When a test fails, readers cannot tell whether the number is an arbitrary fixture value, a meaningful boundary, or a calculated expected result, making failures harder to diagnose and fix.',
+    correctionMessage:
+        'Extract test values to named constants (e.g., const expectedCount = 42) that describe their role in the test. '
+        'This makes assertions self-documenting, failures easier to diagnose, and test data easier to update when requirements change.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -1065,8 +1076,11 @@ class NoMagicStringInTestsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'no_magic_string_in_tests',
     problemMessage:
-        '[no_magic_string_in_tests] Avoid magic strings in test files.',
-    correctionMessage: 'Extract the string to a named constant.',
+        '[no_magic_string_in_tests] Unexplained string literal in test file obscures the purpose of expected values and assertions. '
+        'When a test fails, readers cannot tell whether the string is an arbitrary fixture, a meaningful expected output, or a format-specific value, making failures harder to diagnose.',
+    correctionMessage:
+        'Extract test strings to named constants (e.g., const expectedName = \'John Doe\') that describe their role in the test. '
+        'This makes assertions self-documenting, failures easier to diagnose, and test data easier to update when requirements change.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 

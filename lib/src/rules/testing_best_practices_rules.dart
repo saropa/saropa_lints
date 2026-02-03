@@ -1340,9 +1340,11 @@ class AvoidRealTimerInWidgetTestRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_real_timer_in_widget_test',
     problemMessage:
-        '[avoid_real_timer_in_widget_test] Avoid using Timer in widget tests.',
+        '[avoid_real_timer_in_widget_test] Real Timer in widget test causes flaky results and slow execution due to actual time delays. '
+        'Timer callbacks execute asynchronously outside the test framework control, leading to race conditions where assertions run before or after the timer fires depending on system load.',
     correctionMessage:
-        'Use fakeAsync or tester.runAsync for timer-based tests.',
+        'Use fakeAsync to control time advancement deterministically, or wrap timer-dependent code in tester.runAsync(). '
+        'This eliminates real-time waits, prevents race conditions, and ensures tests produce consistent results regardless of system load or CI environment speed.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 

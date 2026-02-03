@@ -44,8 +44,11 @@ class AvoidCastingToExtensionTypeRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_casting_to_extension_type',
     problemMessage:
-        '[avoid_casting_to_extension_type] Avoid casting to extension types.',
-    correctionMessage: 'Use the extension type constructor instead of casting.',
+        '[avoid_casting_to_extension_type] Cast to extension type bypasses the constructor invariants and type safety guarantees. '
+        'Extension types are erased at runtime, so the cast always succeeds regardless of whether the value satisfies the extension type constraints, silently producing an invalid wrapper.',
+    correctionMessage:
+        'Use the extension type constructor (e.g., UserId(42)) instead of casting (42 as UserId). '
+        'The constructor enforces any validation logic defined in the extension type and makes the type conversion explicit and self-documenting at the call site.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -221,9 +224,12 @@ class AvoidDynamicRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_dynamic_type',
-    problemMessage: "[avoid_dynamic_type] Avoid using 'dynamic' type.",
+    problemMessage:
+        "[avoid_dynamic_type] 'dynamic' type disables static type checking, hiding errors until runtime. "
+        "Method calls on dynamic values are never verified by the compiler, so typos, missing methods, and wrong argument types only surface as NoSuchMethodError crashes in production.",
     correctionMessage:
-        'Use a specific type, Object, or a generic type instead.',
+        "Replace 'dynamic' with a specific type, Object (for truly unknown values with explicit casts), or a generic type parameter. "
+        'If the actual type varies, use a sealed class hierarchy or union type to keep the compiler involved in checking correctness.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -324,8 +330,11 @@ class AvoidNullableInterpolationRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_nullable_interpolation',
     problemMessage:
-        '[avoid_nullable_interpolation] Avoid interpolating nullable values.',
-    correctionMessage: 'Add null check or use ?? to provide default value.',
+        "[avoid_nullable_interpolation] Nullable value in string interpolation produces the literal text 'null' instead of a meaningful fallback. "
+        "Users may see 'Hello null' or 'Order #null' in the UI, which looks like a bug and erodes trust in the application quality and data integrity.",
+    correctionMessage:
+        "Add a null check before interpolation, or use the null-coalescing operator (??) to provide a sensible default (e.g., '\${name ?? \"Guest\"}'). "
+        'For complex formatting, consider a helper method that handles null values with appropriate placeholder text.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -524,10 +533,11 @@ class AvoidNullAssertionRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_null_assertion',
     problemMessage:
-        '[avoid_null_assertion] Avoid using the null assertion operator (!). '
-        'It can cause runtime crashes if the value is null.',
-    correctionMessage: 'Use null-safe alternatives: ?? for defaults, '
-        'if-null checks, or ?. for optional chaining.',
+        '[avoid_null_assertion] Null assertion operator (!) throws a runtime exception if the value is null, crashing the app without a meaningful error message. '
+        'The resulting _CastError provides no context about which value was null or why, making production crashes difficult to diagnose from error reports alone.',
+    correctionMessage:
+        'Use null-safe alternatives: ?? for default values (e.g., name ?? \'Unknown\'), if-null checks for conditional logic, or ?. for optional chaining. '
+        'When null is truly impossible, add an assert with a descriptive message or use a guard clause that throws a custom exception.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
