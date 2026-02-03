@@ -870,10 +870,11 @@ class AvoidSubstringRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_string_substring',
     problemMessage:
-        '[avoid_string_substring] Avoid using substring() as it can throw if indices '
-        'are out of bounds.',
-    correctionMessage: 'Consider bounds checking or using safer string '
-        'manipulation methods.',
+        '[avoid_string_substring] substring() throws RangeError if start or end indices are out of bounds, causing runtime crashes when input lengths vary. '
+        'This is especially dangerous with user input, API responses, or dynamically sized strings where the length cannot be guaranteed at compile time.',
+    correctionMessage:
+        'Check string length before calling substring(), or use safer alternatives such as split(), replaceRange(), or pattern matching. '
+        'For optional extraction, consider an extension method that returns null for invalid ranges instead of throwing.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 

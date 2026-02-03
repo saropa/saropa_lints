@@ -1858,9 +1858,12 @@ class AvoidHardcodedColorsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_hardcoded_colors',
-    problemMessage: '[avoid_hardcoded_colors] Avoid hardcoded color values.',
+    problemMessage:
+        '[avoid_hardcoded_colors] Hardcoded color value bypasses the theme system, breaking dark mode and dynamic theming. '
+        'When users switch themes, hardcoded colors remain unchanged, creating contrast issues, illegible text, and an inconsistent visual experience that can fail accessibility requirements.',
     correctionMessage:
-        'Use theme colors instead (e.g., Theme.of(context).colorScheme.primary).',
+        'Use theme colors from Theme.of(context).colorScheme (e.g., colorScheme.primary, colorScheme.surface) or define semantic color tokens in your ThemeData. '
+        'This ensures colors adapt automatically when the theme changes and maintains WCAG contrast ratios across all theme variants.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 

@@ -2306,8 +2306,11 @@ class AvoidSizedBoxExpandRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_sized_box_expand',
     problemMessage:
-        '[avoid_sized_box_expand] Avoid SizedBox.expand() as it fills all available space.',
-    correctionMessage: 'Use explicit width/height for predictable layouts.',
+        '[avoid_sized_box_expand] SizedBox.expand() fills all available space unconditionally, causing unpredictable layout overflow in constrained parents. '
+        'Inside a Column, Row, or other flex widget without explicit constraints, expand() can trigger unbounded height/width errors or silently push sibling widgets off-screen.',
+    correctionMessage:
+        'Use SizedBox with explicit width and height values for predictable sizing, or use Expanded/Flexible inside flex widgets to share space proportionally. '
+        'If you need to fill available space, use LayoutBuilder to measure constraints before deciding dimensions.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -2770,9 +2773,11 @@ class AvoidHardcodedLayoutValuesRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_hardcoded_layout_values',
     problemMessage:
-        '[avoid_hardcoded_layout_values] Avoid hardcoded numeric values in layout widgets.',
+        '[avoid_hardcoded_layout_values] Hardcoded numeric value in layout widget prevents responsive adaptation across screen sizes and text scales. '
+        'Fixed pixel values that look correct on one device may cause overflow, clipping, or wasted space on devices with different screen densities, orientations, or accessibility font size settings.',
     correctionMessage:
-        'Extract magic numbers to named constants or use a spacing system.',
+        'Extract layout values to named constants in a spacing/dimension system (e.g., AppSpacing.medium, AppDimensions.buttonHeight) or use MediaQuery-based calculations for responsive sizing. '
+        'Named constants centralize layout decisions and enable consistent updates across the entire app.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -6356,9 +6361,11 @@ class PreferExpandedAtCallSiteRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_expanded_at_call_site',
     problemMessage:
-        '[prefer_expanded_at_call_site] Avoid returning Expanded/Flexible from build(). Add it at the call site instead.',
+        '[prefer_expanded_at_call_site] Expanded/Flexible returned from build() forces flex layout on all callers, breaking reuse in non-flex contexts. '
+        'If this widget is placed inside a Stack, SingleChildScrollView, or any non-flex parent, the Expanded wrapper triggers a runtime ParentDataWidget error and crashes the app.',
     correctionMessage:
-        'Return the child widget directly and let the caller wrap with Expanded if needed.',
+        'Return the child widget directly and let the caller wrap with Expanded or Flexible as needed. '
+        'This keeps the widget reusable in any layout context (Row, Column, Stack, etc.) and follows the principle of letting the parent control how its children are sized and positioned.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 

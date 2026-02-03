@@ -453,8 +453,11 @@ class AvoidNonNullAssertionRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_non_null_assertion',
     problemMessage:
-        '[avoid_non_null_assertion] Avoid using the non-null assertion operator (!).',
-    correctionMessage: 'Use null-aware operators or explicit null checks.',
+        '[avoid_non_null_assertion] Non-null assertion operator (!) throws a runtime exception if the value is null, crashing the app. '
+        'The resulting _CastError provides no context about which variable was null or why, making production crashes from error reports and stack traces alone difficult to diagnose and reproduce.',
+    correctionMessage:
+        'Use null-aware operators (?., ??) or explicit null checks (if (value != null)) to handle nullability safely. '
+        'When null is truly impossible due to prior validation, add an assert with a descriptive message or use a guard clause that throws a meaningful exception.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
