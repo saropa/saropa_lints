@@ -1255,7 +1255,8 @@ class _ReplaceWithWhereOrNullFix extends DartFix {
 ///
 /// Alias: sort_map_keys, alphabetical_map_keys
 ///
-/// Consistent key ordering improves readability.
+/// **Stylistic rule (opt-in only).** Key ordering does not affect runtime
+/// behavior or performance. This is purely a readability preference.
 ///
 /// ### Example
 ///
@@ -1271,9 +1272,8 @@ class _ReplaceWithWhereOrNullFix extends DartFix {
 class MapKeysOrderingRule extends SaropaLintRule {
   const MapKeysOrderingRule() : super(code: _code);
 
-  /// Code quality issue. Review when count exceeds 100.
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.opinionated;
 
   @override
   RuleCost get cost => RuleCost.medium;
@@ -1281,7 +1281,7 @@ class MapKeysOrderingRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'map_keys_ordering',
     problemMessage:
-        '[map_keys_ordering] Map keys are not in alphabetical order, making it harder to locate specific entries, verify completeness, and review diffs. Unordered keys increase cognitive load during code reviews and maintenance.',
+        '[map_keys_ordering] Ordering map keys alphabetically is a stylistic preference for readability. Key order does not affect map behavior or performance at runtime. Enable via the stylistic tier.',
     correctionMessage:
         'Reorder the map entries alphabetically by key to improve readability and make diffs easier to review.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -1433,6 +1433,10 @@ class _UseContainsFix extends DartFix {
 ///
 /// Alias: use_first_not_index, no_list_zero
 ///
+/// **Stylistic rule (opt-in only).** The `.first` getter calls `operator[]`
+/// with index 0 internally — there is no performance benefit. This is purely
+/// a readability preference.
+///
 /// Example of **bad** code:
 /// ```dart
 /// final first = list[0];
@@ -1447,9 +1451,8 @@ class _UseContainsFix extends DartFix {
 class PreferFirstRule extends SaropaLintRule {
   const PreferFirstRule() : super(code: _code);
 
-  /// Code quality issue. Review when count exceeds 100.
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.opinionated;
 
   @override
   RuleCost get cost => RuleCost.medium;
@@ -1457,7 +1460,7 @@ class PreferFirstRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_list_first',
     problemMessage:
-        '[prefer_list_first] Accessing a list element with [0] is less expressive than .first and does not convey the intent of retrieving the first element. Using .first improves readability and consistency across the codebase.',
+        '[prefer_list_first] Using [0] instead of .first is a stylistic choice. The .first getter calls [0] internally — there is no performance benefit. Enable via the stylistic tier.',
     correctionMessage:
         'Replace [0] with .first or .firstOrNull to clearly communicate the intent of accessing the first element.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -1583,6 +1586,10 @@ class PreferIterableOfRule extends SaropaLintRule {
 ///
 /// Alias: use_last_not_index, no_length_minus_one
 ///
+/// **Stylistic rule (opt-in only).** The `.last` getter performs the same
+/// index computation internally — there is no performance benefit. This is
+/// purely a readability preference.
+///
 /// Example of **bad** code:
 /// ```dart
 /// final last = list[list.length - 1];
@@ -1598,7 +1605,7 @@ class PreferLastRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_list_last',
     problemMessage:
-        '[prefer_list_last] Accessing the last element with [length - 1] is verbose, error-prone, and does not convey intent. The .last property expresses the purpose clearly and eliminates off-by-one error risk.',
+        '[prefer_list_last] Using [length-1] instead of .last is a stylistic choice. The .last getter does the same indexing internally — no performance benefit. Enable via the stylistic tier.',
     correctionMessage:
         'Replace list[list.length - 1] with list.last to improve readability and reduce off-by-one error risk.',
     errorSeverity: DiagnosticSeverity.INFO,

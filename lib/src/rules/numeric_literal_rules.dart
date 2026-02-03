@@ -171,14 +171,16 @@ class AvoidUnnecessaryDigitSeparatorsRule extends SaropaLintRule {
 
 /// Warns when double literals don't follow a consistent format.
 ///
+/// **Stylistic rule (opt-in only).** No performance or correctness benefit.
+///
 /// Double literals should be formatted consistently, e.g., always include
 /// a digit before the decimal point (0.5 instead of .5).
 class DoubleLiteralFormatRule extends SaropaLintRule {
   const DoubleLiteralFormatRule() : super(code: _code);
 
-  /// Style/consistency. Large counts acceptable in legacy code.
+  /// Stylistic preference only. No performance or correctness benefit.
   @override
-  LintImpact get impact => LintImpact.low;
+  LintImpact get impact => LintImpact.opinionated;
 
   @override
   RuleCost get cost => RuleCost.medium;
@@ -186,7 +188,7 @@ class DoubleLiteralFormatRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'double_literal_format',
     problemMessage:
-        '[double_literal_format] Use consistent double literal format.',
+        '[double_literal_format] Formatting double literals in a specific way (e.g., 1.0 vs 1.) is a stylistic preference. All forms represent the same value with no performance difference. Enable via the stylistic tier.',
     correctionMessage: 'Include leading zero before decimal point (e.g., 0.5).',
     errorSeverity: DiagnosticSeverity.INFO,
   );

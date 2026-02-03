@@ -1282,6 +1282,8 @@ class _RegExpCreationFinder extends RecursiveAstVisitor<void> {
 /// Future rule: prefer-getter-over-method
 /// Warns when a method with no parameters just returns a value.
 ///
+/// **Stylistic rule (opt-in only).** No performance or correctness benefit.
+///
 /// Example of **bad** code:
 /// ```dart
 /// String getName() => _name;
@@ -1297,9 +1299,9 @@ class _RegExpCreationFinder extends RecursiveAstVisitor<void> {
 class PreferGetterOverMethodRule extends SaropaLintRule {
   const PreferGetterOverMethodRule() : super(code: _code);
 
-  /// Code quality issue. Review when count exceeds 100.
+  /// Stylistic preference only. No performance or correctness benefit.
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.opinionated;
 
   @override
   RuleCost get cost => RuleCost.medium;
@@ -1310,7 +1312,7 @@ class PreferGetterOverMethodRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_getter_over_method',
     problemMessage:
-        '[prefer_getter_over_method] Zero-argument method that returns a value without side effects reads more naturally as a getter. Methods imply computation or side effects, while getters signal a simple property access. Using a getter clarifies intent and aligns with the Dart style guide convention.',
+        '[prefer_getter_over_method] Using a getter instead of a zero-parameter method is a Dart API style preference. Both produce identical compiled code with no performance difference. Enable via the stylistic tier.',
     correctionMessage:
         'Convert to a getter (e.g. String get name => _name;). Reserve methods for operations that have side effects or accept parameters.',
     errorSeverity: DiagnosticSeverity.INFO,

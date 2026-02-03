@@ -326,6 +326,8 @@ class PreferDescriptiveTestNameRule extends SaropaLintRule {
 
 /// Warns when a test file doesn't follow naming conventions.
 ///
+/// **Test discovery benefit:** Test files not following _test.dart convention are invisible to dart test and CI runners, causing tests to be silently skipped.
+///
 /// Alias: test_file_naming, test_file_convention, test_dart_suffix
 ///
 /// Test files should end with `_test.dart` and be located in the `test/`
@@ -358,7 +360,7 @@ class PreferCorrectTestFileNameRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_correct_test_file_name',
     problemMessage:
-        '[prefer_correct_test_file_name] Test file naming convention violation.',
+        '[prefer_correct_test_file_name] Test files not following the _test.dart naming convention are invisible to dart test and CI runners. Non-matching names cause tests to be silently skipped.',
     correctionMessage:
         'Test files should end with `_test.dart` and be in test/ directory.',
     errorSeverity: DiagnosticSeverity.INFO,
