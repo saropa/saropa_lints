@@ -988,6 +988,8 @@ class PreferCorrectEdgeInsetsConstructorRule extends SaropaLintRule {
 
 /// Warns when Hero widget is used without defining heroTag.
 ///
+/// **Stylistic rule (opt-in only).** Naming convention with no performance or correctness impact.
+///
 /// Example of **bad** code:
 /// ```dart
 /// Hero(
@@ -1008,7 +1010,7 @@ class PreferSliverPrefixRule extends SaropaLintRule {
 
   /// Code quality issue. Review when count exceeds 100.
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.opinionated;
 
   @override
   RuleCost get cost => RuleCost.medium;
@@ -1019,7 +1021,7 @@ class PreferSliverPrefixRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_sliver_prefix',
     problemMessage:
-        '[prefer_sliver_prefix] Sliver widget class name lacks the conventional "Sliver" prefix. Without this prefix, developers scanning the widget tree cannot quickly distinguish sliver-based widgets from regular box widgets, leading to incorrect usage inside CustomScrollView or other sliver contexts.',
+        '[prefer_sliver_prefix] Prefixing sliver widget class names with Sliver is a naming convention. It does not affect widget behavior or performance. Enable via the stylistic tier.',
     correctionMessage:
         'Rename the class to start with "Sliver" (e.g., SliverHeader instead of Header) to communicate its sliver layout protocol.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -1957,6 +1959,8 @@ class PreferOpacityWidgetRule extends SaropaLintRule {
 
 /// Warns when dependOnInheritedWidgetOfExactType is called in initState.
 ///
+/// **Performance benefit:** Container internally creates DecoratedBox, ConstrainedBox, and other widgets. SizedBox is a single lightweight widget with fewer allocations.
+///
 /// Example of **bad** code:
 /// ```dart
 /// @override
@@ -1991,7 +1995,7 @@ class PreferSizedBoxForWhitespaceRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_sized_box_for_whitespace',
     problemMessage:
-        '[prefer_sized_box_for_whitespace] Use SizedBox instead of Container for whitespace.',
+        '[prefer_sized_box_for_whitespace] Container creates unnecessary intermediate widgets (DecoratedBox, ConstrainedBox) when used only for whitespace. SizedBox is a single lightweight widget with fewer allocations and faster layout.',
     correctionMessage:
         'SizedBox is more efficient for spacing. Use SizedBox(width:) or SizedBox(height:).',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -2346,6 +2350,8 @@ class AvoidSizedBoxExpandRule extends SaropaLintRule {
 /// SelectableText('Very long paragraph...')
 /// ```
 
+/// **Stylistic rule (opt-in only).** No performance or correctness benefit.
+///
 /// Warns when Row or Column children alternate between content widgets and
 /// identical spacer widgets (SizedBox or Spacer), suggesting the `spacing`
 /// parameter instead.
@@ -2388,7 +2394,7 @@ class PreferSpacingOverSizedBoxRule extends SaropaLintRule {
 
   /// Code quality issue. Review when count exceeds 100.
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.opinionated;
 
   @override
   RuleCost get cost => RuleCost.low;
@@ -2398,8 +2404,8 @@ class PreferSpacingOverSizedBoxRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_spacing_over_sizedbox',
-    problemMessage: '[prefer_spacing_over_sizedbox] Use the spacing parameter '
-        'instead of spacer widgets between children.',
+    problemMessage:
+        '[prefer_spacing_over_sizedbox] Using SizedBox for gaps instead of the spacing parameter is a stylistic API choice. Both achieve the same layout with no performance difference. Enable via the stylistic tier.',
     correctionMessage: 'Remove spacer children and add spacing: <value> to the '
         'Row/Column constructor.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -4956,6 +4962,8 @@ class AvoidUnconstrainedImagesRule extends SaropaLintRule {
 
 /// Warns when `SizedBox(width: X, height: X)` with identical dimensions is used.
 ///
+/// **Stylistic rule (opt-in only).** No performance or correctness benefit.
+///
 /// Use `SizedBox.square(dimension: X)` for clearer intent when width and height
 /// are the same value.
 ///
@@ -4978,7 +4986,7 @@ class PreferSizedBoxSquareRule extends SaropaLintRule {
 
   /// Style preference. Large counts acceptable.
   @override
-  LintImpact get impact => LintImpact.low;
+  LintImpact get impact => LintImpact.opinionated;
 
   @override
   RuleCost get cost => RuleCost.low;
@@ -4989,7 +4997,7 @@ class PreferSizedBoxSquareRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_sized_box_square',
     problemMessage:
-        '[prefer_sized_box_square] SizedBox has identical width and height. Use SizedBox.square() instead.',
+        '[prefer_sized_box_square] Using SizedBox(width: x, height: x) instead of SizedBox.square(dimension: x) is a stylistic choice — same widget at runtime, no performance benefit. Enable via the stylistic tier.',
     correctionMessage:
         'Replace with SizedBox.square(dimension: X) for clearer intent.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -5123,6 +5131,8 @@ class _PreferSizedBoxSquareFix extends DartFix {
 
 /// Warns when `Align(alignment: Alignment.center, ...)` is used.
 ///
+/// **Stylistic rule (opt-in only).** No performance or correctness benefit.
+///
 /// Use `Center` widget for clearer intent when centering content.
 /// `Center` is semantically clearer and slightly more efficient.
 ///
@@ -5148,7 +5158,7 @@ class PreferCenterOverAlignRule extends SaropaLintRule {
 
   /// Style preference. Large counts acceptable.
   @override
-  LintImpact get impact => LintImpact.low;
+  LintImpact get impact => LintImpact.opinionated;
 
   @override
   RuleCost get cost => RuleCost.low;
@@ -5159,7 +5169,7 @@ class PreferCenterOverAlignRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_center_over_align',
     problemMessage:
-        '[prefer_center_over_align] Align with Alignment.center should use Center widget instead.',
+        '[prefer_center_over_align] Center is identical to Align(alignment: Alignment.center) at runtime — same class, same behavior. Purely stylistic preference with no performance benefit. Enable via the stylistic tier.',
     correctionMessage: 'Replace with Center(child: ...) for clearer intent.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -5287,6 +5297,8 @@ class _PreferCenterOverAlignFix extends DartFix {
 
 /// Warns when `Container` is used only for alignment.
 ///
+/// **Performance benefit:** Container with only alignment creates unnecessary intermediate widgets. Align is a single-purpose widget with fewer allocations.
+///
 /// Use `Align` widget when Container is only used for the alignment property.
 /// This makes the intent clearer and is more efficient.
 ///
@@ -5324,7 +5336,7 @@ class PreferAlignOverContainerRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_align_over_container',
     problemMessage:
-        '[prefer_align_over_container] Container with only alignment should use Align widget instead.',
+        '[prefer_align_over_container] Container with only alignment creates unnecessary intermediate widgets. Align is a single-purpose widget with fewer allocations and faster layout computation.',
     correctionMessage:
         'Replace with Align(alignment: ..., child: ...) for clearer intent.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -5459,6 +5471,8 @@ class _PreferAlignOverContainerFix extends DartFix {
 
 /// Warns when `Container` is used only for padding.
 ///
+/// **Performance benefit:** Container with only padding creates unnecessary intermediate widgets. Padding is a single-purpose widget with fewer allocations.
+///
 /// Use `Padding` widget when Container is only used for the padding property.
 /// This makes the intent clearer and is more efficient.
 ///
@@ -5496,7 +5510,7 @@ class PreferPaddingOverContainerRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_padding_over_container',
     problemMessage:
-        '[prefer_padding_over_container] Container with only padding should use Padding widget instead.',
+        '[prefer_padding_over_container] Container with only padding creates unnecessary intermediate widgets (DecoratedBox, ConstrainedBox). Padding is a single-purpose widget with fewer allocations and faster layout.',
     correctionMessage:
         'Replace with Padding(padding: ..., child: ...) for clearer intent.',
     errorSeverity: DiagnosticSeverity.INFO,

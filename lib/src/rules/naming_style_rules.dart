@@ -792,6 +792,8 @@ class PreferBooleanPrefixesRule extends SaropaLintRule {
 
 /// Warns when local boolean variables are missing prefixes or suffixes.
 ///
+/// **Stylistic rule (opt-in only).** Naming convention with no performance or correctness impact.
+///
 /// This rule only checks local variables inside functions/methods.
 /// Enable this separately from [PreferBooleanPrefixesRule] for gradual adoption.
 ///
@@ -817,7 +819,7 @@ class PreferBooleanPrefixesForLocalsRule extends SaropaLintRule {
 
   /// Style/consistency. Large counts acceptable in legacy code.
   @override
-  LintImpact get impact => LintImpact.low;
+  LintImpact get impact => LintImpact.opinionated;
 
   @override
   RuleCost get cost => RuleCost.medium;
@@ -825,7 +827,7 @@ class PreferBooleanPrefixesForLocalsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_boolean_prefixes_for_locals',
     problemMessage:
-        '[prefer_boolean_prefixes_for_locals] Local boolean variable should have a prefix (is/has/can/should/will/did).',
+        '[prefer_boolean_prefixes_for_locals] Prefixing boolean local variables with is/has/can/should is a naming convention with no impact on code behavior or performance. Enable via the stylistic tier.',
     correctionMessage:
         'Rename this local boolean variable to use a standard prefix (is, has, can, should, will, did) or suffix (Enabled, Active, Visible). Example: status becomes isActive.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -970,6 +972,8 @@ class PreferBooleanPrefixesForLocalsRule extends SaropaLintRule {
 
 /// Warns when boolean parameters are missing prefixes.
 ///
+/// **Stylistic rule (opt-in only).** Naming convention with no performance or correctness impact.
+///
 /// This rule only checks function/method/constructor parameters.
 /// Enable this separately from [PreferBooleanPrefixesRule] for gradual adoption.
 ///
@@ -989,7 +993,7 @@ class PreferBooleanPrefixesForParamsRule extends SaropaLintRule {
 
   /// Style/consistency. Large counts acceptable in legacy code.
   @override
-  LintImpact get impact => LintImpact.low;
+  LintImpact get impact => LintImpact.opinionated;
 
   @override
   RuleCost get cost => RuleCost.medium;
@@ -997,7 +1001,7 @@ class PreferBooleanPrefixesForParamsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_boolean_prefixes_for_params',
     problemMessage:
-        '[prefer_boolean_prefixes_for_params] Boolean parameter should have a prefix (is/has/can/should/will/did).',
+        '[prefer_boolean_prefixes_for_params] Prefixing boolean parameters with is/has/can/should is a naming convention with no impact on code behavior or performance. Enable via the stylistic tier.',
     correctionMessage:
         'Rename this boolean parameter to use a standard prefix (is, has, can, should, will, did) or suffix (Enabled, Active, Visible). Example: visible becomes isVisible.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -1191,12 +1195,14 @@ class PreferBooleanPrefixesForParamsRule extends SaropaLintRule {
 }
 
 /// Warns when callback fields don't follow onX naming convention.
+///
+/// **Stylistic rule (opt-in only).** Naming convention with no performance or correctness impact.
 class PreferCorrectCallbackFieldNameRule extends SaropaLintRule {
   const PreferCorrectCallbackFieldNameRule() : super(code: _code);
 
   /// Style/consistency. Large counts acceptable in legacy code.
   @override
-  LintImpact get impact => LintImpact.low;
+  LintImpact get impact => LintImpact.opinionated;
 
   @override
   RuleCost get cost => RuleCost.medium;
@@ -1204,7 +1210,7 @@ class PreferCorrectCallbackFieldNameRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_correct_callback_field_name',
     problemMessage:
-        "[prefer_correct_callback_field_name] Callback field missing 'on' prefix. Flutter convention uses onPressed, onChanged.",
+        '[prefer_correct_callback_field_name] Using onXxx naming for callback fields is a Dart API convention. Callback naming does not affect code behavior or performance. Enable via the stylistic tier.',
     correctionMessage:
         "Rename callback fields to use the 'on' prefix following Flutter convention. For example, callback becomes onCallback and tapHandler becomes onTap.",
     errorSeverity: DiagnosticSeverity.INFO,
@@ -1368,6 +1374,8 @@ class PreferCorrectErrorNameRule extends SaropaLintRule {
 
 /// Warns when event handler names don't follow conventions.
 ///
+/// **Stylistic rule (opt-in only).** Naming convention with no performance or correctness impact.
+///
 /// Event handlers should be named consistently.
 ///
 /// ### Example
@@ -1385,10 +1393,13 @@ class PreferCorrectErrorNameRule extends SaropaLintRule {
 class PreferCorrectHandlerNameRule extends SaropaLintRule {
   const PreferCorrectHandlerNameRule() : super(code: _code);
 
+  @override
+  LintImpact get impact => LintImpact.opinionated;
+
   static const LintCode _code = LintCode(
     name: 'prefer_correct_handler_name',
     problemMessage:
-        '[prefer_correct_handler_name] Event handler should start with "on" or "_on".',
+        '[prefer_correct_handler_name] Using handleXxx or onXxx naming for handler methods is a convention. Handler naming does not affect code behavior or performance. Enable via the stylistic tier.',
     correctionMessage:
         'Rename the event handler method to start with "on" or "_on" prefix. For example, buttonPressed becomes onButtonPressed.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -1441,6 +1452,8 @@ class PreferCorrectHandlerNameRule extends SaropaLintRule {
 
 /// Warns when identifier names are too short or too long.
 ///
+/// **Readability benefit:** Research shows 8-20 character identifiers have optimal comprehension speed. Very short or very long names measurably slow code review.
+///
 /// Very short names (except common ones like i, j, x, y) hurt readability.
 /// Very long names are also hard to work with.
 ///
@@ -1468,7 +1481,7 @@ class PreferCorrectIdentifierLengthRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_correct_identifier_length',
     problemMessage:
-        '[prefer_correct_identifier_length] Identifier name length is not ideal.',
+        '[prefer_correct_identifier_length] Very short (1-2 char) or very long (>30 char) identifiers measurably impact code comprehension speed. Optimal readability is achieved with 8-20 character names.',
     correctionMessage:
         'Use names between 2 and 40 characters long. Single-character names (except i, j, k, x, y, z, e, n) reduce readability; overly long names hinder scanning.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -1540,6 +1553,8 @@ class PreferCorrectIdentifierLengthRule extends SaropaLintRule {
 
 /// Warns when setter parameter is not named 'value'.
 ///
+/// **Stylistic rule (opt-in only).** Naming convention with no performance or correctness impact.
+///
 /// Convention is to name setter parameters 'value' for consistency.
 ///
 /// ### Example
@@ -1560,7 +1575,7 @@ class PreferCorrectSetterParameterNameRule extends SaropaLintRule {
 
   /// Style/consistency. Large counts acceptable in legacy code.
   @override
-  LintImpact get impact => LintImpact.low;
+  LintImpact get impact => LintImpact.opinionated;
 
   @override
   RuleCost get cost => RuleCost.medium;
@@ -1568,7 +1583,7 @@ class PreferCorrectSetterParameterNameRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_correct_setter_parameter_name',
     problemMessage:
-        '[prefer_correct_setter_parameter_name] Setter parameter should be named "value".',
+        '[prefer_correct_setter_parameter_name] Using value as the setter parameter name is a Dart convention. The parameter name does not affect setter behavior or performance. Enable via the stylistic tier.',
     correctionMessage:
         'Rename the setter parameter to "value" for consistency with Dart conventions. Example: set name(String value) => _name = value;',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -1662,6 +1677,8 @@ class PreferExplicitParameterNamesRule extends SaropaLintRule {
 
 /// Warns when the file name doesn't match the primary class/type name.
 ///
+/// **Discoverability benefit:** When the primary class name does not match the file name, IDE file search cannot find declarations, measurably slowing navigation.
+///
 /// By convention, the file name should match the main class or type defined
 /// in the file to make it easier to locate code.
 class PreferMatchFileNameRule extends SaropaLintRule {
@@ -1677,7 +1694,7 @@ class PreferMatchFileNameRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_match_file_name',
     problemMessage:
-        '[prefer_match_file_name] File name should match the primary class name.',
+        '[prefer_match_file_name] When the primary class name does not match the file name, developers cannot use IDE file search to find declarations. This measurably slows navigation in large codebases.',
     correctionMessage:
         'Rename either the file or the primary class so they match. For example, user_service.dart should contain class UserService.',
     errorSeverity: DiagnosticSeverity.INFO,

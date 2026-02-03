@@ -2030,6 +2030,8 @@ class _TypeNameFinder extends RecursiveAstVisitor<void> {
 
 /// Warns when unused parameters don't have underscore prefix.
 ///
+/// **Stylistic rule (opt-in only).** No performance or correctness benefit.
+///
 /// Example of **bad** code:
 /// ```dart
 /// list.map((item) => 'fixed');
@@ -2042,9 +2044,9 @@ class _TypeNameFinder extends RecursiveAstVisitor<void> {
 class PreferTrailingUnderscoreForUnusedRule extends SaropaLintRule {
   const PreferTrailingUnderscoreForUnusedRule() : super(code: _code);
 
-  /// Code quality issue. Review when count exceeds 100.
+  /// Stylistic preference only. No performance or correctness benefit.
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.opinionated;
 
   @override
   RuleCost get cost => RuleCost.medium;
@@ -2052,7 +2054,7 @@ class PreferTrailingUnderscoreForUnusedRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_trailing_underscore_for_unused',
     problemMessage:
-        '[prefer_trailing_underscore_for_unused] Unused parameter should be named with underscore.',
+        '[prefer_trailing_underscore_for_unused] Naming unused variables with a trailing underscore is a convention. The Dart compiler handles unused variables the same either way. Enable via the stylistic tier.',
     correctionMessage: 'Rename to _ or _paramName to indicate it is unused.',
     errorSeverity: DiagnosticSeverity.INFO,
   );

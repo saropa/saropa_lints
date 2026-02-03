@@ -149,6 +149,72 @@ class _AddTryCatchTodoFix extends DartFix {
   }
 }
 
+class _AddEnvVarTodoFix extends DartFix {
+  @override
+  void run(
+    CustomLintResolver resolver,
+    ChangeReporter reporter,
+    CustomLintContext context,
+    AnalysisError analysisError,
+    List<AnalysisError> others,
+  ) {
+    context.registry.addSimpleStringLiteral((SimpleStringLiteral node) {
+      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
+
+      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
+        message: 'Add HACK: Use environment variable',
+        priority: 1,
+      );
+
+      changeBuilder.addDartFileEdit((builder) {
+        builder.addSimpleInsertion(
+          node.offset,
+          '// HACK: Use environment variable or secure storage instead\n',
+        );
+      });
+    });
+  }
+}
+
+class _AddDisposeTodoFix extends DartFix {
+  _AddDisposeTodoFix(this._methodCall);
+  final String _methodCall;
+
+  @override
+  void run(
+    CustomLintResolver resolver,
+    ChangeReporter reporter,
+    CustomLintContext context,
+    AnalysisError analysisError,
+    List<AnalysisError> others,
+  ) {
+    context.registry.addVariableDeclaration((VariableDeclaration node) {
+      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
+
+      // Find the full field declaration (including semicolon)
+      AstNode? fieldDecl = node.parent?.parent;
+      if (fieldDecl is! FieldDeclaration) return;
+
+      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
+        message: 'Add FIXME reminder for $_methodCall',
+        priority: 1,
+      );
+
+      changeBuilder.addDartFileEdit((builder) {
+        // Find where the semicolon is and insert comment before it
+        final String fieldSource = fieldDecl.toSource();
+        final int semicolonIndex = fieldSource.lastIndexOf(';');
+        if (semicolonIndex == -1) return;
+
+        builder.addSimpleInsertion(
+          fieldDecl.offset + semicolonIndex,
+          ' // FIXME: Add $_methodCall in dispose()',
+        );
+      });
+    });
+  }
+}
+
 /// Warns when Apple Sign-In is used without nonce parameter.
 ///
 /// Alias: apple_signin_nonce, require_apple_nonce
@@ -265,350 +331,6 @@ class _AddNonceParameterFix extends DartFix {
         builder.addSimpleInsertion(
           node.offset,
           '// HACK: Add nonce parameter to prevent replay attacks\n',
-        );
-      });
-    });
-  }
-}
-
-// =============================================================================
-// SUPABASE RULES
-// =============================================================================
-
-/// Warns when Supabase calls lack try-catch error handling.
-///
-/// Alias: supabase_try_catch, handle_supabase_errors
-///
-/// Supabase operations can fail due to network issues, auth problems, or
-/// database constraints. Unhandled errors will crash the app.
-///
-/// **BAD:**
-/// ```dart
-/// Future<void> fetchData() async {
-///   final response = await supabase.from('users').select();
-/// }
-/// ```
-///
-/// **GOOD:**
-/// ```dart
-/// Future<void> fetchData() async {
-///   try {
-///     final response = await supabase.from('users').select();
-///   } on PostgrestException catch (e) {
-///     // Handle database error
-///   }
-/// }
-/// ```
-class RequireSupabaseErrorHandlingRule extends SaropaLintRule {
-  const RequireSupabaseErrorHandlingRule() : super(code: _code);
-
-  @override
-  LintImpact get impact => LintImpact.high;
-
-  @override
-  RuleCost get cost => RuleCost.low;
-
-  static const LintCode _code = LintCode(
-    name: 'require_supabase_error_handling',
-    problemMessage:
-        '[require_supabase_error_handling] Supabase operation called without error handling crashes when the network is unavailable, authentication tokens expire, or the database rejects the query. Users see an unhandled exception crash screen instead of a friendly error message, causing data loss and a broken user experience.',
-    correctionMessage:
-        'Wrap Supabase operations in a try-catch block that handles PostgrestException and network errors, and display user-friendly messages with retry options.',
-    errorSeverity: DiagnosticSeverity.WARNING,
-  );
-
-  @override
-  void runWithReporter(
-    CustomLintResolver resolver,
-    SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
-  ) {
-    // Look for the .from('table') pattern which is unique to Supabase
-    context.registry.addMethodInvocation((MethodInvocation node) {
-      if (node.methodName.name != 'from') return;
-
-      // Must be called on something containing 'supabase' or 'Supabase'
-      final Expression? target = node.target;
-      if (target == null) return;
-
-      final String targetSource = target.toSource().toLowerCase();
-      if (!targetSource.contains('supabase')) return;
-
-      // Found a supabase.from() call - now check if it's in a try-catch
-      AstNode? current = node.parent;
-      while (current != null) {
-        if (current is TryStatement) return; // Has try-catch, OK
-        if (current is FunctionBody) break;
-        current = current.parent;
-      }
-
-      reporter.atNode(node, code);
-    });
-  }
-
-  @override
-  List<Fix> getFixes() => <Fix>[_AddTryCatchTodoFix(code)];
-}
-
-/// Warns when Supabase anon key is hardcoded in source code.
-///
-/// Alias: no_supabase_key_in_code, supabase_key_security
-///
-/// Supabase anon keys should come from environment variables or secure storage,
-/// not hardcoded in source files that may be committed to version control.
-///
-/// **BAD:**
-/// ```dart
-/// final supabase = Supabase.initialize(
-///   url: 'https://xxx.supabase.co',
-///   anonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...',
-/// );
-/// ```
-///
-/// **GOOD:**
-/// ```dart
-/// final supabase = Supabase.initialize(
-///   url: Env.supabaseUrl,
-///   anonKey: Env.supabaseAnonKey,
-/// );
-/// ```
-class AvoidSupabaseAnonKeyInCodeRule extends SaropaLintRule {
-  const AvoidSupabaseAnonKeyInCodeRule() : super(code: _code);
-
-  @override
-  LintImpact get impact => LintImpact.critical;
-
-  @override
-  RuleCost get cost => RuleCost.medium;
-
-  static const LintCode _code = LintCode(
-    name: 'avoid_supabase_anon_key_in_code',
-    problemMessage:
-        '[avoid_supabase_anon_key_in_code] Hardcoded keys can be extracted '
-        'from app binary. Attackers gain direct access to your Supabase project.',
-    correctionMessage:
-        'Use environment variables or secure configuration for API keys.',
-    errorSeverity: DiagnosticSeverity.ERROR,
-  );
-
-  // Supabase JWT tokens start with this pattern
-  static final RegExp _jwtPattern = RegExp(r'eyJ[A-Za-z0-9_-]{20,}');
-
-  @override
-  void runWithReporter(
-    CustomLintResolver resolver,
-    SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
-  ) {
-    context.registry.addSimpleStringLiteral((SimpleStringLiteral node) {
-      final String value = node.value;
-      if (value.length < 50) return; // JWT tokens are long
-
-      if (_jwtPattern.hasMatch(value)) {
-        // Check if it's in a Supabase context
-        AstNode? current = node.parent;
-        while (current != null) {
-          final String source = current.toSource();
-          if (source.contains('Supabase') ||
-              source.contains('anonKey') ||
-              source.contains('supabase')) {
-            reporter.atNode(node, code);
-            return;
-          }
-          if (current is FunctionBody || current is ClassDeclaration) break;
-          current = current.parent;
-        }
-      }
-    });
-  }
-
-  @override
-  List<Fix> getFixes() => <Fix>[_AddEnvVarTodoFix()];
-}
-
-class _AddEnvVarTodoFix extends DartFix {
-  @override
-  void run(
-    CustomLintResolver resolver,
-    ChangeReporter reporter,
-    CustomLintContext context,
-    AnalysisError analysisError,
-    List<AnalysisError> others,
-  ) {
-    context.registry.addSimpleStringLiteral((SimpleStringLiteral node) {
-      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
-
-      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
-        message: 'Add HACK: Use environment variable',
-        priority: 1,
-      );
-
-      changeBuilder.addDartFileEdit((builder) {
-        builder.addSimpleInsertion(
-          node.offset,
-          '// HACK: Use environment variable or secure storage instead\n',
-        );
-      });
-    });
-  }
-}
-
-/// Warns when Supabase realtime subscriptions are not unsubscribed in dispose.
-///
-/// Alias: supabase_realtime_dispose, unsubscribe_supabase_channel
-///
-/// Supabase realtime channels must be unsubscribed when the widget is disposed
-/// to prevent memory leaks and unexpected behavior.
-///
-/// **BAD:**
-/// ```dart
-/// class _ChatState extends State<Chat> {
-///   late RealtimeChannel _channel;
-///
-///   @override
-///   void initState() {
-///     super.initState();
-///     _channel = supabase.channel('room').subscribe();
-///   }
-///   // Missing unsubscribe in dispose!
-/// }
-/// ```
-///
-/// **GOOD:**
-/// ```dart
-/// class _ChatState extends State<Chat> {
-///   late RealtimeChannel _channel;
-///
-///   @override
-///   void initState() {
-///     super.initState();
-///     _channel = supabase.channel('room').subscribe();
-///   }
-///
-///   @override
-///   void dispose() {
-///     _channel.unsubscribe();
-///     super.dispose();
-///   }
-/// }
-/// ```
-class RequireSupabaseRealtimeUnsubscribeRule extends SaropaLintRule {
-  const RequireSupabaseRealtimeUnsubscribeRule() : super(code: _code);
-
-  @override
-  LintImpact get impact => LintImpact.critical;
-
-  @override
-  RuleCost get cost => RuleCost.medium;
-
-  static const LintCode _code = LintCode(
-    name: 'require_supabase_realtime_unsubscribe',
-    problemMessage:
-        '[require_supabase_realtime_unsubscribe] Unsubscribed channel keeps '
-        'WebSocket open, leaking connections and receiving stale updates.',
-    correctionMessage:
-        'Add channel.unsubscribe() in dispose() to prevent memory leaks.',
-    errorSeverity: DiagnosticSeverity.ERROR,
-  );
-
-  @override
-  void runWithReporter(
-    CustomLintResolver resolver,
-    SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
-  ) {
-    context.registry.addClassDeclaration((ClassDeclaration node) {
-      final ExtendsClause? extendsClause = node.extendsClause;
-      if (extendsClause == null) return;
-
-      final String superName = extendsClause.superclass.name.lexeme;
-      if (superName != 'State') return;
-
-      // Find RealtimeChannel fields
-      final List<String> channelNames = <String>[];
-      for (final ClassMember member in node.members) {
-        if (member is FieldDeclaration) {
-          final String? typeName = member.fields.type?.toSource();
-          if (typeName != null && typeName.contains('RealtimeChannel')) {
-            for (final VariableDeclaration variable
-                in member.fields.variables) {
-              channelNames.add(variable.name.lexeme);
-            }
-          }
-        }
-      }
-
-      if (channelNames.isEmpty) return;
-
-      // Find dispose method
-      String? disposeBody;
-      for (final ClassMember member in node.members) {
-        if (member is MethodDeclaration && member.name.lexeme == 'dispose') {
-          disposeBody = member.body.toSource();
-          break;
-        }
-      }
-
-      // Check if channels are unsubscribed
-      for (final String name in channelNames) {
-        final bool isUnsubscribed = disposeBody != null &&
-            (disposeBody.contains('$name.unsubscribe(') ||
-                disposeBody.contains('$name?.unsubscribe(') ||
-                disposeBody.contains('removeChannel'));
-
-        if (!isUnsubscribed) {
-          for (final ClassMember member in node.members) {
-            if (member is FieldDeclaration) {
-              for (final VariableDeclaration variable
-                  in member.fields.variables) {
-                if (variable.name.lexeme == name) {
-                  reporter.atNode(variable, code);
-                }
-              }
-            }
-          }
-        }
-      }
-    });
-  }
-
-  @override
-  List<Fix> getFixes() => <Fix>[_AddDisposeTodoFix('unsubscribe()')];
-}
-
-class _AddDisposeTodoFix extends DartFix {
-  _AddDisposeTodoFix(this._methodCall);
-  final String _methodCall;
-
-  @override
-  void run(
-    CustomLintResolver resolver,
-    ChangeReporter reporter,
-    CustomLintContext context,
-    AnalysisError analysisError,
-    List<AnalysisError> others,
-  ) {
-    context.registry.addVariableDeclaration((VariableDeclaration node) {
-      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
-
-      // Find the full field declaration (including semicolon)
-      AstNode? fieldDecl = node.parent?.parent;
-      if (fieldDecl is! FieldDeclaration) return;
-
-      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
-        message: 'Add FIXME reminder for $_methodCall',
-        priority: 1,
-      );
-
-      changeBuilder.addDartFileEdit((builder) {
-        // Find where the semicolon is and insert comment before it
-        final String fieldSource = fieldDecl.toSource();
-        final int semicolonIndex = fieldSource.lastIndexOf(';');
-        if (semicolonIndex == -1) return;
-
-        builder.addSimpleInsertion(
-          fieldDecl.offset + semicolonIndex,
-          ' // FIXME: Add $_methodCall in dispose()',
         );
       });
     });
@@ -882,236 +604,6 @@ class _RemoveFileAccessFix extends DartFix {
         builder.addSimpleInsertion(
           node.offset,
           '// HACK: Remove file access for security\n',
-        );
-      });
-    });
-  }
-}
-
-// =============================================================================
-// WORKMANAGER RULES
-// =============================================================================
-
-/// Warns when WorkManager task registration lacks constraints.
-///
-/// Alias: workmanager_constraints, require_task_constraints
-///
-/// WorkManager tasks without constraints may run at inappropriate times,
-/// draining battery or using metered data unexpectedly.
-///
-/// **BAD:**
-/// ```dart
-/// Workmanager().registerPeriodicTask(
-///   'sync',
-///   'syncTask',
-/// );
-/// ```
-///
-/// **GOOD:**
-/// ```dart
-/// Workmanager().registerPeriodicTask(
-///   'sync',
-///   'syncTask',
-///   constraints: Constraints(
-///     networkType: NetworkType.connected,
-///     requiresBatteryNotLow: true,
-///   ),
-/// );
-/// ```
-class RequireWorkmanagerConstraintsRule extends SaropaLintRule {
-  const RequireWorkmanagerConstraintsRule() : super(code: _code);
-
-  @override
-  LintImpact get impact => LintImpact.high;
-
-  @override
-  RuleCost get cost => RuleCost.low;
-
-  static const LintCode _code = LintCode(
-    name: 'require_workmanager_constraints',
-    problemMessage:
-        '[require_workmanager_constraints] WorkManager task registered without constraints runs unconditionally regardless of network availability, battery level, or charging state. This drains battery during low-power conditions, consumes metered mobile data, and causes failed network connection requests when connectivity is unavailable, wasting battery, memory, and processing resources.',
-    correctionMessage:
-        'Add Constraints(networkType: NetworkType.connected) and optionally requiresBatteryNotLow or requiresCharging to control when background tasks execute.',
-    errorSeverity: DiagnosticSeverity.WARNING,
-  );
-
-  static const Set<String> _taskMethods = <String>{
-    'registerPeriodicTask',
-    'registerOneOffTask',
-  };
-
-  @override
-  void runWithReporter(
-    CustomLintResolver resolver,
-    SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
-  ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
-      final String methodName = node.methodName.name;
-      if (!_taskMethods.contains(methodName)) return;
-
-      // Check if it's a Workmanager call
-      final String? targetSource = node.target?.toSource();
-      if (targetSource == null) return;
-      if (!targetSource.contains('Workmanager') &&
-          !targetSource.contains('workmanager')) {
-        return;
-      }
-
-      // Check for constraints parameter
-      final bool hasConstraints =
-          node.argumentList.arguments.any((Expression arg) {
-        if (arg is NamedExpression) {
-          return arg.name.label.name == 'constraints';
-        }
-        return false;
-      });
-
-      if (!hasConstraints) {
-        reporter.atNode(node, code);
-      }
-    });
-  }
-
-  @override
-  List<Fix> getFixes() => <Fix>[_AddConstraintsTodoFix()];
-}
-
-class _AddConstraintsTodoFix extends DartFix {
-  @override
-  void run(
-    CustomLintResolver resolver,
-    ChangeReporter reporter,
-    CustomLintContext context,
-    AnalysisError analysisError,
-    List<AnalysisError> others,
-  ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
-      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
-
-      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
-        message: 'Add HACK: Add constraints parameter',
-        priority: 1,
-      );
-
-      changeBuilder.addDartFileEdit((builder) {
-        builder.addSimpleInsertion(
-          node.offset,
-          '// HACK: Add constraints parameter to specify network/battery requirements\n',
-        );
-      });
-    });
-  }
-}
-
-/// Warns when WorkManager callback does not return a result.
-///
-/// Alias: workmanager_return_result, require_task_result
-///
-/// WorkManager callbacks must return a bool (or `Future<bool>`) to indicate
-/// success or failure. Without proper returns, task scheduling may behave
-/// unexpectedly.
-///
-/// **BAD:**
-/// ```dart
-/// Workmanager().executeTask((task, inputData) async {
-///   await doWork();
-///   // No return!
-/// });
-/// ```
-///
-/// **GOOD:**
-/// ```dart
-/// Workmanager().executeTask((task, inputData) async {
-///   try {
-///     await doWork();
-///     return true;
-///   } catch (e) {
-///     return false;
-///   }
-/// });
-/// ```
-class RequireWorkmanagerResultReturnRule extends SaropaLintRule {
-  const RequireWorkmanagerResultReturnRule() : super(code: _code);
-
-  @override
-  LintImpact get impact => LintImpact.critical;
-
-  @override
-  RuleCost get cost => RuleCost.low;
-
-  static const LintCode _code = LintCode(
-    name: 'require_workmanager_result_return',
-    problemMessage:
-        '[require_workmanager_result_return] Missing return value makes '
-        'WorkManager assume failure, triggering unnecessary retries.',
-    correctionMessage:
-        'Return true/false from the executeTask callback to indicate success.',
-    errorSeverity: DiagnosticSeverity.ERROR,
-  );
-
-  @override
-  void runWithReporter(
-    CustomLintResolver resolver,
-    SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
-  ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
-      if (node.methodName.name != 'executeTask') return;
-
-      // Check if it's a Workmanager call
-      final String? targetSource = node.target?.toSource();
-      if (targetSource == null) return;
-      if (!targetSource.contains('Workmanager') &&
-          !targetSource.contains('workmanager')) {
-        return;
-      }
-
-      // Find the callback
-      final ArgumentList args = node.argumentList;
-      if (args.arguments.isEmpty) return;
-
-      final Expression callback = args.arguments.first;
-      if (callback is! FunctionExpression) return;
-
-      final FunctionBody body = callback.body;
-      final String bodySource = body.toSource();
-
-      // Check for any return statement - the callback must return something
-      // We use a simple heuristic: if there's no 'return' keyword followed by
-      // something, the callback likely doesn't return properly
-      if (!bodySource.contains('return ')) {
-        reporter.atNode(callback, code);
-      }
-    });
-  }
-
-  @override
-  List<Fix> getFixes() => <Fix>[_AddReturnTodoFix()];
-}
-
-class _AddReturnTodoFix extends DartFix {
-  @override
-  void run(
-    CustomLintResolver resolver,
-    ChangeReporter reporter,
-    CustomLintContext context,
-    AnalysisError analysisError,
-    List<AnalysisError> others,
-  ) {
-    context.registry.addFunctionExpression((FunctionExpression node) {
-      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
-
-      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
-        message: 'Add HACK: Return true/false from callback',
-        priority: 1,
-      );
-
-      changeBuilder.addDartFileEdit((builder) {
-        builder.addSimpleInsertion(
-          node.offset,
-          '// HACK: Ensure this callback returns true (success) or false (failure)\n',
         );
       });
     });
@@ -2558,97 +2050,6 @@ class PreferGeolocatorDistanceFilterRule extends SaropaLintRule {
 }
 
 // =============================================================================
-// NEW ROADMAP STAR RULES - Package-Specific Rules
-// =============================================================================
-
-/// Warns when Freezed is used for logic classes like Blocs or Services.
-///
-/// Freezed is designed for immutable data classes. Using it for Blocs,
-/// Cubits, or Services adds unnecessary complexity.
-///
-/// **BAD:**
-/// ```dart
-/// @freezed
-/// class UserBloc with _$UserBloc {
-///   // Freezed on a Bloc - overkill!
-/// }
-/// ```
-///
-/// **GOOD:**
-/// ```dart
-/// @freezed
-/// class User with _$User {
-///   const factory User({required String name}) = _User;
-/// }
-///
-/// class UserBloc extends Bloc<UserEvent, UserState> {
-///   // Regular class for logic
-/// }
-/// ```
-class AvoidFreezedForLogicClassesRule extends SaropaLintRule {
-  const AvoidFreezedForLogicClassesRule() : super(code: _code);
-
-  @override
-  LintImpact get impact => LintImpact.low;
-
-  @override
-  RuleCost get cost => RuleCost.low;
-
-  static const LintCode _code = LintCode(
-    name: 'avoid_freezed_for_logic_classes',
-    problemMessage:
-        '[avoid_freezed_for_logic_classes] Freezed annotation on logic class. '
-        'Freezed is meant for data classes, not Blocs/Services.',
-    correctionMessage:
-        'Remove @freezed from logic classes. Use regular classes for Blocs/Services.',
-    errorSeverity: DiagnosticSeverity.INFO,
-  );
-
-  static const Set<String> _logicClassSuffixes = <String>{
-    'Bloc',
-    'Cubit',
-    'Service',
-    'Repository',
-    'Controller',
-    'Provider',
-    'Notifier',
-    'Manager',
-    'UseCase',
-    'Interactor',
-  };
-
-  @override
-  void runWithReporter(
-    CustomLintResolver resolver,
-    SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
-  ) {
-    context.registry.addClassDeclaration((ClassDeclaration node) {
-      // Check if has @freezed annotation
-      bool hasFreezed = false;
-      for (final annotation in node.metadata) {
-        final name = annotation.name.name;
-        if (name == 'freezed' || name == 'Freezed') {
-          hasFreezed = true;
-          break;
-        }
-      }
-
-      if (!hasFreezed) return;
-
-      // Check if class name suggests it's a logic class
-      final String className = node.name.lexeme;
-      for (final suffix in _logicClassSuffixes) {
-        if (className.endsWith(suffix)) {
-          reporter.atToken(node.name, code);
-          return;
-        }
-      }
-    });
-  }
-}
-
-// =============================================================================
 // prefer_typed_prefs_wrapper
 // =============================================================================
 
@@ -2737,136 +2138,6 @@ class PreferTypedPrefsWrapperRule extends SaropaLintRule {
       if (keyArg is SimpleStringLiteral) {
         // Direct string literal - suggests not using a wrapper
         reporter.atNode(node, code);
-      }
-    });
-  }
-}
-
-// =============================================================================
-// prefer_freezed_for_data_classes
-// =============================================================================
-
-/// Warns when data classes could benefit from using freezed.
-///
-/// Alias: use_freezed, immutable_data_class
-///
-/// Data classes with multiple fields benefit from freezed for immutability,
-/// copyWith, equality, and serialization. Pure data classes without freezed
-/// require manual boilerplate.
-///
-/// **BAD:**
-/// ```dart
-/// class User {
-///   final String name;
-///   final int age;
-///   final String? email;
-///
-///   User({required this.name, required this.age, this.email});
-///
-///   User copyWith({String? name, int? age, String? email}) {
-///     return User(
-///       name: name ?? this.name,
-///       age: age ?? this.age,
-///       email: email ?? this.email,
-///     );
-///   }
-///
-///   @override
-///   bool operator ==(Object other) =>
-///       identical(this, other) ||
-///       other is User &&
-///           name == other.name &&
-///           age == other.age &&
-///           email == other.email;
-///
-///   @override
-///   int get hashCode => name.hashCode ^ age.hashCode ^ email.hashCode;
-/// }
-/// ```
-///
-/// **GOOD:**
-/// ```dart
-/// @freezed
-/// class User with _$User {
-///   const factory User({
-///     required String name,
-///     required int age,
-///     String? email,
-///   }) = _User;
-///
-///   factory User.fromJson(Map<String, dynamic> json) => _$UserFromJson(json);
-/// }
-/// ```
-class PreferFreezedForDataClassesRule extends SaropaLintRule {
-  const PreferFreezedForDataClassesRule() : super(code: _code);
-
-  @override
-  LintImpact get impact => LintImpact.low;
-
-  @override
-  RuleCost get cost => RuleCost.medium;
-
-  static const LintCode _code = LintCode(
-    name: 'prefer_freezed_for_data_classes',
-    problemMessage:
-        '[prefer_freezed_for_data_classes] Data class with manual copyWith/equals. '
-        'Consider using @freezed to eliminate boilerplate.',
-    correctionMessage:
-        'Add @freezed annotation and let code generation handle copyWith, ==, hashCode.',
-    errorSeverity: DiagnosticSeverity.INFO,
-  );
-
-  @override
-  void runWithReporter(
-    CustomLintResolver resolver,
-    SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
-  ) {
-    context.registry.addClassDeclaration((ClassDeclaration node) {
-      // Check if already using freezed/equatable
-      for (final annotation in node.metadata) {
-        final name = annotation.name.name;
-        if (name == 'freezed' ||
-            name == 'Freezed' ||
-            name == 'immutable' ||
-            name == 'JsonSerializable') {
-          return; // Already using code generation
-        }
-      }
-
-      // Check for extends Equatable
-      final extendsClause = node.extendsClause;
-      if (extendsClause != null) {
-        final superclass = extendsClause.superclass.name.lexeme;
-        if (superclass == 'Equatable') return;
-      }
-
-      // Count data class indicators
-      int finalFieldCount = 0;
-      bool hasCopyWith = false;
-      bool hasEqualsOverride = false;
-      bool hasHashCodeOverride = false;
-
-      for (final ClassMember member in node.members) {
-        if (member is FieldDeclaration) {
-          if (member.fields.isFinal) {
-            finalFieldCount += member.fields.variables.length;
-          }
-        }
-        if (member is MethodDeclaration) {
-          final name = member.name.lexeme;
-          if (name == 'copyWith') hasCopyWith = true;
-          if (name == '==') hasEqualsOverride = true;
-          if (name == 'hashCode') hasHashCodeOverride = true;
-        }
-      }
-
-      // Suggest freezed if:
-      // - Has 3+ final fields AND
-      // - Has manual copyWith OR manual equals/hashCode
-      if (finalFieldCount >= 3 &&
-          (hasCopyWith || (hasEqualsOverride && hasHashCodeOverride))) {
-        reporter.atToken(node.name, code);
       }
     });
   }

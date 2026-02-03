@@ -1994,6 +1994,8 @@ class PreferExplicitFunctionTypeRule extends SaropaLintRule {
 
 /// Warns when `var` is used instead of explicit type.
 ///
+/// **Stylistic rule (opt-in only).** Conflicts with prefer_var_over_explicit_type. No performance or correctness benefit.
+///
 /// Explicit types improve code readability and catch type errors earlier.
 ///
 /// Example of **bad** code:
@@ -2012,10 +2014,14 @@ class PreferExplicitFunctionTypeRule extends SaropaLintRule {
 class PreferTypeOverVarRule extends SaropaLintRule {
   const PreferTypeOverVarRule() : super(code: _code);
 
+  /// Stylistic preference only. Conflicts with prefer_var_over_explicit_type.
+  @override
+  LintImpact get impact => LintImpact.opinionated;
+
   static const LintCode _code = LintCode(
     name: 'prefer_type_over_var',
     problemMessage:
-        '[prefer_type_over_var] Prefer explicit type annotation over var.',
+        '[prefer_type_over_var] Preferring explicit type annotations over var is a style choice. Both produce identical compiled code. Conflicts with prefer_var_over_explicit_type. Enable via the stylistic tier.',
     correctionMessage: 'Replace var with the explicit type.',
     errorSeverity: DiagnosticSeverity.INFO,
   );

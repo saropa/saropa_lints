@@ -85,3 +85,9 @@ export 'permission_rules.dart';
 export 'connectivity_rules.dart';
 export 'geolocator_rules.dart';
 export 'sqflite_rules.dart';
+export 'db_yield_rules.dart';
+
+// v4.3.0 rule files - package extractions
+export 'flutter_hooks_rules.dart';
+export 'supabase_rules.dart';
+export 'workmanager_rules.dart';
