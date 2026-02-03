@@ -51,13 +51,78 @@ dedicated rule files today:
 | Windows | none | `windowsPlatformRules` (empty) + `_desktopPlatformRules` |
 | Linux | none | `linuxPlatformRules` (empty) + `_desktopPlatformRules` |
 
-macOS and Web have rules defined in their tier sets but those rules live in
-other category files (no dedicated `macos_rules.dart` or `web_rules.dart`).
-Windows and Linux tier sets are empty.
-
 `platform_rules.dart` contains cross-platform detection rules
 (`RequirePlatformCheckRule`, `PreferPlatformIoConditionalRule`, etc.) that are
 not tied to a single platform and should stay in the general folder.
+
+#### macOS rules (15) — extract from `ios_rules.dart`
+
+All 15 macOS rule classes currently live in `ios_rules.dart`. No helper classes.
+
+| Class | Line |
+|-------|------|
+| `PreferMacosMenuBarIntegrationRule` | 908 |
+| `PreferMacosKeyboardShortcutsRule` | 1008 |
+| `RequireMacosWindowSizeConstraintsRule` | 1102 |
+| `RequireMacosFileAccessIntentRule` | 3568 |
+| `AvoidMacosDeprecatedSecurityApisRule` | 3649 |
+| `RequireMacosHardenedRuntimeRule` | 4191 |
+| `AvoidMacosCatalystUnsupportedApisRule` | 4296 |
+| `RequireMacosWindowRestorationRule` | 6121 |
+| `AvoidMacosFullDiskAccessRule` | 6355 |
+| `RequireMacosSandboxEntitlementsRule` | 6703 |
+| `RequireMacosSandboxExceptionsRule` | 8579 |
+| `AvoidMacosHardenedRuntimeViolationsRule` | 8666 |
+| `RequireMacosAppTransportSecurityRule` | 8738 |
+| `RequireMacosNotarizationReadyRule` | 8811 |
+| `RequireMacosEntitlementsRule` | 8890 |
+
+#### Web rules (6 web-specific) — extract from scattered files
+
+Only the web-specific rules move. Shared rules (accessibility, package-specific)
+stay in their current category files.
+
+| Class | Current file | Line |
+|-------|-------------|------|
+| `AvoidPlatformChannelOnWebRule` | `performance_rules.dart` | 2970 |
+| `RequireCorsHandlingRule` | `performance_rules.dart` | 3057 |
+| `PreferDeferredLoadingWebRule` | `performance_rules.dart` | 3136 |
+| `AvoidWebOnlyDependenciesRule` | `platform_rules.dart` | 237 |
+| `PreferUrlStrategyForWebRule` | `widget_patterns_rules.dart` | 6423 |
+| `RequireWebRendererAwarenessRule` | `widget_patterns_rules.dart` | 7055 |
+
+Rules in `webPlatformRules` that stay in their current files:
+
+| Rule | Current file | Reason |
+|------|-------------|--------|
+| `avoid_secure_storage_on_web` | `firebase_rules.dart` | Firebase-specific |
+| `avoid_isar_web_limitations` | `isar_rules.dart` | Isar-specific |
+| `avoid_gesture_only_interactions` | `accessibility_rules.dart` | shared with `_desktopPlatformRules` |
+| `avoid_hover_only` | `accessibility_rules.dart` | shared with `_desktopPlatformRules` |
+| `require_focus_indicator` | `accessibility_rules.dart` | shared with `_desktopPlatformRules` |
+
+#### Windows and Linux — empty placeholders
+
+`windowsPlatformRules` and `linuxPlatformRules` are empty in `tiers.dart`.
+Desktop-shared rules (`_desktopPlatformRules`) stay in their current category
+files. Create empty placeholder files matching the pattern of other platform
+files.
+
+#### Desktop shared rules (`_desktopPlatformRules`) — stay in current files
+
+These apply to macOS, Windows, and Linux via `_desktopPlatformRules` in
+`tiers.dart`. They stay in their category files.
+
+| Rule | Current file | Line |
+|------|-------------|------|
+| `require_menu_bar_for_desktop` | `performance_rules.dart` | 3227 |
+| `require_window_close_confirmation` | `performance_rules.dart` | 3311 |
+| `prefer_native_file_dialogs` | `performance_rules.dart` | 3391 |
+| `require_window_size_constraints` | `widget_patterns_rules.dart` | 6514 |
+| `avoid_touch_only_gestures` | `architecture_rules.dart` | 634 |
+| `avoid_gesture_only_interactions` | `accessibility_rules.dart` | 444 |
+| `require_focus_indicator` | `accessibility_rules.dart` | 2511 |
+| `avoid_hover_only` | `accessibility_rules.dart` | 1695 |
 
 ### General/category files (68)
 
@@ -72,8 +137,10 @@ lib/src/rules/
   platforms/
     android_rules.dart
     ios_rules.dart
-    macos_rules.dart             (new, needs new rules written)
-    web_rules.dart               (new, needs new rules written)
+    linux_rules.dart             (new, empty placeholder)
+    macos_rules.dart             (new, extract 15 rules from ios_rules.dart)
+    web_rules.dart               (new, extract 6 rules from 4 files)
+    windows_rules.dart           (new, empty placeholder)
   packages/
     bloc_rules.dart
     dio_rules.dart
