@@ -15,7 +15,13 @@ Dates are not included in version headers — [pub.dev](https://pub.dev/packages
 
 ### Fixed
 
+- **`avoid_unbounded_constraints` reduced false positives**: Three improvements: (1) checks only direct children for `Expanded`/`Flexible` via AST instead of string-matching the entire nested subtree, eliminating false positives on parent Columns that contain nested Rows with `Expanded`; (2) scroll-direction-aware — only flags when the widget axis matches the scroll axis (e.g. `Row` with `Expanded` in a vertical `SingleChildScrollView` is no longer flagged); (3) constraint widget detection (`ConstrainedBox`/`SizedBox`/`Container`) now only counts widgets between the Column/Row and the scroll view, not above it.
+
+- **`avoid_positioned_outside_stack` now recognises `Stack` subclasses**: The rule previously only matched the exact types `Stack` and `IndexedStack` by name. Widgets that extend `Stack` (e.g. `Indexer` from `package:indexed`) triggered a false positive. The rule now uses the analyzer type hierarchy (`allSupertypes`) to accept any subclass of `Stack` as a valid parent.
+
 - **Platform-aware filtering for keyboard/focus/hover rules**: `avoid_gesture_only_interactions`, `require_focus_indicator`, and `avoid_hover_only` now respect the project's `platforms:` configuration. These rules enforce desktop/web-specific patterns (keyboard alternatives, focus indicators, hover alternatives) and are auto-disabled for mobile-only projects where they produced false positives.
+
+- **`require_deep_link_fallback` reduced false positives**: Two improvements: (1) methods returning Widget types (`Widget`, `Future<Widget>`, `PreferredSizeWidget`, etc.) are now skipped as UI builders rather than deep link handlers; (2) a positive body signal check requires at least one deep link pattern (`Uri`, `pathSegments`, `queryParameters`, `Navigator`, `GoRouter`, or navigation calls) before flagging — methods like `linkAccounts()` or `logRouteChange()` that have link/route in their name but no URI parsing or navigation in their body are no longer flagged.
 
 ---
 ## [4.9.15]

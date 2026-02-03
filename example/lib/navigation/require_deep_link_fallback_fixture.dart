@@ -148,6 +148,43 @@ extension UriExtensions on Uri? {
   bool get checkDeepLinkFormat => this?.host == 'example.com';
 }
 
+// FALSE POSITIVE TEST: Widget return types should NOT trigger
+// These are UI builders, not deep link handlers
+class LinkWidgetBuilders {
+  // OK: Returns Widget - UI builder, not a handler
+  Widget buildShareLinkButton() {
+    return ElevatedButton(
+      onPressed: () {},
+      child: const Text('Share Link'),
+    );
+  }
+
+  // OK: Returns Widget? - nullable widget builder
+  Widget? buildRouteBanner(bool show) {
+    if (!show) return null;
+    return const Text('Route active');
+  }
+}
+
+// FALSE POSITIVE TEST: Methods with link/route in name but no deep link
+// signals in body should NOT trigger
+class NonDeepLinkMethods {
+  bool _isProcessing = false;
+
+  // OK: Name has 'link' but body has no Uri/Navigator/GoRouter usage
+  void linkAccounts(String fromId, String toId) {
+    _isProcessing = true;
+    print('Linking $fromId to $toId');
+    _isProcessing = false;
+  }
+
+  // OK: Name has 'route' but body has no deep link signals
+  void logRouteChange(String from, String to) {
+    print('Route changed: $from -> $to');
+    _isProcessing = false;
+  }
+}
+
 // Mock classes
 class ProductPage extends StatelessWidget {
   final String id;
