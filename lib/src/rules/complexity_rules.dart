@@ -602,15 +602,21 @@ class AvoidMultiAssignmentRule extends SaropaLintRule {
 
 /// Warns when binary expression operands could be reordered for clarity.
 ///
+/// **Stylistic rule (opt-in only).** No performance or correctness benefit.
+///
 /// Prefer having the variable on the left side of comparisons for readability.
 /// Example: Prefer `x == 5` over `5 == x`.
 class BinaryExpressionOperandOrderRule extends SaropaLintRule {
   const BinaryExpressionOperandOrderRule() : super(code: _code);
 
+  /// Stylistic preference only. No performance or correctness benefit.
+  @override
+  LintImpact get impact => LintImpact.opinionated;
+
   static const LintCode _code = LintCode(
     name: 'binary_expression_operand_order',
     problemMessage:
-        '[binary_expression_operand_order] Constant placed on the left side of equality comparison (Yoda conditions). This reverses the natural reading order, making code harder to understand and increasing cognitive load when scanning through multiple comparisons.',
+        '[binary_expression_operand_order] Preferring a specific operand order in binary expressions is a stylistic convention. Both orderings produce equivalent compiled code. Enable via the stylistic tier.',
     correctionMessage:
         'Place the variable or expression on the left side and the constant on the right (e.g., "status == 200" instead of "200 == status") to match natural language order and improve readability.',
     errorSeverity: DiagnosticSeverity.INFO,

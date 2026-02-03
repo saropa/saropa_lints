@@ -1734,14 +1734,16 @@ class NoEqualThenElseRule extends SaropaLintRule {
 
 /// Warns when an if-else could be simplified to a conditional expression.
 ///
+/// **Stylistic rule (opt-in only).** No performance or correctness benefit.
+///
 /// Simple if-else statements that assign to the same variable or return
 /// values can often be replaced with a ternary operator.
 class PreferConditionalExpressionsRule extends SaropaLintRule {
   const PreferConditionalExpressionsRule() : super(code: _code);
 
-  /// Code quality issue. Review when count exceeds 100.
+  /// Stylistic preference only. No performance or correctness benefit.
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.opinionated;
 
   @override
   RuleCost get cost => RuleCost.medium;
@@ -1749,7 +1751,7 @@ class PreferConditionalExpressionsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_conditional_expressions',
     problemMessage:
-        '[prefer_conditional_expressions] if-else statement used only to assign or return different values. Using statement syntax for simple value selection adds unnecessary lines and nesting, making the code more verbose and harder to scan quickly.',
+        '[prefer_conditional_expressions] Using ternary expressions instead of if-else is a code shape preference. Both compile to equivalent code with no performance impact. Enable via the stylistic tier.',
     correctionMessage:
         'Replace with a conditional expression (condition ? thenValue : elseValue) for concise value selection. Ternary expressions make the intent clear, reduce nesting levels, and improve code density for simple branching.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -1859,6 +1861,8 @@ class PreferCorrectSwitchLengthRule extends SaropaLintRule {
 
 /// Warns when returning a conditional could be simplified.
 ///
+/// **Stylistic rule (opt-in only).** No performance or correctness benefit.
+///
 /// Handles the pattern: `if (cond) return true; return false;`
 /// For if-else patterns, see PreferReturningConditionRule.
 ///
@@ -1881,9 +1885,9 @@ class PreferCorrectSwitchLengthRule extends SaropaLintRule {
 class PreferReturningConditionalsRule extends SaropaLintRule {
   const PreferReturningConditionalsRule() : super(code: _code);
 
-  /// Code quality issue. Review when count exceeds 100.
+  /// Stylistic preference only. No performance or correctness benefit.
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.opinionated;
 
   @override
   RuleCost get cost => RuleCost.medium;
@@ -1891,7 +1895,7 @@ class PreferReturningConditionalsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_returning_conditionals',
     problemMessage:
-        '[prefer_returning_conditionals] Function returns true in one branch and false in the other, which is equivalent to returning the condition expression directly. The extra if/else adds lines and nesting without changing the computed boolean result.',
+        '[prefer_returning_conditionals] Simplifying return logic to a single conditional expression is a code shape preference. Both forms produce equivalent compiled output. Enable via the stylistic tier.',
     correctionMessage:
         'Replace the if/else with return condition; (or return !condition; if the branches are swapped) to communicate the intent more concisely.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -1959,6 +1963,8 @@ class PreferReturningConditionalsRule extends SaropaLintRule {
 
 /// Warns when using `if (x) return true; else return false;` instead of `return x;`.
 ///
+/// **Stylistic rule (opt-in only).** No performance or correctness benefit.
+///
 /// Example of **bad** code:
 /// ```dart
 /// bool isValid(int x) {
@@ -1979,9 +1985,9 @@ class PreferReturningConditionalsRule extends SaropaLintRule {
 class PreferReturningConditionRule extends SaropaLintRule {
   const PreferReturningConditionRule() : super(code: _code);
 
-  /// Code quality issue. Review when count exceeds 100.
+  /// Stylistic preference only. No performance or correctness benefit.
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.opinionated;
 
   @override
   RuleCost get cost => RuleCost.medium;
@@ -1989,7 +1995,7 @@ class PreferReturningConditionRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_returning_condition',
     problemMessage:
-        '[prefer_returning_condition] Variable assigned true or false in separate branches, then returned. The intermediate variable and branching add unnecessary steps when the condition expression itself is the desired boolean result.',
+        '[prefer_returning_condition] Returning a condition directly instead of if-else with true/false is a simplification preference. No performance or correctness difference. Enable via the stylistic tier.',
     correctionMessage:
         'Return the condition expression directly instead of assigning to a temporary variable, reducing the code to a single return statement.',
     errorSeverity: DiagnosticSeverity.INFO,
