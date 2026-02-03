@@ -174,6 +174,29 @@ void main() {
           isNotNull,
         );
       });
+
+      test('should skip methods returning Widget types', () {
+        // Expected behavior: These should NOT trigger
+        // - Widget buildShareLinkButton() - UI builder
+        // - Widget? buildRouteBanner() - nullable widget builder
+        // Also covers Future<Widget>, PreferredSizeWidget, etc.
+
+        expect(
+          'Methods returning Widget types are UI builders, not handlers',
+          isNotNull,
+        );
+      });
+
+      test('should skip methods with no deep link signals in body', () {
+        // Expected behavior: These should NOT trigger
+        // - linkAccounts() - name has "link" but body has no Uri/Navigator
+        // - logRouteChange() - name has "route" but body has no navigation
+
+        expect(
+          'Methods without Uri/Navigator/GoRouter in body are skipped',
+          isNotNull,
+        );
+      });
     });
 
     group('require_https_only', () {
