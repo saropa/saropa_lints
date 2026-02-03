@@ -13,6 +13,10 @@ Dates are not included in version headers — [pub.dev](https://pub.dev/packages
 ---
 ## [Unreleased]
 
+### Fixed
+
+- **Platform-aware filtering for keyboard/focus/hover rules**: `avoid_gesture_only_interactions`, `require_focus_indicator`, and `avoid_hover_only` now respect the project's `platforms:` configuration. These rules enforce desktop/web-specific patterns (keyboard alternatives, focus indicators, hover alternatives) and are auto-disabled for mobile-only projects where they produced false positives.
+
 ---
 ## [4.9.15]
 
