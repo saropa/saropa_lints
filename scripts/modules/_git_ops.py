@@ -60,6 +60,19 @@ def extract_repo_path(remote_url: str) -> str:
     return match.group(1) if match else "owner/repo"
 
 
+def tag_exists_on_remote(project_dir: Path, tag_name: str) -> bool:
+    """Check if a git tag already exists on the remote."""
+    use_shell = get_shell_mode()
+    result = subprocess.run(
+        ["git", "ls-remote", "--tags", "origin", tag_name],
+        cwd=project_dir,
+        capture_output=True,
+        text=True,
+        shell=use_shell,
+    )
+    return bool(result.stdout.strip())
+
+
 def git_commit_and_push(
     project_dir: Path, version: str, branch: str
 ) -> bool:
@@ -179,7 +192,7 @@ def create_git_tag(project_dir: Path, version: str) -> bool:
         if result.returncode != 0:
             return False
 
-    # Check if tag exists on remote
+    # Check if tag exists on remote — blocker if already published
     result = subprocess.run(
         ["git", "ls-remote", "--tags", "origin", tag_name],
         cwd=project_dir,
@@ -188,7 +201,11 @@ def create_git_tag(project_dir: Path, version: str) -> bool:
         shell=use_shell,
     )
     if result.stdout.strip():
-        print_warning(f"Tag {tag_name} already exists on remote.")
+        print_error(
+            f"Tag {tag_name} already exists on remote. "
+            f"This version has already been published."
+        )
+        return False
     else:
         result = run_command(
             ["git", "push", "origin", tag_name],
@@ -241,8 +258,10 @@ def create_github_release(
         shell=use_shell,
     )
     if result.returncode == 0:
-        print_warning(f"Release {tag_name} already exists.")
-        return True, None
+        return False, (
+            f"Release {tag_name} already exists. "
+            f"This version has already been published."
+        )
 
     result = subprocess.run(
         [
@@ -275,11 +294,15 @@ def create_github_release(
 def post_publish_commit(
     project_dir: Path, next_version: str, branch: str
 ) -> bool:
-    """Commit and push the post-publish version bump."""
+    """Commit and push the post-publish version bump.
+
+    Stages only pubspec.yaml and CHANGELOG.md — never uses
+    'git add -A' to avoid picking up unrelated changes.
+    """
     use_shell = get_shell_mode()
 
     result = subprocess.run(
-        ["git", "add", "-A"],
+        ["git", "add", "pubspec.yaml", "CHANGELOG.md"],
         cwd=project_dir,
         capture_output=True,
         text=True,

@@ -8,7 +8,6 @@ tier integrity verification.
 
 Workflow:
     Step 1:  Pre-publish audit (tier integrity, duplicates, quality checks)
-    Pre-pub: Merge [Unreleased] into version (automatic)
     Step 2:  Check prerequisites (flutter, git, gh)
     Step 3:  Validate working tree
     Step 4:  Check remote sync
@@ -169,6 +168,7 @@ from scripts.modules._git_ops import (
     git_commit_and_push,
     post_publish_commit,
     publish_to_pubdev_step,
+    tag_exists_on_remote,
 )
 from scripts.modules._pubdev_lint import (
     check_pubdev_lint_issues,
@@ -200,10 +200,9 @@ from scripts.modules._version_changelog import (
     get_latest_changelog_version,
     get_package_name,
     get_version_from_pubspec,
-    has_unreleased_content,
     increment_patch_version,
-    merge_unreleased_into_version,
     parse_version,
+    rename_unreleased_to_version,
     set_version_in_pubspec,
 )
 
@@ -288,6 +287,15 @@ def main() -> int:
             ExitCode.VALIDATION_FAILED,
         )
 
+    # Rename [Unreleased] to this version before validation
+    try:
+        if rename_unreleased_to_version(changelog_path, version):
+            print_success(
+                f"Renamed [Unreleased] to [{version}] in CHANGELOG.md"
+            )
+    except ValueError as exc:
+        exit_with_error(str(exc), ExitCode.CHANGELOG_FAILED)
+
     # Validate versions in sync
     changelog_version = get_latest_changelog_version(changelog_path)
     if changelog_version is None:
@@ -310,6 +318,15 @@ def main() -> int:
                 f"CHANGELOG={changelog_version}. Update CHANGELOG.md first.",
                 ExitCode.CHANGELOG_FAILED,
             )
+
+    # Early check: fail fast if this version is already published
+    tag_name = f"v{version}"
+    if tag_exists_on_remote(project_dir, tag_name):
+        exit_with_error(
+            f"Tag {tag_name} already exists on remote. "
+            f"Version {version} has already been published.",
+            ExitCode.GIT_FAILED,
+        )
 
     print_header(f"SAROPA LINTS PUBLISHER v{SCRIPT_VERSION}")
     print_colored("  Package Information:", Color.WHITE)
@@ -360,16 +377,6 @@ def main() -> int:
     elif audit_only:
         print_warning("--audit-only and --skip-audit are contradictory.")
         return ExitCode.USER_CANCELLED.value
-
-    # --- Pre-publish: finalize [Unreleased] in CHANGELOG ---
-    print_header("FINALIZING CHANGELOG")
-    if has_unreleased_content(changelog_path):
-        merge_unreleased_into_version(changelog_path, version)
-        print_success(
-            f"Merged [Unreleased] content into [{version}]"
-        )
-    if add_unreleased_section(changelog_path):
-        print_success("Added fresh [Unreleased] section to CHANGELOG.md")
 
     # --- Steps 2-10: Publish workflow ---
     if not check_prerequisites():
@@ -455,6 +462,9 @@ def main() -> int:
 
     set_version_in_pubspec(pubspec_path, next_version)
     print_success(f"Updated pubspec.yaml to {next_version}")
+
+    if add_unreleased_section(changelog_path):
+        print_success("Added [Unreleased] section to CHANGELOG.md")
 
     if post_publish_commit(project_dir, next_version, branch):
         print_success(
