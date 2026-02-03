@@ -89,9 +89,9 @@ class RequireHiveInitializationRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_hive_initialization',
     problemMessage:
-        '[require_hive_initialization] Hive.openBox called. Verify Hive.init() or Hive.initFlutter() is called in main().',
+        '[require_hive_initialization] Hive.openBox() or Hive.openLazyBox() was called without a visible Hive.init() or Hive.initFlutter() call in this file. Opening a box before initialization throws a HiveError at runtime.',
     correctionMessage:
-        'Ensure Hive.initFlutter() is called in main() before opening boxes (cannot verify cross-file).',
+        'Call Hive.initFlutter() in main() before any openBox() calls. This rule cannot verify cross-file initialization, so suppress the warning if Hive.init() is called in a separate startup file.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
