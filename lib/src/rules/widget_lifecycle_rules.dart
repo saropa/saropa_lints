@@ -31,11 +31,11 @@ class AvoidContextInInitStateDisposeRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_context_in_initstate_dispose',
     problemMessage:
-        "[avoid_context_in_initstate_dispose] Avoid using 'context' in initState or dispose. "
-        'The widget may not be mounted.',
+        '[avoid_context_in_initstate_dispose] BuildContext used in initState or dispose may reference an unmounted widget, causing runtime errors or silent failures. '
+        'In initState the widget tree is not yet fully built, and in dispose the widget has been removed, so context-dependent lookups (Theme.of, Navigator.of) can return stale or invalid data.',
     correctionMessage:
-        'Use WidgetsBinding.instance.addPostFrameCallback to defer '
-        'context access until after the widget is mounted.',
+        'Use WidgetsBinding.instance.addPostFrameCallback to defer context access until after the widget is mounted. '
+        'For dispose, move context-dependent cleanup to deactivate() or use a pre-captured reference to ensure the widget tree is in a valid state when context is accessed.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -269,9 +269,11 @@ class AvoidLateContextRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_late_context',
     problemMessage:
-        '[avoid_late_context] Avoid using BuildContext in late field initializers.',
+        '[avoid_late_context] BuildContext in late field initializer captures a stale reference that may become invalid after rebuilds. '
+        'Late fields are initialized once on first access, but BuildContext changes whenever the widget rebuilds, so the captured context points to an outdated element that may no longer exist in the tree.',
     correctionMessage:
-        'Initialize in didChangeDependencies() or build() instead.',
+        'Initialize context-dependent values in didChangeDependencies() (which runs after every dependency change) or directly in build(). '
+        'For one-time initialization, use addPostFrameCallback in initState to safely access context after the first frame is rendered.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
