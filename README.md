@@ -273,7 +273,7 @@ dart run saropa_lints:init --tier professional
 
 ### Platform configuration
 
-The `analysis_options_custom.yaml` file includes a `platforms` section that controls which platform-specific rules are active. Only iOS and Android are enabled by default. Enable additional platforms your project targets:
+The `analysis_options_custom.yaml` file includes a `platforms` section that controls which platform-specific rules are active. Only iOS and Android are enabled by default. Enable the platforms your project targets:
 
 ```yaml
 # In analysis_options_custom.yaml
@@ -286,7 +286,23 @@ platforms:
   linux: false      # enable if targeting Linux
 ```
 
-When a platform is set to `false`, all rules specific to that platform are moved to the disabled section. Rules shared between multiple platforms (e.g., Apple Sign In rules for iOS + macOS) are only disabled when **all** their platforms are disabled.
+Each platform has dedicated rules that catch platform-specific issues:
+
+| Platform | Rules | Examples |
+|----------|-------|---------|
+| **iOS** | 90+ | Safe area, privacy manifest, App Tracking Transparency, Face ID, HealthKit, keychain |
+| **Android** | 11+ | Runtime permissions, notification channels, PendingIntent flags, cleartext traffic |
+| **macOS** | 15+ | Sandboxing, notarization, hardened runtime, window restoration, entitlements |
+| **Web** | 10+ | CORS handling, platform channels, deferred loading, URL strategy, web renderer |
+| **Windows** | Desktop shared | Menu bar, window close confirmation, native file dialogs, focus indicators |
+| **Linux** | Desktop shared | Same desktop rules as Windows |
+
+Some rules are shared across platform groups:
+
+- **Apple rules** (iOS + macOS): Apple Sign In, nonce validation
+- **Desktop rules** (macOS + Windows + Linux): Menu bar, window management, keyboard/mouse interaction patterns
+
+When a platform is set to `false`, its rules move to the disabled section. Shared rules (e.g., Apple Sign In for iOS + macOS) are only disabled when **all** their platforms are disabled.
 
 **User overrides always win** — if you force-enable a rule in the overrides section, it stays enabled even if its platform is disabled.
 
@@ -296,7 +312,56 @@ The `init` tool logs which platforms are disabled and how many rules are affecte
 Platforms disabled: web, windows, linux (23 rules affected)
 ```
 
-To apply platform changes, re-run init:
+### Package configuration
+
+The `analysis_options_custom.yaml` file includes a `packages` section that controls which library-specific rules are active. All packages are enabled by default. Disable packages you don't use to reduce noise:
+
+```yaml
+# In analysis_options_custom.yaml
+packages:
+  # State Management
+  bloc: true
+  provider: true
+  riverpod: true
+  getx: true
+
+  # UI & Utilities
+  flutter_hooks: true
+
+  # Data Classes
+  equatable: true
+  freezed: true
+
+  # Storage & Database
+  firebase: true
+  isar: true
+  hive: true
+  shared_preferences: true
+  sqflite: true
+
+  # Networking
+  dio: true
+  graphql: true
+  supabase: true
+
+  # DI & Services
+  get_it: true
+  workmanager: true
+
+  # Device & UI
+  url_launcher: true
+  geolocator: true
+  qr_scanner: true
+
+  # Gaming
+  flame: true
+```
+
+Setting a package to `false` moves all its rules to the disabled section. If you don't use Riverpod, for example, set `riverpod: false` to remove 24+ Riverpod-specific rules from your analysis.
+
+Rules shared between packages (e.g., database rules shared by Firebase, Isar, Hive, and sqflite) are only disabled when **all** packages that use them are disabled.
+
+After changing platform or package settings, re-run init to apply:
 
 ```bash
 dart run saropa_lints:init

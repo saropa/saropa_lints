@@ -288,7 +288,10 @@ def create_github_release(
             "GitHub CLI auth failed. Clear GITHUB_TOKEN env var "
             "and run: gh auth status"
         )
-    return False, f"Release failed (exit code {result.returncode})"
+    return False, (
+        f"Release failed (exit code {result.returncode})"
+        f"{': ' + error_output.strip() if error_output.strip() else ''}"
+    )
 
 
 def post_publish_commit(
