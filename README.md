@@ -26,7 +26,7 @@ Catch memory leaks, security vulnerabilities, and runtime crashes that standard 
 [![Flutter Platform](https://img.shields.io/badge/platform-flutter-ff69b4.svg?logo=flutter)](https://flutter.dev/)
 
 <!-- Custom Badges -->
-[![rules](https://img.shields.io/badge/rules-1690%2B-4B0082)](https://github.com/saropa/saropa_lints/blob/main/doc/rules/README.md)
+[![rules](https://img.shields.io/badge/rules-1692%2B-4B0082)](https://github.com/saropa/saropa_lints/blob/main/doc/rules/README.md)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 [![style: saropa lints](https://img.shields.io/badge/style-saropa__lints-4B0082.svg)](https://pub.dev/packages/saropa_lints)
 
@@ -137,7 +137,7 @@ print(rule.owasp); // Mobile: M1 | Web: A07
 
 Good options exist, but many are paid or closed-source. We believe these fundamentals should be free and open. A rising tide lifts all boats.
 
-The tier system lets you adopt gradually — start with ~100 critical rules, work up to 1690+ when you're ready.
+The tier system lets you adopt gradually — start with ~100 critical rules, work up to 1692+ when you're ready.
 
 ---
 
@@ -200,7 +200,7 @@ Pick the tier that matches your team's needs. Each tier builds on the previous o
 
 ### Stylistic Rules (Separate Track)
 
-**[100+ stylistic rules](https://github.com/saropa/saropa_lints/blob/main/README_STYLISTIC.md)** for formatting, ordering, and naming conventions.
+**[175+ stylistic rules](https://github.com/saropa/saropa_lints/blob/main/README_STYLISTIC.md)** for formatting, ordering, and naming conventions.
 
 To include stylistic rules when generating configuration:
 
@@ -216,7 +216,7 @@ Stylistic rules are orthogonal to correctness. Your code can be perfectly correc
 
 ### Configuration template
 
-See [example/analysis_options_template.yaml](https://github.com/saropa/saropa_lints/blob/main/example/analysis_options_template.yaml) for a complete reference with all 1690+ rules organized by category, tier membership, and examples.
+See [example/analysis_options_template.yaml](https://github.com/saropa/saropa_lints/blob/main/example/analysis_options_template.yaml) for a complete reference with all 1692+ rules organized by category, tier membership, and examples.
 
 ### Using a tier
 
@@ -479,15 +479,15 @@ dart run saropa_lints:baseline --help        # See all options
 
 ## Stylistic Rules
 
-20 rules for team preferences — not included in any tier. Enable individually based on your conventions.
+175+ rules for team preferences — not included in any correctness tier. Enable individually or via `--stylistic` flag based on your conventions.
 
-Examples: `prefer_relative_imports`, `prefer_single_quotes`, `prefer_arrow_functions`, `prefer_trailing_comma_always`
+Examples: `prefer_relative_imports`, `prefer_single_quotes`, `prefer_arrow_functions`, `prefer_trailing_comma_always`, `prefer_for_in`, `prefer_boolean_prefixes_for_params`
 
 **See [README_STYLISTIC.md](https://github.com/saropa/saropa_lints/blob/main/README_STYLISTIC.md)** for the full list with examples, pros/cons, and quick fixes.
 
 ## Performance
 
-Running all 1690+ rules uses significant memory. The tier system helps:
+Running all 1692+ rules uses significant memory. The tier system helps:
 
 - Rules set to `false` are not loaded
 - Start with `essential` or `recommended`
@@ -913,7 +913,7 @@ Contact: [saropa.com](https://saropa.com) | [services@saropa.com](mailto:service
 
 | Document                                                                                              | Description                                   |
 | ----------------------------------------------------------------------------------------------------- | --------------------------------------------- |
-| [README_STYLISTIC.md](https://github.com/saropa/saropa_lints/blob/main/README_STYLISTIC.md)           | 100+ optional stylistic rules with examples   |
+| [README_STYLISTIC.md](https://github.com/saropa/saropa_lints/blob/main/README_STYLISTIC.md)           | 175+ optional stylistic rules with examples   |
 | [PERFORMANCE.md](https://github.com/saropa/saropa_lints/blob/main/PERFORMANCE.md)                     | Performance optimization guide and profiling  |
 | [ROADMAP.md](https://github.com/saropa/saropa_lints/blob/main/ROADMAP.md)                             | Planned rules and project direction           |
 | [ROADMAP_DEFERRED.md](https://github.com/saropa/saropa_lints/blob/main/ROADMAP_DEFERRED.md)           | Deferred rules (cross-file, heuristic)        |
@@ -981,7 +981,7 @@ Built with care by the Flutter community. Questions? Ideas? We'd love to hear fr
 
 > "Quality is not an act, it is a habit." — Aristotle
 
-**saropa_lints** is a comprehensive static analysis package for Flutter and Dart applications. With 1690+ lint rules organized into 5 progressive tiers (and more planned), it catches memory leaks, security vulnerabilities, accessibility violations, and runtime crashes that standard linters miss. Whether you're building a startup MVP or enterprise software, saropa_lints helps you ship more stable, secure, and accessible apps.
+**saropa_lints** is a comprehensive static analysis package for Flutter and Dart applications. With 1692+ lint rules organized into 5 progressive tiers (and more planned), it catches memory leaks, security vulnerabilities, accessibility violations, and runtime crashes that standard linters miss. Whether you're building a startup MVP or enterprise software, saropa_lints helps you ship more stable, secure, and accessible apps.
 
 **Keywords:** Flutter linter, Dart static analysis, custom_lint rules, Flutter code quality, memory leak detection, security scanning, accessibility testing, WCAG compliance, European Accessibility Act, Flutter best practices, Dart analyzer plugin, code review automation, CI/CD linting, Flutter enterprise tools
 

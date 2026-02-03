@@ -308,6 +308,8 @@ class _UseNumTryParseFix extends DartFix {
 
 /// Warns when Duration constructor can use cleaner units.
 ///
+/// **Stylistic rule (opt-in only).** No performance or correctness benefit.
+///
 /// Duration(seconds: 60) is clearer as Duration(minutes: 1).
 /// This rule suggests using larger units when they divide evenly.
 ///
@@ -327,9 +329,9 @@ class _UseNumTryParseFix extends DartFix {
 class PreferDurationConstantsRule extends SaropaLintRule {
   const PreferDurationConstantsRule() : super(code: _code);
 
-  /// Minor improvement. Track for later review.
+  /// Stylistic preference only. No performance or correctness benefit.
   @override
-  LintImpact get impact => LintImpact.low;
+  LintImpact get impact => LintImpact.opinionated;
 
   @override
   RuleCost get cost => RuleCost.low;
@@ -337,7 +339,7 @@ class PreferDurationConstantsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_duration_constants',
     problemMessage:
-        '[prefer_duration_constants] Duration constructor uses a smaller time unit than necessary, reducing readability and making the intended duration harder to understand at a glance.',
+        '[prefer_duration_constants] Using named Duration constants instead of inline constructors is a naming convention. Both create identical Duration objects with no performance difference. Enable via the stylistic tier.',
     correctionMessage:
         'Replace with the equivalent larger time unit (e.g., Duration(seconds: 60) becomes Duration(minutes: 1)) for clarity.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -717,201 +719,6 @@ class _ConvertDateTimeToIso8601Fix extends DartFix {
       changeBuilder.addDartFileEdit((builder) {
         builder.addSimpleInsertion(node.end, '.toIso8601String()');
       });
-    });
-  }
-}
-
-// =============================================================================
-// require_freezed_json_converter
-// =============================================================================
-
-/// Custom types in Freezed classes need JsonConverter.
-///
-/// Types like DateTime, Color, or custom classes need explicit converters
-/// for proper JSON serialization in Freezed.
-///
-/// **BAD:**
-/// ```dart
-/// @freezed
-/// class User with _$User {
-///   factory User({
-///     required DateTime createdAt,  // Needs converter!
-///   }) = _User;
-/// }
-/// ```
-///
-/// **GOOD:**
-/// ```dart
-/// @freezed
-/// class User with _$User {
-///   @JsonSerializable(converters: [DateTimeConverter()])
-///   factory User({
-///     required DateTime createdAt,
-///   }) = _User;
-/// }
-/// ```
-class RequireFreezedJsonConverterRule extends SaropaLintRule {
-  const RequireFreezedJsonConverterRule() : super(code: _code);
-
-  /// JSON serialization failures at runtime.
-  @override
-  LintImpact get impact => LintImpact.high;
-
-  @override
-  RuleCost get cost => RuleCost.medium;
-
-  static const LintCode _code = LintCode(
-    name: 'require_freezed_json_converter',
-    problemMessage:
-        '[require_freezed_json_converter] Freezed class with DateTime/Color field may need a JsonConverter for correct serialization. Missing converters can cause runtime errors, silent data loss, and broken API contracts. This is a common source of serialization bugs in complex models.',
-    correctionMessage:
-        'Add @JsonSerializable(converters: [...]) for custom types. Audit all Freezed models for converter coverage and add tests for serialization/deserialization. Document converter logic for maintainability.',
-    errorSeverity: DiagnosticSeverity.WARNING,
-  );
-
-  /// Types that typically need converters.
-  static const Set<String> _typesNeedingConverter = <String>{
-    'DateTime',
-    'Duration',
-    'Color',
-    'Uri',
-    'BigInt',
-    'Uint8List',
-  };
-
-  @override
-  void runWithReporter(
-    CustomLintResolver resolver,
-    SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
-  ) {
-    context.registry.addClassDeclaration((ClassDeclaration node) {
-      // Check for @freezed annotation
-      bool hasFreezed = false;
-      for (final Annotation annotation in node.metadata) {
-        final String name = annotation.name.name;
-        if (name == 'freezed' || name == 'Freezed') {
-          hasFreezed = true;
-          break;
-        }
-      }
-      if (!hasFreezed) return;
-
-      // Check for fromJson factory
-      bool hasFromJson = false;
-      for (final ClassMember member in node.members) {
-        if (member is ConstructorDeclaration) {
-          final String? name = member.name?.lexeme;
-          if (name == 'fromJson') {
-            hasFromJson = true;
-            break;
-          }
-        }
-      }
-      if (!hasFromJson) return;
-
-      // Check factory constructors for types needing converters
-      for (final ClassMember member in node.members) {
-        if (member is ConstructorDeclaration && member.factoryKeyword != null) {
-          final FormalParameterList? params = member.parameters;
-          if (params == null) continue;
-
-          for (final FormalParameter param in params.parameters) {
-            String? typeSource;
-            if (param is DefaultFormalParameter) {
-              final NormalFormalParameter inner = param.parameter;
-              if (inner is SimpleFormalParameter) {
-                typeSource = inner.type?.toSource();
-              }
-            } else if (param is SimpleFormalParameter) {
-              typeSource = param.type?.toSource();
-            }
-
-            // cspell:ignore annot
-            if (typeSource != null) {
-              for (final String typeName in _typesNeedingConverter) {
-                if (typeSource.contains(typeName)) {
-                  // Check if there's a converter annotation
-                  bool hasConverter = false;
-                  for (final Annotation annotation in member.metadata) {
-                    final String annotSource = annotation.toSource();
-                    if (annotSource.contains('JsonSerializable') &&
-                        annotSource.contains('converters')) {
-                      hasConverter = true;
-                      break;
-                    }
-                    if (annotSource.contains('JsonKey') &&
-                        (annotSource.contains('fromJson') ||
-                            annotSource.contains('toJson'))) {
-                      hasConverter = true;
-                      break;
-                    }
-                  }
-
-                  if (!hasConverter) {
-                    reporter.atNode(param, code);
-                    return;
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    });
-  }
-}
-
-// =============================================================================
-// require_freezed_lint_package
-// =============================================================================
-
-/// Install freezed_lint for official linting of Freezed classes.
-///
-/// **Heuristic warning:** This rule cannot verify if freezed_lint is in your
-/// pubspec.yaml. It simply reminds developers using Freezed to consider
-/// adding freezed_lint to their dev_dependencies. Disable this rule if you
-/// have already installed freezed_lint.
-///
-/// The freezed_lint package provides specialized rules for Freezed patterns.
-///
-/// **Recommendation:** Add freezed_lint to dev_dependencies.
-class RequireFreezedLintPackageRule extends SaropaLintRule {
-  const RequireFreezedLintPackageRule() : super(code: _code);
-
-  /// Missing specialized linting for Freezed patterns.
-  @override
-  LintImpact get impact => LintImpact.low;
-
-  @override
-  RuleCost get cost => RuleCost.medium;
-
-  static const LintCode _code = LintCode(
-    name: 'require_freezed_lint_package',
-    problemMessage:
-        '[require_freezed_lint_package] File uses Freezed. Consider adding freezed_lint package for specialized linting.',
-    correctionMessage:
-        'Add freezed_lint to dev_dependencies. Disable this rule if already installed.',
-    errorSeverity: DiagnosticSeverity.INFO,
-  );
-
-  @override
-  void runWithReporter(
-    CustomLintResolver resolver,
-    SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
-  ) {
-    // Flag the first freezed import as a reminder to add freezed_lint.
-    // This is a heuristic - we cannot check if freezed_lint is actually
-    // in pubspec.yaml. Users should disable this rule if they've installed it.
-    context.registry.addImportDirective((ImportDirective node) {
-      final String? uri = node.uri.stringValue;
-      if (uri == null) return;
-
-      // Only flag freezed_annotation imports (the main freezed package)
-      if (uri == 'package:freezed_annotation/freezed_annotation.dart') {
-        reporter.atNode(node, code);
-      }
     });
   }
 }

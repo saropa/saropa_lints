@@ -4112,6 +4112,8 @@ class PreferAnyOrEveryRule extends SaropaLintRule {
 
 /// Warns when index-based for loop can be replaced with for-in.
 ///
+/// **Stylistic rule (opt-in only).** No performance or correctness benefit.
+///
 /// Example of **bad** code:
 /// ```dart
 /// for (var i = 0; i < list.length; i++) {
@@ -4130,7 +4132,7 @@ class PreferForInRule extends SaropaLintRule {
 
   /// Code quality issue. Review when count exceeds 100.
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.opinionated;
 
   @override
   RuleCost get cost => RuleCost.medium;
@@ -4138,7 +4140,7 @@ class PreferForInRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_for_in',
     problemMessage:
-        '[prefer_for_in] Index-based for loop iterates over a collection using an index variable that is only used to access list[i]. The index adds an extra variable to track, risks off-by-one errors in the bounds condition, and obscures the intent of iterating over elements.',
+        '[prefer_for_in] Using for-in loops instead of index-based for loops is a stylistic preference. Both have equivalent performance for most Dart collections. Enable via the stylistic tier.',
     correctionMessage:
         'Replace the index-based loop with a for-in loop (for (final item in list)) to iterate directly over elements without managing an index variable.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -5002,6 +5004,8 @@ class PreferBytesBuilderRule extends SaropaLintRule {
 
 /// Warns when a ternary expression can be pushed into arguments.
 ///
+/// **Stylistic rule (opt-in only).** No performance or correctness benefit.
+///
 /// Example of **bad** code:
 /// ```dart
 /// condition ? foo(1, 2) : foo(1, 3);
@@ -5016,7 +5020,7 @@ class PreferPushingConditionalExpressionsRule extends SaropaLintRule {
 
   /// Code quality issue. Review when count exceeds 100.
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.opinionated;
 
   @override
   RuleCost get cost => RuleCost.medium;
@@ -5024,7 +5028,7 @@ class PreferPushingConditionalExpressionsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_pushing_conditional_expressions',
     problemMessage:
-        '[prefer_pushing_conditional_expressions] Conditional expression wraps an entire constructor or function call where only one argument differs between branches. This duplicates the call site, making it harder to see what actually varies and increasing the risk of inconsistent changes.',
+        '[prefer_pushing_conditional_expressions] Moving conditional logic into return expressions is a code shape preference. No performance or correctness difference between forms. Enable via the stylistic tier.',
     correctionMessage:
         'Move the conditional expression inside the single differing argument so the constructor or function call appears once with all shared arguments visible.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -7365,6 +7369,8 @@ class AvoidEmptyBuildWhenRule extends SaropaLintRule {
 
 /// Suggests using 'use' prefix for custom hooks.
 ///
+/// **Stylistic rule (opt-in only).** No performance or correctness benefit.
+///
 /// Flutter Hooks convention requires hooks to start with 'use'.
 ///
 /// **BAD:**
@@ -7380,7 +7386,7 @@ class PreferUsePrefixRule extends SaropaLintRule {
   const PreferUsePrefixRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.low;
+  LintImpact get impact => LintImpact.opinionated;
 
   @override
   RuleCost get cost => RuleCost.medium;
@@ -7388,7 +7394,7 @@ class PreferUsePrefixRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_use_prefix',
     problemMessage:
-        '[prefer_use_prefix] Custom hook should start with "use" prefix.',
+        '[prefer_use_prefix] Prefixing Flutter Hooks function names with use is a naming convention. The prefix does not affect hook behavior or performance. Enable via the stylistic tier.',
     correctionMessage:
         'Rename the function to start with "use" (e.g. useMyHook) following the hooks convention, so it is recognizable as a hook and subject to hook linting rules.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -7900,6 +7906,8 @@ class PreferDotShorthandRule extends SaropaLintRule {
 
 /// Warns when comparing boolean expressions to boolean literals.
 ///
+/// **Stylistic rule (opt-in only).** No performance or correctness benefit.
+///
 /// Alias: boolean_literal_compare, unnecessary_bool_compare, redundant_bool_literal
 ///
 /// Comparing a boolean expression to `true` or `false` is redundant and
@@ -7925,7 +7933,7 @@ class NoBooleanLiteralCompareRule extends SaropaLintRule {
 
   /// Code style improvement.
   @override
-  LintImpact get impact => LintImpact.low;
+  LintImpact get impact => LintImpact.opinionated;
 
   @override
   RuleCost get cost => RuleCost.medium;
@@ -7933,7 +7941,7 @@ class NoBooleanLiteralCompareRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'no_boolean_literal_compare',
     problemMessage:
-        '[no_boolean_literal_compare] Unnecessary comparison to boolean literal.',
+        '[no_boolean_literal_compare] Comparing a boolean to true/false literally (x == true) instead of using the value directly (x) is a stylistic choice with no correctness or performance impact. Enable via the stylistic tier.',
     correctionMessage:
         'Use the boolean expression directly: write x instead of x == true, and !x instead of x == false. '
         '!x instead of x == false.',
@@ -8060,6 +8068,8 @@ class _SimplifyBooleanComparisonFix extends DartFix {
 
 /// Return conditional expressions directly instead of if/else blocks.
 ///
+/// **Stylistic rule (opt-in only).** No performance or correctness benefit.
+///
 /// When an if/else block simply returns different values, use a ternary
 /// expression or direct return for cleaner, more readable code.
 ///
@@ -8085,7 +8095,7 @@ class PreferReturningConditionalExpressionsRule extends SaropaLintRule {
 
   /// Code quality improvement. Review when count exceeds 100.
   @override
-  LintImpact get impact => LintImpact.low;
+  LintImpact get impact => LintImpact.opinionated;
 
   @override
   RuleCost get cost => RuleCost.medium;
@@ -8093,7 +8103,7 @@ class PreferReturningConditionalExpressionsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_returning_conditional_expressions',
     problemMessage:
-        '[prefer_returning_conditional_expressions] If/else with only return statements can be simplified to ternary.',
+        '[prefer_returning_conditional_expressions] Returning a ternary expression instead of if-else is a stylistic preference. Both compile to the same code with no performance difference. Enable via the stylistic tier.',
     correctionMessage:
         'Collapse to return condition ? valueA : valueB; for value returns, or return condition; when directly returning a boolean expression.',
     errorSeverity: DiagnosticSeverity.INFO,

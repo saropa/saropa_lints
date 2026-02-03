@@ -231,6 +231,8 @@ class _RemoveUnnecessaryReturnFix extends DartFix {
 
 /// Warns when a variable is declared and immediately returned.
 ///
+/// **Stylistic rule (opt-in only).** No performance or correctness benefit.
+///
 /// Example of **bad** code:
 /// ```dart
 /// String getName() {
@@ -250,9 +252,9 @@ class _RemoveUnnecessaryReturnFix extends DartFix {
 class PreferImmediateReturnRule extends SaropaLintRule {
   const PreferImmediateReturnRule() : super(code: _code);
 
-  /// Code quality issue. Review when count exceeds 100.
+  /// Stylistic preference only. No performance or correctness benefit.
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.opinionated;
 
   @override
   RuleCost get cost => RuleCost.medium;
@@ -260,7 +262,7 @@ class PreferImmediateReturnRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_immediate_return',
     problemMessage:
-        '[prefer_immediate_return] Variable is declared and immediately returned.',
+        '[prefer_immediate_return] Returning an expression directly instead of assigning to a variable first is a stylistic preference. Both produce the same compiled output. Enable via the stylistic tier.',
     correctionMessage:
         'Return the expression directly instead of storing in a variable.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -350,6 +352,8 @@ class _InlineImmediateReturnFix extends DartFix {
 
 /// Warns when arrow function could be used instead of block.
 ///
+/// **Stylistic rule (opt-in only).** No performance or correctness benefit.
+///
 /// Simple return statements should use arrow syntax.
 ///
 /// ### Example
@@ -370,9 +374,9 @@ class _InlineImmediateReturnFix extends DartFix {
 class PreferReturningShorthandsRule extends SaropaLintRule {
   const PreferReturningShorthandsRule() : super(code: _code);
 
-  /// Code quality issue. Review when count exceeds 100.
+  /// Stylistic preference only. No performance or correctness benefit.
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.opinionated;
 
   @override
   RuleCost get cost => RuleCost.medium;
@@ -380,7 +384,7 @@ class PreferReturningShorthandsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_returning_shorthands',
     problemMessage:
-        '[prefer_returning_shorthands] Use arrow syntax for simple return statements.',
+        '[prefer_returning_shorthands] Simplifying return expressions to shorter forms is a code style preference. Both produce equivalent compiled output with no performance impact. Enable via the stylistic tier.',
     correctionMessage: 'Convert to expression body with =>.',
     errorSeverity: DiagnosticSeverity.INFO,
   );

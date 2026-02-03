@@ -13,7 +13,15 @@ Dates are not included in version headers — [pub.dev](https://pub.dev/packages
 ---
 ## [Unreleased]
 
+### Added
+
+- **New rules: `require_yield_between_db_awaits`, `avoid_return_await_db`**: Two database/IO yield rules that detect missing `yieldToUI()` calls after heavy DB or file I/O awaits. Prevents UI jank caused by blocking the main thread with consecutive database operations. Both rules include quick fixes that insert `await DelayUtils.yieldToUI();` automatically. Heuristic detection covers Isar, sqflite, Hive, and file I/O methods, with configurable target identifiers. Assigned to Recommended tier with WARNING severity.
+
+- **Extracted package rules into dedicated files**: Supabase rules (`require_supabase_error_handling`, `avoid_supabase_anon_key_in_code`, `require_supabase_realtime_unsubscribe`) moved to `supabase_rules.dart`. Workmanager rules (`require_workmanager_constraints`, `require_workmanager_result_return`, `require_workmanager_for_background`) moved to `workmanager_rules.dart`. No behavior changes — rules remain in their original tiers with the same detection logic.
+
 ### Changed
+
+- **Moved ~40 opinionated rules from tier sets to stylistic tier**: Rules with no performance or correctness benefit — code style preferences, formatting, ordering, and naming conventions — are now in `stylisticRules` instead of their original tier sets (recommended, professional, comprehensive, insanity). Each moved rule's `LintImpact` is set to `opinionated`, and its `problemMessage` explicitly states there is no performance benefit. The 6 rules that remained in their original tiers (`prefer_sized_box_for_whitespace`, `prefer_padding_over_container`, `prefer_align_over_container`, `prefer_correct_identifier_length`, `prefer_match_file_name`, `prefer_correct_test_file_name`) now document their objective justification (performance benefit or discoverability) in doc headers and problem messages. Conflicting pair `prefer_type_over_var` / `prefer_var_over_explicit_type` are both in the stylistic tier with explicit conflict notes.
 
 - **Audit report now includes DX Message Quality section**: The full audit markdown report (`reports/*_full_audit.md`) now exports the complete DX quality analysis — summary tables by impact level and tier, issues grouped by type, and a searchable per-rule failing table with tier, impact, score, and specific issues. Previously, DX data was only shown in the console during the audit run but omitted from the exported report.
 

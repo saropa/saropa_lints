@@ -667,6 +667,10 @@ const Set<String> recommendedOnlyRules = <String>{
   // Database (Isar)
   'require_isar_nullable_field',
 
+  // Database / IO (all DB packages + file I/O)
+  'require_yield_between_db_awaits',
+  'avoid_return_await_db',
+
   // BuildContext Safety (Recommended)
   // 'prefer_rethrow_over_throw_e' moved to stylisticRules (opinionated)
   'avoid_context_in_async_static', // WARNING - async static with context
@@ -3112,6 +3116,8 @@ const Set<String> _databaseSharedRules = <String>{
   'require_database_migration',
   'require_database_index',
   'prefer_transaction_for_batch',
+  'require_yield_between_db_awaits',
+  'avoid_return_await_db',
 };
 
 /// Rules specific to the Firebase platform.
