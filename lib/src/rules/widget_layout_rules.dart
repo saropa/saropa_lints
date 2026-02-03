@@ -3,6 +3,7 @@
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/token.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
+import 'package:analyzer/dart/element/type.dart';
 import 'package:analyzer/error/error.dart'
     show AnalysisError, DiagnosticSeverity;
 import 'package:analyzer/source/source_range.dart';
@@ -3531,9 +3532,10 @@ class PreferIntrinsicDimensionsRule extends SaropaLintRule {
 class AvoidUnboundedConstraintsRule extends SaropaLintRule {
   const AvoidUnboundedConstraintsRule() : super(code: _code);
 
-  /// Code quality issue. Review when count exceeds 100.
+  /// Crash path — Expanded/Flexible in unbounded scroll axis throws
+  /// RenderFlex overflow. Even 10+ violations need immediate attention.
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.high;
 
   @override
   RuleCost get cost => RuleCost.low;
@@ -3562,41 +3564,112 @@ class AvoidUnboundedConstraintsRule extends SaropaLintRule {
       final String typeName = node.constructorName.type.name.lexeme;
       if (typeName != 'Column' && typeName != 'Row') return;
 
-      // Check if inside SingleChildScrollView
-      AstNode? current = node.parent;
-      bool insideSingleChildScrollView = false;
-      bool hasConstrainedBox = false;
+      final _ScrollAncestorInfo? scrollInfo = _findScrollAncestor(node);
+      if (scrollInfo == null || scrollInfo.hasConstrainedBox) return;
 
-      while (current != null) {
-        if (current is InstanceCreationExpression) {
-          final String parentType = current.constructorName.type.name.lexeme;
-          if (parentType == 'SingleChildScrollView') {
-            insideSingleChildScrollView = true;
-          }
-          if (parentType == 'ConstrainedBox' ||
-              parentType == 'SizedBox' ||
-              parentType == 'Container') {
-            hasConstrainedBox = true;
-          }
-        }
-        current = current.parent;
-      }
+      // Only flag when axes match: Column in vertical scroll,
+      // Row in horizontal scroll. Cross-axis is always bounded.
+      final bool isVerticalScroll = !scrollInfo.isHorizontalScroll;
+      if ((typeName == 'Column') != isVerticalScroll) return;
 
-      if (insideSingleChildScrollView && !hasConstrainedBox) {
-        // Check if has Expanded/Flexible children
-        for (final Expression arg in node.argumentList.arguments) {
-          if (arg is NamedExpression && arg.name.label.name == 'children') {
-            final String childrenSource = arg.expression.toSource();
-            if (childrenSource.contains('Expanded') ||
-                childrenSource.contains('Flexible')) {
-              reporter.atNode(node.constructorName, code);
-              return;
-            }
-          }
-        }
+      if (_hasDirectExpandedOrFlexible(node)) {
+        reporter.atNode(node.constructorName, code);
       }
     });
   }
+
+  /// Walks ancestors to find SingleChildScrollView and any constraint
+  /// widgets between the node and the scroll view.
+  static _ScrollAncestorInfo? _findScrollAncestor(AstNode node) {
+    AstNode? current = node.parent;
+    bool hasConstrainedBox = false;
+
+    while (current != null) {
+      if (current is InstanceCreationExpression) {
+        final String parentType = current.constructorName.type.name.lexeme;
+        if (parentType == 'SingleChildScrollView') {
+          return _ScrollAncestorInfo(
+            isHorizontalScroll: _hasHorizontalScrollDirection(current),
+            hasConstrainedBox: hasConstrainedBox,
+          );
+        }
+        if (parentType == 'ConstrainedBox' ||
+            parentType == 'SizedBox' ||
+            parentType == 'Container') {
+          hasConstrainedBox = true;
+        }
+      }
+      current = current.parent;
+    }
+    return null;
+  }
+
+  /// Whether SingleChildScrollView has scrollDirection: Axis.horizontal.
+  static bool _hasHorizontalScrollDirection(
+    InstanceCreationExpression node,
+  ) {
+    for (final Expression arg in node.argumentList.arguments) {
+      if (arg is NamedExpression && arg.name.label.name == 'scrollDirection') {
+        return arg.expression.toSource().contains('horizontal');
+      }
+    }
+    return false;
+  }
+
+  /// Checks only direct children for Expanded/Flexible, not nested
+  /// descendants which have their own constraint context.
+  static bool _hasDirectExpandedOrFlexible(
+    InstanceCreationExpression node,
+  ) {
+    for (final Expression arg in node.argumentList.arguments) {
+      if (arg is NamedExpression && arg.name.label.name == 'children') {
+        final Expression childrenExpr = arg.expression;
+        if (childrenExpr is ListLiteral) {
+          return _elementsContainExpandedFlexible(childrenExpr.elements);
+        }
+        // Non-literal children list — fall back to string check
+        final String source = childrenExpr.toSource();
+        return source.contains('Expanded') || source.contains('Flexible');
+      }
+    }
+    return false;
+  }
+
+  /// Checks top-level list elements (including if-branches) for
+  /// Expanded/Flexible, without descending into nested widget trees.
+  static bool _elementsContainExpandedFlexible(
+    NodeList<CollectionElement> elements,
+  ) {
+    for (final CollectionElement element in elements) {
+      if (_isExpandedOrFlexible(element)) return true;
+      if (element is IfElement) {
+        if (_isExpandedOrFlexible(element.thenElement)) return true;
+        final CollectionElement? elseElement = element.elseElement;
+        if (elseElement != null && _isExpandedOrFlexible(elseElement)) {
+          return true;
+        }
+      }
+    }
+    return false;
+  }
+
+  /// Whether an element is an Expanded or Flexible constructor call.
+  static bool _isExpandedOrFlexible(CollectionElement element) {
+    if (element is! InstanceCreationExpression) return false;
+    final String name = element.constructorName.type.name.lexeme;
+    return name == 'Expanded' || name == 'Flexible';
+  }
+}
+
+/// Info about a SingleChildScrollView ancestor.
+class _ScrollAncestorInfo {
+  const _ScrollAncestorInfo({
+    required this.isHorizontalScroll,
+    required this.hasConstrainedBox,
+  });
+
+  final bool isHorizontalScroll;
+  final bool hasConstrainedBox;
 }
 
 // ============================================================================
@@ -6715,6 +6788,10 @@ enum _AncestorResult {
 /// Walks up the AST from [startNode] looking for a parent widget whose
 /// constructor name is in [targetParents].
 ///
+/// When [checkSuperTypes] is `true`, also matches parent widgets whose type
+/// hierarchy includes any of [targetParents] (e.g. a custom widget that
+/// extends `Stack` will match `{'Stack'}`).
+///
 /// Returns [_AncestorResult.found] if a target parent is found.
 /// Returns [_AncestorResult.wrongParent] if a widget in [stopAt] is found
 /// before any target parent.
@@ -6724,6 +6801,7 @@ _AncestorResult _findWidgetAncestor(
   AstNode startNode, {
   required Set<String> targetParents,
   Set<String> stopAt = const <String>{},
+  bool checkSuperTypes = false,
   int maxDepth = 20,
 }) {
   AstNode? current = startNode.parent;
@@ -6768,6 +6846,13 @@ _AncestorResult _findWidgetAncestor(
       final String parentType = current.constructorName.type.name.lexeme;
       if (targetParents.contains(parentType)) return _AncestorResult.found;
       if (stopAt.contains(parentType)) return _AncestorResult.wrongParent;
+
+      // Check if the parent widget is a subclass of any target.
+      if (checkSuperTypes) {
+        if (_isSubtypeOfAny(current.staticType, targetParents)) {
+          return _AncestorResult.found;
+        }
+      }
     }
 
     // Stop at method/function boundaries.
@@ -6784,6 +6869,16 @@ _AncestorResult _findWidgetAncestor(
   }
 
   return _AncestorResult.notFound;
+}
+
+/// Returns `true` when [type] is an [InterfaceType] whose supertype chain
+/// contains a type whose name is in [targetNames].
+bool _isSubtypeOfAny(DartType? type, Set<String> targetNames) {
+  if (type is! InterfaceType) return false;
+  for (final InterfaceType supertype in type.allSupertypes) {
+    if (targetNames.contains(supertype.element.name)) return true;
+  }
+  return false;
 }
 
 // =========================================================================
@@ -6858,8 +6953,11 @@ class AvoidTableCellOutsideTableRule extends SaropaLintRule {
 /// Warns when `Positioned` is used outside of a `Stack` widget.
 ///
 /// `Positioned` is a `ParentDataWidget` that communicates position
-/// coordinates to a `Stack` parent. Using it outside a `Stack` causes
-/// a ParentData crash at runtime.
+/// coordinates to a `Stack` parent. Using it outside a `Stack` (or a
+/// subclass of `Stack`) causes a ParentData crash at runtime.
+///
+/// Recognises `Stack`, `IndexedStack`, and any custom widget that
+/// extends `Stack` (e.g. `Indexer` from `package:indexed`).
 ///
 /// **BAD:**
 /// ```dart
@@ -6887,7 +6985,8 @@ class AvoidPositionedOutsideStackRule extends SaropaLintRule {
     problemMessage:
         '[avoid_positioned_outside_stack] Positioned widget used outside '
         'of a Stack. This causes a ParentData crash at runtime.',
-    correctionMessage: 'Place Positioned widgets only inside a Stack.',
+    correctionMessage:
+        'Place Positioned widgets only inside a Stack or Stack subclass.',
     errorSeverity: DiagnosticSeverity.ERROR,
   );
 
@@ -6912,6 +7011,7 @@ class AvoidPositionedOutsideStackRule extends SaropaLintRule {
       final result = _findWidgetAncestor(
         node,
         targetParents: const <String>{'Stack', 'IndexedStack'},
+        checkSuperTypes: true,
       );
 
       if (result == _AncestorResult.found) return;

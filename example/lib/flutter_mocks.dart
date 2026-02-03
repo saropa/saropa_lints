@@ -131,8 +131,13 @@ class Stack extends Widget {
   const Stack({super.key, List<Widget>? children});
 }
 
-class IndexedStack extends Widget {
-  const IndexedStack({super.key, int? index, List<Widget>? children});
+class IndexedStack extends Stack {
+  const IndexedStack({super.key, int? index, super.children});
+}
+
+/// Mock for `package:indexed` Indexer widget which extends Stack.
+class Indexer extends Stack {
+  const Indexer({super.key, super.children});
 }
 
 class Positioned extends Widget {
@@ -280,7 +285,12 @@ class ListView extends Widget {
 }
 
 class SingleChildScrollView extends Widget {
-  const SingleChildScrollView({super.key, Widget? child, dynamic physics});
+  const SingleChildScrollView({
+    super.key,
+    Widget? child,
+    dynamic physics,
+    Axis scrollDirection = Axis.vertical,
+  });
 }
 
 class CustomScrollView extends Widget {
