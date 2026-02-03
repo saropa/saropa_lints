@@ -2713,6 +2713,9 @@ const Set<String> webPlatformRules = <String>{
   // Recommended
   'avoid_secure_storage_on_web',
   'prefer_deferred_loading_web',
+  'avoid_gesture_only_interactions',
+  'require_focus_indicator',
+  'avoid_hover_only',
 
   // Professional
   'prefer_url_strategy_for_web',
@@ -2748,6 +2751,9 @@ const Set<String> _desktopPlatformRules = <String>{
   'require_window_size_constraints',
   'prefer_native_file_dialogs',
   'avoid_touch_only_gestures',
+  'avoid_gesture_only_interactions',
+  'require_focus_indicator',
+  'avoid_hover_only',
 };
 
 /// All platform sets keyed by platform name.
