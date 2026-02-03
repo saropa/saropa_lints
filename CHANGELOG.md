@@ -11,10 +11,7 @@ Dates are not included in version headers — [pub.dev](https://pub.dev/packages
 ** See the current published changelog: [saropa_lints/changelog](https://pub.dev/packages/saropa_lints/changelog)
 
 ---
-## [Unreleased]
-
----
-## [4.9.15]
+## [4.9.16]
 
 ### Added
 
@@ -56,6 +53,8 @@ Dates are not included in version headers — [pub.dev](https://pub.dev/packages
 
 - Rules 4.9.0 and older moved to [CHANGELOG_ARCHIVE.md](https://github.com/saropa/saropa_lints/blob/main/CHANGELOG_ARCHIVE.md)
 
+---
+## [4.9.145]
 
 ### Fixed
 
