@@ -1892,42 +1892,56 @@ class AvoidAsyncCallInSyncFunctionRule extends SaropaLintRule {
     CustomLintContext context,
   ) {
     context.registry.addMethodInvocation((MethodInvocation node) {
-      // Check if the return type is Future
-      final DartType? returnType = node.staticType;
-      if (returnType == null) return;
-
-      final String typeName = returnType.getDisplayString();
-      if (!typeName.startsWith('Future')) return;
-
-      // Check if we're in a sync function
-      final FunctionBody? enclosingBody = _findEnclosingFunctionBody(node);
-      if (enclosingBody == null) return;
-      if (enclosingBody.isAsynchronous) return; // OK in async functions
-
-      // Check if the Future is being handled
-      final AstNode? parent = node.parent;
-
-      // OK if assigned, awaited, returned, or passed as argument
-      if (parent is VariableDeclaration) return;
-      if (parent is AssignmentExpression) return;
-      if (parent is ReturnStatement) return;
-      if (parent is ArgumentList) return;
-      if (parent is AwaitExpression) return;
-      if (parent is MethodInvocation) {
-        // Check for .then(), .catchError(), etc.
-        final String methodName = parent.methodName.name;
-        if (methodName == 'then' ||
-            methodName == 'catchError' ||
-            methodName == 'whenComplete') {
-          return;
-        }
-      }
-
-      // Unhandled Future in sync context
-      if (parent is ExpressionStatement) {
+      if (_shouldReport(node)) {
         reporter.atNode(node, code);
       }
     });
+  }
+
+  bool _shouldReport(MethodInvocation node) {
+    // Check if the return type is Future
+    final DartType? returnType = node.staticType;
+    if (returnType == null) return false;
+
+    final String typeName = returnType.getDisplayString();
+    if (!typeName.startsWith('Future')) return false;
+
+    // Check if we're in a sync function
+    final FunctionBody? body = _findEnclosingFunctionBody(node);
+    if (body == null || body.isAsynchronous) return false;
+
+    // Exempt cleanup calls in lifecycle methods — standard Flutter pattern.
+    // dispose/didUpdateWidget/deactivate cannot be async, and
+    // cancel()/close() are expected fire-and-forget cleanup calls.
+    if (_isCleanupInLifecycle(node, body)) return false;
+
+    // Exempt StreamController.close() in void callbacks (onDone/onError)
+    if (_isCloseInVoidCallback(node)) return false;
+
+    // Walk through transparent wrappers (parentheses, postfix !)
+    AstNode? parent = node.parent;
+    while (parent is ParenthesizedExpression || parent is PostfixExpression) {
+      parent = parent?.parent;
+    }
+
+    // OK if assigned, awaited, returned, or passed as argument
+    if (parent is VariableDeclaration) return false;
+    if (parent is AssignmentExpression) return false;
+    if (parent is ReturnStatement) return false;
+    if (parent is ArgumentList) return false;
+    if (parent is AwaitExpression) return false;
+    if (parent is MethodInvocation) {
+      final String name = parent.methodName.name;
+      if (name == 'then' ||
+          name == 'catchError' ||
+          name == 'whenComplete' ||
+          name == 'ignore') {
+        return false;
+      }
+    }
+
+    // Unhandled Future in sync context
+    return parent is ExpressionStatement;
   }
 
   FunctionBody? _findEnclosingFunctionBody(AstNode node) {
@@ -1937,6 +1951,53 @@ class AvoidAsyncCallInSyncFunctionRule extends SaropaLintRule {
       current = current.parent;
     }
     return null;
+  }
+
+  /// Cleanup calls (cancel/close) in lifecycle methods are safe.
+  /// These methods cannot be async and fire-and-forget is expected.
+  bool _isCleanupInLifecycle(
+    MethodInvocation node,
+    FunctionBody enclosingBody,
+  ) {
+    final AstNode? declaration = enclosingBody.parent;
+    if (declaration is! MethodDeclaration) return false;
+
+    final String name = declaration.name.lexeme;
+    if (name != 'dispose' &&
+        name != 'didUpdateWidget' &&
+        name != 'deactivate') {
+      return false;
+    }
+
+    final String called = node.methodName.name;
+    return called == 'cancel' || called == 'close';
+  }
+
+  /// StreamController.close() in onDone/onError callbacks is safe.
+  /// These callbacks are void Function(), so await is impossible.
+  bool _isCloseInVoidCallback(MethodInvocation node) {
+    if (node.methodName.name != 'close') return false;
+
+    final Expression? target = node.target;
+    if (target != null) {
+      final DartType? type = target.staticType;
+      if (type is InterfaceType && type.element.name != 'StreamController') {
+        return false;
+      }
+    }
+
+    AstNode? current = node.parent;
+    while (current != null) {
+      if (current is NamedExpression) {
+        final String name = current.name.label.name;
+        return name == 'onDone' || name == 'onError';
+      }
+      if (current is MethodDeclaration || current is FunctionDeclaration) {
+        break;
+      }
+      current = current.parent;
+    }
+    return false;
   }
 }
 
@@ -7639,10 +7700,23 @@ class _LateFinalMethodCallCounterVisitor extends RecursiveAstVisitor<void> {
   }
 }
 
+/// Returns true if the declaration is `late final` with all variables having
+/// inline initializers. Such fields use lazy evaluation and cannot throw
+/// [LateInitializationError] — the initializer runs on first access.
+bool _allVariablesHaveInitializers(VariableDeclarationList fields) {
+  if (!fields.isFinal) return false;
+  return fields.variables.every(
+    (VariableDeclaration v) => v.initializer != null,
+  );
+}
+
 /// Warns when late is used for a value that could simply be nullable.
 ///
 /// Using `late` for optional values that might not be initialized is risky.
 /// A nullable type with null checks is safer and more explicit.
+///
+/// Exempts `late final` fields with inline initializers, where `late`
+/// provides lazy evaluation rather than deferred assignment.
 ///
 /// **BAD:**
 /// ```dart
@@ -7657,6 +7731,7 @@ class _LateFinalMethodCallCounterVisitor extends RecursiveAstVisitor<void> {
 /// class UserProfile {
 ///   String? avatarUrl; // Simply nullable
 ///   User? user; // Null-safe access
+///   late final Stream<bool>? stream = _init(); // OK: lazy evaluation
 /// }
 /// ```
 class AvoidLateForNullableRule extends SaropaLintRule {
@@ -7688,6 +7763,10 @@ class AvoidLateForNullableRule extends SaropaLintRule {
       final VariableDeclarationList fields = node.fields;
       if (fields.lateKeyword == null) return;
 
+      // Exempt: late final with inline initializer — late provides lazy
+      // evaluation, not deferred assignment. No LateInitializationError risk.
+      if (_allVariablesHaveInitializers(fields)) return;
+
       // Check if type is nullable
       final TypeAnnotation? typeAnnotation = fields.type;
       if (typeAnnotation == null) return;
@@ -7701,6 +7780,9 @@ class AvoidLateForNullableRule extends SaropaLintRule {
     context.registry.addVariableDeclarationStatement((node) {
       final VariableDeclarationList variables = node.variables;
       if (variables.lateKeyword == null) return;
+
+      // Exempt: late final with inline initializer
+      if (_allVariablesHaveInitializers(variables)) return;
 
       final TypeAnnotation? typeAnnotation = variables.type;
       if (typeAnnotation == null) return;
