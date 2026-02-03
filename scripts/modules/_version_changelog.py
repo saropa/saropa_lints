@@ -166,62 +166,35 @@ def increment_patch_version(version: str) -> str:
     return ".".join(parts)
 
 
-def has_unreleased_content(changelog_path: Path) -> bool:
-    """Check if [Unreleased] section has bullet point content."""
-    content = changelog_path.read_text(encoding="utf-8")
-    match = re.search(
-        r"## \[Unreleased\]\s*\n(.*?)(?=\n---|\n## \[?\d+)",
-        content,
-        re.DOTALL,
-    )
-    if not match:
-        return False
-    section = match.group(1).strip()
-    return bool(re.search(r"^\s*-\s+", section, re.MULTILINE))
-
-
-def merge_unreleased_into_version(
+def rename_unreleased_to_version(
     changelog_path: Path, version: str
 ) -> bool:
-    """Move [Unreleased] content into the [version] section.
+    """Rename [Unreleased] heading to [version] before publishing.
 
-    Renames [Unreleased] to [version] and removes the duplicate
-    old [version] header so content merges into one section.
+    Returns:
+        True if renamed, False if no [Unreleased] section found.
+
+    Raises:
+        ValueError: If both [Unreleased] and [version] sections exist.
     """
     content = changelog_path.read_text(encoding="utf-8")
+
     if not re.search(r"## \[Unreleased\]", content):
         return False
 
-    # Rename [Unreleased] to [version]
+    version_pattern = rf"## \[{re.escape(version)}\]"
+    if re.search(version_pattern, content):
+        raise ValueError(
+            f"CHANGELOG has both [Unreleased] and [{version}]. "
+            f"Remove one before publishing."
+        )
+
     content = re.sub(
         r"## \[Unreleased\]",
         f"## [{version}]",
         content,
         count=1,
     )
-
-    # Find all ## [version] headers — remove the second (old) one
-    version_escaped = re.escape(version)
-    header_pattern = rf"^## \[{version_escaped}\].*$"
-    headers = list(re.finditer(header_pattern, content, re.MULTILINE))
-
-    if len(headers) >= 2:
-        second_header = headers[1]
-        # Look backwards for the --- separator before this header
-        before = content[: second_header.start()]
-        sep_match = re.search(r"\n---\s*\n$", before)
-
-        remove_start = (
-            sep_match.start() if sep_match else second_header.start()
-        )
-        remove_end = second_header.end()
-
-        # Also consume trailing newline
-        if remove_end < len(content) and content[remove_end] == "\n":
-            remove_end += 1
-
-        content = content[:remove_start] + "\n" + content[remove_end:]
-
     changelog_path.write_text(content, encoding="utf-8")
     return True
 
