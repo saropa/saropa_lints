@@ -13,6 +13,9 @@ Dates are not included in version headers — [pub.dev](https://pub.dev/packages
 ---
 ## [Unreleased]
 
+---
+## [4.9.15]
+
 ### Added
 
 - **New rules: `require_yield_between_db_awaits`, `avoid_return_await_db`**: Two database/IO yield rules that detect missing `yieldToUI()` calls after heavy DB or file I/O awaits. Prevents UI jank caused by blocking the main thread with consecutive database operations. Both rules include quick fixes that insert `await DelayUtils.yieldToUI();` automatically. Heuristic detection covers Isar, sqflite, Hive, and file I/O methods, with configurable target identifiers. Assigned to Recommended tier with WARNING severity.
@@ -53,8 +56,6 @@ Dates are not included in version headers — [pub.dev](https://pub.dev/packages
 
 - Rules 4.9.0 and older moved to [CHANGELOG_ARCHIVE.md](https://github.com/saropa/saropa_lints/blob/main/CHANGELOG_ARCHIVE.md)
 
----
-## [4.9.15]
 
 ### Fixed
 

@@ -8,6 +8,7 @@ tier integrity verification.
 
 Workflow:
     Step 1:  Pre-publish audit (tier integrity, duplicates, quality checks)
+    Pre-pub: Merge [Unreleased] into version (automatic)
     Step 2:  Check prerequisites (flutter, git, gh)
     Step 3:  Validate working tree
     Step 4:  Check remote sync
@@ -21,6 +22,7 @@ Workflow:
     Step 12: Create git tag
     Step 13: Publish via GitHub Actions
     Step 14: Create GitHub release
+    Post:    Bump version for next cycle (pubspec + [Unreleased])
 
 Options:
     --audit-only      Run audit + integrity checks only, skip publish
@@ -165,6 +167,7 @@ from scripts.modules._git_ops import (
     get_current_branch,
     get_remote_url,
     git_commit_and_push,
+    post_publish_commit,
     publish_to_pubdev_step,
 )
 from scripts.modules._pubdev_lint import (
@@ -192,10 +195,14 @@ from scripts.modules._rule_metrics import (
     sync_readme_badges,
 )
 from scripts.modules._version_changelog import (
+    add_unreleased_section,
     display_changelog,
     get_latest_changelog_version,
     get_package_name,
     get_version_from_pubspec,
+    has_unreleased_content,
+    increment_patch_version,
+    merge_unreleased_into_version,
     parse_version,
     set_version_in_pubspec,
 )
@@ -354,6 +361,16 @@ def main() -> int:
         print_warning("--audit-only and --skip-audit are contradictory.")
         return ExitCode.USER_CANCELLED.value
 
+    # --- Pre-publish: finalize [Unreleased] in CHANGELOG ---
+    print_header("FINALIZING CHANGELOG")
+    if has_unreleased_content(changelog_path):
+        merge_unreleased_into_version(changelog_path, version)
+        print_success(
+            f"Merged [Unreleased] content into [{version}]"
+        )
+    if add_unreleased_section(changelog_path):
+        print_success("Added fresh [Unreleased] section to CHANGELOG.md")
+
     # --- Steps 2-10: Publish workflow ---
     if not check_prerequisites():
         exit_with_error("Prerequisites failed", ExitCode.PREREQUISITES_FAILED)
@@ -431,6 +448,23 @@ def main() -> int:
     else:
         print()
         print_warning(f"GitHub release not created: {gh_error}")
+
+    # --- Post-publish: bump pubspec version for next cycle ---
+    next_version = increment_patch_version(version)
+    print_header(f"POST-PUBLISH: BUMPING VERSION TO {next_version}")
+
+    set_version_in_pubspec(pubspec_path, next_version)
+    print_success(f"Updated pubspec.yaml to {next_version}")
+
+    if post_publish_commit(project_dir, next_version, branch):
+        print_success(
+            f"Committed and pushed version bump to {next_version}"
+        )
+    else:
+        print_warning(
+            f"Could not commit version bump to {next_version}. "
+            f"Manually commit pubspec.yaml and CHANGELOG.md."
+        )
 
     print()
     try:
