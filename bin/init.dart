@@ -764,13 +764,18 @@ Future<void> main(List<String> args) async {
   Map<String, bool> platformSettings = Map<String, bool>.of(
     tiers.defaultPlatforms,
   );
+  Map<String, bool> packageSettings = Map<String, bool>.of(
+    tiers.defaultPackages,
+  );
 
   if (overridesFile.existsSync()) {
     // Ensure all sections exist in the file
     _ensureMaxIssuesSetting(overridesFile);
     _ensurePlatformsSetting(overridesFile);
+    _ensurePackagesSetting(overridesFile);
     _ensureStylisticRulesSection(overridesFile);
     platformSettings = _extractPlatformsFromFile(overridesFile);
+    packageSettings = _extractPackagesFromFile(overridesFile);
 
     // Extract overrides and partition stylistic from non-stylistic
     final allOverrides = _extractOverridesFromFile(overridesFile, allRules);
@@ -810,6 +815,23 @@ Future<void> main(List<String> args) async {
     _logTerminal('${_Colors.yellow}Platforms disabled:${_Colors.reset} '
         '${disabledPlatforms.join(', ')} '
         '${_Colors.dim}(${platformDisabledRules.length} rules affected)${_Colors.reset}');
+  }
+
+  // Apply package filtering - disable rules for disabled packages
+  final Set<String> packageDisabledRules =
+      tiers.getRulesDisabledByPackages(packageSettings);
+
+  if (packageDisabledRules.isNotEmpty) {
+    finalEnabled = finalEnabled.difference(packageDisabledRules);
+    finalDisabled = finalDisabled.union(packageDisabledRules);
+
+    final disabledPackages = packageSettings.entries
+        .where((e) => !e.value)
+        .map((e) => e.key)
+        .toList();
+    _logTerminal('${_Colors.yellow}Packages disabled:${_Colors.reset} '
+        '${disabledPackages.join(', ')} '
+        '${_Colors.dim}(${packageDisabledRules.length} rules affected)${_Colors.reset}');
   }
 
   // Read existing config and extract user customizations
@@ -892,6 +914,7 @@ Future<void> main(List<String> args) async {
     allRules: allRules,
     includeStylistic: cliArgs.includeStylistic,
     platformSettings: platformSettings,
+    packageSettings: packageSettings,
   );
 
   // Replace custom_lint section in existing content, preserving everything else
@@ -1085,6 +1108,7 @@ Map<String, bool> _extractOverridesFromFile(File file, Set<String> allRules) {
 /// defaulting to false, organized by category.
 void _createCustomOverridesFile(File file) {
   final stylisticSection = _buildStylisticSection();
+  final packageSection = _buildPackageSection();
 
   final content = '''
 # ╔═══════════════════════════════════════════════════════════════════════════╗
@@ -1124,7 +1148,7 @@ platforms:
   windows: false
   linux: false
 
-$stylisticSection# ─────────────────────────────────────────────────────────────────────────────
+$packageSection$stylisticSection# ─────────────────────────────────────────────────────────────────────────────
 # RULE OVERRIDES
 # ─────────────────────────────────────────────────────────────────────────────
 # FORMAT: rule_name: true/false
@@ -1241,6 +1265,101 @@ platforms:
   file.writeAsStringSync(newContent);
   _logTerminal(
       '${_Colors.green}✓ Added platforms setting to ${file.path}${_Colors.reset}');
+}
+
+/// Ensure packages setting exists in an existing custom config file.
+///
+/// Older files won't have this setting, so we add it after the
+/// platforms setting if missing.
+void _ensurePackagesSetting(File file) {
+  final content = file.readAsStringSync();
+
+  // Check if packages section already exists
+  if (RegExp(r'^packages:', multiLine: true).hasMatch(content)) {
+    return; // Already has the setting
+  }
+
+  final packageEntries = tiers.allPackages
+      .map((p) => '  $p: ${tiers.defaultPackages[p]}')
+      .join('\n');
+
+  final settingBlock = '''
+# ─────────────────────────────────────────────────────────────────────────────
+# PACKAGE SETTINGS
+# ─────────────────────────────────────────────────────────────────────────────
+# Disable packages your project doesn't use.
+# Rules specific to disabled packages will be automatically disabled.
+# All packages are enabled by default for backward compatibility.
+#
+# EXAMPLES:
+#   - Riverpod-only project: set bloc, provider, getx to false
+#   - No local DB: set isar, hive, sqflite to false
+#   - No Firebase: set firebase to false
+
+packages:
+$packageEntries
+
+''';
+
+  // Insert after platforms section if present
+  final platformsEndMatch = RegExp(
+    r'^platforms:\s*\n(?:\s+\w+:\s*(?:true|false)\s*\n)*',
+    multiLine: true,
+  ).firstMatch(content);
+
+  String newContent;
+  if (platformsEndMatch != null) {
+    final insertPos = platformsEndMatch.end;
+    newContent = content.substring(0, insertPos) +
+        '\n' +
+        settingBlock +
+        content.substring(insertPos);
+  } else {
+    // Fallback: insert after max_issues
+    final maxIssuesMatch = RegExp(r'max_issues:\s*\d+\n*').firstMatch(content);
+    if (maxIssuesMatch != null) {
+      final insertPos = maxIssuesMatch.end;
+      newContent = content.substring(0, insertPos) +
+          '\n' +
+          settingBlock +
+          content.substring(insertPos);
+    } else {
+      newContent = settingBlock + content;
+    }
+  }
+
+  file.writeAsStringSync(newContent);
+  _logTerminal(
+      '${_Colors.green}✓ Added packages setting to ${file.path}${_Colors.reset}');
+}
+
+/// Builds the PACKAGE SETTINGS section for analysis_options_custom.yaml.
+String _buildPackageSection() {
+  final buffer = StringBuffer();
+  buffer.writeln(
+      '# ─────────────────────────────────────────────────────────────────────────────');
+  buffer.writeln('# PACKAGE SETTINGS');
+  buffer.writeln(
+      '# ─────────────────────────────────────────────────────────────────────────────');
+  buffer.writeln("# Disable packages your project doesn't use.");
+  buffer.writeln(
+      '# Rules specific to disabled packages will be automatically disabled.');
+  buffer.writeln(
+      '# All packages are enabled by default for backward compatibility.');
+  buffer.writeln('#');
+  buffer.writeln('# EXAMPLES:');
+  buffer.writeln(
+      '#   - Riverpod-only project: set bloc, provider, getx to false');
+  buffer.writeln('#   - No local DB: set isar, hive, sqflite to false');
+  buffer.writeln('#   - No Firebase: set firebase to false');
+  buffer.writeln('');
+  buffer.writeln('packages:');
+  for (final package in tiers.allPackages) {
+    final enabled = tiers.defaultPackages[package] ?? true;
+    buffer.writeln('  $package: $enabled');
+  }
+  buffer.writeln('');
+  return buffer.toString();
 }
 
 /// Builds the STYLISTIC RULES section content for analysis_options_custom.yaml.
@@ -1509,6 +1628,57 @@ Map<String, bool> _extractPlatformsFromFile(File file) {
   return platforms;
 }
 
+/// Extract package settings from analysis_options_custom.yaml.
+///
+/// Returns a map of package name to enabled status.
+/// Defaults to [tiers.defaultPackages] if not specified (all enabled).
+///
+/// Supports format:
+/// ```yaml
+/// packages:
+///   bloc: true
+///   riverpod: false
+///   firebase: true
+/// ```
+Map<String, bool> _extractPackagesFromFile(File file) {
+  final Map<String, bool> packages = Map<String, bool>.of(
+    tiers.defaultPackages,
+  );
+
+  if (!file.existsSync()) return packages;
+
+  final content = file.readAsStringSync();
+
+  // Find the packages: section
+  final sectionMatch =
+      RegExp(r'^packages:\s*$', multiLine: true).firstMatch(content);
+  if (sectionMatch == null) return packages;
+
+  // Extract indented entries after packages:
+  final afterSection = content.substring(sectionMatch.end);
+
+  final packagePattern = RegExp(
+    r'^\s+([\w_]+):\s*(true|false)',
+    multiLine: true,
+  );
+
+  for (final match in packagePattern.allMatches(afterSection)) {
+    // Stop if we hit a non-indented line (next section)
+    final beforeMatch = afterSection.substring(0, match.start);
+    if (RegExp(r'^\S', multiLine: true).hasMatch(beforeMatch)) break;
+
+    final name = match.group(1)!;
+    final enabled = match.group(2) == 'true';
+
+    // Only include packages we know about
+    if (tiers.defaultPackages.containsKey(name)) {
+      packages[name] = enabled;
+    }
+  }
+
+  return packages;
+}
+
 /// Generate the custom_lint YAML section with proper formatting.
 ///
 /// Organizes rules by tier with problem message comments.
@@ -1520,6 +1690,7 @@ String _generateCustomLintYaml({
   required Set<String> allRules,
   required bool includeStylistic,
   required Map<String, bool> platformSettings,
+  required Map<String, bool> packageSettings,
 }) {
   final StringBuffer buffer = StringBuffer();
   final customizedRuleNames = userCustomizations.keys.toSet();
@@ -1561,8 +1732,16 @@ String _generateCustomLintYaml({
     buffer.writeln('  #');
   }
 
+  // Show package status
+  final disabledPackages =
+      packageSettings.entries.where((e) => !e.value).map((e) => e.key).toList();
+  if (disabledPackages.isNotEmpty) {
+    buffer.writeln('  # Disabled packages: ${disabledPackages.join(', ')}');
+    buffer.writeln('  #');
+  }
+
   buffer.writeln(
-      '  # Settings (max_issues, platforms) are in analysis_options_custom.yaml');
+      '  # Settings (max_issues, platforms, packages) are in analysis_options_custom.yaml');
   buffer.writeln(
       '  # ═══════════════════════════════════════════════════════════════════════');
   buffer.writeln('');

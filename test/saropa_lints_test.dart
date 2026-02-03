@@ -162,4 +162,109 @@ void main() {
       );
     });
   });
+
+  group('Package Rule Set Validation', () {
+    late Set<String> pluginRuleNames;
+    late Map<String, Set<String>> pkgSets;
+
+    setUpAll(() {
+      pluginRuleNames =
+          allSaropaRules.map((LintRule rule) => rule.code.name).toSet();
+      pkgSets = packageRuleSets;
+    });
+
+    test('all package rules must exist in plugin', () {
+      final Set<String> allPackageRules = <String>{};
+      for (final rules in pkgSets.values) {
+        allPackageRules.addAll(rules);
+      }
+
+      final Set<String> phantomRules =
+          allPackageRules.difference(pluginRuleNames);
+
+      expect(
+        phantomRules,
+        isEmpty,
+        reason: 'Rules in package sets do not exist in plugin:\n'
+            '${phantomRules.toList()..sort()}\n\n'
+            'Remove these phantom rules from package sets in '
+            'lib/src/tiers.dart',
+      );
+    });
+
+    test('package rules must be in a tier set', () {
+      final Set<String> tierRuleNames = getAllDefinedRules();
+      final Set<String> allPackageRules = <String>{};
+      for (final rules in pkgSets.values) {
+        allPackageRules.addAll(rules);
+      }
+
+      final Set<String> orphaned = allPackageRules.difference(tierRuleNames);
+
+      expect(
+        orphaned,
+        isEmpty,
+        reason: 'Package rules not in any tier set:\n'
+            '${orphaned.toList()..sort()}\n\n'
+            'Package sets are orthogonal to tiers. Every rule '
+            'in a package set must also be in a tier set.',
+      );
+    });
+
+    test('allPackages matches defaultPackages keys', () {
+      final Set<String> allSet = allPackages.toSet();
+      final Set<String> defaultKeys = defaultPackages.keys.toSet();
+
+      expect(
+        allSet,
+        defaultKeys,
+        reason: 'allPackages and defaultPackages.keys must match.\n'
+            'In allPackages only: ${allSet.difference(defaultKeys)}\n'
+            'In defaultPackages only: ${defaultKeys.difference(allSet)}',
+      );
+    });
+
+    test('allPackages matches packageRuleSets keys', () {
+      final Set<String> allSet = allPackages.toSet();
+      final Set<String> ruleSetKeys = pkgSets.keys.toSet();
+
+      expect(
+        allSet,
+        ruleSetKeys,
+        reason: 'allPackages and packageRuleSets.keys must match.\n'
+            'In allPackages only: ${allSet.difference(ruleSetKeys)}\n'
+            'In packageRuleSets only: ${ruleSetKeys.difference(allSet)}',
+      );
+    });
+
+    test('getRulesDisabledByPackages returns empty when all enabled', () {
+      final result = getRulesDisabledByPackages(defaultPackages);
+      expect(result, isEmpty);
+    });
+
+    test('getRulesDisabledByPackages disables rules for disabled package', () {
+      final settings = Map<String, bool>.of(defaultPackages);
+      settings['flame'] = false;
+
+      final result = getRulesDisabledByPackages(settings);
+
+      // Flame rules should be disabled (they're not in other sets)
+      expect(result, contains('avoid_creating_vector_in_update'));
+      expect(result, contains('avoid_redundant_async_on_load'));
+    });
+
+    test('shared rules stay enabled if any package still uses them', () {
+      final settings = Map<String, bool>.of(defaultPackages);
+      settings['firebase'] = false;
+
+      final result = getRulesDisabledByPackages(settings);
+
+      // Database shared rules should still be enabled via isar/hive/sqflite
+      expect(result, isNot(contains('avoid_database_in_build')));
+      expect(result, isNot(contains('require_database_migration')));
+
+      // Firebase-only rules should be disabled
+      expect(result, contains('require_firebase_init_before_use'));
+    });
+  });
 }

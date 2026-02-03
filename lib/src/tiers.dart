@@ -23,6 +23,10 @@ const Set<String> stylisticRules = <String>{
   'prefer_sorted_parameters',
   'prefer_sorted_pattern_fields',
   'prefer_sorted_record_fields',
+  'binary_expression_operand_order', // Moved from professional (opinionated)
+  'enforce_parameters_ordering', // Moved from professional (opinionated)
+  'enum_constants_ordering', // Moved from professional (opinionated)
+  'map_keys_ordering', // Moved from professional (opinionated)
 
   // === Naming conventions ===
   'prefer_boolean_prefixes',
@@ -34,6 +38,16 @@ const Set<String> stylisticRules = <String>{
   'prefer_camel_case_method_names',
   'prefer_exception_suffix',
   'prefer_error_suffix',
+  'prefer_boolean_prefixes_for_params', // Moved from professional (opinionated)
+  'prefer_boolean_prefixes_for_locals', // Moved from professional (opinionated)
+  'prefer_trailing_underscore_for_unused', // Moved from professional (opinionated)
+  'prefer_sliver_prefix', // Moved from professional (opinionated)
+  'prefer_correct_callback_field_name', // Moved from professional (opinionated)
+  'prefer_correct_handler_name', // Moved from professional (opinionated)
+  'prefer_correct_setter_parameter_name', // Moved from professional (opinionated)
+  'prefer_bloc_event_suffix', // Moved from comprehensive (opinionated)
+  'prefer_bloc_state_suffix', // Moved from comprehensive (opinionated)
+  'prefer_use_prefix', // Moved from comprehensive (opinionated)
 
   // === Error handling style ===
   'prefer_catch_over_on',
@@ -43,6 +57,23 @@ const Set<String> stylisticRules = <String>{
   'prefer_single_exit_point',
   'prefer_wildcard_for_unused_param',
   'prefer_rethrow_over_throw_e',
+  'prefer_list_first', // Moved from recommended (opinionated)
+  'prefer_list_last', // Moved from recommended (opinionated)
+  'prefer_sized_box_square', // Moved from recommended (opinionated)
+  'prefer_center_over_align', // Moved from recommended (opinionated)
+  'prefer_spacing_over_sizedbox', // Moved from recommended (opinionated)
+  'no_boolean_literal_compare', // Moved from recommended (opinionated)
+  'prefer_returning_conditional_expressions', // Moved from recommended (opinionated)
+  'prefer_duration_constants', // Moved from recommended (opinionated)
+  'prefer_immediate_return', // Moved from professional (opinionated)
+  'prefer_for_in', // Moved from professional (opinionated)
+  'prefer_getter_over_method', // Moved from professional (opinionated)
+  'prefer_conditional_expressions', // Moved from professional (opinionated)
+  'prefer_returning_condition', // Moved from professional (opinionated)
+  'prefer_returning_conditionals', // Moved from professional (opinionated)
+  'prefer_returning_shorthands', // Moved from professional (opinionated)
+  'prefer_pushing_conditional_expressions', // Moved from professional (opinionated)
+  'prefer_type_over_var', // Moved from professional (conflicts with prefer_var_over_explicit_type)
 
   // === Function & Parameter style ===
   'prefer_arrow_functions',
@@ -64,6 +95,14 @@ const Set<String> stylisticRules = <String>{
 
   // === Formatting ===
   'prefer_trailing_comma_always',
+  'prefer_blank_line_before_case', // Moved from professional (opinionated)
+  'prefer_blank_line_before_constructor', // Moved from professional (opinionated)
+  'prefer_blank_line_before_method', // Moved from professional (opinionated)
+  'prefer_blank_line_before_return', // Moved from professional (opinionated)
+  'prefer_trailing_comma', // Moved from professional (opinionated)
+  'unnecessary_trailing_comma', // Moved from professional (opinionated)
+  'double_literal_format', // Moved from professional (opinionated)
+  'format_comment_style', // Moved from insanity (opinionated)
 
   // === Comments & Documentation ===
   'prefer_todo_format',
@@ -618,8 +657,8 @@ const Set<String> recommendedOnlyRules = <String>{
   'avoid_ignore_trailing_comment',
 
   // Moved from Essential (style/quality, not crash prevention)
-  'prefer_list_first',
-  'prefer_list_last',
+  // 'prefer_list_first' moved to stylisticRules (opinionated)
+  // 'prefer_list_last' moved to stylisticRules (opinionated)
   'avoid_variable_shadowing',
   'avoid_string_substring',
   'prefer_single_container',
@@ -732,8 +771,8 @@ const Set<String> recommendedOnlyRules = <String>{
   'avoid_state_constructors',
   'avoid_empty_text_widgets',
   'prefer_sized_box_for_whitespace',
-  'prefer_sized_box_square',
-  'prefer_center_over_align',
+  // 'prefer_sized_box_square' moved to stylisticRules (opinionated)
+  // 'prefer_center_over_align' moved to stylisticRules (opinionated)
   'prefer_align_over_container',
   'prefer_padding_over_container',
   'prefer_constrained_box_over_container',
@@ -744,7 +783,7 @@ const Set<String> recommendedOnlyRules = <String>{
   'prefer_inkwell_over_gesture',
   'prefer_listview_builder',
   'avoid_opacity_animation',
-  'prefer_spacing_over_sizedbox',
+  // 'prefer_spacing_over_sizedbox' moved to stylisticRules (opinionated)
   'avoid_material2_fallback',
   'avoid_navigator_push_unnamed',
 
@@ -774,7 +813,7 @@ const Set<String> recommendedOnlyRules = <String>{
   'prefer_simpler_boolean_expressions',
   'no_empty_string',
   'avoid_misnamed_padding',
-  'no_boolean_literal_compare', // INFO - use boolean expression directly
+  // 'no_boolean_literal_compare' moved to stylisticRules (opinionated)
 
   // Collections
   'avoid_map_keys_contains',
@@ -862,7 +901,7 @@ const Set<String> recommendedOnlyRules = <String>{
   'prefer_on_field_submitted',
 
   // Duration & DateTime (Plan Group F)
-  'prefer_duration_constants',
+  // 'prefer_duration_constants' moved to stylisticRules (opinionated)
 
   // UI/UX (Plan Groups G, J, K)
   'require_responsive_breakpoints',
@@ -1092,7 +1131,7 @@ const Set<String> recommendedOnlyRules = <String>{
   'require_macos_app_transport_security', // WARNING - macOS ATS compliance
 
   // v2.6.0 rules (ROADMAP_NEXT)
-  'prefer_returning_conditional_expressions', // INFO - cleaner code
+  // 'prefer_returning_conditional_expressions' moved to stylisticRules (opinionated)
   'prefer_riverpod_family_for_params', // INFO - type-safe parameters
   'require_dio_response_type', // INFO - explicit response types
   'require_go_router_fallback_route', // INFO - error handling
@@ -1648,7 +1687,7 @@ const Set<String> professionalOnlyRules = <String>{
   // Note: require_covariant_documentation, require_futureor_documentation moved to Comprehensive
 
   // Naming & Style
-  'prefer_boolean_prefixes_for_params',
+  // 'prefer_boolean_prefixes_for_params' moved to stylisticRules (opinionated)
 
   // Security (Batch 14)
   'prefer_encrypted_prefs',
@@ -2044,13 +2083,13 @@ const Set<String> professionalOnlyRules = <String>{
   'avoid_unused_callback_parameters',
   'avoid_vague_test_descriptions',
   'avoid_widget_creation_in_loop',
-  'binary_expression_operand_order',
-  'double_literal_format',
-  'enforce_parameters_ordering',
-  'enum_constants_ordering',
+  // 'binary_expression_operand_order' moved to stylisticRules (opinionated)
+  // 'double_literal_format' moved to stylisticRules (opinionated)
+  // 'enforce_parameters_ordering' moved to stylisticRules (opinionated)
+  // 'enum_constants_ordering' moved to stylisticRules (opinionated)
   'function_always_returns_same_value',
   'limit_max_imports',
-  'map_keys_ordering',
+  // 'map_keys_ordering' moved to stylisticRules (opinionated)
   'match_base_class_default_value',
   'match_getter_setter_field_names',
   'match_lib_folder_structure',
@@ -2077,12 +2116,12 @@ const Set<String> professionalOnlyRules = <String>{
   'prefer_audio_session_config',
   // 'prefer_await_over_then' moved to stylisticRules (opinionated)
   // 'prefer_blank_line_after_declarations' moved to stylisticRules (opinionated)
-  'prefer_blank_line_before_case',
-  'prefer_blank_line_before_constructor',
-  'prefer_blank_line_before_method',
-  'prefer_blank_line_before_return',
+  // 'prefer_blank_line_before_case' moved to stylisticRules (opinionated)
+  // 'prefer_blank_line_before_constructor' moved to stylisticRules (opinionated)
+  // 'prefer_blank_line_before_method' moved to stylisticRules (opinionated)
+  // 'prefer_blank_line_before_return' moved to stylisticRules (opinionated)
   // 'prefer_blank_lines_between_members' moved to stylisticRules (opinionated)
-  'prefer_boolean_prefixes_for_locals',
+  // 'prefer_boolean_prefixes_for_locals' moved to stylisticRules (opinionated)
   // 'prefer_borderradius_circular' moved to stylisticRules (opinionated)
   'prefer_both_inlining_annotations',
   'prefer_bytes_builder',
@@ -2101,7 +2140,7 @@ const Set<String> professionalOnlyRules = <String>{
   'prefer_compound_assignment_operators',
   // 'prefer_concatenation_over_interpolation' moved to stylisticRules (opinionated)
   // 'prefer_concise_variable_names' moved to stylisticRules (opinionated)
-  'prefer_conditional_expressions',
+  // 'prefer_conditional_expressions' moved to stylisticRules (opinionated)
   'prefer_const_border_radius',
   'prefer_const_string_list',
   'prefer_const_widgets',
@@ -2109,12 +2148,12 @@ const Set<String> professionalOnlyRules = <String>{
   // 'prefer_constructor_body_assignment' moved to stylisticRules (opinionated)
   // 'prefer_container_over_sizedbox' moved to stylisticRules (opinionated)
   'prefer_context_selector',
-  'prefer_correct_callback_field_name',
+  // 'prefer_correct_callback_field_name' moved to stylisticRules (opinionated)
   'prefer_correct_edge_insets_constructor',
   'prefer_correct_error_name',
-  'prefer_correct_handler_name',
+  // 'prefer_correct_handler_name' moved to stylisticRules (opinionated)
   'prefer_correct_identifier_length',
-  'prefer_correct_setter_parameter_name',
+  // 'prefer_correct_setter_parameter_name' moved to stylisticRules (opinionated)
   'prefer_correct_switch_length',
   'prefer_correct_test_file_name',
   'prefer_cupertino_for_ios',
@@ -2155,16 +2194,16 @@ const Set<String> professionalOnlyRules = <String>{
   // 'prefer_fields_before_methods' moved to stylisticRules (opinionated)
   // 'prefer_fixme_format' moved to stylisticRules (opinionated)
   // 'prefer_flexible_over_expanded' moved to stylisticRules (opinionated)
-  'prefer_for_in',
+  // 'prefer_for_in' moved to stylisticRules (opinionated)
   // 'prefer_future_void_function_over_async_callback' moved to stylisticRules (opinionated)
   // 'prefer_generic_exception' moved to stylisticRules (opinionated)
-  'prefer_getter_over_method',
+  // 'prefer_getter_over_method' moved to stylisticRules (opinionated)
   // 'prefer_given_when_then_comments' moved to stylisticRules (opinionated)
   // 'prefer_grouped_by_purpose' moved to stylisticRules (opinionated)
   // 'prefer_grouped_expectations' moved to stylisticRules (opinionated)
   // 'prefer_guard_clauses' moved to stylisticRules (opinionated)
   // 'prefer_if_null_over_ternary' moved to stylisticRules (opinionated)
-  'prefer_immediate_return',
+  // 'prefer_immediate_return' moved to stylisticRules (opinionated)
   // 'prefer_implicit_boolean_comparison' moved to stylisticRules (opinionated)
   // 'prefer_initializing_formals' moved to stylisticRules (opinionated)
   // 'prefer_inline_callbacks' moved to stylisticRules (opinionated)
@@ -2213,11 +2252,11 @@ const Set<String> professionalOnlyRules = <String>{
   'prefer_proxy_provider',
   'prefer_public_exception_classes',
   // 'prefer_public_members_first' moved to stylisticRules (conflicting pair)
-  'prefer_pushing_conditional_expressions',
+  // 'prefer_pushing_conditional_expressions' moved to stylisticRules (opinionated)
   // 'prefer_required_before_optional' moved to stylisticRules (opinionated)
-  'prefer_returning_condition',
-  'prefer_returning_conditionals',
-  'prefer_returning_shorthands',
+  // 'prefer_returning_condition' moved to stylisticRules (opinionated)
+  // 'prefer_returning_conditionals' moved to stylisticRules (opinionated)
+  // 'prefer_returning_shorthands' moved to stylisticRules (opinionated)
   'prefer_rich_text_for_complex',
   // 'prefer_richtext_over_text_rich' moved to stylisticRules (opinionated)
   // 'prefer_screaming_case_constants' moved to stylisticRules (opinionated)
@@ -2237,7 +2276,7 @@ const Set<String> professionalOnlyRules = <String>{
   // 'prefer_single_quotes' moved to stylisticRules (conflicting pair)
   'prefer_single_widget_per_file',
   // 'prefer_sizedbox_over_container' moved to stylisticRules (opinionated)
-  'prefer_sliver_prefix',
+  // 'prefer_sliver_prefix' moved to stylisticRules (opinionated)
   // 'prefer_snake_case_files' moved to stylisticRules (opinionated)
   // 'prefer_specific_exceptions' moved to stylisticRules (opinionated)
   // 'prefer_spread_over_addall' moved to stylisticRules (opinionated)
@@ -2260,10 +2299,10 @@ const Set<String> professionalOnlyRules = <String>{
   // 'prefer_text_rich_over_richtext' moved to stylisticRules (opinionated)
   // 'prefer_then_over_await' moved to stylisticRules (opinionated)
   // 'prefer_todo_format' moved to stylisticRules (opinionated)
-  'prefer_trailing_comma',
+  // 'prefer_trailing_comma' moved to stylisticRules (opinionated)
   // 'prefer_trailing_comma_always' moved to stylisticRules (opinionated)
-  'prefer_trailing_underscore_for_unused',
-  'prefer_type_over_var',
+  // 'prefer_trailing_underscore_for_unused' moved to stylisticRules (opinionated)
+  // 'prefer_type_over_var' moved to stylisticRules (conflicts with prefer_var_over_explicit_type)
   'prefer_typedef_for_callbacks',
   'prefer_utc_datetimes',
   // 'prefer_var_over_explicit_type' moved to stylisticRules (opinionated)
@@ -2287,7 +2326,7 @@ const Set<String> professionalOnlyRules = <String>{
   'require_text_input_tests',
   'require_theme_color_from_scheme',
   'require_update_callback',
-  'unnecessary_trailing_comma',
+  // 'unnecessary_trailing_comma' moved to stylisticRules (opinionated)
   'use_existing_destructuring',
   'use_existing_variable',
 
@@ -2387,9 +2426,9 @@ const Set<String> comprehensiveOnlyRules = <String>{
   'prefer_typedefs_for_callbacks',
 
   // Naming suffix conventions (moved from Professional)
-  'prefer_bloc_event_suffix',
-  'prefer_bloc_state_suffix',
-  'prefer_use_prefix', // Hooks naming
+  // 'prefer_bloc_event_suffix' moved to stylisticRules (opinionated)
+  // 'prefer_bloc_state_suffix' moved to stylisticRules (opinionated)
+  // 'prefer_use_prefix' moved to stylisticRules (opinionated)
 
   // Documentation extras (moved from Professional)
   'require_covariant_documentation',
@@ -2495,7 +2534,7 @@ const Set<String> insanityOnlyRules = <String>{
   'prefer_specific_numeric_types', // int vs num pedantry
 
   // Documentation pedantry
-  'format_comment_style', // comment formatting conventions
+  // 'format_comment_style' moved to stylisticRules (opinionated)
   'prefer_providing_intl_description', // i18n descriptions
   'prefer_providing_intl_examples', // i18n examples
 
@@ -2823,6 +2862,562 @@ Set<String> getRulesDisabledByPlatforms(Map<String, bool> platforms) {
       bool stillRelevant = false;
       for (final enabledPlatform in enabledPlatforms) {
         if (sets[enabledPlatform]?.contains(rule) ?? false) {
+          stillRelevant = true;
+          break;
+        }
+      }
+      if (!stillRelevant) {
+        rulesToDisable.add(rule);
+      }
+    }
+  }
+
+  return rulesToDisable;
+}
+
+// =========================================================================
+// PACKAGE/TECHNOLOGY RULE SETS
+// =========================================================================
+// Rules specific to each third-party package or technology.
+// Orthogonal to both tiers and platforms.
+//
+// A rule can appear in multiple package sets (e.g., a Provider rule about
+// Equatable also appears in the Equatable set). A rule is disabled only
+// when ALL its packages are disabled.
+//
+// Generic cross-cutting rules (require_mounted_check, etc.) are NOT in
+// any package set -- they remain always-on regardless of package config.
+// =========================================================================
+
+// ---------------------------------------------------------------------------
+// State Management
+// ---------------------------------------------------------------------------
+
+/// Rules specific to the Bloc/Cubit state management package.
+const Set<String> blocPackageRules = <String>{
+  'avoid_bloc_event_in_constructor',
+  'require_bloc_close',
+  'require_immutable_bloc_state',
+  'require_bloc_observer',
+  'avoid_bloc_event_mutation',
+  'avoid_bloc_listen_in_build',
+  'require_initial_state',
+  'require_error_state',
+  'avoid_bloc_in_bloc',
+  'prefer_sealed_events',
+  'require_bloc_transformer',
+  'prefer_multi_bloc_provider',
+  'avoid_duplicate_bloc_event_handlers',
+  'prefer_immutable_bloc_events',
+  'prefer_immutable_bloc_state',
+  'prefer_sealed_bloc_events',
+  'prefer_sealed_bloc_state',
+  'prefer_bloc_event_suffix',
+  'prefer_bloc_state_suffix',
+  'avoid_yield_in_on_event',
+  'emit_new_bloc_state_instances',
+  'avoid_bloc_public_fields',
+  'avoid_bloc_public_methods',
+  'require_bloc_selector',
+  'avoid_bloc_emit_after_close',
+  'avoid_bloc_state_mutation',
+  'require_bloc_initial_state',
+  'require_bloc_loading_state',
+  'require_bloc_error_state',
+  'avoid_bloc_context_dependency',
+  'require_bloc_consumer_when_both',
+  'avoid_bloc_business_logic_in_ui',
+  'require_bloc_event_sealed',
+  'require_bloc_repository_abstraction',
+  'prefer_bloc_transform',
+  'avoid_passing_bloc_to_bloc',
+  'avoid_passing_build_context_to_blocs',
+  'avoid_returning_value_from_cubit_methods',
+  'require_bloc_repository_injection',
+  'prefer_bloc_hydration',
+  'avoid_large_bloc',
+  'avoid_overengineered_bloc_states',
+  'prefer_cubit_for_simple',
+  'prefer_cubit_for_simple_state',
+  'prefer_bloc_listener_for_side_effects',
+  'prefer_copy_with_for_state',
+  'avoid_instantiating_in_bloc_value_provider',
+  'avoid_existing_instances_in_bloc_provider',
+  'prefer_correct_bloc_provider',
+  'require_update_should_notify',
+};
+
+/// Rules specific to the Provider state management package.
+const Set<String> providerPackageRules = <String>{
+  'require_notify_listeners',
+  'require_update_should_notify',
+  'avoid_provider_of_in_build',
+  'avoid_provider_recreate',
+  'require_provider_scope',
+  'avoid_provider_in_widget',
+  'prefer_family_for_params',
+  'avoid_change_notifier_in_widget',
+  'require_provider_dispose',
+  'avoid_circular_provider_deps',
+  'require_error_handling_in_async',
+  'prefer_notifier_over_state',
+  'require_multi_provider',
+  'avoid_nested_providers',
+  'avoid_instantiating_in_value_provider',
+  'dispose_provider_instances',
+  'dispose_provided_instances',
+  'prefer_immutable_selector_value',
+  'prefer_provider_extensions',
+  'prefer_nullable_provider_types',
+  'prefer_consumer_over_provider_of',
+  'avoid_listen_in_async',
+  'prefer_context_selector',
+  'require_provider_generic_type',
+  'require_equatable_immutable',
+  'require_equatable_props_override',
+  'avoid_equatable_mutable_collections',
+  'avoid_static_state',
+  'avoid_provider_in_init_state',
+  'prefer_context_read_in_callbacks',
+  'prefer_proxy_provider',
+  'require_update_callback',
+  'prefer_selector_over_consumer',
+  'avoid_provider_value_rebuild',
+  'prefer_change_notifier_proxy',
+  'prefer_selector_widget',
+  'prefer_change_notifier_proxy_provider',
+  'prefer_multi_provider',
+  'avoid_instantiating_in_bloc_value_provider',
+  'avoid_existing_instances_in_bloc_provider',
+  'prefer_correct_bloc_provider',
+};
+
+/// Rules specific to the Riverpod state management package.
+const Set<String> riverpodPackageRules = <String>{
+  // From riverpod_rules.dart
+  'avoid_ref_read_inside_build',
+  'avoid_ref_watch_outside_build',
+  'avoid_ref_inside_state_dispose',
+  'use_ref_read_synchronously',
+  'use_ref_and_state_synchronously',
+  'avoid_assigning_notifiers',
+  'avoid_notifier_constructors',
+  'prefer_immutable_provider_arguments',
+  'avoid_unnecessary_consumer_widgets',
+  'avoid_nullable_async_value_pattern',
+  'require_riverpod_error_handling',
+  'avoid_riverpod_state_mutation',
+  'prefer_riverpod_select',
+  'require_flutter_riverpod_package',
+  'prefer_riverpod_auto_dispose',
+  'prefer_riverpod_family_for_params',
+  // From state_management_rules.dart
+  'avoid_watch_in_callbacks',
+  'avoid_global_riverpod_providers',
+  'prefer_consumer_widget',
+  'require_auto_dispose',
+  'avoid_ref_in_build_body',
+  'avoid_ref_in_dispose',
+  'prefer_select_for_partial',
+  'prefer_ref_watch_over_read',
+  'require_riverpod_lint',
+  'require_flutter_riverpod_not_riverpod',
+  'avoid_riverpod_navigation',
+  'avoid_riverpod_for_network_only',
+  'avoid_riverpod_notifier_in_build',
+  'require_riverpod_async_value_guard',
+  'require_async_value_order',
+};
+
+/// Rules specific to the GetX state management package.
+const Set<String> getxPackageRules = <String>{
+  // From getx_rules.dart
+  'require_getx_worker_dispose',
+  'require_getx_permanent_cleanup',
+  'avoid_getx_context_outside_widget',
+  'avoid_getx_global_navigation',
+  'require_getx_binding_routes',
+  'avoid_getx_dialog_snackbar_in_controller',
+  'require_getx_lazy_put',
+  // From state_management_rules.dart
+  'avoid_get_find_in_build',
+  'require_getx_controller_dispose',
+  'avoid_obs_outside_controller',
+  'proper_getx_super_calls',
+  'always_remove_getx_listener',
+  'avoid_getx_rx_inside_build',
+  'avoid_mutable_rx_variables',
+  'dispose_getx_fields',
+  'prefer_getx_builder',
+  'require_getx_binding',
+  'avoid_getx_global_state',
+  'avoid_getx_static_context',
+  'avoid_tight_coupling_with_getx',
+};
+
+/// Rules specific to the flutter_hooks package.
+const Set<String> flutterHooksPackageRules = <String>{
+  'avoid_hooks_outside_build',
+  'avoid_conditional_hooks',
+  'avoid_unnecessary_hook_widgets',
+};
+
+// ---------------------------------------------------------------------------
+// Data & Code Generation
+// ---------------------------------------------------------------------------
+
+/// Rules specific to the Equatable package.
+const Set<String> equatablePackageRules = <String>{
+  'require_extend_equatable',
+  'list_all_equatable_fields',
+  'prefer_equatable_mixin',
+  'prefer_equatable_stringify',
+  'prefer_immutable_annotation',
+  'prefer_record_over_equatable',
+  'avoid_mutable_field_in_equatable',
+  'require_equatable_copy_with',
+  'require_copy_with_null_handling',
+  'require_deep_equality_collections',
+  'avoid_equatable_datetime',
+  'prefer_unmodifiable_collections',
+  'require_equatable_immutable',
+  'require_equatable_props_override',
+  'avoid_equatable_mutable_collections',
+};
+
+/// Rules specific to the Freezed code generation package.
+const Set<String> freezedPackageRules = <String>{
+  'require_freezed_explicit_json',
+  'prefer_freezed_default_values',
+  'require_freezed_arrow_syntax',
+  'require_freezed_private_constructor',
+  'avoid_freezed_json_serializable_conflict',
+  'require_freezed_json_converter',
+  'require_freezed_lint_package',
+  'avoid_freezed_for_logic_classes',
+  'prefer_freezed_for_data_classes',
+};
+
+// ---------------------------------------------------------------------------
+// Storage & Database
+// ---------------------------------------------------------------------------
+
+/// Rules shared across database packages (Firebase, Isar, Hive, sqflite).
+///
+/// These generic database rules are unioned into each database package set
+/// via [packageRuleSets], so they are disabled only when ALL database
+/// packages are disabled.
+const Set<String> _databaseSharedRules = <String>{
+  'avoid_database_in_build',
+  'require_database_migration',
+  'require_database_index',
+  'prefer_transaction_for_batch',
+};
+
+/// Rules specific to the Firebase platform.
+const Set<String> firebasePackageRules = <String>{
+  'require_firebase_init_before_use',
+  'incorrect_firebase_event_name',
+  'incorrect_firebase_parameter_name',
+  'prefer_firestore_batch_write',
+  'avoid_firestore_in_widget_build',
+  'prefer_firebase_remote_config_defaults',
+  'require_fcm_token_refresh_handler',
+  'require_background_message_handler',
+  'require_crashlytics_user_id',
+  'require_firebase_app_check',
+  'avoid_storing_user_data_in_auth',
+  'prefer_firebase_auth_persistence',
+  'require_firebase_error_handling',
+  'avoid_firebase_realtime_in_build',
+  'require_firestore_index',
+  'avoid_firestore_unbounded_query',
+  'avoid_map_markers_in_build',
+  'require_map_idle_callback',
+  'prefer_marker_clustering',
+};
+
+/// Rules specific to the Isar database package.
+const Set<String> isarPackageRules = <String>{
+  'avoid_isar_enum_field',
+  'require_isar_collection_annotation',
+  'require_isar_id_field',
+  'require_isar_close_on_dispose',
+  'prefer_isar_async_writes',
+  'avoid_isar_transaction_nesting',
+  'prefer_isar_batch_operations',
+  'avoid_isar_float_equality_queries',
+  'require_isar_inspector_debug_only',
+  'avoid_isar_clear_in_production',
+  'require_isar_links_load',
+  'prefer_isar_query_stream',
+  'avoid_isar_web_limitations',
+  'prefer_isar_index_for_queries',
+  'avoid_isar_embedded_large_objects',
+  'prefer_isar_lazy_links',
+  'avoid_isar_schema_breaking_changes',
+  'require_isar_nullable_field',
+  'prefer_isar_composite_index',
+  'avoid_isar_string_contains_without_index',
+  'avoid_cached_isar_stream',
+};
+
+/// Rules specific to the Hive database package.
+const Set<String> hivePackageRules = <String>{
+  'require_hive_initialization',
+  'require_hive_type_adapter',
+  'require_hive_box_close',
+  'prefer_hive_encryption',
+  'require_hive_encryption_key_secure',
+  'require_hive_database_close',
+  'require_type_adapter_registration',
+  'prefer_lazy_box_for_large',
+  'require_hive_type_id_management',
+  'avoid_hive_field_index_reuse',
+  'require_hive_field_default_value',
+  'require_hive_adapter_registration_order',
+  'require_hive_nested_object_adapter',
+  'avoid_hive_box_name_collision',
+  'prefer_hive_value_listenable',
+  'prefer_hive_lazy_box',
+  'avoid_hive_binary_storage',
+  'require_hive_migration_strategy',
+};
+
+/// Rules specific to the shared_preferences package.
+const Set<String> sharedPreferencesPackageRules = <String>{
+  'require_shared_prefs_prefix',
+  'prefer_shared_prefs_async_api',
+  'avoid_shared_prefs_in_isolate',
+  'require_prefs_key_constants',
+  'avoid_prefs_for_large_data',
+  'prefer_typed_prefs_wrapper',
+};
+
+/// Rules specific to the sqflite package.
+const Set<String> sqflitePackageRules = <String>{
+  'avoid_sqflite_type_mismatch',
+  'require_sqflite_migration',
+};
+
+// ---------------------------------------------------------------------------
+// Networking
+// ---------------------------------------------------------------------------
+
+/// Rules specific to the Dio HTTP client package.
+const Set<String> dioPackageRules = <String>{
+  'require_cancel_token',
+  'require_dio_timeout',
+  'require_dio_error_handling',
+  'require_dio_interceptor_error_handler',
+  'prefer_dio_cancel_token',
+  'require_dio_ssl_pinning',
+  'avoid_dio_form_data_leak',
+  'avoid_dio_debug_print_production',
+  'require_dio_singleton',
+  'prefer_dio_base_options',
+  'avoid_dio_without_base_url',
+  'prefer_dio_over_http',
+  'require_dio_response_type',
+  'require_dio_retry_interceptor',
+  'prefer_dio_transformer',
+};
+
+/// Rules specific to the GraphQL package.
+const Set<String> graphqlPackageRules = <String>{
+  'avoid_graphql_string_queries',
+};
+
+/// Rules specific to the Supabase package.
+const Set<String> supabasePackageRules = <String>{
+  'require_supabase_error_handling',
+  'avoid_supabase_anon_key_in_code',
+  'require_supabase_realtime_unsubscribe',
+};
+
+// ---------------------------------------------------------------------------
+// DI & Services
+// ---------------------------------------------------------------------------
+
+/// Rules specific to the get_it dependency injection package.
+const Set<String> getItPackageRules = <String>{
+  'avoid_service_locator_in_widgets',
+  'avoid_too_many_dependencies',
+  'avoid_internal_dependency_creation',
+  'prefer_abstract_dependencies',
+  'avoid_singleton_for_scoped_dependencies',
+  'avoid_circular_di_dependencies',
+  'prefer_null_object_pattern',
+  'require_typed_di_registration',
+  'avoid_functions_in_register_singleton',
+  'require_getit_registration_order',
+  'require_default_config',
+  'prefer_constructor_injection',
+  'require_di_scope_awareness',
+  'avoid_di_in_widgets',
+  'prefer_abstraction_injection',
+  'prefer_lazy_singleton_registration',
+};
+
+/// Rules specific to the workmanager package.
+const Set<String> workmanagerPackageRules = <String>{
+  'require_workmanager_constraints',
+  'require_workmanager_result_return',
+};
+
+// ---------------------------------------------------------------------------
+// UI & Device
+// ---------------------------------------------------------------------------
+
+/// Rules specific to the url_launcher package.
+const Set<String> urlLauncherPackageRules = <String>{
+  'require_url_launcher_can_launch_check',
+  'avoid_url_launcher_simulator_tests',
+  'prefer_url_launcher_fallback',
+  'require_url_launcher_mode',
+  'require_url_launcher_error_handling',
+};
+
+/// Rules specific to the geolocator package.
+const Set<String> geolocatorPackageRules = <String>{
+  'require_geolocator_battery_awareness',
+  'require_geolocator_permission_check',
+  'require_geolocator_service_enabled',
+  'require_geolocator_stream_cancel',
+  'require_geolocator_error_handling',
+  'require_geolocator_timeout',
+  'prefer_geolocator_distance_filter',
+};
+
+/// Rules specific to the QR scanner packages.
+const Set<String> qrScannerPackageRules = <String>{
+  'require_qr_scan_feedback',
+  'avoid_qr_scanner_always_active',
+  'require_qr_content_validation',
+  'require_qr_permission_check',
+};
+
+/// Rules specific to the Flame game engine package.
+const Set<String> flamePackageRules = <String>{
+  'avoid_creating_vector_in_update',
+  'avoid_redundant_async_on_load',
+};
+
+// ---------------------------------------------------------------------------
+// Package rule sets, constants, and filtering
+// ---------------------------------------------------------------------------
+
+/// All package sets keyed by package name.
+///
+/// Each package's effective rules include the package-specific set plus
+/// any shared sets (database) that apply. A rule is disabled only when
+/// ALL packages that contain it are disabled.
+Map<String, Set<String>> get packageRuleSets => {
+      'bloc': blocPackageRules,
+      'provider': providerPackageRules,
+      'riverpod': riverpodPackageRules,
+      'getx': getxPackageRules,
+      'flutter_hooks': flutterHooksPackageRules,
+      'equatable': equatablePackageRules,
+      'freezed': freezedPackageRules,
+      'firebase': firebasePackageRules.union(_databaseSharedRules),
+      'isar': isarPackageRules.union(_databaseSharedRules),
+      'hive': hivePackageRules.union(_databaseSharedRules),
+      'shared_preferences': sharedPreferencesPackageRules,
+      'sqflite': sqflitePackageRules.union(_databaseSharedRules),
+      'dio': dioPackageRules,
+      'graphql': graphqlPackageRules,
+      'supabase': supabasePackageRules,
+      'get_it': getItPackageRules,
+      'workmanager': workmanagerPackageRules,
+      'url_launcher': urlLauncherPackageRules,
+      'geolocator': geolocatorPackageRules,
+      'qr_scanner': qrScannerPackageRules,
+      'flame': flamePackageRules,
+    };
+
+/// All supported package names.
+const List<String> allPackages = <String>[
+  'bloc',
+  'provider',
+  'riverpod',
+  'getx',
+  'flutter_hooks',
+  'equatable',
+  'freezed',
+  'firebase',
+  'isar',
+  'hive',
+  'shared_preferences',
+  'sqflite',
+  'dio',
+  'graphql',
+  'supabase',
+  'get_it',
+  'workmanager',
+  'url_launcher',
+  'geolocator',
+  'qr_scanner',
+  'flame',
+];
+
+/// Default package settings.
+///
+/// All packages are enabled by default for backward compatibility.
+/// Users can disable packages they don't use in
+/// `analysis_options_custom.yaml`.
+const Map<String, bool> defaultPackages = <String, bool>{
+  'bloc': true,
+  'provider': true,
+  'riverpod': true,
+  'getx': true,
+  'flutter_hooks': true,
+  'equatable': true,
+  'freezed': true,
+  'firebase': true,
+  'isar': true,
+  'hive': true,
+  'shared_preferences': true,
+  'sqflite': true,
+  'dio': true,
+  'graphql': true,
+  'supabase': true,
+  'get_it': true,
+  'workmanager': true,
+  'url_launcher': true,
+  'geolocator': true,
+  'qr_scanner': true,
+  'flame': true,
+};
+
+/// Returns the set of rules that should be disabled based on
+/// disabled packages.
+///
+/// A rule is disabled if ALL packages it belongs to are disabled.
+/// If a rule appears in multiple package sets (e.g., a Provider rule
+/// about Equatable is in both sets), it stays enabled as long as at
+/// least one of its packages is enabled.
+///
+/// Rules not in any package set are never affected.
+Set<String> getRulesDisabledByPackages(Map<String, bool> packages) {
+  final disabledPackages =
+      packages.entries.where((e) => !e.value).map((e) => e.key).toSet();
+
+  if (disabledPackages.isEmpty) return const <String>{};
+
+  final enabledPackages =
+      packages.entries.where((e) => e.value).map((e) => e.key).toSet();
+
+  final Set<String> rulesToDisable = <String>{};
+  final sets = packageRuleSets;
+
+  for (final package in disabledPackages) {
+    final rules = sets[package] ?? const <String>{};
+    for (final rule in rules) {
+      // Check if this rule is still relevant via another enabled package
+      bool stillRelevant = false;
+      for (final enabledPackage in enabledPackages) {
+        if (sets[enabledPackage]?.contains(rule) ?? false) {
           stillRelevant = true;
           break;
         }
