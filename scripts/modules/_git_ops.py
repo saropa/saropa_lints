@@ -270,3 +270,33 @@ def create_github_release(
             "and run: gh auth status"
         )
     return False, f"Release failed (exit code {result.returncode})"
+
+
+def post_publish_commit(
+    project_dir: Path, next_version: str, branch: str
+) -> bool:
+    """Commit and push the post-publish version bump."""
+    use_shell = get_shell_mode()
+
+    result = subprocess.run(
+        ["git", "add", "-A"],
+        cwd=project_dir,
+        capture_output=True,
+        text=True,
+        shell=use_shell,
+    )
+    if result.returncode != 0:
+        return False
+
+    result = subprocess.run(
+        ["git", "commit", "-m", f"chore: bump version to {next_version}"],
+        cwd=project_dir,
+        capture_output=True,
+        text=True,
+        shell=use_shell,
+    )
+    if result.returncode != 0:
+        print_warning("Could not commit version bump.")
+        return False
+
+    return _push_with_retry(project_dir, branch)

@@ -157,3 +157,93 @@ def display_changelog(project_dir: Path) -> str | None:
     )
     print()
     return latest_entry
+
+
+def increment_patch_version(version: str) -> str:
+    """Increment the patch version: 4.9.15 -> 4.9.16."""
+    parts = version.split(".")
+    parts[-1] = str(int(parts[-1]) + 1)
+    return ".".join(parts)
+
+
+def has_unreleased_content(changelog_path: Path) -> bool:
+    """Check if [Unreleased] section has bullet point content."""
+    content = changelog_path.read_text(encoding="utf-8")
+    match = re.search(
+        r"## \[Unreleased\]\s*\n(.*?)(?=\n---|\n## \[?\d+)",
+        content,
+        re.DOTALL,
+    )
+    if not match:
+        return False
+    section = match.group(1).strip()
+    return bool(re.search(r"^\s*-\s+", section, re.MULTILINE))
+
+
+def merge_unreleased_into_version(
+    changelog_path: Path, version: str
+) -> bool:
+    """Move [Unreleased] content into the [version] section.
+
+    Renames [Unreleased] to [version] and removes the duplicate
+    old [version] header so content merges into one section.
+    """
+    content = changelog_path.read_text(encoding="utf-8")
+    if not re.search(r"## \[Unreleased\]", content):
+        return False
+
+    # Rename [Unreleased] to [version]
+    content = re.sub(
+        r"## \[Unreleased\]",
+        f"## [{version}]",
+        content,
+        count=1,
+    )
+
+    # Find all ## [version] headers — remove the second (old) one
+    version_escaped = re.escape(version)
+    header_pattern = rf"^## \[{version_escaped}\].*$"
+    headers = list(re.finditer(header_pattern, content, re.MULTILINE))
+
+    if len(headers) >= 2:
+        second_header = headers[1]
+        # Look backwards for the --- separator before this header
+        before = content[: second_header.start()]
+        sep_match = re.search(r"\n---\s*\n$", before)
+
+        remove_start = (
+            sep_match.start() if sep_match else second_header.start()
+        )
+        remove_end = second_header.end()
+
+        # Also consume trailing newline
+        if remove_end < len(content) and content[remove_end] == "\n":
+            remove_end += 1
+
+        content = content[:remove_start] + "\n" + content[remove_end:]
+
+    changelog_path.write_text(content, encoding="utf-8")
+    return True
+
+
+def add_unreleased_section(changelog_path: Path) -> bool:
+    """Add empty [Unreleased] section above the first versioned section.
+
+    Returns:
+        True if section was added, False if it already existed.
+    """
+    content = changelog_path.read_text(encoding="utf-8")
+
+    if re.search(r"## \[Unreleased\]", content):
+        return False
+
+    # Insert before the first ---\n## [version] block
+    content = re.sub(
+        r"(---\n)(## \[?\d+)",
+        r"\1## [Unreleased]\n\n---\n\2",
+        content,
+        count=1,
+    )
+
+    changelog_path.write_text(content, encoding="utf-8")
+    return True
