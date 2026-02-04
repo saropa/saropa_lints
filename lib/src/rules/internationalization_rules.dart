@@ -1541,27 +1541,9 @@ class AvoidManualDateFormattingRule extends SaropaLintRule {
     CustomLintContext context,
   ) {
     context.registry.addStringInterpolation((StringInterpolation node) {
-      int datePropertyCount = 0;
+      final int datePropertyCount = _countDateTimeProperties(node);
 
-      for (final element in node.elements) {
-        if (element is InterpolationExpression) {
-          final expr = element.expression;
-          if (expr is PropertyAccess) {
-            final propertyName = expr.propertyName.name;
-            if (_dateProperties.contains(propertyName)) {
-              datePropertyCount++;
-            }
-          } else if (expr is PrefixedIdentifier) {
-            final propertyName = expr.identifier.name;
-            if (_dateProperties.contains(propertyName)) {
-              datePropertyCount++;
-            }
-          }
-        }
-      }
-
-      // If 2+ date properties are used, it's likely manual date formatting
-      if (datePropertyCount >= 2) {
+      if (datePropertyCount >= 2 && !_isNonDisplayContext(node)) {
         reporter.atNode(node, code);
       }
     });
@@ -1576,6 +1558,82 @@ class AvoidManualDateFormattingRule extends SaropaLintRule {
         reporter.atNode(node, code);
       }
     });
+  }
+
+  /// Counts interpolation expressions that access DateTime properties.
+  static int _countDateTimeProperties(StringInterpolation node) {
+    int count = 0;
+
+    for (final element in node.elements) {
+      if (element is InterpolationExpression) {
+        final expr = element.expression;
+        String? propertyName;
+        String? targetTypeName;
+
+        if (expr is PropertyAccess) {
+          propertyName = expr.propertyName.name;
+          targetTypeName = expr.target?.staticType?.getDisplayString();
+        } else if (expr is PrefixedIdentifier) {
+          propertyName = expr.identifier.name;
+          targetTypeName = expr.prefix.staticType?.getDisplayString();
+        }
+
+        if (propertyName != null &&
+            _dateProperties.contains(propertyName) &&
+            _isDateTimeName(targetTypeName)) {
+          count++;
+        }
+      }
+    }
+
+    return count;
+  }
+
+  /// Returns true if [typeName] is DateTime (or unknown).
+  ///
+  /// Unknown types (null) are treated as potentially DateTime to avoid
+  /// false negatives when static type information is unavailable.
+  static bool _isDateTimeName(String? typeName) {
+    if (typeName == null) return true;
+    return typeName == 'DateTime' || typeName == 'DateTime?';
+  }
+
+  /// Returns true if the string is used in a non-display context such as
+  /// a map key, cache key, or internal identifier.
+  static bool _isNonDisplayContext(StringInterpolation node) {
+    final parent = node.parent;
+
+    // Used as a map subscript: map['${d.year}-${d.month}']
+    if (parent is IndexExpression && parent.index == node) return true;
+
+    // Assigned to a variable with an internal-use name
+    if (parent is VariableDeclaration) {
+      final varName = parent.name.lexeme.toLowerCase();
+      if (varName.contains('key') ||
+          varName.contains('cache') ||
+          varName.contains('tag') ||
+          varName.contains('hash') ||
+          varName.contains('bucket') ||
+          varName.contains('identifier')) {
+        return true;
+      }
+    }
+
+    // Passed as argument to map lookup/mutation methods
+    if (parent is ArgumentList) {
+      final grandparent = parent.parent;
+      if (grandparent is MethodInvocation) {
+        const Set<String> mapMethods = <String>{
+          'putIfAbsent',
+          'containsKey',
+          'containsValue',
+          'remove',
+        };
+        if (mapMethods.contains(grandparent.methodName.name)) return true;
+      }
+    }
+
+    return false;
   }
 }
 
