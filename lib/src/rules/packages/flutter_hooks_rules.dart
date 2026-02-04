@@ -11,7 +11,7 @@ import 'package:analyzer/dart/ast/visitor.dart';
 import 'package:analyzer/error/error.dart' show DiagnosticSeverity;
 import 'package:custom_lint_builder/custom_lint_builder.dart';
 
-import '../saropa_lint_rule.dart';
+import '../../saropa_lint_rule.dart';
 
 // =============================================================================
 // FLUTTER HOOKS RULES
