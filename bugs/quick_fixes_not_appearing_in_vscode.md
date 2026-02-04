@@ -16,7 +16,7 @@ Only the quick fix suggestions are missing.
 ## Environment
 
 - **Test project**: `D:\src\contacts` (Flutter app using saropa_lints as path dependency)
-- **saropa_lints version**: 4.9.18 (project is at 4.9.21)
+- **saropa_lints version**: 4.9.18 (project is at 4.10.0)
 - **custom_lint / custom_lint_builder**: 0.8.1
 - **analyzer**: 8.1.1 (contacts) / 8.4.0 (saropa_lints)
 - **Dart SDK**: 3.10.8
