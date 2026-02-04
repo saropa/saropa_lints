@@ -7,7 +7,8 @@
 library;
 
 import 'package:analyzer/dart/ast/ast.dart';
-import 'package:analyzer/error/error.dart' show DiagnosticSeverity;
+import 'package:analyzer/error/error.dart'
+    show AnalysisError, DiagnosticSeverity;
 import 'package:custom_lint_builder/custom_lint_builder.dart';
 
 import '../saropa_lint_rule.dart';
@@ -85,6 +86,38 @@ class AvoidFreezedJsonSerializableConflictRule extends SaropaLintRule {
       }
     });
   }
+
+  @override
+  List<Fix> getFixes() => [_RemoveJsonSerializableFix()];
+}
+
+class _RemoveJsonSerializableFix extends DartFix {
+  @override
+  void run(
+    CustomLintResolver resolver,
+    ChangeReporter reporter,
+    CustomLintContext context,
+    AnalysisError analysisError,
+    List<AnalysisError> others,
+  ) {
+    context.registry.addClassDeclaration((ClassDeclaration node) {
+      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
+
+      for (final annotation in node.metadata) {
+        if (annotation.name.name.toLowerCase() != 'jsonserializable') continue;
+
+        final changeBuilder = reporter.createChangeBuilder(
+          message: 'Remove @JsonSerializable()',
+          priority: 80,
+        );
+
+        changeBuilder.addDartFileEdit((builder) {
+          builder.addDeletion(annotation.sourceRange);
+        });
+        return;
+      }
+    });
+  }
 }
 
 // cspell:ignore freezed_fromjson_syntax
@@ -158,6 +191,56 @@ class RequireFreezedArrowSyntaxRule extends SaropaLintRule {
             reporter.atNode(member, code);
           }
         }
+      }
+    });
+  }
+
+  @override
+  List<Fix> getFixes() => [_ConvertToArrowSyntaxFix()];
+}
+
+class _ConvertToArrowSyntaxFix extends DartFix {
+  @override
+  void run(
+    CustomLintResolver resolver,
+    ChangeReporter reporter,
+    CustomLintContext context,
+    AnalysisError analysisError,
+    List<AnalysisError> others,
+  ) {
+    context.registry.addClassDeclaration((ClassDeclaration node) {
+      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
+
+      for (final member in node.members) {
+        if (member is! ConstructorDeclaration) continue;
+        if (member.factoryKeyword == null) continue;
+        if (member.name?.lexeme != 'fromJson') continue;
+        if (!member.sourceRange.intersects(analysisError.sourceRange)) continue;
+
+        final body = member.body;
+        if (body is! BlockFunctionBody) continue;
+
+        final block = body.block;
+        if (block.statements.length != 1) continue;
+
+        final statement = block.statements.first;
+        if (statement is! ReturnStatement) continue;
+
+        final expression = statement.expression;
+        if (expression == null) continue;
+
+        final changeBuilder = reporter.createChangeBuilder(
+          message: 'Convert to arrow syntax',
+          priority: 80,
+        );
+
+        changeBuilder.addDartFileEdit((builder) {
+          builder.addSimpleReplacement(
+            body.sourceRange,
+            '=> ${expression.toSource()};',
+          );
+        });
+        return;
       }
     });
   }
@@ -248,6 +331,38 @@ class RequireFreezedPrivateConstructorRule extends SaropaLintRule {
       if (!hasPrivateConstructor && hasCustomMethods) {
         reporter.atNode(node, code);
       }
+    });
+  }
+
+  @override
+  List<Fix> getFixes() => [_AddPrivateConstructorFix()];
+}
+
+class _AddPrivateConstructorFix extends DartFix {
+  @override
+  void run(
+    CustomLintResolver resolver,
+    ChangeReporter reporter,
+    CustomLintContext context,
+    AnalysisError analysisError,
+    List<AnalysisError> others,
+  ) {
+    context.registry.addClassDeclaration((ClassDeclaration node) {
+      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
+
+      final className = node.name.lexeme;
+
+      final changeBuilder = reporter.createChangeBuilder(
+        message: 'Add const $className._()',
+        priority: 80,
+      );
+
+      changeBuilder.addDartFileEdit((builder) {
+        builder.addSimpleInsertion(
+          node.leftBracket.end,
+          '\n  const $className._();',
+        );
+      });
     });
   }
 }
