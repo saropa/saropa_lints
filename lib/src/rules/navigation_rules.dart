@@ -1773,7 +1773,7 @@ class PreferGoRouterRedirectAuthRule extends SaropaLintRule {
     problemMessage:
         '[prefer_go_router_redirect_auth] Authentication check detected inside a GoRoute builder instead of the router-level redirect callback. Scattering auth logic across individual page builders duplicates code, creates inconsistent enforcement, and allows new routes to accidentally skip authentication.',
     correctionMessage:
-        'Move authentication logic to GoRouter\'s redirect parameter so all routes are protected by a single, centralized auth check that runs before any page builder executes.',
+        'Move authentication logic to the GoRouter redirect parameter so all routes are protected by a single, centralized auth check that runs before any page builder executes.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 

@@ -820,7 +820,7 @@ class PreferIntlNameRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_intl_name',
     problemMessage:
-        '[prefer_intl_name] Intl.message without name parameter. The name parameter is required for message extraction tools and enables proper identification of messages across the codebase.',
+        '[prefer_intl_name] Intl.message without name parameter. Message extraction tools require the name parameter to identify and track translatable strings across the codebase.',
     correctionMessage:
         'Add name parameter for message extraction tools. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,

@@ -266,7 +266,7 @@ class PreferAbsoluteImportsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_absolute_imports',
     problemMessage:
-        '[prefer_absolute_imports] Relative import detected where an absolute package import should be used. Absolute imports provide a canonical path that avoids breakage when files are moved and improves cross-file searchability.',
+        '[prefer_absolute_imports] Relative import detected instead of the preferred absolute package import. Absolute imports provide a canonical path that avoids breakage when files are moved and improves cross-file searchability.',
     correctionMessage:
         'Replace relative imports with absolute package: imports so every file references the same canonical path.',
     errorSeverity: DiagnosticSeverity.INFO,
