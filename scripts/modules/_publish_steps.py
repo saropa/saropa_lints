@@ -364,8 +364,8 @@ def run_analysis(project_dir: Path) -> bool:
 def validate_changelog(
     project_dir: Path, version: str
 ) -> tuple[bool, str]:
-    """Step 8: Validate version in CHANGELOG and get release notes."""
-    print_header("STEP 8: VALIDATING CHANGELOG")
+    """Step 9: Validate version in CHANGELOG and get release notes."""
+    print_header("STEP 9: VALIDATING CHANGELOG")
 
     release_notes = validate_changelog_version(project_dir, version)
     if release_notes is None:
@@ -394,15 +394,15 @@ def validate_changelog(
 
 
 def generate_docs(project_dir: Path) -> bool:
-    """Step 9: Generate documentation."""
-    print_header("STEP 9: GENERATING DOCUMENTATION")
+    """Step 10: Generate documentation."""
+    print_header("STEP 10: GENERATING DOCUMENTATION")
     result = run_command(["dart", "doc"], project_dir, "Generating docs")
     return result.returncode == 0
 
 
 def pre_publish_validation(project_dir: Path) -> bool:
-    """Step 10: Run dart pub publish --dry-run."""
-    print_header("STEP 10: PRE-PUBLISH VALIDATION")
+    """Step 11: Run dart pub publish --dry-run."""
+    print_header("STEP 11: PRE-PUBLISH VALIDATION")
 
     print_info("Running 'dart pub publish --dry-run'...")
     use_shell = get_shell_mode()

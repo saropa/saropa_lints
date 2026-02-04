@@ -76,8 +76,8 @@ def tag_exists_on_remote(project_dir: Path, tag_name: str) -> bool:
 def git_commit_and_push(
     project_dir: Path, version: str, branch: str
 ) -> bool:
-    """Step 10: Commit changes and push to remote."""
-    print_header("STEP 10: COMMITTING CHANGES")
+    """Step 12: Commit changes and push to remote."""
+    print_header("STEP 12: COMMITTING CHANGES")
 
     tag_name = f"v{version}"
     use_shell = get_shell_mode()
@@ -164,8 +164,8 @@ def _push_with_retry(
 
 
 def create_git_tag(project_dir: Path, version: str) -> bool:
-    """Step 11: Create and push git tag."""
-    print_header("STEP 11: CREATING GIT TAG")
+    """Step 13: Create and push git tag."""
+    print_header("STEP 13: CREATING GIT TAG")
 
     tag_name = f"v{version}"
     use_shell = get_shell_mode()
@@ -219,8 +219,8 @@ def create_git_tag(project_dir: Path, version: str) -> bool:
 
 
 def publish_to_pubdev_step(project_dir: Path) -> bool:
-    """Step 12: Notify that publishing happens via GitHub Actions."""
-    print_header("STEP 12: PUBLISHING TO PUB.DEV VIA GITHUB ACTIONS")
+    """Step 14: Notify that publishing happens via GitHub Actions."""
+    print_header("STEP 14: PUBLISHING TO PUB.DEV VIA GITHUB ACTIONS")
 
     print_success(
         "Tag push triggered GitHub Actions publish workflow!"
@@ -243,8 +243,8 @@ def publish_to_pubdev_step(project_dir: Path) -> bool:
 def create_github_release(
     project_dir: Path, version: str, release_notes: str
 ) -> tuple[bool, str | None]:
-    """Step 13: Create GitHub release."""
-    print_header("STEP 13: CREATING GITHUB RELEASE")
+    """Step 15: Create GitHub release."""
+    print_header("STEP 15: CREATING GITHUB RELEASE")
 
     tag_name = f"v{version}"
     use_shell = get_shell_mode()
