@@ -13,6 +13,10 @@ Dates are not included in version headers — [pub.dev](https://pub.dev/packages
 ---
 ## [4.9.21]
 
+### Fixed
+
+- **Removed duplicate rule `prefer_async_only_when_awaiting`**: This rule detected the same issue as `avoid_redundant_async` (async function without await), causing duplicate diagnostics. The quick fix has been ported to `avoid_redundant_async`, which has broader detection scope and more robust await detection.
+
 ### Added
 
 - **7 new quick fixes for dialog, freezed, and accessibility rules**:

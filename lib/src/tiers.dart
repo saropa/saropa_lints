@@ -142,7 +142,6 @@ const Set<String> stylisticRules = <String>{
 
   // === Opinionated prefer_* rules (conflicting/stylistic - opt-in only) ===
   'prefer_addall_over_spread',
-  'prefer_async_only_when_awaiting',
   'prefer_await_over_then',
   'prefer_blank_line_after_declarations',
   'prefer_blank_lines_between_members',
@@ -2115,7 +2114,7 @@ const Set<String> professionalOnlyRules = <String>{
   'prefer_any_or_every',
   // 'prefer_arrow_functions' moved to stylisticRules (opinionated)
   'prefer_async_await',
-  // 'prefer_async_only_when_awaiting' moved to stylisticRules (opinionated)
+  // 'prefer_async_only_when_awaiting' removed (duplicate of avoid_redundant_async)
   'prefer_audio_session_config',
   // 'prefer_await_over_then' moved to stylisticRules (opinionated)
   // 'prefer_blank_line_after_declarations' moved to stylisticRules (opinionated)
