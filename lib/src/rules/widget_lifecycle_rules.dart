@@ -3649,25 +3649,30 @@ class _AddFocusNodeDisposeFix extends DartFix {
   }
 }
 
-/// Suggests using Theme.textTheme instead of hardcoded TextStyle.
+/// Warns when InheritedWidget is missing updateShouldNotify.
 ///
-/// Hardcoded text styles make it difficult to maintain consistent
-/// typography and support theming/dark mode.
+/// Without updateShouldNotify, dependent widgets rebuild on every
+/// ancestor rebuild, even when the inherited data has not changed.
 ///
 /// **BAD:**
 /// ```dart
-/// Text(
-///   'Hello',
-///   style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-/// )
+/// class MyInherited extends InheritedWidget {
+///   final int value;
+///   const MyInherited({required this.value, required super.child});
+///   // Missing updateShouldNotify — causes unnecessary rebuilds.
+/// }
 /// ```
 ///
 /// **GOOD:**
 /// ```dart
-/// Text(
-///   'Hello',
-///   style: Theme.of(context).textTheme.headlineLarge,
-/// )
+/// class MyInherited extends InheritedWidget {
+///   final int value;
+///   const MyInherited({required this.value, required super.child});
+///
+///   @override
+///   bool updateShouldNotify(MyInherited oldWidget) =>
+///       value != oldWidget.value;
+/// }
 /// ```
 
 class RequireShouldRebuildRule extends SaropaLintRule {
