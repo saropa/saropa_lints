@@ -1785,7 +1785,7 @@ class PreferOnFieldSubmittedRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_on_field_submitted',
     problemMessage:
-        '[prefer_on_field_submitted] Form field must have onFieldSubmitted to handle keyboard action. The onFieldSubmitted callback is triggered when the user presses the keyboard action button (e.g., Done, Next). This must be used to move focus to the next field or submit the form to improve UX.',
+        '[prefer_on_field_submitted] Form field must have onFieldSubmitted to handle keyboard action. This callback fires when the user presses the keyboard action button (e.g., Done, Next). Add it to move focus to the next field or submit the form for a smooth keyboard-driven workflow.',
     correctionMessage:
         'Add onFieldSubmitted: (_) => nextFocusNode.requestFocus() or submit. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,

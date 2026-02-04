@@ -411,7 +411,7 @@ class RequireFreezedExplicitJsonRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_freezed_explicit_json',
     problemMessage:
-        '[require_freezed_explicit_json] Freezed class with nested objects may need explicit_to_json in build.yaml. When using Freezed with nested objects, explicit_to_json: true is required in build.yaml to ensure proper JSON serialization of nested objects. Without it, nested objects may not serialize correctly.',
+        '[require_freezed_explicit_json] Freezed class with nested objects may need explicit_to_json in build.yaml. Freezed requires explicit_to_json: true in build.yaml to correctly serialize nested objects into JSON. Without this setting, nested toJson() calls produce Instance-of strings instead of actual JSON data.',
     correctionMessage:
         'Add explicit_to_json: true to build.yaml under json_serializable options. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
