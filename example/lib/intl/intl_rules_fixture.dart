@@ -127,6 +127,23 @@ void testManualDateFormatting() {
   // GOOD: Single date property (not formatting)
   final day = date.day;
   final month = date.month;
+
+  // GOOD: Map key from DateTime properties (non-display context)
+  final Map<String, int> counts = <String, int>{};
+  final String monthKey = '${date.year}-${date.month}';
+  counts[monthKey] = 42;
+
+  // GOOD: Direct map subscript with DateTime properties
+  counts['${date.year}-${date.month}'] = 42;
+
+  // GOOD: Cache key variable name
+  final String cacheKey = '${date.year}-${date.month}-${date.day}';
+
+  // GOOD: Used with putIfAbsent
+  counts.putIfAbsent('${date.year}-${date.month}', () => 0);
+
+  // GOOD: Used with containsKey
+  counts.containsKey('${date.year}-${date.month}');
 }
 
 // =========================================================================
