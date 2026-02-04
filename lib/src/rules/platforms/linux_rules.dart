@@ -486,7 +486,7 @@ class _AddFontFallbackFix extends DartFix {
 /// await Process.run('flatpak', ['install', 'com.example.App']);
 /// ```
 ///
-/// **OWASP:** [M1:Improper-Platform-Usage]
+/// **OWASP:** `M1:Improper-Platform-Usage`
 class AvoidSudoShellCommandsRule extends SaropaLintRule {
   /// Creates a new instance of [AvoidSudoShellCommandsRule].
   const AvoidSudoShellCommandsRule() : super(code: _code);

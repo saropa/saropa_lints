@@ -3647,26 +3647,43 @@ class PreferStreamDistinctRule extends SaropaLintRule {
     context.registry.addMethodInvocation((MethodInvocation node) {
       if (node.methodName.name != 'listen') return;
 
-      // Check if the stream type
       final targetType = node.target?.staticType;
       if (targetType == null) return;
+      if (targetType is! InterfaceType) return;
 
-      final typeName = targetType.getDisplayString();
-      if (!typeName.contains('Stream')) return;
+      // Verify this is actually a Stream type
+      if (targetType.element.name != 'Stream') return;
 
-      // Check if .distinct() is in the chain
-      final target = node.target;
-      if (target is MethodInvocation) {
-        if (target.methodName.name == 'distinct') {
-          return; // Already has distinct
-        }
-      }
+      // Skip Stream<void> and Stream<Null> — .distinct() would suppress
+      // all events after the first since every value is equal.
+      if (_hasVoidOrNullTypeArg(targetType)) return;
+
+      // Walk the full method chain to find .distinct() at any position
+      if (_chainHasDistinct(node.target)) return;
 
       // Check if this is inside a setState callback (UI context)
       if (_hasSetStateInListener(node)) {
         reporter.atNode(node, code);
       }
     });
+  }
+
+  /// Returns true if [type] has a single type argument that is void or Null.
+  bool _hasVoidOrNullTypeArg(InterfaceType type) {
+    final typeArgs = type.typeArguments;
+    if (typeArgs.length != 1) return false;
+    final arg = typeArgs.first;
+    return arg is VoidType || arg.isDartCoreNull;
+  }
+
+  /// Walks the method invocation chain to find .distinct() at any position.
+  bool _chainHasDistinct(Expression? target) {
+    Expression? current = target;
+    while (current is MethodInvocation) {
+      if (current.methodName.name == 'distinct') return true;
+      current = current.target;
+    }
+    return false;
   }
 
   bool _hasSetStateInListener(MethodInvocation listenNode) {

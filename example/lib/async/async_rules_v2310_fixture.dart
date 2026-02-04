@@ -1,5 +1,6 @@
 // ignore_for_file: unused_local_variable, unused_element, unawaited_futures
 // ignore_for_file: avoid_print, unused_field, avoid_types_on_closure_parameters
+// ignore_for_file: use_of_void_result
 // Test fixture for async rules added in v2.3.10
 
 import 'dart:async';
@@ -130,6 +131,40 @@ class _StreamTestWidgetState extends State<StreamTestWidget> {
 
     // expect_lint: prefer_stream_distinct
     _controller.stream.listen((value) {
+      setState(() {});
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) => Container();
+}
+
+class StreamDistinctFalsePositiveWidget extends StatefulWidget {
+  const StreamDistinctFalsePositiveWidget({super.key});
+
+  @override
+  State<StreamDistinctFalsePositiveWidget> createState() =>
+      _StreamDistinctFalsePositiveWidgetState();
+}
+
+class _StreamDistinctFalsePositiveWidgetState
+    extends State<StreamDistinctFalsePositiveWidget> {
+  @override
+  void initState() {
+    super.initState();
+
+    // OK: Stream<void>.periodic — .distinct() would break the timer
+    Stream<void>.periodic(const Duration(seconds: 1)).listen((_) {
+      setState(() {});
+    });
+
+    // OK: .distinct() already present in chain before .map()
+    StreamController<int>().stream.distinct().map((v) => v + 1).listen((v) {
+      setState(() {});
+    });
+
+    // OK: .distinct() already present in chain before .where()
+    StreamController<int>().stream.distinct().where((v) => v > 0).listen((v) {
       setState(() {});
     });
   }

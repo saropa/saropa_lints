@@ -1,6 +1,7 @@
 // ignore_for_file: depend_on_referenced_packages, deprecated_member_use
 
 import 'package:analyzer/dart/ast/ast.dart';
+import 'package:analyzer/dart/element/nullability_suffix.dart';
 import 'package:analyzer/error/error.dart'
     show AnalysisError, DiagnosticSeverity;
 import 'package:custom_lint_builder/custom_lint_builder.dart';
@@ -1403,9 +1404,16 @@ class PreferImplicitBooleanComparisonRule extends SaropaLintRule {
       if (node.operator.lexeme != '==' && node.operator.lexeme != '!=') return;
 
       final right = node.rightOperand;
-      if (right is BooleanLiteral) {
-        reporter.atNode(node, code);
+      if (right is! BooleanLiteral) return;
+
+      // Skip nullable booleans — explicit comparison is semantically necessary
+      final leftType = node.leftOperand.staticType;
+      if (leftType == null ||
+          leftType.nullabilitySuffix != NullabilitySuffix.none) {
+        return;
       }
+
+      reporter.atNode(node, code);
     });
   }
 }
