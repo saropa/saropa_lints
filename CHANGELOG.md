@@ -11,6 +11,15 @@ Dates are not included in version headers — [pub.dev](https://pub.dev/packages
 ** See the current published changelog: [saropa_lints/changelog](https://pub.dev/packages/saropa_lints/changelog)
 
 ---
+## [4.9.19]
+
+### Fixed
+
+- **`require_did_update_widget_check` reduced false positives**: Rule now recognises function-based comparisons (`listEquals`, `setEquals`, `mapEquals`, `identical`, `DeepCollectionEquality().equals`) as valid property-change checks. Previously the regex only matched `oldWidget` adjacent to `!=`/`==` operators, so standard Flutter collection comparisons were falsely flagged.
+- **`prefer_const_widgets_in_lists` reduced false positives**: Two fixes — (1) rule now verifies list elements are actually `Widget` subclasses instead of treating any `InstanceCreationExpression` as a widget, eliminating false positives on `List<Color>`, `List<Offset>`, `List<EdgeInsets>`, and other non-widget types with const constructors; (2) rule now recognises implicitly const lists inside `static const` fields, `const` variable declarations, enum bodies, annotations, and const constructor calls, instead of only checking for an explicit `const` keyword on the list literal itself.
+- **`avoid_positioned_outside_stack` / `avoid_table_cell_outside_table` / `avoid_spacer_in_wrap` reduced false positives in builder callbacks**: `_findWidgetAncestor` now treats named-parameter callbacks (e.g. `BlocBuilder.builder`, `StreamBuilder.builder`, `Builder.builder`, `LayoutBuilder.builder`) as indeterminate boundaries. Previously the AST walk crossed callback boundaries and incorrectly flagged widgets whose runtime parent depends on the call site, not the builder widget itself. Also applied the same fix to the inline ancestor walk in `avoid_flex_child_outside_flex`.
+
+---
 ## [4.9.18]
 
 ### Fixed

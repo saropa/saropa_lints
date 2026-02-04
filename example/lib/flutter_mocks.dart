@@ -40,6 +40,7 @@ abstract class State<T extends StatefulWidget> {
   void setState(void Function() fn) {}
   void dispose() {}
   void initState() {}
+  void didUpdateWidget(T oldWidget) {}
   Widget build(BuildContext context);
 }
 
@@ -814,6 +815,40 @@ class ChangeNotifierProxyProvider<T, R extends ChangeNotifier> extends Widget {
 }
 
 // ============================================================================
+// Builder widgets (mock for builder-callback tests)
+// ============================================================================
+
+class Builder extends Widget {
+  const Builder({super.key, required Widget Function(BuildContext) builder});
+}
+
+class StreamBuilder<T> extends Widget {
+  const StreamBuilder({
+    super.key,
+    Stream<T>? stream,
+    required Widget Function(BuildContext, AsyncSnapshot<T>) builder,
+  });
+}
+
+class AsyncSnapshot<T> {
+  const AsyncSnapshot();
+}
+
+class BlocBuilder<B, S> extends Widget {
+  const BlocBuilder({
+    super.key,
+    required Widget Function(BuildContext, S) builder,
+  });
+}
+
+class LayoutBuilder extends Widget {
+  const LayoutBuilder({
+    super.key,
+    required Widget Function(BuildContext, BoxConstraints) builder,
+  });
+}
+
+// ============================================================================
 // freezed annotation (mock for v4.1.4 rules)
 // ============================================================================
 
@@ -831,3 +866,11 @@ class WidgetsBinding {
   static WidgetsBinding get instance => WidgetsBinding();
   void addPostFrameCallback(void Function(Duration) callback) {}
 }
+
+// ============================================================================
+// Collection comparison functions (from foundation.dart)
+// ============================================================================
+
+bool listEquals<T>(List<T>? a, List<T>? b) => a == b;
+bool setEquals<T>(Set<T>? a, Set<T>? b) => a == b;
+bool mapEquals<K, V>(Map<K, V>? a, Map<K, V>? b) => a == b;
