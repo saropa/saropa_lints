@@ -6,6 +6,7 @@ import 'package:analyzer/dart/ast/visitor.dart';
 import 'package:analyzer/dart/element/type.dart';
 import 'package:analyzer/error/error.dart'
     show AnalysisError, DiagnosticSeverity;
+import 'package:analyzer/source/source_range.dart';
 import 'package:custom_lint_builder/custom_lint_builder.dart';
 
 import '../saropa_lint_rule.dart';
@@ -388,6 +389,9 @@ class AvoidRedundantAsyncRule extends SaropaLintRule {
     }
   }
 
+  @override
+  List<Fix> getFixes() => <Fix>[_AvoidRedundantAsyncFix()];
+
   bool _containsAwait(AstNode node) {
     bool found = false;
     node.visitChildren(
@@ -408,6 +412,37 @@ class _AwaitFinder extends RecursiveAstVisitor<void> {
   void visitAwaitExpression(AwaitExpression node) {
     onFound(node);
     super.visitAwaitExpression(node);
+  }
+}
+
+class _AvoidRedundantAsyncFix extends DartFix {
+  @override
+  void run(
+    CustomLintResolver resolver,
+    ChangeReporter reporter,
+    CustomLintContext context,
+    AnalysisError analysisError,
+    List<AnalysisError> others,
+  ) {
+    context.registry.addFunctionBody((FunctionBody node) {
+      if (!analysisError.sourceRange.intersects(node.sourceRange)) return;
+      if (!node.isAsynchronous) return;
+
+      final changeBuilder = reporter.createChangeBuilder(
+        message: 'Remove async keyword',
+        priority: 80,
+      );
+
+      changeBuilder.addDartFileEdit((builder) {
+        final keyword = node.keyword;
+        if (keyword != null && keyword.lexeme == 'async') {
+          // Remove 'async ' (including the trailing space)
+          builder.addDeletion(
+            SourceRange(keyword.offset, keyword.length + 1),
+          );
+        }
+      });
+    });
   }
 }
 

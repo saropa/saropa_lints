@@ -926,7 +926,6 @@ final List<LintRule Function()> _allRuleFactories = <LintRule Function()>[
   PreferChainedOverCascadeRule.new,
   PreferExhaustiveEnumsRule.new,
   PreferDefaultEnumCaseRule.new,
-  PreferAsyncOnlyWhenAwaitingRule.new,
   PreferAwaitOverThenRule.new,
   PreferThenOverAwaitRule.new,
   PreferSyncOverAsyncWhereSimpleRule.new,
