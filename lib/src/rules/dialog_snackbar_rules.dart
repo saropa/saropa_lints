@@ -1,5 +1,6 @@
 import 'package:analyzer/dart/ast/ast.dart';
-import 'package:analyzer/error/error.dart' show DiagnosticSeverity;
+import 'package:analyzer/error/error.dart'
+    show AnalysisError, DiagnosticSeverity;
 import 'package:custom_lint_builder/custom_lint_builder.dart';
 import 'package:saropa_lints/src/saropa_lint_rule.dart';
 
@@ -70,6 +71,46 @@ class RequireSnackbarDurationRule extends SaropaLintRule {
       }
     });
   }
+
+  @override
+  List<Fix> getFixes() => [_AddDurationFix()];
+}
+
+class _AddDurationFix extends DartFix {
+  @override
+  void run(
+    CustomLintResolver resolver,
+    ChangeReporter reporter,
+    CustomLintContext context,
+    AnalysisError analysisError,
+    List<AnalysisError> others,
+  ) {
+    context.registry.addInstanceCreationExpression((
+      InstanceCreationExpression node,
+    ) {
+      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
+
+      final changeBuilder = reporter.createChangeBuilder(
+        message: 'Add duration: const Duration(seconds: 4)',
+        priority: 80,
+      );
+
+      changeBuilder.addDartFileEdit((builder) {
+        final args = node.argumentList;
+        if (args.arguments.isEmpty) {
+          builder.addSimpleInsertion(
+            args.leftParenthesis.end,
+            'duration: const Duration(seconds: 4)',
+          );
+        } else {
+          builder.addSimpleInsertion(
+            args.arguments.last.end,
+            ', duration: const Duration(seconds: 4)',
+          );
+        }
+      });
+    });
+  }
 }
 
 /// Warns when showDialog is called without explicit barrierDismissible.
@@ -136,6 +177,44 @@ class RequireDialogBarrierDismissibleRule extends SaropaLintRule {
       if (!hasBarrierDismissible) {
         reporter.atNode(node.methodName, code);
       }
+    });
+  }
+
+  @override
+  List<Fix> getFixes() => [_AddBarrierDismissibleFix()];
+}
+
+class _AddBarrierDismissibleFix extends DartFix {
+  @override
+  void run(
+    CustomLintResolver resolver,
+    ChangeReporter reporter,
+    CustomLintContext context,
+    AnalysisError analysisError,
+    List<AnalysisError> others,
+  ) {
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
+
+      final changeBuilder = reporter.createChangeBuilder(
+        message: 'Add barrierDismissible: false',
+        priority: 80,
+      );
+
+      changeBuilder.addDartFileEdit((builder) {
+        final args = node.argumentList;
+        if (args.arguments.isEmpty) {
+          builder.addSimpleInsertion(
+            args.leftParenthesis.end,
+            'barrierDismissible: false',
+          );
+        } else {
+          builder.addSimpleInsertion(
+            args.arguments.last.end,
+            ', barrierDismissible: false',
+          );
+        }
+      });
     });
   }
 }
@@ -398,6 +477,38 @@ class PreferAdaptiveDialogRule extends SaropaLintRule {
       }
 
       reporter.atNode(node.constructorName, code);
+    });
+  }
+
+  @override
+  List<Fix> getFixes() => [_UseAdaptiveDialogFix()];
+}
+
+class _UseAdaptiveDialogFix extends DartFix {
+  @override
+  void run(
+    CustomLintResolver resolver,
+    ChangeReporter reporter,
+    CustomLintContext context,
+    AnalysisError analysisError,
+    List<AnalysisError> others,
+  ) {
+    context.registry.addInstanceCreationExpression((
+      InstanceCreationExpression node,
+    ) {
+      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
+
+      final changeBuilder = reporter.createChangeBuilder(
+        message: 'Use AlertDialog.adaptive()',
+        priority: 80,
+      );
+
+      changeBuilder.addDartFileEdit((builder) {
+        builder.addSimpleReplacement(
+          node.constructorName.sourceRange,
+          'AlertDialog.adaptive',
+        );
+      });
     });
   }
 }
