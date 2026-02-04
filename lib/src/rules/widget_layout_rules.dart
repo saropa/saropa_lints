@@ -416,21 +416,24 @@ class AvoidSingleChildColumnRowRule extends SaropaLintRule {
         if (arg is NamedExpression && arg.name.label.name == 'children') {
           final Expression value = arg.expression;
           if (value is ListLiteral) {
-            // Only flag if there's exactly one non-spread element
-            // Spread operators can expand to multiple children at runtime
-            int nonSpreadCount = 0;
-            bool hasSpread = false;
+            // Only flag if there's exactly one static element and no
+            // dynamic elements. Spreads, collection-if, and collection-for
+            // can all produce varying child counts at runtime.
+            int staticCount = 0;
+            bool hasDynamicElement = false;
 
             for (final CollectionElement element in value.elements) {
-              if (element is SpreadElement) {
-                hasSpread = true;
+              if (element is SpreadElement ||
+                  element is IfElement ||
+                  element is ForElement) {
+                hasDynamicElement = true;
               } else {
-                nonSpreadCount++;
+                staticCount++;
               }
             }
 
-            // Only report if: single non-spread element AND no spreads
-            if (nonSpreadCount == 1 && !hasSpread) {
+            // Only report if: single static element AND no dynamic elements
+            if (staticCount == 1 && !hasDynamicElement) {
               reporter.atNode(node.constructorName, code);
             }
           }
@@ -6176,6 +6179,21 @@ class AvoidStackWithoutPositionedRule extends SaropaLintRule {
 /// Expanded and Flexible only work inside Flex widgets (Row, Column, Flex).
 /// Using them elsewhere causes runtime errors.
 ///
+/// ## Why This Crashes
+///
+/// Expanded, Flexible, and Spacer work by writing `FlexParentData` onto their
+/// child's render object. Only `RenderFlex` — the render object behind Row,
+/// Column, and Flex — reads that data during layout. Every other parent render
+/// object either ignores or rejects it. When Flutter detects the mismatch it
+/// throws an unrecoverable `ParentDataWidget` error that cannot be caught by
+/// try-catch.
+///
+/// The most dangerous variant is when a reusable widget returns Expanded from
+/// its `build()` method. The widget appears to work when placed directly in a
+/// Row, but the moment anyone wraps it — with Padding, LimitedBox,
+/// GestureDetector, or any other widget — the Flex→Expanded parent chain
+/// breaks and the app crashes at runtime.
+///
 /// **BAD - Inside non-Flex container:**
 /// ```dart
 /// Stack(
@@ -6261,9 +6279,19 @@ class AvoidExpandedOutsideFlexRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_expanded_outside_flex',
     problemMessage:
-        '[avoid_expanded_outside_flex] Expanded without Row/Column parent '
-        'throws FlutterError, crashing the app at runtime.',
-    correctionMessage: 'Use Expanded only inside Row, Column, or Flex.',
+        '[avoid_expanded_outside_flex] Expanded, Flexible, and Spacer set '
+        'FlexParentData on their child, which only RenderFlex (Row, Column, '
+        'Flex) can read during layout. Placing them inside any other parent '
+        '— Stack, Center, Padding, LimitedBox, SizedBox, etc. — throws an '
+        'unrecoverable "Incorrect use of ParentDataWidget" FlutterError at '
+        'runtime. This also happens indirectly when a widget\'s build() '
+        'returns Expanded and the widget is later wrapped by a non-Flex '
+        'container, breaking the Flex→Expanded parent chain.',
+    correctionMessage:
+        'Move Expanded/Flexible/Spacer so it is a direct child of Row, '
+        'Column, or Flex. If a reusable widget needs to expand, remove '
+        'Expanded from its build() method and let the caller wrap it at '
+        'the call site where the Flex parent is visible.',
     errorSeverity: DiagnosticSeverity.ERROR,
   );
 
@@ -6276,6 +6304,7 @@ class AvoidExpandedOutsideFlexRule extends SaropaLintRule {
   static const Set<String> _flexChildTypes = <String>{
     'Expanded',
     'Flexible',
+    'Spacer',
   };
 
   @override
@@ -6294,6 +6323,7 @@ class AvoidExpandedOutsideFlexRule extends SaropaLintRule {
       AstNode? current = node.parent;
       bool foundFlexParent = false;
       bool assignedToVariable = false;
+      bool passedThroughWidget = false;
       int depth = 0;
 
       while (current != null && depth < 20) {
@@ -6351,6 +6381,7 @@ class AvoidExpandedOutsideFlexRule extends SaropaLintRule {
         }
 
         if (current is InstanceCreationExpression) {
+          passedThroughWidget = true;
           final String parentType = current.constructorName.type.name.lexeme;
           if (_flexTypes.contains(parentType)) {
             foundFlexParent = true;
@@ -6365,8 +6396,12 @@ class AvoidExpandedOutsideFlexRule extends SaropaLintRule {
         // Trust non-build methods and standalone functions — these
         // are helper methods that typically build children for Flex
         // widgets at the call site.
+        // For build() with no intermediate widget wrapper,
+        // prefer_expanded_at_call_site provides specific guidance.
         if (current is MethodDeclaration) {
           if (current.name.lexeme != 'build') {
+            assignedToVariable = true;
+          } else if (!passedThroughWidget) {
             assignedToVariable = true;
           }
           break;
@@ -6394,12 +6429,13 @@ class AvoidExpandedOutsideFlexRule extends SaropaLintRule {
   }
 }
 
-/// Warns when a widget's build() method returns Expanded/Flexible directly.
+/// Warns when a widget's build() method returns Expanded/Flexible/Spacer.
 ///
 /// Alias: expanded_in_build, flexible_in_build
 ///
-/// Returning Expanded/Flexible from build() couples the widget to Flex parents.
-/// If the widget is later wrapped (e.g., with Padding), it will crash.
+/// Returning Expanded/Flexible/Spacer from build() couples the widget to Flex
+/// parents. If the widget is later wrapped (e.g., with Padding), it will crash
+/// at runtime with a ParentDataWidget error.
 /// Better design: let the caller add Expanded where needed.
 ///
 /// **BAD:**
@@ -6423,7 +6459,8 @@ class AvoidExpandedOutsideFlexRule extends SaropaLintRule {
 /// // Caller controls: Row(children: [Expanded(child: _MyWidget())])
 /// ```
 ///
-/// **Quick fix available:** Adds a `HACK` comment to mark for manual refactoring.
+/// **Quick fix available:** Unwraps Expanded/Flexible and returns the child
+/// directly. Not available for Spacer (no child to extract).
 ///
 /// ## When to Ignore
 ///
@@ -6433,9 +6470,9 @@ class AvoidExpandedOutsideFlexRule extends SaropaLintRule {
 class PreferExpandedAtCallSiteRule extends SaropaLintRule {
   const PreferExpandedAtCallSiteRule() : super(code: _code);
 
-  /// Design guidance - not a crash, but risky pattern.
+  /// Expanded/Flexible/Spacer in build() causes runtime crash if misused.
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.critical;
 
   @override
   RuleCost get cost => RuleCost.low;
@@ -6446,17 +6483,18 @@ class PreferExpandedAtCallSiteRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_expanded_at_call_site',
     problemMessage:
-        '[prefer_expanded_at_call_site] Expanded/Flexible returned from build() forces flex layout on all callers, breaking reuse in non-flex contexts. '
+        '[prefer_expanded_at_call_site] Expanded/Flexible/Spacer returned from build() forces flex layout on all callers, breaking reuse in non-flex contexts. '
         'If this widget is placed inside a Stack, SingleChildScrollView, or any non-flex parent, the Expanded wrapper triggers a runtime ParentDataWidget error and crashes the app.',
     correctionMessage:
         'Return the child widget directly and let the caller wrap with Expanded or Flexible as needed. '
         'This keeps the widget reusable in any layout context (Row, Column, Stack, etc.) and follows the principle of letting the parent control how its children are sized and positioned.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    errorSeverity: DiagnosticSeverity.ERROR,
   );
 
   static const Set<String> _flexChildTypes = <String>{
     'Expanded',
     'Flexible',
+    'Spacer',
   };
 
   @override
@@ -6541,7 +6579,8 @@ class PreferExpandedAtCallSiteRule extends SaropaLintRule {
 
 /// Quick fix for prefer_expanded_at_call_site.
 ///
-/// Adds a `HACK` comment to mark the code for manual refactoring.
+/// Unwraps the Expanded/Flexible and returns the child directly.
+/// For Spacer (no child argument), no fix is offered.
 class _PreferExpandedAtCallSiteFix extends DartFix {
   @override
   void run(
@@ -6551,36 +6590,41 @@ class _PreferExpandedAtCallSiteFix extends DartFix {
     AnalysisError analysisError,
     List<AnalysisError> others,
   ) {
-    context.registry.addMethodDeclaration((MethodDeclaration node) {
-      if (!analysisError.sourceRange.intersects(node.sourceRange)) return;
+    context.registry.addInstanceCreationExpression((
+      InstanceCreationExpression node,
+    ) {
+      if (!analysisError.sourceRange.intersects(
+        node.constructorName.sourceRange,
+      )) {
+        return;
+      }
 
+      final Expression? childExpr = _extractChild(node);
+      if (childExpr == null) return;
+
+      final String typeName = node.constructorName.type.name.lexeme;
       final changeBuilder = reporter.createChangeBuilder(
-        message: 'Add HACK comment for manual refactoring',
-        priority: 1,
+        message: 'Unwrap $typeName — return child directly',
+        priority: 80,
       );
 
       changeBuilder.addDartFileEdit((builder) {
-        // Find the line start to insert the comment
-        final lineInfo = resolver.lineInfo;
-        final location = lineInfo.getLocation(analysisError.offset);
-        final lineStart = lineInfo.getOffsetOfLine(location.lineNumber - 1);
-
-        // Get indentation from the current line
-        final source = resolver.source.contents.data;
-        var indent = '';
-        var i = lineStart;
-        while (i < source.length && (source[i] == ' ' || source[i] == '\t')) {
-          indent += source[i];
-          i++;
-        }
-
-        builder.addSimpleInsertion(
-          lineStart,
-          '$indent// HACK: Returning Expanded from build() couples to Flex parent. '
-          'Consider returning the child directly.\n',
+        builder.addSimpleReplacement(
+          node.sourceRange,
+          childExpr.toSource(),
         );
       });
     });
+  }
+
+  /// Extracts the `child` argument expression from a constructor call.
+  Expression? _extractChild(InstanceCreationExpression node) {
+    for (final Expression arg in node.argumentList.arguments) {
+      if (arg is NamedExpression && arg.name.label.name == 'child') {
+        return arg.expression;
+      }
+    }
+    return null;
   }
 }
 

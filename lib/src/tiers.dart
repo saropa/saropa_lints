@@ -506,6 +506,7 @@ const Set<String> essentialRules = <String>{
   'require_mock_http_client', // WARNING - test reliability
   'require_image_cache_dimensions', // WARNING - OOM prevention
   'avoid_expanded_outside_flex', // ERROR - runtime crash
+  'prefer_expanded_at_call_site', // ERROR - Expanded in build() crashes if misused
   'avoid_table_cell_outside_table', // ERROR - ParentData crash
   'avoid_positioned_outside_stack', // ERROR - ParentData crash
   'avoid_spacer_in_wrap', // ERROR - flex paradox crash
@@ -694,7 +695,6 @@ const Set<String> recommendedOnlyRules = <String>{
   'avoid_analytics_in_build',
   'avoid_json_encode_in_build',
   'avoid_canvas_operations_in_build',
-  'prefer_expanded_at_call_site', // WARNING - Expanded in build() couples to Flex parent
 
   // Scroll and List Performance
   'avoid_shrinkwrap_in_scrollview',
