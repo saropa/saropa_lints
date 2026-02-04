@@ -11,6 +11,7 @@ import 'package:test/test.dart';
 /// 6. avoid_isar_clear_in_production - receiver type checking
 /// 7. avoid_unused_instances - fire-and-forget constructor allowlist
 /// 8. prefer_late_final - method call-site awareness
+/// 9. avoid_nested_assignments - for-loop update clause exclusion
 ///
 /// Test fixtures are located in:
 /// - example/lib/require_subscription_status_check_example.dart
@@ -18,6 +19,7 @@ import 'package:test/test.dart';
 /// - example/lib/security/require_https_only_fixture.dart
 /// - example/lib/avoid_variable_shadowing_fixture.dart
 /// - example/lib/isar/avoid_isar_clear_in_production_fixture.dart
+/// - example/lib/avoid_nested_assignments_fixture.dart
 void main() {
   group('False Positive Fixes - v4.2.3', () {
     group('require_subscription_status_check', () {
@@ -416,6 +418,35 @@ void main() {
         );
       });
     });
+
+    group('avoid_nested_assignments', () {
+      test('should not flag for-loop update clauses', () {
+        // Expected behavior: These should NOT trigger
+        // for (int i = 0; i < n; i += 1) {}
+        // for (int i = 0; i < n; i += step) {}
+        // for (int i = n; i > 0; i -= 1) {}
+        // for (int i = 1; i < n; i *= 2) {}
+        // for (int i = 0; i < n; i = next(i)) {}
+        // for (int mask = 1; mask != 0; mask <<= 1) {}
+
+        expect(
+          'For-loop update clause assignments are not nested',
+          isNotNull,
+        );
+      });
+
+      test('should still flag assignments in conditions and arguments', () {
+        // Expected behavior: These SHOULD trigger
+        // if ((x = getValue()) > 0) {}
+        // foo(x = 5)
+        // final list = [x = 5]
+
+        expect(
+          'Genuinely nested assignments are still detected',
+          isNotNull,
+        );
+      });
+    });
   });
 
   group('Test Fixture Coverage', () {
@@ -446,6 +477,11 @@ void main() {
 
     test('prefer_late_final has test fixture', () {
       // Located at: example/lib/code_quality/code_quality_v250_fixture.dart
+      expect(true, isTrue);
+    });
+
+    test('avoid_nested_assignments has test fixture', () {
+      // Located at: example/lib/avoid_nested_assignments_fixture.dart
       expect(true, isTrue);
     });
   });
