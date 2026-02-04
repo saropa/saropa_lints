@@ -947,7 +947,7 @@ class AvoidNestedAssignmentsRule extends SaropaLintRule {
         '[avoid_nested_assignments] Assignment expression embedded inside another expression (e.g. condition, argument, or return). Nested assignments obscure the data flow and make it unclear whether the intent is comparison, assignment, or both, increasing the risk of logic errors.',
     correctionMessage:
         'Extract the assignment to a separate statement on its own line, then reference the variable in the expression to make the data flow explicit.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    errorSeverity: DiagnosticSeverity.INFO,
   );
 
   @override
@@ -971,6 +971,11 @@ class AvoidNestedAssignmentsRule extends SaropaLintRule {
 
       // Skip if parent is CascadeExpression (e.g. obj..field = value)
       if (parent is CascadeExpression) return;
+
+      // Skip if parent is ExpressionFunctionBody (arrow function body).
+      // () => x = value is shorthand for () { x = value; } — the assignment
+      // is the sole statement, not embedded inside another expression.
+      if (parent is ExpressionFunctionBody) return;
 
       // Report nested assignment
       reporter.atNode(node, code);
