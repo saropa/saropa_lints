@@ -1381,8 +1381,14 @@ class PreferConstWidgetsInListsRule extends SaropaLintRule {
     CustomLintContext context,
   ) {
     context.registry.addListLiteral((ListLiteral node) {
-      // Skip if already const
+      // Skip if already explicitly const
       if (node.constKeyword != null) return;
+
+      // Skip if implicitly const (const declaration, enum, etc.)
+      if (_isInConstContext(node)) return;
+
+      // Skip if the list element type is not a Widget subclass
+      if (!_isWidgetListType(node)) return;
 
       // Check if all elements are potentially const widgets
       bool allPotentiallyConst = true;
@@ -1411,8 +1417,65 @@ class PreferConstWidgetsInListsRule extends SaropaLintRule {
     });
   }
 
+  /// Check if the list's element type is a Widget subclass.
+  bool _isWidgetListType(ListLiteral node) {
+    final TypeArgumentList? typeArgs = node.typeArguments;
+    if (typeArgs != null && typeArgs.arguments.isNotEmpty) {
+      final DartType? listElementType = typeArgs.arguments.first.type;
+      if (listElementType != null) {
+        return _isWidgetType(listElementType);
+      }
+    }
+
+    // No explicit type argument — check first element's static type
+    for (final CollectionElement element in node.elements) {
+      if (element is InstanceCreationExpression) {
+        final DartType? type = element.staticType;
+        if (type != null) return _isWidgetType(type);
+      }
+    }
+
+    return false;
+  }
+
+  /// Returns true if [type] is or extends Widget from Flutter.
+  bool _isWidgetType(DartType type) {
+    if (type is! InterfaceType) return false;
+    for (InterfaceType? t = type; t != null;) {
+      if (t.element.name == 'Widget' &&
+          t.element.library.identifier.startsWith('package:flutter/')) {
+        return true;
+      }
+      t = t.element.supertype;
+    }
+    return false;
+  }
+
+  /// Check if a node is within a const context (const declaration,
+  /// const constructor, enum body, annotation, or const collection).
+  bool _isInConstContext(AstNode node) {
+    AstNode? current = node.parent;
+    while (current != null) {
+      if (current is VariableDeclarationList && current.isConst) {
+        return true;
+      }
+      if (current is InstanceCreationExpression && current.isConst) {
+        return true;
+      }
+      if (current is EnumDeclaration) return true;
+      if (current is Annotation) return true;
+      if (current is ListLiteral && current.constKeyword != null) {
+        return true;
+      }
+      if (current is SetOrMapLiteral && current.constKeyword != null) {
+        return true;
+      }
+      current = current.parent;
+    }
+    return false;
+  }
+
   bool _couldBeConst(InstanceCreationExpression node) {
-    // Simplified check - in reality would need semantic analysis
     for (final Expression arg in node.argumentList.arguments) {
       if (arg is NamedExpression) {
         if (!_isConstExpression(arg.expression)) return false;
@@ -6263,10 +6326,18 @@ class AvoidExpandedOutsideFlexRule extends SaropaLintRule {
           }
         }
 
-        // Trust Expanded returned from callbacks of collection builders.
-        // Handles: List.generate(n, (i) { return Expanded(...); })
+        // Trust Expanded returned from callbacks of collection builders
+        // and named-parameter callbacks (e.g. builder: (ctx) => Expanded(...)).
         if (current is FunctionExpression) {
           final feParent = current.parent;
+
+          // Named-parameter callbacks — placement depends on the call site.
+          if (feParent is NamedExpression) {
+            assignedToVariable = true;
+            break;
+          }
+
+          // Positional args in .generate() / .map().
           if (feParent is ArgumentList) {
             final grandparent = feParent.parent;
             if (grandparent is MethodInvocation) {
@@ -6852,9 +6923,18 @@ _AncestorResult _findWidgetAncestor(
       }
     }
 
-    // Trust callbacks in collection builders.
+    // Trust callbacks in collection builders and named-parameter callbacks.
     if (current is FunctionExpression) {
       final feParent = current.parent;
+
+      // Named-parameter callbacks (e.g. builder: (ctx) => Positioned(...)).
+      // The callback output's placement depends on the call site, not this
+      // widget, so we cannot determine the ancestor statically.
+      if (feParent is NamedExpression) {
+        return _AncestorResult.indeterminate;
+      }
+
+      // Positional args in .generate() / .map().
       if (feParent is ArgumentList) {
         final grandparent = feParent.parent;
         if (grandparent is MethodInvocation) {
