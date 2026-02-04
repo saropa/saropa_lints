@@ -846,7 +846,7 @@ class PreferIso8601DatesRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_iso8601_dates',
     problemMessage:
-        '[prefer_iso8601_dates] Use ISO 8601 format for date serialization. This JSON or DateTime handling can cause parsing errors or timezone-related bugs.',
+        '[prefer_iso8601_dates] Locale-specific date format detected instead of ISO 8601. Non-standard date formats break cross-system interoperability and can cause parsing failures or timezone-related data corruption.',
     correctionMessage:
         'Use toIso8601String() or yyyy-MM-dd format for interoperability. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,

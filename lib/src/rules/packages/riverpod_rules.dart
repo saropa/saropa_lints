@@ -1029,7 +1029,7 @@ class AvoidRiverpodStateMutationRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_riverpod_state_mutation',
     problemMessage:
-        '[avoid_riverpod_state_mutation] State mutated directly. Mutations don\'t trigger rebuilds. In Riverpod Notifiers, state must be replaced, not mutated. State is mutated directly instead of using state assignment.',
+        '[avoid_riverpod_state_mutation] Riverpod state mutated directly instead of replaced. Direct mutations don\'t trigger Notifier rebuilds, causing the UI to display stale, inconsistent data. Listeners and consumers will not receive the updated values.',
     correctionMessage:
         'Use state = state.copyWith(..) to replace state. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.WARNING,

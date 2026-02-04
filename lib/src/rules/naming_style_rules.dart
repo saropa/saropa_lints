@@ -1648,7 +1648,7 @@ class PreferExplicitParameterNamesRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_explicit_parameter_names',
     problemMessage:
-        '[prefer_explicit_parameter_names] Function type parameters must have names. Parameter names in function types improve documentation.',
+        '[prefer_explicit_parameter_names] Function type parameters must have descriptive names. Unnamed parameters lose intent and force callers to guess what each positional argument represents.',
     correctionMessage:
         'Add descriptive names to function type parameters. Unnamed parameters lose intent: void Function(String) becomes void Function(String message).',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -1947,7 +1947,7 @@ class PreferTypedefForCallbacksRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_typedef_for_callbacks',
     problemMessage:
-        '[prefer_typedef_for_callbacks] Use typedef for repeated function types. Inline function types are repeated and should use typedef.',
+        '[prefer_typedef_for_callbacks] Use typedef for repeated function types. Duplicate inline function types reduce readability and make signature changes error-prone across the codebase.',
     correctionMessage:
         'Create a typedef for this function type to improve readability. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,

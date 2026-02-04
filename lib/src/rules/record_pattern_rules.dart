@@ -495,7 +495,7 @@ class AvoidLongRecordsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_long_records',
     problemMessage:
-        '[avoid_long_records] Record has more than $_maxFields fields. This pattern matching usage can cause unexpected behavior or miss important type information.',
+        '[avoid_long_records] Record has more than $_maxFields fields, reducing readability. Records with excessive fields lose their clarity advantage over classes and become harder to destructure, understand, and maintain.',
     correctionMessage:
         'Use a class to improve readability. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
