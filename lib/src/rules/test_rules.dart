@@ -97,7 +97,7 @@ class AvoidEmptyTestGroupsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_empty_test_groups',
     problemMessage:
-        '[avoid_empty_test_groups] Test group has an empty body. This reduces test maintainability and makes it harder to identify which behavior failed when tests break.',
+        '[avoid_empty_test_groups] Test group has an empty body with no test cases. Empty groups clutter the test suite, provide false organization, and reduce confidence in actual test coverage.',
     correctionMessage:
         'Add tests to the group or remove it. Update related tests to reflect the new structure and verify they still pass.',
     errorSeverity: DiagnosticSeverity.INFO,

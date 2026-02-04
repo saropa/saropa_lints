@@ -1637,7 +1637,7 @@ class PreferGetxBuilderRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_getx_builder',
     problemMessage:
-        '[prefer_getx_builder] .obs value accessed without Obx wrapper. UI won\'t rebuild. This pattern increases maintenance cost and the likelihood of introducing bugs during future changes.',
+        '[prefer_getx_builder] .obs value accessed outside Obx or GetX builder. The UI will display stale data because reactive variable changes are silently ignored without an observable wrapper that triggers widget rebuilds.',
     correctionMessage:
         'Wrap in Obx(() => ..) to enable reactive updates. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.WARNING,

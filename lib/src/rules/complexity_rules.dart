@@ -332,7 +332,7 @@ class AvoidDuplicateCascadesRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_duplicate_cascades',
     problemMessage:
-        '[avoid_duplicate_cascades] Duplicate cascade operation detected. This excessive complexity makes the code harder to understand, test, and maintain.',
+        '[avoid_duplicate_cascades] Duplicate cascade operation detected on the same target. Identical cascade members are likely copy-paste errors that produce redundant side effects and increase maintenance risk.',
     correctionMessage:
         'Remove the duplicate or verify this is intentional. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.WARNING,

@@ -251,7 +251,7 @@ class AvoidInternalDependencyCreationRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_internal_dependency_creation',
     problemMessage:
-        '[avoid_internal_dependency_creation] Dependency created internally. Cannot substitute mock for testing. This DI pattern reduces testability and creates tight coupling between components.',
+        '[avoid_internal_dependency_creation] Dependency created internally instead of being injected. Cannot substitute mock implementations for testing. This tight coupling reduces testability and makes the component harder to reuse.',
     correctionMessage:
         'Add constructor parameter: MyClass(this._repo); then inject from outside. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
