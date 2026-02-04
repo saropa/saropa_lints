@@ -440,13 +440,24 @@ class PreferEdgeInsetsSymmetricRule extends SaropaLintRule {
       final top = args['top'];
       final bottom = args['bottom'];
 
-      final horizontalSymmetric =
-          left != null && right != null && left == right;
-      final verticalSymmetric = top != null && bottom != null && top == bottom;
+      final hasH = left != null && right != null;
+      final hasV = top != null && bottom != null;
+      final horizontalSymmetric = hasH && left == right;
+      final verticalSymmetric = hasV && top == bottom;
 
-      if (horizontalSymmetric || verticalSymmetric) {
-        reporter.atNode(node, code);
-      }
+      if (!horizontalSymmetric && !verticalSymmetric) return;
+
+      // Reject unpaired sides (e.g., right without left) — no clean
+      // EdgeInsets.symmetric() replacement exists for these cases.
+      if ((left == null) != (right == null)) return;
+      if ((top == null) != (bottom == null)) return;
+
+      // Reject when one axis is symmetric but the other has mismatched
+      // values — the fix would lose the non-symmetric axis.
+      if (hasH && !horizontalSymmetric) return;
+      if (hasV && !verticalSymmetric) return;
+
+      reporter.atNode(node, code);
     });
   }
 

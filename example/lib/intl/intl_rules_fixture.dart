@@ -166,6 +166,22 @@ void testCurrencyFormatting() {
   // GOOD: Non-currency strings with $ (like shell variables)
   final shellVar = 'HOME=\$HOME';
   final regex = r'^\$[a-z]+';
+
+  // GOOD: Non-currency toStringAsFixed in string interpolation
+  final bearing = 270.5;
+  final lat = 51.5074;
+  final lon = -0.1278;
+  final temp = 23.7;
+  final level = 85.0;
+  final angle = 45.0;
+  final score = 4.3;
+  final qibla = 'Qibla: ${bearing.toStringAsFixed(1)}° from North';
+  final coords =
+      'Lat ${lat.toStringAsFixed(2)}°, Lon ${lon.toStringAsFixed(2)}°';
+  final temperature = 'Temperature: ${temp.toStringAsFixed(1)}°C';
+  final battery = 'Battery: ${level.toStringAsFixed(0)}%';
+  final rotation = 'Rotation: ${angle.toStringAsFixed(1)}°';
+  final rating = 'Rating: ${score.toStringAsFixed(1)} / 5.0';
 }
 
 // =========================================================================
