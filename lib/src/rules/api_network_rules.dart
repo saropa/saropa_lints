@@ -1569,7 +1569,7 @@ class RequireContentTypeCheckRule extends SaropaLintRule {
     problemMessage:
         '[require_content_type_check] Parsing response without Content-Type check. May fail on error responses. APIs may return different content types on error. Parsing JSON without checking Content-Type may fail unexpectedly.',
     correctionMessage:
-        'Check response.headers[\'content-type\'] before parsing. Test with slow and interrupted connections to verify network resilience.',
+        'Check the Content-Type header before parsing the response body. APIs may return HTML error pages or plaintext instead of JSON on failure, causing parse exceptions.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
