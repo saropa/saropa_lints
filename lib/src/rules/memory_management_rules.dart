@@ -416,9 +416,9 @@ class PreferWeakReferencesForCacheRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_weak_references_for_cache',
     problemMessage:
-        '[prefer_weak_references_for_cache] Strong cache references prevent garbage collection under memory pressure.',
+        '[prefer_weak_references_for_cache] Strong cache references prevent garbage collection under memory pressure. Strong references to large objects prevent garbage collection. Use WeakReference for caches that should yield to memory pressure.',
     correctionMessage:
-        'WeakReference allows garbage collection under memory pressure.',
+        'WeakReference allows garbage collection under memory pressure. Use the DevTools memory profiler to verify the leak is resolved after the fix.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -569,8 +569,9 @@ class AvoidLargeIsolateCommunicationRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_large_isolate_communication',
     problemMessage:
-        '[avoid_large_isolate_communication] Sending large objects between isolates is expensive.',
-    correctionMessage: 'Use TransferableTypedData or process data in chunks.',
+        '[avoid_large_isolate_communication] Sending large objects between isolates is expensive. Sending large objects between isolates requires copying, which is expensive. Use SendPort with TransferableTypedData for large data.',
+    correctionMessage:
+        'Use TransferableTypedData or process data in chunks. Use the DevTools memory profiler to verify the leak is resolved after the fix.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -670,9 +671,9 @@ class RequireCacheExpirationRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_cache_expiration',
     problemMessage:
-        '[require_cache_expiration] Cache implementation lacks expiration logic.',
+        '[require_cache_expiration] Cache implementation lacks expiration logic. Caches without TTL serve stale data indefinitely. Implement expiration to ensure data freshness. Unreleased memory grows over time, increasing garbage collection pressure and risking out-of-memory crashes.',
     correctionMessage:
-        'Add TTL/expiration to prevent serving stale data indefinitely.',
+        'Add TTL/expiration to prevent serving stale data indefinitely. Use the DevTools memory profiler to verify the leak is resolved after the fix.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -1045,9 +1046,9 @@ class RequireCacheKeyUniquenessRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_cache_key_uniqueness',
     problemMessage:
-        '[require_cache_key_uniqueness] Cache key type may have unstable hashCode.',
+        '[require_cache_key_uniqueness] Cache key type may have unstable hashCode. Cache keys must be deterministic. Using objects without stable hashCode/equality as cache keys causes missed cache hits.',
     correctionMessage:
-        'Use String, int, or objects with stable hashCode/equality as cache keys.',
+        'Use String, int, or objects with stable hashCode/equality as cache keys. Use the DevTools memory profiler to verify the leak is resolved after the fix.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 

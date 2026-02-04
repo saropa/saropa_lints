@@ -37,9 +37,9 @@ class AvoidDeclaringCallMethodRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_declaring_call_method',
     problemMessage:
-        '[avoid_declaring_call_method] call() method makes class callable but hides intent. Code reads ambiguously.',
+        '[avoid_declaring_call_method] call() method makes class callable but hides intent. Code reads ambiguously. A class declares a call() method.',
     correctionMessage:
-        'Use descriptive method name: execute(), invoke(), or run() instead.',
+        'Use descriptive method name: execute(), invoke(), or run() instead. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -85,8 +85,9 @@ class AvoidGenericsShadowingRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_generics_shadowing',
     problemMessage:
-        '[avoid_generics_shadowing] Generic type parameter shadows a top-level declaration.',
-    correctionMessage: 'Rename the generic parameter to avoid shadowing.',
+        '[avoid_generics_shadowing] Generic type parameter shadows a top-level declaration. This class design reduces clarity and can lead to incorrect object initialization.',
+    correctionMessage:
+        'Rename the generic parameter to avoid shadowing. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -177,9 +178,9 @@ class AvoidIncompleteCopyWithRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_incomplete_copy_with',
     problemMessage:
-        '[avoid_incomplete_copy_with] copyWith() is missing fields. Copied objects will lose data for those fields.',
+        '[avoid_incomplete_copy_with] copyWith() is missing fields. Copied objects will lose data for those fields. All non-final fields must be included in copyWith for complete copying.',
     correctionMessage:
-        'Add missing fields as nullable parameters: copyWith({String? name, int? age}).',
+        'Add missing fields as nullable parameters: copyWith({String? name, int? age}). Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -265,9 +266,9 @@ class AvoidNonEmptyConstructorBodiesRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_non_empty_constructor_bodies',
     problemMessage:
-        '[avoid_non_empty_constructor_bodies] Constructor body has logic. Final fields cannot be set in body, only initializers.',
+        '[avoid_non_empty_constructor_bodies] Constructor body has logic. Final fields cannot be set in body, only initializers. Constructor bodies with logic can be harder to understand. Prefer using initializer lists or factory constructors.',
     correctionMessage:
-        'Move logic to initializer list: MyClass(input) : name = input.trim();',
+        'Move logic to initializer list: MyClass(input) : name = input.trim();. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -366,8 +367,9 @@ class AvoidShadowingRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_variable_shadowing',
     problemMessage:
-        '[avoid_variable_shadowing] Declaration shadows a declaration from an outer scope.',
-    correctionMessage: 'Rename the variable to avoid confusion.',
+        '[avoid_variable_shadowing] Declaration shadows a declaration from an outer scope. Shadowing occurs when a nested scope declares a variable with the same name as one in an enclosing scope. This can lead to confusion about which variable is being referenced and is a common source of subtle bugs.',
+    correctionMessage:
+        'Rename the variable to avoid confusion. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -632,8 +634,9 @@ class PreferDeclaringConstConstructorRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_declaring_const_constructor',
     problemMessage:
-        '[prefer_declaring_const_constructor] Class could have a const constructor.',
-    correctionMessage: 'Add const keyword to constructor.',
+        '[prefer_declaring_const_constructor] Class could have a const constructor. A class could have a const constructor but doesn\'t. This class design reduces clarity and can lead to incorrect object initialization.',
+    correctionMessage:
+        'Add const keyword to constructor. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -725,8 +728,9 @@ class PreferPrivateExtensionTypeFieldRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_private_extension_type_field',
     problemMessage:
-        '[prefer_private_extension_type_field] Extension type representation field should be private.',
-    correctionMessage: 'Use a private field with underscore prefix.',
+        '[prefer_private_extension_type_field] Extension type representation field must be private. Extension type fields must be private for encapsulation.',
+    correctionMessage:
+        'Use a private field with underscore prefix. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -795,9 +799,9 @@ class ProperSuperCallsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'proper_super_calls',
     problemMessage:
-        '[proper_super_calls] Super lifecycle method called in wrong order.',
+        '[proper_super_calls] Super lifecycle method called in wrong order. In State classes, super.initState() must be called first, and super.dispose() must be called last.',
     correctionMessage:
-        'super.initState() should be first; super.dispose() should be last.',
+        'super.initState() must be first; super.dispose() must be last. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -889,9 +893,9 @@ class AvoidUnmarkedPublicClassRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_unmarked_public_class',
     problemMessage:
-        '[avoid_unmarked_public_class] Public class lacks an explicit class modifier.',
+        '[avoid_unmarked_public_class] Public class lacks an explicit class modifier. Dart 3.0 introduced class modifiers (base, final, interface, sealed). For API stability, public classes should declare their inheritance intent.',
     correctionMessage:
-        'Add base, final, interface, or sealed modifier (Dart 3.0+).',
+        'Add base, final, interface, or sealed modifier (Dart 3.0+). Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -956,9 +960,9 @@ class PreferFinalClassRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_final_class',
     problemMessage:
-        '[prefer_final_class] Consider marking this class as final.',
+        '[prefer_final_class] Prefer marking this class as final. Dart 3.0 introduced the final modifier to prevent subclassing. Classes that are not designed for extension must be marked final.',
     correctionMessage:
-        'Add final modifier if this class is not designed for extension (Dart 3.0+).',
+        'Add final modifier if this class is not designed for extension (Dart 3.0+). Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -1052,8 +1056,9 @@ class PreferInterfaceClassRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_interface_class',
     problemMessage:
-        '[prefer_interface_class] Abstract class with only abstract members could be interface.',
-    correctionMessage: 'Use interface class for pure contracts (Dart 3.0+).',
+        '[prefer_interface_class] Abstract class with only abstract members could be interface. Dart 3.0 introduced the interface modifier for pure contracts. Abstract classes with no implementation should use interface class.',
+    correctionMessage:
+        'Use interface class for pure contracts (Dart 3.0+). Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -1157,9 +1162,9 @@ class PreferBaseClassRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_base_class',
     problemMessage:
-        '[prefer_base_class] Abstract class with shared implementation could be base.',
+        '[prefer_base_class] Abstract class with shared implementation could be base. Dart 3.0 introduced the base modifier for classes meant to be extended but not implemented directly.',
     correctionMessage:
-        'Use abstract base class to prevent direct implementation (Dart 3.0+).',
+        'Use abstract base class to prevent direct implementation (Dart 3.0+). Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 

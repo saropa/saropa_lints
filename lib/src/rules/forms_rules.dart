@@ -1247,9 +1247,9 @@ class RequireKeyboardActionTypeRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_keyboard_action_type',
     problemMessage:
-        '[require_keyboard_action_type] Text field should have textInputAction for better UX.',
+        '[require_keyboard_action_type] Text field must have textInputAction to improve UX. The textInputAction parameter controls the keyboard action button (e.g., Next, Done). This improves form navigation and UX.',
     correctionMessage:
-        'Add textInputAction: TextInputAction.next or TextInputAction.done.',
+        'Add textInputAction: TextInputAction.next or TextInputAction.done. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -1320,9 +1320,9 @@ class RequireKeyboardDismissOnScrollRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_keyboard_dismiss_on_scroll',
     problemMessage:
-        '[require_keyboard_dismiss_on_scroll] Scroll view should have keyboardDismissBehavior for form UX.',
+        '[require_keyboard_dismiss_on_scroll] Scroll view must have keyboardDismissBehavior for form UX. ScrollViews containing text fields should specify how the keyboard dismisses when the user scrolls. This provides better UX for forms in scrollable content.',
     correctionMessage:
-        'Add keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag.',
+        'Add keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -1599,9 +1599,9 @@ class RequireFormAutoValidateModeRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_form_auto_validate_mode',
     problemMessage:
-        '[require_form_auto_validate_mode] Form should specify autovalidateMode for consistent UX.',
+        '[require_form_auto_validate_mode] Form should specify autovalidateMode for consistent UX. Forms should specify how validation is triggered for consistent UX. The autovalidateMode parameter controls when the form fields validate.',
     correctionMessage:
-        'Add autovalidateMode: AutovalidateMode.onUserInteraction.',
+        'Add autovalidateMode: AutovalidateMode.onUserInteraction. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -1709,9 +1709,9 @@ class RequireAutofillHintsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_autofill_hints',
     problemMessage:
-        '[require_autofill_hints] Form field should have autofillHints for better user experience.',
+        '[require_autofill_hints] Form field must have autofillHints to improve user experience. The autofillHints parameter enables system autofill to help users complete forms faster. This improves UX especially for common fields like email, password, name, and address.',
     correctionMessage:
-        'Add autofillHints: [AutofillHints.email] or appropriate hint.',
+        'Add autofillHints: [AutofillHints.email] or appropriate hint. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -1785,9 +1785,9 @@ class PreferOnFieldSubmittedRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_on_field_submitted',
     problemMessage:
-        '[prefer_on_field_submitted] Form field should have onFieldSubmitted to handle keyboard action.',
+        '[prefer_on_field_submitted] Form field must have onFieldSubmitted to handle keyboard action. The onFieldSubmitted callback is triggered when the user presses the keyboard action button (e.g., Done, Next). This must be used to move focus to the next field or submit the form to improve UX.',
     correctionMessage:
-        'Add onFieldSubmitted: (_) => nextFocusNode.requestFocus() or submit.',
+        'Add onFieldSubmitted: (_) => nextFocusNode.requestFocus() or submit. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -1861,9 +1861,9 @@ class RequireTextInputTypeRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_text_input_type',
     problemMessage:
-        '[require_text_input_type] TextField without keyboardType. Users may see wrong keyboard.',
+        '[require_text_input_type] TextField without keyboardType. Users may see wrong keyboard. Setting the appropriate keyboardType improves user experience by showing the right keyboard layout for the expected input.',
     correctionMessage:
-        'Add keyboardType parameter for appropriate keyboard layout.',
+        'Add keyboardType parameter for appropriate keyboard layout. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -1919,9 +1919,9 @@ class PreferTextInputActionRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_text_input_action',
     problemMessage:
-        '[prefer_text_input_action] TextField without textInputAction. Keyboard action button unclear.',
+        '[prefer_text_input_action] TextField without textInputAction. Keyboard action button unclear. Setting textInputAction helps users navigate forms efficiently with the keyboard action button (Done, Next, Search, etc.).',
     correctionMessage:
-        'Add textInputAction (e.g., TextInputAction.next or .done).',
+        'Add textInputAction (e.g., TextInputAction.next or .done). Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 

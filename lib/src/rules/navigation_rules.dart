@@ -2618,9 +2618,9 @@ class PreferShellRouteSharedLayoutRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_shell_route_shared_layout',
     problemMessage:
-        '[prefer_shell_route_shared_layout] GoRoute with Scaffold builder may duplicate layout code.',
+        '[prefer_shell_route_shared_layout] GoRoute with Scaffold builder may duplicate layout code. Multiple routes with the same Scaffold layout cause code duplication and inconsistent behavior. ShellRoute provides a shared wrapper.',
     correctionMessage:
-        'Consider using ShellRoute for shared AppBar/BottomNav layouts.',
+        'Use ShellRoute for shared AppBar/BottomNav layouts. Test the full navigation flow including back button and deep links.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -2694,9 +2694,9 @@ class RequireStatefulShellRouteTabsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_stateful_shell_route_tabs',
     problemMessage:
-        '[require_stateful_shell_route_tabs] ShellRoute with tab-like navigation may lose state on tab switch.',
+        '[require_stateful_shell_route_tabs] ShellRoute with tab-like navigation may lose state on tab switch. Regular ShellRoute recreates child widgets on tab switch, losing state. StatefulShellRoute preserves each tab\'s state.',
     correctionMessage:
-        'Use StatefulShellRoute.indexedStack for preserving tab state.',
+        'Use StatefulShellRoute.indexedStack for preserving tab state. Test the full navigation flow including back button and deep links.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 

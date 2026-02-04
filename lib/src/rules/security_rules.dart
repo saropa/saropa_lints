@@ -708,9 +708,9 @@ class RequireBiometricFallbackRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_biometric_fallback',
     problemMessage:
-        '[require_biometric_fallback] Biometric-only auth locks out users with damaged sensors.',
+        '[require_biometric_fallback] Biometric-only auth locks out users with damaged sensors. Not all devices support biometrics, and users must have an alternative authentication method.',
     correctionMessage:
-        'Set biometricOnly to false or provide an alternative auth method.',
+        'Set biometricOnly to false or provide an alternative auth method. Audit similar patterns across the codebase to ensure consistent security practices.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -2010,9 +2010,9 @@ class PreferTypedDataRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_typed_data',
     problemMessage:
-        '[prefer_typed_data] List<int> for binary data wastes memory. Use Uint8List instead.',
+        '[prefer_typed_data] List<int> for binary data wastes memory. Use Uint8List instead. Uint8List is more memory-efficient for binary data and provides better interoperability with native code and I/O operations. List<int> uses 8 bytes per element vs 1 byte for Uint8List.',
     correctionMessage:
-        'Use Uint8List for binary data - 8x more memory efficient.',
+        'Use Uint8List for binary data - 8x more memory efficient. Audit similar patterns across the codebase to ensure consistent security practices.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -2085,9 +2085,9 @@ class AvoidUnnecessaryToListRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_unnecessary_to_list',
     problemMessage:
-        '[avoid_unnecessary_to_list] .toList() may be unnecessary here. Lazy iterables are more efficient.',
+        '[avoid_unnecessary_to_list] .toList() may be unnecessary here. Lazy iterables are more efficient. Calling .toList() after .map(), .where(), .take(), etc. creates an intermediate list that may not be needed. Dart\'s lazy iterables are more memory efficient.',
     correctionMessage:
-        'Remove .toList() unless you need to modify the list or access by index.',
+        'Remove .toList() unless you need to modify the list or access by index. Audit similar patterns across the codebase to ensure consistent security practices.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -2436,9 +2436,9 @@ class RequireTokenRefreshRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_token_refresh',
     problemMessage:
-        '[require_token_refresh] Auth service stores access token but may lack refresh logic.',
+        '[require_token_refresh] Auth service stores access token but may lack refresh logic. Access tokens expire. Without refresh logic, users get logged out unexpectedly. Implement proactive token refresh.',
     correctionMessage:
-        'Implement token refresh to handle expiration gracefully.',
+        'Implement token refresh to handle expiration gracefully. Audit similar patterns across the codebase to ensure consistent security practices.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -3115,9 +3115,9 @@ class PreferDataMaskingRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_data_masking',
     problemMessage:
-        '[prefer_data_masking] Unmasked sensitive data visible in UI and screenshots.',
+        '[prefer_data_masking] Unmasked sensitive data visible in UI and screenshots. Sensitive data (SSN, credit cards, passwords) must be partially masked when displayed to prevent shoulder surfing.',
     correctionMessage:
-        'Mask sensitive data: "****-****-****-1234" instead of full number.',
+        'Mask sensitive data: "****-****-****-1234" instead of full number. Audit similar patterns across the codebase to ensure consistent security practices.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -3222,9 +3222,9 @@ class AvoidScreenshotSensitiveRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_screenshot_sensitive',
     problemMessage:
-        '[avoid_screenshot_sensitive] Sensitive screen allows screenshots and screen recording.',
+        '[avoid_screenshot_sensitive] Sensitive screen allows screenshots and screen recording. Financial and authentication screens should disable screenshots using platform APIs to prevent sensitive data exposure.',
     correctionMessage:
-        'Use FlutterWindowManager.addFlags(FLAG_SECURE) for sensitive screens.',
+        'Use FlutterWindowManager.addFlags(FLAG_SECURE) for sensitive screens. Audit similar patterns across the codebase to ensure consistent security practices.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -4272,9 +4272,9 @@ class PreferLocalAuthRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_local_auth',
     problemMessage:
-        '[prefer_local_auth] Payment/sensitive operation without biometric authentication.',
+        '[prefer_local_auth] Payment/sensitive operation without biometric authentication. Critical operations like payments should require additional authentication to prevent unauthorized access even if the device is unlocked.',
     correctionMessage:
-        'Add LocalAuthentication().authenticate() before sensitive operations.',
+        'Add LocalAuthentication().authenticate() before sensitive operations. Audit similar patterns across the codebase to ensure consistent security practices.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -6289,9 +6289,9 @@ class RequireClipboardPasteValidationRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_clipboard_paste_validation',
     problemMessage:
-        '[require_clipboard_paste_validation] Clipboard data used without validation.',
+        '[require_clipboard_paste_validation] Clipboard data used without validation. Pasted content can be unexpected format or malicious. Validate clipboard data before using it. This creates a security vulnerability that attackers can exploit to compromise user data or application integrity.',
     correctionMessage:
-        'Validate clipboard content format and sanitize before using.',
+        'Validate clipboard content format and sanitize before using. Audit similar patterns across the codebase to ensure consistent security practices.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 

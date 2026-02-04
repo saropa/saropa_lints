@@ -153,8 +153,9 @@ class AvoidUnnecessaryReturnRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_unnecessary_return',
     problemMessage:
-        '[avoid_unnecessary_return] Unnecessary return statement at end of void function.',
-    correctionMessage: 'Remove the redundant return statement.',
+        '[avoid_unnecessary_return] Unnecessary return statement at end of void function. This return pattern causes unexpected control flow and makes function behavior harder to predict.',
+    correctionMessage:
+        'Remove the redundant return statement. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -264,7 +265,7 @@ class PreferImmediateReturnRule extends SaropaLintRule {
     problemMessage:
         '[prefer_immediate_return] Returning an expression directly instead of assigning to a variable first is a stylistic preference. Both produce the same compiled output. Enable via the stylistic tier.',
     correctionMessage:
-        'Return the expression directly instead of storing in a variable.',
+        'Return the expression directly instead of storing in a variable. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -385,7 +386,8 @@ class PreferReturningShorthandsRule extends SaropaLintRule {
     name: 'prefer_returning_shorthands',
     problemMessage:
         '[prefer_returning_shorthands] Simplifying return expressions to shorter forms is a code style preference. Both produce equivalent compiled output with no performance impact. Enable via the stylistic tier.',
-    correctionMessage: 'Convert to expression body with =>.',
+    correctionMessage:
+        'Convert to expression body with =>. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 

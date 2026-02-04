@@ -891,9 +891,9 @@ class PreferHttpConnectionReuseRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_http_connection_reuse',
     problemMessage:
-        '[prefer_http_connection_reuse] HTTP client created inside method. Connection overhead on every call.',
+        '[prefer_http_connection_reuse] HTTP client created inside method. Connection overhead on every call. Each new HTTP client requires DNS lookup, TCP handshake, and TLS negotiation. Reusing connections is much more efficient.',
     correctionMessage:
-        'Create HTTP client as a class field and reuse across requests.',
+        'Create HTTP client as a class field and reuse across requests. Test with slow and interrupted connections to verify network resilience.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -1001,8 +1001,9 @@ class AvoidRedundantRequestsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_redundant_requests',
     problemMessage:
-        '[avoid_redundant_requests] API call in build() or similar may cause redundant requests.',
-    correctionMessage: 'Cache results or use request deduplication pattern.',
+        '[avoid_redundant_requests] API call in build() or similar may cause redundant requests. Multiple widgets or methods requesting the same data simultaneously wastes bandwidth and server resources. Deduplicate concurrent requests.',
+    correctionMessage:
+        'Cache results or use request deduplication pattern. Test with slow and interrupted connections to verify network resilience.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -1092,7 +1093,7 @@ class RequireResponseCachingRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_response_caching',
     problemMessage:
-        '[require_response_caching] GET request without caching. Static or rarely-changing data wastes bandwidth on every call.',
+        '[require_response_caching] GET request without caching. Static or rarely-changing data wastes bandwidth on every call. GET responses for static or slowly-changing data must be cached to reduce bandwidth usage and improve responsiveness.',
     correctionMessage:
         'Add response caching with a TTL header or local cache layer for data that changes infrequently to reduce network load.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -1184,9 +1185,9 @@ class PreferPaginationRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_api_pagination',
     problemMessage:
-        '[prefer_api_pagination] API fetches all items without pagination. May cause memory issues.',
+        '[prefer_api_pagination] API fetches all items without pagination. May cause memory issues. Loading thousands of items at once is slow and memory-intensive. Use pagination with limit/offset or cursor-based pagination.',
     correctionMessage:
-        'Add pagination parameters: limit, offset, page, or cursor.',
+        'Add pagination parameters: limit, offset, page, or cursor. Test with slow and interrupted connections to verify network resilience.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -1276,7 +1277,7 @@ class AvoidOverFetchingRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_over_fetching',
     problemMessage:
-        '[avoid_over_fetching] Fetching the full object but only using a few fields, wasting bandwidth and serialization time.',
+        '[avoid_over_fetching] Fetching the full object but only using a few fields, wasting bandwidth and serialization time. This network pattern wastes bandwidth and server resources, increasing latency and data costs for users.',
     correctionMessage:
         'Use field selection, sparse fieldsets, or a dedicated endpoint to fetch only the fields this call-site actually uses.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -1566,9 +1567,9 @@ class RequireContentTypeCheckRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_content_type_check',
     problemMessage:
-        '[require_content_type_check] Parsing response without Content-Type check. May fail on error responses.',
+        '[require_content_type_check] Parsing response without Content-Type check. May fail on error responses. APIs may return different content types on error. Parsing JSON without checking Content-Type may fail unexpectedly.',
     correctionMessage:
-        'Check response.headers[\'content-type\'] before parsing.',
+        'Check response.headers[\'content-type\'] before parsing. Test with slow and interrupted connections to verify network resilience.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -1659,9 +1660,9 @@ class AvoidWebsocketWithoutHeartbeatRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_websocket_without_heartbeat',
     problemMessage:
-        '[avoid_websocket_without_heartbeat] WebSocket without heartbeat/ping. Dead connections won\'t be detected.',
+        '[avoid_websocket_without_heartbeat] WebSocket without heartbeat/ping. Dead connections won\'t be detected. WebSocket connections can silently fail. Periodic pings help detect dead connections and keep firewalls from closing idle sockets.',
     correctionMessage:
-        'Add periodic ping messages to detect connection failures.',
+        'Add periodic ping messages to detect connection failures. Test with slow and interrupted connections to verify network resilience.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -1909,8 +1910,9 @@ class RequireImagePickerSourceChoiceRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_image_picker_source_choice',
     problemMessage:
-        '[require_image_picker_source_choice] Hardcoded ImageSource. Consider offering user a choice.',
-    correctionMessage: 'Show dialog letting user choose camera or gallery.',
+        '[require_image_picker_source_choice] Hardcoded ImageSource. Prefer offering user a choice. Users must be able to choose between camera and gallery.',
+    correctionMessage:
+        'Show dialog letting user choose camera or gallery. Test with slow and interrupted connections to verify network resilience.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -2483,8 +2485,9 @@ class AvoidCachedImageInBuildRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_cached_image_in_build',
     problemMessage:
-        '[avoid_cached_image_in_build] Variable cacheKey in build method defeats caching.',
-    correctionMessage: 'Use a stable cacheKey that does not change on rebuild.',
+        '[avoid_cached_image_in_build] Variable cacheKey in build method defeats caching. Using a changing cacheKey in build causes the image to reload on every rebuild, defeating the purpose of caching.',
+    correctionMessage:
+        'Use a stable cacheKey that does not change on rebuild. Test with slow and interrupted connections to verify network resilience.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -2662,9 +2665,9 @@ class RequirePermissionRationaleRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_permission_rationale',
     problemMessage:
-        '[require_permission_rationale] Permission request without checking shouldShowRequestRationale.',
+        '[require_permission_rationale] Permission request without checking shouldShowRequestRationale. Android established convention is to explain why the app needs a permission before requesting it using shouldShowRequestRationale.',
     correctionMessage:
-        'Check shouldShowRequestRationale() before requesting permission.',
+        'Check shouldShowRequestRationale() before requesting permission. Test with slow and interrupted connections to verify network resilience.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 

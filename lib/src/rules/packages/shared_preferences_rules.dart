@@ -951,9 +951,9 @@ class RequireSharedPrefsKeyConstantsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_shared_prefs_key_constants',
     problemMessage:
-        '[require_shared_prefs_key_constants] String literal used as SharedPreferences key. Use named constants.',
+        '[require_shared_prefs_key_constants] String literal used as SharedPreferences key. Use named constants. Using string literals for keys is error-prone and makes refactoring difficult. Define keys as constants for type safety and easier maintenance.',
     correctionMessage:
-        'Define keys as constants (e.g., static const kUserName = "user_name").',
+        'Define keys as constants (e.g., static const kUserName = "user_name"). Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 

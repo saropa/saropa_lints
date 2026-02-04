@@ -41,9 +41,9 @@ class AvoidBitwiseOperatorsWithBooleansRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_bitwise_operators_with_booleans',
     problemMessage:
-        '[avoid_bitwise_operators_with_booleans] Bitwise operator on boolean. Unlike &&/||, this does not short-circuit.',
+        '[avoid_bitwise_operators_with_booleans] Bitwise operator on boolean. Unlike &&/||, this does not short-circuit. Using & or | with booleans is likely a mistake; use && or || instead. Bitwise operators don\'t short-circuit and can cause unexpected behavior.',
     correctionMessage:
-        'Use && instead of & and || instead of | for boolean logic.',
+        'Use && instead of & and || instead of | for boolean logic. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -107,9 +107,9 @@ class AvoidCascadeAfterIfNullRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_cascade_after_if_null',
     problemMessage:
-        '[avoid_cascade_after_if_null] Cascade after ?? may have unexpected precedence.',
+        '[avoid_cascade_after_if_null] Cascade after ?? may have unexpected precedence. Using cascade after ?? without parentheses can lead to unexpected behavior because ?? has lower precedence than cascade.',
     correctionMessage:
-        'Wrap the ?? expression in parentheses: (a ?? b)..cascade',
+        'Wrap the ?? expression in parentheses: (a ?? b).cascade. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -166,8 +166,9 @@ class AvoidComplexArithmeticExpressionsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_complex_arithmetic_expressions',
     problemMessage:
-        '[avoid_complex_arithmetic_expressions] Arithmetic expression has more than $_maxOperators operators.',
-    correctionMessage: 'Extract parts into named variables for clarity.',
+        '[avoid_complex_arithmetic_expressions] Arithmetic expression has more than $_maxOperators operators. Complex arithmetic expressions are hard to understand and maintain. Extract parts into named variables.',
+    correctionMessage:
+        'Extract parts into named variables for clarity. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -245,8 +246,9 @@ class AvoidComplexConditionsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_complex_conditions',
     problemMessage:
-        '[avoid_complex_conditions] Condition has more than $_maxOperators logical operators.',
-    correctionMessage: 'Extract parts into named boolean variables.',
+        '[avoid_complex_conditions] Condition has more than $_maxOperators logical operators. Complex conditions with many logical operators are hard to understand. Extract parts into named boolean variables.',
+    correctionMessage:
+        'Extract parts into named boolean variables. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -330,8 +332,9 @@ class AvoidDuplicateCascadesRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_duplicate_cascades',
     problemMessage:
-        '[avoid_duplicate_cascades] Duplicate cascade operation detected.',
-    correctionMessage: 'Remove the duplicate or verify this is intentional.',
+        '[avoid_duplicate_cascades] Duplicate cascade operation detected. This excessive complexity makes the code harder to understand, test, and maintain.',
+    correctionMessage:
+        'Remove the duplicate or verify this is intentional. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -392,8 +395,9 @@ class AvoidExcessiveExpressionsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_excessive_expressions',
     problemMessage:
-        '[avoid_excessive_expressions] Expression has excessive complexity (>$_maxOperators operators).',
-    correctionMessage: 'Break into smaller expressions with named variables.',
+        '[avoid_excessive_expressions] Expression has excessive complexity (>$_maxOperators operators). Complex expressions are hard to read and maintain. This excessive complexity makes the code harder to understand, test, and maintain.',
+    correctionMessage:
+        'Break into smaller expressions with named variables. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -464,8 +468,9 @@ class AvoidImmediatelyInvokedFunctionsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_immediately_invoked_functions',
     problemMessage:
-        '[avoid_immediately_invoked_functions] Function is immediately invoked after definition.',
-    correctionMessage: 'Extract the logic inline or to a named function.',
+        '[avoid_immediately_invoked_functions] Function is immediately invoked after definition. Immediately invoked function expressions (IIFE) can be confusing and usually indicate the code must be refactored.',
+    correctionMessage:
+        'Extract the logic inline or to a named function. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -580,8 +585,9 @@ class AvoidMultiAssignmentRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_multi_assignment',
     problemMessage:
-        '[avoid_multi_assignment] Multiple chained assignments detected.',
-    correctionMessage: 'Split into separate assignment statements.',
+        '[avoid_multi_assignment] Multiple chained assignments detected. Chained assignments reduce readability and can be confusing. This excessive complexity makes the code harder to understand, test, and maintain.',
+    correctionMessage:
+        'Split into separate assignment statements. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -742,8 +748,9 @@ class PreferParenthesesWithIfNullRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_parentheses_with_if_null',
     problemMessage:
-        '[prefer_parentheses_with_if_null] Add parentheses to clarify if-null expression precedence.',
-    correctionMessage: 'Wrap operands in parentheses for clarity.',
+        '[prefer_parentheses_with_if_null] Add parentheses to clarify if-null expression precedence. If-null operator (??) is used without parentheses in potentially ambiguous expressions. This excessive complexity makes the code harder to understand, test, and maintain.',
+    correctionMessage:
+        'Wrap operands in parentheses for clarity. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 

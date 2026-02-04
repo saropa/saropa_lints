@@ -846,9 +846,9 @@ class PreferIso8601DatesRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_iso8601_dates',
     problemMessage:
-        '[prefer_iso8601_dates] Use ISO 8601 format for date serialization.',
+        '[prefer_iso8601_dates] Use ISO 8601 format for date serialization. This JSON or DateTime handling can cause parsing errors or timezone-related bugs.',
     correctionMessage:
-        'Use toIso8601String() or yyyy-MM-dd format for interoperability.',
+        'Use toIso8601String() or yyyy-MM-dd format for interoperability. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -1025,9 +1025,9 @@ class PreferExplicitJsonKeysRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_explicit_json_keys',
     problemMessage:
-        '[prefer_explicit_json_keys] Consider using @JsonKey for field name mapping.',
+        '[prefer_explicit_json_keys] Use @JsonKey for field name mapping. Manual key mapping in fromJson is error-prone and verbose. Use @JsonKey annotation with json_serializable for clarity.',
     correctionMessage:
-        'Use json_serializable with @JsonKey annotation for cleaner mapping.',
+        'Use json_serializable with @JsonKey annotation for cleaner mapping. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 

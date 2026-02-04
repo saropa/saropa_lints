@@ -196,9 +196,9 @@ class AvoidNestedScrollablesConflictRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_nested_scrollables_conflict',
     problemMessage:
-        '[avoid_nested_scrollables_conflict] Nested scrollable without explicit physics causes gesture conflicts.',
+        '[avoid_nested_scrollables_conflict] Nested scrollable without explicit physics causes gesture conflicts. Nested scrollable widgets cause gesture conflicts. The inner scrollable must have NeverScrollableScrollPhysics to let the outer one handle scrolling.',
     correctionMessage:
-        'Add physics: NeverScrollableScrollPhysics() to inner scrollable.',
+        'Add physics: NeverScrollableScrollPhysics() to inner scrollable. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -316,9 +316,9 @@ class AvoidListViewChildrenForLargeListsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_listview_children_for_large_lists',
     problemMessage:
-        '[avoid_listview_children_for_large_lists] ListView with many children loads all items. Use ListView.builder.',
+        '[avoid_listview_children_for_large_lists] ListView with many children loads all items. Use ListView.builder. ListView(children: [..]) builds all children immediately. For lists with more than 20 items, use ListView.builder to improve performance through virtualization.',
     correctionMessage:
-        'Replace ListView(children: [...]) with ListView.builder for better performance.',
+        'Replace ListView(children: [..]) with ListView.builder to improve performance. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -387,9 +387,9 @@ class AvoidExcessiveBottomNavItemsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_excessive_bottom_nav_items',
     problemMessage:
-        '[avoid_excessive_bottom_nav_items] BottomNavigationBar with more than 5 items crowds the UI.',
+        '[avoid_excessive_bottom_nav_items] BottomNavigationBar with more than 5 items crowds the UI. More than 5 bottom navigation items crowds the UI and makes tap targets too small for comfortable use.',
     correctionMessage:
-        'Limit to 5 items or use a navigation drawer for additional options.',
+        'Limit to 5 items or use a navigation drawer for additional options. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -657,8 +657,9 @@ class AvoidMultipleAutofocusRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_multiple_autofocus',
     problemMessage:
-        '[avoid_multiple_autofocus] Multiple widgets with autofocus: true causes unpredictable behavior.',
-    correctionMessage: 'Only one widget should have autofocus: true.',
+        '[avoid_multiple_autofocus] Multiple widgets with autofocus: true causes unpredictable behavior. Only one widget can have autofocus at a time. Multiple autofocus widgets cause unpredictable focus behavior.',
+    correctionMessage:
+        'Only one widget must have autofocus: true. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -741,9 +742,9 @@ class RequireRefreshIndicatorOnListsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_refresh_indicator_on_lists',
     problemMessage:
-        '[require_refresh_indicator_on_lists] ListView without RefreshIndicator. Users can\'t pull to refresh.',
+        '[require_refresh_indicator_on_lists] ListView without RefreshIndicator. Users can\'t pull to refresh. Pull-to-refresh is a standard mobile UX pattern. Lists with dynamic content should support manual refresh.',
     correctionMessage:
-        'Wrap with RefreshIndicator for pull-to-refresh support.',
+        'Wrap with RefreshIndicator for pull-to-refresh support. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -938,9 +939,9 @@ class PreferItemExtentRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_item_extent',
     problemMessage:
-        '[prefer_item_extent] ListView without itemExtent recalculates layout on every scroll.',
+        '[prefer_item_extent] ListView without itemExtent recalculates layout on every scroll. When all items have the same height, specifying itemExtent improves scroll performance by avoiding per-item layout calculations.',
     correctionMessage:
-        'Add itemExtent parameter if all items have the same height.',
+        'Add itemExtent parameter if all items have the same height. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -1017,9 +1018,9 @@ class PreferPrototypeItemRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_prototype_item',
     problemMessage:
-        '[prefer_prototype_item] ListView.builder without prototypeItem measures each child separately.',
+        '[prefer_prototype_item] ListView.builder without prototypeItem measures each child separately. prototypeItem allows Flutter to determine item sizes from a single prototype widget, which is more efficient than calculating each item.',
     correctionMessage:
-        'Add prototypeItem parameter if items have consistent dimensions.',
+        'Add prototypeItem parameter if items have consistent dimensions. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -1263,9 +1264,9 @@ class RequireAddAutomaticKeepAlivesOffRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_add_automatic_keep_alives_off',
     problemMessage:
-        '[require_add_automatic_keep_alives_off] Long lists with addAutomaticKeepAlives: true (default) can cause memory issues.',
+        '[require_add_automatic_keep_alives_off] Long lists with addAutomaticKeepAlives: true (default) can cause memory issues. addAutomaticKeepAlives: true (the default) keeps list items alive in memory even when scrolled off-screen. For long lists, this can cause excessive memory usage. Set it to false to improve memory efficiency.',
     correctionMessage:
-        'Add addAutomaticKeepAlives: false for better memory efficiency.',
+        'Add addAutomaticKeepAlives: false to improve memory efficiency. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 

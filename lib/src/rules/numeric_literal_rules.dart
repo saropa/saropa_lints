@@ -39,8 +39,9 @@ class AvoidInconsistentDigitSeparatorsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_inconsistent_digit_separators',
     problemMessage:
-        '[avoid_inconsistent_digit_separators] Digit separators are not grouped consistently.',
-    correctionMessage: 'Use consistent groups of 3 digits.',
+        '[avoid_inconsistent_digit_separators] Digit separators are not grouped consistently. Digit separators should group digits by 3 for readability.',
+    correctionMessage:
+        'Use consistent groups of 3 digits. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -131,9 +132,9 @@ class AvoidUnnecessaryDigitSeparatorsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_unnecessary_digit_separators',
     problemMessage:
-        '[avoid_unnecessary_digit_separators] Unnecessary or poorly placed digit separator.',
+        '[avoid_unnecessary_digit_separators] Unnecessary or poorly placed digit separator. Digit separators should improve readability, not hinder it.',
     correctionMessage:
-        'Use digit separators consistently for large numbers only.',
+        'Use digit separators consistently for large numbers only. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -189,7 +190,8 @@ class DoubleLiteralFormatRule extends SaropaLintRule {
     name: 'double_literal_format',
     problemMessage:
         '[double_literal_format] Formatting double literals in a specific way (e.g., 1.0 vs 1.) is a stylistic preference. All forms represent the same value with no performance difference. Enable via the stylistic tier.',
-    correctionMessage: 'Include leading zero before decimal point (e.g., 0.5).',
+    correctionMessage:
+        'Include leading zero before decimal point (e.g., 0.5). Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -399,8 +401,9 @@ class PreferAdditionSubtractionAssignmentsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_addition_subtraction_assignments',
     problemMessage:
-        '[prefer_addition_subtraction_assignments] Use compound assignment operator.',
-    correctionMessage: 'Replace with +=, -=, *=, /=, etc.',
+        '[prefer_addition_subtraction_assignments] Use compound assignment operator. This numeric literal usage can cause precision errors or make the intended value unclear.',
+    correctionMessage:
+        'Replace with +=, -=, *=, /=, etc. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -479,8 +482,9 @@ class PreferCompoundAssignmentOperatorsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_compound_assignment_operators',
     problemMessage:
-        '[prefer_compound_assignment_operators] Use compound assignment operator.',
-    correctionMessage: 'Replace with compound assignment (e.g., &=, |=, ^=).',
+        '[prefer_compound_assignment_operators] Use compound assignment operator. Similar to PreferAdditionSubtractionAssignmentsRule but focuses on less common operators.',
+    correctionMessage:
+        'Replace with compound assignment (e.g., &=, |=, ^=). Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -545,8 +549,9 @@ class PreferDigitSeparatorsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_digit_separators',
     problemMessage:
-        '[prefer_digit_separators] Large number should use digit separators.',
-    correctionMessage: 'Add underscores to group digits (e.g., 1_000_000).',
+        '[prefer_digit_separators] Large number should use digit separators. Digit separators improve readability of large numbers. This numeric literal usage can cause precision errors or make the intended value unclear.',
+    correctionMessage:
+        'Add underscores to group digits (e.g., 1_000_000). Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -677,8 +682,9 @@ class AvoidDigitSeparatorsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_digit_separators',
     problemMessage:
-        '[avoid_digit_separators] Unnecessary digit separator in small number.',
-    correctionMessage: 'Remove digit separators from small numbers.',
+        '[avoid_digit_separators] Unnecessary digit separator in small number. Digit separators in small numbers don\'t improve readability.',
+    correctionMessage:
+        'Remove digit separators from small numbers. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 

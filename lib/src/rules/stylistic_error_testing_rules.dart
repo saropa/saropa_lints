@@ -767,7 +767,7 @@ class PreferSingleExpectationPerTestRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_single_expectation_per_test',
     problemMessage:
-        '[prefer_single_expectation_per_test] Test contains multiple logical assertions that verify unrelated behaviors.',
+        '[prefer_single_expectation_per_test] Test contains multiple logical assertions that verify unrelated behaviors. This is an opinionated rule - not included in any tier by default.',
     correctionMessage:
         'Split into multiple focused tests, each verifying one behavior, so failures pinpoint exactly which expectation broke.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -1029,7 +1029,7 @@ class PreferTestNameDescriptiveRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_test_name_descriptive',
     problemMessage:
-        '[prefer_test_name_descriptive] Test name is not descriptive. Rigid patterns make test failures harder to diagnose and understand.',
+        '[prefer_test_name_descriptive] Test name is not descriptive. Rigid patterns make test failures harder to diagnose and understand. This is an opinionated rule - not included in any tier by default.',
     correctionMessage:
         'Use natural, descriptive test names that explain the behavior being tested. Example: test("user can authenticate with valid credentials").',
     errorSeverity: DiagnosticSeverity.INFO,

@@ -1230,8 +1230,9 @@ class PreferImmutableSelectorValueRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_immutable_selector_value',
     problemMessage:
-        '[prefer_immutable_selector_value] Selector uses mutable type that may cause incorrect rebuilds.',
-    correctionMessage: 'Return an immutable value or use a primitive type.',
+        '[prefer_immutable_selector_value] Selector uses mutable type that may cause incorrect rebuilds. Selector values must be immutable to ensure proper comparisons. Mutable values are used in Provider Selector.',
+    correctionMessage:
+        'Return an immutable value or use a primitive type. Verify the state updates correctly across all affected screens and edge cases.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 

@@ -108,9 +108,9 @@ class AvoidCollectionMethodsWithUnrelatedTypesRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_collection_methods_with_unrelated_types',
     problemMessage:
-        '[avoid_collection_methods_with_unrelated_types] Collection method called with unrelated type.',
+        '[avoid_collection_methods_with_unrelated_types] Collection method called with unrelated type. Using contains, indexOf, remove, etc. with a type that can never match the collection\'s element type is likely a bug.',
     correctionMessage:
-        'The argument type cannot match any element in the collection.',
+        'The argument type cannot match any element in the collection. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -278,8 +278,9 @@ class AvoidImplicitlyNullableExtensionTypesRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_implicitly_nullable_extension_types',
     problemMessage:
-        '[avoid_implicitly_nullable_extension_types] Extension type is implicitly nullable.',
-    correctionMessage: 'Add "implements Object" to make it non-nullable.',
+        '[avoid_implicitly_nullable_extension_types] Extension type is implicitly nullable. Extension types that don\'t implement Object can be implicitly nullable, which may lead to unexpected behavior.',
+    correctionMessage:
+        'Add "implements Object" to make it non-nullable. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -389,9 +390,9 @@ class AvoidNullableParametersWithDefaultValuesRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_nullable_parameters_with_default_values',
     problemMessage:
-        '[avoid_nullable_parameters_with_default_values] Parameter with default value should not be nullable.',
+        '[avoid_nullable_parameters_with_default_values] Parameter with default value must not be nullable. If a parameter has a default value, it doesn\'t need to be nullable. Quick fix available: Adds a comment to flag for manual review.',
     correctionMessage:
-        'Remove the ? from the type since it has a non-null default.',
+        'Remove the ? from the type since it has a non-null default. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -454,8 +455,9 @@ class AvoidNullableToStringRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_nullable_tostring',
     problemMessage:
-        '[avoid_nullable_tostring] Calling toString() on a nullable value.',
-    correctionMessage: 'Check for null first or provide a default value.',
+        '[avoid_nullable_tostring] Calling toString() on a nullable value. Calling .toString() on a nullable value without null check. This type usage can cause unexpected runtime behavior or weaken static analysis effectiveness.',
+    correctionMessage:
+        'Check for null first or provide a default value. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -1867,9 +1869,9 @@ class PreferCorrectTypeNameRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_correct_type_name',
     problemMessage:
-        '[prefer_correct_type_name] Type name is not UpperCamelCase. Nonstandard type names reduce code readability and break Dart conventions.',
+        '[prefer_correct_type_name] Type name is not UpperCamelCase. Nonstandard type names reduce code readability and break Dart conventions. Quick fix available: Adds a comment to flag for manual review.',
     correctionMessage:
-        'Rename type to use UpperCamelCase. Example: MyType, UserProfile, HttpClient.',
+        'Rename type to use UpperCamelCase. Example: MyType, UserProfile, HttpClient. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -1968,9 +1970,9 @@ class PreferExplicitFunctionTypeRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_explicit_function_type',
     problemMessage:
-        '[prefer_explicit_function_type] Use explicit function type instead of bare "Function".',
+        '[prefer_explicit_function_type] Use explicit function type instead of bare "Function". The bare \'Function\' type is too permissive and loses type information. Using bare \'Function\' type instead of specific function type.',
     correctionMessage:
-        'Specify the function signature (e.g., void Function()).',
+        'Specify the function signature (e.g., void Function()). Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -2022,7 +2024,8 @@ class PreferTypeOverVarRule extends SaropaLintRule {
     name: 'prefer_type_over_var',
     problemMessage:
         '[prefer_type_over_var] Preferring explicit type annotations over var is a style choice. Both produce identical compiled code. Conflicts with prefer_var_over_explicit_type. Enable via the stylistic tier.',
-    correctionMessage: 'Replace var with the explicit type.',
+    correctionMessage:
+        'Replace var with the explicit type. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 

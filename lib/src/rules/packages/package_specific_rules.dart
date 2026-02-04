@@ -1423,8 +1423,9 @@ class RequireSvgErrorHandlerRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_svg_error_handler',
     problemMessage:
-        '[require_svg_error_handler] SvgPicture without errorBuilder shows blank on invalid SVG.',
-    correctionMessage: 'Add errorBuilder to handle SVG loading failures.',
+        '[require_svg_error_handler] SvgPicture without errorBuilder shows blank on invalid SVG. SVG loading can fail for various reasons. Without an error builder, the UI may break or show nothing when an SVG fails to load.',
+    correctionMessage:
+        'Add errorBuilder to handle SVG loading failures. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -1531,9 +1532,9 @@ class RequireGoogleFontsFallbackRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_google_fonts_fallback',
     problemMessage:
-        '[require_google_fonts_fallback] GoogleFonts should specify fontFamilyFallback.',
+        '[require_google_fonts_fallback] GoogleFonts should specify fontFamilyFallback. Google Fonts may fail to load on slow connections or offline. Without a fallback, text may be invisible or use system default unexpectedly.',
     correctionMessage:
-        'Add fontFamilyFallback to handle font loading failures.',
+        'Add fontFamilyFallback to handle font loading failures. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -1626,8 +1627,9 @@ class PreferUuidV4Rule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_uuid_v4',
     problemMessage:
-        '[prefer_uuid_v4] Prefer UUID v4 over v1 for better randomness and privacy.',
-    correctionMessage: 'Use Uuid().v4() instead of Uuid().v1().',
+        '[prefer_uuid_v4] Prefer UUID v4 over v1 to improve randomness and privacy. UUID v1 is time-based and includes MAC address, which may leak information. UUID v4 is random and more suitable for most use cases.',
+    correctionMessage:
+        'Use Uuid().v4() instead of Uuid().v1(). Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -1871,7 +1873,7 @@ class RequireUrlLauncherModeRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_url_launcher_mode',
     problemMessage:
-        '[require_url_launcher_mode] launchUrl() without mode parameter has inconsistent behavior across platforms.',
+        '[require_url_launcher_mode] launchUrl() without mode parameter has inconsistent behavior across platforms. Without explicit LaunchMode, URL launching behavior varies by platform: - iOS: Opens in-app Safari View Controller by default - Android: Opens external browser by default - Web: Opens in same tab by default.',
     correctionMessage:
         'Add mode parameter (e.g., LaunchMode.externalApplication) for consistent behavior.',
     errorSeverity: DiagnosticSeverity.INFO,

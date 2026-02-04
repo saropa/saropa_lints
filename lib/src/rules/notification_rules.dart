@@ -542,7 +542,7 @@ class RequireNotificationTimezoneAwarenessRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_notification_timezone_awareness',
     problemMessage:
-        '[require_notification_timezone_awareness] Scheduled notification should use TZDateTime instead of DateTime.',
+        '[require_notification_timezone_awareness] Scheduled notification should use TZDateTime instead of DateTime. Scheduled notifications require timezone-aware datetime handling to ensure notifications fire at the correct time across timezone changes, daylight saving time transitions, and for users in different time zones.',
     correctionMessage:
         'Use tz.TZDateTime.now(tz.local) or tz.TZDateTime.from() for timezone-aware scheduling.',
     errorSeverity: DiagnosticSeverity.INFO,

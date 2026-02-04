@@ -29,7 +29,7 @@ class AlwaysFailRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_fail_test_case',
     problemMessage:
-        '[prefer_fail_test_case] This custom lint always fails (test hook).',
+        '[prefer_fail_test_case] This custom lint always fails (test hook). Formerly: always_fail_test_case. Test-only rule that always reports a lint at the start of the file.',
     correctionMessage:
         'This rule always fails by design — it verifies your lint pipeline is active. Seeing this error confirms saropa_lints is running. Remove prefer_fail_test_case from your enabled rules once verified.',
     errorSeverity: DiagnosticSeverity.ERROR,
@@ -376,9 +376,9 @@ class PreferCommentingAnalyzerIgnoresRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_commenting_analyzer_ignores',
     problemMessage:
-        '[prefer_commenting_analyzer_ignores] Analyzer ignore comment should have a preceding explanatory comment.',
+        '[prefer_commenting_analyzer_ignores] Analyzer ignore comment must have a preceding explanatory comment. This debug artifact executes in production, potentially exposing internal state or degrading performance.',
     correctionMessage:
-        'Add a comment on the line above explaining why this rule is ignored.',
+        'Add a comment on the line above explaining why this rule is ignored. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -745,7 +745,7 @@ class RequireStructuredLoggingRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_structured_logging',
     problemMessage:
-        '[require_structured_logging] String concatenation in logs wastes CPU building strings even when logging is disabled.',
+        '[require_structured_logging] String concatenation in logs wastes CPU building strings even when logging is disabled. String concatenation in log messages wastes CPU cycles constructing strings even when logging is disabled. Use structured logging with placeholders or log levels.',
     correctionMessage:
         'Use structured logging with named parameters: log("event", data: {"key": value}).',
     errorSeverity: DiagnosticSeverity.INFO,

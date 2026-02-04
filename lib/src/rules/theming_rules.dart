@@ -46,8 +46,9 @@ class RequireDarkModeTestingRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_dark_mode_testing',
     problemMessage:
-        '[require_dark_mode_testing] MaterialApp missing darkTheme. App won\'t adapt to dark mode.',
-    correctionMessage: 'Add darkTheme parameter to support dark mode.',
+        '[require_dark_mode_testing] MaterialApp missing darkTheme. App won\'t adapt to dark mode. Apps should support dark mode for accessibility and user preference. Without darkTheme, the app won\'t adapt when the user enables dark mode.',
+    correctionMessage:
+        'Add darkTheme parameter to support dark mode. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -127,9 +128,9 @@ class AvoidElevationOpacityInDarkRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_elevation_opacity_in_dark',
     problemMessage:
-        '[avoid_elevation_opacity_in_dark] High elevation (>4) without brightness check. Shadows look poor in dark mode.',
+        '[avoid_elevation_opacity_in_dark] High elevation (>4) without brightness check. Shadows look poor in dark mode. Elevation shadows appear differently in dark mode. Material Design recommends using surface overlays instead of shadows in dark themes.',
     correctionMessage:
-        'Check Theme.of(context).brightness or use lower elevation in dark mode.',
+        'Check Theme.of(context).brightness or use lower elevation in dark mode. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -214,9 +215,9 @@ class PreferThemeExtensionsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_theme_extensions',
     problemMessage:
-        '[prefer_theme_extensions] ThemeData.copyWith used for custom colors. Consider ThemeExtension.',
+        '[prefer_theme_extensions] ThemeData.copyWith used for custom colors. Prefer ThemeExtension. ThemeExtension provides type-safe, documented custom theme properties. Ad-hoc fields on ThemeData are not standardized and harder to maintain.',
     correctionMessage:
-        'Create a ThemeExtension subclass for type-safe custom theme properties.',
+        'Create a ThemeExtension subclass for type-safe custom theme properties. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 

@@ -58,7 +58,7 @@ class AvoidGradientInBuildRule extends SaropaLintRule {
     problemMessage:
         '[avoid_gradient_in_build] Creating Gradient in build() prevents reuse and causes allocations. This leads to unnecessary memory usage, slower UI performance, and increased battery drain.',
     correctionMessage:
-        'Store gradient as a static const field or create outside build().',
+        'Store gradient as a static const field or create outside build(). Use DevTools widget inspector to verify that rebuild counts decrease.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -509,8 +509,9 @@ class AvoidJsonEncodeInBuildRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_json_encode_in_build',
     problemMessage:
-        '[avoid_json_encode_in_build] jsonEncode in build() is expensive and causes jank.',
-    correctionMessage: 'Cache JSON encoding result outside of build().',
+        '[avoid_json_encode_in_build] jsonEncode in build() is expensive and causes jank. JSON encoding is expensive. Doing it in build() causes performance issues because build() is called frequently (60fps during animations).',
+    correctionMessage:
+        'Cache JSON encoding result outside of build(). Use DevTools widget inspector to verify that rebuild counts decrease.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -661,8 +662,9 @@ class AvoidHardcodedFeatureFlagsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_hardcoded_feature_flags',
     problemMessage:
-        '[avoid_hardcoded_feature_flags] Hardcoded if(true)/if(false) suggests incomplete feature flag.',
-    correctionMessage: 'Use a proper feature flag system or remove dead code.',
+        '[avoid_hardcoded_feature_flags] Hardcoded if(true)/if(false) suggests incomplete feature flag. Hardcoded conditions like if (true) or if (false) suggest incomplete feature flag implementation or dead code.',
+    correctionMessage:
+        'Use a proper feature flag system or remove dead code. Use DevTools widget inspector to verify that rebuild counts decrease.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -755,8 +757,9 @@ class PreferSingleSetStateRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_single_setstate',
     problemMessage:
-        '[prefer_single_setstate] Multiple setState calls cause unnecessary rebuilds.',
-    correctionMessage: 'Combine setState calls into a single call.',
+        '[prefer_single_setstate] Multiple setState calls cause unnecessary rebuilds. Multiple setState calls are made in the same method. This increases build() cost, causing unnecessary widget rebuilds that degrade scroll performance.',
+    correctionMessage:
+        'Combine setState calls into a single call. Use DevTools widget inspector to verify that rebuild counts decrease.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -832,8 +835,9 @@ class PreferComputeOverIsolateRunRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_compute_over_isolate_run',
     problemMessage:
-        '[prefer_compute_over_isolate_run] Consider using compute() instead of Isolate.run().',
-    correctionMessage: 'compute() provides better error handling and typing.',
+        '[prefer_compute_over_isolate_run] Use compute() instead of Isolate.run(). For simple, quick operations, the overhead of spawning an isolate is greater than running inline. Use compute() for heavy work.',
+    correctionMessage:
+        'compute() provides better error handling and typing. Use DevTools widget inspector to verify that rebuild counts decrease.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -891,8 +895,9 @@ class PreferForLoopInChildrenRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_for_loop_in_children',
     problemMessage:
-        '[prefer_for_loop_in_children] Prefer collection-for over List.generate in children.',
-    correctionMessage: 'Use [for (final item in items) Widget(item)].',
+        '[prefer_for_loop_in_children] Prefer collection-for over List.generate in children. For building widget lists, prefer for-in collection or spread to improve readability and performance.',
+    correctionMessage:
+        'Use [for (final item in items) Widget(item)]. Use DevTools widget inspector to verify that rebuild counts decrease.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -966,8 +971,9 @@ class PreferContainerRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_single_container',
     problemMessage:
-        '[prefer_single_container] Nested decoration widgets could be a single Container.',
-    correctionMessage: 'Use Container with padding, decoration, and size.',
+        '[prefer_single_container] Nested decoration widgets could be a single Container. Using nested Padding, DecoratedBox, etc. is verbose when Container provides all these features in one widget.',
+    correctionMessage:
+        'Use Container with padding, decoration, and size. Use DevTools widget inspector to verify that rebuild counts decrease.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
