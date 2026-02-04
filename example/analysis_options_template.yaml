@@ -319,8 +319,9 @@ custom_lint:
     - avoid_sqflite_reserved_words: false     # WARNING - SQL reserved words (v2.3.9)
     - prefer_sqflite_singleton: false        # INFO - use singleton for database (v2.6.0)
     - prefer_sqflite_column_constants: false # INFO - constants for column names (v2.6.0)
-    - require_yield_between_db_awaits: false # WARNING - yield after DB await to prevent UI jank
-    - avoid_return_await_db: false           # WARNING - save result, yield, then return
+    - require_yield_after_db_write: false  # WARNING - yield after DB write to prevent UI jank
+    - suggest_yield_after_db_read: false   # INFO - yield after bulk DB read (findFirst excluded)
+    - avoid_return_await_db: false         # WARNING - save result, yield, then return (writes only)
 
     # =========================================================================
     # FLUTTER DISPOSAL (CRITICAL)
