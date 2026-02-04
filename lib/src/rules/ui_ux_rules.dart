@@ -131,7 +131,7 @@ class PreferCachedPaintObjectsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_cached_paint_objects',
     problemMessage:
-        '[prefer_cached_paint_objects] Creating Paint objects inside paint() causes new allocations every frame and hurts performance.',
+        '[prefer_cached_paint_objects] Creating Paint objects inside paint() causes new allocations every frame and hurts performance. Paint objects created in paint() are recreated every frame, causing unnecessary allocations. Move to class fields to improve performance.',
     correctionMessage:
         'Move Paint creation outside paint() and reuse a static or instance field. This reduces allocations and improves performance.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -216,7 +216,7 @@ class RequireCustomPainterShouldRepaintRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_custom_painter_shouldrepaint',
     problemMessage:
-        '[require_custom_painter_shouldrepaint] Always returning true from shouldRepaint causes unnecessary repaints and wastes resources.',
+        '[require_custom_painter_shouldrepaint] Always returning true from shouldRepaint causes unnecessary repaints and wastes resources. Always returning true from shouldRepaint causes unnecessary repaints. Compare relevant fields to determine if repaint is actually needed.',
     correctionMessage:
         'Compare relevant fields in shouldRepaint and only return true when the painter’s output would change. Avoid always returning true.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -298,7 +298,7 @@ class RequireCurrencyFormattingLocaleRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_currency_formatting_locale',
     problemMessage:
-        '[require_currency_formatting_locale] NumberFormat.currency() without a locale can format currency inconsistently for users.',
+        '[require_currency_formatting_locale] NumberFormat.currency() without a locale can format currency inconsistently for users. Currency formatting depends heavily on locale. Without explicit locale, the format may not match user expectations.',
     correctionMessage:
         'Always specify a locale for NumberFormat.currency() to ensure consistent formatting for all users.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -701,9 +701,9 @@ class PreferItemExtentWhenKnownRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_itemextent_when_known',
     problemMessage:
-        '[prefer_itemextent_when_known] Consider adding itemExtent for better scroll performance.',
+        '[prefer_itemextent_when_known] Add itemExtent to improve scroll performance. When all list items have the same height, setting itemExtent allows Flutter to optimize layout calculations, improving scroll performance significantly.',
     correctionMessage:
-        'Set itemExtent when all list items have the same height.',
+        'Set itemExtent when all list items have the same height. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -780,8 +780,9 @@ class RequireTabStatePreservationRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_tab_state_preservation',
     problemMessage:
-        '[require_tab_state_preservation] TabBarView children may lose state on tab switch.',
-    correctionMessage: 'Use AutomaticKeepAliveClientMixin to preserve state.',
+        '[require_tab_state_preservation] TabBarView children may lose state on tab switch. By default, tab content is disposed when switching tabs. Use AutomaticKeepAliveClientMixin to preserve state across tab switches.',
+    correctionMessage:
+        'Use AutomaticKeepAliveClientMixin to preserve state. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -853,9 +854,9 @@ class PreferSkeletonOverSpinnerRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_skeleton_over_spinner',
     problemMessage:
-        '[prefer_skeleton_over_spinner] CircularProgressIndicator for content loading. Consider skeleton loaders.',
+        '[prefer_skeleton_over_spinner] CircularProgressIndicator for content loading. Prefer skeleton loaders. This pattern increases maintenance cost and the likelihood of introducing bugs during future changes.',
     correctionMessage:
-        'Use skeleton/shimmer loaders for better perceived performance.',
+        'Use skeleton/shimmer loaders to improve perceived performance. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -928,8 +929,9 @@ class RequireEmptyResultsStateRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_empty_results_state',
     problemMessage:
-        '[require_empty_results_state] List with search-related name missing empty state check.',
-    correctionMessage: 'Add isEmpty check with empty state UI for better UX.',
+        '[require_empty_results_state] List with search-related name missing empty state check. Search results should show a helpful message when no results are found. Empty ListView/GridView with no indicator confuses users.',
+    correctionMessage:
+        'Add isEmpty check with empty state UI to improve UX. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -1038,9 +1040,9 @@ class RequireSearchLoadingIndicatorRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_search_loading_indicator',
     problemMessage:
-        '[require_search_loading_indicator] Search callback without loading state management.',
+        '[require_search_loading_indicator] Search callback without loading state management. When triggering a search (API call), users need feedback that something is happening. Missing loading state causes confusion.',
     correctionMessage:
-        'Set loading state before search and clear it on completion.',
+        'Set loading state before search and clear it on completion. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -1226,9 +1228,9 @@ class RequirePaginationLoadingStateRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_pagination_loading_state',
     problemMessage:
-        '[require_pagination_loading_state] Paginated list triggers loadMore but shows no loading indicator.',
+        '[require_pagination_loading_state] Paginated list triggers loadMore but shows no loading indicator. Infinite scroll lists should show a loading indicator when fetching the next page of results.',
     correctionMessage:
-        'Add +1 to itemCount when loading and show indicator at the end.',
+        'Add +1 to itemCount when loading and show indicator at the end. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -1353,9 +1355,9 @@ class RequireWebViewProgressIndicatorRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_webview_progress_indicator',
     problemMessage:
-        '[require_webview_progress_indicator] WebView without progress indicator. Users see no loading feedback.',
+        '[require_webview_progress_indicator] WebView without progress indicator. Users see no loading feedback. WebView page loads can take significant time. Without a progress indicator, users may think the app is frozen or broken. Show loading state while content loads.',
     correctionMessage:
-        'Add onProgress/onProgressChanged callback to show loading state.',
+        'Add onProgress/onProgressChanged callback to show loading state. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 

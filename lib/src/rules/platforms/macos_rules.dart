@@ -97,9 +97,9 @@ class PreferMacosMenuBarIntegrationRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_macos_menu_bar_integration',
     problemMessage:
-        '[prefer_macos_menu_bar_integration] macOS apps should use PlatformMenuBar for native menu integration.',
+        '[prefer_macos_menu_bar_integration] macOS apps should use PlatformMenuBar for native menu integration. macOS apps should integrate with the system menu bar for a native experience. PlatformMenuBar provides this integration in Flutter.',
     correctionMessage:
-        'Add PlatformMenuBar with standard macOS menus (File, Edit, View, etc.).',
+        'Add PlatformMenuBar with standard macOS menus (File, Edit, View, etc.). Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -197,9 +197,9 @@ class PreferMacosKeyboardShortcutsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_macos_keyboard_shortcuts',
     problemMessage:
-        '[prefer_macos_keyboard_shortcuts] macOS apps should implement standard keyboard shortcuts.',
+        '[prefer_macos_keyboard_shortcuts] macOS apps should implement standard keyboard shortcuts. macOS users expect standard keyboard shortcuts like Cmd+S (Save), Cmd+Z (Undo), Cmd+C/V/X (Copy/Paste/Cut). Flutter provides Shortcuts and CallbackShortcuts widgets to implement these.',
     correctionMessage:
-        'Use Shortcuts widget with common macOS shortcuts (Cmd+S, Cmd+Z, etc.).',
+        'Use Shortcuts widget with common macOS shortcuts (Cmd+S, Cmd+Z, etc.). Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -463,9 +463,9 @@ class AvoidMacosDeprecatedSecurityApisRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_macos_deprecated_security_apis',
     problemMessage:
-        '[avoid_macos_deprecated_security_apis] Deprecated macOS Security API detected. Use modern equivalents.',
+        '[avoid_macos_deprecated_security_apis] Deprecated macOS Security API detected. Use modern equivalents. macOS Security framework has deprecated several APIs that may cause issues with notarization or future macOS versions.',
     correctionMessage:
-        'Replace deprecated Keychain APIs with SecItem* functions.',
+        'Replace deprecated Keychain APIs with SecItem* functions. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 

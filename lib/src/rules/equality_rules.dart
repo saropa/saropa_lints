@@ -127,7 +127,7 @@ class AvoidNegationsInEqualityChecksRule extends SaropaLintRule {
     problemMessage:
         '[avoid_negations_in_equality_checks] Equality check is wrapped in a negation operator !(a == b) instead of using the direct != operator. The negated form adds unnecessary cognitive overhead, increases nesting depth, and is harder to scan during code review. The != operator expresses the same intent more clearly and concisely.',
     correctionMessage:
-        'Replace !(a == b) with a != b for direct and readable inequality checking.',
+        'Replace !(a == b) with a != b for direct and readable inequality checking. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 

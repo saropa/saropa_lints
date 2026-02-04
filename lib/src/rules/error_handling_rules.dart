@@ -621,7 +621,7 @@ class AvoidNestedTryStatementsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_nested_try_statements',
     problemMessage:
-        '[avoid_nested_try_statements] Nested try statements found. Deeply nested error handling is hard to read and maintain.',
+        '[avoid_nested_try_statements] Nested try statements found. Deeply nested error handling is hard to read and maintain. Nested try-catch blocks make code harder to read and maintain. Extract nested logic into separate functions.',
     correctionMessage:
         'Extract inner try-catch into a separate function or refactor to flatten error handling. Example: move inner try to a helper method.',
     errorSeverity: DiagnosticSeverity.INFO,

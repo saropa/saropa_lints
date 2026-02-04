@@ -356,8 +356,9 @@ class RequireAudioFocusHandlingRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_audio_focus_handling',
     problemMessage:
-        '[require_audio_focus_handling] Audio playback should configure AudioSession for proper focus handling.',
-    correctionMessage: 'Use AudioSession.instance to configure audio behavior.',
+        '[require_audio_focus_handling] Audio playback should configure AudioSession for proper focus handling. Without proper audio session handling, your app may conflict with other audio sources (music apps, calls, navigation). Use audio_session package to configure proper audio focus behavior.',
+    correctionMessage:
+        'Use AudioSession.instance to configure audio behavior. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -846,9 +847,9 @@ class PreferBleMtuNegotiationRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_ble_mtu_negotiation',
     problemMessage:
-        '[prefer_ble_mtu_negotiation] BLE data transfer without MTU negotiation causes slow, fragmented transfers.',
+        '[prefer_ble_mtu_negotiation] BLE data transfer without MTU negotiation causes slow, fragmented transfers. BLE default MTU is only 23 bytes (20 bytes payload). Without negotiating a larger MTU, data transfers are fragmented into many small packets, causing poor throughput and increased latency. Always request MTU negotiation before transferring data.',
     correctionMessage:
-        'Call device.requestMtu(512) after connect() and before write operations.',
+        'Call device.requestMtu(512) after connect() and before write operations. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 

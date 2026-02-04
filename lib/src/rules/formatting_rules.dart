@@ -50,7 +50,8 @@ class NewlineBeforeCaseRule extends SaropaLintRule {
     name: 'prefer_blank_line_before_case',
     problemMessage:
         '[prefer_blank_line_before_case] Adding blank lines before case clauses is a formatting preference with no impact on code behavior or performance. Enable via the stylistic tier.',
-    correctionMessage: 'Add blank line before this case.',
+    correctionMessage:
+        'Add blank line before this case. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -126,7 +127,8 @@ class NewlineBeforeConstructorRule extends SaropaLintRule {
     name: 'prefer_blank_line_before_constructor',
     problemMessage:
         '[prefer_blank_line_before_constructor] Adding blank lines before constructors is a formatting preference with no impact on code behavior or performance. Enable via the stylistic tier.',
-    correctionMessage: 'Add blank line for better readability.',
+    correctionMessage:
+        'Add blank line to improve readability. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -212,7 +214,8 @@ class NewlineBeforeMethodRule extends SaropaLintRule {
     name: 'prefer_blank_line_before_method',
     problemMessage:
         '[prefer_blank_line_before_method] Adding blank lines before methods is a formatting preference with no impact on code behavior or performance. Enable via the stylistic tier.',
-    correctionMessage: 'Add blank line for better readability.',
+    correctionMessage:
+        'Add blank line to improve readability. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -283,7 +286,8 @@ class NewlineBeforeReturnRule extends SaropaLintRule {
     name: 'prefer_blank_line_before_return',
     problemMessage:
         '[prefer_blank_line_before_return] Adding blank lines before return statements is a formatting preference with no impact on code behavior or performance. Enable via the stylistic tier.',
-    correctionMessage: 'Insert a blank line before return for readability.',
+    correctionMessage:
+        'Insert a blank line before return for readability. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -385,7 +389,8 @@ class PreferTrailingCommaRule extends SaropaLintRule {
     name: 'prefer_trailing_comma',
     problemMessage:
         '[prefer_trailing_comma] Adding trailing commas in multi-line constructs is a formatting preference that affects diff readability. No performance or correctness impact. Enable via the stylistic tier.',
-    correctionMessage: 'Add a trailing comma.',
+    correctionMessage:
+        'Add a trailing comma. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -546,7 +551,8 @@ class UnnecessaryTrailingCommaRule extends SaropaLintRule {
     name: 'unnecessary_trailing_comma',
     problemMessage:
         '[unnecessary_trailing_comma] Removing trailing commas in single-line constructs is a formatting preference. No impact on code behavior or performance. Enable via the stylistic tier.',
-    correctionMessage: 'Remove trailing comma or keep on single line.',
+    correctionMessage:
+        'Remove trailing comma or keep on single line. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -669,7 +675,8 @@ class FormatCommentFormattingRule extends SaropaLintRule {
     name: 'format_comment_style',
     problemMessage:
         '[format_comment_style] Enforcing specific comment formatting conventions is a stylistic preference. Comment format has no impact on code behavior or performance. Enable via the stylistic tier.',
-    correctionMessage: 'Start with capital letter and end with punctuation.',
+    correctionMessage:
+        'Start with capital letter and end with punctuation. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -780,7 +787,7 @@ class MemberOrderingFormattingRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_member_ordering',
     problemMessage:
-        '[prefer_member_ordering] Class members are not in conventional order.',
+        '[prefer_member_ordering] Class members are not in conventional order. Members must be ordered: fields, constructors, methods.',
     correctionMessage:
         'Reorder class members to follow the conventional layout: static fields, instance fields, constructors, then methods.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -860,7 +867,7 @@ class ParametersOrderingConventionRule extends SaropaLintRule {
     problemMessage:
         '[enforce_parameters_ordering] Ordering parameters in a specific sequence is a convention preference. Parameter order does not affect performance or compiled output. Enable via the stylistic tier.',
     correctionMessage:
-        'Order: required positional, optional positional, named.',
+        'Order: required positional, optional positional, named. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -949,7 +956,8 @@ class EnumConstantsOrderingRule extends SaropaLintRule {
     name: 'enum_constants_ordering',
     problemMessage:
         '[enum_constants_ordering] Ordering enum constants alphabetically is a stylistic preference. Enum constant order does not affect runtime behavior or performance. Enable via the stylistic tier.',
-    correctionMessage: 'Consider ordering enum constants alphabetically.',
+    correctionMessage:
+        'Prefer ordering enum constants alphabetically. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 

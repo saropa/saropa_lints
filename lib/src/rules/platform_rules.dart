@@ -254,9 +254,9 @@ class PreferFoundationPlatformCheckRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_foundation_platform_check',
     problemMessage:
-        '[prefer_foundation_platform_check] Use defaultTargetPlatform in widget code.',
+        '[prefer_foundation_platform_check] Use defaultTargetPlatform in widget code. In widget code, defaultTargetPlatform from foundation is safer and allows for testing overrides. Platform requires dart:io which doesn\'t exist on web.',
     correctionMessage:
-        'Replace Platform.isX with defaultTargetPlatform == TargetPlatform.X.',
+        'Replace Platform.isX with defaultTargetPlatform == TargetPlatform.X. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 

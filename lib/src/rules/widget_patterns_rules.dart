@@ -6090,9 +6090,9 @@ class PreferSystemThemeDefaultRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_system_theme_default',
     problemMessage:
-        '[prefer_system_theme_default] Hardcoded ThemeMode ignores user\'s OS dark mode preference.',
+        '[prefer_system_theme_default] Hardcoded ThemeMode ignores user\'s OS dark mode preference. Using ThemeMode.light or ThemeMode.dark ignores user\'s OS preference. Default to ThemeMode.system to respect user settings, with option to override.',
     correctionMessage:
-        'Use ThemeMode.system as default to respect user settings.',
+        'Use ThemeMode.system as default to respect user settings. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -6361,7 +6361,7 @@ class PreferCupertinoForIosFeelRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_cupertino_for_ios_feel',
     problemMessage:
-        '[prefer_cupertino_for_ios_feel] Material widget has Cupertino equivalent for native iOS feel.',
+        '[prefer_cupertino_for_ios_feel] Material widget has Cupertino equivalent for native iOS feel. Material widgets look foreign on iOS. Use Cupertino equivalents or adaptive widgets for native iOS feel.',
     correctionMessage:
         'Use the Cupertino equivalent (e.g. CupertinoAlertDialog, CupertinoButton) or an adaptive widget (.adaptive constructor) to provide native iOS look and feel.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -6532,7 +6532,7 @@ class PreferKeyboardShortcutsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_keyboard_shortcuts',
     problemMessage:
-        '[prefer_keyboard_shortcuts] Desktop app should implement keyboard shortcuts for common actions.',
+        '[prefer_keyboard_shortcuts] Desktop app should implement keyboard shortcuts for common actions. Desktop users expect Ctrl+S, Ctrl+Z, etc. Implement Shortcuts and Actions for standard keyboard interactions.',
     correctionMessage:
         'Add Shortcuts and Actions widgets for standard keyboard shortcuts (Ctrl+S save, Ctrl+Z undo, Ctrl+C copy, etc.) to match desktop user expectations.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -6799,7 +6799,7 @@ class PreferVoidCallbackRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_void_callback',
     problemMessage:
-        '[prefer_void_callback] Use VoidCallback instead of void Function().',
+        '[prefer_void_callback] Use VoidCallback instead of void Function(). Using VoidCallback typedef is cleaner and more conventional in Flutter.',
     correctionMessage:
         'Replace void Function() with VoidCallback for consistency. Use ValueChanged<T> for void Function(T) and ValueGetter<T> for T Function().',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -6907,7 +6907,7 @@ class RequireOrientationHandlingRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_orientation_handling',
     problemMessage:
-        '[require_orientation_handling] MaterialApp without orientation handling. May break in landscape.',
+        '[require_orientation_handling] MaterialApp without orientation handling. May break in landscape. This widget pattern increases complexity and makes the widget tree harder to maintain and debug.',
     correctionMessage:
         'Call SystemChrome.setPreferredOrientations in main() to lock orientation, or use OrientationBuilder/LayoutBuilder to provide responsive layouts for both portrait and landscape.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -8298,7 +8298,7 @@ class PreferFeatureFolderStructureRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_feature_folder_structure',
     problemMessage:
-        '[prefer_feature_folder_structure] File in type-based folder. Consider feature-based organization.',
+        '[prefer_feature_folder_structure] File in type-based folder. Prefer feature-based organization. Group files by feature (/auth, /profile) instead of type (/bloc, /ui) to improve scalability.',
     correctionMessage:
         'Group related files by feature (e.g. features/auth/login_bloc.dart, features/auth/login_screen.dart) so all code for a feature is co-located and can be modified, tested, and deleted as a unit.',
     errorSeverity: DiagnosticSeverity.INFO,

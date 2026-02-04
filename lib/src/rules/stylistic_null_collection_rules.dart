@@ -445,7 +445,7 @@ class PreferLateOverNullableRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_late_over_nullable',
     problemMessage:
-        '[prefer_late_over_nullable] Use late instead of nullable for lazily initialized fields that are always set before first access.',
+        '[prefer_late_over_nullable] Use late instead of nullable for lazily initialized fields that are always set before first access. This is an opinionated rule - not included in any tier by default.',
     correctionMessage:
         'Declare the field as late to remove null checks — the runtime guarantees a LateInitializationError if read too early.',
     errorSeverity: DiagnosticSeverity.INFO,

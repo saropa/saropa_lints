@@ -59,7 +59,7 @@ class AvoidServiceLocatorInWidgetsRule extends SaropaLintRule {
     problemMessage:
         '[avoid_service_locator_in_widgets] Service locator in widget hides dependencies. Cannot mock in widget tests. This reduces testability, maintainability, and makes code harder to refactor.',
     correctionMessage:
-        'Add required constructor parameter: MyWidget({required this.service}).',
+        'Add required constructor parameter: MyWidget({required this.service}). Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -143,9 +143,9 @@ class AvoidTooManyDependenciesRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_too_many_dependencies',
     problemMessage:
-        '[avoid_too_many_dependencies] Constructor has >5 dependencies. Class likely violates Single Responsibility.',
+        '[avoid_too_many_dependencies] Constructor has >5 dependencies. Class likely violates Single Responsibility. Classes with many dependencies often violate single responsibility. Break the class into smaller, focused components.',
     correctionMessage:
-        'Group related dependencies into a facade class, or split this class.',
+        'Group related dependencies into a facade class, or split this class. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -251,9 +251,9 @@ class AvoidInternalDependencyCreationRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_internal_dependency_creation',
     problemMessage:
-        '[avoid_internal_dependency_creation] Dependency created internally. Cannot substitute mock for testing.',
+        '[avoid_internal_dependency_creation] Dependency created internally. Cannot substitute mock for testing. This DI pattern reduces testability and creates tight coupling between components.',
     correctionMessage:
-        'Add constructor parameter: MyClass(this._repo); then inject from outside.',
+        'Add constructor parameter: MyClass(this._repo); then inject from outside. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -332,9 +332,9 @@ class PreferAbstractDependenciesRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_abstract_dependencies',
     problemMessage:
-        '[prefer_abstract_dependencies] Depends on concrete implementation. Tight coupling prevents substitution.',
+        '[prefer_abstract_dependencies] Depends on concrete implementation. Tight coupling prevents substitution. Dependencies should depend on abstractions (interfaces/abstract classes), not concrete implementations, following the Dependency Inversion Principle.',
     correctionMessage:
-        'Use abstract type: replace PostgresUserRepo with UserRepository interface.',
+        'Use abstract type: replace PostgresUserRepo with UserRepository interface. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -424,9 +424,9 @@ class AvoidSingletonForScopedDependenciesRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_singleton_for_scoped_dependencies',
     problemMessage:
-        '[avoid_singleton_for_scoped_dependencies] Scoped data as singleton. State will persist across sessions/screens.',
+        '[avoid_singleton_for_scoped_dependencies] Scoped data as singleton. State will persist across sessions/screens. Some dependencies must be scoped to a specific lifecycle (e.g., per request, per screen) rather than being global singletons.',
     correctionMessage:
-        'Use registerFactory(() => MySession()) for fresh instance per scope.',
+        'Use registerFactory(() => MySession()) for fresh instance per scope. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -552,9 +552,9 @@ class AvoidCircularDiDependenciesRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_circular_di_dependencies',
     problemMessage:
-        '[avoid_circular_di_dependencies] Potential circular dependency detected.',
+        '[avoid_circular_di_dependencies] Potential circular dependency detected. Circular dependencies cause runtime errors or infinite loops during dependency resolution. Circular dependencies are detected in DI registration.',
     correctionMessage:
-        'Refactor to break the cycle using interfaces or events.',
+        'Refactor to break the cycle using interfaces or events. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -1061,9 +1061,9 @@ class PreferConstructorInjectionRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_constructor_injection',
     problemMessage:
-        '[prefer_constructor_injection] Setter/method injection hides dependencies. Use constructor injection.',
+        '[prefer_constructor_injection] Setter/method injection hides dependencies. Use constructor injection. Constructor injection makes dependencies explicit and ensures objects are fully initialized when created. Setter injection allows partially initialized objects and makes dependencies implicit.',
     correctionMessage:
-        'Make this a final field and add a constructor parameter: '
+        'Make this a final field and add a constructor parameter:. Verify the change works correctly with existing tests and add coverage for the new behavior.'
         'MyClass(this._service);',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -1255,9 +1255,9 @@ class RequireDiScopeAwarenessRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_di_scope_awareness',
     problemMessage:
-        '[require_di_scope_awareness] Review DI scope: singleton retains state, factory creates each time.',
+        '[require_di_scope_awareness] Review DI scope: singleton retains state, factory creates each time. Misusing DI scopes causes lifecycle bugs: - singleton: Created once, lives forever - lazySingleton: Created on first access, lives forever - factory: Created fresh each time.',
     correctionMessage:
-        'Use lazySingleton for expensive objects, factory for stateless handlers.',
+        'Use lazySingleton for expensive objects, factory for stateless handlers. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 

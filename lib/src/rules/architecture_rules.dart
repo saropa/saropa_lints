@@ -633,7 +633,7 @@ class AvoidTouchOnlyGesturesRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_touch_only_gestures',
     problemMessage:
-        '[avoid_touch_only_gestures] GestureDetector with only onTap. Missing desktop/web interactions.',
+        '[avoid_touch_only_gestures] GestureDetector with only onTap. Missing desktop/web interactions. Desktop and web apps support secondary click (right-click) and hover. Touch-only gesture handlers reduce accessibility on these platforms.',
     correctionMessage:
         'Add onSecondaryTap for right-click context menus and onLongPress as a mobile fallback for desktop interactions.',
     errorSeverity: DiagnosticSeverity.INFO,

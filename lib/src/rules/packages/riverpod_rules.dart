@@ -714,8 +714,9 @@ class PreferImmutableProviderArgumentsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_immutable_provider_arguments',
     problemMessage:
-        '[prefer_immutable_provider_arguments] Mutable provider arguments cause unpredictable rebuilds.',
-    correctionMessage: 'Use final for provider arguments.',
+        '[prefer_immutable_provider_arguments] Mutable provider arguments cause unpredictable rebuilds. Provider arguments must be immutable for consistent behavior. Mutable arguments can lead to unexpected state changes within the provider callback.',
+    correctionMessage:
+        'Use final for provider arguments. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -790,8 +791,9 @@ class AvoidUnnecessaryConsumerWidgetsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_unnecessary_consumer_widgets',
     problemMessage:
-        '[avoid_unnecessary_consumer_widgets] ConsumerWidget does not use ref parameter.',
-    correctionMessage: 'Use StatelessWidget instead if ref is not needed.',
+        '[avoid_unnecessary_consumer_widgets] ConsumerWidget does not use ref parameter. If a widget extends ConsumerWidget but doesn\'t use ref, it must be a regular StatelessWidget instead.',
+    correctionMessage:
+        'Use StatelessWidget instead if ref is not needed. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -1027,8 +1029,9 @@ class AvoidRiverpodStateMutationRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_riverpod_state_mutation',
     problemMessage:
-        '[avoid_riverpod_state_mutation] State mutated directly. Mutations don\'t trigger rebuilds.',
-    correctionMessage: 'Use state = state.copyWith(...) to replace state.',
+        '[avoid_riverpod_state_mutation] State mutated directly. Mutations don\'t trigger rebuilds. In Riverpod Notifiers, state must be replaced, not mutated. State is mutated directly instead of using state assignment.',
+    correctionMessage:
+        'Use state = state.copyWith(..) to replace state. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -1112,9 +1115,9 @@ class PreferRiverpodSelectRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_riverpod_select',
     problemMessage:
-        '[prefer_riverpod_select] ref.watch() accessing single field. Use .select() for efficiency.',
+        '[prefer_riverpod_select] ref.watch() accessing single field. Use .select() for efficiency. This pattern increases maintenance cost and the likelihood of introducing bugs during future changes.',
     correctionMessage:
-        'Use ref.watch(provider.select((s) => s.field)) for targeted rebuilds.',
+        'Use ref.watch(provider.select((s) => s.field)) for targeted rebuilds. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -1331,9 +1334,9 @@ class PreferRiverpodFamilyForParamsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_riverpod_family_for_params',
     problemMessage:
-        '[prefer_riverpod_family_for_params] Provider uses nullable state for parameterized data. Use .family instead.',
+        '[prefer_riverpod_family_for_params] Provider uses nullable state for parameterized data. Use .family instead. Using state to pass parameters to providers is error-prone. The .family modifier provides type-safe parameter passing.',
     correctionMessage:
-        'Use FutureProvider.family<T, Param>((ref, param) => ...) for parameterized providers.',
+        'Use FutureProvider.family<T, Param>((ref, param) => ..) for parameterized providers.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -2203,8 +2206,9 @@ class PreferRefWatchOverReadRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_ref_watch_over_read',
     problemMessage:
-        '[prefer_ref_watch_over_read] ref.read in build() won\'t rebuild widget when provider changes.',
-    correctionMessage: 'Use ref.watch() in build methods for reactive updates.',
+        '[prefer_ref_watch_over_read] ref.read in build() won\'t rebuild widget when provider changes. ref.read doesn\'t subscribe to changes - widget won\'t rebuild when provider updates. Use ref.watch in build methods for reactive updates.',
+    correctionMessage:
+        'Use ref.watch() in build methods for reactive updates. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -2546,9 +2550,9 @@ class PreferNotifierOverStateRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_notifier_over_state',
     problemMessage:
-        '[prefer_notifier_over_state] StateProvider exposes raw state to uncontrolled mutation.',
+        '[prefer_notifier_over_state] StateProvider exposes raw state to uncontrolled mutation. StateProvider is fine for simple state but Notifier provides: - Encapsulated business logic - Methods instead of raw state mutation - Better testability.',
     correctionMessage:
-        'Use NotifierProvider for encapsulated business logic and testability.',
+        'Use NotifierProvider for encapsulated business logic and testability. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -2644,9 +2648,9 @@ class RequireRiverpodLintRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_riverpod_lint',
     problemMessage:
-        '[require_riverpod_lint] Project uses Riverpod but riverpod_lint is not configured.',
+        '[require_riverpod_lint] Project uses Riverpod but riverpod_lint is not configured. The official riverpod_lint package catches Riverpod-specific mistakes that general linters miss. Use it alongside saropa_lints for complete coverage.',
     correctionMessage:
-        'Add riverpod_lint to dev_dependencies for Riverpod-specific linting.',
+        'Add riverpod_lint to dev_dependencies for Riverpod-specific linting. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -2811,8 +2815,9 @@ class RequireAsyncValueOrderRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_async_value_order',
     problemMessage:
-        '[require_async_value_order] AsyncValue.when() has non-standard parameter order.',
-    correctionMessage: 'Use order: data, error, loading for consistency.',
+        '[require_async_value_order] AsyncValue.when() has non-standard parameter order. The standard order is data, error, loading. Incorrect order makes code harder to read and may indicate confusion about the API.',
+    correctionMessage:
+        'Use order: data, error, loading for consistency. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -2878,9 +2883,9 @@ class PreferSelectorRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_context_selector',
     problemMessage:
-        '[prefer_context_selector] context.watch() accessing property. Use select() for efficiency.',
+        '[prefer_context_selector] context.watch() accessing property. Use select() for efficiency. watch() rebuilds on any change to the provider. Using select() limits rebuilds to specific property changes.',
     correctionMessage:
-        'Replace with context.select((notifier) => notifier.field).',
+        'Replace with context.select((notifier) => notifier.field). Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -3046,9 +3051,9 @@ class RequireRiverpodAsyncValueGuardRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_riverpod_async_value_guard',
     problemMessage:
-        '[require_riverpod_async_value_guard] Try-catch in async provider. Consider using AsyncValue.guard for consistent error handling.',
+        '[require_riverpod_async_value_guard] Try-catch in async provider. Use AsyncValue.guard for consistent error handling. AsyncValue.guard provides better error handling and state management for async operations in Riverpod providers.',
     correctionMessage:
-        'Replace try-catch with AsyncValue.guard(() => yourAsyncOperation()).',
+        'Replace try-catch with AsyncValue.guard(() => yourAsyncOperation()). Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -3325,9 +3330,9 @@ class AvoidRiverpodForNetworkOnlyRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_riverpod_for_network_only',
     problemMessage:
-        '[avoid_riverpod_for_network_only] Provider adds unnecessary indirection for a simple network client. Harder to debug.',
+        '[avoid_riverpod_for_network_only] Provider adds unnecessary indirection for a simple network client. Harder to debug. Using Riverpod just to access a network layer when direct injection would suffice adds unnecessary complexity.',
     correctionMessage:
-        'Use direct dependency injection instead of wrapping in a Provider.',
+        'Use direct dependency injection instead of wrapping in a Provider. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
