@@ -156,6 +156,14 @@ See [CHANGELOG.md](CHANGELOG.md) for implemented rules. Goal: 2000 rules.
 |-----------|------|----------|-------------|
 | ℹ️ `prefer_isar_for_complex_queries` | Comprehensive | INFO | Hive's query capabilities are limited. Isar supports complex queries, full-text search, and links between objects. |
 
+#### DB/IO Yield (All DB Packages + File I/O)
+
+| Rule Name | Tier | Severity | Description |
+|-----------|------|----------|-------------|
+| ⚠️ `require_yield_after_db_write` | Recommended | WARNING | Database or I/O write without a following `yieldToUI()` call. Write operations acquire exclusive locks that block the UI thread. |
+| ℹ️ `suggest_yield_after_db_read` | Recommended | INFO | Bulk database or I/O read without a following `yieldToUI()` call. Deserializing large payloads can cause frame drops. `findFirst` is excluded. |
+| ⚠️ `avoid_return_await_db` | Recommended | WARNING | Returning directly from a database/IO write skips `yieldToUI()`. Save to variable, yield, then return. Read operations are excluded. |
+
 ### 1.11 Platform-Specific Rules
 
 > **iOS/macOS**: Implemented in v2.4.0 - See [Apple Platform Rules Guide](doc/guides/apple_platform_rules.md) for 104 rules.
@@ -372,6 +380,20 @@ See [CHANGELOG.md](CHANGELOG.md) for implemented rules. Goal: 2000 rules.
 | ⚠️⭐ `no_empty_block` | Recommended | WARNING | Empty blocks indicate missing implementation or dead code. |
 | ℹ️ `tag_name` | Professional | INFO | Validate custom element tag names follow conventions. |
 | ⚠️ `banned_usage` | Professional | WARNING | Configurable rule to ban specific APIs, classes, or patterns. |
+
+### 1.63 Documentation Rules
+
+| Rule Name | Tier | Severity | Description |
+|-----------|------|----------|-------------|
+| ℹ️ `require_public_api_documentation` | Professional | INFO | Public classes and methods must have doc comments |
+| ℹ️ `avoid_misleading_documentation` | Professional | INFO | Doc comments must match method name and behavior |
+| ℹ️ `require_deprecation_message` | Recommended | INFO | `@Deprecated` must include migration guidance |
+| ℹ️ `require_complex_logic_comments` | Professional | INFO | Complex methods must have explanatory comments |
+| ℹ️ `require_parameter_documentation` | Professional | INFO | Parameters must be documented with `[paramName]` |
+| ℹ️ `require_return_documentation` | Professional | INFO | Non-void methods must document return value |
+| ℹ️ `require_exception_documentation` | Professional | INFO | Methods that throw must document exceptions |
+| ℹ️ `require_example_in_documentation` | Professional | INFO | Complex public classes should include usage examples |
+| ⚠️ `verify_documented_parameters_exist` | Professional | WARNING | Doc `[paramName]` references must match actual parameters |
 
 ### 1.62 Bloc/Cubit Rules
 

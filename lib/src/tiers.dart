@@ -669,7 +669,8 @@ const Set<String> recommendedOnlyRules = <String>{
   'require_isar_nullable_field',
 
   // Database / IO (all DB packages + file I/O)
-  'require_yield_between_db_awaits',
+  'require_yield_after_db_write',
+  'suggest_yield_after_db_read',
   'avoid_return_await_db',
 
   // BuildContext Safety (Recommended)
@@ -1572,6 +1573,7 @@ const Set<String> professionalOnlyRules = <String>{
   'require_return_documentation',
   'require_exception_documentation',
   'require_example_in_documentation',
+  'verify_documented_parameters_exist',
 
   // Dependency Injection
   'avoid_service_locator_in_widgets',
@@ -3138,7 +3140,8 @@ const Set<String> _databaseSharedRules = <String>{
   'require_database_migration',
   'require_database_index',
   'prefer_transaction_for_batch',
-  'require_yield_between_db_awaits',
+  'require_yield_after_db_write',
+  'suggest_yield_after_db_read',
   'avoid_return_await_db',
 };
 
