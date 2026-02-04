@@ -82,6 +82,21 @@ def run_pre_publish_audits(project_dir: Path) -> bool:
         print_error("Blocking audit issues found (duplicate rules).")
         return False
 
+    # --- INFORMATIONAL: DX message improvement analysis ---
+    from scripts.improve_dx_messages import run_dx_analysis
+
+    dx = run_dx_analysis()
+    if dx.total > 0:
+        print_info(
+            f"DX messages: {dx.total} improvable "
+            f"({dx.fixed} auto-fixable, "
+            f"{dx.partial} need review)"
+        )
+        if dx.report_path:
+            print_info(f"DX report: {dx.report_path.name}")
+    else:
+        print_success("All DX messages meet quality thresholds.")
+
     print_success("All pre-publish audit checks passed.")
     return True
 
