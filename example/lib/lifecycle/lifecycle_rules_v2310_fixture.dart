@@ -132,6 +132,148 @@ class _GoodDidUpdateWidgetEqualityState
   Widget build(BuildContext context) => Container();
 }
 
+// GOOD: didUpdateWidget with listEquals
+class GoodDidUpdateWidgetListEquals extends StatefulWidget {
+  const GoodDidUpdateWidgetListEquals({
+    super.key,
+    required this.countries,
+  });
+  final List<String> countries;
+
+  @override
+  State<GoodDidUpdateWidgetListEquals> createState() =>
+      _GoodDidUpdateWidgetListEqualsState();
+}
+
+class _GoodDidUpdateWidgetListEqualsState
+    extends State<GoodDidUpdateWidgetListEquals> {
+  @override
+  void didUpdateWidget(GoodDidUpdateWidgetListEquals oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (!listEquals(widget.countries, oldWidget.countries)) {
+      _reload();
+    }
+  }
+
+  void _reload() {}
+
+  @override
+  Widget build(BuildContext context) => Container();
+}
+
+// GOOD: didUpdateWidget with multiple listEquals checks
+class GoodDidUpdateWidgetMultiListEquals extends StatefulWidget {
+  const GoodDidUpdateWidgetMultiListEquals({
+    super.key,
+    required this.contacts,
+    required this.activities,
+  });
+  final List<String> contacts;
+  final List<String> activities;
+
+  @override
+  State<GoodDidUpdateWidgetMultiListEquals> createState() =>
+      _GoodDidUpdateWidgetMultiListEqualsState();
+}
+
+class _GoodDidUpdateWidgetMultiListEqualsState
+    extends State<GoodDidUpdateWidgetMultiListEquals> {
+  @override
+  void didUpdateWidget(GoodDidUpdateWidgetMultiListEquals oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (!listEquals(widget.contacts, oldWidget.contacts) ||
+        !listEquals(widget.activities, oldWidget.activities)) {
+      _refresh();
+    }
+  }
+
+  void _refresh() {}
+
+  @override
+  Widget build(BuildContext context) => Container();
+}
+
+// GOOD: didUpdateWidget with setEquals
+class GoodDidUpdateWidgetSetEquals extends StatefulWidget {
+  const GoodDidUpdateWidgetSetEquals({super.key, required this.tags});
+  final Set<String> tags;
+
+  @override
+  State<GoodDidUpdateWidgetSetEquals> createState() =>
+      _GoodDidUpdateWidgetSetEqualsState();
+}
+
+class _GoodDidUpdateWidgetSetEqualsState
+    extends State<GoodDidUpdateWidgetSetEquals> {
+  @override
+  void didUpdateWidget(GoodDidUpdateWidgetSetEquals oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (!setEquals(widget.tags, oldWidget.tags)) {
+      _refresh();
+    }
+  }
+
+  void _refresh() {}
+
+  @override
+  Widget build(BuildContext context) => Container();
+}
+
+// GOOD: didUpdateWidget with mapEquals
+class GoodDidUpdateWidgetMapEquals extends StatefulWidget {
+  const GoodDidUpdateWidgetMapEquals({super.key, required this.config});
+  final Map<String, String> config;
+
+  @override
+  State<GoodDidUpdateWidgetMapEquals> createState() =>
+      _GoodDidUpdateWidgetMapEqualsState();
+}
+
+class _GoodDidUpdateWidgetMapEqualsState
+    extends State<GoodDidUpdateWidgetMapEquals> {
+  @override
+  void didUpdateWidget(GoodDidUpdateWidgetMapEquals oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (!mapEquals(widget.config, oldWidget.config)) {
+      _apply();
+    }
+  }
+
+  void _apply() {}
+
+  @override
+  Widget build(BuildContext context) => Container();
+}
+
+// GOOD: didUpdateWidget with identical
+class GoodDidUpdateWidgetIdentical extends StatefulWidget {
+  const GoodDidUpdateWidgetIdentical({
+    super.key,
+    required this.callback,
+  });
+  final VoidCallback callback;
+
+  @override
+  State<GoodDidUpdateWidgetIdentical> createState() =>
+      _GoodDidUpdateWidgetIdenticalState();
+}
+
+class _GoodDidUpdateWidgetIdenticalState
+    extends State<GoodDidUpdateWidgetIdentical> {
+  @override
+  void didUpdateWidget(GoodDidUpdateWidgetIdentical oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (!identical(widget.callback, oldWidget.callback)) {
+      _rebind();
+    }
+  }
+
+  void _rebind() {}
+
+  @override
+  Widget build(BuildContext context) => Container();
+}
+
 // =========================================================================
 // Widget Lifecycle Rules (from v4.1.4)
 // =========================================================================

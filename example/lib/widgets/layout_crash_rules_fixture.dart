@@ -37,6 +37,63 @@ Widget testPositionedInStackSubclassGood() {
   return Indexer(children: [Positioned(top: 10, child: Text('x'))]);
 }
 
+// Builder callback tests: Positioned in named-parameter callbacks should
+// not trigger because the runtime parent depends on the call site.
+
+class _PositionedInBlocBuilder extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return BlocBuilder<Bloc<Object, Object>, Object>(
+      builder: (context, state) {
+        return Positioned(top: 10, child: Text('x'));
+      },
+    );
+  }
+}
+
+class _PositionedInStreamBuilder extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return StreamBuilder<int>(
+      stream: Stream.value(1),
+      builder: (context, snapshot) {
+        return Positioned(top: 10, child: Text('x'));
+      },
+    );
+  }
+}
+
+class _PositionedInBuilderArrow extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Builder(
+      builder: (context) => Positioned(top: 10, child: Text('x')),
+    );
+  }
+}
+
+class _PositionedInLayoutBuilder extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        return Positioned(top: 10, child: Text('x'));
+      },
+    );
+  }
+}
+
+Widget testPositionedInColumnInsideBuilderIndeterminate() {
+  // Positioned inside a Column inside a builder callback. The callback
+  // boundary makes this indeterminate (cannot determine runtime parent
+  // from static analysis), so it does NOT trigger.
+  return BlocBuilder<Bloc<Object, Object>, Object>(
+    builder: (context, state) {
+      return Column(children: [Positioned(top: 10, child: Text('x'))]);
+    },
+  );
+}
+
 // ============================================================
 // avoid_spacer_in_wrap
 // ============================================================
