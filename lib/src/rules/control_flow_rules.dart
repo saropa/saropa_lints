@@ -966,6 +966,10 @@ class AvoidNestedAssignmentsRule extends SaropaLintRule {
       // Skip if parent is ForEachParts (for-in loop variable)
       if (parent is ForEachParts) return;
 
+      // Skip if parent is ForParts (standard for-loop update clause)
+      // e.g. for (int i = 0; i < n; i += step)
+      if (parent is ForParts) return;
+
       // Skip if parent is VariableDeclaration
       if (parent is VariableDeclaration) return;
 
