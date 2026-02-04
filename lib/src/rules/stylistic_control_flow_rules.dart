@@ -4,7 +4,6 @@ import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/token.dart';
 import 'package:analyzer/error/error.dart'
     show AnalysisError, DiagnosticSeverity;
-import 'package:analyzer/source/source_range.dart';
 import 'package:custom_lint_builder/custom_lint_builder.dart';
 
 import '../saropa_lint_rule.dart';
@@ -808,90 +807,6 @@ class PreferDefaultEnumCaseRule extends SaropaLintRule {
 ///   return await computeValue();
 /// }
 /// ```
-class PreferAsyncOnlyWhenAwaitingRule extends SaropaLintRule {
-  const PreferAsyncOnlyWhenAwaitingRule() : super(code: _code);
-
-  @override
-  LintImpact get impact => LintImpact.opinionated;
-
-  @override
-  RuleCost get cost => RuleCost.medium;
-
-  static const LintCode _code = LintCode(
-    name: 'prefer_async_only_when_awaiting',
-    problemMessage:
-        '[prefer_async_only_when_awaiting] Function is marked async but contains no await expressions, adding unnecessary Future wrapping overhead and obscuring intent.',
-    correctionMessage:
-        'Remove the async keyword and return a Future directly, or add await expressions if asynchronous work is intended.',
-    errorSeverity: DiagnosticSeverity.INFO,
-  );
-
-  @override
-  void runWithReporter(
-    CustomLintResolver resolver,
-    SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
-  ) {
-    context.registry.addFunctionBody((node) {
-      if (node is! BlockFunctionBody) return;
-      if (!node.isAsynchronous) return;
-
-      // Check for await expressions
-      bool hasAwait = false;
-
-      void checkStatement(Statement stmt) {
-        if (hasAwait) return;
-
-        if (stmt is ExpressionStatement) {
-          if (_containsAwaitExpression(stmt.expression)) hasAwait = true;
-        } else if (stmt is ReturnStatement && stmt.expression != null) {
-          if (_containsAwaitExpression(stmt.expression!)) hasAwait = true;
-        } else if (stmt is VariableDeclarationStatement) {
-          for (final v in stmt.variables.variables) {
-            if (v.initializer != null &&
-                _containsAwaitExpression(v.initializer!)) {
-              hasAwait = true;
-            }
-          }
-        } else if (stmt is IfStatement) {
-          checkStatement(stmt.thenStatement);
-          if (stmt.elseStatement != null) {
-            checkStatement(stmt.elseStatement!);
-          }
-        } else if (stmt is Block) {
-          for (final s in stmt.statements) {
-            checkStatement(s);
-          }
-        } else if (stmt is ForStatement) {
-          checkStatement(stmt.body);
-        } else if (stmt is WhileStatement) {
-          checkStatement(stmt.body);
-        } else if (stmt is TryStatement) {
-          checkStatement(stmt.body);
-          for (final clause in stmt.catchClauses) {
-            checkStatement(clause.body);
-          }
-          if (stmt.finallyBlock != null) {
-            checkStatement(stmt.finallyBlock!);
-          }
-        }
-      }
-
-      for (final stmt in node.block.statements) {
-        checkStatement(stmt);
-        if (hasAwait) break;
-      }
-
-      if (!hasAwait) {
-        reporter.atNode(node, code);
-      }
-    });
-  }
-
-  @override
-  List<Fix> getFixes() => <Fix>[_PreferAsyncOnlyWhenAwaitingFix()];
-}
-
 /// Warns when await is preferred over .then() chains.
 ///
 /// This is an **opinionated rule** - not included in any tier by default.
@@ -1081,39 +996,6 @@ class PreferSyncOverAsyncWhereSimpleRule extends SaropaLintRule {
 // =============================================================================
 // QUICK FIXES
 // =============================================================================
-
-class _PreferAsyncOnlyWhenAwaitingFix extends DartFix {
-  @override
-  void run(
-    CustomLintResolver resolver,
-    ChangeReporter reporter,
-    CustomLintContext context,
-    AnalysisError analysisError,
-    List<AnalysisError> others,
-  ) {
-    context.registry.addFunctionBody((FunctionBody node) {
-      if (!analysisError.sourceRange.intersects(node.sourceRange)) return;
-      if (node is! BlockFunctionBody) return;
-      if (!node.isAsynchronous) return;
-
-      final changeBuilder = reporter.createChangeBuilder(
-        message: 'Remove async keyword',
-        priority: 80,
-      );
-
-      changeBuilder.addDartFileEdit((builder) {
-        // Find and remove the 'async' keyword
-        final keyword = node.keyword;
-        if (keyword != null && keyword.lexeme == 'async') {
-          // Remove 'async ' (including the trailing space)
-          builder.addDeletion(
-            SourceRange(keyword.offset, keyword.length + 1),
-          );
-        }
-      });
-    });
-  }
-}
 
 // =============================================================================
 // POSITIVE CONDITIONS RULE
