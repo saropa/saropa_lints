@@ -271,12 +271,9 @@ class RequireDidUpdateWidgetCheckRule extends SaropaLintRule {
     problemMessage:
         '[require_did_update_widget_check] didUpdateWidget triggers updates without checking if properties changed, causing unnecessary rebuilds.',
     correctionMessage:
-        'Compare oldWidget.property != widget.property before updating state.',
+        'Compare properties using operators (oldWidget.x != widget.x) or functions (listEquals, setEquals, mapEquals) before updating state.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
-
-  // Cached regex for performance - matches whitespace
-  static final RegExp _whitespacePattern = RegExp(r'\s+');
 
   @override
   void runWithReporter(
@@ -307,24 +304,19 @@ class RequireDidUpdateWidgetCheckRule extends SaropaLintRule {
 
       final String bodySource = body.toSource();
 
-      // Check if it only calls super.didUpdateWidget
-      final String trimmed = bodySource
-          .replaceAll(_whitespacePattern, '')
-          .replaceAll('{', '')
-          .replaceAll('}', '');
-
-      // If body only contains super call, no need to warn
-      if (trimmed == 'super.didUpdateWidget($paramName);') return;
-
-      // Check if the parameter is accessed for comparison
-      // Look for: paramName.property, paramName != , paramName == , paramName.hashCode
-      final RegExp comparisonPattern = RegExp(
-        '${RegExp.escape(paramName)}\\s*\\.\\w+\\s*[!=]=|'
-        '${RegExp.escape(paramName)}\\s*[!=]=|'
-        '[!=]=\\s*${RegExp.escape(paramName)}',
+      // Strip super.didUpdateWidget(paramName) and check if paramName
+      // is still referenced anywhere in the body. This catches operator-based
+      // comparisons (!=, ==) and function-based comparisons (listEquals,
+      // setEquals, mapEquals, identical) without maintaining a regex.
+      final RegExp superCallPattern = RegExp(
+        r'super\s*\.\s*didUpdateWidget\s*\(\s*' +
+            RegExp.escape(paramName) +
+            r'\s*\)',
       );
+      final String bodyWithoutSuper =
+          bodySource.replaceAll(superCallPattern, '');
 
-      if (!comparisonPattern.hasMatch(bodySource)) {
+      if (!bodyWithoutSuper.contains(paramName)) {
         reporter.atNode(node, code);
       }
     });
