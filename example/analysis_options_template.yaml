@@ -481,7 +481,7 @@ custom_lint:
     - avoid_unbounded_listview_in_column: false  # ERROR - ListView in Column needs Expanded (v4.9.14)
     - avoid_textfield_in_row: false              # ERROR - TextField in Row needs width constraint (v4.9.14)
     - avoid_fixed_size_in_scaffold_body: false   # WARNING - Scaffold body with TextField needs ScrollView (v4.9.14)
-    - prefer_expanded_at_call_site: false        # WARNING - Don't return Expanded from build() (v3.0.0)
+    - prefer_expanded_at_call_site: false        # ERROR - Don't return Expanded/Flexible/Spacer from build() (v3.0.0)
     - avoid_stack_without_positioned: false      # WARNING - Stack needs Positioned (v2.3.10)
     - avoid_builder_index_out_of_bounds: false   # WARNING - runtime crash (v2.3.11)
     - avoid_duplicate_widget_keys: false

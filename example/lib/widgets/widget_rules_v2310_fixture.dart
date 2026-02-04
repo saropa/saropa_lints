@@ -355,6 +355,90 @@ class GoodTernaryNoExpanded extends StatelessWidget {
   }
 }
 
+// BAD: Returning Spacer from build() (expression body)
+class BadSpacerInBuild extends StatelessWidget {
+  const BadSpacerInBuild({super.key});
+
+  @override
+  // expect_lint: prefer_expanded_at_call_site
+  Widget build(BuildContext context) => const Spacer();
+}
+
+// BAD: Returning Spacer from build() (block body)
+class BadSpacerInBuildBlock extends StatelessWidget {
+  const BadSpacerInBuildBlock({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    // expect_lint: prefer_expanded_at_call_site
+    return const Spacer(flex: 2);
+  }
+}
+
+// GOOD: Spacer inside Column (not as build return value)
+class GoodSpacerInColumn extends StatelessWidget {
+  const GoodSpacerInColumn({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        Container(),
+        const Spacer(),
+        Container(),
+      ],
+    );
+  }
+}
+
+// =========================================================================
+// avoid_single_child_column_row — collection-if / collection-for
+// =========================================================================
+
+// BAD: Single static child, no dynamic elements
+class BadSingleChildColumn extends StatelessWidget {
+  const BadSingleChildColumn({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    // expect_lint: avoid_single_child_column_row
+    return Column(children: [Container()]);
+  }
+}
+
+// GOOD: Single collection-if can produce 0 or 1 children at runtime
+class GoodColumnWithCollectionIf extends StatelessWidget {
+  const GoodColumnWithCollectionIf({super.key});
+  final bool show = true;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(children: [if (show) Container()]);
+  }
+}
+
+// GOOD: Single collection-for can produce 0..N children at runtime
+class GoodColumnWithCollectionFor extends StatelessWidget {
+  const GoodColumnWithCollectionFor({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final items = <int>[1, 2, 3];
+    return Row(children: [for (final i in items) Container()]);
+  }
+}
+
+// GOOD: Static child + collection-if — not a single-child list
+class GoodColumnWithMixedElements extends StatelessWidget {
+  const GoodColumnWithMixedElements({super.key});
+  final bool show = true;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(children: [Container(), if (show) Container()]);
+  }
+}
+
 // =========================================================================
 // Helper mocks
 // =========================================================================
@@ -367,6 +451,11 @@ class Expanded extends Widget {
 class Flexible extends Widget {
   const Flexible({super.key, required this.child});
   final Widget child;
+}
+
+class Spacer extends Widget {
+  const Spacer({super.key, this.flex = 1});
+  final int flex;
 }
 
 class Stack extends Widget {
