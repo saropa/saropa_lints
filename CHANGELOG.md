@@ -25,6 +25,7 @@ Dates are not included in version headers — [pub.dev](https://pub.dev/packages
 
 - **`avoid_expanded_outside_flex` no longer duplicates `prefer_expanded_at_call_site`**: When Expanded/Flexible/Spacer is returned directly from `build()` without an intermediate widget wrapper, `avoid_expanded_outside_flex` now defers to `prefer_expanded_at_call_site` instead of reporting a second diagnostic on the same node. Expanded nested inside a non-Flex widget within `build()` is still reported by `avoid_expanded_outside_flex`.
 - **`avoid_single_child_column_row` reduced false positives on collection-if and collection-for**: Rule now treats `IfElement` and `ForElement` as dynamic-count elements (like `SpreadElement`). Previously, a `children` list containing a single collection-if or collection-for was incorrectly flagged as a single-child Column/Row, even though these elements can produce 0, 1, or many children at runtime.
+- **`avoid_manual_date_formatting` reduced false positives on non-display contexts**: Rule now verifies the target object is actually `DateTime` via static type checking (properties named `year`, `month`, etc. on non-DateTime types are no longer flagged). Additionally, string interpolations used as map keys, cache keys, or arguments to map methods (`putIfAbsent`, `containsKey`, `remove`) are skipped. Variables with internal-use names containing `key`, `cache`, `tag`, `hash`, `bucket`, or `identifier` are also excluded.
 
 ---
 ## [4.9.20]
