@@ -11,7 +11,7 @@ import 'package:analyzer/error/error.dart'
     show AnalysisError, DiagnosticSeverity;
 import 'package:custom_lint_builder/custom_lint_builder.dart';
 
-import '../saropa_lint_rule.dart';
+import '../../saropa_lint_rule.dart';
 
 // =============================================================================
 // avoid_prefs_for_large_data (from firebase_rules.dart)

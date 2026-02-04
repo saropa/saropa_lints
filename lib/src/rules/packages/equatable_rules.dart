@@ -6,8 +6,8 @@ import 'package:analyzer/error/error.dart'
 import 'package:analyzer/source/source_range.dart';
 import 'package:custom_lint_builder/custom_lint_builder.dart';
 
-import '../saropa_lint_rule.dart';
-import '../type_annotation_utils.dart';
+import '../../saropa_lint_rule.dart';
+import '../../type_annotation_utils.dart';
 
 // =============================================================================
 // Shared Utilities

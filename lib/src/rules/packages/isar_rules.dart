@@ -12,8 +12,8 @@ import 'package:analyzer/error/error.dart'
 import 'package:analyzer/source/source_range.dart';
 import 'package:custom_lint_builder/custom_lint_builder.dart';
 
-import '../mode_constants_utils.dart';
-import '../saropa_lint_rule.dart';
+import '../../mode_constants_utils.dart';
+import '../../saropa_lint_rule.dart';
 
 /// Warns when enum types are used directly as fields in Isar `@collection` classes.
 ///
