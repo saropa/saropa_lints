@@ -3576,32 +3576,33 @@ class PreferIntrinsicDimensionsRule extends SaropaLintRule {
   }
 }
 
-/// Warns when keyboard shortcuts don't use the Actions/Shortcuts system.
+/// Warns when Column/Row inside SingleChildScrollView may have unbounded
+/// constraints.
 ///
-/// The Actions/Shortcuts system provides better accessibility and
-/// consistency across platforms.
+/// Expanded/Flexible children in an unbounded scroll axis throw
+/// RenderFlex overflow errors at runtime.
 ///
 /// **BAD:**
 /// ```dart
-/// RawKeyboardListener(
-///   onKey: (event) {
-///     if (event.isKeyPressed(LogicalKeyboardKey.enter)) {
-///       submit();
-///     }
-///   },
-///   child: Form(...),
+/// SingleChildScrollView(
+///   child: Column(
+///     children: [
+///       Expanded(child: Text('Crash')),
+///     ],
+///   ),
 /// )
 /// ```
 ///
 /// **GOOD:**
 /// ```dart
-/// Shortcuts(
-///   shortcuts: {
-///     LogicalKeySet(LogicalKeyboardKey.enter): SubmitIntent(),
-///   },
-///   child: Actions(
-///     actions: {SubmitIntent: SubmitAction()},
-///     child: Form(...),
+/// SingleChildScrollView(
+///   child: Column(
+///     children: [
+///       ConstrainedBox(
+///         constraints: BoxConstraints(maxHeight: 200),
+///         child: Text('Safe'),
+///       ),
+///     ],
 ///   ),
 /// )
 /// ```
@@ -3922,30 +3923,28 @@ class AvoidUnconstrainedBoxMisuseRule extends SaropaLintRule {
   }
 }
 
-/// Warns when FutureBuilder/StreamBuilder doesn't handle errors.
+/// Warns when AppBar is used inside CustomScrollView instead of SliverAppBar.
 ///
-/// Async builders should handle error states for robustness.
+/// SliverAppBar integrates with CustomScrollView for scroll-based effects
+/// like collapsing, floating, and pinning.
 ///
 /// **BAD:**
 /// ```dart
-/// FutureBuilder<User>(
-///   future: fetchUser(),
-///   builder: (context, snapshot) {
-///     if (snapshot.hasData) return UserWidget(snapshot.data!);
-///     return CircularProgressIndicator();
-///   },
+/// CustomScrollView(
+///   slivers: [
+///     SliverToBoxAdapter(child: AppBar(title: Text('Title'))),
+///     SliverList(...),
+///   ],
 /// )
 /// ```
 ///
 /// **GOOD:**
 /// ```dart
-/// FutureBuilder<User>(
-///   future: fetchUser(),
-///   builder: (context, snapshot) {
-///     if (snapshot.hasError) return ErrorWidget(snapshot.error!);
-///     if (snapshot.hasData) return UserWidget(snapshot.data!);
-///     return CircularProgressIndicator();
-///   },
+/// CustomScrollView(
+///   slivers: [
+///     SliverAppBar(title: Text('Title'), floating: true),
+///     SliverList(...),
+///   ],
 /// )
 /// ```
 
