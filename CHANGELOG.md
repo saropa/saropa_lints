@@ -15,6 +15,8 @@ Dates are not included in version headers — [pub.dev](https://pub.dev/packages
 
 ### Changed
 
+- **Publish script defers version prompt until after analysis**: The `publish_to_pubdev.py` script no longer asks for the publish version upfront. Audits, prerequisites, tests, formatting, and static analysis all run first; the version prompt now appears at Step 8 only after all analysis passes.
+
 - **`prefer_expanded_at_call_site` severity upgraded to ERROR**: Bumped from WARNING to ERROR and impact from medium to critical — returning Expanded/Flexible/Spacer from `build()` causes the same class of runtime crash (ParentDataWidget error) as `avoid_expanded_outside_flex`. Moved from recommended tier to essential tier.
 - **`prefer_expanded_at_call_site` now detects `Spacer`**: Added `Spacer` to the detection set alongside `Expanded` and `Flexible`. Returning `Spacer` from `build()` has the same crash risk since it wraps `Expanded` internally.
 - **`avoid_expanded_outside_flex` now detects `Spacer`**: Same `Spacer` gap fixed in the sibling rule.

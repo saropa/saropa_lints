@@ -14,13 +14,14 @@ Workflow:
     Step 5:  Run tests
     Step 6:  Format code
     Step 7:  Run static analysis
-    Step 8:  Validate CHANGELOG.md
-    Step 9:  Generate documentation
-    Step 10: Pre-publish validation (dart pub publish --dry-run)
-    Step 11: Commit and push
-    Step 12: Create git tag
-    Step 13: Publish via GitHub Actions
-    Step 14: Create GitHub release
+    Step 8:  Prompt for publish version
+    Step 9:  Validate CHANGELOG.md
+    Step 10: Generate documentation
+    Step 11: Pre-publish validation (dart pub publish --dry-run)
+    Step 12: Commit and push
+    Step 13: Create git tag
+    Step 14: Publish via GitHub Actions
+    Step 15: Create GitHub release
 
 Options:
     --audit-only      Run audit + integrity checks only, skip publish
@@ -320,19 +321,87 @@ def main() -> int:
             print_warning("No auto-fixable issues found.")
         return ExitCode.SUCCESS.value
 
-    # --- Package info ---
+    # --- Package info (basic, version-independent) ---
     package_name = get_package_name(pubspec_path)
     pubspec_version = get_version_from_pubspec(pubspec_path)
     branch = get_current_branch(project_dir)
     remote_url = get_remote_url(project_dir)
+    rule_count = count_rules(project_dir)
+    category_count = count_categories(project_dir)
 
-    # Default to next patch if current version is already published
+    print_header(f"SAROPA LINTS PUBLISHER v{SCRIPT_VERSION}")
+    print_colored("  Package Information:", Color.WHITE)
+    print_colored(f"      Name:       {package_name}", Color.CYAN)
+    print_colored(f"      Current:    {pubspec_version}", Color.CYAN)
+    print_colored(f"      Branch:     {branch}", Color.CYAN)
+    print_colored(f"      Repository: {remote_url}", Color.CYAN)
+    print_colored(
+        f"      Rules:      {rule_count} in {category_count} categories",
+        Color.CYAN,
+    )
+    print()
+
+    display_changelog(project_dir)
+    display_test_coverage(project_dir)
+    display_roadmap_summary(project_dir)
+
+    # --- Step 1: Pre-publish audits (unless --skip-audit) ---
+    audit_only = "--audit-only" in sys.argv
+    skip_audit = "--skip-audit" in sys.argv
+
+    if not skip_audit:
+        print_header("STEP 1: PRE-PUBLISH AUDIT")
+        if not run_pre_publish_audits(project_dir):
+            exit_with_error(
+                "Pre-publish audit failed. Fix issues before publishing.",
+                ExitCode.AUDIT_FAILED,
+            )
+
+        if audit_only:
+            print_success("Audit complete (--audit-only mode).")
+            return ExitCode.SUCCESS.value
+
+        # Gate: ask to continue
+        print()
+        response = (
+            input("  Audit passed. Continue to publish? [Y/n] ")
+            .strip()
+            .lower()
+        )
+        if response.startswith("n"):
+            print_warning("Publish cancelled by user.")
+            return ExitCode.USER_CANCELLED.value
+    elif audit_only:
+        print_warning("--audit-only and --skip-audit are contradictory.")
+        return ExitCode.USER_CANCELLED.value
+
+    # --- Steps 2-7: Analysis workflow (version-independent) ---
+    if not check_prerequisites():
+        exit_with_error("Prerequisites failed", ExitCode.PREREQUISITES_FAILED)
+
+    ok, _ = check_working_tree(project_dir)
+    if not ok:
+        exit_with_error("Aborted.", ExitCode.USER_CANCELLED)
+
+    if not check_remote_sync(project_dir, branch):
+        exit_with_error("Remote sync failed", ExitCode.WORKING_TREE_FAILED)
+
+    if not run_tests(project_dir):
+        exit_with_error("Tests failed.", ExitCode.TEST_FAILED)
+
+    if not run_format(project_dir):
+        exit_with_error("Formatting failed.", ExitCode.VALIDATION_FAILED)
+
+    if not run_analysis(project_dir):
+        exit_with_error("Analysis failed.", ExitCode.ANALYSIS_FAILED)
+
+    # --- Step 8: Prompt for version (after analysis passes) ---
+    print_header("VERSION")
     if tag_exists_on_remote(project_dir, f"v{pubspec_version}"):
         default_version = increment_patch_version(pubspec_version)
     else:
         default_version = pubspec_version
 
-    # Confirm or override publish version
     version = _prompt_version(default_version)
 
     if not re.match(r"^\d+\.\d+\.\d+$", version):
@@ -377,7 +446,7 @@ def main() -> int:
                 ExitCode.CHANGELOG_FAILED,
             )
 
-    # Early check: fail fast if this version is already published
+    # Fail fast if this version is already published
     tag_name = f"v{version}"
     if tag_exists_on_remote(project_dir, tag_name):
         exit_with_error(
@@ -386,77 +455,12 @@ def main() -> int:
             ExitCode.GIT_FAILED,
         )
 
-    print_header(f"SAROPA LINTS PUBLISHER v{SCRIPT_VERSION}")
-    print_colored("  Package Information:", Color.WHITE)
-    print_colored(f"      Name:       {package_name}", Color.CYAN)
-    print_colored(f"      Version:    {version}", Color.CYAN)
+    print_colored(f"      Publishing: {version}", Color.CYAN)
     print_colored(f"      Tag:        v{version}", Color.CYAN)
-    print_colored(f"      Branch:     {branch}", Color.CYAN)
-    print_colored(f"      Repository: {remote_url}", Color.CYAN)
-
-    rule_count = count_rules(project_dir)
-    category_count = count_categories(project_dir)
-    print_colored(
-        f"      Rules:      {rule_count} in {category_count} categories",
-        Color.CYAN,
-    )
     print()
 
-    display_changelog(project_dir)
-    display_test_coverage(project_dir)
-    display_roadmap_summary(project_dir)
-
-    # --- Step 1: Pre-publish audits (unless --skip-audit) ---
-    audit_only = "--audit-only" in sys.argv
-    skip_audit = "--skip-audit" in sys.argv
-
-    if not skip_audit:
-        print_header("STEP 1: PRE-PUBLISH AUDIT")
-        if not run_pre_publish_audits(project_dir):
-            exit_with_error(
-                "Pre-publish audit failed. Fix issues before publishing.",
-                ExitCode.AUDIT_FAILED,
-            )
-
-        if audit_only:
-            print_success("Audit complete (--audit-only mode).")
-            return ExitCode.SUCCESS.value
-
-        # Gate: ask to continue
-        print()
-        response = (
-            input("  Audit passed. Continue to publish? [Y/n] ")
-            .strip()
-            .lower()
-        )
-        if response.startswith("n"):
-            print_warning("Publish cancelled by user.")
-            return ExitCode.USER_CANCELLED.value
-    elif audit_only:
-        print_warning("--audit-only and --skip-audit are contradictory.")
-        return ExitCode.USER_CANCELLED.value
-
-    # --- Steps 2-10: Publish workflow ---
-    if not check_prerequisites():
-        exit_with_error("Prerequisites failed", ExitCode.PREREQUISITES_FAILED)
-
-    ok, _ = check_working_tree(project_dir)
-    if not ok:
-        exit_with_error("Aborted.", ExitCode.USER_CANCELLED)
-
-    if not check_remote_sync(project_dir, branch):
-        exit_with_error("Remote sync failed", ExitCode.WORKING_TREE_FAILED)
-
-    if not run_tests(project_dir):
-        exit_with_error("Tests failed.", ExitCode.TEST_FAILED)
-
+    # --- Steps 9-11: Version-dependent validation ---
     sync_readme_badges(project_dir, version, rule_count)
-
-    if not run_format(project_dir):
-        exit_with_error("Formatting failed.", ExitCode.VALIDATION_FAILED)
-
-    if not run_analysis(project_dir):
-        exit_with_error("Analysis failed.", ExitCode.ANALYSIS_FAILED)
 
     ok, release_notes = validate_changelog(project_dir, version)
     if not ok:
