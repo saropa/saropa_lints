@@ -95,6 +95,7 @@ Future<void> main(List<String> args) async {
     print('HIGH:     0');
     print('MEDIUM:   0');
     print('LOW:      0');
+    print('OPINIONATED: 0');
     return;
   }
 
@@ -104,6 +105,7 @@ Future<void> main(List<String> args) async {
     LintImpact.high: [],
     LintImpact.medium: [],
     LintImpact.low: [],
+    LintImpact.opinionated: [],
   };
 
   for (final v in violations) {
@@ -135,6 +137,7 @@ Future<void> main(List<String> args) async {
   final highCount = byImpact[LintImpact.high]!.length;
   final mediumCount = byImpact[LintImpact.medium]!.length;
   final lowCount = byImpact[LintImpact.low]!.length;
+  final opinionatedCount = byImpact[LintImpact.opinionated]!.length;
 
   if (criticalCount > 0) {
     print('CRITICAL: $criticalCount (fix immediately!)');
@@ -160,6 +163,12 @@ Future<void> main(List<String> args) async {
     print('LOW:      0');
   }
 
+  if (opinionatedCount > 0) {
+    print('OPINIONATED: $opinionatedCount (preferential)');
+  } else {
+    print('OPINIONATED: 0');
+  }
+
   print('');
   print('Total: ${violations.length} issues');
 
@@ -175,10 +184,10 @@ Future<void> main(List<String> args) async {
 List<Violation> _parseViolations(String output) {
   final violations = <Violation>[];
 
-  // Pattern: file.dart:line:col - rule_name - message
-  // Or: file.dart:line:col - rule_name • message
+  // Pattern: file.dart:line:col • description • rule_name • SEVERITY
+  // Actual custom_lint output format uses bullet (•) as separator
   final pattern = RegExp(
-    r'^(.+?):(\d+):(\d+)\s+-\s+(\w+)\s+[-•]\s+(.+)$',
+    r'^\s*(.+?):(\d+):(\d+)\s+•\s+(.*?)•\s+(\w+)\s+•',
     multiLine: true,
   );
 
@@ -186,8 +195,8 @@ List<Violation> _parseViolations(String output) {
     final file = match.group(1)!;
     final line = int.tryParse(match.group(2)!) ?? 0;
     final column = int.tryParse(match.group(3)!) ?? 0;
-    final rule = match.group(4)!;
-    final message = match.group(5)!;
+    final message = match.group(4)!;  // description
+    final rule = match.group(5)!;     // rule name
 
     // Look up impact for this rule
     final impact = _ruleImpacts[rule] ?? LintImpact.medium;

@@ -222,10 +222,10 @@ Future<void> main(List<String> args) async {
 List<Violation> _parseViolations(String output) {
   final violations = <Violation>[];
 
-  // Pattern: file.dart:line:col - rule_name - message
-  // Or: file.dart:line:col - rule_name . message (bullet point separator)
+  // Pattern: file.dart:line:col • description • rule_name • SEVERITY
+  // Actual custom_lint output format uses bullet (•) as separator
   final pattern = RegExp(
-    r'^(.+?):(\d+):(\d+)\s+-\s+(\w+)\s+[-.\u2022]\s+(.+)$',
+    r'^\s*(.+?):(\d+):(\d+)\s+•\s+(.*?)•\s+(\w+)\s+•',
     multiLine: true,
   );
 
@@ -233,8 +233,8 @@ List<Violation> _parseViolations(String output) {
     final file = match.group(1)!;
     final line = int.tryParse(match.group(2)!) ?? 0;
     final column = int.tryParse(match.group(3)!) ?? 0;
-    final rule = match.group(4)!;
-    final message = match.group(5)!;
+    final message = match.group(4)!;  // description
+    final rule = match.group(5)!;     // rule name
 
     violations.add(Violation(
       file: file,
