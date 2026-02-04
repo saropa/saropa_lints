@@ -265,7 +265,7 @@ def extract_rule_messages(rules_dir: Path) -> list[RuleMessage]:
         r"LintImpact get impact => LintImpact\.(\w+);"
     )
 
-    for dart_file in sorted(rules_dir.glob("*.dart")):
+    for dart_file in sorted(rules_dir.glob("**/*.dart")):
         if dart_file.name == "all_rules.dart":
             continue
         content = dart_file.read_text(encoding="utf-8")

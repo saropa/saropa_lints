@@ -214,7 +214,7 @@ def get_aliases(rules_dir: Path) -> set[str]:
         r"^///\s*Alias:\s*([a-zA-Z0-9_,\s]+)", re.MULTILINE
     )
 
-    for dart_file in rules_dir.glob("*.dart"):
+    for dart_file in rules_dir.glob("**/*.dart"):
         content = dart_file.read_text(encoding="utf-8")
         for match in alias_pattern.findall(content):
             for alias in match.split(","):
@@ -308,7 +308,7 @@ def get_opinionated_prefer_rules(rules_dir: Path) -> set[str]:
         r"class\s+\w+\s+extends\s+\w+LintRule"
     )
 
-    for dart_file in rules_dir.glob("*.dart"):
+    for dart_file in rules_dir.glob("**/*.dart"):
         if dart_file.name == "all_rules.dart":
             continue
         content = dart_file.read_text(encoding="utf-8")

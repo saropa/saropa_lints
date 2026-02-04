@@ -39,7 +39,7 @@ def count_rules(project_dir: Path) -> int:
         return 0
 
     count = 0
-    for dart_file in rules_dir.glob("*.dart"):
+    for dart_file in rules_dir.glob("**/*.dart"):
         if dart_file.name == "all_rules.dart":
             continue
         content = dart_file.read_text(encoding="utf-8")
@@ -54,7 +54,7 @@ def count_categories(project_dir: Path) -> int:
         return 0
     return sum(
         1
-        for f in rules_dir.glob("*_rules.dart")
+        for f in rules_dir.glob("**/*_rules.dart")
         if f.name != "all_rules.dart"
     )
 
@@ -93,7 +93,7 @@ def display_test_coverage(project_dir: Path) -> None:
         return
 
     category_details: list[tuple[str, int, int]] = []
-    for dart_file in sorted(rules_dir.glob("*_rules.dart")):
+    for dart_file in sorted(rules_dir.glob("**/*_rules.dart")):
         if dart_file.name == "all_rules.dart":
             continue
         category = dart_file.stem.replace("_rules", "")
