@@ -140,8 +140,9 @@ class AvoidRedundantAsyncOnLoadRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_redundant_async_on_load',
     problemMessage:
-        '[avoid_redundant_async_on_load] async onLoad() without await adds unnecessary overhead.',
-    correctionMessage: 'Remove async keyword or add await statements.',
+        '[avoid_redundant_async_on_load] async onLoad() without await adds unnecessary overhead. OnLoad() is async but doesn\'t contain any await.',
+    correctionMessage:
+        'Remove async keyword or add await statements. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 

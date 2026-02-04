@@ -499,9 +499,9 @@ class AvoidGetxGlobalNavigationRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_getx_global_navigation',
     problemMessage:
-        '[avoid_getx_global_navigation] GetX global navigation (Get.to, Get.off) bypasses widget context.',
+        '[avoid_getx_global_navigation] GetX global navigation (Get.to, Get.off) bypasses widget context. GetX navigation methods bypass the widget tree\'s context, making testing and navigation state management difficult.',
     correctionMessage:
-        'Use Navigator.of(context) or a typed routing solution like GoRouter.',
+        'Use Navigator.of(context) or a typed routing solution like GoRouter. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -579,8 +579,9 @@ class RequireGetxBindingRoutesRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_getx_binding_routes',
     problemMessage:
-        '[require_getx_binding_routes] GetPage without binding parameter.',
-    correctionMessage: 'Add binding: YourBinding() for proper DI lifecycle.',
+        '[require_getx_binding_routes] GetPage without binding parameter. GetPage without a binding forces manual controller creation and lifecycle management in widgets. GetX routes should use Bindings for dependency injection.',
+    correctionMessage:
+        'Add binding: YourBinding() for proper DI lifecycle. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -1636,8 +1637,9 @@ class PreferGetxBuilderRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_getx_builder',
     problemMessage:
-        '[prefer_getx_builder] .obs value accessed without Obx wrapper. UI won\'t rebuild.',
-    correctionMessage: 'Wrap in Obx(() => ...) to enable reactive updates.',
+        '[prefer_getx_builder] .obs value accessed without Obx wrapper. UI won\'t rebuild. This pattern increases maintenance cost and the likelihood of introducing bugs during future changes.',
+    correctionMessage:
+        'Wrap in Obx(() => ..) to enable reactive updates. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -1734,9 +1736,9 @@ class RequireGetxBindingRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_getx_binding',
     problemMessage:
-        '[require_getx_binding] Get.put() in widget. Consider using Bindings for lifecycle management.',
+        '[require_getx_binding] Get.put() in widget. Use Bindings for lifecycle management. GetX controllers must be registered via Bindings for proper lifecycle management and dependency injection.',
     correctionMessage:
-        'Create a Binding class and register via GetPage binding parameter.',
+        'Create a Binding class and register via GetPage binding parameter. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -1809,9 +1811,9 @@ class AvoidGetxGlobalStateRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_getx_global_state',
     problemMessage:
-        '[avoid_getx_global_state] Global GetX state (Get.put/Get.find) makes testing difficult.',
+        '[avoid_getx_global_state] Global GetX state (Get.put/Get.find) makes testing difficult. Using Get.put() for global state makes testing difficult and creates implicit dependencies. Prefer reactive state with GetBuilder.',
     correctionMessage:
-        'Use GetBuilder with init: parameter, or inject controller via constructor.',
+        'Use GetBuilder with init: parameter, or inject controller via constructor. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -1885,9 +1887,9 @@ class AvoidGetxStaticContextRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_getx_static_context',
     problemMessage:
-        '[avoid_getx_static_context] GetX static context method used. Hard to unit test.',
+        '[avoid_getx_static_context] GetX static context method used. Hard to unit test. Get.offNamed and Get.dialog use static context internally which cannot be unit tested. Prefer abstraction for testability.',
     correctionMessage:
-        'Wrap GetX navigation in a service class for testability.',
+        'Wrap GetX navigation in a service class for testability. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -1962,9 +1964,9 @@ class AvoidTightCouplingWithGetxRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_tight_coupling_with_getx',
     problemMessage:
-        '[avoid_tight_coupling_with_getx] Class with 5+ GetX usages becomes tightly coupled and difficult to unit test.',
+        '[avoid_tight_coupling_with_getx] Class with 5+ GetX usages becomes tightly coupled and difficult to unit test. Using GetX for everything leads to tight coupling and hard-to-test code. Use only necessary features.',
     correctionMessage:
-        'Use direct dependency injection for core logic. Reserve GetX for UI bindings.',
+        'Use direct dependency injection for core logic. Reserve GetX for UI bindings. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 

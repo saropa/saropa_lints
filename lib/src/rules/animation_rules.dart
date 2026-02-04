@@ -666,7 +666,7 @@ class AvoidHardcodedDurationRule extends SaropaLintRule {
     problemMessage:
         '[avoid_hardcoded_duration] Hardcoded Duration values make it difficult to maintain consistent timing across the app and can lead to subtle bugs when timings need to be updated globally. This practice reduces maintainability and increases the risk of inconsistent user experiences. Always extract Duration values to named constants for clarity, reusability, and easier updates.',
     correctionMessage:
-        'Extract Duration to a named constant for consistency and maintainability.',
+        'Extract Duration to a named constant for consistency and maintainability. Test on a low-end device to confirm smooth rendering after the fix.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -765,7 +765,7 @@ class RequireAnimationCurveRule extends SaropaLintRule {
     problemMessage:
         '[require_animation_curve] Animation uses the default linear curve, which often results in unnatural or robotic motion. Without specifying a curve, transitions may feel abrupt and lack the smoothness users expect. Always wrap with CurvedAnimation or use .animate() with a curve parameter to create more natural, visually appealing animations that enhance user experience.',
     correctionMessage:
-        'Wrap with CurvedAnimation or use .animate() with a curve parameter.',
+        'Wrap with CurvedAnimation or use .animate() with a curve parameter. Test on a low-end device to confirm smooth rendering after the fix.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -965,9 +965,9 @@ class RequireStaggeredAnimationDelaysRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_staggered_animation_delays',
     problemMessage:
-        '[require_staggered_animation_delays] List item animations are not staggered, resulting in all items animating simultaneously. This creates a chaotic and unnatural cascade effect, making it hard for users to follow the UI changes. Use index-based delays (e.g., Interval(index * 0.1, ...)) to stagger animations for a smooth, visually appealing transition.',
+        '[require_staggered_animation_delays] List item animations are not staggered, resulting in all items animating simultaneously. This creates a chaotic and unnatural cascade effect, making it hard for users to follow the UI changes. Use index-based delays (e.g., Interval(index * 0.1, ..)) to stagger animations for a smooth, visually appealing transition.',
     correctionMessage:
-        'Use Interval with index-based delays: Interval(index * 0.1, ...).',
+        'Use Interval with index-based delays: Interval(index * 0.1, ..). Test on a low-end device to confirm smooth rendering after the fix.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -1061,7 +1061,8 @@ class PreferTweenSequenceRule extends SaropaLintRule {
     name: 'prefer_tween_sequence',
     problemMessage:
         '[prefer_tween_sequence] Multiple chained animations are implemented without using TweenSequence, which can lead to complex, error-prone code and unpredictable animation timing. TweenSequence simplifies sequential animations, making them easier to manage and ensuring smooth transitions. Use TweenSequence for sequential property changes to improve maintainability and user experience.',
-    correctionMessage: 'Use TweenSequence for sequential animations.',
+    correctionMessage:
+        'Use TweenSequence for sequential animations. Test on a low-end device to confirm smooth rendering after the fix.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -1478,9 +1479,9 @@ class PreferPhysicsSimulationRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_physics_simulation',
     problemMessage:
-        '[prefer_physics_simulation] Drag-release should use physics simulation for natural feel.',
+        '[prefer_physics_simulation] Drag-release should use physics simulation for natural feel. Abruptly stopping animations on release feels unnatural. Use spring or friction physics for smooth deceleration.',
     correctionMessage:
-        'Use SpringSimulation or FrictionSimulation with animateWith.',
+        'Use SpringSimulation or FrictionSimulation with animateWith. Test on a low-end device to confirm smooth rendering after the fix.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 

@@ -40,8 +40,9 @@ class RequireFileExistsCheckRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_file_exists_check',
     problemMessage:
-        '[require_file_exists_check] File read operation should check exists() or use try-catch.',
-    correctionMessage: 'Wrap in if (await file.exists()) or try-catch block.',
+        '[require_file_exists_check] File read operation should check exists() or use try-catch. File operations on non-existent files throw exceptions. Always verify the file exists or wrap in try-catch to handle missing files gracefully.',
+    correctionMessage:
+        'Wrap in if (await file.exists()) or try-catch block. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -455,9 +456,9 @@ class RequireSqfliteTransactionRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_sqflite_transaction',
     problemMessage:
-        '[require_sqflite_transaction] Multiple sequential writes should use transaction for atomicity.',
+        '[require_sqflite_transaction] Multiple sequential writes should use transaction for atomicity. Multiple sequential writes should use transactions for atomicity and better performance.',
     correctionMessage:
-        'Wrap writes in db.transaction() for better performance.',
+        'Wrap writes in db.transaction() to improve performance. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -649,8 +650,9 @@ class PreferSqfliteBatchRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_sqflite_batch',
     problemMessage:
-        '[prefer_sqflite_batch] Database insert in loop reduces throughput by 10-100x.',
-    correctionMessage: 'Use db.batch() with batch.insert() and batch.commit().',
+        '[prefer_sqflite_batch] Database insert in loop reduces throughput by 10-100x. Inserting rows one at a time is slow. Use batch operations for bulk inserts. Sqflite uses individual inserts in a loop instead of batch.',
+    correctionMessage:
+        'Use db.batch() with batch.insert() and batch.commit(). Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -1087,9 +1089,9 @@ class AvoidSqfliteReadAllColumnsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_sqflite_read_all_columns',
     problemMessage:
-        '[avoid_sqflite_read_all_columns] SELECT * fetches unnecessary columns, wasting memory and bandwidth.',
+        '[avoid_sqflite_read_all_columns] SELECT * fetches unnecessary columns, wasting memory and bandwidth. Using SELECT * fetches all columns from the database, which: - Wastes memory by loading unused data - Increases network/disk bandwidth - Breaks when table schema changes (new columns appear unexpectedly) - Prevents SQLite query optimization.',
     correctionMessage:
-        'Specify only the columns you need: SELECT id, name, email FROM ...',
+        'Specify only the columns you need: SELECT id, name, email FROM .. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -1311,8 +1313,9 @@ class PreferSqfliteSingletonRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_sqflite_singleton',
     problemMessage:
-        '[prefer_sqflite_singleton] openDatabase called directly. May create multiple connections.',
-    correctionMessage: 'Use a singleton pattern for database instance.',
+        '[prefer_sqflite_singleton] openDatabase called directly. May create multiple connections. Calling openDatabase repeatedly creates connection overhead and may cause locking issues. Use a singleton pattern.',
+    correctionMessage:
+        'Use a singleton pattern for database instance. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -1389,8 +1392,9 @@ class PreferSqfliteColumnConstantsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_sqflite_column_constants',
     problemMessage:
-        '[prefer_sqflite_column_constants] String literal column name may contain typos.',
-    correctionMessage: 'Define column names as constants in a table class.',
+        '[prefer_sqflite_column_constants] String literal column name may contain typos. String literals for column names are error-prone. Use constants for compile-time checking. This file handling can cause data corruption, resource leaks, or permission errors.',
+    correctionMessage:
+        'Define column names as constants in a table class. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 

@@ -2276,8 +2276,9 @@ class PreferSimplerBooleanExpressionsRule extends SaropaLintRule {
   static const LintCode _codeDeMorgan = LintCode(
     name: 'prefer_simpler_boolean_expressions',
     problemMessage:
-        '[prefer_simpler_boolean_expressions] Negated compound expression can be simplified using De Morgan\'s law.',
-    correctionMessage: 'Use !(a && b) → !a || !b, or !(a || b) → !a && !b.',
+        '[prefer_simpler_boolean_expressions] Negated compound expression can be simplified using De Morgan\'s law. De Morgan\'s laws state: - !(a && b) is equivalent to !a || !b - !(a || b) is equivalent to !a && !b.',
+    correctionMessage:
+        'Use !(a && b) → !a || !b, or !(a || b) → !a && !b. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 

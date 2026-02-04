@@ -58,9 +58,9 @@ class AvoidWorkInPausedStateRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_work_in_paused_state',
     problemMessage:
-        '[avoid_work_in_paused_state] Timer.periodic without lifecycle handling. Will run when app is backgrounded.',
+        '[avoid_work_in_paused_state] Timer.periodic without lifecycle handling. Will run when app is backgrounded. Timers and periodic callbacks should pause when the app is backgrounded to save battery and avoid unexpected behavior.',
     correctionMessage:
-        'Add WidgetsBindingObserver and pause timer in didChangeAppLifecycleState.',
+        'Add WidgetsBindingObserver and pause timer in didChangeAppLifecycleState. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -188,7 +188,7 @@ class RequireResumeStateRefreshRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_resume_state_refresh',
     problemMessage:
-        '[require_resume_state_refresh] App handles paused state but not resumed, leaving UI stale after returning from background.',
+        '[require_resume_state_refresh] App handles paused state but not resumed, leaving UI stale after returning from background. When app returns from background, data may be stale and must be refreshed. Missing resumed handling leads to outdated UI.',
     correctionMessage:
         'Handle AppLifecycleState.resumed to refresh data when app returns to foreground.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -269,7 +269,7 @@ class RequireDidUpdateWidgetCheckRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_did_update_widget_check',
     problemMessage:
-        '[require_did_update_widget_check] didUpdateWidget triggers updates without checking if properties changed, causing unnecessary rebuilds.',
+        '[require_did_update_widget_check] didUpdateWidget triggers updates without checking if properties changed, causing unnecessary rebuilds. didUpdateWidget receives the old widget for comparison. Without comparing oldWidget to widget, you might trigger unnecessary updates.',
     correctionMessage:
         'Compare properties using operators (oldWidget.x != widget.x) or functions (listEquals, setEquals, mapEquals) before updating state.',
     errorSeverity: DiagnosticSeverity.INFO,

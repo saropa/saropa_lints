@@ -586,9 +586,9 @@ class RequireDatabaseIndexRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_database_index',
     problemMessage:
-        '[require_database_index] Query on non-indexed field causes full table scan.',
+        '[require_database_index] Query on non-indexed field causes full table scan. Queries on non-indexed fields are slow. Add indices for fields used in where clauses, especially in large collections.',
     correctionMessage:
-        'Add @Index() annotation to fields used in queries and filters.',
+        'Add @Index() annotation to fields used in queries and filters. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -687,9 +687,9 @@ class PreferTransactionForBatchRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_transaction_for_batch',
     problemMessage:
-        '[prefer_transaction_for_batch] Multiple sequential database writes. Use transaction for atomicity.',
+        '[prefer_transaction_for_batch] Multiple sequential database writes. Use transaction for atomicity. Individual writes are slower and can leave data inconsistent. Use transactions or batch writes for multiple related changes.',
     correctionMessage:
-        'Wrap related writes in a transaction or use batch operations.',
+        'Wrap related writes in a transaction or use batch operations. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -1032,8 +1032,9 @@ class PreferFirestoreBatchWriteRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_firestore_batch_write',
     problemMessage:
-        '[prefer_firestore_batch_write] Individual writes increase latency and billing costs.',
-    correctionMessage: 'Use WriteBatch for multiple related write operations.',
+        '[prefer_firestore_batch_write] Individual writes increase latency and billing costs. Multiple individual write operations are slower and more expensive than batch writes. Use WriteBatch for multiple related operations.',
+    correctionMessage:
+        'Use WriteBatch for multiple related write operations. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -1459,8 +1460,9 @@ class AvoidMapMarkersInBuildRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_map_markers_in_build',
     problemMessage:
-        '[avoid_map_markers_in_build] Creating map markers in build() causes flickering.',
-    correctionMessage: 'Cache markers in state and only recreate when needed.',
+        '[avoid_map_markers_in_build] Creating map markers in build() causes flickering. Creating markers in build() causes recreation on every rebuild, leading to flickering and performance issues. Cache markers.',
+    correctionMessage:
+        'Cache markers in state and only recreate when needed. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -1604,8 +1606,9 @@ class PreferMarkerClusteringRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_marker_clustering',
     problemMessage:
-        '[prefer_marker_clustering] Many markers cause frame drops and memory issues.',
-    correctionMessage: 'Use marker clustering library for many markers.',
+        '[prefer_marker_clustering] Many markers cause frame drops and memory issues. Displaying hundreds of markers individually causes performance issues. Use marker clustering to improve performance and UX.',
+    correctionMessage:
+        'Use marker clustering library for many markers. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -1666,9 +1669,9 @@ class RequireCrashlyticsUserIdRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_crashlytics_user_id',
     problemMessage:
-        '[require_crashlytics_user_id] Crashlytics setup without setUserIdentifier. Crashes will be anonymous.',
+        '[require_crashlytics_user_id] Crashlytics setup without setUserIdentifier. Crashes will be anonymous. Setting a user identifier helps track crashes to specific users to improve debugging and support. Without it, crashes are anonymous.',
     correctionMessage:
-        'Add FirebaseCrashlytics.instance.setUserIdentifier(userId).',
+        'Add FirebaseCrashlytics.instance.setUserIdentifier(userId). Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -1758,9 +1761,9 @@ class RequireFirebaseAppCheckRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_firebase_app_check',
     problemMessage:
-        '[require_firebase_app_check] Firebase initialization without App Check activation.',
+        '[require_firebase_app_check] Firebase initialization without App Check activation. Firebase App Check helps protect your backend resources from abuse. Without it, your Firebase services are vulnerable to unauthorized access.',
     correctionMessage:
-        'Add FirebaseAppCheck.instance.activate() after Firebase.initializeApp().',
+        'Add FirebaseAppCheck.instance.activate() after Firebase.initializeApp(). Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -1852,7 +1855,7 @@ class AvoidStoringUserDataInAuthRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_storing_user_data_in_auth',
     problemMessage:
-        '[avoid_storing_user_data_in_auth] Large object in setCustomClaims. Claims are for roles, not data storage.',
+        '[avoid_storing_user_data_in_auth] Large object in setCustomClaims. Claims are for roles, not data storage. Firebase custom claims are meant for access control, not user data storage. They\'re limited to 1000 bytes and are included in every auth token.',
     correctionMessage:
         'Store user data in Firestore. Use claims only for access control (roles, permissions).',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -1950,7 +1953,7 @@ class PreferFirebaseAuthPersistenceRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_firebase_auth_persistence',
     problemMessage:
-        '[prefer_firebase_auth_persistence] Firebase Auth on web defaults to session persistence. Consider setting LOCAL persistence.',
+        '[prefer_firebase_auth_persistence] Firebase Auth on web defaults to session persistence. Prefer setting LOCAL persistence. By default, Firebase Auth on web uses session persistence, meaning users are logged out when they close the browser tab. For "remember me" functionality, you need to explicitly set persistence to LOCAL.',
     correctionMessage:
         'Call FirebaseAuth.instance.setPersistence(Persistence.LOCAL) before sign-in for "remember me".',
     errorSeverity: DiagnosticSeverity.INFO,

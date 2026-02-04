@@ -39,9 +39,9 @@ class AvoidImageRebuildOnScrollRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_image_rebuild_on_scroll',
     problemMessage:
-        '[avoid_image_rebuild_on_scroll] Image.network in ListView.builder will rebuild on scroll.',
+        '[avoid_image_rebuild_on_scroll] Image.network in ListView.builder will rebuild on scroll. Images in scrollable lists will be rebuilt on every scroll, causing unnecessary network requests and poor performance.',
     correctionMessage:
-        'Use CachedNetworkImage or move image loading outside the builder.',
+        'Use CachedNetworkImage or move image loading outside the builder. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -232,8 +232,9 @@ class PreferVideoLoadingPlaceholderRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_video_loading_placeholder',
     problemMessage:
-        '[prefer_video_loading_placeholder] Video player should have a loading placeholder.',
-    correctionMessage: 'Add placeholder parameter for better UX during load.',
+        '[prefer_video_loading_placeholder] Video player must have a loading placeholder. Video widgets should show a placeholder while loading to provide visual feedback and prevent layout shifts.',
+    correctionMessage:
+        'Add placeholder parameter to improve UX during load. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -313,9 +314,9 @@ class PreferImageSizeConstraintsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_image_size_constraints',
     problemMessage:
-        '[prefer_image_size_constraints] Missing cacheWidth/cacheHeight decodes full resolution into memory.',
+        '[prefer_image_size_constraints] Missing cacheWidth/cacheHeight decodes full resolution into memory. Images decoded at full resolution consume excessive memory. Use cacheWidth or cacheHeight to decode images at display size, significantly reducing memory usage for large images.',
     correctionMessage:
-        'Set cacheWidth/cacheHeight to avoid decoding at full resolution.',
+        'Set cacheWidth/cacheHeight to avoid decoding at full resolution. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -499,8 +500,9 @@ class RequireImageLoadingPlaceholderRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_image_loading_placeholder',
     problemMessage:
-        '[require_image_loading_placeholder] Image.network without loadingBuilder shows blank space during load.',
-    correctionMessage: 'Add loadingBuilder to show progress while loading.',
+        '[require_image_loading_placeholder] Image.network without loadingBuilder shows blank space during load. Network images take time to download. Without a loading indicator, users see an empty space which creates a poor user experience.',
+    correctionMessage:
+        'Add loadingBuilder to show progress while loading. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -665,9 +667,9 @@ class RequirePdfLoadingIndicatorRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_pdf_loading_indicator',
     problemMessage:
-        '[require_pdf_loading_indicator] PDF viewer should provide loading feedback.',
+        '[require_pdf_loading_indicator] PDF viewer should provide loading feedback. PDF loading can be slow, especially for large documents or over network. Users should see progress feedback during load.',
     correctionMessage:
-        'Add loading state handling or use onDocumentLoaded callback.',
+        'Add loading state handling or use onDocumentLoaded callback. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -749,8 +751,9 @@ class PreferClipboardFeedbackRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_clipboard_feedback',
     problemMessage:
-        '[prefer_clipboard_feedback] Clipboard.setData should provide user feedback.',
-    correctionMessage: 'Add SnackBar or Toast to confirm clipboard operation.',
+        '[prefer_clipboard_feedback] Clipboard.setData should provide user feedback. Clipboard operations should provide user feedback (SnackBar, Toast, etc.) to confirm the action was successful. Without feedback, users won\'t know if the copy succeeded.',
+    correctionMessage:
+        'Add SnackBar or Toast to confirm clipboard operation. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -937,8 +940,9 @@ class RequireCachedImagePlaceholderRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_cached_image_placeholder',
     problemMessage:
-        '[require_cached_image_placeholder] CachedNetworkImage without placeholder. User sees blank during load.',
-    correctionMessage: 'Add placeholder parameter for loading state.',
+        '[require_cached_image_placeholder] CachedNetworkImage without placeholder. User sees blank during load. Placeholders provide visual feedback while the image loads. This image handling causes excessive memory usage, visual artifacts, or slow load times.',
+    correctionMessage:
+        'Add placeholder parameter for loading state. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -1003,8 +1007,9 @@ class RequireCachedImageErrorWidgetRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_cached_image_error_widget',
     problemMessage:
-        '[require_cached_image_error_widget] CachedNetworkImage without errorWidget. Broken images show nothing.',
-    correctionMessage: 'Add errorWidget parameter to handle failed loads.',
+        '[require_cached_image_error_widget] CachedNetworkImage without errorWidget. Broken images show nothing. Network images can fail. Always provide fallback for broken images. CachedNetworkImage is used without error widget.',
+    correctionMessage:
+        'Add errorWidget parameter to handle failed loads. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -1074,9 +1079,9 @@ class RequireExifHandlingRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_exif_handling',
     problemMessage:
-        '[require_exif_handling] Image.file may show photos rotated. Consider EXIF handling.',
+        '[require_exif_handling] Image.file may show photos rotated. Prefer EXIF handling. Photos from cameras often have EXIF orientation metadata. Without handling, images may appear rotated incorrectly.',
     correctionMessage:
-        'Use flutter_image_compress or similar to auto-rotate camera photos.',
+        'Use flutter_image_compress or similar to auto-rotate camera photos. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -1161,8 +1166,9 @@ class PreferCachedImageFadeAnimationRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_cached_image_fade_animation',
     problemMessage:
-        '[prefer_cached_image_fade_animation] CachedNetworkImage without fadeInDuration causes abrupt image pop-in.',
-    correctionMessage: 'Add fadeInDuration for a smoother loading experience.',
+        '[prefer_cached_image_fade_animation] CachedNetworkImage without fadeInDuration causes abrupt image pop-in. CachedNetworkImage has a default fadeInDuration of 500ms, which works well for most cases. However, explicitly setting this value signals intentional UX design and allows customization for different contexts: - Fast transitions: 150-200ms for thumbnail grids - Smooth transitions: 300-400ms for hero images - No transition: Duration.zero for instant display.',
+    correctionMessage:
+        'Add fadeInDuration for a smoother loading experience. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -1417,9 +1423,9 @@ class PreferImagePickerRequestFullMetadataRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_image_picker_request_full_metadata',
     problemMessage:
-        '[prefer_image_picker_request_full_metadata] pickImage collects EXIF metadata (GPS, timestamps) by default.',
+        '[prefer_image_picker_request_full_metadata] pickImage collects EXIF metadata (GPS, timestamps) by default. By default, image_picker includes full EXIF metadata (GPS location, camera info, timestamps). If your app doesn\'t need this metadata, set requestFullMetadata: false to improve privacy and reduce permissions needed.',
     correctionMessage:
-        'Add requestFullMetadata: false if EXIF data (GPS, timestamps) not needed.',
+        'Add requestFullMetadata: false if EXIF data (GPS, timestamps) not needed. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -1681,9 +1687,9 @@ class PreferCachedImageCacheManagerRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_cached_image_cache_manager',
     problemMessage:
-        '[prefer_cached_image_cache_manager] CachedNetworkImage without CacheManager. Cache may grow unbounded.',
+        '[prefer_cached_image_cache_manager] CachedNetworkImage without CacheManager. Cache may grow unbounded. Without a custom CacheManager, cached images can grow unbounded and consume excessive storage. Configure limits for production apps.',
     correctionMessage:
-        'Add cacheManager parameter to limit cache size and stale period.',
+        'Add cacheManager parameter to limit cache size and stale period. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 

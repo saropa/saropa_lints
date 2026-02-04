@@ -59,9 +59,9 @@ class AvoidGetItInBuildRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_getit_in_build',
     problemMessage:
-        '[avoid_getit_in_build] GetIt service locator in build() hides dependencies.',
+        '[avoid_getit_in_build] GetIt service locator in build() hides dependencies. Service locator calls in build() hide dependencies and make testing difficult. Inject dependencies via constructor instead.',
     correctionMessage:
-        'Inject dependencies via constructor or access in initState().',
+        'Inject dependencies via constructor or access in initState(). Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 

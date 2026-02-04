@@ -515,7 +515,7 @@ class PreferAllNamedParametersRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_all_named_parameters',
     problemMessage:
-        '[prefer_all_named_parameters] Function has $_threshold or more positional parameters that lack self-documenting call sites.',
+        '[prefer_all_named_parameters] Function has $_threshold or more positional parameters that lack self-documenting call sites. This is an opinionated rule - not included in any tier by default.',
     correctionMessage:
         'Convert positional parameters to named parameters so call sites are self-documenting and order-independent.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -834,7 +834,7 @@ class PreferPrivateUnderscorePrefixRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_private_underscore_prefix',
     problemMessage:
-        '[prefer_private_underscore_prefix] Instance field is public without documentation, exposing internal state.',
+        '[prefer_private_underscore_prefix] Instance field is public without documentation, exposing internal state. This is an opinionated rule - not included in any tier by default.',
     correctionMessage:
         'Prefix with underscore to enforce encapsulation, then expose via a getter if external access is needed.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -1183,9 +1183,9 @@ class PreferClassOverRecordReturnRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_class_over_record_return',
     problemMessage:
-        '[prefer_class_over_record_return] Method returns a record type, which lacks named fields and dedicated methods.',
+        '[prefer_class_over_record_return] Method returns a record type, which lacks named fields and dedicated methods. This is an opinionated rule - not included in any tier by default.',
     correctionMessage:
-        'Create a class with named fields for better IDE support, type documentation, and long-term maintainability.',
+        'Create a class with named fields to improve IDE support, type documentation, and long-term maintainability.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -1279,7 +1279,7 @@ class PreferInlineCallbacksRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_inline_callbacks',
     problemMessage:
-        '[prefer_inline_callbacks] Callback references a separate method, forcing readers to jump away to understand behavior.',
+        '[prefer_inline_callbacks] Callback references a separate method, forcing readers to jump away to understand behavior. This is an opinionated rule - not included in any tier by default.',
     correctionMessage:
         'Inline the callback body at the call site so the behavior is visible where the widget is constructed.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -2248,7 +2248,7 @@ class PreferDescriptiveBoolNamesRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_descriptive_bool_names',
     problemMessage:
-        '[prefer_descriptive_bool_names] Boolean should use a descriptive prefix (is, has, can, should, etc.) or action verb.',
+        '[prefer_descriptive_bool_names] Boolean should use a descriptive prefix (is, has, can, should, etc.) or action verb. This rule is suitable for the professional tier.',
     correctionMessage:
         'Rename with a descriptive prefix: isEnabled, hasData, canEdit, shouldUpdate, or an action verb like processData.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -2520,7 +2520,7 @@ class PreferDescriptiveBoolNamesStrictRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_descriptive_bool_names_strict',
     problemMessage:
-        '[prefer_descriptive_bool_names_strict] Boolean should use a descriptive prefix (is, has, can, should, etc.).',
+        '[prefer_descriptive_bool_names_strict] Boolean should use a descriptive prefix (is, has, can, should, etc.). This rule is suitable for the insanity tier.',
     correctionMessage:
         'Rename with a descriptive boolean prefix: isEnabled, hasData, canEdit, shouldUpdate, doesExist, or willChange.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -2848,7 +2848,7 @@ class AvoidSmallTextRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_small_text',
     problemMessage:
-        '[avoid_small_text] Font size is smaller than $_minFontSize, which reduces readability for users with low vision.',
+        '[avoid_small_text] Font size is smaller than $_minFontSize, which reduces readability for users with low vision. This is an opinionated rule - not included in any tier by default. Default minimum is 12 logical pixels.',
     correctionMessage:
         'Use a font size of at least $_minFontSize to meet accessibility readability guidelines for body text.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -2978,7 +2978,7 @@ class PreferDocCommentsOverRegularRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_doc_comments_over_regular',
     problemMessage:
-        '[prefer_doc_comments_over_regular] Use doc comments (///) instead of regular comments (//) for public API documentation.',
+        '[prefer_doc_comments_over_regular] Use doc comments (///) instead of regular comments (//) for public API documentation. This is an opinionated rule - not included in any tier by default.',
     correctionMessage:
         'Replace // with /// so the comment appears in IDE hover docs and can be extracted by dartdoc for API reference.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -3331,7 +3331,7 @@ class PreferDocCurlyApostropheRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_doc_curly_apostrophe',
     problemMessage:
-        "[prefer_doc_curly_apostrophe] Use Right Single Quotation Mark (') instead of straight apostrophe (') in documentation.",
+        "[prefer_doc_curly_apostrophe] Use Right Single Quotation Mark (') instead of straight apostrophe (') in documentation. This is an opinionated rule - not included in any tier by default.",
     correctionMessage:
         "Replace the straight apostrophe with a Right Single Quotation Mark (U+2019) for typographic correctness.",
     errorSeverity: DiagnosticSeverity.INFO,
@@ -3542,7 +3542,7 @@ class PreferDocStraightApostropheRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_doc_straight_apostrophe',
     problemMessage:
-        "[prefer_doc_straight_apostrophe] Use straight apostrophe (') instead of Right Single Quotation Mark (') in documentation.",
+        "[prefer_doc_straight_apostrophe] Use straight apostrophe (') instead of Right Single Quotation Mark (') in documentation. This is an opinionated rule - not included in any tier by default.",
     correctionMessage:
         "Replace the Right Single Quotation Mark (U+2019) with a straight apostrophe (U+0027) for plain-text docs.",
     errorSeverity: DiagnosticSeverity.INFO,
@@ -3724,7 +3724,7 @@ class PreferCurlyApostropheRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_curly_apostrophe',
     problemMessage:
-        "[prefer_curly_apostrophe] Use Right Single Quotation Mark (') instead of straight apostrophe (') in strings.",
+        "[prefer_curly_apostrophe] Use Right Single Quotation Mark (') instead of straight apostrophe (') in strings. This is an opinionated rule - not included in any tier by default.",
     correctionMessage:
         "Replace the straight apostrophe with a Right Single Quotation Mark (U+2019) for typographic polish in strings.",
     errorSeverity: DiagnosticSeverity.INFO,

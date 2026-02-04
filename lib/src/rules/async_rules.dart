@@ -1491,7 +1491,7 @@ class PreferFutureVoidFunctionOverAsyncCallbackRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_future_void_function_over_async_callback',
     problemMessage:
-        '[prefer_future_void_function_over_async_callback] Prefer explicit Future<void> Function() instead of AsyncCallback.',
+        '[prefer_future_void_function_over_async_callback] Prefer explicit Future<void> Function() instead of AsyncCallback. Enforces using explicit Future-returning callbacks instead of AsyncCallback.',
     correctionMessage:
         'Use Future<void> Function() instead of AsyncCallback to keep the signature framework-agnostic and self-documenting.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -2789,9 +2789,9 @@ class RequireFutureWaitErrorHandlingRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_future_wait_error_handling',
     problemMessage:
-        '[require_future_wait_error_handling] Future.wait without eagerError: false. Partial results lost on failure.',
+        '[require_future_wait_error_handling] Future.wait without eagerError: false. Partial results lost on failure. When one Future in Future.wait fails, all results are lost by default. Use eagerError: false to get partial results on failure.',
     correctionMessage:
-        'Add eagerError: false or wrap individual futures with catchError.',
+        'Add eagerError: false or wrap individual futures with catchError. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -3209,8 +3209,9 @@ class AvoidFutureThenInAsyncRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_future_then_in_async',
     problemMessage:
-        '[avoid_future_then_in_async] Using .then() inside async function. Prefer await for consistency.',
-    correctionMessage: 'Use await instead of .then() for cleaner async code.',
+        '[avoid_future_then_in_async] Using .then() inside async function. Prefer await for consistency. Using .then() inside an async function mixes two async patterns. Prefer await for cleaner, more readable code.',
+    correctionMessage:
+        'Use await instead of .then() for cleaner async code. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 

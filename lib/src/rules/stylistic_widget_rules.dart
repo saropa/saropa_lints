@@ -664,7 +664,7 @@ class PreferBorderRadiusCircularRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_borderradius_circular',
     problemMessage:
-        '[prefer_borderradius_circular] Use BorderRadius.circular() instead of BorderRadius.all(Radius.circular()).',
+        '[prefer_borderradius_circular] Use BorderRadius.circular() instead of BorderRadius.all(Radius.circular()). This is an opinionated rule - not included in any tier by default.',
     correctionMessage:
         'Replace BorderRadius.all(Radius.circular(r)) with BorderRadius.circular(r) for a shorter single-call equivalent.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -1285,7 +1285,7 @@ class PreferClipRSuperellipseClipperRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_clip_r_superellipse_clipper',
     problemMessage:
-        '[prefer_clip_r_superellipse_clipper] Use ClipRSuperellipse instead of ClipRRect for smoother continuous corners.',
+        '[prefer_clip_r_superellipse_clipper] Use ClipRSuperellipse instead of ClipRRect for smoother continuous corners. This is an opinionated rule — not included in any tier by default.',
     correctionMessage:
         'The custom clipper must be rewritten as CustomClipper<RSuperellipse>. Requires Flutter 3.32+.',
     errorSeverity: DiagnosticSeverity.INFO,

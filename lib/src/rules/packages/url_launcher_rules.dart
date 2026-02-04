@@ -50,7 +50,7 @@ class RequireUrlLauncherCanLaunchCheckRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_url_launcher_can_launch_check',
     problemMessage:
-        '[require_url_launcher_can_launch_check] launchUrl called without canLaunchUrl check. May fail silently on unsupported schemes, confusing users and breaking expected flows.',
+        '[require_url_launcher_can_launch_check] launchUrl called without canLaunchUrl check. May fail silently on unsupported schemes, confusing users and breaking expected flows. Check canLaunchUrl before launchUrl to improve error messages. Without this check, launchUrl may fail silently or throw cryptic platform exceptions.',
     correctionMessage:
         'Check canLaunchUrl(uri) before calling launchUrl(uri). Example: if (await canLaunchUrl(uri)) { launchUrl(uri); } else { showError("Could not open link"); }',
     errorSeverity: DiagnosticSeverity.INFO,

@@ -2221,8 +2221,9 @@ class RequireBadgeCountLimitRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_badge_count_limit',
     problemMessage:
-        '[require_badge_count_limit] Badge count exceeds 99. Use "99+" pattern for large numbers.',
-    correctionMessage: 'Replace with: Text(count > 99 ? "99+" : "\$count")',
+        '[require_badge_count_limit] Badge count exceeds 99. Use "99+" pattern for large numbers. Large numbers in badges are hard to read and look unprofessional. The convention is to show "99+" for counts above 99.',
+    correctionMessage:
+        'Replace with: Text(count > 99 ? "99+" : "\$count"). Test with VoiceOver (iOS) and TalkBack (Android) to verify the change improves accessibility.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -2887,9 +2888,9 @@ class AvoidMotionWithoutReduceRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_motion_without_reduce',
     problemMessage:
-        '[avoid_motion_without_reduce] Animation should respect disableAnimations preference.',
+        '[avoid_motion_without_reduce] Animation should respect disableAnimations preference. Users with vestibular disorders may have enabled "Reduce Motion" in their accessibility settings. Respect this preference for non-essential animations.',
     correctionMessage:
-        'Check MediaQuery.disableAnimations and reduce/skip animation if true.',
+        'Check MediaQuery.disableAnimations and reduce/skip animation if true. Test with VoiceOver (iOS) and TalkBack (Android) to verify the change improves accessibility.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 

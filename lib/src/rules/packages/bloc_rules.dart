@@ -1214,9 +1214,9 @@ class RequireBlocTransformerRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_bloc_transformer',
     problemMessage:
-        '[require_bloc_transformer] Bloc on<Event> without transformer processes all events sequentially.',
+        '[require_bloc_transformer] Bloc on<Event> without transformer processes all events sequentially. Without EventTransformer, rapid events are processed sequentially. Use transformers for debouncing, throttling, or concurrent processing.',
     correctionMessage:
-        'Add transformer: for debounce, throttle, or concurrent event handling.',
+        'Add transformer: for debounce, throttle, or concurrent event handling. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -1318,9 +1318,9 @@ class AvoidLongEventHandlersRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_long_event_handlers',
     problemMessage:
-        '[avoid_long_event_handlers] Bloc event handler is too long. Extract logic to separate methods.',
+        '[avoid_long_event_handlers] Bloc event handler is too long. Extract logic to separate methods. Long event handlers indicate the handler is doing too much. Extract business logic to separate methods or services for testability.',
     correctionMessage:
-        'Move complex logic to named methods or use cases for better testability.',
+        'Move complex logic to named methods or use cases to improve testability. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -1395,9 +1395,9 @@ class PreferMultiBlocProviderRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_multi_bloc_provider',
     problemMessage:
-        '[prefer_multi_bloc_provider] Nested BlocProviders should use MultiBlocProvider instead.',
+        '[prefer_multi_bloc_provider] Nested BlocProviders should use MultiBlocProvider instead. Use MultiBlocProvider when providing multiple blocs to reduce nesting and improve readability.',
     correctionMessage:
-        'Combine into MultiBlocProvider(providers: [...], child: ...).',
+        'Combine into MultiBlocProvider(providers: [..], child: ..). Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -2100,8 +2100,9 @@ class PreferSealedBlocEventsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_sealed_bloc_events',
     problemMessage:
-        '[prefer_sealed_bloc_events] Bloc event base class should be sealed.',
-    correctionMessage: 'Use sealed keyword for exhaustive pattern matching.',
+        '[prefer_sealed_bloc_events] Bloc event base class must be sealed. Sealed event classes ensure exhaustive pattern matching in handlers and prevent unexpected event subtypes from being created.',
+    correctionMessage:
+        'Use sealed keyword for exhaustive pattern matching. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -2169,8 +2170,9 @@ class PreferSealedBlocStateRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_sealed_bloc_state',
     problemMessage:
-        '[prefer_sealed_bloc_state] Bloc state base class should be sealed.',
-    correctionMessage: 'Use sealed keyword for exhaustive pattern matching.',
+        '[prefer_sealed_bloc_state] Bloc state base class must be sealed. Sealed state classes ensure exhaustive pattern matching in widgets and prevent unexpected state subtypes from being created.',
+    correctionMessage:
+        'Use sealed keyword for exhaustive pattern matching. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -2239,7 +2241,7 @@ class PreferBlocEventSuffixRule extends SaropaLintRule {
     problemMessage:
         '[prefer_bloc_event_suffix] Suffixing Bloc event class names with Event is a naming convention. The suffix does not affect Bloc behavior or performance. Enable via the stylistic tier.',
     correctionMessage:
-        'Rename class to include Event suffix (e.g., LoadUserEvent).',
+        'Rename class to include Event suffix (e.g., LoadUserEvent). Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -2301,7 +2303,7 @@ class PreferBlocStateSuffixRule extends SaropaLintRule {
     problemMessage:
         '[prefer_bloc_state_suffix] Suffixing Bloc state class names with State is a naming convention. The suffix does not affect Bloc behavior or performance. Enable via the stylistic tier.',
     correctionMessage:
-        'Rename class to include State suffix (e.g., UserLoadingState).',
+        'Rename class to include State suffix (e.g., UserLoadingState). Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -2492,8 +2494,9 @@ class AvoidBlocPublicFieldsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_bloc_public_fields',
     problemMessage:
-        '[avoid_bloc_public_fields] Public field in Bloc. Keep internals private.',
-    correctionMessage: 'Make field private (_fieldName) or final.',
+        '[avoid_bloc_public_fields] Public field in Bloc. Keep internals private. Bloc internals must be private. Public fields expose implementation details and allow external modification of state.',
+    correctionMessage:
+        'Make field private (_fieldName) or final. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -2564,8 +2567,9 @@ class AvoidBlocPublicMethodsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_bloc_public_methods',
     problemMessage:
-        '[avoid_bloc_public_methods] Public method in Bloc. Use events via add() instead.',
-    correctionMessage: 'Convert to event class and handle in on<Event>().',
+        '[avoid_bloc_public_methods] Public method in Bloc. Use events via add() instead. Bloc should only expose add() for events. Other public methods break the event-driven architecture and make testing harder.',
+    correctionMessage:
+        'Convert to event class and handle in on<Event>(). Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -2653,9 +2657,9 @@ class RequireBlocSelectorRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_bloc_selector',
     problemMessage:
-        '[require_bloc_selector] BlocBuilder accessing single field. Use BlocSelector instead.',
+        '[require_bloc_selector] BlocBuilder accessing single field. Use BlocSelector instead. Using BlocSelector instead of BlocBuilder when you only need one field prevents unnecessary rebuilds when other fields change.',
     correctionMessage:
-        'Replace with BlocSelector for targeted rebuilds on specific field.',
+        'Replace with BlocSelector for targeted rebuilds on specific field. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -3012,8 +3016,9 @@ class RequireBlocLoadingStateRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_bloc_loading_state',
     problemMessage:
-        '[require_bloc_loading_state] Async Bloc handler should emit loading state.',
-    correctionMessage: 'Add emit(LoadingState()) before async operations.',
+        '[require_bloc_loading_state] Async Bloc handler should emit loading state. Async operations should emit loading state to show UI feedback.',
+    correctionMessage:
+        'Add emit(LoadingState()) before async operations. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -3104,8 +3109,9 @@ class RequireBlocErrorStateRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_bloc_error_state',
     problemMessage:
-        '[require_bloc_error_state] Bloc state sealed class should have an error case.',
-    correctionMessage: 'Add an error state class (e.g., UserError).',
+        '[require_bloc_error_state] Bloc state sealed class must have an error case. Bloc states should include an error case for proper error handling.',
+    correctionMessage:
+        'Add an error state class (e.g., UserError). Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -3348,9 +3354,9 @@ class PreferCubitForSimpleStateRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_cubit_for_simple_state',
     problemMessage:
-        '[prefer_cubit_for_simple_state] Bloc with single event type. Consider using Cubit for simpler code.',
+        '[prefer_cubit_for_simple_state] Bloc with single event type. Use Cubit for simpler code. Bloc is designed for complex state management with multiple events. When a Bloc only has one event type, a Cubit is simpler and more direct.',
     correctionMessage:
-        'Replace with Cubit when only one event/action is needed.',
+        'Replace with Cubit when only one event/action is needed. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -3541,9 +3547,9 @@ class RequireBlocConsumerWhenBothRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_bloc_consumer_when_both',
     problemMessage:
-        '[require_bloc_consumer_when_both] Nested BlocListener + BlocBuilder. Use BlocConsumer instead.',
+        '[require_bloc_consumer_when_both] Nested BlocListener + BlocBuilder. Use BlocConsumer instead. When you need both listener (for side effects) and builder (for UI), BlocConsumer provides a cleaner single-widget solution.',
     correctionMessage:
-        'Replace with BlocConsumer which combines listener and builder.',
+        'Replace with BlocConsumer which combines listener and builder. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -3803,7 +3809,7 @@ class RequireBlocEventSealedRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_bloc_event_sealed',
     problemMessage:
-        '[require_bloc_event_sealed] Bloc event hierarchy should use sealed class for exhaustive matching.',
+        '[require_bloc_event_sealed] Bloc event hierarchy should use sealed class for exhaustive matching. Using sealed classes for Bloc events enables exhaustive pattern matching and prevents invalid event subtypes.',
     correctionMessage:
         'Change abstract class XEvent to sealed class XEvent for Dart 3+ pattern matching.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -3880,9 +3886,9 @@ class RequireBlocRepositoryAbstractionRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_bloc_repository_abstraction',
     problemMessage:
-        '[require_bloc_repository_abstraction] Bloc depends on concrete repository. Use abstract interface for testability.',
+        '[require_bloc_repository_abstraction] Bloc depends on concrete repository. Use abstract interface for testability. Blocs should depend on abstract repository interfaces, not concrete implementations. This enables testing and swapping implementations.',
     correctionMessage:
-        'Inject UserRepository interface instead of FirebaseUserRepository.',
+        'Inject UserRepository interface instead of FirebaseUserRepository. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -3984,9 +3990,9 @@ class PreferBlocTransformRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_bloc_transform',
     problemMessage:
-        '[prefer_bloc_transform] Search/input event without transformer. Consider debounce/throttle.',
+        '[prefer_bloc_transform] Search/input event without transformer. Prefer debounce/throttle. For events like search queries, use EventTransformer to debounce or throttle, preventing excessive API calls.',
     correctionMessage:
-        'Add transformer: debounce(Duration(milliseconds: 300)) to on<Event>().',
+        'Add transformer: debounce(Duration(milliseconds: 300)) to on<Event>(). Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -4637,9 +4643,9 @@ class AvoidLargeBlocRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_large_bloc',
     problemMessage:
-        '[avoid_large_bloc] Bloc with 7+ event handlers becomes difficult to test and reason about.',
+        '[avoid_large_bloc] Bloc with 7+ event handlers becomes difficult to test and reason about. Blocs handling too many responsibilities become hard to maintain. Keep Blocs focused on a single domain.',
     correctionMessage:
-        'Split into smaller domain-focused Blocs: UserBloc, OrderBloc, etc.',
+        'Split into smaller domain-focused Blocs: UserBloc, OrderBloc, etc. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -4713,9 +4719,9 @@ class AvoidOverengineeredBlocStatesRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_overengineered_bloc_states',
     problemMessage:
-        '[avoid_overengineered_bloc_states] More than 5 state subclasses adds complexity without benefit. Harder to maintain and test.',
+        '[avoid_overengineered_bloc_states] More than 5 state subclasses adds complexity without benefit. Harder to maintain and test. Separate states for "loading" and "idle" when a boolean would suffice. Simpler state machines are easier to reason about.',
     correctionMessage:
-        'Use a single state class with isLoading, error, data properties.',
+        'Use a single state class with isLoading, error, data properties. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 

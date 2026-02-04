@@ -669,9 +669,9 @@ class PreferLazyBoxForLargeRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_lazy_box_for_large',
     problemMessage:
-        '[prefer_lazy_box_for_large] Regular box loads all entries into memory at once.',
+        '[prefer_lazy_box_for_large] Regular box loads all entries into memory at once. Regular boxes load all data into memory at open time. For large datasets, use lazy boxes that load values on demand.',
     correctionMessage:
-        'Use Hive.openLazyBox() for collections that may grow large.',
+        'Use Hive.openLazyBox() for collections that may grow large. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -785,9 +785,9 @@ class RequireHiveTypeIdManagementRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_hive_type_id_management',
     problemMessage:
-        '[require_hive_type_id_management] @HiveType found. Ensure typeId is unique and documented in a central registry.',
+        '[require_hive_type_id_management] @HiveType found. Ensure typeId is unique and documented in a central registry. Hive typeIds must be unique and stable. Changing or duplicating typeIds corrupts stored data. Track typeIds in a central registry.',
     correctionMessage:
-        'Create a hive_type_ids.dart file to track all typeIds and prevent conflicts.',
+        'Create a hive_type_ids.dart file to track all typeIds and prevent conflicts. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -1265,9 +1265,9 @@ class AvoidHiveBoxNameCollisionRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_hive_box_name_collision',
     problemMessage:
-        '[avoid_hive_box_name_collision] Generic Hive box name may cause collision. Use a specific name.',
+        '[avoid_hive_box_name_collision] Generic Hive box name may cause collision. Use a specific name. Box names must be unique across the application. Using the same name for different types causes data corruption or type errors.',
     correctionMessage:
-        'Use a unique, descriptive box name like "users" or "settings".',
+        'Use a unique, descriptive box name like "users" or "settings". Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -1356,9 +1356,9 @@ class PreferHiveValueListenableRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_hive_value_listenable',
     problemMessage:
-        '[prefer_hive_value_listenable] Manual setState after Hive changes is error-prone.',
+        '[prefer_hive_value_listenable] Manual setState after Hive changes is error-prone. Manually calling setState after Hive updates is error-prone. Use ValueListenableBuilder with box.listenable() for reactive updates.',
     correctionMessage:
-        'Use ValueListenableBuilder with box.listenable() for reactive UI.',
+        'Use ValueListenableBuilder with box.listenable() for reactive UI. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 

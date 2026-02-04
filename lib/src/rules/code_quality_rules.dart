@@ -7193,7 +7193,7 @@ class PreferTypedefsForCallbacksRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_typedefs_for_callbacks',
     problemMessage:
-        '[prefer_typedefs_for_callbacks] Inline function type could be a typedef.',
+        '[prefer_typedefs_for_callbacks] Inline function type could be a typedef. Inline function types are harder to read and reuse. Suggests using typedefs for callback function types.',
     correctionMessage:
         'Create a named typedef for this callback signature and reference it by name, improving readability and allowing reuse across multiple parameters.',
     errorSeverity: DiagnosticSeverity.INFO,

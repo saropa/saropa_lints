@@ -1067,9 +1067,9 @@ class RequireUniversalLinkValidationRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_universal_link_validation',
     problemMessage:
-        '[require_universal_link_validation] Deep link route may need iOS Universal Links server configuration.',
+        '[require_universal_link_validation] Deep link route may need iOS Universal Links server configuration. iOS Universal Links (and Android App Links) require proper server-side configuration: - iOS: apple-app-site-association file at /.well-known/ - Android: assetlinks.json at /.well-known/.',
     correctionMessage:
-        'Ensure apple-app-site-association is configured and test on real '
+        'Ensure apple-app-site-association is configured and test on real. Verify the change works correctly with existing tests and add coverage for the new behavior.'
         'iOS device.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -2282,8 +2282,9 @@ class AvoidIosDeprecatedUikitRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_ios_deprecated_uikit',
     problemMessage:
-        '[avoid_ios_deprecated_uikit] Deprecated UIKit API pattern detected in platform channel code.',
-    correctionMessage: 'Update platform channel code to use modern iOS APIs. '
+        '[avoid_ios_deprecated_uikit] Deprecated UIKit API pattern detected in platform channel code. Platform channel code (Swift/Objective-C) that uses deprecated UIKit APIs will generate warnings during Xcode builds and may be rejected by App Store in future iOS versions.',
+    correctionMessage:
+        'Update platform channel code to use modern iOS APIs. Verify the change works correctly with existing tests and add coverage for the new behavior.'
         'See Xcode warnings for specific replacements.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );

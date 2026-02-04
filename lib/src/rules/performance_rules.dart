@@ -2520,7 +2520,8 @@ class RequireDisposePatternRule extends SaropaLintRule {
     name: 'require_dispose_pattern',
     problemMessage:
         '[require_dispose_pattern] Class has StreamController, AnimationController, or other disposable fields but no cleanup method. These controllers leak memory and can crash when accessed after disposal.',
-    correctionMessage: 'Add dispose() or close() method to clean up resources.',
+    correctionMessage:
+        'Add dispose() or close() method to clean up resources. Profile the affected code path to confirm the improvement under realistic workloads.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -2756,9 +2757,9 @@ class PreferBuilderForConditionalRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_builder_for_conditional',
     problemMessage:
-        '[prefer_builder_for_conditional] Complex widget in ternary conditional. Consider if/return for readability.',
+        '[prefer_builder_for_conditional] Complex widget in ternary conditional. Prefer if/return for readability. This introduces unnecessary computational overhead that degrades responsiveness and increases battery drain on mobile.',
     correctionMessage:
-        'Use if/return pattern for cleaner code: if (cond) return A(); return B();',
+        'Use if/return pattern for cleaner code: if (cond) return A(); return B();. Profile the affected code path to confirm the improvement under realistic workloads.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -2855,9 +2856,9 @@ class RequireWidgetKeyStrategyRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_widget_key_strategy',
     problemMessage:
-        '[require_widget_key_strategy] Inconsistent key usage in itemBuilder - some returns have keys, others do not.',
+        '[require_widget_key_strategy] Inconsistent key usage in itemBuilder - some returns have keys, others do not. Keys help Flutter efficiently update widget trees. Without keys or with inconsistent keys, Flutter may rebuild more than necessary.',
     correctionMessage:
-        'Apply consistent key strategy: either all items have keys or none do.',
+        'Apply consistent key strategy: either all items have keys or none do. Profile the affected code path to confirm the improvement under realistic workloads.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -2976,8 +2977,9 @@ class RequireMenuBarForDesktopRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_menu_bar_for_desktop',
     problemMessage:
-        '[require_menu_bar_for_desktop] Desktop app without PlatformMenuBar lacks standard keyboard shortcuts.',
-    correctionMessage: 'Add PlatformMenuBar for standard desktop experience.',
+        '[require_menu_bar_for_desktop] Desktop app without PlatformMenuBar lacks standard keyboard shortcuts. Desktop apps must have a menu bar for keyboard shortcuts and standard desktop interactions.',
+    correctionMessage:
+        'Add PlatformMenuBar for standard desktop experience. Profile the affected code path to confirm the improvement under realistic workloads.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -3060,8 +3062,9 @@ class RequireWindowCloseConfirmationRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_window_close_confirmation',
     problemMessage:
-        '[require_window_close_confirmation] Desktop app should handle window close confirmation.',
-    correctionMessage: 'Implement didRequestAppExit for save confirmation.',
+        '[require_window_close_confirmation] Desktop app should handle window close confirmation. Desktop apps with unsaved data should confirm before closing to prevent data loss. This introduces unnecessary computational overhead that degrades responsiveness and increases battery drain on mobile.',
+    correctionMessage:
+        'Implement didRequestAppExit for save confirmation. Profile the affected code path to confirm the improvement under realistic workloads.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -3140,9 +3143,9 @@ class PreferNativeFileDialogsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_native_file_dialogs',
     problemMessage:
-        '[prefer_native_file_dialogs] Consider using native file dialogs on desktop.',
+        '[prefer_native_file_dialogs] Use native file dialogs on desktop. Desktop platforms have native file dialogs that users expect. Using custom dialogs creates inconsistent UX.',
     correctionMessage:
-        'Use file_picker or file_selector for native experience.',
+        'Use file_picker or file_selector for native experience. Profile the affected code path to confirm the improvement under realistic workloads.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -3219,9 +3222,9 @@ class PreferInheritedWidgetCacheRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_inherited_widget_cache',
     problemMessage:
-        '[prefer_inherited_widget_cache] Multiple .of(context) calls for same type. Cache in local variable.',
+        '[prefer_inherited_widget_cache] Multiple .of(context) calls for same type. Cache in local variable. Multiple .of(context) calls for the same type trigger redundant lookups. Cache the result in a local variable to improve performance.',
     correctionMessage:
-        'Extract to: final theme = Theme.of(context); then use theme.',
+        'Extract to: final theme = Theme.of(context); then use theme. Profile the affected code path to confirm the improvement under realistic workloads.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -3307,9 +3310,9 @@ class PreferLayoutBuilderOverMediaQueryRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_layout_builder_over_media_query',
     problemMessage:
-        '[prefer_layout_builder_over_media_query] MediaQuery.of in list item builder. Causes unnecessary rebuilds.',
+        '[prefer_layout_builder_over_media_query] MediaQuery.of in list item builder. Causes unnecessary rebuilds. MediaQuery.of in list item builders causes rebuilds on every scroll. Use LayoutBuilder or pass dimensions from parent to improve performance.',
     correctionMessage:
-        'Use LayoutBuilder above the list or pass dimensions from parent.',
+        'Use LayoutBuilder above the list or pass dimensions from parent. Profile the affected code path to confirm the improvement under realistic workloads.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -3897,9 +3900,9 @@ class PreferElementRebuildRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_element_rebuild',
     problemMessage:
-        '[prefer_element_rebuild] Conditional return of different widget types destroys Elements.',
+        '[prefer_element_rebuild] Conditional return of different widget types destroys Elements. Returning the same widget type with same key reuses Elements. Changing widget types or keys destroys Elements, losing state and causing expensive rebuilds.',
     correctionMessage:
-        'Use Stack, Visibility, or AnimatedSwitcher to preserve Element state.',
+        'Use Stack, Visibility, or AnimatedSwitcher to preserve Element state. Profile the affected code path to confirm the improvement under realistic workloads.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -4061,7 +4064,7 @@ class AvoidFinalizerMisuseRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_finalizer_misuse',
     problemMessage:
-        '[avoid_finalizer_misuse] Finalizer used for non-native resources. Prefer explicit dispose().',
+        '[avoid_finalizer_misuse] Finalizer used for non-native resources. Prefer explicit dispose(). Dart Finalizers run non-deterministically and add GC overhead. Prefer explicit dispose() methods. Finalizers are only for native resource cleanup as a safety net.',
     correctionMessage:
         'Use dispose() pattern for deterministic cleanup. Finalizers are only for native FFI resources.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -4145,9 +4148,9 @@ class AvoidJsonInMainRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_json_in_main',
     problemMessage:
-        '[avoid_json_in_main] jsonDecode on main thread blocks UI for large payloads (100KB+).',
+        '[avoid_json_in_main] jsonDecode on main thread blocks UI for large payloads (100KB+). jsonDecode() for large payloads (>100KB) blocks the main thread. Use compute() to parse JSON in a background isolate.',
     correctionMessage:
-        'Use compute(jsonDecode, data) or Isolate.run(() => jsonDecode(data)).',
+        'Use compute(jsonDecode, data) or Isolate.run(() => jsonDecode(data)). Profile the affected code path to confirm the improvement under realistic workloads.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 

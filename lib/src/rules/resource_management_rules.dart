@@ -880,9 +880,9 @@ class RequireImageCompressionRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_image_compression',
     problemMessage:
-        '[require_image_compression] Camera image captured without compression. Large files waste bandwidth.',
+        '[require_image_compression] Camera image captured without compression. Large files waste bandwidth. Phone cameras produce large images (5-20MB). Uploading uncompressed images wastes bandwidth and storage. Compress before upload.',
     correctionMessage:
-        'Add maxWidth, maxHeight, or imageQuality parameters to limit file size.',
+        'Add maxWidth, maxHeight, or imageQuality parameters to limit file size. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -996,9 +996,9 @@ class PreferCoarseLocationRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_coarse_location_when_sufficient',
     problemMessage:
-        '[prefer_coarse_location_when_sufficient] High accuracy location uses more battery. Consider coarse location.',
+        '[prefer_coarse_location_when_sufficient] High accuracy location uses more battery. Prefer coarse location. Precise GPS location uses more battery and feels more invasive to users. For city-level features (weather, local stores), use coarse location instead.',
     correctionMessage:
-        'Use LocationAccuracy.low or .medium if you only need city-level location.',
+        'Use LocationAccuracy.low or .medium if you only need city-level location. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -1183,9 +1183,9 @@ class PreferGeolocatorAccuracyAppropriateRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_geolocator_accuracy_appropriate',
     problemMessage:
-        '[prefer_geolocator_accuracy_appropriate] LocationAccuracy.high uses GPS and drains battery significantly.',
+        '[prefer_geolocator_accuracy_appropriate] LocationAccuracy.high uses GPS and drains battery significantly. LocationAccuracy.high uses GPS and significantly drains battery. For features that don\'t need precise location, use lower accuracy.',
     correctionMessage:
-        'Consider LocationAccuracy.low or .medium if precise location not needed.',
+        'Prefer LocationAccuracy.low or .medium if precise location not needed. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -1253,9 +1253,9 @@ class PreferGeolocatorLastKnownRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_geolocator_last_known',
     problemMessage:
-        '[prefer_geolocator_last_known] getCurrentPosition polls GPS. Consider getLastKnownPosition for cached location.',
+        '[prefer_geolocator_last_known] getCurrentPosition polls GPS. Prefer getLastKnownPosition for cached location. getLastKnownPosition returns cached location without GPS poll. Use it when fresh location isn\'t critical.',
     correctionMessage:
-        'Use Geolocator.getLastKnownPosition() when fresh location not critical.',
+        'Use Geolocator.getLastKnownPosition() when fresh location not critical. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -1331,8 +1331,9 @@ class PreferImagePickerMultiSelectionRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_image_picker_multi_selection',
     problemMessage:
-        '[prefer_image_picker_multi_selection] pickImage in loop. Use pickMultiImage for batch selection.',
-    correctionMessage: 'Replace with ImagePicker().pickMultiImage().',
+        '[prefer_image_picker_multi_selection] pickImage in loop. Use pickMultiImage for batch selection. Use pickMultiImage instead of loop calling pickImage. This can cause resource exhaustion, performance degradation, or application instability.',
+    correctionMessage:
+        'Replace with ImagePicker().pickMultiImage(). Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 

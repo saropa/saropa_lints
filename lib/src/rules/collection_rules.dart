@@ -45,9 +45,9 @@ class AvoidCollectionEqualityChecksRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_collection_equality_checks',
     problemMessage:
-        '[avoid_collection_equality_checks] Comparing collections with == uses reference equality. This can cause false positives/negatives, leading to logic errors and unexpected app behavior.',
+        '[avoid_collection_equality_checks] Comparing collections with == uses reference equality. This can cause false positives/negatives, leading to logic errors and unexpected app behavior. Collections (List, Set, Map) use reference equality by default, not value equality. Use listEquals, setEquals, or mapEquals instead.',
     correctionMessage:
-        'Use listEquals, setEquals, mapEquals, or DeepCollectionEquality.',
+        'Use listEquals, setEquals, mapEquals, or DeepCollectionEquality. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 

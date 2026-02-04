@@ -202,9 +202,9 @@ class AvoidEmptySetStateRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_empty_setstate',
     problemMessage:
-        '[avoid_empty_setstate] setState callback is empty — state was likely modified before this call.',
+        '[avoid_empty_setstate] setState callback is empty — state was likely modified before this call. An empty setState(() {}) still triggers a rebuild, but moving state changes inside the callback makes the intent clearer.',
     correctionMessage:
-        'Move state changes inside the callback for clarity, or suppress if intentional.',
+        'Move state changes inside the callback for clarity, or suppress if intentional. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -458,8 +458,9 @@ class AvoidStateConstructorsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_state_constructors',
     problemMessage:
-        '[avoid_state_constructors] State class should not have constructor body.',
-    correctionMessage: 'Use initState() for initialization instead.',
+        '[avoid_state_constructors] State class must not have constructor body. This violates the widget lifecycle, risking setState-after-dispose errors or silent state corruption.',
+    correctionMessage:
+        'Use initState() for initialization instead. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -523,8 +524,9 @@ class AvoidStatelessWidgetInitializedFieldsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_stateless_widget_initialized_fields',
     problemMessage:
-        '[avoid_stateless_widget_initialized_fields] StatelessWidget should not have initialized fields.',
-    correctionMessage: 'Pass values through the constructor instead.',
+        '[avoid_stateless_widget_initialized_fields] StatelessWidget must not have initialized fields. This violates the widget lifecycle, risking setState-after-dispose errors or silent state corruption.',
+    correctionMessage:
+        'Pass values through the constructor instead. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -593,9 +595,9 @@ class AvoidUnnecessarySetStateRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_unnecessary_setstate',
     problemMessage:
-        '[avoid_unnecessary_setstate] setState called in lifecycle method where not needed.',
+        '[avoid_unnecessary_setstate] setState called in lifecycle method where not needed. This violates the widget lifecycle, risking setState-after-dispose errors or silent state corruption.',
     correctionMessage:
-        'In initState/dispose, modify state directly without setState.',
+        'In initState/dispose, modify state directly without setState. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -687,9 +689,9 @@ class AvoidUnnecessaryStatefulWidgetsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_unnecessary_stateful_widgets',
     problemMessage:
-        '[avoid_unnecessary_stateful_widgets] StatefulWidget may be unnecessary.',
+        '[avoid_unnecessary_stateful_widgets] StatefulWidget may be unnecessary. If a State class never calls setState and has no mutable state, it should probably be a StatelessWidget. This violates the widget lifecycle, risking setState-after-dispose errors or silent state corruption.',
     correctionMessage:
-        'Consider using StatelessWidget if no mutable state is needed.',
+        'Use StatelessWidget if no mutable state is needed. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -766,9 +768,9 @@ class AvoidUnremovableCallbacksInListenersRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_unremovable_callbacks_in_listeners',
     problemMessage:
-        '[avoid_unremovable_callbacks_in_listeners] Anonymous function cannot be removed from listener.',
+        '[avoid_unremovable_callbacks_in_listeners] Anonymous function cannot be removed from listener. This violates the widget lifecycle, risking setState-after-dispose errors or silent state corruption.',
     correctionMessage:
-        'Use a named function or store reference to remove later.',
+        'Use a named function or store reference to remove later. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -849,9 +851,9 @@ class AvoidUnsafeSetStateRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_unsafe_setstate',
     problemMessage:
-        '[avoid_unsafe_setstate] setState() called without a mounted check.',
+        '[avoid_unsafe_setstate] setState() called without a mounted check. Calling setState() after a widget has been unmounted (e.g., after an async operation completes) can cause errors. Always check mounted before calling setState() in async contexts.',
     correctionMessage:
-        'Wrap in `if (mounted)` or use `mounted ? setState(...) : null`.',
+        'Wrap in `if (mounted)` or use `mounted ? setState(..) : null`. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -1362,9 +1364,9 @@ class RequireTimerCancellationRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_timer_cancellation',
     problemMessage:
-        '[require_timer_cancellation] Timer or StreamSubscription must be cancelled in dispose().',
+        '[require_timer_cancellation] Timer or StreamSubscription must be cancelled in dispose(). Timers and stream subscriptions that aren\'t cancelled will continue running after the widget is disposed, causing: - Crashes if they call setState on a disposed widget - Memory leaks from retained references - Wasted CPU cycles.',
     correctionMessage:
-        'Add cancel() in dispose() to prevent crashes and memory leaks. '
+        'Add cancel() in dispose() to prevent crashes and memory leaks. Verify the change works correctly with existing tests and add coverage for the new behavior.'
         'Uncancelled timers continue firing after widget disposal.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
@@ -1580,9 +1582,9 @@ class NullifyAfterDisposeRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'nullify_after_dispose',
     problemMessage:
-        '[nullify_after_dispose] Nullable disposable field should be set to null after disposal.',
+        '[nullify_after_dispose] Nullable disposable field must be set to null after disposal. When a nullable disposable field (Timer?, StreamSubscription?, etc.) is disposed/cancelled, it\'s good practice to also set it to null. This: - Helps garbage collection - Prevents accidental reuse of disposed resources - Makes it clear the resource has been cleaned up.',
     correctionMessage:
-        'Add `fieldName = null;` after disposing to help garbage collection '
+        'Add `fieldName = null;` after disposing to help garbage collection. Verify the change works correctly with existing tests and add coverage for the new behavior.'
         'and prevent accidental reuse.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -1837,8 +1839,9 @@ class UseSetStateSynchronouslyRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'use_setstate_synchronously',
     problemMessage:
-        '[use_setstate_synchronously] setState called after async gap without mounted check.',
-    correctionMessage: 'Check mounted before calling setState after await.',
+        '[use_setstate_synchronously] setState called after async gap without mounted check. Quick fix available: Wraps the setState call in if (mounted) { .. }. This violates the widget lifecycle, risking setState-after-dispose errors or silent state corruption.',
+    correctionMessage:
+        'Check mounted before calling setState after await. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -2286,8 +2289,9 @@ class AvoidScaffoldMessengerAfterAwaitRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_scaffold_messenger_after_await',
     problemMessage:
-        '[avoid_scaffold_messenger_after_await] Using ScaffoldMessenger.of(context) after await may use an invalid context.',
-    correctionMessage: 'Store ScaffoldMessenger.of(context) before the await.',
+        '[avoid_scaffold_messenger_after_await] Using ScaffoldMessenger.of(context) after await may use an invalid context. This violates the widget lifecycle, risking setState-after-dispose errors or silent state corruption.',
+    correctionMessage:
+        'Store ScaffoldMessenger.of(context) before the await. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -2379,9 +2383,9 @@ class AvoidBuildContextInProvidersRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_build_context_in_providers',
     problemMessage:
-        '[avoid_build_context_in_providers] Storing BuildContext in providers can cause memory leaks.',
+        '[avoid_build_context_in_providers] Storing BuildContext in providers can cause memory leaks. BuildContext is stored in providers or state managers. This violates the widget lifecycle, risking setState-after-dispose errors or silent state corruption.',
     correctionMessage:
-        'Pass BuildContext as a method parameter when needed instead.',
+        'Pass BuildContext as a method parameter when needed instead. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -2449,9 +2453,9 @@ class PreferWidgetStateMixinRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_widget_state_mixin',
     problemMessage:
-        '[prefer_widget_state_mixin] Consider using WidgetStateMixin for interaction states.',
+        '[prefer_widget_state_mixin] Use WidgetStateMixin for interaction states. Widgets use generic names like Container instead of semantic alternatives. This violates the widget lifecycle, risking setState-after-dispose errors or silent state corruption.',
     correctionMessage:
-        'Use WidgetStateMixin to manage hover, pressed, and focus states.',
+        'Use WidgetStateMixin to manage hover, pressed, and focus states. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -2902,8 +2906,9 @@ class AvoidUnnecessaryOverridesInStateRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_unnecessary_overrides_in_state',
     problemMessage:
-        '[avoid_unnecessary_overrides_in_state] Override only calls super with no additional logic.',
-    correctionMessage: 'Remove the unnecessary override.',
+        '[avoid_unnecessary_overrides_in_state] Override only calls super with no additional logic. State class has unnecessary overrides. This violates the widget lifecycle, risking setState-after-dispose errors or silent state corruption.',
+    correctionMessage:
+        'Remove the unnecessary override. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -2984,8 +2989,9 @@ class DisposeFieldsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'dispose_widget_fields',
     problemMessage:
-        '[dispose_widget_fields] Field requires disposal but dispose method is missing or incomplete.',
-    correctionMessage: 'Add dispose method and call dispose on this field.',
+        '[dispose_widget_fields] Field requires disposal but dispose method is missing or incomplete. Fields that need disposal are not disposed. This violates the widget lifecycle, risking setState-after-dispose errors or silent state corruption.',
+    correctionMessage:
+        'Add dispose method and call dispose on this field. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -3691,9 +3697,9 @@ class RequireShouldRebuildRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_should_rebuild',
     problemMessage:
-        '[require_should_rebuild] InheritedWidget missing updateShouldNotify. Causes unnecessary rebuilds.',
+        '[require_should_rebuild] InheritedWidget missing updateShouldNotify. Causes unnecessary rebuilds. This violates the widget lifecycle, risking setState-after-dispose errors or silent state corruption.',
     correctionMessage:
-        'Override updateShouldNotify to control when dependents rebuild.',
+        'Override updateShouldNotify to control when dependents rebuild. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 

@@ -672,9 +672,9 @@ class AvoidUnnecessaryGetterRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_unnecessary_getter',
     problemMessage:
-        '[avoid_unnecessary_getter] Getter just returns a final field without additional logic.',
+        '[avoid_unnecessary_getter] Getter just returns a final field without additional logic. This unnecessary code increases cognitive load without providing functional benefit.',
     correctionMessage:
-        'Consider making the field public or adding meaningful logic.',
+        'Prefer making the field public or adding meaningful logic. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -763,8 +763,9 @@ class AvoidUnnecessaryLengthCheckRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_unnecessary_length_check',
     problemMessage:
-        '[avoid_unnecessary_length_check] Use isNotEmpty instead of length comparison.',
-    correctionMessage: 'Replace with .isNotEmpty or .isEmpty.',
+        '[avoid_unnecessary_length_check] Use isNotEmpty instead of length comparison. Quick fix available: Replaces with .isEmpty or .isNotEmpty.',
+    correctionMessage:
+        'Replace with .isNotEmpty or .isEmpty. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -942,9 +943,9 @@ class AvoidUnnecessaryNegationsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_unnecessary_negations',
     problemMessage:
-        '[avoid_unnecessary_negations] Unnecessary negation can be simplified.',
+        '[avoid_unnecessary_negations] Unnecessary negation can be simplified. This unnecessary code increases cognitive load without providing functional benefit.',
     correctionMessage:
-        'Simplify by using the opposite operator or removing double negation.',
+        'Simplify by using the opposite operator or removing double negation. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -1016,8 +1017,9 @@ class AvoidUnnecessarySuperRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_unnecessary_super',
     problemMessage:
-        '[avoid_unnecessary_super] Unnecessary super() call with no arguments.',
-    correctionMessage: 'Remove the super() call - it is implicit.',
+        '[avoid_unnecessary_super] Unnecessary super() call with no arguments. Super call is unnecessary in constructor. This unnecessary code increases cognitive load without providing functional benefit.',
+    correctionMessage:
+        'Remove the super() call - it is implicit. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 

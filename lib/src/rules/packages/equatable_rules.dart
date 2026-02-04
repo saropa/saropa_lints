@@ -85,9 +85,9 @@ class ExtendEquatableRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_extend_equatable',
     problemMessage:
-        '[require_extend_equatable] Class overrides operator == but does not extend Equatable.',
+        '[require_extend_equatable] Class overrides operator == but does not extend Equatable. Equatable provides consistent hashCode and equality implementations with less boilerplate and fewer opportunities for bugs.',
     correctionMessage:
-        'Consider extending Equatable for cleaner equality implementation.',
+        'Prefer extending Equatable for cleaner equality implementation. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -353,9 +353,9 @@ class PreferEquatableMixinRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_equatable_mixin',
     problemMessage:
-        '[prefer_equatable_mixin] Consider using EquatableMixin instead of extending Equatable.',
+        '[prefer_equatable_mixin] Use EquatableMixin instead of extending Equatable. Using EquatableMixin is preferred when: - The class already extends another class - You want to preserve the class hierarchy.',
     correctionMessage:
-        'EquatableMixin allows you to extend other classes while keeping '
+        'EquatableMixin allows you to extend other classes while keeping. Verify the change works correctly with existing tests and add coverage for the new behavior.'
         'Equatable functionality. Change to: class X with EquatableMixin',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -492,9 +492,9 @@ class PreferEquatableStringifyRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_equatable_stringify',
     problemMessage:
-        '[prefer_equatable_stringify] Equatable class does not override stringify to true.',
+        '[prefer_equatable_stringify] Equatable class does not override stringify to true. Overriding stringify to true provides better debugging output by including field values in toString() instead of just the class name.',
     correctionMessage:
-        'Add: @override bool get stringify => true; for better debugging.',
+        'Add: @override bool get stringify => true; to improve debugging. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -613,9 +613,9 @@ class PreferImmutableAnnotationRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_immutable_annotation',
     problemMessage:
-        '[prefer_immutable_annotation] Equatable class is not annotated with @immutable.',
+        '[prefer_immutable_annotation] Equatable class is not annotated with @immutable. Equatable classes must be immutable to ensure correct equality behavior. The @immutable annotation documents this intent and enables additional static analysis.',
     correctionMessage:
-        'Add @immutable annotation to document immutability intent.',
+        'Add @immutable annotation to document immutability intent. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -986,9 +986,9 @@ class RequireCopyWithNullHandlingRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_copy_with_null_handling',
     problemMessage:
-        '[require_copy_with_null_handling] copyWith with ?? operator cannot set nullable fields to null.',
+        '[require_copy_with_null_handling] copyWith with ?? operator cannot set nullable fields to null. Standard copyWith pattern can\'t distinguish between "not provided" and "explicitly null". Use a sentinel value or wrapper class to support setting nullable fields back to null.',
     correctionMessage:
-        'Use a wrapper type like Optional<T> or generated copyWith from freezed.',
+        'Use a wrapper type like Optional<T> or generated copyWith from freezed. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -1192,9 +1192,9 @@ class AvoidEquatableDatetimeRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_equatable_datetime',
     problemMessage:
-        '[avoid_equatable_datetime] DateTime in Equatable props may cause flaky equality checks.',
+        '[avoid_equatable_datetime] DateTime in Equatable props may cause flaky equality checks. DateTime comparisons can fail due to microsecond differences. Compare truncated or formatted values instead.',
     correctionMessage:
-        'Use timestamp.millisecondsSinceEpoch or toIso8601String() instead.',
+        'Use timestamp.millisecondsSinceEpoch or toIso8601String() instead. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 

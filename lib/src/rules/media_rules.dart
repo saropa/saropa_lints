@@ -44,9 +44,9 @@ class AvoidAutoplayAudioRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_autoplay_audio',
     problemMessage:
-        '[avoid_autoplay_audio] Autoplay is blocked on iOS/web and annoys users.',
+        '[avoid_autoplay_audio] Autoplay is blocked on iOS/web and annoys users. Autoplaying audio is blocked on iOS/web and annoying to users. Require explicit user interaction to start playback.',
     correctionMessage:
-        'Set autoPlay: false and require user interaction to play.',
+        'Set autoPlay: false and require user interaction to play. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -134,9 +134,9 @@ class PreferCameraResolutionSelectionRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_camera_resolution_selection',
     problemMessage:
-        '[prefer_camera_resolution_selection] CameraController with max resolution. Consider app-specific needs.',
+        '[prefer_camera_resolution_selection] CameraController with max resolution. Prefer app-specific needs. Camera resolution affects performance, battery, and storage. Always specify the desired resolution for your use case.',
     correctionMessage:
-        'Use ResolutionPreset.medium for video calls, .high for photos.',
+        'Use ResolutionPreset.medium for video calls, .high for photos. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -199,8 +199,9 @@ class PreferAudioSessionConfigRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_audio_session_config',
     problemMessage:
-        '[prefer_audio_session_config] AudioPlayer used without audio session config. May conflict with other audio.',
-    correctionMessage: 'Configure AudioSession.instance before playing audio.',
+        '[prefer_audio_session_config] AudioPlayer used without audio session config. May conflict with other audio. Audio session determines how your app interacts with other audio. Without configuration, audio may behave unexpectedly.',
+    correctionMessage:
+        'Configure AudioSession.instance before playing audio. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
