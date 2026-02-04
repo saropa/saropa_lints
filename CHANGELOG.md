@@ -11,6 +11,22 @@ Dates are not included in version headers — [pub.dev](https://pub.dev/packages
 ** See the current published changelog: [saropa_lints/changelog](https://pub.dev/packages/saropa_lints/changelog)
 
 ---
+## [4.9.21]
+
+### Changed
+
+- **`prefer_expanded_at_call_site` severity upgraded to ERROR**: Bumped from WARNING to ERROR and impact from medium to critical — returning Expanded/Flexible/Spacer from `build()` causes the same class of runtime crash (ParentDataWidget error) as `avoid_expanded_outside_flex`. Moved from recommended tier to essential tier.
+- **`prefer_expanded_at_call_site` now detects `Spacer`**: Added `Spacer` to the detection set alongside `Expanded` and `Flexible`. Returning `Spacer` from `build()` has the same crash risk since it wraps `Expanded` internally.
+- **`avoid_expanded_outside_flex` now detects `Spacer`**: Same `Spacer` gap fixed in the sibling rule.
+- **`prefer_expanded_at_call_site` quick fix now unwraps**: Replaced the `// HACK` comment insertion with a proper code transformation that extracts the `child` argument and returns it directly. Not offered for `Spacer` (no child to extract).
+- **`avoid_expanded_outside_flex` improved diagnostic messages**: Expanded `problemMessage` to explain the FlexParentData/RenderFlex mechanism and the indirect `build()` return case. Expanded `correctionMessage` with actionable guidance for reusable widgets. Added "Why This Crashes" dartdoc section explaining the ParentDataWidget error.
+
+### Fixed
+
+- **`avoid_expanded_outside_flex` no longer duplicates `prefer_expanded_at_call_site`**: When Expanded/Flexible/Spacer is returned directly from `build()` without an intermediate widget wrapper, `avoid_expanded_outside_flex` now defers to `prefer_expanded_at_call_site` instead of reporting a second diagnostic on the same node. Expanded nested inside a non-Flex widget within `build()` is still reported by `avoid_expanded_outside_flex`.
+- **`avoid_single_child_column_row` reduced false positives on collection-if and collection-for**: Rule now treats `IfElement` and `ForElement` as dynamic-count elements (like `SpreadElement`). Previously, a `children` list containing a single collection-if or collection-for was incorrectly flagged as a single-child Column/Row, even though these elements can produce 0, 1, or many children at runtime.
+
+---
 ## [4.9.20]
 
 ### Added
