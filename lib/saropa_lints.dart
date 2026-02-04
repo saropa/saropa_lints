@@ -2393,6 +2393,20 @@ final List<LintRule Function()> _allRuleFactories = <LintRule Function()>[
   RequireWebViewNavigationDelegateRule.new,
   RequireWebViewProgressIndicatorRule.new,
   RequireWssOverWsRule.new,
+
+  // Windows platform rules (windows_rules.dart)
+  AvoidHardcodedDriveLettersRule.new,
+  AvoidForwardSlashPathAssumptionRule.new,
+  AvoidCaseSensitivePathComparisonRule.new,
+  RequireWindowsSingleInstanceCheckRule.new,
+  AvoidMaxPathRiskRule.new,
+
+  // Linux platform rules (linux_rules.dart)
+  AvoidHardcodedUnixPathsRule.new,
+  PreferXdgDirectoryConventionRule.new,
+  AvoidX11OnlyAssumptionsRule.new,
+  RequireLinuxFontFallbackRule.new,
+  AvoidSudoShellCommandsRule.new,
 ];
 
 // =============================================================================
