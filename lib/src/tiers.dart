@@ -648,6 +648,7 @@ const Set<String> essentialRules = <String>{
   'avoid_assert_in_production', // WARNING - asserts don't run in production
   'prefer_lazy_loading_images', // WARNING - large images should be lazy loaded
   'avoid_sqflite_type_mismatch', // ERROR - SQLite type mismatches cause runtime errors
+  'avoid_sudo_shell_commands', // ERROR - elevated privileges are a security risk
 };
 
 /// Recommended tier rules - Essential + common mistakes, performance basics.
@@ -1431,6 +1432,13 @@ const Set<String> recommendedOnlyRules = <String>{
   'require_url_launcher_queries_android',
   'require_url_launcher_schemes_ios',
   'require_validator_return_null',
+
+  // Windows/Linux platform rules (Recommended)
+  'avoid_hardcoded_drive_letters', // WARNING - hardcoded drive letters break portability
+  'avoid_forward_slash_path_assumption', // WARNING - forward-slash paths fail on Windows
+  'avoid_case_sensitive_path_comparison', // WARNING - path comparison must be case-insensitive on Windows
+  'avoid_hardcoded_unix_paths', // WARNING - hardcoded Unix paths break portability
+  'avoid_x11_only_assumptions', // WARNING - X11-only code fails on Wayland
   'require_video_player_controller_dispose',
   'require_wss_over_ws',
 };
@@ -2383,6 +2391,12 @@ const Set<String> professionalOnlyRules = <String>{
   'require_url_launcher_error_handling',
   'require_webview_error_handling',
   'require_webview_navigation_delegate',
+
+  // Windows/Linux platform rules (Professional)
+  'require_windows_single_instance_check', // INFO - desktop apps need single-instance guard
+  'avoid_max_path_risk', // INFO - deeply nested paths hit MAX_PATH on Windows
+  'prefer_xdg_directory_convention', // INFO - use XDG base directories on Linux
+  'require_linux_font_fallback', // INFO - platform fonts need fallback on Linux
 };
 
 /// Rules that are only included in the comprehensive tier (not in professional).
