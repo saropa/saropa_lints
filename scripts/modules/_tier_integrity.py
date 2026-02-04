@@ -131,7 +131,7 @@ def get_registered_rule_names(
 
     # Step 2: Build file content cache (read each file once)
     file_contents: dict[str, str] = {}
-    for dart_file in rules_dir.glob("*.dart"):
+    for dart_file in rules_dir.glob("**/*.dart"):
         if dart_file.name == "all_rules.dart":
             continue
         file_contents[dart_file.name] = dart_file.read_text(encoding="utf-8")

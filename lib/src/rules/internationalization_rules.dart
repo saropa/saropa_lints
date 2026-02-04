@@ -1640,14 +1640,20 @@ class RequireIntlCurrencyFormatRule extends SaropaLintRule {
     CustomLintContext context,
   ) {
     context.registry.addStringInterpolation((StringInterpolation node) {
-      final source = node.toSource();
-
-      // Check if contains currency symbol
+      // Check only literal string segments for currency symbols.
+      // Using node.toSource() would match '$' from Dart interpolation
+      // syntax, causing false positives on every interpolated string.
       bool hasCurrencySymbol = false;
-      for (final symbol in _currencySymbols) {
-        if (source.contains(symbol)) {
-          hasCurrencySymbol = true;
-          break;
+      for (final element in node.elements) {
+        if (element is InterpolationString) {
+          final literal = element.value;
+          for (final symbol in _currencySymbols) {
+            if (literal.contains(symbol)) {
+              hasCurrencySymbol = true;
+              break;
+            }
+          }
+          if (hasCurrencySymbol) break;
         }
       }
 
