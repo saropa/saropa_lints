@@ -243,9 +243,9 @@ class RequireCurrencyCodeWithAmountRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_currency_code_with_amount',
     problemMessage:
-        '[require_currency_code_with_amount] Money amount without currency information.',
+        '[require_currency_code_with_amount] Money amount without currency information. Amounts without currency are ambiguous. Always pair amounts with currency codes. This monetary calculation can produce rounding errors that accumulate, causing financial discrepancies.',
     correctionMessage:
-        'Add currency field (String currency or CurrencyCode enum) alongside amount.',
+        'Add currency field (String currency or CurrencyCode enum) alongside amount. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 

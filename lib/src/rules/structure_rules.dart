@@ -727,9 +727,9 @@ class PreferSmallTestFilesRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_small_length_test_files',
     problemMessage:
-        '[prefer_small_length_test_files] Test file has more than $_maxLines lines.',
+        '[prefer_small_length_test_files] Test file has more than $_maxLines lines. While test files typically need more room than production code, very large test files can still indicate poor organization. Split by feature, scenario, or test category.',
     correctionMessage:
-        'Split tests by feature or scenario for better organization. '
+        'Split tests by feature or scenario to improve organization. Verify the change works correctly with existing tests and add coverage for the new behavior.'
         'Disable with: // ignore_for_file: prefer_small_length_test_files',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -779,8 +779,9 @@ class AvoidMediumTestFilesRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_medium_length_test_files',
     problemMessage:
-        '[avoid_medium_length_test_files] Test file exceeds $_maxLines lines.',
-    correctionMessage: 'Consider splitting tests by feature or scenario. '
+        '[avoid_medium_length_test_files] Test file exceeds $_maxLines lines. At 600+ lines, a test file may be covering too many scenarios or features. Split tests by domain, widget, or use case to improve maintainability and faster test runs.',
+    correctionMessage:
+        'Split tests by feature or scenario. Verify the change works correctly with existing tests and add coverage for the new behavior.'
         'Disable with: // ignore_for_file: avoid_medium_length_test_files',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -830,8 +831,9 @@ class AvoidLongTestFilesRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_long_length_test_files',
     problemMessage:
-        '[avoid_long_length_test_files] Test file exceeds $_maxLines lines.',
-    correctionMessage: 'Consider splitting tests by feature or scenario. '
+        '[avoid_long_length_test_files] Test file exceeds $_maxLines lines. A 1000+ line test file is difficult to navigate and likely tests multiple distinct features. Extract test groups into separate files organized by feature area.',
+    correctionMessage:
+        'Split tests by feature or scenario. Verify the change works correctly with existing tests and add coverage for the new behavior.'
         'Disable with: // ignore_for_file: avoid_long_length_test_files',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -881,8 +883,9 @@ class AvoidVeryLongTestFilesRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_very_long_length_test_files',
     problemMessage:
-        '[avoid_very_long_length_test_files] Test file exceeds $_maxLines lines.',
-    correctionMessage: 'Consider splitting tests by feature or scenario. '
+        '[avoid_very_long_length_test_files] Test file exceeds $_maxLines lines. Even with test files\' higher tolerance for length, 2000+ lines indicates the file is testing too much. Split into separate test files organized by feature, screen, or use case.',
+    correctionMessage:
+        'Split tests by feature or scenario. Verify the change works correctly with existing tests and add coverage for the new behavior.'
         'Disable with: // ignore_for_file: avoid_very_long_length_test_files',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -1776,8 +1779,9 @@ class PreferAbstractFinalStaticClassRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_abstract_final_static_class',
     problemMessage:
-        '[prefer_abstract_final_static_class] Class with only static members should be abstract final.',
-    correctionMessage: 'Use "abstract final class" to prevent instantiation.',
+        '[prefer_abstract_final_static_class] Class with only static members must be abstract final. This structural issue reduces code organization and makes the codebase harder to navigate.',
+    correctionMessage:
+        'Use "abstract final class" to prevent instantiation. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -1926,9 +1930,9 @@ class AvoidUnusedGenericsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_unused_generics',
     problemMessage:
-        '[avoid_unused_generics] Type parameter is declared but never used.',
+        '[avoid_unused_generics] Type parameter is declared but never used. This structural issue reduces code organization and makes the codebase harder to navigate.',
     correctionMessage:
-        'Remove unused type parameter or use it in the declaration.',
+        'Remove unused type parameter or use it in the declaration. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -2055,7 +2059,8 @@ class PreferTrailingUnderscoreForUnusedRule extends SaropaLintRule {
     name: 'prefer_trailing_underscore_for_unused',
     problemMessage:
         '[prefer_trailing_underscore_for_unused] Naming unused variables with a trailing underscore is a convention. The Dart compiler handles unused variables the same either way. Enable via the stylistic tier.',
-    correctionMessage: 'Rename to _ or _paramName to indicate it is unused.',
+    correctionMessage:
+        'Rename to _ or _paramName to indicate it is unused. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -2126,8 +2131,9 @@ class AvoidUnnecessaryFuturesRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_unnecessary_futures',
     problemMessage:
-        '[avoid_unnecessary_futures] Async function has no await expressions.',
-    correctionMessage: 'Remove async keyword or add await expressions.',
+        '[avoid_unnecessary_futures] Async function has no await expressions. This structural issue reduces code organization and makes the codebase harder to navigate.',
+    correctionMessage:
+        'Remove async keyword or add await expressions. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -2269,8 +2275,9 @@ class AvoidUnnecessaryNullableReturnTypeRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_unnecessary_nullable_return_type',
     problemMessage:
-        '[avoid_unnecessary_nullable_return_type] Return type is nullable but function never returns null.',
-    correctionMessage: 'Remove the ? from the return type.',
+        '[avoid_unnecessary_nullable_return_type] Return type is nullable but function never returns null. This structural issue reduces code organization and makes the codebase harder to navigate.',
+    correctionMessage:
+        'Remove the ? from the return type. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 

@@ -1,3 +1,5 @@
+// ignore_for_file: depend_on_referenced_packages, deprecated_member_use
+
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/error/error.dart'
     show AnalysisError, DiagnosticSeverity;
@@ -263,9 +265,9 @@ class RequireDialogResultHandlingRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_dialog_result_handling',
     problemMessage:
-        '[require_dialog_result_handling] showDialog result should be awaited or handled.',
+        '[require_dialog_result_handling] showDialog result must be awaited or handled. Dialogs that return values (like confirmation dialogs) must have their results awaited and processed. Ignoring the result can lead to missed user actions.',
     correctionMessage:
-        'Use await showDialog() or .then() to handle the dialog result.',
+        'Use await showDialog() or .then() to handle the dialog result. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -335,9 +337,9 @@ class AvoidSnackbarQueueBuildupRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_snackbar_queue_buildup',
     problemMessage:
-        '[avoid_snackbar_queue_buildup] Consider clearing snackbars before showing new ones.',
+        '[avoid_snackbar_queue_buildup] Prefer clearing snackbars before showing new ones. Multiple snackbars can queue up, leading to poor UX where users see stale messages. Prefer clearing or hiding previous snackbars before showing new ones.',
     correctionMessage:
-        'Call clearSnackBars() or hideCurrentSnackBar() before showSnackBar().',
+        'Call clearSnackBars() or hideCurrentSnackBar() before showSnackBar(). Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -433,9 +435,9 @@ class PreferAdaptiveDialogRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_adaptive_dialog',
     problemMessage:
-        '[prefer_adaptive_dialog] AlertDialog without adaptive styling. May look non-native on iOS.',
+        '[prefer_adaptive_dialog] AlertDialog without adaptive styling. May look non-native on iOS. Dialogs should adapt to the platform (Material on Android, Cupertino on iOS) for native look and feel.',
     correctionMessage:
-        'Use AlertDialog.adaptive() or platform-specific dialogs.',
+        'Use AlertDialog.adaptive() or platform-specific dialogs. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -550,9 +552,9 @@ class RequireSnackbarActionForUndoRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_snackbar_action_for_undo',
     problemMessage:
-        '[require_snackbar_action_for_undo] SnackBar for delete/remove without undo action. Users can\'t recover.',
+        '[require_snackbar_action_for_undo] SnackBar for delete/remove without undo action. Users can\'t recover. Destructive actions should provide an undo option. SnackBars are perfect for this pattern with their action button.',
     correctionMessage:
-        'Add action parameter with SnackBarAction for undo functionality.',
+        'Add action parameter with SnackBarAction for undo functionality. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 

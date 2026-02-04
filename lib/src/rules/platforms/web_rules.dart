@@ -242,8 +242,9 @@ class PreferDeferredLoadingWebRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_deferred_loading_web',
     problemMessage:
-        '[prefer_deferred_loading_web] Large package imported eagerly increases initial bundle size.',
-    correctionMessage: 'Use "deferred as" import to reduce initial load time.',
+        '[prefer_deferred_loading_web] Large package imported eagerly increases initial bundle size. Web apps should defer loading large libraries to improve initial load time. Use deferred loading for heavy packages.',
+    correctionMessage:
+        'Use "deferred as" import to reduce initial load time. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -491,7 +492,7 @@ class RequireWebRendererAwarenessRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_web_renderer_awareness',
     problemMessage:
-        '[require_web_renderer_awareness] kIsWeb check without renderer consideration. Behavior may vary.',
+        '[require_web_renderer_awareness] kIsWeb check without renderer consideration. Behavior may vary. Flutter web has different renderers (HTML, CanvasKit, Skia) with different capabilities. Code assuming one renderer may fail on others.',
     correctionMessage:
         'Check if the web-specific code depends on HTML DOM access (HTML renderer only) or canvas features (CanvasKit only). Use dart:js_interop or conditional imports for renderer-specific behavior.',
     errorSeverity: DiagnosticSeverity.INFO,

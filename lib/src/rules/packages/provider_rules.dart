@@ -707,9 +707,9 @@ class RequireMultiProviderRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_multi_provider',
     problemMessage:
-        '[require_multi_provider] Nested Provider widgets. Use MultiProvider for better readability.',
+        '[require_multi_provider] Nested Provider widgets. Use MultiProvider to improve readability. Nested Provider widgets create deep indentation. MultiProvider flattens the tree and is easier to read and maintain.',
     correctionMessage:
-        'Replace nested Providers with MultiProvider(providers: [...], child: ...).',
+        'Replace nested Providers with MultiProvider(providers: [..], child: ..). Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -806,9 +806,9 @@ class AvoidNestedProvidersRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_nested_providers',
     problemMessage:
-        '[avoid_nested_providers] Provider created inside Consumer or builder callback.',
+        '[avoid_nested_providers] Provider created inside Consumer or builder callback. Deeply nested provider trees are hard to reason about and maintain. Flatten with MultiProvider and avoid provider-in-provider patterns where possible.',
     correctionMessage:
-        'Use ProxyProvider or move provider to MultiProvider at tree root.',
+        'Use ProxyProvider or move provider to MultiProvider at tree root. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -935,9 +935,9 @@ class PreferMultiProviderRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_multi_provider',
     problemMessage:
-        '[prefer_multi_provider] Nested Providers should use MultiProvider instead.',
+        '[prefer_multi_provider] Nested Providers should use MultiProvider instead. Use MultiProvider when providing multiple objects to reduce nesting and improve readability. Nested Provider widgets are used.',
     correctionMessage:
-        'Combine into MultiProvider(providers: [...], child: ...).',
+        'Combine into MultiProvider(providers: [..], child: ..). Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -1182,8 +1182,9 @@ class PreferProviderExtensionsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_provider_extensions',
     problemMessage:
-        '[prefer_provider_extensions] Long provider access chain is hard to read.',
-    correctionMessage: 'Consider using an extension method.',
+        '[prefer_provider_extensions] Long provider access chain is hard to read. Long chains like context.read<A>().read<B>().value are hard to read. Use extension methods.',
+    correctionMessage:
+        'Use an extension method. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -1351,8 +1352,9 @@ class PreferNullableProviderTypesRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_nullable_provider_types',
     problemMessage:
-        '[prefer_nullable_provider_types] Provider type is non-nullable but create may return null.',
-    correctionMessage: 'Use nullable type parameter: Provider<Type?>.',
+        '[prefer_nullable_provider_types] Provider type is non-nullable but create may return null. When a Provider\'s create callback explicitly returns null, the type parameter must be nullable to prevent runtime errors.',
+    correctionMessage:
+        'Use nullable type parameter: Provider<Type?>. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -1449,9 +1451,9 @@ class PreferConsumerOverProviderOfRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_consumer_over_provider_of',
     problemMessage:
-        '[prefer_consumer_over_provider_of] Provider.of in build. Use Consumer for granular rebuilds.',
+        '[prefer_consumer_over_provider_of] Provider.of in build. Use Consumer for granular rebuilds. Provider.of<T>(context) is used in build method. This pattern increases maintenance cost and the likelihood of introducing bugs during future changes.',
     correctionMessage:
-        'Replace with Consumer<T> or context.select() for better performance.',
+        'Replace with Consumer<T> or context.select() to improve performance. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -1663,8 +1665,9 @@ class PreferContextReadInCallbacksRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_context_read_in_callbacks',
     problemMessage:
-        '[prefer_context_read_in_callbacks] context.watch should not be used in callbacks.',
-    correctionMessage: 'Use context.read instead for one-time access.',
+        '[prefer_context_read_in_callbacks] context.watch must not be used in callbacks. Using context.watch in button callbacks or event handlers will cause unnecessary rebuilds. Use context.read for one-time access in callbacks.',
+    correctionMessage:
+        'Use context.read instead for one-time access. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -1760,7 +1763,7 @@ class PreferProxyProviderRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_proxy_provider',
     problemMessage:
-        '[prefer_proxy_provider] Provider.create() accesses other providers. Use ProxyProvider instead.',
+        '[prefer_proxy_provider] Provider.create() accesses other providers. Use ProxyProvider instead. When a Provider needs to depend on another provider\'s value, using a plain Provider with context.read() or context.watch() is fragile and error-prone. ProxyProvider ensures proper dependency tracking and rebuild behavior.',
     correctionMessage:
         'Use ProxyProvider, ProxyProvider2, etc. to properly declare provider dependencies.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -1885,7 +1888,7 @@ class RequireUpdateCallbackRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_update_callback',
     problemMessage:
-        '[require_update_callback] ProxyProvider.update ignores the previous value. This may cause resource leaks.',
+        '[require_update_callback] ProxyProvider.update ignores the previous value. This may cause resource leaks. ProxyProvider.update is called whenever a dependency changes. If the callback doesn\'t properly handle the previous parameter, it may cause memory leaks or miss important cleanup logic.',
     correctionMessage:
         'Handle the previous parameter to dispose resources or reuse the existing instance.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -2031,9 +2034,9 @@ class PreferSelectorOverConsumerRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_selector_over_consumer',
     problemMessage:
-        '[prefer_selector_over_consumer] Consumer accessing single property. Use Selector for granular rebuilds.',
+        '[prefer_selector_over_consumer] Consumer accessing single property. Use Selector for granular rebuilds. Consumer rebuilds on any change to the provider. Selector only rebuilds when the selected value changes, providing more granular control.',
     correctionMessage:
-        'Use Selector widget or ref.watch(provider.select(...)) for efficiency.',
+        'Use Selector widget or ref.watch(provider.select(..)) for efficiency. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -2207,9 +2210,9 @@ class PreferChangeNotifierProxyRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_change_notifier_proxy',
     problemMessage:
-        '[prefer_change_notifier_proxy] Provider.of without listen:false in callback. Use context.read() or add listen: false.',
+        '[prefer_change_notifier_proxy] Provider.of without listen:false in callback. Use context.read() or add listen: false. This pattern increases maintenance cost and the likelihood of introducing bugs during future changes.',
     correctionMessage:
-        'Add listen: false parameter, or use context.read<T>() for one-time reads.',
+        'Add listen: false parameter, or use context.read<T>() for one-time reads. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -2347,9 +2350,9 @@ class PreferSelectorWidgetRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_selector_widget',
     problemMessage:
-        '[prefer_selector_widget] Consumer rebuilds entire subtree. Consider Selector for targeted rebuilds.',
+        '[prefer_selector_widget] Consumer rebuilds entire subtree. Prefer Selector for targeted rebuilds. Using Consumer to rebuild an entire widget tree when only part needs updating is wasteful. Use Selector to rebuild only what changed.',
     correctionMessage:
-        'Use Selector<Model, T> to rebuild only widgets that depend on specific values.',
+        'Use Selector<Model, T> to rebuild only widgets that depend on specific values. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 

@@ -40,9 +40,9 @@ class RequireQrScanFeedbackRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_qr_scan_feedback',
     problemMessage:
-        '[require_qr_scan_feedback] QR scan callback should provide user feedback.',
+        '[require_qr_scan_feedback] QR scan callback should provide user feedback. Users need confirmation that their scan was successful. Haptic feedback (vibration) or visual feedback (flash, animation) improves user experience and prevents double-scanning.',
     correctionMessage:
-        'Add HapticFeedback.mediumImpact() or visual feedback on scan.',
+        'Add HapticFeedback.mediumImpact() or visual feedback on scan. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -132,9 +132,9 @@ class AvoidQrScannerAlwaysActiveRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_qr_scanner_always_active',
     problemMessage:
-        '[avoid_qr_scanner_always_active] QR scanner should pause when app is backgrounded.',
+        '[avoid_qr_scanner_always_active] QR scanner should pause when app is backgrounded. Camera for QR scanning drains battery significantly. Without proper lifecycle handling, the camera stays active when the app is backgrounded or the screen is turned off.',
     correctionMessage:
-        'Add WidgetsBindingObserver and pause camera in didChangeAppLifecycleState.',
+        'Add WidgetsBindingObserver and pause camera in didChangeAppLifecycleState. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 

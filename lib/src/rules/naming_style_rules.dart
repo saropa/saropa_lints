@@ -30,7 +30,7 @@ class AvoidGetterPrefixRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_no_getter_prefix',
     problemMessage:
-        "[prefer_no_getter_prefix] Getter with 'get' prefix is redundant. Dart convention omits it.",
+        "[prefer_no_getter_prefix] Getter with 'get' prefix is redundant. Dart convention omits it. Formerly: avoid_getter_prefix. A getter name starts with \'get\'.",
     correctionMessage:
         "Remove the 'get' prefix from the getter name. For example, rename getName to name, or getValue to value.",
     errorSeverity: DiagnosticSeverity.INFO,
@@ -88,7 +88,7 @@ class AvoidNonAsciiSymbolsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_non_ascii_symbols',
     problemMessage:
-        '[avoid_non_ascii_symbols] String contains non-ASCII characters.',
+        '[avoid_non_ascii_symbols] String contains non-ASCII characters. Non-ASCII characters can cause encoding issues and may be hard to distinguish visually (e.g., different types of spaces).',
     correctionMessage:
         'Replace non-ASCII characters with ASCII equivalents or Unicode escape sequences (e.g., \\u00E9 for e-acute).',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -164,7 +164,7 @@ class FormatCommentRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_capitalized_comment_start',
     problemMessage:
-        '[prefer_capitalized_comment_start] Comment should start with capital letter.',
+        '[prefer_capitalized_comment_start] Comment should start with capital letter. Prose comments should start with a capital letter for readability. Commented-out code is automatically detected and skipped to avoid false positives on patterns like // foo.bar() or // return x;.',
     correctionMessage:
         'Capitalize the first letter of the comment text. Prose comments that start with lowercase letters reduce readability.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -317,7 +317,7 @@ class MatchClassNamePatternRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'match_class_name_pattern',
     problemMessage:
-        '[match_class_name_pattern] Class name does not follow expected pattern.',
+        '[match_class_name_pattern] Class name does not follow expected pattern. Class names should follow naming conventions for their purpose.',
     correctionMessage:
         'Rename the class to follow Dart naming conventions. Use UpperCamelCase and include a suffix matching its purpose (e.g., Widget, State, Screen).',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -410,9 +410,9 @@ class MatchGetterSetterFieldNamesRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'match_getter_setter_field_names',
     problemMessage:
-        '[match_getter_setter_field_names] Getter/setter name should match the backing field.',
+        '[match_getter_setter_field_names] Getter/setter name should match the backing field. Getter/setter must have the same name as the backing field (without underscore).',
     correctionMessage:
-        'Rename the getter or setter to match the backing field name without the leading underscore. For example, _count should have getter count, not total.',
+        'Rename the getter or setter to match the backing field name without the leading underscore. For example, _count must have getter count, not total.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -493,9 +493,9 @@ class MatchLibFolderStructureRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'match_lib_folder_structure',
     problemMessage:
-        '[match_lib_folder_structure] Test file location should mirror lib folder structure.',
+        '[match_lib_folder_structure] Test file location should mirror lib folder structure. This naming violation reduces readability and makes the codebase harder for teams to navigate.',
     correctionMessage:
-        'Move the test file so its path mirrors the lib folder structure. For example, lib/src/utils/helper.dart should have test/src/utils/helper_test.dart.',
+        'Move the test file so its path mirrors the lib folder structure. For example, lib/src/utils/helper.dart must have test/src/utils/helper_test.dart.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -542,7 +542,7 @@ class MatchPositionalFieldNamesOnAssignmentRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'match_positional_field_names_on_assignment',
     problemMessage:
-        '[match_positional_field_names_on_assignment] Positional field name should match the variable being assigned.',
+        '[match_positional_field_names_on_assignment] Positional field name should match the variable being assigned. This naming violation reduces readability and makes the codebase harder for teams to navigate.',
     correctionMessage:
         'Rename the positional field to match the variable it is assigned to. Mismatched names cause confusion when reading destructured assignments.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -628,7 +628,7 @@ class PreferBooleanPrefixesRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_boolean_prefixes',
     problemMessage:
-        '[prefer_boolean_prefixes] Boolean variable should have a prefix (is/has/can/should/will/did).',
+        '[prefer_boolean_prefixes] Boolean variable must have a prefix (is/has/can/should/will/did). This rule only checks class fields and top-level variables, not local variables inside functions/methods. Local variables are implementation details and don\'t need strict naming conventions.',
     correctionMessage:
         'Rename this boolean field to use a standard prefix (is, has, can, should, will, did) or suffix (Enabled, Active, Visible). Example: enabled becomes isEnabled.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -1339,7 +1339,7 @@ class PreferCorrectErrorNameRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_correct_error_name',
     problemMessage:
-        '[prefer_correct_error_name] Catch parameter uses nonstandard name. Use "e" or "error" for consistency and readability.',
+        '[prefer_correct_error_name] Catch parameter uses nonstandard name. Use "e" or "error" for consistency and readability. Consistent naming of catch parameters improves readability.',
     correctionMessage:
         'Rename the catch parameter to "e" or "error" for consistency. Example: catch (e) { } or catch (error) { }.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -1648,7 +1648,7 @@ class PreferExplicitParameterNamesRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_explicit_parameter_names',
     problemMessage:
-        '[prefer_explicit_parameter_names] Function type parameters should have names.',
+        '[prefer_explicit_parameter_names] Function type parameters must have names. Parameter names in function types improve documentation.',
     correctionMessage:
         'Add descriptive names to function type parameters. Unnamed parameters lose intent: void Function(String) becomes void Function(String message).',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -1762,7 +1762,7 @@ class PreferPrefixedGlobalConstantsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_prefixed_global_constants',
     problemMessage:
-        '[prefer_prefixed_global_constants] Global constant should have a descriptive prefix.',
+        '[prefer_prefixed_global_constants] Global constant must have a descriptive prefix. Global constants must be prefixed with \'k\' or similar.',
     correctionMessage:
         'Prefix the global constant with "k" (e.g., kMaxRetries) or use a longer descriptive name to distinguish it from local variables.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -1830,7 +1830,7 @@ class TagNameRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_kebab_tag_name',
     problemMessage:
-        '[prefer_kebab_tag_name] Tag name should follow naming conventions.',
+        '[prefer_kebab_tag_name] Tag name should follow naming conventions. Widget tag names don\'t follow conventions. This naming violation reduces readability and makes the codebase harder for teams to navigate.',
     correctionMessage:
         'Use kebab-case (lowercase with hyphens) for tag names. Tag names must start with a lowercase letter and contain only lowercase letters, digits, and hyphens.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -1897,9 +1897,9 @@ class PreferNamedExtensionsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_named_extensions',
     problemMessage:
-        '[prefer_named_extensions] Anonymous extension should be named.',
+        '[prefer_named_extensions] Anonymous extension must be named. This naming violation reduces readability and makes the codebase harder for teams to navigate.',
     correctionMessage:
-        'Add a name to the extension for better debugging and documentation.',
+        'Add a name to the extension to improve debugging and documentation. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -1947,9 +1947,9 @@ class PreferTypedefForCallbacksRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_typedef_for_callbacks',
     problemMessage:
-        '[prefer_typedef_for_callbacks] Consider using typedef for repeated function types.',
+        '[prefer_typedef_for_callbacks] Use typedef for repeated function types. Inline function types are repeated and should use typedef.',
     correctionMessage:
-        'Create a typedef for this function type to improve readability.',
+        'Create a typedef for this function type to improve readability. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -2020,8 +2020,9 @@ class PreferEnhancedEnumsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_enhanced_enums',
     problemMessage:
-        '[prefer_enhanced_enums] Consider using enhanced enum instead of extension.',
-    correctionMessage: 'Move extension members into the enum itself.',
+        '[prefer_enhanced_enums] Use enhanced enum instead of extension. An enum could use enhanced enum features instead of extensions.',
+    correctionMessage:
+        'Move extension members into the enum itself. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 

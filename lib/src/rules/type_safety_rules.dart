@@ -54,8 +54,9 @@ class AvoidUnsafeCastRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_unsafe_cast',
     problemMessage:
-        '[avoid_unsafe_cast] Direct cast with "as" may throw at runtime.',
-    correctionMessage: 'Use "is" check or pattern matching instead.',
+        '[avoid_unsafe_cast] Direct cast with "as" may throw at runtime. Direct casting with as can throw if the value is null or wrong type. Prefer is check first or use as? for nullable result.',
+    correctionMessage:
+        'Use "is" check or pattern matching instead. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -138,8 +139,9 @@ class PreferConstrainedGenericsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_constrained_generics',
     problemMessage:
-        '[prefer_constrained_generics] Generic type parameter has no constraint.',
-    correctionMessage: 'Consider adding extends clause to constrain the type.',
+        '[prefer_constrained_generics] Generic type parameter has no constraint. Unconstrained type parameters accept any type including null, which can lead to unexpected behavior. This weakens type safety, allowing errors to reach runtime where they crash instead of being caught at compile time.',
+    correctionMessage:
+        'Add extends clause to constrain the type. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -194,9 +196,9 @@ class RequireCovariantDocumentationRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_covariant_documentation',
     problemMessage:
-        '[require_covariant_documentation] Covariant parameter should be documented.',
+        '[require_covariant_documentation] Covariant parameter must be documented. Covariant parameters weaken type safety and can cause runtime errors. They must be documented to explain why they\'re necessary.',
     correctionMessage:
-        'Add documentation explaining why covariant is necessary.',
+        'Add documentation explaining why covariant is necessary. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -266,8 +268,9 @@ class RequireSafeJsonParsingRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_safe_json_parsing',
     problemMessage:
-        '[require_safe_json_parsing] JSON parsing may throw on missing keys.',
-    correctionMessage: 'Use null-aware operators or provide defaults.',
+        '[require_safe_json_parsing] JSON parsing may throw on missing keys. JSON parsing should handle missing or null values gracefully to avoid runtime exceptions. This weakens type safety, allowing errors to reach runtime where they crash instead of being caught at compile time.',
+    correctionMessage:
+        'Use null-aware operators or provide defaults. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -334,7 +337,7 @@ class RequireNullSafeExtensionsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_null_safe_extensions',
     problemMessage:
-        '[require_null_safe_extensions] Extension method on a nullable type does not handle null receivers. This can cause runtime exceptions.',
+        '[require_null_safe_extensions] Extension method on a nullable type does not handle null receivers. This can cause runtime exceptions. Extension methods on nullable types should check for null.',
     correctionMessage:
         'Add null checks or use ?. to safely handle nullable receivers in extension methods.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -391,8 +394,9 @@ class PreferSpecificNumericTypesRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_specific_numeric_types',
     problemMessage:
-        '[prefer_specific_numeric_types] Prefer int or double over num for better type safety.',
-    correctionMessage: 'Use int or double instead of num.',
+        '[prefer_specific_numeric_types] Prefer int or double over num to improve type safety. This weakens type safety, allowing errors to reach runtime where they crash instead of being caught at compile time.',
+    correctionMessage:
+        'Use int or double instead of num. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -503,8 +507,9 @@ class AvoidTypeCastsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_type_casts',
     problemMessage:
-        '[avoid_type_casts] Type cast with "as" may throw at runtime.',
-    correctionMessage: 'Use "is" check or pattern matching instead.',
+        '[avoid_type_casts] Type cast with "as" may throw at runtime. Type casts with as can throw at runtime. Prefer is checks or pattern matching for safer type narrowing.',
+    correctionMessage:
+        'Use "is" check or pattern matching instead. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -547,8 +552,9 @@ class RequireFutureOrDocumentationRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_futureor_documentation',
     problemMessage:
-        '[require_futureor_documentation] FutureOr return type should be documented.',
-    correctionMessage: 'Add documentation explaining when sync vs async.',
+        '[require_futureor_documentation] FutureOr return type must be documented. FutureOr can be confusing for API consumers and must be documented. FutureOr is used in public API without documentation.',
+    correctionMessage:
+        'Add documentation explaining when sync vs async. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -608,7 +614,7 @@ class PreferExplicitTypeArgumentsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_explicit_type_arguments',
     problemMessage:
-        '[prefer_explicit_type_arguments] Generic type without explicit type arguments.',
+        '[prefer_explicit_type_arguments] Generic type without explicit type arguments. Explicit type arguments improve code clarity and prevent accidental type inference issues.',
     correctionMessage:
         'Add explicit type arguments to the generic type so that the intended types are visible without relying on inference.',
     errorSeverity: DiagnosticSeverity.INFO,

@@ -198,9 +198,9 @@ class RequireDioInterceptorErrorHandlerRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_dio_interceptor_error_handler',
     problemMessage:
-        '[require_dio_interceptor_error_handler] InterceptorsWrapper without onError handler. Errors may be unhandled.',
+        '[require_dio_interceptor_error_handler] InterceptorsWrapper without onError handler. Errors may be unhandled. Interceptors without error handling let errors propagate unexpectedly. This pattern increases maintenance cost and the likelihood of introducing bugs during future changes.',
     correctionMessage:
-        'Add onError callback to handle request errors in interceptor.',
+        'Add onError callback to handle request errors in interceptor. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -260,8 +260,9 @@ class PreferDioCancelTokenRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_dio_cancel_token',
     problemMessage:
-        '[prefer_dio_cancel_token] Long-running Dio request without CancelToken. Cannot be cancelled.',
-    correctionMessage: 'Add cancelToken parameter for cancellable requests.',
+        '[prefer_dio_cancel_token] Long-running Dio request without CancelToken. Cannot be cancelled. Requests must be cancellable to avoid wasting resources when the user navigates away.',
+    correctionMessage:
+        'Add cancelToken parameter for cancellable requests. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -415,9 +416,9 @@ class AvoidDioFormDataLeakRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_dio_form_data_leak',
     problemMessage:
-        '[avoid_dio_form_data_leak] FormData with file. Ensure proper cleanup of file resources.',
+        '[avoid_dio_form_data_leak] FormData with file. Ensure proper cleanup of file resources. FormData with file streams must be cleaned up to avoid resource leaks. FormData with files is not properly cleaned up.',
     correctionMessage:
-        'Consider cleanup or using try-finally for file uploads.',
+        'Prefer cleanup or using try-finally for file uploads. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -583,9 +584,9 @@ class RequireDioSingletonRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_dio_singleton',
     problemMessage:
-        '[require_dio_singleton] Consider using a singleton Dio instance.',
+        '[require_dio_singleton] Use a singleton Dio instance. Creating multiple Dio instances wastes resources and makes interceptor configuration inconsistent.',
     correctionMessage:
-        'Create a shared Dio instance with consistent configuration.',
+        'Create a shared Dio instance with consistent configuration. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -657,9 +658,9 @@ class PreferDioBaseOptionsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_dio_base_options',
     problemMessage:
-        '[prefer_dio_base_options] Repeated options in Dio requests. Consider using BaseOptions.',
+        '[prefer_dio_base_options] Repeated options in Dio requests. Use BaseOptions. Repeated headers/timeouts across requests must be in BaseOptions.',
     correctionMessage:
-        'Move common headers/timeouts to BaseOptions in Dio constructor.',
+        'Move common headers/timeouts to BaseOptions in Dio constructor. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -730,9 +731,9 @@ class AvoidDioWithoutBaseUrlRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_dio_without_base_url',
     problemMessage:
-        '[avoid_dio_without_base_url] Dio request with full URL. Consider setting baseUrl.',
+        '[avoid_dio_without_base_url] Dio request with full URL. Prefer setting baseUrl. Using full URLs in each request is error-prone. Set baseUrl once.',
     correctionMessage:
-        'Set baseUrl in BaseOptions and use relative paths in requests.',
+        'Set baseUrl in BaseOptions and use relative paths in requests. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -803,7 +804,7 @@ class PreferDioOverHttpRule extends SaropaLintRule {
     problemMessage:
         '[prefer_dio_over_http] Using http package. Dio provides interceptors, cancellation, and structured error handling suited for production apps.',
     correctionMessage:
-        'Consider using Dio for interceptors, cancellation, and error handling.',
+        'Use Dio for interceptors, cancellation, and error handling. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -856,9 +857,9 @@ class RequireDioResponseTypeRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_dio_response_type',
     problemMessage:
-        '[require_dio_response_type] Dio download without explicit responseType may corrupt binary data.',
+        '[require_dio_response_type] Dio download without explicit responseType may corrupt binary data. Dio defaults responseType to JSON, which causes issues when downloading files or handling binary responses.',
     correctionMessage:
-        'Add options: Options(responseType: ResponseType.bytes) for downloads.',
+        'Add options: Options(responseType: ResponseType.bytes) for downloads. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -937,8 +938,9 @@ class RequireDioRetryInterceptorRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_dio_retry_interceptor',
     problemMessage:
-        '[require_dio_retry_interceptor] Dio instance without retry interceptor.',
-    correctionMessage: 'Add RetryInterceptor for network resilience.',
+        '[require_dio_retry_interceptor] Dio instance without retry interceptor. Network failures are common on mobile. Without retry logic, transient failures cause unnecessary errors.',
+    correctionMessage:
+        'Add RetryInterceptor for network resilience. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -1004,9 +1006,9 @@ class PreferDioTransformerRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_dio_transformer',
     problemMessage:
-        '[prefer_dio_transformer] Dio instance without custom transformer for large data.',
+        '[prefer_dio_transformer] Dio instance without custom transformer for large data. Parsing large JSON responses on the main thread causes jank. Use BackgroundTransformer or compute() for heavy parsing.',
     correctionMessage:
-        'Set dio.transformer = BackgroundTransformer() for off-main-thread parsing.',
+        'Set dio.transformer = BackgroundTransformer() for off-main-thread parsing. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 

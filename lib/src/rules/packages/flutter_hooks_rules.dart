@@ -240,8 +240,9 @@ class AvoidUnnecessaryHookWidgetsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_unnecessary_hook_widgets',
     problemMessage:
-        '[avoid_unnecessary_hook_widgets] HookWidget without any hook calls. Use StatelessWidget instead.',
-    correctionMessage: 'Change to StatelessWidget if no hooks are needed.',
+        '[avoid_unnecessary_hook_widgets] HookWidget without any hook calls. Use StatelessWidget instead. If a widget extends HookWidget but doesn\'t call any hook functions, it must be a regular StatelessWidget instead.',
+    correctionMessage:
+        'Change to StatelessWidget if no hooks are needed. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 

@@ -411,9 +411,9 @@ class RequireFreezedExplicitJsonRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_freezed_explicit_json',
     problemMessage:
-        '[require_freezed_explicit_json] Freezed class with nested objects may need explicit_to_json in build.yaml.',
+        '[require_freezed_explicit_json] Freezed class with nested objects may need explicit_to_json in build.yaml. When using Freezed with nested objects, explicit_to_json: true is required in build.yaml to ensure proper JSON serialization of nested objects. Without it, nested objects may not serialize correctly.',
     correctionMessage:
-        'Add explicit_to_json: true to build.yaml under json_serializable options.',
+        'Add explicit_to_json: true to build.yaml under json_serializable options. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -573,9 +573,9 @@ class PreferFreezedDefaultValuesRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_freezed_default_values',
     problemMessage:
-        '[prefer_freezed_default_values] Freezed nullable field could use @Default annotation instead.',
+        '[prefer_freezed_default_values] Freezed nullable field could use @Default annotation instead. Using @Default annotation instead of nullable types provides clearer intent and better code when the field must have a default value rather than being truly optional.',
     correctionMessage:
-        'Consider using @Default(value) instead of nullable type if field has a sensible default.',
+        'Use @Default(value) instead of nullable type if field has a sensible default. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -805,9 +805,9 @@ class RequireFreezedLintPackageRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_freezed_lint_package',
     problemMessage:
-        '[require_freezed_lint_package] File uses Freezed. Consider adding freezed_lint package for specialized linting.',
+        '[require_freezed_lint_package] File uses Freezed. Add freezed_lint package for specialized linting. Heuristic warning: This rule cannot verify if freezed_lint is in your pubspec.yaml. It simply reminds developers using Freezed to Add freezed_lint to their dev_dependencies. Disable this rule if you have already installed freezed_lint.',
     correctionMessage:
-        'Add freezed_lint to dev_dependencies. Disable this rule if already installed.',
+        'Add freezed_lint to dev_dependencies. Disable this rule if already installed. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 

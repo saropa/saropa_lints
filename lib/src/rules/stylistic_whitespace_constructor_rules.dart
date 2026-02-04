@@ -836,7 +836,7 @@ class PreferFactoryForValidationRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_factory_for_validation',
     problemMessage:
-        '[prefer_factory_for_validation] Use a factory constructor for validation logic instead of constructor assertions.',
+        '[prefer_factory_for_validation] Use a factory constructor for validation logic instead of constructor assertions. This is an opinionated rule - not included in any tier by default.',
     correctionMessage:
         'A factory constructor can return null, a cached instance, or a subtype when validation fails, unlike assert.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -924,7 +924,7 @@ class PreferConstructorAssertionRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_constructor_assertion',
     problemMessage:
-        '[prefer_constructor_assertion] Use a constructor assertion instead of a factory for simple debug-only precondition checks.',
+        '[prefer_constructor_assertion] Use a constructor assertion instead of a factory for simple debug-only precondition checks. This is an opinionated rule - not included in any tier by default.',
     correctionMessage:
         'Constructor assertions run only in debug mode and keep the class constructor simple without a factory indirection.',
     errorSeverity: DiagnosticSeverity.INFO,
