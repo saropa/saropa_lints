@@ -9,8 +9,8 @@ import 'package:analyzer/error/error.dart'
     show AnalysisError, DiagnosticSeverity;
 import 'package:custom_lint_builder/custom_lint_builder.dart';
 
-import '../import_utils.dart';
-import '../saropa_lint_rule.dart';
+import '../../import_utils.dart';
+import '../../saropa_lint_rule.dart';
 
 /// Warns when `ref.read()` is used inside a `build()` method.
 ///
