@@ -654,3 +654,205 @@ class RequireExampleInDocumentationRule extends SaropaLintRule {
     });
   }
 }
+
+/// Warns when a dartdoc `[name]` references a parameter that does not exist
+/// in the function, method, or constructor signature.
+///
+/// The existing `require_parameter_documentation` rule checks that real
+/// parameters are documented. This rule checks the inverse: that documented
+/// `[names]` actually correspond to real parameters (or valid type/field
+/// references).
+///
+/// **BAD:**
+/// ```dart
+/// /// Restores from [context] for the toast.
+/// Future<bool> fileRestore(String filePath) async { ... }
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// /// Restores from [filePath].
+/// Future<bool> fileRestore(String filePath) async { ... }
+/// ```
+class VerifyDocumentedParametersExistRule extends SaropaLintRule {
+  const VerifyDocumentedParametersExistRule() : super(code: _code);
+
+  /// Style/consistency. Large counts acceptable in legacy code.
+  @override
+  LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  static const LintCode _code = LintCode(
+    name: 'verify_documented_parameters_exist',
+    problemMessage:
+        '[verify_documented_parameters_exist] Documentation references '
+        'a parameter that does not exist in the signature.',
+    correctionMessage:
+        'Remove the stale parameter reference or update it to match '
+        'an actual parameter name.',
+    errorSeverity: DiagnosticSeverity.WARNING,
+  );
+
+  /// Creates a [LintCode] with the specific ghost parameter name.
+  static LintCode _codeForName(String name) => LintCode(
+        name: 'verify_documented_parameters_exist',
+        problemMessage:
+            '[verify_documented_parameters_exist] Documentation references '
+            "'[$name]' which does not exist in the signature.",
+        correctionMessage:
+            'Remove the stale parameter reference or update it to match '
+            'an actual parameter name.',
+        errorSeverity: DiagnosticSeverity.WARNING,
+      );
+
+  /// Pattern to extract `[bracketedName]` from doc comments.
+  ///
+  /// Matches `[name]` but not `[name.field]` (dotted refs are
+  /// field/enum accesses, not parameter references).
+  static final RegExp _bracketedNamePattern = RegExp(r'\[([a-zA-Z_]\w*)\]');
+
+  /// Words after `[name]` that confirm parameter intent.
+  static const Set<String> _parameterKeywords = <String>{
+    'parameter',
+    'param',
+    'argument',
+    'arg',
+  };
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addMethodDeclaration((MethodDeclaration node) {
+      _checkDeclaration(
+        docComment: node.documentationComment,
+        parameters: node.parameters,
+        enclosingClass: node.thisOrAncestorOfType<ClassDeclaration>(),
+        reporter: reporter,
+      );
+    });
+
+    context.registry.addFunctionDeclaration((FunctionDeclaration node) {
+      _checkDeclaration(
+        docComment: node.documentationComment,
+        parameters: node.functionExpression.parameters,
+        reporter: reporter,
+      );
+    });
+
+    context.registry.addConstructorDeclaration((ConstructorDeclaration node) {
+      _checkDeclaration(
+        docComment: node.documentationComment,
+        parameters: node.parameters,
+        enclosingClass: node.thisOrAncestorOfType<ClassDeclaration>(),
+        reporter: reporter,
+      );
+    });
+  }
+
+  void _checkDeclaration({
+    required Comment? docComment,
+    required FormalParameterList? parameters,
+    ClassDeclaration? enclosingClass,
+    required SaropaDiagnosticReporter reporter,
+  }) {
+    if (docComment == null) return;
+    if (parameters == null) return;
+
+    final Set<String> paramNames = _extractParamNames(parameters);
+    final Set<String> classFieldNames = _extractClassFieldNames(enclosingClass);
+    final String docText =
+        docComment.tokens.map((Token t) => t.lexeme).join('\n');
+
+    for (final RegExpMatch match in _bracketedNamePattern.allMatches(docText)) {
+      final String name = match.group(1)!;
+
+      // Skip if it's an actual parameter
+      if (paramNames.contains(name)) continue;
+
+      // Skip single uppercase letter (generic type params like T, E, K, V)
+      if (name.length == 1 && name == name.toUpperCase()) continue;
+
+      // Skip names starting with uppercase (type references like
+      // FormatException, Widget, DateTime)
+      if (name[0] == name[0].toUpperCase() &&
+          !_isConfirmedParameterReference(docText, match)) {
+        continue;
+      }
+
+      // Skip class fields/properties
+      if (classFieldNames.contains(name)) continue;
+
+      reporter.atOffset(
+        offset: match.start + docComment.offset,
+        length: match.end - match.start,
+        errorCode: _codeForName(name),
+      );
+    }
+  }
+
+  /// Checks whether the context around `[Name]` confirms it is meant
+  /// as a parameter reference (e.g. `[Name] parameter`, `- [Name]`).
+  bool _isConfirmedParameterReference(
+    String docText,
+    RegExpMatch match,
+  ) {
+    // Check for bullet-style: `/// - [Name]`
+    final int matchStart = match.start;
+    if (matchStart >= 2) {
+      final String before =
+          docText.substring(matchStart - 2, matchStart).trimLeft();
+      if (before.endsWith('-')) return true;
+    }
+
+    // Check for keyword after: `[Name] parameter`, `[Name] argument`
+    final int matchEnd = match.end;
+    if (matchEnd < docText.length) {
+      final String after = docText.substring(matchEnd).trimLeft();
+      final String firstWord =
+          after.split(RegExp(r'\s+')).firstOrNull?.toLowerCase() ?? '';
+      if (_parameterKeywords.contains(firstWord)) return true;
+    }
+
+    return false;
+  }
+
+  Set<String> _extractParamNames(FormalParameterList parameters) {
+    final Set<String> names = <String>{};
+    for (final FormalParameter param in parameters.parameters) {
+      final String? name = _getParameterName(param);
+      if (name != null) names.add(name);
+    }
+    return names;
+  }
+
+  Set<String> _extractClassFieldNames(ClassDeclaration? classDecl) {
+    if (classDecl == null) return const <String>{};
+    final Set<String> names = <String>{};
+    for (final ClassMember member in classDecl.members) {
+      if (member is FieldDeclaration) {
+        for (final VariableDeclaration variable in member.fields.variables) {
+          names.add(variable.name.lexeme);
+        }
+      }
+    }
+    return names;
+  }
+
+  String? _getParameterName(FormalParameter param) {
+    if (param is SimpleFormalParameter) {
+      return param.name?.lexeme;
+    } else if (param is DefaultFormalParameter) {
+      return _getParameterName(param.parameter);
+    } else if (param is FieldFormalParameter) {
+      return param.name.lexeme;
+    } else if (param is SuperFormalParameter) {
+      return param.name.lexeme;
+    }
+    return null;
+  }
+}
