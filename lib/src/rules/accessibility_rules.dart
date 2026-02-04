@@ -82,6 +82,46 @@ class AvoidIconButtonsWithoutTooltipRule extends SaropaLintRule {
       }
     });
   }
+
+  @override
+  List<Fix> getFixes() => [_AddIconButtonTooltipFix()];
+}
+
+class _AddIconButtonTooltipFix extends DartFix {
+  @override
+  void run(
+    CustomLintResolver resolver,
+    ChangeReporter reporter,
+    CustomLintContext context,
+    AnalysisError analysisError,
+    List<AnalysisError> others,
+  ) {
+    context.registry.addInstanceCreationExpression((
+      InstanceCreationExpression node,
+    ) {
+      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
+
+      final changeBuilder = reporter.createChangeBuilder(
+        message: "Add tooltip",
+        priority: 80,
+      );
+
+      changeBuilder.addDartFileEdit((builder) {
+        final args = node.argumentList;
+        if (args.arguments.isEmpty) {
+          builder.addSimpleInsertion(
+            args.leftParenthesis.end,
+            "tooltip: 'TODO: add tooltip'",
+          );
+        } else {
+          builder.addSimpleInsertion(
+            args.arguments.last.end,
+            ", tooltip: 'TODO: add tooltip'",
+          );
+        }
+      });
+    });
+  }
 }
 
 /// Warns when touch targets are potentially too small for accessibility.

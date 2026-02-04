@@ -13,6 +13,17 @@ Dates are not included in version headers — [pub.dev](https://pub.dev/packages
 ---
 ## [4.9.21]
 
+### Added
+
+- **7 new quick fixes for dialog, freezed, and accessibility rules**:
+  - `require_snackbar_duration`: adds `duration: const Duration(seconds: 4)`
+  - `require_dialog_barrier_dismissible`: adds `barrierDismissible: false`
+  - `prefer_adaptive_dialog`: converts `AlertDialog()` to `AlertDialog.adaptive()`
+  - `avoid_freezed_json_serializable_conflict`: removes redundant `@JsonSerializable()` annotation
+  - `require_freezed_arrow_syntax`: converts `fromJson` block body to arrow syntax
+  - `require_freezed_private_constructor`: inserts `const ClassName._()`
+  - `avoid_icon_buttons_without_tooltip`: adds `tooltip` parameter to `IconButton`
+
 ### Changed
 
 - **Publish script defers version prompt until after analysis**: The `publish_to_pubdev.py` script no longer asks for the publish version upfront. Audits, prerequisites, tests, formatting, and static analysis all run first; the version prompt now appears at Step 8 only after all analysis passes.
