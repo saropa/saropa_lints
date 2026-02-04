@@ -183,7 +183,7 @@ def find_duplicate_rules(rules_dir: Path) -> dict:
         re.DOTALL,
     )
 
-    for dart_file in rules_dir.glob("*.dart"):
+    for dart_file in rules_dir.glob("**/*.dart"):
         content = dart_file.read_text(encoding="utf-8")
 
         rule_problem_len = {}
@@ -250,7 +250,7 @@ def get_file_stats(rules_dir: Path) -> list[FileStats]:
     fix_pattern = re.compile(r"class \w+ extends DartFix")
     stats: list[FileStats] = []
 
-    for dart_file in sorted(rules_dir.glob("*.dart")):
+    for dart_file in sorted(rules_dir.glob("**/*.dart")):
         if dart_file.name == "all_rules.dart":
             continue
         content = dart_file.read_text(encoding="utf-8")
@@ -299,7 +299,7 @@ def get_implemented_rules(
     )
     fix_pattern = re.compile(r"class \w+ extends DartFix")
 
-    for dart_file in rules_dir.glob("*.dart"):
+    for dart_file in rules_dir.glob("**/*.dart"):
         content = dart_file.read_text(encoding="utf-8")
         rules.update(lintcode_pattern.findall(content))
         fix_count += len(fix_pattern.findall(content))
@@ -358,7 +358,7 @@ def get_rules_with_corrections(
     )
     name_pattern = re.compile(r"name:\s*'([a-z0-9_]+)'")
 
-    for dart_file in rules_dir.glob("*.dart"):
+    for dart_file in rules_dir.glob("**/*.dart"):
         if dart_file.name == "all_rules.dart":
             continue
         content = dart_file.read_text(encoding="utf-8")
@@ -390,7 +390,7 @@ def get_owasp_coverage(rules_dir: Path) -> OwaspCoverage:
         re.DOTALL,
     )
 
-    for dart_file in sorted(rules_dir.glob("*.dart")):
+    for dart_file in sorted(rules_dir.glob("**/*.dart")):
         if dart_file.name == "all_rules.dart":
             continue
         content = dart_file.read_text(encoding="utf-8")
@@ -484,7 +484,7 @@ def get_severity_stats(rules_dir: Path) -> SeverityStats:
         r"LintImpact get impact => LintImpact\.(\w+);"
     )
 
-    for dart_file in sorted(rules_dir.glob("*.dart")):
+    for dart_file in sorted(rules_dir.glob("**/*.dart")):
         if dart_file.name == "all_rules.dart":
             continue
         content = dart_file.read_text(encoding="utf-8")
