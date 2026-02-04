@@ -16,6 +16,7 @@ Dates are not included in version headers — [pub.dev](https://pub.dev/packages
 ### Fixed
 
 - **Removed duplicate rule `prefer_async_only_when_awaiting`**: This rule detected the same issue as `avoid_redundant_async` (async function without await), causing duplicate diagnostics. The quick fix has been ported to `avoid_redundant_async`, which has broader detection scope and more robust await detection.
+- **Registered 10 Windows/Linux platform rules**: 5 Windows rules (`avoid_hardcoded_drive_letters`, `avoid_forward_slash_path_assumption`, `avoid_case_sensitive_path_comparison`, `require_windows_single_instance_check`, `avoid_max_path_risk`) and 5 Linux rules (`avoid_hardcoded_unix_paths`, `prefer_xdg_directory_convention`, `avoid_x11_only_assumptions`, `require_linux_font_fallback`, `avoid_sudo_shell_commands`) were implemented but not registered in the plugin or assigned to tiers.
 
 ### Added
 
