@@ -30,7 +30,8 @@ Dates are not included in version headers — [pub.dev](https://pub.dev/packages
 
 ### Changed
 
-- **Improved diagnostic messages on 503 rules across 76 files**: Expanded short `problemMessage` and `correctionMessage` strings using DartDoc context, fixed vague language ("consider" to direct commands, "should be" to "must be"), and appended category-specific consequences and testing advice. 485 rules now fully pass DX quality thresholds; 18 remain within a few characters of their target.
+- **Improved diagnostic messages on 503 rules across 76 files**: Expanded short `problemMessage` and `correctionMessage` strings using DartDoc context, fixed vague language ("consider" to direct commands, "should be" to "must be"), and appended category-specific consequences and testing advice. All 503 rules now fully pass DX quality thresholds.
+- **Rewrote DX messages on 18 rules that were below quality thresholds**: Replaced generic boilerplate consequences with rule-specific explanations across `avoid_duplicate_cascades`, `avoid_riverpod_state_mutation`, `prefer_getx_builder`, `prefer_correct_edge_insets_constructor`, `prefer_clip_behavior`, `require_screen_size_tests`, and 12 other rules. Eliminated repetitive phrasing, added consequence keywords for high-impact rules, and ensured all messages are specific and actionable.
 - **Publish script defers version prompt until after analysis**: The `publish_to_pubdev.py` script no longer asks for the publish version upfront. Audits, prerequisites, tests, formatting, and static analysis all run first; the version prompt now appears at Step 8 only after all analysis passes.
 
 - **`prefer_expanded_at_call_site` severity upgraded to ERROR**: Bumped from WARNING to ERROR and impact from medium to critical — returning Expanded/Flexible/Spacer from `build()` causes the same class of runtime crash (ParentDataWidget error) as `avoid_expanded_outside_flex`. Moved from recommended tier to essential tier.

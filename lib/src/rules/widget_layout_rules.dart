@@ -898,7 +898,7 @@ class PreferCorrectEdgeInsetsConstructorRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_correct_edge_insets_constructor',
     problemMessage:
-        '[prefer_correct_edge_insets_constructor] Use a more specific EdgeInsets constructor. Suggests using more specific constructors when appropriate. Incorrect EdgeInsets constructor is used.',
+        '[prefer_correct_edge_insets_constructor] EdgeInsets constructor is more verbose than necessary when all values are equal or symmetric. Use .all() or .symmetric() to improve readability and communicate intent more clearly.',
     correctionMessage:
         'Use .all() for equal values or .symmetric() for symmetric values. Test on multiple screen sizes to verify the layout adapts correctly.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -1268,7 +1268,7 @@ class AvoidDeeplyNestedWidgetsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_deeply_nested_widgets',
     problemMessage:
-        '[avoid_deeply_nested_widgets] Widget tree is too deeply nested. This layout configuration can trigger RenderFlex overflow errors or unexpected visual behavior at runtime.',
+        '[avoid_deeply_nested_widgets] Widget tree is too deeply nested, exceeding the recommended nesting depth. Deep nesting reduces build method readability and increases the risk of layout overflow errors at runtime.',
     correctionMessage:
         'Extract subtrees into separate widgets to improve readability. Test on multiple screen sizes to verify the layout adapts correctly.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -4117,7 +4117,7 @@ class PreferClipBehaviorRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_clip_behavior',
     problemMessage:
-        '[prefer_clip_behavior] Prefer specifying clipBehavior for performance. Explicit clipBehavior helps optimize rendering. Widgets don\'t specify clipBehavior for performance.',
+        '[prefer_clip_behavior] Widget does not specify clipBehavior explicitly. Default clipping wastes rendering performance when no overflow occurs, and obscures whether overflow is intentionally allowed or prevented.',
     correctionMessage:
         'Add clipBehavior: Clip.none or Clip.hardEdge. Test on multiple screen sizes to verify the layout adapts correctly.',
     errorSeverity: DiagnosticSeverity.INFO,

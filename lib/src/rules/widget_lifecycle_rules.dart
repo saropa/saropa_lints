@@ -458,7 +458,7 @@ class AvoidStateConstructorsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_state_constructors',
     problemMessage:
-        '[avoid_state_constructors] State class must not have constructor body. This violates the widget lifecycle, risking setState-after-dispose errors or silent state corruption.',
+        '[avoid_state_constructors] State class must not have a constructor body. Constructor logic runs before the framework initializes the State object, risking errors that bypass the widget lifecycle contract.',
     correctionMessage:
         'Use initState() for initialization instead. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.WARNING,

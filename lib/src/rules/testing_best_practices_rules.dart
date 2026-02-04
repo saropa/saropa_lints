@@ -1775,7 +1775,7 @@ class RequireScreenSizeTestsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_screen_size_tests',
     problemMessage:
-        '[require_screen_size_tests] Prefer testing at multiple screen sizes. Responsive apps must be tested at different screen sizes. Widget tests don\'t test multiple screen sizes.',
+        '[require_screen_size_tests] Widget test does not verify behavior at multiple screen sizes. Responsive layouts can break on different devices, and single-size tests miss overflow and layout errors at runtime.',
     correctionMessage:
         'Use tester.binding.window.physicalSizeTestValue to test responsive layouts. Run the full test suite to confirm the refactored tests maintain equivalent coverage.',
     errorSeverity: DiagnosticSeverity.INFO,

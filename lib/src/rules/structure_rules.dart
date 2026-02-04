@@ -1779,7 +1779,7 @@ class PreferAbstractFinalStaticClassRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_abstract_final_static_class',
     problemMessage:
-        '[prefer_abstract_final_static_class] Class with only static members must be abstract final. This structural issue reduces code organization and makes the codebase harder to navigate.',
+        '[prefer_abstract_final_static_class] Class with only static members must be declared abstract final to prevent instantiation. Creating instances of a static-only class is meaningless and misleads readers about its intended usage.',
     correctionMessage:
         'Use "abstract final class" to prevent instantiation. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -1930,7 +1930,7 @@ class AvoidUnusedGenericsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_unused_generics',
     problemMessage:
-        '[avoid_unused_generics] Type parameter is declared but never used. This structural issue reduces code organization and makes the codebase harder to navigate.',
+        '[avoid_unused_generics] Type parameter is declared but never used in the class or method body. Unused generics add false complexity and mislead callers into thinking the type affects behavior.',
     correctionMessage:
         'Remove unused type parameter or use it in the declaration. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -2131,7 +2131,7 @@ class AvoidUnnecessaryFuturesRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_unnecessary_futures',
     problemMessage:
-        '[avoid_unnecessary_futures] Async function has no await expressions. This structural issue reduces code organization and makes the codebase harder to navigate.',
+        '[avoid_unnecessary_futures] Async function has no await expressions and gains nothing from being async. The unnecessary Future wrapper adds overhead and misleads callers about asynchronous behavior.',
     correctionMessage:
         'Remove async keyword or add await expressions. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -2275,7 +2275,7 @@ class AvoidUnnecessaryNullableReturnTypeRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_unnecessary_nullable_return_type',
     problemMessage:
-        '[avoid_unnecessary_nullable_return_type] Return type is nullable but function never returns null. This structural issue reduces code organization and makes the codebase harder to navigate.',
+        '[avoid_unnecessary_nullable_return_type] Return type is nullable but function never returns null. Unnecessary nullability forces callers to add redundant null checks, reducing code clarity and type safety.',
     correctionMessage:
         'Remove the ? from the return type. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
