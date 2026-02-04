@@ -75,8 +75,8 @@ def get_output_level() -> OutputLevel:
 # Unified ANSI color codes used by all scripts.
 #
 # NOTE: The Saropa ASCII logo (show_saropa_logo) is defined here but
-# must ONLY be called by the entry point script (publish_to_pubdev.py).
-# Module scripts must NEVER call it.
+# must ONLY be called by entry point scripts (e.g. publish_to_pubdev.py,
+# improve_dx_messages.py). Module scripts must NEVER call it.
 
 
 class Color(Enum):
