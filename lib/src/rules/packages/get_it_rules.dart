@@ -13,7 +13,7 @@ import 'package:analyzer/error/error.dart'
     show AnalysisError, DiagnosticSeverity;
 import 'package:custom_lint_builder/custom_lint_builder.dart';
 
-import '../saropa_lint_rule.dart';
+import '../../saropa_lint_rule.dart';
 
 // =============================================================================
 // GET_IT RULES
