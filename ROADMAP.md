@@ -166,6 +166,10 @@ See [CHANGELOG.md](CHANGELOG.md) for implemented rules. Goal: 2000 rules.
 |-----------|------|----------|-------------|
 | ⚠️ `avoid_large_assets_on_web` | Recommended | WARNING | Web has no app install; assets download on demand. Lazy-load images and use appropriate formats (WebP) for faster loads. |
 
+> **Linux**: Implemented in v4.9.20 — 5 rules covering XDG paths, X11/Wayland, font fallbacks, and privilege escalation.
+>
+> **Windows**: Implemented in v4.9.20 — 5 rules covering drive letters, path separators, case-insensitive FS, single-instance, and MAX_PATH.
+
 ### 1.13 Offline-First & Sync Rules
 
 | Rule Name | Tier | Severity | Description |

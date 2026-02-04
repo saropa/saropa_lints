@@ -2766,14 +2766,30 @@ const Set<String> webPlatformRules = <String>{
 };
 
 /// Rules specific to the Windows platform.
-///
-/// Currently empty - populated as Windows-specific rules are added.
-const Set<String> windowsPlatformRules = <String>{};
+const Set<String> windowsPlatformRules = <String>{
+  // Recommended
+  'avoid_hardcoded_drive_letters',
+  'avoid_forward_slash_path_assumption',
+  'avoid_case_sensitive_path_comparison',
+
+  // Professional
+  'require_windows_single_instance_check',
+  'avoid_max_path_risk',
+};
 
 /// Rules specific to the Linux platform.
-///
-/// Currently empty - populated as Linux-specific rules are added.
-const Set<String> linuxPlatformRules = <String>{};
+const Set<String> linuxPlatformRules = <String>{
+  // Essential
+  'avoid_sudo_shell_commands',
+
+  // Recommended
+  'avoid_hardcoded_unix_paths',
+  'avoid_x11_only_assumptions',
+
+  // Professional
+  'prefer_xdg_directory_convention',
+  'require_linux_font_fallback',
+};
 
 /// Rules shared by Apple platforms (iOS + macOS).
 ///
