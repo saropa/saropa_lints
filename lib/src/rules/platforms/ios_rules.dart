@@ -840,7 +840,6 @@ class AvoidIosBackgroundFetchAbuseRule extends SaropaLintRule {
   }
 }
 
-
 // =============================================================================
 // Cross-Platform Apple Rules (iOS & macOS)
 // =============================================================================
