@@ -1336,3 +1336,21 @@ custom_lint:
     - prefer_regex_validation: false               # INFO - use regex for input validation patterns (v4.2.0)
     - prefer_typed_prefs_wrapper: false            # INFO - wrap SharedPreferences with typed accessor (v4.2.0)
     - prefer_freezed_for_data_classes: false       # INFO - Freezed for immutable data classes (v4.2.0)
+
+    # =========================================================================
+    # LINUX PLATFORM RULES
+    # =========================================================================
+    - avoid_sudo_shell_commands: false              # ERROR - Process.run with sudo/pkexec (v4.9.20)
+    - avoid_hardcoded_unix_paths: false             # WARNING - hardcoded /home/, /tmp/, /etc/ paths (v4.9.20)
+    - avoid_x11_only_assumptions: false             # WARNING - X11-only tools without Wayland check (v4.9.20)
+    - prefer_xdg_directory_convention: false        # INFO - manual ~/.config/ path construction (v4.9.20)
+    - require_linux_font_fallback: false            # INFO - non-Linux font without fontFamilyFallback (v4.9.20)
+
+    # =========================================================================
+    # WINDOWS PLATFORM RULES
+    # =========================================================================
+    - avoid_hardcoded_drive_letters: false          # WARNING - hardcoded C:\, D:\ paths (v4.9.20)
+    - avoid_forward_slash_path_assumption: false    # WARNING - path built with / instead of path.join (v4.9.20)
+    - avoid_case_sensitive_path_comparison: false   # WARNING - path == without case normalization (v4.9.20)
+    - require_windows_single_instance_check: false  # INFO - main() without single-instance check (v4.9.20)
+    - avoid_max_path_risk: false                    # INFO - deeply nested paths exceeding MAX_PATH (v4.9.20)

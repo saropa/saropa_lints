@@ -78,6 +78,11 @@ export 'package_specific_rules.dart';
 export 'platform_rules.dart';
 export 'config_rules.dart';
 
+// Platform-specific rule files
+export 'platforms/linux_rules.dart';
+export 'platforms/macos_rules.dart';
+export 'platforms/windows_rules.dart';
+
 // v4.2.0 rule files
 export 'android_rules.dart';
 export 'iap_rules.dart';
