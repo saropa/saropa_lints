@@ -131,6 +131,30 @@ class EdgeInsetsExamples extends StatelessWidget {
           child: Text('Different horizontal'),
         ),
 
+        // GOOD: symmetric pair with unpaired side — no clean replacement
+        Padding(
+          padding: EdgeInsets.only(right: 8, top: 16, bottom: 16),
+          child: Text('Unpaired right with symmetric vertical'),
+        ),
+        Padding(
+          padding: EdgeInsets.only(left: 8, top: 16, bottom: 16),
+          child: Text('Unpaired left with symmetric vertical'),
+        ),
+        Padding(
+          padding: EdgeInsets.only(top: 8, left: 16, right: 16),
+          child: Text('Unpaired top with symmetric horizontal'),
+        ),
+        Padding(
+          padding: EdgeInsets.only(bottom: 8, left: 16, right: 16),
+          child: Text('Unpaired bottom with symmetric horizontal'),
+        ),
+
+        // GOOD: one axis symmetric, other axis has mismatched values
+        Padding(
+          padding: EdgeInsets.only(left: 16, right: 16, top: 8, bottom: 4),
+          child: Text('Symmetric horizontal, different vertical'),
+        ),
+
         // GOOD: EdgeInsets.symmetric
         Padding(
           padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),

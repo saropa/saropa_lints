@@ -426,6 +426,29 @@ class BooleanComparisonExamples {
   bool checkNullableExplicit(bool? isValid) {
     return isValid == true;
   }
+
+  // GOOD: Nullable bool == false (distinct from null)
+  bool checkNullableFalse(bool? isValid) {
+    return isValid == false;
+  }
+
+  // GOOD: Null-aware chain produces bool? — explicit comparison required
+  bool checkNullAwareChain(List<String>? items, String target) {
+    return items?.contains(target) == true;
+  }
+
+  // GOOD: Tristate logic — all three branches are meaningful
+  String checkTristate(bool? value) {
+    if (value == true) return 'yes';
+    if (value == false) return 'no';
+    return 'unknown';
+  }
+
+  // BAD: Non-nullable bool — comparison IS redundant (should still lint)
+  // expect_lint: prefer_implicit_boolean_comparison
+  bool checkNonNullableStillLints(bool isValid) {
+    return isValid == true;
+  }
 }
 
 // --- prefer_grouped_imports / prefer_flat_imports ---
