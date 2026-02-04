@@ -712,6 +712,7 @@ final List<LintRule Function()> _allRuleFactories = <LintRule Function()>[
   RequireReturnDocumentationRule.new,
   RequireExceptionDocumentationRule.new,
   RequireExampleInDocumentationRule.new,
+  VerifyDocumentedParametersExistRule.new,
 
   // NOTE: always_fail is intentionally NOT here - it's a test hook only best practices rules (NEW)
   RequireTestAssertionsRule.new,
@@ -2204,7 +2205,8 @@ final List<LintRule Function()> _allRuleFactories = <LintRule Function()>[
   RequireGeolocatorBatteryAwarenessRule.new,
 
   // DB yield rules (db_yield_rules.dart)
-  RequireYieldBetweenDbAwaitsRule.new,
+  RequireYieldAfterDbWriteRule.new,
+  SuggestYieldAfterDbReadRule.new,
   AvoidReturnAwaitDbRule.new,
 
   // SQLite rules (sqflite_rules.dart)
