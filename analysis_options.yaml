@@ -606,7 +606,7 @@ custom_lint:
     - prefer_delayed_permission_prompt: true  # [WARNING] Permission request detected in main() or initState(). Asking too early reduces acceptance rates.
     - prefer_dispose_before_new_instance: true  # [WARNING] Reassigning without dispose leaks the old instance. Listeners and resources remain active forever.
     - prefer_duration_constants: true  # [INFO] Duration constructor uses a smaller time unit than necessary, reducing readability and making the intended duration harder to understand at a glance.
-    - prefer_expanded_at_call_site: true  # [WARNING] Avoid returning Expanded/Flexible from build(). Add it at the call site instead.
+    - prefer_expanded_at_call_site: true  # [ERROR] Avoid returning Expanded/Flexible/Spacer from build(). Add it at the call site instead.
     - prefer_explicit_json_keys: true  # [INFO] Consider using @JsonKey for field name mapping.
     - prefer_firebase_auth_persistence: true  # [INFO] Firebase Auth on web defaults to session persistence. Consider setting LOCAL persistence.
     - prefer_fit_cover_for_background: true  # [INFO] Background images should use BoxFit.cover.
