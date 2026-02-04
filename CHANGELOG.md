@@ -11,6 +11,20 @@ Dates are not included in version headers — [pub.dev](https://pub.dev/packages
 ** See the current published changelog: [saropa_lints/changelog](https://pub.dev/packages/saropa_lints/changelog)
 
 ---
+## [Unreleased]
+
+### Added
+
+- **Linux platform rules (5 new rules)**: `avoid_sudo_shell_commands` (ERROR — detects Process.run with sudo/pkexec, OWASP M1), `avoid_hardcoded_unix_paths` (WARNING — detects `/home/`, `/tmp/`, `/etc/` literals), `avoid_x11_only_assumptions` (WARNING — detects X11-only tools and DISPLAY access without Wayland check), `prefer_xdg_directory_convention` (INFO — detects manual `~/.config/` path construction), `require_linux_font_fallback` (INFO — detects non-Linux fonts without fontFamilyFallback, quick fix adds fallback fonts)
+- **Windows platform rules (5 new rules)**: `avoid_hardcoded_drive_letters` (WARNING — detects `C:\`, `D:\` literals), `avoid_forward_slash_path_assumption` (WARNING — detects `/` path concatenation instead of path.join()), `avoid_case_sensitive_path_comparison` (WARNING — detects path equality without case normalization, quick fix adds `.toLowerCase()`), `require_windows_single_instance_check` (INFO — detects missing single-instance enforcement in Windows main()), `avoid_max_path_risk` (INFO — detects deeply nested paths that may exceed 260-char MAX_PATH)
+
+### Fixed
+
+- **`prefer_implicit_boolean_comparison` reduced false positives on nullable booleans**: Rule now checks the static type of the left operand and only fires when it is non-nullable `bool`. Previously the rule flagged `== true` / `== false` on `bool?` operands, where the explicit comparison is semantically necessary — removing it either causes a compile error or changes runtime behaviour (treating `null` the same as `false`). This also resolves a conflict with the sibling rule `prefer_explicit_boolean_comparison`, which recommends `== true` for nullable booleans.
+- **`prefer_stream_distinct` reduced false positives**: Three fixes — (1) rule now skips `Stream<void>` and `Stream<Null>` where `.distinct()` would suppress all events after the first (breaks `Stream.periodic` timers and signal-only streams like Isar's `watchLazy()`); (2) chain detection now walks the full method invocation chain instead of only checking the immediate parent, so `stream.distinct().map(f).listen(...)` is correctly recognised as already having `.distinct()`; (3) replaced string-based type matching (`getDisplayString().contains('Stream')`) with proper `InterfaceType` checking to avoid false matches on non-stream types.
+- **`prefer_edgeinsets_symmetric` reduced false positives**: Detection logic now matches the quick-fix validation — the rule no longer fires on `EdgeInsets.only()` calls that have a symmetric pair (e.g. `top == bottom`) but also contain an unpaired side (e.g. `right` without `left`) or a non-symmetric axis (e.g. `top != bottom`), since `EdgeInsets.symmetric()` cannot express these cases without chaining `.copyWith()`.
+
+---
 ## [4.9.19]
 
 ### Fixed
