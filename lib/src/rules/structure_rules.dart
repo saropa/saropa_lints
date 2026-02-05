@@ -89,13 +89,13 @@ class AvoidBarrelFilesRule extends SaropaLintRule {
 /// Example of **bad** code:
 /// ```dart
 /// import 'package:foo//bar.dart';
-/// import '//src/utils.dart';
+/// import '//src/violation_parser.dart';
 /// ```
 ///
 /// Example of **good** code:
 /// ```dart
 /// import 'package:foo/bar.dart';
-/// import 'src/utils.dart';
+/// import 'src/violation_parser.dart';
 /// ```
 ///
 /// **Quick fix available:** Adds a comment to flag for manual review.
@@ -156,13 +156,13 @@ class AvoidDoubleSlashImportsRule extends SaropaLintRule {
 ///
 /// Example of **bad** code:
 /// ```dart
-/// export 'utils.dart';
-/// export 'utils.dart';  // Duplicate export
+/// export 'violation_parser.dart';
+/// export 'violation_parser.dart';  // Duplicate export
 /// ```
 ///
 /// Example of **good** code:
 /// ```dart
-/// export 'utils.dart';
+/// export 'violation_parser.dart';
 /// ```
 ///
 /// **Quick fix available:** Adds a comment to flag for manual review.
