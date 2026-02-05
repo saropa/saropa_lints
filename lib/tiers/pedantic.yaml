@@ -1,10 +1,10 @@
-# Saropa Lints - Insanity Tier (ALL 475 rules)
+# Saropa Lints - Pedantic Tier (ALL 475 rules)
 #
 # Everything. For greenfield projects or the truly obsessive.
 # Many rules are INFO level and may be noisy.
 #
 # Usage in analysis_options.yaml:
-#   include: package:saropa_lints/tiers/insanity.yaml
+#   include: package:saropa_lints/tiers/pedantic.yaml
 
 include: package:saropa_lints/tiers/comprehensive.yaml
 

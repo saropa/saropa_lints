@@ -11,7 +11,7 @@ dart run saropa_lints:init --tier recommended
 ```
 
 Available tiers: `essential` (1), `recommended` (2), `professional` (3),
-`comprehensive` (4), `insanity` (5).
+`comprehensive` (4), `pedantic` (5).
 
 ## Tiers
 
@@ -21,7 +21,7 @@ Available tiers: `essential` (1), `recommended` (2), `professional` (3),
 | `recommended` | ~150 | Default for most teams |
 | `professional` | ~350 | Enterprise teams |
 | `comprehensive` | ~700 | Quality-obsessed teams |
-| `insanity` | 475+ | Greenfield projects |
+| `pedantic` | 475+ | Greenfield projects |
 
 ## Rule Categories
 

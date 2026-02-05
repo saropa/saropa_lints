@@ -2480,7 +2480,7 @@ class _AddBoolPrefixFix extends DartFix {
 
 /// Warns when boolean variables/parameters don't use descriptive prefixes.
 ///
-/// This rule is suitable for the **insanity** tier.
+/// This rule is suitable for the **pedantic** tier.
 ///
 /// This is the strict version that only allows traditional boolean prefixes
 /// like `is`, `has`, `can`, `should`. Action verbs like `processData` are NOT
@@ -2520,7 +2520,7 @@ class PreferDescriptiveBoolNamesStrictRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_descriptive_bool_names_strict',
     problemMessage:
-        '[prefer_descriptive_bool_names_strict] Boolean should use a descriptive prefix (is, has, can, should, etc.). This rule is suitable for the insanity tier.',
+        '[prefer_descriptive_bool_names_strict] Boolean should use a descriptive prefix (is, has, can, should, etc.). This rule is suitable for the pedantic tier.',
     correctionMessage:
         'Rename with a descriptive boolean prefix: isEnabled, hasData, canEdit, shouldUpdate, doesExist, or willChange.',
     errorSeverity: DiagnosticSeverity.INFO,
