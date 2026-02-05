@@ -3,7 +3,8 @@
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/syntactic_entity.dart';
 import 'package:analyzer/dart/ast/token.dart';
-import 'package:analyzer/error/error.dart' show AnalysisError, DiagnosticSeverity;
+import 'package:analyzer/error/error.dart'
+    show AnalysisError, DiagnosticSeverity;
 import 'package:analyzer/source/source_range.dart';
 import 'package:custom_lint_builder/custom_lint_builder.dart';
 
@@ -159,7 +160,8 @@ class _ConvertToRelativeImportFix extends DartFix {
   }
 
   String _calculateRelativePath(String fromDir, String toPath) {
-    final List<String> fromParts = fromDir.isEmpty ? <String>[] : fromDir.split('/');
+    final List<String> fromParts =
+        fromDir.isEmpty ? <String>[] : fromDir.split('/');
     final List<String> toParts = toPath.split('/');
 
     // Find common prefix length
@@ -285,7 +287,8 @@ class PreferOneWidgetPerFileRule extends SaropaLintRule {
     // Note: State classes are NOT counted as widgets - they MUST be in the
     // same file as their StatefulWidget and are not independent widgets.
     // We only count actual widget classes that could be in separate files.
-    return superclassName == 'StatelessWidget' || superclassName == 'StatefulWidget';
+    return superclassName == 'StatelessWidget' ||
+        superclassName == 'StatefulWidget';
   }
 }
 
@@ -878,7 +881,8 @@ class PreferPrivateUnderscorePrefixRule extends SaropaLintRule {
       // Check if class extends StatelessWidget or StatefulWidget (widget props)
       if (extendsClause != null) {
         final String? superclassName = extendsClause.superclass.element?.name;
-        if (superclassName == 'StatelessWidget' || superclassName == 'StatefulWidget') {
+        if (superclassName == 'StatelessWidget' ||
+            superclassName == 'StatefulWidget') {
           return true; // Widget constructor parameters are intentionally public
         }
       }
@@ -1436,7 +1440,8 @@ class _ConvertToSingleQuotesFix extends DartFix {
       if (node.value.contains("'")) return;
 
       // Escape any existing backslashes and single quotes in the value
-      final String escaped = node.value.replaceAll(r'\', r'\\').replaceAll("'", r"\'");
+      final String escaped =
+          node.value.replaceAll(r'\', r'\\').replaceAll("'", r"\'");
 
       final String newLexeme = "'$escaped'";
 
@@ -1860,8 +1865,10 @@ class _CapitalizeCommentFix extends DartFix {
             final String content = lexeme.substring(prefixLength);
 
             if (content.isNotEmpty) {
-              final String capitalized = content[0].toUpperCase() + content.substring(1);
-              final String newLexeme = '${lexeme.substring(0, prefixLength)}$capitalized';
+              final String capitalized =
+                  content[0].toUpperCase() + content.substring(1);
+              final String newLexeme =
+                  '${lexeme.substring(0, prefixLength)}$capitalized';
 
               final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
                 message: 'Capitalize first letter',
@@ -1965,7 +1972,8 @@ class PreferPeriodAfterDocRule extends SaropaLintRule {
     });
 
     // Check top-level variables
-    context.registry.addTopLevelVariableDeclaration((TopLevelVariableDeclaration node) {
+    context.registry
+        .addTopLevelVariableDeclaration((TopLevelVariableDeclaration node) {
       _checkDocComment(node.documentationComment, reporter);
     });
 
@@ -2122,7 +2130,8 @@ class PreferScreamingCaseConstantsRule extends SaropaLintRule {
     CustomLintContext context,
   ) {
     // Check top-level constants
-    context.registry.addTopLevelVariableDeclaration((TopLevelVariableDeclaration node) {
+    context.registry
+        .addTopLevelVariableDeclaration((TopLevelVariableDeclaration node) {
       if (!node.variables.isConst) return;
 
       for (final VariableDeclaration variable in node.variables.variables) {
@@ -2170,7 +2179,8 @@ class _ConvertToScreamingCaseFix extends DartFix {
       if (!analysisError.sourceRange.intersects(node.name.sourceRange)) return;
 
       final String name = node.name.lexeme;
-      final String newName = PreferScreamingCaseConstantsRule.toScreamingSnakeCase(name);
+      final String newName =
+          PreferScreamingCaseConstantsRule.toScreamingSnakeCase(name);
 
       if (name == newName) return;
 
@@ -2749,7 +2759,8 @@ class PreferSnakeCaseFilesRule extends SaropaLintRule {
       }
 
       // Skip files in generated directories
-      if (fullPath.contains('/generated/') || fullPath.contains('/.dart_tool/')) {
+      if (fullPath.contains('/generated/') ||
+          fullPath.contains('/.dart_tool/')) {
         return;
       }
 
@@ -2758,7 +2769,8 @@ class PreferSnakeCaseFilesRule extends SaropaLintRule {
 
       if (!_snakeCasePattern.hasMatch(baseName)) {
         // Report at the library directive if present, otherwise at the first token
-        final LibraryDirective? library = unit.directives.whereType<LibraryDirective>().firstOrNull;
+        final LibraryDirective? library =
+            unit.directives.whereType<LibraryDirective>().firstOrNull;
         if (library != null) {
           reporter.atNode(library, code);
         } else {
@@ -2848,7 +2860,8 @@ class AvoidSmallTextRule extends SaropaLintRule {
     SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
-    context.registry.addInstanceCreationExpression((InstanceCreationExpression node) {
+    context.registry
+        .addInstanceCreationExpression((InstanceCreationExpression node) {
       final String? constructorName = node.constructorName.type.element?.name;
 
       // Check TextStyle constructor
@@ -2871,7 +2884,8 @@ class AvoidSmallTextRule extends SaropaLintRule {
           fontSize = expression.value?.toDouble();
         } else if (expression is DoubleLiteral) {
           fontSize = expression.value;
-        } else if (expression is PrefixExpression && expression.operator.lexeme == '-') {
+        } else if (expression is PrefixExpression &&
+            expression.operator.lexeme == '-') {
           // Handle negative numbers (which would definitely be invalid)
           final Expression operand = expression.operand;
           if (operand is IntegerLiteral || operand is DoubleLiteral) {
@@ -3254,7 +3268,8 @@ class _ReplaceCurlyApostropheFix extends DartFix {
       final String quote = lexeme[0]; // Get the original quote character
 
       // Escape apostrophes if using single quotes
-      final String escaped = quote == "'" ? fixed.replaceAll("'", "\\'") : fixed;
+      final String escaped =
+          quote == "'" ? fixed.replaceAll("'", "\\'") : fixed;
 
       final String newLexeme = '$quote$escaped$quote';
 
@@ -3351,7 +3366,8 @@ class PreferDocCurlyApostropheRule extends SaropaLintRule {
       _checkDocComment(node.documentationComment, reporter);
     });
 
-    context.registry.addTopLevelVariableDeclaration((TopLevelVariableDeclaration node) {
+    context.registry
+        .addTopLevelVariableDeclaration((TopLevelVariableDeclaration node) {
       _checkDocComment(node.documentationComment, reporter);
     });
   }
@@ -3398,23 +3414,29 @@ class _ReplaceStraightApostropheFix extends DartFix {
   ) {
     // Doc comments are stored on declaration nodes, not as precedingComments
     context.registry.addClassDeclaration((ClassDeclaration node) {
-      _checkAndFixDocComment(node.documentationComment, analysisError, reporter);
+      _checkAndFixDocComment(
+          node.documentationComment, analysisError, reporter);
     });
 
     context.registry.addMethodDeclaration((MethodDeclaration node) {
-      _checkAndFixDocComment(node.documentationComment, analysisError, reporter);
+      _checkAndFixDocComment(
+          node.documentationComment, analysisError, reporter);
     });
 
     context.registry.addFunctionDeclaration((FunctionDeclaration node) {
-      _checkAndFixDocComment(node.documentationComment, analysisError, reporter);
+      _checkAndFixDocComment(
+          node.documentationComment, analysisError, reporter);
     });
 
     context.registry.addFieldDeclaration((FieldDeclaration node) {
-      _checkAndFixDocComment(node.documentationComment, analysisError, reporter);
+      _checkAndFixDocComment(
+          node.documentationComment, analysisError, reporter);
     });
 
-    context.registry.addTopLevelVariableDeclaration((TopLevelVariableDeclaration node) {
-      _checkAndFixDocComment(node.documentationComment, analysisError, reporter);
+    context.registry
+        .addTopLevelVariableDeclaration((TopLevelVariableDeclaration node) {
+      _checkAndFixDocComment(
+          node.documentationComment, analysisError, reporter);
     });
   }
 
@@ -3555,7 +3577,8 @@ class PreferDocStraightApostropheRule extends SaropaLintRule {
       _checkDocComment(node.documentationComment, reporter);
     });
 
-    context.registry.addTopLevelVariableDeclaration((TopLevelVariableDeclaration node) {
+    context.registry
+        .addTopLevelVariableDeclaration((TopLevelVariableDeclaration node) {
       _checkDocComment(node.documentationComment, reporter);
     });
   }
@@ -3571,7 +3594,8 @@ class PreferDocStraightApostropheRule extends SaropaLintRule {
       if (!lexeme.startsWith('///')) continue;
 
       // Check if it contains curly apostrophes
-      if (lexeme.contains(rightSingleQuote) || lexeme.contains(leftSingleQuote)) {
+      if (lexeme.contains(rightSingleQuote) ||
+          lexeme.contains(leftSingleQuote)) {
         reporter.atToken(token, code);
       }
     }
@@ -3591,23 +3615,29 @@ class _ReplaceDocCurlyApostropheFix extends DartFix {
     List<AnalysisError> others,
   ) {
     context.registry.addClassDeclaration((ClassDeclaration node) {
-      _checkAndFixDocComment(node.documentationComment, analysisError, reporter);
+      _checkAndFixDocComment(
+          node.documentationComment, analysisError, reporter);
     });
 
     context.registry.addMethodDeclaration((MethodDeclaration node) {
-      _checkAndFixDocComment(node.documentationComment, analysisError, reporter);
+      _checkAndFixDocComment(
+          node.documentationComment, analysisError, reporter);
     });
 
     context.registry.addFunctionDeclaration((FunctionDeclaration node) {
-      _checkAndFixDocComment(node.documentationComment, analysisError, reporter);
+      _checkAndFixDocComment(
+          node.documentationComment, analysisError, reporter);
     });
 
     context.registry.addFieldDeclaration((FieldDeclaration node) {
-      _checkAndFixDocComment(node.documentationComment, analysisError, reporter);
+      _checkAndFixDocComment(
+          node.documentationComment, analysisError, reporter);
     });
 
-    context.registry.addTopLevelVariableDeclaration((TopLevelVariableDeclaration node) {
-      _checkAndFixDocComment(node.documentationComment, analysisError, reporter);
+    context.registry
+        .addTopLevelVariableDeclaration((TopLevelVariableDeclaration node) {
+      _checkAndFixDocComment(
+          node.documentationComment, analysisError, reporter);
     });
   }
 
@@ -3935,14 +3965,16 @@ class _SortArgumentsFix extends DartFix {
       if (namedArgs.length < 2) return;
 
       // Sort named arguments alphabetically
-      final List<NamedExpression> sortedNamedArgs = List<NamedExpression>.from(namedArgs)
-        ..sort((NamedExpression a, NamedExpression b) =>
-            a.name.label.name.compareTo(b.name.label.name));
+      final List<NamedExpression> sortedNamedArgs =
+          List<NamedExpression>.from(namedArgs)
+            ..sort((NamedExpression a, NamedExpression b) =>
+                a.name.label.name.compareTo(b.name.label.name));
 
       // Check if already sorted
       bool alreadySorted = true;
       for (int i = 0; i < namedArgs.length; i++) {
-        if (namedArgs[i].name.label.name != sortedNamedArgs[i].name.label.name) {
+        if (namedArgs[i].name.label.name !=
+            sortedNamedArgs[i].name.label.name) {
           alreadySorted = false;
           break;
         }
@@ -3985,7 +4017,8 @@ class _SortArgumentsFix extends DartFix {
       changeBuilder.addDartFileEdit((builder) {
         // Replace just the arguments (not the parentheses)
         final int startOffset = node.arguments.first.offset;
-        final int endOffset = hasTrailingComma ? nextToken!.end : node.arguments.last.end;
+        final int endOffset =
+            hasTrailingComma ? nextToken!.end : node.arguments.last.end;
 
         builder.addSimpleReplacement(
           SourceRange(startOffset, endOffset - startOffset),
@@ -4064,7 +4097,8 @@ class AvoidCommentedOutCodeRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_no_commented_out_code',
-    problemMessage: '[prefer_no_commented_out_code] Commented-out code clutters the codebase. '
+    problemMessage:
+        '[prefer_no_commented_out_code] Commented-out code clutters the codebase. '
         'Delete it - git preserves history.',
     correctionMessage:
         'Delete the commented-out code. Use version control to retrieve it if needed.',
