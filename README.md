@@ -1,36 +1,29 @@
-![saropa_lints banner](https://raw.githubusercontent.com/saropa/saropa_lints/main/assets/banner_v2.png)
 
-# Saropa Lints
+![Saropa Lints - Advanced Static Analysis](https://raw.githubusercontent.com/saropa/saropa_lints/main/assets/banner_v2.png)
 
-Catch memory leaks, security vulnerabilities, and runtime crashes that standard linters miss. Developed by [Saropa][saropa_link] to make the world of Dart & Flutter better, one fix at a time.
+<!-- # Saropa Lints -->
 
-[saropa_link]: https://saropa.com
+**Catch memory leaks, security vulnerabilities, and runtime crashes that standard linters miss.**
+<br>
+Developed by [Saropa](https://saropa.com) to make the world of Dart & Flutter better.
 
-<!-- CI/CD & Build Status -->
-[![ci](https://github.com/saropa/saropa_lints/actions/workflows/ci.yml/badge.svg)](https://github.com/saropa/saropa_lints/actions/workflows/ci.yml)
+<!-- ref: https://shields.io/badges and https://simpleicons.org/?q=flutter -->
+<br>
+<div align="center">
 
-<!-- Pub.dev Metrics (Auto-updating) -->
-[![pub package](https://img.shields.io/pub/v/saropa_lints.svg?logo=dart&label=pub)](https://pub.dev/packages/saropa_lints)
-[![pub points](https://img.shields.io/pub/points/saropa_lints?logo=dart)](https://pub.dev/packages/saropa_lints/score)
-<!-- NO LONGER AVAILABLE [![popularity](https://img.shields.io/pub/popularity/saropa_lints?logo=dart)](https://pub.dev/packages/saropa_lints/score) -->
-[![likes](https://img.shields.io/pub/likes/saropa_lints?logo=dart&color=red)](https://pub.dev/packages/saropa_lints/score)
+<!-- Note that the badges are all grouped together so they flow horizontally. -->
 
-<!-- GitHub Activity -->
-[![GitHub stars](https://img.shields.io/github/stars/saropa/saropa_lints?style=social)](https://github.com/saropa/saropa_lints)
-[![GitHub forks](https://img.shields.io/github/forks/saropa/saropa_lints?style=social)](https://github.com/saropa/saropa_lints)
-[![GitHub last commit](https://img.shields.io/github/last-commit/saropa/saropa_lints)](https://github.com/saropa/saropa_lints/commits)
-[![GitHub issues](https://img.shields.io/github/issues/saropa/saropa_lints)](https://github.com/saropa/saropa_lints/issues)
+[![pub package](https://img.shields.io/pub/v/saropa_lints.svg?style=flat-square&logo=dart&color=blue)](https://pub.dev/packages/saropa_lints) [![pub points](https://img.shields.io/pub/points/saropa_lints?style=flat-square&logo=dart)](https://pub.dev/packages/saropa_lints/score) [![likes](https://img.shields.io/pub/likes/saropa_lints?style=flat-square&logo=dart&color=red)](https://pub.dev/packages/saropa_lints/score) [![ci](https://img.shields.io/github/actions/workflow/status/saropa/saropa_lints/ci.yml?branch=main&style=flat-square&logo=github&label=build)](https://github.com/saropa/saropa_lints/actions) [![GitHub stars](https://img.shields.io/github/stars/saropa/saropa_lints?style=flat-square&logo=github)](https://github.com/saropa/saropa_lints) [![GitHub forks](https://img.shields.io/github/forks/saropa/saropa_lints?style=flat-square&logo=github)](https://github.com/saropa/saropa_lints) [![GitHub issues](https://img.shields.io/github/issues/saropa/saropa_lints?style=flat-square&logo=github)](https://github.com/saropa/saropa_lints/issues) [![GitHub last commit](https://img.shields.io/github/last-commit/saropa/saropa_lints?style=flat-square&logo=github)](https://github.com/saropa/saropa_lints/commits) 
 
-<!-- Technical Info -->
-[![Dart SDK Version](https://badgen.net/pub/sdk-version/saropa_lints)](https://pub.dev/packages/saropa_lints)
-[![Flutter Platform](https://img.shields.io/badge/platform-flutter-ff69b4.svg?logo=flutter)](https://flutter.dev/)
+[![Saropa Lints Badge](https://img.shields.io/badge/saropa_lints-1700%2B-blue?style=flat&logo=flutter&logoColor=white&color=435489)](https://pub.dev/packages/saropa_lints) [![Flutter Platform](https://img.shields.io/badge/platform-flutter-02569B.svg?style=flat-square&logo=flutter)](https://flutter.dev/) [![License: MIT](https://img.shields.io/badge/license-MIT-purple.svg?style=flat-square)](https://opensource.org/licenses/MIT)
 
-<!-- Custom Badges -->
-[![rules](https://img.shields.io/badge/rules-1700%2B-4B0082)](https://github.com/saropa/saropa_lints/blob/main/doc/rules/README.md)
-[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
-[![style: saropa lints](https://img.shields.io/badge/style-saropa__lints-4B0082.svg)](https://pub.dev/packages/saropa_lints)
 
-> 💬 **Have feedback on Saropa Lints?** Share it by [opening an issue](https://github.com/saropa/saropa_lints/issues/new) on GitHub!
+[![Share on X](https://img.shields.io/badge/share%20on-X-000000?style=flat-square&logo=x&logoColor=white)](https://twitter.com/intent/tweet?text=Check%20out%20Saropa%20Lints%3A%20Catch%20memory%20leaks%2C%20security%20vulnerabilities%2C%20and%20runtime%20crashes%20in%20Flutter%21&url=https%3A%2F%2Fpub.dev%2Fpackages%2Fsaropa_lints) [![Share on Facebook](https://img.shields.io/badge/share%20on-facebook-1877F2?style=flat-square&logo=facebook&logoColor=white)](https://www.facebook.com/sharer/sharer.php?u=https%3A%2F%2Fpub.dev%2Fpackages%2Fsaropa_lints) [![Share on Bluesky](https://img.shields.io/badge/share%20on-bluesky-0285FF?style=flat-square&logo=bluesky&logoColor=white)](https://bsky.app/intent/compose?text=Check%20out%20Saropa%20Lints%3A%20Catch%20memory%20leaks%2C%20security%20vulnerabilities%2C%20and%20runtime%20crashes%20in%20Flutter%21%20https%3A%2F%2Fpub.dev%2Fpackages%2Fsaropa_lints) [![Share on LinkedIn](https://img.shields.io/badge/share%20on-linkedin-0077B5?style=flat-square&logo=linkedin&logoColor=white)](https://www.linkedin.com/sharing/share-offsite/?url=https%3A%2F%2Fpub.dev%2Fpackages%2Fsaropa_lints) [![Share on Reddit](https://img.shields.io/badge/share%20on-reddit-FF4500?style=flat-square&logo=reddit&logoColor=white)](https://www.reddit.com/submit?url=https%3A%2F%2Fpub.dev%2Fpackages%2Fsaropa_lints&title=Saropa%20Lints%20-%20Advanced%20Static%20Analysis)
+
+</div>
+<br>
+
+> 💬 **Have feedback on Saropa Lints?** Please share it by [opening an issue](https://github.com/saropa/saropa_lints/issues/new) on GitHub!
 
 ---
 
@@ -103,12 +96,19 @@ If you use **GetX**, **Riverpod**, **Provider**, **Bloc**, **Isar**, **Hive**, o
 
 Standard linters don't understand these libraries. They see valid Dart code. Saropa Lints has 50+ rules specifically for library-specific anti-patterns that cause crashes, memory leaks, cost overruns, and data corruption in production. Recent update: `require_camera_permission_check` no longer triggers on non-camera controllers (e.g., IsarStreamController), eliminating a key false positive for Isar users. The new `avoid_cached_isar_stream` rule (with quick fix) prevents a common Isar runtime error.
 
-### Legend: Roadmap Markers
+### Radical Transparency
+
+We build in public. We don't just show you what works; we explicitly document what *doesn't* work yet.
+
+* [**ROADMAP.md**](ROADMAP.md): Our active backlog. See exactly what rules are coming next and vote on priorities.
+* [**ROADMAP_DEFERRED.md**](ROADMAP_DEFERRED.md): The "Hard Problems." We document rules we *can't* implement yet due to technical limitations (like cross-file analysis). We invite the community to help us crack these barriers.
 
 | Marker | Meaning | Example |
 |--------|---------|---------|
-| 🐙 | Tracked as GitHub issue | [#0000](https://github.com/saropa/saropa_lints/issues/0000) |
-| 💡 | Planned enhancement tracked as GitHub Discussion | [Discussion: Diagnostic Statistics](https://github.com/saropa/saropa_lints/discussions/000) |
+| 🐙 | Tracked as GitHub issue | [Open Issues](https://github.com/saropa/saropa_lints/issues) |
+| 💭 | Announcements, Q&A, and Ideas | [Discussion: Diagnostic Statistics](https://github.com/saropa/saropa_lints/discussions) |
+
+![AI fixing Flutter security vulnerability automatically in Android Studio](https://raw.githubusercontent.com/saropa/saropa_lints/main/assets/20260502_build_report_terminal_tab.png)
 
 ### Compliance: EAA & OWASP Security
 
@@ -121,14 +121,16 @@ These aren't edge cases. They're compliance requirements and security basics tha
 Why switch? Saropa Lints covers everything in standard tools plus strict behavioral analysis.
 
 | Feature | `flutter_lints` | `very_good_analysis` | **Saropa Lints** |
-| :--- | :---: | :---: | :---: |
+| :--- | :---: | :---: | :--- |
 | **Syntax Checks** | ✅ | ✅ | ✅ |
-| **Style Enforcement** | ❌ | ✅ | ✅ |
-| **Memory Leak Detection** | ❌ | ❌ | **✅ (Deep Analysis)** |
-| **Runtime Crash Prevention** | ❌ | ❌ | **✅ (Behavioral)** |
-| **Security (OWASP)** | ❌ | ❌ | **✅ (Mapped)** |
-| **Library Specific (Riverpod/Bloc)**| ❌ | ❌ | **✅ (50+ rules)** |
-| **AI-Ready Diagnostics** | ❌ | ❌ | **✅** |
+| **Strict/Opinionated Style** | ❌ | ✅ | ✅ |
+| **Zero-Config Setup** | ✅ | ✅ | 🚧 **(Coming Soon)** |
+| **Controller Leak Detection** | ❌ | ❌ | ✅ **(Deep Analysis)** |
+| **Runtime Crash Prevention** | ❌ | ❌ | ✅ **(Behavioral)** |
+| **Security (OWASP Mapped)** | ❌ | ❌ | ✅ **(ISO/OWASP)** |
+| **Library Specific (Riverpod/Bloc)**| ❌ | ❌ | ✅ **(50+ rules)** |
+| **AI-Ready Diagnostics** | ❌ | ❌ | ✅ |
+| **Dependency Scanning** | ❌ | ❌ | 🚧 **(Coming Soon)** |
 
 ### OWASP Compliance Mapping
 
@@ -161,11 +163,13 @@ final rule = AvoidHardcodedCredentialsRule();
 print(rule.owasp); // Mobile: M1 | Web: A07
 ```
 
-### Free and open
+### Open Source & Community Driven
 
-Good options exist, but many are paid or closed-source. We believe these fundamentals should be free and open. A rising tide lifts all boats.
+Unlike "black box" paid tools, Saropa Lints is 100% open source (MIT). You can inspect the logic behind every rule, verify the security checks yourself, and fork it if you disagree.
 
-The tier system lets you adopt gradually — start with ~100 critical rules, work up to 1700+ when you're ready.
+* **No hidden logic:** See exactly how we detect vulnerabilities.
+* **No vendor lock-in:** It's standard Dart code.
+* **Community powered:** Rules are often suggested, debated, and refined by the Flutter community, not just a single vendor.
 
 ---
 
@@ -979,7 +983,9 @@ A: Yes! Use the **Baseline** feature (`dart run saropa_lints:baseline`) to suppr
 
 ## Contributing
 
-We believe great tools are built by communities, not companies. Contributions and feedback are always welcome.
+**We are building the industry standard together.**
+
+We don't have all the answers. We believe great tools are forged by many hands, and if you've shipped production Flutter apps, we want your opinions.
 
 If you think a rule is:
 
@@ -988,7 +994,7 @@ If you think a rule is:
 - **Too lenient** - maybe it should be stricter or have options
 - **Missing** - propose it, or better yet, implement it
 
-We don't have all the answers. If you've shipped production Flutter apps and have opinions, we want to hear from you.
+**Want to learn AST analysis?** We mentor contributors. Pick a "Good First Issue" and we'll guide you through writing your first linter.
 
 ### How to contribute
 
@@ -1070,10 +1076,10 @@ Contact us via [CONTRIBUTING.md](https://github.com/saropa/saropa_lints/blob/mai
 
 Prove that your code is secure, memory-safe, and accessible. Add the Saropa Lints style badge to your README to indicate you follow strict behavioral standards.
 
-[![style: saropa lints](https://img.shields.io/badge/style-saropa__lints-4B0082.svg)](https://pub.dev/packages/saropa_lints)
+[![Saropa Lints Badge](https://img.shields.io/badge/saropa_lints-recommended%2B-blue?style=flat&logo=flutter&logoColor=white&color=435489)](https://pub.dev/packages/saropa_lints)
 
 ```md
-[![style: saropa lints](https://img.shields.io/badge/style-saropa__lints-4B0082.svg)](https://pub.dev/packages/saropa_lints)
+[![Saropa Lints Badge](https://img.shields.io/badge/saropa_lints-recommended%2B-blue?style=flat&logo=flutter&logoColor=white&color=435489)](https://pub.dev/packages/saropa_lints)
 ```
 
 ## License
