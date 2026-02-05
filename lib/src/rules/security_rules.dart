@@ -1816,7 +1816,7 @@ class _AddTodoForDynamicSqlFix extends DartFix {
   }
 }
 
-/// Warns when generic key/auth parameters appear in URLs (insanity tier).
+/// Warns when generic key/auth parameters appear in URLs (pedantic tier).
 ///
 /// This is a stricter variant of [AvoidTokenInUrlRule] that catches
 /// generic parameter names that might contain sensitive data. More prone

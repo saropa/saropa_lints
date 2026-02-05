@@ -14,7 +14,7 @@
 /// See `BROKEN_TIERS.md` for why YAML-based tier config is not supported.
 ///
 /// Available tiers: `essential` (1), `recommended` (2),
-/// `professional` (3), `comprehensive` (4), `insanity` (5).
+/// `professional` (3), `comprehensive` (4), `pedantic` (5).
 ///
 /// You can also enable/disable individual rules in the generated file:
 ///
@@ -2686,7 +2686,7 @@ class _SaropaLints extends PluginBase {
   String _inferEffectiveTier(Set<String> enabledRuleNames) {
     // Check from highest to lowest — first full match wins.
     const tiers = [
-      'insanity',
+      'pedantic',
       'comprehensive',
       'professional',
       'recommended',

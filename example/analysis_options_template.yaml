@@ -11,7 +11,7 @@
 # QUICK START
 # ===========
 # 1. Copy this file to your project as: analysis_options.yaml
-# 2. Choose a tier: essential | recommended | professional | comprehensive | insanity
+# 2. Choose a tier: essential | recommended | professional | comprehensive | pedantic
 # 3. Customize by commenting/uncommenting rules as needed
 # 4. Run: dart analyze
 #
@@ -21,7 +21,7 @@
 # - recommended    : Essential + common mistakes (~850) - default for most teams
 # - professional   : Recommended + architecture/testing (~1590) - enterprise teams
 # - comprehensive  : Professional + thorough coverage (~1640) - quality obsessed
-# - insanity       : Everything including opinionated rules (~1650) - greenfield projects
+# - pedantic       : Everything including opinionated rules (~1650) - greenfield projects
 #
 # CONFIGURATION NOTES
 # ===================
@@ -88,7 +88,7 @@ custom_lint:
     #   - recommended    : ~850 rules (default) ← START HERE
     #   - professional   : ~1590 rules (strict)
     #   - comprehensive  : ~1640 rules (very strict)
-    #   - insanity       : ~1650 rules (everything)
+    #   - pedantic       : ~1650 rules (everything)
     tier: recommended
 
   # cspell:ignore shouldrepaint itemextent
@@ -592,11 +592,11 @@ custom_lint:
     # Test files:       prefer_small_length_test_files (400), avoid_medium_length_test_files (600),
     #                   avoid_long_length_test_files (1000), avoid_very_long_length_test_files (2000)
     # =========================================================================
-    - prefer_small_length_files: false           # 200 lines [LOW] Tier: insanity
+    - prefer_small_length_files: false           # 200 lines [LOW] Tier: pedantic
     - avoid_medium_length_files: false           # 300 lines [LOW] Tier: professional
     - avoid_long_length_files: false             # 500 lines [LOW] Tier: comprehensive
     - avoid_very_long_length_files: false        # 1000 lines [LOW] Tier: recommended
-    - prefer_small_length_test_files: false      # 400 lines [LOW] Tier: insanity (test files)
+    - prefer_small_length_test_files: false      # 400 lines [LOW] Tier: pedantic (test files)
     - avoid_medium_length_test_files: false      # 600 lines [LOW] Tier: professional (test files)
     - avoid_long_length_test_files: false        # 1000 lines [LOW] Tier: comprehensive (test files)
     - avoid_very_long_length_test_files: false   # 2000 lines [LOW] Tier: recommended (test files)

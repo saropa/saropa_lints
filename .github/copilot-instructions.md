@@ -16,7 +16,7 @@
 
 - Rule Implementation: Each rule is a Dart class (usually extending DartLintRule or SaropaLintRule) in lib/src/rules/. Rules must be registered in both lib/src/rules/all_rules.dart and assigned to a tier in lib/src/tiers.dart.
 
-* Tier System: Rules are grouped into 5 tiers (essential, recommended, professional, comprehensive, insanity). Config is generated via CLI, not plugin config. See README.md for tier details.
+* Tier System: Rules are grouped into 5 tiers (essential, recommended, professional, comprehensive, enterprise). Config is generated via CLI, not plugin config. See README.md for tier details.
 * Domain-Specific Rules: Many rules target specific libraries (e.g., Riverpod, Bloc, GetX, Isar, Hive, Firebase). See doc/guides/ for anti-patterns and integration details.
 * Security/OWASP Mapping: Security rules expose OWASP categories programmatically. See README.md for OWASP mapping.
 

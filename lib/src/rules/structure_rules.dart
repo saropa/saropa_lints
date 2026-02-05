@@ -421,7 +421,7 @@ class AvoidGlobalStateRule extends SaropaLintRule {
 // Production rules (non-test files):
 // | Threshold  | Rule                    | Tier          |
 // |------------|-------------------------|---------------|
-// | 200 lines  | prefer_small_length_files      | insanity      |
+// | 200 lines  | prefer_small_length_files      | pedantic      |
 // | 300 lines  | avoid_medium_length_files      | professional  |
 // | 500 lines  | avoid_long_length_files        | comprehensive |
 // | 1000 lines | avoid_very_long_length_files   | recommended   |
@@ -429,7 +429,7 @@ class AvoidGlobalStateRule extends SaropaLintRule {
 // Test file rules (files in test/, test_driver/, integration_test/):
 // | Threshold  | Rule                         | Tier          |
 // |------------|------------------------------|---------------|
-// | 400 lines  | prefer_small_length_test_files      | insanity      |
+// | 400 lines  | prefer_small_length_test_files      | pedantic      |
 // | 600 lines  | avoid_medium_length_test_files      | professional  |
 // | 1000 lines | avoid_long_length_test_files        | comprehensive |
 // | 2000 lines | avoid_very_long_length_test_files   | recommended   |
