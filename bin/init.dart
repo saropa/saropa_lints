@@ -35,7 +35,7 @@ library;
 /// 2. **recommended** - Essential + accessibility, performance (~850)
 /// 3. **professional** - Recommended + architecture, testing (~1590)
 /// 4. **comprehensive** - Professional + thorough coverage (~1640)
-/// 5. **insanity** - All rules enabled (~1650)
+/// 5. **pedantic** - All rules enabled (~1650)
 ///
 /// ## Preservation Behavior
 ///
@@ -81,8 +81,7 @@ import 'dart:ffi';
 import 'dart:io';
 
 import 'package:custom_lint_builder/custom_lint_builder.dart' show LintRule;
-import 'package:saropa_lints/saropa_lints.dart'
-    show RuleTier, SaropaLintRule, allSaropaRules;
+import 'package:saropa_lints/saropa_lints.dart' show RuleTier, SaropaLintRule, allSaropaRules;
 import 'package:saropa_lints/src/tiers.dart' as tiers;
 
 /// Get saropa_lints rootUri from .dart_tool/package_config.json.
@@ -126,8 +125,7 @@ String _getPackageVersion() {
     if (!pubspecFile.existsSync()) return 'unknown';
 
     final content = pubspecFile.readAsStringSync();
-    final match =
-        RegExp(r'^version:\s*(.+)$', multiLine: true).firstMatch(content);
+    final match = RegExp(r'^version:\s*(.+)$', multiLine: true).firstMatch(content);
     return match?.group(1)?.trim() ?? 'unknown';
   } catch (_) {}
   return 'unknown';
@@ -177,8 +175,7 @@ void _writeLogFile() {
 
     print('${_Colors.dim}Log written to: $logPath${_Colors.reset}');
   } on Exception catch (e) {
-    print(
-        '${_Colors.yellow}Warning: Could not write log file: $e${_Colors.reset}');
+    print('${_Colors.yellow}Warning: Could not write log file: $e${_Colors.reset}');
   }
 }
 
@@ -196,16 +193,13 @@ void _tryEnableAnsiWindows() {
   try {
     final k = DynamicLibrary.open('kernel32.dll');
     final getStdHandle =
-        k.lookupFunction<IntPtr Function(Int32), int Function(int)>(
-            'GetStdHandle');
+        k.lookupFunction<IntPtr Function(Int32), int Function(int)>('GetStdHandle');
     final getMode = k.lookupFunction<Int32 Function(IntPtr, Pointer<Uint32>),
         int Function(int, Pointer<Uint32>)>('GetConsoleMode');
-    final setMode = k.lookupFunction<Int32 Function(IntPtr, Uint32),
-        int Function(int, int)>('SetConsoleMode');
-    final getHeap =
-        k.lookupFunction<IntPtr Function(), int Function()>('GetProcessHeap');
-    final alloc = k.lookupFunction<
-        Pointer<Void> Function(IntPtr, Uint32, IntPtr),
+    final setMode =
+        k.lookupFunction<Int32 Function(IntPtr, Uint32), int Function(int, int)>('SetConsoleMode');
+    final getHeap = k.lookupFunction<IntPtr Function(), int Function()>('GetProcessHeap');
+    final alloc = k.lookupFunction<Pointer<Void> Function(IntPtr, Uint32, IntPtr),
         Pointer<Void> Function(int, int, int)>('HeapAlloc');
     final free = k.lookupFunction<Int32 Function(IntPtr, Uint32, Pointer<Void>),
         int Function(int, int, Pointer<Void>)>('HeapFree');
@@ -217,8 +211,7 @@ void _tryEnableAnsiWindows() {
 
     final mode = ptr.cast<Uint32>();
     if (getMode(handle, mode) != 0) {
-      setMode(
-          handle, mode.value | 0x0004); // ENABLE_VIRTUAL_TERMINAL_PROCESSING
+      setMode(handle, mode.value | 0x0004); // ENABLE_VIRTUAL_TERMINAL_PROCESSING
     }
     free(heap, 0, ptr);
   } catch (_) {
@@ -292,7 +285,7 @@ String _tierColor(String tier) {
       return '${_Colors.blue}$tier${_Colors.reset}';
     case 'comprehensive':
       return '${_Colors.magenta}$tier${_Colors.reset}';
-    case 'insanity':
+    case 'pedantic':
       return '${_Colors.brightCyan}$tier${_Colors.reset}';
     case 'stylistic':
       return '${_Colors.dim}$tier${_Colors.reset}';
@@ -410,15 +403,13 @@ RuleTier _getRuleTierFromMetadata(String ruleName) {
 // ---------------------------------------------------------------------------
 
 /// Matches the `custom_lint:` section header in YAML.
-final RegExp _customLintSectionPattern =
-    RegExp(r'^custom_lint:\s*$', multiLine: true);
+final RegExp _customLintSectionPattern = RegExp(r'^custom_lint:\s*$', multiLine: true);
 
 /// Matches any top-level YAML key (for finding section boundaries).
 final RegExp _topLevelKeyPattern = RegExp(r'^\w+:', multiLine: true);
 
 /// Matches rule entries like `- rule_name: true` or `- rule_name: false`.
-final RegExp _ruleEntryPattern =
-    RegExp(r'^\s+-\s+(\w+):\s*(true|false)', multiLine: true);
+final RegExp _ruleEntryPattern = RegExp(r'^\s+-\s+(\w+):\s*(true|false)', multiLine: true);
 
 /// All available tiers in order of strictness.
 const List<String> tierOrder = <String>[
@@ -426,7 +417,7 @@ const List<String> tierOrder = <String>[
   'recommended',
   'professional',
   'comprehensive',
-  'insanity',
+  'pedantic',
 ];
 
 /// Map tier names to numeric IDs for user convenience.
@@ -435,23 +426,21 @@ const Map<String, int> tierIds = <String, int>{
   'recommended': 2,
   'professional': 3,
   'comprehensive': 4,
-  'insanity': 5,
+  'pedantic': 5,
 };
 
 /// Tier descriptions for display.
 const Map<String, String> tierDescriptions = <String, String>{
-  'essential':
-      'Critical rules preventing crashes, security holes, memory leaks',
+  'essential': 'Critical rules preventing crashes, security holes, memory leaks',
   'recommended': 'Essential + accessibility, performance patterns',
   'professional': 'Recommended + architecture, testing, documentation',
   'comprehensive': 'Professional + thorough coverage (recommended)',
-  'insanity': 'All rules enabled (may have conflicts)',
+  'pedantic': 'All rules enabled (may have conflicts)',
 };
 
 /// Stylistic rule categories, mirroring the organization in tiers.dart.
 /// Used to generate the STYLISTIC RULES section in analysis_options_custom.yaml.
-const Map<String, List<String>> _stylisticRuleCategories =
-    <String, List<String>>{
+const Map<String, List<String>> _stylisticRuleCategories = <String, List<String>>{
   'Debug/Test utility': <String>[
     'prefer_fail_test_case',
   ],
@@ -645,8 +634,8 @@ String _tierToString(RuleTier tier) {
       return 'professional';
     case RuleTier.comprehensive:
       return 'comprehensive';
-    case RuleTier.insanity:
-      return 'insanity';
+    case RuleTier.pedantic:
+      return 'pedantic';
     case RuleTier.stylistic:
       return 'stylistic';
   }
@@ -663,7 +652,7 @@ int _tierIndex(RuleTier tier) {
       return 2;
     case RuleTier.comprehensive:
       return 3;
-    case RuleTier.insanity:
+    case RuleTier.pedantic:
       return 4;
     case RuleTier.stylistic:
       return -1; // Stylistic is opt-in, not part of tier progression
@@ -674,7 +663,7 @@ int _tierIndex(RuleTier tier) {
 RuleTier _getTierFromSets(String ruleName) {
   if (tiers.stylisticRules.contains(ruleName)) return RuleTier.stylistic;
   if (tiers.essentialRules.contains(ruleName)) return RuleTier.essential;
-  if (tiers.insanityOnlyRules.contains(ruleName)) return RuleTier.insanity;
+  if (tiers.pedanticOnlyRules.contains(ruleName)) return RuleTier.pedantic;
   if (tiers.comprehensiveOnlyRules.contains(ruleName)) {
     return RuleTier.comprehensive;
   }
@@ -736,8 +725,7 @@ Future<void> main(List<String> args) async {
     return;
   }
 
-  _logTerminal(
-      '${_Colors.bold}Tier:${_Colors.reset} ${_tierColor(tier)} (level ${tierIds[tier]})');
+  _logTerminal('${_Colors.bold}Tier:${_Colors.reset} ${_tierColor(tier)} (level ${tierIds[tier]})');
   _logTerminal('${_Colors.dim}${tierDescriptions[tier]}${_Colors.reset}');
   _logTerminal('');
 
@@ -796,39 +784,32 @@ Future<void> main(List<String> args) async {
   } else {
     // Create the custom overrides file with a helpful header
     _createCustomOverridesFile(overridesFile);
-    _logTerminal(
-        '${_Colors.green}✓ Created:${_Colors.reset} analysis_options_custom.yaml');
+    _logTerminal('${_Colors.green}✓ Created:${_Colors.reset} analysis_options_custom.yaml');
   }
 
   // Apply platform filtering - disable rules for disabled platforms
-  final Set<String> platformDisabledRules =
-      tiers.getRulesDisabledByPlatforms(platformSettings);
+  final Set<String> platformDisabledRules = tiers.getRulesDisabledByPlatforms(platformSettings);
 
   if (platformDisabledRules.isNotEmpty) {
     finalEnabled = finalEnabled.difference(platformDisabledRules);
     finalDisabled = finalDisabled.union(platformDisabledRules);
 
-    final disabledPlatforms = platformSettings.entries
-        .where((e) => !e.value)
-        .map((e) => e.key)
-        .toList();
+    final disabledPlatforms =
+        platformSettings.entries.where((e) => !e.value).map((e) => e.key).toList();
     _logTerminal('${_Colors.yellow}Platforms disabled:${_Colors.reset} '
         '${disabledPlatforms.join(', ')} '
         '${_Colors.dim}(${platformDisabledRules.length} rules affected)${_Colors.reset}');
   }
 
   // Apply package filtering - disable rules for disabled packages
-  final Set<String> packageDisabledRules =
-      tiers.getRulesDisabledByPackages(packageSettings);
+  final Set<String> packageDisabledRules = tiers.getRulesDisabledByPackages(packageSettings);
 
   if (packageDisabledRules.isNotEmpty) {
     finalEnabled = finalEnabled.difference(packageDisabledRules);
     finalDisabled = finalDisabled.union(packageDisabledRules);
 
-    final disabledPackages = packageSettings.entries
-        .where((e) => !e.value)
-        .map((e) => e.key)
-        .toList();
+    final disabledPackages =
+        packageSettings.entries.where((e) => !e.value).map((e) => e.key).toList();
     _logTerminal('${_Colors.yellow}Packages disabled:${_Colors.reset} '
         '${disabledPackages.join(', ')} '
         '${_Colors.dim}(${packageDisabledRules.length} rules affected)${_Colors.reset}');
@@ -854,8 +835,7 @@ Future<void> main(List<String> args) async {
             '${_Colors.red}⚠ ${userCustomizations.length} customizations found - consider --reset${_Colors.reset}');
       }
     } else {
-      _logTerminal(
-          '${_Colors.yellow}⚠ --reset: discarding customizations${_Colors.reset}');
+      _logTerminal('${_Colors.yellow}⚠ --reset: discarding customizations${_Colors.reset}');
     }
   }
 
@@ -866,16 +846,8 @@ Future<void> main(List<String> args) async {
   }
 
   // Count rules by severity for summary
-  final Map<String, int> enabledBySeverity = {
-    'ERROR': 0,
-    'WARNING': 0,
-    'INFO': 0
-  };
-  final Map<String, int> disabledBySeverity = {
-    'ERROR': 0,
-    'WARNING': 0,
-    'INFO': 0
-  };
+  final Map<String, int> enabledBySeverity = {'ERROR': 0, 'WARNING': 0, 'INFO': 0};
+  final Map<String, int> disabledBySeverity = {'ERROR': 0, 'WARNING': 0, 'INFO': 0};
 
   for (final rule in finalEnabled) {
     final severity = _getRuleSeverity(rule);
@@ -896,9 +868,7 @@ Future<void> main(List<String> args) async {
   // Compact summary
   _logTerminal('');
   final customCount = userCustomizations.length;
-  final customStr = customCount > 0
-      ? ' ${_Colors.dim}(+$customCount custom)${_Colors.reset}'
-      : '';
+  final customStr = customCount > 0 ? ' ${_Colors.dim}(+$customCount custom)${_Colors.reset}' : '';
   _logTerminal(
       '${_Colors.bold}Rules:${_Colors.reset} ${_success('${finalEnabled.length} enabled')} / ${_error('${finalDisabled.length} disabled')}$customStr');
   _logTerminal(
@@ -918,13 +888,11 @@ Future<void> main(List<String> args) async {
   );
 
   // Replace custom_lint section in existing content, preserving everything else
-  final String newContent =
-      _replaceCustomLintSection(existingContent, customLintYaml);
+  final String newContent = _replaceCustomLintSection(existingContent, customLintYaml);
 
   if (cliArgs.dryRun) {
     _logTerminal('${_Colors.yellow}━━━ DRY RUN ━━━${_Colors.reset}');
-    _logTerminal(
-        '${_Colors.dim}Would write to: ${cliArgs.outputPath}${_Colors.reset}');
+    _logTerminal('${_Colors.dim}Would write to: ${cliArgs.outputPath}${_Colors.reset}');
     _logTerminal('');
 
     // Show preview of custom_lint section only
@@ -937,16 +905,14 @@ Future<void> main(List<String> args) async {
       _logTerminal(lines[i]);
     }
     if (lines.length > previewLines) {
-      _logTerminal(
-          '${_Colors.dim}... (${lines.length - previewLines} more lines)${_Colors.reset}');
+      _logTerminal('${_Colors.dim}... (${lines.length - previewLines} more lines)${_Colors.reset}');
     }
     return;
   }
 
   // Skip writing if the file content hasn't changed
   if (newContent == existingContent) {
-    _logTerminal(
-        '${_Colors.dim}✓ No changes needed: ${cliArgs.outputPath}${_Colors.reset}');
+    _logTerminal('${_Colors.dim}✓ No changes needed: ${cliArgs.outputPath}${_Colors.reset}');
   } else {
     // Create backup before overwriting
     try {
@@ -980,8 +946,7 @@ Future<void> main(List<String> args) async {
 
     if (response == 'y' || response == 'yes') {
       _logTerminal('');
-      _logTerminal(
-          '🚀 ${_Colors.bold}Running: dart run custom_lint${_Colors.reset}');
+      _logTerminal('🚀 ${_Colors.bold}Running: dart run custom_lint${_Colors.reset}');
       _logTerminal('${'─' * 60}');
 
       // Run with inheritStdio for real-time output streaming
@@ -999,8 +964,7 @@ Future<void> main(List<String> args) async {
 }
 
 /// Matches the USER CUSTOMIZATIONS section header in generated YAML.
-final RegExp _userCustomizationsSectionPattern =
-    RegExp(r'USER CUSTOMIZATIONS', multiLine: true);
+final RegExp _userCustomizationsSectionPattern = RegExp(r'USER CUSTOMIZATIONS', multiLine: true);
 
 /// Extract existing user customizations from the USER CUSTOMIZATIONS section.
 ///
@@ -1020,8 +984,7 @@ Map<String, bool> _extractUserCustomizations(
   final Map<String, bool> customizations = <String, bool>{};
 
   // Find USER CUSTOMIZATIONS section
-  final Match? customizationsMatch =
-      _userCustomizationsSectionPattern.firstMatch(yamlContent);
+  final Match? customizationsMatch = _userCustomizationsSectionPattern.firstMatch(yamlContent);
   if (customizationsMatch == null) {
     // No customizations section - file wasn't generated by this tool
     // or user hasn't made any customizations
@@ -1038,13 +1001,11 @@ Map<String, bool> _extractUserCustomizations(
     multiLine: true,
   );
   final Match? nextSection = sectionEndPattern.firstMatch(afterHeader);
-  final String customizationsSection = nextSection != null
-      ? afterHeader.substring(0, nextSection.start)
-      : afterHeader;
+  final String customizationsSection =
+      nextSection != null ? afterHeader.substring(0, nextSection.start) : afterHeader;
 
   // Extract rules from the customizations section only
-  for (final Match match
-      in _ruleEntryPattern.allMatches(customizationsSection)) {
+  for (final Match match in _ruleEntryPattern.allMatches(customizationsSection)) {
     final String ruleName = match.group(1)!;
     final bool currentEnabled = match.group(2) == 'true';
 
@@ -1197,18 +1158,15 @@ max_issues: 1000
   if (headerEndMatch != null) {
     // Insert after the header box
     final insertPos = headerEndMatch.end;
-    newContent = content.substring(0, insertPos) +
-        '\n' +
-        settingBlock +
-        content.substring(insertPos);
+    newContent =
+        content.substring(0, insertPos) + '\n' + settingBlock + content.substring(insertPos);
   } else {
     // No header box, insert at top
     newContent = settingBlock + content;
   }
 
   file.writeAsStringSync(newContent);
-  _logTerminal(
-      '${_Colors.green}✓ Added max_issues setting to ${file.path}${_Colors.reset}');
+  _logTerminal('${_Colors.green}✓ Added max_issues setting to ${file.path}${_Colors.reset}');
 }
 
 /// Ensure platforms setting exists in an existing custom config file.
@@ -1245,26 +1203,21 @@ platforms:
   String newContent;
   if (maxIssuesMatch != null) {
     final insertPos = maxIssuesMatch.end;
-    newContent = content.substring(0, insertPos) +
-        '\n' +
-        settingBlock +
-        content.substring(insertPos);
+    newContent =
+        content.substring(0, insertPos) + '\n' + settingBlock + content.substring(insertPos);
   } else {
     final headerEndMatch = RegExp(r'╚[═]+╝\n*').firstMatch(content);
     if (headerEndMatch != null) {
       final insertPos = headerEndMatch.end;
-      newContent = content.substring(0, insertPos) +
-          '\n' +
-          settingBlock +
-          content.substring(insertPos);
+      newContent =
+          content.substring(0, insertPos) + '\n' + settingBlock + content.substring(insertPos);
     } else {
       newContent = settingBlock + content;
     }
   }
 
   file.writeAsStringSync(newContent);
-  _logTerminal(
-      '${_Colors.green}✓ Added platforms setting to ${file.path}${_Colors.reset}');
+  _logTerminal('${_Colors.green}✓ Added platforms setting to ${file.path}${_Colors.reset}');
 }
 
 /// Ensure packages setting exists in an existing custom config file.
@@ -1279,9 +1232,8 @@ void _ensurePackagesSetting(File file) {
     return; // Already has the setting
   }
 
-  final packageEntries = tiers.allPackages
-      .map((p) => '  $p: ${tiers.defaultPackages[p]}')
-      .join('\n');
+  final packageEntries =
+      tiers.allPackages.map((p) => '  $p: ${tiers.defaultPackages[p]}').join('\n');
 
   final settingBlock = '''
 # ─────────────────────────────────────────────────────────────────────────────
@@ -1310,46 +1262,36 @@ $packageEntries
   String newContent;
   if (platformsEndMatch != null) {
     final insertPos = platformsEndMatch.end;
-    newContent = content.substring(0, insertPos) +
-        '\n' +
-        settingBlock +
-        content.substring(insertPos);
+    newContent =
+        content.substring(0, insertPos) + '\n' + settingBlock + content.substring(insertPos);
   } else {
     // Fallback: insert after max_issues
     final maxIssuesMatch = RegExp(r'max_issues:\s*\d+\n*').firstMatch(content);
     if (maxIssuesMatch != null) {
       final insertPos = maxIssuesMatch.end;
-      newContent = content.substring(0, insertPos) +
-          '\n' +
-          settingBlock +
-          content.substring(insertPos);
+      newContent =
+          content.substring(0, insertPos) + '\n' + settingBlock + content.substring(insertPos);
     } else {
       newContent = settingBlock + content;
     }
   }
 
   file.writeAsStringSync(newContent);
-  _logTerminal(
-      '${_Colors.green}✓ Added packages setting to ${file.path}${_Colors.reset}');
+  _logTerminal('${_Colors.green}✓ Added packages setting to ${file.path}${_Colors.reset}');
 }
 
 /// Builds the PACKAGE SETTINGS section for analysis_options_custom.yaml.
 String _buildPackageSection() {
   final buffer = StringBuffer();
-  buffer.writeln(
-      '# ─────────────────────────────────────────────────────────────────────────────');
+  buffer.writeln('# ─────────────────────────────────────────────────────────────────────────────');
   buffer.writeln('# PACKAGE SETTINGS');
-  buffer.writeln(
-      '# ─────────────────────────────────────────────────────────────────────────────');
+  buffer.writeln('# ─────────────────────────────────────────────────────────────────────────────');
   buffer.writeln("# Disable packages your project doesn't use.");
-  buffer.writeln(
-      '# Rules specific to disabled packages will be automatically disabled.');
-  buffer.writeln(
-      '# All packages are enabled by default for backward compatibility.');
+  buffer.writeln('# Rules specific to disabled packages will be automatically disabled.');
+  buffer.writeln('# All packages are enabled by default for backward compatibility.');
   buffer.writeln('#');
   buffer.writeln('# EXAMPLES:');
-  buffer.writeln(
-      '#   - Riverpod-only project: set bloc, provider, getx to false');
+  buffer.writeln('#   - Riverpod-only project: set bloc, provider, getx to false');
   buffer.writeln('#   - No local DB: set isar, hive, sqflite to false');
   buffer.writeln('#   - No Firebase: set firebase to false');
   buffer.writeln('');
@@ -1373,20 +1315,15 @@ String _buildStylisticSection({
   Set<String> skipRules = const <String>{},
 }) {
   final buffer = StringBuffer();
-  buffer.writeln(
-      '# ─────────────────────────────────────────────────────────────────────────────');
+  buffer.writeln('# ─────────────────────────────────────────────────────────────────────────────');
   buffer.writeln('# STYLISTIC RULES');
-  buffer.writeln(
-      '# ─────────────────────────────────────────────────────────────────────────────');
-  buffer.writeln(
-      '# Opinionated formatting, ordering, and naming convention rules.');
-  buffer.writeln(
-      '# These are NOT included in any tier - enable the ones that match your style.');
+  buffer.writeln('# ─────────────────────────────────────────────────────────────────────────────');
+  buffer.writeln('# Opinionated formatting, ordering, and naming convention rules.');
+  buffer.writeln('# These are NOT included in any tier - enable the ones that match your style.');
   buffer.writeln('# Set to true to enable, false to disable.');
   buffer.writeln('#');
   buffer.writeln('# NOTE: Some rules conflict (e.g., prefer_single_quotes vs');
-  buffer.writeln(
-      '# prefer_double_quotes). Only enable one from each conflicting group.');
+  buffer.writeln('# prefer_double_quotes). Only enable one from each conflicting group.');
   buffer.writeln('');
 
   final categorizedRules = <String>{};
@@ -1411,11 +1348,8 @@ String _buildStylisticSection({
   }
 
   // Add any uncategorized stylistic rules (safety net for new rules)
-  final uncategorized = tiers.stylisticRules
-      .difference(categorizedRules)
-      .difference(skipRules)
-      .toList()
-    ..sort();
+  final uncategorized =
+      tiers.stylisticRules.difference(categorizedRules).difference(skipRules).toList()..sort();
 
   if (uncategorized.isNotEmpty) {
     buffer.writeln('# --- Other stylistic rules ---');
@@ -1432,12 +1366,10 @@ String _buildStylisticSection({
 }
 
 /// Regex matching the STYLISTIC RULES section header.
-final RegExp _stylisticSectionHeader =
-    RegExp(r'# STYLISTIC RULES\s*\n', multiLine: true);
+final RegExp _stylisticSectionHeader = RegExp(r'# STYLISTIC RULES\s*\n', multiLine: true);
 
 /// Regex matching the RULE OVERRIDES section header.
-final RegExp _ruleOverridesSectionHeader =
-    RegExp(r'# RULE OVERRIDES\s*\n', multiLine: true);
+final RegExp _ruleOverridesSectionHeader = RegExp(r'# RULE OVERRIDES\s*\n', multiLine: true);
 
 /// Ensure stylistic rules section exists and is complete in the custom
 /// config file. Adds missing rules, preserves existing true/false values.
@@ -1474,8 +1406,7 @@ void _ensureStylisticRulesSection(File file) {
     }
 
     file.writeAsStringSync(newContent);
-    _logTerminal(
-        '${_Colors.green}✓ Added stylistic rules section to ${file.path}${_Colors.reset}');
+    _logTerminal('${_Colors.green}✓ Added stylistic rules section to ${file.path}${_Colors.reset}');
     return;
   }
 
@@ -1490,9 +1421,8 @@ void _ensureStylisticRulesSection(File file) {
   final sectionStart = _findStylisticSectionStart(content);
   final sectionEnd = _findStylisticSectionEnd(content, sectionStart);
 
-  final newContent = content.substring(0, sectionStart) +
-      newSection +
-      content.substring(sectionEnd);
+  final newContent =
+      content.substring(0, sectionStart) + newSection + content.substring(sectionEnd);
 
   file.writeAsStringSync(newContent);
 }
@@ -1516,11 +1446,9 @@ int _findStylisticSectionEnd(String content, int sectionStart) {
   if (afterHeader == -1) return content.length;
 
   // Skip past the "# STYLISTIC RULES" line and its closing divider
-  final afterSectionHeader =
-      _stylisticSectionHeader.firstMatch(content.substring(afterHeader));
-  final searchFrom = afterSectionHeader != null
-      ? afterHeader + afterSectionHeader.end
-      : afterHeader;
+  final afterSectionHeader = _stylisticSectionHeader.firstMatch(content.substring(afterHeader));
+  final searchFrom =
+      afterSectionHeader != null ? afterHeader + afterSectionHeader.end : afterHeader;
 
   final nextDivider = RegExp(
     r'\n# ─+\n# ',
@@ -1603,8 +1531,7 @@ Map<String, bool> _extractPlatformsFromFile(File file) {
   final content = file.readAsStringSync();
 
   // Find the platforms: section
-  final sectionMatch =
-      RegExp(r'^platforms:\s*$', multiLine: true).firstMatch(content);
+  final sectionMatch = RegExp(r'^platforms:\s*$', multiLine: true).firstMatch(content);
   if (sectionMatch == null) return platforms;
 
   // Extract indented entries after platforms:
@@ -1650,8 +1577,7 @@ Map<String, bool> _extractPackagesFromFile(File file) {
   final content = file.readAsStringSync();
 
   // Find the packages: section
-  final sectionMatch =
-      RegExp(r'^packages:\s*$', multiLine: true).firstMatch(content);
+  final sectionMatch = RegExp(r'^packages:\s*$', multiLine: true).firstMatch(content);
   if (sectionMatch == null) return packages;
 
   // Extract indented entries after packages:
@@ -1696,37 +1622,27 @@ String _generateCustomLintYaml({
   final customizedRuleNames = userCustomizations.keys.toSet();
 
   buffer.writeln('custom_lint:');
-  buffer.writeln(
-      '  # ═══════════════════════════════════════════════════════════════════════');
+  buffer.writeln('  # ═══════════════════════════════════════════════════════════════════════');
   buffer.writeln('  # SAROPA LINTS CONFIGURATION');
-  buffer.writeln(
-      '  # ═══════════════════════════════════════════════════════════════════════');
+  buffer.writeln('  # ═══════════════════════════════════════════════════════════════════════');
+  buffer.writeln('  # Regenerate with: dart run saropa_lints:init --tier $tier');
+  buffer.writeln('  # Tier: $tier (${enabledRules.length} of ${allRules.length} rules enabled)');
   buffer
-      .writeln('  # Regenerate with: dart run saropa_lints:init --tier $tier');
-  buffer.writeln(
-      '  # Tier: $tier (${enabledRules.length} of ${allRules.length} rules enabled)');
-  buffer.writeln(
-      '  # custom_lint enables ALL rules by default. To disable a rule, set it to false.');
-  buffer
-      .writeln('  # User customizations are preserved unless --reset is used');
+      .writeln('  # custom_lint enables ALL rules by default. To disable a rule, set it to false.');
+  buffer.writeln('  # User customizations are preserved unless --reset is used');
   buffer.writeln('  #');
   buffer.writeln('  # Tiers (cumulative):');
-  buffer.writeln(
-      '  #   1. essential    - Critical: crashes, security, memory leaks');
-  buffer.writeln(
-      '  #   2. recommended  - Essential + accessibility, performance');
+  buffer.writeln('  #   1. essential    - Critical: crashes, security, memory leaks');
+  buffer.writeln('  #   2. recommended  - Essential + accessibility, performance');
   buffer.writeln('  #   3. professional - Recommended + architecture, testing');
   buffer.writeln('  #   4. comprehensive - Professional + thorough coverage');
-  buffer.writeln(
-      '  #   5. insanity     - All rules (pedantic, highly opinionated)');
+  buffer.writeln('  #   5. pedantic     - All rules (pedantic, highly opinionated)');
   buffer.writeln('  #   +  stylistic    - Opt-in only (formatting, ordering)');
   buffer.writeln('  #');
 
   // Show platform status
-  final disabledPlatforms = platformSettings.entries
-      .where((e) => !e.value)
-      .map((e) => e.key)
-      .toList();
+  final disabledPlatforms =
+      platformSettings.entries.where((e) => !e.value).map((e) => e.key).toList();
   if (disabledPlatforms.isNotEmpty) {
     buffer.writeln('  # Disabled platforms: ${disabledPlatforms.join(', ')}');
     buffer.writeln('  #');
@@ -1742,22 +1658,18 @@ String _generateCustomLintYaml({
 
   buffer.writeln(
       '  # Settings (max_issues, platforms, packages) are in analysis_options_custom.yaml');
-  buffer.writeln(
-      '  # ═══════════════════════════════════════════════════════════════════════');
+  buffer.writeln('  # ═══════════════════════════════════════════════════════════════════════');
   buffer.writeln('');
   buffer.writeln('  rules:');
 
   // Section 1: User customizations (always at top, preserved)
   if (userCustomizations.isNotEmpty) {
     buffer.writeln(_sectionHeader('USER CUSTOMIZATIONS', '~'));
-    buffer.writeln(
-        '    # These rules have been manually configured and will be preserved');
-    buffer.writeln(
-        '    # when regenerating. Use --reset to discard these customizations.');
+    buffer.writeln('    # These rules have been manually configured and will be preserved');
+    buffer.writeln('    # when regenerating. Use --reset to discard these customizations.');
     buffer.writeln('');
 
-    final List<String> sortedCustomizations = userCustomizations.keys.toList()
-      ..sort();
+    final List<String> sortedCustomizations = userCustomizations.keys.toList()..sort();
     for (final String rule in sortedCustomizations) {
       final bool enabled = userCustomizations[rule]!;
       final String msg = _getProblemMessage(rule);
@@ -1798,7 +1710,7 @@ String _generateCustomLintYaml({
     RuleTier.recommended,
     RuleTier.professional,
     RuleTier.comprehensive,
-    RuleTier.insanity,
+    RuleTier.pedantic,
   ]) {
     final rules = enabledByTier[tierLevel]!..sort();
     if (rules.isEmpty) continue;
@@ -1806,8 +1718,7 @@ String _generateCustomLintYaml({
     final tierName = _tierToString(tierLevel).toUpperCase();
     final tierNum = _tierIndex(tierLevel) + 1;
     buffer.writeln('    #');
-    buffer.writeln(
-        '    # --- TIER $tierNum: $tierName (${rules.length} rules) ---');
+    buffer.writeln('    # --- TIER $tierNum: $tierName (${rules.length} rules) ---');
     buffer.writeln('    #');
     for (final String rule in rules) {
       final String msg = _getProblemMessage(rule);
@@ -1824,8 +1735,7 @@ String _generateCustomLintYaml({
   if (stylisticEnabled.isNotEmpty || stylisticDisabled.isNotEmpty) {
     buffer.writeln(_sectionHeader('STYLISTIC RULES (opt-in)', '~'));
     buffer.writeln('    # Formatting, ordering, naming conventions.');
-    buffer.writeln(
-        '    # Enable with: dart run saropa_lints:init --tier <tier> --stylistic');
+    buffer.writeln('    # Enable with: dart run saropa_lints:init --tier <tier> --stylistic');
     buffer.writeln('');
 
     if (stylisticEnabled.isNotEmpty) {
@@ -1867,20 +1777,19 @@ String _generateCustomLintYaml({
     RuleTier.recommended,
     RuleTier.professional,
     RuleTier.comprehensive,
-    RuleTier.insanity,
+    RuleTier.pedantic,
   ].any((t) => disabledByTier[t]!.isNotEmpty);
 
   if (hasDisabledNonStylistic) {
     buffer.writeln(_sectionHeader('DISABLED RULES (above $tier tier)', '-'));
     buffer.writeln('    # These rules are in higher tiers. To enable:');
     buffer.writeln('    #   1. Choose a higher tier with --tier <tier>');
-    buffer.writeln(
-        '    #   2. Or manually set to true in USER CUSTOMIZATIONS above');
+    buffer.writeln('    #   2. Or manually set to true in USER CUSTOMIZATIONS above');
     buffer.writeln('');
 
     // Output disabled tiers (from highest to lowest)
     for (final tierLevel in [
-      RuleTier.insanity,
+      RuleTier.pedantic,
       RuleTier.comprehensive,
       RuleTier.professional,
       RuleTier.recommended,
@@ -1892,12 +1801,11 @@ String _generateCustomLintYaml({
       final tierName = _tierToString(tierLevel).toUpperCase();
       final tierNum = _tierIndex(tierLevel) + 1;
       buffer.writeln('    #');
-      buffer.writeln(
-          '    # ┌ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ┐');
-      buffer.writeln(
-          '    #   TIER $tierNum: $tierName (${rules.length} rules disabled)');
-      buffer.writeln(
-          '    # └ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ┘');
+      buffer
+          .writeln('    # ┌ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ┐');
+      buffer.writeln('    #   TIER $tierNum: $tierName (${rules.length} rules disabled)');
+      buffer
+          .writeln('    # └ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ┘');
       buffer.writeln('    #');
       for (final String rule in rules) {
         final String msg = _getProblemMessage(rule);
@@ -1950,8 +1858,7 @@ String _replaceCustomLintSection(String existingContent, String newCustomLint) {
   }
 
   // Find custom_lint: section
-  final Match? customLintMatch =
-      _customLintSectionPattern.firstMatch(existingContent);
+  final Match? customLintMatch = _customLintSectionPattern.firstMatch(existingContent);
 
   if (customLintMatch == null) {
     // No existing custom_lint section - append to end
@@ -1959,18 +1866,14 @@ String _replaceCustomLintSection(String existingContent, String newCustomLint) {
   }
 
   // Find the end of the custom_lint section (next top-level key or end of file)
-  final String beforeCustomLint =
-      existingContent.substring(0, customLintMatch.start);
-  final String afterCustomLintStart =
-      existingContent.substring(customLintMatch.end);
+  final String beforeCustomLint = existingContent.substring(0, customLintMatch.start);
+  final String afterCustomLintStart = existingContent.substring(customLintMatch.end);
 
   // Find next top-level section (line starting with a word followed by colon, no indentation)
-  final Match? nextSection =
-      _topLevelKeyPattern.firstMatch(afterCustomLintStart);
+  final Match? nextSection = _topLevelKeyPattern.firstMatch(afterCustomLintStart);
 
-  final String afterCustomLint = nextSection != null
-      ? afterCustomLintStart.substring(nextSection.start)
-      : '';
+  final String afterCustomLint =
+      nextSection != null ? afterCustomLintStart.substring(nextSection.start) : '';
 
   return '$beforeCustomLint$newCustomLint\n$afterCustomLint';
 }
@@ -2087,7 +1990,7 @@ Examples:
   dart run saropa_lints:init --tier comprehensive
   dart run saropa_lints:init --tier 4
   dart run saropa_lints:init --tier essential --reset
-  dart run saropa_lints:init --tier insanity --stylistic
+  dart run saropa_lints:init --tier pedantic --stylistic
   dart run saropa_lints:init --dry-run
 
 After generating, run `dart run custom_lint` to verify.

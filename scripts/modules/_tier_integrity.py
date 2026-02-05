@@ -85,7 +85,7 @@ TIER_SET_PATTERNS: dict[str, str] = {
     "recommended": r"const Set<String> recommendedOnlyRules = <String>\{([^}]*)\};",
     "professional": r"const Set<String> professionalOnlyRules = <String>\{([^}]*)\};",
     "comprehensive": r"const Set<String> comprehensiveOnlyRules = <String>\{([^}]*)\};",
-    "insanity": r"const Set<String> insanityOnlyRules = <String>\{([^}]*)\};",
+    "pedantic": r"const Set<String> pedanticOnlyRules = <String>\{([^}]*)\};",
     "stylistic": r"const Set<String> stylisticRules = <String>\{([^}]*)\};",
 }
 

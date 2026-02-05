@@ -16,7 +16,7 @@ See [CHANGELOG.md](CHANGELOG.md) for implemented rules. Goal: 2000 rules.
 | 🐙 | [GitHub issue](https://github.com/saropa/saropa_lints/issues) |
 | 💡 | [Discussion](https://github.com/saropa/saropa_lints/discussions) |
 
-**Tiers**: Essential (1) → Recommended (2) → Professional (3) → Comprehensive (4) → Insanity (5)
+**Tiers**: Essential (1) → Recommended (2) → Professional (3) → Comprehensive (4) → Pedantic (5)
 
 ---
 
@@ -549,7 +549,7 @@ These rules are **not included in any tier** by default. They represent team pre
 | ℹ️ `prefer_import_groups` | Professional | INFO | Group imports: dart, package, relative (with blank lines) |
 | ℹ️ `prefer_deferred_imports` | Comprehensive | INFO | Use deferred imports for large libraries |
 | ℹ️ `prefer_show_hide` | Comprehensive | INFO | Explicit `show`/`hide` on imports |
-| ℹ️ `prefer_part_over_import` | Insanity | INFO | Use `part`/`part of` for tightly coupled files |
+| ℹ️ `prefer_part_over_import` | Pedantic | INFO | Use `part`/`part of` for tightly coupled files |
 | ℹ️ `prefer_import_over_part` | Professional | INFO | Use imports instead of `part`/`part of` |
 
 #### Naming Conventions
