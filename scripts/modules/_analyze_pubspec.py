@@ -243,7 +243,7 @@ class SuggestedRule:
 class RelevantRule:
     """An EXISTING saropa_lints rule relevant to a package."""
     name: str
-    tier: str  # essential, recommended, professional, comprehensive, insanity
+    tier: str  # essential, recommended, professional, comprehensive, pedantic
     description: str
 
 
@@ -251,14 +251,14 @@ class RelevantRule:
 # TIERS - Order matters (lowest to highest)
 # =============================================================================
 
-TIER_ORDER = ["essential", "recommended", "professional", "comprehensive", "insanity"]
+TIER_ORDER = ["essential", "recommended", "professional", "comprehensive", "pedantic"]
 
 TIER_DESCRIPTIONS = {
     "essential": "Critical safety (crashes, security, memory leaks)",
     "recommended": "Essential + performance, accessibility, common mistakes",
     "professional": "Recommended + architecture, testing, i18n",
     "comprehensive": "Professional + thorough code quality",
-    "insanity": "Everything (noisy, for greenfield projects)",
+    "pedantic": "Everything (noisy, for greenfield projects)",
 }
 
 
@@ -276,11 +276,11 @@ def count_tier_rules() -> tuple[dict[str, int], int]:
         "recommended": 150,
         "professional": 350,
         "comprehensive": 700,
-        "insanity": 1025,
+        "pedantic": 1025,
     }
 
     if not tiers_dir.exists():
-        return fallback_counts, fallback_counts["insanity"]
+        return fallback_counts, fallback_counts["pedantic"]
 
     tier_counts: dict[str, int] = {}
     cumulative = 0
@@ -308,7 +308,7 @@ def count_tier_rules() -> tuple[dict[str, int], int]:
         except Exception:
             tier_counts[tier] = fallback_counts.get(tier, 0)
 
-    total = tier_counts.get("insanity", fallback_counts["insanity"])
+    total = tier_counts.get("pedantic", fallback_counts["pedantic"])
     return tier_counts, total
 
 
