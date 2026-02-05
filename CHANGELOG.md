@@ -11,6 +11,12 @@ Dates are not included in version headers — [pub.dev](https://pub.dev/packages
 ** See the current published changelog: [saropa_lints/changelog](https://pub.dev/packages/saropa_lints/changelog)
 
 ---
+## [4.11.0]
+
+### Changed
+- Centralized the duplicated violation-parsing logic from the `baseline` and `impact_report` tools. This resolves a structural issue highlighted by the regex fix in PR #84 and makes future updates more robust. (Thanks [@icealive](https://github.com/icealive!))
+
+---
 ## [4.10.2]
 
 ### Readme
