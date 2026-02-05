@@ -1,4 +1,3 @@
-
 import 'package:saropa_lints/src/saropa_lint_rule.dart';
 
 class Violation {
