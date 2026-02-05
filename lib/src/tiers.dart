@@ -102,7 +102,7 @@ const Set<String> stylisticRules = <String>{
   'prefer_trailing_comma', // Moved from professional (opinionated)
   'unnecessary_trailing_comma', // Moved from professional (opinionated)
   'double_literal_format', // Moved from professional (opinionated)
-  'format_comment_style', // Moved from insanity (opinionated)
+  'format_comment_style', // Moved from pedantic (opinionated)
 
   // === Comments & Documentation ===
   'prefer_todo_format',
@@ -110,7 +110,7 @@ const Set<String> stylisticRules = <String>{
   'prefer_sentence_case_comments',
   'prefer_period_after_doc',
   'prefer_doc_comments_over_regular',
-  'prefer_no_commented_out_code', // Moved from insanity (v4.2.0)
+  'prefer_no_commented_out_code', // Moved from pedantic (v4.2.0)
 
   // === Testing style ===
   'prefer_expect_over_assert_in_tests',
@@ -1043,7 +1043,7 @@ const Set<String> recommendedOnlyRules = <String>{
   'require_test_description_convention', // INFO - descriptive test names
   // Test Quality (New assignments)
   'avoid_real_network_calls_in_tests', // Ensures tests do not hit real network
-  // Note: avoid_duplicate_test_assertions moved to Insanity (pedantic)
+  // Note: avoid_duplicate_test_assertions moved to Pedantic (pedantic)
   'require_error_case_tests', // Ensures error cases are tested
   'require_test_isolation', // Ensures tests do not share mutable state
 
@@ -1503,7 +1503,7 @@ const Set<String> professionalOnlyRules = <String>{
   'avoid_synchronous_file_io',
   'prefer_compute_for_heavy_work',
   'prefer_cached_getter',
-  // Note: avoid_object_creation_in_hot_loops moved to Insanity (micro-optimization)
+  // Note: avoid_object_creation_in_hot_loops moved to Pedantic (micro-optimization)
   'require_item_extent_for_large_lists',
   // Note: require_image_cache_dimensions is in Essential (OOM prevention)
   'avoid_layout_builder_misuse',
@@ -1537,7 +1537,7 @@ const Set<String> professionalOnlyRules = <String>{
   // Bloc (Professional - cleaner patterns)
   // Note: prefer_immutable_bloc_events, prefer_immutable_bloc_state,
   // prefer_sealed_bloc_events, prefer_sealed_bloc_state moved to Comprehensive
-  // require_bloc_repository_abstraction moved to Insanity
+  // require_bloc_repository_abstraction moved to Pedantic
 
   // State Management (Batch 10)
   'avoid_expensive_computation_in_build',
@@ -1664,7 +1664,7 @@ const Set<String> professionalOnlyRules = <String>{
   'avoid_hardcoded_app_name',
   'prefer_date_format',
   'prefer_intl_name',
-  // Note: prefer_providing_intl_description, prefer_providing_intl_examples moved to Insanity
+  // Note: prefer_providing_intl_description, prefer_providing_intl_examples moved to Pedantic
 
   // API & Network
   'require_retry_logic',
@@ -1695,7 +1695,7 @@ const Set<String> professionalOnlyRules = <String>{
 
   // Type Safety
   // Note: prefer_constrained_generics, prefer_explicit_type_arguments moved to Comprehensive
-  // Note: prefer_specific_numeric_types moved to Insanity
+  // Note: prefer_specific_numeric_types moved to Pedantic
   // Note: require_covariant_documentation, require_futureor_documentation moved to Comprehensive
 
   // Naming & Style
@@ -1720,7 +1720,7 @@ const Set<String> professionalOnlyRules = <String>{
 
   // Gap Analysis Rules (Batch 15)
   'avoid_duplicate_string_literals',
-  // Note: avoid_returning_widgets, avoid_nullable_widget_methods moved to Insanity
+  // Note: avoid_returning_widgets, avoid_nullable_widget_methods moved to Pedantic
   'avoid_setstate_in_large_state_class',
 
   // State Management (Batch 17)
@@ -2534,9 +2534,9 @@ const Set<String> comprehensiveOnlyRules = <String>{
   'require_webview_progress_indicator',
 };
 
-/// Insanity tier rules - pedantic, highly opinionated rules.
+/// Pedantic tier rules - pedantic, highly opinionated rules.
 /// Rules most teams would find excessive. For greenfield projects.
-const Set<String> insanityOnlyRules = <String>{
+const Set<String> pedanticOnlyRules = <String>{
   // File length (very strict thresholds - 200 lines for production, 400 for tests)
   'prefer_small_length_files', // 200 line limit
   'prefer_small_length_test_files', // 400 line limit for tests
@@ -2574,22 +2574,20 @@ Set<String> getRulesForTier(String tier) {
       return essentialRules.union(recommendedOnlyRules);
     case 'professional':
       // professional = recommended + professionalOnly
-      return essentialRules
-          .union(recommendedOnlyRules)
-          .union(professionalOnlyRules);
+      return essentialRules.union(recommendedOnlyRules).union(professionalOnlyRules);
     case 'comprehensive':
       // comprehensive = professional + comprehensiveOnly
       return essentialRules
           .union(recommendedOnlyRules)
           .union(professionalOnlyRules)
           .union(comprehensiveOnlyRules);
-    case 'insanity':
-      // insanity = all rules
+    case 'pedantic':
+      // pedantic = all rules
       return essentialRules
           .union(recommendedOnlyRules)
           .union(professionalOnlyRules)
           .union(comprehensiveOnlyRules)
-          .union(insanityOnlyRules);
+          .union(pedanticOnlyRules);
     default:
       // fallback to essential
       return essentialRules;
@@ -2605,7 +2603,7 @@ Set<String> getAllDefinedRules() {
       .union(recommendedOnlyRules)
       .union(professionalOnlyRules)
       .union(comprehensiveOnlyRules)
-      .union(insanityOnlyRules)
+      .union(pedanticOnlyRules)
       .union(stylisticRules);
 }
 
@@ -2834,9 +2832,7 @@ const Set<String> _desktopPlatformRules = <String>{
 Map<String, Set<String>> get platformRuleSets => {
       'ios': iosPlatformRules.union(_applePlatformRules),
       'android': androidPlatformRules,
-      'macos': macosPlatformRules
-          .union(_applePlatformRules)
-          .union(_desktopPlatformRules),
+      'macos': macosPlatformRules.union(_applePlatformRules).union(_desktopPlatformRules),
       'web': webPlatformRules,
       'windows': windowsPlatformRules.union(_desktopPlatformRules),
       'linux': linuxPlatformRules.union(_desktopPlatformRules),
@@ -2876,13 +2872,11 @@ const Map<String, bool> defaultPlatforms = <String, bool>{
 ///
 /// Rules not in any platform set are never affected.
 Set<String> getRulesDisabledByPlatforms(Map<String, bool> platforms) {
-  final disabledPlatforms =
-      platforms.entries.where((e) => !e.value).map((e) => e.key).toSet();
+  final disabledPlatforms = platforms.entries.where((e) => !e.value).map((e) => e.key).toSet();
 
   if (disabledPlatforms.isEmpty) return const <String>{};
 
-  final enabledPlatforms =
-      platforms.entries.where((e) => e.value).map((e) => e.key).toSet();
+  final enabledPlatforms = platforms.entries.where((e) => e.value).map((e) => e.key).toSet();
 
   final Set<String> rulesToDisable = <String>{};
   final sets = platformRuleSets;
@@ -3430,13 +3424,11 @@ const Map<String, bool> defaultPackages = <String, bool>{
 ///
 /// Rules not in any package set are never affected.
 Set<String> getRulesDisabledByPackages(Map<String, bool> packages) {
-  final disabledPackages =
-      packages.entries.where((e) => !e.value).map((e) => e.key).toSet();
+  final disabledPackages = packages.entries.where((e) => !e.value).map((e) => e.key).toSet();
 
   if (disabledPackages.isEmpty) return const <String>{};
 
-  final enabledPackages =
-      packages.entries.where((e) => e.value).map((e) => e.key).toSet();
+  final enabledPackages = packages.entries.where((e) => e.value).map((e) => e.key).toSet();
 
   final Set<String> rulesToDisable = <String>{};
   final sets = packageRuleSets;

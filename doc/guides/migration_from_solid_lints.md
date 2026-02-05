@@ -74,7 +74,7 @@ solid_lints has one configuration. saropa_lints offers progressive tiers:
 | Full config       | **Recommended** (~573 rules)    | Balanced coverage                     |
 | + strict mode     | **Professional** (~979 rules)   | Enterprise-grade                      |
 | Maximum           | **Comprehensive** (~1202 rules) | Quality obsessed                      |
-| Everything        | **Insanity** (1450+ rules)      | Every single rule                     |
+| Everything        | **Pedantic** (1450+ rules)      | Every single rule                     |
 
 **Start with `recommended`** - it provides similar coverage to solid_lints plus Flutter-specific rules.
 

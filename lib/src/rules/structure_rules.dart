@@ -3,8 +3,7 @@
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/token.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
-import 'package:analyzer/error/error.dart'
-    show AnalysisError, DiagnosticSeverity;
+import 'package:analyzer/error/error.dart' show AnalysisError, DiagnosticSeverity;
 import 'package:custom_lint_builder/custom_lint_builder.dart';
 
 import '../saropa_lint_rule.dart';
@@ -41,12 +40,10 @@ class AvoidBarrelFilesRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_barrel_files',
-    problemMessage:
-        '[avoid_barrel_files] File contains only export statements (barrel file). '
+    problemMessage: '[avoid_barrel_files] File contains only export statements (barrel file). '
         'Barrel files increase build times by pulling in unused code and obscure dependency tracking, '
         'making it harder to identify which modules depend on which implementations.',
-    correctionMessage:
-        'Import specific files where needed instead of using barrel files. '
+    correctionMessage: 'Import specific files where needed instead of using barrel files. '
         'Direct imports make dependency graphs explicit and enable tree-shaking.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -111,12 +108,10 @@ class AvoidDoubleSlashImportsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_double_slash_imports',
-    problemMessage:
-        '[avoid_double_slash_imports] Import path contains double slashes. '
+    problemMessage: '[avoid_double_slash_imports] Import path contains double slashes. '
         'Double slashes in import paths cause resolution failures on some platforms and may silently '
         'import the wrong file, leading to runtime errors or missing symbols.',
-    correctionMessage:
-        'Remove the extra slash from the import path to ensure consistent '
+    correctionMessage: 'Remove the extra slash from the import path to ensure consistent '
         'resolution across all platforms and build systems.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
@@ -178,12 +173,10 @@ class AvoidDuplicateExportsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_duplicate_exports',
-    problemMessage:
-        '[avoid_duplicate_exports] File is exported multiple times. '
+    problemMessage: '[avoid_duplicate_exports] File is exported multiple times. '
         'Duplicate exports increase compilation time, confuse IDE auto-imports, and '
         'may cause unexpected symbol visibility when show/hide combinators differ between duplicates.',
-    correctionMessage:
-        'Remove the duplicate export directive. Keep a single export with '
+    correctionMessage: 'Remove the duplicate export directive. Keep a single export with '
         'the correct show/hide combinators for the intended API surface.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
@@ -243,8 +236,7 @@ class AvoidDuplicateMixinsRule extends SaropaLintRule {
         '[avoid_duplicate_mixins] Mixin is applied multiple times in the same class declaration. '
         'Duplicate mixin applications have no additional effect and indicate a copy-paste error '
         'or misunderstanding of the class hierarchy.',
-    correctionMessage:
-        'Remove the duplicate mixin application. Each mixin only needs '
+    correctionMessage: 'Remove the duplicate mixin application. Each mixin only needs '
         'to appear once in the with clause to apply its members.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
@@ -305,8 +297,7 @@ class AvoidDuplicateNamedImportsRule extends SaropaLintRule {
         '[avoid_duplicate_named_imports] Import is declared multiple times with different prefixes. '
         'Multiple imports of the same URI with different prefixes create ambiguity about which prefix to use, '
         'increase cognitive load, and may cause IDE auto-import confusion.',
-    correctionMessage:
-        'Use a single import with one prefix. Consolidate all usages to '
+    correctionMessage: 'Use a single import with one prefix. Consolidate all usages to '
         'reference the same prefix for consistent and readable code.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
@@ -369,8 +360,7 @@ class AvoidGlobalStateRule extends SaropaLintRule {
     problemMessage: '[avoid_global_state] Mutable global state detected. '
         'Top-level mutable variables create hidden dependencies between functions, make unit testing unreliable '
         'because tests share state, and cause race conditions in concurrent or isolate-based code.',
-    correctionMessage:
-        'Use const or final for immutable values, or encapsulate mutable state '
+    correctionMessage: 'Use const or final for immutable values, or encapsulate mutable state '
         'in a class with controlled access to enable proper testing and prevent unintended side effects.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
@@ -421,7 +411,7 @@ class AvoidGlobalStateRule extends SaropaLintRule {
 // Production rules (non-test files):
 // | Threshold  | Rule                    | Tier          |
 // |------------|-------------------------|---------------|
-// | 200 lines  | prefer_small_length_files      | insanity      |
+// | 200 lines  | prefer_small_length_files      | pedantic      |
 // | 300 lines  | avoid_medium_length_files      | professional  |
 // | 500 lines  | avoid_long_length_files        | comprehensive |
 // | 1000 lines | avoid_very_long_length_files   | recommended   |
@@ -429,7 +419,7 @@ class AvoidGlobalStateRule extends SaropaLintRule {
 // Test file rules (files in test/, test_driver/, integration_test/):
 // | Threshold  | Rule                         | Tier          |
 // |------------|------------------------------|---------------|
-// | 400 lines  | prefer_small_length_test_files      | insanity      |
+// | 400 lines  | prefer_small_length_test_files      | pedantic      |
 // | 600 lines  | avoid_medium_length_test_files      | professional  |
 // | 1000 lines | avoid_long_length_test_files        | comprehensive |
 // | 2000 lines | avoid_very_long_length_test_files   | recommended   |
@@ -500,11 +490,9 @@ class PreferSmallFilesRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_small_length_files',
-    problemMessage:
-        '[prefer_small_length_files] File has more than $_maxLines lines. '
+    problemMessage: '[prefer_small_length_files] File has more than $_maxLines lines. '
         'Smaller files are easier to understand and maintain.',
-    correctionMessage:
-        'Split this file into focused modules with single responsibilities. '
+    correctionMessage: 'Split this file into focused modules with single responsibilities. '
         'For data/enum files, disable with: // ignore_for_file: prefer_small_length_files',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -547,12 +535,10 @@ class AvoidMediumFilesRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_medium_length_files',
-    problemMessage:
-        '[avoid_medium_length_files] File exceeds $_maxLines lines. '
+    problemMessage: '[avoid_medium_length_files] File exceeds $_maxLines lines. '
         'Files beyond this threshold often contain multiple responsibilities, '
         'which makes navigation harder and increases merge conflict risk in team development.',
-    correctionMessage:
-        'Split into smaller modules with single responsibilities, or disable '
+    correctionMessage: 'Split into smaller modules with single responsibilities, or disable '
         'this rule for data/enum files where large size is intentional.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -598,8 +584,7 @@ class AvoidLongFilesRule extends SaropaLintRule {
     problemMessage: '[avoid_long_length_files] File exceeds $_maxLines lines. '
         'Files this long are difficult to navigate, increase code review time, '
         'and frequently indicate that the file handles multiple unrelated concerns.',
-    correctionMessage:
-        'Split into smaller modules with single responsibilities, or disable '
+    correctionMessage: 'Split into smaller modules with single responsibilities, or disable '
         'this rule for data/enum files where large size is intentional.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -644,12 +629,10 @@ class AvoidVeryLongFilesRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_very_long_length_files',
-    problemMessage:
-        '[avoid_very_long_length_files] File exceeds $_maxLines lines. '
+    problemMessage: '[avoid_very_long_length_files] File exceeds $_maxLines lines. '
         'Files this large significantly slow down IDE indexing, increase build times, '
         'and make it nearly impossible to understand the full scope of changes during code review.',
-    correctionMessage:
-        'Split into smaller modules with single responsibilities, or disable '
+    correctionMessage: 'Split into smaller modules with single responsibilities, or disable '
         'this rule for data/enum files where large size is intentional.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -928,12 +911,10 @@ class AvoidLongFunctionsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_long_functions',
-    problemMessage:
-        '[avoid_long_functions] Function body exceeds $_maxLines lines. '
+    problemMessage: '[avoid_long_functions] Function body exceeds $_maxLines lines. '
         'Long functions are harder to understand, test in isolation, and debug '
         'because they typically handle multiple concerns and have complex control flow paths.',
-    correctionMessage:
-        'Extract logical sections into smaller, well-named private functions. '
+    correctionMessage: 'Extract logical sections into smaller, well-named private functions. '
         'Each function should do one thing and be testable independently.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -994,12 +975,10 @@ class AvoidLongParameterListRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_long_parameter_list',
-    problemMessage:
-        '[avoid_long_parameter_list] Function has too many parameters (max 5). '
+    problemMessage: '[avoid_long_parameter_list] Function has too many parameters (max 5). '
         'Functions with many parameters are difficult to call correctly, hard to test with all combinations, '
         'and indicate the function may be doing too much work.',
-    correctionMessage:
-        'Group related parameters into a configuration object or convert '
+    correctionMessage: 'Group related parameters into a configuration object or convert '
         'positional parameters to named parameters for self-documenting call sites.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -1059,12 +1038,10 @@ class AvoidLocalFunctionsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_local_functions',
-    problemMessage:
-        '[avoid_local_functions] Local function declared inside another function. '
+    problemMessage: '[avoid_local_functions] Local function declared inside another function. '
         'Local functions increase nesting depth, cannot be tested independently, '
         'and make the enclosing function harder to read and reason about.',
-    correctionMessage:
-        'Extract to a private top-level function or a class method so it can be '
+    correctionMessage: 'Extract to a private top-level function or a class method so it can be '
         'tested in isolation and reused across the codebase.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -1075,8 +1052,7 @@ class AvoidLocalFunctionsRule extends SaropaLintRule {
     SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
-    context.registry
-        .addFunctionDeclarationStatement((FunctionDeclarationStatement node) {
+    context.registry.addFunctionDeclarationStatement((FunctionDeclarationStatement node) {
       reporter.atNode(node.functionDeclaration, code);
     });
   }
@@ -1102,12 +1078,10 @@ class MaxImportsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'limit_max_imports',
-    problemMessage:
-        '[limit_max_imports] File has more than $_maxImports imports. '
+    problemMessage: '[limit_max_imports] File has more than $_maxImports imports. '
         'A high import count signals the file depends on too many modules, '
         'which increases coupling, makes refactoring risky, and slows incremental compilation.',
-    correctionMessage:
-        'Split the file into focused modules with fewer dependencies, or '
+    correctionMessage: 'Split the file into focused modules with fewer dependencies, or '
         'consolidate related imports behind a facade to reduce direct coupling.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -1149,12 +1123,10 @@ class MemberOrderingRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_sorted_members',
-    problemMessage:
-        '[prefer_sorted_members] Class members are not in conventional order. '
+    problemMessage: '[prefer_sorted_members] Class members are not in conventional order. '
         'Inconsistent member ordering forces developers to scan the entire class to find '
         'constructors, fields, or methods, which slows navigation and code review.',
-    correctionMessage:
-        'Reorder members: static fields, instance fields, constructors, '
+    correctionMessage: 'Reorder members: static fields, instance fields, constructors, '
         'static methods, instance methods. Consistent ordering enables quick navigation.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -1224,12 +1196,10 @@ class PreferSortedParametersRule extends SaropaLintRule {
   /// Alias: prefer_sorted_parameter
   static const LintCode _code = LintCode(
     name: 'prefer_sorted_parameters',
-    problemMessage:
-        '[prefer_sorted_parameters] Named parameters are not in alphabetical order. '
+    problemMessage: '[prefer_sorted_parameters] Named parameters are not in alphabetical order. '
         'Unsorted parameters force developers to scan all parameters to find the one they need, '
         'and inconsistent ordering across functions creates unnecessary cognitive load during code review.',
-    correctionMessage:
-        'Reorder named parameters alphabetically so developers can quickly '
+    correctionMessage: 'Reorder named parameters alphabetically so developers can quickly '
         'locate parameters by name without scanning the entire parameter list.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -1301,12 +1271,10 @@ class PreferNamedBooleanParametersRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_named_boolean_parameters',
-    problemMessage:
-        '[prefer_named_boolean_parameters] Positional boolean parameter detected. '
+    problemMessage: '[prefer_named_boolean_parameters] Positional boolean parameter detected. '
         'Call sites like doThing(true) give no indication what the boolean controls, '
         'forcing readers to look up the function signature to understand the intent.',
-    correctionMessage:
-        'Convert to a named parameter so call sites read as doThing(enabled: true), '
+    correctionMessage: 'Convert to a named parameter so call sites read as doThing(enabled: true), '
         'making the code self-documenting without requiring signature lookup.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -1323,13 +1291,11 @@ class PreferNamedBooleanParametersRule extends SaropaLintRule {
         if (param.isNamed) continue;
 
         // Check if the parameter type is bool
-        final SimpleFormalParameter? simpleParam =
-            param is SimpleFormalParameter
-                ? param
-                : (param is DefaultFormalParameter &&
-                        param.parameter is SimpleFormalParameter
-                    ? param.parameter as SimpleFormalParameter
-                    : null);
+        final SimpleFormalParameter? simpleParam = param is SimpleFormalParameter
+            ? param
+            : (param is DefaultFormalParameter && param.parameter is SimpleFormalParameter
+                ? param.parameter as SimpleFormalParameter
+                : null);
 
         if (simpleParam == null) continue;
 
@@ -1348,8 +1314,7 @@ class PreferNamedImportsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_named_imports',
-    problemMessage:
-        '[prefer_named_imports] Package import without show/hide combinators detected. '
+    problemMessage: '[prefer_named_imports] Package import without show/hide combinators detected. '
         'Unfiltered imports pull the entire package namespace into scope, increasing the risk of name '
         'collisions and making it unclear which symbols the file actually depends on.',
     correctionMessage:
@@ -1415,12 +1380,10 @@ class PreferNamedParametersRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_named_parameters',
-    problemMessage:
-        '[prefer_named_parameters] Function has too many positional parameters. '
+    problemMessage: '[prefer_named_parameters] Function has too many positional parameters. '
         'Call sites with multiple positional arguments like create("a", 1, true, null) are error-prone '
         'because argument order is easy to confuse and provides no self-documentation.',
-    correctionMessage:
-        'Convert positional parameters to named parameters so call sites read '
+    correctionMessage: 'Convert positional parameters to named parameters so call sites read '
         'as create(name: "a", count: 1) and argument purpose is clear without checking the signature.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -1462,8 +1425,7 @@ class PreferStaticClassRule extends SaropaLintRule {
         '[prefer_static_class] Class contains only static members and acts as a namespace. '
         'Static-only classes cannot be instantiated meaningfully, add unnecessary boilerplate, '
         'and prevent tree-shaking of unused members in the class.',
-    correctionMessage:
-        'Replace with top-level functions and constants, which are simpler, '
+    correctionMessage: 'Replace with top-level functions and constants, which are simpler, '
         'support tree-shaking, and follow idiomatic Dart conventions.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -1618,8 +1580,7 @@ class AvoidUnnecessaryReassignmentRule extends SaropaLintRule {
         '[avoid_unnecessary_reassignment] Variable is assigned the same value it already holds (x = x). '
         'Self-assignment has no effect and typically indicates a copy-paste error '
         'or a missing right-hand-side expression that was intended.',
-    correctionMessage:
-        'Remove the self-assignment statement, or fix the right-hand side '
+    correctionMessage: 'Remove the self-assignment statement, or fix the right-hand side '
         'if a different value was intended.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
@@ -1675,8 +1636,7 @@ class PreferStaticMethodRule extends SaropaLintRule {
         '[prefer_static_method] Method does not reference any instance members and could be static. '
         'Non-static methods that ignore instance state mislead readers into thinking the method '
         'depends on object state, and they prevent calling the method without an instance.',
-    correctionMessage:
-        'Mark the method as static to communicate that it operates independently '
+    correctionMessage: 'Mark the method as static to communicate that it operates independently '
         'of instance state and can be called without constructing the class.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -1877,8 +1837,7 @@ class AvoidHardcodedColorsRule extends SaropaLintRule {
     SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
-    context.registry
-        .addInstanceCreationExpression((InstanceCreationExpression node) {
+    context.registry.addInstanceCreationExpression((InstanceCreationExpression node) {
       final String typeName = node.constructorName.type.name.lexeme;
 
       // Check for Color constructor
@@ -1967,8 +1926,7 @@ class AvoidUnusedGenericsRule extends SaropaLintRule {
     });
 
     context.registry.addFunctionDeclaration((FunctionDeclaration node) {
-      final TypeParameterList? typeParams =
-          node.functionExpression.typeParameters;
+      final TypeParameterList? typeParams = node.functionExpression.typeParameters;
       if (typeParams == null) return;
 
       for (final TypeParameter param in typeParams.typeParameters) {
@@ -1995,8 +1953,7 @@ class AvoidUnusedGenericsRule extends SaropaLintRule {
       if (found) return true;
     }
     // Check parameters and body
-    node.parameters
-        ?.visitChildren(_TypeNameFinder(typeName, () => found = true));
+    node.parameters?.visitChildren(_TypeNameFinder(typeName, () => found = true));
     if (found) return true;
     node.body.visitChildren(_TypeNameFinder(typeName, () => found = true));
     return found;
@@ -2012,8 +1969,7 @@ class AvoidUnusedGenericsRule extends SaropaLintRule {
     node.functionExpression.parameters
         ?.visitChildren(_TypeNameFinder(typeName, () => found = true));
     if (found) return true;
-    node.functionExpression.body
-        .visitChildren(_TypeNameFinder(typeName, () => found = true));
+    node.functionExpression.body.visitChildren(_TypeNameFinder(typeName, () => found = true));
     return found;
   }
 }
@@ -2335,8 +2291,7 @@ class AvoidUnnecessaryNullableReturnTypeRule extends SaropaLintRule {
 }
 
 class _NullReturnFinder extends RecursiveAstVisitor<void> {
-  _NullReturnFinder(
-      {required this.onNullReturn, required this.onImplicitReturn});
+  _NullReturnFinder({required this.onNullReturn, required this.onImplicitReturn});
   final void Function() onNullReturn;
   final void Function() onImplicitReturn;
 
@@ -2473,8 +2428,7 @@ class _AddHackForGlobalStateFix extends DartFix {
     AnalysisError analysisError,
     List<AnalysisError> others,
   ) {
-    context.registry
-        .addTopLevelVariableDeclaration((TopLevelVariableDeclaration node) {
+    context.registry.addTopLevelVariableDeclaration((TopLevelVariableDeclaration node) {
       if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
 
       final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
