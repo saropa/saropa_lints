@@ -1,36 +1,29 @@
-![saropa_lints banner](https://raw.githubusercontent.com/saropa/saropa_lints/main/assets/banner_v2.png)
 
-# Saropa Lints
+![Saropa Lints - Advanced Static Analysis](https://raw.githubusercontent.com/saropa/saropa_lints/main/assets/banner_v2.png)
 
-Catch memory leaks, security vulnerabilities, and runtime crashes that standard linters miss. Developed by [Saropa][saropa_link] to make the world of Dart & Flutter better, one fix at a time.
+<!-- # Saropa Lints -->
 
-[saropa_link]: https://saropa.com
+**Catch memory leaks, security vulnerabilities, and runtime crashes that standard linters miss.**
+<br>
+Developed by [Saropa](https://saropa.com) to make the world of Dart & Flutter better.
 
-<!-- CI/CD & Build Status -->
-[![ci](https://github.com/saropa/saropa_lints/actions/workflows/ci.yml/badge.svg)](https://github.com/saropa/saropa_lints/actions/workflows/ci.yml)
+<!-- ref: https://shields.io/badges and https://simpleicons.org/?q=flutter -->
+<br>
+<div align="center">
 
-<!-- Pub.dev Metrics (Auto-updating) -->
-[![pub package](https://img.shields.io/pub/v/saropa_lints.svg?logo=dart&label=pub)](https://pub.dev/packages/saropa_lints)
-[![pub points](https://img.shields.io/pub/points/saropa_lints?logo=dart)](https://pub.dev/packages/saropa_lints/score)
-<!-- NO LONGER AVAILABLE [![popularity](https://img.shields.io/pub/popularity/saropa_lints?logo=dart)](https://pub.dev/packages/saropa_lints/score) -->
-[![likes](https://img.shields.io/pub/likes/saropa_lints?logo=dart&color=red)](https://pub.dev/packages/saropa_lints/score)
+<!-- Note that the badges are all grouped together so they flow horizontally. -->
 
-<!-- GitHub Activity -->
-[![GitHub stars](https://img.shields.io/github/stars/saropa/saropa_lints?style=social)](https://github.com/saropa/saropa_lints)
-[![GitHub forks](https://img.shields.io/github/forks/saropa/saropa_lints?style=social)](https://github.com/saropa/saropa_lints)
-[![GitHub last commit](https://img.shields.io/github/last-commit/saropa/saropa_lints)](https://github.com/saropa/saropa_lints/commits)
-[![GitHub issues](https://img.shields.io/github/issues/saropa/saropa_lints)](https://github.com/saropa/saropa_lints/issues)
+[![pub package](https://img.shields.io/pub/v/saropa_lints.svg?style=flat-square&logo=dart&color=blue)](https://pub.dev/packages/saropa_lints) [![pub points](https://img.shields.io/pub/points/saropa_lints?style=flat-square&logo=dart)](https://pub.dev/packages/saropa_lints/score) [![likes](https://img.shields.io/pub/likes/saropa_lints?style=flat-square&logo=dart&color=red)](https://pub.dev/packages/saropa_lints/score) [![ci](https://img.shields.io/github/actions/workflow/status/saropa/saropa_lints/ci.yml?branch=main&style=flat-square&logo=github&label=build)](https://github.com/saropa/saropa_lints/actions) [![GitHub stars](https://img.shields.io/github/stars/saropa/saropa_lints?style=flat-square&logo=github)](https://github.com/saropa/saropa_lints) [![GitHub forks](https://img.shields.io/github/forks/saropa/saropa_lints?style=flat-square&logo=github)](https://github.com/saropa/saropa_lints) [![GitHub issues](https://img.shields.io/github/issues/saropa/saropa_lints?style=flat-square&logo=github)](https://github.com/saropa/saropa_lints/issues) [![GitHub last commit](https://img.shields.io/github/last-commit/saropa/saropa_lints?style=flat-square&logo=github)](https://github.com/saropa/saropa_lints/commits) 
 
-<!-- Technical Info -->
-[![Dart SDK Version](https://badgen.net/pub/sdk-version/saropa_lints)](https://pub.dev/packages/saropa_lints)
-[![Flutter Platform](https://img.shields.io/badge/platform-flutter-ff69b4.svg?logo=flutter)](https://flutter.dev/)
+[![Saropa Lints Badge](https://img.shields.io/badge/saropa_lints-1700%2B-blue?style=flat&logo=flutter&logoColor=white&color=435489)](https://pub.dev/packages/saropa_lints) [![Flutter Platform](https://img.shields.io/badge/platform-flutter-02569B.svg?style=flat-square&logo=flutter)](https://flutter.dev/) [![License: MIT](https://img.shields.io/badge/license-MIT-purple.svg?style=flat-square)](https://opensource.org/licenses/MIT)
 
-<!-- Custom Badges -->
-[![rules](https://img.shields.io/badge/rules-1700%2B-4B0082)](https://github.com/saropa/saropa_lints/blob/main/doc/rules/README.md)
-[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
-[![style: saropa lints](https://img.shields.io/badge/style-saropa__lints-4B0082.svg)](https://pub.dev/packages/saropa_lints)
 
-> 💬 **Have feedback on Saropa Lints?** Share it by [opening an issue](https://github.com/saropa/saropa_lints/issues/new) on GitHub!
+[![Share on X](https://img.shields.io/badge/share%20on-X-000000?style=flat-square&logo=x&logoColor=white)](https://twitter.com/intent/tweet?text=Check%20out%20Saropa%20Lints%3A%20Catch%20memory%20leaks%2C%20security%20vulnerabilities%2C%20and%20runtime%20crashes%20in%20Flutter%21&url=https%3A%2F%2Fpub.dev%2Fpackages%2Fsaropa_lints) [![Share on Facebook](https://img.shields.io/badge/share%20on-facebook-1877F2?style=flat-square&logo=facebook&logoColor=white)](https://www.facebook.com/sharer/sharer.php?u=https%3A%2F%2Fpub.dev%2Fpackages%2Fsaropa_lints) [![Share on Bluesky](https://img.shields.io/badge/share%20on-bluesky-0285FF?style=flat-square&logo=bluesky&logoColor=white)](https://bsky.app/intent/compose?text=Check%20out%20Saropa%20Lints%3A%20Catch%20memory%20leaks%2C%20security%20vulnerabilities%2C%20and%20runtime%20crashes%20in%20Flutter%21%20https%3A%2F%2Fpub.dev%2Fpackages%2Fsaropa_lints) [![Share on LinkedIn](https://img.shields.io/badge/share%20on-linkedin-0077B5?style=flat-square&logo=linkedin&logoColor=white)](https://www.linkedin.com/sharing/share-offsite/?url=https%3A%2F%2Fpub.dev%2Fpackages%2Fsaropa_lints) [![Share on Reddit](https://img.shields.io/badge/share%20on-reddit-FF4500?style=flat-square&logo=reddit&logoColor=white)](https://www.reddit.com/submit?url=https%3A%2F%2Fpub.dev%2Fpackages%2Fsaropa_lints&title=Saropa%20Lints%20-%20Advanced%20Static%20Analysis)
+
+</div>
+<br>
+
+> 💬 **Have feedback on Saropa Lints?** Please share it by [opening an issue](https://github.com/saropa/saropa_lints/issues/new) on GitHub!
 
 ---
 
@@ -43,6 +36,8 @@ Catch memory leaks, security vulnerabilities, and runtime crashes that standard 
 Your linter catches unused variables and formatting issues. It doesn't catch undisposed controllers, hardcoded credentials, or `setState` after `dispose` — because these require understanding what the code _does_, not just how it's written.
 
 In mature ecosystems, tools like [SonarQube](https://www.sonarsource.com/products/sonarqube/), [Coverity](https://www.synopsys.com/software-integrity/security-testing/static-analysis-sast.html), and [Checkmarx](https://checkmarx.com/) fill this gap. Flutter hasn't had an equivalent — until now.
+
+![Flutter memory leak detection in VS Code showing undisposed TextEditingController](https://raw.githubusercontent.com/saropa/saropa_lints/main/assets/20260502_problems_tab.png)
 
 ### What it catches
 
@@ -72,6 +67,15 @@ Saropa Lints detects these patterns and hundreds more:
 
 **Accuracy focused**: Rules use proper AST type checking instead of string matching, reducing false positives on variable names like "upstream" or "spinning".
 
+### Stop Debugging Known Issues
+Saropa Lints specifically targets the error messages developers search for when their app crashes. It statically analyzes and prevents:
+
+* **Memory Leaks:** `TextEditingController`, `AnimationController`, and `StreamSubscription` created but never disposed.
+* **Concurrency Bugs:** `BuildContext` usage across async gaps and unawaited futures in `initState`.
+* **Security Flaws:** Hardcoded API keys, insecure HTTP (cleartext), and weak cryptography.
+* **UI Crashes:** `setState() called after dispose()`, layout overflow risks, and null assertions on backend data.
+* **State Errors:** `Riverpod` providers reading inside `build` or `Bloc` events added in constructors.
+
 ### Essential for popular packages
 
 If you use **GetX**, **Riverpod**, **Provider**, **Bloc**, **Isar**, **Hive**, or **Firebase**, these audits are critical. These libraries are powerful but have patterns that fail silently at runtime:
@@ -87,20 +91,46 @@ If you use **GetX**, **Riverpod**, **Provider**, **Bloc**, **Isar**, **Hive**, o
 | **Firebase** | Unbounded queries, missing batch writes, invalid Analytics events, FCM token leaks               | [Using with Firebase](doc/guides/using_with_firebase.md) |
 
 
+![Screenshot of analysis_options_custom.yaml](https://raw.githubusercontent.com/saropa/saropa_lints/main/assets/20260502_analysis_options_custom_yaml.png)
+
+
 Standard linters don't understand these libraries. They see valid Dart code. Saropa Lints has 50+ rules specifically for library-specific anti-patterns that cause crashes, memory leaks, cost overruns, and data corruption in production. Recent update: `require_camera_permission_check` no longer triggers on non-camera controllers (e.g., IsarStreamController), eliminating a key false positive for Isar users. The new `avoid_cached_isar_stream` rule (with quick fix) prevents a common Isar runtime error.
 
-### Legend: Roadmap Markers
+### Radical Transparency
+
+We build in public. We don't just show you what works; we explicitly document what *doesn't* work yet.
+
+* [**ROADMAP.md**](ROADMAP.md): Our active backlog. See exactly what rules are coming next and vote on priorities.
+* [**ROADMAP_DEFERRED.md**](ROADMAP_DEFERRED.md): The "Hard Problems." We document rules we *can't* implement yet due to technical limitations (like cross-file analysis). We invite the community to help us crack these barriers.
 
 | Marker | Meaning | Example |
 |--------|---------|---------|
-| 🐙 | Tracked as GitHub issue | [#0000](https://github.com/saropa/saropa_lints/issues/0000) |
-| 💡 | Planned enhancement tracked as GitHub Discussion | [Discussion: Diagnostic Statistics](https://github.com/saropa/saropa_lints/discussions/000) |
+| 🐙 | Tracked as GitHub issue | [Open Issues](https://github.com/saropa/saropa_lints/issues) |
+| 💭 | Announcements, Q&A, and Ideas | [Discussion: Diagnostic Statistics](https://github.com/saropa/saropa_lints/discussions) |
 
-### Why it matters
+![AI fixing Flutter security vulnerability automatically in Android Studio](https://raw.githubusercontent.com/saropa/saropa_lints/main/assets/20260502_build_report_terminal_tab.png)
+
+### Compliance: EAA & OWASP Security
 
 The [European Accessibility Act](https://accessible-eu-centre.ec.europa.eu/content-corner/news/eaa-comes-effect-june-2025-are-you-ready-2025-01-31_en) takes effect June 2025, requiring accessible apps in retail, banking, and travel. GitHub detected [39 million leaked secrets](https://github.blog/security/application-security/next-evolution-github-advanced-security/) in repositories during 2024.
 
 These aren't edge cases. They're compliance requirements and security basics that standard linters miss.
+
+### Comparison vs Standard Tools
+
+Why switch? Saropa Lints covers everything in standard tools plus strict behavioral analysis.
+
+| Feature | `flutter_lints` | `very_good_analysis` | **Saropa Lints** |
+| :--- | :---: | :---: | :--- |
+| **Syntax Checks** | ✅ | ✅ | ✅ |
+| **Strict/Opinionated Style** | ❌ | ✅ | ✅ |
+| **Zero-Config Setup** | ✅ | ✅ | 🚧 **(Coming Soon)** |
+| **Controller Leak Detection** | ❌ | ❌ | ✅ **(Deep Analysis)** |
+| **Runtime Crash Prevention** | ❌ | ❌ | ✅ **(Behavioral)** |
+| **Security (OWASP Mapped)** | ❌ | ❌ | ✅ **(ISO/OWASP)** |
+| **Library Specific (Riverpod/Bloc)**| ❌ | ❌ | ✅ **(50+ rules)** |
+| **AI-Ready Diagnostics** | ❌ | ❌ | ✅ |
+| **Dependency Scanning** | ❌ | ❌ | 🚧 **(Coming Soon)** |
 
 ### OWASP Compliance Mapping
 
@@ -133,14 +163,27 @@ final rule = AvoidHardcodedCredentialsRule();
 print(rule.owasp); // Mobile: M1 | Web: A07
 ```
 
-### Free and open
+### Open Source & Community Driven
 
-Good options exist, but many are paid or closed-source. We believe these fundamentals should be free and open. A rising tide lifts all boats.
+Unlike "black box" paid tools, Saropa Lints is 100% open source (MIT). You can inspect the logic behind every rule, verify the security checks yourself, and fork it if you disagree.
 
-The tier system lets you adopt gradually — start with ~100 critical rules, work up to 1700+ when you're ready.
+* **No hidden logic:** See exactly how we detect vulnerabilities.
+* **No vendor lock-in:** It's standard Dart code.
+* **Community powered:** Rules are often suggested, debated, and refined by the Flutter community, not just a single vendor.
 
 ---
 
+### Built for AI
+AI coding assistants like Cursor, Windsurf, and Copilot move fast, but they often hallucinate code that compiles yet fails in production. They might forget to dispose a controller, use a deprecated API, or ignore security best practices.
+
+Saropa Lints acts as the guardrails for your AI. By providing immediate, semantic feedback on **behavior**—not just syntax—it forces the AI to correct its own mistakes in real-time.
+
+**Optimized for AI Repair**
+The tool is also built to **fix**. Saropa Lints diagnostics are engineered to be "paste-ready," providing deep context and specific failure points. When you copy a problem report directly into your AI tool window, it acts as a perfect prompt—giving the AI exactly the info it needs to refactor the code and resolve the issue immediately, without you needing to explain the context.
+
+![AI fixing Flutter security vulnerability automatically in Android Studio](https://raw.githubusercontent.com/saropa/saropa_lints/main/assets/20260502_AI_solver_tab.png)
+
+---
 ## Quick Start
 
 ### 1. Add dependencies
@@ -169,7 +212,7 @@ dart run saropa_lints:init --tier comprehensive
 
 This generates `analysis_options.yaml` with explicit `true`/`false` for every rule.
 
-Available tiers: `essential` (1), `recommended` (2), `professional` (3), `comprehensive` (4), `insanity` (5)
+Available tiers: `essential` (1), `recommended` (2), `professional` (3), `comprehensive` (4), `pedantic` (5)
 
 > **Why a CLI tool?** The `custom_lint` plugin doesn't reliably pass configuration like `tier: recommended` to plugins. The CLI tool bypasses this limitation by generating explicit rule lists that work 100% of the time.
 
@@ -196,7 +239,7 @@ Pick the tier that matches your team's needs. Each tier builds on the previous o
 | **Recommended**   | **Catches common bugs, basic performance issues, and accessibility fundamentals.** These are mistakes that cause real problems but may not immediately crash your app - poor UX, sluggish performance, inaccessible interfaces, silent failures.        | Most teams. The sensible default for production apps.                         | `require_semantics_label` (accessibility), `avoid_expensive_build` (performance), `require_json_decode_try_catch` (error handling), `avoid_shrinkwrap_in_scrollview` (performance), `require_image_error_builder` (UX) |
 | **Professional**  | **Enforces architecture, testability, maintainability, and documentation standards.** Code that works but is hard to test, hard to change, or hard to understand. Technical debt that slows teams down over time.                                       | Enterprise teams, long-lived codebases, teams with multiple developers.       | `avoid_god_class` (architecture), `require_public_api_documentation` (docs), `prefer_result_pattern` (error handling), `require_test_cleanup` (testing), `avoid_hardcoded_strings_in_ui` (i18n)                        |
 | **Comprehensive** | **Stricter patterns, optimization hints, and thorough edge case coverage.** Rules that catch subtle issues, enforce consistency, and push toward optimal patterns. Helpful but not critical.                                                            | Quality-obsessed teams, libraries/packages, teams that want maximum coverage. | `prefer_element_rebuild` (subtle perf), `prefer_immutable_bloc_state` (strict pattern), `require_test_documentation` (maintainability), `prefer_fake_platform` (test quality)                                          |
-| **Insanity**      | **Everything, including pedantic and highly opinionated rules.** Rules that most teams would find excessive but are valuable for greenfield projects or teams that want zero compromise.                                                                | New projects starting fresh, teams that want maximum strictness from day one. | `prefer_custom_single_child_layout` (micro-optimization), `prefer_feature_folder_structure` (opinionated architecture), `avoid_returning_widgets` (pedantic)                                                           |
+| **Pedantic**      | **Everything, including pedantic and highly opinionated rules.** Rules that most teams would find excessive but are valuable for greenfield projects or teams that want zero compromise.                                                                | New projects starting fresh, teams that want maximum strictness from day one. | `prefer_custom_single_child_layout` (micro-optimization), `prefer_feature_folder_structure` (opinionated architecture), `avoid_returning_widgets` (pedantic)                                                           |
 
 ### Stylistic Rules (Separate Track)
 
@@ -233,7 +276,7 @@ dart run saropa_lints:init --help
 dart run saropa_lints:init --tier professional --dry-run
 ```
 
-Available tiers: `essential` (1), `recommended` (2), `professional` (3), `comprehensive` (4), `insanity` (5)
+Available tiers: `essential` (1), `recommended` (2), `professional` (3), `comprehensive` (4), `pedantic` (5)
 
 Add `--stylistic` to include opinionated formatting rules.
 
@@ -563,7 +606,7 @@ Running all 1700+ rules uses significant memory. The tier system helps:
 dart run saropa_lints:init --tier recommended
 
 # CAUTION: Enabling everything on a legacy codebase may show thousands of warnings
-dart run saropa_lints:init --tier insanity
+dart run saropa_lints:init --tier pedantic
 ```
 
 ### Performance Tip: Use Lower Tiers During Development
@@ -587,7 +630,7 @@ The tier you choose has a direct impact on analysis speed:
 - `essential`: ~250 rules → **fastest** (memory leaks, security, crashes)
 - `recommended`: ~800 rules → moderate (+ accessibility, performance)
 - `professional`: ~1400 rules → slower (+ architecture, documentation)
-- `comprehensive`/`insanity`: 1520+ rules → **slowest** (everything)
+- `comprehensive`/`pedantic`: 1520+ rules → **slowest** (everything)
 
 ## Adoption Strategy
 
@@ -832,8 +875,8 @@ Run `dart run custom_lint` in your terminal to see all issues immediately.
 # Generate config for comprehensive tier (1618 rules)
 dart run saropa_lints:init --tier comprehensive
 
-# Or for all rules (insanity tier)
-dart run saropa_lints:init --tier insanity
+# Or for all rules (pedantic tier)
+dart run saropa_lints:init --tier pedantic
 ```
 
 This generates `analysis_options.yaml` with explicit `- rule_name: true` for every enabled rule, which works 100% of the time.
@@ -927,9 +970,22 @@ rm -rf .dart_tool && flutter pub get
 
 Then run `dart run custom_lint` again.
 
+## Frequently Asked Questions
+
+**Q: Does this replace `flutter_lints`?**
+A: You can run them side-by-side, but Saropa Lints covers everything in `flutter_lints` plus 1600+ additional behavioral and security checks. Most teams replace `flutter_lints` entirely.
+
+**Q: Will this slow down my CI/CD pipeline?**
+A: Saropa Lints is optimized for performance. While it runs deeper checks than standard linters, the **Tier System** allows you to balance speed and strictness. The `essential` tier is designed to be lightning-fast for CI environments.
+
+**Q: Can I use this with existing legacy projects?**
+A: Yes! Use the **Baseline** feature (`dart run saropa_lints:baseline`) to suppress existing issues instantly. This lets you enforce quality on *new* code without having to fix 500+ legacy errors first.
+
 ## Contributing
 
-We believe great tools are built by communities, not companies. Contributions and feedback are always welcome.
+**We are building the industry standard together.**
+
+We don't have all the answers. We believe great tools are forged by many hands, and if you've shipped production Flutter apps, we want your opinions.
 
 If you think a rule is:
 
@@ -938,7 +994,7 @@ If you think a rule is:
 - **Too lenient** - maybe it should be stricter or have options
 - **Missing** - propose it, or better yet, implement it
 
-We don't have all the answers. If you've shipped production Flutter apps and have opinions, we want to hear from you.
+**Want to learn AST analysis?** We mentor contributors. Pick a "Good First Issue" and we'll guide you through writing your first linter.
 
 ### How to contribute
 
@@ -1016,12 +1072,14 @@ Contact us via [CONTRIBUTING.md](https://github.com/saropa/saropa_lints/blob/mai
 
 ## Badge
 
-To indicate your project is using `saropa_lints`:
+**Show off your code quality**
 
-[![style: saropa lints](https://img.shields.io/badge/style-saropa__lints-4B0082.svg)](https://pub.dev/packages/saropa_lints)
+Prove that your code is secure, memory-safe, and accessible. Add the Saropa Lints style badge to your README to indicate you follow strict behavioral standards.
+
+[![Saropa Lints Badge](https://img.shields.io/badge/saropa_lints-recommended%2B-blue?style=flat&logo=flutter&logoColor=white&color=435489)](https://pub.dev/packages/saropa_lints)
 
 ```md
-[![style: saropa lints](https://img.shields.io/badge/style-saropa__lints-4B0082.svg)](https://pub.dev/packages/saropa_lints)
+[![Saropa Lints Badge](https://img.shields.io/badge/saropa_lints-recommended%2B-blue?style=flat&logo=flutter&logoColor=white&color=435489)](https://pub.dev/packages/saropa_lints)
 ```
 
 ## License

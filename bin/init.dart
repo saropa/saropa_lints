@@ -35,7 +35,7 @@ library;
 /// 2. **recommended** - Essential + accessibility, performance (~850)
 /// 3. **professional** - Recommended + architecture, testing (~1590)
 /// 4. **comprehensive** - Professional + thorough coverage (~1640)
-/// 5. **insanity** - All rules enabled (~1650)
+/// 5. **pedantic** - All rules enabled (~1650)
 ///
 /// ## Preservation Behavior
 ///
@@ -292,7 +292,7 @@ String _tierColor(String tier) {
       return '${_Colors.blue}$tier${_Colors.reset}';
     case 'comprehensive':
       return '${_Colors.magenta}$tier${_Colors.reset}';
-    case 'insanity':
+    case 'pedantic':
       return '${_Colors.brightCyan}$tier${_Colors.reset}';
     case 'stylistic':
       return '${_Colors.dim}$tier${_Colors.reset}';
@@ -426,7 +426,7 @@ const List<String> tierOrder = <String>[
   'recommended',
   'professional',
   'comprehensive',
-  'insanity',
+  'pedantic',
 ];
 
 /// Map tier names to numeric IDs for user convenience.
@@ -435,7 +435,7 @@ const Map<String, int> tierIds = <String, int>{
   'recommended': 2,
   'professional': 3,
   'comprehensive': 4,
-  'insanity': 5,
+  'pedantic': 5,
 };
 
 /// Tier descriptions for display.
@@ -445,7 +445,7 @@ const Map<String, String> tierDescriptions = <String, String>{
   'recommended': 'Essential + accessibility, performance patterns',
   'professional': 'Recommended + architecture, testing, documentation',
   'comprehensive': 'Professional + thorough coverage (recommended)',
-  'insanity': 'All rules enabled (may have conflicts)',
+  'pedantic': 'All rules enabled (may have conflicts)',
 };
 
 /// Stylistic rule categories, mirroring the organization in tiers.dart.
@@ -645,8 +645,8 @@ String _tierToString(RuleTier tier) {
       return 'professional';
     case RuleTier.comprehensive:
       return 'comprehensive';
-    case RuleTier.insanity:
-      return 'insanity';
+    case RuleTier.pedantic:
+      return 'pedantic';
     case RuleTier.stylistic:
       return 'stylistic';
   }
@@ -663,7 +663,7 @@ int _tierIndex(RuleTier tier) {
       return 2;
     case RuleTier.comprehensive:
       return 3;
-    case RuleTier.insanity:
+    case RuleTier.pedantic:
       return 4;
     case RuleTier.stylistic:
       return -1; // Stylistic is opt-in, not part of tier progression
@@ -674,7 +674,7 @@ int _tierIndex(RuleTier tier) {
 RuleTier _getTierFromSets(String ruleName) {
   if (tiers.stylisticRules.contains(ruleName)) return RuleTier.stylistic;
   if (tiers.essentialRules.contains(ruleName)) return RuleTier.essential;
-  if (tiers.insanityOnlyRules.contains(ruleName)) return RuleTier.insanity;
+  if (tiers.pedanticOnlyRules.contains(ruleName)) return RuleTier.pedantic;
   if (tiers.comprehensiveOnlyRules.contains(ruleName)) {
     return RuleTier.comprehensive;
   }
@@ -1718,7 +1718,7 @@ String _generateCustomLintYaml({
   buffer.writeln('  #   3. professional - Recommended + architecture, testing');
   buffer.writeln('  #   4. comprehensive - Professional + thorough coverage');
   buffer.writeln(
-      '  #   5. insanity     - All rules (pedantic, highly opinionated)');
+      '  #   5. pedantic     - All rules (pedantic, highly opinionated)');
   buffer.writeln('  #   +  stylistic    - Opt-in only (formatting, ordering)');
   buffer.writeln('  #');
 
@@ -1798,7 +1798,7 @@ String _generateCustomLintYaml({
     RuleTier.recommended,
     RuleTier.professional,
     RuleTier.comprehensive,
-    RuleTier.insanity,
+    RuleTier.pedantic,
   ]) {
     final rules = enabledByTier[tierLevel]!..sort();
     if (rules.isEmpty) continue;
@@ -1867,7 +1867,7 @@ String _generateCustomLintYaml({
     RuleTier.recommended,
     RuleTier.professional,
     RuleTier.comprehensive,
-    RuleTier.insanity,
+    RuleTier.pedantic,
   ].any((t) => disabledByTier[t]!.isNotEmpty);
 
   if (hasDisabledNonStylistic) {
@@ -1880,7 +1880,7 @@ String _generateCustomLintYaml({
 
     // Output disabled tiers (from highest to lowest)
     for (final tierLevel in [
-      RuleTier.insanity,
+      RuleTier.pedantic,
       RuleTier.comprehensive,
       RuleTier.professional,
       RuleTier.recommended,
@@ -2087,7 +2087,7 @@ Examples:
   dart run saropa_lints:init --tier comprehensive
   dart run saropa_lints:init --tier 4
   dart run saropa_lints:init --tier essential --reset
-  dart run saropa_lints:init --tier insanity --stylistic
+  dart run saropa_lints:init --tier pedantic --stylistic
   dart run saropa_lints:init --dry-run
 
 After generating, run `dart run custom_lint` to verify.

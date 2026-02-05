@@ -10,7 +10,7 @@ const List<({String name, Set<String> rules})> _allTierSets =
   (name: 'recommendedOnlyRules', rules: recommendedOnlyRules),
   (name: 'professionalOnlyRules', rules: professionalOnlyRules),
   (name: 'comprehensiveOnlyRules', rules: comprehensiveOnlyRules),
-  (name: 'insanityOnlyRules', rules: insanityOnlyRules),
+  (name: 'pedanticOnlyRules', rules: pedanticOnlyRules),
 ];
 
 void main() {
