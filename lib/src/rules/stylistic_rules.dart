@@ -2731,7 +2731,7 @@ class PreferSnakeCaseFilesRule extends SaropaLintRule {
     '.screen.dart', // Screen files
     '.page.dart', // Page files
     '.dialog.dart', // Dialog files
-    '.utils.dart', // Utils files
+    '.violation_parser.dart', // Utils files
     '.helper.dart', // Helper files
     '.extension.dart', // Extension files
     '.mixin.dart', // Mixin files
