@@ -2574,7 +2574,9 @@ Set<String> getRulesForTier(String tier) {
       return essentialRules.union(recommendedOnlyRules);
     case 'professional':
       // professional = recommended + professionalOnly
-      return essentialRules.union(recommendedOnlyRules).union(professionalOnlyRules);
+      return essentialRules
+          .union(recommendedOnlyRules)
+          .union(professionalOnlyRules);
     case 'comprehensive':
       // comprehensive = professional + comprehensiveOnly
       return essentialRules
@@ -2832,7 +2834,9 @@ const Set<String> _desktopPlatformRules = <String>{
 Map<String, Set<String>> get platformRuleSets => {
       'ios': iosPlatformRules.union(_applePlatformRules),
       'android': androidPlatformRules,
-      'macos': macosPlatformRules.union(_applePlatformRules).union(_desktopPlatformRules),
+      'macos': macosPlatformRules
+          .union(_applePlatformRules)
+          .union(_desktopPlatformRules),
       'web': webPlatformRules,
       'windows': windowsPlatformRules.union(_desktopPlatformRules),
       'linux': linuxPlatformRules.union(_desktopPlatformRules),
@@ -2872,11 +2876,13 @@ const Map<String, bool> defaultPlatforms = <String, bool>{
 ///
 /// Rules not in any platform set are never affected.
 Set<String> getRulesDisabledByPlatforms(Map<String, bool> platforms) {
-  final disabledPlatforms = platforms.entries.where((e) => !e.value).map((e) => e.key).toSet();
+  final disabledPlatforms =
+      platforms.entries.where((e) => !e.value).map((e) => e.key).toSet();
 
   if (disabledPlatforms.isEmpty) return const <String>{};
 
-  final enabledPlatforms = platforms.entries.where((e) => e.value).map((e) => e.key).toSet();
+  final enabledPlatforms =
+      platforms.entries.where((e) => e.value).map((e) => e.key).toSet();
 
   final Set<String> rulesToDisable = <String>{};
   final sets = platformRuleSets;
@@ -3424,11 +3430,13 @@ const Map<String, bool> defaultPackages = <String, bool>{
 ///
 /// Rules not in any package set are never affected.
 Set<String> getRulesDisabledByPackages(Map<String, bool> packages) {
-  final disabledPackages = packages.entries.where((e) => !e.value).map((e) => e.key).toSet();
+  final disabledPackages =
+      packages.entries.where((e) => !e.value).map((e) => e.key).toSet();
 
   if (disabledPackages.isEmpty) return const <String>{};
 
-  final enabledPackages = packages.entries.where((e) => e.value).map((e) => e.key).toSet();
+  final enabledPackages =
+      packages.entries.where((e) => e.value).map((e) => e.key).toSet();
 
   final Set<String> rulesToDisable = <String>{};
   final sets = packageRuleSets;
