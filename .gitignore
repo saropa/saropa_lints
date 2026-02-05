@@ -46,3 +46,4 @@ reports/
 
 # Other local config
 analysis_options_custom.yaml
+.github/copilot-instructions.md
