@@ -16,44 +16,8 @@
 import 'dart:io';
 
 import 'package:saropa_lints/saropa_lints.dart';
-
-/// Rule name to impact level mapping.
-/// Generated from the rule definitions.
-final Map<String, LintImpact> _ruleImpacts = _buildRuleImpactMap();
-
-Map<String, LintImpact> _buildRuleImpactMap() {
-  final map = <String, LintImpact>{};
-
-  // Get impact from each rule instance
-  for (final rule in allSaropaRules) {
-    if (rule is SaropaLintRule) {
-      map[rule.code.name] = rule.impact;
-    }
-  }
-
-  return map;
-}
-
-class Violation {
-  Violation({
-    required this.file,
-    required this.line,
-    required this.column,
-    required this.rule,
-    required this.message,
-    required this.impact,
-  });
-
-  final String file;
-  final int line;
-  final int column;
-  final String rule;
-  final String message;
-  final LintImpact impact;
-
-  @override
-  String toString() => '$file:$line:$column - $rule - $message';
-}
+import 'package:saropa_lints/src/models/violation.dart';
+import 'package:saropa_lints/src/violation_parser.dart';
 
 Future<void> main(List<String> args) async {
   if (args.contains('--help') || args.contains('-h')) {
@@ -84,7 +48,7 @@ Future<void> main(List<String> args) async {
   }
 
   // Parse violations
-  final violations = _parseViolations(output);
+  final violations = parseViolations(output);
 
   if (violations.isEmpty) {
     print('No issues found!');
@@ -95,6 +59,7 @@ Future<void> main(List<String> args) async {
     print('HIGH:     0');
     print('MEDIUM:   0');
     print('LOW:      0');
+    print('OPINIONATED: 0');
     return;
   }
 
@@ -104,10 +69,13 @@ Future<void> main(List<String> args) async {
     LintImpact.high: [],
     LintImpact.medium: [],
     LintImpact.low: [],
+    LintImpact.opinionated: [],
   };
 
   for (final v in violations) {
-    byImpact[v.impact]!.add(v);
+    if (v.impact != null) {
+      byImpact[v.impact!]!.add(v);
+    }
   }
 
   // Print violations sorted by impact (critical first)
@@ -135,6 +103,7 @@ Future<void> main(List<String> args) async {
   final highCount = byImpact[LintImpact.high]!.length;
   final mediumCount = byImpact[LintImpact.medium]!.length;
   final lowCount = byImpact[LintImpact.low]!.length;
+  final opinionatedCount = byImpact[LintImpact.opinionated]!.length;
 
   if (criticalCount > 0) {
     print('CRITICAL: $criticalCount (fix immediately!)');
@@ -160,6 +129,12 @@ Future<void> main(List<String> args) async {
     print('LOW:      0');
   }
 
+  if (opinionatedCount > 0) {
+    print('OPINIONATED: $opinionatedCount (style)');
+  } else {
+    print('OPINIONATED: 0');
+  }
+
   print('');
   print('Total: ${violations.length} issues');
 
@@ -169,40 +144,6 @@ Future<void> main(List<String> args) async {
     print('WARNING: $criticalCount critical issue(s) found!');
     exit(criticalCount > 125 ? 125 : criticalCount);
   }
-}
-
-/// Parse custom_lint output into violations.
-List<Violation> _parseViolations(String output) {
-  final violations = <Violation>[];
-
-  // Pattern: file.dart:line:col - rule_name - message
-  // Or: file.dart:line:col - rule_name • message
-  final pattern = RegExp(
-    r'^(.+?):(\d+):(\d+)\s+-\s+(\w+)\s+[-•]\s+(.+)$',
-    multiLine: true,
-  );
-
-  for (final match in pattern.allMatches(output)) {
-    final file = match.group(1)!;
-    final line = int.tryParse(match.group(2)!) ?? 0;
-    final column = int.tryParse(match.group(3)!) ?? 0;
-    final rule = match.group(4)!;
-    final message = match.group(5)!;
-
-    // Look up impact for this rule
-    final impact = _ruleImpacts[rule] ?? LintImpact.medium;
-
-    violations.add(Violation(
-      file: file,
-      line: line,
-      column: column,
-      rule: rule,
-      message: message,
-      impact: impact,
-    ));
-  }
-
-  return violations;
 }
 
 void _printUsage() {
