@@ -17,23 +17,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:saropa_lints/src/baseline/baseline_file.dart';
-
-/// Represents a parsed violation from custom_lint output.
-class Violation {
-  Violation({
-    required this.file,
-    required this.line,
-    required this.column,
-    required this.rule,
-    required this.message,
-  });
-
-  final String file;
-  final int line;
-  final int column;
-  final String rule;
-  final String message;
-}
+import 'package:saropa_lints/src/violation_parser.dart';
 
 Future<void> main(List<String> args) async {
   if (args.contains('--help') || args.contains('-h')) {
@@ -107,7 +91,7 @@ Future<void> main(List<String> args) async {
   }
 
   // Parse violations
-  final violations = _parseViolations(output);
+  final violations = parseViolations(output);
 
   if (violations.isEmpty) {
     print('No violations found!');
@@ -216,36 +200,6 @@ Future<void> main(List<String> args) async {
   print('');
   print('As you fix violations, run `dart run saropa_lints:baseline --update`');
   print('to remove fixed items from the baseline.');
-}
-
-/// Parse custom_lint output into violations.
-List<Violation> _parseViolations(String output) {
-  final violations = <Violation>[];
-
-  // Pattern: file.dart:line:col - rule_name - message
-  // Or: file.dart:line:col - rule_name . message (bullet point separator)
-  final pattern = RegExp(
-    r'^(.+?):(\d+):(\d+)\s+-\s+(\w+)\s+[-.\u2022]\s+(.+)$',
-    multiLine: true,
-  );
-
-  for (final match in pattern.allMatches(output)) {
-    final file = match.group(1)!;
-    final line = int.tryParse(match.group(2)!) ?? 0;
-    final column = int.tryParse(match.group(3)!) ?? 0;
-    final rule = match.group(4)!;
-    final message = match.group(5)!;
-
-    violations.add(Violation(
-      file: file,
-      line: line,
-      column: column,
-      rule: rule,
-      message: message,
-    ));
-  }
-
-  return violations;
 }
 
 /// Update analysis_options.yaml to include baseline configuration.
