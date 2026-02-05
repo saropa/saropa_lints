@@ -14,6 +14,8 @@
 #   3. professional: Recommended + architecture, testing, documentation
 #   4. comprehensive: Professional + thorough coverage (recommended) <-- current
 #   5. pedantic: All rules enabled (may have conflicts)
+#
+# cspell:disable
 
 analyzer:
   errors:
@@ -51,7 +53,6 @@ custom_lint:
   #
   # Settings (max_issues, baseline) are in analysis_options_custom.yaml
   # ═══════════════════════════════════════════════════════════════════════
-  # cspell:disable
   rules:
     #
     # ════════════════════════════════════════════════════════════════════════════
