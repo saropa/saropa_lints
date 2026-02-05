@@ -3,7 +3,8 @@ import 'package:saropa_lints/saropa_lints.dart';
 import 'package:test/test.dart';
 
 /// All tier sets in tiers.dart, for validation.
-const List<({String name, Set<String> rules})> _allTierSets = <({String name, Set<String> rules})>[
+const List<({String name, Set<String> rules})> _allTierSets =
+    <({String name, Set<String> rules})>[
   (name: 'stylisticRules', rules: stylisticRules),
   (name: 'essentialRules', rules: essentialRules),
   (name: 'recommendedOnlyRules', rules: recommendedOnlyRules),
@@ -33,12 +34,14 @@ void main() {
     late Set<String> tierRuleNames;
 
     setUpAll(() {
-      pluginRuleNames = allSaropaRules.map((LintRule rule) => rule.code.name).toSet();
+      pluginRuleNames =
+          allSaropaRules.map((LintRule rule) => rule.code.name).toSet();
       tierRuleNames = getAllDefinedRules();
     });
 
     test('all plugin rules must be in tiers.dart', () {
-      final Set<String> missingFromTiers = pluginRuleNames.difference(tierRuleNames);
+      final Set<String> missingFromTiers =
+          pluginRuleNames.difference(tierRuleNames);
 
       expect(
         missingFromTiers,
@@ -50,7 +53,8 @@ void main() {
     });
 
     test('all tier rules must exist in plugin', () {
-      final Set<String> phantomRules = tierRuleNames.difference(pluginRuleNames);
+      final Set<String> phantomRules =
+          tierRuleNames.difference(pluginRuleNames);
 
       expect(
         phantomRules,
@@ -72,8 +76,10 @@ void main() {
         }
       }
 
-      final Map<String, List<String>> duplicates = Map<String, List<String>>.fromEntries(
-        ruleToSets.entries.where((MapEntry<String, List<String>> e) => e.value.length > 1),
+      final Map<String, List<String>> duplicates =
+          Map<String, List<String>>.fromEntries(
+        ruleToSets.entries
+            .where((MapEntry<String, List<String>> e) => e.value.length > 1),
       );
 
       expect(
@@ -94,7 +100,8 @@ void main() {
         allTierRuleNames.addAll(tier.rules);
       }
 
-      final Set<String> missingRules = pluginRuleNames.difference(allTierRuleNames);
+      final Set<String> missingRules =
+          pluginRuleNames.difference(allTierRuleNames);
 
       expect(
         missingRules,
@@ -161,7 +168,8 @@ void main() {
     late Map<String, Set<String>> pkgSets;
 
     setUpAll(() {
-      pluginRuleNames = allSaropaRules.map((LintRule rule) => rule.code.name).toSet();
+      pluginRuleNames =
+          allSaropaRules.map((LintRule rule) => rule.code.name).toSet();
       pkgSets = packageRuleSets;
     });
 
@@ -171,7 +179,8 @@ void main() {
         allPackageRules.addAll(rules);
       }
 
-      final Set<String> phantomRules = allPackageRules.difference(pluginRuleNames);
+      final Set<String> phantomRules =
+          allPackageRules.difference(pluginRuleNames);
 
       expect(
         phantomRules,
