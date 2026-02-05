@@ -1,0 +1,271 @@
+# ╔═══════════════════════════════════════════════════════════════════════════╗
+# ║                    SAROPA LINTS CUSTOM CONFIG                             ║
+# ║                                                                           ║
+# ║  Settings in this file are ALWAYS applied, even when using --reset.      ║
+# ║  Use this for project-specific customizations that should persist.       ║
+# ╚═══════════════════════════════════════════════════════════════════════════╝
+
+# ─────────────────────────────────────────────────────────────────────────────
+# ANALYSIS SETTINGS
+# ─────────────────────────────────────────────────────────────────────────────
+# max_issues: Maximum warnings/info to track in detail (errors always tracked)
+#   - Default: 1000
+#   - Set to 0 for unlimited
+#   - Lower values = faster analysis on legacy codebases
+
+max_issues: 1000
+
+# ─────────────────────────────────────────────────────────────────────────────
+# PLATFORM SETTINGS
+# ─────────────────────────────────────────────────────────────────────────────
+# Disable platforms your project doesn't target.
+# Rules specific to disabled platforms will be automatically disabled.
+# Only ios and android are enabled by default.
+#
+# EXAMPLES:
+#   - Web-only project: set ios, android, macos, windows, linux to false; web to true
+#   - All platforms: set all to true
+#   - Desktop app: set macos, windows, linux to true
+
+platforms:
+  ios: true
+  android: true
+  macos: false
+  web: false
+  windows: false
+  linux: false
+
+# ─────────────────────────────────────────────────────────────────────────────
+# PACKAGE SETTINGS
+# ─────────────────────────────────────────────────────────────────────────────
+# Disable packages your project doesn't use.
+# Rules specific to disabled packages will be automatically disabled.
+# All packages are enabled by default for backward compatibility.
+#
+# EXAMPLES:
+#   - Riverpod-only project: set bloc, provider, getx to false
+#   - No local DB: set isar, hive, sqflite to false
+#   - No Firebase: set firebase to false
+
+packages:
+  bloc: true
+  provider: true
+  riverpod: true
+  getx: true
+  flutter_hooks: true
+  equatable: true
+  freezed: true
+  firebase: true
+  isar: true
+  hive: true
+  shared_preferences: true
+  sqflite: true
+  dio: true
+  graphql: true
+  supabase: true
+  get_it: true
+  workmanager: true
+  url_launcher: true
+  geolocator: true
+  qr_scanner: true
+  flame: true
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# STYLISTIC RULES
+# ─────────────────────────────────────────────────────────────────────────────
+# Opinionated formatting, ordering, and naming convention rules.
+# These are NOT included in any tier - enable the ones that match your style.
+# Set to true to enable, false to disable.
+#
+# NOTE: Some rules conflict (e.g., prefer_single_quotes vs
+# prefer_double_quotes). Only enable one from each conflicting group.
+
+# --- Debug/Test utility ---
+prefer_fail_test_case: false  # This custom lint always fails (test hook). This rule always fails by design — it verifies your lint pipeline is active. Seeing this error confirms saropa_lints is running. Remove prefer_fail_test_case from your enabled rules once verified.
+
+# --- Ordering & Sorting ---
+prefer_member_ordering: false  # Class members are not in conventional order. Reorder class members to follow the conventional layout: static fields, instance fields, constructors, then methods.
+prefer_arguments_ordering: false  # Named arguments are not in alphabetical order. Reorder named arguments alphabetically so reviewers can quickly spot missing or duplicate arguments.
+prefer_sorted_members: false  # Class members are not in conventional order. Inconsistent member ordering forces developers to scan the entire class to find constructors, fields, or methods, which slows navigation and code review. Reorder members: static fields, instance fields, constructors, static methods, instance methods. Consistent ordering enables quick navigation.
+prefer_sorted_parameters: false  # Named parameters are not in alphabetical order. Unsorted parameters force developers to scan all parameters to find the one they need, and inconsistent ordering across functions creates unnecessary cognitive load during code review. Reorder named parameters alphabetically so developers can quickly locate parameters by name without scanning the entire parameter list.
+prefer_sorted_pattern_fields: false  # Unsorted pattern fields slow code review and make refactoring error-prone. Alphabetical ordering provides a predictable scanning path, reduces merge conflicts when multiple developers modify the same pattern, and makes it easier to spot missing or duplicate fields at a glance. Reorder the pattern fields in alphabetical order. The quick fix can sort them automatically while preserving comments.
+prefer_sorted_record_fields: false  # Unsorted record fields slow code review and make refactoring error-prone. Alphabetical ordering provides a predictable scanning path, reduces merge conflicts when multiple developers modify the same record definition, and makes it easier to spot duplicate or missing fields. Reorder the record fields in alphabetical order. The quick fix can sort them automatically while preserving type annotations.
+
+# --- Naming conventions ---
+prefer_boolean_prefixes: false  # Boolean variable should have a prefix (is/has/can/should/will/did). Rename this boolean field to use a standard prefix (is, has, can, should, will, did) or suffix (Enabled, Active, Visible). Example: enabled becomes isEnabled.
+prefer_no_getter_prefix: false  # Getter with 'get' prefix is redundant. Dart convention omits it. Remove the 'get' prefix from the getter name. For example, rename getName to name, or getValue to value.
+prefer_kebab_tag_name: false  # Tag name should follow naming conventions. Use kebab-case (lowercase with hyphens) for tag names. Tag names must start with a lowercase letter and contain only lowercase letters, digits, and hyphens.
+prefer_capitalized_comment_start: false  # Comment should start with capital letter. Capitalize the first letter of the comment text. Prose comments that start with lowercase letters reduce readability.
+prefer_descriptive_bool_names: false  # Boolean should use a descriptive prefix (is, has, can, should, etc.) or action verb. Rename with a descriptive prefix: isEnabled, hasData, canEdit, shouldUpdate, or an action verb like processData.
+prefer_snake_case_files: false  # File name should use snake_case. Rename the file to snake_case (e.g., user_service.dart instead of UserService.dart) to follow Dart conventions.
+prefer_camel_case_method_names: false  # Use camelCase for method names. Rename the method to lowerCamelCase (e.g., fetchUserData) to follow the Dart naming convention.
+prefer_exception_suffix: false  # Exception classes missing the "Exception" suffix are harder to identify as throwable types during code review and IDE search. Rename the class to end with "Exception" so it is immediately recognizable as a throwable type in code and search results.
+prefer_error_suffix: false  # The "Exception" suffix is verbose and inconsistent with Dart core types like StateError and ArgumentError. Use "Error" for brevity. Rename the class to end with "Error" instead of "Exception" to align with Dart core naming conventions and reduce verbosity.
+
+# --- Error handling style ---
+prefer_catch_over_on: false  # Typed "on" clauses add complexity and risk missing unexpected exception types. A bare catch ensures no failure goes unhandled. Replace the "on ExceptionType" clause with a bare "catch (e)" to simplify error handling and ensure all exceptions are caught.
+
+# --- Code style preferences ---
+prefer_no_continue_statement: false  # Loop body uses a continue statement to skip to the next iteration. Continue statements break the linear flow of the loop, forcing readers to mentally track which paths reach the end of the body and which jump back to the loop header. Invert the condition and wrap the remaining body in an if block, or extract the skip logic into an early return within a helper method.
+prefer_single_exit_point: false  # Multiple return statements (early exits) make it harder to ensure cleanup, logging, and consistent resource management at the end of a function. This can lead to missed cleanup, inconsistent state, and bugs that are difficult to trace. Refactor to a single exit point so all cleanup and logging happens reliably before returning. Refactor to a single exit point: move cleanup and logging to the end, and return once.
+prefer_wildcard_for_unused_param: false  # Unused parameter obscures intent and signals incomplete API design. Replacing it with a _ wildcard (Dart 3.7+) makes the function signature self-documenting, communicating that the parameter exists for interface conformance but is intentionally ignored in this implementation. Replace the parameter with _ to make the function signature self-documenting and signal that the value is intentionally unused.
+prefer_rethrow_over_throw_e: false  # Use rethrow instead of throw e to preserve stack trace. Replace throw e with rethrow to preserve the original stack trace instead of resetting it to the current frame.
+
+# --- Function & Parameter style ---
+prefer_arrow_functions: false  # Function body contains only a return statement; use arrow syntax. Convert to arrow syntax (=> expression) to signal a pure, single-expression return and reduce visual noise.
+prefer_all_named_parameters: false  # Function has 3 or more positional parameters that lack self-documenting call sites. Convert positional parameters to named parameters so call sites are self-documenting and order-independent.
+prefer_inline_callbacks: false  # Callback references a separate method, forcing readers to jump away to understand behavior. Inline the callback body at the call site so the behavior is visible where the widget is constructed.
+avoid_parameter_reassignment: false  # Parameter is being reassigned. This hides the original input value. Create a local variable instead of reassigning the parameter.
+
+# --- Widget style ---
+avoid_shrink_wrap_in_scroll: false  # shrinkWrap: true causes O(n) layout cost and defeats lazy loading. Use CustomScrollView with Slivers for efficient lazy loading. If this ListView is inside a Column/Row with a small bounded itemCount and NeverScrollableScrollPhysics, shrinkWrap: true is acceptable.
+prefer_one_widget_per_file: false  # Multiple widget classes defined in a single file. Move each widget class to its own file so file names map directly to widget names for faster navigation.
+prefer_widget_methods_over_classes: false  # Simple widget class could be a method in the parent widget. Convert to a build method in the parent widget to eliminate class boilerplate and access parent state directly.
+prefer_borderradius_circular: false  # Use BorderRadius.circular() instead of BorderRadius.all(Radius.circular()). Replace BorderRadius.all(Radius.circular(r)) with BorderRadius.circular(r) for a shorter single-call equivalent.
+avoid_small_text: false  # Font size is smaller than 12.0, which reduces readability for users with low vision. Use a font size of at least 12.0 to meet accessibility readability guidelines for body text.
+
+# --- Class & Record style ---
+prefer_class_over_record_return: false  # Method returns a record type, which lacks named fields and dedicated methods. Create a class with named fields for better IDE support, type documentation, and long-term maintainability.
+prefer_private_underscore_prefix: false  # Instance field is public without documentation, exposing internal state. Prefix with underscore to enforce encapsulation, then expose via a getter if external access is needed.
+prefer_explicit_this: false  # Use explicit this. prefix for instance field access. Add an explicit this. prefix to every instance-field reference so readers can distinguish fields from locals.
+
+# --- Formatting ---
+prefer_trailing_comma_always: false  # Multi-line construct is missing a trailing comma. Add a trailing comma so dart format keeps each argument on its own line, producing cleaner git diffs.
+
+# --- Comments & Documentation ---
+prefer_todo_format: false  # TODO comment should follow format: TODO(author): description Add author name in parentheses: TODO(author): ... so the TODO is trackable and searchable by owner.
+prefer_fixme_format: false  # FIXME comment should follow format: FIXME(author): description Add author name in parentheses: FIXME(author): ... so the issue is trackable and searchable by owner.
+prefer_sentence_case_comments: false  # Comment should start with a capital letter. Capitalize the first letter of the comment to maintain sentence-case consistency across the codebase.
+prefer_period_after_doc: false  # Doc comment missing period at end. Incomplete sentences reduce clarity and professionalism in API docs. Add a period at the end of every doc comment sentence. Example: /// Returns the user name.
+prefer_doc_comments_over_regular: false  # Use doc comments (///) instead of regular comments (//) for public API documentation. Replace // with /// so the comment appears in IDE hover docs and can be extracted by dartdoc for API reference.
+prefer_no_commented_out_code: false  # Commented-out code clutters the codebase. Delete it - git preserves history. Delete the commented-out code. Use version control to retrieve it if needed.
+
+# --- Testing style ---
+prefer_expect_over_assert_in_tests: false  # Use expect() instead of assert() in tests. Use expect() for assertions in tests. Example: expect(user.name, "John"). This provides better error messages and matchers than assert.
+
+# --- Type argument style (conflicting - choose one) ---
+prefer_inferred_type_arguments: false  # Explicit generic type arguments match what the compiler already infers from context. Redundant type parameters add visual noise without providing additional type safety, and they must be manually updated if the underlying types change. Remove the explicit type arguments and let the compiler infer them. This reduces verbosity and keeps the code in sync with the actual types automatically.
+prefer_explicit_type_arguments: false  # Generic type without explicit type arguments. Add explicit type arguments to the generic type so that the intended types are visible without relying on inference.
+
+# --- Import style (conflicting - choose one) ---
+prefer_absolute_imports: false  # Use absolute package imports instead of relative imports. Replace relative imports with absolute package: imports so every file references the same canonical path.
+prefer_flat_imports: false  # Keep imports in a flat list without grouping. Remove blank lines between import groups so the entire import block stays compact and alphabetically sorted.
+prefer_grouped_imports: false  # Group imports by type: dart, package, then relative. Organize imports into dart:, package:, and relative groups separated by blank lines for quick scanning.
+prefer_named_imports: false  # Package import without show/hide combinators detected. Unfiltered imports pull the entire package namespace into scope, increasing the risk of name collisions and making it unclear which symbols the file actually depends on. Use show to explicitly list imported symbols, e.g. import "package:foo/foo.dart" show Bar, Baz. This documents dependencies and prevents accidental usage of unintended symbols.
+prefer_relative_imports: false  # Use relative imports instead of absolute package imports. Relative imports make refactoring easier and clearly signal local dependencies within the package.
+
+# --- Quote style (conflicting - choose one) ---
+prefer_double_quotes: false  # Use double quotes for string literals. Replace single quotes with double quotes across all string literals for a consistent codebase style.
+prefer_single_quotes: false  # Use single quotes instead of double quotes for strings. Replace double quotes with single quotes to follow Dart style conventions and maintain codebase consistency.
+
+# --- Apostrophe style (conflicting - choose one) ---
+prefer_doc_curly_apostrophe: false  # Use Right Single Quotation Mark (') instead of straight apostrophe (') in documentation. Replace the straight apostrophe with a Right Single Quotation Mark (U+2019) for typographic correctness.
+prefer_doc_straight_apostrophe: false  # Use straight apostrophe (') instead of Right Single Quotation Mark (') in documentation. Replace the Right Single Quotation Mark (U+2019) with a straight apostrophe (U+0027) for plain-text docs.
+prefer_straight_apostrophe: false  # Use straight apostrophe (') instead of Right Single Quotation Mark ('). Replace the Right Single Quotation Mark (U+2019) with a straight apostrophe (U+0027) for code consistency.
+
+# --- Member ordering (conflicting - choose one) ---
+prefer_static_members_first: false  # Declare static members before instance members in classes. Move static declarations above instance declarations to group class-level constants and factories together.
+prefer_instance_members_first: false  # Declare instance members before static members in classes. Move instance declarations above static declarations so per-object state is visible before shared members.
+prefer_public_members_first: false  # Declare public members before private members in classes. Move public declarations above private declarations so the external API is visible at the top of the class.
+prefer_private_members_first: false  # Declare private members before public members in classes. Move private declarations above public declarations so internal state is defined before the public surface.
+
+# --- Opinionated prefer_* rules ---
+prefer_addall_over_spread: false  # Use addAll() instead of spread for consistency. Replace the spread operator with addAll() for an explicit imperative mutation that reads naturally in method chains.
+prefer_async_only_when_awaiting: false  # Function is marked async but contains no await expressions, adding unnecessary Future wrapping overhead and obscuring intent. Remove the async keyword and return a Future directly, or add await expressions if asynchronous work is intended.
+prefer_await_over_then: false  # The .then() chain obscures sequential async logic and complicates error handling. Rewrite with await for clearer control flow. Replace .then() with await to enable sequential reading, try/catch error handling, and easier debugging of async code.
+prefer_blank_line_after_declarations: false  # Add a blank line after variable declarations. Insert a blank line after variable declarations to visually separate the setup block from the logic that follows.
+prefer_blank_lines_between_members: false  # Add a blank line between class members. Insert a blank line between each class member so fields, methods, and constructors are visually distinct.
+prefer_cascade_over_chained: false  # Consecutive method calls on the same variable repeat the target name unnecessarily. Cascade notation (..) signals that all operations mutate the same object. Rewrite consecutive calls using cascade (..) to eliminate the repeated variable name and clarify mutation intent.
+prefer_chained_over_cascade: false  # Cascade notation is unfamiliar to developers from other languages and breaks builder patterns. Separate statements are explicit about each operation. Replace cascade (..) with separate statements to improve readability and maintain compatibility with builder patterns.
+prefer_clip_r_superellipse: false  # Use ClipRSuperellipse instead of ClipRRect for smoother rounded corners. ClipRSuperellipse provides smoother corner transitions matching iOS design language. Requires Flutter 3.32+.
+prefer_clip_r_superellipse_clipper: false  # Use ClipRSuperellipse instead of ClipRRect for smoother continuous corners. The custom clipper must be rewritten as CustomClipper<RSuperellipse>. Requires Flutter 3.32+.
+prefer_collection_if_over_ternary: false  # Use collection-if instead of ternary with spread. Replace the ternary-spread pattern with a collection-if expression: [if (condition) element] for cleaner syntax.
+prefer_compact_class_members: false  # Remove blank lines between class members. Remove blank lines between class members so the full class definition fits on fewer lines for a quick overview.
+prefer_compact_declarations: false  # Remove blank line after variable declarations. Remove the blank line after declarations to keep variable definitions close to the code that uses them.
+prefer_concatenation_over_interpolation: false  # Use string concatenation instead of interpolation. Replace $-interpolation with explicit + concatenation for a consistent string-building style.
+prefer_concise_variable_names: false  # Use concise variable names (30 characters or less). Shorten the variable name to 30 characters or fewer while still communicating its purpose clearly.
+prefer_constructor_assertion: false  # Use a constructor assertion instead of a factory for simple debug-only precondition checks. Constructor assertions run only in debug mode and keep the class constructor simple without a factory indirection.
+prefer_constructor_body_assignment: false  # Use explicit initializer instead of this.field syntax. Assign fields inside the constructor body instead of using this.field to allow validation or transformation logic.
+prefer_container_over_sizedbox: false  # Use Container instead of SizedBox for consistency. Replace SizedBox with Container so decoration, padding, or alignment can be added later without a widget swap.
+prefer_curly_apostrophe: false  # Use Right Single Quotation Mark (') instead of straight apostrophe (') in strings. Replace the straight apostrophe with a Right Single Quotation Mark (U+2019) for typographic polish in strings.
+prefer_default_enum_case: false  # Exhaustive enum switches break at compile time when new values are added, requiring immediate updates across the codebase. A default case handles unknown values gracefully. Add a default case to handle unknown or future enum values gracefully and prevent compile-time breakage on enum changes.
+prefer_descriptive_bool_names_strict: false  # Boolean should use a descriptive prefix (is, has, can, should, etc.). Rename with a descriptive boolean prefix: isEnabled, hasData, canEdit, shouldUpdate, doesExist, or willChange.
+prefer_descriptive_variable_names: false  # Use descriptive variable names (at least 3 characters). Rename the variable to a descriptive name that communicates its purpose without requiring surrounding context.
+prefer_dot_shorthand: false  # Enum value could use dot shorthand (.value) in Dart 3. Replace the fully qualified EnumType.value with .value where the type is already known from context, reducing verbosity while keeping the code type-safe.
+prefer_dynamic_over_object: false  # Use dynamic instead of Object? for truly dynamic types. Replace Object? with dynamic when the variable intentionally bypasses static type checks on every access.
+prefer_edgeinsets_only: false  # Use EdgeInsets.only() for explicit side values. Replace EdgeInsets.symmetric() with EdgeInsets.only() for explicit per-side values that are easier to adjust independently.
+prefer_edgeinsets_symmetric: false  # Use EdgeInsets.symmetric() when left/right or top/bottom are equal. Replace EdgeInsets.only() with EdgeInsets.symmetric() when horizontal or vertical values are equal, for brevity.
+prefer_exhaustive_enums: false  # Prefer exhaustive enum cases instead of default. Exhaustive cases catch missing logic at compile time and prevent silent failures. Remove the default branch and list every enum value explicitly so the compiler flags missing cases after additions.
+prefer_expanded_over_flexible: false  # Use Expanded instead of Flexible(fit: FlexFit.tight). Replace Flexible(fit: FlexFit.tight) with Expanded, which is the idiomatic shorthand for tight-fit flex children.
+prefer_explicit_boolean_comparison: false  # Use explicit == true comparison for nullable boolean expressions. Add an explicit == true comparison so the nullable bool intent is clear and avoids implicit null-is-false confusion.
+prefer_explicit_colors: false  # Use explicit Colors instead of Theme.of(context).colorScheme. Replace Theme.of(context).colorScheme with explicit Colors.* values for predictable output without runtime context.
+prefer_explicit_null_assignment: false  # Use explicit if-null-then-assign instead of ??=. Replace ??= with an explicit if (variable == null) variable = value; block for step-by-step clarity.
+prefer_explicit_types: false  # Use explicit type annotation instead of var. Replace var with the explicit type annotation so the declared type is visible without hovering or reading the initializer.
+prefer_factory_for_validation: false  # Use a factory constructor for validation logic instead of constructor assertions. A factory constructor can return null, a cached instance, or a subtype when validation fails, unlike assert.
+prefer_fake_over_mock: false  # Test uses mock with verify(). A hand-written fake keeps the test simpler and avoids mock-framework coupling. Create a hand-written Fake subclass instead of a Mock — fakes are easier to maintain and do not require verify() calls.
+prefer_fields_before_methods: false  # Declare fields before methods in class declarations. Move field declarations above method declarations so readers see the data model before the behaviour.
+prefer_flexible_over_expanded: false  # Use Flexible instead of Expanded for consistency. Replace Expanded with Flexible(fit: FlexFit.tight) so the fit parameter is always visible and easy to change later.
+prefer_future_void_function_over_async_callback: false  # Prefer explicit Future<void> Function() instead of AsyncCallback. Use Future<void> Function() instead of AsyncCallback to keep the signature framework-agnostic and self-documenting.
+prefer_generic_exception: false  # Custom exception classes add boilerplate without proportional benefit. Use generic Exception to keep error handling simple. Replace the custom exception with Exception to reduce class boilerplate while still conveying the error message.
+prefer_given_when_then_comments: false  # Use Arrange/Act/Assert or Given/When/Then comments in tests. Add "// Arrange", "// Act", "// Assert" (or Given/When/Then) comments to delineate setup, execution, and verification phases.
+prefer_grouped_by_purpose: false  # Group parameters by purpose rather than required/optional. Group constructor parameters by purpose (e.g., layout, style, callbacks) rather than required-vs-optional ordering.
+prefer_grouped_expectations: false  # Isolating every assertion into its own test duplicates setup logic and inflates the test suite. Group related assertions to reduce boilerplate. Combine related assertions into a single test to share setup logic, reduce duplication, and keep the test suite concise.
+prefer_guard_clauses: false  # Wrapping the entire function body in an if block obscures preconditions and increases nesting. Guard clauses make preconditions explicit and help prevent bugs. Extract the condition as a guard clause with early return at the top to make preconditions explicit and reduce nesting.
+prefer_if_null_over_ternary: false  # Use ?? instead of null-checking ternary expression. Replace the ternary null check with the ?? operator, which expresses the same intent in fewer tokens.
+prefer_implicit_boolean_comparison: false  # Explicit comparison with boolean literal is redundant. Remove the redundant == true or == false comparison — the expression is already a bool and reads more naturally.
+prefer_initializing_formals: false  # Use this.field syntax instead of initializer list. Use this.field syntax in the constructor parameter list to assign the value directly without an initializer body.
+prefer_interpolation_over_concatenation: false  # Use string interpolation instead of concatenation. Replace string concatenation with $-interpolation for readability and to reduce operator noise.
+prefer_keys_with_lookup: false  # Use map.keys with lookup for consistency. Iterate with map.keys and look up each value explicitly for a familiar loop style that matches common patterns.
+prefer_late_over_nullable: false  # Use late instead of nullable for lazily initialized fields that are always set before first access. Declare the field as late to remove null checks — the runtime guarantees a LateInitializationError if read too early.
+prefer_lower_camel_case_constants: false  # Use lowerCamelCase for constant names. Rename the constant to lowerCamelCase (e.g., maxRetries) to match the Dart style-guide convention.
+prefer_map_entries_iteration: false  # Use map.entries instead of iterating .keys with lookup. Iterate with map.entries to access key and value in a single lookup instead of re-indexing via map[key].
+prefer_material_theme_colors: false  # Use Theme.of(context).colorScheme instead of hardcoded Colors. Replace hardcoded Colors.* with Theme.of(context).colorScheme values to support dark mode and keep colors consistent.
+prefer_methods_before_fields: false  # Declare methods before fields in class declarations. Move method declarations above field declarations so the public API is visible before implementation details.
+prefer_no_blank_line_before_return: false  # Remove the blank line before the return statement. Remove the blank line directly above the return statement to keep the function body compact and readable.
+prefer_no_blank_line_inside_blocks: false  # Remove blank line at start/end of block. Remove the leading or trailing blank line inside the block body so the code stays compact and consistently indented.
+prefer_null_aware_assignment: false  # Use ??= instead of if-null-then-assign pattern. Replace the if-null-then-assign block with the ??= operator for a single-expression null-coalescing assignment.
+prefer_nullable_over_late: false  # Use nullable type instead of late for safer code. Use a nullable type instead of late so the compiler enforces a null check at every access, preventing runtime errors.
+prefer_object_over_dynamic: false  # Use Object? instead of dynamic for unknown types. Replace dynamic with Object? to gain static type-safety while still accepting values of any runtime type.
+prefer_on_over_catch: false  # Use "on ExceptionType" instead of bare "catch". Add an "on ExceptionType" clause to catch only expected failures and let unexpected errors propagate to the caller.
+prefer_positive_conditions: false  # Prefer a positive condition with the branches swapped for readability. Invert the condition to its positive form and swap the then/else branches.
+prefer_positive_conditions_first: false  # Guard clauses with negated conditions push the happy path deeper into the function. Positive conditions make the primary logic path prominent and easier to understand. Restructure to place the positive condition first so the happy path is prominent and easier to follow.
+prefer_required_before_optional: false  # Put required parameters before optional parameters. Move required parameters before optional ones so callers see mandatory arguments first in the signature.
+prefer_richtext_over_text_rich: false  # Use RichText instead of Text.rich() for explicit control. Replace Text.rich() with RichText for full control over the base text style without implicit DefaultTextStyle inheritance.
+prefer_screaming_case_constants: false  # Constants should use SCREAMING_SNAKE_CASE. Rename the constant to SCREAMING_SNAKE_CASE (e.g., MAX_VALUE instead of maxValue) for visual distinction.
+prefer_self_documenting_tests: false  # Structure comments like Arrange/Act/Assert add noise to well-written tests. Self-documenting code with clear variable names and assertions is more maintainable. Remove the structure comments and use descriptive variable names and focused assertions to make the test self-documenting.
+prefer_single_blank_line_max: false  # Use at most one consecutive blank line. Collapse multiple consecutive blank lines into a single blank line to conserve vertical space in the file.
+prefer_single_expectation_per_test: false  # Test contains multiple logical assertions that verify unrelated behaviors. Split into multiple focused tests, each verifying one behavior, so failures pinpoint exactly which expectation broke.
+prefer_sizedbox_over_container: false  # Use SizedBox instead of Container for simple width/height spacing. Replace Container with SizedBox when you only need width and height — SizedBox skips the decoration/padding layers.
+prefer_specific_exceptions: false  # Throw specific exception types instead of generic Exception. Create a custom exception class so callers can catch specific failures and provide targeted error recovery.
+prefer_spread_over_addall: false  # Use spread operator [...] instead of addAll(). Replace addAll() with the spread operator [...list1, ...list2] for a declarative, expression-level merge.
+prefer_super_parameters: false  # Use super.parameter syntax instead of passing to super(). Use Dart 3 super-parameter syntax (super.name) to forward constructor arguments without repeating the field name.
+prefer_switch_statement: false  # Switch expressions limit flexibility for side effects and debugging. Switch statements support imperative logic, breakpoints, and multi-line case bodies. Replace the switch expression with a switch statement to enable side effects, multi-line cases, and debuggability.
+prefer_sync_over_async_where_possible: false  # Marking a function async when it only returns a synchronous value adds unnecessary Future wrapping overhead and obscures intent. Remove the async keyword and return Future.value() directly to eliminate unnecessary Future wrapping and clarify synchronous intent.
+prefer_ternary_over_collection_if: false  # Use ternary spread instead of collection-if. Replace the collection-if with a ternary-spread expression: ...(condition ? [element] : []) for explicit control.
+prefer_ternary_over_if_null: false  # Use ternary expression instead of ?? for explicit control. Replace ?? with an explicit ternary (value != null ? value : fallback) for full control over both branches.
+prefer_test_data_builder: false  # Complex object construction in test duplicates setup logic across multiple test cases. Extract a TestDataBuilder class (e.g., UserBuilder().withName('Test').build()) to share setup logic across tests.
+prefer_test_name_descriptive: false  # Test name is not descriptive. Rigid patterns make test failures harder to diagnose and understand. Use natural, descriptive test names that explain the behavior being tested. Example: test("user can authenticate with valid credentials").
+prefer_test_name_should_when: false  # Test names should follow "should X when Y" pattern. Rename the test to follow the should-when pattern: test('should [behavior] when [condition]', ...) for clarity.
+prefer_text_rich_over_richtext: false  # Use Text.rich() instead of RichText widget. Replace RichText with Text.rich() to inherit the DefaultTextStyle and avoid manually setting the base style.
+prefer_then_over_await: false  # The await keyword introduces implicit suspension points that break functional composition. Use .then() for explicit Future chaining. Replace await with .then() to maintain functional composition and make asynchronous data flow explicit in the call chain.
+prefer_var_over_explicit_type: false  # Use var instead of explicit type when type is obvious. Replace the explicit type annotation with var when the right-hand side already makes the type obvious.
+prefer_wheretype_over_where_is: false  # Use whereType<T>() instead of where((e) => e is T). Replace where((e) => e is T) with whereType<T>() for concise, type-safe filtering without a manual cast.
+
+# --- Control flow & collection style ---
+prefer_early_return: false  # Deeply nested if blocks increase cognitive load and make code harder to follow. Early returns flatten the structure and clarify preconditions. Invert conditions and return early at the top of the function to reduce nesting and improve readability.
+prefer_mutable_collections: false  # Return mutable collections for flexibility. Return a plain List, Set, or Map so callers can modify the collection without needing to copy or unwrap it first.
+prefer_record_over_equatable: false  # Simple Equatable class could be replaced with a Dart 3 record. Replace the Equatable subclass with a Dart 3 record: typedef ClassName = ({Type field, ...}); for less boilerplate.
+
+# ─────────────────────────────────────────────────────────────────────────────
+# RULE OVERRIDES
+# ─────────────────────────────────────────────────────────────────────────────
+# FORMAT: rule_name: true/false
+#
+# EXAMPLES:
+#   - avoid_print: false                # Allow print statements
+#   - avoid_null_assertion: false       # Allow ! operator
+#   - prefer_const_constructors: true   # Force-enable regardless of tier
+#
+# Add your custom rule overrides below:
+
