@@ -365,7 +365,7 @@ _RULES_BADGE_RE = re.compile(r"(badge/rules-)(\d+)(%2B)")
 _TIER_ESSENTIAL_RE = re.compile(r"(`essential`: ~)\d+")
 _TIER_RECOMMENDED_RE = re.compile(r"(`recommended`: ~)\d+")
 _TIER_PROFESSIONAL_RE = re.compile(r"(`professional`: ~)\d+")
-_TIER_COMP_INSANITY_RE = re.compile(r"(`comprehensive`/`insanity`: )\d+\+")
+_TIER_COMP_PEDANTIC_RE = re.compile(r"(`comprehensive`/`pedantic`: )\d+\+")
 
 
 def _round_tier_count(count: int) -> int:
@@ -458,7 +458,7 @@ def _sync_tier_counts(project_dir: Path, content: str) -> str:
     recommended = essential + stats.counts.get("recommended", 0)
     professional = recommended + stats.counts.get("professional", 0)
     comprehensive = professional + stats.counts.get("comprehensive", 0)
-    insanity = comprehensive + stats.counts.get("insanity", 0)
+    pedantic = comprehensive + stats.counts.get("pedantic", 0)
 
     content = _TIER_ESSENTIAL_RE.sub(
         rf"\g<1>{_round_tier_count(essential)}", content
@@ -469,8 +469,8 @@ def _sync_tier_counts(project_dir: Path, content: str) -> str:
     content = _TIER_PROFESSIONAL_RE.sub(
         rf"\g<1>{_round_tier_count(professional)}", content
     )
-    content = _TIER_COMP_INSANITY_RE.sub(
-        rf"\g<1>{insanity}+", content
+    content = _TIER_COMP_PEDANTIC_RE.sub(
+        rf"\g<1>{pedantic}+", content
     )
 
     return content

@@ -22,7 +22,7 @@ Be respectful and constructive. We're all here to make Flutter development bette
    - What it detects
    - Why it matters (bug prevention, performance, etc.)
    - BAD and GOOD code examples
-   - Suggested tier (Essential, Recommended, Professional, Comprehensive, Insanity)
+   - Suggested tier (Essential, Recommended, Professional, Comprehensive, Pedantic)
 
 ### Submitting Code
 

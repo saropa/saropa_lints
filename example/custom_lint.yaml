@@ -622,25 +622,25 @@ custom_lint:
     # =========================================================================
     # Rules for file organization and code structure.
     # Production file length rules (non-test files):
-    # - prefer_small_length_files: 200 lines (insanity)
+    # - prefer_small_length_files: 200 lines (pedantic)
     # - avoid_medium_length_files: 300 lines (professional)
     # - avoid_long_length_files: 500 lines (comprehensive)
     # - avoid_very_long_length_files: 1000 lines (recommended)
     # Test file length rules (test/, test_driver/, integration_test/):
-    # - prefer_small_length_test_files: 400 lines (insanity)
+    # - prefer_small_length_test_files: 400 lines (pedantic)
     # - avoid_medium_length_test_files: 600 lines (professional)
     # - avoid_long_length_test_files: 1000 lines (comprehensive)
     # - avoid_very_long_length_test_files: 2000 lines (recommended)
     # =========================================================================
 
     # Production file length rules
-    prefer_small_length_files: false # File exceeds 200 lines. [LOW] Tier: insanity
+    prefer_small_length_files: false # File exceeds 200 lines. [LOW] Tier: pedantic
     avoid_medium_length_files: false # File exceeds 300 lines. [LOW] Tier: professional
     avoid_long_length_files: false # File exceeds 500 lines. [LOW] Tier: comprehensive
     avoid_very_long_length_files: false # File exceeds 1000 lines. [LOW] Tier: recommended
 
     # Test file length rules (higher thresholds for test files)
-    prefer_small_length_test_files: false # Test file exceeds 400 lines. [LOW] Tier: insanity
+    prefer_small_length_test_files: false # Test file exceeds 400 lines. [LOW] Tier: pedantic
     avoid_medium_length_test_files: false # Test file exceeds 600 lines. [LOW] Tier: professional
     avoid_long_length_test_files: false # Test file exceeds 1000 lines. [LOW] Tier: comprehensive
     avoid_very_long_length_test_files: false # Test file exceeds 2000 lines. [LOW] Tier: recommended

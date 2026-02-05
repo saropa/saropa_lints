@@ -208,7 +208,7 @@ dart run saropa_lints:init --tier comprehensive
 
 This generates `analysis_options.yaml` with explicit `true`/`false` for every rule.
 
-Available tiers: `essential` (1), `recommended` (2), `professional` (3), `comprehensive` (4), `insanity` (5)
+Available tiers: `essential` (1), `recommended` (2), `professional` (3), `comprehensive` (4), `pedantic` (5)
 
 > **Why a CLI tool?** The `custom_lint` plugin doesn't reliably pass configuration like `tier: recommended` to plugins. The CLI tool bypasses this limitation by generating explicit rule lists that work 100% of the time.
 
@@ -235,7 +235,7 @@ Pick the tier that matches your team's needs. Each tier builds on the previous o
 | **Recommended**   | **Catches common bugs, basic performance issues, and accessibility fundamentals.** These are mistakes that cause real problems but may not immediately crash your app - poor UX, sluggish performance, inaccessible interfaces, silent failures.        | Most teams. The sensible default for production apps.                         | `require_semantics_label` (accessibility), `avoid_expensive_build` (performance), `require_json_decode_try_catch` (error handling), `avoid_shrinkwrap_in_scrollview` (performance), `require_image_error_builder` (UX) |
 | **Professional**  | **Enforces architecture, testability, maintainability, and documentation standards.** Code that works but is hard to test, hard to change, or hard to understand. Technical debt that slows teams down over time.                                       | Enterprise teams, long-lived codebases, teams with multiple developers.       | `avoid_god_class` (architecture), `require_public_api_documentation` (docs), `prefer_result_pattern` (error handling), `require_test_cleanup` (testing), `avoid_hardcoded_strings_in_ui` (i18n)                        |
 | **Comprehensive** | **Stricter patterns, optimization hints, and thorough edge case coverage.** Rules that catch subtle issues, enforce consistency, and push toward optimal patterns. Helpful but not critical.                                                            | Quality-obsessed teams, libraries/packages, teams that want maximum coverage. | `prefer_element_rebuild` (subtle perf), `prefer_immutable_bloc_state` (strict pattern), `require_test_documentation` (maintainability), `prefer_fake_platform` (test quality)                                          |
-| **Insanity**      | **Everything, including pedantic and highly opinionated rules.** Rules that most teams would find excessive but are valuable for greenfield projects or teams that want zero compromise.                                                                | New projects starting fresh, teams that want maximum strictness from day one. | `prefer_custom_single_child_layout` (micro-optimization), `prefer_feature_folder_structure` (opinionated architecture), `avoid_returning_widgets` (pedantic)                                                           |
+| **Pedantic**      | **Everything, including pedantic and highly opinionated rules.** Rules that most teams would find excessive but are valuable for greenfield projects or teams that want zero compromise.                                                                | New projects starting fresh, teams that want maximum strictness from day one. | `prefer_custom_single_child_layout` (micro-optimization), `prefer_feature_folder_structure` (opinionated architecture), `avoid_returning_widgets` (pedantic)                                                           |
 
 ### Stylistic Rules (Separate Track)
 
@@ -272,7 +272,7 @@ dart run saropa_lints:init --help
 dart run saropa_lints:init --tier professional --dry-run
 ```
 
-Available tiers: `essential` (1), `recommended` (2), `professional` (3), `comprehensive` (4), `insanity` (5)
+Available tiers: `essential` (1), `recommended` (2), `professional` (3), `comprehensive` (4), `pedantic` (5)
 
 Add `--stylistic` to include opinionated formatting rules.
 
@@ -602,7 +602,7 @@ Running all 1700+ rules uses significant memory. The tier system helps:
 dart run saropa_lints:init --tier recommended
 
 # CAUTION: Enabling everything on a legacy codebase may show thousands of warnings
-dart run saropa_lints:init --tier insanity
+dart run saropa_lints:init --tier pedantic
 ```
 
 ### Performance Tip: Use Lower Tiers During Development
@@ -626,7 +626,7 @@ The tier you choose has a direct impact on analysis speed:
 - `essential`: ~250 rules → **fastest** (memory leaks, security, crashes)
 - `recommended`: ~800 rules → moderate (+ accessibility, performance)
 - `professional`: ~1400 rules → slower (+ architecture, documentation)
-- `comprehensive`/`insanity`: 1520+ rules → **slowest** (everything)
+- `comprehensive`/`pedantic`: 1520+ rules → **slowest** (everything)
 
 ## Adoption Strategy
 
@@ -871,8 +871,8 @@ Run `dart run custom_lint` in your terminal to see all issues immediately.
 # Generate config for comprehensive tier (1618 rules)
 dart run saropa_lints:init --tier comprehensive
 
-# Or for all rules (insanity tier)
-dart run saropa_lints:init --tier insanity
+# Or for all rules (pedantic tier)
+dart run saropa_lints:init --tier pedantic
 ```
 
 This generates `analysis_options.yaml` with explicit `- rule_name: true` for every enabled rule, which works 100% of the time.

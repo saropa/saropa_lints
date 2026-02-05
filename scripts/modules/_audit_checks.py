@@ -117,7 +117,7 @@ TIERS = [
     "recommended",
     "professional",
     "comprehensive",
-    "insanity",
+    "pedantic",
     "stylistic",
 ]
 
@@ -446,7 +446,7 @@ def get_tier_stats(tiers_path: Path) -> TierStats:
         "recommended": r"const Set<String> recommendedOnlyRules = <String>\{([^}]*)\};",
         "professional": r"const Set<String> professionalOnlyRules = <String>\{([^}]*)\};",
         "comprehensive": r"const Set<String> comprehensiveOnlyRules = <String>\{([^}]*)\};",
-        "insanity": r"const Set<String> insanityOnlyRules = <String>\{([^}]*)\};",
+        "pedantic": r"const Set<String> pedanticOnlyRules = <String>\{([^}]*)\};",
     }
 
     for tier, pattern in tier_patterns.items():
@@ -573,7 +573,7 @@ def print_tier_stats(stats: TierStats) -> None:
         "recommended": Color.YELLOW,
         "professional": Color.GREEN,
         "comprehensive": Color.CYAN,
-        "insanity": Color.MAGENTA,
+        "pedantic": Color.MAGENTA,
         "stylistic": Color.BLUE,
     }
 
