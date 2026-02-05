@@ -1249,7 +1249,7 @@ enum RuleTier {
 
   /// All rules enabled including pedantic/opinionated ones.
   /// For greenfield projects with strict standards.
-  insanity,
+  pedantic,
 
   /// Stylistic rules (formatting, ordering, naming).
   /// Opt-in only via --stylistic flag. Not included in any tier by default.

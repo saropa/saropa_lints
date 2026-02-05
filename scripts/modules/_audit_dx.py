@@ -314,7 +314,7 @@ _TIER_ORDER = [
     "recommended",
     "professional",
     "comprehensive",
-    "insanity",
+    "pedantic",
     "stylistic",
 ]
 
@@ -323,7 +323,7 @@ _TIER_COLORS = {
     "recommended": Color.YELLOW,
     "professional": Color.GREEN,
     "comprehensive": Color.CYAN,
-    "insanity": Color.MAGENTA,
+    "pedantic": Color.MAGENTA,
     "stylistic": Color.BLUE,
 }
 

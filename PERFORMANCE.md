@@ -39,7 +39,7 @@ dart run saropa_lints:init --tier professional
 | `recommended`   | ~900       | ~2x slower             |
 | `professional`  | ~1400      | ~3x slower             |
 | `comprehensive` | ~1450      | ~3.5x slower           |
-| `insanity`      | ~1600      | **Slowest**            |
+| `pedantic`      | ~1600      | **Slowest**            |
 
 ### 2. Exclude Generated Code
 
@@ -336,7 +336,7 @@ On a typical project (100 Dart files):
 | `essential`    | 5-15 seconds  |
 | `recommended`  | 10-30 seconds |
 | `professional` | 20-60 seconds |
-| `insanity`     | 30-90 seconds |
+| `pedantic`     | 30-90 seconds |
 
 Times vary based on:
 
