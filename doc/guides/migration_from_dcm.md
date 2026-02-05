@@ -124,7 +124,7 @@ DCM has granular metric thresholds. saropa_lints uses progressive tiers:
 | Default config | **Recommended** (~573 rules) | Balanced coverage |
 | Strict metrics | **Professional** (~979 rules) | Enterprise-grade |
 | All rules enabled | **Comprehensive** (~1202 rules) | Quality obsessed |
-| Maximum everything | **Insanity** (1450+ rules) | Every single rule |
+| Maximum everything | **Pedantic** (1450+ rules) | Every single rule |
 
 **Start with `recommended`** - it provides broad coverage without overwhelming noise.
 

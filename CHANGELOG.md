@@ -11,6 +11,16 @@ Dates are not included in version headers — [pub.dev](https://pub.dev/packages
 ** See the current published changelog: [saropa_lints/changelog](https://pub.dev/packages/saropa_lints/changelog)
 
 ---
+## [4.10.2]
+
+### Readme
+- **Screenshots** added to several sections in [README.md](./README.md).
+- **Clarifications** to some wording and tables. Plus **badges** were updated in [README.md](./README.md).
+
+### Tiers
+- **Renamed** the `"Insanity"` tier ruleset to the `"Pedantic"` for clarity.
+
+---
 ## [4.10.1]
 
 ### Added

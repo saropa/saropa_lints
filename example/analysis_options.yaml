@@ -9,7 +9,7 @@ analyzer:
 # Configure saropa_lints tier
 custom_lint:
   saropa_lints:
-    tier: recommended  # essential | recommended | professional | comprehensive | insanity
+    tier: recommended # essential | recommended | professional | comprehensive | pedantic
   rules:
     # Explicitly enable widget preference rules for testing
     - prefer_sized_box_square: true

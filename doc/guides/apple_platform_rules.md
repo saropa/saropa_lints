@@ -404,6 +404,7 @@ These are automatically enabled when using `dart:ffi`.
 
 saropa_lints intentionally does **not** recommend specific commercial products or services. While some third-party SDKs can simplify complex tasks like in-app purchases (IAP), subscription management, or analytics, recommending specific vendors is outside the scope of a lint package.
 
+<!-- cspell:ignore Adapty Qonversion Purchasely -->
 **Examples of products NOT recommended by these rules:**
 - IAP SDKs (RevenueCat, Adapty, Qonversion, Purchasely, etc.)
 - Analytics platforms (Amplitude, Mixpanel, Segment, etc.)
