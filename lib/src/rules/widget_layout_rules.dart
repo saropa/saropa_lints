@@ -1119,10 +1119,10 @@ class PreferUsingListViewRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_using_list_view',
     problemMessage:
-        '[prefer_using_list_view] Column inside SingleChildScrollView. Use ListView. This layout configuration can trigger RenderFlex overflow errors or unexpected visual behavior at runtime.',
+        '[prefer_using_list_view] Column inside SingleChildScrollView. A "Column" is being used inside a "SingleChildScrollView" Flutter to pre-render the entire list, bypassing "Lazy Loading" optimizations. This layout configuration can also trigger RenderFlex overflow errors or unexpected visual behavior at runtime.',
     correctionMessage:
-        'Use ListView to improve performance with scrollable lists. Test on multiple screen sizes to verify the layout adapts correctly.',
-    errorSeverity: DiagnosticSeverity.INFO,
+        'Refactor this layout into a single "ListView" to leverage viewport-based optimizations and memory management. To maintain the layout logic of a "Column" with a "spacing" property, use the "ListView.separated" constructor; this allows you to define a "separatorBuilder" that injects consistent spacing only between elements, effectively replacing manual "SizedBox" additions or the "spacing" attribute. Ensure the new "ListView" is wrapped in a "Flexible" or "Expanded" widget if it resides within a "Flex" container to avoid unbounded height errors. This transition ensures that off-screen items are lazily loaded and disposed of, preventing "RenderFlex" overflows and significantly improving scrolling performance on resource-constrained devices.',
+    errorSeverity: DiagnosticSeverity.WARNING,
   );
 
   @override
@@ -7130,7 +7130,7 @@ class AvoidTableCellOutsideTableRule extends SaropaLintRule {
 /// coordinates to a `Stack` parent. Using it outside a `Stack` (or a
 /// subclass of `Stack`) causes a ParentData crash at runtime.
 ///
-/// Recognises `Stack`, `IndexedStack`, and any custom widget that
+/// Recognizes `Stack`, `IndexedStack`, and any custom widget that
 /// extends `Stack` (e.g. `Indexer` from `package:indexed`).
 ///
 /// **BAD:**
