@@ -11,6 +11,13 @@ Dates are not included in version headers — [pub.dev](https://pub.dev/packages
 ** See the current published changelog: [saropa_lints/changelog](https://pub.dev/packages/saropa_lints/changelog)
 
 ---
+## [4.11.1]
+
+- **Improved `prefer_using_list_view` Rule:**
+  - Upgraded `problemMessage` to clearly define the performance pitfalls of eager-loading `Column` widgets inside scroll views.
+  - Rewrote `correctionMessage` into a detailed technical guide. It now explicitly recommends `ListView.separated` as the direct replacement for layouts requiring specific spacing, provides guidance on handling `Flex` constraints, and explains the mechanics of lazy loading.
+  
+---
 ## [4.11.0]
 
 ### Changed
