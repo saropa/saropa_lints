@@ -2409,6 +2409,18 @@ final List<LintRule Function()> _allRuleFactories = <LintRule Function()>[
   AvoidX11OnlyAssumptionsRule.new,
   RequireLinuxFontFallbackRule.new,
   AvoidSudoShellCommandsRule.new,
+
+  // ROADMAP ⭐ Rules (new batch)
+  AvoidContextDependencyInCallbackRule.new,
+  AvoidDatetimeComparisonWithoutPrecisionRule.new,
+  AvoidGetxStaticGetRule.new,
+  AvoidMissingInterpolationRule.new,
+  AvoidProviderListenFalseInBuildRule.new,
+  PreferSpringAnimationRule.new,
+  RequireNavigationResultHandlingRule.new,
+  AvoidHiveSynchronousInUiRule.new,
+  RequireSemanticColorsRule.new,
+  PreferAvatarLoadingPlaceholderRule.new,
 ];
 
 // =============================================================================

@@ -11,7 +11,9 @@ import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
 import 'package:analyzer/dart/element/element.dart';
 import 'package:analyzer/dart/element/type.dart';
-import 'package:analyzer/error/error.dart' show DiagnosticSeverity;
+import 'package:analyzer/error/error.dart'
+    show AnalysisError, DiagnosticSeverity;
+import 'package:analyzer/source/source_range.dart';
 import 'package:custom_lint_builder/custom_lint_builder.dart';
 
 import '../../saropa_lint_rule.dart';
@@ -2484,6 +2486,147 @@ class PreferChangeNotifierProxyProviderRule extends SaropaLintRule {
               reporter.atNode(node, code);
             }
           }
+        }
+      }
+    });
+  }
+}
+
+// =============================================================================
+// Provider listen:false in build Rules
+// =============================================================================
+
+/// Warns when Provider.of(context, listen: false) is used inside a build()
+/// method.
+///
+/// Using listen: false in build means the widget will not rebuild when the
+/// provided value changes, causing the UI to display stale data. In build(),
+/// you almost always want listen: true (the default) so the widget rebuilds.
+///
+/// **BAD:**
+/// ```dart
+/// @override
+/// Widget build(BuildContext context) {
+///   final counter = Provider.of<Counter>(context, listen: false);
+///   return Text('${counter.value}'); // Shows stale data!
+/// }
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// @override
+/// Widget build(BuildContext context) {
+///   final counter = Provider.of<Counter>(context); // listen: true by default
+///   return Text('${counter.value}');
+/// }
+/// ```
+class AvoidProviderListenFalseInBuildRule extends SaropaLintRule {
+  const AvoidProviderListenFalseInBuildRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  static const LintCode _code = LintCode(
+    name: 'avoid_provider_listen_false_in_build',
+    problemMessage:
+        '[avoid_provider_listen_false_in_build] Provider.of() is called with listen: false inside a build() method. This prevents the widget from rebuilding when the provided value changes, causing the UI to display stale data that does not reflect the current application state. Users see outdated information until something else triggers a rebuild, creating confusing and inconsistent UI behavior that is difficult to debug.',
+    correctionMessage:
+        'Remove the listen: false parameter so that Provider.of() uses the default listen: true, or use context.watch<T>() which always rebuilds on change.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      // Check for Provider.of() call
+      if (node.methodName.name != 'of') return;
+
+      final Expression? target = node.target;
+      if (target is! SimpleIdentifier) return;
+      if (target.name != 'Provider') return;
+
+      // Check for listen: false named argument
+      bool hasListenFalse = false;
+      for (final Expression arg in node.argumentList.arguments) {
+        if (arg is NamedExpression &&
+            arg.name.label.name == 'listen' &&
+            arg.expression is BooleanLiteral &&
+            (arg.expression as BooleanLiteral).value == false) {
+          hasListenFalse = true;
+          break;
+        }
+      }
+      if (!hasListenFalse) return;
+
+      // Check if inside a build() method
+      AstNode? current = node.parent;
+      while (current != null) {
+        if (current is MethodDeclaration && current.name.lexeme == 'build') {
+          reporter.atNode(node, code);
+          return;
+        }
+        current = current.parent;
+      }
+    });
+  }
+
+  @override
+  List<Fix> getFixes() => <Fix>[_RemoveListenFalseFix()];
+}
+
+class _RemoveListenFalseFix extends DartFix {
+  @override
+  void run(
+    CustomLintResolver resolver,
+    ChangeReporter reporter,
+    CustomLintContext context,
+    AnalysisError analysisError,
+    List<AnalysisError> others,
+  ) {
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
+      if (node.methodName.name != 'of') return;
+
+      // Find the listen: false argument
+      for (final Expression arg in node.argumentList.arguments) {
+        if (arg is NamedExpression &&
+            arg.name.label.name == 'listen' &&
+            arg.expression is BooleanLiteral &&
+            (arg.expression as BooleanLiteral).value == false) {
+          final changeBuilder = reporter.createChangeBuilder(
+            message: 'Remove listen: false to enable rebuilds',
+            priority: 1,
+          );
+
+          changeBuilder.addDartFileEdit((builder) {
+            // Remove the ", listen: false" or "listen: false, " part
+            int start = arg.offset;
+            int end = arg.end;
+
+            // Check for preceding comma and whitespace
+            final String fullSource = node.toSource();
+            final int argOffsetInNode = start - node.offset;
+            if (argOffsetInNode > 0) {
+              // Look for preceding ", "
+              final String before =
+                  fullSource.substring(0, argOffsetInNode).trimRight();
+              if (before.endsWith(',')) {
+                start = node.offset + before.length - 1;
+              }
+            }
+
+            builder.addDeletion(
+              SourceRange(start, end - start),
+            );
+          });
+          return;
         }
       }
     });
