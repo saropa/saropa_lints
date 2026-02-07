@@ -11,6 +11,23 @@ Dates are not included in version headers — [pub.dev](https://pub.dev/packages
 ** See the current published changelog: [saropa_lints/changelog](https://pub.dev/packages/saropa_lints/changelog)
 
 ---
+## [4.12.0]
+
+### Added
+
+- **10 new lint rules** across multiple categories:
+  - `avoid_context_dependency_in_callback` (Essential, WARNING): Detects `Theme.of(context)`, `MediaQuery.of(context)`, etc. inside async callbacks (`.then()`, `Future.delayed`, `Timer`). These calls can use a disposed context. Includes quick fix.
+  - `avoid_datetime_comparison_without_precision` (Professional, INFO): Flags `==`/`!=` on DateTime values which fails due to microsecond differences. Suggests `difference().abs()` comparison. Includes quick fix.
+  - `avoid_getx_static_get` (Professional, WARNING): Detects `Get.find()` calls which create hidden global dependencies. Suggests constructor injection. Includes quick fix.
+  - `avoid_missing_interpolation` (Recommended, WARNING): Detects string concatenation with `+` where interpolation is clearer. Includes quick fix.
+  - `avoid_provider_listen_false_in_build` (Recommended, INFO): Flags `Provider.of(context, listen: false)` inside `build()` methods which suppresses reactive rebuilds. Includes quick fix to remove `listen: false`.
+  - `avoid_hive_synchronous_in_ui` (Essential, WARNING): Detects synchronous Hive operations (`get`, `put`, `delete`, etc.) inside `build()` or `initState()` which block the UI thread. Includes quick fix.
+  - `prefer_spring_animation` (Recommended, INFO): Suggests replacing `CurvedAnimation` with physics-like bounce/elastic curves with `SpringSimulation` for more natural motion. Includes quick fix.
+  - `prefer_avatar_loading_placeholder` (Recommended, INFO): Flags `CircleAvatar` with `NetworkImage` but no error handler or fallback child. Includes quick fix adding `onBackgroundImageError` and fallback `Icon`.
+  - `require_navigation_result_handling` (Professional, INFO): Detects `Navigator.push*()` calls where the result is not awaited or assigned. Includes quick fix adding `await`.
+  - `require_semantic_colors` (Professional, INFO): Flags Color variables named by appearance (e.g., `redColor`) instead of semantic purpose (e.g., `errorColor`). Includes quick fix.
+
+---
 ## [4.11.1]
 
 - **Improved `prefer_using_list_view` Rule:**

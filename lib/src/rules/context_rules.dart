@@ -1145,3 +1145,146 @@ class AvoidContextInStaticMethodsRule extends SaropaLintRule {
     });
   }
 }
+
+// =============================================================================
+// Context Dependency in Callback Rules
+// =============================================================================
+
+/// Warns when BuildContext-dependent calls (Theme.of, MediaQuery.of,
+/// Navigator.of, etc.) are used inside asynchronous callbacks such as
+/// Future.then(), Future.delayed(), or Timer callbacks.
+///
+/// After an async gap the widget may have been disposed, making the
+/// captured BuildContext stale. Using a stale context causes
+/// "Looking up a deactivated widget's ancestor" exceptions at runtime.
+///
+/// **BAD:**
+/// ```dart
+/// Future.delayed(Duration(seconds: 1), () {
+///   final theme = Theme.of(context); // context may be stale
+/// });
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// final theme = Theme.of(context); // capture before async gap
+/// Future.delayed(Duration(seconds: 1), () {
+///   // use captured theme
+/// });
+/// ```
+class AvoidContextDependencyInCallbackRule extends SaropaLintRule {
+  const AvoidContextDependencyInCallbackRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  static const LintCode _code = LintCode(
+    name: 'avoid_context_dependency_in_callback',
+    problemMessage:
+        '[avoid_context_dependency_in_callback] BuildContext-dependent call (Theme.of, MediaQuery.of, Navigator.of, ScaffoldMessenger.of, etc.) is used inside an asynchronous callback such as Future.then(), Future.delayed(), or Timer. After an async gap the originating widget may have been unmounted, making the captured BuildContext stale and causing a "Looking up a deactivated widget\'s ancestor" exception at runtime.',
+    correctionMessage:
+        'Capture the context-dependent value (e.g., final theme = Theme.of(context)) before the async gap and use the captured value inside the callback instead of accessing context directly.',
+    errorSeverity: DiagnosticSeverity.WARNING,
+  );
+
+  /// Known context-dependent static accessor methods.
+  static const Set<String> _contextOfMethods = <String>{
+    'Theme',
+    'MediaQuery',
+    'Navigator',
+    'ScaffoldMessenger',
+    'Scaffold',
+    'DefaultTextStyle',
+    'IconTheme',
+    'Directionality',
+    'Localizations',
+    'FocusScope',
+    'ModalRoute',
+    'InheritedTheme',
+  };
+
+  /// Async callback creator method names.
+  static const Set<String> _asyncCallbackMethods = <String>{
+    'then',
+    'whenComplete',
+    'catchError',
+    'delayed',
+    'periodic',
+    'run',
+    'schedule',
+  };
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      // Look for Xxx.of(context) pattern
+      if (node.methodName.name != 'of') return;
+
+      final Expression? target = node.target;
+      if (target is! SimpleIdentifier) return;
+      if (!_contextOfMethods.contains(target.name)) return;
+
+      // Walk up to find if we're inside an async callback
+      AstNode? current = node.parent;
+      while (current != null) {
+        if (current is FunctionExpression) {
+          final AstNode? funcParent = current.parent;
+          // Check if this function is an argument to an async method
+          if (funcParent is ArgumentList) {
+            final AstNode? callParent = funcParent.parent;
+            if (callParent is MethodInvocation) {
+              final String methodName = callParent.methodName.name;
+              if (_asyncCallbackMethods.contains(methodName)) {
+                reporter.atNode(node, code);
+                return;
+              }
+            }
+          }
+        }
+        current = current.parent;
+      }
+    });
+  }
+
+  @override
+  List<Fix> getFixes() => <Fix>[_CaptureContextBeforeAsyncFix()];
+}
+
+class _CaptureContextBeforeAsyncFix extends DartFix {
+  @override
+  void run(
+    CustomLintResolver resolver,
+    ChangeReporter reporter,
+    CustomLintContext context,
+    AnalysisError analysisError,
+    List<AnalysisError> others,
+  ) {
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
+      if (node.methodName.name != 'of') return;
+
+      final Expression? target = node.target;
+      if (target is! SimpleIdentifier) return;
+
+      final changeBuilder = reporter.createChangeBuilder(
+        message:
+            'Add comment: capture ${target.name}.of(context) before async gap',
+        priority: 1,
+      );
+
+      changeBuilder.addDartFileEdit((builder) {
+        builder.addSimpleInsertion(
+          node.offset,
+          '/* TODO: capture ${target.name}.of(context) before the async gap */ ',
+        );
+      });
+    });
+  }
+}

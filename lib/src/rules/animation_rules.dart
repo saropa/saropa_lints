@@ -1661,3 +1661,115 @@ class RequireAnimationTickerDisposalRule extends SaropaLintRule {
     });
   }
 }
+
+// =============================================================================
+// Spring Animation Preference Rules
+// =============================================================================
+
+/// Suggests using SpringSimulation instead of CurvedAnimation for
+/// physics-based interactions like drag, fling, and bounce gestures.
+///
+/// Spring-based animations feel more natural because they model real-world
+/// physics. CurvedAnimation uses fixed duration and easing which can feel
+/// artificial for interactive gestures.
+///
+/// **BAD:**
+/// ```dart
+/// final animation = CurvedAnimation(
+///   parent: controller,
+///   curve: Curves.bounceOut,
+/// );
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// final spring = SpringDescription(mass: 1, stiffness: 100, damping: 10);
+/// controller.animateWith(SpringSimulation(spring, 0, 1, velocity));
+/// ```
+class PreferSpringAnimationRule extends SaropaLintRule {
+  const PreferSpringAnimationRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  static const LintCode _code = LintCode(
+    name: 'prefer_spring_animation',
+    problemMessage:
+        '[prefer_spring_animation] CurvedAnimation with a physics-like curve (bounceOut, elasticOut, bounceIn, elasticIn, etc.) is being used where a SpringSimulation would produce smoother, more natural-feeling motion. CurvedAnimation uses a fixed duration that cannot respond to user input velocity, causing disconnects between gesture speed and animation behavior that feel artificial and jarring to users.',
+    correctionMessage:
+        'Consider using SpringSimulation with SpringDescription for physics-based animations, especially for gestures like drag, fling, and bounce where animation should respond to input velocity.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  /// Curves that mimic physics and are better served by SpringSimulation.
+  static const Set<String> _physicsLikeCurves = <String>{
+    'bounceOut',
+    'bounceIn',
+    'bounceInOut',
+    'elasticOut',
+    'elasticIn',
+    'elasticInOut',
+  };
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addInstanceCreationExpression((
+      InstanceCreationExpression node,
+    ) {
+      final String? constructorName = node.constructorName.type.element?.name;
+      if (constructorName != 'CurvedAnimation') return;
+
+      // Check if the curve argument is a physics-like curve
+      for (final Expression arg in node.argumentList.arguments) {
+        if (arg is NamedExpression && arg.name.label.name == 'curve') {
+          final String curveSource = arg.expression.toSource();
+          for (final String physicsCurve in _physicsLikeCurves) {
+            if (curveSource.contains(physicsCurve)) {
+              reporter.atNode(node, code);
+              return;
+            }
+          }
+        }
+      }
+    });
+  }
+
+  @override
+  List<Fix> getFixes() => <Fix>[_SuggestSpringSimulationFix()];
+}
+
+class _SuggestSpringSimulationFix extends DartFix {
+  @override
+  void run(
+    CustomLintResolver resolver,
+    ChangeReporter reporter,
+    CustomLintContext context,
+    AnalysisError analysisError,
+    List<AnalysisError> others,
+  ) {
+    context.registry.addInstanceCreationExpression((
+      InstanceCreationExpression node,
+    ) {
+      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
+
+      final changeBuilder = reporter.createChangeBuilder(
+        message: 'Add TODO: consider SpringSimulation for natural physics',
+        priority: 1,
+      );
+
+      changeBuilder.addDartFileEdit((builder) {
+        builder.addSimpleInsertion(
+          node.offset,
+          '/* TODO: consider SpringSimulation for natural physics-based motion */ ',
+        );
+      });
+    });
+  }
+}
