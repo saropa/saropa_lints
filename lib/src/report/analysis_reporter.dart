@@ -5,16 +5,47 @@ import 'dart:io' show Directory, File, Platform, stderr;
 
 import 'package:saropa_lints/src/saropa_lint_rule.dart';
 
+/// Snapshot of the analysis configuration captured at rule-loading time.
+///
+/// Stored by [AnalysisReporter.setAnalysisConfig] and written into the
+/// report header so every report file is self-describing.
+class ReportConfig {
+  const ReportConfig({
+    required this.version,
+    required this.effectiveTier,
+    required this.enabledRuleCount,
+    required this.enabledRuleNames,
+    required this.enabledPlatforms,
+    required this.disabledPlatforms,
+    required this.enabledPackages,
+    required this.disabledPackages,
+    required this.userExclusions,
+    required this.maxIssues,
+    required this.outputMode,
+  });
+
+  final String version;
+  final String effectiveTier;
+  final int enabledRuleCount;
+  final List<String> enabledRuleNames;
+  final List<String> enabledPlatforms;
+  final List<String> disabledPlatforms;
+  final List<String> enabledPackages;
+  final List<String> disabledPackages;
+  final List<String> userExclusions;
+  final int maxIssues;
+  final String outputMode;
+}
+
 /// Writes a combined analysis report to the project's `reports/` directory.
 ///
-/// Generates a single timestamped file after each analysis run containing
-/// both the full violation list and summary statistics.
+/// Produces a single timestamped file that is overwritten on each debounce
+/// cycle, so it always reflects the full cumulative data. Per-file
+/// de-duplication in [ProgressTracker] prevents double-counting when the
+/// analyzer re-visits a file.
 ///
-/// Reports are triggered via a debounce timer — after 3 seconds of no new
-/// violations, the reporter assumes analysis is complete and writes the file.
-///
-/// Initialize once per analysis session via [initialize], then call
-/// [scheduleWrite] after each violation is recorded.
+/// Initialize once via [initialize], then call [scheduleWrite] on each
+/// file visit or violation. Call [reset] to start a fresh report file.
 class AnalysisReporter {
   AnalysisReporter._();
 
@@ -22,10 +53,18 @@ class AnalysisReporter {
   static String? _timestamp;
   static Timer? _debounceTimer;
   static bool _pathsLogged = false;
-  static bool _sessionEnded = false;
+  static bool _reportWritten = false;
+  static ReportConfig? _config;
 
   /// Debounce duration: write reports after this idle period.
   static const Duration _debounce = Duration(seconds: 3);
+
+  /// Store the analysis configuration for inclusion in report headers.
+  ///
+  /// Called from `getLintRules()` where all config data is available.
+  static void setAnalysisConfig(ReportConfig config) {
+    _config = config;
+  }
 
   /// Initialize the reporter with the project root directory.
   ///
@@ -53,22 +92,43 @@ class AnalysisReporter {
   /// Schedule report writing after a debounce period.
   ///
   /// Each call resets the timer. When no new violations arrive for
-  /// `_debounce` duration, reports are written. Reports are overwritten
-  /// on each cycle so the final write captures all violations.
+  /// [_debounce] duration, the report is written. The same report file
+  /// is overwritten on each write so it always reflects cumulative data.
   ///
-  /// If a previous session ended (debounce fired), this resets all
-  /// trackers for a fresh session before scheduling.
+  /// Per-file de-duplication is handled by [ProgressTracker._clearFileData],
+  /// so re-analyzed files don't double-count.
+  ///
+  /// When a report has already been written and [ProgressTracker] detects
+  /// file re-analysis (a new build/session), this method starts a fresh
+  /// session: resets trackers, generates a new timestamp, and writes to
+  /// a new report file.
   static void scheduleWrite() {
     if (_projectRoot == null) return;
 
-    // Detect new session: if the debounce fired (session ended) and
-    // we're being called again, a new analysis run has started.
-    if (_sessionEnded) {
+    // Detect new analysis session: a report was already written and the
+    // analyzer is now re-visiting files it already processed. This is
+    // safe from false positives because late-arriving straggler files are
+    // new (wasNew=true) and never set the re-analysis flag.
+    if (_reportWritten && ProgressTracker.hasReanalyzedFile) {
       _startNewSession();
     }
 
     _debounceTimer?.cancel();
     _debounceTimer = Timer(_debounce, _writeReport);
+  }
+
+  /// Start a fresh report session.
+  ///
+  /// Called when re-analysis is detected after a report has been written.
+  /// Resets all accumulated data and generates a new timestamp so the
+  /// next report is written to a new file.
+  static void _startNewSession() {
+    ProgressTracker.reset();
+    ImpactTracker.reset();
+    ProgressTracker.clearReanalysisFlag();
+    _timestamp = _generateTimestamp();
+    _pathsLogged = false;
+    _reportWritten = false;
   }
 
   /// The project root directory, or null if not initialized.
@@ -92,26 +152,13 @@ class AnalysisReporter {
         '${_timestamp}_saropa_lint_report.log';
   }
 
-  /// Reset all trackers and start a fresh session with a new timestamp.
-  static void _startNewSession() {
-    _sessionEnded = false;
-    _pathsLogged = false;
-
-    // Reset trackers so counts don't accumulate across sessions
-    ProgressTracker.reset();
-    ImpactTracker.reset();
-
-    _timestamp = _generateTimestamp();
-  }
-
   /// Write the combined report file, overwriting any previous output.
   ///
-  /// Called by the debounce timer when analysis goes idle. Marks the
-  /// session as ended so the next [scheduleWrite] call resets trackers.
+  /// Called by the debounce timer when analysis goes idle. The same
+  /// timestamped file is overwritten on each call so late-arriving
+  /// results are always included.
   static void _writeReport() {
     if (_projectRoot == null) return;
-
-    _sessionEnded = true;
 
     try {
       final sep = Platform.pathSeparator;
@@ -122,6 +169,8 @@ class AnalysisReporter {
 
       final path = reportPath!;
       _writeCombinedReport(path);
+
+      _reportWritten = true;
 
       // Log file path only on the first write to avoid spamming stderr.
       if (!_pathsLogged) {
@@ -146,8 +195,14 @@ class AnalysisReporter {
     buf.writeln('Saropa Lints Analysis Report');
     buf.writeln('Generated: ${DateTime.now().toIso8601String()}');
     buf.writeln('Project: $_projectRoot');
+    if (_config != null) {
+      buf.writeln('Version: ${_config!.version}');
+    }
     buf.writeln('${'=' * 70}');
     buf.writeln();
+
+    // Configuration
+    _writeConfigSection(buf);
 
     // Overview
     buf.writeln('OVERVIEW');
@@ -170,6 +225,127 @@ class AnalysisReporter {
     _writeTopFiles(buf, trackerData);
 
     // Full violation list
+    _writeViolationList(buf, violations);
+
+    buf.writeln('${'=' * 70}');
+    buf.writeln('Total: $total issues');
+
+    File(path).writeAsStringSync(buf.toString());
+  }
+
+  /// Write the analysis configuration section.
+  static void _writeConfigSection(StringBuffer buf) {
+    final config = _config;
+    if (config == null) {
+      buf.writeln('CONFIGURATION');
+      buf.writeln('  (not available — config was not captured)');
+      buf.writeln();
+      return;
+    }
+
+    buf.writeln('CONFIGURATION');
+    buf.writeln('  Tier:             ${config.effectiveTier}');
+    buf.writeln('  Rules enabled:    ${config.enabledRuleCount}');
+    buf.writeln('  Max issues:       '
+        '${config.maxIssues == 0 ? 'unlimited' : config.maxIssues}');
+    buf.writeln('  Output mode:      ${config.outputMode}');
+    buf.writeln();
+
+    _writePlatformsSubsection(buf, config);
+    _writePackagesSubsection(buf, config);
+    _writeExclusionsSubsection(buf, config);
+    _writeCustomYamlSubsection(buf);
+    _writeEnabledRulesSubsection(buf, config);
+  }
+
+  /// Write platforms subsection of the config.
+  static void _writePlatformsSubsection(
+    StringBuffer buf,
+    ReportConfig config,
+  ) {
+    buf.writeln('  Platforms:');
+    if (config.enabledPlatforms.isNotEmpty) {
+      buf.writeln('    Enabled:  ${config.enabledPlatforms.join(', ')}');
+    }
+    if (config.disabledPlatforms.isNotEmpty) {
+      buf.writeln('    Disabled: ${config.disabledPlatforms.join(', ')}');
+    }
+    buf.writeln();
+  }
+
+  /// Write packages subsection of the config.
+  static void _writePackagesSubsection(
+    StringBuffer buf,
+    ReportConfig config,
+  ) {
+    buf.writeln('  Packages:');
+    if (config.enabledPackages.isNotEmpty) {
+      buf.writeln('    Enabled:  ${config.enabledPackages.join(', ')}');
+    }
+    if (config.disabledPackages.isNotEmpty) {
+      buf.writeln('    Disabled: ${config.disabledPackages.join(', ')}');
+    }
+    buf.writeln();
+  }
+
+  /// Write user exclusions subsection.
+  static void _writeExclusionsSubsection(
+    StringBuffer buf,
+    ReportConfig config,
+  ) {
+    if (config.userExclusions.isEmpty) return;
+
+    buf.writeln('  User exclusions (${config.userExclusions.length}):');
+    for (final rule in config.userExclusions) {
+      buf.writeln('    - $rule');
+    }
+    buf.writeln();
+  }
+
+  /// Write the full analysis_options_custom.yaml content verbatim.
+  static void _writeCustomYamlSubsection(StringBuffer buf) {
+    if (_projectRoot == null) return;
+
+    try {
+      final sep = Platform.pathSeparator;
+      final customFile =
+          File('$_projectRoot${sep}analysis_options_custom.yaml');
+      if (!customFile.existsSync()) return;
+
+      final content = customFile.readAsStringSync().trimRight();
+      buf.writeln('${'─' * 70}');
+      buf.writeln('  analysis_options_custom.yaml:');
+      buf.writeln('${'─' * 70}');
+      for (final line in content.split('\n')) {
+        buf.writeln('  | $line');
+      }
+      buf.writeln('${'─' * 70}');
+      buf.writeln();
+    } catch (_) {
+      // Silently skip if file can't be read
+    }
+  }
+
+  /// Write the full list of enabled rule names (sorted).
+  static void _writeEnabledRulesSubsection(
+    StringBuffer buf,
+    ReportConfig config,
+  ) {
+    if (config.enabledRuleNames.isEmpty) return;
+
+    final sorted = config.enabledRuleNames.toList()..sort();
+    buf.writeln('  Enabled rules (${sorted.length}):');
+    for (final rule in sorted) {
+      buf.writeln('    - $rule');
+    }
+    buf.writeln();
+  }
+
+  /// Write all violations grouped by impact level.
+  static void _writeViolationList(
+    StringBuffer buf,
+    Map<LintImpact, List<ViolationRecord>> violations,
+  ) {
     buf.writeln('${'=' * 70}');
     buf.writeln('ALL VIOLATIONS');
     buf.writeln('${'=' * 70}');
@@ -187,11 +363,6 @@ class AnalysisReporter {
       }
       buf.writeln();
     }
-
-    buf.writeln('${'=' * 70}');
-    buf.writeln('Total: $total issues');
-
-    File(path).writeAsStringSync(buf.toString());
   }
 
   /// Write impact breakdown section.
@@ -278,13 +449,17 @@ class AnalysisReporter {
     buf.writeln();
   }
 
-  /// Reset state between analysis runs.
+  /// Reset state for a fresh analysis session.
+  ///
+  /// Call this before starting a new analysis run (e.g. from `init`)
+  /// to clear accumulated data and generate a new report file.
   static void reset() {
     _debounceTimer?.cancel();
     _debounceTimer = null;
     _projectRoot = null;
     _timestamp = null;
     _pathsLogged = false;
-    _sessionEnded = false;
+    _reportWritten = false;
+    _config = null;
   }
 }
