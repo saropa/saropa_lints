@@ -316,12 +316,17 @@ class ProgressTracker {
     if (!isError && _maxIssues > 0 && nonErrorCount > _maxIssues) {
       if (!_limitReached) {
         _limitReached = true;
+        final next = _maxIssues * 2;
         stderr.writeln('');
-        stderr.writeln(
-          '[saropa_lints] $_maxIssues issues reached — analysis stopped. '
-          'See report log for details. '
-          'To increase: max_issues: 1000 in analysis_options_custom.yaml',
-        );
+        stderr.writeln('[saropa_lints] $_maxIssues issues reached '
+            '— analysis paused.');
+        stderr.writeln('  Report log written to reports/ directory.');
+        stderr.writeln('  To continue, set max_issues in '
+            'analysis_options_custom.yaml:');
+        stderr.writeln('    max_issues: $next   '
+            '# next $_maxIssues issues');
+        stderr.writeln('    max_issues: 0      '
+            '# unlimited (full scan)');
       }
     }
 
@@ -546,11 +551,17 @@ class ProgressTracker {
 
     // Warning if issue limit was reached (only applies to warnings/info, not errors)
     if (_limitReached) {
+      final next = _maxIssues * 2;
       buf.writeln();
-      buf.writeln('$yellow  ⚠️  $_maxIssues issues reached — analysis stopped. '
-          'See report log for details.$reset');
       buf.writeln(
-          '$dim     To increase: echo "max_issues: 1000" > analysis_options_custom.yaml$reset');
+          '$yellow  ⚠️  $_maxIssues issues reached — analysis paused.$reset');
+      buf.writeln('$dim     Report log written to reports/ directory.');
+      buf.writeln('     To continue, set max_issues in '
+          'analysis_options_custom.yaml:');
+      buf.writeln('       max_issues: $next   '
+          '# next $_maxIssues issues');
+      buf.writeln('       max_issues: 0      '
+          '# unlimited (full scan)$reset');
     }
 
     // Severity breakdown (only if there are issues)
