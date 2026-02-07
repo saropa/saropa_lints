@@ -649,6 +649,10 @@ const Set<String> essentialRules = <String>{
   'prefer_lazy_loading_images', // WARNING - large images should be lazy loaded
   'avoid_sqflite_type_mismatch', // ERROR - SQLite type mismatches cause runtime errors
   'avoid_sudo_shell_commands', // ERROR - elevated privileges are a security risk
+
+  // ROADMAP ⭐ Rules - Essential (new batch)
+  'avoid_context_dependency_in_callback', // WARNING - stale context in async callbacks
+  'avoid_hive_synchronous_in_ui', // WARNING - sync Hive I/O blocks UI thread
 };
 
 /// Recommended tier rules - Essential + common mistakes, performance basics.
@@ -1442,6 +1446,12 @@ const Set<String> recommendedOnlyRules = <String>{
   'avoid_x11_only_assumptions', // WARNING - X11-only code fails on Wayland
   'require_video_player_controller_dispose',
   'require_wss_over_ws',
+
+  // ROADMAP ⭐ Rules - Recommended (new batch)
+  'avoid_missing_interpolation', // WARNING - use string interpolation over +
+  'avoid_provider_listen_false_in_build', // INFO - stale data from listen: false
+  'prefer_spring_animation', // INFO - natural physics-based animation
+  'prefer_avatar_loading_placeholder', // INFO - fallback for network avatars
 };
 
 /// Professional tier rules - Recommended + architecture, testing, maintainability.
@@ -2399,6 +2409,12 @@ const Set<String> professionalOnlyRules = <String>{
   'avoid_max_path_risk', // INFO - deeply nested paths hit MAX_PATH on Windows
   'prefer_xdg_directory_convention', // INFO - use XDG base directories on Linux
   'require_linux_font_fallback', // INFO - platform fonts need fallback on Linux
+
+  // ROADMAP ⭐ Rules - Professional (new batch)
+  'avoid_datetime_comparison_without_precision', // INFO - DateTime == fails on microseconds
+  'avoid_getx_static_get', // WARNING - Get.find() hides dependencies
+  'require_navigation_result_handling', // INFO - Navigator.push result ignored
+  'require_semantic_colors', // INFO - name colors by purpose not appearance
 };
 
 /// Rules that are only included in the comprehensive tier (not in professional).

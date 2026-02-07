@@ -1542,3 +1542,122 @@ class AvoidLoadingFlashRule extends SaropaLintRule {
     });
   }
 }
+
+// =============================================================================
+// Avatar Loading Placeholder Rules
+// =============================================================================
+
+/// Warns when CircleAvatar uses a NetworkImage for backgroundImage without
+/// providing an onBackgroundImageError callback or a fallback child widget.
+///
+/// Network images can fail due to connectivity, invalid URLs, or server
+/// errors. Without error handling, CircleAvatar shows an empty or broken
+/// state that confuses users.
+///
+/// **BAD:**
+/// ```dart
+/// CircleAvatar(
+///   backgroundImage: NetworkImage(user.avatarUrl),
+/// )
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// CircleAvatar(
+///   backgroundImage: NetworkImage(user.avatarUrl),
+///   onBackgroundImageError: (_, __) {},
+///   child: Text(user.initials), // Fallback when image fails
+/// )
+/// ```
+class PreferAvatarLoadingPlaceholderRule extends SaropaLintRule {
+  const PreferAvatarLoadingPlaceholderRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  static const LintCode _code = LintCode(
+    name: 'prefer_avatar_loading_placeholder',
+    problemMessage:
+        '[prefer_avatar_loading_placeholder] CircleAvatar uses a network-loaded backgroundImage without providing onBackgroundImageError or a child widget as fallback. When the network image fails to load due to connectivity issues, invalid URLs, server errors, or slow connections, the avatar displays an empty or broken state with no visual feedback to the user. This creates a confusing UI where the user sees a blank circle instead of meaningful placeholder content like initials or a default icon.',
+    correctionMessage:
+        'Add an onBackgroundImageError callback and/or a child widget (e.g., Text with user initials or an Icon) to serve as a fallback when the network image fails to load.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addInstanceCreationExpression((
+      InstanceCreationExpression node,
+    ) {
+      final String typeName = node.constructorName.type.name.lexeme;
+      if (typeName != 'CircleAvatar') return;
+
+      bool hasNetworkImage = false;
+      bool hasErrorHandler = false;
+      bool hasChild = false;
+
+      for (final Expression arg in node.argumentList.arguments) {
+        if (arg is! NamedExpression) continue;
+        final String paramName = arg.name.label.name;
+
+        if (paramName == 'backgroundImage') {
+          final String imgSource = arg.expression.toSource();
+          if (imgSource.contains('NetworkImage') ||
+              imgSource.contains('CachedNetworkImageProvider')) {
+            hasNetworkImage = true;
+          }
+        } else if (paramName == 'onBackgroundImageError') {
+          hasErrorHandler = true;
+        } else if (paramName == 'child') {
+          hasChild = true;
+        }
+      }
+
+      if (hasNetworkImage && !hasErrorHandler && !hasChild) {
+        reporter.atNode(node, code);
+      }
+    });
+  }
+
+  @override
+  List<Fix> getFixes() => <Fix>[_AddAvatarFallbackFix()];
+}
+
+class _AddAvatarFallbackFix extends DartFix {
+  @override
+  void run(
+    CustomLintResolver resolver,
+    ChangeReporter reporter,
+    CustomLintContext context,
+    AnalysisError analysisError,
+    List<AnalysisError> others,
+  ) {
+    context.registry.addInstanceCreationExpression((
+      InstanceCreationExpression node,
+    ) {
+      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
+      if (node.constructorName.type.name.lexeme != 'CircleAvatar') return;
+
+      final changeBuilder = reporter.createChangeBuilder(
+        message: 'Add onBackgroundImageError and child fallback',
+        priority: 1,
+      );
+
+      changeBuilder.addDartFileEdit((builder) {
+        // Insert before the closing parenthesis
+        final int insertOffset = node.argumentList.rightParenthesis.offset;
+        builder.addSimpleInsertion(
+          insertOffset,
+          "onBackgroundImageError: (_, __) {}, child: const Icon(Icons.person), ",
+        );
+      });
+    });
+  }
+}

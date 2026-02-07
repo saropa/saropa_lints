@@ -3366,3 +3366,105 @@ class RequireDeepLinkTestingRule extends SaropaLintRule {
     });
   }
 }
+
+// =============================================================================
+// Navigation Result Handling Rules
+// =============================================================================
+
+/// Warns when Navigator.push() or Navigator.pushNamed() is called without
+/// awaiting the result or assigning it to a variable.
+///
+/// Navigator.push returns a Future that resolves to the value passed to
+/// Navigator.pop(). Ignoring this result means the calling screen cannot
+/// react to what happened on the pushed screen.
+///
+/// **BAD:**
+/// ```dart
+/// Navigator.push(context, MaterialPageRoute(builder: (_) => EditPage()));
+/// // Result from EditPage is lost!
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// final result = await Navigator.push<bool>(
+///   context,
+///   MaterialPageRoute(builder: (_) => EditPage()),
+/// );
+/// if (result == true) refreshData();
+/// ```
+class RequireNavigationResultHandlingRule extends SaropaLintRule {
+  const RequireNavigationResultHandlingRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  static const LintCode _code = LintCode(
+    name: 'require_navigation_result_handling',
+    problemMessage:
+        '[require_navigation_result_handling] Navigator push method is called as a fire-and-forget statement without awaiting or assigning its Future result. Navigator.push() returns a Future<T?> that resolves to the value passed to Navigator.pop(result). Ignoring this return value means the calling screen cannot react to user actions on the pushed screen, leading to stale UI, missed data updates, and broken back-navigation workflows that frustrate users.',
+    correctionMessage:
+        'Await the Navigator.push() call and handle the returned result, or assign it to a variable for later use. If no result is expected, add an explicit comment.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  /// Navigator push methods that return results.
+  static const Set<String> _pushMethods = <String>{
+    'push',
+    'pushNamed',
+    'pushReplacement',
+    'pushReplacementNamed',
+    'pushAndRemoveUntil',
+    'pushNamedAndRemoveUntil',
+  };
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      if (!_pushMethods.contains(node.methodName.name)) return;
+
+      // Check target is Navigator
+      final Expression? target = node.target;
+      if (target is! SimpleIdentifier || target.name != 'Navigator') return;
+
+      // Check if it's an expression statement (not awaited, not assigned)
+      final AstNode? parent = node.parent;
+      if (parent is ExpressionStatement) {
+        reporter.atNode(node, code);
+      }
+    });
+  }
+
+  @override
+  List<Fix> getFixes() => <Fix>[_AddAwaitToNavigatorPushFix()];
+}
+
+class _AddAwaitToNavigatorPushFix extends DartFix {
+  @override
+  void run(
+    CustomLintResolver resolver,
+    ChangeReporter reporter,
+    CustomLintContext context,
+    AnalysisError analysisError,
+    List<AnalysisError> others,
+  ) {
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
+
+      final changeBuilder = reporter.createChangeBuilder(
+        message: 'Add await to handle navigation result',
+        priority: 1,
+      );
+
+      changeBuilder.addDartFileEdit((builder) {
+        builder.addSimpleInsertion(node.offset, 'await ');
+      });
+    });
+  }
+}
