@@ -11,6 +11,13 @@ Dates are not included in version headers — [pub.dev](https://pub.dev/packages
 ** See the current published changelog: [saropa_lints/changelog](https://pub.dev/packages/saropa_lints/changelog)
 
 ---
+## [4.12.4]
+
+### Changed
+
+- **`avoid_empty_setstate` moved from recommended to comprehensive tier**: This rule flags a valid Flutter idiom (`if (mounted) setState(() {})` after async gaps). It is a style preference, not a bug or correctness issue, so it belongs in the comprehensive tier for quality-focused teams. Impact reduced from medium to low.
+
+---
 ## [4.12.3]
 
 ### Fixed

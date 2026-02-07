@@ -774,7 +774,6 @@ const Set<String> recommendedOnlyRules = <String>{
   'avoid_text_scale_factor',
   'prefer_using_list_view',
   'avoid_scaffold_messenger_after_await',
-  'avoid_empty_setstate',
   'avoid_unnecessary_setstate',
   'avoid_stateless_widget_initialized_fields',
   'avoid_state_constructors',
@@ -2012,6 +2011,7 @@ const Set<String> professionalOnlyRules = <String>{
   'avoid_duplicate_constant_values',
   'avoid_duplicate_initializers',
   'avoid_duplicate_string_literals_pair',
+  'avoid_empty_setstate', // stylistic: moved from recommended (v4.12.4)
   'avoid_excessive_bottom_nav_items',
   'avoid_excessive_expressions',
   'avoid_explicit_pattern_field_name',
