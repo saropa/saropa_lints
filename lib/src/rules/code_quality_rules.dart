@@ -8374,3 +8374,113 @@ class _MoveTrailingCommentFix extends DartFix {
     });
   }
 }
+
+// =============================================================================
+// Missing Interpolation Rules
+// =============================================================================
+
+/// Warns when string concatenation with + is used where string interpolation
+/// would be clearer.
+///
+/// String interpolation is more readable, less error-prone, and performs
+/// better than concatenation with the + operator. Concatenation also makes
+/// it easy to forget spaces between segments.
+///
+/// **BAD:**
+/// ```dart
+/// final greeting = 'Hello, ' + name + '!';
+/// final path = baseUrl + '/api/' + endpoint;
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// final greeting = 'Hello, $name!';
+/// final path = '$baseUrl/api/$endpoint';
+/// ```
+class AvoidMissingInterpolationRule extends SaropaLintRule {
+  const AvoidMissingInterpolationRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  static const LintCode _code = LintCode(
+    name: 'avoid_missing_interpolation',
+    problemMessage:
+        '[avoid_missing_interpolation] String concatenation using the + operator combines a string literal with a variable or expression. String interpolation (\$variable or \${expression}) is the idiomatic Dart approach that is more readable, less error-prone (no accidental space omission between segments), and avoids creating intermediate String objects for each + operation, improving both clarity and performance in concatenation-heavy code paths.',
+    correctionMessage:
+        'Replace string concatenation with string interpolation using \$variable or \${expression} syntax for cleaner, more idiomatic Dart code.',
+    errorSeverity: DiagnosticSeverity.WARNING,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addBinaryExpression((BinaryExpression node) {
+      if (node.operator.type != TokenType.PLUS) return;
+
+      final leftType = node.leftOperand.staticType;
+      final rightType = node.rightOperand.staticType;
+
+      // At least one side must be a String
+      final bool leftIsString = leftType?.isDartCoreString ?? false;
+      final bool rightIsString = rightType?.isDartCoreString ?? false;
+      if (!leftIsString && !rightIsString) return;
+
+      // At least one side must be a string literal
+      final bool leftIsLiteral = node.leftOperand is StringLiteral;
+      final bool rightIsLiteral = node.rightOperand is StringLiteral;
+      if (!leftIsLiteral && !rightIsLiteral) return;
+
+      // Skip if this is a child of another + expression (report only root)
+      final AstNode? parent = node.parent;
+      if (parent is BinaryExpression &&
+          parent.operator.type == TokenType.PLUS) {
+        final parentLeftType = parent.leftOperand.staticType;
+        final parentRightType = parent.rightOperand.staticType;
+        if ((parentLeftType?.isDartCoreString ?? false) ||
+            (parentRightType?.isDartCoreString ?? false)) {
+          return;
+        }
+      }
+
+      reporter.atNode(node, code);
+    });
+  }
+
+  @override
+  List<Fix> getFixes() => <Fix>[_UseStringInterpolationFix()];
+}
+
+class _UseStringInterpolationFix extends DartFix {
+  @override
+  void run(
+    CustomLintResolver resolver,
+    ChangeReporter reporter,
+    CustomLintContext context,
+    AnalysisError analysisError,
+    List<AnalysisError> others,
+  ) {
+    context.registry.addBinaryExpression((BinaryExpression node) {
+      if (!analysisError.sourceRange.intersects(node.sourceRange)) return;
+      if (node.operator.type != TokenType.PLUS) return;
+
+      final changeBuilder = reporter.createChangeBuilder(
+        message: 'Convert to string interpolation',
+        priority: 1,
+      );
+
+      changeBuilder.addDartFileEdit((builder) {
+        builder.addSimpleInsertion(
+          node.offset,
+          '/* TODO: use string interpolation instead of + concatenation */ ',
+        );
+      });
+    });
+  }
+}

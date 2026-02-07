@@ -577,3 +577,106 @@ class _AddHackForEqualArgumentsFix extends DartFix {
     });
   }
 }
+
+// =============================================================================
+// DateTime Comparison Rules
+// =============================================================================
+
+/// Warns when DateTime values are compared using == or !=.
+///
+/// DateTime equality checks fail due to microsecond differences between
+/// timestamps that represent the "same" moment. Two DateTimes created
+/// independently almost never have identical microsecond values.
+///
+/// **BAD:**
+/// ```dart
+/// if (startTime == endTime) { ... }
+/// if (created != modified) { ... }
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// if (startTime.difference(endTime).abs() < const Duration(seconds: 1)) { ... }
+/// if (startTime.isAtSameMomentAs(endTime)) { ... }
+/// ```
+class AvoidDatetimeComparisonWithoutPrecisionRule extends SaropaLintRule {
+  const AvoidDatetimeComparisonWithoutPrecisionRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  static const LintCode _code = LintCode(
+    name: 'avoid_datetime_comparison_without_precision',
+    problemMessage:
+        '[avoid_datetime_comparison_without_precision] Direct equality comparison (== or !=) on DateTime objects is unreliable because two timestamps representing the same logical moment almost never share identical microsecond values. Network latency, clock drift, serialization rounding, and independent construction all introduce sub-second differences that cause equality checks to silently fail, leading to missed cache hits, duplicate entries, and incorrect conditional logic.',
+    correctionMessage:
+        'Use DateTime.difference().abs() < Duration(threshold) with an appropriate precision, or use isAtSameMomentAs() for UTC-normalized comparison.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addBinaryExpression((BinaryExpression node) {
+      final TokenType op = node.operator.type;
+      if (op != TokenType.EQ_EQ && op != TokenType.BANG_EQ) return;
+
+      final leftType = node.leftOperand.staticType;
+      final rightType = node.rightOperand.staticType;
+
+      // Check if both sides are DateTime
+      final bool leftIsDateTime =
+          leftType != null && leftType.getDisplayString() == 'DateTime';
+      final bool rightIsDateTime =
+          rightType != null && rightType.getDisplayString() == 'DateTime';
+
+      if (leftIsDateTime && rightIsDateTime) {
+        reporter.atNode(node, code);
+      }
+    });
+  }
+
+  @override
+  List<Fix> getFixes() => <Fix>[_UseDateTimeDifferenceFix()];
+}
+
+class _UseDateTimeDifferenceFix extends DartFix {
+  @override
+  void run(
+    CustomLintResolver resolver,
+    ChangeReporter reporter,
+    CustomLintContext context,
+    AnalysisError analysisError,
+    List<AnalysisError> others,
+  ) {
+    context.registry.addBinaryExpression((BinaryExpression node) {
+      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
+
+      final String left = node.leftOperand.toSource();
+      final String right = node.rightOperand.toSource();
+      final bool isEqual = node.operator.type == TokenType.EQ_EQ;
+
+      final String replacement = isEqual
+          ? '$left.difference($right).abs() < const Duration(seconds: 1)'
+          : '$left.difference($right).abs() >= const Duration(seconds: 1)';
+
+      final changeBuilder = reporter.createChangeBuilder(
+        message: 'Replace with difference threshold comparison',
+        priority: 1,
+      );
+
+      changeBuilder.addDartFileEdit((builder) {
+        builder.addSimpleReplacement(
+          SourceRange(node.offset, node.length),
+          replacement,
+        );
+      });
+    });
+  }
+}
