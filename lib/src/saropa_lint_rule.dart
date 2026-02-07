@@ -2179,6 +2179,10 @@ abstract class SaropaLintRule extends DartLintRule {
     // environment variable SAROPA_LINTS_PROGRESS=true
     ProgressTracker.recordFile(path);
 
+    // Reset the report-write debounce on every file so the timer only fires
+    // after analysis truly goes idle, not just between violations.
+    AnalysisReporter.scheduleWrite();
+
     // =========================================================================
     // BATCH EXECUTION PLAN CHECK (Performance Optimization)
     // =========================================================================
