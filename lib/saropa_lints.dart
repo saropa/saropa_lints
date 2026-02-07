@@ -29,7 +29,7 @@
 /// Map format (without `-`) is silently ignored by custom_lint!
 library;
 
-import 'dart:io' show Directory, File, Platform;
+import 'dart:io' show Directory, File, Platform, stderr;
 
 import 'package:custom_lint_builder/custom_lint_builder.dart';
 
@@ -2513,12 +2513,14 @@ class _SaropaLints extends PluginBase {
     }
 
     // =========================================================================
-    // ISSUE LIMIT CONFIGURATION
+    // ANALYSIS CONFIGURATION
     // =========================================================================
-    // Configure maximum issues to report before pausing analysis.
-    // Priority: SAROPA_LINTS_MAX env var > analysis_options_custom.yaml > default (500).
-    // Set to 0 for unlimited.
-    _loadMaxIssuesConfig();
+    // Load max_issues and output mode from env vars or yaml config.
+    // Priority: env var > analysis_options_custom.yaml > default.
+    _loadAnalysisConfig();
+
+    // Log active configuration so users know what's happening
+    _logActiveConfig();
 
     // =========================================================================
     // PERFORMANCE INFRASTRUCTURE INITIALIZATION
@@ -2748,53 +2750,98 @@ void _checkConflictingRules(List<LintRule> enabledRules) {
   }
 }
 
-/// Load max_issues config from environment variable or yaml.
+/// Load analysis configuration from environment variables and yaml.
+///
+/// Reads two settings:
+/// - `max_issues` — cap on Problems tab (default 500, 0 = unlimited)
+/// - `output` — `both` (default) or `file` (report log only)
 ///
 /// Priority (highest wins):
-/// 1. `SAROPA_LINTS_MAX` environment variable
-/// 2. `max_issues` in `analysis_options_custom.yaml`
-/// 3. Default (500)
+/// 1. Environment variables (`SAROPA_LINTS_MAX`, `SAROPA_LINTS_OUTPUT`)
+/// 2. `analysis_options_custom.yaml` root-level keys
+/// 3. Defaults
 ///
 /// Examples:
 /// ```sh
-/// # Environment variable (one-off):
-/// SAROPA_LINTS_MAX=0 dart run custom_lint
+/// # One-off overrides via environment:
+/// SAROPA_LINTS_MAX=0 SAROPA_LINTS_OUTPUT=file dart run custom_lint
 ///
 /// # Persistent config (analysis_options_custom.yaml):
 /// max_issues: 500
+/// output: both
 /// ```
-void _loadMaxIssuesConfig() {
-  // Check environment variable first (highest priority)
+void _loadAnalysisConfig() {
+  var maxFromEnv = false;
+  var outputFromEnv = false;
+
+  // Environment variables (highest priority)
   try {
     final envMax = Platform.environment['SAROPA_LINTS_MAX'];
     if (envMax != null) {
       final value = int.tryParse(envMax);
       if (value != null) {
         ProgressTracker.setMaxIssues(value);
-        return; // Env var takes priority over yaml
+        maxFromEnv = true;
       }
+    }
+
+    final envOutput = Platform.environment['SAROPA_LINTS_OUTPUT'];
+    if (envOutput != null) {
+      final normalized = envOutput.toLowerCase();
+      if (normalized == 'file' || normalized == 'both') {
+        ProgressTracker.setFileOnly(fileOnly: normalized == 'file');
+      }
+      outputFromEnv = true;
     }
   } catch (_) {
     // Platform.environment may throw on some platforms
   }
 
-  // Fall back to yaml config
-  try {
-    final customConfigFile = File('analysis_options_custom.yaml');
-    if (!customConfigFile.existsSync()) return;
+  // Fall back to yaml for any settings not set by env vars
+  if (maxFromEnv && outputFromEnv) return;
 
-    final content = customConfigFile.readAsStringSync();
-    // Simple regex to extract max_issues value
-    // Matches: max_issues: 500 or max_issues:500
-    final match = RegExp(r'max_issues:\s*(\d+)').firstMatch(content);
-    if (match != null) {
-      final value = int.tryParse(match.group(1)!);
-      if (value != null) {
-        ProgressTracker.setMaxIssues(value);
+  try {
+    final configFile = File('analysis_options_custom.yaml');
+    if (!configFile.existsSync()) return;
+
+    final content = configFile.readAsStringSync();
+
+    // Parse max_issues (root-level key only)
+    if (!maxFromEnv) {
+      final match =
+          RegExp(r'^max_issues:\s*(\d+)', multiLine: true).firstMatch(content);
+      if (match != null) {
+        final value = int.tryParse(match.group(1)!);
+        if (value != null) ProgressTracker.setMaxIssues(value);
+      }
+    }
+
+    // Parse output (root-level key only)
+    if (!outputFromEnv) {
+      final match =
+          RegExp(r'^output:\s*(\w+)', multiLine: true).firstMatch(content);
+      if (match != null && match.group(1)!.toLowerCase() == 'file') {
+        ProgressTracker.setFileOnly(fileOnly: true);
       }
     }
   } catch (_) {
-    // Silently ignore - use default if config can't be read
+    // Silently ignore — use defaults if config can't be read
+  }
+}
+
+/// Log the active analysis configuration to stderr so users know
+/// what the system is configured to do.
+void _logActiveConfig() {
+  final output = ProgressTracker.isFileOnly ? 'file' : 'both';
+  final max = ProgressTracker.maxIssues;
+  final maxLabel = max == 0 ? 'unlimited' : '$max';
+
+  if (ProgressTracker.isFileOnly) {
+    stderr.writeln('[saropa_lints] Output: file-only — '
+        'all violations go to report log, nothing in Problems tab.');
+  } else {
+    stderr.writeln('[saropa_lints] Output: $output — '
+        'Problems tab capped at $maxLabel, all issues in report log.');
   }
 }
 

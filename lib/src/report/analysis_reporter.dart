@@ -71,6 +71,19 @@ class AnalysisReporter {
     _debounceTimer = Timer(_debounce, _writeReport);
   }
 
+  /// The project root directory, or null if not initialized.
+  static String? get projectRoot => _projectRoot;
+
+  /// Write the report immediately, cancelling any pending debounce.
+  ///
+  /// Used by the abort mechanism to flush partial results before rules
+  /// stop running.
+  static void writeNow() {
+    _debounceTimer?.cancel();
+    _debounceTimer = null;
+    _writeReport();
+  }
+
   /// Full path to the report file, or null if not initialized.
   static String? get reportPath {
     if (_projectRoot == null || _timestamp == null) return null;

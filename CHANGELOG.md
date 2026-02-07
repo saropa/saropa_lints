@@ -21,11 +21,19 @@ Dates are not included in version headers — [pub.dev](https://pub.dev/packages
 
 - **Progress shows total after limit**: After 500 issues, the progress line shows "500 shown, 847 total" so you can see the report growing in real time.
 
+### Added
+
+- **Graceful abort**: Create a `.saropa_stop` file in the project root to stop analysis mid-flight and get a partial report. Hint shown when the 500-issue limit is reached.
+
+- **File-only output mode**: Set `output: file` in `analysis_options_custom.yaml` (or `SAROPA_LINTS_OUTPUT=file` env var for a one-off run) to skip the Problems tab and send all violations to the report log only.
+
 ### Fixed
 
 - **Report debounce resets on every file**: The debounce timer now resets when any file is processed, not just when a violation is found. Prevents premature report writes during long stretches of clean files.
 
 - **Session reset between analysis runs**: Trackers now reset automatically when a new analysis session starts, preventing double-counted violations and stale `_limitReached` state from previous runs.
+
+- **File re-analysis no longer double-counts**: When a file is re-analyzed within the same session (e.g. user saves during active analysis), stale violation data is cleared before recording new violations.
 
 ---
 ## [4.12.1]
