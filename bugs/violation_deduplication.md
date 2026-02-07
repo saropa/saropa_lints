@@ -233,6 +233,6 @@ adds a dedup layer at the point where data is stored.
 ## Related
 
 - [report_session_management.md](report_session_management.md) — session
-  boundary detection (separate but overlapping concern)
+  boundary detection (separate but overlapping concern, fixed)
 - [priority_impact_assessment.md](priority_impact_assessment.md) — report
   prioritization feature (blocked by this bug)

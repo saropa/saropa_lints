@@ -1,5 +1,6 @@
 // ignore_for_file: always_specify_types, depend_on_referenced_packages, unused_element
 
+import 'dart:collection' show LinkedHashSet;
 import 'dart:developer' as developer;
 import 'dart:io' show Directory, File, Platform, stderr, stdout;
 import 'dart:math' show max;
@@ -214,6 +215,10 @@ class ProgressTracker {
   static final Map<String, Map<String, int>> _issuesByFileBySeverity = {};
   static final Map<String, Map<String, int>> _issuesByFileByRule = {};
 
+  // Per-file dedup keys: 'ruleName:line' — prevents duplicate counting when
+  // the analyzer re-visits the same file without _clearFileData firing.
+  static final Map<String, Set<String>> _fileViolationKeys = {};
+
   // Rolling rate samples for more stable ETA (last N samples)
   static final List<double> _rateSamples = [];
   static const int _maxRateSamples = 5;
@@ -340,7 +345,20 @@ class ProgressTracker {
   /// which stops non-ERROR rules from running (performance safeguard)
   /// and prevents diagnostics from reaching the Problems tab.
   /// The report log captures all issues found up to the limit.
-  static void recordViolation({String? severity, String? ruleName}) {
+  static void recordViolation({
+    String? severity,
+    String? ruleName,
+    int line = 0,
+  }) {
+    // Dedup: skip if this exact violation was already counted for this file.
+    // Prevents inflated counts when the analyzer re-visits a file without
+    // _clearFileData firing (consecutive re-analysis of the same file).
+    if (_currentFile != null && ruleName != null) {
+      final key = '$ruleName:$line';
+      final keys = _fileViolationKeys[_currentFile!] ??= {};
+      if (!keys.add(key)) return;
+    }
+
     _violationsFound++;
     final severityUpper = severity?.toUpperCase();
     final isError = severityUpper == 'ERROR';
@@ -875,6 +893,9 @@ class ProgressTracker {
       }
     }
 
+    // Clear dedup keys so new violations for this file are counted fresh
+    _fileViolationKeys.remove(path);
+
     // Clear from ImpactTracker
     ImpactTracker.removeViolationsForFile(path);
   }
@@ -900,6 +921,7 @@ class ProgressTracker {
     _ruleSeverities.clear();
     _issuesByFileBySeverity.clear();
     _issuesByFileByRule.clear();
+    _fileViolationKeys.clear();
     _rateSamples.clear();
     _slowFiles.clear();
     _limitReached = false;
@@ -1481,15 +1503,15 @@ enum TestRelevance {
 class ImpactTracker {
   ImpactTracker._();
 
-  static final Map<LintImpact, List<ViolationRecord>> _violations = {
-    LintImpact.critical: [],
-    LintImpact.high: [],
-    LintImpact.medium: [],
-    LintImpact.low: [],
-    LintImpact.opinionated: [],
+  static final Map<LintImpact, LinkedHashSet<ViolationRecord>> _violations = {
+    LintImpact.critical: LinkedHashSet<ViolationRecord>(),
+    LintImpact.high: LinkedHashSet<ViolationRecord>(),
+    LintImpact.medium: LinkedHashSet<ViolationRecord>(),
+    LintImpact.low: LinkedHashSet<ViolationRecord>(),
+    LintImpact.opinionated: LinkedHashSet<ViolationRecord>(),
   };
 
-  /// Record a violation.
+  /// Record a violation. Duplicates (same file + line + rule) are ignored.
   static void record({
     required LintImpact impact,
     required String rule,
@@ -1506,8 +1528,10 @@ class ImpactTracker {
   }
 
   /// Get all violations grouped by impact.
-  static Map<LintImpact, List<ViolationRecord>> get violations =>
-      Map.unmodifiable(_violations);
+  static Map<LintImpact, List<ViolationRecord>> get violations => {
+        for (final entry in _violations.entries)
+          entry.key: entry.value.toList(),
+      };
 
   /// Get count of violations by impact level.
   static Map<LintImpact, int> get counts => {
@@ -1581,20 +1605,24 @@ class ImpactTracker {
 
   /// Remove all violations for a specific file (used on re-analysis).
   static void removeViolationsForFile(String filePath) {
-    for (final list in _violations.values) {
-      list.removeWhere((v) => v.file == filePath);
+    for (final set in _violations.values) {
+      set.removeWhere((v) => v.file == filePath);
     }
   }
 
   /// Clear all tracked violations (useful between analysis runs).
   static void reset() {
-    for (final list in _violations.values) {
-      list.clear();
+    for (final set in _violations.values) {
+      set.clear();
     }
   }
 }
 
 /// A recorded lint violation with location and metadata.
+///
+/// Equality is based on [file], [line], and [rule] so that duplicate
+/// reports of the same violation (from consecutive re-analysis passes)
+/// are collapsed when stored in a [Set].
 class ViolationRecord {
   const ViolationRecord({
     required this.rule,
@@ -1607,6 +1635,17 @@ class ViolationRecord {
   final String file;
   final int line;
   final String message;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is ViolationRecord &&
+          file == other.file &&
+          line == other.line &&
+          rule == other.rule;
+
+  @override
+  int get hashCode => Object.hash(file, line, rule);
 
   @override
   String toString() => '$file:$line - $rule: $message';
@@ -2764,7 +2803,11 @@ class SaropaDiagnosticReporter {
 
     // Track for progress reporting with severity
     final severity = code.errorSeverity.name;
-    ProgressTracker.recordViolation(severity: severity, ruleName: _ruleName);
+    ProgressTracker.recordViolation(
+      severity: severity,
+      ruleName: _ruleName,
+      line: line,
+    );
 
     // Schedule report file writing (debounced)
     AnalysisReporter.scheduleWrite();
