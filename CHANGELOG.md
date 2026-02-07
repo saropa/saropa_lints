@@ -29,6 +29,10 @@ Dates are not included in version headers — [pub.dev](https://pub.dev/packages
 
 - **Report: analysis configuration header**: Reports now include tier, enabled rules, platforms, packages, user exclusions, and verbatim `analysis_options_custom.yaml` content.
 
+- **Report: import graph priority scoring**: New FILE IMPORTANCE section ranks every analyzed file by a combined score of fan-in (how many files import it) and architectural layer weight. New FIX PRIORITY section sorts all violations by `impact * (importance + 1) * layer_weight` so the developer sees what to fix first. New PROJECT STRUCTURE section renders the full import dependency tree from entry points.
+
+- **Report: multi-isolate batch consolidation**: Reports now merge data from all isolate restarts within a session instead of losing earlier analysis data. Each isolate writes a batch file; the final report consolidates all batches into one combined report.
+
 ---
 ## [4.12.3]
 
