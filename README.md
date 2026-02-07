@@ -27,6 +27,74 @@ Developed by [Saropa](https://saropa.com) to make the world of Dart & Flutter be
 
 ---
 
+## Quick Start
+
+**Three steps. Two commands. One config file.**
+
+### Step 1 — Install & initialize
+
+```bash
+# Add dependencies
+dart pub add --dev custom_lint saropa_lints
+
+# Generate rule configuration (pick your tier - try essential or recommended to begin with)
+dart run saropa_lints:init --tier essential
+```
+
+This updates (or creates) two files:
+- **`analysis_options.yaml`** — the `custom_lint:` section is regenerated with every rule set to `true`/`false` for your tier. All other sections (`analyzer:`, `linter:`, etc.) are preserved. Your manual rule overrides are kept.
+- **`analysis_options_custom.yaml`** — your project settings. Created on first run; never overwritten. Missing sections are added automatically on subsequent runs.
+
+### Step 2 — Review your settings
+
+Open `analysis_options_custom.yaml` and adjust for your project:
+
+```yaml
+# Enable only the platforms you target
+platforms:
+  ios: true
+  android: true
+  web: false         # set true if you target web
+  macos: false
+  windows: false
+  linux: false
+
+# Disable packages you don't use (all enabled by default)
+packages:
+  riverpod: true
+  bloc: true
+  firebase: true
+  # ... see file for full list
+
+# Analysis settings
+max_issues: 500      # Max issues shown in Problems tab (0 = show all)
+output: both         # "both" = Problems tab + report file
+                     # "file" = report file only (nothing in Problems tab)
+```
+
+After changing settings, re-run init to apply: `dart run saropa_lints:init`
+
+### Step 3 — Run analysis
+
+```bash
+dart run custom_lint
+```
+
+#### Where do my issues go?
+
+| Destination | What it contains | Controlled by |
+|-------------|-----------------|---------------|
+| **Problems tab** | First 500 issues (configurable) | `max_issues` — set to `0` for unlimited |
+| **Report file** | **ALL issues, always, uncapped** | `output` — set to `file` to skip Problems tab entirely |
+
+The report file is written to `reports/<timestamp>_saropa_lint_report.log` in your project root. It contains every violation for your tier regardless of the `max_issues` cap.
+
+> **Available tiers:** `essential` · `recommended` · `professional` · `comprehensive` · `pedantic` — see [The 5 Tiers](#the-5-tiers) for details
+>
+> **Stuck?** See [Troubleshooting](#troubleshooting) · **Upgrading?** See [Migration guides](#migrating-from-other-tools)
+
+---
+
 ## Why Saropa Lints?
 
 ### Linting vs static analysis
@@ -184,50 +252,14 @@ The tool is also built to **fix**. Saropa Lints diagnostics are engineered to be
 ![AI fixing Flutter security vulnerability automatically in Android Studio](https://raw.githubusercontent.com/saropa/saropa_lints/main/assets/20260502_AI_solver_tab.png)
 
 ---
-## Quick Start
-
-### 1. Add dependencies
-
-```yaml
-# pubspec.yaml
-dev_dependencies:
-  custom_lint: ^0.8.0
-  saropa_lints: ^4.6.0
-```
-
-### 2. Enable custom_lint
-
-```yaml
-# analysis_options.yaml
-analyzer:
-  plugins:
-    - custom_lint
-```
-
-### 3. Generate tier configuration
-
-```bash
-dart run saropa_lints:init --tier comprehensive
-```
-
-This generates `analysis_options.yaml` with explicit `true`/`false` for every rule.
-
-Available tiers: `essential` (1), `recommended` (2), `professional` (3), `comprehensive` (4), `pedantic` (5)
-
-> **Why a CLI tool?** The `custom_lint` plugin doesn't reliably pass configuration like `tier: recommended` to plugins. The CLI tool bypasses this limitation by generating explicit rule lists that work 100% of the time.
-
-### 4. Run the linter
-
-```bash
-dart run custom_lint
-```
-
 ### Migrating from other tools?
 
 - [Migrating from very_good_analysis](https://github.com/saropa/saropa_lints/blob/main/doc/guides/migration_from_vga.md) (also covers `lints`, `lint`, `pedantic`)
 - [Migrating from DCM (Dart Code Metrics)](https://github.com/saropa/saropa_lints/blob/main/doc/guides/migration_from_dcm.md)
 - [Migrating from solid_lints](https://github.com/saropa/saropa_lints/blob/main/doc/guides/migration_from_solid_lints.md)
 - [Using with flutter_lints](https://github.com/saropa/saropa_lints/blob/main/doc/guides/using_with_flutter_lints.md) (complementary setup)
+
+> **Why a CLI tool?** The `custom_lint` plugin doesn't reliably pass configuration like `tier: recommended` to plugins. The CLI generates explicit `true`/`false` for every rule, which works 100% of the time.
 
 ## The 5 Tiers
 
