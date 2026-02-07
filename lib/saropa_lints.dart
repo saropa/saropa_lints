@@ -29,7 +29,7 @@
 /// Map format (without `-`) is silently ignored by custom_lint!
 library;
 
-import 'dart:io' show Directory, File;
+import 'dart:io' show Directory, File, Platform;
 
 import 'package:custom_lint_builder/custom_lint_builder.dart';
 
@@ -2515,10 +2515,9 @@ class _SaropaLints extends PluginBase {
     // =========================================================================
     // ISSUE LIMIT CONFIGURATION
     // =========================================================================
-    // Configure maximum issues to report before stopping detailed tracking.
-    // Read from analysis_options_custom.yaml in project root:
-    //   max_issues: 500  # default: 1000, 0 = unlimited
-    // This file is read directly (not via custom_lint config).
+    // Configure maximum issues to report before pausing analysis.
+    // Priority: SAROPA_LINTS_MAX env var > analysis_options_custom.yaml > default (500).
+    // Set to 0 for unlimited.
     _loadMaxIssuesConfig();
 
     // =========================================================================
@@ -2749,14 +2748,37 @@ void _checkConflictingRules(List<LintRule> enabledRules) {
   }
 }
 
-/// Load max_issues config from analysis_options_custom.yaml.
+/// Load max_issues config from environment variable or yaml.
 ///
-/// Reads directly from the project's custom config file:
-/// ```yaml
-/// # In analysis_options_custom.yaml
-/// max_issues: 500  # Limit warning/info tracking (errors always tracked)
+/// Priority (highest wins):
+/// 1. `SAROPA_LINTS_MAX` environment variable
+/// 2. `max_issues` in `analysis_options_custom.yaml`
+/// 3. Default (500)
+///
+/// Examples:
+/// ```sh
+/// # Environment variable (one-off):
+/// SAROPA_LINTS_MAX=0 dart run custom_lint
+///
+/// # Persistent config (analysis_options_custom.yaml):
+/// max_issues: 500
 /// ```
 void _loadMaxIssuesConfig() {
+  // Check environment variable first (highest priority)
+  try {
+    final envMax = Platform.environment['SAROPA_LINTS_MAX'];
+    if (envMax != null) {
+      final value = int.tryParse(envMax);
+      if (value != null) {
+        ProgressTracker.setMaxIssues(value);
+        return; // Env var takes priority over yaml
+      }
+    }
+  } catch (_) {
+    // Platform.environment may throw on some platforms
+  }
+
+  // Fall back to yaml config
   try {
     final customConfigFile = File('analysis_options_custom.yaml');
     if (!customConfigFile.existsSync()) return;

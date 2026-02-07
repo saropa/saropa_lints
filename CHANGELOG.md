@@ -15,11 +15,17 @@ Dates are not included in version headers — [pub.dev](https://pub.dev/packages
 
 ### Changed
 
-- **Issue limit reduced to 500** (from 1000): After 500 non-ERROR issues, analysis stops to protect system resources. The report log captures all issues found up to the limit. Configurable via `max_issues` in `analysis_options_custom.yaml`.
+- **Problems tab capped at 500**: After 500 non-ERROR issues in the Problems tab, rules keep running and all remaining issues are written to the report log only. Configurable via `SAROPA_LINTS_MAX` env var or `max_issues` in `analysis_options_custom.yaml`.
+
+- **Single report file**: Merged full violation log and summary into one combined report file (`_saropa_lint_report.log`).
+
+- **Progress shows total after limit**: After 500 issues, the progress line shows "500 shown, 847 total" so you can see the report growing in real time.
 
 ### Fixed
 
 - **Report debounce resets on every file**: The debounce timer now resets when any file is processed, not just when a violation is found. Prevents premature report writes during long stretches of clean files.
+
+- **Session reset between analysis runs**: Trackers now reset automatically when a new analysis session starts, preventing double-counted violations and stale `_limitReached` state from previous runs.
 
 ---
 ## [4.12.1]
