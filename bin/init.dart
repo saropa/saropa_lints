@@ -1179,14 +1179,35 @@ $packageSection$stylisticSection# ───────────────�
 /// Added in v4.9.1 - older files won't have this setting, so we add it
 /// at the top of the file if missing.
 void _ensureMaxIssuesSetting(File file) {
-  final content = file.readAsStringSync();
+  var content = file.readAsStringSync();
 
-  // Check if max_issues already exists
-  if (RegExp(r'^max_issues:\s*\d+', multiLine: true).hasMatch(content)) {
-    return; // Already has the setting
+  final hasMaxIssues =
+      RegExp(r'^max_issues:\s*\d+', multiLine: true).hasMatch(content);
+  final hasOutput =
+      RegExp(r'^output:\s*\w+', multiLine: true).hasMatch(content);
+
+  if (hasMaxIssues && hasOutput) return; // Both settings present
+
+  if (!hasMaxIssues) {
+    // Neither setting exists — add the full block
+    content = _addAnalysisSettingsBlock(content);
+    file.writeAsStringSync(content);
+    _logTerminal(
+        '${_Colors.green}✓ Added analysis settings to ${file.path}${_Colors.reset}');
+    return;
   }
 
-  // Add max_issues at the top, after any existing header comments
+  // max_issues exists but output is missing — add output after max_issues
+  if (!hasOutput) {
+    content = _addOutputSetting(content);
+    file.writeAsStringSync(content);
+    _logTerminal(
+        '${_Colors.green}✓ Added output setting to ${file.path}${_Colors.reset}');
+  }
+}
+
+/// Add the full analysis settings block (max_issues + output).
+String _addAnalysisSettingsBlock(String content) {
   final settingBlock = '''
 # ─────────────────────────────────────────────────────────────────────────────
 # ANALYSIS SETTINGS (added in v4.9.1, updated v4.12.2)
@@ -1209,24 +1230,36 @@ output: both
 
 ''';
 
-  // Find where to insert - after the header box if present, else at top
   final headerEndMatch = RegExp(r'╚[═]+╝\n*').firstMatch(content);
-  String newContent;
   if (headerEndMatch != null) {
-    // Insert after the header box
     final insertPos = headerEndMatch.end;
-    newContent = content.substring(0, insertPos) +
+    return content.substring(0, insertPos) +
         '\n' +
         settingBlock +
         content.substring(insertPos);
-  } else {
-    // No header box, insert at top
-    newContent = settingBlock + content;
   }
+  return settingBlock + content;
+}
 
-  file.writeAsStringSync(newContent);
-  _logTerminal(
-      '${_Colors.green}✓ Added max_issues setting to ${file.path}${_Colors.reset}');
+/// Add just the output setting after an existing max_issues line.
+String _addOutputSetting(String content) {
+  final maxIssuesMatch =
+      RegExp(r'^(max_issues:\s*\d+.*)\n', multiLine: true).firstMatch(content);
+  if (maxIssuesMatch == null) return content;
+
+  final insertPos = maxIssuesMatch.end;
+  const outputBlock = '''
+# output: Where violations are sent.
+#   - "both"  (default) — Problems tab + report file
+#   - "file"  — Report file only (nothing in Problems tab)
+#   - Override per-run: SAROPA_LINTS_OUTPUT=file dart run custom_lint
+output: both
+
+''';
+
+  return content.substring(0, insertPos) +
+      outputBlock +
+      content.substring(insertPos);
 }
 
 /// Ensure platforms setting exists in an existing custom config file.
