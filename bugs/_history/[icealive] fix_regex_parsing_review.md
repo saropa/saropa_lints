@@ -1,14 +1,16 @@
 # Analysis: Resolution of CLI Tool Parsing (PR #84 and Subsequent Refactoring)
 
-[Github PR #84](https://github.com/saropa/saropa_lints/pull/84)
+<!-- cspell:ignore Github -->
+[Github PR #84](https://github.com/saropa/saropa_lints/pull/84) (closed in favor of [PR #90](https://github.com/saropa/saropa_lints/pull/90))
 
-**Status:** ✅ **Complete & Approved**
+**Status:** Resolved — PR #84 was closed, its fix was adopted and refactored in PR #90 (merged 2026-02-05).
 
 ## 1. Executive Summary
 
-The project's command-line tools (`baseline.dart`, `impact_report.dart`) were non-functional due to a regex bug. **PR #84 correctly fixed this bug**, but in doing so, highlighted a pre-existing structural issue: the parsing logic was duplicated across both tool files.
+<!-- cspell:ignore icealive -->
+The project's command-line tools (`baseline.dart`, `impact_report.dart`) were non-functional due to a regex bug. **PR #84 by [@icealive](https://github.com/icealive) correctly identified and fixed this bug**. The maintainer adopted the fix but closed PR #84 in favor of [PR #90](https://github.com/saropa/saropa_lints/pull/90), which incorporated the regex correction alongside a refactoring to eliminate the duplicated parsing logic.
 
-This structural issue has now been **fully resolved** by refactoring the duplicated code into shared, single-purpose files, resulting in a more robust and maintainable codebase.
+Regression tests for `parseViolations()` were added in v4.12.1 to guard against future output format changes.
 
 ---
 
@@ -24,11 +26,16 @@ The root cause of the failure was that the `_parseViolations` function, present 
 
 ## 3. The Pull Request Fix (PR #84)
 
-PR #84 successfully fixed the immediate bug by updating the regex pattern in both files.
+PR #84 correctly diagnosed the bug and updated the regex pattern in both files.
 
 *   **Corrected Pattern:** `r'^\s*(.+?):(\d+):(\d+)\s+•\s+(.*?)•\s+(\w+)\s+•'`
-*   **Action:** The author correctly identified the format change and updated the pattern to match the bullet separators and capture the correct data groups.
-*   **Outcome:** This made the tools functional again.
+*   **Key Changes:**
+    *   Replaced hyphen (`-`) separators with bullet (`•`) separators
+    *   Reordered capture groups: message now comes before rule name, matching actual `custom_lint` output
+    *   Added leading `\s*` to handle indented output lines
+*   **Additional Fix:** Added the missing `LintImpact.opinionated` category to the `impact_report` grouping
+
+**Note:** PR #84 was **not merged directly**. The maintainer closed it in favor of PR #90, which incorporated the fix alongside structural improvements. The contributor was credited in the v4.11.0 CHANGELOG.
 
 ---
 
@@ -46,13 +53,34 @@ While PR #84 fixed the bug inside this duplicated code, it left the duplication 
 
 ---
 
-## 5. The Final Resolution: Refactoring
+## 5. The Resolution: PR #90 (Refactoring)
 
-The current codebase has addressed the code duplication issue by moving the shared logic into dedicated files.
+[PR #90](https://github.com/saropa/saropa_lints/pull/90) (commit `d573c45`, merged 2026-02-05) resolved both the bug and the duplication:
 
-*   **`lib/src/violation_parser.dart`:** Now contains the single, authoritative `parseViolations` function.
+*   **`lib/src/violation_parser.dart`:** Now contains the single, authoritative `parseViolations` function with the corrected regex.
 *   **`lib/src/models/violation.dart`:** Now contains the single `Violation` data model.
 
-Both `bin/baseline.dart` and `bin/impact_report.dart` have been updated to `import` these new files instead of defining the logic locally.
+Both `bin/baseline.dart` and `bin/impact_report.dart` were updated to import these shared files instead of defining the logic locally.
 
-**Conclusion:** The initial bug is fixed, and the underlying structural problem of code duplication has been resolved through proper refactoring. The code is now correct, maintainable, and follows best practices.
+**Net result:** -65 lines of code, single source of truth for parsing.
+
+---
+
+## 6. Remaining Risks and Mitigations
+
+| Risk | Mitigation |
+|------|------------|
+| `custom_lint` output format may change again | Regression tests in `test/violation_parser_test.dart` validate parsing against fixture output |
+| Unknown rules default to `LintImpact.medium` silently | Acceptable for third-party rules; documented in code |
+| `_ruleImpacts` map instantiates all rules on first access | One-time cost, acceptable for CLI tools that run once |
+
+---
+
+## 7. Timeline
+
+| Date | Event |
+|------|-------|
+| 2026-02-03 | @icealive opens PR #84 with regex fix |
+| 2026-02-05 | Maintainer closes PR #84, opens PR #90 with fix + refactoring |
+| 2026-02-05 | PR #90 merged, released in v4.11.0 |
+| 2026-02-07 | Regression tests added for `parseViolations()` (v4.12.1) |
