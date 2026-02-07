@@ -15,6 +15,7 @@ import 'baseline/baseline_manager.dart';
 import 'ignore_fixes.dart';
 import 'ignore_utils.dart';
 import 'report/analysis_reporter.dart';
+import 'report/import_graph_tracker.dart';
 import 'owasp/owasp.dart';
 import 'project_context.dart';
 import 'tiers.dart' show essentialRules;
@@ -800,6 +801,9 @@ class ProgressTracker {
       stderr.writeln('⚠️  Could not write log file: $e');
     }
   }
+
+  /// Unmodifiable view of all file paths analyzed in this session.
+  static Set<String> get analyzedFiles => Set<String>.unmodifiable(_seenFiles);
 
   /// Get a snapshot of all tracking data for report generation.
   static ProgressTrackerData get reportData => ProgressTrackerData(
@@ -2406,6 +2410,9 @@ abstract class SaropaLintRule extends DartLintRule {
     // Get file content from resolver (already loaded by analyzer)
     final content = resolver.source.contents.data;
 
+    // Collect imports for dependency graph (runs once per file)
+    ImportGraphTracker.collectImports(path, content);
+
     // =========================================================================
     // FILE-LEVEL IGNORE CHECK
     // =========================================================================
@@ -2439,6 +2446,11 @@ abstract class SaropaLintRule extends DartLintRule {
         GitAwarePriority.initialize(projectRoot);
         // Initialize report writer for automatic report generation
         AnalysisReporter.initialize(projectRoot);
+        // Initialize import graph tracker for priority-based reports
+        ImportGraphTracker.setProjectInfo(
+          projectRoot,
+          ProjectContext.getPackageName(projectRoot),
+        );
       }
     }
 
