@@ -11,6 +11,13 @@ Dates are not included in version headers — [pub.dev](https://pub.dev/packages
 ** See the current published changelog: [saropa_lints/changelog](https://pub.dev/packages/saropa_lints/changelog)
 
 ---
+## [4.12.1]
+
+### Fixed
+
+- **Analysis report captures all violations**: The debounce timer's write-once guard caused reports to contain only the first batch of violations when analysis gaps exceeded 3 seconds. Reports now overwrite on each debounce cycle so the final output reflects the complete analysis.
+
+---
 ## [4.12.0]
 
 ### Added
