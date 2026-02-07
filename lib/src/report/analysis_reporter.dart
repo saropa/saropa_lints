@@ -22,7 +22,7 @@ class AnalysisReporter {
   static String? _projectRoot;
   static String? _timestamp;
   static Timer? _debounceTimer;
-  static bool _written = false;
+  static bool _pathsLogged = false;
 
   /// Debounce duration: write reports after this idle period.
   static const Duration _debounce = Duration(seconds: 3);
@@ -34,7 +34,7 @@ class AnalysisReporter {
   static void initialize(String projectRoot) {
     if (_projectRoot != null) return;
     _projectRoot = projectRoot;
-    _written = false;
+    _pathsLogged = false;
 
     final now = DateTime.now();
     _timestamp = '${now.year}'
@@ -49,18 +49,18 @@ class AnalysisReporter {
   /// Schedule report writing after a debounce period.
   ///
   /// Each call resets the timer. When no new violations arrive for
-  /// `_debounce` duration, reports are written.
+  /// [_debounce] duration, reports are written. Reports are overwritten
+  /// on each cycle so the final write captures all violations.
   static void scheduleWrite() {
-    if (_projectRoot == null || _written) return;
+    if (_projectRoot == null) return;
 
     _debounceTimer?.cancel();
     _debounceTimer = Timer(_debounce, _writeReports);
   }
 
-  /// Write both report files immediately.
+  /// Write both report files, overwriting any previous output.
   static void _writeReports() {
-    if (_projectRoot == null || _written) return;
-    _written = true;
+    if (_projectRoot == null) return;
 
     try {
       final sep = Platform.pathSeparator;
@@ -77,10 +77,14 @@ class AnalysisReporter {
       _writeFullLog(fullPath);
       _writeSummary(summaryPath);
 
-      stderr.writeln('');
-      stderr.writeln('[saropa_lints] Reports written:');
-      stderr.writeln('  Full log: $fullPath');
-      stderr.writeln('  Summary:  $summaryPath');
+      // Log file paths only on the first write to avoid spamming stderr.
+      if (!_pathsLogged) {
+        _pathsLogged = true;
+        stderr.writeln('');
+        stderr.writeln('[saropa_lints] Reports written:');
+        stderr.writeln('  Full log: $fullPath');
+        stderr.writeln('  Summary:  $summaryPath');
+      }
     } catch (e) {
       stderr.writeln('[saropa_lints] Could not write reports: $e');
     }
@@ -239,6 +243,6 @@ class AnalysisReporter {
     _debounceTimer = null;
     _projectRoot = null;
     _timestamp = null;
-    _written = false;
+    _pathsLogged = false;
   }
 }
