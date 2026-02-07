@@ -21,6 +21,14 @@ Dates are not included in version headers — [pub.dev](https://pub.dev/packages
 
 - **`avoid_empty_setstate` no longer flags mounted-guarded calls**: Empty `setState(() {})` inside a `mounted` guard (`if (mounted)`, ternary, or early-return pattern) is now suppressed. This is an intentional Flutter idiom for triggering rebuilds after async gaps or external state mutations.
 
+- **Report: duplicate violations on file re-analysis**: `_currentFile` was not updated when a file was re-analyzed, causing `_trackByFileAndRule` to attribute violations to the wrong file and `_clearFileData` to skip ImpactTracker cleanup. Violations appeared 10-15x in reports.
+
+- **Report: session detection uses re-analysis instead of timeout**: The 3-second debounce could fire mid-analysis (observed 83-second gap between file batches), splitting one run into multiple reports. Session boundaries now use file re-analysis detection — straggler files are new and never trigger false boundaries.
+
+### Added
+
+- **Report: analysis configuration header**: Reports now include tier, enabled rules, platforms, packages, user exclusions, and verbatim `analysis_options_custom.yaml` content.
+
 ---
 ## [4.12.3]
 
