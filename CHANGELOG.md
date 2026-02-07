@@ -17,6 +17,10 @@ Dates are not included in version headers — [pub.dev](https://pub.dev/packages
 
 - **`avoid_empty_setstate` moved from recommended to comprehensive tier**: This rule flags a valid Flutter idiom (`if (mounted) setState(() {})` after async gaps). It is a style preference, not a bug or correctness issue, so it belongs in the comprehensive tier for quality-focused teams. Impact reduced from medium to low.
 
+### Fixed
+
+- **`avoid_empty_setstate` no longer flags mounted-guarded calls**: Empty `setState(() {})` inside a `mounted` guard (`if (mounted)`, ternary, or early-return pattern) is now suppressed. This is an intentional Flutter idiom for triggering rebuilds after async gaps or external state mutations.
+
 ---
 ## [4.12.3]
 

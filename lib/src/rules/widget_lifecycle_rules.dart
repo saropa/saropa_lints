@@ -169,10 +169,15 @@ class _ContextUsageVisitor extends RecursiveAstVisitor<void> {
   }
 }
 
-/// Warns when a setState callback body is empty.
+/// Warns when a setState callback body is empty without a `mounted` guard.
 ///
 /// An empty `setState(() {})` still triggers a rebuild, but moving state
 /// changes inside the callback makes the intent clearer.
+///
+/// The rule **does not fire** when the call is inside a `mounted` guard
+/// (`if (mounted) setState(() {})`, ternary, or early-return pattern),
+/// because these indicate intentional rebuilds after async gaps or
+/// external state mutations — a common and valid Flutter idiom.
 ///
 /// Example of **bad** code:
 /// ```dart
@@ -184,6 +189,9 @@ class _ContextUsageVisitor extends RecursiveAstVisitor<void> {
 /// setState(() {
 ///   _value = newValue;
 /// });
+///
+/// // Also OK — mounted guard makes the intent clear:
+/// if (mounted) setState(() {});
 /// ```
 
 class AvoidEmptySetStateRule extends SaropaLintRule {
@@ -225,10 +233,35 @@ class AvoidEmptySetStateRule extends SaropaLintRule {
       if (callback is FunctionExpression) {
         final FunctionBody body = callback.body;
         if (body is BlockFunctionBody && body.block.statements.isEmpty) {
+          if (_isInsideMountedGuard(node)) return;
           reporter.atNode(node, code);
         }
       }
     });
+  }
+
+  /// Walk ancestors to check if [node] is inside a `mounted` guard.
+  ///
+  /// Handles `if (mounted) setState(…)`, ternary guards, and
+  /// early-return patterns (`if (!mounted) return;` before setState).
+  static bool _isInsideMountedGuard(AstNode node) {
+    AstNode? current = node.parent;
+    while (current != null) {
+      if (current is IfStatement &&
+          current.expression.toSource().contains('mounted')) {
+        return true;
+      }
+      if (current is ConditionalExpression &&
+          current.condition.toSource().contains('mounted')) {
+        return true;
+      }
+      // Stop at method/function boundary
+      if (current is MethodDeclaration || current is FunctionDeclaration) {
+        break;
+      }
+      current = current.parent;
+    }
+    return false;
   }
 }
 
