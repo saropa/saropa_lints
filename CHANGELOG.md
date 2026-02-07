@@ -13,6 +13,10 @@ Dates are not included in version headers — [pub.dev](https://pub.dev/packages
 ---
 ## [4.12.3]
 
+### Fixed
+
+- **Init migrates existing configs**: Running `dart run saropa_lints:init` on projects that already have `max_issues` now adds the missing `output` setting instead of skipping the file.
+
 ---
 ## [4.12.2]
 
@@ -37,8 +41,6 @@ Dates are not included in version headers — [pub.dev](https://pub.dev/packages
 - **Session reset between analysis runs**: Trackers now reset automatically when a new analysis session starts, preventing double-counted violations and stale `_limitReached` state from previous runs.
 
 - **File re-analysis no longer double-counts**: When a file is re-analyzed within the same session (e.g. user saves during active analysis), stale violation data is cleared before recording new violations.
-
-- **Init migrates existing configs**: Running `dart run saropa_lints:init` on projects that already have `max_issues` now adds the missing `output` setting instead of skipping the file.
 
 ---
 ## [4.12.1]
