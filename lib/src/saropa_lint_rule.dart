@@ -228,16 +228,13 @@ class ProgressTracker {
     _totalEnabledRules = count;
   }
 
-  /// Set the maximum number of issues to report to the Problems tab.
+  /// Set the maximum number of issues to show in the Problems tab.
   ///
-  /// Configure in `analysis_options_custom.yaml`:
-  /// ```yaml
-  /// max_issues: 500  # Stop after 500 issues (default: 500, 0 = unlimited)
-  /// ```
+  /// After this limit, rules keep running but violations only go to the
+  /// report log. Set to 0 for unlimited Problems tab output.
   ///
-  /// Once the limit is reached, non-ERROR rules stop running and the
-  /// report log captures all issues found up to that point.
-  /// ERROR-severity rules always run to catch critical issues.
+  /// Configured via `SAROPA_LINTS_MAX` env var or `max_issues` in
+  /// `analysis_options_custom.yaml`. Default: 500.
   static void setMaxIssues(int limit) {
     _maxIssues = limit;
   }
@@ -316,17 +313,9 @@ class ProgressTracker {
     if (!isError && _maxIssues > 0 && nonErrorCount > _maxIssues) {
       if (!_limitReached) {
         _limitReached = true;
-        final next = _maxIssues * 2;
         stderr.writeln('');
-        stderr.writeln('[saropa_lints] $_maxIssues issues reached '
-            '— analysis paused.');
-        stderr.writeln('  Report log written to reports/ directory.');
-        stderr.writeln('  To continue, set max_issues in '
-            'analysis_options_custom.yaml:');
-        stderr.writeln('    max_issues: $next   '
-            '# next $_maxIssues issues');
-        stderr.writeln('    max_issues: 0      '
-            '# unlimited (full scan)');
+        stderr.writeln('[saropa_lints] $_maxIssues issues in Problems tab. '
+            'Remaining issues will be in the report only.');
       }
     }
 
@@ -448,6 +437,11 @@ class ProgressTracker {
     final brightGreen = _ProgressColors.brightGreen;
     final clearLine = _ProgressColors.clearLine;
 
+    // Issue count string shared by both progress line variants
+    final issuesDisplay = _limitReached
+        ? '$_maxIssues shown, $_violationsFound total'
+        : '$_violationsFound';
+
     if (_discoveredFromFiles && _totalExpectedFiles > 0) {
       final percent =
           (fileCount * 100 / _totalExpectedFiles).clamp(0, 100).round();
@@ -462,14 +456,12 @@ class ProgressTracker {
       final empty = barWidth - filled;
       final bar = '$brightGreen${'█' * filled}$dim${'░' * empty}$reset';
 
-      // Color-code issues count (show limit indicator if reached)
+      // Color-code issues count
       final issuesColor = _violationsFound == 0
           ? green
           : _errorCount > 0
               ? red
               : yellow;
-      final issuesDisplay =
-          _limitReached ? '$_maxIssues+' : '$_violationsFound';
       final issuesStr = '$issuesColor$issuesDisplay$reset';
 
       // Build compact status line with clear labels
@@ -500,7 +492,7 @@ class ProgressTracker {
         ..write('$dim│$reset ')
         ..write('${dim}Rate:$reset ${filesPerSec.round()}/s ')
         ..write('$dim│$reset ')
-        ..write('${dim}Issues:$reset $_violationsFound ')
+        ..write('${dim}Issues:$reset $issuesDisplay ')
         ..write('$dim│$reset ')
         ..write('$dim$displayName$reset');
 
@@ -549,19 +541,15 @@ class ProgressTracker {
     buf.writeln(
         '  $dim📄$reset Files with issues: $issueColor$_filesWithIssues$reset ($issuePercent%)');
 
-    // Warning if issue limit was reached (only applies to warnings/info, not errors)
+    // Note if issue limit was reached (Problems tab capped, report has all)
     if (_limitReached) {
-      final next = _maxIssues * 2;
+      final report = AnalysisReporter.reportPath;
       buf.writeln();
-      buf.writeln(
-          '$yellow  ⚠️  $_maxIssues issues reached — analysis paused.$reset');
-      buf.writeln('$dim     Report log written to reports/ directory.');
-      buf.writeln('     To continue, set max_issues in '
-          'analysis_options_custom.yaml:');
-      buf.writeln('       max_issues: $next   '
-          '# next $_maxIssues issues');
-      buf.writeln('       max_issues: 0      '
-          '# unlimited (full scan)$reset');
+      buf.writeln('$yellow  ⚠️  Problems tab capped at $_maxIssues. '
+          'All $_violationsFound issues in report.$reset');
+      if (report != null) {
+        buf.writeln('$dim     $report$reset');
+      }
     }
 
     // Severity breakdown (only if there are issues)
@@ -2157,17 +2145,6 @@ abstract class SaropaLintRule extends DartLintRule {
   ) {
     // Check if rule is disabled
     if (isDisabled) return;
-
-    // =========================================================================
-    // ISSUE LIMIT CHECK (Performance Safeguard)
-    // =========================================================================
-    // After hitting the warning/info limit, stop non-ERROR rules to avoid
-    // overwhelming the machine. The report log captures issues found so far.
-    // ERROR-severity rules always run (security, crashes, etc.)
-    if (ProgressTracker.isLimitReached &&
-        code.errorSeverity != DiagnosticSeverity.ERROR) {
-      return;
-    }
 
     // =========================================================================
     // SLOW RULE DEFERRAL (Performance Optimization)

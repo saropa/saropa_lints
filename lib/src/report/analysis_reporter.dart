@@ -5,14 +5,13 @@ import 'dart:io' show Directory, File, Platform, stderr;
 
 import 'package:saropa_lints/src/saropa_lint_rule.dart';
 
-/// Writes analysis reports to the project's `reports/` directory.
+/// Writes a combined analysis report to the project's `reports/` directory.
 ///
-/// Automatically generates two timestamped files after each analysis run:
-/// - **Full log** (`_saropa_lint_report_full.log`): Every violation with location and metadata
-/// - **Summary** (`_saropa_lint_report_summary.log`): Counts by impact, severity, rule, and file
+/// Generates a single timestamped file after each analysis run containing
+/// both the full violation list and summary statistics.
 ///
 /// Reports are triggered via a debounce timer — after 3 seconds of no new
-/// violations, the reporter assumes analysis is complete and writes both files.
+/// violations, the reporter assumes analysis is complete and writes the file.
 ///
 /// Initialize once per analysis session via [initialize], then call
 /// [scheduleWrite] after each violation is recorded.
@@ -23,6 +22,7 @@ class AnalysisReporter {
   static String? _timestamp;
   static Timer? _debounceTimer;
   static bool _pathsLogged = false;
+  static bool _sessionEnded = false;
 
   /// Debounce duration: write reports after this idle period.
   static const Duration _debounce = Duration(seconds: 3);
@@ -35,9 +35,13 @@ class AnalysisReporter {
     if (_projectRoot != null) return;
     _projectRoot = projectRoot;
     _pathsLogged = false;
+    _timestamp = _generateTimestamp();
+  }
 
+  /// Generate a timestamp string for the report filename.
+  static String _generateTimestamp() {
     final now = DateTime.now();
-    _timestamp = '${now.year}'
+    return '${now.year}'
         '${now.month.toString().padLeft(2, '0')}'
         '${now.day.toString().padLeft(2, '0')}'
         '_'
@@ -51,16 +55,50 @@ class AnalysisReporter {
   /// Each call resets the timer. When no new violations arrive for
   /// `_debounce` duration, reports are written. Reports are overwritten
   /// on each cycle so the final write captures all violations.
+  ///
+  /// If a previous session ended (debounce fired), this resets all
+  /// trackers for a fresh session before scheduling.
   static void scheduleWrite() {
     if (_projectRoot == null) return;
 
+    // Detect new session: if the debounce fired (session ended) and
+    // we're being called again, a new analysis run has started.
+    if (_sessionEnded) {
+      _startNewSession();
+    }
+
     _debounceTimer?.cancel();
-    _debounceTimer = Timer(_debounce, _writeReports);
+    _debounceTimer = Timer(_debounce, _writeReport);
   }
 
-  /// Write both report files, overwriting any previous output.
-  static void _writeReports() {
+  /// Full path to the report file, or null if not initialized.
+  static String? get reportPath {
+    if (_projectRoot == null || _timestamp == null) return null;
+    final sep = Platform.pathSeparator;
+    return '$_projectRoot${sep}reports$sep'
+        '${_timestamp}_saropa_lint_report.log';
+  }
+
+  /// Reset all trackers and start a fresh session with a new timestamp.
+  static void _startNewSession() {
+    _sessionEnded = false;
+    _pathsLogged = false;
+
+    // Reset trackers so counts don't accumulate across sessions
+    ProgressTracker.reset();
+    ImpactTracker.reset();
+
+    _timestamp = _generateTimestamp();
+  }
+
+  /// Write the combined report file, overwriting any previous output.
+  ///
+  /// Called by the debounce timer when analysis goes idle. Marks the
+  /// session as ended so the next [scheduleWrite] call resets trackers.
+  static void _writeReport() {
     if (_projectRoot == null) return;
+
+    _sessionEnded = true;
 
     try {
       final sep = Platform.pathSeparator;
@@ -69,39 +107,61 @@ class AnalysisReporter {
         reportsDir.createSync(recursive: true);
       }
 
-      final fullPath =
-          '${reportsDir.path}/${_timestamp}_saropa_lint_report_full.log';
-      final summaryPath =
-          '${reportsDir.path}/${_timestamp}_saropa_lint_report_summary.log';
+      final path = reportPath!;
+      _writeCombinedReport(path);
 
-      _writeFullLog(fullPath);
-      _writeSummary(summaryPath);
-
-      // Log file paths only on the first write to avoid spamming stderr.
+      // Log file path only on the first write to avoid spamming stderr.
       if (!_pathsLogged) {
         _pathsLogged = true;
         stderr.writeln('');
-        stderr.writeln('[saropa_lints] Reports written:');
-        stderr.writeln('  Full log: $fullPath');
-        stderr.writeln('  Summary:  $summaryPath');
+        stderr.writeln('[saropa_lints] Report: $path');
       }
     } catch (e) {
-      stderr.writeln('[saropa_lints] Could not write reports: $e');
+      stderr.writeln('[saropa_lints] Could not write report: $e');
     }
   }
 
-  /// Write the full violation log.
-  static void _writeFullLog(String path) {
+  /// Write the combined report (summary + full violation list).
+  static void _writeCombinedReport(String path) {
     final violations = ImpactTracker.violations;
+    final counts = ImpactTracker.counts;
+    final total = ImpactTracker.total;
+    final trackerData = ProgressTracker.reportData;
     final buf = StringBuffer();
 
-    buf.writeln('Saropa Lints Full Analysis Log');
+    // Header
+    buf.writeln('Saropa Lints Analysis Report');
     buf.writeln('Generated: ${DateTime.now().toIso8601String()}');
     buf.writeln('Project: $_projectRoot');
     buf.writeln('${'=' * 70}');
     buf.writeln();
 
-    // Write violations grouped by impact (critical first)
+    // Overview
+    buf.writeln('OVERVIEW');
+    buf.writeln('  Total issues:       $total');
+    buf.writeln('  Files analyzed:     ${trackerData.filesAnalyzed}');
+    buf.writeln('  Files with issues:  ${trackerData.filesWithIssues}');
+    buf.writeln('  Rules triggered:    ${trackerData.issuesByRule.length}');
+    buf.writeln();
+
+    // By Impact
+    _writeImpactSection(buf, counts, total);
+
+    // By Severity
+    _writeSeveritySection(buf, trackerData);
+
+    // Top rules
+    _writeTopRules(buf, trackerData);
+
+    // Top files
+    _writeTopFiles(buf, trackerData);
+
+    // Full violation list
+    buf.writeln('${'=' * 70}');
+    buf.writeln('ALL VIOLATIONS');
+    buf.writeln('${'=' * 70}');
+    buf.writeln();
+
     for (final impact in LintImpact.values) {
       final list = violations[impact];
       if (list == null || list.isEmpty) continue;
@@ -116,73 +176,46 @@ class AnalysisReporter {
     }
 
     buf.writeln('${'=' * 70}');
-    buf.writeln('Total: ${ImpactTracker.total} issues');
+    buf.writeln('Total: $total issues');
 
     File(path).writeAsStringSync(buf.toString());
   }
 
-  /// Write the markdown summary.
-  static void _writeSummary(String path) {
-    final counts = ImpactTracker.counts;
-    final total = ImpactTracker.total;
-    final trackerData = ProgressTracker.reportData;
-    final buf = StringBuffer();
-
-    buf.writeln('# Saropa Lints Analysis Summary');
-    buf.writeln();
-    buf.writeln('Generated: ${DateTime.now().toIso8601String()}');
-    buf.writeln();
-
-    // Overview
-    buf.writeln('## Overview');
-    buf.writeln();
-    buf.writeln('| Metric | Value |');
-    buf.writeln('|--------|-------|');
-    buf.writeln('| Total issues | $total |');
-    buf.writeln('| Files analyzed | ${trackerData.filesAnalyzed} |');
-    buf.writeln('| Files with issues | ${trackerData.filesWithIssues} |');
-    buf.writeln('| Rules triggered | ${trackerData.issuesByRule.length} |');
-    buf.writeln();
-
-    // By Impact
-    buf.writeln('## By Impact');
-    buf.writeln();
-    buf.writeln('| Impact | Count | % |');
-    buf.writeln('|--------|------:|--:|');
+  /// Write impact breakdown section.
+  static void _writeImpactSection(
+    StringBuffer buf,
+    Map<LintImpact, int> counts,
+    int total,
+  ) {
+    buf.writeln('BY IMPACT');
     for (final impact in LintImpact.values) {
       final count = counts[impact] ?? 0;
       if (count == 0) continue;
       final pct = total > 0 ? (count * 100.0 / total).toStringAsFixed(1) : '0';
-      buf.writeln('| ${impact.name} | $count | $pct% |');
+      buf.writeln('  ${impact.name.padRight(12)} $count ($pct%)');
     }
     buf.writeln();
-
-    // By Severity
-    buf.writeln('## By Severity');
-    buf.writeln();
-    buf.writeln('| Severity | Count |');
-    buf.writeln('|----------|------:|');
-    if (trackerData.errorCount > 0) {
-      buf.writeln('| ERROR | ${trackerData.errorCount} |');
-    }
-    if (trackerData.warningCount > 0) {
-      buf.writeln('| WARNING | ${trackerData.warningCount} |');
-    }
-    if (trackerData.infoCount > 0) {
-      buf.writeln('| INFO | ${trackerData.infoCount} |');
-    }
-    buf.writeln();
-
-    // Top rules
-    _writeTopRules(buf, trackerData);
-
-    // Top files
-    _writeTopFiles(buf, trackerData);
-
-    File(path).writeAsStringSync(buf.toString());
   }
 
-  /// Write top rules section to the summary buffer.
+  /// Write severity breakdown section.
+  static void _writeSeveritySection(
+    StringBuffer buf,
+    ProgressTrackerData data,
+  ) {
+    buf.writeln('BY SEVERITY');
+    if (data.errorCount > 0) {
+      buf.writeln('  ERROR        ${data.errorCount}');
+    }
+    if (data.warningCount > 0) {
+      buf.writeln('  WARNING      ${data.warningCount}');
+    }
+    if (data.infoCount > 0) {
+      buf.writeln('  INFO         ${data.infoCount}');
+    }
+    buf.writeln();
+  }
+
+  /// Write top rules section.
   static void _writeTopRules(
     StringBuffer buf,
     ProgressTrackerData data,
@@ -193,20 +226,18 @@ class AnalysisReporter {
       ..sort((a, b) => b.value.compareTo(a.value));
     final top = sorted.take(20);
 
-    buf.writeln('## Top Rules');
-    buf.writeln();
-    buf.writeln('| # | Rule | Count | Severity |');
-    buf.writeln('|--:|------|------:|----------|');
+    buf.writeln('TOP RULES');
     var i = 1;
     for (final entry in top) {
       final severity = data.ruleSeverities[entry.key] ?? '?';
-      buf.writeln('| $i | `${entry.key}` | ${entry.value} | $severity |');
+      buf.writeln('  ${i.toString().padLeft(2)}. '
+          '${entry.key} (${entry.value}) [$severity]');
       i++;
     }
     buf.writeln();
   }
 
-  /// Write top files section to the summary buffer.
+  /// Write top files section.
   static void _writeTopFiles(
     StringBuffer buf,
     ProgressTrackerData data,
@@ -217,10 +248,7 @@ class AnalysisReporter {
       ..sort((a, b) => b.value.compareTo(a.value));
     final top = sorted.take(20);
 
-    buf.writeln('## Top Files');
-    buf.writeln();
-    buf.writeln('| # | File | Issues |');
-    buf.writeln('|--:|------|-------:|');
+    buf.writeln('TOP FILES');
     var i = 1;
     for (final entry in top) {
       // Show relative path from project root
@@ -231,7 +259,7 @@ class AnalysisReporter {
           filePath = filePath.substring(1);
         }
       }
-      buf.writeln('| $i | `$filePath` | ${entry.value} |');
+      buf.writeln('  ${i.toString().padLeft(2)}. $filePath (${entry.value})');
       i++;
     }
     buf.writeln();
@@ -244,5 +272,6 @@ class AnalysisReporter {
     _projectRoot = null;
     _timestamp = null;
     _pathsLogged = false;
+    _sessionEnded = false;
   }
 }
