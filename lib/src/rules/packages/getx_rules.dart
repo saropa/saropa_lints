@@ -2002,3 +2002,102 @@ class AvoidTightCouplingWithGetxRule extends SaropaLintRule {
     });
   }
 }
+
+// =============================================================================
+// GetX Static Get.find Rules
+// =============================================================================
+
+/// Warns when Get.find() is used for dependency lookup instead of
+/// constructor injection.
+///
+/// Get.find() is a service locator pattern that creates hidden dependencies,
+/// making classes hard to test and understand. Constructor injection makes
+/// dependencies explicit and enables easy mocking in tests.
+///
+/// **BAD:**
+/// ```dart
+/// class UserService {
+///   void loadUser() {
+///     final api = Get.find<ApiClient>();
+///     api.fetchUser();
+///   }
+/// }
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// class UserService {
+///   UserService(this._api);
+///   final ApiClient _api;
+///
+///   void loadUser() {
+///     _api.fetchUser();
+///   }
+/// }
+/// ```
+class AvoidGetxStaticGetRule extends SaropaLintRule {
+  const AvoidGetxStaticGetRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  static const LintCode _code = LintCode(
+    name: 'avoid_getx_static_get',
+    problemMessage:
+        '[avoid_getx_static_get] Get.find<T>() is a static service locator call that creates a hidden dependency on the global GetX container. This pattern makes the class impossible to unit test in isolation because there is no way to substitute a mock without initializing the full GetX dependency graph. It also obscures the true dependency count of the class, making it harder to detect god-object violations and architectural boundary breaches.',
+    correctionMessage:
+        'Accept the dependency as a constructor parameter instead of looking it up with Get.find(). This makes the dependency explicit, testable, and visible to static analysis.',
+    errorSeverity: DiagnosticSeverity.WARNING,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      if (node.methodName.name != 'find') return;
+
+      final Expression? target = node.target;
+      if (target is! SimpleIdentifier) return;
+      if (target.name != 'Get') return;
+
+      reporter.atNode(node, code);
+    });
+  }
+
+  @override
+  List<Fix> getFixes() => <Fix>[_AddGetxConstructorInjectionCommentFix()];
+}
+
+class _AddGetxConstructorInjectionCommentFix extends DartFix {
+  @override
+  void run(
+    CustomLintResolver resolver,
+    ChangeReporter reporter,
+    CustomLintContext context,
+    AnalysisError analysisError,
+    List<AnalysisError> others,
+  ) {
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
+      if (node.methodName.name != 'find') return;
+
+      final changeBuilder = reporter.createChangeBuilder(
+        message: 'Add TODO: use constructor injection instead of Get.find()',
+        priority: 1,
+      );
+
+      changeBuilder.addDartFileEdit((builder) {
+        builder.addSimpleInsertion(
+          node.offset,
+          '/* TODO: replace Get.find() with constructor injection */ ',
+        );
+      });
+    });
+  }
+}

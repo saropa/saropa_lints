@@ -1742,3 +1742,134 @@ class RequireHiveMigrationStrategyRule extends SaropaLintRule {
     return null;
   }
 }
+
+// =============================================================================
+// Hive Synchronous in UI Rules
+// =============================================================================
+
+/// Warns when synchronous Hive box operations (get, put, delete, add) are
+/// called inside build() or initState() methods.
+///
+/// Hive synchronous operations perform disk I/O on the main thread. In
+/// build() this blocks frame rendering; in initState() it delays widget
+/// display. Both cause UI jank and ANR (Application Not Responding) dialogs.
+///
+/// **BAD:**
+/// ```dart
+/// @override
+/// Widget build(BuildContext context) {
+///   final name = box.get('name'); // Blocks UI rendering!
+///   return Text(name ?? 'Unknown');
+/// }
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// String? _name;
+///
+/// @override
+/// void initState() {
+///   super.initState();
+///   _loadName();
+/// }
+///
+/// Future<void> _loadName() async {
+///   final name = await compute((_) => box.get('name'), null);
+///   setState(() => _name = name);
+/// }
+/// ```
+class AvoidHiveSynchronousInUiRule extends SaropaLintRule {
+  const AvoidHiveSynchronousInUiRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  static const LintCode _code = LintCode(
+    name: 'avoid_hive_synchronous_in_ui',
+    problemMessage:
+        '[avoid_hive_synchronous_in_ui] Synchronous Hive box operation (get, put, delete, add) is called inside a build() or initState() method. These operations perform disk I/O on the main isolate, blocking frame rendering and causing visible UI jank. On slower devices or with large boxes, this can trigger ANR (Application Not Responding) dialogs, force-close the app, and create a poor user experience that leads to negative app store reviews.',
+    correctionMessage:
+        'Move the Hive operation to an async method and use setState() or a state management solution to update the UI when the data is ready. For large operations, use compute() or Isolate.run() to offload to a background isolate.',
+    errorSeverity: DiagnosticSeverity.WARNING,
+  );
+
+  /// Hive box methods that perform synchronous I/O.
+  static const Set<String> _syncHiveMethods = <String>{
+    'get',
+    'getAt',
+    'put',
+    'putAt',
+    'putAll',
+    'add',
+    'addAll',
+    'delete',
+    'deleteAt',
+    'deleteAll',
+    'clear',
+    'compact',
+  };
+
+  /// UI lifecycle methods where sync I/O should be avoided.
+  static const Set<String> _uiMethods = <String>{
+    'build',
+    'initState',
+  };
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      if (!_syncHiveMethods.contains(node.methodName.name)) return;
+
+      // Check if target looks like a Hive box
+      if (!_isHiveBoxTarget(node.target)) return;
+
+      // Check if inside build() or initState()
+      AstNode? current = node.parent;
+      while (current != null) {
+        if (current is MethodDeclaration &&
+            _uiMethods.contains(current.name.lexeme)) {
+          reporter.atNode(node, code);
+          return;
+        }
+        current = current.parent;
+      }
+    });
+  }
+
+  @override
+  List<Fix> getFixes() => <Fix>[_WrapHiveInAsyncCommentFix()];
+}
+
+class _WrapHiveInAsyncCommentFix extends DartFix {
+  @override
+  void run(
+    CustomLintResolver resolver,
+    ChangeReporter reporter,
+    CustomLintContext context,
+    AnalysisError analysisError,
+    List<AnalysisError> others,
+  ) {
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
+
+      final changeBuilder = reporter.createChangeBuilder(
+        message: 'Add TODO: move Hive operation to async method',
+        priority: 1,
+      );
+
+      changeBuilder.addDartFileEdit((builder) {
+        builder.addSimpleInsertion(
+          node.offset,
+          '/* TODO: move to async method or use compute() */ ',
+        );
+      });
+    });
+  }
+}

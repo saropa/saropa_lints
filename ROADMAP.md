@@ -216,7 +216,6 @@ See [CHANGELOG.md](CHANGELOG.md) for implemented rules. Goal: 2000 rules.
 
 | Rule Name | Tier | Severity | Description |
 |-----------|------|----------|-------------|
-| ℹ️⭐ `require_semantic_colors` | Professional | INFO | Name colors by purpose (errorColor, successColor) not appearance (redColor). Purposes stay constant; appearances change with theme. |
 
 ### 1.20 Responsive & Adaptive Design Rules
 
@@ -248,8 +247,6 @@ See [CHANGELOG.md](CHANGELOG.md) for implemented rules. Goal: 2000 rules.
 |-----------|------|----------|-------------|
 | ℹ️⭐ `require_timezone_display` | Recommended | INFO | When displaying times, indicate timezone or use relative time. Detect time formatting without timezone context. |
 | ℹ️🐙 [`require_timezone_display`](https://github.com/saropa/saropa_lints/issues/22) | Recommended | INFO | When displaying times, indicate timezone or use relative time. Detect time formatting without timezone context. |
-| ℹ️⭐ `avoid_datetime_comparison_without_precision` | Professional | INFO | DateTime equality fails due to microsecond differences. Detect direct DateTime equality; suggest difference threshold. |
-| ℹ️🐙 [`avoid_datetime_comparison_without_precision`](https://github.com/saropa/saropa_lints/issues/23) | Professional | INFO | DateTime equality fails due to microsecond differences. Detect direct DateTime equality; suggest difference threshold. |
 
 ### 1.34 JSON & Serialization Rules
 
@@ -311,7 +308,6 @@ See [CHANGELOG.md](CHANGELOG.md) for implemented rules. Goal: 2000 rules.
 
 | Rule Name | Tier | Severity | Description |
 |-----------|------|----------|-------------|
-| ℹ️⭐ `prefer_avatar_loading_placeholder` | Recommended | INFO | Show placeholder while avatar loads. Detect CircleAvatar without placeholder during load. |
 
 > **Note:** Loading State, Pull-to-Refresh, and Infinite Scroll end-indicator rules have been moved to [ROADMAP_DEFERRED.md](ROADMAP_DEFERRED.md#deferred-loading-state-rules) due to `[TOO-COMPLEX]` detection requirements.
 
@@ -374,7 +370,6 @@ See [CHANGELOG.md](CHANGELOG.md) for implemented rules. Goal: 2000 rules.
 | ⚠️ `avoid_high_cyclomatic_complexity` | Professional | WARNING | Warn when functions exceed a configurable cyclomatic complexity threshold. |
 | ℹ️⭐ `avoid_ignoring_return_values` | Recommended | INFO | Warn when function return values are ignored (unless explicitly marked). |
 | ℹ️ `avoid_importing_entrypoint_exports` | Professional | INFO | Avoid importing from files that re-export entry points. |
-| ⚠️⭐ `avoid_missing_interpolation` | Recommended | WARNING | Detect string concatenation that should use interpolation. |
 | ⚠️ `avoid_suspicious_global_reference` | Professional | WARNING | Detect suspicious references to global state in methods. |
 | ⚠️ `avoid_unused_local_variable` | Recommended | WARNING | Local variables that are declared but never used. |
 | ⚠️⭐ `no_empty_block` | Recommended | WARNING | Empty blocks indicate missing implementation or dead code. |
@@ -675,7 +670,6 @@ Rules for popular Flutter packages based on common gotchas, anti-patterns, and b
 
 | Rule Name | Tier | Severity | Description |
 |-----------|------|----------|-------------|
-| ℹ️⭐ `avoid_provider_listen_false_in_build` | Recommended | INFO | `listen: false` in build prevents rebuilds but may show stale data. Detect inappropriate usage. |
 | ℹ️ `require_provider_update_should_notify` | Professional | INFO | ChangeNotifiers should implement efficient notifyListeners. Detect notifying on every setter. |
 
 ### 5.4 Riverpod Advanced Rules
@@ -698,7 +692,6 @@ Rules for popular Flutter packages based on common gotchas, anti-patterns, and b
 | Rule Name | Tier | Severity | Description |
 |-----------|------|----------|-------------|
 | ℹ️ `prefer_getx_builder_over_obx` | Recommended | INFO | GetBuilder is more explicit than Obx for state. Detect mixed patterns. |
-| ⚠️⭐ `avoid_getx_static_get` | Professional | WARNING | Get.find() is hard to test. Prefer constructor injection. Detect Get.find in methods. |
 | ⚠️ `avoid_getx_rx_nested_obs` | Professional | WARNING | Nested .obs creates complex reactive trees. Detect Rx<List<Rx<Type>>>. |
 | 🚨 `avoid_getx_build_context_bypass` | Essential | ERROR | Bypassing BuildContext hides Flutter fundamentals. Detect excessive Get.context usage. |
 
@@ -708,7 +701,6 @@ Rules for popular Flutter packages based on common gotchas, anti-patterns, and b
 |-----------|------|----------|-------------|
 | ⚠️ `avoid_hive_type_modification` | Professional | WARNING | Modifying Hive type fields breaks existing data. Detect field type changes. |
 | ℹ️ `prefer_hive_compact` | Professional | INFO | Large boxes should be compacted periodically. Detect long-running box without compact. |
-| ⚠️⭐ `avoid_hive_synchronous_in_ui` | Essential | WARNING | Hive operations can block UI. Use isolates for large operations. |
 | ℹ️ `prefer_hive_web_aware` | Recommended | INFO | Hive web has different behavior. Detect Hive usage without web considerations. |
 
 ### 5.8 SharedPreferences Security Rules
@@ -809,7 +801,6 @@ Rules for popular Flutter packages based on common gotchas, anti-patterns, and b
 | ⚠️ `avoid_clip_during_animation` | Professional | WARNING | Pre-clip content before animating. Detect ClipRect in animated widget. |
 | ⚠️⭐ `avoid_excessive_rebuilds_animation` | Essential | WARNING | Don't wrap entire screen in AnimatedBuilder. Detect large subtree in builder. |
 | ⚠️ `avoid_multiple_animation_controllers` | Professional | WARNING | Multiple controllers on same widget conflict. Detect multiple controllers without coordination. |
-| ℹ️⭐ `prefer_spring_animation` | Recommended | INFO | SpringSimulation feels more natural. Suggest for drag/fling gestures. |
 
 ### 5.21 Stream/StreamBuilder Rules
 
@@ -855,7 +846,6 @@ Rules for popular Flutter packages based on common gotchas, anti-patterns, and b
 | Rule Name | Tier | Severity | Description |
 |-----------|------|----------|-------------|
 | ℹ️ `require_will_pop_scope | Professional | INFO | Handle back button appropriately. Detect navigation without back handling. |
-| ℹ️⭐ `require_navigation_result_handling` | Professional | INFO | Handle pushed route's result. Detect push without await or then. |
 | ℹ️ `prefer_named_routes_for_deep_links` | Professional | INFO | Named routes enable deep linking. Detect anonymous route construction. |
 
 ### 5.27 auto_route Rules
@@ -950,7 +940,6 @@ Rules for popular Flutter packages based on common gotchas, anti-patterns, and b
 | ℹ️ `prefer_context_read_not_watch | Professional | INFO | Use context.read in one-time operations. Detect context.watch in single-use callback. |
 | ℹ️ `prefer_closest_context` | Professional | INFO | Use closest BuildContext for better performance. Detect distant context usage. |
 | ℹ️ `require_context_in_build_descendants` | Professional | INFO | Use Builder for updated context. Detect context issue after widget creation. |
-| ⚠️⭐ `avoid_context_dependency_in_callback` | Essential | WARNING | Callbacks may run with stale context. Detect Theme.of(context) in future callback. |
 
 ### 5.38 Code Organization Rules
 

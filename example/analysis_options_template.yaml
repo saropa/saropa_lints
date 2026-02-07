@@ -245,6 +245,7 @@ custom_lint:
     - avoid_self_assignment: false
     - no_equal_arguments: false
     - avoid_unnecessary_compare_to: false
+    - avoid_datetime_comparison_without_precision: false # INFO - DateTime == fails on microseconds
     - binary_expression_operand_order: false
     - prefer_overriding_parent_equality: false
 
@@ -368,6 +369,7 @@ custom_lint:
     - avoid_context_in_initstate_dispose: false
     - avoid_storing_context: false              # ERROR - context in fields (v2.3.10)
     - avoid_context_across_async: false         # ERROR - context after await (v2.3.10)
+    - avoid_context_dependency_in_callback: false # WARNING - context dependency in async callback (v4.12.0)
     - avoid_context_in_static_methods: false    # ERROR - context in static methods (v2.3.10)
     - avoid_inherited_widget_in_initstate: false
     - avoid_build_context_in_providers: false
@@ -405,6 +407,7 @@ custom_lint:
     - avoid_navigator_context_issue: false       # ERROR - GlobalKey context in navigation (v4.1.5)
     - prefer_url_launcher_uri_over_string: false # INFO - use Uri type safety (v2.3.10)
     - avoid_go_router_push_replacement_confusion: false # WARNING - clear routing intent (v2.3.10)
+    - require_navigation_result_handling: false # INFO - handle Navigator.push results (v4.12.0)
     - require_url_launcher_encoding: false       # WARNING - URL failure (v2.3.11)
     - avoid_nested_routes_without_parent: false  # WARNING - navigation issues (v2.3.11)
     # GoRouter v2.6.0
@@ -496,6 +499,7 @@ custom_lint:
     - avoid_missing_image_alt: false
     - avoid_absorb_pointer_misuse: false
     - avoid_brightness_check_for_theme: false
+    - require_semantic_colors: false           # INFO - use semantic color names not appearance (v4.12.0)
     - prefer_const_border_radius: false
     - prefer_correct_edge_insets_constructor: false
     - prefer_text_rich: false
@@ -531,6 +535,7 @@ custom_lint:
     - avoid_unconstrained_images: false
     - avoid_image_rebuild_on_scroll: false
     - require_avatar_fallback: false
+    - prefer_avatar_loading_placeholder: false # INFO - CircleAvatar with network image needs placeholder (v4.12.0)
     - prefer_video_loading_placeholder: false
     # v4.1.8 Widget rules
     - prefer_custom_single_child_layout: false  # INFO - use delegate for complex positioning (v4.1.8)
@@ -560,6 +565,7 @@ custom_lint:
     - prefer_logger_over_print: false
     - prefer_itemextent_when_known: false
     - require_tab_state_preservation: false
+    - prefer_spring_animation: false           # INFO - prefer SpringSimulation over bounce curves (v4.12.0)
     - prefer_image_size_constraints: false
 
     # =========================================================================
@@ -759,6 +765,7 @@ custom_lint:
     - avoid_incorrect_uri: false
     - no_empty_string: false
     - no_magic_string: false
+    - avoid_missing_interpolation: false       # WARNING - use interpolation instead of string concat (v4.12.0)
     - no_magic_number: false
     - no_magic_number_in_tests: false
     - no_magic_string_in_tests: false
@@ -927,6 +934,7 @@ custom_lint:
     - avoid_overengineered_bloc_states: false    # INFO - too many state subclasses (v4.1.8)
     - avoid_getx_static_context: false           # WARNING - Get.offNamed uses untestable context (v4.1.8)
     - avoid_tight_coupling_with_getx: false      # INFO - heavy GetX usage reduces testability (v4.1.8)
+    - avoid_getx_static_get: false             # WARNING - Get.find() creates hidden dependencies (v4.12.0)
 
     # =========================================================================
     # CACHING (v4.1.8)
@@ -1105,6 +1113,7 @@ custom_lint:
     # Provider
     - avoid_provider_in_init_state: false        # WARNING - timing issue
     - prefer_context_read_in_callbacks: false    # WARNING - avoid rebuilds
+    - avoid_provider_listen_false_in_build: false # INFO - listen:false in build skips rebuilds (v4.12.0)
     # Hive
     - require_hive_type_id_management: false     # INFO - typeId registry
     - require_hive_field_default_value: false    # WARNING - migration safety (v2.3.11)
@@ -1325,6 +1334,7 @@ custom_lint:
     - prefer_notification_grouping: false          # INFO - notifications should be grouped (v4.2.0)
     - avoid_notification_silent_failure: false     # WARNING - notification failures should be handled (v4.2.0)
     - require_hive_migration_strategy: false       # INFO - Hive migrations need strategy (v4.2.0)
+    - avoid_hive_synchronous_in_ui: false        # WARNING - sync Hive ops in build/initState block UI (v4.12.0)
     - prefer_streaming_for_large_files: false      # INFO - stream large files instead of loading all (v4.2.0)
     - require_file_path_sanitization: false        # WARNING - file paths need sanitization (v4.2.0)
     - require_app_startup_error_handling: false    # WARNING - app startup needs error handling (v4.2.0)

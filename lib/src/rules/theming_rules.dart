@@ -1,4 +1,4 @@
-// ignore_for_file: depend_on_referenced_packages
+// ignore_for_file: depend_on_referenced_packages, deprecated_member_use
 
 /// Theming rules for Flutter applications.
 ///
@@ -7,7 +7,8 @@
 library;
 
 import 'package:analyzer/dart/ast/ast.dart';
-import 'package:analyzer/error/error.dart' show DiagnosticSeverity;
+import 'package:analyzer/error/error.dart'
+    show AnalysisError, DiagnosticSeverity;
 import 'package:custom_lint_builder/custom_lint_builder.dart';
 
 import '../saropa_lint_rule.dart';
@@ -292,6 +293,148 @@ class PreferThemeExtensionsRule extends SaropaLintRule {
           }
         }
       }
+    });
+  }
+}
+
+// =============================================================================
+// Semantic Color Naming Rules
+// =============================================================================
+
+/// Warns when Color variables are named by their appearance (redColor,
+/// blueBackground) instead of their semantic purpose (errorColor,
+/// primaryBackground).
+///
+/// Appearance-based names break when themes change. A "redColor" used for
+/// errors becomes misleading when the error color changes to orange.
+/// Semantic names describe intent and remain valid across theme variants.
+///
+/// **BAD:**
+/// ```dart
+/// final redColor = Color(0xFFFF0000);
+/// final blueBackground = Color(0xFF0000FF);
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// final errorColor = Color(0xFFFF0000);
+/// final primaryBackground = Color(0xFF0000FF);
+/// ```
+class RequireSemanticColorsRule extends SaropaLintRule {
+  const RequireSemanticColorsRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  static const LintCode _code = LintCode(
+    name: 'require_semantic_colors',
+    problemMessage:
+        '[require_semantic_colors] Color variable is named by its visual appearance (e.g., redColor, blueBackground) rather than its semantic purpose (e.g., errorColor, primaryBackground). Appearance-based color names become misleading when themes change, dark mode inverts colors, or branding updates alter the palette. Developers reading the code assume the color is literally red, leading to confusion when it is actually orange after a theme update, and making it impossible to safely refactor theme colors without auditing every usage site.',
+    correctionMessage:
+        'Rename the variable to describe its purpose (errorColor, successColor, primaryBackground, surfaceColor) rather than its appearance (redColor, blueText).',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  /// Color words that indicate appearance-based naming.
+  static const Set<String> _colorAppearanceWords = <String>{
+    'red',
+    'blue',
+    'green',
+    'yellow',
+    'orange',
+    'purple',
+    'pink',
+    'cyan',
+    'magenta',
+    'teal',
+    'indigo',
+    'amber',
+    'lime',
+    'brown',
+    'grey',
+    'gray',
+    'violet',
+    'maroon',
+    'navy',
+    'coral',
+    'salmon',
+    'turquoise',
+    'crimson',
+    'scarlet',
+  };
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addVariableDeclaration((VariableDeclaration node) {
+      // Check if the type is Color-related
+      final AstNode? parent = node.parent;
+      if (parent is! VariableDeclarationList) return;
+
+      final String? typeStr = parent.type?.toSource();
+      final bool isColorType = typeStr != null &&
+          (typeStr == 'Color' ||
+              typeStr == 'Color?' ||
+              typeStr == 'MaterialColor' ||
+              typeStr == 'MaterialAccentColor');
+
+      // Also check initializer for Color constructor
+      final Expression? initializer = node.initializer;
+      final bool hasColorInit = initializer != null &&
+          (initializer.toSource().startsWith('Color(') ||
+              initializer.toSource().startsWith('const Color(') ||
+              initializer.toSource().startsWith('Colors.'));
+
+      if (!isColorType && !hasColorInit) return;
+
+      // Check if the variable name contains a raw color word
+      final String name = node.name.lexeme.toLowerCase();
+      for (final String colorWord in _colorAppearanceWords) {
+        if (name.contains(colorWord)) {
+          // Skip if it's a well-known framework name like Colors.red
+          if (name == colorWord) return;
+
+          reporter.atNode(node, code);
+          return;
+        }
+      }
+    });
+  }
+
+  @override
+  List<Fix> getFixes() => <Fix>[_SuggestSemanticColorNameFix()];
+}
+
+class _SuggestSemanticColorNameFix extends DartFix {
+  @override
+  void run(
+    CustomLintResolver resolver,
+    ChangeReporter reporter,
+    CustomLintContext context,
+    AnalysisError analysisError,
+    List<AnalysisError> others,
+  ) {
+    context.registry.addVariableDeclaration((VariableDeclaration node) {
+      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
+
+      final changeBuilder = reporter.createChangeBuilder(
+        message:
+            'Add TODO: rename to describe purpose (e.g., errorColor, primaryBackground)',
+        priority: 1,
+      );
+
+      changeBuilder.addDartFileEdit((builder) {
+        builder.addSimpleInsertion(
+          node.offset,
+          '/* TODO: rename to describe purpose, not appearance */ ',
+        );
+      });
     });
   }
 }
