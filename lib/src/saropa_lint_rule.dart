@@ -217,9 +217,8 @@ class ProgressTracker {
   static final Map<String, int> _slowFiles = {}; // file -> seconds
 
   // Issue limit tracking
-  static int _maxIssues = 1000; // Default limit (0 = unlimited)
+  static int _maxIssues = 500; // Default limit (0 = unlimited)
   static bool _limitReached = false;
-  static int _issuesAfterLimit = 0; // Count of issues we stopped tracking
 
   // Total enabled rules (set from plugin entry point)
   static int _totalEnabledRules = 0;
@@ -229,14 +228,15 @@ class ProgressTracker {
     _totalEnabledRules = count;
   }
 
-  /// Set the maximum number of issues to report.
+  /// Set the maximum number of issues to report to the Problems tab.
   ///
   /// Configure in `analysis_options_custom.yaml`:
   /// ```yaml
-  /// max_issues: 500  # Stop after 500 issues (default: 1000, 0 = unlimited)
+  /// max_issues: 500  # Stop after 500 issues (default: 500, 0 = unlimited)
   /// ```
   ///
-  /// Once the limit is reached, non-ERROR rules stop running entirely.
+  /// Once the limit is reached, non-ERROR rules stop running and the
+  /// report log captures all issues found up to that point.
   /// ERROR-severity rules always run to catch critical issues.
   static void setMaxIssues(int limit) {
     _maxIssues = limit;
@@ -291,15 +291,16 @@ class ProgressTracker {
   /// [severity] should be 'ERROR', 'WARNING', or 'INFO'
   /// [ruleName] is the lint rule that triggered
   ///
-  /// ERROR severity issues are ALWAYS fully tracked (no limit).
-  /// The limit only applies to WARNING/INFO to ensure critical issues
-  /// are never lost in favor of formatting nits.
+  /// After [_maxIssues] non-ERROR issues, [isLimitReached] becomes true
+  /// which stops non-ERROR rules from running (performance safeguard)
+  /// and prevents diagnostics from reaching the Problems tab.
+  /// The report log captures all issues found up to the limit.
   static void recordViolation({String? severity, String? ruleName}) {
     _violationsFound++;
     final severityUpper = severity?.toUpperCase();
     final isError = severityUpper == 'ERROR';
 
-    // Track by severity (always counted, regardless of limit)
+    // Track by severity (always counted)
     switch (severityUpper) {
       case 'ERROR':
         _errorCount++;
@@ -309,18 +310,22 @@ class ProgressTracker {
         _infoCount++;
     }
 
-    // ERROR severity ALWAYS gets full tracking - critical issues never skipped
-    // Limit only applies to WARNING/INFO (formatting, style, etc.)
+    // Mark limit when non-ERROR count exceeds threshold. The reporter
+    // checks this flag to stop pushing diagnostics to the Problems tab.
     final nonErrorCount = _warningCount + _infoCount;
     if (!isError && _maxIssues > 0 && nonErrorCount > _maxIssues) {
       if (!_limitReached) {
         _limitReached = true;
+        stderr.writeln('');
+        stderr.writeln(
+          '[saropa_lints] $_maxIssues issues reached — analysis stopped. '
+          'See report log for details. '
+          'To increase: max_issues: 1000 in analysis_options_custom.yaml',
+        );
       }
-      _issuesAfterLimit++;
-      return; // Skip detailed tracking for non-critical issues after limit
     }
 
-    // Track by file
+    // Track by file (always, for complete report log)
     if (_currentFile != null) {
       _issuesByFile[_currentFile!] = (_issuesByFile[_currentFile!] ?? 0) + 1;
       if (_currentFile != _lastFileWithIssue) {
@@ -329,7 +334,7 @@ class ProgressTracker {
       }
     }
 
-    // Track by rule
+    // Track by rule (always, for complete report log)
     if (ruleName != null) {
       _issuesByRule[ruleName] = (_issuesByRule[ruleName] ?? 0) + 1;
       if (severityUpper != null) {
@@ -542,12 +547,10 @@ class ProgressTracker {
     // Warning if issue limit was reached (only applies to warnings/info, not errors)
     if (_limitReached) {
       buf.writeln();
+      buf.writeln('$yellow  ⚠️  $_maxIssues issues reached — analysis stopped. '
+          'See report log for details.$reset');
       buf.writeln(
-          '$yellow  ⚠️  Limit reached: $_maxIssues warnings/info. Skipping remaining non-error rules.$reset');
-      buf.writeln(
-          '$dim     All $_errorCount errors fully checked. $_issuesAfterLimit warning/info rules skipped.$reset');
-      buf.writeln(
-          '$dim     To adjust: echo "max_issues: 2000" > analysis_options_custom.yaml$reset');
+          '$dim     To increase: echo "max_issues: 1000" > analysis_options_custom.yaml$reset');
     }
 
     // Severity breakdown (only if there are issues)
@@ -731,7 +734,6 @@ class ProgressTracker {
     _rateSamples.clear();
     _slowFiles.clear();
     _limitReached = false;
-    _issuesAfterLimit = 0;
     // Note: _maxIssues is not reset - it's config, not state
   }
 }
@@ -2146,10 +2148,10 @@ abstract class SaropaLintRule extends DartLintRule {
     if (isDisabled) return;
 
     // =========================================================================
-    // ISSUE LIMIT CHECK (Performance Optimization)
+    // ISSUE LIMIT CHECK (Performance Safeguard)
     // =========================================================================
-    // After hitting the warning/info limit, skip non-ERROR rules entirely.
-    // This provides real speedup on legacy codebases with many issues.
+    // After hitting the warning/info limit, stop non-ERROR rules to avoid
+    // overwhelming the machine. The report log captures issues found so far.
     // ERROR-severity rules always run (security, crashes, etc.)
     if (ProgressTracker.isLimitReached &&
         code.errorSeverity != DiagnosticSeverity.ERROR) {
@@ -2514,10 +2516,13 @@ class SaropaDiagnosticReporter {
       return;
     }
 
-    // Track the violation by impact level
+    // Track the violation by impact level (always, for report log)
     _trackViolation(code, line);
 
-    _delegate.atNode(node, _applyOverride(code));
+    // Only push to Problems tab if under the issue limit
+    if (!ProgressTracker.isLimitReached) {
+      _delegate.atNode(node, _applyOverride(code));
+    }
   }
 
   /// Reports a diagnostic at the given [token].
@@ -2533,17 +2538,20 @@ class SaropaDiagnosticReporter {
       return;
     }
 
-    // Track the violation by impact level
+    // Track the violation by impact level (always, for report log)
     _trackViolation(code, 0); // Token doesn't have easy line access
 
+    // Only push to Problems tab if under the issue limit.
     // Use atOffset instead of atToken to ensure proper span width.
     // The built-in atToken has a bug where endColumn equals startColumn
     // (zero-width highlight). Using atOffset with explicit length fixes this.
-    _delegate.atOffset(
-      offset: token.offset,
-      length: token.length,
-      diagnosticCode: _applyOverride(code),
-    );
+    if (!ProgressTracker.isLimitReached) {
+      _delegate.atOffset(
+        offset: token.offset,
+        length: token.length,
+        diagnosticCode: _applyOverride(code),
+      );
+    }
   }
 
   /// Reports a diagnostic at the given offset and length.
@@ -2560,16 +2568,17 @@ class SaropaDiagnosticReporter {
       return;
     }
 
-    // Track the violation by impact level
+    // Track the violation by impact level (always, for report log)
     _trackViolation(errorCode, 0);
 
-    // Cannot easily check for ignore comments with just offset/length
-    // Delegate directly to the underlying reporter
-    _delegate.atOffset(
-      offset: offset,
-      length: length,
-      diagnosticCode: _applyOverride(errorCode),
-    );
+    // Only push to Problems tab if under the issue limit
+    if (!ProgressTracker.isLimitReached) {
+      _delegate.atOffset(
+        offset: offset,
+        length: length,
+        diagnosticCode: _applyOverride(errorCode),
+      );
+    }
   }
 
   /// Track a violation in the ImpactTracker and ProgressTracker.
