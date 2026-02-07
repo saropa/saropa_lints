@@ -3,7 +3,7 @@ import 'dart:io' show Platform;
 import 'package:saropa_lints/src/saropa_lint_rule.dart' show LintImpact;
 
 /// Numeric weights for [LintImpact] used in priority scoring.
-extension LintImpactNumeric on LintImpact {
+extension _LintImpactNumeric on LintImpact {
   /// Numeric value for priority calculations.
   double get numericValue => switch (this) {
         LintImpact.critical => 5.0,
@@ -49,6 +49,9 @@ class ImportGraphTracker {
   static String? _projectRoot;
   static String? _packageName;
 
+  /// Weight applied to indirect (transitive) importers in fan-in scoring.
+  static const _transitiveImportWeight = 0.3;
+
   // ── Regex patterns ──
 
   /// Matches `import 'uri';` and `import "uri";` (with optional show/hide).
@@ -88,7 +91,8 @@ class ImportGraphTracker {
     if (_rawImports.containsKey(filePath)) return;
     final uris = <String>{};
     for (final match in _importExportRe.allMatches(content)) {
-      uris.add(match.group(1)!);
+      final uri = match.group(1);
+      if (uri != null) uris.add(uri);
     }
     _rawImports[filePath] = uris;
   }
@@ -263,7 +267,7 @@ class ImportGraphTracker {
     for (final file in _rawImports.keys) {
       final direct = (_importedBy[file] ?? const <String>{}).length;
       final indirect = _countTransitiveImporters(file) - direct;
-      _importanceScores[file] = direct + (indirect * 0.3);
+      _importanceScores[file] = direct + (indirect * _transitiveImportWeight);
     }
   }
 

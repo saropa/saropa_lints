@@ -2410,7 +2410,8 @@ abstract class SaropaLintRule extends DartLintRule {
     // Get file content from resolver (already loaded by analyzer)
     final content = resolver.source.contents.data;
 
-    // Collect imports for dependency graph (runs once per file)
+    // Collect imports for dependency graph before ignore checks so that
+    // ignored files still contribute edges to the project structure.
     ImportGraphTracker.collectImports(path, content);
 
     // =========================================================================

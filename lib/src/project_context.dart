@@ -372,9 +372,9 @@ class _ProjectInfo {
           content.contains('flutter_test:') ||
           content.contains('sdk: flutter');
 
-      // Parse package name from top-level `name:` field
-      final nameMatch =
-          RegExp(r'^name:\s*(\S+)', multiLine: true).firstMatch(content);
+      // Parse package name from top-level `name:` field (valid Dart pkg names)
+      final nameMatch = RegExp(r'^name:\s+([a-z][a-z0-9_]*)', multiLine: true)
+          .firstMatch(content);
       final packageName = nameMatch?.group(1) ?? '';
 
       // Parse dependencies (simple regex-based parsing)
