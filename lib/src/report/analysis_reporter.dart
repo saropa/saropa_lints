@@ -2,7 +2,11 @@
 
 import 'dart:async';
 import 'dart:io' show Directory, File, Platform, stderr;
+import 'dart:math' show Random;
 
+import 'package:saropa_lints/src/report/batch_data.dart';
+import 'package:saropa_lints/src/report/import_graph_tracker.dart';
+import 'package:saropa_lints/src/report/report_consolidator.dart';
 import 'package:saropa_lints/src/saropa_lint_rule.dart';
 
 /// Snapshot of the analysis configuration captured at rule-loading time.
@@ -50,7 +54,8 @@ class AnalysisReporter {
   AnalysisReporter._();
 
   static String? _projectRoot;
-  static String? _timestamp;
+  static String? _sessionId;
+  static String? _isolateId;
   static Timer? _debounceTimer;
   static bool _pathsLogged = false;
   static bool _reportWritten = false;
@@ -58,6 +63,16 @@ class AnalysisReporter {
 
   /// Debounce duration: write reports after this idle period.
   static const Duration _debounce = Duration(seconds: 3);
+
+  /// Maximum violations to write inline in the report.
+  /// Higher-impact violations take priority when the cap is reached.
+  static const int _maxInlineViolations = 500;
+
+  /// Maximum report files to keep in the reports directory.
+  static const int _maxReportFiles = 10;
+
+  /// Maximum rows in the FILE IMPORTANCE table.
+  static const int _maxFileImportanceRows = 50;
 
   /// Store the analysis configuration for inclusion in report headers.
   ///
@@ -68,25 +83,21 @@ class AnalysisReporter {
 
   /// Initialize the reporter with the project root directory.
   ///
-  /// Called once when the first file is analyzed and the project root
-  /// is detected. Safe to call multiple times (subsequent calls are ignored).
+  /// Joins an existing session (from a prior isolate in the same
+  /// analysis run) or creates a new one. Safe to call multiple times.
   static void initialize(String projectRoot) {
     if (_projectRoot != null) return;
     _projectRoot = projectRoot;
     _pathsLogged = false;
-    _timestamp = _generateTimestamp();
+    _sessionId = ReportConsolidator.initSession(projectRoot);
+    _isolateId = _generateIsolateId();
   }
 
-  /// Generate a timestamp string for the report filename.
-  static String _generateTimestamp() {
-    final now = DateTime.now();
-    return '${now.year}'
-        '${now.month.toString().padLeft(2, '0')}'
-        '${now.day.toString().padLeft(2, '0')}'
-        '_'
-        '${now.hour.toString().padLeft(2, '0')}'
-        '${now.minute.toString().padLeft(2, '0')}'
-        '${now.second.toString().padLeft(2, '0')}';
+  /// Generate a short unique ID for this isolate.
+  static String _generateIsolateId() {
+    final now = DateTime.now().microsecondsSinceEpoch;
+    final rand = Random().nextInt(0xFFFF);
+    return (now ^ rand).toRadixString(36).substring(0, 6);
   }
 
   /// Schedule report writing after a debounce period.
@@ -125,8 +136,13 @@ class AnalysisReporter {
   static void _startNewSession() {
     ProgressTracker.reset();
     ImpactTracker.reset();
+    ImportGraphTracker.reset();
     ProgressTracker.clearReanalysisFlag();
-    _timestamp = _generateTimestamp();
+    if (_projectRoot != null) {
+      ReportConsolidator.cleanupSession(_projectRoot!);
+      _sessionId = ReportConsolidator.initSession(_projectRoot!);
+    }
+    _isolateId = _generateIsolateId();
     _pathsLogged = false;
     _reportWritten = false;
   }
@@ -146,19 +162,19 @@ class AnalysisReporter {
 
   /// Full path to the report file, or null if not initialized.
   static String? get reportPath {
-    if (_projectRoot == null || _timestamp == null) return null;
+    if (_projectRoot == null || _sessionId == null) return null;
     final sep = Platform.pathSeparator;
     return '$_projectRoot${sep}reports$sep'
-        '${_timestamp}_saropa_lint_report.log';
+        '${ReportConsolidator.reportFilename(_sessionId!)}';
   }
 
-  /// Write the combined report file, overwriting any previous output.
+  /// Write the consolidated report file.
   ///
-  /// Called by the debounce timer when analysis goes idle. The same
-  /// timestamped file is overwritten on each call so late-arriving
-  /// results are always included.
+  /// Called by the debounce timer when analysis goes idle. Writes
+  /// this isolate's batch data, then reads ALL batches from the
+  /// session and merges them into one report file.
   static void _writeReport() {
-    if (_projectRoot == null) return;
+    if (_projectRoot == null || _sessionId == null) return;
 
     try {
       final sep = Platform.pathSeparator;
@@ -167,10 +183,22 @@ class AnalysisReporter {
         reportsDir.createSync(recursive: true);
       }
 
+      // 1. Write this isolate's batch file
+      _writeBatchFile();
+
+      // 2. Consolidate all batches into one report
+      final consolidated = ReportConsolidator.consolidate(
+        _projectRoot!,
+        _sessionId!,
+      );
+      if (consolidated == null) return;
+
+      // 3. Write the consolidated report
       final path = reportPath!;
-      _writeCombinedReport(path);
+      _writeCombinedReport(path, consolidated);
 
       _reportWritten = true;
+      _cleanOldReports();
 
       // Log file path only on the first write to avoid spamming stderr.
       if (!_pathsLogged) {
@@ -183,59 +211,86 @@ class AnalysisReporter {
     }
   }
 
-  /// Write the combined report (summary + full violation list).
-  static void _writeCombinedReport(String path) {
-    final violations = ImpactTracker.violations;
-    final counts = ImpactTracker.counts;
-    final total = ImpactTracker.total;
+  /// Write this isolate's data as a batch file for cross-isolate merging.
+  static void _writeBatchFile() {
+    if (_projectRoot == null || _sessionId == null) return;
+
     final trackerData = ProgressTracker.reportData;
+    final batch = BatchData(
+      sessionId: _sessionId!,
+      isolateId: _isolateId ?? 'unknown',
+      updatedAt: DateTime.now(),
+      config: _config,
+      analyzedFiles: ProgressTracker.analyzedFiles.toList(),
+      issuesByFile: trackerData.issuesByFile,
+      issuesByRule: trackerData.issuesByRule,
+      ruleSeverities: trackerData.ruleSeverities,
+      severityCounts: SeverityCounts(
+        error: trackerData.errorCount,
+        warning: trackerData.warningCount,
+        info: trackerData.infoCount,
+      ),
+      violations: ImpactTracker.violations,
+    );
+
+    ReportConsolidator.writeBatch(_projectRoot!, batch);
+  }
+
+  /// Write the consolidated report (summary + full violation list).
+  static void _writeCombinedReport(String path, ConsolidatedData data) {
+    ImportGraphTracker.compute();
+
+    final config = data.config ?? _config;
     final buf = StringBuffer();
 
-    // Header
-    buf.writeln('Saropa Lints Analysis Report');
-    buf.writeln('Generated: ${DateTime.now().toIso8601String()}');
-    buf.writeln('Project: $_projectRoot');
-    if (_config != null) {
-      buf.writeln('Version: ${_config!.version}');
-    }
-    buf.writeln('${'=' * 70}');
-    buf.writeln();
-
-    // Configuration
-    _writeConfigSection(buf);
-
-    // Overview
-    buf.writeln('OVERVIEW');
-    buf.writeln('  Total issues:       $total');
-    buf.writeln('  Files analyzed:     ${trackerData.filesAnalyzed}');
-    buf.writeln('  Files with issues:  ${trackerData.filesWithIssues}');
-    buf.writeln('  Rules triggered:    ${trackerData.issuesByRule.length}');
-    buf.writeln();
-
-    // By Impact
-    _writeImpactSection(buf, counts, total);
-
-    // By Severity
-    _writeSeveritySection(buf, trackerData);
-
-    // Top rules
-    _writeTopRules(buf, trackerData);
-
-    // Top files
-    _writeTopFiles(buf, trackerData);
-
-    // Full violation list
-    _writeViolationList(buf, violations);
+    _writeHeader(buf, config, data.batchCount);
+    _writeConfigSection(buf, config);
+    _writeOverview(buf, data);
+    _writeImpactSection(buf, data.impactCounts, data.total);
+    _writeSeveritySubsection(buf, data);
+    _writeTopRulesFromMap(buf, data.issuesByRule, data.ruleSeverities);
+    _writeFileImportance(buf, data.issuesByFile);
+    _writePrioritizedViolations(buf, data.violations);
+    _writeViolationList(buf, data.violations);
+    _writeProjectStructure(buf);
 
     buf.writeln('${'=' * 70}');
-    buf.writeln('Total: $total issues');
+    buf.writeln('Total: ${data.total} issues');
 
     File(path).writeAsStringSync(buf.toString());
   }
 
+  /// Write the report header block.
+  static void _writeHeader(
+    StringBuffer buf,
+    ReportConfig? config,
+    int batchCount,
+  ) {
+    buf.writeln('Saropa Lints Analysis Report');
+    buf.writeln('Generated: ${DateTime.now().toIso8601String()}');
+    buf.writeln('Project: $_projectRoot');
+    if (config != null) {
+      buf.writeln('Version: ${config.version}');
+    }
+    if (batchCount > 1) {
+      buf.writeln('Batches: $batchCount isolates contributed');
+    }
+    buf.writeln('${'=' * 70}');
+    buf.writeln();
+  }
+
+  /// Write the overview statistics block.
+  static void _writeOverview(StringBuffer buf, ConsolidatedData data) {
+    buf.writeln('OVERVIEW');
+    buf.writeln('  Total issues:       ${data.total}');
+    buf.writeln('  Files analyzed:     ${data.filesAnalyzed}');
+    buf.writeln('  Files with issues:  ${data.filesWithIssues}');
+    buf.writeln('  Rules triggered:    ${data.issuesByRule.length}');
+    buf.writeln();
+  }
+
   /// Write the analysis configuration section.
-  static void _writeConfigSection(StringBuffer buf) {
-    final config = _config;
+  static void _writeConfigSection(StringBuffer buf, ReportConfig? config) {
     if (config == null) {
       buf.writeln('CONFIGURATION');
       buf.writeln('  (not available — config was not captured)');
@@ -341,28 +396,54 @@ class AnalysisReporter {
     buf.writeln();
   }
 
-  /// Write all violations grouped by impact level.
+  /// Write violations grouped by impact level, capped at
+  /// [_maxInlineViolations] total. Higher-impact violations take
+  /// priority when the cap is reached.
   static void _writeViolationList(
     StringBuffer buf,
     Map<LintImpact, List<ViolationRecord>> violations,
   ) {
+    final total = violations.values.fold(0, (s, l) => s + l.length);
+
     buf.writeln('${'=' * 70}');
-    buf.writeln('ALL VIOLATIONS');
+    buf.writeln(
+        'ALL VIOLATIONS${total > _maxInlineViolations ? ' (showing $_maxInlineViolations of $total)' : ''}');
     buf.writeln('${'=' * 70}');
     buf.writeln();
+
+    var remaining = _maxInlineViolations;
 
     for (final impact in LintImpact.values) {
       final list = violations[impact];
       if (list == null || list.isEmpty) continue;
 
-      buf.writeln('--- ${impact.name.toUpperCase()} (${list.length}) ---');
-      for (final v in list) {
-        buf.writeln('  ${v.file}:${v.line} '
-            '| [${v.rule}] ${v.message} '
-            '| ${impact.name}');
-      }
-      buf.writeln();
+      final toWrite = remaining >= list.length ? list.length : remaining;
+      _writeImpactViolations(buf, impact, list, toWrite);
+      remaining -= toWrite;
     }
+  }
+
+  /// Write violations for a single impact level, capped at [limit].
+  static void _writeImpactViolations(
+    StringBuffer buf,
+    LintImpact impact,
+    List<ViolationRecord> list,
+    int limit,
+  ) {
+    buf.writeln('--- ${impact.name.toUpperCase()} (${list.length}) ---');
+
+    for (var i = 0; i < limit; i++) {
+      final v = list[i];
+      buf.writeln('  ${v.file}:${v.line} '
+          '| [${v.rule}] ${v.message} '
+          '| ${impact.name}');
+    }
+
+    final omitted = list.length - limit;
+    if (omitted > 0) {
+      buf.writeln('  ... $omitted more ${impact.name} violations omitted');
+    }
+    buf.writeln();
   }
 
   /// Write impact breakdown section.
@@ -382,9 +463,9 @@ class AnalysisReporter {
   }
 
   /// Write severity breakdown section.
-  static void _writeSeveritySection(
+  static void _writeSeveritySubsection(
     StringBuffer buf,
-    ProgressTrackerData data,
+    ConsolidatedData data,
   ) {
     buf.writeln('BY SEVERITY');
     if (data.errorCount > 0) {
@@ -399,21 +480,22 @@ class AnalysisReporter {
     buf.writeln();
   }
 
-  /// Write top rules section.
-  static void _writeTopRules(
+  /// Write top rules section from raw maps.
+  static void _writeTopRulesFromMap(
     StringBuffer buf,
-    ProgressTrackerData data,
+    Map<String, int> issuesByRule,
+    Map<String, String> ruleSeverities,
   ) {
-    if (data.issuesByRule.isEmpty) return;
+    if (issuesByRule.isEmpty) return;
 
-    final sorted = data.issuesByRule.entries.toList()
+    final sorted = issuesByRule.entries.toList()
       ..sort((a, b) => b.value.compareTo(a.value));
     final top = sorted.take(20);
 
     buf.writeln('TOP RULES');
     var i = 1;
     for (final entry in top) {
-      final severity = data.ruleSeverities[entry.key] ?? '?';
+      final severity = ruleSeverities[entry.key] ?? '?';
       buf.writeln('  ${i.toString().padLeft(2)}. '
           '${entry.key} (${entry.value}) [$severity]');
       i++;
@@ -421,32 +503,246 @@ class AnalysisReporter {
     buf.writeln();
   }
 
-  /// Write top files section.
-  static void _writeTopFiles(
+  /// Write all analyzed files ranked by importance score.
+  ///
+  /// Replaces the old TOP FILES section (which was just a violation count).
+  /// Shows every file with its importance score, fan-in, layer, and
+  /// issue count so the developer sees which files matter most.
+  static void _writeFileImportance(
     StringBuffer buf,
-    ProgressTrackerData data,
+    Map<String, int> issuesByFile,
   ) {
-    if (data.issuesByFile.isEmpty) return;
+    final files = ImportGraphTracker.allFiles;
+    if (files.isEmpty) return;
 
-    final sorted = data.issuesByFile.entries.toList()
-      ..sort((a, b) => b.value.compareTo(a.value));
-    final top = sorted.take(20);
+    // Build scored list: all known files
+    final scored =
+        <({String path, double score, int fanIn, String layer, int issues})>[];
+    for (final file in files) {
+      scored.add((
+        path: file,
+        score: ImportGraphTracker.getFileScore(file),
+        fanIn: ImportGraphTracker.importersOf(file).length,
+        layer: ImportGraphTracker.getLayer(file),
+        issues: issuesByFile[file] ?? 0,
+      ));
+    }
+    scored.sort((a, b) => b.score.compareTo(a.score));
 
-    buf.writeln('TOP FILES');
-    var i = 1;
-    for (final entry in top) {
-      // Show relative path from project root
-      var filePath = entry.key;
-      if (_projectRoot != null && filePath.startsWith(_projectRoot!)) {
-        filePath = filePath.substring(_projectRoot!.length);
-        if (filePath.startsWith('/') || filePath.startsWith('\\')) {
-          filePath = filePath.substring(1);
-        }
-      }
-      buf.writeln('  ${i.toString().padLeft(2)}. $filePath (${entry.value})');
-      i++;
+    final capped = scored.take(_maxFileImportanceRows).toList();
+    final omitted = scored.length - capped.length;
+
+    buf.writeln('FILE IMPORTANCE (${scored.length} files, '
+        'sorted by priority score'
+        '${omitted > 0 ? ', showing top ${capped.length}' : ''})');
+    buf.writeln('  ${'Score'.padLeft(5)} | '
+        '${'Fan-in'.padLeft(6)} | '
+        '${'Layer'.padRight(10)} | '
+        '${'Issues'.padLeft(6)} | File');
+    buf.writeln('  ${'-' * 5}-+-${'-' * 6}-+-'
+        '${'-' * 10}-+-${'-' * 6}-+-${'-' * 30}');
+
+    for (final f in capped) {
+      buf.writeln('  ${f.score.toStringAsFixed(0).padLeft(5)} | '
+          '${f.fanIn.toString().padLeft(6)} | '
+          '${f.layer.padRight(10)} | '
+          '${f.issues.toString().padLeft(6)} | '
+          '${_relativePath(f.path)}');
+    }
+
+    if (omitted > 0) {
+      buf.writeln('  ... $omitted more files omitted');
     }
     buf.writeln();
+  }
+
+  /// Write all violations sorted by priority score descending.
+  ///
+  /// Each violation's priority combines its impact level, the file's
+  /// importance (fan-in), and the file's architectural layer weight.
+  static void _writePrioritizedViolations(
+    StringBuffer buf,
+    Map<LintImpact, List<ViolationRecord>> violations,
+  ) {
+    // Flatten all violations with their impact
+    final all = <({ViolationRecord v, LintImpact impact, double priority})>[];
+    for (final entry in violations.entries) {
+      for (final v in entry.value) {
+        all.add((
+          v: v,
+          impact: entry.key,
+          priority: ImportGraphTracker.getPriority(v.file, entry.key),
+        ));
+      }
+    }
+    if (all.isEmpty) return;
+
+    all.sort((a, b) => b.priority.compareTo(a.priority));
+
+    final showing =
+        all.length > _maxInlineViolations ? _maxInlineViolations : all.length;
+
+    buf.writeln('${'=' * 70}');
+    buf.writeln('FIX PRIORITY (${all.length} violations, '
+        'sorted by priority = impact * importance * layer)');
+    buf.writeln('${'=' * 70}');
+    buf.writeln();
+    buf.writeln('  ${'Priority'.padLeft(8)} | '
+        '${'Impact'.padRight(11)} | '
+        '${'File'.padRight(40)} | '
+        '${'Line'.padLeft(4)} | Rule');
+    buf.writeln('  ${'-' * 8}-+-${'-' * 11}-+-'
+        '${'-' * 40}-+-${'-' * 4}-+-${'-' * 20}');
+
+    for (var i = 0; i < showing; i++) {
+      final e = all[i];
+      buf.writeln('  ${e.priority.toStringAsFixed(0).padLeft(8)} | '
+          '${e.impact.name.padRight(11)} | '
+          '${_relativePath(e.v.file).padRight(40)} | '
+          '${e.v.line.toString().padLeft(4)} | '
+          '${e.v.rule}');
+    }
+
+    final omitted = all.length - showing;
+    if (omitted > 0) {
+      buf.writeln('  ... $omitted more violations omitted');
+    }
+    buf.writeln();
+  }
+
+  /// Write the full import dependency tree from entry points.
+  static void _writeProjectStructure(StringBuffer buf) {
+    final files = ImportGraphTracker.allFiles;
+    if (files.isEmpty) return;
+
+    buf.writeln('${'=' * 70}');
+    buf.writeln('PROJECT STRUCTURE '
+        '(${files.length} files, ${ImportGraphTracker.totalEdges} edges)');
+    buf.writeln('${'=' * 70}');
+    buf.writeln();
+
+    // Find entry points: files with no importers and at least one import
+    final roots = <String>[];
+    final standalone = <String>[];
+    for (final file in files) {
+      final fanIn = ImportGraphTracker.importersOf(file).length;
+      final fanOut = ImportGraphTracker.importsOf(file).length;
+      if (fanIn == 0) {
+        if (fanOut > 0) {
+          roots.add(file);
+        } else {
+          standalone.add(file);
+        }
+      }
+    }
+    roots.sort();
+
+    // DFS tree walk from each root
+    final visited = <String>{};
+    for (final root in roots) {
+      _writeTreeNode(buf, root, '', true, visited);
+    }
+
+    // Standalone files
+    if (standalone.isNotEmpty) {
+      standalone.sort();
+      buf.writeln();
+      buf.writeln('Standalone (no inbound imports):');
+      for (final file in standalone) {
+        final layer = ImportGraphTracker.getLayer(file);
+        buf.writeln('  ${_relativePath(file)} [$layer]');
+      }
+    }
+    buf.writeln();
+  }
+
+  /// Recursively write a tree node and its children.
+  static void _writeTreeNode(
+    StringBuffer buf,
+    String file,
+    String prefix,
+    bool isLast,
+    Set<String> visited,
+  ) {
+    final connector = prefix.isEmpty ? '' : (isLast ? '└── ' : '├── ');
+    final layer = ImportGraphTracker.getLayer(file);
+    final fanIn = ImportGraphTracker.importersOf(file).length;
+    final fanOut = ImportGraphTracker.importsOf(file).length;
+    final label = '${_relativePath(file)} '
+        '[$layer] (fan-in: $fanIn, fan-out: $fanOut)';
+
+    if (!visited.add(file)) {
+      buf.writeln('$prefix$connector$label [shown above]');
+      return;
+    }
+
+    buf.writeln('$prefix$connector$label');
+
+    final children = ImportGraphTracker.importsOf(file).toList()..sort();
+    // Only show children that are in our project graph
+    final projectChildren =
+        children.where((c) => ImportGraphTracker.allFiles.contains(c)).toList();
+
+    final childPrefix =
+        prefix + (prefix.isEmpty ? '' : (isLast ? '    ' : '│   '));
+    for (var i = 0; i < projectChildren.length; i++) {
+      _writeTreeNode(
+        buf,
+        projectChildren[i],
+        childPrefix,
+        i == projectChildren.length - 1,
+        visited,
+      );
+    }
+  }
+
+  /// Convert an absolute path to a relative path from project root.
+  ///
+  /// Normalizes separators to `/` before comparing so that Windows
+  /// paths (which may mix `\` and `/`) are handled correctly.
+  static String _relativePath(String filePath) {
+    if (_projectRoot == null) return filePath;
+    final root = _projectRoot!.replaceAll('\\', '/');
+    final file = filePath.replaceAll('\\', '/');
+    if (file.startsWith('$root/')) {
+      return file.substring(root.length + 1);
+    }
+    return filePath;
+  }
+
+  /// Move old report files to `.trash/`, keeping only the
+  /// [_maxReportFiles] most recent in the reports directory.
+  /// Trashed files can still be viewed but are excluded from the
+  /// active reports listing.
+  static void _cleanOldReports() {
+    if (_projectRoot == null) return;
+
+    try {
+      final sep = Platform.pathSeparator;
+      final reportsDir = Directory('$_projectRoot${sep}reports');
+      if (!reportsDir.existsSync()) return;
+
+      final reportFiles = reportsDir
+          .listSync()
+          .whereType<File>()
+          .where((f) => f.path.endsWith('_saropa_lint_report.log'))
+          .toList()
+        ..sort((a, b) => b.path.compareTo(a.path));
+
+      if (reportFiles.length <= _maxReportFiles) return;
+
+      final trashDir = Directory('$_projectRoot${sep}reports$sep.trash');
+      if (!trashDir.existsSync()) {
+        trashDir.createSync(recursive: true);
+      }
+
+      for (final old in reportFiles.skip(_maxReportFiles)) {
+        final name = old.path.split(sep).last;
+        old.renameSync('${trashDir.path}$sep$name');
+      }
+    } catch (_) {
+      // Cleanup failure is non-critical — silently ignore.
+    }
   }
 
   /// Reset state for a fresh analysis session.
@@ -457,9 +753,11 @@ class AnalysisReporter {
     _debounceTimer?.cancel();
     _debounceTimer = null;
     _projectRoot = null;
-    _timestamp = null;
+    _sessionId = null;
+    _isolateId = null;
     _pathsLogged = false;
     _reportWritten = false;
     _config = null;
+    ImportGraphTracker.reset();
   }
 }
