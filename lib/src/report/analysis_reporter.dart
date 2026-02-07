@@ -103,7 +103,7 @@ class AnalysisReporter {
   /// Schedule report writing after a debounce period.
   ///
   /// Each call resets the timer. When no new violations arrive for
-  /// [_debounce] duration, the report is written. The same report file
+  /// `_debounce` duration, the report is written. The same report file
   /// is overwritten on each write so it always reflects cumulative data.
   ///
   /// Per-file de-duplication is handled by [ProgressTracker._clearFileData],
