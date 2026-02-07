@@ -1121,12 +1121,21 @@ void _createCustomOverridesFile(File file) {
 # ─────────────────────────────────────────────────────────────────────────────
 # ANALYSIS SETTINGS
 # ─────────────────────────────────────────────────────────────────────────────
-# max_issues: Maximum warnings/info to track in detail (errors always tracked)
-#   - Default: 1000
-#   - Set to 0 for unlimited
-#   - Lower values = faster analysis on legacy codebases
+#
+# max_issues: Maximum non-ERROR issues shown in the Problems tab.
+#   After this limit, rules keep running but remaining issues go to the
+#   report log only (reports/<timestamp>_saropa_lint_report.log).
+#   - Default: 500
+#   - Set to 0 for unlimited (all issues in Problems tab)
+#   - Override per-run: SAROPA_LINTS_MAX=200 dart run custom_lint
+#
+# output: Where violations are sent.
+#   - "both"  (default) — Problems tab + report file
+#   - "file"  — Report file only (nothing in Problems tab)
+#   - Override per-run: SAROPA_LINTS_OUTPUT=file dart run custom_lint
 
-max_issues: 1000
+max_issues: 500
+output: both
 
 # ─────────────────────────────────────────────────────────────────────────────
 # PLATFORM SETTINGS
@@ -1180,14 +1189,23 @@ void _ensureMaxIssuesSetting(File file) {
   // Add max_issues at the top, after any existing header comments
   final settingBlock = '''
 # ─────────────────────────────────────────────────────────────────────────────
-# ANALYSIS SETTINGS (added in v4.9.1)
+# ANALYSIS SETTINGS (added in v4.9.1, updated v4.12.2)
 # ─────────────────────────────────────────────────────────────────────────────
-# max_issues: Maximum warnings/info to track in detail (errors always tracked)
-#   - Default: 1000
-#   - Set to 0 for unlimited
-#   - Lower values = faster analysis on legacy codebases
+#
+# max_issues: Maximum non-ERROR issues shown in the Problems tab.
+#   After this limit, rules keep running but remaining issues go to the
+#   report log only (reports/<timestamp>_saropa_lint_report.log).
+#   - Default: 500
+#   - Set to 0 for unlimited (all issues in Problems tab)
+#   - Override per-run: SAROPA_LINTS_MAX=200 dart run custom_lint
+#
+# output: Where violations are sent.
+#   - "both"  (default) — Problems tab + report file
+#   - "file"  — Report file only (nothing in Problems tab)
+#   - Override per-run: SAROPA_LINTS_OUTPUT=file dart run custom_lint
 
-max_issues: 1000
+max_issues: 500
+output: both
 
 ''';
 
