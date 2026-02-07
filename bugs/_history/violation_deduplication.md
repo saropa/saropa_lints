@@ -1,6 +1,6 @@
 # Bug: Violations duplicated on consecutive re-analysis of the same file
 
-## Status: Open
+## Status: Fixed
 
 ## Summary
 
