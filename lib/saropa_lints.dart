@@ -35,6 +35,7 @@ import 'package:custom_lint_builder/custom_lint_builder.dart';
 
 import 'package:saropa_lints/src/baseline/baseline_config.dart';
 import 'package:saropa_lints/src/baseline/baseline_manager.dart';
+import 'package:saropa_lints/src/report/analysis_reporter.dart';
 import 'package:saropa_lints/src/rules/all_rules.dart';
 import 'package:saropa_lints/src/saropa_lint_rule.dart';
 import 'package:saropa_lints/src/tiers.dart';
@@ -2691,6 +2692,13 @@ class _SaropaLints extends PluginBase {
     // Tell progress tracker how many rules are active
     ProgressTracker.setEnabledRuleCount(filteredRules.length);
 
+    // Capture analysis config for the report header
+    _captureReportConfig(
+      effectiveTier: effectiveTier,
+      enabledRuleNames: enabledRuleNames,
+      configs: configs,
+    );
+
     return filteredRules;
   }
 
@@ -2712,6 +2720,135 @@ class _SaropaLints extends PluginBase {
       }
     }
     return 'custom';
+  }
+}
+
+/// Capture analysis config snapshot for the report header.
+///
+/// Reads platform/package settings from `analysis_options_custom.yaml`
+/// and combines with the resolved tier, enabled rules, and user
+/// exclusions from [configs].
+void _captureReportConfig({
+  required String effectiveTier,
+  required Set<String> enabledRuleNames,
+  required CustomLintConfigs configs,
+}) {
+  // Collect explicitly disabled rules from the YAML config
+  final userExclusions = <String>[];
+  for (final entry in configs.rules.entries) {
+    if (entry.key == 'saropa_lints') continue;
+    if (!entry.value.enabled) {
+      userExclusions.add(entry.key);
+    }
+  }
+  userExclusions.sort();
+
+  // Read platform/package settings from custom yaml
+  final customSettings = _parseCustomYamlSettings();
+
+  AnalysisReporter.setAnalysisConfig(ReportConfig(
+    version: saropaLintsVersion,
+    effectiveTier: effectiveTier,
+    enabledRuleCount: enabledRuleNames.length,
+    enabledRuleNames: enabledRuleNames.toList()..sort(),
+    enabledPlatforms: customSettings.enabledPlatforms,
+    disabledPlatforms: customSettings.disabledPlatforms,
+    enabledPackages: customSettings.enabledPackages,
+    disabledPackages: customSettings.disabledPackages,
+    userExclusions: userExclusions,
+    maxIssues: ProgressTracker.maxIssues,
+    outputMode: ProgressTracker.isFileOnly ? 'file' : 'both',
+  ));
+}
+
+/// Parsed platform and package settings from custom YAML.
+class _CustomYamlSettings {
+  const _CustomYamlSettings({
+    required this.enabledPlatforms,
+    required this.disabledPlatforms,
+    required this.enabledPackages,
+    required this.disabledPackages,
+  });
+
+  final List<String> enabledPlatforms;
+  final List<String> disabledPlatforms;
+  final List<String> enabledPackages;
+  final List<String> disabledPackages;
+}
+
+/// Parse platform and package settings from `analysis_options_custom.yaml`.
+_CustomYamlSettings _parseCustomYamlSettings() {
+  const empty = _CustomYamlSettings(
+    enabledPlatforms: [],
+    disabledPlatforms: [],
+    enabledPackages: [],
+    disabledPackages: [],
+  );
+
+  try {
+    final configFile = File('analysis_options_custom.yaml');
+    if (!configFile.existsSync()) return empty;
+
+    final content = configFile.readAsStringSync();
+    final enabledPlatforms = <String>[];
+    final disabledPlatforms = <String>[];
+    final enabledPackages = <String>[];
+    final disabledPackages = <String>[];
+
+    _parseYamlSection(
+      content: content,
+      sectionName: 'platforms',
+      onEntry: (name, enabled) {
+        (enabled ? enabledPlatforms : disabledPlatforms).add(name);
+      },
+    );
+
+    _parseYamlSection(
+      content: content,
+      sectionName: 'packages',
+      onEntry: (name, enabled) {
+        (enabled ? enabledPackages : disabledPackages).add(name);
+      },
+    );
+
+    return _CustomYamlSettings(
+      enabledPlatforms: enabledPlatforms,
+      disabledPlatforms: disabledPlatforms,
+      enabledPackages: enabledPackages,
+      disabledPackages: disabledPackages,
+    );
+  } catch (_) {
+    return empty;
+  }
+}
+
+/// Parse a YAML section of `key: true/false` entries indented under
+/// [sectionName].
+void _parseYamlSection({
+  required String content,
+  required String sectionName,
+  required void Function(String name, bool enabled) onEntry,
+}) {
+  // Match "sectionName:" then capture indented "key: true/false" lines
+  final sectionPattern = RegExp(
+    '^$sectionName:\\s*\$',
+    multiLine: true,
+  );
+  final match = sectionPattern.firstMatch(content);
+  if (match == null) return;
+
+  final lines = content.substring(match.end).split('\n');
+  for (final line in lines) {
+    // Stop at next non-indented, non-empty, non-comment line
+    if (line.trim().isEmpty || line.trimLeft().startsWith('#')) continue;
+    if (!line.startsWith('  ')) break;
+
+    final entryMatch = RegExp(r'^\s+(\w+):\s*(true|false)').firstMatch(line);
+    if (entryMatch != null) {
+      final name = entryMatch.group(1)!;
+      final enabled = entryMatch.group(2) == 'true';
+      onEntry(name, enabled);
+    }
   }
 }
 
