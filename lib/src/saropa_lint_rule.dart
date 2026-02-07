@@ -228,6 +228,10 @@ class ProgressTracker {
   // Abort tracking (triggered by .saropa_stop sentinel file)
   static bool _abortRequested = false;
 
+  // Re-analysis detection: set when _clearFileData fires, indicating a
+  // previously-completed file is being analyzed again (new build/session).
+  static bool _hasReanalyzedFile = false;
+
   // Output mode: when true, all violations go to report file only
   static bool _fileOnly = false;
 
@@ -258,6 +262,15 @@ class ProgressTracker {
 
   /// Returns true if abort was requested via `.saropa_stop` sentinel file.
   static bool get isAbortRequested => _abortRequested;
+
+  /// Returns true if a previously-completed file has been re-analyzed,
+  /// indicating a new build/analysis session has started.
+  static bool get hasReanalyzedFile => _hasReanalyzedFile;
+
+  /// Clear the re-analysis flag after the reporter has acted on it.
+  static void clearReanalysisFlag() {
+    _hasReanalyzedFile = false;
+  }
 
   /// Returns true if violations should go to the report file only,
   /// not the Problems tab.
@@ -413,8 +426,12 @@ class ProgressTracker {
     // Detect file re-analysis: file was already fully processed but is
     // now being analyzed again (e.g. user saved during active analysis).
     // Clear stale violation data before recording new violations.
+    // Update _currentFile so subsequent rules for this file don't
+    // re-trigger _clearFileData and so _trackByFileAndRule attributes
+    // violations to the correct file.
     if (!wasNew && path != _currentFile) {
       _clearFileData(path);
+      _currentFile = path;
     }
 
     if (wasNew) {
@@ -812,6 +829,11 @@ class ProgressTracker {
   /// Subtracts old counts from totals and removes old violation records so
   /// the re-analysis starts from a clean baseline for that file.
   static void _clearFileData(String path) {
+    // Signal that file re-analysis was detected (a previously-completed
+    // file is being analyzed again). AnalysisReporter uses this to start
+    // a new report session on the next scheduleWrite() call.
+    _hasReanalyzedFile = true;
+
     final oldCount = _issuesByFile[path] ?? 0;
     if (oldCount == 0) return;
 
@@ -882,6 +904,7 @@ class ProgressTracker {
     _slowFiles.clear();
     _limitReached = false;
     _abortRequested = false;
+    _hasReanalyzedFile = false;
     // Note: _maxIssues and _fileOnly are not reset - they're config, not state
   }
 }
