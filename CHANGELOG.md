@@ -17,6 +17,12 @@ Dates are not included in version headers — [pub.dev](https://pub.dev/packages
 
 - **Analysis report captures all violations**: The debounce timer's write-once guard caused reports to contain only the first batch of violations when analysis gaps exceeded 3 seconds. Reports now overwrite on each debounce cycle so the final output reflects the complete analysis.
 
+### Added
+
+- **Regression tests for violation parser**: Added 16 tests covering `parseViolations()` and the `Violation` model to guard against future `custom_lint` output format changes (see PR #84 / PR #90).
+
+- **Updated PR #84 review document**: Corrected merge status (PR #84 was closed in favor of PR #90), added timeline, risk table, and regression test reference.
+
 ---
 ## [4.12.0]
 

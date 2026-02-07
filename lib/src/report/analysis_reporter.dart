@@ -49,7 +49,7 @@ class AnalysisReporter {
   /// Schedule report writing after a debounce period.
   ///
   /// Each call resets the timer. When no new violations arrive for
-  /// [_debounce] duration, reports are written. Reports are overwritten
+  /// `_debounce` duration, reports are written. Reports are overwritten
   /// on each cycle so the final write captures all violations.
   static void scheduleWrite() {
     if (_projectRoot == null) return;
