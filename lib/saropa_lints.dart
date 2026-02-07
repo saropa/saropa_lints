@@ -2786,7 +2786,7 @@ _CustomYamlSettings _parseCustomYamlSettings() {
   );
 
   try {
-    final configFile = File('analysis_options_custom.yaml');
+    final configFile = File(_customYamlPath);
     if (!configFile.existsSync()) return empty;
 
     final content = configFile.readAsStringSync();
@@ -2817,7 +2817,9 @@ _CustomYamlSettings _parseCustomYamlSettings() {
       enabledPackages: enabledPackages,
       disabledPackages: disabledPackages,
     );
-  } catch (_) {
+  } catch (e) {
+    // ignore: avoid_print
+    print('[saropa_lints] Failed to parse analysis_options_custom.yaml: $e');
     return empty;
   }
 }
@@ -2830,8 +2832,9 @@ void _parseYamlSection({
   required void Function(String name, bool enabled) onEntry,
 }) {
   // Match "sectionName:" then capture indented "key: true/false" lines
+  final escaped = RegExp.escape(sectionName);
   final sectionPattern = RegExp(
-    '^$sectionName:\\s*\$',
+    '^$escaped:\\s*\$',
     multiLine: true,
   );
   final match = sectionPattern.firstMatch(content);
@@ -2850,6 +2853,13 @@ void _parseYamlSection({
       onEntry(name, enabled);
     }
   }
+}
+
+/// Resolve `analysis_options_custom.yaml` against the current working
+/// directory so the path is absolute rather than CWD-relative.
+String get _customYamlPath {
+  final sep = Platform.pathSeparator;
+  return '${Directory.current.path}${sep}analysis_options_custom.yaml';
 }
 
 /// Conflicting rule pairs that should not be enabled together.
@@ -2938,7 +2948,7 @@ void _loadAnalysisConfig() {
   if (maxFromEnv && outputFromEnv) return;
 
   try {
-    final configFile = File('analysis_options_custom.yaml');
+    final configFile = File(_customYamlPath);
     if (!configFile.existsSync()) return;
 
     final content = configFile.readAsStringSync();
@@ -2961,8 +2971,9 @@ void _loadAnalysisConfig() {
         ProgressTracker.setFileOnly(fileOnly: true);
       }
     }
-  } catch (_) {
-    // Silently ignore — use defaults if config can't be read
+  } catch (e) {
+    // ignore: avoid_print
+    print('[saropa_lints] Failed to read analysis_options_custom.yaml: $e');
   }
 }
 
