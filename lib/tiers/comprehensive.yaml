@@ -20,6 +20,7 @@ custom_lint:
     # FLUTTER WIDGETS - Complete
     # =========================================================================
     avoid_border_all: true
+    avoid_empty_setstate: true
     avoid_incorrect_image_opacity: true
     avoid_image_without_cache: true
     avoid_missing_image_alt: true
