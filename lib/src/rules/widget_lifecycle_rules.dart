@@ -189,9 +189,10 @@ class _ContextUsageVisitor extends RecursiveAstVisitor<void> {
 class AvoidEmptySetStateRule extends SaropaLintRule {
   const AvoidEmptySetStateRule() : super(code: _code);
 
-  /// Code quality issue. Review when count exceeds 100.
+  /// Style preference. Large counts are normal in codebases that use the
+  /// `if (mounted) setState(() {})` idiom after async gaps.
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.low;
 
   @override
   RuleCost get cost => RuleCost.low;
