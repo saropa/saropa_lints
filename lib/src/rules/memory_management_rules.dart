@@ -1100,3 +1100,138 @@ class RequireCacheKeyUniquenessRule extends SaropaLintRule {
     });
   }
 }
+
+// =============================================================================
+// avoid_retaining_disposed_widgets
+// =============================================================================
+
+/// Warns when widget or State references are stored in non-widget classes.
+///
+/// Alias: widget_reference_leak, no_widget_in_service
+///
+/// Storing references to widgets or State objects in services, controllers,
+/// or other non-widget classes prevents garbage collection after the widget
+/// is disposed. This causes memory leaks and potential use-after-dispose
+/// crashes.
+///
+/// [HEURISTIC] This rule uses extends-clause analysis to identify widget
+/// classes. Classes without an extends clause that happen to end with
+/// "Widget" or "State" are NOT treated as widgets — only explicit
+/// inheritance from Flutter widget base classes is checked. Classes with
+/// custom inheritance hierarchies may need `// ignore:` if they are
+/// legitimate widget wrappers.
+///
+/// **BAD:**
+/// ```dart
+/// class MyService {
+///   Widget? cachedWidget;        // LINT - retains widget reference
+///   State? savedState;           // LINT - retains State reference
+///   BuildContext? storedContext;  // LINT - retains context
+/// }
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// class MyService {
+///   String? cachedData;          // OK - plain data
+///   VoidCallback? onUpdate;      // OK - callback
+/// }
+///
+/// class MyWidget extends StatefulWidget {
+///   final Widget child;          // OK - widget tree composition
+/// }
+/// ```
+class AvoidRetainingDisposedWidgetsRule extends SaropaLintRule {
+  const AvoidRetainingDisposedWidgetsRule() : super(code: _code);
+
+  /// Retaining disposed widgets causes memory leaks and crashes.
+  @override
+  LintImpact get impact => LintImpact.critical;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  static const LintCode _code = LintCode(
+    name: 'avoid_retaining_disposed_widgets',
+    problemMessage:
+        '[avoid_retaining_disposed_widgets] Non-widget class stores a '
+        'reference to a Widget or State object. After the widget is disposed, '
+        'this reference prevents garbage collection and may cause '
+        'use-after-dispose crashes. Widget and State objects are tied to the '
+        'Flutter lifecycle and should not be retained outside the widget tree. '
+        'This creates a strong reference that outlives the widget\'s lifecycle.',
+    correctionMessage:
+        'Store only the data you need (not the widget itself), or use '
+        'callbacks (VoidCallback, ValueChanged) to communicate between '
+        'widgets and services.',
+    errorSeverity: DiagnosticSeverity.ERROR,
+  );
+
+  /// Widget-related type names that should not be stored in non-widget classes
+  static const Set<String> _widgetTypes = <String>{
+    'Widget',
+    'StatelessWidget',
+    'StatefulWidget',
+    'State',
+    'Element',
+    'RenderObject',
+    'BuildContext',
+  };
+
+  /// Base classes from Flutter that indicate a widget-tree class.
+  /// Only explicit inheritance counts — no name-based heuristics.
+  static const Set<String> _widgetBaseClasses = <String>{
+    'StatelessWidget',
+    'StatefulWidget',
+    'State',
+    'InheritedWidget',
+    'RenderObjectWidget',
+    'Widget',
+    'GetView',
+    'GetWidget',
+    'HookWidget',
+    'ConsumerWidget',
+    'ConsumerStatefulWidget',
+  };
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addClassDeclaration((ClassDeclaration node) {
+      // Skip widget classes — they can hold widget references
+      if (_isWidgetClass(node)) return;
+
+      for (final ClassMember member in node.members) {
+        if (member is! FieldDeclaration) continue;
+
+        final TypeAnnotation? type = member.fields.type;
+        if (type == null) continue;
+
+        final String typeSource = type.toSource();
+
+        // Exact-match against known Flutter lifecycle types
+        for (final String widgetType in _widgetTypes) {
+          if (typeSource == widgetType ||
+              typeSource == '$widgetType?' ||
+              typeSource == 'List<$widgetType>' ||
+              typeSource == 'List<$widgetType?>') {
+            reporter.atNode(member, code);
+            break;
+          }
+        }
+      }
+    });
+  }
+
+  /// Check if class extends a known Flutter widget base class.
+  /// Uses explicit inheritance only — no name-based heuristics.
+  bool _isWidgetClass(ClassDeclaration node) {
+    final NamedType? superclass = node.extendsClause?.superclass;
+    if (superclass == null) return false;
+
+    return _widgetBaseClasses.contains(superclass.name2.lexeme);
+  }
+}

@@ -2422,6 +2422,14 @@ final List<LintRule Function()> _allRuleFactories = <LintRule Function()>[
   AvoidHiveSynchronousInUiRule.new,
   RequireSemanticColorsRule.new,
   PreferAvatarLoadingPlaceholderRule.new,
+
+  // ROADMAP 🚨 Rules (Essential - ERROR severity)
+  PreferCorrectPackageNameRule.new,
+  AvoidGetxBuildContextBypassRule.new,
+  AvoidPermissionHandlerNullSafetyRule.new,
+  AvoidRetainingDisposedWidgetsRule.new,
+  RequireSecureKeyGenerationRule.new,
+  RequireHiveWebSubdirectoryRule.new,
 ];
 
 // =============================================================================

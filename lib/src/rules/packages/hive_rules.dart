@@ -1873,3 +1873,117 @@ class _WrapHiveInAsyncCommentFix extends DartFix {
     });
   }
 }
+
+// =============================================================================
+// require_hive_web_subdirectory
+// =============================================================================
+
+/// Warns when Hive.initFlutter() is called without a subDir parameter on
+/// web platform.
+///
+/// Alias: hive_web_subdir, hive_web_init
+///
+/// On web, Hive stores data in IndexedDB. Without an explicit subDir,
+/// multiple apps on the same domain share the same Hive storage, causing
+/// data conflicts and overwrites. Always specify a subDir unique to your app.
+///
+/// **BAD:**
+/// ```dart
+/// await Hive.initFlutter(); // No subDir - shared storage on web!
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// await Hive.initFlutter('my_app_data');
+/// ```
+class RequireHiveWebSubdirectoryRule extends SaropaLintRule {
+  const RequireHiveWebSubdirectoryRule() : super(code: _code);
+
+  /// Missing subDir causes data conflicts between web apps on same domain.
+  @override
+  LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  static const LintCode _code = LintCode(
+    name: 'require_hive_web_subdirectory',
+    problemMessage:
+        '[require_hive_web_subdirectory] Hive.initFlutter() called without a '
+        'subDir parameter. On web platforms, Hive stores data in IndexedDB. '
+        'Without an explicit subdirectory, multiple apps deployed on the same '
+        'domain will share the same Hive storage namespace, causing data '
+        'conflicts, overwrites, and potential data loss between applications. '
+        'This is especially critical for web deployments.',
+    correctionMessage:
+        'Pass a unique subdirectory name to Hive.initFlutter(), e.g., '
+        "Hive.initFlutter('my_app_data'). Use your app's package name or a "
+        'unique identifier to avoid storage conflicts.',
+    errorSeverity: DiagnosticSeverity.ERROR,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      // Check for initFlutter method
+      if (node.methodName.name != 'initFlutter') return;
+
+      // Check if target is Hive
+      final Expression? target = node.target;
+      if (target == null) return;
+      if (target is! SimpleIdentifier || target.name != 'Hive') return;
+
+      // Check if subDir argument is provided
+      final NodeList<Expression> args = node.argumentList.arguments;
+      if (args.isEmpty) {
+        // No arguments at all - missing subDir
+        reporter.atNode(node, code);
+        return;
+      }
+
+      // Check if first positional arg is a non-empty string
+      final Expression firstArg = args.first;
+      if (firstArg is StringLiteral) {
+        final String? value = firstArg.stringValue;
+        if (value == null || value.isEmpty) {
+          reporter.atNode(node, code);
+        }
+      }
+    });
+  }
+
+  @override
+  List<Fix> getFixes() => <Fix>[_AddHiveSubDirFix()];
+}
+
+class _AddHiveSubDirFix extends DartFix {
+  @override
+  void run(
+    CustomLintResolver resolver,
+    ChangeReporter reporter,
+    CustomLintContext context,
+    AnalysisError analysisError,
+    List<AnalysisError> others,
+  ) {
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
+      if (node.methodName.name != 'initFlutter') return;
+
+      final changeBuilder = reporter.createChangeBuilder(
+        message: 'Add subdirectory parameter',
+        priority: 1,
+      );
+
+      changeBuilder.addDartFileEdit((builder) {
+        builder.addSimpleReplacement(
+          node.sourceRange,
+          "Hive.initFlutter('my_app_data')",
+        );
+      });
+    });
+  }
+}
