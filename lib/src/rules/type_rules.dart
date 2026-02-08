@@ -15,6 +15,8 @@ import '../saropa_lint_rule.dart';
 
 /// Warns when casting to an extension type.
 ///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v5
+///
 /// Extension types are compile-time only; casting to them can be misleading
 /// as the runtime type doesn't change.
 ///
@@ -45,7 +47,7 @@ class AvoidCastingToExtensionTypeRule extends SaropaLintRule {
     name: 'avoid_casting_to_extension_type',
     problemMessage:
         '[avoid_casting_to_extension_type] Cast to extension type bypasses the constructor invariants and type safety guarantees. '
-        'Extension types are erased at runtime, so the cast always succeeds regardless of whether the value satisfies the extension type constraints, silently producing an invalid wrapper.',
+        'Extension types are erased at runtime, so the cast always succeeds regardless of whether the value satisfies the extension type constraints, silently producing an invalid wrapper. {v5}',
     correctionMessage:
         'Use the extension type constructor (e.g., UserId(42)) instead of casting (42 as UserId). '
         'The constructor enforces any validation logic defined in the extension type and makes the type conversion explicit and self-documenting at the call site.',
@@ -79,6 +81,8 @@ class AvoidCastingToExtensionTypeRule extends SaropaLintRule {
 
 /// Warns when using collection methods with unrelated types.
 ///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v5
+///
 /// Using `contains`, `indexOf`, `remove`, etc. with a type that can never
 /// match the collection's element type is likely a bug.
 ///
@@ -108,7 +112,7 @@ class AvoidCollectionMethodsWithUnrelatedTypesRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_collection_methods_with_unrelated_types',
     problemMessage:
-        '[avoid_collection_methods_with_unrelated_types] Collection method called with unrelated type. Using contains, indexOf, remove, etc. with a type that can never match the collection\'s element type is likely a bug.',
+        '[avoid_collection_methods_with_unrelated_types] Collection method called with unrelated type. Using contains, indexOf, remove, etc. with a type that can never match the collection\'s element type is likely a bug. {v5}',
     correctionMessage:
         'The argument type cannot match any element in the collection. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -210,6 +214,8 @@ class AvoidCollectionMethodsWithUnrelatedTypesRule extends SaropaLintRule {
 
 /// Warns when dynamic type is used.
 ///
+/// Since: v4.1.3 | Updated: v4.13.0 | Rule version: v3
+///
 /// Using dynamic bypasses the type system and can lead to runtime errors.
 /// Prefer using specific types or generics.
 class AvoidDynamicRule extends SaropaLintRule {
@@ -226,7 +232,7 @@ class AvoidDynamicRule extends SaropaLintRule {
     name: 'avoid_dynamic_type',
     problemMessage:
         "[avoid_dynamic_type] 'dynamic' type disables static type checking, hiding errors until runtime. "
-        "Method calls on dynamic values are never verified by the compiler, so typos, missing methods, and wrong argument types only surface as NoSuchMethodError crashes in production.",
+        "Method calls on dynamic values are never verified by the compiler, so typos, missing methods, and wrong argument types only surface as NoSuchMethodError crashes in production. {v3}",
     correctionMessage:
         "Replace 'dynamic' with a specific type, Object (for truly unknown values with explicit casts), or a generic type parameter. "
         'If the actual type varies, use a sealed class hierarchy or union type to keep the compiler involved in checking correctness.',
@@ -248,6 +254,8 @@ class AvoidDynamicRule extends SaropaLintRule {
 }
 
 /// Warns when extension type doesn't implement Object and is implicitly nullable.
+///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v4
 ///
 /// Extension types that don't implement Object can be implicitly nullable,
 /// which may lead to unexpected behavior.
@@ -278,7 +286,7 @@ class AvoidImplicitlyNullableExtensionTypesRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_implicitly_nullable_extension_types',
     problemMessage:
-        '[avoid_implicitly_nullable_extension_types] Extension type is implicitly nullable. Extension types that don\'t implement Object can be implicitly nullable, which may lead to unexpected behavior.',
+        '[avoid_implicitly_nullable_extension_types] Extension type is implicitly nullable. Extension types that don\'t implement Object can be implicitly nullable, which may lead to unexpected behavior. {v4}',
     correctionMessage:
         'Add "implements Object" to make it non-nullable. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -317,6 +325,8 @@ class AvoidImplicitlyNullableExtensionTypesRule extends SaropaLintRule {
 
 /// Warns when interpolating a nullable value in a string.
 ///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v5
+///
 /// **Quick fix available:** Adds a comment to flag for manual review.
 class AvoidNullableInterpolationRule extends SaropaLintRule {
   const AvoidNullableInterpolationRule() : super(code: _code);
@@ -332,7 +342,7 @@ class AvoidNullableInterpolationRule extends SaropaLintRule {
     name: 'avoid_nullable_interpolation',
     problemMessage:
         "[avoid_nullable_interpolation] Nullable value in string interpolation produces the literal text 'null' instead of a meaningful fallback. "
-        "Users may see 'Hello null' or 'Order #null' in the UI, which looks like a bug and erodes trust in the application quality and data integrity.",
+        "Users may see 'Hello null' or 'Order #null' in the UI, which looks like a bug and erodes trust in the application quality and data integrity. {v5}",
     correctionMessage:
         "Add a null check before interpolation, or use the null-coalescing operator (??) to provide a sensible default (e.g., '\${name ?? \"Guest\"}'). "
         'For complex formatting, consider a helper method that handles null values with appropriate placeholder text.',
@@ -362,6 +372,8 @@ class AvoidNullableInterpolationRule extends SaropaLintRule {
 
 /// Warns when nullable parameters have default values that could be non-null.
 ///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v5
+///
 /// If a parameter has a default value, it doesn't need to be nullable.
 ///
 /// ### Example
@@ -390,7 +402,7 @@ class AvoidNullableParametersWithDefaultValuesRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_nullable_parameters_with_default_values',
     problemMessage:
-        '[avoid_nullable_parameters_with_default_values] Parameter with default value must not be nullable. If a parameter has a default value, it doesn\'t need to be nullable. Quick fix available: Adds a comment to flag for manual review.',
+        '[avoid_nullable_parameters_with_default_values] Parameter with default value must not be nullable. If a parameter has a default value, it doesn\'t need to be nullable. Quick fix available: Adds a comment to flag for manual review. {v5}',
     correctionMessage:
         'Remove the ? from the type since it has a non-null default. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -429,6 +441,8 @@ class AvoidNullableParametersWithDefaultValuesRule extends SaropaLintRule {
 
 /// Warns when calling `.toString()` on a nullable value without null check.
 ///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v4
+///
 /// Example of **bad** code:
 /// ```dart
 /// String? name;
@@ -455,7 +469,7 @@ class AvoidNullableToStringRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_nullable_tostring',
     problemMessage:
-        '[avoid_nullable_tostring] Calling toString() on a nullable value. Calling .toString() on a nullable value without null check. This type usage can cause unexpected runtime behavior or weaken static analysis effectiveness.',
+        '[avoid_nullable_tostring] Calling toString() on a nullable value. Calling .toString() on a nullable value without null check. This type usage can cause unexpected runtime behavior or weaken static analysis effectiveness. {v4}',
     correctionMessage:
         'Check for null first or provide a default value. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -492,6 +506,8 @@ class AvoidNullableToStringRule extends SaropaLintRule {
 }
 
 /// Warns when the null assertion operator (!) is used unsafely.
+///
+/// Since: v1.1.18 | Updated: v4.13.0 | Rule version: v7
 ///
 /// The bang operator can cause runtime crashes when the value is unexpectedly null.
 /// Use null-safe alternatives instead:
@@ -536,7 +552,7 @@ class AvoidNullAssertionRule extends SaropaLintRule {
     name: 'avoid_null_assertion',
     problemMessage:
         '[avoid_null_assertion] Null assertion operator (!) throws a runtime exception if the value is null, crashing the app without a meaningful error message. '
-        'The resulting _CastError provides no context about which value was null or why, making production crashes difficult to diagnose from error reports alone.',
+        'The resulting _CastError provides no context about which value was null or why, making production crashes difficult to diagnose from error reports alone. {v7}',
     correctionMessage:
         'Use null-safe alternatives: ?? for default values (e.g., name ?? \'Unknown\'), if-null checks for conditional logic, or ?. for optional chaining. '
         'When null is truly impossible, add an assert with a descriptive message or use a guard clause that throws a custom exception.',
@@ -1622,6 +1638,8 @@ class _NodeContainsFinder extends GeneralizingAstVisitor<void> {
 
 /// Warns when a type assertion (is check) is unnecessary.
 ///
+/// Since: v1.7.2 | Updated: v4.13.0 | Rule version: v2
+///
 /// Redundant `is` checks occur when the type is already known statically.
 ///
 /// Example of **bad** code:
@@ -1649,7 +1667,7 @@ class AvoidUnnecessaryTypeAssertionsRule extends SaropaLintRule {
     name: 'avoid_unnecessary_type_assertions',
     problemMessage:
         '[avoid_unnecessary_type_assertions] Unnecessary type assertion. '
-        'The expression is already known to be of this type.',
+        'The expression is already known to be of this type. {v2}',
     correctionMessage: 'Remove the redundant type check.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -1689,6 +1707,8 @@ class AvoidUnnecessaryTypeAssertionsRule extends SaropaLintRule {
 
 /// Warns when a type cast (as) is unnecessary.
 ///
+/// Since: v1.7.2 | Updated: v4.13.0 | Rule version: v2
+///
 /// Redundant `as` casts occur when the expression is already of the target type.
 ///
 /// Example of **bad** code:
@@ -1715,7 +1735,7 @@ class AvoidUnnecessaryTypeCastsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_unnecessary_type_casts',
     problemMessage: '[avoid_unnecessary_type_casts] Unnecessary type cast. '
-        'The expression is already of this type.',
+        'The expression is already of this type. {v2}',
     correctionMessage: 'Remove the redundant cast.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -1752,6 +1772,8 @@ class AvoidUnnecessaryTypeCastsRule extends SaropaLintRule {
 
 /// Warns when an 'is' type check can never be true.
 ///
+/// Since: v1.7.2 | Updated: v4.13.0 | Rule version: v2
+///
 /// This catches impossible type assertions where the expression type
 /// and tested type have no relationship.
 ///
@@ -1782,7 +1804,7 @@ class AvoidUnrelatedTypeAssertionsRule extends SaropaLintRule {
     name: 'avoid_unrelated_type_assertions',
     problemMessage:
         '[avoid_unrelated_type_assertions] Type assertion can never be true. '
-        'The types are unrelated.',
+        'The types are unrelated. {v2}',
     correctionMessage: 'Remove the impossible type check or fix the types.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
@@ -1839,6 +1861,8 @@ class AvoidUnrelatedTypeAssertionsRule extends SaropaLintRule {
 
 /// Warns when type names don't follow Dart conventions.
 ///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v4
+///
 /// Type names should be UpperCamelCase.
 ///
 /// ### Example
@@ -1869,7 +1893,7 @@ class PreferCorrectTypeNameRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_correct_type_name',
     problemMessage:
-        '[prefer_correct_type_name] Type name is not UpperCamelCase. Nonstandard type names reduce code readability and break Dart conventions. Quick fix available: Adds a comment to flag for manual review.',
+        '[prefer_correct_type_name] Type name is not UpperCamelCase. Nonstandard type names reduce code readability and break Dart conventions. Quick fix available: Adds a comment to flag for manual review. {v4}',
     correctionMessage:
         'Rename type to use UpperCamelCase. Example: MyType, UserProfile, HttpClient. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -1942,6 +1966,8 @@ class PreferCorrectTypeNameRule extends SaropaLintRule {
 
 /// Warns when using bare 'Function' type instead of specific function type.
 ///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v5
+///
 /// The bare 'Function' type is too permissive and loses type information.
 ///
 /// ### Example
@@ -1970,7 +1996,7 @@ class PreferExplicitFunctionTypeRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_explicit_function_type',
     problemMessage:
-        '[prefer_explicit_function_type] Use explicit function type instead of bare "Function". The bare \'Function\' type is too permissive and loses type information. Using bare \'Function\' type instead of specific function type.',
+        '[prefer_explicit_function_type] Use explicit function type instead of bare "Function". The bare \'Function\' type is too permissive and loses type information. Using bare \'Function\' type instead of specific function type. {v5}',
     correctionMessage:
         'Specify the function signature (e.g., void Function()). Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -1995,6 +2021,8 @@ class PreferExplicitFunctionTypeRule extends SaropaLintRule {
 }
 
 /// Warns when `var` is used instead of explicit type.
+///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v4
 ///
 /// **Stylistic rule (opt-in only).** Conflicts with prefer_var_over_explicit_type. No performance or correctness benefit.
 ///
@@ -2023,7 +2051,7 @@ class PreferTypeOverVarRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_type_over_var',
     problemMessage:
-        '[prefer_type_over_var] Preferring explicit type annotations over var is a style choice. Both produce identical compiled code. Conflicts with prefer_var_over_explicit_type. Enable via the stylistic tier.',
+        '[prefer_type_over_var] Preferring explicit type annotations over var is a style choice. Both produce identical compiled code. Conflicts with prefer_var_over_explicit_type. Enable via the stylistic tier. {v4}',
     correctionMessage:
         'Replace var with the explicit type. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,

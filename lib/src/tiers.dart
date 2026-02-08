@@ -661,6 +661,9 @@ const Set<String> essentialRules = <String>{
   'avoid_retaining_disposed_widgets', // ERROR - memory leak from widget refs
   'require_secure_key_generation', // ERROR - hardcoded encryption keys
   'require_hive_web_subdirectory', // ERROR - web storage conflicts
+
+  // v4.14.0 - GitHub issue rules (Essential)
+  'avoid_blocking_main_thread', // WARNING - sync I/O blocks main thread
 };
 
 /// Recommended tier rules - Essential + common mistakes, performance basics.
@@ -1459,6 +1462,10 @@ const Set<String> recommendedOnlyRules = <String>{
   'avoid_provider_listen_false_in_build', // INFO - stale data from listen: false
   'prefer_spring_animation', // INFO - natural physics-based animation
   'prefer_avatar_loading_placeholder', // INFO - fallback for network avatars
+
+  // v4.14.0 - GitHub issue rules (Recommended)
+  'require_feature_flag_type_safety', // INFO - typed feature flag accessors
+  'require_timezone_display', // INFO - timezone context in time display
 };
 
 /// Professional tier rules - Recommended + architecture, testing, maintainability.
@@ -1517,7 +1524,7 @@ const Set<String> professionalOnlyRules = <String>{
 
   // Performance
   'require_keys_in_animated_lists',
-  'avoid_synchronous_file_io',
+  'avoid_synchronous_file_io', // superseded by avoid_blocking_main_thread (Essential)
   'prefer_compute_for_heavy_work',
   'prefer_cached_getter',
   // Note: avoid_object_creation_in_hot_loops moved to Pedantic (micro-optimization)
@@ -2000,6 +2007,10 @@ const Set<String> professionalOnlyRules = <String>{
   'avoid_encryption_key_in_memory', // INFO - keys in memory can be extracted
   'prefer_lazy_singleton_registration', // INFO - eager singletons slow startup
   'require_cache_key_uniqueness', // INFO - cache keys need stable hashCode
+
+  // v4.14.0 - GitHub issue rules (Professional)
+  'require_log_level_for_production', // INFO - guard verbose logs for production
+  'require_analytics_event_naming', // INFO - snake_case analytics events
 
   // Best practices (auto-assigned by severity)
   'avoid_adjacent_strings',

@@ -17,6 +17,8 @@ import '../saropa_lint_rule.dart';
 
 /// Warns when ChangeNotifier subclass doesn't call notifyListeners.
 ///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v5
+///
 /// ChangeNotifier without notify calls won't update listeners.
 ///
 /// **BAD:**
@@ -52,7 +54,7 @@ class RequireNotifyListenersRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_notify_listeners',
     problemMessage:
-        '[require_notify_listeners] ChangeNotifier method modifies state properties but does not call notifyListeners(). Widgets listening to this notifier will not rebuild to reflect the updated state, displaying stale data to the user. This creates silent data synchronization bugs that are difficult to diagnose because the state appears correct in debug tools.',
+        '[require_notify_listeners] ChangeNotifier method modifies state properties but does not call notifyListeners(). Widgets listening to this notifier will not rebuild to reflect the updated state, displaying stale data to the user. This creates silent data synchronization bugs that are difficult to diagnose because the state appears correct in debug tools. {v5}',
     correctionMessage:
         'Add notifyListeners() as the last statement in every method that modifies observable state properties to trigger dependent widget rebuilds.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -132,6 +134,8 @@ class _StateModificationVisitor extends RecursiveAstVisitor<void> {
 
 /// Warns when StreamController is not disposed.
 ///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v7
+///
 /// Not closing StreamControllers causes memory leaks.
 ///
 /// **Detection:**
@@ -174,7 +178,7 @@ class RequireStreamControllerDisposeRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_stream_controller_dispose',
     problemMessage:
-        '[require_stream_controller_dispose] Not closing a StreamController in the StatefulWidget dispose method will leak memory, keep listeners active, and cause app slowdowns, crashes, or persistent background activity. This leads to stream subscription exhaustion, battery drain, and unpredictable bugs, especially in production apps with frequent widget tree rebuilds. Unclosed controllers also prevent garbage collection and block app updates.',
+        '[require_stream_controller_dispose] Not closing a StreamController in the StatefulWidget dispose method will leak memory, keep listeners active, and cause app slowdowns, crashes, or persistent background activity. This leads to stream subscription exhaustion, battery drain, and unpredictable bugs, especially in production apps with frequent widget tree rebuilds. Unclosed controllers also prevent garbage collection and block app updates. {v7}',
     correctionMessage:
         'Always call controller.close() in the dispose method of your widget or class to properly release resources and prevent memory leaks. Audit all StreamController usage for proper cleanup and add tests for resource management. Document disposal logic for maintainability.',
     errorSeverity: DiagnosticSeverity.ERROR,
@@ -292,6 +296,8 @@ class _AddTodoForStreamControllerDisposeFix extends DartFix {
 
 /// Warns when ValueNotifier is used without dispose.
 ///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v6
+///
 /// ValueNotifier should be disposed to release resources.
 ///
 /// **BAD:**
@@ -342,7 +348,7 @@ class RequireValueNotifierDisposeRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_value_notifier_dispose',
     problemMessage:
-        '[require_value_notifier_dispose] If you do not dispose a ValueNotifier, it will leak memory, keep listeners attached, and trigger updates on a StatefulWidget that has already been removed from the widget tree. This causes memory leaks, unexpected UI updates, and hard-to-find bugs in your app.',
+        '[require_value_notifier_dispose] If you do not dispose a ValueNotifier, it will leak memory, keep listeners attached, and trigger updates on a StatefulWidget that has already been removed from the widget tree. This causes memory leaks, unexpected UI updates, and hard-to-find bugs in your app. {v6}',
     correctionMessage:
         'Call notifier.dispose() in the dispose method of your widget or class to properly release resources and prevent memory leaks.',
     errorSeverity: DiagnosticSeverity.ERROR,
@@ -594,6 +600,8 @@ class _SimpleDisposeChecker extends RecursiveAstVisitor<void> {
 
 /// Warns when setState is called with async gap.
 ///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v4
+///
 /// Alias: check_mounted_after_async
 ///
 /// Calling setState after await may occur when widget is unmounted.
@@ -631,7 +639,7 @@ class RequireMountedCheckRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_mounted_check',
     problemMessage:
-        '[require_mounted_check] Calling setState after an await without checking if the StatefulWidget is still mounted in the widget tree throws a "setState called after dispose" error. This leads to runtime exceptions, app instability, and hard-to-debug crashes, especially in async code.',
+        '[require_mounted_check] Calling setState after an await without checking if the StatefulWidget is still mounted in the widget tree throws a "setState called after dispose" error. This leads to runtime exceptions, app instability, and hard-to-debug crashes, especially in async code. {v4}',
     correctionMessage:
         'Add "if (!mounted) return;" before calling setState after an await to ensure the widget is still in the widget tree and prevent runtime errors.',
     errorSeverity: DiagnosticSeverity.ERROR,
@@ -764,6 +772,9 @@ class _AsyncSetStateVisitor extends RecursiveAstVisitor<void> {
 }
 
 /// Warns when a State class has no mutable state, lifecycle methods, or
+///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v6
+///
 /// setState calls.
 ///
 /// A StatefulWidget is designed for widgets that maintain mutable state.
@@ -833,7 +844,7 @@ class AvoidStatefulWithoutStateRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_stateful_without_state',
     problemMessage:
-        '[avoid_stateful_without_state] Using a StatefulWidget without any state fields adds unnecessary complexity, increases lifecycle overhead, and can confuse maintainers. This leads to harder-to-read code, wasted memory allocations for the State object, and potential performance issues.',
+        '[avoid_stateful_without_state] Using a StatefulWidget without any state fields adds unnecessary complexity, increases lifecycle overhead, and can confuse maintainers. This leads to harder-to-read code, wasted memory allocations for the State object, and potential performance issues. {v6}',
     correctionMessage:
         'Convert the widget to a StatelessWidget if it does not manage any state. This simplifies your code and improves performance.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -957,6 +968,8 @@ class _StatefulSetStateVisitor extends RecursiveAstVisitor<void> {
 
 /// Warns when GlobalKey is created in build method.
 ///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v4
+///
 /// GlobalKeys created in build cause widget recreation on every rebuild.
 ///
 /// **BAD:**
@@ -988,7 +1001,7 @@ class AvoidGlobalKeyInBuildRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_global_key_in_build',
     problemMessage:
-        '[avoid_global_key_in_build] Creating a GlobalKey inside the build() method causes it to be recreated on every rebuild, which results in lost widget state, broken references, and unpredictable UI behavior. This can cause your app to lose user input or fail to maintain state across rebuilds.',
+        '[avoid_global_key_in_build] Creating a GlobalKey inside the build() method causes it to be recreated on every rebuild, which results in lost widget state, broken references, and unpredictable UI behavior. This can cause your app to lose user input or fail to maintain state across rebuilds. {v4}',
     correctionMessage:
         'Create the GlobalKey as a class field (not inside build) to preserve widget state and ensure consistent behavior.',
     errorSeverity: DiagnosticSeverity.ERROR,
@@ -1057,6 +1070,8 @@ class _GlobalKeyVisitor extends RecursiveAstVisitor<void> {
 }
 
 /// Warns when setState() is called in a large State class.
+///
+/// Since: v4.13.0 | Rule version: v1
 ///
 /// When a State class is large (many lines or members), calling setState()
 /// triggers a rebuild of the entire widget subtree, which can be expensive.
@@ -1129,7 +1144,7 @@ class AvoidSetStateInLargeStateClassRule extends SaropaLintRule {
     name: 'avoid_setstate_in_large_state_class',
     problemMessage:
         '[avoid_setstate_in_large_state_class] setState() in a large State class causes expensive full rebuilds. '
-        'Consider breaking into smaller widgets or using granular state.',
+        'Consider breaking into smaller widgets or using granular state. {v1}',
     correctionMessage:
         'Extract parts of this widget into smaller stateless/stateful widgets, '
         'or use ValueNotifier/ValueListenableBuilder for targeted rebuilds.',
@@ -1201,6 +1216,8 @@ class _SetStateCallVisitor extends RecursiveAstVisitor<void> {
 
 /// Warns when mutable values are used in Provider Selector.
 ///
+/// Since: v2.0.0 | Updated: v4.13.0 | Rule version: v2
+///
 /// Selector values should be immutable to ensure proper comparisons.
 ///
 /// **BAD:**
@@ -1230,7 +1247,7 @@ class PreferImmutableSelectorValueRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_immutable_selector_value',
     problemMessage:
-        '[prefer_immutable_selector_value] Selector uses mutable type that may cause incorrect rebuilds. Selector values must be immutable to ensure proper comparisons. Mutable values are used in Provider Selector.',
+        '[prefer_immutable_selector_value] Selector uses mutable type that may cause incorrect rebuilds. Selector values must be immutable to ensure proper comparisons. Mutable values are used in Provider Selector. {v2}',
     correctionMessage:
         'Return an immutable value or use a primitive type. Verify the state updates correctly across all affected screens and edge cases.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -1274,6 +1291,8 @@ class PreferImmutableSelectorValueRule extends SaropaLintRule {
 
 /// Warns when static mutable state is used.
 ///
+/// Since: v4.2.0 | Updated: v4.13.0 | Rule version: v4
+///
 /// Alias: global_mutable_state, static_state_antipattern
 ///
 /// Static mutable state causes issues with testing, hot reload, and
@@ -1308,7 +1327,7 @@ class AvoidStaticStateRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_static_state',
     problemMessage:
-        '[avoid_static_state] Static mutable state persists across hot-reloads and tests, causing stale data and inconsistent behavior. Tests fail unpredictably due to shared state leaking between runs, and production bugs become hard to reproduce across different app sessions and isolates.',
+        '[avoid_static_state] Static mutable state persists across hot-reloads and tests, causing stale data and inconsistent behavior. Tests fail unpredictably due to shared state leaking between runs, and production bugs become hard to reproduce across different app sessions and isolates. {v4}',
     correctionMessage:
         'Replace static mutable fields with scoped state management (Provider, Riverpod, or Bloc) to ensure proper isolation across tests and hot-reloads.',
     errorSeverity: DiagnosticSeverity.WARNING,

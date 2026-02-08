@@ -15,6 +15,8 @@ import '../saropa_lint_rule.dart';
 
 /// Warns when hardcoded user-facing strings are detected.
 ///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v4
+///
 /// User-facing strings should use localization (l10n) instead of
 /// hardcoded text for proper internationalization.
 ///
@@ -42,7 +44,7 @@ class AvoidHardcodedStringsInUiRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_hardcoded_strings_in_ui',
     problemMessage:
-        '[avoid_hardcoded_strings_in_ui] Hardcoded user-facing string. Cannot be translated to other languages. User-facing strings should use localization (l10n) instead of hardcoded text for proper internationalization.',
+        '[avoid_hardcoded_strings_in_ui] Hardcoded user-facing string. Cannot be translated to other languages. User-facing strings should use localization (l10n) instead of hardcoded text for proper internationalization. {v4}',
     correctionMessage:
         'Replace with l10n.yourKey or AppLocalizations.of(context).yourKey. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -119,6 +121,8 @@ class AvoidHardcodedStringsInUiRule extends SaropaLintRule {
 
 /// Warns when locale-dependent formatting is not used.
 ///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v4
+///
 /// Dates, numbers, and currencies should use locale-aware formatting.
 ///
 /// **BAD:**
@@ -145,7 +149,7 @@ class RequireLocaleAwareFormattingRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_locale_aware_formatting',
     problemMessage:
-        '[require_locale_aware_formatting] Manual date/number formatting ignores locale. Will display wrong format for users. Dates, numbers, and currencies should use locale-aware formatting.',
+        '[require_locale_aware_formatting] Manual date/number formatting ignores locale. Will display wrong format for users. Dates, numbers, and currencies should use locale-aware formatting. {v4}',
     correctionMessage:
         'Use NumberFormat.currency(locale: locale).format(n) or DateFormat.yMd(locale).format(d).',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -192,6 +196,8 @@ class RequireLocaleAwareFormattingRule extends SaropaLintRule {
 
 /// Warns when text direction is not considered.
 ///
+/// Since: v4.8.8 | Updated: v4.13.0 | Rule version: v5
+///
 /// Apps should support RTL (right-to-left) languages properly.
 ///
 /// **BAD:**
@@ -221,7 +227,7 @@ class RequireDirectionalWidgetsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_directional_widgets',
     problemMessage:
-        '[require_directional_widgets] Non-directional widget. Layout will be wrong for RTL languages (Arabic, Hebrew). This prevents proper localization, causing text to display incorrectly for users in non-English locales.',
+        '[require_directional_widgets] Non-directional widget. Layout will be wrong for RTL languages (Arabic, Hebrew). This prevents proper localization, causing text to display incorrectly for users in non-English locales. {v5}',
     correctionMessage:
         'Replace left/right with start/end: EdgeInsetsDirectional.only(start: 16). Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -336,6 +342,8 @@ class _RequireDirectionalWidgetsFix extends DartFix {
 
 /// Warns when plural forms are not handled correctly.
 ///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v4
+///
 /// Different languages have different plural rules (e.g., Russian has
 /// singular, few, many; Arabic has six forms).
 ///
@@ -366,7 +374,7 @@ class RequirePluralHandlingRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_plural_handling',
     problemMessage:
-        '[require_plural_handling] Simple plural logic fails for many languages (Russian, Arabic have complex plural rules). Different languages have different plural rules (e.g., Russian has singular, few, many; Arabic has six forms).',
+        '[require_plural_handling] Simple plural logic fails for many languages (Russian, Arabic have complex plural rules). Different languages have different plural rules (e.g., Russian has singular, few, many; Arabic has six forms). {v4}',
     correctionMessage:
         "Use Intl.plural(count, zero: '..', one: '..', other: '..'). Verify the change works correctly with existing tests and add coverage for the new behavior.",
     errorSeverity: DiagnosticSeverity.INFO,
@@ -441,6 +449,8 @@ class RequirePluralHandlingRule extends SaropaLintRule {
 
 /// Warns when locale is hardcoded instead of using device locale.
 ///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v6
+///
 /// Apps should respect the user's device locale settings.
 ///
 /// **BAD:**
@@ -467,7 +477,7 @@ class AvoidHardcodedLocaleRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_hardcoded_locale',
     problemMessage:
-        "[avoid_hardcoded_locale] Hardcoded locale ignores user's device settings. Apps should respect the user\'s device locale settings.",
+        "[avoid_hardcoded_locale] Hardcoded locale ignores user's device settings. Apps should respect the user\'s device locale settings. {v6}",
     correctionMessage:
         'Use Localizations.localeOf(context).toString() to get device locale. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -497,6 +507,8 @@ class AvoidHardcodedLocaleRule extends SaropaLintRule {
 
 /// Warns when string concatenation is used for sentences.
 ///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v4
+///
 /// Word order varies by language, so concatenation breaks i18n.
 ///
 /// **BAD:**
@@ -523,7 +535,7 @@ class AvoidStringConcatenationInUiRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_string_concatenation_in_ui',
     problemMessage:
-        '[avoid_string_concatenation_in_ui] String concatenation breaks internationalization. Word order varies by language, so concatenation breaks i18n.',
+        '[avoid_string_concatenation_in_ui] String concatenation breaks internationalization. Word order varies by language, so concatenation breaks i18n. {v4}',
     correctionMessage:
         'Use localized strings with placeholders. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -567,6 +579,8 @@ class AvoidStringConcatenationInUiRule extends SaropaLintRule {
 
 /// Warns when images contain text that should be localized.
 ///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v5
+///
 /// Text in images cannot be translated.
 ///
 /// **BAD:**
@@ -596,7 +610,7 @@ class AvoidTextInImagesRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_text_in_images',
     problemMessage:
-        '[avoid_text_in_images] Image path suggests embedded text that cannot be localized. Text in images cannot be translated. This prevents proper localization, causing text to display incorrectly for users in non-English locales.',
+        '[avoid_text_in_images] Image path suggests embedded text that cannot be localized. Text in images cannot be translated. This prevents proper localization, causing text to display incorrectly for users in non-English locales. {v5}',
     correctionMessage:
         'Use locale-specific images or text overlays. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -647,6 +661,8 @@ class AvoidTextInImagesRule extends SaropaLintRule {
 
 /// Warns when app name or branding is hardcoded.
 ///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v4
+///
 /// App names may need to vary by market or locale.
 ///
 /// **BAD:**
@@ -673,7 +689,7 @@ class AvoidHardcodedAppNameRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_hardcoded_app_name',
     problemMessage:
-        '[avoid_hardcoded_app_name] App name must not be hardcoded in UI. App names may need to vary by market or locale. App name or branding is hardcoded.',
+        '[avoid_hardcoded_app_name] App name must not be hardcoded in UI. App names may need to vary by market or locale. App name or branding is hardcoded. {v4}',
     correctionMessage:
         'Use a configuration constant or localized string. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -717,6 +733,8 @@ class AvoidHardcodedAppNameRule extends SaropaLintRule {
 
 /// Warns when raw DateTime formatting is used instead of DateFormat.
 ///
+/// Since: v2.0.0 | Updated: v4.13.0 | Rule version: v2
+///
 /// DateTime.toString() and manual formatting produce inconsistent results
 /// across locales. Use DateFormat from intl package for proper i18n.
 ///
@@ -744,7 +762,7 @@ class PreferDateFormatRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_date_format',
     problemMessage:
-        '[prefer_date_format] Raw DateTime formatting ignores user locale. DateTime.toString() and manual formatting produce inconsistent results across locales. Use DateFormat from intl package for proper i18n.',
+        '[prefer_date_format] Raw DateTime formatting ignores user locale. DateTime.toString() and manual formatting produce inconsistent results across locales. Use DateFormat from intl package for proper i18n. {v2}',
     correctionMessage:
         'Use DateFormat from intl package for locale-aware formatting. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -796,6 +814,8 @@ class PreferDateFormatRule extends SaropaLintRule {
 
 /// Warns when Intl.message lacks the name parameter.
 ///
+/// Since: v2.0.0 | Updated: v4.13.0 | Rule version: v4
+///
 /// The name parameter is required for message extraction tools and
 /// enables proper identification of messages across the codebase.
 ///
@@ -820,7 +840,7 @@ class PreferIntlNameRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_intl_name',
     problemMessage:
-        '[prefer_intl_name] Intl.message without name parameter. Message extraction tools require the name parameter to identify and track translatable strings across the codebase.',
+        '[prefer_intl_name] Intl.message without name parameter. Message extraction tools require the name parameter to identify and track translatable strings across the codebase. {v4}',
     correctionMessage:
         'Add name parameter for message extraction tools. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -905,6 +925,8 @@ class _PreferIntlNameFix extends DartFix {
 
 /// Warns when Intl.message lacks a description parameter.
 ///
+/// Since: v2.0.0 | Updated: v4.13.0 | Rule version: v3
+///
 /// Descriptions help translators understand context and produce
 /// accurate translations.
 ///
@@ -933,7 +955,7 @@ class PreferProvidingIntlDescriptionRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_providing_intl_description',
     problemMessage:
-        '[prefer_providing_intl_description] Intl.message without description. Descriptions help translators understand context and produce accurate translations.',
+        '[prefer_providing_intl_description] Intl.message without description. Descriptions help translators understand context and produce accurate translations. {v3}',
     correctionMessage:
         'Add desc parameter to help translators understand context. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -1022,6 +1044,8 @@ class _PreferProvidingIntlDescriptionFix extends DartFix {
 
 /// Warns when Intl.message with placeholders lacks examples.
 ///
+/// Since: v2.0.0 | Updated: v4.13.0 | Rule version: v3
+///
 /// Examples help translators see how placeholders are used and
 /// produce grammatically correct translations.
 ///
@@ -1055,7 +1079,7 @@ class PreferProvidingIntlExamplesRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_providing_intl_examples',
     problemMessage:
-        '[prefer_providing_intl_examples] Intl.message with args but no examples. Examples help translators see how placeholders are used and produce grammatically correct translations.',
+        '[prefer_providing_intl_examples] Intl.message with args but no examples. Examples help translators see how placeholders are used and produce grammatically correct translations. {v3}',
     correctionMessage:
         'Add examples parameter to help translators. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -1147,6 +1171,8 @@ class _PreferProvidingIntlExamplesFix extends DartFix {
 
 /// Warns when intl package is used without initializing Intl.defaultLocale.
 ///
+/// Since: v2.3.7 | Updated: v4.13.0 | Rule version: v3
+///
 /// The intl package requires Intl.defaultLocale to be set for proper locale
 /// handling. Without initialization, date/number formatting and pluralization
 /// may use unexpected system defaults, causing inconsistent behavior across
@@ -1196,7 +1222,7 @@ class RequireIntlLocaleInitializationRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_intl_locale_initialization',
     problemMessage:
-        '[require_intl_locale_initialization] Intl package used without Intl.defaultLocale initialization. The intl package requires Intl.defaultLocale to be set for proper locale handling. Without initialization, date/number formatting and pluralization may use unexpected system defaults, causing inconsistent behavior across platforms and devices.',
+        '[require_intl_locale_initialization] Intl package used without Intl.defaultLocale initialization. The intl package requires Intl.defaultLocale to be set for proper locale handling. Without initialization, date/number formatting and pluralization may use unexpected system defaults, causing inconsistent behavior across platforms and devices. {v3}',
     correctionMessage:
         'Initialize Intl.defaultLocale in main() before using DateFormat, NumberFormat, or Intl.message.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -1286,6 +1312,8 @@ class RequireIntlLocaleInitializationRule extends SaropaLintRule {
 
 /// Warns when DateFormat is used without explicit locale parameter.
 ///
+/// Since: v2.3.9 | Updated: v4.13.0 | Rule version: v2
+///
 /// Alias: dateformat_locale, date_format_locale_required
 ///
 /// DateFormat without locale uses the system default, which varies across
@@ -1314,7 +1342,7 @@ class RequireIntlDateFormatLocaleRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_intl_date_format_locale',
     problemMessage:
-        '[require_intl_date_format_locale] DateFormat created without an explicit locale parameter. The format output varies unpredictably across devices and platforms because each uses a different system default locale. Users in different regions see dates in unexpected formats (e.g., MM/DD/YYYY vs DD/MM/YYYY), leading to confusion about whether 01/02 means January 2nd or February 1st.',
+        '[require_intl_date_format_locale] DateFormat created without an explicit locale parameter. The format output varies unpredictably across devices and platforms because each uses a different system default locale. Users in different regions see dates in unexpected formats (e.g., MM/DD/YYYY vs DD/MM/YYYY), leading to confusion about whether 01/02 means January 2nd or February 1st. {v2}',
     correctionMessage:
         'Always provide a locale to DateFormat (e.g., DateFormat.yMd(locale)) to ensure dates are formatted consistently for all users.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -1387,6 +1415,8 @@ class RequireIntlDateFormatLocaleRule extends SaropaLintRule {
 
 /// Warns when NumberFormat is used without explicit locale parameter.
 ///
+/// Since: v2.3.9 | Updated: v4.13.0 | Rule version: v2
+///
 /// Alias: numberformat_locale, number_format_locale_required
 ///
 /// NumberFormat without locale uses system defaults which vary by device.
@@ -1417,7 +1447,7 @@ class RequireNumberFormatLocaleRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_number_format_locale',
     problemMessage:
-        '[require_number_format_locale] NumberFormat without explicit locale. 1,234.56 vs 1.234,56 varies by device. Consequence: Numbers may be formatted incorrectly for users in different locales, leading to misinterpretation.',
+        '[require_number_format_locale] NumberFormat without explicit locale. 1,234.56 vs 1.234,56 varies by device. Consequence: Numbers may be formatted incorrectly for users in different locales, leading to misinterpretation. {v2}',
     correctionMessage:
         'Pass a locale to NumberFormat (e.g., NumberFormat.decimalPattern(locale)) so numbers display correctly for every user.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -1494,6 +1524,8 @@ class RequireNumberFormatLocaleRule extends SaropaLintRule {
 
 /// Warns when dates are formatted manually instead of using DateFormat.
 ///
+/// Since: v2.3.9 | Updated: v4.13.0 | Rule version: v3
+///
 /// Alias: no_manual_date_format, use_dateformat
 ///
 /// Manual date formatting produces inconsistent results across locales
@@ -1523,7 +1555,7 @@ class AvoidManualDateFormattingRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_manual_date_formatting',
     problemMessage:
-        '[avoid_manual_date_formatting] Manual date formatting is error-prone, ignores locale, and can produce incorrect or confusing output for international users. This can break compliance, cause user confusion, and lead to support issues in global apps.',
+        '[avoid_manual_date_formatting] Manual date formatting is error-prone, ignores locale, and can produce incorrect or confusing output for international users. This can break compliance, cause user confusion, and lead to support issues in global apps. {v3}',
     correctionMessage:
         'Use DateFormat from intl: DateFormat.yMd(locale).format(date). Audit all date formatting for locale coverage and add tests for internationalization. Document formatting logic for maintainability.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -1645,6 +1677,8 @@ class AvoidManualDateFormattingRule extends SaropaLintRule {
 
 /// Warns when currency/money values are formatted manually.
 ///
+/// Since: v2.3.9 | Updated: v4.13.0 | Rule version: v3
+///
 /// Alias: use_currency_format, no_manual_currency
 ///
 /// Currency formatting requires proper symbol placement, decimal handling,
@@ -1675,7 +1709,7 @@ class RequireIntlCurrencyFormatRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_intl_currency_format',
     problemMessage:
-        '[require_intl_currency_format] Currency value formatted manually using string interpolation with currency symbols. Symbol placement (prefix vs suffix), decimal separator (period vs comma), and digit grouping vary by locale. Manual formatting produces incorrect output for international users, causing financial confusion and misread amounts that undermine trust.',
+        '[require_intl_currency_format] Currency value formatted manually using string interpolation with currency symbols. Symbol placement (prefix vs suffix), decimal separator (period vs comma), and digit grouping vary by locale. Manual formatting produces incorrect output for international users, causing financial confusion and misread amounts that undermine trust. {v3}',
     correctionMessage:
         'Use NumberFormat.currency(locale: locale, symbol: s) to format currency values, ensuring correct symbols and decimal placement for every locale.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -1784,6 +1818,8 @@ class RequireIntlCurrencyFormatRule extends SaropaLintRule {
 
 /// Warns when manual count-based string selection is used instead of Intl.plural.
 ///
+/// Since: v2.3.10 | Updated: v4.13.0 | Rule version: v2
+///
 /// Alias: use_intl_plural, manual_plural
 ///
 /// Different languages have different plural rules. Using Intl.plural ensures
@@ -1822,7 +1858,7 @@ class RequireIntlPluralRulesRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_intl_plural_rules',
     problemMessage:
-        '[require_intl_plural_rules] Manual pluralization logic using if/else or ternary expressions on count values. Languages such as Russian, Arabic, and Polish have complex plural categories (zero, one, two, few, many, other) that simple singular/plural branching cannot handle. This produces grammatically incorrect text for international users and breaks translation workflows.',
+        '[require_intl_plural_rules] Manual pluralization logic using if/else or ternary expressions on count values. Languages such as Russian, Arabic, and Polish have complex plural categories (zero, one, two, few, many, other) that simple singular/plural branching cannot handle. This produces grammatically incorrect text for international users and breaks translation workflows. {v2}',
     correctionMessage:
         'Replace manual plural logic with Intl.plural() to handle pluralization correctly in every supported language.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -1916,6 +1952,8 @@ class RequireIntlPluralRulesRule extends SaropaLintRule {
 
 /// Warns when Intl.message args don't match placeholders in the message.
 ///
+/// Since: v2.3.11 | Updated: v4.13.0 | Rule version: v3
+///
 /// Alias: intl_args_placeholders, intl_message_args
 ///
 /// Intl.message placeholders must have matching args. Mismatched args cause
@@ -1949,7 +1987,7 @@ class RequireIntlArgsMatchRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_intl_args_match',
     problemMessage:
-        '[require_intl_args_match] The placeholders in your Intl.message string do not match the arguments provided in the args list. Missing, extra, or mismatched arguments cause runtime errors, broken translations, and can result in untranslated or incorrect messages in production. This is a common source of i18n bugs and can break localization workflows.',
+        '[require_intl_args_match] The placeholders in your Intl.message string do not match the arguments provided in the args list. Missing, extra, or mismatched arguments cause runtime errors, broken translations, and can result in untranslated or incorrect messages in production. This is a common source of i18n bugs and can break localization workflows. {v3}',
     correctionMessage:
         'Update your Intl.message so every placeholder in the string has a matching argument in the args list, and vice versa. Example: args: [name, count] for "Hello {name}, you have {count} messages". Audit your codebase for mismatches and add tests to catch i18n errors before release.',
     errorSeverity: DiagnosticSeverity.ERROR,
@@ -2015,6 +2053,8 @@ class RequireIntlArgsMatchRule extends SaropaLintRule {
 
 /// Warns when string concatenation is used for localized text.
 ///
+/// Since: v2.3.11 | Updated: v4.13.0 | Rule version: v2
+///
 /// Alias: no_concat_l10n, string_plus_l10n, l10n_concatenation
 ///
 /// HEURISTIC: String concatenation breaks word order in RTL languages
@@ -2042,7 +2082,7 @@ class AvoidStringConcatenationForL10nRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_string_concatenation_for_l10n',
     problemMessage:
-        '[avoid_string_concatenation_for_l10n] String concatenation may break word order in other languages. HEURISTIC: String concatenation breaks word order in RTL languages and languages with different grammatical structures.',
+        '[avoid_string_concatenation_for_l10n] String concatenation may break word order in other languages. HEURISTIC: String concatenation breaks word order in RTL languages and languages with different grammatical structures. {v2}',
     correctionMessage:
         'Use parameterized translations: l10n.greeting(name) instead of concatenation. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -2088,6 +2128,8 @@ class AvoidStringConcatenationForL10nRule extends SaropaLintRule {
 
 /// Warns when numbers are displayed without proper formatting.
 ///
+/// Since: v4.1.4 | Updated: v4.13.0 | Rule version: v2
+///
 /// Use NumberFormat for locale-aware number display. Raw numbers
 /// don't respect locale-specific decimal separators and grouping.
 ///
@@ -2115,7 +2157,7 @@ class PreferNumberFormatRule extends SaropaLintRule {
     name: 'prefer_number_format',
     problemMessage:
         '[prefer_number_format] Number displayed without locale formatting. '
-        'Different locales use different decimal/grouping separators.',
+        'Different locales use different decimal/grouping separators. {v2}',
     correctionMessage:
         'Use NumberFormat.decimalPattern(locale).format(number) for i18n.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -2181,6 +2223,8 @@ class PreferNumberFormatRule extends SaropaLintRule {
 
 /// Warns when Intl.message arguments don't match placeholders.
 ///
+/// Since: v4.1.4 | Updated: v4.13.0 | Rule version: v2
+///
 /// Intl.message placeholders like {name} must have matching args.
 /// Mismatched arguments cause runtime errors.
 ///
@@ -2212,7 +2256,7 @@ class ProvideCorrectIntlArgsRule extends SaropaLintRule {
     name: 'provide_correct_intl_args',
     problemMessage:
         '[provide_correct_intl_args] Intl.message args count does not match '
-        'placeholders. This will cause runtime errors.',
+        'placeholders. This will cause runtime errors. {v2}',
     correctionMessage:
         'Ensure args list matches all {placeholder} names in the message.',
     errorSeverity: DiagnosticSeverity.ERROR,
@@ -2279,6 +2323,8 @@ class ProvideCorrectIntlArgsRule extends SaropaLintRule {
 
 /// String concatenation breaks word order in translations.
 ///
+/// Since: v4.1.5 | Updated: v4.13.0 | Rule version: v2
+///
 /// Different languages have different word orders. Concatenating strings
 /// makes proper translation impossible.
 ///
@@ -2309,7 +2355,7 @@ class AvoidStringConcatenationL10nRule extends SaropaLintRule {
     name: 'avoid_string_concatenation_l10n',
     problemMessage:
         '[avoid_string_concatenation_l10n] String concatenation in UI breaks '
-        'word order for translations.',
+        'word order for translations. {v2}',
     correctionMessage:
         'Use Intl.message with placeholders or a localization solution that '
         'supports proper word order.',
@@ -2364,6 +2410,8 @@ class AvoidStringConcatenationL10nRule extends SaropaLintRule {
 
 /// Intl.message should include description for translators.
 ///
+/// Since: v4.1.5 | Updated: v4.13.0 | Rule version: v2
+///
 /// Translators need context to translate correctly. The desc parameter
 /// explains when and how the string is used.
 ///
@@ -2391,7 +2439,7 @@ class PreferIntlMessageDescriptionRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_intl_message_description',
     problemMessage:
-        '[prefer_intl_message_description] Intl.message missing description (desc). Translators lack context, leading to poor or incorrect translations.',
+        '[prefer_intl_message_description] Intl.message missing description (desc). Translators lack context, leading to poor or incorrect translations. {v2}',
     correctionMessage:
         'Add a desc parameter to Intl.message explaining when and where this text is shown. Example: desc: "Shown on login screen after failed attempt."',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -2432,6 +2480,8 @@ class PreferIntlMessageDescriptionRule extends SaropaLintRule {
 
 /// User-visible strings should use localization.
 ///
+/// Since: v4.1.5 | Updated: v4.13.0 | Rule version: v2
+///
 /// Hardcoded strings in Text widgets can't be translated.
 ///
 /// **BAD:**
@@ -2459,7 +2509,7 @@ class AvoidHardcodedLocaleStringsRule extends SaropaLintRule {
     name: 'avoid_hardcoded_locale_strings',
     problemMessage:
         '[avoid_hardcoded_locale_strings] `[HEURISTIC]` Hardcoded string in '
-        'Text widget. Use localization for user-visible text.',
+        'Text widget. Use localization for user-visible text. {v2}',
     correctionMessage:
         'Replace with AppLocalizations.of(context).yourString or Intl.message.',
     errorSeverity: DiagnosticSeverity.WARNING,

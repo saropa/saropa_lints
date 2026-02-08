@@ -17,6 +17,8 @@ import '../../saropa_lint_rule.dart';
 
 /// Warns when BLoC events are emitted in constructor.
 ///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v5
+///
 /// Events should not be added during BLoC construction.
 ///
 /// **BAD:**
@@ -51,7 +53,7 @@ class AvoidBlocEventInConstructorRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_bloc_event_in_constructor',
     problemMessage:
-        '[avoid_bloc_event_in_constructor] Adding a BLoC event in the constructor runs it before listeners are attached, causing missed state updates and unpredictable app behavior. This can result in lost events, bugs that are hard to trace, and inconsistent UI state.',
+        '[avoid_bloc_event_in_constructor] Adding a BLoC event in the constructor runs it before listeners are attached, causing missed state updates and unpredictable app behavior. This can result in lost events, bugs that are hard to trace, and inconsistent UI state. {v5}',
     correctionMessage:
         'Dispatch initial events from the widget that creates the BLoC, not from the BLoC constructor, to ensure all listeners are attached and receive the event.',
     errorSeverity: DiagnosticSeverity.ERROR,
@@ -99,6 +101,8 @@ class _AddCallVisitor extends RecursiveAstVisitor<void> {
 
 /// Requires Bloc/Cubit fields to be closed in dispose.
 ///
+/// Since: v1.4.3 | Updated: v4.13.0 | Rule version: v3
+///
 /// Bloc and Cubit instances created in a State class must be closed when
 /// the widget is disposed to prevent memory leaks and cancel active
 /// stream subscriptions.
@@ -142,7 +146,7 @@ class RequireBlocCloseRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_bloc_close',
     problemMessage:
-        '[require_bloc_close] If you do not close your Bloc or Cubit in the StatefulWidget dispose() method, it will leak memory, keep stream subscriptions active, and cause app slowdowns or crashes. Always close Blocs and Cubits to prevent leaks and unexpected behavior after the widget tree is rebuilt.',
+        '[require_bloc_close] If you do not close your Bloc or Cubit in the StatefulWidget dispose() method, it will leak memory, keep stream subscriptions active, and cause app slowdowns or crashes. Always close Blocs and Cubits to prevent leaks and unexpected behavior after the widget tree is rebuilt. {v3}',
     correctionMessage:
         'Add _bloc.close() (or cubit.close()) in the dispose() method before calling super.dispose() to properly release resources and prevent memory leaks.',
     errorSeverity: DiagnosticSeverity.ERROR,
@@ -322,6 +326,8 @@ class _AddBlocCloseFix extends DartFix {
 
 /// Warns when BLoC state classes are not immutable.
 ///
+/// Since: v1.4.3 | Updated: v4.13.0 | Rule version: v5
+///
 /// BLoC pattern relies on comparing old and new states to determine if the UI
 /// should rebuild. Mutable state classes can lead to subtle bugs where state
 /// changes aren't detected because the same object instance is being compared.
@@ -389,7 +395,7 @@ class RequireImmutableBlocStateRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_immutable_bloc_state',
     problemMessage:
-        '[require_immutable_bloc_state] If your BLoC state is mutable, it causes unpredictable UI updates, breaks state comparison, and leads to missed widget rebuilds. This results in subtle bugs, inconsistent UI, and hard-to-maintain code.',
+        '[require_immutable_bloc_state] If your BLoC state is mutable, it causes unpredictable UI updates, breaks state comparison, and leads to missed widget rebuilds. This results in subtle bugs, inconsistent UI, and hard-to-maintain code. {v5}',
     correctionMessage:
         'Add the @immutable annotation or extend Equatable to ensure your BLoC state is immutable and supports proper equality comparisons. This guarantees reliable UI updates and easier debugging.',
     errorSeverity: DiagnosticSeverity.ERROR,
@@ -477,6 +483,8 @@ class RequireImmutableBlocStateRule extends SaropaLintRule {
 
 /// Warns when Bloc is used for simple state that could use Cubit.
 ///
+/// Since: v1.6.0 | Updated: v4.13.0 | Rule version: v3
+///
 /// Cubit is simpler than Bloc for straightforward state changes.
 /// If your Bloc only has 1-2 events with simple handlers, use Cubit.
 ///
@@ -517,7 +525,7 @@ class PreferCubitForSimpleRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_cubit_for_simple',
     problemMessage:
-        '[prefer_cubit_for_simple] Using Bloc for simple state management with few events adds unnecessary boilerplate, indirection, and makes code harder to maintain. This can slow down development and introduce avoidable complexity.',
+        '[prefer_cubit_for_simple] Using Bloc for simple state management with few events adds unnecessary boilerplate, indirection, and makes code harder to maintain. This can slow down development and introduce avoidable complexity. {v3}',
     correctionMessage:
         'Use Cubit for straightforward state management. Reserve Bloc for cases with complex event handling or multiple event types.',
     errorSeverity: DiagnosticSeverity.ERROR,
@@ -554,6 +562,8 @@ class PreferCubitForSimpleRule extends SaropaLintRule {
 }
 
 /// Warns when BlocProvider is used without a BlocObserver setup.
+///
+/// Since: v1.6.0 | Updated: v4.13.0 | Rule version: v3
 ///
 /// BlocObserver provides centralized logging and error handling for all
 /// Blocs. Without it, state changes and errors may go untracked.
@@ -608,7 +618,7 @@ class RequireBlocObserverRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_bloc_observer',
     problemMessage:
-        '[require_bloc_observer] Without a BlocObserver, state transitions and errors are invisible, making it extremely difficult to debug production issues, track bugs, or monitor app health. This can lead to undetected failures and poor user experience.',
+        '[require_bloc_observer] Without a BlocObserver, state transitions and errors are invisible, making it extremely difficult to debug production issues, track bugs, or monitor app health. This can lead to undetected failures and poor user experience. {v3}',
     correctionMessage:
         'Add Bloc.observer = AppBlocObserver() in main() to enable centralized logging and error handling for all Blocs and Cubits.',
     errorSeverity: DiagnosticSeverity.ERROR,
@@ -646,6 +656,8 @@ class RequireBlocObserverRule extends SaropaLintRule {
 
 /// Warns when BLoC events are mutated after dispatch.
 ///
+/// Since: v1.7.0 | Updated: v4.13.0 | Rule version: v3
+///
 /// Bloc events should be immutable. Mutating an event after dispatch
 /// causes race conditions and makes debugging impossible.
 ///
@@ -682,7 +694,7 @@ class AvoidBlocEventMutationRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_bloc_event_mutation',
     problemMessage:
-        '[avoid_bloc_event_mutation] If BLoC events are mutable, they can be modified during processing, causing race conditions, unpredictable state changes, and hard-to-debug bugs. This breaks the contract of event immutability and can destabilize your app.',
+        '[avoid_bloc_event_mutation] If BLoC events are mutable, they can be modified during processing, causing race conditions, unpredictable state changes, and hard-to-debug bugs. This breaks the contract of event immutability and can destabilize your app. {v3}',
     correctionMessage:
         'Make all event fields final and use a const constructor to ensure events are immutable and safe to use in BLoC.',
     errorSeverity: DiagnosticSeverity.ERROR,
@@ -713,6 +725,8 @@ class AvoidBlocEventMutationRule extends SaropaLintRule {
 
 /// Warns when BLoC state is modified directly instead of using copyWith.
 ///
+/// Since: v4.1.1 | Updated: v4.13.0 | Rule version: v4
+///
 /// Directly modifying state fields breaks immutability. Use copyWith
 /// to create new state instances with updated fields.
 ///
@@ -739,7 +753,7 @@ class PreferCopyWithForStateRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_copy_with_for_state',
     problemMessage:
-        '[prefer_copy_with_for_state] Directly modifying BLoC state breaks immutability, leading to unpredictable UI updates, missed rebuilds, and subtle bugs that surface only in production. The BLoC pattern relies on immutable state transitions to guarantee that every emit triggers a rebuild; mutating fields in place silently bypasses this contract.',
+        '[prefer_copy_with_for_state] Directly modifying BLoC state breaks immutability, leading to unpredictable UI updates, missed rebuilds, and subtle bugs that surface only in production. The BLoC pattern relies on immutable state transitions to guarantee that every emit triggers a rebuild; mutating fields in place silently bypasses this contract. {v4}',
     correctionMessage:
         'Use state.copyWith(field: value) to create a new immutable state object and trigger proper UI updates.',
     errorSeverity: DiagnosticSeverity.ERROR,
@@ -766,6 +780,8 @@ class PreferCopyWithForStateRule extends SaropaLintRule {
 }
 
 /// Warns when BlocProvider.of is used with listen:true in build method.
+///
+/// Since: v1.7.0 | Updated: v4.13.0 | Rule version: v3
 ///
 /// listen:true causes rebuilds on every state change. Use BlocBuilder
 /// or BlocConsumer for controlled rebuilds.
@@ -802,7 +818,7 @@ class AvoidBlocListenInBuildRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_bloc_listen_in_build',
     problemMessage:
-        '[avoid_bloc_listen_in_build] Using BlocProvider.of in build() with listen:true causes the widget to rebuild on every state change, leading to performance issues and unpredictable UI updates. This can make your app less efficient and harder to maintain.',
+        '[avoid_bloc_listen_in_build] Using BlocProvider.of in build() with listen:true causes the widget to rebuild on every state change, leading to performance issues and unpredictable UI updates. This can make your app less efficient and harder to maintain. {v3}',
     correctionMessage:
         'Use BlocBuilder for reactive UI updates, or context.read() for one-time access to the bloc, to avoid unnecessary rebuilds and improve performance.',
     errorSeverity: DiagnosticSeverity.ERROR,
@@ -855,6 +871,8 @@ class _BlocProviderOfVisitor extends RecursiveAstVisitor<void> {
 
 /// Warns when BLoC constructor doesn't pass initial state to super.
 ///
+/// Since: v1.7.0 | Updated: v4.13.0 | Rule version: v3
+///
 /// Bloc without an initial state throws at runtime. Always pass
 /// initial state to super() in the constructor.
 ///
@@ -884,7 +902,7 @@ class RequireInitialStateRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_initial_state',
     problemMessage:
-        '[require_initial_state] If a BLoC or Cubit does not provide an initial state, it will throw a LateInitializationError at runtime when BlocBuilder or BlocConsumer tries to read the state. This causes your app to crash and makes debugging difficult.',
+        '[require_initial_state] If a BLoC or Cubit does not provide an initial state, it will throw a LateInitializationError at runtime when BlocBuilder or BlocConsumer tries to read the state. This causes your app to crash and makes debugging difficult. {v3}',
     correctionMessage:
         'Always add an initial state: super(InitialState()) or super(const State()) in your BLoC/Cubit constructor to prevent runtime errors.',
     errorSeverity: DiagnosticSeverity.ERROR,
@@ -925,6 +943,8 @@ class RequireInitialStateRule extends SaropaLintRule {
 
 /// Warns when BLoC state sealed class doesn't include an error state.
 ///
+/// Since: v1.7.0 | Updated: v4.13.0 | Rule version: v3
+///
 /// States should include an error variant. Without it, errors are either
 /// swallowed or crash the app instead of showing error UI.
 ///
@@ -959,7 +979,7 @@ class RequireErrorStateRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_error_state',
     problemMessage:
-        '[require_error_state] If your BLoC state hierarchy does not include an error state, failures will be unhandled, leading to crashes or missing error UI. This makes your app less robust and harder to debug.',
+        '[require_error_state] If your BLoC state hierarchy does not include an error state, failures will be unhandled, leading to crashes or missing error UI. This makes your app less robust and harder to debug. {v3}',
     correctionMessage:
         'Add an Error state class (e.g., UserError) to your BLoC state hierarchy to handle failures gracefully and display error messages to users.',
     errorSeverity: DiagnosticSeverity.ERROR,
@@ -1003,6 +1023,8 @@ class RequireErrorStateRule extends SaropaLintRule {
 }
 
 /// Warns when BLoCs directly call other BLoCs.
+///
+/// Since: v1.7.2 | Updated: v4.13.0 | Rule version: v5
 ///
 /// Blocs calling other blocs directly creates tight coupling. Use a
 /// parent widget or service to coordinate between blocs.
@@ -1048,7 +1070,7 @@ class AvoidBlocInBlocRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_bloc_in_bloc',
     problemMessage:
-        '[avoid_bloc_in_bloc] BLoC directly calling another BLoC creates tight coupling between state managers. This makes unit testing difficult, risks circular dependencies, and breaks the unidirectional data flow pattern that BLoC relies on for predictable state management.',
+        '[avoid_bloc_in_bloc] BLoC directly calling another BLoC creates tight coupling between state managers. This makes unit testing difficult, risks circular dependencies, and breaks the unidirectional data flow pattern that BLoC relies on for predictable state management. {v5}',
     correctionMessage:
         'Coordinate between BLoCs at the widget layer using BlocListener, or communicate through shared streams to maintain loose coupling.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -1112,6 +1134,8 @@ class _BlocAddVisitor extends RecursiveAstVisitor<void> {
 
 /// Warns when BLoC events don't use sealed classes.
 ///
+/// Since: v1.7.2 | Updated: v4.13.0 | Rule version: v2
+///
 /// Sealed classes for events enable exhaustive switch statements, so
 /// the compiler catches unhandled events.
 ///
@@ -1143,7 +1167,7 @@ class PreferSealedEventsRule extends SaropaLintRule {
     name: 'prefer_sealed_events',
     problemMessage:
         '[prefer_sealed_events] Non-sealed events allow subclassing anywhere, '
-        'preventing compiler exhaustiveness checks in switch statements.',
+        'preventing compiler exhaustiveness checks in switch statements. {v2}',
     correctionMessage:
         'Use sealed class instead of abstract class for event hierarchy.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -1168,6 +1192,8 @@ class PreferSealedEventsRule extends SaropaLintRule {
 }
 
 /// Warns when Bloc event handlers don't use EventTransformer.
+///
+/// Since: v4.13.0 | Rule version: v1
 ///
 /// Without EventTransformer, rapid events are processed sequentially.
 /// Use transformers for debouncing, throttling, or concurrent processing.
@@ -1214,7 +1240,7 @@ class RequireBlocTransformerRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_bloc_transformer',
     problemMessage:
-        '[require_bloc_transformer] Bloc on<Event> without transformer processes all events sequentially. Without EventTransformer, rapid events are processed sequentially. Use transformers for debouncing, throttling, or concurrent processing.',
+        '[require_bloc_transformer] Bloc on<Event> without transformer processes all events sequentially. Without EventTransformer, rapid events are processed sequentially. Use transformers for debouncing, throttling, or concurrent processing. {v1}',
     correctionMessage:
         'Add transformer: for debounce, throttle, or concurrent event handling. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -1275,6 +1301,8 @@ class RequireBlocTransformerRule extends SaropaLintRule {
 
 /// Warns when Bloc event handlers are too long.
 ///
+/// Since: v4.13.0 | Rule version: v1
+///
 /// Long event handlers indicate the handler is doing too much. Extract
 /// business logic to separate methods or services for testability.
 ///
@@ -1318,7 +1346,7 @@ class AvoidLongEventHandlersRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_long_event_handlers',
     problemMessage:
-        '[avoid_long_event_handlers] Bloc event handler is too long. Extract logic to separate methods. Long event handlers indicate the handler is doing too much. Extract business logic to separate methods or services for testability.',
+        '[avoid_long_event_handlers] Bloc event handler is too long. Extract logic to separate methods. Long event handlers indicate the handler is doing too much. Extract business logic to separate methods or services for testability. {v1}',
     correctionMessage:
         'Move complex logic to named methods or use cases to improve testability. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -1352,6 +1380,8 @@ class AvoidLongEventHandlersRule extends SaropaLintRule {
 }
 
 /// Warns when nested `BlocProvider` widgets are used.
+///
+/// Since: v2.0.0 | Updated: v4.13.0 | Rule version: v2
 ///
 /// Use `MultiBlocProvider` when providing multiple blocs to reduce nesting
 /// and improve readability.
@@ -1395,7 +1425,7 @@ class PreferMultiBlocProviderRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_multi_bloc_provider',
     problemMessage:
-        '[prefer_multi_bloc_provider] Nested BlocProviders should use MultiBlocProvider instead. Use MultiBlocProvider when providing multiple blocs to reduce nesting and improve readability.',
+        '[prefer_multi_bloc_provider] Nested BlocProviders should use MultiBlocProvider instead. Use MultiBlocProvider when providing multiple blocs to reduce nesting and improve readability. {v2}',
     correctionMessage:
         'Combine into MultiBlocProvider(providers: [..], child: ..). Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -1430,6 +1460,8 @@ class PreferMultiBlocProviderRule extends SaropaLintRule {
 }
 
 /// Warns when `BlocProvider.value` receives a newly created bloc instance.
+///
+/// Since: v2.0.0 | Updated: v4.13.0 | Rule version: v2
 ///
 /// `BlocProvider.value` should only receive existing bloc instances.
 /// Creating a new bloc in the value parameter will not properly manage
@@ -1471,7 +1503,7 @@ class AvoidInstantiatingInBlocValueProviderRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_instantiating_in_bloc_value_provider',
     problemMessage:
-        '[avoid_instantiating_in_bloc_value_provider] Creating a new bloc instance inside BlocProvider.value prevents the bloc from being automatically closed, leading to memory leaks and unpredictable state. This is a critical resource management issue that can degrade app performance and reliability.',
+        '[avoid_instantiating_in_bloc_value_provider] Creating a new bloc instance inside BlocProvider.value prevents the bloc from being automatically closed, leading to memory leaks and unpredictable state. This is a critical resource management issue that can degrade app performance and reliability. {v2}',
     correctionMessage:
         'Always use BlocProvider(create: ...) to create new bloc instances, or pass an existing bloc variable to BlocProvider.value. Never instantiate a bloc directly inside BlocProvider.value.',
     errorSeverity: DiagnosticSeverity.ERROR,
@@ -1508,6 +1540,8 @@ class AvoidInstantiatingInBlocValueProviderRule extends SaropaLintRule {
 }
 
 /// Warns when `BlocProvider(create: ...)` returns an existing bloc instance.
+///
+/// Since: v2.0.0 | Updated: v4.13.0 | Rule version: v2
 ///
 /// `BlocProvider(create: ...)` should create a new bloc instance.
 /// Returning an existing variable will cause the bloc to be closed when
@@ -1551,7 +1585,7 @@ class AvoidExistingInstancesInBlocProviderRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_existing_instances_in_bloc_provider',
     problemMessage:
-        '[avoid_existing_instances_in_bloc_provider] Returning an existing bloc instance from BlocProvider(create: ...) causes the bloc to be closed when the provider disposes, even if it is still used elsewhere. This can lead to unexpected state loss, runtime errors, and hard-to-debug bugs. Always use the correct provider pattern for new vs. existing blocs.',
+        '[avoid_existing_instances_in_bloc_provider] Returning an existing bloc instance from BlocProvider(create: ...) causes the bloc to be closed when the provider disposes, even if it is still used elsewhere. This can lead to unexpected state loss, runtime errors, and hard-to-debug bugs. Always use the correct provider pattern for new vs. existing blocs. {v2}',
     correctionMessage:
         'For existing bloc instances, use BlocProvider.value(value: existingBloc). Only use BlocProvider(create: ...) to create new bloc instances. This ensures proper lifecycle management and prevents accidental closure of shared blocs.',
     errorSeverity: DiagnosticSeverity.ERROR,
@@ -1597,6 +1631,8 @@ class AvoidExistingInstancesInBlocProviderRule extends SaropaLintRule {
 
 /// Warns when the wrong BlocProvider variant is used for the use case.
 ///
+/// Since: v2.0.0 | Updated: v4.13.0 | Rule version: v2
+///
 /// - Use `BlocProvider(create: ...)` when you need to create AND manage a bloc
 /// - Use `BlocProvider.value(value: ...)` when providing an already-existing bloc
 ///
@@ -1636,7 +1672,7 @@ class PreferCorrectBlocProviderRule extends SaropaLintRule {
     name: 'prefer_correct_bloc_provider',
     problemMessage:
         '[prefer_correct_bloc_provider] Using context.read() in BlocProvider.create returns an existing bloc. '
-        'Use BlocProvider.value instead.',
+        'Use BlocProvider.value instead. {v2}',
     correctionMessage:
         'Replace with BlocProvider.value(value: context.read<T>(), ...).',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -1683,6 +1719,8 @@ class PreferCorrectBlocProviderRule extends SaropaLintRule {
 
 /// Warns when emit() is called after an await without checking isClosed.
 ///
+/// Since: v2.0.0 | Updated: v4.13.0 | Rule version: v2
+///
 /// Bloc can be closed while awaiting, leading to state emissions on a
 /// closed bloc which causes errors.
 ///
@@ -1719,7 +1757,7 @@ class CheckIsNotClosedAfterAsyncGapRule extends SaropaLintRule {
     name: 'check_is_not_closed_after_async_gap',
     problemMessage:
         '[check_is_not_closed_after_async_gap] Emitting to closed Bloc throws '
-        'StateError, crashing the app when widget is disposed during async.',
+        'StateError, crashing the app when widget is disposed during async. {v2}',
     correctionMessage:
         'Add if (!isClosed) check before emit() after async operations.',
     errorSeverity: DiagnosticSeverity.ERROR,
@@ -1804,6 +1842,8 @@ class _EmitAfterAwaitVisitor extends RecursiveAstVisitor<void> {
 
 /// Warns when multiple handlers are registered for the same event type.
 ///
+/// Since: v2.0.0 | Updated: v4.13.0 | Rule version: v2
+///
 /// Bloc doesn't support multiple handlers for the same event. The second
 /// handler will override the first, leading to unexpected behavior.
 ///
@@ -1847,7 +1887,7 @@ class AvoidDuplicateBlocEventHandlersRule extends SaropaLintRule {
     name: 'avoid_duplicate_bloc_event_handlers',
     problemMessage:
         '[avoid_duplicate_bloc_event_handlers] Second handler for same event '
-        'type is ignored, causing silent bugs when expected logic runs.',
+        'type is ignored, causing silent bugs when expected logic runs. {v2}',
     correctionMessage:
         'Combine handlers into one on<Event> call. Only one handler per event type.',
     errorSeverity: DiagnosticSeverity.ERROR,
@@ -1922,6 +1962,8 @@ class _OnCallVisitor extends RecursiveAstVisitor<void> {
 
 /// Warns when Bloc event classes have mutable fields.
 ///
+/// Since: v2.0.0 | Updated: v4.13.0 | Rule version: v2
+///
 /// Bloc events should be immutable for predictable state management.
 /// Mutable events can be changed after dispatch, causing bugs.
 ///
@@ -1960,7 +2002,7 @@ class PreferImmutableBlocEventsRule extends SaropaLintRule {
     name: 'prefer_immutable_bloc_events',
     problemMessage:
         '[prefer_immutable_bloc_events] Mutable event fields can be changed '
-        'during processing, causing inconsistent state and debugging nightmares.',
+        'during processing, causing inconsistent state and debugging nightmares. {v2}',
     correctionMessage: 'Mark all fields as final for immutable events.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
@@ -1990,6 +2032,8 @@ class PreferImmutableBlocEventsRule extends SaropaLintRule {
 }
 
 /// Warns when Bloc state classes have mutable fields.
+///
+/// Since: v2.0.0 | Updated: v4.13.0 | Rule version: v2
 ///
 /// Bloc states should be immutable for predictable state management.
 /// Mutable states can be changed outside the bloc, breaking the pattern.
@@ -2029,7 +2073,7 @@ class PreferImmutableBlocStateRule extends SaropaLintRule {
     name: 'prefer_immutable_bloc_state',
     problemMessage:
         '[prefer_immutable_bloc_state] Mutable state fields break equality '
-        'comparison, causing BlocBuilder to miss or duplicate updates.',
+        'comparison, causing BlocBuilder to miss or duplicate updates. {v2}',
     correctionMessage: 'Mark all fields as final for immutable state.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
@@ -2067,6 +2111,8 @@ class PreferImmutableBlocStateRule extends SaropaLintRule {
 
 /// Warns when Bloc event classes are not sealed.
 ///
+/// Since: v2.0.0 | Updated: v4.13.0 | Rule version: v2
+///
 /// Sealed event classes ensure exhaustive pattern matching in handlers
 /// and prevent unexpected event subtypes from being created.
 ///
@@ -2100,7 +2146,7 @@ class PreferSealedBlocEventsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_sealed_bloc_events',
     problemMessage:
-        '[prefer_sealed_bloc_events] Bloc event base class must be sealed. Sealed event classes ensure exhaustive pattern matching in handlers and prevent unexpected event subtypes from being created.',
+        '[prefer_sealed_bloc_events] Bloc event base class must be sealed. Sealed event classes ensure exhaustive pattern matching in handlers and prevent unexpected event subtypes from being created. {v2}',
     correctionMessage:
         'Use sealed keyword for exhaustive pattern matching. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -2137,6 +2183,8 @@ class PreferSealedBlocEventsRule extends SaropaLintRule {
 
 /// Warns when Bloc state classes are not sealed.
 ///
+/// Since: v2.0.0 | Updated: v4.13.0 | Rule version: v2
+///
 /// Sealed state classes ensure exhaustive pattern matching in widgets
 /// and prevent unexpected state subtypes from being created.
 ///
@@ -2170,7 +2218,7 @@ class PreferSealedBlocStateRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_sealed_bloc_state',
     problemMessage:
-        '[prefer_sealed_bloc_state] Bloc state base class must be sealed. Sealed state classes ensure exhaustive pattern matching in widgets and prevent unexpected state subtypes from being created.',
+        '[prefer_sealed_bloc_state] Bloc state base class must be sealed. Sealed state classes ensure exhaustive pattern matching in widgets and prevent unexpected state subtypes from being created. {v2}',
     correctionMessage:
         'Use sealed keyword for exhaustive pattern matching. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -2209,6 +2257,8 @@ class PreferSealedBlocStateRule extends SaropaLintRule {
 
 /// Suggests that Bloc event classes end with 'Event' suffix.
 ///
+/// Since: v2.0.0 | Updated: v4.13.0 | Rule version: v2
+///
 /// **Stylistic rule (opt-in only).** Naming convention with no performance or correctness impact.
 ///
 /// Consistent naming helps identify Bloc event classes quickly.
@@ -2239,7 +2289,7 @@ class PreferBlocEventSuffixRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_bloc_event_suffix',
     problemMessage:
-        '[prefer_bloc_event_suffix] Suffixing Bloc event class names with Event is a naming convention. The suffix does not affect Bloc behavior or performance. Enable via the stylistic tier.',
+        '[prefer_bloc_event_suffix] Suffixing Bloc event class names with Event is a naming convention. The suffix does not affect Bloc behavior or performance. Enable via the stylistic tier. {v2}',
     correctionMessage:
         'Rename class to include Event suffix (e.g., LoadUserEvent). Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -2271,6 +2321,8 @@ class PreferBlocEventSuffixRule extends SaropaLintRule {
 
 /// Suggests that Bloc state classes end with 'State' suffix.
 ///
+/// Since: v2.0.0 | Updated: v4.13.0 | Rule version: v2
+///
 /// **Stylistic rule (opt-in only).** Naming convention with no performance or correctness impact.
 ///
 /// Consistent naming helps identify Bloc state classes quickly.
@@ -2301,7 +2353,7 @@ class PreferBlocStateSuffixRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_bloc_state_suffix',
     problemMessage:
-        '[prefer_bloc_state_suffix] Suffixing Bloc state class names with State is a naming convention. The suffix does not affect Bloc behavior or performance. Enable via the stylistic tier.',
+        '[prefer_bloc_state_suffix] Suffixing Bloc state class names with State is a naming convention. The suffix does not affect Bloc behavior or performance. Enable via the stylistic tier. {v2}',
     correctionMessage:
         'Rename class to include State suffix (e.g., UserLoadingState). Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -2332,6 +2384,8 @@ class PreferBlocStateSuffixRule extends SaropaLintRule {
 }
 
 /// Warns when yield is used inside Bloc event handler.
+///
+/// Since: v2.1.0 | Updated: v4.13.0 | Rule version: v3
 ///
 /// In Bloc 8.0+, yield was replaced with emit(). Using yield in `on<Event>`
 /// handlers is deprecated and won't work correctly.
@@ -2365,7 +2419,7 @@ class AvoidYieldInOnEventRule extends SaropaLintRule {
     name: 'avoid_yield_in_on_event',
     problemMessage:
         '[avoid_yield_in_on_event] yield breaks Bloc 8.0+ concurrency and '
-        'event ordering, causing unpredictable state updates.',
+        'event ordering, causing unpredictable state updates. {v3}',
     correctionMessage:
         'Replace yield with emit() - yield is deprecated in Bloc 8.0+.',
     errorSeverity: DiagnosticSeverity.ERROR,
@@ -2396,6 +2450,8 @@ class AvoidYieldInOnEventRule extends SaropaLintRule {
 }
 
 /// Warns when Bloc state is mutated with cascade instead of new instance.
+///
+/// Since: v2.1.0 | Updated: v4.13.0 | Rule version: v2
 ///
 /// Bloc states should be immutable. Using cascade (..) to mutate existing
 /// state breaks Bloc's equality comparison and causes missed rebuilds.
@@ -2428,7 +2484,7 @@ class EmitNewBlocStateInstancesRule extends SaropaLintRule {
     name: 'emit_new_bloc_state_instances',
     problemMessage:
         '[emit_new_bloc_state_instances] Mutating state object breaks equality '
-        'checks, preventing BlocBuilder from detecting changes.',
+        'checks, preventing BlocBuilder from detecting changes. {v2}',
     correctionMessage: 'Use copyWith() or constructor to create new state.',
     errorSeverity: DiagnosticSeverity.ERROR,
   );
@@ -2459,6 +2515,8 @@ class EmitNewBlocStateInstancesRule extends SaropaLintRule {
 }
 
 /// Warns when Bloc has public non-final fields.
+///
+/// Since: v2.1.0 | Updated: v4.13.0 | Rule version: v2
 ///
 /// Bloc internals should be private. Public fields expose implementation
 /// details and allow external modification of state.
@@ -2494,7 +2552,7 @@ class AvoidBlocPublicFieldsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_bloc_public_fields',
     problemMessage:
-        '[avoid_bloc_public_fields] Public field in Bloc. Keep internals private. Bloc internals must be private. Public fields expose implementation details and allow external modification of state.',
+        '[avoid_bloc_public_fields] Public field in Bloc. Keep internals private. Bloc internals must be private. Public fields expose implementation details and allow external modification of state. {v2}',
     correctionMessage:
         'Make field private (_fieldName) or final. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -2532,6 +2590,8 @@ class AvoidBlocPublicFieldsRule extends SaropaLintRule {
 
 /// Warns when Bloc has public methods other than add().
 ///
+/// Since: v2.1.0 | Updated: v4.13.0 | Rule version: v2
+///
 /// Bloc should only expose add() for events. Other public methods
 /// break the event-driven architecture and make testing harder.
 ///
@@ -2567,7 +2627,7 @@ class AvoidBlocPublicMethodsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_bloc_public_methods',
     problemMessage:
-        '[avoid_bloc_public_methods] Public method in Bloc. Use events via add() instead. Bloc should only expose add() for events. Other public methods break the event-driven architecture and make testing harder.',
+        '[avoid_bloc_public_methods] Public method in Bloc. Use events via add() instead. Bloc should only expose add() for events. Other public methods break the event-driven architecture and make testing harder. {v2}',
     correctionMessage:
         'Convert to event class and handle in on<Event>(). Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -2620,6 +2680,8 @@ class AvoidBlocPublicMethodsRule extends SaropaLintRule {
 
 /// Warns when BlocBuilder accesses only one field from state.
 ///
+/// Since: v2.1.0 | Updated: v4.13.0 | Rule version: v2
+///
 /// Using BlocSelector instead of BlocBuilder when you only need one
 /// field prevents unnecessary rebuilds when other fields change.
 ///
@@ -2657,7 +2719,7 @@ class RequireBlocSelectorRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_bloc_selector',
     problemMessage:
-        '[require_bloc_selector] BlocBuilder accessing single field. Use BlocSelector instead. Using BlocSelector instead of BlocBuilder when you only need one field prevents unnecessary rebuilds when other fields change.',
+        '[require_bloc_selector] BlocBuilder accessing single field. Use BlocSelector instead. Using BlocSelector instead of BlocBuilder when you only need one field prevents unnecessary rebuilds when other fields change. {v2}',
     correctionMessage:
         'Replace with BlocSelector for targeted rebuilds on specific field. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -2722,6 +2784,8 @@ class _StateAccessCounter extends RecursiveAstVisitor<void> {
 
 /// Warns when emit() is called without checking isClosed in async handlers.
 ///
+/// Since: v4.13.0 | Rule version: v1
+///
 /// Alias: bloc_emit_after_close, unsafe_emit
 ///
 /// After async operations, the Bloc may have been closed. Emitting to a
@@ -2759,7 +2823,7 @@ class AvoidBlocEmitAfterCloseRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_bloc_emit_after_close',
     problemMessage:
-        '[avoid_bloc_emit_after_close] Calling emit() after an await may throw an exception if the Bloc has been closed, leading to runtime errors and unpredictable state changes. This can cause crashes or silent failures, especially in asynchronous event handlers. Always check that the Bloc is still open before emitting new states after an await.',
+        '[avoid_bloc_emit_after_close] Calling emit() after an await may throw an exception if the Bloc has been closed, leading to runtime errors and unpredictable state changes. This can cause crashes or silent failures, especially in asynchronous event handlers. Always check that the Bloc is still open before emitting new states after an await. {v1}',
     correctionMessage:
         'Before calling emit() after an await, add an "if (!isClosed)" check to ensure the Bloc is still active. This prevents exceptions and ensures state updates are only performed on open Blocs.',
     errorSeverity: DiagnosticSeverity.ERROR,
@@ -2827,6 +2891,8 @@ class AvoidBlocEmitAfterCloseRule extends SaropaLintRule {
 
 /// Warns when Bloc state is mutated directly instead of using copyWith.
 ///
+/// Since: v4.13.0 | Rule version: v1
+///
 /// Alias: bloc_state_direct_mutation, immutable_bloc_state
 ///
 /// Bloc states should be immutable. Direct mutation causes bugs because
@@ -2862,7 +2928,7 @@ class AvoidBlocStateMutationRule extends SaropaLintRule {
     name: 'avoid_bloc_state_mutation',
     problemMessage:
         '[avoid_bloc_state_mutation] Direct mutation bypasses equality checks, '
-        'preventing UI rebuild and causing stale data display.',
+        'preventing UI rebuild and causing stale data display. {v1}',
     correctionMessage: 'Use state.copyWith() to create a new state instance.',
     errorSeverity: DiagnosticSeverity.ERROR,
   );
@@ -2904,6 +2970,8 @@ class AvoidBlocStateMutationRule extends SaropaLintRule {
 
 /// Warns when Bloc constructor doesn't call super with initial state.
 ///
+/// Since: v4.13.0 | Rule version: v1
+///
 /// Alias: bloc_missing_initial_state, bloc_super_required
 ///
 /// Every Bloc must specify its initial state in the super() constructor call.
@@ -2940,7 +3008,7 @@ class RequireBlocInitialStateRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_bloc_initial_state',
     problemMessage: '[require_bloc_initial_state] Missing initial state throws '
-        'LateInitializationError when BlocBuilder tries to read state.',
+        'LateInitializationError when BlocBuilder tries to read state. {v1}',
     correctionMessage: 'Add : super(InitialState()) to the constructor.',
     errorSeverity: DiagnosticSeverity.ERROR,
   );
@@ -2981,6 +3049,8 @@ class RequireBlocInitialStateRule extends SaropaLintRule {
 
 /// Warns when Bloc async handler doesn't emit loading state.
 ///
+/// Since: v4.13.0 | Rule version: v1
+///
 /// Alias: bloc_missing_loading, async_loading_state
 ///
 /// Async operations should emit loading state to show UI feedback.
@@ -3016,7 +3086,7 @@ class RequireBlocLoadingStateRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_bloc_loading_state',
     problemMessage:
-        '[require_bloc_loading_state] Async Bloc handler should emit loading state. Async operations should emit loading state to show UI feedback.',
+        '[require_bloc_loading_state] Async Bloc handler should emit loading state. Async operations should emit loading state to show UI feedback. {v1}',
     correctionMessage:
         'Add emit(LoadingState()) before async operations. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -3075,6 +3145,8 @@ class RequireBlocLoadingStateRule extends SaropaLintRule {
 
 /// Warns when Bloc state sealed class doesn't have an error case.
 ///
+/// Since: v4.13.0 | Rule version: v1
+///
 /// Alias: bloc_missing_error_state, state_error_handling
 ///
 /// Bloc states should include an error case for proper error handling.
@@ -3109,7 +3181,7 @@ class RequireBlocErrorStateRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_bloc_error_state',
     problemMessage:
-        '[require_bloc_error_state] Bloc state sealed class must have an error case. Bloc states should include an error case for proper error handling.',
+        '[require_bloc_error_state] Bloc state sealed class must have an error case. Bloc states should include an error case for proper error handling. {v1}',
     correctionMessage:
         'Add an error state class (e.g., UserError). Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -3147,6 +3219,8 @@ class RequireBlocErrorStateRule extends SaropaLintRule {
 // cspell:ignore antipattern
 
 /// Warns when Bloc/Cubit has controllers or streams without close() cleanup.
+///
+/// Since: v2.3.7 | Updated: v4.13.0 | Rule version: v5
 ///
 /// Alias: bloc_dispose, bloc_close, cubit_dispose
 ///
@@ -3195,7 +3269,7 @@ class RequireBlocManualDisposeRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_bloc_manual_dispose',
     problemMessage:
-        '[require_bloc_manual_dispose] Bloc or Cubit holds StreamController or Timer fields but does not override close() to dispose them. Undisposed resources cause memory leaks that accumulate across navigation, eventually increasing memory pressure until the operating system kills the app.',
+        '[require_bloc_manual_dispose] Bloc or Cubit holds StreamController or Timer fields but does not override close() to dispose them. Undisposed resources cause memory leaks that accumulate across navigation, eventually increasing memory pressure until the operating system kills the app. {v5}',
     correctionMessage:
         'Override close() to dispose StreamController, Timer, and other held resources, then call super.close() to complete the Bloc lifecycle.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -3314,6 +3388,8 @@ class RequireBlocManualDisposeRule extends SaropaLintRule {
 
 /// Suggests using Cubit instead of Bloc when only one event type exists.
 ///
+/// Since: v2.3.7 | Updated: v4.13.0 | Rule version: v3
+///
 /// Bloc is designed for complex state management with multiple events.
 /// When a Bloc only has one event type, a Cubit is simpler and more direct.
 ///
@@ -3354,7 +3430,7 @@ class PreferCubitForSimpleStateRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_cubit_for_simple_state',
     problemMessage:
-        '[prefer_cubit_for_simple_state] Bloc with single event type. Use Cubit for simpler code. Bloc is designed for complex state management with multiple events. When a Bloc only has one event type, a Cubit is simpler and more direct.',
+        '[prefer_cubit_for_simple_state] Bloc with single event type. Use Cubit for simpler code. Bloc is designed for complex state management with multiple events. When a Bloc only has one event type, a Cubit is simpler and more direct. {v3}',
     correctionMessage:
         'Replace with Cubit when only one event/action is needed. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -3404,6 +3480,8 @@ class PreferCubitForSimpleStateRule extends SaropaLintRule {
 
 /// Warns when side effects (navigation, snackbar) are performed in BlocBuilder.
 ///
+/// Since: v2.3.7 | Updated: v4.13.0 | Rule version: v6
+///
 /// BlocBuilder is for building UI based on state. Side effects should be
 /// handled in BlocListener to ensure they only execute once per state change.
 ///
@@ -3448,7 +3526,7 @@ class PreferBlocListenerForSideEffectsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_bloc_listener_for_side_effects',
     problemMessage:
-        '[prefer_bloc_listener_for_side_effects] Side effects inside BlocBuilder execute on every widget rebuild, causing user-facing errors like duplicate navigation pushes, multiple snackbars stacking on screen, or repeated API calls that waste bandwidth and may corrupt server-side state.',
+        '[prefer_bloc_listener_for_side_effects] Side effects inside BlocBuilder execute on every widget rebuild, causing user-facing errors like duplicate navigation pushes, multiple snackbars stacking on screen, or repeated API calls that waste bandwidth and may corrupt server-side state. {v6}',
     correctionMessage:
         'Move side effects (navigation, snackbars, API calls) to BlocListener or use BlocConsumer to separate rebuilds from one-time actions.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -3504,6 +3582,8 @@ class PreferBlocListenerForSideEffectsRule extends SaropaLintRule {
 
 /// Suggests using BlocConsumer when both BlocListener and BlocBuilder are nested.
 ///
+/// Since: v2.3.7 | Updated: v4.13.0 | Rule version: v3
+///
 /// When you need both listener (for side effects) and builder (for UI),
 /// BlocConsumer provides a cleaner single-widget solution.
 ///
@@ -3547,7 +3627,7 @@ class RequireBlocConsumerWhenBothRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_bloc_consumer_when_both',
     problemMessage:
-        '[require_bloc_consumer_when_both] Nested BlocListener + BlocBuilder. Use BlocConsumer instead. When you need both listener (for side effects) and builder (for UI), BlocConsumer provides a cleaner single-widget solution.',
+        '[require_bloc_consumer_when_both] Nested BlocListener + BlocBuilder. Use BlocConsumer instead. When you need both listener (for side effects) and builder (for UI), BlocConsumer provides a cleaner single-widget solution. {v3}',
     correctionMessage:
         'Replace with BlocConsumer which combines listener and builder. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -3598,6 +3678,8 @@ class RequireBlocConsumerWhenBothRule extends SaropaLintRule {
 
 /// Warns when BuildContext is passed to Bloc constructor.
 ///
+/// Since: v2.3.10 | Updated: v4.13.0 | Rule version: v6
+///
 /// Alias: bloc_context, context_in_bloc
 ///
 /// Blocs should be independent of the widget tree. Passing BuildContext
@@ -3636,7 +3718,7 @@ class AvoidBlocContextDependencyRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_bloc_context_dependency',
     problemMessage:
-        '[avoid_bloc_context_dependency] Bloc depending on BuildContext couples business logic to the UI layer. This makes the Bloc untestable in isolation, prevents reuse across widgets, and can cause crashes when the context becomes invalid after the widget is removed from the tree.',
+        '[avoid_bloc_context_dependency] Bloc depending on BuildContext couples business logic to the UI layer. This makes the Bloc untestable in isolation, prevents reuse across widgets, and can cause crashes when the context becomes invalid after the widget is removed from the tree. {v6}',
     correctionMessage:
         'Inject dependencies through the constructor instead of passing BuildContext, keeping business logic independent from the UI layer for better testability.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -3683,6 +3765,8 @@ class AvoidBlocContextDependencyRule extends SaropaLintRule {
 
 /// Warns when Bloc contains BuildContext usage or UI dependencies.
 ///
+/// Since: v2.3.11 | Updated: v4.13.0 | Rule version: v5
+///
 /// Alias: bloc_no_context, bloc_separation, bloc_business_logic
 ///
 /// Blocs should contain only business logic, not UI-related code.
@@ -3722,7 +3806,7 @@ class AvoidBlocBusinessLogicInUiRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_bloc_business_logic_in_ui',
     problemMessage:
-        '[avoid_bloc_business_logic_in_ui] UI code such as showDialog or Navigator calls inside a Bloc breaks separation of concerns and makes the Bloc untestable without a widget tree. Business logic becomes coupled to the UI framework, preventing reuse across platforms and complicating unit testing.',
+        '[avoid_bloc_business_logic_in_ui] UI code such as showDialog or Navigator calls inside a Bloc breaks separation of concerns and makes the Bloc untestable without a widget tree. Business logic becomes coupled to the UI framework, preventing reuse across platforms and complicating unit testing. {v5}',
     correctionMessage:
         'Emit a state representing the UI action (e.g., ShowDialogState or NavigateState) and handle the actual UI change in a BlocListener within the widget layer.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -3775,6 +3859,8 @@ class AvoidBlocBusinessLogicInUiRule extends SaropaLintRule {
 
 /// Warns when Bloc events are not sealed classes.
 ///
+/// Since: v2.5.0 | Updated: v4.13.0 | Rule version: v2
+///
 /// Alias: bloc_event_sealed, sealed_bloc_event, event_sealed
 ///
 /// Using sealed classes for Bloc events enables exhaustive pattern matching
@@ -3809,7 +3895,7 @@ class RequireBlocEventSealedRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_bloc_event_sealed',
     problemMessage:
-        '[require_bloc_event_sealed] Bloc event hierarchy should use sealed class for exhaustive matching. Using sealed classes for Bloc events enables exhaustive pattern matching and prevents invalid event subtypes.',
+        '[require_bloc_event_sealed] Bloc event hierarchy should use sealed class for exhaustive matching. Using sealed classes for Bloc events enables exhaustive pattern matching and prevents invalid event subtypes. {v2}',
     correctionMessage:
         'Change abstract class XEvent to sealed class XEvent for Dart 3+ pattern matching.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -3846,6 +3932,8 @@ class RequireBlocEventSealedRule extends SaropaLintRule {
 }
 
 /// Warns when Bloc directly depends on repository implementations.
+///
+/// Since: v2.5.0 | Updated: v4.13.0 | Rule version: v2
 ///
 /// Alias: bloc_repository, bloc_abstract_repo, bloc_di
 ///
@@ -3886,7 +3974,7 @@ class RequireBlocRepositoryAbstractionRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_bloc_repository_abstraction',
     problemMessage:
-        '[require_bloc_repository_abstraction] Bloc depends on concrete repository. Use abstract interface for testability. Blocs should depend on abstract repository interfaces, not concrete implementations. This enables testing and swapping implementations.',
+        '[require_bloc_repository_abstraction] Bloc depends on concrete repository. Use abstract interface for testability. Blocs should depend on abstract repository interfaces, not concrete implementations. This enables testing and swapping implementations. {v2}',
     correctionMessage:
         'Inject UserRepository interface instead of FirebaseUserRepository. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -3948,6 +4036,8 @@ class RequireBlocRepositoryAbstractionRule extends SaropaLintRule {
 
 /// Warns when Bloc doesn't use transform for event debouncing/throttling.
 ///
+/// Since: v2.5.0 | Updated: v4.13.0 | Rule version: v2
+///
 /// Alias: bloc_transform, event_transformer, debounce_bloc
 ///
 /// For events like search queries, use EventTransformer to debounce or
@@ -3990,7 +4080,7 @@ class PreferBlocTransformRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_bloc_transform',
     problemMessage:
-        '[prefer_bloc_transform] Search/input event without transformer. Prefer debounce/throttle. For events like search queries, use EventTransformer to debounce or throttle, preventing excessive API calls.',
+        '[prefer_bloc_transform] Search/input event without transformer. Prefer debounce/throttle. For events like search queries, use EventTransformer to debounce or throttle, preventing excessive API calls. {v2}',
     correctionMessage:
         'Add transformer: debounce(Duration(milliseconds: 300)) to on<Event>(). Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -4069,6 +4159,8 @@ class PreferBlocTransformRule extends SaropaLintRule {
 
 /// Warns when Bloc constructor receives another Bloc as dependency.
 ///
+/// Since: v4.1.4 | Updated: v4.13.0 | Rule version: v2
+///
 /// Blocs should not directly depend on other Blocs. This creates tight coupling
 /// and makes testing difficult. Use streams or events for inter-Bloc communication.
 ///
@@ -4101,7 +4193,7 @@ class AvoidPassingBlocToBlocRule extends SaropaLintRule {
     name: 'avoid_passing_bloc_to_bloc',
     problemMessage:
         '[avoid_passing_bloc_to_bloc] Bloc should not depend on another Bloc. '
-        'This creates tight coupling and makes testing difficult.',
+        'This creates tight coupling and makes testing difficult. {v2}',
     correctionMessage:
         'Use streams or events for inter-Bloc communication instead.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -4177,6 +4269,8 @@ class AvoidPassingBlocToBlocRule extends SaropaLintRule {
 
 /// Warns when BuildContext is passed to Bloc or Cubit.
 ///
+/// Since: v4.1.4 | Updated: v4.13.0 | Rule version: v2
+///
 /// BuildContext in Blocs couples UI to business logic and makes testing
 /// difficult. Blocs should be context-agnostic.
 ///
@@ -4208,7 +4302,7 @@ class AvoidPassingBuildContextToBlocsRule extends SaropaLintRule {
     name: 'avoid_passing_build_context_to_blocs',
     problemMessage:
         '[avoid_passing_build_context_to_blocs] BuildContext in Bloc couples '
-        'UI to business logic and makes testing difficult.',
+        'UI to business logic and makes testing difficult. {v2}',
     correctionMessage:
         'Remove BuildContext parameter. Extract needed values before passing to Bloc.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -4268,6 +4362,8 @@ class AvoidPassingBuildContextToBlocsRule extends SaropaLintRule {
 
 /// Warns when Cubit methods return values instead of emitting states.
 ///
+/// Since: v4.1.4 | Updated: v4.13.0 | Rule version: v2
+///
 /// Cubit methods should emit states, not return values. Returning values
 /// bypasses the reactive state management pattern.
 ///
@@ -4304,7 +4400,7 @@ class AvoidReturningValueFromCubitMethodsRule extends SaropaLintRule {
     name: 'avoid_returning_value_from_cubit_methods',
     problemMessage:
         '[avoid_returning_value_from_cubit_methods] Cubit methods should emit '
-        'states, not return values. This bypasses reactive state management.',
+        'states, not return values. This bypasses reactive state management. {v2}',
     correctionMessage:
         'Change return type to void and use emit() to update state.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -4375,6 +4471,8 @@ class _EmitCallVisitor extends RecursiveAstVisitor<void> {
 
 /// Warns when Bloc creates its own repository instead of receiving via constructor.
 ///
+/// Since: v4.1.4 | Updated: v4.13.0 | Rule version: v2
+///
 /// Blocs should receive repositories via constructor injection for testability.
 ///
 /// **BAD:**
@@ -4407,7 +4505,7 @@ class RequireBlocRepositoryInjectionRule extends SaropaLintRule {
     name: 'require_bloc_repository_injection',
     problemMessage:
         '[require_bloc_repository_injection] Bloc creates its own repository. '
-        'This makes testing difficult and violates dependency injection.',
+        'This makes testing difficult and violates dependency injection. {v2}',
     correctionMessage:
         'Inject the repository via constructor parameter instead.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -4495,6 +4593,8 @@ class _RepositoryCreationVisitor extends RecursiveAstVisitor<void> {
 
 /// Warns when Bloc uses SharedPreferences instead of HydratedBloc for persistence.
 ///
+/// Since: v4.1.4 | Updated: v4.13.0 | Rule version: v2
+///
 /// Persistent state should use HydratedBloc for automatic persistence.
 /// Manual SharedPreferences in Bloc is error-prone and creates coupling.
 ///
@@ -4535,7 +4635,7 @@ class PreferBlocHydrationRule extends SaropaLintRule {
     name: 'prefer_bloc_hydration',
     problemMessage:
         '[prefer_bloc_hydration] Bloc uses SharedPreferences for persistence. '
-        'Consider using HydratedBloc for automatic state persistence.',
+        'Consider using HydratedBloc for automatic state persistence. {v2}',
     correctionMessage:
         'Extend HydratedBloc instead and implement fromJson/toJson.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -4606,6 +4706,8 @@ class _SharedPrefsUsageVisitor extends RecursiveAstVisitor<void> {
 
 /// Warns when a Bloc class has too many event handlers.
 ///
+/// Since: v4.1.8 | Updated: v4.13.0 | Rule version: v2
+///
 /// `[HEURISTIC]` - Counts `on<Event>` registrations in constructor.
 ///
 /// Blocs handling too many responsibilities become hard to maintain.
@@ -4643,7 +4745,7 @@ class AvoidLargeBlocRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_large_bloc',
     problemMessage:
-        '[avoid_large_bloc] Bloc with 7+ event handlers becomes difficult to test and reason about. Blocs handling too many responsibilities become hard to maintain. Keep Blocs focused on a single domain.',
+        '[avoid_large_bloc] Bloc with 7+ event handlers becomes difficult to test and reason about. Blocs handling too many responsibilities become hard to maintain. Keep Blocs focused on a single domain. {v2}',
     correctionMessage:
         'Split into smaller domain-focused Blocs: UserBloc, OrderBloc, etc. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -4680,6 +4782,8 @@ class AvoidLargeBlocRule extends SaropaLintRule {
 }
 
 /// Warns when Bloc states are over-engineered.
+///
+/// Since: v4.1.8 | Updated: v4.13.0 | Rule version: v2
 ///
 /// `[HEURISTIC]` - Detects state classes with redundant states.
 ///
@@ -4719,7 +4823,7 @@ class AvoidOverengineeredBlocStatesRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_overengineered_bloc_states',
     problemMessage:
-        '[avoid_overengineered_bloc_states] More than 5 state subclasses adds complexity without benefit. Harder to maintain and test. Separate states for "loading" and "idle" when a boolean would suffice. Simpler state machines are easier to reason about.',
+        '[avoid_overengineered_bloc_states] More than 5 state subclasses adds complexity without benefit. Harder to maintain and test. Separate states for "loading" and "idle" when a boolean would suffice. Simpler state machines are easier to reason about. {v2}',
     correctionMessage:
         'Use a single state class with isLoading, error, data properties. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,

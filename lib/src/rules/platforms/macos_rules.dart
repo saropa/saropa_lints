@@ -36,6 +36,8 @@ import '../../saropa_lint_rule.dart';
 
 /// Suggests using PlatformMenuBar for native macOS menu integration.
 ///
+/// Since: v2.4.0 | Updated: v4.13.0 | Rule version: v2
+///
 /// macOS apps should integrate with the system menu bar for a native
 /// experience. `PlatformMenuBar` provides this integration in Flutter.
 ///
@@ -97,7 +99,7 @@ class PreferMacosMenuBarIntegrationRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_macos_menu_bar_integration',
     problemMessage:
-        '[prefer_macos_menu_bar_integration] macOS apps should use PlatformMenuBar for native menu integration. macOS apps should integrate with the system menu bar for a native experience. PlatformMenuBar provides this integration in Flutter.',
+        '[prefer_macos_menu_bar_integration] macOS apps should use PlatformMenuBar for native menu integration. macOS apps should integrate with the system menu bar for a native experience. PlatformMenuBar provides this integration in Flutter. {v2}',
     correctionMessage:
         'Add PlatformMenuBar with standard macOS menus (File, Edit, View, etc.). Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -138,6 +140,8 @@ class PreferMacosMenuBarIntegrationRule extends SaropaLintRule {
 }
 
 /// Suggests implementing standard macOS keyboard shortcuts.
+///
+/// Since: v2.4.0 | Updated: v4.13.0 | Rule version: v2
 ///
 /// macOS users expect standard keyboard shortcuts like Cmd+S (Save),
 /// Cmd+Z (Undo), Cmd+C/V/X (Copy/Paste/Cut). Flutter provides `Shortcuts`
@@ -197,7 +201,7 @@ class PreferMacosKeyboardShortcutsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_macos_keyboard_shortcuts',
     problemMessage:
-        '[prefer_macos_keyboard_shortcuts] macOS apps should implement standard keyboard shortcuts. macOS users expect standard keyboard shortcuts like Cmd+S (Save), Cmd+Z (Undo), Cmd+C/V/X (Copy/Paste/Cut). Flutter provides Shortcuts and CallbackShortcuts widgets to implement these.',
+        '[prefer_macos_keyboard_shortcuts] macOS apps should implement standard keyboard shortcuts. macOS users expect standard keyboard shortcuts like Cmd+S (Save), Cmd+Z (Undo), Cmd+C/V/X (Copy/Paste/Cut). Flutter provides Shortcuts and CallbackShortcuts widgets to implement these. {v2}',
     correctionMessage:
         'Use Shortcuts widget with common macOS shortcuts (Cmd+S, Cmd+Z, etc.). Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -240,6 +244,8 @@ class PreferMacosKeyboardShortcutsRule extends SaropaLintRule {
 }
 
 /// Warns when macOS apps lack window size constraints.
+///
+/// Since: v2.4.0 | Updated: v4.13.0 | Rule version: v2
 ///
 /// macOS windows can be resized freely by default. Without minimum/maximum
 /// size constraints, windows can become unusably small or excessively large.
@@ -292,7 +298,7 @@ class RequireMacosWindowSizeConstraintsRule extends SaropaLintRule {
     name: 'require_macos_window_size_constraints',
     problemMessage:
         '[require_macos_window_size_constraints] macOS app without window size constraints may resize to unusable '
-        'dimensions.',
+        'dimensions. {v2}',
     correctionMessage:
         'Use window_manager package to set minimum/maximum window size.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -334,6 +340,8 @@ class RequireMacosWindowSizeConstraintsRule extends SaropaLintRule {
 }
 
 /// Warns when macOS file access may require user intent.
+///
+/// Since: v2.4.0 | Updated: v4.13.0 | Rule version: v2
 ///
 /// macOS sandboxed apps can only access files the user explicitly chooses
 /// (via file picker or drag-and-drop), not arbitrary file paths.
@@ -383,7 +391,7 @@ class RequireMacosFileAccessIntentRule extends SaropaLintRule {
     name: 'require_macos_file_access_intent',
     problemMessage:
         '[require_macos_file_access_intent] Direct file path access detected. macOS sandboxed apps require '
-        'user intent (file picker, drag-drop) for file access.',
+        'user intent (file picker, drag-drop) for file access. {v2}',
     correctionMessage:
         'Use FilePicker or drag-and-drop for user-selected files. '
         'Or add appropriate entitlements for specific directories.',
@@ -430,6 +438,8 @@ class RequireMacosFileAccessIntentRule extends SaropaLintRule {
 
 /// Warns when deprecated macOS Security framework APIs are used.
 ///
+/// Since: v2.4.0 | Updated: v4.13.0 | Rule version: v2
+///
 /// macOS Security framework has deprecated several APIs that may cause
 /// issues with notarization or future macOS versions.
 ///
@@ -463,7 +473,7 @@ class AvoidMacosDeprecatedSecurityApisRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_macos_deprecated_security_apis',
     problemMessage:
-        '[avoid_macos_deprecated_security_apis] Deprecated macOS Security API detected. Use modern equivalents. macOS Security framework has deprecated several APIs that may cause issues with notarization or future macOS versions.',
+        '[avoid_macos_deprecated_security_apis] Deprecated macOS Security API detected. Use modern equivalents. macOS Security framework has deprecated several APIs that may cause issues with notarization or future macOS versions. {v2}',
     correctionMessage:
         'Replace deprecated Keychain APIs with SecItem* functions. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -510,6 +520,8 @@ class AvoidMacosDeprecatedSecurityApisRule extends SaropaLintRule {
 
 /// Warns when macOS app may not meet Hardened Runtime requirements.
 ///
+/// Since: v2.4.0 | Updated: v4.13.0 | Rule version: v2
+///
 /// macOS apps distributed outside the Mac App Store must be notarized,
 /// which requires Hardened Runtime. Certain operations are blocked
 /// unless you have specific entitlements.
@@ -548,7 +560,7 @@ class RequireMacosHardenedRuntimeRule extends SaropaLintRule {
     name: 'require_macos_hardened_runtime',
     problemMessage:
         '[require_macos_hardened_runtime] Operation detected that may require Hardened Runtime entitlement. '
-        'Ensure proper entitlements are configured for notarization.',
+        'Ensure proper entitlements are configured for notarization. {v2}',
     correctionMessage:
         'Add required entitlements in macos/Runner/Release.entitlements.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -610,6 +622,8 @@ class RequireMacosHardenedRuntimeRule extends SaropaLintRule {
 
 /// Warns when Mac Catalyst unsupported APIs may be used.
 ///
+/// Since: v2.4.0 | Updated: v4.13.0 | Rule version: v2
+///
 /// Mac Catalyst allows iOS apps to run on macOS, but not all iOS APIs
 /// are available. Using unavailable APIs causes crashes on Mac Catalyst.
 ///
@@ -653,7 +667,7 @@ class AvoidMacosCatalystUnsupportedApisRule extends SaropaLintRule {
     name: 'avoid_macos_catalyst_unsupported_apis',
     problemMessage:
         '[avoid_macos_catalyst_unsupported_apis] API detected that is not available on Mac Catalyst. '
-        'Add platform check if supporting Mac Catalyst.',
+        'Add platform check if supporting Mac Catalyst. {v2}',
     correctionMessage:
         'Wrap with Platform.isMacOS check or use kIsWeb/defaultTargetPlatform.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -716,6 +730,8 @@ class AvoidMacosCatalystUnsupportedApisRule extends SaropaLintRule {
 
 /// Warns when macOS window restoration may not be implemented.
 ///
+/// Since: v2.4.0 | Updated: v4.13.0 | Rule version: v2
+///
 /// macOS users expect window position and size to be restored between
 /// app launches. Apps should implement NSWindowRestoration or equivalent.
 class RequireMacosWindowRestorationRule extends SaropaLintRule {
@@ -732,7 +748,7 @@ class RequireMacosWindowRestorationRule extends SaropaLintRule {
     name: 'require_macos_window_restoration',
     problemMessage:
         '[require_macos_window_restoration] macOS window configuration detected. Consider implementing window '
-        'state restoration for better UX.',
+        'state restoration for better UX. {v2}',
     correctionMessage:
         'Save and restore window position/size using SharedPreferences '
         'or window_manager package.',
@@ -769,6 +785,8 @@ class RequireMacosWindowRestorationRule extends SaropaLintRule {
 
 /// Warns when macOS app may need Full Disk Access alternatives.
 ///
+/// Since: v2.4.0 | Updated: v4.13.0 | Rule version: v2
+///
 /// Full Disk Access requires user interaction in System Preferences.
 /// Apps should use scoped file access (NSOpenPanel) when possible.
 class AvoidMacosFullDiskAccessRule extends SaropaLintRule {
@@ -785,7 +803,7 @@ class AvoidMacosFullDiskAccessRule extends SaropaLintRule {
     name: 'avoid_macos_full_disk_access',
     problemMessage:
         '[avoid_macos_full_disk_access] Accessing protected paths detected. Consider using NSOpenPanel '
-        'for user-selected file access instead of Full Disk Access.',
+        'for user-selected file access instead of Full Disk Access. {v2}',
     correctionMessage:
         'Use file_picker or NSOpenPanel to let users choose files '
         'instead of requiring Full Disk Access.',
@@ -822,6 +840,8 @@ class AvoidMacosFullDiskAccessRule extends SaropaLintRule {
 
 /// Warns when macOS sandbox entitlements may be missing.
 ///
+/// Since: v2.4.0 | Updated: v4.13.0 | Rule version: v2
+///
 /// macOS App Store apps must be sandboxed. Network, file, and
 /// hardware access require specific entitlements.
 ///
@@ -845,7 +865,7 @@ class RequireMacosSandboxEntitlementsRule extends SaropaLintRule {
     name: 'require_macos_sandbox_entitlements',
     problemMessage:
         '[require_macos_sandbox_entitlements] Feature requiring macOS sandbox entitlement detected. '
-        'Ensure entitlements file includes required permissions.',
+        'Ensure entitlements file includes required permissions. {v2}',
     correctionMessage:
         'Add required entitlements to macOS/Runner/Release.entitlements.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -881,6 +901,8 @@ class RequireMacosSandboxEntitlementsRule extends SaropaLintRule {
 }
 
 /// Warns when macOS sandbox entitlements may be needed.
+///
+/// Since: v2.4.0 | Updated: v4.13.0 | Rule version: v2
 ///
 /// macOS App Store apps must be sandboxed. Certain features require
 /// explicit entitlements in the sandbox configuration.
@@ -922,7 +944,7 @@ class RequireMacosSandboxExceptionsRule extends SaropaLintRule {
     name: 'require_macos_sandbox_exceptions',
     problemMessage:
         '[require_macos_sandbox_exceptions] Feature requiring macOS sandbox entitlement detected. '
-        'App Store apps must declare entitlements.',
+        'App Store apps must declare entitlements. {v2}',
     correctionMessage:
         'Add the required entitlement to macos/Runner/Release.entitlements.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -971,6 +993,8 @@ class RequireMacosSandboxExceptionsRule extends SaropaLintRule {
 
 /// Warns when code may violate macOS Hardened Runtime requirements.
 ///
+/// Since: v2.4.0 | Updated: v4.13.0 | Rule version: v2
+///
 /// macOS apps must enable Hardened Runtime for notarization. Certain
 /// operations (like code injection) are blocked.
 ///
@@ -1009,7 +1033,7 @@ class AvoidMacosHardenedRuntimeViolationsRule extends SaropaLintRule {
     name: 'avoid_macos_hardened_runtime_violations',
     problemMessage:
         '[avoid_macos_hardened_runtime_violations] Pattern detected that may violate macOS Hardened Runtime. '
-        'Apps must pass notarization for distribution.',
+        'Apps must pass notarization for distribution. {v2}',
     correctionMessage:
         'Avoid loading unsigned dynamic libraries or using JIT compilation '
         'without the appropriate entitlement.',
@@ -1046,6 +1070,8 @@ class AvoidMacosHardenedRuntimeViolationsRule extends SaropaLintRule {
 
 /// Warns when macOS App Transport Security is needed.
 ///
+/// Since: v2.4.0 | Updated: v4.13.0 | Rule version: v2
+///
 /// Like iOS, macOS enforces ATS (App Transport Security). HTTP connections
 /// need explicit exceptions in Info.plist.
 ///
@@ -1081,7 +1107,7 @@ class RequireMacosAppTransportSecurityRule extends SaropaLintRule {
     name: 'require_macos_app_transport_security',
     problemMessage:
         '[require_macos_app_transport_security] HTTP URL detected. macOS enforces App Transport Security. '
-        'Use HTTPS or declare exception in Info.plist.',
+        'Use HTTPS or declare exception in Info.plist. {v2}',
     correctionMessage:
         'Change to HTTPS or add NSAppTransportSecurity exception '
         'in macos/Runner/Info.plist.',
@@ -1115,6 +1141,8 @@ class RequireMacosAppTransportSecurityRule extends SaropaLintRule {
 }
 
 /// Reminds about notarization requirements for macOS distribution.
+///
+/// Since: v2.4.0 | Updated: v4.13.0 | Rule version: v2
 ///
 /// macOS apps must be notarized for distribution. This requires proper
 /// code signing and Hardened Runtime.
@@ -1154,7 +1182,7 @@ class RequireMacosNotarizationReadyRule extends SaropaLintRule {
     name: 'require_macos_notarization_ready',
     problemMessage:
         '[require_macos_notarization_ready] macOS app detected. Ensure notarization is configured for distribution. '
-        'Apps without notarization show security warnings.',
+        'Apps without notarization show security warnings. {v2}',
     correctionMessage:
         'Configure code signing, enable Hardened Runtime, and notarize '
         'the app before distribution.',
@@ -1199,6 +1227,8 @@ class RequireMacosNotarizationReadyRule extends SaropaLintRule {
 
 /// Warns when features requiring macOS entitlements are used.
 ///
+/// Since: v2.4.0 | Updated: v4.13.0 | Rule version: v2
+///
 /// macOS sandboxed apps require entitlements for many features. Detect
 /// usage without corresponding entitlement configuration.
 ///
@@ -1233,7 +1263,7 @@ class RequireMacosEntitlementsRule extends SaropaLintRule {
     name: 'require_macos_entitlements',
     problemMessage:
         '[require_macos_entitlements] Feature detected that requires macOS entitlement. '
-        'Sandboxed apps crash without proper entitlements.',
+        'Sandboxed apps crash without proper entitlements. {v2}',
     correctionMessage:
         'Add the required entitlement to macos/Runner/Release.entitlements '
         'and macos/Runner/DebugProfile.entitlements.',

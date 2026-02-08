@@ -18,6 +18,8 @@ import '../../saropa_lint_rule.dart';
 
 /// Warns when continuous location tracking doesn't consider battery impact.
 ///
+/// Since: v4.2.0 | Updated: v4.13.0 | Rule version: v2
+///
 /// Alias: geolocator_battery, location_accuracy_battery
 ///
 /// High-accuracy continuous tracking drains battery. Detect location stream
@@ -67,7 +69,7 @@ class RequireGeolocatorBatteryAwarenessRule extends SaropaLintRule {
     name: 'require_geolocator_battery_awareness',
     problemMessage:
         '[require_geolocator_battery_awareness] High-accuracy continuous '
-        'location tracking without battery consideration drains battery quickly.',
+        'location tracking without battery consideration drains battery quickly. {v2}',
     correctionMessage:
         'Use LocationAccuracy.balanced, set distanceFilter > 0, or use '
         'AndroidSettings/AppleSettings for battery-optimized tracking.',

@@ -1,7 +1,12 @@
+<!-- AUTO-SYNC: The heading and Goal line below are updated by the publish
+     script via sync_roadmap_header() in scripts/modules/_rule_metrics.py.
+     Heading regex: "# Roadmap: Aiming for N,NNN"
+     Goal regex:    "Goal: NNN rules (NNN implemented, NNN remaining)"
+     Goal is rounded up to the nearest 100. -->
 # Roadmap: Aiming for 2,200 Lint Rules
 <!-- cspell:disable -->
 
-See [CHANGELOG.md](CHANGELOG.md) for implemented rules. Goal: 2200 rules (1716 implemented, 473 remaining).
+See [CHANGELOG.md](CHANGELOG.md) for implemented rules. Goal: 2200 rules (1721 implemented, 469 remaining).
 
 > **When implementing**: Remove from ROADMAP, add to CHANGELOG, register in `all_rules.dart` + `tiers.dart`. See [CONTRIBUTING.md](CONTRIBUTING.md).
 
@@ -41,8 +46,7 @@ See [CHANGELOG.md](CHANGELOG.md) for implemented rules. Goal: 2200 rules (1716 i
 | ℹ️🐙 [`require_compression`](https://github.com/saropa/saropa_lints/issues/15) | Comprehensive | INFO | Large JSON/text responses should use gzip compression. Reduces bandwidth 60-80% for typical API responses. |
 | ℹ️ `prefer_batch_requests` | Professional | INFO | Multiple small requests have more overhead than one batched request. Combine related queries when the API supports it. |
 | ℹ️🐙 [`prefer_batch_requests`](https://github.com/saropa/saropa_lints/issues/16) | Professional | INFO | Multiple small requests have more overhead than one batched request. Combine related queries when the API supports it. |
-| ⚠️ `avoid_blocking_main_thread` | Essential | WARNING | Network I/O on main thread blocks UI during DNS/TLS. While Dart's http is async, large response processing should use isolates. |
-| ⚠️🐙 [`avoid_blocking_main_thread`](https://github.com/saropa/saropa_lints/issues/17) | Essential | WARNING | Network I/O on main thread blocks UI during DNS/TLS. While Dart's http is async, large response processing should use isolates. |
+| ⚠️✅ [`avoid_blocking_main_thread`](https://github.com/saropa/saropa_lints/issues/17) | Essential | WARNING | Network I/O on main thread blocks UI during DNS/TLS. While Dart's http is async, large response processing should use isolates. |
 | ℹ️ `prefer_binary_format` | Comprehensive | INFO | Protocol Buffers or MessagePack are smaller and faster to parse than JSON. Consider for high-frequency or large-payload APIs. |
 | ℹ️🐙 [`prefer_binary_format`](https://github.com/saropa/saropa_lints/issues/18) | Comprehensive | INFO | Protocol Buffers or MessagePack are smaller and faster to parse than JSON. Consider for high-frequency or large-payload APIs. |
 
@@ -229,8 +233,7 @@ See [CHANGELOG.md](CHANGELOG.md) for implemented rules. Goal: 2200 rules (1716 i
 
 | Rule Name | Tier | Severity | Description |
 |-----------|------|----------|-------------|
-| ℹ️ `require_analytics_event_naming` | Professional | INFO | Consistent event naming improves analysis. Detect analytics events not matching configured naming pattern (e.g., snake_case). |
-| ℹ️🐙 [`require_analytics_event_naming`](https://github.com/saropa/saropa_lints/issues/19) | Professional | INFO | Consistent event naming improves analysis. Detect analytics events not matching configured naming pattern (e.g., snake_case). |
+| ℹ️✅ [`require_analytics_event_naming`](https://github.com/saropa/saropa_lints/issues/19) | Professional | INFO | Consistent event naming improves analysis. Detect analytics events not matching configured naming pattern (e.g., snake_case). |
 | ℹ️⭐ `require_analytics_error_handling` | Recommended | INFO | Analytics failures shouldn't crash the app. Detect analytics calls without try-catch wrapper. |
 | ℹ️[⭐ `require_analytics_error_handling`](https://github.com/saropa/saropa_lints/issues/20) | Recommended | INFO | Analytics failures shouldn't crash the app. Detect analytics calls without try-catch wrapper. |
 
@@ -238,15 +241,13 @@ See [CHANGELOG.md](CHANGELOG.md) for implemented rules. Goal: 2200 rules (1716 i
 
 | Rule Name | Tier | Severity | Description |
 |-----------|------|----------|-------------|
-| ℹ️⭐ `require_feature_flag_type_safety` | Recommended | INFO | Use typed feature flag accessors, not raw string lookups. Detect string literal keys in feature flag calls. |
-| ℹ️🐙 [`require_feature_flag_type_safety`](https://github.com/saropa/saropa_lints/issues/21) | Recommended | INFO | Use typed feature flag accessors, not raw string lookups. Detect string literal keys in feature flag calls. |
+| ℹ️✅ [`require_feature_flag_type_safety`](https://github.com/saropa/saropa_lints/issues/21) | Recommended | INFO | Use typed feature flag accessors, not raw string lookups. Detect string literal keys in feature flag calls. |
 
 ### 1.30 Date & Time Rules
 
 | Rule Name | Tier | Severity | Description |
 |-----------|------|----------|-------------|
-| ℹ️⭐ `require_timezone_display` | Recommended | INFO | When displaying times, indicate timezone or use relative time. Detect time formatting without timezone context. |
-| ℹ️🐙 [`require_timezone_display`](https://github.com/saropa/saropa_lints/issues/22) | Recommended | INFO | When displaying times, indicate timezone or use relative time. Detect time formatting without timezone context. |
+| ℹ️✅ [`require_timezone_display`](https://github.com/saropa/saropa_lints/issues/22) | Recommended | INFO | When displaying times, indicate timezone or use relative time. Detect time formatting without timezone context. |
 
 ### 1.34 JSON & Serialization Rules
 
@@ -268,8 +269,7 @@ See [CHANGELOG.md](CHANGELOG.md) for implemented rules. Goal: 2200 rules (1716 i
 
 | Rule Name | Tier | Severity | Description |
 |-----------|------|----------|-------------|
-| ℹ️ `require_log_level_for_production` | Professional | INFO | Debug logs in production waste resources. Detect verbose logging without level checks. |
-| ℹ️🐙 [`require_log_level_for_production`](https://github.com/saropa/saropa_lints/issues/27) | Professional | INFO | Debug logs in production waste resources. Detect verbose logging without level checks. |
+| ℹ️✅ [`require_log_level_for_production`](https://github.com/saropa/saropa_lints/issues/27) | Professional | INFO | Debug logs in production waste resources. Detect verbose logging without level checks. |
 | ℹ️ `avoid_expensive_log_string_construction` | Professional | INFO | Don't build expensive strings for logs that won't print. Detect string interpolation in log calls without level guard. |
 
 ### 1.37 Pagination Rules

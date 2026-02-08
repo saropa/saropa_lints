@@ -2430,6 +2430,13 @@ final List<LintRule Function()> _allRuleFactories = <LintRule Function()>[
   AvoidRetainingDisposedWidgetsRule.new,
   RequireSecureKeyGenerationRule.new,
   RequireHiveWebSubdirectoryRule.new,
+
+  // v4.14.0 - GitHub issue rules
+  AvoidBlockingMainThreadRule.new,
+  RequireLogLevelForProductionRule.new,
+  RequireFeatureFlagTypeSafetyRule.new,
+  RequireAnalyticsEventNamingRule.new,
+  RequireTimezoneDisplayRule.new,
 ];
 
 // =============================================================================
