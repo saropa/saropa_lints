@@ -15,7 +15,7 @@ import '../saropa_lint_rule.dart';
 
 /// Warns when encryption keys appear to be hardcoded.
 ///
-/// Since: v1.7.9 | Updated: vunreleased | Rule version: v5
+/// Since: v1.7.9 | Updated: v4.13.0 | Rule version: v5
 ///
 /// Alias: no_hardcoded_key, hardcoded_secret_key, embedded_encryption_key
 ///
@@ -615,7 +615,7 @@ class _UseSecureRandomIvFix extends DartFix {
 
 /// Warns when encryption keys are generated from predictable byte patterns.
 ///
-/// Since: v4.14.0 | Updated: vunreleased | Rule version: v2
+/// Since: v4.14.0 | Rule version: v2
 ///
 /// Alias: secure_key_generation, predictable_key
 ///

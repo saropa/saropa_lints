@@ -2266,7 +2266,7 @@ class _ReplaceWithWildcardFix extends DartFix {
 
 /// Warns when a `library` directive name doesn't follow Dart naming conventions.
 ///
-/// Since: v4.14.0 | Updated: vunreleased | Rule version: v2
+/// Since: v4.14.0 | Rule version: v2
 ///
 /// Alias: package_name_convention, library_name_convention
 ///
