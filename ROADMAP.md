@@ -235,41 +235,37 @@ See [CHANGELOG.md](CHANGELOG.md) for implemented rules. Goal: 2200 rules (1721 i
 |-----------|------|----------|-------------|
 | ℹ️✅ [`require_analytics_event_naming`](https://github.com/saropa/saropa_lints/issues/19) | Professional | INFO | Consistent event naming improves analysis. Detect analytics events not matching configured naming pattern (e.g., snake_case). |
 | ℹ️⭐ `require_analytics_error_handling` | Recommended | INFO | Analytics failures shouldn't crash the app. Detect analytics calls without try-catch wrapper. |
-| ℹ️[⭐ `require_analytics_error_handling`](https://github.com/saropa/saropa_lints/issues/20) | Recommended | INFO | Analytics failures shouldn't crash the app. Detect analytics calls without try-catch wrapper. |
 
 ### 1.29 Feature Flag Rules
 
 | Rule Name | Tier | Severity | Description |
 |-----------|------|----------|-------------|
-| ℹ️✅ [`require_feature_flag_type_safety`](https://github.com/saropa/saropa_lints/issues/21) | Recommended | INFO | Use typed feature flag accessors, not raw string lookups. Detect string literal keys in feature flag calls. |
+| ℹ️✅ `require_feature_flag_type_safety` | Recommended | INFO | Use typed feature flag accessors, not raw string lookups. Detect string literal keys in feature flag calls. |
 
 ### 1.30 Date & Time Rules
 
 | Rule Name | Tier | Severity | Description |
 |-----------|------|----------|-------------|
-| ℹ️✅ [`require_timezone_display`](https://github.com/saropa/saropa_lints/issues/22) | Recommended | INFO | When displaying times, indicate timezone or use relative time. Detect time formatting without timezone context. |
+| ℹ️✅ `require_timezone_display` | Recommended | INFO | When displaying times, indicate timezone or use relative time. Detect time formatting without timezone context. |
 
 ### 1.34 JSON & Serialization Rules
 
 | Rule Name | Tier | Severity | Description |
 |-----------|------|----------|-------------|
 | ℹ️ `prefer_json_codegen` | Professional | INFO | Manual fromJson/toJson is error-prone. Detect hand-written fromJson methods; suggest json_serializable/freezed. |
-| ℹ️🐙 [`prefer_json_codegen`](https://github.com/saropa/saropa_lints/issues/24) | Professional | INFO | Manual fromJson/toJson is error-prone. Detect hand-written fromJson methods; suggest json_serializable/freezed. |
 | ℹ️ `require_json_date_format_consistency` | Professional | INFO | Dates in JSON need consistent format. Detect DateTime serialization without explicit format. |
-| ℹ️🐙 [`require_json_date_format_consistency`](https://github.com/saropa/saropa_lints/issues/25) | Professional | INFO | Dates in JSON need consistent format. Detect DateTime serialization without explicit format. |
 
 ### 1.35 GetIt & Dependency Injection Rules
 
 | Rule Name | Tier | Severity | Description |
 |-----------|------|----------|-------------|
 | ℹ️ `require_getit_dispose_registration` | Professional | INFO | Disposable singletons need dispose callbacks. Detect registerSingleton of Disposable types without dispose parameter. |
-| ℹ️🐙 [`require_getit_dispose_registration`](https://github.com/saropa/saropa_lints/issues/26) | Professional | INFO | Disposable singletons need dispose callbacks. Detect registerSingleton of Disposable types without dispose parameter. |
 
 ### 1.36 Logging Rules
 
 | Rule Name | Tier | Severity | Description |
 |-----------|------|----------|-------------|
-| ℹ️✅ [`require_log_level_for_production`](https://github.com/saropa/saropa_lints/issues/27) | Professional | INFO | Debug logs in production waste resources. Detect verbose logging without level checks. |
+| ℹ️✅ `require_log_level_for_production` | Professional | INFO | Debug logs in production waste resources. Detect verbose logging without level checks. |
 | ℹ️ `avoid_expensive_log_string_construction` | Professional | INFO | Don't build expensive strings for logs that won't print. Detect string interpolation in log calls without level guard. |
 
 ### 1.37 Pagination Rules
@@ -893,8 +889,7 @@ Rules for popular Flutter packages based on common gotchas, anti-patterns, and b
 | Rule Name | Tier | Severity | Description |
 |-----------|------|----------|-------------|
 | ℹ️ `require_test_golden_threshold` | Professional | INFO | Set golden test threshold for CI differences. Detect default threshold. |
-| ℹ️🐙 [`require_test_golden_threshold`](https://github.com/saropa/saropa_lints/issues/30) | Professional | INFO | Set golden test threshold for CI differences. Detect default threshold. |
-| ℹ️🐙 [`require_test_coverage_threshold`](https://github.com/saropa/saropa_lints/issues/31) | Professional | INFO | Set minimum coverage threshold. Detect coverage below threshold. |
+| ℹ️ `require_test_coverage_threshold` | Professional | INFO | Set minimum coverage threshold. Detect coverage below threshold. |
 
 ### 5.33 Memory Optimization Rules
 
@@ -985,23 +980,21 @@ Rules for popular Flutter packages based on common gotchas, anti-patterns, and b
 | Rule Name | Tier | Severity | Description |
 |-----------|------|----------|-------------|
 | ⚠️ `require_text_scale_factor_awareness` | Essential | WARNING | UI should handle text scaling. Detect fixed-size text containers. |
-| ⚠️🐙 [`require_text_scale_factor_awareness`](https://github.com/saropa/saropa_lints/issues/42) | Essential | WARNING | UI should handle text scaling. Detect fixed-size text containers. |
-| ℹ️🐙 [`require_focus_order`](https://github.com/saropa/saropa_lints/issues/44) | Professional | INFO | Ensure logical focus order. Detect FocusTraversalGroup misconfiguration. |
-| ℹ️🐙 [`require_reduced_motion_support`](https://github.com/saropa/saropa_lints/issues/45) | Recommended | INFO | Check MediaQuery.disableAnimations. Detect animations without reduced motion check. |
-| ℹ️🐙 [`prefer_readable_line_length`](https://github.com/saropa/saropa_lints/issues/46) | Professional | INFO | Lines shouldn't exceed ~80 characters. Detect wide text without constraints. |
-| ℹ️🐙 [`require_heading_hierarchy`](https://github.com/saropa/saropa_lints/issues/47) | Professional | INFO | Use proper heading structure. Detect inconsistent heading levels. |
+| ℹ️ `require_focus_order` | Professional | INFO | Ensure logical focus order. Detect FocusTraversalGroup misconfiguration. |
+| ℹ️ `require_reduced_motion_support` | Recommended | INFO | Check MediaQuery.disableAnimations. Detect animations without reduced motion check. |
+| ℹ️ `prefer_readable_line_length` | Professional | INFO | Lines shouldn't exceed ~80 characters. Detect wide text without constraints. |
+| ℹ️ `require_heading_hierarchy` | Professional | INFO | Use proper heading structure. Detect inconsistent heading levels. |
 
 ### 5.44 Auto-Dispose Pattern Rules
 
 | Rule Name | Tier | Severity | Description |
 |-----------|------|----------|-------------|
-| ℹ️ `prefer_automatic_dispose | Professional | INFO | Use packages with auto-dispose. Detect manual disposal patterns. |
-| ℹ️🐙 [`prefer_automatic_dispose`](https://github.com/saropa/saropa_lints/issues/48) | Professional | INFO | Use packages with auto-dispose. Detect manual disposal patterns. |
-| ℹ️🐙 [`require_subscription_composite`](https://github.com/saropa/saropa_lints/issues/49) | Professional | INFO | Group subscriptions for batch disposal. Detect multiple individual subscriptions. |
-| ℹ️🐙 [`prefer_using_for_temp_resources`](https://github.com/saropa/saropa_lints/issues/50) | Recommended | INFO | Use using() extension for scoped resources. Detect try-finally for temp resources. |
-| ℹ️🐙 [`require_resource_tracker`](https://github.com/saropa/saropa_lints/issues/51) | Comprehensive | INFO | Track resources for leak detection. Detect undisposed resources in debug mode. |
-| ℹ️🐙 [`prefer_cancellation_token_pattern`](https://github.com/saropa/saropa_lints/issues/52) | Professional | INFO | Use CancelToken pattern for cancelable operations. Detect manual cancellation. |
-| ℹ️🐙 [`require_dispose_verification_tests`](https://github.com/saropa/saropa_lints/issues/53) | Professional | INFO | Test dispose is called properly. Detect disposable without dispose test. |
+| ℹ️ `prefer_automatic_dispose` | Professional | INFO | Use packages with auto-dispose. Detect manual disposal patterns. |
+| ℹ️ `require_subscription_composite` | Professional | INFO | Group subscriptions for batch disposal. Detect multiple individual subscriptions. |
+| ℹ️ `prefer_using_for_temp_resources` | Recommended | INFO | Use using() extension for scoped resources. Detect try-finally for temp resources. |
+| ℹ️ `require_resource_tracker` | Comprehensive | INFO | Track resources for leak detection. Detect undisposed resources in debug mode. |
+| ℹ️ `prefer_cancellation_token_pattern` | Professional | INFO | Use CancelToken pattern for cancelable operations. Detect manual cancellation. |
+| ℹ️ `require_dispose_verification_tests` | Professional | INFO | Test dispose is called properly. Detect disposable without dispose test. |
 
 ### 5.46 Hot Reload Compatibility Rules
 
