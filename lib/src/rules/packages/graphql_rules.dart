@@ -5,6 +5,8 @@ import 'package:saropa_lints/src/saropa_lint_rule.dart';
 
 /// Warns when GraphQL queries are written as raw string literals.
 ///
+/// Since: v2.3.7 | Updated: v4.13.0 | Rule version: v2
+///
 /// Raw GraphQL string queries are error-prone, lack type safety, and
 /// cannot be validated at compile time. Use code generation tools like
 /// graphql_codegen or artemis to generate type-safe query objects.
@@ -48,7 +50,7 @@ class AvoidGraphqlStringQueriesRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_graphql_string_queries',
     problemMessage:
-        '[avoid_graphql_string_queries] Raw GraphQL string queries lack type safety and compile-time validation. Raw GraphQL string queries are error-prone, lack type safety, and cannot be validated at compile time. Use code generation tools like graphql_codegen or artemis to generate type-safe query objects.',
+        '[avoid_graphql_string_queries] Raw GraphQL string queries lack type safety and compile-time validation. Raw GraphQL string queries are error-prone, lack type safety, and cannot be validated at compile time. Use code generation tools like graphql_codegen or artemis to generate type-safe query objects. {v2}',
     correctionMessage:
         'Use graphql_codegen or artemis to generate type-safe query classes from .graphql files.',
     errorSeverity: DiagnosticSeverity.INFO,

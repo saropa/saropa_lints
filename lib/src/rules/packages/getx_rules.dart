@@ -19,6 +19,9 @@ import '../../saropa_lint_rule.dart';
 // =============================================================================
 
 /// Warns when GetX Workers (ever, debounce, interval, once) are stored
+///
+/// Since: v2.3.7 | Updated: v4.13.0 | Rule version: v2
+///
 /// in fields but not disposed in onClose().
 ///
 /// Alias: getx_worker_dispose, getx_worker_cleanup
@@ -73,7 +76,7 @@ class RequireGetxWorkerDisposeRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_getx_worker_dispose',
     problemMessage:
-        '[require_getx_worker_dispose] GetX Worker field has no corresponding dispose() call in onClose(). Without disposing the Worker, its internal stream subscription remains active after the GetxController is destroyed. This creates a memory leak where the Worker, its closure, and all captured references are retained in memory indefinitely.',
+        '[require_getx_worker_dispose] GetX Worker field has no corresponding dispose() call in onClose(). Without disposing the Worker, its internal stream subscription remains active after the GetxController is destroyed. This creates a memory leak where the Worker, its closure, and all captured references are retained in memory indefinitely. {v2}',
     correctionMessage:
         'Call worker.dispose() inside the onClose() method before calling super.onClose() to properly clean up the Worker stream subscription and prevent memory leaks.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -151,6 +154,8 @@ class RequireGetxWorkerDisposeRule extends SaropaLintRule {
 
 /// Warns when Get.put(permanent: true) is used without manual cleanup.
 ///
+/// Since: v2.3.7 | Updated: v4.13.0 | Rule version: v3
+///
 /// Alias: getx_permanent_cleanup, getx_permanent_delete
 ///
 /// Controllers registered with `permanent: true` are never automatically
@@ -201,7 +206,7 @@ class RequireGetxPermanentCleanupRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_getx_permanent_cleanup',
     problemMessage:
-        '[require_getx_permanent_cleanup] Get.put(permanent: true) registers a navigation, scroll, or animation controller that will never be automatically deleted. This can cause memory leaks if you do not manually clean up. Instances registered as permanent remain in memory for the lifetime of the app unless explicitly deleted. This is especially risky for feature-specific or page-scoped controllers that may not always be needed.',
+        '[require_getx_permanent_cleanup] Get.put(permanent: true) registers a navigation, scroll, or animation controller that will never be automatically deleted. This can cause memory leaks if you do not manually clean up. Instances registered as permanent remain in memory for the lifetime of the app unless explicitly deleted. This is especially risky for feature-specific or page-scoped controllers that may not always be needed. {v3}',
     correctionMessage:
         'Always call Get.delete<T>() when the navigation, animation, or page controller is no longer needed, such as during logout or app shutdown. If the instance must remain for the entire app lifetime, document the reason with a code comment or ignore. Avoid using permanent: true for feature-specific controllers unless absolutely necessary.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -284,6 +289,8 @@ class RequireGetxPermanentCleanupRule extends SaropaLintRule {
 
 /// Warns when Get.context, Get.overlayContext, or similar is used outside widget classes.
 ///
+/// Since: v2.3.7 | Updated: v4.13.0 | Rule version: v2
+///
 /// GetX provides global access to BuildContext via Get.context and Get.overlayContext,
 /// but using these outside of Widget classes (in controllers, services, or repositories)
 /// is dangerous because:
@@ -350,7 +357,7 @@ class AvoidGetxContextOutsideWidgetRule extends SaropaLintRule {
     name: 'avoid_getx_context_outside_widget',
     problemMessage:
         '[avoid_getx_context_outside_widget] Get.context or Get.overlayContext used outside widget class. '
-        'This is unsafe and may cause crashes.',
+        'This is unsafe and may cause crashes. {v2}',
     correctionMessage:
         'Use GetX navigation methods (Get.to, Get.snackbar, etc.) or pass context explicitly.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -471,6 +478,8 @@ class AvoidGetxContextOutsideWidgetRule extends SaropaLintRule {
 
 /// Get.to() uses global context, hurting testability.
 ///
+/// Since: v2.6.0 | Updated: v4.13.0 | Rule version: v2
+///
 /// GetX navigation methods bypass the widget tree's context, making
 /// testing and navigation state management difficult.
 ///
@@ -499,7 +508,7 @@ class AvoidGetxGlobalNavigationRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_getx_global_navigation',
     problemMessage:
-        '[avoid_getx_global_navigation] GetX global navigation (Get.to, Get.off) bypasses widget context. GetX navigation methods bypass the widget tree\'s context, making testing and navigation state management difficult.',
+        '[avoid_getx_global_navigation] GetX global navigation (Get.to, Get.off) bypasses widget context. GetX navigation methods bypass the widget tree\'s context, making testing and navigation state management difficult. {v2}',
     correctionMessage:
         'Use Navigator.of(context) or a typed routing solution like GoRouter. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -546,6 +555,8 @@ class AvoidGetxGlobalNavigationRule extends SaropaLintRule {
 
 /// GetX routes should use Bindings for dependency injection.
 ///
+/// Since: v2.6.0 | Updated: v4.13.0 | Rule version: v2
+///
 /// GetPage without a binding forces manual controller creation and
 /// lifecycle management in widgets.
 ///
@@ -579,7 +590,7 @@ class RequireGetxBindingRoutesRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_getx_binding_routes',
     problemMessage:
-        '[require_getx_binding_routes] GetPage without binding parameter. GetPage without a binding forces manual controller creation and lifecycle management in widgets. GetX routes should use Bindings for dependency injection.',
+        '[require_getx_binding_routes] GetPage without binding parameter. GetPage without a binding forces manual controller creation and lifecycle management in widgets. GetX routes should use Bindings for dependency injection. {v2}',
     correctionMessage:
         'Add binding: YourBinding() for proper DI lifecycle. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -624,6 +635,8 @@ class RequireGetxBindingRoutesRule extends SaropaLintRule {
 
 /// Warns when Get.snackbar or Get.dialog is called in GetxController.
 ///
+/// Since: v4.1.4 | Updated: v4.13.0 | Rule version: v2
+///
 /// Dialogs and snackbars in controllers can't be tested and couple
 /// UI concerns with business logic. Return state/events instead.
 ///
@@ -661,7 +674,7 @@ class AvoidGetxDialogSnackbarInControllerRule extends SaropaLintRule {
     name: 'avoid_getx_dialog_snackbar_in_controller',
     problemMessage:
         '[avoid_getx_dialog_snackbar_in_controller] Get.snackbar/dialog in '
-        'controller couples UI to business logic and prevents testing.',
+        'controller couples UI to business logic and prevents testing. {v2}',
     correctionMessage:
         'Use reactive state or events to trigger UI feedback instead.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -718,6 +731,8 @@ class AvoidGetxDialogSnackbarInControllerRule extends SaropaLintRule {
 
 /// Warns when Get.put is used for controllers that might not be needed immediately.
 ///
+/// Since: v4.1.4 | Updated: v4.13.0 | Rule version: v2
+///
 /// Use Get.lazyPut for lazy initialization to improve startup performance
 /// and reduce memory usage for rarely-used controllers.
 ///
@@ -749,7 +764,7 @@ class RequireGetxLazyPutRule extends SaropaLintRule {
     name: 'require_getx_lazy_put',
     problemMessage:
         '[require_getx_lazy_put] Consider using Get.lazyPut() for controllers '
-        'that may not be needed immediately. This improves startup performance.',
+        'that may not be needed immediately. This improves startup performance. {v2}',
     correctionMessage:
         'Use Get.lazyPut(() => Controller()) instead of Get.put(Controller()).',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -807,6 +822,8 @@ class RequireGetxLazyPutRule extends SaropaLintRule {
 
 /// Warns when Get.find() is used inside build() method.
 ///
+/// Since: v1.5.0 | Updated: v4.13.0 | Rule version: v3
+///
 /// Get.find() in build() fetches the controller on every rebuild. If the
 /// controller doesn't exist, it throws an error. Use GetBuilder or Obx
 /// for reactive updates instead.
@@ -845,7 +862,7 @@ class AvoidGetFindInBuildRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_get_find_in_build',
     problemMessage:
-        '[avoid_get_find_in_build] Calling Get.find() inside the build method is inefficient and can cause unnecessary object creation and performance issues. This leads to wasted memory allocations on every rebuild and makes your app less responsive.',
+        '[avoid_get_find_in_build] Calling Get.find() inside the build method is inefficient and can cause unnecessary object creation and performance issues. This leads to wasted memory allocations on every rebuild and makes your app less responsive. {v3}',
     correctionMessage:
         'Use GetBuilder<T> or Obx for reactive updates with GetX, and avoid calling Get.find() in build() to improve performance.',
     errorSeverity: DiagnosticSeverity.ERROR,
@@ -889,6 +906,8 @@ class _GetFindVisitor extends RecursiveAstVisitor<void> {
 }
 
 /// Warns when GetX controller doesn't call dispose on resources.
+///
+/// Since: v4.8.5 | Updated: v4.13.0 | Rule version: v3
 ///
 /// GetxController.onClose() must dispose controllers, streams, and
 /// subscriptions to prevent memory leaks.
@@ -937,7 +956,7 @@ class RequireGetxControllerDisposeRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_getx_controller_dispose',
     problemMessage:
-        '[require_getx_controller_dispose] GetxController holds TextEditingController or StreamSubscription fields but does not override onClose() to dispose them. Undisposed controllers and subscriptions leak native resources and continue processing events after the screen is removed, causing crashes.',
+        '[require_getx_controller_dispose] GetxController holds TextEditingController or StreamSubscription fields but does not override onClose() to dispose them. Undisposed controllers and subscriptions leak native resources and continue processing events after the screen is removed, causing crashes. {v3}',
     correctionMessage:
         'Override onClose() to dispose TextEditingController, ScrollController, and cancel StreamSubscription fields before calling super.onClose().',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -1038,6 +1057,8 @@ class _AddOnCloseFix extends DartFix {
 
 /// Warns when .obs is used outside a GetxController.
 ///
+/// Since: v4.2.0 | Updated: v4.13.0 | Rule version: v3
+///
 /// Observable (.obs) should be encapsulated in GetxController for proper
 /// lifecycle management. Using .obs in widgets causes memory leaks.
 ///
@@ -1075,7 +1096,7 @@ class AvoidObsOutsideControllerRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_obs_outside_controller',
     problemMessage:
-        '[avoid_obs_outside_controller] .obs used outside a Getx stream controller (GetxController or GetxService) creates observables without proper lifecycle management. These observables cause memory leaks because they are never disposed when the widget tree rebuilds.',
+        '[avoid_obs_outside_controller] .obs used outside a Getx stream controller (GetxController or GetxService) creates observables without proper lifecycle management. These observables cause memory leaks because they are never disposed when the widget tree rebuilds. {v3}',
     correctionMessage:
         'Move observable state into a GetxController or GetxService, where onClose() automatically disposes Rx stream subscriptions and prevents memory leaks.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -1127,6 +1148,8 @@ class AvoidObsOutsideControllerRule extends SaropaLintRule {
 
 /// Warns when GetxController overrides `onInit` or `onClose` without calling super.
 ///
+/// Since: v2.0.0 | Updated: v4.13.0 | Rule version: v2
+///
 /// Not calling the super method in lifecycle overrides can break the
 /// controller's internal state management and cause unexpected behavior.
 ///
@@ -1176,7 +1199,7 @@ class ProperGetxSuperCallsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'proper_getx_super_calls',
     problemMessage:
-        '[proper_getx_super_calls] Omitting a call to super in GetxController lifecycle methods (onInit, onReady, onClose) breaks the controller lifecycle, causing incomplete initialization, missed cleanup, and unpredictable behavior. This can lead to memory leaks, resource retention, and subtle bugs that are hard to diagnose.',
+        '[proper_getx_super_calls] Omitting a call to super in GetxController lifecycle methods (onInit, onReady, onClose) breaks the controller lifecycle, causing incomplete initialization, missed cleanup, and unpredictable behavior. This can lead to memory leaks, resource retention, and subtle bugs that are hard to diagnose. {v2}',
     correctionMessage:
         'Always call the corresponding super method (e.g., super.onInit(), super.onClose()) in GetxController lifecycle overrides. Place super.onInit() at the start and super.onClose() at the end to ensure proper initialization and cleanup.',
     errorSeverity: DiagnosticSeverity.ERROR,
@@ -1240,6 +1263,8 @@ class _SuperCallVisitor extends RecursiveAstVisitor<void> {
 
 /// Warns when GetX reactive workers are created without cleanup.
 ///
+/// Since: v2.0.0 | Updated: v4.13.0 | Rule version: v2
+///
 /// Workers like `ever()`, `once()`, `debounce()`, and `interval()` create
 /// subscriptions that must be cancelled in `onClose()` to prevent memory leaks.
 ///
@@ -1286,7 +1311,7 @@ class AlwaysRemoveGetxListenerRule extends SaropaLintRule {
     name: 'always_remove_getx_listener',
     problemMessage:
         '[always_remove_getx_listener] GetX worker is not assigned to a variable for cleanup. '
-        'This will cause a memory leak.',
+        'This will cause a memory leak. {v2}',
     correctionMessage:
         'Assign the worker to a variable and call dispose() in onClose().',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -1321,6 +1346,8 @@ class AlwaysRemoveGetxListenerRule extends SaropaLintRule {
 }
 
 /// Warns when .obs is used inside build() method.
+///
+/// Since: v2.0.0 | Updated: v4.13.0 | Rule version: v4
 ///
 /// Creating reactive variables in build() causes memory leaks and
 /// unnecessary rebuilds.
@@ -1357,7 +1384,7 @@ class AvoidGetxRxInsideBuildRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_getx_rx_inside_build',
     problemMessage:
-        '[avoid_getx_rx_inside_build] Creating .obs reactive variables inside build() allocates a new Rx instance on every rebuild. Each instance leaks because it is never disposed, and the widget observes a fresh variable each time, losing all previous state and accumulating orphaned subscriptions.',
+        '[avoid_getx_rx_inside_build] Creating .obs reactive variables inside build() allocates a new Rx instance on every rebuild. Each instance leaks because it is never disposed, and the widget observes a fresh variable each time, losing all previous state and accumulating orphaned subscriptions. {v4}',
     correctionMessage:
         'Move reactive .obs variables into a GetxController and access them via GetBuilder or Obx to preserve state across rebuilds.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -1403,6 +1430,8 @@ class _ObsVisitor extends RecursiveAstVisitor<void> {
 
 /// Warns when Rx variables are reassigned instead of updated.
 ///
+/// Since: v2.0.0 | Updated: v4.13.0 | Rule version: v4
+///
 /// Reassigning Rx variables breaks the reactive chain.
 ///
 /// **BAD:**
@@ -1427,7 +1456,7 @@ class AvoidMutableRxVariablesRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_mutable_rx_variables',
     problemMessage:
-        '[avoid_mutable_rx_variables] Reassigning an Rx variable with = replaces the entire reactive wrapper, breaking all existing Obx listeners that still reference the old instance. The build method stops receiving updates because child widgets observe a stale object, leading to a frozen interface that appears unresponsive.',
+        '[avoid_mutable_rx_variables] Reassigning an Rx variable with = replaces the entire reactive wrapper, breaking all existing Obx listeners that still reference the old instance. The build method stops receiving updates because child widgets observe a stale object, leading to a frozen interface that appears unresponsive. {v4}',
     correctionMessage:
         'Use .value = or callable syntax to update the Rx variable without replacing the reactive wrapper that Obx listeners depend on.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -1471,6 +1500,8 @@ class AvoidMutableRxVariablesRule extends SaropaLintRule {
 }
 
 /// Warns when GetxController has Worker fields that are not disposed.
+///
+/// Since: v2.0.0 | Updated: v4.13.0 | Rule version: v2
 ///
 /// Workers created with ever(), once(), debounce(), etc. must be stored
 /// and disposed in onClose() to prevent memory leaks.
@@ -1523,7 +1554,7 @@ class DisposeGetxFieldsRule extends SaropaLintRule {
     name: 'dispose_getx_fields',
     problemMessage:
         '[dispose_getx_fields] Undisposed Worker keeps timer running after '
-        'GetxController closes, causing memory leaks and stale updates.',
+        'GetxController closes, causing memory leaks and stale updates. {v2}',
     correctionMessage: 'Call dispose() on Worker fields in onClose().',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
@@ -1608,6 +1639,8 @@ class _DisposeVisitor extends RecursiveAstVisitor<void> {
 
 /// Warns when .obs property is accessed without Obx wrapper.
 ///
+/// Since: v2.1.0 | Updated: v4.13.0 | Rule version: v2
+///
 /// GetX reactive variables (.obs) must be inside Obx/GetX builder
 /// to trigger rebuilds. Direct access won't update the UI.
 ///
@@ -1637,7 +1670,7 @@ class PreferGetxBuilderRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_getx_builder',
     problemMessage:
-        '[prefer_getx_builder] .obs value accessed outside Obx or GetX builder. The UI will display stale data because reactive variable changes are silently ignored without an observable wrapper that triggers widget rebuilds.',
+        '[prefer_getx_builder] .obs value accessed outside Obx or GetX builder. The UI will display stale data because reactive variable changes are silently ignored without an observable wrapper that triggers widget rebuilds. {v2}',
     correctionMessage:
         'Wrap in Obx(() => ..) to enable reactive updates. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -1698,6 +1731,8 @@ class PreferGetxBuilderRule extends SaropaLintRule {
 
 /// Warns when GetxController is used without proper Binding registration.
 ///
+/// Since: v2.1.0 | Updated: v4.13.0 | Rule version: v2
+///
 /// GetX controllers should be registered via Bindings for proper
 /// lifecycle management and dependency injection.
 ///
@@ -1736,7 +1771,7 @@ class RequireGetxBindingRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_getx_binding',
     problemMessage:
-        '[require_getx_binding] Get.put() in widget. Use Bindings for lifecycle management. GetX controllers must be registered via Bindings for proper lifecycle management and dependency injection.',
+        '[require_getx_binding] Get.put() in widget. Use Bindings for lifecycle management. GetX controllers must be registered via Bindings for proper lifecycle management and dependency injection. {v2}',
     correctionMessage:
         'Create a Binding class and register via GetPage binding parameter. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -1769,6 +1804,8 @@ class RequireGetxBindingRule extends SaropaLintRule {
 }
 
 /// Warns when GetX global state is used instead of reactive state.
+///
+/// Since: v2.5.0 | Updated: v4.13.0 | Rule version: v2
 ///
 /// Alias: getx_global, getx_reactive, avoid_get_put
 ///
@@ -1811,7 +1848,7 @@ class AvoidGetxGlobalStateRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_getx_global_state',
     problemMessage:
-        '[avoid_getx_global_state] Global GetX state (Get.put/Get.find) makes testing difficult. Using Get.put() for global state makes testing difficult and creates implicit dependencies. Prefer reactive state with GetBuilder.',
+        '[avoid_getx_global_state] Global GetX state (Get.put/Get.find) makes testing difficult. Using Get.put() for global state makes testing difficult and creates implicit dependencies. Prefer reactive state with GetBuilder. {v2}',
     correctionMessage:
         'Use GetBuilder with init: parameter, or inject controller via constructor. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -1852,6 +1889,8 @@ class AvoidGetxGlobalStateRule extends SaropaLintRule {
 
 /// Warns when GetX static context methods are used.
 ///
+/// Since: v4.1.8 | Updated: v4.13.0 | Rule version: v2
+///
 /// `[HEURISTIC]` - Detects Get.offNamed, Get.dialog, etc.
 ///
 /// Get.offNamed and Get.dialog use static context internally which
@@ -1887,7 +1926,7 @@ class AvoidGetxStaticContextRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_getx_static_context',
     problemMessage:
-        '[avoid_getx_static_context] GetX static context method used. Hard to unit test. Get.offNamed and Get.dialog use static context internally which cannot be unit tested. Prefer abstraction for testability.',
+        '[avoid_getx_static_context] GetX static context method used. Hard to unit test. Get.offNamed and Get.dialog use static context internally which cannot be unit tested. Prefer abstraction for testability. {v2}',
     correctionMessage:
         'Wrap GetX navigation in a service class for testability. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -1925,6 +1964,8 @@ class AvoidGetxStaticContextRule extends SaropaLintRule {
 }
 
 /// Warns when GetX is used excessively throughout a file.
+///
+/// Since: v4.1.8 | Updated: v4.13.0 | Rule version: v2
 ///
 /// `[HEURISTIC]` - Counts Get.* usages in a file.
 ///
@@ -1964,7 +2005,7 @@ class AvoidTightCouplingWithGetxRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_tight_coupling_with_getx',
     problemMessage:
-        '[avoid_tight_coupling_with_getx] Class with 5+ GetX usages becomes tightly coupled and difficult to unit test. Using GetX for everything leads to tight coupling and hard-to-test code. Use only necessary features.',
+        '[avoid_tight_coupling_with_getx] Class with 5+ GetX usages becomes tightly coupled and difficult to unit test. Using GetX for everything leads to tight coupling and hard-to-test code. Use only necessary features. {v2}',
     correctionMessage:
         'Use direct dependency injection for core logic. Reserve GetX for UI bindings. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -2008,6 +2049,9 @@ class AvoidTightCouplingWithGetxRule extends SaropaLintRule {
 // =============================================================================
 
 /// Warns when Get.find() is used for dependency lookup instead of
+///
+/// Since: v4.12.0 | Updated: v4.13.0 | Rule version: v2
+///
 /// constructor injection.
 ///
 /// Get.find() is a service locator pattern that creates hidden dependencies,
@@ -2047,7 +2091,7 @@ class AvoidGetxStaticGetRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_getx_static_get',
     problemMessage:
-        '[avoid_getx_static_get] Get.find<T>() is a static service locator call that creates a hidden dependency on the global GetX container. This pattern makes the class impossible to unit test in isolation because there is no way to substitute a mock without initializing the full GetX dependency graph. It also obscures the true dependency count of the class, making it harder to detect god-object violations and architectural boundary breaches.',
+        '[avoid_getx_static_get] Get.find<T>() is a static service locator call that creates a hidden dependency on the global GetX container. This pattern makes the class impossible to unit test in isolation because there is no way to substitute a mock without initializing the full GetX dependency graph. It also obscures the true dependency count of the class, making it harder to detect god-object violations and architectural boundary breaches. {v2}',
     correctionMessage:
         'Accept the dependency as a constructor parameter instead of looking it up with Get.find(). This makes the dependency explicit, testable, and visible to static analysis.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -2108,6 +2152,8 @@ class _AddGetxConstructorInjectionCommentFix extends DartFix {
 
 /// Warns when Get.context is used to bypass Flutter's BuildContext mechanism.
 ///
+/// Since: v4.14.0 | Updated: vunreleased | Rule version: v2
+///
 /// Alias: getx_context_bypass, no_get_context
 ///
 /// Using Get.context bypasses Flutter's widget tree context propagation,
@@ -2149,7 +2195,7 @@ class AvoidGetxBuildContextBypassRule extends SaropaLintRule {
         'dependencies, makes code untestable without GetX runtime, and '
         'circumvents Flutter\'s fundamental context-based service location '
         'pattern. The retrieved context may be stale or from an unexpected '
-        'part of the widget tree, causing subtle bugs.',
+        'part of the widget tree, causing subtle bugs. {v2}',
     correctionMessage:
         'Pass BuildContext explicitly as a parameter to the method, or use '
         'GetX navigation methods (Get.to, Get.snackbar) that manage context '

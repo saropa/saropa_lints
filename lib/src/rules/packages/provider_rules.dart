@@ -24,6 +24,8 @@ import '../../saropa_lint_rule.dart';
 
 /// Warns when Provider is watched unnecessarily in callbacks.
 ///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v4
+///
 /// Using watch in callbacks causes unnecessary rebuilds.
 ///
 /// **BAD:**
@@ -52,7 +54,7 @@ class AvoidWatchInCallbacksRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_watch_in_callbacks',
     problemMessage:
-        '[avoid_watch_in_callbacks] Using watch in callbacks (like onPressed or onTap) creates new subscriptions on every call, leading to memory leaks, redundant widget rebuilds, and degraded app performance. This can cause your app to slow down or even crash over time.',
+        '[avoid_watch_in_callbacks] Using watch in callbacks (like onPressed or onTap) creates new subscriptions on every call, leading to memory leaks, redundant widget rebuilds, and degraded app performance. This can cause your app to slow down or even crash over time. {v4}',
     correctionMessage:
         'Use ref.read instead of ref.watch in event handlers and callbacks to avoid creating unnecessary subscriptions and prevent memory leaks.',
     errorSeverity: DiagnosticSeverity.ERROR,
@@ -84,6 +86,8 @@ class AvoidWatchInCallbacksRule extends SaropaLintRule {
 }
 
 /// Warns when InheritedWidget is used without updateShouldNotify.
+///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v5
 ///
 /// Missing updateShouldNotify causes unnecessary rebuilds.
 ///
@@ -117,7 +121,7 @@ class RequireUpdateShouldNotifyRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_update_should_notify',
     problemMessage:
-        '[require_update_should_notify] If an InheritedWidget does not override updateShouldNotify, all dependents rebuild on every change, causing unnecessary rebuilds, degraded performance, and battery drain. This can make your app slow and unresponsive.',
+        '[require_update_should_notify] If an InheritedWidget does not override updateShouldNotify, all dependents rebuild on every change, causing unnecessary rebuilds, degraded performance, and battery drain. This can make your app slow and unresponsive. {v5}',
     correctionMessage:
         'Override updateShouldNotify in your InheritedWidget to control when dependents rebuild and optimize app performance.',
     errorSeverity: DiagnosticSeverity.ERROR,
@@ -159,6 +163,8 @@ class RequireUpdateShouldNotifyRule extends SaropaLintRule {
 }
 
 /// Warns when Provider.of is used inside build() without listen: false.
+///
+/// Since: v1.5.0 | Updated: v4.13.0 | Rule version: v3
 ///
 /// Using Provider.of(context) in build() with listen: true (default) causes
 /// the widget to rebuild whenever the provider changes. If you only need
@@ -206,7 +212,7 @@ class AvoidProviderOfInBuildRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_provider_of_in_build',
     problemMessage:
-        '[avoid_provider_of_in_build] Using Provider.of in build() causes the widget to rebuild every time the provider changes, which can lead to performance issues and unnecessary UI updates. This can make your app less efficient and harder to maintain.',
+        '[avoid_provider_of_in_build] Using Provider.of in build() causes the widget to rebuild every time the provider changes, which can lead to performance issues and unnecessary UI updates. This can make your app less efficient and harder to maintain. {v3}',
     correctionMessage:
         'Use context.watch() for reactive UI updates, or context.read() in callbacks (like onPressed) to avoid unnecessary rebuilds and improve performance.',
     errorSeverity: DiagnosticSeverity.ERROR,
@@ -267,6 +273,8 @@ class _ProviderOfVisitor extends RecursiveAstVisitor<void> {
 
 /// Warns when ChangeNotifier or Provider is created inside build().
 ///
+/// Since: v1.5.0 | Updated: v4.13.0 | Rule version: v3
+///
 /// Creating providers inside build() creates new instances on every rebuild,
 /// losing state and causing performance issues. Providers should be created
 /// once and reused.
@@ -309,7 +317,7 @@ class AvoidProviderRecreateRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_provider_recreate',
     problemMessage:
-        '[avoid_provider_recreate] Creating a Provider inside a frequently rebuilding build() method causes the provider to be recreated, losing its state and causing unexpected behavior. This can result in lost user input, bugs, and degraded app performance.',
+        '[avoid_provider_recreate] Creating a Provider inside a frequently rebuilding build() method causes the provider to be recreated, losing its state and causing unexpected behavior. This can result in lost user input, bugs, and degraded app performance. {v3}',
     correctionMessage:
         'Move Provider creation to a parent widget that does not rebuild often to preserve provider state and ensure consistent behavior.',
     errorSeverity: DiagnosticSeverity.ERROR,
@@ -369,6 +377,8 @@ class _ProviderRecreateVisitor extends RecursiveAstVisitor<void> {
 
 /// Warns when Riverpod provider is declared inside a widget class.
 ///
+/// Since: v1.7.2 | Updated: v4.13.0 | Rule version: v2
+///
 /// Declaring providers inside widget classes makes them instance-specific
 /// and breaks Riverpod's global state model. Providers should be declared
 /// at file level as top-level variables.
@@ -410,7 +420,7 @@ class AvoidProviderInWidgetRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_provider_in_widget',
     problemMessage:
-        '[avoid_provider_in_widget] Declaring a provider inside a widget class breaks Riverpod\'s global state model, leading to multiple provider instances, lost state, and unpredictable bugs. This can make your app behave inconsistently and is hard to debug.',
+        '[avoid_provider_in_widget] Declaring a provider inside a widget class breaks Riverpod\'s global state model, leading to multiple provider instances, lost state, and unpredictable bugs. This can make your app behave inconsistently and is hard to debug. {v2}',
     correctionMessage:
         'Move provider declaration to the file level as a top-level final variable to ensure a single, consistent provider instance.',
     errorSeverity: DiagnosticSeverity.ERROR,
@@ -468,6 +478,8 @@ class AvoidProviderInWidgetRule extends SaropaLintRule {
 
 /// Warns when ChangeNotifier is created inside build().
 ///
+/// Since: v1.7.2 | Updated: v4.13.0 | Rule version: v5
+///
 /// Creating ChangeNotifier in build() creates new instances on every rebuild,
 /// losing state and causing memory leaks. Create in provider or StatefulWidget.
 ///
@@ -512,7 +524,7 @@ class AvoidChangeNotifierInWidgetRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_change_notifier_in_widget',
     problemMessage:
-        '[avoid_change_notifier_in_widget] ChangeNotifier created inside build() is re-instantiated on every widget rebuild, losing all accumulated state and listener registrations. This causes flickering UI, lost user input, and wasted allocations that trigger unnecessary garbage collection.',
+        '[avoid_change_notifier_in_widget] ChangeNotifier created inside build() is re-instantiated on every widget rebuild, losing all accumulated state and listener registrations. This causes flickering UI, lost user input, and wasted allocations that trigger unnecessary garbage collection. {v5}',
     correctionMessage:
         'Create the ChangeNotifier in a ChangeNotifierProvider or in StatefulWidget.initState() to preserve state across rebuilds and ensure proper disposal.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -572,6 +584,8 @@ class AvoidChangeNotifierInWidgetRule extends SaropaLintRule {
 
 /// Warns when ChangeNotifierProvider is used without dispose callback.
 ///
+/// Since: v1.7.2 | Updated: v4.13.0 | Rule version: v4
+///
 /// ChangeNotifier and other resources must be disposed. Use create with
 /// dispose callback, or ChangeNotifierProvider which auto-disposes.
 ///
@@ -613,7 +627,7 @@ class RequireProviderDisposeRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_provider_dispose',
     problemMessage:
-        '[require_provider_dispose] Provider creating a ChangeNotifier without a dispose callback leaks listener registrations and memory. Over time, leaked notifiers accumulate stale listeners that fire after the StatefulWidget is removed from the tree, causing setState-after-dispose errors and increasing memory pressure.',
+        '[require_provider_dispose] Provider creating a ChangeNotifier without a dispose callback leaks listener registrations and memory. Over time, leaked notifiers accumulate stale listeners that fire after the StatefulWidget is removed from the tree, causing setState-after-dispose errors and increasing memory pressure. {v4}',
     correctionMessage:
         'Use ChangeNotifierProvider (auto-disposes) or add a dispose callback that calls notifier.dispose() to release all listener registrations.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -664,6 +678,9 @@ class RequireProviderDisposeRule extends SaropaLintRule {
 }
 
 /// Warns when Provider package uses nested Provider widgets instead of
+///
+/// Since: v1.7.8 | Updated: v4.13.0 | Rule version: v2
+///
 /// MultiProvider.
 ///
 /// Nested Provider widgets create deep indentation. MultiProvider flattens
@@ -709,7 +726,7 @@ class RequireMultiProviderRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_multi_provider',
     problemMessage:
-        '[require_multi_provider] Nested Provider widgets. Use MultiProvider to improve readability. Nested Provider widgets create deep indentation. MultiProvider flattens the tree and is easier to read and maintain.',
+        '[require_multi_provider] Nested Provider widgets. Use MultiProvider to improve readability. Nested Provider widgets create deep indentation. MultiProvider flattens the tree and is easier to read and maintain. {v2}',
     correctionMessage:
         'Replace nested Providers with MultiProvider(providers: [..], child: ..). Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -766,6 +783,8 @@ class RequireMultiProviderRule extends SaropaLintRule {
 
 /// Warns when Provider widgets are deeply nested.
 ///
+/// Since: v1.7.8 | Updated: v4.13.0 | Rule version: v4
+///
 /// Deeply nested provider trees are hard to reason about and maintain.
 /// Flatten with MultiProvider and avoid provider-in-provider patterns
 /// where possible.
@@ -808,7 +827,7 @@ class AvoidNestedProvidersRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_nested_providers',
     problemMessage:
-        '[avoid_nested_providers] Provider created inside Consumer or builder callback. Deeply nested provider trees are hard to reason about and maintain. Flatten with MultiProvider and avoid provider-in-provider patterns where possible.',
+        '[avoid_nested_providers] Provider created inside Consumer or builder callback. Deeply nested provider trees are hard to reason about and maintain. Flatten with MultiProvider and avoid provider-in-provider patterns where possible. {v4}',
     correctionMessage:
         'Use ProxyProvider or move provider to MultiProvider at tree root. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -897,6 +916,8 @@ class AvoidNestedProvidersRule extends SaropaLintRule {
 
 /// Warns when nested `Provider` widgets are used.
 ///
+/// Since: v2.0.0 | Updated: v4.13.0 | Rule version: v2
+///
 /// Use `MultiProvider` when providing multiple objects to reduce nesting
 /// and improve readability.
 ///
@@ -937,7 +958,7 @@ class PreferMultiProviderRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_multi_provider',
     problemMessage:
-        '[prefer_multi_provider] Nested Providers should use MultiProvider instead. Use MultiProvider when providing multiple objects to reduce nesting and improve readability. Nested Provider widgets are used.',
+        '[prefer_multi_provider] Nested Providers should use MultiProvider instead. Use MultiProvider when providing multiple objects to reduce nesting and improve readability. Nested Provider widgets are used. {v2}',
     correctionMessage:
         'Combine into MultiProvider(providers: [..], child: ..). Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -987,6 +1008,8 @@ class PreferMultiProviderRule extends SaropaLintRule {
 
 /// Warns when `Provider.value` receives a newly created instance.
 ///
+/// Since: v2.0.0 | Updated: v4.13.0 | Rule version: v2
+///
 /// `Provider.value` should only receive existing instances.
 /// Creating a new instance in the value parameter will not properly manage
 /// the instance's lifecycle.
@@ -1027,7 +1050,7 @@ class AvoidInstantiatingInValueProviderRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_instantiating_in_value_provider',
     problemMessage:
-        '[avoid_instantiating_in_value_provider] Creating a new instance inside Provider.value prevents proper lifecycle management, leading to memory leaks, resource retention, and unpredictable behavior. This is a critical issue for stateful objects like ChangeNotifiers and ValueListenables.',
+        '[avoid_instantiating_in_value_provider] Creating a new instance inside Provider.value prevents proper lifecycle management, leading to memory leaks, resource retention, and unpredictable behavior. This is a critical issue for stateful objects like ChangeNotifiers and ValueListenables. {v2}',
     correctionMessage:
         'Always use Provider(create: ...) to create new instances, or pass an existing instance variable to Provider.value. Never instantiate objects directly inside Provider.value.',
     errorSeverity: DiagnosticSeverity.ERROR,
@@ -1071,6 +1094,8 @@ class AvoidInstantiatingInValueProviderRule extends SaropaLintRule {
 
 /// Warns when `Provider` lacks a dispose callback for disposable instances.
 ///
+/// Since: v4.1.3 | Updated: v4.13.0 | Rule version: v4
+///
 /// When providing disposable resources like controllers or services,
 /// always provide a dispose callback to prevent memory leaks.
 ///
@@ -1109,7 +1134,7 @@ class DisposeProvidersRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'dispose_provider_instances',
     problemMessage:
-        '[dispose_provider_instances] Provider creating a disposable instance without a dispose callback leaks stream subscriptions and controllers. These undisposed resources accumulate across navigation, increasing memory usage and leaving background listeners that fire after the parent StatefulWidget is removed from the tree.',
+        '[dispose_provider_instances] Provider creating a disposable instance without a dispose callback leaks stream subscriptions and controllers. These undisposed resources accumulate across navigation, increasing memory usage and leaving background listeners that fire after the parent StatefulWidget is removed from the tree. {v4}',
     correctionMessage:
         'Add dispose: (_, instance) => instance.dispose() to the Provider constructor to release stream subscriptions and controllers on removal.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -1154,6 +1179,8 @@ class DisposeProvidersRule extends SaropaLintRule {
 
 /// Warns when long Provider access chains are used.
 ///
+/// Since: v2.0.0 | Updated: v4.13.0 | Rule version: v2
+///
 /// Long chains like `context.read<A>().read<B>().value` are hard to read.
 /// Consider using extension methods.
 ///
@@ -1184,7 +1211,7 @@ class PreferProviderExtensionsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_provider_extensions',
     problemMessage:
-        '[prefer_provider_extensions] Long provider access chain is hard to read. Long chains like context.read<A>().read<B>().value are hard to read. Use extension methods.',
+        '[prefer_provider_extensions] Long provider access chain is hard to read. Long chains like context.read<A>().read<B>().value are hard to read. Use extension methods. {v2}',
     correctionMessage:
         'Use an extension method. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -1217,6 +1244,8 @@ class PreferProviderExtensionsRule extends SaropaLintRule {
 }
 
 /// Warns when Provider.create returns a disposable instance without dispose callback.
+///
+/// Since: v2.0.0 | Updated: v4.13.0 | Rule version: v4
 ///
 /// When a Provider creates an instance that has a dispose() method, it should
 /// also provide a dispose callback to clean up the instance.
@@ -1252,7 +1281,7 @@ class DisposeProvidedInstancesRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'dispose_provided_instances',
     problemMessage:
-        '[dispose_provided_instances] Provider creates a disposable instance without a dispose callback, causing memory leaks. Undisposed stream subscriptions and controllers persist after the parent StatefulWidget is removed from the tree, continuing to hold resources and fire callbacks that trigger setState-after-dispose errors.',
+        '[dispose_provided_instances] Provider creates a disposable instance without a dispose callback, causing memory leaks. Undisposed stream subscriptions and controllers persist after the parent StatefulWidget is removed from the tree, continuing to hold resources and fire callbacks that trigger setState-after-dispose errors. {v4}',
     correctionMessage:
         'Add dispose: (_, instance) => instance.dispose() to the Provider constructor to release stream subscriptions and controllers on removal.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -1320,6 +1349,8 @@ class DisposeProvidedInstancesRule extends SaropaLintRule {
 
 /// Warns when Provider type parameter is non-nullable but create returns null.
 ///
+/// Since: v2.0.0 | Updated: v4.13.0 | Rule version: v2
+///
 /// When a Provider's create callback explicitly returns null, the type
 /// parameter should be nullable to prevent runtime errors.
 ///
@@ -1354,7 +1385,7 @@ class PreferNullableProviderTypesRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_nullable_provider_types',
     problemMessage:
-        '[prefer_nullable_provider_types] Provider type is non-nullable but create may return null. When a Provider\'s create callback explicitly returns null, the type parameter must be nullable to prevent runtime errors.',
+        '[prefer_nullable_provider_types] Provider type is non-nullable but create may return null. When a Provider\'s create callback explicitly returns null, the type parameter must be nullable to prevent runtime errors. {v2}',
     correctionMessage:
         'Use nullable type parameter: Provider<Type?>. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -1418,6 +1449,8 @@ class _NullReturnVisitor extends RecursiveAstVisitor<void> {
 
 /// Warns when `Provider.of<T>(context)` is used in build method.
 ///
+/// Since: v2.1.0 | Updated: v4.13.0 | Rule version: v2
+///
 /// Provider.of rebuilds on every change. Use Consumer or context.watch
 /// for more granular rebuilds.
 ///
@@ -1453,7 +1486,7 @@ class PreferConsumerOverProviderOfRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_consumer_over_provider_of',
     problemMessage:
-        '[prefer_consumer_over_provider_of] Provider.of in build. Use Consumer for granular rebuilds. Provider.of<T>(context) is used in build method. This pattern increases maintenance cost and the likelihood of introducing bugs during future changes.',
+        '[prefer_consumer_over_provider_of] Provider.of in build. Use Consumer for granular rebuilds. Provider.of<T>(context) is used in build method. This pattern increases maintenance cost and the likelihood of introducing bugs during future changes. {v2}',
     correctionMessage:
         'Replace with Consumer<T> or context.select() to improve performance. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -1486,6 +1519,8 @@ class PreferConsumerOverProviderOfRule extends SaropaLintRule {
 
 /// Warns when Provider.of is used without a generic type parameter.
 ///
+/// Since: v4.13.0 | Rule version: v1
+///
 /// Alias: provider_missing_type, provider_generic_required
 ///
 /// Provider.of without a type parameter returns dynamic, losing type safety.
@@ -1517,7 +1552,7 @@ class RequireProviderGenericTypeRule extends SaropaLintRule {
     name: 'require_provider_generic_type',
     problemMessage:
         '[require_provider_generic_type] Missing generic type causes runtime '
-        'cast errors when Provider returns dynamic instead of expected type.',
+        'cast errors when Provider returns dynamic instead of expected type. {v1}',
     correctionMessage: 'Add <Type> to Provider.of<Type>(context).',
     errorSeverity: DiagnosticSeverity.ERROR,
   );
@@ -1545,6 +1580,8 @@ class RequireProviderGenericTypeRule extends SaropaLintRule {
 }
 
 /// Warns when Provider.of or context.read/watch is used in initState.
+///
+/// Since: v2.3.0 | Updated: v4.13.0 | Rule version: v4
 ///
 /// Alias: provider_in_init_state, read_in_init_state
 ///
@@ -1583,7 +1620,7 @@ class AvoidProviderInInitStateRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_provider_in_init_state',
     problemMessage:
-        '[avoid_provider_in_init_state] Accessing Provider in initState() may fail because the widget context is not fully mounted in the element tree. This can throw a ProviderNotFoundException or return stale data, causing initialization logic to operate on incorrect values or crash on first render.',
+        '[avoid_provider_in_init_state] Accessing Provider in initState() may fail because the widget context is not fully mounted in the element tree. This can throw a ProviderNotFoundException or return stale data, causing initialization logic to operate on incorrect values or crash on first render. {v4}',
     correctionMessage:
         'Move Provider access to didChangeDependencies() where the BuildContext is fully mounted and InheritedWidget lookups are safe.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -1632,6 +1669,8 @@ class AvoidProviderInInitStateRule extends SaropaLintRule {
 
 /// Suggests using context.read instead of context.watch in callbacks.
 ///
+/// Since: v2.3.0 | Updated: v4.13.0 | Rule version: v2
+///
 /// Alias: watch_in_callbacks, read_for_callbacks
 ///
 /// Using context.watch in button callbacks or event handlers will cause
@@ -1668,7 +1707,7 @@ class PreferContextReadInCallbacksRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_context_read_in_callbacks',
     problemMessage:
-        '[prefer_context_read_in_callbacks] context.watch must not be used in callbacks. Using context.watch in button callbacks or event handlers will cause unnecessary rebuilds. Use context.read for one-time access in callbacks.',
+        '[prefer_context_read_in_callbacks] context.watch must not be used in callbacks. Using context.watch in button callbacks or event handlers will cause unnecessary rebuilds. Use context.read for one-time access in callbacks. {v2}',
     correctionMessage:
         'Use context.read instead for one-time access. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -1729,6 +1768,8 @@ class PreferContextReadInCallbacksRule extends SaropaLintRule {
 
 /// Warns when Provider depends on another provider but doesn't use ProxyProvider.
 ///
+/// Since: v2.3.7 | Updated: v4.13.0 | Rule version: v2
+///
 /// When a Provider needs to depend on another provider's value, using a plain
 /// Provider with context.read() or context.watch() is fragile and error-prone.
 /// ProxyProvider ensures proper dependency tracking and rebuild behavior.
@@ -1766,7 +1807,7 @@ class PreferProxyProviderRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_proxy_provider',
     problemMessage:
-        '[prefer_proxy_provider] Provider.create() accesses other providers. Use ProxyProvider instead. When a Provider needs to depend on another provider\'s value, using a plain Provider with context.read() or context.watch() is fragile and error-prone. ProxyProvider ensures proper dependency tracking and rebuild behavior.',
+        '[prefer_proxy_provider] Provider.create() accesses other providers. Use ProxyProvider instead. When a Provider needs to depend on another provider\'s value, using a plain Provider with context.read() or context.watch() is fragile and error-prone. ProxyProvider ensures proper dependency tracking and rebuild behavior. {v2}',
     correctionMessage:
         'Use ProxyProvider, ProxyProvider2, etc. to properly declare provider dependencies.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -1847,6 +1888,8 @@ class _ProxyProviderAccessVisitor extends RecursiveAstVisitor<void> {
 
 /// Warns when ProxyProvider doesn't properly handle the update callback.
 ///
+/// Since: v2.3.7 | Updated: v4.13.0 | Rule version: v2
+///
 /// ProxyProvider.update is called whenever a dependency changes. If the
 /// callback doesn't properly handle the `previous` parameter, it may
 /// cause memory leaks or miss important cleanup logic.
@@ -1891,7 +1934,7 @@ class RequireUpdateCallbackRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_update_callback',
     problemMessage:
-        '[require_update_callback] ProxyProvider.update ignores the previous value. This may cause resource leaks. ProxyProvider.update is called whenever a dependency changes. If the callback doesn\'t properly handle the previous parameter, it may cause memory leaks or miss important cleanup logic.',
+        '[require_update_callback] ProxyProvider.update ignores the previous value. This may cause resource leaks. ProxyProvider.update is called whenever a dependency changes. If the callback doesn\'t properly handle the previous parameter, it may cause memory leaks or miss important cleanup logic. {v2}',
     correctionMessage:
         'Handle the previous parameter to dispose resources or reuse the existing instance.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -1995,6 +2038,8 @@ class _UpdateCallbackParameterUsageVisitor extends RecursiveAstVisitor<void> {
 
 /// Suggests using Selector instead of Consumer for granular rebuilds.
 ///
+/// Since: v2.3.7 | Updated: v4.13.0 | Rule version: v3
+///
 /// Consumer rebuilds on any change to the provider. Selector only rebuilds
 /// when the selected value changes, providing more granular control.
 ///
@@ -2037,7 +2082,7 @@ class PreferSelectorOverConsumerRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_selector_over_consumer',
     problemMessage:
-        '[prefer_selector_over_consumer] Consumer accessing single property. Use Selector for granular rebuilds. Consumer rebuilds on any change to the provider. Selector only rebuilds when the selected value changes, providing more granular control.',
+        '[prefer_selector_over_consumer] Consumer accessing single property. Use Selector for granular rebuilds. Consumer rebuilds on any change to the provider. Selector only rebuilds when the selected value changes, providing more granular control. {v3}',
     correctionMessage:
         'Use Selector widget or ref.watch(provider.select(..)) for efficiency. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -2089,6 +2134,8 @@ class PreferSelectorOverConsumerRule extends SaropaLintRule {
 
 /// Warns when Provider.value is used with inline notifier creation.
 ///
+/// Since: v2.3.10 | Updated: v4.13.0 | Rule version: v6
+///
 /// Alias: provider_value_inline, notifier_in_provider_value
 ///
 /// Provider.value should only be used with existing notifiers. Creating
@@ -2134,7 +2181,7 @@ class AvoidProviderValueRebuildRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_provider_value_rebuild',
     problemMessage:
-        '[avoid_provider_value_rebuild] Provider.value with inline object creation recreates the notifier on every widget build. This discards accumulated user data, resets form state, and can trigger infinite rebuild loops that freeze the UI as each rebuild creates a new instance that triggers another rebuild.',
+        '[avoid_provider_value_rebuild] Provider.value with inline object creation recreates the notifier on every widget build. This discards accumulated user data, resets form state, and can trigger infinite rebuild loops that freeze the UI as each rebuild creates a new instance that triggers another rebuild. {v6}',
     correctionMessage:
         'Store the notifier instance in a variable and reuse it with Provider.value, or use the Provider constructor to create and manage the instance lifecycle automatically.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -2175,6 +2222,8 @@ class AvoidProviderValueRebuildRule extends SaropaLintRule {
 
 /// Warns when Provider.of is used without listen: false in non-build contexts.
 ///
+/// Since: v2.5.0 | Updated: v4.13.0 | Rule version: v2
+///
 /// Alias: provider_of_listen, change_notifier_proxy, provider_proxy
 ///
 /// Using Provider.of without listen: false outside build() causes unnecessary
@@ -2213,7 +2262,7 @@ class PreferChangeNotifierProxyRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_change_notifier_proxy',
     problemMessage:
-        '[prefer_change_notifier_proxy] Provider.of without listen:false in callback. Use context.read() or add listen: false. This pattern increases maintenance cost and the likelihood of introducing bugs during future changes.',
+        '[prefer_change_notifier_proxy] Provider.of without listen:false in callback. Use context.read() or add listen: false. This pattern increases maintenance cost and the likelihood of introducing bugs during future changes. {v2}',
     correctionMessage:
         'Add listen: false parameter, or use context.read<T>() for one-time reads. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -2305,6 +2354,8 @@ class PreferChangeNotifierProxyRule extends SaropaLintRule {
 
 /// Warns when Consumer/Selector rebuilds entire subtree unnecessarily.
 ///
+/// Since: v2.5.0 | Updated: v4.13.0 | Rule version: v2
+///
 /// Alias: selector_widget, consumer_selector, provider_selector
 ///
 /// Using Consumer to rebuild an entire widget tree when only part needs
@@ -2353,7 +2404,7 @@ class PreferSelectorWidgetRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_selector_widget',
     problemMessage:
-        '[prefer_selector_widget] Consumer rebuilds entire subtree. Prefer Selector for targeted rebuilds. Using Consumer to rebuild an entire widget tree when only part needs updating is wasteful. Use Selector to rebuild only what changed.',
+        '[prefer_selector_widget] Consumer rebuilds entire subtree. Prefer Selector for targeted rebuilds. Using Consumer to rebuild an entire widget tree when only part needs updating is wasteful. Use Selector to rebuild only what changed. {v2}',
     correctionMessage:
         'Use Selector<Model, T> to rebuild only widgets that depend on specific values. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -2423,6 +2474,8 @@ class PreferSelectorWidgetRule extends SaropaLintRule {
 
 /// Warns when ChangeNotifierProvider update accesses another provider directly.
 ///
+/// Since: v4.1.4 | Updated: v4.13.0 | Rule version: v2
+///
 /// Use ChangeNotifierProxyProvider when a ChangeNotifier depends on another
 /// provider's value to avoid stale data and proper dependency management.
 ///
@@ -2456,7 +2509,7 @@ class PreferChangeNotifierProxyProviderRule extends SaropaLintRule {
     name: 'prefer_change_notifier_proxy_provider',
     problemMessage:
         '[prefer_change_notifier_proxy_provider] ChangeNotifierProvider.create '
-        'accesses another provider. Use ChangeNotifierProxyProvider instead.',
+        'accesses another provider. Use ChangeNotifierProxyProvider instead. {v2}',
     correctionMessage:
         'Use ChangeNotifierProxyProvider for proper dependency tracking.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -2498,6 +2551,9 @@ class PreferChangeNotifierProxyProviderRule extends SaropaLintRule {
 // =============================================================================
 
 /// Warns when Provider.of(context, listen: false) is used inside a build()
+///
+/// Since: v4.12.0 | Updated: v4.13.0 | Rule version: v2
+///
 /// method.
 ///
 /// Using listen: false in build means the widget will not rebuild when the
@@ -2533,7 +2589,7 @@ class AvoidProviderListenFalseInBuildRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_provider_listen_false_in_build',
     problemMessage:
-        '[avoid_provider_listen_false_in_build] Provider.of() is called with listen: false inside a build() method. This prevents the widget from rebuilding when the provided value changes, causing the UI to display stale data that does not reflect the current application state. Users see outdated information until something else triggers a rebuild, creating confusing and inconsistent UI behavior that is difficult to debug.',
+        '[avoid_provider_listen_false_in_build] Provider.of() is called with listen: false inside a build() method. This prevents the widget from rebuilding when the provided value changes, causing the UI to display stale data that does not reflect the current application state. Users see outdated information until something else triggers a rebuild, creating confusing and inconsistent UI behavior that is difficult to debug. {v2}',
     correctionMessage:
         'Remove the listen: false parameter so that Provider.of() uses the default listen: true, or use context.watch<T>() which always rebuilds on change.',
     errorSeverity: DiagnosticSeverity.INFO,

@@ -70,6 +70,8 @@ bool _containsPathPattern(String source) {
 
 /// Detects hardcoded Windows drive letter paths in string literals.
 ///
+/// Since: v4.9.20 | Updated: v4.13.0 | Rule version: v3
+///
 /// Alias: drive_letter, windows_path
 ///
 /// Hardcoded drive letters like `C:\Users\` break when the app runs on a
@@ -105,7 +107,7 @@ class AvoidHardcodedDriveLettersRule extends SaropaLintRule {
     name: 'avoid_hardcoded_drive_letters',
     problemMessage:
         '[avoid_hardcoded_drive_letters] Hardcoded Windows drive letter path '
-        'detected. This breaks on other drives, users, or platforms.',
+        'detected. This breaks on other drives, users, or platforms. {v3}',
     correctionMessage: 'Use path_provider (getApplicationSupportDirectory) or '
         "Platform.environment['APPDATA'] instead.",
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -151,6 +153,8 @@ class AvoidHardcodedDriveLettersRule extends SaropaLintRule {
 
 /// Detects path construction using `/` concatenation instead of `path.join()`.
 ///
+/// Since: v4.9.20 | Updated: v4.13.0 | Rule version: v3
+///
 /// Alias: path_separator, forward_slash_path
 ///
 /// Building file paths with forward slash (`/`) string concatenation produces
@@ -183,7 +187,7 @@ class AvoidForwardSlashPathAssumptionRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_forward_slash_path_assumption',
     problemMessage: '[avoid_forward_slash_path_assumption] Path built with "/" '
-        'concatenation. This is not idiomatic on Windows.',
+        'concatenation. This is not idiomatic on Windows. {v3}',
     correctionMessage:
         "Use path.join() from the 'path' package for cross-platform paths.",
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -238,6 +242,8 @@ class AvoidForwardSlashPathAssumptionRule extends SaropaLintRule {
 
 /// Detects file path comparisons that don't account for case insensitivity.
 ///
+/// Since: v4.9.20 | Updated: v4.13.0 | Rule version: v3
+///
 /// Alias: case_path, windows_case
 ///
 /// Windows uses a case-insensitive filesystem (NTFS). Comparing file paths
@@ -275,7 +281,7 @@ class AvoidCaseSensitivePathComparisonRule extends SaropaLintRule {
     name: 'avoid_case_sensitive_path_comparison',
     problemMessage:
         '[avoid_case_sensitive_path_comparison] File path compared without '
-        'case normalization. Windows filesystem is case-insensitive.',
+        'case normalization. Windows filesystem is case-insensitive. {v3}',
     correctionMessage:
         'Use .toLowerCase() on both sides or path.equals() from the '
         "'path' package for case-insensitive comparison.",
@@ -357,6 +363,8 @@ class _CaseInsensitivePathFix extends DartFix {
 
 /// Detects Windows desktop apps without single-instance enforcement.
 ///
+/// Since: v4.9.20 | Updated: v4.13.0 | Rule version: v3
+///
 /// Alias: single_instance, windows_mutex
 ///
 /// Windows users expect desktop applications to be single-instance: launching
@@ -398,7 +406,7 @@ class RequireWindowsSingleInstanceCheckRule extends SaropaLintRule {
     name: 'require_windows_single_instance_check',
     problemMessage:
         '[require_windows_single_instance_check] runApp() called without '
-        'single-instance check. Users may open duplicate windows.',
+        'single-instance check. Users may open duplicate windows. {v3}',
     correctionMessage:
         'Add single-instance enforcement using windows_single_instance '
         'package or a mutex/named pipe check before runApp().',
@@ -452,6 +460,8 @@ class RequireWindowsSingleInstanceCheckRule extends SaropaLintRule {
 
 /// Detects deeply nested path construction that may exceed Windows MAX_PATH.
 ///
+/// Since: v4.9.20 | Updated: v4.13.0 | Rule version: v3
+///
 /// Alias: max_path, path_length
 ///
 /// Windows' traditional MAX_PATH limit is 260 characters. While long path
@@ -488,7 +498,7 @@ class AvoidMaxPathRiskRule extends SaropaLintRule {
     name: 'avoid_max_path_risk',
     problemMessage:
         '[avoid_max_path_risk] Deeply nested path construction detected. '
-        "This may exceed Windows' 260-character MAX_PATH limit.",
+        "This may exceed Windows' 260-character MAX_PATH limit. {v3}",
     correctionMessage:
         'Flatten the directory structure or enable long path support '
         '(LongPathsEnabled registry key).',

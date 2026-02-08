@@ -11,6 +11,8 @@ import '../saropa_lint_rule.dart';
 
 /// Warns when case clauses don't have newlines before them.
 ///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v4
+///
 /// **Stylistic rule (opt-in only).** No performance or correctness benefit.
 ///
 /// Alias: blank_line_before_case, newline_before_case, case_spacing
@@ -49,7 +51,7 @@ class NewlineBeforeCaseRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_blank_line_before_case',
     problemMessage:
-        '[prefer_blank_line_before_case] Adding blank lines before case clauses is a formatting preference with no impact on code behavior or performance. Enable via the stylistic tier.',
+        '[prefer_blank_line_before_case] Adding blank lines before case clauses is a formatting preference with no impact on code behavior or performance. Enable via the stylistic tier. {v4}',
     correctionMessage:
         'Add blank line before this case. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -89,6 +91,8 @@ class NewlineBeforeCaseRule extends SaropaLintRule {
 
 /// Warns when constructors don't have blank lines before them.
 ///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v4
+///
 /// **Stylistic rule (opt-in only).** No performance or correctness benefit.
 ///
 /// Alias: blank_line_before_constructor, constructor_spacing, newline_before_constructor
@@ -126,7 +130,7 @@ class NewlineBeforeConstructorRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_blank_line_before_constructor',
     problemMessage:
-        '[prefer_blank_line_before_constructor] Adding blank lines before constructors is a formatting preference with no impact on code behavior or performance. Enable via the stylistic tier.',
+        '[prefer_blank_line_before_constructor] Adding blank lines before constructors is a formatting preference with no impact on code behavior or performance. Enable via the stylistic tier. {v4}',
     correctionMessage:
         'Add blank line to improve readability. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -176,6 +180,8 @@ class NewlineBeforeConstructorRule extends SaropaLintRule {
 
 /// Warns when methods don't have blank lines before them.
 ///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v4
+///
 /// **Stylistic rule (opt-in only).** No performance or correctness benefit.
 ///
 /// Alias: blank_line_before_method, method_spacing, newline_before_method
@@ -213,7 +219,7 @@ class NewlineBeforeMethodRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_blank_line_before_method',
     problemMessage:
-        '[prefer_blank_line_before_method] Adding blank lines before methods is a formatting preference with no impact on code behavior or performance. Enable via the stylistic tier.',
+        '[prefer_blank_line_before_method] Adding blank lines before methods is a formatting preference with no impact on code behavior or performance. Enable via the stylistic tier. {v4}',
     correctionMessage:
         'Add blank line to improve readability. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -266,6 +272,8 @@ class NewlineBeforeMethodRule extends SaropaLintRule {
 
 /// Warns when there's no blank line before a return statement.
 ///
+/// Since: v2.7.0 | Updated: v4.13.0 | Rule version: v5
+///
 /// **Stylistic rule (opt-in only).** No performance or correctness benefit.
 ///
 /// Alias: blank_line_before_return, return_spacing, newline_before_return
@@ -285,7 +293,7 @@ class NewlineBeforeReturnRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_blank_line_before_return',
     problemMessage:
-        '[prefer_blank_line_before_return] Adding blank lines before return statements is a formatting preference with no impact on code behavior or performance. Enable via the stylistic tier.',
+        '[prefer_blank_line_before_return] Adding blank lines before return statements is a formatting preference with no impact on code behavior or performance. Enable via the stylistic tier. {v5}',
     correctionMessage:
         'Insert a blank line before return for readability. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -350,6 +358,8 @@ class _AddBlankLineBeforeReturnFix extends DartFix {
 
 /// Warns when multi-line constructs are missing trailing commas.
 ///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v4
+///
 /// **Stylistic rule (opt-in only).** No performance or correctness benefit.
 ///
 /// Alias: require_trailing_comma, add_trailing_comma, multiline_comma
@@ -388,7 +398,7 @@ class PreferTrailingCommaRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_trailing_comma',
     problemMessage:
-        '[prefer_trailing_comma] Adding trailing commas in multi-line constructs is a formatting preference that affects diff readability. No performance or correctness impact. Enable via the stylistic tier.',
+        '[prefer_trailing_comma] Adding trailing commas in multi-line constructs is a formatting preference that affects diff readability. No performance or correctness impact. Enable via the stylistic tier. {v4}',
     correctionMessage:
         'Add a trailing comma. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -513,6 +523,8 @@ class _AddTrailingCommaFix extends DartFix {
 
 /// Warns when trailing commas are unnecessary.
 ///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v4
+///
 /// **Stylistic rule (opt-in only).** No performance or correctness benefit.
 ///
 /// Alias: remove_trailing_comma, single_element_comma, extra_comma
@@ -550,7 +562,7 @@ class UnnecessaryTrailingCommaRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'unnecessary_trailing_comma',
     problemMessage:
-        '[unnecessary_trailing_comma] Removing trailing commas in single-line constructs is a formatting preference. No impact on code behavior or performance. Enable via the stylistic tier.',
+        '[unnecessary_trailing_comma] Removing trailing commas in single-line constructs is a formatting preference. No impact on code behavior or performance. Enable via the stylistic tier. {v4}',
     correctionMessage:
         'Remove trailing comma or keep on single line. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -642,6 +654,8 @@ class _RemoveTrailingCommaFix extends DartFix {
 
 /// Warns when comments don't follow formatting conventions.
 ///
+/// Since: v4.1.3 | Updated: v4.13.0 | Rule version: v3
+///
 /// **Stylistic rule (opt-in only).** No performance or correctness benefit.
 ///
 /// Alias: comment_style, comment_capitalization, comment_punctuation
@@ -674,7 +688,7 @@ class FormatCommentFormattingRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'format_comment_style',
     problemMessage:
-        '[format_comment_style] Enforcing specific comment formatting conventions is a stylistic preference. Comment format has no impact on code behavior or performance. Enable via the stylistic tier.',
+        '[format_comment_style] Enforcing specific comment formatting conventions is a stylistic preference. Comment format has no impact on code behavior or performance. Enable via the stylistic tier. {v3}',
     correctionMessage:
         'Start with capital letter and end with punctuation. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -745,6 +759,8 @@ class FormatCommentFormattingRule extends SaropaLintRule {
 
 /// Warns when class members are not in the conventional order.
 ///
+/// Since: v4.1.3 | Updated: v4.13.0 | Rule version: v4
+///
 /// Alias: sort_class_members, class_member_order, fields_before_methods
 ///
 /// Members should be ordered: fields, constructors, methods.
@@ -787,7 +803,7 @@ class MemberOrderingFormattingRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_member_ordering',
     problemMessage:
-        '[prefer_member_ordering] Class members are not in conventional order. Members must be ordered: fields, constructors, methods.',
+        '[prefer_member_ordering] Class members are not in conventional order. Members must be ordered: fields, constructors, methods. {v4}',
     correctionMessage:
         'Reorder class members to follow the conventional layout: static fields, instance fields, constructors, then methods.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -830,6 +846,8 @@ class MemberOrderingFormattingRule extends SaropaLintRule {
 
 /// Warns when parameters are not in conventional order.
 ///
+/// Since: v4.2.0 | Updated: v4.13.0 | Rule version: v3
+///
 /// **Stylistic rule (opt-in only).** No performance or correctness benefit.
 ///
 /// Alias: sort_parameters, parameter_order, required_before_optional
@@ -865,7 +883,7 @@ class ParametersOrderingConventionRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'enforce_parameters_ordering',
     problemMessage:
-        '[enforce_parameters_ordering] Ordering parameters in a specific sequence is a convention preference. Parameter order does not affect performance or compiled output. Enable via the stylistic tier.',
+        '[enforce_parameters_ordering] Ordering parameters in a specific sequence is a convention preference. Parameter order does not affect performance or compiled output. Enable via the stylistic tier. {v3}',
     correctionMessage:
         'Order: required positional, optional positional, named. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -914,6 +932,8 @@ class ParametersOrderingConventionRule extends SaropaLintRule {
 
 /// Warns when enum constants are not in alphabetical order.
 ///
+/// Since: v2.0.0 | Updated: v4.13.0 | Rule version: v2
+///
 /// **Stylistic rule (opt-in only).** No performance or correctness benefit.
 ///
 /// Alias: sort_enum_constants, alphabetical_enum, enum_alphabetical_order
@@ -955,7 +975,7 @@ class EnumConstantsOrderingRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'enum_constants_ordering',
     problemMessage:
-        '[enum_constants_ordering] Ordering enum constants alphabetically is a stylistic preference. Enum constant order does not affect runtime behavior or performance. Enable via the stylistic tier.',
+        '[enum_constants_ordering] Ordering enum constants alphabetically is a stylistic preference. Enum constant order does not affect runtime behavior or performance. Enable via the stylistic tier. {v2}',
     correctionMessage:
         'Prefer ordering enum constants alphabetically. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
