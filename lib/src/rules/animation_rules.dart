@@ -293,7 +293,7 @@ class RequireAnimationControllerDisposeRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_animation_controller_dispose',
     problemMessage:
-        'Neglecting to dispose of an AnimationController when a widget is removed from the tree causes memory leaks and can lead to performance degradation, as the controller continues to consume resources and tick animations in the background. This can eventually crash your app or cause unexpected behavior. Always dispose of AnimationControllers to maintain optimal app performance. See https://api.flutter.dev/flutter/animation/AnimationController/dispose.html.',
+        '[require_animation_controller_dispose] Neglecting to dispose of an AnimationController when a widget is removed from the tree causes memory leaks and can lead to performance degradation, as the controller continues to consume resources and tick animations in the background. This can eventually crash your app or cause unexpected behavior. Always dispose of AnimationControllers to maintain optimal app performance. See https://api.flutter.dev/flutter/animation/AnimationController/dispose.html.',
     correctionMessage:
         'Call dispose on your AnimationController in the widget’s dispose method to release resources and prevent memory leaks. This is a core Flutter best practice for managing animation lifecycles. See https://api.flutter.dev/flutter/animation/AnimationController/dispose.html for details.',
     errorSeverity: DiagnosticSeverity.ERROR,
@@ -326,7 +326,8 @@ class RequireAnimationControllerDisposeRule extends SaropaLintRule {
 
             final String? typeName = member.fields.type?.toSource();
             if (typeName != null &&
-                typeName.contains('AnimationController') &&
+                (typeName == 'AnimationController' ||
+                    typeName == 'AnimationController?') &&
                 !typeName.startsWith('List<') &&
                 !typeName.startsWith('Set<') &&
                 !typeName.startsWith('Map<') &&
@@ -360,12 +361,10 @@ class RequireAnimationControllerDisposeRule extends SaropaLintRule {
       // Check if controllers are disposed
       for (final String name in controllerNames) {
         final bool isDisposed = disposeBody != null &&
-            (disposeBody.contains('$name.dispose(') ||
-                disposeBody.contains('$name?.dispose(') ||
-                disposeBody.contains('$name..dispose(') ||
-                disposeBody.contains('$name.disposeSafe(') ||
-                disposeBody.contains('$name?.disposeSafe(') ||
-                disposeBody.contains('$name..disposeSafe('));
+            RegExp(
+              '${RegExp.escape(name)}\\s*[?.]+'
+              '\\s*dispose(Safe)?\\s*\\(',
+            ).hasMatch(disposeBody);
 
         if (!isDisposed) {
           for (final ClassMember member in node.members) {
@@ -501,7 +500,7 @@ class RequireHeroTagUniquenessRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_hero_tag_uniqueness',
     problemMessage:
-        'Using duplicate Hero tags within the same navigation context causes Hero animations to fail, resulting in visual glitches and confusing user experiences. This can break navigation transitions and reduce the perceived quality of your app. Ensure each Hero tag is unique within a given Navigator to maintain smooth and predictable animations. See https://docs.flutter.dev/ui/animations/hero-animations#the-hero-tag.',
+        '[require_hero_tag_uniqueness] Using duplicate Hero tags within the same navigation context causes Hero animations to fail, resulting in visual glitches and confusing user experiences. This can break navigation transitions and reduce the perceived quality of your app. Ensure each Hero tag is unique within a given Navigator to maintain smooth and predictable animations. See https://docs.flutter.dev/ui/animations/hero-animations#the-hero-tag.',
     correctionMessage:
         'Assign unique tags to each Hero widget within the same navigation context to guarantee correct animation behavior and prevent transition errors. Refer to https://docs.flutter.dev/ui/animations/hero-animations#the-hero-tag for best practices.',
     errorSeverity: DiagnosticSeverity.ERROR,
@@ -784,15 +783,17 @@ class RequireAnimationCurveRule extends SaropaLintRule {
 
       // Check if target is a Tween
       final String targetSource = target.toSource();
-      if (!targetSource.contains('Tween')) return;
+      if (!targetSource.endsWith('Tween')) return;
 
-      // Check if the argument is a CurvedAnimation or has curve
+      // Check if the argument is a CurvedAnimation or has curve parameter
       for (final Expression arg in node.argumentList.arguments) {
+        if (arg is NamedExpression && arg.name.label.name == 'curve') {
+          return; // Has a curve parameter
+        }
         final String argSource = arg.toSource();
-        if (argSource.contains('CurvedAnimation') ||
-            argSource.contains('curve:') ||
-            argSource.contains('Curve')) {
-          return; // Has a curve
+        if (argSource.endsWith('CurvedAnimation') ||
+            argSource.startsWith('CurvedAnimation')) {
+          return; // Using CurvedAnimation
         }
       }
 
@@ -1640,10 +1641,10 @@ class RequireAnimationTickerDisposalRule extends SaropaLintRule {
       // Report tickers not stopped in dispose
       for (final String fieldName in tickerFields) {
         final bool isStopped = disposeBody != null &&
-            (disposeBody.contains('$fieldName.stop()') ||
-                disposeBody.contains('$fieldName?.stop()') ||
-                disposeBody.contains('$fieldName.dispose()') ||
-                disposeBody.contains('$fieldName?.dispose()'));
+            RegExp(
+              '${RegExp.escape(fieldName)}\\s*[?.]+'
+              '\\s*(stop|dispose)\\s*\\(\\)',
+            ).hasMatch(disposeBody);
 
         if (!isStopped) {
           for (final ClassMember member in node.members) {

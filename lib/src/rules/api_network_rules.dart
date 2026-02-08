@@ -66,13 +66,15 @@ class RequireHttpStatusCheckRule extends SaropaLintRule {
       final FunctionBody body = node.body;
       final String bodySource = body.toSource();
 
-      // Check for HTTP calls
+      // Check for HTTP calls (specific client patterns only)
       if (!bodySource.contains('http.get') &&
           !bodySource.contains('http.post') &&
           !bodySource.contains('http.put') &&
           !bodySource.contains('http.delete') &&
-          !bodySource.contains('.get(') &&
-          !bodySource.contains('.post(')) {
+          !bodySource.contains('dio.get') &&
+          !bodySource.contains('dio.post') &&
+          !bodySource.contains('client.get') &&
+          !bodySource.contains('client.post')) {
         return;
       }
 
@@ -206,18 +208,17 @@ class RequireRetryLogicRule extends SaropaLintRule {
       final FunctionBody body = node.body;
       final String bodySource = body.toSource();
 
-      // Check for HTTP calls
+      // Check for HTTP calls (specific client patterns only)
       if (!bodySource.contains('http.') &&
           !bodySource.contains('dio.') &&
-          !bodySource.contains('.get(') &&
-          !bodySource.contains('.post(')) {
+          !bodySource.contains('client.get') &&
+          !bodySource.contains('client.post')) {
         return;
       }
 
       // Check for retry logic
       if (!bodySource.contains('retry') &&
           !bodySource.contains('Retry') &&
-          !bodySource.contains('attempts') &&
           !bodySource.contains('maxRetries')) {
         reporter.atNode(node, code);
       }
@@ -277,9 +278,10 @@ class RequireTypedApiResponseRule extends SaropaLintRule {
       while (parent != null) {
         if (parent is MethodInvocation) {
           final String parentMethod = parent.methodName.name;
-          if (parentMethod.contains('fromJson') ||
-              parentMethod.contains('fromMap') ||
-              parentMethod.contains('parse')) {
+          if (parentMethod == 'fromJson' ||
+              parentMethod == 'fromMap' ||
+              parentMethod == 'parse' ||
+              parentMethod == 'tryParse') {
             return; // Good - being parsed into model
           }
         }
@@ -366,28 +368,32 @@ class RequireConnectivityCheckRule extends SaropaLintRule {
     context.registry.addMethodDeclaration((MethodDeclaration node) {
       // Check methods that do network operations
       final String methodName = node.name.lexeme.toLowerCase();
-      if (!methodName.contains('sync') &&
-          !methodName.contains('upload') &&
-          !methodName.contains('download') &&
-          !methodName.contains('fetch') &&
-          !methodName.contains('submit')) {
+      // Use word-boundary-aware checks to avoid matching 'resync', 'async', etc.
+      if (!methodName.startsWith('sync') &&
+          !methodName.startsWith('upload') &&
+          !methodName.startsWith('download') &&
+          !methodName.startsWith('fetch') &&
+          !methodName.startsWith('submit') &&
+          !methodName.endsWith('sync') &&
+          !methodName.endsWith('upload') &&
+          !methodName.endsWith('download')) {
         return;
       }
 
       final FunctionBody body = node.body;
       final String bodySource = body.toSource();
 
-      // Check for HTTP calls
+      // Check for HTTP calls (specific client patterns only)
       if (!bodySource.contains('http.') &&
           !bodySource.contains('dio.') &&
-          !bodySource.contains('.post(') &&
-          !bodySource.contains('.get(')) {
+          !bodySource.contains('client.post') &&
+          !bodySource.contains('client.get')) {
         return;
       }
 
       // Check for connectivity check
-      if (!bodySource.contains('connectivity') &&
-          !bodySource.contains('Connectivity') &&
+      if (!bodySource.contains('Connectivity') &&
+          !bodySource.contains('checkConnectivity') &&
           !bodySource.contains('isConnected') &&
           !bodySource.contains('hasConnection')) {
         reporter.atNode(node, code);
@@ -447,12 +453,11 @@ class RequireApiErrorMappingRule extends SaropaLintRule {
     context.registry.addTryStatement((TryStatement node) {
       final String trySource = node.body.toSource();
 
-      // Check if try block contains API calls
+      // Check if try block contains API calls (specific client patterns only)
       if (!trySource.contains('http.') &&
           !trySource.contains('dio.') &&
-          !trySource.contains('.get(') &&
-          !trySource.contains('.post(') &&
-          !trySource.contains('fetch')) {
+          !trySource.contains('client.get') &&
+          !trySource.contains('client.post')) {
         return;
       }
 
@@ -554,16 +559,15 @@ class RequireRequestTimeoutRule extends SaropaLintRule {
       final String targetSource = target.toSource().toLowerCase();
 
       // cspell:ignore httpclient
-      // Check if this is an HTTP-related call
-      // Be specific to avoid false positives (e.g., apiResponse.get() is not HTTP)
-      // Look for actual HTTP client patterns, not just 'api' which matches too broadly
-      final bool isHttpCall = targetSource.contains('http') ||
+      // Check if this is an HTTP-related call using exact target patterns
+      final bool isHttpCall = targetSource == 'http' ||
           targetSource == 'dio' ||
+          targetSource == 'client' ||
+          targetSource.endsWith('.http') ||
           targetSource.endsWith('.dio') ||
-          targetSource.contains('httpclient') ||
-          targetSource.contains('http.client') ||
-          // Client without 'api' prefix to avoid matching apiClient, apiResponse, etc.
-          (targetSource == 'client' || targetSource.endsWith('.client'));
+          targetSource.endsWith('.client') ||
+          targetSource == 'httpclient' ||
+          targetSource.endsWith('.httpclient');
 
       if (!isHttpCall) return;
 
@@ -2974,7 +2978,7 @@ class RequireSseSubscriptionCancelRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_sse_subscription_cancel',
     problemMessage:
-        'If a widget (such as a StatefulWidget managing a live data feed) opens a Server-Sent Events (SSE) or EventSource connection but does not cancel it in dispose(), the connection remains open after the widget is removed. This can result in orphaned network connections, wasted bandwidth, and memory leaks, especially in dashboards, chat clients, or any UI with dynamic SSE usage. Always close SSE/EventSource connections in the correct State object’s dispose() method. See https://docs.flutter.dev/perf/memory#dispose-resources.',
+        '[require_sse_subscription_cancel] If a widget (such as a StatefulWidget managing a live data feed) opens a Server-Sent Events (SSE) or EventSource connection but does not cancel it in dispose(), the connection remains open after the widget is removed. This can result in orphaned network connections, wasted bandwidth, and memory leaks, especially in dashboards, chat clients, or any UI with dynamic SSE usage. Always close SSE/EventSource connections in the correct State object’s dispose() method. See https://docs.flutter.dev/perf/memory#dispose-resources.',
     correctionMessage:
         'In every State class that owns an SSE or EventSource connection, call connection.close() in the dispose() method before calling super.dispose(). This ensures the connection is properly terminated when the widget is removed, preventing leaks and network resource exhaustion. See https://docs.flutter.dev/perf/memory#dispose-resources for more details.',
     errorSeverity: DiagnosticSeverity.ERROR,

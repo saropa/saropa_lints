@@ -1602,7 +1602,10 @@ class AvoidDialogContextAfterAsyncRule extends SaropaLintRule {
       if (target == null) return;
 
       final String targetSource = target.toSource();
-      if (!targetSource.contains('Navigator')) return;
+      if (targetSource != 'Navigator' &&
+          !targetSource.startsWith('Navigator.')) {
+        return;
+      }
 
       // Check if there's an await before this in the same function
       final FunctionBody? body = _findEnclosingFunctionBody(node);
@@ -1868,10 +1871,10 @@ class RequireWebsocketMessageValidationRule extends SaropaLintRule {
 
       // Check for WebSocket-related patterns
       final String targetSource = target.toSource();
-      if (!targetSource.contains('socket') &&
-          !targetSource.contains('Socket') &&
-          !targetSource.contains('channel') &&
-          !targetSource.contains('Channel')) {
+      if (!targetSource.endsWith('socket') &&
+          !targetSource.endsWith('Socket') &&
+          !targetSource.endsWith('channel') &&
+          !targetSource.endsWith('Channel')) {
         return;
       }
 
@@ -2190,6 +2193,28 @@ class RequireLocationTimeoutRule extends SaropaLintRule {
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
+  /// Methods that actually request GPS coordinates.
+  static const Set<String> _gpsRequestMethods = {
+    'getCurrentPosition',
+    'getLastKnownPosition',
+    'getLocation',
+    'getPositionStream',
+    'requestPosition',
+  };
+
+  /// Classes that own GPS-requesting methods.
+  static const Set<String> _gpsRequestTargets = {
+    'Geolocator',
+    'Location', // from location package
+  };
+
+  /// Named args that indicate a timeout is configured.
+  static const Set<String> _timeoutArgNames = {
+    'timeLimit',
+    'timeout',
+    'duration',
+  };
+
   @override
   void runWithReporter(
     CustomLintResolver resolver,
@@ -2197,43 +2222,67 @@ class RequireLocationTimeoutRule extends SaropaLintRule {
     CustomLintContext context,
   ) {
     context.registry.addMethodInvocation((MethodInvocation node) {
-      // Check for location-related methods
       final String methodName = node.methodName.name;
-      if (!methodName.contains('Position') &&
-          !methodName.contains('Location') &&
-          !methodName.contains('location') &&
-          methodName != 'getCurrentPosition' &&
-          methodName != 'getLastKnownPosition' &&
-          methodName != 'getLocation') {
-        return;
-      }
+      if (!_gpsRequestMethods.contains(methodName)) return;
 
       final Expression? target = node.target;
       if (target == null) return;
 
-      final String targetSource = target.toSource();
-      if (!targetSource.contains('Geolocator') &&
-          !targetSource.contains('Location') &&
-          !targetSource.contains('location')) {
-        return;
-      }
+      // Match exact class name, not substrings
+      final String targetName = _extractTargetName(target);
+      if (!_gpsRequestTargets.contains(targetName)) return;
 
-      // Check for timeout parameter
-      bool hasTimeout = false;
-      for (final Expression arg in node.argumentList.arguments) {
-        if (arg is NamedExpression) {
-          final String name = arg.name.label.name;
-          if (name == 'timeLimit' || name == 'timeout' || name == 'duration') {
-            hasTimeout = true;
-            break;
-          }
-        }
-      }
+      // Check for timeout in direct arguments
+      if (_hasTimeoutArg(node)) return;
 
-      if (!hasTimeout) {
-        reporter.atNode(node, code);
-      }
+      // Check for chained .timeout() on the returned Future
+      if (_hasChainedTimeout(node)) return;
+
+      reporter.atNode(node, code);
     });
+  }
+
+  /// Extracts the simple class/identifier name from the call target,
+  /// ignoring instance chains like `widget.geolocator`.
+  static String _extractTargetName(Expression target) {
+    if (target is SimpleIdentifier) return target.name;
+    if (target is PrefixedIdentifier) return target.identifier.name;
+    if (target is PropertyAccess) return target.propertyName.name;
+    return '';
+  }
+
+  /// Checks if any named argument is a timeout parameter.
+  static bool _hasTimeoutArg(MethodInvocation node) {
+    for (final Expression arg in node.argumentList.arguments) {
+      if (arg is NamedExpression &&
+          _timeoutArgNames.contains(arg.name.label.name)) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  /// Checks if `.timeout()` is chained anywhere on the returned Future.
+  ///
+  /// Handles patterns like:
+  /// - `call().timeout(...)`
+  /// - `call().then(...).timeout(...)`
+  /// - `call().catchError(...).timeout(...)`
+  static bool _hasChainedTimeout(MethodInvocation node) {
+    AstNode? current = node.parent;
+    while (current != null) {
+      if (current is MethodInvocation && current.methodName.name == 'timeout') {
+        return true;
+      }
+      // Walk through chained method calls and property accesses
+      if (current is MethodInvocation || current is PropertyAccess) {
+        current = current.parent;
+        continue;
+      }
+      // Stop at expression boundaries
+      break;
+    }
+    return false;
   }
 }
 
@@ -2275,7 +2324,7 @@ class AvoidStreamInBuildRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_stream_in_build',
     problemMessage:
-        'Creating a Stream or StreamController inside a widget’s build() method causes a new stream instance to be created on every rebuild of that widget. This leads to multiple overlapping subscriptions, memory leaks, and lost or duplicated events, making the widget’s state unpredictable and difficult to debug. Always manage streams as persistent fields in the State class, not as local variables in build(). See https://docs.flutter.dev/cookbook/networking/web-sockets#using-streambuilder.',
+        "[avoid_stream_in_build] Creating a Stream or StreamController inside a widget's build() method causes a new stream instance to be created on every rebuild of that widget. This leads to multiple overlapping subscriptions, memory leaks, and lost or duplicated events, making the widget's state unpredictable and difficult to debug. Always manage streams as persistent fields in the State class, not as local variables in build(). See https://docs.flutter.dev/cookbook/networking/web-sockets#using-streambuilder.",
     correctionMessage:
         'Move all Stream and StreamController creation out of the build() method and into the State class, typically initializing them in initState() and disposing them in dispose(). This ensures a single, consistent stream lifecycle per widget instance and prevents memory leaks or event loss. See https://docs.flutter.dev/cookbook/networking/web-sockets#using-streambuilder for recommended patterns.',
     errorSeverity: DiagnosticSeverity.ERROR,
@@ -2291,7 +2340,7 @@ class AvoidStreamInBuildRule extends SaropaLintRule {
       InstanceCreationExpression node,
     ) {
       final String typeName = node.constructorName.type.name.lexeme;
-      if (!typeName.contains('StreamController')) return;
+      if (typeName != 'StreamController') return;
 
       // Check if inside build method
       AstNode? current = node.parent;
@@ -2373,11 +2422,12 @@ class RequireStreamControllerCloseRule extends SaropaLintRule {
       for (final member in node.members) {
         if (member is FieldDeclaration) {
           final String? typeStr = member.fields.type?.toSource();
-          if (typeStr != null && typeStr.contains('StreamController')) {
-            // Check if this is an exact StreamController type vs a wrapper
-            final bool isExactType = typeStr.startsWith('StreamController<') ||
-                typeStr.startsWith('StreamController ') ||
-                typeStr == 'StreamController';
+          if (typeStr != null &&
+              (typeStr.startsWith('StreamController') ||
+                  typeStr.startsWith('StreamController?'))) {
+            final bool isExactType = typeStr == 'StreamController' ||
+                typeStr.startsWith('StreamController<') ||
+                typeStr.startsWith('StreamController?');
             for (final variable in member.fields.variables) {
               controllers.add((variable, isExactType));
             }
@@ -2876,7 +2926,7 @@ class RequireStreamOnDoneRule extends SaropaLintRule {
       if (targetType == null) return;
 
       final typeName = targetType.getDisplayString();
-      if (!typeName.contains('Stream')) return;
+      if (!typeName.startsWith('Stream<') && typeName != 'Stream') return;
 
       // Check for onDone parameter
       bool hasOnDone = false;
@@ -3036,7 +3086,7 @@ class AvoidStreamSubscriptionInFieldRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_stream_subscription_in_field',
     problemMessage:
-        'If a StreamSubscription is stored as a field in a State class but not properly cancelled in dispose(), the subscription will continue to receive events even after the widget is removed from the widget tree. This can cause memory leaks, unexpected UI updates, and subtle bugs, especially in dynamic lists or navigation flows where widgets are frequently created and destroyed. Always cancel subscriptions in the correct State object’s dispose() method. See https://docs.flutter.dev/perf/memory#dispose-resources.',
+        '[avoid_stream_subscription_in_field] If a StreamSubscription is stored as a field in a State class but not properly cancelled in dispose(), the subscription will continue to receive events even after the widget is removed from the widget tree. This can cause memory leaks, unexpected UI updates, and subtle bugs, especially in dynamic lists or navigation flows where widgets are frequently created and destroyed. Always cancel subscriptions in the correct State object’s dispose() method. See https://docs.flutter.dev/perf/memory#dispose-resources.',
     correctionMessage:
         'In every State class that owns a StreamSubscription field, call subscription.cancel() in the dispose() method before calling super.dispose(). This ensures the subscription is cleaned up when the widget is removed, preventing leaks and unwanted callbacks. See https://docs.flutter.dev/perf/memory#dispose-resources for more information.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -3432,7 +3482,7 @@ class AvoidUnawaitedFutureRule extends SaropaLintRule {
       final DartType? targetType = target.staticType;
       if (targetType != null) {
         final String targetTypeName = targetType.getDisplayString();
-        if (!targetTypeName.contains('StreamController')) {
+        if (!targetTypeName.startsWith('StreamController')) {
           return false;
         }
       }
@@ -4561,7 +4611,10 @@ class AvoidStreamSyncEventsRule extends SaropaLintRule {
       final int bodyOffset = functionBody.offset;
 
       // Check if StreamController is created in this function
-      if (!bodySource.contains('StreamController')) return;
+      if (!bodySource.contains('StreamController(') &&
+          !bodySource.contains('StreamController<')) {
+        return;
+      }
 
       // Check if the add is close to the controller creation (within a few statements)
       final String beforeAdd = bodySource.substring(0, nodeOffset - bodyOffset);
