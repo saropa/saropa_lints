@@ -11,15 +11,17 @@ Dates are not included in version headers — [pub.dev](https://pub.dev/packages
 ** See the current published changelog: [saropa_lints/changelog](https://pub.dev/packages/saropa_lints/changelog)
 
 ---
-## [4.12.4]
+## [4.13.0]
 
 ### Changed
 
-- **`avoid_empty_setstate` moved from recommended to comprehensive tier**: This rule flags a valid Flutter idiom (`if (mounted) setState(() {})` after async gaps). It is a style preference, not a bug or correctness issue, so it belongs in the comprehensive tier for quality-focused teams. Impact reduced from medium to low.
+- **`avoid_empty_setstate` no longer flags mounted-guarded calls**: Empty `setState(() {})` inside a `mounted` guard (`if (mounted)`, ternary, or early-return pattern) is now suppressed. This is an intentional Flutter idiom for triggering rebuilds after async gaps or external state mutations. This rule flags a valid Flutter idiom (`if (mounted) setState(() {})` after async gaps). It is a style preference, not a bug or correctness issue, so it belongs in the comprehensive tier for quality-focused teams. Impact reduced from medium to low.
 
 ### Fixed
 
-- **`avoid_empty_setstate` no longer flags mounted-guarded calls**: Empty `setState(() {})` inside a `mounted` guard (`if (mounted)`, ternary, or early-return pattern) is now suppressed. This is an intentional Flutter idiom for triggering rebuilds after async gaps or external state mutations.
+- **False positives: replaced substring matching with exact detection across 30+ rules**: Rules in animation, async, navigation, API/network, disposal, permission, provider, and widget lifecycle categories now use exact-match sets, `endsWith`/`startsWith`, and AST patterns instead of `String.contains()` substring matching. Eliminates false positives on permission utilities, custom wrappers, and identifiers that happen to contain framework terms like "Location", "Navigator", or "Controller".
+
+- **`require_location_timeout` no longer fires on permission checks**: GPS timeout rule now uses an exact allowlist of GPS methods (`getCurrentPosition`, `getLastKnownPosition`, etc.) and detects chained `.timeout()` calls. Previously matched any method with "location" in the name.
 
 - **Report: duplicate violations on file re-analysis**: `_currentFile` was not updated when a file was re-analyzed, causing `_trackByFileAndRule` to attribute violations to the wrong file and `_clearFileData` to skip ImpactTracker cleanup. Violations appeared 10-15x in reports.
 
@@ -28,6 +30,14 @@ Dates are not included in version headers — [pub.dev](https://pub.dev/packages
 ### Added
 
 - **Report: analysis configuration header**: Reports now include tier, enabled rules, platforms, packages, user exclusions, and verbatim `analysis_options_custom.yaml` content.
+
+- **Publish gate: `[rule_name]` prefix required in all problemMessage strings**: The publish script now blocks release if any rule's `problemMessage` does not start with `[rule_name]`. All 15 previously non-compliant rules have been updated.
+
+- **CI guard: `.contains()` anti-pattern detection test**: New test scans all rule files for 9 dangerous `String.contains()` patterns (e.g. `methodName.contains(`, `toSource().contains(`) and fails CI if new violations are introduced. Per-file baseline counts track the 1,100+ existing instances; baselines tighten as violations are removed.
+
+- **Shared utility: `target_matcher_utils.dart`**: Four functions (`extractTargetName`, `isExactTarget`, `isFieldCleanedUp`, `hasChainedMethod`) that replace the most common `.contains()` anti-patterns with exact-match and AST-based detection.
+
+- **False-positive regression tests**: 7 new test cases in `false_positive_fixes_test.dart` covering the patterns that caused the most real-world false positives (location timeout, navigator match, context access, HTTP status, scroll controller dispose).
 
 - **Report: import graph priority scoring**: New FILE IMPORTANCE section ranks every analyzed file by a combined score of fan-in (how many files import it) and architectural layer weight. New FIX PRIORITY section sorts all violations by `impact * (importance + 1) * layer_weight` so the developer sees what to fix first. New PROJECT STRUCTURE section renders the full import dependency tree from entry points.
 
