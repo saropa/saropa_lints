@@ -1127,7 +1127,7 @@ class RequireCacheKeyUniquenessRule extends SaropaLintRule {
 
 /// Warns when widget or State references are stored in non-widget classes.
 ///
-/// Since: v4.14.0 | Updated: vunreleased | Rule version: v2
+/// Since: v4.14.0 | Rule version: v2
 ///
 /// Alias: widget_reference_leak, no_widget_in_service
 ///

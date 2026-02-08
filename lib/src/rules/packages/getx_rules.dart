@@ -2152,7 +2152,7 @@ class _AddGetxConstructorInjectionCommentFix extends DartFix {
 
 /// Warns when Get.context is used to bypass Flutter's BuildContext mechanism.
 ///
-/// Since: v4.14.0 | Updated: vunreleased | Rule version: v2
+/// Since: v4.14.0 | Rule version: v2
 ///
 /// Alias: getx_context_bypass, no_get_context
 ///

@@ -420,7 +420,7 @@ class PreferImageCroppingRule extends SaropaLintRule {
 
 /// Warns when deprecated permission_handler APIs from pre-null-safety versions
 ///
-/// Since: v4.14.0 | Updated: vunreleased | Rule version: v2
+/// Since: v4.14.0 | Rule version: v2
 ///
 /// are detected.
 ///
