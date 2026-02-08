@@ -3447,13 +3447,27 @@ class RequireAnalyticsEventNamingRule extends SaropaLintRule {
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
-  static const Set<String> _analyticsMethods = <String>{
+  /// Unambiguous analytics method names - always trigger without
+  /// receiver filtering since they are specific to analytics APIs.
+  static const Set<String> _unambiguousMethods = <String>{
     'logEvent',
-    'track',
     'trackEvent',
-    'sendEvent',
     'logCustomEvent',
   };
+
+  /// Ambiguous method names that appear in non-analytics contexts.
+  /// Require an analytics-like receiver to avoid false positives
+  /// (e.g., shipment.track(), stateMachine.sendEvent()).
+  static const Set<String> _ambiguousMethods = <String>{
+    'track',
+    'sendEvent',
+  };
+
+  /// Receivers that indicate an analytics context.
+  static final RegExp _analyticsTargetPattern = RegExp(
+    r'(analytics|tracker|segment|mixpanel|amplitude|firebase|appFlyer|braze|clevertap|appsFlyer|posthog)',
+    caseSensitive: false,
+  );
 
   static final RegExp _snakeCasePattern = RegExp(
     r'^[a-z][a-z0-9]*(_[a-z0-9]+)*$',
@@ -3466,7 +3480,17 @@ class RequireAnalyticsEventNamingRule extends SaropaLintRule {
     CustomLintContext context,
   ) {
     context.registry.addMethodInvocation((MethodInvocation node) {
-      if (!_analyticsMethods.contains(node.methodName.name)) return;
+      final String methodName = node.methodName.name;
+
+      if (_ambiguousMethods.contains(methodName)) {
+        // Require an analytics-like receiver
+        final Expression? target = node.target;
+        if (target == null) return;
+        if (!_analyticsTargetPattern.hasMatch(target.toSource())) return;
+      } else if (!_unambiguousMethods.contains(methodName)) {
+        return;
+      }
+
       final String? eventName = _extractEventName(node);
       if (eventName == null || eventName.isEmpty) return;
       if (!_snakeCasePattern.hasMatch(eventName)) {

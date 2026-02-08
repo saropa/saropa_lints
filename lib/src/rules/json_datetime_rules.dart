@@ -1387,6 +1387,28 @@ class RequireTimezoneDisplayRule extends SaropaLintRule {
   /// Timezone patterns that indicate timezone is included.
   static final RegExp _timezonePattern = RegExp(r'[zZvOxX]');
 
+  /// Named constructors that produce time-only formats without timezone.
+  /// These are ICU DateFormat factory constructors from the intl package.
+  static const Set<String> _timeOnlyConstructors = <String>{
+    'Hm',
+    'Hms',
+    'j',
+    'jm',
+    'jms',
+    'jmv',
+    'jmz',
+    'jv',
+    'jz',
+  };
+
+  /// Named constructors that include timezone (safe to skip).
+  static const Set<String> _timeWithTzConstructors = <String>{
+    'jmv',
+    'jmz',
+    'jv',
+    'jz',
+  };
+
   @override
   void runWithReporter(
     CustomLintResolver resolver,
@@ -1398,10 +1420,21 @@ class RequireTimezoneDisplayRule extends SaropaLintRule {
       final String typeName = node.constructorName.type.name2.lexeme;
       if (typeName != 'DateFormat') return;
 
+      final String? namedCtor = node.constructorName.name?.name;
+
+      // Check named constructors (e.g., DateFormat.Hm())
+      if (namedCtor != null) {
+        if (_timeOnlyConstructors.contains(namedCtor) &&
+            !_timeWithTzConstructors.contains(namedCtor)) {
+          reporter.atNode(node, code);
+        }
+        return;
+      }
+
+      // Check format string in default constructor
       final NodeList<Expression> args = node.argumentList.arguments;
       if (args.isEmpty) return;
 
-      // Get the format string
       final Expression firstArg = args.first;
       String? formatString;
       if (firstArg is SimpleStringLiteral) {
@@ -1413,7 +1446,6 @@ class RequireTimezoneDisplayRule extends SaropaLintRule {
 
       if (formatString == null) return;
 
-      // Check if format has time but no timezone
       if (_timePattern.hasMatch(formatString) &&
           !_timezonePattern.hasMatch(formatString)) {
         reporter.atNode(node, code);
