@@ -1524,7 +1524,7 @@ const Set<String> professionalOnlyRules = <String>{
 
   // Performance
   'require_keys_in_animated_lists',
-  'avoid_synchronous_file_io', // superseded by avoid_blocking_main_thread (Essential)
+  'avoid_synchronous_file_io', // also covered by avoid_blocking_main_thread (Essential)
   'prefer_compute_for_heavy_work',
   'prefer_cached_getter',
   // Note: avoid_object_creation_in_hot_loops moved to Pedantic (micro-optimization)

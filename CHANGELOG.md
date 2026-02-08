@@ -25,12 +25,20 @@ Dates are not included in version headers — [pub.dev](https://pub.dev/packages
 
 - **Quick fix for `require_hive_web_subdirectory`**: Adds subdirectory parameter to Hive.initFlutter() calls
 
-- **5 new GitHub-issue rules**:
-  - `avoid_blocking_main_thread` (Essential/WARNING): Detects synchronous I/O methods (readAsStringSync, etc.) on the main isolate ([#16](https://github.com/saropa/saropa_lints/issues/16))
-  - `require_log_level_for_production` (Professional/INFO): Detects verbose logging without kDebugMode/assert guards ([#18](https://github.com/saropa/saropa_lints/issues/18))
+- **5 new rules**:
+  - `avoid_blocking_main_thread` (Essential/WARNING): Detects synchronous I/O methods (readAsStringSync, etc.) on the main isolate ([#17](https://github.com/saropa/saropa_lints/issues/17))
+  - `require_log_level_for_production` (Professional/INFO): Detects verbose logging without kDebugMode/assert guards
   - `require_analytics_event_naming` (Professional/INFO): Detects non-snake_case analytics event names ([#19](https://github.com/saropa/saropa_lints/issues/19))
-  - `require_feature_flag_type_safety` (Recommended/INFO): Detects string-based feature flag access without type-safe wrappers ([#20](https://github.com/saropa/saropa_lints/issues/20))
-  - `require_timezone_display` (Recommended/INFO): Detects DateFormat with time components but no timezone indicator ([#22](https://github.com/saropa/saropa_lints/issues/22))
+  - `require_feature_flag_type_safety` (Recommended/INFO): Detects string-based feature flag access without type-safe wrappers
+  - `require_timezone_display` (Recommended/INFO): Detects DateFormat with time components but no timezone indicator; covers named constructors (Hm, jm, Hms)
+
+### Fixed
+
+- **False positive prevention**: Added receiver/target filtering to 3 heuristic rules to prevent false positives on unrelated APIs:
+  - `require_log_level_for_production`: Now requires logger-like receiver; `math.log()`, `myObject.trace()` no longer trigger
+  - `require_analytics_event_naming`: `track()` and `sendEvent()` now require analytics-like receiver; `shipment.track()` no longer triggers
+  - `require_feature_flag_type_safety`: `isEnabled()` moved to target-filtered set; `notification.isEnabled()` no longer triggers
+- **Double-fire note**: `avoid_synchronous_file_io` (Professional) is now also covered by `avoid_blocking_main_thread` (Essential) which adds isolate detection
 
 - **Rule versioning**: Added `{vN}` version suffixes and `Since: vX.Y.Z` DartDoc provenance to all rules
 
