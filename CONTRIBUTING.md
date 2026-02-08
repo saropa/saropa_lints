@@ -454,6 +454,21 @@ dart test                              # Run unit tests
 
 3. **`require_unique_iv_per_encryption`** — Had to add word boundary detection to avoid matching `activity`, `private`, `derivative`
 
+### Use target_matcher_utils.dart
+
+The `lib/src/target_matcher_utils.dart` file provides drop-in replacements for
+the most common `.contains()` anti-patterns:
+
+| Instead of | Use |
+|-----------|-----|
+| `targetSource.contains('Navigator')` | `isExactTarget(target, {'Navigator'})` |
+| `typeName.contains('ScrollController')` | `typeName == 'ScrollController'` |
+| `bodySource.contains('$name.dispose(')` | `isFieldCleanedUp(name, 'dispose', body)` |
+| Checking only direct args for `.timeout()` | `hasChainedMethod(node, 'timeout')` |
+
+A CI guard test (`test/anti_pattern_detection_test.dart`) will fail if new
+`.contains()` anti-patterns are added to rule files.
+
 ### What TO do
 
 | Good Pattern | Why It Works | Example |
