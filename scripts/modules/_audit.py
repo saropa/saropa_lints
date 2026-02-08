@@ -32,6 +32,7 @@ from scripts.modules._audit_checks import (
     get_implemented_rules,
     get_owasp_coverage,
     get_roadmap_rules,
+    get_rules_missing_prefix,
     get_rules_with_corrections,
     get_severity_stats,
     get_tier_stats,
@@ -88,14 +89,21 @@ class AuditResult:
     with_corrections: set[str]
     without_corrections: set[str]
     roadmap_duplicates: set[str] = field(default_factory=set)
+    rules_missing_prefix: list[str] = field(default_factory=list)
 
     @property
     def has_blocking_issues(self) -> bool:
-        """True if any blocking issues were found (duplicates)."""
+        """True if any blocking issues were found.
+
+        Blocks publishing when:
+        - Duplicate class names, rule names, or aliases exist
+        - Rules missing ``[rule_name]`` prefix in problemMessage
+        """
         return bool(
             self.duplicate_report.get("class_names")
             or self.duplicate_report.get("rule_names")
             or self.duplicate_report.get("aliases")
+            or self.rules_missing_prefix
         )
 
 
@@ -453,6 +461,27 @@ def run_full_audit(
     # Duplicate detection (print_duplicate_report uses subheader internally)
     print_duplicate_report(duplicates)
 
+    # Problem message prefix check (BLOCKING — runs even when DX is skipped)
+    rules_missing_prefix = get_rules_missing_prefix(rules_dir)
+    print_subheader("Problem Message Prefix Check")
+    if rules_missing_prefix:
+        print_error(
+            f"{len(rules_missing_prefix)} rule(s) missing "
+            f"[rule_name] prefix in problemMessage (BLOCKING):"
+        )
+        for rule in sorted(rules_missing_prefix)[:20]:
+            print(f"      {Color.RED.value}{rule}{Color.RESET.value}")
+        if len(rules_missing_prefix) > 20:
+            print(
+                f"      {Color.DIM.value}"
+                f"... and {len(rules_missing_prefix) - 20} more"
+                f"{Color.RESET.value}"
+            )
+    else:
+        print_success(
+            "All rules have [rule_name] prefix in problemMessage."
+        )
+
     # Underscore naming audit
     print_subheader("Underscore Naming Audit")
     if not rules_with_1 and not rules_with_0:
@@ -599,4 +628,5 @@ def run_full_audit(
         with_corrections=with_corrections,
         without_corrections=without_corrections,
         roadmap_duplicates=roadmap_duplicates,
+        rules_missing_prefix=rules_missing_prefix,
     )

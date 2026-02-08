@@ -135,9 +135,9 @@ class RequireUpdateShouldNotifyRule extends SaropaLintRule {
       if (extendsClause == null) return;
 
       final String superName = extendsClause.superclass.name.lexeme;
-      if (!superName.contains('InheritedWidget') &&
-          !superName.contains('InheritedNotifier') &&
-          !superName.contains('InheritedModel')) {
+      if (superName != 'InheritedWidget' &&
+          superName != 'InheritedNotifier' &&
+          superName != 'InheritedModel') {
         return;
       }
 
@@ -552,9 +552,9 @@ class AvoidChangeNotifierInWidgetRule extends SaropaLintRule {
     if (element is! InterfaceElement) {
       // Fall back to name matching when type can't be resolved
       final String typeName = node.constructorName.type.name.lexeme;
-      return typeName.contains('Notifier') ||
-          typeName.contains('Controller') ||
-          typeName.contains('ViewModel');
+      return typeName.endsWith('Notifier') ||
+          typeName.endsWith('Controller') ||
+          typeName.endsWith('ViewModel');
     }
 
     // Check the class itself and all supertypes
@@ -647,9 +647,9 @@ class RequireProviderDisposeRule extends SaropaLintRule {
 
           if (name == 'create') {
             final String createSource = arg.expression.toSource();
-            if (createSource.contains('Notifier') ||
-                createSource.contains('Controller') ||
-                createSource.contains('ViewModel')) {
+            if (createSource.endsWith('Notifier()') ||
+                createSource.endsWith('Controller()') ||
+                createSource.endsWith('ViewModel()')) {
               createsNotifier = true;
             }
           }
@@ -1605,8 +1605,9 @@ class AvoidProviderInInitStateRule extends SaropaLintRule {
       if (target is SimpleIdentifier && target.name == 'Provider') {
         if (methodName == 'of') isProviderCall = true;
       } else if (target != null) {
-        final String targetSource = target.toSource().toLowerCase();
-        if (targetSource.contains('context') &&
+        // Match exact 'context' identifier, not variables containing "context"
+        if (target is SimpleIdentifier &&
+            target.name == 'context' &&
             (methodName == 'read' || methodName == 'watch')) {
           isProviderCall = true;
         }
@@ -1685,8 +1686,8 @@ class PreferContextReadInCallbacksRule extends SaropaLintRule {
       final Expression? target = node.target;
       if (target == null) return;
 
-      final String targetSource = target.toSource().toLowerCase();
-      if (!targetSource.contains('context')) return;
+      // Match exact 'context' identifier, not variables containing "context"
+      if (target is! SimpleIdentifier || target.name != 'context') return;
 
       // Check if inside a callback (FunctionExpression)
       AstNode? current = node.parent;
@@ -1825,8 +1826,8 @@ class _ProxyProviderAccessVisitor extends RecursiveAstVisitor<void> {
     if (methodName == 'read' || methodName == 'watch') {
       final Expression? target = node.target;
       if (target != null) {
-        final String targetSource = target.toSource();
-        if (targetSource.contains('context')) {
+        // Match exact 'context' identifier
+        if (target is SimpleIdentifier && target.name == 'context') {
           accessesProviders = true;
         }
       }
