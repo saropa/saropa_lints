@@ -5644,7 +5644,7 @@ class AvoidUserControlledUrlsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_user_controlled_urls',
     problemMessage:
-        'Allowing user-controlled URLs to be loaded without validation exposes your app to security vulnerabilities such as phishing, open redirects, and malicious content injection. This can compromise user data and app integrity. Always validate and sanitize URLs before loading or displaying them. See https://owasp.org/www-community/attacks/Unvalidated_Redirects_and_Forwards_Cheat_Sheet and https://pub.dev/packages/webview_flutter#security-considerations.',
+        '[avoid_user_controlled_urls] Allowing user-controlled URLs to be loaded without validation exposes your app to security vulnerabilities such as phishing, open redirects, and malicious content injection. This can compromise user data and app integrity. Always validate and sanitize URLs before loading or displaying them. See https://owasp.org/www-community/attacks/Unvalidated_Redirects_and_Forwards_Cheat_Sheet and https://pub.dev/packages/webview_flutter#security-considerations.',
     correctionMessage:
         'Implement strict validation and sanitization of all user-provided URLs to prevent security breaches and protect users from malicious content. See https://owasp.org/www-community/attacks/Unvalidated_Redirects_and_Forwards_Cheat_Sheet and https://pub.dev/packages/webview_flutter#security-considerations.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -6214,7 +6214,7 @@ class AvoidSensitiveDataInClipboardRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_sensitive_data_in_clipboard',
     problemMessage:
-        'Copying sensitive data such as passwords, tokens, or personal information to the clipboard exposes users to data theft, as other apps or malicious actors can access clipboard contents. This is a significant privacy and security risk, especially on shared or compromised devices. See https://owasp.org/www-project-top-ten/2017/A3_2017-Sensitive_Data_Exposure.html and https://api.flutter.dev/flutter/services/Clipboard-class.html.',
+        '[avoid_sensitive_data_in_clipboard] Copying sensitive data such as passwords, tokens, or personal information to the clipboard exposes users to data theft, as other apps or malicious actors can access clipboard contents. This is a significant privacy and security risk, especially on shared or compromised devices. See https://owasp.org/www-project-top-ten/2017/A3_2017-Sensitive_Data_Exposure.html and https://api.flutter.dev/flutter/services/Clipboard-class.html.',
     correctionMessage:
         'Avoid placing sensitive data on the clipboard and implement safeguards to prevent accidental exposure. Educate users about the risks and follow platform-specific security guidelines. See https://owasp.org/www-project-top-ten/2017/A3_2017-Sensitive_Data_Exposure.html and https://api.flutter.dev/flutter/services/Clipboard-class.html.',
     errorSeverity: DiagnosticSeverity.WARNING,

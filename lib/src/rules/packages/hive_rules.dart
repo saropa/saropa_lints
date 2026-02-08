@@ -868,7 +868,7 @@ class AvoidHiveFieldIndexReuseRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_hive_field_index_reuse',
     problemMessage:
-        'Reusing Hive field indexes across different fields or types can corrupt your database, cause data loss, and make migrations impossible. This can result in users losing critical data or experiencing app crashes after updates. Always assign unique field indexes and never change them after release. See https://docs.hivedb.dev/#/adapters/fields.',
+        '[avoid_hive_field_index_reuse] Reusing Hive field indexes across different fields or types can corrupt your database, cause data loss, and make migrations impossible. This can result in users losing critical data or experiencing app crashes after updates. Always assign unique field indexes and never change them after release. See https://docs.hivedb.dev/#/adapters/fields.',
     correctionMessage:
         'Ensure each Hive field has a unique, immutable index and avoid reusing or changing indexes after deployment. See https://docs.hivedb.dev/#/adapters/fields for guidance.',
     errorSeverity: DiagnosticSeverity.ERROR,

@@ -87,8 +87,10 @@ class RequireLocationPermissionRationaleRule extends SaropaLintRule {
       if (target == null) return;
 
       final String targetSource = target.toSource();
-      if (!targetSource.contains('location') &&
-          !targetSource.contains('Location')) {
+      // Match specific permission enum values, not any class with "location"
+      if (targetSource != 'Permission.location' &&
+          targetSource != 'Permission.locationAlways' &&
+          targetSource != 'Permission.locationWhenInUse') {
         return;
       }
 
@@ -108,13 +110,11 @@ class RequireLocationPermissionRationaleRule extends SaropaLintRule {
 
       final String bodySource = functionBody.toSource();
 
-      // Check for rationale patterns
+      // Check for rationale patterns using specific function/class names
       if (bodySource.contains('showDialog') ||
           bodySource.contains('AlertDialog') ||
           bodySource.contains('showModalBottomSheet') ||
           bodySource.contains('SnackBar') ||
-          bodySource.contains('rationale') ||
-          bodySource.contains('explanation') ||
           bodySource.contains('shouldShowRationale') ||
           bodySource.contains('shouldShowRequestRationale')) {
         return; // Has rationale
@@ -211,7 +211,6 @@ class RequireCameraPermissionCheckRule extends SaropaLintRule {
           // Check the entire class for permission handling
           final String classSource = current.toSource();
           if (classSource.contains('Permission.camera') ||
-              classSource.contains('permission_handler') ||
               classSource.contains('.camera.request') ||
               classSource.contains('.camera.status') ||
               classSource.contains('requestCameraPermission') ||
@@ -276,8 +275,8 @@ class RequireCameraPermissionCheckRule extends SaropaLintRule {
       if (!bodySource.contains('Permission.camera') &&
           !bodySource.contains('.camera.request') &&
           !bodySource.contains('.camera.status') &&
-          !bodySource.contains('isGranted') &&
-          !bodySource.contains('checkPermission')) {
+          !bodySource.contains('checkCameraPermission') &&
+          !bodySource.contains('requestCameraPermission')) {
         reporter.atNode(node, code);
       }
     });
