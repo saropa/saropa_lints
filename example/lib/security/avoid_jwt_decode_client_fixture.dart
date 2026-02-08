@@ -114,7 +114,7 @@ final token = 'token';
 void _bad1006() {
   final jwt = decodeJwt(token);
   if (jwt['role'] == 'admin') {
-  showAdminPanel(); // User could modify JWT payload!
+    showAdminPanel(); // User could modify JWT payload!
   }
 }
 
@@ -123,6 +123,6 @@ void _good1006() async {
   // Verify role on server
   final response = await api.getUserRole(token);
   if (response.role == 'admin') {
-  showAdminPanel();
+    showAdminPanel();
   }
 }

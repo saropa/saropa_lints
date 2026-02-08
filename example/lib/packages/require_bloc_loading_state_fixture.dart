@@ -114,16 +114,16 @@ dynamic state;
 // expect_lint: require_bloc_loading_state
 void _bad579() async {
   Future<void> _onFetch(FetchEvent event, Emitter<State> emit) async {
-  final data = await api.fetch();  // No loading state!
-  emit(LoadedState(data));
+    final data = await api.fetch(); // No loading state!
+    emit(LoadedState(data));
   }
 }
 
 // GOOD: Should NOT trigger require_bloc_loading_state
 void _good579() async {
   Future<void> _onFetch(FetchEvent event, Emitter<State> emit) async {
-  emit(LoadingState());
-  final data = await api.fetch();
-  emit(LoadedState(data));
+    emit(LoadingState());
+    final data = await api.fetch();
+    emit(LoadedState(data));
   }
 }

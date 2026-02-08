@@ -108,13 +108,13 @@ import '../flutter_mocks.dart';
 // BAD: Should trigger avoid_unreachable_for_loop
 // expect_lint: avoid_unreachable_for_loop
 void _bad254() {
-  for (int i = 10; i < 5; i++) { } // Never executes
-  for (int i = 0; i > 10; i++) { } // Never executes
-  for (int i = 0; i < 10; i--) { } // Infinite loop
+  for (int i = 10; i < 5; i++) {} // Never executes
+  for (int i = 0; i > 10; i++) {} // Never executes
+  for (int i = 0; i < 10; i--) {} // Infinite loop
 }
 
 // GOOD: Should NOT trigger avoid_unreachable_for_loop
 void _good254() {
-  for (int i = 0; i < 10; i++) { } // Standard ascending
-  for (int i = 10; i > 0; i--) { } // Standard descending
+  for (int i = 0; i < 10; i++) {} // Standard ascending
+  for (int i = 10; i > 0; i--) {} // Standard descending
 }

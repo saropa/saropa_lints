@@ -113,15 +113,15 @@ final users = <dynamic>[];
 // expect_lint: prefer_sqflite_singleton
 void _bad379() async {
   Future<void> saveUser(User user) async {
-  final db = await openDatabase('app.db');  // Opens new connection!
-  await db.insert('users', user.toMap());
+    final db = await openDatabase('app.db'); // Opens new connection!
+    await db.insert('users', user.toMap());
   }
 }
 
 // GOOD: Should NOT trigger prefer_sqflite_singleton
 class _good379_DatabaseService {
-static Database? _db;
-static Future<Database> get database async {
-return _db ??= await openDatabase('app.db');
-}
+  static Database? _db;
+  static Future<Database> get database async {
+    return _db ??= await openDatabase('app.db');
+  }
 }

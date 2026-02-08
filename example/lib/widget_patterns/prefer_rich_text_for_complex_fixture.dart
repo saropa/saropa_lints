@@ -112,23 +112,23 @@ final text = 'text';
 // expect_lint: prefer_rich_text_for_complex
 void _bad1436() {
   Row(
-  children: [
-  Text('Hello ', style: TextStyle(fontWeight: FontWeight.bold)),
-  Text('world', style: TextStyle(color: Colors.blue)),
-  Text('!', style: TextStyle(fontSize: 20)),
-  ],
+    children: [
+      Text('Hello ', style: TextStyle(fontWeight: FontWeight.bold)),
+      Text('world', style: TextStyle(color: Colors.blue)),
+      Text('!', style: TextStyle(fontSize: 20)),
+    ],
   );
 }
 
 // GOOD: Should NOT trigger prefer_rich_text_for_complex
 void _good1436() {
   Text.rich(
-  TextSpan(
-  children: [
-  TextSpan(text: 'Hello ', style: TextStyle(fontWeight: FontWeight.bold)),
-  TextSpan(text: 'world', style: TextStyle(color: Colors.blue)),
-  TextSpan(text: '!', style: TextStyle(fontSize: 20)),
-  ],
-  ),
+    TextSpan(
+      children: [
+        TextSpan(text: 'Hello ', style: TextStyle(fontWeight: FontWeight.bold)),
+        TextSpan(text: 'world', style: TextStyle(color: Colors.blue)),
+        TextSpan(text: '!', style: TextStyle(fontSize: 20)),
+      ],
+    ),
   );
 }

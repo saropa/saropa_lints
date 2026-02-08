@@ -116,8 +116,8 @@ void _bad1352() {
 // GOOD: Should NOT trigger avoid_inherited_widget_in_initstate
 void _good1352() {
   Image.network(
-  'https://example.com/image.png',
-  cacheWidth: 200,
-  cacheHeight: 200,
+    'https://example.com/image.png',
+    cacheWidth: 200,
+    cacheHeight: 200,
   );
 }

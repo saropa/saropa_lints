@@ -114,17 +114,17 @@ dynamic map;
 // expect_lint: prefer_for_loop_in_children
 void _bad134() {
   Column(
-  children: List.generate(items.length, (i) => Text(items[i])),
+    children: List.generate(items.length, (i) => Text(items[i])),
   );
 }
 
 // GOOD: Should NOT trigger prefer_for_loop_in_children
 void _good134() {
   Column(
-  children: [for (final item in items) Text(item)],
+    children: [for (final item in items) Text(item)],
   );
   // Or:
   Column(
-  children: items.map((item) => Text(item)).toList(),
+    children: items.map((item) => Text(item)).toList(),
   );
 }

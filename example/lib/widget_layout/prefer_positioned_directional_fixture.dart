@@ -112,17 +112,17 @@ final children = <Widget>[];
 // expect_lint: prefer_positioned_directional
 void _bad1323() {
   Stack(
-  children: [
-  Positioned(left: 10, child: Icon(Icons.arrow_back)),
-  ],
+    children: [
+      Positioned(left: 10, child: Icon(Icons.arrow_back)),
+    ],
   );
 }
 
 // GOOD: Should NOT trigger prefer_positioned_directional
 void _good1323() {
   Stack(
-  children: [
-  PositionedDirectional(start: 10, child: Icon(Icons.arrow_back)),
-  ],
+    children: [
+      PositionedDirectional(start: 10, child: Icon(Icons.arrow_back)),
+    ],
   );
 }

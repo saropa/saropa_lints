@@ -111,7 +111,7 @@ final items = <dynamic>[];
 // expect_lint: avoid_accessing_collections_by_constant_index
 void _bad182() {
   for (var i = 0; i < items.length; i++) {
-  print(items[0]);  // Always accessing first element
+    print(items[0]); // Always accessing first element
   }
 }
 

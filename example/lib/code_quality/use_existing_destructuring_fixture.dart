@@ -113,11 +113,11 @@ dynamic y;
 // expect_lint: use_existing_destructuring
 void _bad228() {
   final (x, y) = point;
-  print(point.x);  // Already have x from destructuring
+  print(point.x); // Already have x from destructuring
 }
 
 // GOOD: Should NOT trigger use_existing_destructuring
 void _good228() {
   final (x, y) = point;
-  print(x);  // Use destructured variable
+  print(x); // Use destructured variable
 }

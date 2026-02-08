@@ -108,17 +108,17 @@ import '../flutter_mocks.dart';
 // BAD: Should trigger require_bloc_close
 // expect_lint: require_bloc_close
 class _bad551__MyState extends State<MyWidget> {
-final _counterBloc = CounterBloc();
+  final _counterBloc = CounterBloc();
 // Missing close - MEMORY LEAK!
 }
 
 // GOOD: Should NOT trigger require_bloc_close
 class _good551__MyState extends State<MyWidget> {
-final _counterBloc = CounterBloc();
+  final _counterBloc = CounterBloc();
 
-@override
-void dispose() {
-_counterBloc.close();
-super.dispose();
-}
+  @override
+  void dispose() {
+    _counterBloc.close();
+    super.dispose();
+  }
 }

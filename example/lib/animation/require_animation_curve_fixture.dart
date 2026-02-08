@@ -109,21 +109,21 @@ import '../flutter_mocks.dart';
 // expect_lint: require_animation_curve
 void _bad35() {
   AnimationController(
-  duration: Duration(milliseconds: 300),
-  vsync: this,
+    duration: Duration(milliseconds: 300),
+    vsync: this,
   ); // Uses linear curve by default
-  
+
   Tween<double>(begin: 0, end: 1).animate(_controller);
 }
 
 // GOOD: Should NOT trigger require_animation_curve
 void _good35() {
   CurvedAnimation(
-  parent: _controller,
-  curve: Curves.easeInOut,
+    parent: _controller,
+    curve: Curves.easeInOut,
   );
-  
+
   Tween<double>(begin: 0, end: 1).animate(
-  CurvedAnimation(parent: _controller, curve: Curves.easeOut),
+    CurvedAnimation(parent: _controller, curve: Curves.easeOut),
   );
 }

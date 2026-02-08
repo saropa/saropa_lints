@@ -112,7 +112,7 @@ dynamic state;
 // BAD: Should trigger emit_new_bloc_state_instances
 // expect_lint: emit_new_bloc_state_instances
 void _bad572() {
-  emit(state..items.add(newItem));  // Mutation!
+  emit(state..items.add(newItem)); // Mutation!
   emit(state..count = newCount);
 }
 

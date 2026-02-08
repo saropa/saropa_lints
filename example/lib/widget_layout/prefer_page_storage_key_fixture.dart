@@ -111,16 +111,16 @@ dynamic child;
 // expect_lint: prefer_page_storage_key
 void _bad1310() {
   GestureDetector(
-  onTap: () => print('tapped'),
-  child: Container(color: Colors.transparent),
+    onTap: () => print('tapped'),
+    child: Container(color: Colors.transparent),
   );
 }
 
 // GOOD: Should NOT trigger prefer_page_storage_key
 void _good1310() {
   GestureDetector(
-  behavior: HitTestBehavior.opaque,
-  onTap: () => print('tapped'),
-  child: Container(color: Colors.transparent),
+    behavior: HitTestBehavior.opaque,
+    onTap: () => print('tapped'),
+    child: Container(color: Colors.transparent),
   );
 }

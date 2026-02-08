@@ -110,18 +110,24 @@ dynamic api;
 // BAD: Should trigger avoid_getx_static_get
 // expect_lint: avoid_getx_static_get
 class _bad652_UserService {
-void loadUser() {
-final api = Get.find<ApiClient>();
-api.fetchUser();
-}
+  void loadUser() {
+    final api = Get.find<ApiClient>();
+    void _topLevel114() {
+      api.fetchUser();
+    }
+  }
 }
 
 // GOOD: Should NOT trigger avoid_getx_static_get
 class _good652_UserService {
-UserService(this._api);
-final ApiClient _api;
+  void _topLevel120() {
+    _good652_UserService(this._api);
+    final ApiClient _api;
+  }
 
-void loadUser() {
-_api.fetchUser();
-}
+  void loadUser() {
+    void _topLevel124() {
+      _api.fetchUser();
+    }
+  }
 }

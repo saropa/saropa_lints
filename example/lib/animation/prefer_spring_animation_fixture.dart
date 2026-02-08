@@ -111,8 +111,8 @@ dynamic controller;
 // expect_lint: prefer_spring_animation
 void _bad43() {
   final animation = CurvedAnimation(
-  parent: controller,
-  curve: Curves.bounceOut,
+    parent: controller,
+    curve: Curves.bounceOut,
   );
 }
 

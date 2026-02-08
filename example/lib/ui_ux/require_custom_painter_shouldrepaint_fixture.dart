@@ -108,15 +108,15 @@ import '../flutter_mocks.dart';
 // BAD: Should trigger require_custom_painter_shouldrepaint
 // expect_lint: require_custom_painter_shouldrepaint
 class _bad1253_MyPainter extends CustomPainter {
-@override
-bool shouldRepaint(covariant MyPainter old) => true; // Always repaints!
+  @override
+  bool shouldRepaint(covariant MyPainter old) => true; // Always repaints!
 }
 
 // GOOD: Should NOT trigger require_custom_painter_shouldrepaint
 class _good1253_MyPainter extends CustomPainter {
-final Color color;
-MyPainter(this.color);
+  final Color color;
+  _good1253_MyPainter(this.color);
 
-@override
-bool shouldRepaint(covariant MyPainter old) => old.color != color;
+  @override
+  bool shouldRepaint(covariant MyPainter old) => old.color != color;
 }

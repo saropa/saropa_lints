@@ -108,15 +108,16 @@ import '../flutter_mocks.dart';
 // BAD: Should trigger prefer_platform_io_conditional
 // expect_lint: prefer_platform_io_conditional
 void _bad827() {
-  if (Platform.isAndroid || Platform.isIOS) { // Crashes on web!
-  // Mobile code
+  if (Platform.isAndroid || Platform.isIOS) {
+    // Crashes on web!
+    // Mobile code
   }
 }
 
 // GOOD: Should NOT trigger prefer_platform_io_conditional
 void _good827() {
   if (!kIsWeb) {
-  if (Platform.isAndroid) { /* Android code */ }
-  if (Platform.isIOS) { /* iOS code */ }
+    if (Platform.isAndroid) {/* Android code */}
+    if (Platform.isIOS) {/* iOS code */}
   }
 }

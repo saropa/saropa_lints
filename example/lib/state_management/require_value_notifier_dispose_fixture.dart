@@ -108,17 +108,17 @@ import '../flutter_mocks.dart';
 // BAD: Should trigger require_value_notifier_dispose
 // expect_lint: require_value_notifier_dispose
 class _bad1028_MyWidget extends StatefulWidget {
-final counter = ValueNotifier<int>(0);
+  final counter = ValueNotifier<int>(0);
 // Missing dispose
 }
 
 // GOOD: Should NOT trigger require_value_notifier_dispose
 class _good1028_MyWidget extends StatefulWidget {
-final counter = ValueNotifier<int>(0);
+  final counter = ValueNotifier<int>(0);
 
-@override
-void dispose() {
-counter.dispose();
-super.dispose();
-}
+  @override
+  void dispose() {
+    counter.dispose();
+    super.dispose();
+  }
 }

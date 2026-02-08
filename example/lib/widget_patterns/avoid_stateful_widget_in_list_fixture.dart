@@ -112,16 +112,16 @@ final children = <Widget>[];
 // expect_lint: avoid_stateful_widget_in_list
 void _bad1394() {
   GestureDetector(
-  onTap: () {},
-  child: ListView(),  // Conflicts with scroll gestures
+    onTap: () {},
+    child: ListView(), // Conflicts with scroll gestures
   );
 }
 
 // GOOD: Should NOT trigger avoid_stateful_widget_in_list
 void _good1394() {
   ListView(
-  children: [
-  GestureDetector(onTap: () {}, child: ListItem()),
-  ],
+    children: [
+      GestureDetector(onTap: () {}, child: ListItem()),
+    ],
   );
 }

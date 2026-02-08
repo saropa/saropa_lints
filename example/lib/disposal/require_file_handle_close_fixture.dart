@@ -110,25 +110,25 @@ final path = '/path';
 // BAD: Should trigger require_file_handle_close
 // expect_lint: require_file_handle_close
 class _bad334__FileReaderState extends State<FileReader> {
-RandomAccessFile? _file;
+  RandomAccessFile? _file;
 
-Future<void> openFile() async {
-_file = await File('path').open();
-}
+  Future<void> openFile() async {
+    _file = await File('path').open();
+  }
 // Missing close!
 }
 
 // GOOD: Should NOT trigger require_file_handle_close
 class _good334__FileReaderState extends State<FileReader> {
-RandomAccessFile? _file;
+  RandomAccessFile? _file;
 
-Future<void> openFile() async {
-_file = await File('path').open();
-}
+  Future<void> openFile() async {
+    _file = await File('path').open();
+  }
 
-@override
-void dispose() {
-_file?.closeSync();
-super.dispose();
-}
+  @override
+  void dispose() {
+    _file?.closeSync();
+    super.dispose();
+  }
 }

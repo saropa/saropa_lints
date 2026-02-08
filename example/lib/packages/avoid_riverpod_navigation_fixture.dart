@@ -115,21 +115,21 @@ dynamic ref;
 final navigatorKeyProvider = Provider((ref) => GlobalKey<NavigatorState>());
 
 class _bad762_MyNotifier extends StateNotifier<MyState> {
-final GlobalKey<NavigatorState> navigatorKey;
+  final GlobalKey<NavigatorState> navigatorKey;
 
-void goToDetails() {
-navigatorKey.currentState?.pushNamed('/details');
-}
+  void goToDetails() {
+    navigatorKey.currentState?.pushNamed('/details');
+  }
 }
 
 // GOOD: Should NOT trigger avoid_riverpod_navigation
 // Navigate in widgets instead
 class _good762_MyWidget extends ConsumerWidget {
-@override
-Widget build(BuildContext context, WidgetRef ref) {
-return ElevatedButton(
-onPressed: () => Navigator.of(context).pushNamed('/details'),
-child: Text('Details'),
-);
-}
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    return ElevatedButton(
+      onPressed: () => Navigator.of(context).pushNamed('/details'),
+      child: Text('Details'),
+    );
+  }
 }

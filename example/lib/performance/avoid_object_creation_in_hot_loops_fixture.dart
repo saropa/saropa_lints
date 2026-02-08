@@ -113,8 +113,8 @@ final items = <dynamic>[];
 // expect_lint: avoid_object_creation_in_hot_loops
 void _bad781() {
   for (final item in items) {
-  final formatter = DateFormat('yyyy-MM-dd');
-  print(formatter.format(item.date));
+    final formatter = DateFormat('yyyy-MM-dd');
+    print(formatter.format(item.date));
   }
 }
 
@@ -122,6 +122,6 @@ void _bad781() {
 void _good781() {
   final formatter = DateFormat('yyyy-MM-dd');
   for (final item in items) {
-  print(formatter.format(item.date));
+    print(formatter.format(item.date));
   }
 }

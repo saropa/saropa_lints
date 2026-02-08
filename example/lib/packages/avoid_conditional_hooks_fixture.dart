@@ -112,17 +112,17 @@ dynamic value;
 // BAD: Should trigger avoid_conditional_hooks
 // expect_lint: avoid_conditional_hooks
 Widget _bad632_build(BuildContext context) {
-if (condition) {
-final value = useState(0); // Wrong!
-}
-return condition ? useCallback() : null; // Wrong!
+  if (condition) {
+    final value = useState(0); // Wrong!
+  }
+  return condition ? useCallback() : null; // Wrong!
 }
 
 // GOOD: Should NOT trigger avoid_conditional_hooks
 Widget _good632_build(BuildContext context) {
-final value = useState(0); // Called unconditionally
-if (condition) {
-value.value = 42; // Use the value conditionally, not the hook
-}
-return Container();
+  final value = useState(0); // Called unconditionally
+  if (condition) {
+    value.value = 42; // Use the value conditionally, not the hook
+  }
+  return Container();
 }

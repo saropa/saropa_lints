@@ -110,26 +110,26 @@ dynamic channel;
 // BAD: Should trigger require_platform_channel_cleanup
 // expect_lint: require_platform_channel_cleanup
 class _bad970__MyState extends State<MyWidget> {
-final channel = MethodChannel('my_channel');
+  final channel = MethodChannel('my_channel');
 
-void initState() {
-super.initState();
-channel.setMethodCallHandler(_handleCall);
-}
+  void initState() {
+    super.initState();
+    channel.setMethodCallHandler(_handleCall);
+  }
 // Handler never removed
 }
 
 // GOOD: Should NOT trigger require_platform_channel_cleanup
 class _good970__MyState extends State<MyWidget> {
-final channel = MethodChannel('my_channel');
+  final channel = MethodChannel('my_channel');
 
-void initState() {
-super.initState();
-channel.setMethodCallHandler(_handleCall);
-}
+  void initState() {
+    super.initState();
+    channel.setMethodCallHandler(_handleCall);
+  }
 
-void dispose() {
-channel.setMethodCallHandler(null);
-super.dispose();
-}
+  void dispose() {
+    channel.setMethodCallHandler(null);
+    super.dispose();
+  }
 }

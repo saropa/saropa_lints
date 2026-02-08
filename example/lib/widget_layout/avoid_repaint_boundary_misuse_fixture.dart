@@ -113,13 +113,13 @@ final text = 'text';
 // expect_lint: avoid_repaint_boundary_misuse
 void _bad1298() {
   RepaintBoundary(
-  child: const Text('Static text'),  // No benefit for static content
+    child: const Text('Static text'), // No benefit for static content
   );
 }
 
 // GOOD: Should NOT trigger avoid_repaint_boundary_misuse
 void _good1298() {
   RepaintBoundary(
-  child: AnimatedWidget(),  // Isolates frequently changing content
+    child: AnimatedWidget(), // Isolates frequently changing content
   );
 }

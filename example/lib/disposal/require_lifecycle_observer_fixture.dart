@@ -110,40 +110,40 @@ dynamic state;
 // BAD: Should trigger require_lifecycle_observer
 // expect_lint: require_lifecycle_observer
 class _bad326__ClockState extends State<Clock> {
-Timer? _timer;
+  Timer? _timer;
 
-@override
-void initState() {
-super.initState();
-_timer = Timer.periodic(Duration(seconds: 1), (_) => setState(() {}));
-}
+  @override
+  void initState() {
+    super.initState();
+    _timer = Timer.periodic(Duration(seconds: 1), (_) => setState(() {}));
+  }
 // Timer fires in background, wasting battery!
 }
 
 // GOOD: Should NOT trigger require_lifecycle_observer
 class _good326__ClockState extends State<Clock> with WidgetsBindingObserver {
-Timer? _timer;
+  Timer? _timer;
 
-@override
-void initState() {
-super.initState();
-WidgetsBinding.instance.addObserver(this);
-_startTimer();
-}
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+    _startTimer();
+  }
 
-@override
-void didChangeAppLifecycleState(AppLifecycleState state) {
-if (state == AppLifecycleState.paused) {
-_timer?.cancel();
-} else if (state == AppLifecycleState.resumed) {
-_startTimer();
-}
-}
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.paused) {
+      _timer?.cancel();
+    } else if (state == AppLifecycleState.resumed) {
+      _startTimer();
+    }
+  }
 
-@override
-void dispose() {
-WidgetsBinding.instance.removeObserver(this);
-_timer?.cancel();
-super.dispose();
-}
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    _timer?.cancel();
+    super.dispose();
+  }
 }

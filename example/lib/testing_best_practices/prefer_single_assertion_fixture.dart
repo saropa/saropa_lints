@@ -113,26 +113,26 @@ dynamic user;
 // expect_lint: prefer_single_assertion
 void _bad1209() {
   test('user operations', () {
-  expect(user.name, 'John');
-  expect(user.age, 30);
-  expect(user.isAdmin, false);
-  expect(user.email, 'john@example.com');
-  expect(user.createdAt, isNotNull);
+    expect(user.name, 'John');
+    expect(user.age, 30);
+    expect(user.isAdmin, false);
+    expect(user.email, 'john@example.com');
+    expect(user.createdAt, isNotNull);
   });
 }
 
 // GOOD: Should NOT trigger prefer_single_assertion
 void _good1209() {
   test('user has correct name', () {
-  expect(user.name, 'John');
+    expect(user.name, 'John');
   });
-  
+
   test('user has correct age', () {
-  expect(user.age, 30);
+    expect(user.age, 30);
   });
   // Or group related assertions:
   test('user is not admin by default', () {
-  expect(user.isAdmin, false);
-  expect(user.permissions, isEmpty); // Related assertion
+    expect(user.isAdmin, false);
+    expect(user.permissions, isEmpty); // Related assertion
   });
 }

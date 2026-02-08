@@ -111,7 +111,7 @@ dynamic x;
 // expect_lint: avoid_unused_after_null_check
 void _bad190() {
   if (x != null) {
-  print('exists');  // x is not used
+    print('exists'); // x is not used
   }
 }
 

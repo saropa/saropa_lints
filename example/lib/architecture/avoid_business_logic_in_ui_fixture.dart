@@ -113,19 +113,19 @@ final items = <dynamic>[];
 // BAD: Should trigger avoid_business_logic_in_ui
 // expect_lint: avoid_business_logic_in_ui
 class _bad77_CartWidget extends StatelessWidget {
-double calculateTotal() {
-return items.fold(0, (sum, item) =>
-sum + item.price * item.quantity * (1 - item.discount));
-}
+  double calculateTotal() {
+    return items.fold(0,
+        (sum, item) => sum + item.price * item.quantity * (1 - item.discount));
+  }
 }
 
 // GOOD: Should NOT trigger avoid_business_logic_in_ui
 // In domain layer
 class _good77_Cart {
-double calculateTotal() {}
+  double calculateTotal() {}
 }
 
 // In UI layer
 class _good77_CartWidget extends StatelessWidget {
-Widget build(context) => Text(cart.calculateTotal().toString());
+  Widget build(context) => Text(cart.calculateTotal().toString());
 }

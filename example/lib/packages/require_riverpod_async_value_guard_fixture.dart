@@ -110,18 +110,18 @@ dynamic error;
 // BAD: Should trigger require_riverpod_async_value_guard
 // expect_lint: require_riverpod_async_value_guard
 class _bad760_MyNotifier extends AsyncNotifier<Data> {
-Future<Data> build() async {
-try {
-return await fetchData();
-} catch (e) {
-throw e; // Poor error handling
-}
-}
+  Future<Data> build() async {
+    try {
+      return await fetchData();
+    } catch (e) {
+      throw e; // Poor error handling
+    }
+  }
 }
 
 // GOOD: Should NOT trigger require_riverpod_async_value_guard
 class _good760_MyNotifier extends AsyncNotifier<Data> {
-Future<Data> build() async {
-return AsyncValue.guard(() => fetchData());
-}
+  Future<Data> build() async {
+    return AsyncValue.guard(() => fetchData());
+  }
 }

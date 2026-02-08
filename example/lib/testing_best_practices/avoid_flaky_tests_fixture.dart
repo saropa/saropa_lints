@@ -109,17 +109,17 @@ import '../flutter_mocks.dart';
 // expect_lint: avoid_flaky_tests
 void _bad1208() async {
   test('flaky test', () {
-  final random = Random(); // Different results each run
-  final now = DateTime.now(); // Time-dependent
-  await Future.delayed(Duration(milliseconds: 100)); // Arbitrary delay
+    final random = Random(); // Different results each run
+    final now = DateTime.now(); // Time-dependent
+    await Future.delayed(Duration(milliseconds: 100)); // Arbitrary delay
   });
 }
 
 // GOOD: Should NOT trigger avoid_flaky_tests
 void _good1208() async {
   test('deterministic test', () {
-  final random = Random(42); // Seeded for reproducibility
-  final clock = FakeClock(); // Mockable time
-  await tester.pump(Duration(milliseconds: 100)); // Use tester.pump
+    final random = Random(42); // Seeded for reproducibility
+    final clock = FakeClock(); // Mockable time
+    await tester.pump(Duration(milliseconds: 100)); // Use tester.pump
   });
 }

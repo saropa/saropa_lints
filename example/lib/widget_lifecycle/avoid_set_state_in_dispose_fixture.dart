@@ -108,18 +108,20 @@ import '../flutter_mocks.dart';
 // BAD: Should trigger avoid_set_state_in_dispose
 // expect_lint: avoid_set_state_in_dispose
 class _bad1364__MyWidgetState extends State<MyWidget> {
-@override
-void dispose() {
-setState(() { _value = null; });  // Error!
-super.dispose();
-}
+  @override
+  void dispose() {
+    setState(() {
+      _value = null;
+    }); // Error!
+    super.dispose();
+  }
 }
 
 // GOOD: Should NOT trigger avoid_set_state_in_dispose
 class _good1364__MyWidgetState extends State<MyWidget> {
-@override
-void dispose() {
-_controller.dispose();
-super.dispose();
-}
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
 }

@@ -108,10 +108,10 @@ import '../flutter_mocks.dart';
 // BAD: Should trigger prefer_isar_lazy_links
 // expect_lint: prefer_isar_lazy_links
 void _bad686() {
-  final posts = IsarLinks<Post>();  // Loads ALL posts eagerly
+  final posts = IsarLinks<Post>(); // Loads ALL posts eagerly
 }
 
 // GOOD: Should NOT trigger prefer_isar_lazy_links
 void _good686() {
-  final posts = IsarLinks<Post>.lazy();  // Loads on-demand
+  final posts = IsarLinks<Post>.lazy(); // Loads on-demand
 }

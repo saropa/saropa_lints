@@ -113,23 +113,23 @@ final children = <Widget>[];
 // expect_lint: prefer_ios_safe_area
 void _bad835() {
   Scaffold(
-  body: Column(
-  children: [
-  Text('Header'), // May be hidden behind notch
-  ],
-  ),
+    body: Column(
+      children: [
+        Text('Header'), // May be hidden behind notch
+      ],
+    ),
   );
 }
 
 // GOOD: Should NOT trigger prefer_ios_safe_area
 void _good835() {
   Scaffold(
-  body: SafeArea(
-  child: Column(
-  children: [
-  Text('Header'),
-  ],
-  ),
-  ),
+    body: SafeArea(
+      child: Column(
+        children: [
+          Text('Header'),
+        ],
+      ),
+    ),
   );
 }

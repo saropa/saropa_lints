@@ -110,7 +110,7 @@ dynamic data;
 // BAD: Should trigger require_isar_inspector_debug_only
 // expect_lint: require_isar_inspector_debug_only
 void _bad680() async {
-  await Isar.open([UserSchema], inspector: true);  // Exposes data in prod!
+  await Isar.open([UserSchema], inspector: true); // Exposes data in prod!
 }
 
 // GOOD: Should NOT trigger require_isar_inspector_debug_only

@@ -111,9 +111,9 @@ dynamic data;
 // expect_lint: require_async_error_documentation
 void _bad357() async {
   Future<void> processData() async {
-  final data = await fetchData();
-  await saveData(data);
-  // Errors propagate silently
+    final data = await fetchData();
+    await saveData(data);
+    // Errors propagate silently
   }
 }
 
@@ -122,7 +122,7 @@ void _good357() async {
   /// Throws [NetworkException] if fetch fails.
   /// Throws [StorageException] if save fails.
   Future<void> processData() async {
-  final data = await fetchData();
-  await saveData(data);
+    final data = await fetchData();
+    await saveData(data);
   }
 }

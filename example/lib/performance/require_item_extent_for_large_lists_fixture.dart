@@ -113,16 +113,16 @@ final index = 0;
 // expect_lint: require_item_extent_for_large_lists
 void _bad784() {
   ListView.builder(
-  itemCount: 10000,
-  itemBuilder: (context, index) => ListTile(),
+    itemCount: 10000,
+    itemBuilder: (context, index) => ListTile(),
   );
 }
 
 // GOOD: Should NOT trigger require_item_extent_for_large_lists
 void _good784() {
   ListView.builder(
-  itemCount: 10000,
-  itemExtent: 56.0, // Fixed height
-  itemBuilder: (context, index) => ListTile(),
+    itemCount: 10000,
+    itemExtent: 56.0, // Fixed height
+    itemBuilder: (context, index) => ListTile(),
   );
 }

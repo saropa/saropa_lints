@@ -113,8 +113,8 @@ dynamic y;
 // expect_lint: avoid_duplicate_patterns
 void _bad197() {
   switch (value) {
-  case (int x, int y) when x > 0:
-  case (int x, int y) when x > 0:  // Duplicate pattern
+    case (int x, int y) when x > 0:
+    case (int x, int y) when x > 0: // Duplicate pattern
   }
 }
 

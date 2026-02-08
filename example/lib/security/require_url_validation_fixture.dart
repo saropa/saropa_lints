@@ -119,7 +119,7 @@ void _bad1016() {
 void _good1016() {
   final url = Uri.parse(userInput);
   if (url.scheme != 'https') {
-  throw SecurityException('Only HTTPS allowed');
+    throw SecurityException('Only HTTPS allowed');
   }
   http.get(url);
 }

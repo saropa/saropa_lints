@@ -108,11 +108,11 @@ import '../flutter_mocks.dart';
 // BAD: Should trigger avoid_ios_background_fetch_abuse
 // expect_lint: avoid_ios_background_fetch_abuse
 void _bad839_backgroundTask() async {
-await Future.delayed(Duration(minutes: 5)); // Will be killed by iOS
-await syncAllData();
+  await Future.delayed(Duration(minutes: 5)); // Will be killed by iOS
+  await syncAllData();
 }
 
 // GOOD: Should NOT trigger avoid_ios_background_fetch_abuse
 void _good839_backgroundTask() async {
-await syncIncrementalData(); // Complete within 30 seconds
+  await syncIncrementalData(); // Complete within 30 seconds
 }

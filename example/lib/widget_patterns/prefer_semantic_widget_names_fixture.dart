@@ -110,16 +110,18 @@ final children = <Widget>[];
 // BAD: Should trigger prefer_semantic_widget_names
 // expect_lint: prefer_semantic_widget_names
 void _bad1382() {
-  children: [
-  SizedBox(height: 8),
-  Divider(),
+  children:
+  [
+    SizedBox(height: 8),
+    Divider(),
   ];
 }
 
 // GOOD: Should NOT trigger prefer_semantic_widget_names
 void _good1382() {
-  children: const [
-  SizedBox(height: 8),
-  Divider(),
+  children:
+  const [
+    SizedBox(height: 8),
+    Divider(),
   ];
 }

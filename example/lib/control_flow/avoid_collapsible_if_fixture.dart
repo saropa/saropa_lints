@@ -112,15 +112,15 @@ dynamic b;
 // expect_lint: avoid_collapsible_if
 void _bad274() {
   if (a) {
-  if (b) {
-  doSomething();
-  }
+    if (b) {
+      doSomething();
+    }
   }
 }
 
 // GOOD: Should NOT trigger avoid_collapsible_if
 void _good274() {
   if (a && b) {
-  doSomething();
+    doSomething();
   }
 }

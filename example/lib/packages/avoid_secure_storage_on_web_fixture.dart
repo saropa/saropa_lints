@@ -121,9 +121,9 @@ void _bad609() async {
 void _good609() async {
   // Check platform and use appropriate storage
   if (kIsWeb) {
-  // Use encrypted cookies or server-side storage
+    // Use encrypted cookies or server-side storage
   } else {
-  final storage = FlutterSecureStorage();
-  await storage.write(key: 'token', value: token);
+    final storage = FlutterSecureStorage();
+    await storage.write(key: 'token', value: token);
   }
 }

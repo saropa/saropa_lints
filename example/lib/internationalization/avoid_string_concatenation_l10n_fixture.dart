@@ -114,12 +114,12 @@ final userName = 'John';
 // BAD: Should trigger avoid_string_concatenation_l10n
 // expect_lint: avoid_string_concatenation_l10n
 void _bad452() {
-  Text('Hello ' + userName + '!');  // Word order is fixed
-  Text('$greeting $name');  // Same problem with interpolation
+  Text('Hello ' + userName + '!'); // Word order is fixed
+  Text('$greeting $name'); // Same problem with interpolation
 }
 
 // GOOD: Should NOT trigger avoid_string_concatenation_l10n
 void _good452() {
-  Text(AppLocalizations.of(context).greeting(name));  // Proper l10n
+  Text(AppLocalizations.of(context).greeting(name)); // Proper l10n
   Text(Intl.message('Hello {name}!', args: [name]));
 }

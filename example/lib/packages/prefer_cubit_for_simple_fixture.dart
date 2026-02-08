@@ -112,17 +112,18 @@ dynamic state;
 // expect_lint: prefer_cubit_for_simple
 // Overly complex for simple counter
 abstract class _bad552_CounterEvent {}
+
 class _bad552_IncrementPressed extends CounterEvent {}
 
 class _bad552_CounterBloc extends Bloc<CounterEvent, int> {
-CounterBloc() : super(0) {
-on<IncrementPressed>((event, emit) => emit(state + 1));
-}
+  _bad552_CounterBloc() : super(0) {
+    on<IncrementPressed>((event, emit) => emit(state + 1));
+  }
 }
 
 // GOOD: Should NOT trigger prefer_cubit_for_simple
 class _good552_CounterCubit extends Cubit<int> {
-CounterCubit() : super(0);
+  _good552_CounterCubit() : super(0);
 
-void increment() => emit(state + 1);
+  void increment() => emit(state + 1);
 }

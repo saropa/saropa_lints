@@ -120,8 +120,8 @@ void _bad737() {
 // GOOD: Should NOT trigger require_riverpod_error_handling
 void _good737() {
   return ref.watch(myAsyncProvider).when(
-  data: (data) => Text(data.toString()),
-  loading: () => CircularProgressIndicator(),
-  error: (err, stack) => ErrorWidget(err),
-  );
+        data: (data) => Text(data.toString()),
+        loading: () => CircularProgressIndicator(),
+        error: (err, stack) => ErrorWidget(err),
+      );
 }

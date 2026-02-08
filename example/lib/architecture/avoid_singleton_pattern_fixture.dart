@@ -110,17 +110,19 @@ final getIt = GetIt.instance;
 // BAD: Should trigger avoid_singleton_pattern
 // expect_lint: avoid_singleton_pattern
 class _bad82_UserService {
-static final UserService _instance = UserService._();
-factory UserService() => _instance;
-UserService._();
+  static final _bad82_UserService _instance = _bad82_UserService._();
+  factory _bad82_UserService() => _instance;
+  _bad82_UserService._();
 }
 
 // GOOD: Should NOT trigger avoid_singleton_pattern
 // Use dependency injection
 class _good82_UserService {
-UserService(this.apiClient);
-final ApiClient apiClient;
+  _good82_UserService(this.apiClient);
+  final ApiClient apiClient;
 }
 
 // Register in DI container
-getIt.registerSingleton(UserService(ApiClient()));
+void _registerDI() {
+  getIt.registerSingleton(UserService(ApiClient()));
+}

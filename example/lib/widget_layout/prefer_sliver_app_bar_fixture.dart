@@ -112,19 +112,19 @@ final title = 'Title';
 // expect_lint: prefer_sliver_app_bar
 void _bad1319() {
   CustomScrollView(
-  slivers: [
-  SliverToBoxAdapter(child: AppBar(title: Text('Title'))),
-  SliverList(),
-  ],
+    slivers: [
+      SliverToBoxAdapter(child: AppBar(title: Text('Title'))),
+      SliverList(),
+    ],
   );
 }
 
 // GOOD: Should NOT trigger prefer_sliver_app_bar
 void _good1319() {
   CustomScrollView(
-  slivers: [
-  SliverAppBar(title: Text('Title'), floating: true),
-  SliverList(),
-  ],
+    slivers: [
+      SliverAppBar(title: Text('Title'), floating: true),
+      SliverList(),
+    ],
   );
 }

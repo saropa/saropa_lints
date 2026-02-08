@@ -110,13 +110,13 @@ final users = <dynamic>[];
 // BAD: Should trigger require_type_adapter_registration
 // expect_lint: require_type_adapter_registration
 void _bad661_main() async {
-await Hive.initFlutter();
-await Hive.openBox<User>('users'); // Error: No adapter for User!
+  await Hive.initFlutter();
+  await Hive.openBox<User>('users'); // Error: No adapter for User!
 }
 
 // GOOD: Should NOT trigger require_type_adapter_registration
 void _good661_main() async {
-await Hive.initFlutter();
-Hive.registerAdapter(UserAdapter());
-await Hive.openBox<User>('users');
+  await Hive.initFlutter();
+  Hive.registerAdapter(UserAdapter());
+  await Hive.openBox<User>('users');
 }

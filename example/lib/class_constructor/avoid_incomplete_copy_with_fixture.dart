@@ -110,15 +110,15 @@ final name = 'example';
 // BAD: Should trigger avoid_incomplete_copy_with
 // expect_lint: avoid_incomplete_copy_with
 class _bad138_User {
-final String name;
-final int age;
-User copyWith({String? name}) => User(name ?? this.name, age);
+  final String name;
+  final int age;
+  User copyWith({String? name}) => User(name ?? this.name, age);
 }
 
 // GOOD: Should NOT trigger avoid_incomplete_copy_with
 class _good138_User {
-final String name;
-final int age;
-User copyWith({String? name, int? age}) =>
-User(name ?? this.name, age ?? this.age);
+  final String name;
+  final int age;
+  User copyWith({String? name, int? age}) =>
+      User(name ?? this.name, age ?? this.age);
 }

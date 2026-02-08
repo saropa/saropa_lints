@@ -110,11 +110,15 @@ dynamic list;
 // BAD: Should trigger avoid_returning_cascades
 // expect_lint: avoid_returning_cascades
 void _bad978() {
-  return list..add(1)..add(2);
+  return list
+    ..add(1)
+    ..add(2);
 }
 
 // GOOD: Should NOT trigger avoid_returning_cascades
 void _good978() {
-  list..add(1)..add(2);
+  list
+    ..add(1)
+    ..add(2);
   return list;
 }

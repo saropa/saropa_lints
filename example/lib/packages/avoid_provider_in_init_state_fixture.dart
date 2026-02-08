@@ -112,11 +112,11 @@ dynamic user;
 // expect_lint: avoid_provider_in_init_state
 void _bad717_initState() {
 // super.initState();
-final user = Provider.of<User>(context); // May fail!
+  final user = Provider.of<User>(context); // May fail!
 }
 
 // GOOD: Should NOT trigger avoid_provider_in_init_state
 void _good717_didChangeDependencies() {
 // super.didChangeDependencies();
-final user = Provider.of<User>(context);
+  final user = Provider.of<User>(context);
 }

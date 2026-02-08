@@ -112,24 +112,24 @@ final children = <Widget>[];
 // expect_lint: avoid_merged_semantics_hiding_info
 void _bad6() {
   MergeSemantics(
-  child: Column(
-  children: [
-  Text('Price:'),
-  Text('\$99.99'),
-  ElevatedButton(onPressed: () {}, child: Text('Buy')),
-  ],
-  ),
+    child: Column(
+      children: [
+        Text('Price:'),
+        Text('\$99.99'),
+        ElevatedButton(onPressed: () {}, child: Text('Buy')),
+      ],
+    ),
   );
 }
 
 // GOOD: Should NOT trigger avoid_merged_semantics_hiding_info
 void _good6() {
   Column(
-  children: [
-  MergeSemantics(
-  child: Row(children: [Text('Price:'), Text('\$99.99')]),
-  ),
-  ElevatedButton(onPressed: () {}, child: Text('Buy')),
-  ],
+    children: [
+      MergeSemantics(
+        child: Row(children: [Text('Price:'), Text('\$99.99')]),
+      ),
+      ElevatedButton(onPressed: () {}, child: Text('Buy')),
+    ],
   );
 }

@@ -117,12 +117,12 @@ void _bad11() {
 // GOOD: Should NOT trigger require_image_semantics
 void _good11() {
   Image.network(
-  'https://example.com/photo.jpg',
-  semanticLabel: 'Profile photo of user',
+    'https://example.com/photo.jpg',
+    semanticLabel: 'Profile photo of user',
   );
   // For decorative images:
   Image.asset(
-  'assets/decoration.png',
-  excludeFromSemantics: true,
+    'assets/decoration.png',
+    excludeFromSemantics: true,
   );
 }

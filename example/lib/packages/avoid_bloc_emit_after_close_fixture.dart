@@ -113,17 +113,17 @@ dynamic event;
 // expect_lint: avoid_bloc_emit_after_close
 void _bad576() async {
   Future<void> _onFetch(FetchEvent event, Emitter<State> emit) async {
-  final data = await api.fetch();
-  emit(LoadedState(data));  // Bloc might be closed!
+    final data = await api.fetch();
+    emit(LoadedState(data)); // Bloc might be closed!
   }
 }
 
 // GOOD: Should NOT trigger avoid_bloc_emit_after_close
 void _good576() async {
   Future<void> _onFetch(FetchEvent event, Emitter<State> emit) async {
-  final data = await api.fetch();
-  if (!isClosed) {
-  emit(LoadedState(data));
-  }
+    final data = await api.fetch();
+    if (!isClosed) {
+      emit(LoadedState(data));
+    }
   }
 }

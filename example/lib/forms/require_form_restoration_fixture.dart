@@ -110,15 +110,16 @@ dynamic data;
 // BAD: Should trigger require_form_restoration
 // expect_lint: require_form_restoration
 class _bad401__FormState extends State<MyForm> {
-String? _name;
-String? _email;
-String? _address;
-String? _phone;
+  String? _name;
+  String? _email;
+  String? _address;
+  String? _phone;
 // 5+ fields without restoration = data loss risk
 }
 
 // GOOD: Should NOT trigger require_form_restoration
 class _good401__FormState extends State<MyForm> with RestorationMixin {
-final RestorableTextEditingController _name = RestorableTextEditingController();
+  final RestorableTextEditingController _name =
+      RestorableTextEditingController();
 // Or persist drafts to SharedPreferences
 }

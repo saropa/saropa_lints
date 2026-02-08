@@ -111,14 +111,13 @@ dynamic status;
 // expect_lint: prefer_switch_with_enums
 void _bad215() {
   if (status == Status.active) {
-  } else if (status == Status.pending) {
-  }
+  } else if (status == Status.pending) {}
 }
 
 // GOOD: Should NOT trigger prefer_switch_with_enums
 void _good215() {
   switch (status) {
-  case Status.active: //
-  case Status.pending: //
+    case Status.active: //
+    case Status.pending: //
   }
 }

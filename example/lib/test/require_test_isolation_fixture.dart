@@ -115,27 +115,27 @@ dynamic state;
 // expect_lint: require_test_isolation
 void _bad1170() {
   final List<String> items = []; // Shared mutable state!
-  
+
   test('adds item', () {
-  items.add('a');
-  expect(items, hasLength(1));
+    items.add('a');
+    expect(items, hasLength(1));
   });
-  
+
   test('removes item', () {
-  items.remove('a'); // Assumes 'a' was added by previous test!
+    items.remove('a'); // Assumes 'a' was added by previous test!
   });
 }
 
 // GOOD: Should NOT trigger require_test_isolation
 void _good1170() {
   late List<String> items;
-  
+
   setUp(() {
-  items = []; // Fresh list for each test
+    items = []; // Fresh list for each test
   });
-  
+
   test('adds item', () {
-  items.add('a');
-  expect(items, hasLength(1));
+    items.add('a');
+    expect(items, hasLength(1));
   });
 }

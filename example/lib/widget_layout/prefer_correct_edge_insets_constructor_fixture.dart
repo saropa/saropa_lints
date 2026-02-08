@@ -108,8 +108,8 @@ import '../flutter_mocks.dart';
 // BAD: Should trigger prefer_correct_edge_insets_constructor
 // expect_lint: prefer_correct_edge_insets_constructor
 void _bad1289() {
-  EdgeInsets.fromLTRB(8, 8, 8, 8)  // Use .all instead
-  EdgeInsets.only(left: 8, right: 8)  // Use .symmetric instead
+  EdgeInsets.fromLTRB(8, 8, 8, 8); // Use .all instead
+  EdgeInsets.only(left: 8, right: 8); // Use .symmetric instead
 }
 
 // GOOD: Should NOT trigger prefer_correct_edge_insets_constructor

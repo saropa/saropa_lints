@@ -113,29 +113,29 @@ final label = 'label';
 // expect_lint: require_button_semantics
 void _bad14() {
   GestureDetector(
-  onTap: () => doSomething(),
-  child: Container(
-  child: Icon(Icons.add),
-  ),
+    onTap: () => doSomething(),
+    child: Container(
+      child: Icon(Icons.add),
+    ),
   );
 }
 
 // GOOD: Should NOT trigger require_button_semantics
 void _good14() {
   Semantics(
-  button: true,
-  label: 'Add item',
-  child: GestureDetector(
-  onTap: () => doSomething(),
-  child: Container(
-  child: Icon(Icons.add),
-  ),
-  ),
+    button: true,
+    label: 'Add item',
+    child: GestureDetector(
+      onTap: () => doSomething(),
+      child: Container(
+        child: Icon(Icons.add),
+      ),
+    ),
   );
   // Or use IconButton which has built-in semantics:
   IconButton(
-  onPressed: () => doSomething(),
-  icon: Icon(Icons.add),
-  tooltip: 'Add item',
+    onPressed: () => doSomething(),
+    icon: Icon(Icons.add),
+    tooltip: 'Add item',
   );
 }

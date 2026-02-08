@@ -112,11 +112,11 @@ dynamic theme;
 // expect_lint: prefer_sized_box_for_whitespace
 void _bad1302_initState() {
 // super.initState();
-final theme = Theme.of(context); // BAD
+  final theme = Theme.of(context); // BAD
 }
 
 // GOOD: Should NOT trigger prefer_sized_box_for_whitespace
 void _good1302_didChangeDependencies() {
 // super.didChangeDependencies();
-final theme = Theme.of(context); // OK
+  final theme = Theme.of(context); // OK
 }

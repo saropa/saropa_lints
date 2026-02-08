@@ -112,10 +112,12 @@ dynamic b;
 // expect_lint: avoid_nested_switches
 void _bad284() {
   switch (a) {
-  case 1:
-  switch (b) {  // Nested switch
-  case 2: break;
-  }
+    case 1:
+      switch (b) {
+        // Nested switch
+        case 2:
+          break;
+      }
   }
 }
 

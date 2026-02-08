@@ -110,8 +110,8 @@ dynamic x;
 // BAD: Should trigger avoid_contradictory_expressions
 // expect_lint: avoid_contradictory_expressions
 void _bad175() {
-  if (x > 5 && x < 3) { }  // Always false
-  if (x == null && x.length > 0) { }  // Second part throws
+  if (x > 5 && x < 3) {} // Always false
+  if (x == null && x.length > 0) {} // Second part throws
 }
 
 // GOOD: Should NOT trigger avoid_contradictory_expressions

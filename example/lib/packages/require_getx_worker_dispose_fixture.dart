@@ -110,29 +110,29 @@ var count = 0;
 // BAD: Should trigger require_getx_worker_dispose
 // expect_lint: require_getx_worker_dispose
 class _bad638_MyController extends GetxController {
-late Worker _countWorker;
+  late Worker _countWorker;
 
-@override
-void onInit() {
-super.onInit();
-_countWorker = ever(count, (_) => print('changed'));
-}
+  @override
+  void onInit() {
+    super.onInit();
+    _countWorker = ever(count, (_) => print('changed'));
+  }
 // Missing onClose with _countWorker.dispose()!
 }
 
 // GOOD: Should NOT trigger require_getx_worker_dispose
 class _good638_MyController extends GetxController {
-late Worker _countWorker;
+  late Worker _countWorker;
 
-@override
-void onInit() {
-super.onInit();
-_countWorker = ever(count, (_) => print('changed'));
-}
+  @override
+  void onInit() {
+    super.onInit();
+    _countWorker = ever(count, (_) => print('changed'));
+  }
 
-@override
-void onClose() {
-_countWorker.dispose();
-super.onClose();
-}
+  @override
+  void onClose() {
+    _countWorker.dispose();
+    super.onClose();
+  }
 }

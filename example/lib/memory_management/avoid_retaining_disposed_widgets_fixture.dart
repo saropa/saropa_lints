@@ -114,17 +114,17 @@ dynamic widget;
 // BAD: Should trigger avoid_retaining_disposed_widgets
 // expect_lint: avoid_retaining_disposed_widgets
 class _bad476_MyService {
-Widget? cachedWidget;        // LINT - retains widget reference
-State? savedState;           // LINT - retains State reference
-BuildContext? storedContext;  // LINT - retains context
+  Widget? cachedWidget; // LINT - retains widget reference
+  State? savedState; // LINT - retains State reference
+  BuildContext? storedContext; // LINT - retains context
 }
 
 // GOOD: Should NOT trigger avoid_retaining_disposed_widgets
 class _good476_MyService {
-String? cachedData;          // OK - plain data
-VoidCallback? onUpdate;      // OK - callback
+  String? cachedData; // OK - plain data
+  VoidCallback? onUpdate; // OK - callback
 }
 
 class MyWidget extends StatefulWidget {
-final Widget child;          // OK - widget tree composition
+  final Widget child; // OK - widget tree composition
 }

@@ -121,16 +121,16 @@ void _bad1249() {
 // GOOD: Should NOT trigger require_enum_unknown_value
 void _good1249() {
   final status = Status.values.asNameMap()[json['status']] ?? Status.unknown;
-  
+
   // Or with tryByName extension
   final type = MyEnum.values.tryByName(data) ?? MyEnum.fallback;
-  
+
   // Or exhaustive switch with default
   Status parseStatus(String value) {
-  return switch (value) {
-  'active' => Status.active,
-  'inactive' => Status.inactive,
-  _ => Status.unknown,
-  };
+    return switch (value) {
+      'active' => Status.active,
+      'inactive' => Status.inactive,
+      _ => Status.unknown,
+    };
   }
 }

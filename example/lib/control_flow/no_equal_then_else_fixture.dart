@@ -111,13 +111,13 @@ final condition = false;
 // expect_lint: no_equal_then_else
 void _bad293() {
   if (condition) {
-  doSomething();
+    doSomething();
   } else {
-  doSomething();  // Same as if branch
+    doSomething(); // Same as if branch
   }
 }
 
 // GOOD: Should NOT trigger no_equal_then_else
 void _good293() {
-  doSomething();  // No need for the condition
+  doSomething(); // No need for the condition
 }

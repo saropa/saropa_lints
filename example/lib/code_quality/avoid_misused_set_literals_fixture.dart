@@ -112,12 +112,12 @@ dynamic map;
 // BAD: Should trigger avoid_misused_set_literals
 // expect_lint: avoid_misused_set_literals
 void _bad153() {
-  Map<String, int> map = {};  // This is actually a Set literal!
-  var items = {1, 2, 3};  // Set when Map might be expected
+  Map<String, int> map = {}; // This is actually a Set literal!
+  var items = {1, 2, 3}; // Set when Map might be expected
 }
 
 // GOOD: Should NOT trigger avoid_misused_set_literals
 void _good153() {
-  Map<String, int> map = <String, int>{};  // Explicit Map
-  Set<int> items = {1, 2, 3};  // Explicit Set type
+  Map<String, int> map = <String, int>{}; // Explicit Map
+  Set<int> items = {1, 2, 3}; // Explicit Set type
 }

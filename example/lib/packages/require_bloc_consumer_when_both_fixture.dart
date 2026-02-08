@@ -114,25 +114,25 @@ dynamic state;
 // expect_lint: require_bloc_consumer_when_both
 void _bad584() {
   BlocListener<AuthBloc, AuthState>(
-  listener: (context, state) {
-  if (state is AuthError) showSnackBar();
-  },
-  child: BlocBuilder<AuthBloc, AuthState>(
-  builder: (context, state) {
-  return Text(state.toString());
-  },
-  ),
+    listener: (context, state) {
+      if (state is AuthError) showSnackBar();
+    },
+    child: BlocBuilder<AuthBloc, AuthState>(
+      builder: (context, state) {
+        return Text(state.toString());
+      },
+    ),
   );
 }
 
 // GOOD: Should NOT trigger require_bloc_consumer_when_both
 void _good584() {
   BlocConsumer<AuthBloc, AuthState>(
-  listener: (context, state) {
-  if (state is AuthError) showSnackBar();
-  },
-  builder: (context, state) {
-  return Text(state.toString());
-  },
+    listener: (context, state) {
+      if (state is AuthError) showSnackBar();
+    },
+    builder: (context, state) {
+      return Text(state.toString());
+    },
   );
 }

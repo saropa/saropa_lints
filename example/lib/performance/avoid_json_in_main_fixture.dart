@@ -114,15 +114,15 @@ final url = 'https://example.com';
 // expect_lint: avoid_json_in_main
 void _bad820() async {
   Future<List<Item>> fetchItems() async {
-  final response = await http.get(url);
-  return jsonDecode(response.body); // Blocks UI!
+    final response = await http.get(url);
+    return jsonDecode(response.body); // Blocks UI!
   }
 }
 
 // GOOD: Should NOT trigger avoid_json_in_main
 void _good820() async {
   Future<List<Item>> fetchItems() async {
-  final response = await http.get(url);
-  return compute(jsonDecode, response.body);
+    final response = await http.get(url);
+    return compute(jsonDecode, response.body);
   }
 }

@@ -114,8 +114,8 @@ dynamic y;
 // BAD: Should trigger avoid_bitwise_operators_with_booleans
 // expect_lint: avoid_bitwise_operators_with_booleans
 void _bad257() {
-  if (a & b) {}  // Should be &&
-  bool result = x | y;  // Should be ||
+  if (a & b) {} // Should be &&
+  bool result = x | y; // Should be ||
 }
 
 // GOOD: Should NOT trigger avoid_bitwise_operators_with_booleans

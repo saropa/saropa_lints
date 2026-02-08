@@ -108,7 +108,7 @@ import '../flutter_mocks.dart';
 // BAD: Should trigger dispose_widget_fields
 // expect_lint: dispose_widget_fields
 class _bad1356__MyState extends State<MyWidget> {
-final _controller = TextEditingController();
+  final _controller = TextEditingController();
 // Missing dispose() override
 }
 

@@ -112,19 +112,19 @@ final children = <Widget>[];
 // expect_lint: prefer_wrap_over_overflow
 void _bad1314() {
   Column(
-  children: [
-  Text('Title', style: TextStyle(fontSize: 24)),
-  Text('Subtitle', style: TextStyle(fontSize: 24)),
-  ],
+    children: [
+      Text('Title', style: TextStyle(fontSize: 24)),
+      Text('Subtitle', style: TextStyle(fontSize: 24)),
+    ],
   );
 }
 
 // GOOD: Should NOT trigger prefer_wrap_over_overflow
 void _good1314() {
   DefaultTextStyle(
-  style: TextStyle(fontSize: 24),
-  child: Column(
-  children: [Text('Title'), Text('Subtitle')],
-  ),
+    style: TextStyle(fontSize: 24),
+    child: Column(
+      children: [Text('Title'), Text('Subtitle')],
+    ),
   );
 }

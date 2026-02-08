@@ -110,7 +110,8 @@ dynamic map;
 // BAD: Should trigger avoid_missing_enum_constant_in_map
 // expect_lint: avoid_missing_enum_constant_in_map
 enum Status { active, inactive, pending }
-final map = {Status.active: 'A', Status.inactive: 'I'};  // Missing pending
+
+final map = {Status.active: 'A', Status.inactive: 'I'}; // Missing pending
 
 // GOOD: Should NOT trigger avoid_missing_enum_constant_in_map
 void _good179() {

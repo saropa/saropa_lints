@@ -118,8 +118,8 @@ void _bad773() async {
 void _good773() async {
   final uri = Uri.parse('https://example.com');
   if (await canLaunchUrl(uri)) {
-  await launchUrl(uri);
+    await launchUrl(uri);
   } else {
-  showError('Could not open link');
+    showError('Could not open link');
   }
 }

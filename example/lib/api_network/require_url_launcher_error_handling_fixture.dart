@@ -112,16 +112,16 @@ final url = 'https://example.com';
 // BAD: Should trigger require_url_launcher_error_handling
 // expect_lint: require_url_launcher_error_handling
 void _bad62() async {
-  await launchUrl(Uri.parse(url));  // May throw!
+  await launchUrl(Uri.parse(url)); // May throw!
 }
 
 // GOOD: Should NOT trigger require_url_launcher_error_handling
 void _good62() async {
   try {
-  if (await canLaunchUrl(uri)) {
-  await launchUrl(uri);
-  }
+    if (await canLaunchUrl(uri)) {
+      await launchUrl(uri);
+    }
   } catch (e) {
-  // Handle error
+    // Handle error
   }
 }

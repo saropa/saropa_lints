@@ -112,16 +112,16 @@ dynamic ref;
 // BAD: Should trigger prefer_ref_watch_over_read
 // expect_lint: prefer_ref_watch_over_read
 class _bad751_MyWidget extends ConsumerWidget {
-Widget build(context, ref) {
-final count = ref.read(counterProvider); // Won't rebuild!
-return Text('$count');
-}
+  Widget build(context, ref) {
+    final count = ref.read(counterProvider); // Won't rebuild!
+    return Text('$count');
+  }
 }
 
 // GOOD: Should NOT trigger prefer_ref_watch_over_read
 class _good751_MyWidget extends ConsumerWidget {
-Widget build(context, ref) {
-final count = ref.watch(counterProvider); // Rebuilds on change
-return Text('$count');
-}
+  Widget build(context, ref) {
+    final count = ref.watch(counterProvider); // Rebuilds on change
+    return Text('$count');
+  }
 }

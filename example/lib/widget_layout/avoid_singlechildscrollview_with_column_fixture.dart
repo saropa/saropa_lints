@@ -112,17 +112,17 @@ final children = <Widget>[];
 // expect_lint: avoid_singlechildscrollview_with_column
 void _bad1299() {
   SingleChildScrollView(
-  child: Column(
-  children: [
-  Expanded(child: Container()),  // Expanded won't work!
-  ],
-  ),
+    child: Column(
+      children: [
+        Expanded(child: Container()), // Expanded won't work!
+      ],
+    ),
   );
 }
 
 // GOOD: Should NOT trigger avoid_singlechildscrollview_with_column
 void _good1299() {
   ListView(
-  children: [],
+    children: [],
   );
 }

@@ -111,6 +111,7 @@ dynamic file;
 // expect_lint: prefer_single_declaration_per_file
 // my_file.dart
 class _bad214_Foo {}
+
 class _bad214_Bar {} // Should be in separate file
 
 // GOOD: Should NOT trigger prefer_single_declaration_per_file

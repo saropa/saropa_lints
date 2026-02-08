@@ -110,12 +110,12 @@ final key = 'key';
 // BAD: Should trigger prefer_weak_references_for_cache
 // expect_lint: prefer_weak_references_for_cache
 class _bad471_WidgetCache {
-final Map<String, Widget> _widgets = {}; // Strong references
+  final Map<String, Widget> _widgets = {}; // Strong references
 }
 
 // GOOD: Should NOT trigger prefer_weak_references_for_cache
 class _good471_WidgetCache {
-final Map<String, WeakReference<Widget>> _widgets = {};
+  final Map<String, WeakReference<Widget>> _widgets = {};
 
-Widget? get(String key) => _widgets[key]?.target;
+  Widget? get(String key) => _widgets[key]?.target;
 }

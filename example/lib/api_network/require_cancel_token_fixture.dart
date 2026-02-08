@@ -112,24 +112,24 @@ final mounted = true;
 // BAD: Should trigger require_cancel_token
 // expect_lint: require_cancel_token
 class _bad58__MyWidgetState extends State<MyWidget> {
-Future<void> loadData() async {
-final data = await api.fetchData(); // No cancellation
-setState(() => _data = data);
-}
+  Future<void> loadData() async {
+    final data = await api.fetchData(); // No cancellation
+    setState(() => _data = data);
+  }
 }
 
 // GOOD: Should NOT trigger require_cancel_token
 class _good58__MyWidgetState extends State<MyWidget> {
-final CancelToken _cancelToken = CancelToken();
+  final CancelToken _cancelToken = CancelToken();
 
-Future<void> loadData() async {
-final data = await api.fetchData(cancelToken: _cancelToken);
-if (mounted) setState(() => _data = data);
-}
+  Future<void> loadData() async {
+    final data = await api.fetchData(cancelToken: _cancelToken);
+    if (mounted) setState(() => _data = data);
+  }
 
-@override
-void dispose() {
-_cancelToken.cancel();
-super.dispose();
-}
+  @override
+  void dispose() {
+    _cancelToken.cancel();
+    super.dispose();
+  }
 }

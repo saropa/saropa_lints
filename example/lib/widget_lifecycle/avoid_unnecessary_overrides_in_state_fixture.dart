@@ -108,10 +108,10 @@ import '../flutter_mocks.dart';
 // BAD: Should trigger avoid_unnecessary_overrides_in_state
 // expect_lint: avoid_unnecessary_overrides_in_state
 class _bad1355__MyState extends State<MyWidget> {
-@override
-void initState() {
-super.initState(); // Only calls super
-}
+  @override
+  void initState() {
+    super.initState(); // Only calls super
+  }
 }
 
 // GOOD: Should NOT trigger avoid_unnecessary_overrides_in_state

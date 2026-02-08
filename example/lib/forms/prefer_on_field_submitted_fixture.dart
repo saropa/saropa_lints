@@ -111,8 +111,8 @@ final password = 'secret';
 // expect_lint: prefer_on_field_submitted
 void _bad410() {
   TextFormField(
-  decoration: InputDecoration(labelText: 'Email'),
-  textInputAction: TextInputAction.next,
+    decoration: InputDecoration(labelText: 'Email'),
+    textInputAction: TextInputAction.next,
   );
   // Pressing "Next" does nothing
 }
@@ -120,9 +120,9 @@ void _bad410() {
 // GOOD: Should NOT trigger prefer_on_field_submitted
 void _good410() {
   TextFormField(
-  decoration: InputDecoration(labelText: 'Email'),
-  textInputAction: TextInputAction.next,
-  onFieldSubmitted: (_) => _passwordFocusNode.requestFocus(),
+    decoration: InputDecoration(labelText: 'Email'),
+    textInputAction: TextInputAction.next,
+    onFieldSubmitted: (_) => _passwordFocusNode.requestFocus(),
   );
   // Pressing "Next" moves focus to password field
 }

@@ -108,25 +108,25 @@ import '../flutter_mocks.dart';
 // BAD: Should trigger require_animation_controller_dispose
 // expect_lint: require_animation_controller_dispose
 class _bad31__MyState extends State<MyWidget>
-with SingleTickerProviderStateMixin {
-late final _controller = AnimationController(
-vsync: this,
-duration: Duration(seconds: 1),
-);
+    with SingleTickerProviderStateMixin {
+  late final _controller = AnimationController(
+    vsync: this,
+    duration: Duration(seconds: 1),
+  );
 // Missing dispose - memory leak!
 }
 
 // GOOD: Should NOT trigger require_animation_controller_dispose
 class _good31__MyState extends State<MyWidget>
-with SingleTickerProviderStateMixin {
-late final _controller = AnimationController(
-vsync: this,
-duration: Duration(seconds: 1),
-);
+    with SingleTickerProviderStateMixin {
+  late final _controller = AnimationController(
+    vsync: this,
+    duration: Duration(seconds: 1),
+  );
 
-@override
-void dispose() {
-_controller.dispose(); // or _controller.disposeSafe();
-super.dispose();
-}
+  @override
+  void dispose() {
+    _controller.dispose(); // or _controller.disposeSafe();
+    super.dispose();
+  }
 }

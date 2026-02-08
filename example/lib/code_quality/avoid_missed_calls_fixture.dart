@@ -110,11 +110,11 @@ dynamic list;
 // BAD: Should trigger avoid_missed_calls
 // expect_lint: avoid_missed_calls
 void _bad152() {
-  print(list.length);  // OK - property
-  print(myMethod);  // BAD - probably meant myMethod();
+  print(list.length); // OK - property
+  print(myMethod); // BAD - probably meant myMethod();
 }
 
 // GOOD: Should NOT trigger avoid_missed_calls
 void _good152() {
-  print(myMethod());  // Method is called
+  print(myMethod()); // Method is called
 }

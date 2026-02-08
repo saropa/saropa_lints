@@ -117,24 +117,24 @@ final title = 'Title';
 // expect_lint: require_keys_in_animated_lists
 void _bad777() {
   AnimatedList(
-  itemBuilder: (context, index, animation) {
-  return SlideTransition(
-  position: animation,
-  child: ListTile(title: Text(items[index])),
-  );
-  },
+    itemBuilder: (context, index, animation) {
+      return SlideTransition(
+        position: animation,
+        child: ListTile(title: Text(items[index])),
+      );
+    },
   );
 }
 
 // GOOD: Should NOT trigger require_keys_in_animated_lists
 void _good777() {
   AnimatedList(
-  itemBuilder: (context, index, animation) {
-  return SlideTransition(
-  key: ValueKey(items[index].id),
-  position: animation,
-  child: ListTile(title: Text(items[index])),
-  );
-  },
+    itemBuilder: (context, index, animation) {
+      return SlideTransition(
+        key: ValueKey(items[index].id),
+        position: animation,
+        child: ListTile(title: Text(items[index])),
+      );
+    },
   );
 }

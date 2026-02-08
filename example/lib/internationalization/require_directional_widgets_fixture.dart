@@ -112,7 +112,7 @@ final label = 'label';
 // expect_lint: require_directional_widgets
 void _bad438() {
   Padding(padding: EdgeInsets.only(left: 16));
-  Row(children: [icon, Text(label)]) // Icon always on left
+  Row(children: [icon, Text(label)]); // Icon always on left
 }
 
 // GOOD: Should NOT trigger require_directional_widgets

@@ -112,19 +112,19 @@ dynamic widget;
 // BAD: Should trigger avoid_provider_recreate
 // expect_lint: avoid_provider_recreate
 Widget _bad705_build(BuildContext context) {
-return ChangeNotifierProvider(
-create: (_) => MyNotifier(), // New instance on every rebuild!
-child: MyWidget(),
-);
+  return ChangeNotifierProvider(
+    create: (_) => MyNotifier(), // New instance on every rebuild!
+    child: MyWidget(),
+  );
 }
 
 // GOOD: Should NOT trigger avoid_provider_recreate
 // Create providers above the widget that rebuilds
 class _good705_MyApp extends StatelessWidget {
-Widget build(BuildContext context) {
-return ChangeNotifierProvider(
-create: (_) => MyNotifier(),
-child: MaterialApp(),
-);
-}
+  Widget build(BuildContext context) {
+    return ChangeNotifierProvider(
+      create: (_) => MyNotifier(),
+      child: MaterialApp(),
+    );
+  }
 }

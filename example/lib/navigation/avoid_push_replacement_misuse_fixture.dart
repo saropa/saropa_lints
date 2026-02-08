@@ -119,7 +119,7 @@ void _bad528() {
 void _good528() {
   // Use push for screens that should stack
   Navigator.push(context, route);
-  
+
   // Use pushReplacement only for login->home transitions
   Navigator.pushReplacement(context, homeRoute);
 }

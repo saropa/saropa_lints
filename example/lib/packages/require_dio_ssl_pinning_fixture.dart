@@ -119,11 +119,11 @@ void _bad593() {
 // GOOD: Should NOT trigger require_dio_ssl_pinning
 void _good593() {
   dio.httpClientAdapter = IOHttpClientAdapter(
-  createHttpClient: () {
-  final client = HttpClient(context: SecurityContext());
-  client.badCertificateCallback = (cert, host, port) =>
-  validateCertificate(cert);
-  return client;
-  },
+    createHttpClient: () {
+      final client = HttpClient(context: SecurityContext());
+      client.badCertificateCallback =
+          (cert, host, port) => validateCertificate(cert);
+      return client;
+    },
   );
 }

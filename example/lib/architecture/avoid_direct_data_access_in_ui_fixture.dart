@@ -110,10 +110,10 @@ dynamic data;
 // BAD: Should trigger avoid_direct_data_access_in_ui
 // expect_lint: avoid_direct_data_access_in_ui
 class _bad76_MyWidget extends StatelessWidget {
-final UserRepository repository; // Direct data access
+  final UserRepository repository; // Direct data access
 }
 
 // GOOD: Should NOT trigger avoid_direct_data_access_in_ui
 class _good76_MyWidget extends StatelessWidget {
-final UserViewModel viewModel; // Through presentation layer
+  final UserViewModel viewModel; // Through presentation layer
 }

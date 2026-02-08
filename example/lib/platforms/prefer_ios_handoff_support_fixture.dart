@@ -117,9 +117,9 @@ class _BadClass922 {}
 void _good922() {
   // Enable Handoff for document editing
   final activity = NSUserActivity(
-  activityType: 'com.example.editing',
-  title: 'Editing ${document.title}',
-  userInfo: {'documentId': document.id},
+    activityType: 'com.example.editing',
+    title: 'Editing ${document.title}',
+    userInfo: {'documentId': document.id},
   );
   activity.becomeCurrent();
 }

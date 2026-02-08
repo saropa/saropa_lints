@@ -112,14 +112,16 @@ dynamic value;
 // BAD: Should trigger avoid_watch_in_callbacks
 // expect_lint: avoid_watch_in_callbacks
 void _bad702() {
-  onPressed: () {
-  final count = context.watch<Counter>().value;
-  }
+  onPressed:
+  () {
+    final count = context.watch<Counter>().value;
+  };
 }
 
 // GOOD: Should NOT trigger avoid_watch_in_callbacks
 void _good702() {
-  onPressed: () {
-  final count = context.read<Counter>().value;
-  }
+  onPressed:
+  () {
+    final count = context.read<Counter>().value;
+  };
 }

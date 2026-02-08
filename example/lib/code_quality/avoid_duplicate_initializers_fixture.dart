@@ -111,9 +111,11 @@ dynamic b;
 // BAD: Should trigger avoid_duplicate_initializers
 // expect_lint: avoid_duplicate_initializers
 class _bad185_Foo {
-final int a;
-final int b;
-Foo() : a = compute(), b = compute();  // Same initializer
+  final int a;
+  final int b;
+  _bad185_Foo()
+      : a = compute(),
+        b = compute(); // Same initializer
 }
 
 // GOOD: Should NOT trigger avoid_duplicate_initializers

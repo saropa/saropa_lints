@@ -118,7 +118,7 @@ void _bad543() {
 void _good543() {
   const kStatusActive = 'active';
   if (status == kStatusActive) {}
-  
+
   const kErrorMessage = 'Error: Something went wrong';
   print(kErrorMessage);
 }

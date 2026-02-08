@@ -111,12 +111,12 @@ dynamic input;
 // BAD: Should trigger no_object_declaration
 // expect_lint: no_object_declaration
 class _bad164_MyClass {
-Object data;  // Too generic
-Object process(Object input) => input;
+  Object data; // Too generic
+  Object process(Object input) => input;
 }
 
 // GOOD: Should NOT trigger no_object_declaration
 class _good164_MyClass<T> {
-T data;
-T process(T input) => input;
+  T data;
+  T process(T input) => input;
 }

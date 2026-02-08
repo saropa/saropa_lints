@@ -112,7 +112,7 @@ final key = 'key';
 void _bad770() {
   // Boolean stored as INTEGER but read without conversion
   final isActive = row['is_active']; // Returns int, not bool!
-  
+
   // DateTime stored as TEXT but not parsed
   final createdAt = row['created_at']; // Returns String, not DateTime!
 }
@@ -126,6 +126,6 @@ final createdAt = DateTime.parse(row['created_at'] as String);
 
 // Or use helper methods
 extension DatabaseRowExtension on Map<String, Object?> {
-bool getBool(String key) => this[key] == 1;
-DateTime getDateTime(String key) => DateTime.parse(this[key] as String);
+  bool getBool(String key) => this[key] == 1;
+  DateTime getDateTime(String key) => DateTime.parse(this[key] as String);
 }

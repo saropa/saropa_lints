@@ -109,21 +109,21 @@ import '../flutter_mocks.dart';
 // expect_lint: avoid_throw_in_finally
 void _bad1066() {
   try {
-  doSomething();
+    doSomething();
   } finally {
-  throw Exception('cleanup failed');  // Hides original exception
+    throw Exception('cleanup failed'); // Hides original exception
   }
 }
 
 // GOOD: Should NOT trigger avoid_throw_in_finally
 void _good1066() {
   try {
-  doSomething();
+    doSomething();
   } finally {
-  try {
-  cleanup();
-  } catch (e) {
-  log(e);
-  }
+    try {
+      cleanup();
+    } catch (e) {
+      log(e);
+    }
   }
 }

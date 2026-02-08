@@ -108,15 +108,15 @@ import '../flutter_mocks.dart';
 // BAD: Should trigger dispose_class_fields
 // expect_lint: dispose_class_fields
 class _bad336_MyService {
-final _controller = StreamController<int>();
+  final _controller = StreamController<int>();
 // No close() called!
 }
 
 // GOOD: Should NOT trigger dispose_class_fields
 class _good336_MyService {
-final _controller = StreamController<int>();
+  final _controller = StreamController<int>();
 
-void dispose() {
-_controller.close();
-}
+  void dispose() {
+    _controller.close();
+  }
 }

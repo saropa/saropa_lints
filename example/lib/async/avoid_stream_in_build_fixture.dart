@@ -112,16 +112,16 @@ dynamic stream;
 // BAD: Should trigger avoid_stream_in_build
 // expect_lint: avoid_stream_in_build
 Widget _bad105_build(BuildContext context) {
-final controller = StreamController<int>(); // Recreated every build!
-return StreamBuilder(stream: controller.stream);
+  final controller = StreamController<int>(); // Recreated every build!
+  return StreamBuilder(stream: controller.stream);
 }
 
 // GOOD: Should NOT trigger avoid_stream_in_build
 void _good105() {
   late final StreamController<int> _controller;
-  
+
   void initState() {
-  // super.initState();
-  _controller = StreamController<int>();
+    // super.initState();
+    _controller = StreamController<int>();
   }
 }

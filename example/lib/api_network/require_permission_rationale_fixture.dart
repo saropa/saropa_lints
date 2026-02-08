@@ -114,7 +114,7 @@ void _bad72() async {
 // GOOD: Should NOT trigger require_permission_rationale
 void _good72() async {
   if (await Permission.camera.shouldShowRequestRationale) {
-  showRationaleDialog();
+    showRationaleDialog();
   }
   await Permission.camera.request();
 }

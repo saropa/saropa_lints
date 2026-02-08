@@ -111,15 +111,15 @@ final context = BuildContext();
 // expect_lint: avoid_motion_without_reduce
 void _bad24() {
   AnimatedContainer(
-  duration: Duration(milliseconds: 500),
+    duration: Duration(milliseconds: 500),
   );
 }
 
 // GOOD: Should NOT trigger avoid_motion_without_reduce
 void _good24() {
   AnimatedContainer(
-  duration: MediaQuery.of(context).disableAnimations
-  ? Duration.zero
-  : Duration(milliseconds: 500),
+    duration: MediaQuery.of(context).disableAnimations
+        ? Duration.zero
+        : Duration(milliseconds: 500),
   );
 }

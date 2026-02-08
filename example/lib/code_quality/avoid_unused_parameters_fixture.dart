@@ -112,12 +112,13 @@ dynamic x;
 // BAD: Should trigger avoid_unused_parameters
 // expect_lint: avoid_unused_parameters
 void _bad161_process(String data, int count) {
-print(data);  // count is never used
+  print(data); // count is never used
 }
 
 // GOOD: Should NOT trigger avoid_unused_parameters
 void _good161_process(String data, int count) {
-print('$data x $count');
+  print('$data x $count');
 }
+
 // Or mark as intentionally unused:
 void process(String data, int _) {}

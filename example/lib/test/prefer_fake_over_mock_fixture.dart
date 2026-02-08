@@ -114,23 +114,23 @@ final users = <dynamic>[];
 // expect_lint: prefer_fake_over_mock
 void _bad1174() async {
   test('loads user', () async {
-  final mockRepo = MockUserRepository();
-  when(mockRepo.getUser(any)).thenAnswer((_) async => user);
-  
-  final result = await service.loadUser(1);
-  
-  verify(mockRepo.getUser(1)).called(1); // Over-specified
-  expect(result, user);
+    final mockRepo = MockUserRepository();
+    when(mockRepo.getUser(any)).thenAnswer((_) async => user);
+
+    final result = await service.loadUser(1);
+
+    verify(mockRepo.getUser(1)).called(1); // Over-specified
+    expect(result, user);
   });
 }
 
 // GOOD: Should NOT trigger prefer_fake_over_mock
 void _good1174() async {
   test('loads user', () async {
-  final fakeRepo = FakeUserRepository()..users = {1: user};
-  
-  final result = await service.loadUser(1);
-  
-  expect(result, user); // Test behavior, not implementation
+    final fakeRepo = FakeUserRepository()..users = {1: user};
+
+    final result = await service.loadUser(1);
+
+    expect(result, user); // Test behavior, not implementation
   });
 }

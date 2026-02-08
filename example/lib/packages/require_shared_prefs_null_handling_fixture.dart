@@ -113,7 +113,8 @@ dynamic prefs;
 // expect_lint: require_shared_prefs_null_handling
 void _bad768() {
   final String name = prefs.getString('name')!;
-  final int count = prefs.getInt('count') ?? 0;  // Good, but detect the first case
+  final int count =
+      prefs.getInt('count') ?? 0; // Good, but detect the first case
 }
 
 // GOOD: Should NOT trigger require_shared_prefs_null_handling

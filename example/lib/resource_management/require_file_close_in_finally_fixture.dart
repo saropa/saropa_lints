@@ -113,24 +113,25 @@ final path = '/path';
 // expect_lint: require_file_close_in_finally
 void _bad965() async {
   Future<String> readFile(String path) async {
-  final file = File(path).openRead();
-  final contents = await file.transform(utf8.decoder).join();
-  // file not closed if exception occurs
-  return contents;
+    final file = File(path).openRead();
+    final contents = await file.transform(utf8.decoder).join();
+    // file not closed if exception occurs
+    return contents;
   }
 }
 
 // GOOD: Should NOT trigger require_file_close_in_finally
 void _good965() async {
   Future<String> readFile(String path) async {
-  final file = File(path);
-  return file.readAsString(); // Handles closing internally
+    final file = File(path);
+    return file.readAsString(); // Handles closing internally
   }
+
   // Or with explicit close:
   final sink = file.openWrite();
   try {
-  await sink.write(data);
+    await sink.write(data);
   } finally {
-  await sink.close();
+    await sink.close();
   }
 }

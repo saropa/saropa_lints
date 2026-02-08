@@ -110,7 +110,7 @@ import '../flutter_mocks.dart';
 void _bad869() async {
   // Always-on high accuracy
   await Geolocator.getPositionStream(
-  locationSettings: LocationSettings(accuracy: LocationAccuracy.best),
+    locationSettings: LocationSettings(accuracy: LocationAccuracy.best),
   );
 }
 
@@ -118,9 +118,9 @@ void _bad869() async {
 void _good869() async {
   // Use appropriate accuracy for use case
   await Geolocator.getPositionStream(
-  locationSettings: LocationSettings(
-  accuracy: LocationAccuracy.medium,
-  distanceFilter: 100, // Only update every 100 meters
-  ),
+    locationSettings: LocationSettings(
+      accuracy: LocationAccuracy.medium,
+      distanceFilter: 100, // Only update every 100 meters
+    ),
   );
 }

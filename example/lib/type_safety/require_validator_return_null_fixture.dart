@@ -112,28 +112,32 @@ dynamic value;
 // BAD: Should trigger require_validator_return_null
 // expect_lint: require_validator_return_null
 void _bad1250() {
-  validator: (value) {
-  if (value == null || value.isEmpty) {
-  return 'Required field';
-  }
-  // Forgot to return null! Always shows error
-  }
-  
-  validator: (value) {
-  return value!.isEmpty ? 'Required' : 'Valid'; // Never valid!
-  }
+  validator:
+  (value) {
+    if (value == null || value.isEmpty) {
+      return 'Required field';
+    }
+    // Forgot to return null! Always shows error
+  };
+
+  validator:
+  (value) {
+    return value!.isEmpty ? 'Required' : 'Valid'; // Never valid!
+  };
 }
 
 // GOOD: Should NOT trigger require_validator_return_null
 void _good1250() {
-  validator: (value) {
-  if (value == null || value.isEmpty) {
-  return 'Required field';
-  }
-  return null; // Valid input
-  }
-  
-  validator: (value) {
-  return value!.isEmpty ? 'Required' : null;
-  }
+  validator:
+  (value) {
+    if (value == null || value.isEmpty) {
+      return 'Required field';
+    }
+    return null; // Valid input
+  };
+
+  validator:
+  (value) {
+    return value!.isEmpty ? 'Required' : null;
+  };
 }

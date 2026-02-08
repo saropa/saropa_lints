@@ -111,17 +111,16 @@ dynamic value;
 // BAD: Should trigger require_should_rebuild
 // expect_lint: require_should_rebuild
 class _bad1361_MyInherited extends InheritedWidget {
-final int value;
-const MyInherited({required this.value, required super.child});
+  final int value;
+  const _bad1361_MyInherited({required this.value, required super.child});
 // Missing updateShouldNotify — causes unnecessary rebuilds.
 }
 
 // GOOD: Should NOT trigger require_should_rebuild
 class _good1361_MyInherited extends InheritedWidget {
-final int value;
-const MyInherited({required this.value, required super.child});
+  final int value;
+  const _good1361_MyInherited({required this.value, required super.child});
 
-@override
-bool updateShouldNotify(MyInherited oldWidget) =>
-value != oldWidget.value;
+  @override
+  bool updateShouldNotify(MyInherited oldWidget) => value != oldWidget.value;
 }

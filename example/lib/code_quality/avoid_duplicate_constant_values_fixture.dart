@@ -111,7 +111,7 @@ dynamic value;
 // expect_lint: avoid_duplicate_constant_values
 void _bad184() {
   const errorMessage = 'Error occurred';
-  const failureMessage = 'Error occurred';  // Same value
+  const failureMessage = 'Error occurred'; // Same value
 }
 
 // GOOD: Should NOT trigger avoid_duplicate_constant_values

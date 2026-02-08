@@ -110,20 +110,20 @@ dynamic service;
 // BAD: Should trigger require_getit_reset_in_tests
 // expect_lint: require_getit_reset_in_tests
 void _bad637_main() {
-test('my test', () {
-final service = GetIt.I<MyService>();
+  test('my test', () {
+    final service = GetIt.I<MyService>();
 // Uses stale singleton from previous test!
-});
+  });
 }
 
 // GOOD: Should NOT trigger require_getit_reset_in_tests
 void _good637_main() {
-setUp(() {
-GetIt.I.reset();
-GetIt.I.registerSingleton<MyService>(MockMyService());
-});
+  setUp(() {
+    GetIt.I.reset();
+    GetIt.I.registerSingleton<MyService>(MockMyService());
+  });
 
-test('my test', () {
-final service = GetIt.I<MyService>();
-});
+  test('my test', () {
+    final service = GetIt.I<MyService>();
+  });
 }

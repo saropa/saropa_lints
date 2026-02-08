@@ -110,23 +110,23 @@ dynamic api;
 // BAD: Should trigger avoid_late_without_guarantee
 // expect_lint: avoid_late_without_guarantee
 class _bad1454_MyWidget extends StatefulWidget {
-late String _data;  // May be accessed before init!
+  late String _data; // May be accessed before init!
 
-void fetchData() async {
-_data = await api.getData();
-}
+  void fetchData() async {
+    _data = await api.getData();
+  }
 }
 
 // GOOD: Should NOT trigger avoid_late_without_guarantee
 class _good1454_MyWidget extends StatefulWidget {
-String? _data;  // Null-safe alternative
+  String? _data; // Null-safe alternative
 
 // Or use late only with guaranteed init in initState:
-late final AnimationController _controller;
+  late final AnimationController _controller;
 
-@override
-void initState() {
-super.initState();
-_controller = AnimationController(vsync: this);  // Always runs
-}
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(vsync: this); // Always runs
+  }
 }

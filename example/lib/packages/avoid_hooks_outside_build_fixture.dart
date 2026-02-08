@@ -111,16 +111,16 @@ dynamic controller;
 // BAD: Should trigger avoid_hooks_outside_build
 // expect_lint: avoid_hooks_outside_build
 class _bad631_MyWidget extends HookWidget {
-void initData() {
-final controller = useTextEditingController(); // Wrong!
-}
+  void initData() {
+    final controller = useTextEditingController(); // Wrong!
+  }
 }
 
 // GOOD: Should NOT trigger avoid_hooks_outside_build
 class _good631_MyWidget extends HookWidget {
-@override
-Widget build(BuildContext context) {
-final controller = useTextEditingController(); // Correct!
-return TextField(controller: controller);
-}
+  @override
+  Widget build(BuildContext context) {
+    final controller = useTextEditingController(); // Correct!
+    return TextField(controller: controller);
+  }
 }

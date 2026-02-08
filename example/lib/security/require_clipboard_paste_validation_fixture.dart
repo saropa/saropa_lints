@@ -111,15 +111,15 @@ final text = 'text';
 // BAD: Should trigger require_clipboard_paste_validation
 // expect_lint: require_clipboard_paste_validation
 void _bad1026_pasteApiKey() async {
-final data = await Clipboard.getData('text/plain');
-_apiKey = data?.text ?? ''; // No validation!
+  final data = await Clipboard.getData('text/plain');
+  _apiKey = data?.text ?? ''; // No validation!
 }
 
 // GOOD: Should NOT trigger require_clipboard_paste_validation
 void _good1026_pasteApiKey() async {
-final data = await Clipboard.getData('text/plain');
-final text = data?.text ?? '';
-if (_isValidApiKeyFormat(text)) {
-_apiKey = text;
-}
+  final data = await Clipboard.getData('text/plain');
+  final text = data?.text ?? '';
+  if (_isValidApiKeyFormat(text)) {
+    _apiKey = text;
+  }
 }

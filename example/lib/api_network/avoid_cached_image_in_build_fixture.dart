@@ -113,16 +113,16 @@ final url = 'https://example.com';
 // BAD: Should trigger avoid_cached_image_in_build
 // expect_lint: avoid_cached_image_in_build
 Widget _bad70_build(context) {
-return CachedNetworkImage(
-imageUrl: url,
-cacheKey: DateTime.now().toString(), // Changes every build!
-);
+  return CachedNetworkImage(
+    imageUrl: url,
+    cacheKey: DateTime.now().toString(), // Changes every build!
+  );
 }
 
 // GOOD: Should NOT trigger avoid_cached_image_in_build
 Widget _good70_build(context) {
-return CachedNetworkImage(
-imageUrl: url,
-cacheKey: 'stable_key_$id', // Stable key
-);
+  return CachedNetworkImage(
+    imageUrl: url,
+    cacheKey: 'stable_key_$id', // Stable key
+  );
 }

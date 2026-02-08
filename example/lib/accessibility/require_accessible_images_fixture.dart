@@ -119,12 +119,12 @@ void _bad26() {
 // GOOD: Should NOT trigger require_accessible_images
 void _good26() {
   Image.network(
-  'https://example.com/photo.jpg',
-  semanticLabel: 'Profile photo of user',
+    'https://example.com/photo.jpg',
+    semanticLabel: 'Profile photo of user',
   );
   // For decorative images:
   Image.asset(
-  'assets/decoration.png',
-  excludeFromSemantics: true,
+    'assets/decoration.png',
+    excludeFromSemantics: true,
   );
 }

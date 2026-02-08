@@ -112,17 +112,17 @@ dynamic status;
 // expect_lint: require_test_assertions
 void _bad1187() {
   test('should process order', () {
-  final order = Order(items: [item1, item2]);
-  processOrder(order);
-  // No assertion!
+    final order = Order(items: [item1, item2]);
+    processOrder(order);
+    // No assertion!
   });
 }
 
 // GOOD: Should NOT trigger require_test_assertions
 void _good1187() {
   test('should process order', () {
-  final order = Order(items: [item1, item2]);
-  processOrder(order);
-  expect(order.status, OrderStatus.processed);
+    final order = Order(items: [item1, item2]);
+    processOrder(order);
+    expect(order.status, OrderStatus.processed);
   });
 }

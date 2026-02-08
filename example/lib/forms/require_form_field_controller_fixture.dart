@@ -112,20 +112,20 @@ dynamic value;
 // expect_lint: require_form_field_controller
 void _bad403() {
   TextFormField(
-  decoration: InputDecoration(labelText: 'Name'),
-  // No controller or onSaved - value lost on rebuild!
+    decoration: InputDecoration(labelText: 'Name'),
+    // No controller or onSaved - value lost on rebuild!
   );
 }
 
 // GOOD: Should NOT trigger require_form_field_controller
 void _good403() {
   TextFormField(
-  controller: _nameController,
-  decoration: InputDecoration(labelText: 'Name'),
+    controller: _nameController,
+    decoration: InputDecoration(labelText: 'Name'),
   );
   // Or
   TextFormField(
-  onSaved: (value) => _name = value,
-  decoration: InputDecoration(labelText: 'Name'),
+    onSaved: (value) => _name = value,
+    decoration: InputDecoration(labelText: 'Name'),
   );
 }

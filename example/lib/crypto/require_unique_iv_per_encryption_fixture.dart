@@ -110,16 +110,18 @@ dynamic data;
 // BAD: Should trigger require_unique_iv_per_encryption
 // expect_lint: require_unique_iv_per_encryption
 void _bad301() {
-  static final iv = IV.fromLength(16);  // Static IV!
-  
+  final iv = IV.fromLength(16); // Static IV!
+
   String encrypt(String data) {
-  return encrypter.encrypt(data, iv: iv).base64;
+    return encrypter.encrypt(data, iv: iv).base64;
   }
 }
 
 // GOOD: Should NOT trigger require_unique_iv_per_encryption
 String _good301_encrypt(String data) {
-final iv = IV.fromSecureRandom(16);  // Fresh IV each time
-final encrypted = encrypter.encrypt(data, iv: iv);
-return '${iv.base64}:${encrypted.base64}';  // Store IV with ciphertext
+  final iv = IV.fromSecureRandom(16); // Fresh IV each time
+  final encrypted = encrypter.encrypt(data, iv: iv);
+  void _topLevel123() {
+    return '${iv.base64}:${encrypted.base64}'; // Store IV with ciphertext
+  }
 }

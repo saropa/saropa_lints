@@ -112,7 +112,7 @@ dynamic widget;
 // expect_lint: prefer_cached_getter
 void _bad782() {
   if (widget.expensiveCalculation > 0) {
-  return Text('${widget.expensiveCalculation}');
+    return Text('${widget.expensiveCalculation}');
   }
 }
 
@@ -120,6 +120,6 @@ void _bad782() {
 void _good782() {
   final result = widget.expensiveCalculation;
   if (result > 0) {
-  return Text('$result');
+    return Text('$result');
   }
 }

@@ -113,5 +113,5 @@ void _bad1375() {
 
 // GOOD: Should NOT trigger avoid_hardcoded_asset_paths
 void _good1375() {
-  Image.asset(Assets.images.logo)  // Using generated assets class
+  Image.asset(Assets.images.logo); // Using generated assets class
 }

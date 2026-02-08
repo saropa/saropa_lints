@@ -113,23 +113,23 @@ dynamic child;
 // expect_lint: avoid_nested_providers
 void _bad710() {
   Provider<A>(
-  create: (_) => A(),
-  child: Consumer<A>(
-  builder: (_, a, child) => Provider<B>(
-  create: (_) => B(a), // Provider inside Consumer
-  child: child,
-  ),
-  ),
-  ),
+    create: (_) => A(),
+    child: Consumer<A>(
+      builder: (_, a, child) => Provider<B>(
+        create: (_) => B(a), // Provider inside Consumer
+        child: child,
+      ),
+    ),
+  );
 }
 
 // GOOD: Should NOT trigger avoid_nested_providers
 void _good710() {
   MultiProvider(
-  providers: [
-  Provider<A>(create: (_) => A()),
-  ProxyProvider<A, B>(update: (_, a, __) => B(a)),
-  ],
-  child: MyApp(),
-  ),
+    providers: [
+      Provider<A>(create: (_) => A()),
+      ProxyProvider<A, B>(update: (_, a, __) => B(a)),
+    ],
+    child: MyApp(),
+  );
 }

@@ -111,24 +111,24 @@ final url = 'https://example.com';
 // BAD: Should trigger require_token_refresh
 // expect_lint: require_token_refresh
 class _bad1005_AuthService {
-String? accessToken;
+  String? accessToken;
 
-Future<Response> makeRequest(String url) async {
-return http.get(url, headers: {'Authorization': 'Bearer $accessToken'});
+  Future<Response> makeRequest(String url) async {
+    return http.get(url, headers: {'Authorization': 'Bearer $accessToken'});
 // Token may be expired!
-}
+  }
 }
 
 // GOOD: Should NOT trigger require_token_refresh
 class _good1005_AuthService {
-String? accessToken;
-String? refreshToken;
-DateTime? tokenExpiry;
+  String? accessToken;
+  String? refreshToken;
+  DateTime? tokenExpiry;
 
-Future<Response> makeRequest(String url) async {
-if (tokenExpiry?.isBefore(DateTime.now()) ?? true) {
-await refreshAccessToken();
-}
-return http.get(url, headers: {'Authorization': 'Bearer $accessToken'});
-}
+  Future<Response> makeRequest(String url) async {
+    if (tokenExpiry?.isBefore(DateTime.now()) ?? true) {
+      await refreshAccessToken();
+    }
+    return http.get(url, headers: {'Authorization': 'Bearer $accessToken'});
+  }
 }

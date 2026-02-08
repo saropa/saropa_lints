@@ -110,9 +110,9 @@ dynamic list;
 // BAD: Should trigger avoid_duplicate_number_elements
 // expect_lint: avoid_duplicate_number_elements
 void _bad249() {
-  final list = [1, 2, 1, 3];  // 1 is duplicated
-  final doubles = [1.5, 2.0, 1.5];  // 1.5 is duplicated
-  final prices = {9.99, 19.99, 9.99};  // Set silently ignores duplicate
+  final list = [1, 2, 1, 3]; // 1 is duplicated
+  final doubles = [1.5, 2.0, 1.5]; // 1.5 is duplicated
+  final prices = {9.99, 19.99, 9.99}; // Set silently ignores duplicate
 }
 
 // GOOD: Should NOT trigger avoid_duplicate_number_elements

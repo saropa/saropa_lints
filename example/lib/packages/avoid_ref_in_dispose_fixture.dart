@@ -110,19 +110,19 @@ dynamic ref;
 // BAD: Should trigger avoid_ref_in_dispose
 // expect_lint: avoid_ref_in_dispose
 class _bad747__MyWidgetState extends ConsumerState<MyWidget> {
-@override
-void dispose() {
-ref.read(someProvider); // Invalid! Provider may be disposed
-super.dispose();
-}
+  @override
+  void dispose() {
+    ref.read(someProvider); // Invalid! Provider may be disposed
+    super.dispose();
+  }
 }
 
 // GOOD: Should NOT trigger avoid_ref_in_dispose
 class _good747__MyWidgetState extends ConsumerState<MyWidget> {
-@override
-void dispose() {
+  @override
+  void dispose() {
 // Clean up local resources only
-_controller.dispose();
-super.dispose();
-}
+    _controller.dispose();
+    super.dispose();
+  }
 }

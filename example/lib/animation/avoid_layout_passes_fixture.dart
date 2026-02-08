@@ -116,18 +116,18 @@ dynamic item;
 // expect_lint: avoid_layout_passes
 void _bad33() {
   ListView.builder(
-  itemBuilder: (context, index) => IntrinsicHeight(
-  child: Row(), // Two layout passes for every item!
-  ),
+    itemBuilder: (context, index) => IntrinsicHeight(
+      child: Row(), // Two layout passes for every item!
+    ),
   );
 }
 
 // GOOD: Should NOT trigger avoid_layout_passes
 void _good33() {
   ListView.builder(
-  itemBuilder: (context, index) => Row(
-  crossAxisAlignment: CrossAxisAlignment.stretch,
-  children: [],
-  ),
+    itemBuilder: (context, index) => Row(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [],
+    ),
   );
 }

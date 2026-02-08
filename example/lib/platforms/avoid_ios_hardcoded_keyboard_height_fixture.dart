@@ -113,17 +113,17 @@ final context = BuildContext();
 // expect_lint: avoid_ios_hardcoded_keyboard_height
 void _bad913() {
   Padding(
-  padding: EdgeInsets.only(bottom: 300), // Hardcoded keyboard height
-  child: content,
+    padding: EdgeInsets.only(bottom: 300), // Hardcoded keyboard height
+    child: content,
   );
 }
 
 // GOOD: Should NOT trigger avoid_ios_hardcoded_keyboard_height
 void _good913() {
   Padding(
-  padding: EdgeInsets.only(
-  bottom: MediaQuery.of(context).viewInsets.bottom,
-  ),
-  child: content,
+    padding: EdgeInsets.only(
+      bottom: MediaQuery.of(context).viewInsets.bottom,
+    ),
+    child: content,
   );
 }

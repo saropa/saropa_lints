@@ -113,7 +113,7 @@ dynamic response;
 // expect_lint: prefer_dio_transformer
 void _bad601() async {
   final response = await dio.get('/large-data');
-  final data = response.data;  // Parsing on main thread
+  final data = response.data; // Parsing on main thread
 }
 
 // GOOD: Should NOT trigger prefer_dio_transformer

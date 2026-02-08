@@ -109,9 +109,9 @@ import '../flutter_mocks.dart';
 // expect_lint: avoid_only_rethrow
 void _bad365() {
   try {
-  doSomething();
+    doSomething();
   } catch (e) {
-  rethrow;
+    rethrow;
   }
 }
 

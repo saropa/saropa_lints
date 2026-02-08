@@ -110,16 +110,18 @@ dynamic child;
 // BAD: Should trigger prefer_nullable_provider_types
 // expect_lint: prefer_nullable_provider_types
 void _bad714() {
-  Provider<User>( // Non-nullable but returns null!
-  create: (_) => null,
-  child: MyApp(),
+  Provider<User>(
+    // Non-nullable but returns null!
+    create: (_) => null,
+    child: MyApp(),
   );
 }
 
 // GOOD: Should NOT trigger prefer_nullable_provider_types
 void _good714() {
-  Provider<User?>( // Nullable type matches reality
-  create: (_) => currentUser,
-  child: MyApp(),
+  Provider<User?>(
+    // Nullable type matches reality
+    create: (_) => currentUser,
+    child: MyApp(),
   );
 }

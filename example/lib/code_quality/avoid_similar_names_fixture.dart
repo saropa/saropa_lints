@@ -109,7 +109,7 @@ import '../flutter_mocks.dart';
 // expect_lint: avoid_similar_names
 void _bad180() {
   final value1 = 1;
-  final valuel = 2;  // Too similar to value1
+  final valuel = 2; // Too similar to value1
 }
 
 // GOOD: Should NOT trigger avoid_similar_names

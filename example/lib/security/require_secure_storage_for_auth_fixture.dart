@@ -115,7 +115,7 @@ dynamic value;
 // BAD: Should trigger require_secure_storage_for_auth
 // expect_lint: require_secure_storage_for_auth
 void _bad1015() {
-  prefs.setString('data', jwtToken);  // Value contains auth token
+  prefs.setString('data', jwtToken); // Value contains auth token
   prefs.setString('user', bearerToken);
 }
 

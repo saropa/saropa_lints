@@ -112,7 +112,7 @@ dynamic config;
 // expect_lint: require_response_caching
 void _bad55() async {
   Future<Config> getConfig() async {
-  return await api.get('/config'); // Fetches every time
+    return await api.get('/config'); // Fetches every time
   }
 }
 
@@ -120,14 +120,14 @@ void _bad55() async {
 void _good55() async {
   Config? _cachedConfig;
   DateTime? _cacheTime;
-  
+
   Future<Config> getConfig() async {
-  if (_cachedConfig != null &&
-  DateTime.now().difference(_cacheTime!) < Duration(minutes: 5)) {
-  return _cachedConfig!;
-  }
-  _cachedConfig = await api.get('/config');
-  _cacheTime = DateTime.now();
-  return _cachedConfig!;
+    if (_cachedConfig != null &&
+        DateTime.now().difference(_cacheTime!) < Duration(minutes: 5)) {
+      return _cachedConfig!;
+    }
+    _cachedConfig = await api.get('/config');
+    _cacheTime = DateTime.now();
+    return _cachedConfig!;
   }
 }

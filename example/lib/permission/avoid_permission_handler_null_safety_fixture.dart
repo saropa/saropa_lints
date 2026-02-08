@@ -118,6 +118,6 @@ void _bad825() async {
 void _good825() async {
   var status = await Permission.camera.status;
   if (!status.isGranted) {
-  status = await Permission.camera.request();
+    status = await Permission.camera.request();
   }
 }

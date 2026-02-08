@@ -121,6 +121,6 @@ void _good916() async {
   final file = File(path);
   await file.writeAsBytes(data);
   await file.setProtection(
-  FileProtectionType.complete, // Encrypted when locked
+    FileProtectionType.complete, // Encrypted when locked
   );
 }

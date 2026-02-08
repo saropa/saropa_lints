@@ -117,7 +117,7 @@ void _bad429() {
 // GOOD: Should NOT trigger require_cached_image_placeholder
 void _good429() {
   CachedNetworkImage(
-  imageUrl: url,
-  placeholder: (context, url) => CircularProgressIndicator(),
+    imageUrl: url,
+    placeholder: (context, url) => CircularProgressIndicator(),
   );
 }

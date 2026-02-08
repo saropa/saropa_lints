@@ -114,6 +114,6 @@ void _bad73() async {
 // GOOD: Should NOT trigger require_permission_status_check
 void _good73() async {
   if (await Permission.location.isGranted) {
-  final position = await Geolocator.getCurrentPosition();
+    final position = await Geolocator.getCurrentPosition();
   }
 }

@@ -112,12 +112,12 @@ dynamic state;
 // BAD: Should trigger avoid_riverpod_state_mutation
 // expect_lint: avoid_riverpod_state_mutation
 class _bad738_MyNotifier extends Notifier<MyState> {
-void update() {
-state.items.add(item); // Mutation doesn't trigger rebuild!
-}
+  void update() {
+    state.items.add(item); // Mutation doesn't trigger rebuild!
+  }
 }
 
 // GOOD: Should NOT trigger avoid_riverpod_state_mutation
 void _good738_update() {
-state = state.copyWith(items: [state.items, item]);
+  state = state.copyWith(items: [state.items, item]);
 }

@@ -111,20 +111,20 @@ final url = 'https://example.com';
 // expect_lint: require_webview_navigation_delegate
 void _bad1449() {
   WebView(
-  initialUrl: 'https://example.com',
-  // No navigation control - can go anywhere!
+    initialUrl: 'https://example.com',
+    // No navigation control - can go anywhere!
   );
 }
 
 // GOOD: Should NOT trigger require_webview_navigation_delegate
 void _good1449() {
   WebView(
-  initialUrl: 'https://example.com',
-  navigationDelegate: (request) {
-  if (request.url.startsWith('https://trusted.com')) {
-  return NavigationDecision.navigate;
-  }
-  return NavigationDecision.prevent;
-  },
+    initialUrl: 'https://example.com',
+    navigationDelegate: (request) {
+      if (request.url.startsWith('https://trusted.com')) {
+        return NavigationDecision.navigate;
+      }
+      return NavigationDecision.prevent;
+    },
   );
 }

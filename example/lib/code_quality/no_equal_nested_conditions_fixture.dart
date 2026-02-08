@@ -112,8 +112,9 @@ dynamic x;
 // expect_lint: no_equal_nested_conditions
 void _bad193() {
   if (x > 0) {
-  if (x > 0) {  // Same condition
-  }
+    if (x > 0) {
+      // Same condition
+    }
   }
 }
 

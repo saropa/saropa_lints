@@ -109,14 +109,18 @@ import '../flutter_mocks.dart';
 // expect_lint: avoid_eval_like_patterns
 void _bad994() {
   Function.apply(dynamicFunction, args);
-  dart:mirrors to invoke dynamic code
+  // dart:mirrors to invoke dynamic code
 }
 
 // GOOD: Should NOT trigger avoid_eval_like_patterns
 void _good994() {
   // Use static dispatch or switch/case instead
   switch (actionName) {
-  case 'action1': doAction1(); break;
-  case 'action2': doAction2(); break;
+    case 'action1':
+      doAction1();
+      break;
+    case 'action2':
+      doAction2();
+      break;
   }
 }

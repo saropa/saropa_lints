@@ -112,21 +112,21 @@ final children = <Widget>[];
 // expect_lint: avoid_excessive_widget_depth
 void _bad783() {
   Container(
-  child: Padding(
-  child: Column(
-  children: [
-  Row(
-  children: [
-  Expanded(
-  child: Container(
-  child: Text('Too deep!'),
-  ),
-  ),
-  ],
-  ),
-  ],
-  ),
-  ),
+    child: Padding(
+      child: Column(
+        children: [
+          Row(
+            children: [
+              Expanded(
+                child: Container(
+                  child: Text('Too deep!'),
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    ),
   );
 }
 

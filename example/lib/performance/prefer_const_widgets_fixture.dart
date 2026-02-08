@@ -111,13 +111,13 @@ dynamic child;
 // expect_lint: prefer_const_widgets
 void _bad795() {
   Container(
-  child: Text('Hello'), // Could be const
+    child: Text('Hello'), // Could be const
   );
 }
 
 // GOOD: Should NOT trigger prefer_const_widgets
 void _good795() {
   Container(
-  child: const Text('Hello'),
+    child: const Text('Hello'),
   );
 }

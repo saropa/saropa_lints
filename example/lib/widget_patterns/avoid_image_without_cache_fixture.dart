@@ -108,11 +108,12 @@ import '../flutter_mocks.dart';
 // BAD: Should trigger avoid_image_without_cache
 // expect_lint: avoid_image_without_cache
 class _bad1384__MyWidgetState extends State<MyWidget> {
-bool _isHovered = false;
-bool _isPressed = false;
+  bool _isHovered = false;
+  bool _isPressed = false;
 }
 
 // GOOD: Should NOT trigger avoid_image_without_cache
-class _good1384__MyWidgetState extends State<MyWidget> with WidgetStateMixin<MyWidget> {
+class _good1384__MyWidgetState extends State<MyWidget>
+    with WidgetStateMixin<MyWidget> {
 // Use WidgetState for hover, pressed, etc.
 }

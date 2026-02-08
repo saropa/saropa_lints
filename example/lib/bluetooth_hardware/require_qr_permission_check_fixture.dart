@@ -113,18 +113,18 @@ dynamic future;
 // BAD: Should trigger require_qr_permission_check
 // expect_lint: require_qr_permission_check
 Widget _bad123_build(context) {
-return QRView(onQRViewCreated: _onCreated); // May crash!
+  return QRView(onQRViewCreated: _onCreated); // May crash!
 }
 
 // GOOD: Should NOT trigger require_qr_permission_check
 Widget _good123_build(context) {
-return FutureBuilder(
-future: Permission.camera.request(),
-builder: (context, snapshot) {
-if (snapshot.data?.isGranted ?? false) {
-return QRView(onQRViewCreated: _onCreated);
-}
-return Text('Camera permission required');
-},
-);
+  return FutureBuilder(
+    future: Permission.camera.request(),
+    builder: (context, snapshot) {
+      if (snapshot.data?.isGranted ?? false) {
+        return QRView(onQRViewCreated: _onCreated);
+      }
+      return Text('Camera permission required');
+    },
+  );
 }

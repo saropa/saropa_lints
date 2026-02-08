@@ -113,7 +113,7 @@ dynamic value;
 // expect_lint: avoid_sized_box_expand
 void _bad1305() {
   AnimatedBuilder(
-  builder: (ctx, child) => Opacity(opacity: _ctrl.value, child: child),
+    builder: (ctx, child) => Opacity(opacity: _ctrl.value, child: child),
   );
 }
 

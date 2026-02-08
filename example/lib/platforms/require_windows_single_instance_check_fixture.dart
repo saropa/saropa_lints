@@ -108,17 +108,17 @@ import '../flutter_mocks.dart';
 // BAD: Should trigger require_windows_single_instance_check
 // expect_lint: require_windows_single_instance_check
 void _bad945_main() {
-runApp(const MyApp());
+  runApp(const MyApp());
 }
 
 // GOOD: Should NOT trigger require_windows_single_instance_check
 void _good945_main() async {
 // Using windows_single_instance or similar package
-final isFirstInstance = await WindowsSingleInstance.ensureSingleInstance(
-args,
-'my_app_unique_id',
-);
-if (!isFirstInstance) return;
+  final isFirstInstance = await WindowsSingleInstance.ensureSingleInstance(
+    args,
+    'my_app_unique_id',
+  );
+  if (!isFirstInstance) return;
 
-runApp(const MyApp());
+  runApp(const MyApp());
 }

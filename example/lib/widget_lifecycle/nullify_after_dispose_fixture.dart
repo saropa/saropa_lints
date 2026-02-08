@@ -108,12 +108,12 @@ import '../flutter_mocks.dart';
 // BAD: Should trigger nullify_after_dispose
 // expect_lint: nullify_after_dispose
 void _bad1346__cancelTimer() {
-_timer?.cancel();
+  _timer?.cancel();
 // Missing: _timer = null;
 }
 
 // GOOD: Should NOT trigger nullify_after_dispose
 void _good1346__cancelTimer() {
-_timer?.cancel();
-_timer = null;
+  _timer?.cancel();
+  _timer = null;
 }

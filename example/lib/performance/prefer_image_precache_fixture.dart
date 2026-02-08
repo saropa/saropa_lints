@@ -118,7 +118,7 @@ void _bad785() {
 void _good785() {
   // In didChangeDependencies
   precacheImage(AssetImage('assets/hero_image.png'), context);
-  
+
   // In build
   Image.asset('assets/hero_image.png');
 }

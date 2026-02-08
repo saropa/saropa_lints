@@ -108,10 +108,10 @@ import '../flutter_mocks.dart';
 // BAD: Should trigger require_null_safe_extensions
 // expect_lint: require_null_safe_extensions
 extension StringExt on String? {
-String get upper => this!.toUpperCase(); // Throws if null
+  String get upper => this!.toUpperCase(); // Throws if null
 }
 
 // GOOD: Should NOT trigger require_null_safe_extensions
 extension StringExt on String? {
-String? get upper => this?.toUpperCase();
+  String? get upper => this?.toUpperCase();
 }

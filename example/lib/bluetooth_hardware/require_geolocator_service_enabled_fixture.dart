@@ -117,7 +117,7 @@ void _bad125() async {
 void _good125() async {
   final serviceEnabled = await Geolocator.isLocationServiceEnabled();
   if (!serviceEnabled) {
-  return; // Handle disabled service
+    return; // Handle disabled service
   }
   final position = await Geolocator.getCurrentPosition();
 }

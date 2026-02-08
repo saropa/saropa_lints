@@ -114,19 +114,19 @@ dynamic value;
 // expect_lint: require_error_message_context
 void _bad396() {
   TextFormField(
-  validator: (value) {
-  if (value?.isEmpty ?? true) return 'Required';
-  if (!isValidEmail(value!)) return 'Invalid input';
-  },
+    validator: (value) {
+      if (value?.isEmpty ?? true) return 'Required';
+      if (!isValidEmail(value!)) return 'Invalid input';
+    },
   );
 }
 
 // GOOD: Should NOT trigger require_error_message_context
 void _good396() {
   TextFormField(
-  validator: (value) {
-  if (value?.isEmpty ?? true) return 'Email is required';
-  if (!isValidEmail(value!)) return 'Please enter a valid email address';
-  },
+    validator: (value) {
+      if (value?.isEmpty ?? true) return 'Email is required';
+      if (!isValidEmail(value!)) return 'Please enter a valid email address';
+    },
   );
 }

@@ -117,25 +117,26 @@ dynamic value;
 void _bad764() async {
   // Scattered throughout codebase
   final prefs = await SharedPreferences.getInstance();
-  prefs.setString('user_name', name);  // Typo-prone key
-  prefs.setInt('user-age', age);       // Inconsistent naming
-  
+  prefs.setString('user_name', name); // Typo-prone key
+  prefs.setInt('user-age', age); // Inconsistent naming
+
   // Elsewhere
   final name = prefs.getString('userName'); // Wrong key, returns null!
 }
 
 // GOOD: Should NOT trigger prefer_typed_prefs_wrapper
 class _good764_UserPreferences {
-static const _keyName = 'user_name';
-static const _keyAge = 'user_age';
+  static const _keyName = 'user_name';
+  static const _keyAge = 'user_age';
 
-final SharedPreferences _prefs;
-UserPreferences(this._prefs);
+  final SharedPreferences _prefs;
+  _good764_UserPreferences(this._prefs);
 
-String? get userName => _prefs.getString(_keyName);
-set userName(String? value) =>
-value == null ? _prefs.remove(_keyName) : _prefs.setString(_keyName, value);
+  String? get userName => _prefs.getString(_keyName);
+  set userName(String? value) => value == null
+      ? _prefs.remove(_keyName)
+      : _prefs.setString(_keyName, value);
 
-int get userAge => _prefs.getInt(_keyAge) ?? 0;
-set userAge(int value) => _prefs.setInt(_keyAge, value);
+  int get userAge => _prefs.getInt(_keyAge) ?? 0;
+  set userAge(int value) => _prefs.setInt(_keyAge, value);
 }

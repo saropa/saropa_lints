@@ -115,6 +115,7 @@ void _bad745() {
 
 // GOOD: Should NOT trigger require_auto_dispose
 final myProvider = StateProvider.autoDispose<int>((ref) => 0);
+
 // Or with @riverpod annotation:
 @riverpod
 class _good745_MyNotifier extends _$MyNotifier {}

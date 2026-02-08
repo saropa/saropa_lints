@@ -116,8 +116,8 @@ void _bad370() async {
 // GOOD: Should NOT trigger require_pdf_error_handling
 void _good370() async {
   try {
-  final doc = await PDFDocument.fromAsset('file.pdf');
+    final doc = await PDFDocument.fromAsset('file.pdf');
   } catch (e) {
-  showError('Could not open PDF: $e');
+    showError('Could not open PDF: $e');
   }
 }

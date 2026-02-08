@@ -110,26 +110,26 @@ dynamic user;
 // BAD: Should trigger avoid_assert_in_production
 // expect_lint: avoid_assert_in_production
 void _bad363_processPayment(double amount) {
-assert(amount > 0); // Silently passes in release mode!
-processTransaction(amount);
+  assert(amount > 0); // Silently passes in release mode!
+  processTransaction(amount);
 }
 
 void setUserRole(String role) {
-assert(allowedRoles.contains(role)); // Security bypass in production!
-user.role = role;
+  assert(allowedRoles.contains(role)); // Security bypass in production!
+  user.role = role;
 }
 
 // GOOD: Should NOT trigger avoid_assert_in_production
 void _good363_processPayment(double amount) {
-if (amount <= 0) {
-throw ArgumentError('Amount must be positive');
-}
-processTransaction(amount);
+  if (amount <= 0) {
+    throw ArgumentError('Amount must be positive');
+  }
+  processTransaction(amount);
 }
 
 void setUserRole(String role) {
-if (!allowedRoles.contains(role)) {
-throw SecurityException('Invalid role: $role');
-}
-user.role = role;
+  if (!allowedRoles.contains(role)) {
+    throw SecurityException('Invalid role: $role');
+  }
+  user.role = role;
 }

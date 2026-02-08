@@ -111,13 +111,13 @@ final context = BuildContext();
 // expect_lint: prefer_custom_single_child_layout
 void _bad1333_initState() {
 // super.initState();
-showDialog(context: context); // Context not ready!
+  showDialog(context: context); // Context not ready!
 }
 
 // GOOD: Should NOT trigger prefer_custom_single_child_layout
 void _good1333_initState() {
 // super.initState();
-WidgetsBinding.instance.addPostFrameCallback((_) {
-showDialog(context: context);
-});
+  WidgetsBinding.instance.addPostFrameCallback((_) {
+    showDialog(context: context);
+  });
 }

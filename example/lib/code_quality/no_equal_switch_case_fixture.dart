@@ -112,8 +112,10 @@ dynamic x;
 // expect_lint: no_equal_switch_case
 void _bad194() {
   switch (x) {
-  case 1: return 'a';
-  case 2: return 'a';  // Same as case 1
+    case 1:
+      return 'a';
+    case 2:
+      return 'a'; // Same as case 1
   }
 }
 

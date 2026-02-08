@@ -111,27 +111,27 @@ dynamic data;
 // expect_lint: avoid_stream_subscription_in_field
 class _bad112__MyWidgetState extends State<MyWidget> {
 // Subscription created but never stored - cannot be cancelled!
-final _ = someStream.listen((data) => print(data));
+  final _ = someStream.listen((data) => print(data));
 
 // Or assigned to void
-void _init() {
-myStream.listen((data) => doSomething(data)); // Lost reference!
-}
+  void _init() {
+    myStream.listen((data) => doSomething(data)); // Lost reference!
+  }
 }
 
 // GOOD: Should NOT trigger avoid_stream_subscription_in_field
 class _good112__MyWidgetState extends State<MyWidget> {
-StreamSubscription<Data>? _subscription;
+  StreamSubscription<Data>? _subscription;
 
-@override
-void initState() {
-super.initState();
-_subscription = myStream.listen((data) => doSomething(data));
-}
+  @override
+  void initState() {
+    super.initState();
+    _subscription = myStream.listen((data) => doSomething(data));
+  }
 
-@override
-void dispose() {
-_subscription?.cancel();
-super.dispose();
-}
+  @override
+  void dispose() {
+    _subscription?.cancel();
+    super.dispose();
+  }
 }

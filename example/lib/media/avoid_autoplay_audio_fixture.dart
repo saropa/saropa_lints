@@ -110,15 +110,21 @@ final url = 'https://example.com';
 // BAD: Should trigger avoid_autoplay_audio
 // expect_lint: avoid_autoplay_audio
 void _bad464() {
-  VideoPlayerController.asset('video.mp4')..initialize()..play();
-  AudioPlayer()..setUrl(url)..play(); // Auto-plays on load
-  BetterPlayerController(configuration: BetterPlayerConfiguration(autoPlay: true));
+  VideoPlayerController.asset('video.mp4')
+    ..initialize()
+    ..play();
+  AudioPlayer()
+    ..setUrl(url)
+    ..play(); // Auto-plays on load
+  BetterPlayerController(
+      configuration: BetterPlayerConfiguration(autoPlay: true));
 }
 
 // GOOD: Should NOT trigger avoid_autoplay_audio
 void _good464() {
   VideoPlayerController.asset('video.mp4')..initialize();
   // User presses play button to start
-  
-  BetterPlayerController(configuration: BetterPlayerConfiguration(autoPlay: false));
+
+  BetterPlayerController(
+      configuration: BetterPlayerConfiguration(autoPlay: false));
 }

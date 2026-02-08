@@ -114,19 +114,19 @@ final userId = '123';
 // expect_lint: require_auth_check
 void _bad1004() async {
   Future<Response> getUserProfile(Request request) async {
-  final userId = request.params['id'];
-  return Response.ok(await db.getUser(userId)); // No auth check!
+    final userId = request.params['id'];
+    return Response.ok(await db.getUser(userId)); // No auth check!
   }
 }
 
 // GOOD: Should NOT trigger require_auth_check
 void _good1004() async {
   Future<Response> getUserProfile(Request request) async {
-  final token = request.headers['Authorization'];
-  if (!await authService.verifyToken(token)) {
-  return Response.unauthorized();
-  }
-  final userId = request.params['id'];
-  return Response.ok(await db.getUser(userId));
+    final token = request.headers['Authorization'];
+    if (!await authService.verifyToken(token)) {
+      return Response.unauthorized();
+    }
+    final userId = request.params['id'];
+    return Response.ok(await db.getUser(userId));
   }
 }

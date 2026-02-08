@@ -111,10 +111,10 @@ dynamic b;
 // BAD: Should trigger prefer_static_method
 // expect_lint: prefer_static_method
 class _bad1060_Utils {
-int add(int a, int b) => a + b;  // Doesn't use this
+  int add(int a, int b) => a + b; // Doesn't use this
 }
 
 // GOOD: Should NOT trigger prefer_static_method
 class _good1060_Utils {
-static int add(int a, int b) => a + b;
+  static int add(int a, int b) => a + b;
 }

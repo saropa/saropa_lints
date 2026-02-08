@@ -110,14 +110,16 @@ dynamic value;
 // BAD: Should trigger avoid_unused_callback_parameters
 // expect_lint: avoid_unused_callback_parameters
 void _bad1381() {
-  onTap: (value) {
-  print('tapped');
-  }
+  onTap:
+  (value) {
+    print('tapped');
+  };
 }
 
 // GOOD: Should NOT trigger avoid_unused_callback_parameters
 void _good1381() {
-  onTap: (_) {
-  print('tapped');
-  }
+  onTap:
+  (_) {
+    print('tapped');
+  };
 }
