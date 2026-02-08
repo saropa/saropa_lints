@@ -12,6 +12,8 @@ import '../saropa_lint_rule.dart';
 
 /// Warns when returning a cascade expression.
 ///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v4
+///
 /// Example of **bad** code:
 /// ```dart
 /// return list..add(1)..add(2);
@@ -35,7 +37,7 @@ class AvoidReturningCascadesRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_returning_cascades',
     problemMessage:
-        '[avoid_returning_cascades] Return statement contains a cascade expression (..operator), which obscures the actual return value and can confuse readers about whether the returned object is the cascade target or the result of the last cascade operation. Separating the cascade from the return makes the control flow explicit and easier to debug.',
+        '[avoid_returning_cascades] Return statement contains a cascade expression (..operator), which obscures the actual return value and can confuse readers about whether the returned object is the cascade target or the result of the last cascade operation. Separating the cascade from the return makes the control flow explicit and easier to debug. {v4}',
     correctionMessage:
         'Assign the cascade result to a variable first, then return the variable on a separate line.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -57,6 +59,8 @@ class AvoidReturningCascadesRule extends SaropaLintRule {
 }
 
 /// Warns when a function explicitly returns `void`.
+///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v6
 ///
 /// Returning void is unnecessary and can be confusing.
 ///
@@ -90,7 +94,7 @@ class AvoidReturningVoidRule extends SaropaLintRule {
     name: 'avoid_returning_void',
     problemMessage:
         '[avoid_returning_void] Explicit void return is redundant and can mask accidental side-effect returns. '
-        'Writing return at the end of a void function adds visual noise without changing behavior, and in rare cases may hide a mistaken attempt to return a value from a void-typed function.',
+        'Writing return at the end of a void function adds visual noise without changing behavior, and in rare cases may hide a mistaken attempt to return a value from a void-typed function. {v6}',
     correctionMessage:
         'Remove the explicit return statement entirely, since void functions implicitly return at the end of their body. '
         'If you need early exit, use a bare return without a value. If you intended to return a result, change the function return type to match.',
@@ -121,6 +125,8 @@ class AvoidReturningVoidRule extends SaropaLintRule {
 }
 
 /// Warns on unnecessary return statement at end of void function.
+///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v5
 ///
 /// A return statement with no value at the end of a void function is redundant.
 ///
@@ -153,7 +159,7 @@ class AvoidUnnecessaryReturnRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_unnecessary_return',
     problemMessage:
-        '[avoid_unnecessary_return] Unnecessary return statement at end of void function. This return pattern causes unexpected control flow and makes function behavior harder to predict.',
+        '[avoid_unnecessary_return] Unnecessary return statement at end of void function. This return pattern causes unexpected control flow and makes function behavior harder to predict. {v5}',
     correctionMessage:
         'Remove the redundant return statement. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -232,6 +238,8 @@ class _RemoveUnnecessaryReturnFix extends DartFix {
 
 /// Warns when a variable is declared and immediately returned.
 ///
+/// Since: v1.8.2 | Updated: v4.13.0 | Rule version: v6
+///
 /// **Stylistic rule (opt-in only).** No performance or correctness benefit.
 ///
 /// Example of **bad** code:
@@ -263,7 +271,7 @@ class PreferImmediateReturnRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_immediate_return',
     problemMessage:
-        '[prefer_immediate_return] Returning an expression directly instead of assigning to a variable first is a stylistic preference. Both produce the same compiled output. Enable via the stylistic tier.',
+        '[prefer_immediate_return] Returning an expression directly instead of assigning to a variable first is a stylistic preference. Both produce the same compiled output. Enable via the stylistic tier. {v6}',
     correctionMessage:
         'Return the expression directly instead of storing in a variable. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -353,6 +361,8 @@ class _InlineImmediateReturnFix extends DartFix {
 
 /// Warns when arrow function could be used instead of block.
 ///
+/// Since: v1.5.1 | Updated: v4.13.0 | Rule version: v5
+///
 /// **Stylistic rule (opt-in only).** No performance or correctness benefit.
 ///
 /// Simple return statements should use arrow syntax.
@@ -385,7 +395,7 @@ class PreferReturningShorthandsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_returning_shorthands',
     problemMessage:
-        '[prefer_returning_shorthands] Simplifying return expressions to shorter forms is a code style preference. Both produce equivalent compiled output with no performance impact. Enable via the stylistic tier.',
+        '[prefer_returning_shorthands] Simplifying return expressions to shorter forms is a code style preference. Both produce equivalent compiled output with no performance impact. Enable via the stylistic tier. {v5}',
     correctionMessage:
         'Convert to expression body with =>. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,

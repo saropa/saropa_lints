@@ -11,6 +11,8 @@ import '../saropa_lint_rule.dart';
 
 /// Warns when comparing an expression to itself (x == x).
 ///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v5
+///
 /// Comparing something to itself is usually a bug, except for NaN checks.
 ///
 /// Example of **bad** code:
@@ -38,7 +40,7 @@ class AvoidEqualExpressionsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_equal_expressions',
     problemMessage:
-        '[avoid_equal_expressions] Both sides of the binary expression are identical, meaning the comparison always produces the same result (true for ==, false for >, <). This is almost always a copy-paste bug where the developer intended to compare two different values, and the redundant comparison masks the real logic error in the code.',
+        '[avoid_equal_expressions] Both sides of the binary expression are identical, meaning the comparison always produces the same result (true for ==, false for >, <). This is almost always a copy-paste bug where the developer intended to compare two different values, and the redundant comparison masks the real logic error in the code. {v5}',
     correctionMessage:
         'Replace one side of the expression with the intended comparison target to fix the copy-paste error.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -96,6 +98,8 @@ class _AddHackForEqualExpressionsFix extends DartFix {
 
 /// Warns when negation is used in equality checks.
 ///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v4
+///
 /// Using negation in equality can be harder to read.
 ///
 /// ### Example
@@ -125,7 +129,7 @@ class AvoidNegationsInEqualityChecksRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_negations_in_equality_checks',
     problemMessage:
-        '[avoid_negations_in_equality_checks] Equality check is wrapped in a negation operator !(a == b) instead of using the direct != operator. The negated form adds unnecessary cognitive overhead, increases nesting depth, and is harder to scan during code review. The != operator expresses the same intent more clearly and concisely.',
+        '[avoid_negations_in_equality_checks] Equality check is wrapped in a negation operator !(a == b) instead of using the direct != operator. The negated form adds unnecessary cognitive overhead, increases nesting depth, and is harder to scan during code review. The != operator expresses the same intent more clearly and concisely. {v4}',
     correctionMessage:
         'Replace !(a == b) with a != b for direct and readable inequality checking. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -196,6 +200,8 @@ class _UseNotEqualsFix extends DartFix {
 
 /// Warns when a variable is assigned to itself.
 ///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v5
+///
 /// Example of **bad** code:
 /// ```dart
 /// x = x;
@@ -220,7 +226,7 @@ class AvoidSelfAssignmentRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_self_assignment',
     problemMessage:
-        '[avoid_self_assignment] Variable is assigned to itself (x = x), which has no effect and indicates a copy-paste error or incomplete refactor. The assignment executes at runtime but produces no state change, wasting CPU cycles and obscuring the developer\'s actual intent. This dead code makes maintenance harder because readers must determine whether the assignment was intentional.',
+        '[avoid_self_assignment] Variable is assigned to itself (x = x), which has no effect and indicates a copy-paste error or incomplete refactor. The assignment executes at runtime but produces no state change, wasting CPU cycles and obscuring the developer\'s actual intent. This dead code makes maintenance harder because readers must determine whether the assignment was intentional. {v5}',
     correctionMessage:
         'Remove the self-assignment entirely, or replace the right-hand side with the intended source value.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -278,6 +284,8 @@ class _AddHackForSelfAssignmentFix extends DartFix {
 
 /// Warns when a variable is compared to itself.
 ///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v4
+///
 /// Example of **bad** code:
 /// ```dart
 /// if (x == x) { }
@@ -302,7 +310,7 @@ class AvoidSelfCompareRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_self_compare',
     problemMessage:
-        '[avoid_self_compare] Variable is compared to itself (x == x, x > x, etc.), which always produces a constant result (true for ==, false for inequality operators) unless the value is NaN. This is almost always a copy-paste bug where the developer intended to compare two distinct values, and the redundant comparison hides the real logic error in the code.',
+        '[avoid_self_compare] Variable is compared to itself (x == x, x > x, etc.), which always produces a constant result (true for ==, false for inequality operators) unless the value is NaN. This is almost always a copy-paste bug where the developer intended to compare two distinct values, and the redundant comparison hides the real logic error in the code. {v4}',
     correctionMessage:
         'Use .isNaN for NaN detection, or replace one operand with the intended comparison target.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -367,6 +375,8 @@ class _AddHackForSelfCompareFix extends DartFix {
 
 /// Warns when compareTo is used for equality instead of ==.
 ///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v4
+///
 /// **Quick fix available:** Transforms `a.compareTo(b) == 0` to `a == b`.
 class AvoidUnnecessaryCompareToRule extends SaropaLintRule {
   const AvoidUnnecessaryCompareToRule() : super(code: _code);
@@ -381,7 +391,7 @@ class AvoidUnnecessaryCompareToRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_unnecessary_compare_to',
     problemMessage:
-        '[avoid_unnecessary_compare_to] Using compareTo() == 0 for equality checking is unnecessarily verbose when the == operator expresses the same comparison directly. The compareTo method is designed for ordering (less than, greater than), and using it for equality adds cognitive overhead, increases code length, and obscures the developer\'s intent of a simple equality check.',
+        '[avoid_unnecessary_compare_to] Using compareTo() == 0 for equality checking is unnecessarily verbose when the == operator expresses the same comparison directly. The compareTo method is designed for ordering (less than, greater than), and using it for equality adds cognitive overhead, increases code length, and obscures the developer\'s intent of a simple equality check. {v4}',
     correctionMessage:
         'Replace compareTo(x) == 0 with == x, and compareTo(x) != 0 with != x for clarity.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -477,6 +487,8 @@ class _UseDirectEqualityFix extends DartFix {
 
 /// Warns when the same argument value is passed multiple times.
 ///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v4
+///
 /// ### Example
 ///
 /// #### BAD:
@@ -503,7 +515,7 @@ class NoEqualArgumentsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'no_equal_arguments',
     problemMessage:
-        '[no_equal_arguments] The same identifier is passed as multiple positional arguments to a function call, which typically indicates a copy-paste error where distinct values were intended (e.g., setPosition(x, x) instead of setPosition(x, y)). This silent bug produces incorrect behavior that passes compilation but yields wrong results at runtime.',
+        '[no_equal_arguments] The same identifier is passed as multiple positional arguments to a function call, which typically indicates a copy-paste error where distinct values were intended (e.g., setPosition(x, x) instead of setPosition(x, y)). This silent bug produces incorrect behavior that passes compilation but yields wrong results at runtime. {v4}',
     correctionMessage:
         'Verify whether duplicate arguments are intentional, and replace with the intended distinct values.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -584,6 +596,8 @@ class _AddHackForEqualArgumentsFix extends DartFix {
 
 /// Warns when DateTime values are compared using == or !=.
 ///
+/// Since: v4.12.0 | Updated: v4.13.0 | Rule version: v2
+///
 /// DateTime equality checks fail due to microsecond differences between
 /// timestamps that represent the "same" moment. Two DateTimes created
 /// independently almost never have identical microsecond values.
@@ -611,7 +625,7 @@ class AvoidDatetimeComparisonWithoutPrecisionRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_datetime_comparison_without_precision',
     problemMessage:
-        '[avoid_datetime_comparison_without_precision] Direct equality comparison (== or !=) on DateTime objects is unreliable because two timestamps representing the same logical moment almost never share identical microsecond values. Network latency, clock drift, serialization rounding, and independent construction all introduce sub-second differences that cause equality checks to silently fail, leading to missed cache hits, duplicate entries, and incorrect conditional logic.',
+        '[avoid_datetime_comparison_without_precision] Direct equality comparison (== or !=) on DateTime objects is unreliable because two timestamps representing the same logical moment almost never share identical microsecond values. Network latency, clock drift, serialization rounding, and independent construction all introduce sub-second differences that cause equality checks to silently fail, leading to missed cache hits, duplicate entries, and incorrect conditional logic. {v2}',
     correctionMessage:
         'Use DateTime.difference().abs() < Duration(threshold) with an appropriate precision, or use isAtSameMomentAs() for UTC-normalized comparison.',
     errorSeverity: DiagnosticSeverity.INFO,

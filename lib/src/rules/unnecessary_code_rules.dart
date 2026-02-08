@@ -12,6 +12,8 @@ import '../saropa_lint_rule.dart';
 
 /// Warns when an empty spread is used.
 ///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v4
+///
 /// Example of **bad** code:
 /// ```dart
 /// final list = [1, 2, ...[], 3];
@@ -36,7 +38,7 @@ class AvoidEmptySpreadRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_empty_spread',
     problemMessage:
-        '[avoid_empty_spread] Empty spread operator (...[] or ...{}) adds nothing to your collection and may confuse readers. This is often a leftover from refactoring or copy-paste and serves no purpose.',
+        '[avoid_empty_spread] Empty spread operator (...[] or ...{}) adds nothing to your collection and may confuse readers. This is often a leftover from refactoring or copy-paste and serves no purpose. {v4}',
     correctionMessage:
         'Remove the empty spread from your collection literal. Only use spreads when they add elements. Clean up any unnecessary or misleading spread operators for clarity.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -91,6 +93,8 @@ class _CommentOutEmptySpreadFix extends DartFix {
 
 /// Warns when unnecessary block braces are used.
 ///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v4
+///
 /// A block inside another block that doesn't introduce scope
 /// is unnecessary.
 ///
@@ -127,7 +131,7 @@ class AvoidUnnecessaryBlockRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_unnecessary_block',
     problemMessage:
-        '[avoid_unnecessary_block] Unnecessary nested code blocks add clutter and reduce readability. They rarely serve a purpose and are often left from copy-paste or refactoring.',
+        '[avoid_unnecessary_block] Unnecessary nested code blocks add clutter and reduce readability. They rarely serve a purpose and are often left from copy-paste or refactoring. {v4}',
     correctionMessage:
         'Remove extra braces from nested blocks that do not introduce a new scope. Only use additional blocks when needed for variable scope or clarity.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -152,6 +156,8 @@ class AvoidUnnecessaryBlockRule extends SaropaLintRule {
 }
 
 /// Warns when `.call()` is used explicitly on a callable.
+///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v4
 ///
 /// The `.call()` method is invoked implicitly when using `()`.
 ///
@@ -183,7 +189,7 @@ class AvoidUnnecessaryCallRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_unnecessary_call',
     problemMessage:
-        '[avoid_unnecessary_call] Using .call() on a function or callable is redundant. Dart automatically calls .call() when you use ().',
+        '[avoid_unnecessary_call] Using .call() on a function or callable is redundant. Dart automatically calls .call() when you use (). {v4}',
     correctionMessage:
         'Replace fn.call() with fn(). Use the () operator for clarity and idiomatic Dart.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -248,6 +254,8 @@ class _RemoveUnnecessaryCallFix extends DartFix {
 
 /// Warns when a class has an empty constructor (no parameters, no body, no initializers).
 ///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v5
+///
 /// Empty constructors are redundant as Dart provides a default constructor.
 ///
 /// Example of **bad** code:
@@ -278,7 +286,7 @@ class AvoidUnnecessaryConstructorRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_unnecessary_constructor',
     problemMessage:
-        '[avoid_unnecessary_constructor] Empty constructors are redundant—Dart provides a default constructor automatically. Leaving them in adds noise and may confuse readers.',
+        '[avoid_unnecessary_constructor] Empty constructors are redundant—Dart provides a default constructor automatically. Leaving them in adds noise and may confuse readers. {v5}',
     correctionMessage:
         'Remove empty constructors with no parameters, initializers, or body. Let Dart provide the default constructor.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -351,6 +359,8 @@ class _CommentOutUnnecessaryConstructorFix extends DartFix {
 
 /// Warns when enum arguments match the default and can be omitted.
 ///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v4
+///
 /// Some enum constructors have default values that don't need to be specified.
 ///
 /// ### Example
@@ -387,7 +397,7 @@ class AvoidUnnecessaryEnumArgumentsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_unnecessary_enum_arguments',
     problemMessage:
-        '[avoid_unnecessary_enum_arguments] Providing an argument to an enum constructor that matches the default value is unnecessary and can make the code harder to read. It may also mislead readers into thinking the value is intentionally different from the default.',
+        '[avoid_unnecessary_enum_arguments] Providing an argument to an enum constructor that matches the default value is unnecessary and can make the code harder to read. It may also mislead readers into thinking the value is intentionally different from the default. {v4}',
     correctionMessage:
         'Remove arguments from enum constructors when they match the default value. This makes your code more concise and avoids confusion about the intent of the value.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -421,6 +431,8 @@ class AvoidUnnecessaryEnumArgumentsRule extends SaropaLintRule {
 }
 
 /// Warns when using enum name prefix inside the enum declaration.
+///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v4
 class AvoidUnnecessaryEnumPrefixRule extends SaropaLintRule {
   const AvoidUnnecessaryEnumPrefixRule() : super(code: _code);
 
@@ -434,7 +446,7 @@ class AvoidUnnecessaryEnumPrefixRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_unnecessary_enum_prefix',
     problemMessage:
-        '[avoid_unnecessary_enum_prefix] Using the enum type name as a prefix when referencing enum values inside the enum declaration is redundant. Dart allows you to reference enum values directly within the enum, and including the prefix adds unnecessary verbosity.',
+        '[avoid_unnecessary_enum_prefix] Using the enum type name as a prefix when referencing enum values inside the enum declaration is redundant. Dart allows you to reference enum values directly within the enum, and including the prefix adds unnecessary verbosity. {v4}',
     correctionMessage:
         'Remove the enum type name prefix when referencing enum values inside the enum declaration. Use the value name directly for clarity and conciseness.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -548,6 +560,8 @@ class _EnumPrefixVisitor extends RecursiveAstVisitor<void> {
 
 /// Warns when a class explicitly extends Object.
 ///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v4
+///
 /// All classes implicitly extend Object, so explicit extends is unnecessary.
 ///
 /// ### Example
@@ -576,7 +590,7 @@ class AvoidUnnecessaryExtendsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_unnecessary_extends',
     problemMessage:
-        '[avoid_unnecessary_extends] All Dart classes implicitly extend Object, so explicitly writing extends Object is unnecessary and adds clutter to your class declaration. This can confuse readers and is never required.',
+        '[avoid_unnecessary_extends] All Dart classes implicitly extend Object, so explicitly writing extends Object is unnecessary and adds clutter to your class declaration. This can confuse readers and is never required. {v4}',
     correctionMessage:
         'Remove the extends Object clause from your class declaration. Dart will automatically inherit from Object, so this is always implied.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -638,6 +652,8 @@ class _RemoveExtendsObjectFix extends DartFix {
 
 /// Warns when a getter just returns a final field without any logic.
 ///
+/// Since: v1.8.2 | Updated: v4.13.0 | Rule version: v6
+///
 /// ### Example
 ///
 /// #### BAD:
@@ -672,7 +688,7 @@ class AvoidUnnecessaryGetterRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_unnecessary_getter',
     problemMessage:
-        '[avoid_unnecessary_getter] Getter just returns a final field without additional logic. This unnecessary code increases cognitive load without providing functional benefit.',
+        '[avoid_unnecessary_getter] Getter just returns a final field without additional logic. This unnecessary code increases cognitive load without providing functional benefit. {v6}',
     correctionMessage:
         'Prefer making the field public or adding meaningful logic. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -749,6 +765,8 @@ class AvoidUnnecessaryGetterRule extends SaropaLintRule {
 
 /// Warns when length > 0 or length != 0 can be replaced with isNotEmpty.
 ///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v4
+///
 /// **Quick fix available:** Replaces with `.isEmpty` or `.isNotEmpty`.
 class AvoidUnnecessaryLengthCheckRule extends SaropaLintRule {
   const AvoidUnnecessaryLengthCheckRule() : super(code: _code);
@@ -763,7 +781,7 @@ class AvoidUnnecessaryLengthCheckRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_unnecessary_length_check',
     problemMessage:
-        '[avoid_unnecessary_length_check] Use isNotEmpty instead of length comparison. Quick fix available: Replaces with .isEmpty or .isNotEmpty.',
+        '[avoid_unnecessary_length_check] Use isNotEmpty instead of length comparison. Quick fix available: Replaces with .isEmpty or .isNotEmpty. {v4}',
     correctionMessage:
         'Replace with .isNotEmpty or .isEmpty. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -914,6 +932,8 @@ class _UseIsEmptyOrIsNotEmptyFix extends DartFix {
 
 /// Warns when negation can be simplified.
 ///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v5
+///
 /// Double negations and negated comparisons can often be simplified
 /// for better readability.
 ///
@@ -943,7 +963,7 @@ class AvoidUnnecessaryNegationsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_unnecessary_negations',
     problemMessage:
-        '[avoid_unnecessary_negations] Unnecessary negation can be simplified. This unnecessary code increases cognitive load without providing functional benefit.',
+        '[avoid_unnecessary_negations] Unnecessary negation can be simplified. This unnecessary code increases cognitive load without providing functional benefit. {v5}',
     correctionMessage:
         'Simplify by using the opposite operator or removing double negation. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -989,6 +1009,8 @@ class AvoidUnnecessaryNegationsRule extends SaropaLintRule {
 
 /// Warns when super call is unnecessary in constructor.
 ///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v4
+///
 /// Example of **bad** code:
 /// ```dart
 /// class Child extends Parent {
@@ -1017,7 +1039,7 @@ class AvoidUnnecessarySuperRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_unnecessary_super',
     problemMessage:
-        '[avoid_unnecessary_super] Unnecessary super() call with no arguments. Super call is unnecessary in constructor. This unnecessary code increases cognitive load without providing functional benefit.',
+        '[avoid_unnecessary_super] Unnecessary super() call with no arguments. Super call is unnecessary in constructor. This unnecessary code increases cognitive load without providing functional benefit. {v4}',
     correctionMessage:
         'Remove the super() call - it is implicit. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -1269,6 +1291,8 @@ class _AddEmptyBlockCommentFix extends DartFix {
 
 /// Warns when an empty string literal is used.
 ///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v6
+///
 /// Example of **bad** code:
 /// ```dart
 /// if (value == '') { ... }
@@ -1291,7 +1315,7 @@ class NoEmptyStringRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'no_empty_string',
     problemMessage:
-        '[no_empty_string] Using empty string literals ("") in your code can be ambiguous and may indicate a missing value or a placeholder. Relying on empty strings for logic can lead to subtle bugs and makes intent unclear to readers.',
+        '[no_empty_string] Using empty string literals ("") in your code can be ambiguous and may indicate a missing value or a placeholder. Relying on empty strings for logic can lead to subtle bugs and makes intent unclear to readers. {v6}',
     correctionMessage:
         'Instead of using empty string literals directly, use .isEmpty or .isNotEmpty for string comparisons. This makes your intent explicit and your code more robust.',
     errorSeverity: DiagnosticSeverity.INFO,

@@ -18,6 +18,8 @@ import '../../saropa_lint_rule.dart';
 
 /// Warns when launchUrl is called without canLaunchUrl check.
 ///
+/// Since: v4.2.0 | Updated: v4.13.0 | Rule version: v2
+///
 /// Alias: can_launch_check, url_launcher_check
 ///
 /// Check canLaunchUrl before launchUrl for better error messages. Without this
@@ -50,7 +52,7 @@ class RequireUrlLauncherCanLaunchCheckRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_url_launcher_can_launch_check',
     problemMessage:
-        '[require_url_launcher_can_launch_check] launchUrl called without canLaunchUrl check. May fail silently on unsupported schemes, confusing users and breaking expected flows. Check canLaunchUrl before launchUrl to improve error messages. Without this check, launchUrl may fail silently or throw cryptic platform exceptions.',
+        '[require_url_launcher_can_launch_check] launchUrl called without canLaunchUrl check. May fail silently on unsupported schemes, confusing users and breaking expected flows. Check canLaunchUrl before launchUrl to improve error messages. Without this check, launchUrl may fail silently or throw cryptic platform exceptions. {v2}',
     correctionMessage:
         'Check canLaunchUrl(uri) before calling launchUrl(uri). Example: if (await canLaunchUrl(uri)) { launchUrl(uri); } else { showError("Could not open link"); }',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -101,6 +103,8 @@ class RequireUrlLauncherCanLaunchCheckRule extends SaropaLintRule {
 
 /// Warns when URL launcher tests may fail on simulator/emulator.
 ///
+/// Since: v4.2.0 | Updated: v4.13.0 | Rule version: v2
+///
 /// Alias: url_launcher_test, simulator_url_test
 ///
 /// URL schemes like tel:, mailto:, sms: fail on iOS Simulator and Android
@@ -138,7 +142,7 @@ class AvoidUrlLauncherSimulatorTestsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_url_launcher_simulator_tests',
     problemMessage:
-        '[avoid_url_launcher_simulator_tests] URL launcher test with tel:/mailto:/sms:/facetime:/maps: scheme may fail on simulator. These schemes are not supported in emulators and will cause test failures.',
+        '[avoid_url_launcher_simulator_tests] URL launcher test with tel:/mailto:/sms:/facetime:/maps: scheme may fail on simulator. These schemes are not supported in emulators and will cause test failures. {v2}',
     correctionMessage:
         'Mock url_launcher in tests or add skip condition for simulator. Example: skip: !Platform.isAndroid or use a mockUrlLauncher.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -205,6 +209,8 @@ class AvoidUrlLauncherSimulatorTestsRule extends SaropaLintRule {
 
 /// Warns when URL launcher is used without a fallback for unsupported schemes.
 ///
+/// Since: v4.2.0 | Updated: v4.13.0 | Rule version: v2
+///
 /// Alias: url_launcher_fallback, handle_launch_failure
 ///
 /// Provide fallback for unsupported schemes. Not all devices support all URL
@@ -240,7 +246,7 @@ class PreferUrlLauncherFallbackRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_url_launcher_fallback',
     problemMessage:
-        '[prefer_url_launcher_fallback] launchUrl called without a fallback. If the scheme is unsupported, the user gets no feedback and cannot complete the action. This leads to user frustration and failed actions.',
+        '[prefer_url_launcher_fallback] launchUrl called without a fallback. If the scheme is unsupported, the user gets no feedback and cannot complete the action. This leads to user frustration and failed actions. {v2}',
     correctionMessage:
         'Provide a fallback action (copy to clipboard, show dialog) when launch fails. Example: if (!await launchUrl(uri)) { showDialog(context: context, builder: (_) => Text("Could not open link")); }',
     errorSeverity: DiagnosticSeverity.INFO,

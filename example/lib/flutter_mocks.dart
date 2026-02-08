@@ -874,3 +874,602 @@ class WidgetsBinding {
 bool listEquals<T>(List<T>? a, List<T>? b) => a == b;
 bool setEquals<T>(Set<T>? a, Set<T>? b) => a == b;
 bool mapEquals<K, V>(Map<K, V>? a, Map<K, V>? b) => a == b;
+
+// ============================================================================
+// Additional widget types for test fixture generation
+// ============================================================================
+
+class ListTile extends Widget {
+  const ListTile({
+    super.key,
+    Widget? title,
+    Widget? subtitle,
+    Widget? leading,
+    Widget? trailing,
+    VoidCallback? onTap,
+    VoidCallback? onLongPress,
+    bool enabled = true,
+    bool selected = false,
+  });
+}
+
+class TextStyle {
+  const TextStyle({
+    double? fontSize,
+    dynamic fontWeight,
+    dynamic color,
+    dynamic decoration,
+    String? fontFamily,
+    double? letterSpacing,
+    double? height,
+  });
+}
+
+class MaterialApp extends Widget {
+  const MaterialApp({
+    super.key,
+    Widget? home,
+    String? title,
+    dynamic theme,
+    dynamic darkTheme,
+    dynamic themeMode,
+    dynamic onGenerateRoute,
+  });
+}
+
+class GestureDetector extends Widget {
+  const GestureDetector({
+    super.key,
+    Widget? child,
+    VoidCallback? onTap,
+    VoidCallback? onDoubleTap,
+    VoidCallback? onLongPress,
+    dynamic behavior,
+  });
+}
+
+class InputDecoration {
+  const InputDecoration({
+    String? labelText,
+    String? hintText,
+    Widget? prefixIcon,
+    Widget? suffixIcon,
+    dynamic border,
+    String? errorText,
+    Widget? label,
+  });
+}
+
+class CircularProgressIndicator extends Widget {
+  const CircularProgressIndicator({super.key, double? value});
+}
+
+class TextSpan {
+  const TextSpan({
+    String? text,
+    TextStyle? style,
+    List<TextSpan>? children,
+    dynamic recognizer,
+  });
+}
+
+class Form extends Widget {
+  const Form({super.key, Widget? child, dynamic key});
+}
+
+class IconButton extends Widget {
+  const IconButton({
+    super.key,
+    required VoidCallback? onPressed,
+    required Widget icon,
+    String? tooltip,
+  });
+}
+
+class InkWell extends Widget {
+  const InkWell({
+    super.key,
+    Widget? child,
+    VoidCallback? onTap,
+  });
+}
+
+class Hero extends Widget {
+  const Hero({super.key, required dynamic tag, required Widget child});
+}
+
+class BoxDecoration {
+  const BoxDecoration({
+    dynamic color,
+    dynamic gradient,
+    dynamic border,
+    dynamic borderRadius,
+    dynamic boxShadow,
+  });
+}
+
+class Opacity extends Widget {
+  const Opacity({super.key, required double opacity, Widget? child});
+}
+
+class SafeArea extends Widget {
+  const SafeArea({super.key, required Widget child});
+}
+
+class AnimatedList extends Widget {
+  const AnimatedList({
+    super.key,
+    required dynamic itemBuilder,
+    int initialItemCount = 0,
+  });
+}
+
+class SliverAnimatedList extends Widget {
+  const SliverAnimatedList({super.key, required dynamic itemBuilder});
+}
+
+class ValueKey<T> extends Key {
+  const ValueKey(T value) : super('');
+}
+
+class GlobalKey<T extends State> extends Key {
+  GlobalKey({String? debugLabel}) : super('');
+}
+
+class Color {
+  const Color(int value);
+  Color withOpacity(double opacity) => this;
+}
+
+class SliverList extends Widget {
+  const SliverList({super.key, required dynamic delegate});
+  const SliverList.builder({
+    super.key,
+    required dynamic itemBuilder,
+    int? itemCount,
+  });
+}
+
+class AnimatedContainer extends Widget {
+  const AnimatedContainer({
+    super.key,
+    required Duration duration,
+    Widget? child,
+    dynamic color,
+    double? width,
+    double? height,
+  });
+}
+
+class SelectableText extends Widget {
+  const SelectableText(String data, {super.key, TextStyle? style});
+}
+
+class Tooltip extends Widget {
+  const Tooltip({super.key, String? message, Widget? child});
+}
+
+class Card extends Widget {
+  const Card({super.key, Widget? child, dynamic elevation});
+}
+
+class FloatingActionButton extends Widget {
+  const FloatingActionButton({
+    super.key,
+    VoidCallback? onPressed,
+    Widget? child,
+    String? tooltip,
+  });
+}
+
+class Switch extends Widget {
+  const Switch({super.key, required bool value, dynamic onChanged});
+}
+
+class Checkbox extends Widget {
+  const Checkbox({super.key, required bool? value, dynamic onChanged});
+}
+
+class RefreshIndicator extends Widget {
+  const RefreshIndicator({
+    super.key,
+    required Widget child,
+    required dynamic onRefresh,
+  });
+}
+
+class RepaintBoundary extends Widget {
+  const RepaintBoundary({super.key, Widget? child});
+}
+
+class FittedBox extends Widget {
+  const FittedBox({super.key, Widget? child, dynamic fit});
+}
+
+class Chip extends Widget {
+  const Chip({super.key, required Widget label, Widget? avatar});
+}
+
+class Draggable<T> extends Widget {
+  const Draggable({
+    super.key,
+    required Widget child,
+    required Widget feedback,
+    T? data,
+  });
+}
+
+class Dismissible extends Widget {
+  const Dismissible({
+    super.key,
+    required dynamic key,
+    required Widget child,
+    dynamic onDismissed,
+  });
+}
+
+class FutureBuilder<T> extends Widget {
+  const FutureBuilder({
+    super.key,
+    required Future<T>? future,
+    required dynamic builder,
+  });
+}
+
+class AbsorbPointer extends Widget {
+  const AbsorbPointer({super.key, bool absorbing = true, Widget? child});
+}
+
+class IgnorePointer extends Widget {
+  const IgnorePointer({super.key, bool ignoring = true, Widget? child});
+}
+
+class Visibility extends Widget {
+  const Visibility({super.key, required Widget child, bool visible = true});
+}
+
+class PopupMenuButton<T> extends Widget {
+  const PopupMenuButton({super.key, required dynamic itemBuilder});
+}
+
+class DropdownButton<T> extends Widget {
+  const DropdownButton({
+    super.key,
+    required T? value,
+    required dynamic onChanged,
+    required List<dynamic> items,
+  });
+}
+
+class DefaultTextStyle extends Widget {
+  const DefaultTextStyle({
+    super.key,
+    required TextStyle style,
+    required Widget child,
+  });
+}
+
+// ============================================================================
+// Test framework stubs
+// ============================================================================
+
+void test(String description, dynamic Function() body) {}
+void testWidgets(String description, dynamic Function(dynamic) callback) {}
+void expect(dynamic actual, dynamic matcher) {}
+void group(String description, dynamic Function() body) {}
+void setUp(dynamic Function() body) {}
+void tearDown(dynamic Function() body) {}
+void when(dynamic obj) {}
+void verify(dynamic obj) {}
+dynamic find = _FindStub();
+dynamic findsOneWidget = true;
+dynamic findsNothing = true;
+
+class _FindStub {
+  dynamic byKey(dynamic key) => null;
+  dynamic byType(dynamic type) => null;
+  dynamic text(String text) => null;
+  dynamic noSuchMethod(Invocation i) => null;
+}
+
+// ============================================================================
+// Common utility stubs
+// ============================================================================
+
+void runApp(Widget app) {}
+dynamic jsonDecode(String source) => {};
+String jsonEncode(dynamic object) => '';
+Future<T> compute<T, U>(T Function(U) callback, U message) async =>
+    callback(message);
+void log(String message, {String? name, int? level}) {}
+void setState(void Function() fn) {}
+void doSomething() {}
+dynamic fetchData() => null;
+dynamic fetchUser() => null;
+dynamic showError(dynamic msg) => null;
+dynamic saveData(dynamic data) => null;
+dynamic showNotification(dynamic n) => null;
+
+class Platform {
+  static bool get isIOS => false;
+  static bool get isAndroid => false;
+  static bool get isMacOS => false;
+  static bool get isWindows => false;
+  static bool get isLinux => false;
+  static Map<String, String> get environment => {};
+}
+
+class MediaQuery {
+  static dynamic of(BuildContext context) => _MediaQueryData();
+  static dynamic maybeOf(BuildContext context) => null;
+}
+
+class _MediaQueryData {
+  dynamic get size => null;
+  double get textScaleFactor => 1.0;
+  dynamic get padding => null;
+  dynamic get viewInsets => null;
+}
+
+class Focus extends Widget {
+  const Focus({super.key, Widget? child, dynamic onFocusChange});
+}
+
+class FocusTraversalGroup extends Widget {
+  const FocusTraversalGroup({super.key, Widget? child, dynamic policy});
+}
+
+class ValueListenableBuilder<T> extends Widget {
+  const ValueListenableBuilder({
+    super.key,
+    required dynamic valueListenable,
+    required dynamic builder,
+  });
+}
+
+class OrientationBuilder extends Widget {
+  const OrientationBuilder({super.key, required dynamic builder});
+}
+
+class CupertinoButton extends Widget {
+  const CupertinoButton({
+    super.key,
+    required VoidCallback? onPressed,
+    required Widget child,
+  });
+}
+
+class ScrollController {
+  ScrollController({double initialScrollOffset = 0.0});
+  void dispose() {}
+  void addListener(VoidCallback listener) {}
+  void removeListener(VoidCallback listener) {}
+  double get offset => 0.0;
+}
+
+class File {
+  File(String path);
+  String readAsStringSync() => '';
+  Future<String> readAsString() async => '';
+  bool existsSync() => false;
+}
+
+class Uri {
+  static Uri parse(String uriString) => Uri._();
+  const Uri._();
+  String get scheme => '';
+  String get host => '';
+}
+
+class DateFormat {
+  DateFormat(String pattern, [String? locale]);
+  String format(dynamic date) => '';
+  dynamic parse(String input) => null;
+}
+
+class GoRouter {
+  GoRouter({required List<dynamic> routes, String? initialLocation});
+  void go(String path) {}
+  void push(String path) {}
+}
+
+class GoRoute {
+  const GoRoute({
+    required String path,
+    dynamic builder,
+    List<dynamic>? routes,
+    String? name,
+  });
+}
+
+class CachedNetworkImage extends Widget {
+  const CachedNetworkImage({
+    super.key,
+    required String imageUrl,
+    Widget? placeholder,
+    Widget? errorWidget,
+  });
+}
+
+class WebView extends Widget {
+  const WebView({
+    super.key,
+    String? initialUrl,
+    dynamic onPageFinished,
+  });
+}
+
+class InAppWebView extends Widget {
+  const InAppWebView({super.key, dynamic initialUrlRequest});
+}
+
+class ImagePicker {
+  Future<dynamic> pickImage({required dynamic source}) async => null;
+}
+
+class ImageSource {
+  static const camera = ImageSource._();
+  static const gallery = ImageSource._();
+  const ImageSource._();
+}
+
+class VideoPlayer {
+  VideoPlayer({bool autoPlay = false});
+  void dispose() {}
+}
+
+class AudioPlayer {
+  AudioPlayer({bool autoPlay = false});
+  void dispose() {}
+}
+
+class FlutterSecureStorage {
+  const FlutterSecureStorage();
+  Future<void> write({required String key, required String? value}) async {}
+  Future<String?> read({required String key}) async => null;
+}
+
+class Dio {
+  Dio([dynamic baseOptions]);
+  Future<dynamic> get(String path) async => null;
+  Future<dynamic> post(String path, {dynamic data}) async => null;
+}
+
+class HttpClient {
+  Future<dynamic> getUrl(Uri url) async => null;
+}
+
+class StateProvider<T> {
+  StateProvider(T Function(dynamic) create);
+}
+
+class ConsumerWidget extends Widget {
+  const ConsumerWidget({super.key});
+}
+
+class MethodChannel {
+  const MethodChannel(String name);
+  Future<T?> invokeMethod<T>(String method, [dynamic arguments]) async => null;
+}
+
+class EventChannel {
+  const EventChannel(String name);
+  Stream<dynamic> receiveBroadcastStream() => Stream.empty();
+}
+
+class NotificationDetails {
+  const NotificationDetails({dynamic android, dynamic iOS});
+}
+
+class BlendMode {
+  static const modulate = BlendMode._();
+  const BlendMode._();
+}
+
+class FontWeight {
+  static const bold = FontWeight._();
+  static const normal = FontWeight._();
+  static const w400 = FontWeight._();
+  static const w700 = FontWeight._();
+  const FontWeight._();
+}
+
+class BorderRadius {
+  static dynamic circular(double radius) => null;
+}
+
+class ClipRRect extends Widget {
+  const ClipRRect({super.key, dynamic borderRadius, Widget? child});
+}
+
+class BackdropFilter extends Widget {
+  const BackdropFilter({super.key, required dynamic filter, Widget? child});
+}
+
+class ThemeMode {
+  static const system = ThemeMode._();
+  static const light = ThemeMode._();
+  static const dark = ThemeMode._();
+  const ThemeMode._();
+}
+
+class Brightness {
+  static const light = Brightness._();
+  static const dark = Brightness._();
+  const Brightness._();
+}
+
+// Placeholder classes for DartDoc examples
+class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+  @override
+  Widget build(BuildContext context) => Container();
+}
+
+class MyWidget extends StatelessWidget {
+  const MyWidget({super.key});
+  @override
+  Widget build(BuildContext context) => Container();
+}
+
+class MyHomePage extends StatelessWidget {
+  const MyHomePage({super.key});
+  @override
+  Widget build(BuildContext context) => Container();
+}
+
+class HomePage extends StatelessWidget {
+  const HomePage({super.key});
+  @override
+  Widget build(BuildContext context) => Container();
+}
+
+class ProfilePage extends StatelessWidget {
+  const ProfilePage({super.key});
+  @override
+  Widget build(BuildContext context) => Container();
+}
+
+class User {
+  String name = '';
+  String email = '';
+  int id = 0;
+}
+
+class MyService {
+  void dispose() {}
+}
+
+class UserService {
+  Future<User> getUser() async => User();
+}
+
+class MyNotifier {
+  void dispose() {}
+}
+
+// AsyncSnapshot for FutureBuilder
+class AsyncSnapshot<T> {
+  bool get hasData => false;
+  bool get hasError => false;
+  T? get data => null;
+  dynamic get error => null;
+  dynamic get connectionState => null;
+}
+
+class ConnectionState {
+  static const none = ConnectionState._();
+  static const waiting = ConnectionState._();
+  static const active = ConnectionState._();
+  static const done = ConnectionState._();
+  const ConnectionState._();
+}
+
+class Geolocator {
+  static Future<dynamic> getCurrentPosition() async => null;
+  static Future<bool> isLocationServiceEnabled() async => false;
+}
+
+class LocationSettings {
+  const LocationSettings({dynamic accuracy, int? distanceFilter});
+}

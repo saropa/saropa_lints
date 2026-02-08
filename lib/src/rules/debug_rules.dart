@@ -12,6 +12,8 @@ import '../saropa_lint_rule.dart';
 
 /// Test-only rule that always reports a lint at the start of the file.
 ///
+/// Since: v4.8.2 | Updated: v4.13.0 | Rule version: v3
+///
 /// Formerly: `always_fail_test_case`
 class AlwaysFailRule extends SaropaLintRule {
   const AlwaysFailRule() : super(code: _code);
@@ -29,7 +31,7 @@ class AlwaysFailRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_fail_test_case',
     problemMessage:
-        '[prefer_fail_test_case] This custom lint always fails (test hook). Formerly: always_fail_test_case. Test-only rule that always reports a lint at the start of the file.',
+        '[prefer_fail_test_case] This custom lint always fails (test hook). Formerly: always_fail_test_case. Test-only rule that always reports a lint at the start of the file. {v3}',
     correctionMessage:
         'This rule always fails by design — it verifies your lint pipeline is active. Seeing this error confirms saropa_lints is running. Remove prefer_fail_test_case from your enabled rules once verified.',
     errorSeverity: DiagnosticSeverity.ERROR,
@@ -52,6 +54,8 @@ class AlwaysFailRule extends SaropaLintRule {
 // The rule now reports at actual comment locations and has a quick fix.
 
 /// Warns when debugPrint is used.
+///
+/// Since: v1.5.1 | Updated: v4.13.0 | Rule version: v4
 ///
 /// debugPrint should not be used in production code. Use a proper logging
 /// solution instead that can be configured per environment.
@@ -81,7 +85,7 @@ class AvoidDebugPrintRule extends SaropaLintRule {
     name: 'avoid_debug_print',
     problemMessage:
         '[avoid_debug_print] debugPrint bypasses structured logging, making it impossible to filter, search, or disable output per environment. '
-        'Debug statements left in production code expose internal state to device logs, degrade performance through I/O overhead, and create noise that obscures real issues during troubleshooting.',
+        'Debug statements left in production code expose internal state to device logs, degrade performance through I/O overhead, and create noise that obscures real issues during troubleshooting. {v4}',
     correctionMessage:
         'Replace debugPrint with a structured logging package (e.g., logger, logging, or a custom Logger class) that supports log levels, filtering, and environment-aware output. '
         'This ensures debug output is suppressed in production while remaining available during development.',
@@ -152,6 +156,8 @@ class _CommentOutDebugPrintFix extends DartFix {
 
 /// Warns when `debugPrint()` calls are not guarded by a debug check.
 ///
+/// Since: v1.7.2 | Updated: v4.13.0 | Rule version: v3
+///
 /// The project's `debug()` function is production-safe logging infrastructure
 /// with its own level filtering and Crashlytics routing — it is NOT flagged.
 ///
@@ -199,7 +205,7 @@ class AvoidUnguardedDebugRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_unguarded_debug',
     problemMessage:
-        '[avoid_unguarded_debug] debugPrint() is not guarded by a debug mode check.',
+        '[avoid_unguarded_debug] debugPrint() is not guarded by a debug mode check. {v3}',
     correctionMessage: 'Wrap in if (kDebugMode) or if (DebugType.*.isDebug). '
         'Consider using debug() instead, which is production-safe.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -348,6 +354,8 @@ class AvoidUnguardedDebugRule extends SaropaLintRule {
 
 /// Warns when `// ignore:` comments don't have a preceding explanatory comment.
 ///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v5
+///
 /// Analyzer ignore comments should be documented to explain why the rule is being
 /// ignored. This helps future maintainers understand the reasoning.
 ///
@@ -376,7 +384,7 @@ class PreferCommentingAnalyzerIgnoresRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_commenting_analyzer_ignores',
     problemMessage:
-        '[prefer_commenting_analyzer_ignores] Analyzer ignore comment must have a preceding explanatory comment. This debug artifact executes in production, potentially exposing internal state or degrading performance.',
+        '[prefer_commenting_analyzer_ignores] Analyzer ignore comment must have a preceding explanatory comment. This debug artifact executes in production, potentially exposing internal state or degrading performance. {v5}',
     correctionMessage:
         'Add a comment on the line above explaining why this rule is ignored. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -483,6 +491,8 @@ class PreferCommentingAnalyzerIgnoresRule extends SaropaLintRule {
 
 /// Suggests using debugPrint instead of print for better output throttling.
 ///
+/// Since: vunknown | Rule version: v1
+///
 /// The print() function can overwhelm the system console and cause message
 /// loss when called rapidly. debugPrint() throttles output to avoid this
 /// issue and is the recommended way to log debug information.
@@ -515,7 +525,7 @@ class PreferDebugPrintRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_debugPrint',
     problemMessage:
-        '[prefer_debugPrint] print() should use debugPrint() for throttled console output.',
+        '[prefer_debugPrint] print() should use debugPrint() for throttled console output. {v1}',
     correctionMessage:
         'Replace print() with debugPrint() to prevent console buffer overflow.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -589,6 +599,8 @@ class _ReplaceWithDebugPrintFix extends DartFix {
 
 /// Warns when print() is used without kDebugMode check.
 ///
+/// Since: v4.1.6 | Updated: v4.13.0 | Rule version: v3
+///
 /// print() statements execute in release builds, potentially exposing
 /// sensitive information or impacting performance. Always guard print
 /// statements with kDebugMode.
@@ -622,7 +634,7 @@ class AvoidPrintInReleaseRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_print_in_release',
     problemMessage:
-        '[avoid_print_in_release] Using print() in production exposes debug information to end users, can leak sensitive data, and negatively impacts performance. Print statements are not optimized for release builds and may clutter logs, making it harder to diagnose real issues. This can also violate privacy policies and app store guidelines.',
+        '[avoid_print_in_release] Using print() in production exposes debug information to end users, can leak sensitive data, and negatively impacts performance. Print statements are not optimized for release builds and may clutter logs, making it harder to diagnose real issues. This can also violate privacy policies and app store guidelines. {v3}',
     correctionMessage:
         'Wrap print() calls in if (kDebugMode) or use a logging framework with configurable log levels. Remove or refactor print statements before release to ensure only intentional logging is present.',
     errorSeverity: DiagnosticSeverity.ERROR,
@@ -718,6 +730,8 @@ class _WrapInDebugModeFix extends DartFix {
 
 /// Warns when log calls use string concatenation instead of structured logging.
 ///
+/// Since: v4.1.6 | Updated: v4.13.0 | Rule version: v2
+///
 /// String concatenation in log messages wastes CPU cycles constructing
 /// strings even when logging is disabled. Use structured logging with
 /// placeholders or log levels.
@@ -745,7 +759,7 @@ class RequireStructuredLoggingRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_structured_logging',
     problemMessage:
-        '[require_structured_logging] String concatenation in logs wastes CPU building strings even when logging is disabled. String concatenation in log messages wastes CPU cycles constructing strings even when logging is disabled. Use structured logging with placeholders or log levels.',
+        '[require_structured_logging] String concatenation in logs wastes CPU building strings even when logging is disabled. String concatenation in log messages wastes CPU cycles constructing strings even when logging is disabled. Use structured logging with placeholders or log levels. {v2}',
     correctionMessage:
         'Use structured logging with named parameters: log("event", data: {"key": value}).',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -806,6 +820,8 @@ class RequireStructuredLoggingRule extends SaropaLintRule {
 
 /// Warns when sensitive data is logged.
 ///
+/// Since: v4.1.6 | Updated: v4.13.0 | Rule version: v5
+///
 /// Alias: avoid_sensitive_data_in_logs
 ///
 /// `[HEURISTIC]` - Uses pattern matching to detect sensitive variable names.
@@ -860,7 +876,7 @@ class AvoidSensitiveInLogsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_sensitive_in_logs',
     problemMessage:
-        '[avoid_sensitive_in_logs] Logging sensitive data (such as passwords, tokens, or personal information) exposes users to credential theft, privacy violations, and compliance failures (e.g., OWASP A09). Attackers or support staff may access logs and extract secrets, leading to data breaches.',
+        '[avoid_sensitive_in_logs] Logging sensitive data (such as passwords, tokens, or personal information) exposes users to credential theft, privacy violations, and compliance failures (e.g., OWASP A09). Attackers or support staff may access logs and extract secrets, leading to data breaches. {v5}',
     correctionMessage:
         'Never log sensitive information. Remove or redact secrets, credentials, and personal data before logging. Use secure logging practices and review log statements for accidental leaks.',
     errorSeverity: DiagnosticSeverity.ERROR,
@@ -1040,5 +1056,110 @@ class _CommentOutSensitiveLogFix extends DartFix {
         );
       });
     });
+  }
+}
+
+// =============================================================================
+// require_log_level_for_production
+// =============================================================================
+
+/// Warns when verbose logging methods are used without a debug-mode guard.
+///
+/// Since: v4.14.0 | Rule version: v1
+///
+/// `[HEURISTIC]` - Detects verbose log calls (log, fine, finer, finest, debug,
+/// trace, verbose) outside kDebugMode/kReleaseMode guards or assert blocks.
+///
+/// Verbose logging in production builds exposes internal state, degrades
+/// performance, and may leak sensitive information to device logs.
+///
+/// **BAD:**
+/// ```dart
+/// void processOrder(Order order) {
+///   log('Processing: ${order.toJson()}'); // Leaks data in production!
+/// }
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// void processOrder(Order order) {
+///   if (kDebugMode) {
+///     log('Processing: ${order.toJson()}');
+///   }
+/// }
+/// ```
+///
+/// GitHub: https://github.com/saropa/saropa_lints/issues/18
+class RequireLogLevelForProductionRule extends SaropaLintRule {
+  const RequireLogLevelForProductionRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  static const LintCode _code = LintCode(
+    name: 'require_log_level_for_production',
+    problemMessage:
+        '[require_log_level_for_production] Verbose log method called without '
+        'a debug-mode guard. In production builds, verbose logging exposes '
+        'internal application state, degrades performance, and may leak '
+        'sensitive information to device logs accessible by other apps. {v1}',
+    correctionMessage: 'Wrap verbose logging in if (kDebugMode) { ... } or use '
+        'a log-level-aware logger that suppresses verbose output in release.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  /// Verbose log methods that should be guarded.
+  static const Set<String> _verboseLogMethods = <String>{
+    'log',
+    'fine',
+    'finer',
+    'finest',
+    'debug',
+    'trace',
+    'verbose',
+  };
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      if (!_verboseLogMethods.contains(node.methodName.name)) return;
+
+      // Skip if already inside a debug guard
+      if (_isInsideDebugContext(node)) return;
+
+      reporter.atNode(node, code);
+    });
+
+    context.registry
+        .addFunctionExpressionInvocation((FunctionExpressionInvocation node) {
+      final Expression function = node.function;
+      if (function is SimpleIdentifier &&
+          _verboseLogMethods.contains(function.name)) {
+        if (!_isInsideDebugContext(node)) {
+          reporter.atNode(node, code);
+        }
+      }
+    });
+  }
+
+  /// Checks if node is inside kDebugMode/kReleaseMode guard or assert.
+  bool _isInsideDebugContext(AstNode node) {
+    AstNode? current = node.parent;
+    while (current != null) {
+      if (current is IfStatement) {
+        final String condition = current.expression.toSource();
+        if (usesFlutterModeConstants(condition)) return true;
+      }
+      if (current is AssertStatement) return true;
+      current = current.parent;
+    }
+    return false;
   }
 }

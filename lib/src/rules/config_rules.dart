@@ -13,6 +13,8 @@ import '../saropa_lint_rule.dart';
 
 /// Warns when hardcoded configuration values are detected.
 ///
+/// Since: v4.1.6 | Updated: v4.13.0 | Rule version: v4
+///
 /// Hardcoded URLs, API keys, and configuration values make code
 /// difficult to maintain and deploy to different environments.
 ///
@@ -43,7 +45,7 @@ class AvoidHardcodedConfigRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_hardcoded_config',
     problemMessage:
-        '[avoid_hardcoded_config] Hardcoded configuration value detected. Embedding URLs, ports, API keys, or feature flags directly in source code makes the app inflexible across environments (dev, staging, production) and forces a rebuild for every configuration change, increasing deployment risk.',
+        '[avoid_hardcoded_config] Hardcoded configuration value detected. Embedding URLs, ports, API keys, or feature flags directly in source code makes the app inflexible across environments (dev, staging, production) and forces a rebuild for every configuration change, increasing deployment risk. {v4}',
     correctionMessage:
         'Use String.fromEnvironment, dotenv, or a config service for environment-specific values.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -115,6 +117,8 @@ class AvoidHardcodedConfigRule extends SaropaLintRule {
 
 /// Detects hardcoded configuration values in test files at reduced severity.
 ///
+/// Since: v4.8.2 | Updated: v4.13.0 | Rule version: v2
+///
 /// Test files routinely contain hardcoded URLs, ports, and paths as test
 /// fixture data. This variant of [AvoidHardcodedConfigRule] surfaces these
 /// at INFO level for awareness without blocking, since the advice to
@@ -149,7 +153,7 @@ class AvoidHardcodedConfigTestRule extends SaropaLintRule {
     name: 'avoid_hardcoded_config_test',
     problemMessage:
         '[avoid_hardcoded_config_test] Hardcoded configuration detected in test file. '
-        'Consider using a const or shared test helper.',
+        'Consider using a const or shared test helper. {v2}',
     correctionMessage:
         'Extract to a const or shared test fixture if reused across tests.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -195,6 +199,8 @@ class AvoidHardcodedConfigTestRule extends SaropaLintRule {
 }
 
 /// Warns when production and development config are mixed in the same class.
+///
+/// Since: v4.1.6 | Updated: v4.13.0 | Rule version: v4
 ///
 /// `[HEURISTIC]` - Uses pattern matching to detect prod/dev indicators.
 ///
@@ -253,7 +259,7 @@ class AvoidMixedEnvironmentsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_mixed_environments',
     problemMessage:
-        '[avoid_mixed_environments] Mixing production and development configuration in your codebase creates serious security vulnerabilities. Debug APIs may expose sensitive data, development endpoints can corrupt production databases, and credentials may leak to unauthorized users. This can result in data breaches, compliance violations, and loss of user trust. Environment-specific configuration must be strictly separated and managed.',
+        '[avoid_mixed_environments] Mixing production and development configuration in your codebase creates serious security vulnerabilities. Debug APIs may expose sensitive data, development endpoints can corrupt production databases, and credentials may leak to unauthorized users. This can result in data breaches, compliance violations, and loss of user trust. Environment-specific configuration must be strictly separated and managed. {v4}',
     correctionMessage:
         'Use conditional configuration based on kReleaseMode, environment variables, or build flavors to separate production and development settings. Audit your codebase for hardcoded endpoints, credentials, or debug flags and refactor to ensure strict separation. Document environment management practices for your team and enforce them in code reviews.',
     errorSeverity: DiagnosticSeverity.ERROR,
@@ -329,5 +335,98 @@ class AvoidMixedEnvironmentsRule extends SaropaLintRule {
         reporter.atNode(firstProdMember, code);
       }
     });
+  }
+}
+
+/// Warns when feature flags are accessed with raw string literal keys.
+///
+/// GitHub: https://github.com/saropa/saropa_lints/issues/21
+///
+/// `[HEURISTIC]` - Uses a two-tier matching approach:
+/// 1. Flag-specific methods always trigger with string literal args.
+/// 2. Generic accessors only trigger on flag-related targets.
+///
+/// **BAD:**
+/// ```dart
+/// final enabled = featureFlags.isEnabled('new_checkout_flow');
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// final enabled = featureFlags.isEnabled(FeatureFlag.newCheckoutFlow);
+/// ```
+class RequireFeatureFlagTypeSafetyRule extends SaropaLintRule {
+  const RequireFeatureFlagTypeSafetyRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  static const LintCode _code = LintCode(
+    name: 'require_feature_flag_type_safety',
+    problemMessage:
+        '[require_feature_flag_type_safety] Feature flag accessed with a '
+        'raw string literal key. String-based lookups are error-prone: '
+        'typos compile successfully but fail silently at runtime, renames '
+        'require a fragile codebase-wide search-and-replace, and there '
+        'is no compile-time guarantee the flag name exists.',
+    correctionMessage:
+        'Define flag keys as typed constants (enum values or static '
+        'const fields) and reference those instead of string literals.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  static const Set<String> _flagSpecificMethods = <String>{
+    'isEnabled',
+    'isFeatureEnabled',
+    'getFeatureFlag',
+    'getFlag',
+    'checkFlag',
+    'evaluateFlag',
+  };
+
+  static const Set<String> _genericAccessors = <String>{
+    'getBool',
+    'getString',
+    'getInt',
+    'getDouble',
+    'getValue',
+  };
+
+  static final RegExp _flagTargetPattern = RegExp(
+    r'(featureFlag|featureToggle|featureSwitch|abTest|experiment|remoteConfig|FirebaseRemoteConfig|launchDarkly)',
+    caseSensitive: false,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      final String methodName = node.methodName.name;
+      if (_flagSpecificMethods.contains(methodName)) {
+        if (_hasStringLiteralFirstArg(node)) {
+          reporter.atNode(node.methodName, code);
+        }
+        return;
+      }
+      if (_genericAccessors.contains(methodName)) {
+        final Expression? target = node.target;
+        if (target == null) return;
+        if (!_flagTargetPattern.hasMatch(target.toSource())) return;
+        if (_hasStringLiteralFirstArg(node)) {
+          reporter.atNode(node.methodName, code);
+        }
+      }
+    });
+  }
+
+  static bool _hasStringLiteralFirstArg(MethodInvocation node) {
+    if (node.argumentList.arguments.isEmpty) return false;
+    return node.argumentList.arguments.first is StringLiteral;
   }
 }

@@ -19,6 +19,8 @@ import '../saropa_lint_rule.dart';
 
 /// Warns when sandbox/production environment handling may be incorrect.
 ///
+/// Since: v4.2.0 | Updated: v4.13.0 | Rule version: v3
+///
 /// Alias: iap_environment, sandbox_production_mismatch
 ///
 /// Sandbox purchases in production or vice versa fail validation. Use correct
@@ -58,7 +60,7 @@ class AvoidPurchaseInSandboxProductionRule extends SaropaLintRule {
     name: 'avoid_purchase_in_sandbox_production',
     problemMessage:
         '[avoid_purchase_in_sandbox_production] Hardcoded IAP environment URL '
-        'detected. Sandbox receipts fail in production and vice versa.',
+        'detected. Sandbox receipts fail in production and vice versa. {v3}',
     correctionMessage:
         'Use kReleaseMode or kDebugMode to select the correct verification URL.',
     errorSeverity: DiagnosticSeverity.ERROR,
@@ -143,6 +145,8 @@ class AvoidPurchaseInSandboxProductionRule extends SaropaLintRule {
 
 /// Warns when subscription features are accessed without status verification.
 ///
+/// Since: v4.2.0 | Updated: v4.13.0 | Rule version: v3
+///
 /// Alias: check_subscription, verify_subscription_status
 ///
 /// Subscriptions can be cancelled, refunded, or expired. Check status on app
@@ -190,7 +194,7 @@ class RequireSubscriptionStatusCheckRule extends SaropaLintRule {
     name: 'require_subscription_status_check',
     problemMessage:
         '[require_subscription_status_check] Premium/subscription content '
-        'displayed without status verification. Subscription may have expired.',
+        'displayed without status verification. Subscription may have expired. {v3}',
     correctionMessage:
         'Check subscription status before showing premium content. Use RevenueCat '
         'or InAppPurchase.instance.purchaseStream to verify entitlements.',
@@ -273,6 +277,8 @@ class RequireSubscriptionStatusCheckRule extends SaropaLintRule {
 
 /// Warns when hardcoded prices are used instead of store-provided prices.
 ///
+/// Since: v4.2.0 | Updated: v4.13.0 | Rule version: v3
+///
 /// Alias: localize_price, store_price
 ///
 /// Show prices from store (with currency) not hardcoded. $4.99 in US might be
@@ -302,7 +308,7 @@ class RequirePriceLocalizationRule extends SaropaLintRule {
     name: 'require_price_localization',
     problemMessage:
         '[require_price_localization] Hardcoded price detected. Prices vary by '
-        'region and currency. Users may see incorrect amounts.',
+        'region and currency. Users may see incorrect amounts. {v3}',
     correctionMessage:
         'Use productDetails.price or priceString from the store SDK.',
     errorSeverity: DiagnosticSeverity.INFO,

@@ -17,6 +17,8 @@ import '../../saropa_lint_rule.dart';
 
 /// Warns when Firestore query doesn't have a limit.
 ///
+/// Since: v1.5.0 | Updated: v4.13.0 | Rule version: v3
+///
 /// Alias: firestore_query_limit, no_unbounded_query
 ///
 /// Firestore queries without limits can return unbounded amounts of data,
@@ -49,7 +51,7 @@ class AvoidFirestoreUnboundedQueryRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_firestore_unbounded_query',
     problemMessage:
-        '[avoid_firestore_unbounded_query] Firestore query without limit() returns unbounded data from the entire collection. This triggers excessive bandwidth consumption, inflated Firestore read costs, slow UI rendering, and out-of-memory crashes on low-end devices when the collection grows large.',
+        '[avoid_firestore_unbounded_query] Firestore query without limit() returns unbounded data from the entire collection. This triggers excessive bandwidth consumption, inflated Firestore read costs, slow UI rendering, and out-of-memory crashes on low-end devices when the collection grows large. {v3}',
     correctionMessage:
         'Add .limit(n) to cap the number of documents returned and prevent unbounded queries. Unbounded reads can result in high bills, slow apps, and out-of-memory errors.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -99,6 +101,8 @@ class AvoidFirestoreUnboundedQueryRule extends SaropaLintRule {
 
 /// Warns when database operations are performed directly in widget build.
 ///
+/// Since: v1.5.0 | Updated: v4.13.0 | Rule version: v4
+///
 /// Alias: no_database_in_build, cache_database_query, avoid_firestore_in_widget_build
 ///
 /// Database operations in build() cause queries on every rebuild, leading
@@ -145,7 +149,7 @@ class AvoidDatabaseInBuildRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_database_in_build',
     problemMessage:
-        '[avoid_database_in_build] Running database queries inside build() causes the query to execute on every rebuild, leading to repeated database hits, slow UI, increased backend load, and degraded app performance. This can also cause inconsistent data, race conditions, and higher costs for cloud databases.',
+        '[avoid_database_in_build] Running database queries inside build() causes the query to execute on every rebuild, leading to repeated database hits, slow UI, increased backend load, and degraded app performance. This can also cause inconsistent data, race conditions, and higher costs for cloud databases. {v4}',
     correctionMessage:
         'Move database queries to initState(), use cached futures, or employ state management solutions to avoid repeated queries. Document query logic to ensure efficient and predictable data access.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -223,6 +227,8 @@ class _DatabaseInBuildVisitor extends RecursiveAstVisitor<void> {
 
 /// Warns when flutter_secure_storage is used in web builds.
 ///
+/// Since: v1.5.0 | Updated: v4.13.0 | Rule version: v4
+///
 /// Alias: no_secure_storage_web, web_storage_insecure
 ///
 /// flutter_secure_storage uses localStorage on web, which is not secure.
@@ -259,7 +265,7 @@ class AvoidSecureStorageOnWebRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_secure_storage_on_web',
     problemMessage:
-        '[avoid_secure_storage_on_web] flutter_secure_storage uses localStorage on web, which is not secure. Sensitive data stored in localStorage may be exposed to attackers, browser extensions, or other scripts, violating user privacy and security requirements. This can lead to credential theft, data breaches, and app store rejection.',
+        '[avoid_secure_storage_on_web] flutter_secure_storage uses localStorage on web, which is not secure. Sensitive data stored in localStorage may be exposed to attackers, browser extensions, or other scripts, violating user privacy and security requirements. This can lead to credential theft, data breaches, and app store rejection. {v4}',
     correctionMessage:
         'Check kIsWeb and use an alternative secure storage solution for web platforms, such as IndexedDB or encrypted cookies. Document platform-specific storage logic to ensure data security.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -310,6 +316,8 @@ class AvoidSecureStorageOnWebRule extends SaropaLintRule {
 
 /// Warns when Firebase services are used before initialization.
 ///
+/// Since: v1.7.2 | Updated: v4.13.0 | Rule version: v2
+///
 /// Alias: firebase_init_first, no_firebase_before_init
 ///
 /// Firebase.initializeApp() must complete before accessing any Firebase
@@ -354,7 +362,7 @@ class RequireFirebaseInitBeforeUseRule extends SaropaLintRule {
     name: 'require_firebase_init_before_use',
     problemMessage:
         '[require_firebase_init_before_use] Firebase services crash if accessed '
-        'before initializeApp() completes. App fails on startup.',
+        'before initializeApp() completes. App fails on startup. {v2}',
     correctionMessage:
         'Ensure Firebase.initializeApp() completes in main() before runApp().',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -437,6 +445,8 @@ class _AddFirebaseInitFix extends DartFix {
 
 /// Warns when database schema changes lack migration support.
 ///
+/// Since: v1.7.8 | Updated: v4.13.0 | Rule version: v4
+///
 /// Alias: schema_versioning
 ///
 /// Breaking schema changes without migrations corrupt existing user data.
@@ -481,7 +491,7 @@ class RequireDatabaseMigrationRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_database_migration',
     problemMessage:
-        '[require_database_migration] Database models must support versioned migrations to handle schema changes safely. Without migration logic, updates to the schema can break data, cause runtime errors, and result in data loss or corruption. This is a critical reliability and maintainability issue for any persistent storage solution.',
+        '[require_database_migration] Database models must support versioned migrations to handle schema changes safely. Without migration logic, updates to the schema can break data, cause runtime errors, and result in data loss or corruption. This is a critical reliability and maintainability issue for any persistent storage solution. {v4}',
     correctionMessage:
         'Implement versioned migrations for all database schema changes. Document migration steps and test upgrades to ensure data integrity and smooth user updates.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -540,6 +550,8 @@ class RequireDatabaseMigrationRule extends SaropaLintRule {
 
 /// Warns when frequently queried database fields lack indices.
 ///
+/// Since: v1.7.8 | Updated: v4.13.0 | Rule version: v4
+///
 /// Alias: index_database_field, add_query_index
 ///
 /// Queries on non-indexed fields are slow. Add indices for fields
@@ -586,7 +598,7 @@ class RequireDatabaseIndexRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_database_index',
     problemMessage:
-        '[require_database_index] Query on non-indexed field causes full table scan. Queries on non-indexed fields are slow. Add indices for fields used in where clauses, especially in large collections.',
+        '[require_database_index] Query on non-indexed field causes full table scan. Queries on non-indexed fields are slow. Add indices for fields used in where clauses, especially in large collections. {v4}',
     correctionMessage:
         'Add @Index() annotation to fields used in queries and filters. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -647,6 +659,8 @@ class RequireDatabaseIndexRule extends SaropaLintRule {
 
 /// Warns when multiple database writes are not batched in transactions.
 ///
+/// Since: v1.7.8 | Updated: v4.13.0 | Rule version: v3
+///
 /// Alias: batch_database_writes, use_transaction
 ///
 /// Individual writes are slower and can leave data inconsistent.
@@ -687,7 +701,7 @@ class PreferTransactionForBatchRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_transaction_for_batch',
     problemMessage:
-        '[prefer_transaction_for_batch] Multiple sequential database writes. Use transaction for atomicity. Individual writes are slower and can leave data inconsistent. Use transactions or batch writes for multiple related changes.',
+        '[prefer_transaction_for_batch] Multiple sequential database writes. Use transaction for atomicity. Individual writes are slower and can leave data inconsistent. Use transactions or batch writes for multiple related changes. {v3}',
     correctionMessage:
         'Wrap related writes in a transaction or use batch operations. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -793,6 +807,8 @@ class _DatabaseWriteCounter extends RecursiveAstVisitor<void> {
 
 /// Warns when Firebase Analytics event name doesn't follow conventions.
 ///
+/// Since: v2.0.0 | Updated: v4.13.0 | Rule version: v2
+///
 /// Alias: firebase_event_naming, analytics_event_format
 ///
 /// Firebase Analytics has strict naming conventions:
@@ -829,7 +845,7 @@ class IncorrectFirebaseEventNameRule extends SaropaLintRule {
     name: 'incorrect_firebase_event_name',
     problemMessage:
         '[incorrect_firebase_event_name] Invalid event name is silently dropped '
-        'by Firebase Analytics. Your analytics data will be incomplete.',
+        'by Firebase Analytics. Your analytics data will be incomplete. {v2}',
     correctionMessage:
         'Event names must: start with a letter, contain only alphanumeric '
         'and underscores, be 1-40 chars, and not use reserved prefixes.',
@@ -885,6 +901,8 @@ class IncorrectFirebaseEventNameRule extends SaropaLintRule {
 
 /// Warns when Firebase Analytics parameter name doesn't follow conventions.
 ///
+/// Since: v2.0.0 | Updated: v4.13.0 | Rule version: v2
+///
 /// Alias: firebase_param_naming, analytics_param_format
 ///
 /// Firebase Analytics parameters have strict naming conventions:
@@ -930,7 +948,7 @@ class IncorrectFirebaseParameterNameRule extends SaropaLintRule {
     name: 'incorrect_firebase_parameter_name',
     problemMessage:
         '[incorrect_firebase_parameter_name] Invalid parameter names are '
-        'silently dropped by Firebase. Event data will be missing fields.',
+        'silently dropped by Firebase. Event data will be missing fields. {v2}',
     correctionMessage:
         'Parameter names must: start with a letter, contain only alphanumeric '
         'and underscores, be 1-40 chars, and not use reserved prefixes.',
@@ -1000,6 +1018,8 @@ class IncorrectFirebaseParameterNameRule extends SaropaLintRule {
 
 /// Warns when multiple individual Firestore writes could be batched.
 ///
+/// Since: v2.0.0 | Updated: v4.13.0 | Rule version: v3
+///
 /// Alias: firestore_batch_write, batch_firestore_ops
 ///
 /// Multiple individual write operations are slower and more expensive than
@@ -1032,7 +1052,7 @@ class PreferFirestoreBatchWriteRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_firestore_batch_write',
     problemMessage:
-        '[prefer_firestore_batch_write] Individual writes increase latency and billing costs. Multiple individual write operations are slower and more expensive than batch writes. Use WriteBatch for multiple related operations.',
+        '[prefer_firestore_batch_write] Individual writes increase latency and billing costs. Multiple individual write operations are slower and more expensive than batch writes. Use WriteBatch for multiple related operations. {v3}',
     correctionMessage:
         'Use WriteBatch for multiple related write operations. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -1082,6 +1102,8 @@ class PreferFirestoreBatchWriteRule extends SaropaLintRule {
 
 /// Warns when Firestore operations are performed in widget build method.
 ///
+/// Since: v2.0.0 | Updated: v4.13.0 | Rule version: v2
+///
 /// Alias: no_firestore_in_build, firestore_query_in_build
 ///
 /// Firestore queries in build() execute on every rebuild, causing performance
@@ -1120,7 +1142,7 @@ class AvoidFirestoreInWidgetBuildRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_firestore_in_widget_build',
     problemMessage:
-        '[avoid_firestore_in_widget_build] Performing Firestore operations (get, collection, doc) inside build() causes the query to run on every rebuild, leading to excessive database reads, slow UI, increased backend costs, and potential quota exhaustion. This can also cause inconsistent data, race conditions, and degraded user experience, especially in dynamic UIs.',
+        '[avoid_firestore_in_widget_build] Performing Firestore operations (get, collection, doc) inside build() causes the query to run on every rebuild, leading to excessive database reads, slow UI, increased backend costs, and potential quota exhaustion. This can also cause inconsistent data, race conditions, and degraded user experience, especially in dynamic UIs. {v2}',
     correctionMessage:
         'Move Firestore queries to StreamBuilder, FutureBuilder, or state management logic outside build(). Cache results and avoid triggering database reads on every rebuild. Document query logic for maintainability and test for correct data flow.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -1185,6 +1207,8 @@ class AvoidFirestoreInWidgetBuildRule extends SaropaLintRule {
 
 /// Warns when RemoteConfig is used without setting defaults.
 ///
+/// Since: v2.0.0 | Updated: v4.13.0 | Rule version: v3
+///
 /// Alias: remote_config_defaults, set_remote_defaults
 ///
 /// RemoteConfig values may not be fetched immediately. Without defaults,
@@ -1215,7 +1239,7 @@ class PreferFirebaseRemoteConfigDefaultsRule extends SaropaLintRule {
     name: 'prefer_firebase_remote_config_defaults',
     problemMessage:
         '[prefer_firebase_remote_config_defaults] Missing defaults cause '
-        'null/zero values when fetch fails, breaking app behavior.',
+        'null/zero values when fetch fails, breaking app behavior. {v3}',
     correctionMessage: 'Call setDefaults() with fallback values.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -1262,6 +1286,8 @@ class PreferFirebaseRemoteConfigDefaultsRule extends SaropaLintRule {
 
 /// Warns when FCM is used without handling token refresh.
 ///
+/// Since: v2.0.0 | Updated: v4.13.0 | Rule version: v3
+///
 /// Alias: fcm_token_refresh, handle_token_refresh
 ///
 /// FCM tokens can be refreshed at any time. Without handling onTokenRefresh,
@@ -1295,7 +1321,7 @@ class RequireFcmTokenRefreshHandlerRule extends SaropaLintRule {
     name: 'require_fcm_token_refresh_handler',
     problemMessage:
         '[require_fcm_token_refresh_handler] FCM tokens expire periodically. '
-        'Without onTokenRefresh handling, push notifications will stop working.',
+        'Without onTokenRefresh handling, push notifications will stop working. {v3}',
     correctionMessage:
         'Listen to onTokenRefresh to update server with new tokens.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -1341,6 +1367,8 @@ class RequireFcmTokenRefreshHandlerRule extends SaropaLintRule {
 
 /// Warns when FCM is used without a background message handler.
 ///
+/// Since: v2.0.0 | Updated: v4.13.0 | Rule version: v3
+///
 /// Alias: fcm_background_handler, background_message_handler
 ///
 /// FCM messages received when app is terminated need a top-level background
@@ -1377,7 +1405,7 @@ class RequireBackgroundMessageHandlerRule extends SaropaLintRule {
     name: 'require_background_message_handler',
     problemMessage:
         '[require_background_message_handler] Push notifications received when '
-        'app is terminated are silently dropped without handler.',
+        'app is terminated are silently dropped without handler. {v3}',
     correctionMessage:
         'Add onBackgroundMessage with a top-level handler function.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -1420,6 +1448,8 @@ class RequireBackgroundMessageHandlerRule extends SaropaLintRule {
 
 /// Warns when map markers are created in build method.
 ///
+/// Since: v2.0.0 | Updated: v4.13.0 | Rule version: v3
+///
 /// Alias: cache_map_markers, no_markers_in_build
 ///
 /// Creating markers in build() causes recreation on every rebuild,
@@ -1460,7 +1490,7 @@ class AvoidMapMarkersInBuildRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_map_markers_in_build',
     problemMessage:
-        '[avoid_map_markers_in_build] Creating map markers in build() causes flickering. Creating markers in build() causes recreation on every rebuild, leading to flickering and performance issues. Cache markers.',
+        '[avoid_map_markers_in_build] Creating map markers in build() causes flickering. Creating markers in build() causes recreation on every rebuild, leading to flickering and performance issues. Cache markers. {v3}',
     correctionMessage:
         'Cache markers in state and only recreate when needed. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -1499,6 +1529,8 @@ class AvoidMapMarkersInBuildRule extends SaropaLintRule {
 
 /// Warns when map data is fetched on onCameraMove instead of onCameraIdle.
 ///
+/// Since: v2.0.0 | Updated: v4.13.0 | Rule version: v3
+///
 /// Alias: map_camera_idle, no_fetch_on_camera_move
 ///
 /// onCameraMove fires continuously during pan/zoom, causing excessive API calls.
@@ -1534,7 +1566,7 @@ class RequireMapIdleCallbackRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_map_idle_callback',
     problemMessage:
-        '[require_map_idle_callback] Data fetching triggered in onCameraMove fires on every frame during map pan and zoom gestures. This spams backend APIs with hundreds of redundant requests per second, causes severe performance degradation with UI jank, and wastes user bandwidth and battery on mobile devices.',
+        '[require_map_idle_callback] Data fetching triggered in onCameraMove fires on every frame during map pan and zoom gestures. This spams backend APIs with hundreds of redundant requests per second, causes severe performance degradation with UI jank, and wastes user bandwidth and battery on mobile devices. {v3}',
     correctionMessage:
         'Move data-fetching logic to the onCameraIdle callback, which fires once after the user stops interacting with the map, preventing API spam and frame drops.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -1568,6 +1600,8 @@ class RequireMapIdleCallbackRule extends SaropaLintRule {
 }
 
 /// Warns when many individual map markers are used without clustering.
+///
+/// Since: v2.0.0 | Updated: v4.13.0 | Rule version: v3
 ///
 /// Alias: marker_clustering, cluster_map_markers
 ///
@@ -1606,7 +1640,7 @@ class PreferMarkerClusteringRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_marker_clustering',
     problemMessage:
-        '[prefer_marker_clustering] Many markers cause frame drops and memory issues. Displaying hundreds of markers individually causes performance issues. Use marker clustering to improve performance and UX.',
+        '[prefer_marker_clustering] Many markers cause frame drops and memory issues. Displaying hundreds of markers individually causes performance issues. Use marker clustering to improve performance and UX. {v3}',
     correctionMessage:
         'Use marker clustering library for many markers. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -1634,6 +1668,8 @@ class PreferMarkerClusteringRule extends SaropaLintRule {
 }
 
 /// Warns when FirebaseCrashlytics is used without setting user identifier.
+///
+/// Since: v2.1.0 | Updated: v4.13.0 | Rule version: v2
 ///
 /// Setting a user identifier helps track crashes to specific users
 /// for better debugging and support. Without it, crashes are anonymous.
@@ -1669,7 +1705,7 @@ class RequireCrashlyticsUserIdRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_crashlytics_user_id',
     problemMessage:
-        '[require_crashlytics_user_id] Crashlytics setup without setUserIdentifier. Crashes will be anonymous. Setting a user identifier helps track crashes to specific users to improve debugging and support. Without it, crashes are anonymous.',
+        '[require_crashlytics_user_id] Crashlytics setup without setUserIdentifier. Crashes will be anonymous. Setting a user identifier helps track crashes to specific users to improve debugging and support. Without it, crashes are anonymous. {v2}',
     correctionMessage:
         'Add FirebaseCrashlytics.instance.setUserIdentifier(userId). Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -1725,6 +1761,8 @@ class RequireCrashlyticsUserIdRule extends SaropaLintRule {
 
 /// Warns when Firebase services are used without App Check.
 ///
+/// Since: v2.1.0 | Updated: v4.13.0 | Rule version: v2
+///
 /// Firebase App Check helps protect your backend resources from abuse.
 /// Without it, your Firebase services are vulnerable to unauthorized access.
 ///
@@ -1761,7 +1799,7 @@ class RequireFirebaseAppCheckRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_firebase_app_check',
     problemMessage:
-        '[require_firebase_app_check] Firebase initialization without App Check activation. Firebase App Check helps protect your backend resources from abuse. Without it, your Firebase services are vulnerable to unauthorized access.',
+        '[require_firebase_app_check] Firebase initialization without App Check activation. Firebase App Check helps protect your backend resources from abuse. Without it, your Firebase services are vulnerable to unauthorized access. {v2}',
     correctionMessage:
         'Add FirebaseAppCheck.instance.activate() after Firebase.initializeApp(). Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -1823,6 +1861,8 @@ class RequireFirebaseAppCheckRule extends SaropaLintRule {
 
 /// Warns when setCustomClaims stores large user data.
 ///
+/// Since: v2.1.0 | Updated: v4.13.0 | Rule version: v2
+///
 /// Firebase custom claims are meant for access control, not user data storage.
 /// They're limited to 1000 bytes and are included in every auth token.
 ///
@@ -1855,7 +1895,7 @@ class AvoidStoringUserDataInAuthRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_storing_user_data_in_auth',
     problemMessage:
-        '[avoid_storing_user_data_in_auth] Large object in setCustomClaims. Claims are for roles, not data storage. Firebase custom claims are meant for access control, not user data storage. They\'re limited to 1000 bytes and are included in every auth token.',
+        '[avoid_storing_user_data_in_auth] Large object in setCustomClaims. Claims are for roles, not data storage. Firebase custom claims are meant for access control, not user data storage. They\'re limited to 1000 bytes and are included in every auth token. {v2}',
     correctionMessage:
         'Store user data in Firestore. Use claims only for access control (roles, permissions).',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -1916,6 +1956,8 @@ class AvoidStoringUserDataInAuthRule extends SaropaLintRule {
 
 /// Warns when Firebase Auth on web doesn't set persistence to LOCAL.
 ///
+/// Since: v2.3.7 | Updated: v4.13.0 | Rule version: v2
+///
 /// By default, Firebase Auth on web uses session persistence, meaning users
 /// are logged out when they close the browser tab. For "remember me"
 /// functionality, you need to explicitly set persistence to LOCAL.
@@ -1953,7 +1995,7 @@ class PreferFirebaseAuthPersistenceRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_firebase_auth_persistence',
     problemMessage:
-        '[prefer_firebase_auth_persistence] Firebase Auth on web defaults to session persistence. Prefer setting LOCAL persistence. By default, Firebase Auth on web uses session persistence, meaning users are logged out when they close the browser tab. For "remember me" functionality, you need to explicitly set persistence to LOCAL.',
+        '[prefer_firebase_auth_persistence] Firebase Auth on web defaults to session persistence. Prefer setting LOCAL persistence. By default, Firebase Auth on web uses session persistence, meaning users are logged out when they close the browser tab. For "remember me" functionality, you need to explicitly set persistence to LOCAL. {v2}',
     correctionMessage:
         'Call FirebaseAuth.instance.setPersistence(Persistence.LOCAL) before sign-in for "remember me".',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -2038,6 +2080,8 @@ class PreferFirebaseAuthPersistenceRule extends SaropaLintRule {
 
 /// Firebase calls can fail and should have error handling.
 ///
+/// Since: v4.1.5 | Updated: v4.13.0 | Rule version: v2
+///
 /// Firebase operations are network calls that can fail for many reasons:
 /// - No network connection
 /// - Permission denied
@@ -2070,7 +2114,7 @@ class RequireFirebaseErrorHandlingRule extends SaropaLintRule {
     name: 'require_firebase_error_handling',
     problemMessage:
         '[require_firebase_error_handling] Firebase operation without '
-        'error handling. Firebase calls can fail.',
+        'error handling. Firebase calls can fail. {v2}',
     correctionMessage:
         'Wrap in try-catch or add .catchError() to handle Firebase errors.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -2164,6 +2208,8 @@ class RequireFirebaseErrorHandlingRule extends SaropaLintRule {
 
 /// Don't create Firebase listeners in build method.
 ///
+/// Since: v4.1.5 | Updated: v4.13.0 | Rule version: v2
+///
 /// Creating stream listeners in build() causes multiple subscriptions
 /// as build is called frequently. Cache stream references.
 ///
@@ -2206,7 +2252,7 @@ class AvoidFirebaseRealtimeInBuildRule extends SaropaLintRule {
     name: 'avoid_firebase_realtime_in_build',
     problemMessage:
         '[avoid_firebase_realtime_in_build] Creating Firebase stream/listener '
-        'in build causes multiple subscriptions.',
+        'in build causes multiple subscriptions. {v2}',
     correctionMessage:
         'Cache the stream reference in a field and initialize in initState.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -2259,6 +2305,8 @@ class AvoidFirebaseRealtimeInBuildRule extends SaropaLintRule {
 
 /// Warns when compound Firestore query may need a composite index.
 ///
+/// Since: v4.2.0 | Updated: v4.13.0 | Rule version: v2
+///
 /// Alias: firestore_index, composite_index
 ///
 /// Firestore compound queries (multiple where clauses or where + orderBy on
@@ -2307,7 +2355,7 @@ class RequireFirestoreIndexRule extends SaropaLintRule {
     name: 'require_firestore_index',
     problemMessage:
         '[require_firestore_index] Compound Firestore query may need a composite '
-        'index. Query will fail at runtime without the required index.',
+        'index. Query will fail at runtime without the required index. {v2}',
     correctionMessage:
         'Create a composite index in Firebase Console or firestore.indexes.json.',
     errorSeverity: DiagnosticSeverity.ERROR,

@@ -42,6 +42,8 @@ bool _isPrivateMember(ClassMember member) {
 
 /// Warns when string concatenation is used instead of interpolation.
 ///
+/// Since: v4.9.11 | Updated: v4.13.0 | Rule version: v2
+///
 /// This is an **opinionated rule** - not included in any tier by default.
 ///
 /// ## Good Example
@@ -70,7 +72,7 @@ class PreferInterpolationOverConcatenationRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_interpolation_over_concatenation',
     problemMessage:
-        '[prefer_interpolation_over_concatenation] String concatenation with the + operator was detected where interpolation would be cleaner. Concatenation adds visual noise and is less idiomatic in Dart. Use \$-interpolation for improved readability.',
+        '[prefer_interpolation_over_concatenation] String concatenation with the + operator was detected where interpolation would be cleaner. Concatenation adds visual noise and is less idiomatic in Dart. Use \$-interpolation for improved readability. {v2}',
     correctionMessage:
         'Replace string concatenation with \$-interpolation for readability and to reduce operator noise.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -101,6 +103,8 @@ class PreferInterpolationOverConcatenationRule extends SaropaLintRule {
 
 /// Warns when interpolation is used instead of concatenation (opposite).
 ///
+/// Since: v4.9.11 | Updated: v4.13.0 | Rule version: v2
+///
 /// This is an **opinionated rule** - not included in any tier by default.
 ///
 /// ## Good Example
@@ -127,7 +131,7 @@ class PreferConcatenationOverInterpolationRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_concatenation_over_interpolation',
     problemMessage:
-        '[prefer_concatenation_over_interpolation] String interpolation was used where explicit concatenation is preferred. Use the + operator to build strings for a consistent style that keeps expressions visually separated from literal text.',
+        '[prefer_concatenation_over_interpolation] String interpolation was used where explicit concatenation is preferred. Use the + operator to build strings for a consistent style that keeps expressions visually separated from literal text. {v2}',
     correctionMessage:
         'Replace \$-interpolation with explicit + concatenation for a consistent string-building style.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -146,6 +150,8 @@ class PreferConcatenationOverInterpolationRule extends SaropaLintRule {
 }
 
 /// Warns when double quotes are used instead of single quotes.
+///
+/// Since: v2.7.0 | Updated: v4.13.0 | Rule version: v6
 ///
 /// This is an **opinionated rule** - not included in any tier by default.
 ///
@@ -175,7 +181,7 @@ class PreferDoubleQuotesRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_double_quotes',
     problemMessage:
-        '[prefer_double_quotes] String literal uses single quotes instead of double quotes. Mixing quote styles creates inconsistent formatting that distracts during code review.',
+        '[prefer_double_quotes] String literal uses single quotes instead of double quotes. Mixing quote styles creates inconsistent formatting that distracts during code review. {v6}',
     correctionMessage:
         'Replace single quotes with double quotes across all string literals for a consistent codebase style.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -238,6 +244,8 @@ class _PreferDoubleQuotesFix extends DartFix {
 
 /// Warns when absolute imports are used instead of relative imports.
 ///
+/// Since: v4.1.0 | Updated: v4.13.0 | Rule version: v5
+///
 /// This is an **opinionated rule** - not included in any tier by default.
 ///
 /// ## Good Example
@@ -266,7 +274,7 @@ class PreferAbsoluteImportsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_absolute_imports',
     problemMessage:
-        '[prefer_absolute_imports] Relative import detected instead of the preferred absolute package import. Absolute imports provide a canonical path that avoids breakage when files are moved and improves cross-file searchability.',
+        '[prefer_absolute_imports] Relative import detected instead of the preferred absolute package import. Absolute imports provide a canonical path that avoids breakage when files are moved and improves cross-file searchability. {v5}',
     correctionMessage:
         'Replace relative imports with absolute package: imports so every file references the same canonical path.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -291,6 +299,8 @@ class PreferAbsoluteImportsRule extends SaropaLintRule {
 }
 
 /// Warns when imports are not grouped by type (dart, package, relative).
+///
+/// Since: v2.7.0 | Updated: v4.13.0 | Rule version: v4
 ///
 /// This is an **opinionated rule** - not included in any tier by default.
 ///
@@ -326,7 +336,7 @@ class PreferGroupedImportsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_grouped_imports',
     problemMessage:
-        '[prefer_grouped_imports] Imports are not grouped by type (dart:, package:, relative). Ungrouped imports make it harder to locate dependencies at a glance; organize them into dart:, package:, and relative sections separated by blank lines.',
+        '[prefer_grouped_imports] Imports are not grouped by type (dart:, package:, relative). Ungrouped imports make it harder to locate dependencies at a glance; organize them into dart:, package:, and relative sections separated by blank lines. {v4}',
     correctionMessage:
         'Organize imports into dart:, package:, and relative groups separated by blank lines for quick scanning.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -369,6 +379,8 @@ class PreferGroupedImportsRule extends SaropaLintRule {
 
 /// Warns when imports are grouped (opposite - prefers flat import list).
 ///
+/// Since: v2.7.0 | Updated: v4.13.0 | Rule version: v4
+///
 /// This is an **opinionated rule** - not included in any tier by default.
 ///
 /// ## Good Example
@@ -401,7 +413,7 @@ class PreferFlatImportsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_flat_imports',
     problemMessage:
-        '[prefer_flat_imports] Import block uses blank-line grouping that fragments the import list. A flat, alphabetically sorted import block is easier to scan and produces fewer merge conflicts.',
+        '[prefer_flat_imports] Import block uses blank-line grouping that fragments the import list. A flat, alphabetically sorted import block is easier to scan and produces fewer merge conflicts. {v4}',
     correctionMessage:
         'Remove blank lines between import groups so the entire import block stays compact and alphabetically sorted.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -444,6 +456,8 @@ class PreferFlatImportsRule extends SaropaLintRule {
 
 /// Warns when fields are not declared before methods.
 ///
+/// Since: v2.7.0 | Updated: v4.13.0 | Rule version: v4
+///
 /// This is an **opinionated rule** - not included in any tier by default.
 ///
 /// ## Good Example
@@ -480,7 +494,7 @@ class PreferFieldsBeforeMethodsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_fields_before_methods',
     problemMessage:
-        '[prefer_fields_before_methods] A method appears before a field declaration in this class. Placing fields first improves readability by showing the data model before behavior. Move all field declarations above methods.',
+        '[prefer_fields_before_methods] A method appears before a field declaration in this class. Placing fields first improves readability by showing the data model before behavior. Move all field declarations above methods. {v4}',
     correctionMessage:
         'Move field declarations above method declarations so readers see the data model before the behaviour.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -507,6 +521,8 @@ class PreferFieldsBeforeMethodsRule extends SaropaLintRule {
 }
 
 /// Warns when methods are not declared before fields (opposite).
+///
+/// Since: v2.7.0 | Updated: v4.13.0 | Rule version: v4
 ///
 /// This is an **opinionated rule** - not included in any tier by default.
 ///
@@ -535,7 +551,7 @@ class PreferMethodsBeforeFieldsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_methods_before_fields',
     problemMessage:
-        '[prefer_methods_before_fields] A field declaration appears before a method in this class. Placing methods first highlights the public API before implementation details. Move all method declarations above fields.',
+        '[prefer_methods_before_fields] A field declaration appears before a method in this class. Placing methods first highlights the public API before implementation details. Move all method declarations above fields. {v4}',
     correctionMessage:
         'Move method declarations above field declarations so the public API is visible before implementation details.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -562,6 +578,8 @@ class PreferMethodsBeforeFieldsRule extends SaropaLintRule {
 }
 
 /// Warns when static members are not declared before instance members.
+///
+/// Since: v2.7.0 | Updated: v4.13.0 | Rule version: v4
 ///
 /// This is an **opinionated rule** - not included in any tier by default.
 ///
@@ -598,7 +616,7 @@ class PreferStaticMembersFirstRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_static_members_first',
     problemMessage:
-        '[prefer_static_members_first] A static member appears after an instance member in the class body. Mixing declaration order makes it harder to locate class-level constants and factories; move all static members above instance members.',
+        '[prefer_static_members_first] A static member appears after an instance member in the class body. Mixing declaration order makes it harder to locate class-level constants and factories; move all static members above instance members. {v4}',
     correctionMessage:
         'Move static declarations above instance declarations to group class-level constants and factories together.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -628,6 +646,8 @@ class PreferStaticMembersFirstRule extends SaropaLintRule {
 
 /// Warns when instance members are not declared before static members (opposite).
 ///
+/// Since: v2.7.0 | Updated: v4.13.0 | Rule version: v4
+///
 /// This is an **opinionated rule** - not included in any tier by default.
 ///
 /// ## Good Example
@@ -655,7 +675,7 @@ class PreferInstanceMembersFirstRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_instance_members_first',
     problemMessage:
-        '[prefer_instance_members_first] An instance member appears after a static member in the class body. Placing instance members first highlights per-object state before shared class-level members; reorder so all instance declarations precede static ones.',
+        '[prefer_instance_members_first] An instance member appears after a static member in the class body. Placing instance members first highlights per-object state before shared class-level members; reorder so all instance declarations precede static ones. {v4}',
     correctionMessage:
         'Move instance declarations above static declarations so per-object state is visible before shared members.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -685,6 +705,8 @@ class PreferInstanceMembersFirstRule extends SaropaLintRule {
 
 /// Warns when public members are not declared before private members.
 ///
+/// Since: v2.7.0 | Updated: v4.13.0 | Rule version: v4
+///
 /// This is an **opinionated rule** - not included in any tier by default.
 ///
 /// ## Good Example
@@ -712,7 +734,7 @@ class PreferPublicMembersFirstRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_public_members_first',
     problemMessage:
-        '[prefer_public_members_first] A public member appears after a private member in the class body. Declaring public members first surfaces the external API at the top, making the class easier to consume.',
+        '[prefer_public_members_first] A public member appears after a private member in the class body. Declaring public members first surfaces the external API at the top, making the class easier to consume. {v4}',
     correctionMessage:
         'Move public declarations above private declarations so the external API is visible at the top of the class.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -742,6 +764,8 @@ class PreferPublicMembersFirstRule extends SaropaLintRule {
 
 /// Warns when private members are not declared before public members (opposite).
 ///
+/// Since: v2.7.0 | Updated: v4.13.0 | Rule version: v4
+///
 /// This is an **opinionated rule** - not included in any tier by default.
 ///
 /// ## Good Example
@@ -769,7 +793,7 @@ class PreferPrivateMembersFirstRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_private_members_first',
     problemMessage:
-        '[prefer_private_members_first] A public member appears before a private member in the class body. Declaring private members first groups internal state at the top so implementation details are established before the public API.',
+        '[prefer_private_members_first] A public member appears before a private member in the class body. Declaring private members first groups internal state at the top so implementation details are established before the public API. {v4}',
     correctionMessage:
         'Move private declarations above public declarations so internal state is defined before the public surface.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -803,6 +827,8 @@ class PreferPrivateMembersFirstRule extends SaropaLintRule {
 
 /// Warns when `var` is used instead of explicit type annotations.
 ///
+/// Since: v4.9.11 | Updated: v4.13.0 | Rule version: v3
+///
 /// This is an **opinionated rule** - not included in any tier by default.
 ///
 /// ## Good Example
@@ -831,7 +857,7 @@ class PreferVarOverExplicitTypeRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_var_over_explicit_type',
     problemMessage:
-        '[prefer_var_over_explicit_type] An explicit type annotation is redundant when the right-hand side already makes the type obvious. Use var to reduce visual noise and let the initializer communicate the type.',
+        '[prefer_var_over_explicit_type] An explicit type annotation is redundant when the right-hand side already makes the type obvious. Use var to reduce visual noise and let the initializer communicate the type. {v3}',
     correctionMessage:
         'Replace the explicit type annotation with var when the right-hand side already makes the type obvious.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -866,6 +892,8 @@ class PreferVarOverExplicitTypeRule extends SaropaLintRule {
 
 /// Warns when `dynamic` is used instead of `Object?`.
 ///
+/// Since: v2.7.0 | Updated: v4.13.0 | Rule version: v4
+///
 /// This is an **opinionated rule** - not included in any tier by default.
 ///
 /// ## Good Example
@@ -894,7 +922,7 @@ class PreferObjectOverDynamicRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_object_over_dynamic',
     problemMessage:
-        '[prefer_object_over_dynamic] Type is declared as dynamic, which disables static type checking and allows any member access without compile-time verification. Use Object? instead to retain type safety while still accepting any runtime type.',
+        '[prefer_object_over_dynamic] Type is declared as dynamic, which disables static type checking and allows any member access without compile-time verification. Use Object? instead to retain type safety while still accepting any runtime type. {v4}',
     correctionMessage:
         'Replace dynamic with Object? to gain static type-safety while still accepting values of any runtime type.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -948,6 +976,8 @@ class _PreferObjectOverDynamicFix extends DartFix {
 
 /// Warns when `Object?` is used instead of `dynamic` (opposite).
 ///
+/// Since: v2.7.0 | Updated: v4.13.0 | Rule version: v4
+///
 /// This is an **opinionated rule** - not included in any tier by default.
 ///
 /// ## Good Example
@@ -976,7 +1006,7 @@ class PreferDynamicOverObjectRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_dynamic_over_object',
     problemMessage:
-        '[prefer_dynamic_over_object] Type is declared as Object? where dynamic is intended. Object? forces explicit casts on every access which adds verbosity; use dynamic to signal that static type checking is intentionally bypassed.',
+        '[prefer_dynamic_over_object] Type is declared as Object? where dynamic is intended. Object? forces explicit casts on every access which adds verbosity; use dynamic to signal that static type checking is intentionally bypassed. {v4}',
     correctionMessage:
         'Replace Object? with dynamic when the variable intentionally bypasses static type checks on every access.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -1034,6 +1064,8 @@ class _PreferDynamicOverObjectFix extends DartFix {
 
 /// Warns when constant names don't use lowerCamelCase.
 ///
+/// Since: v2.7.0 | Updated: v4.13.0 | Rule version: v3
+///
 /// This is an **opinionated rule** - not included in any tier by default.
 ///
 /// ## Good Example
@@ -1062,7 +1094,7 @@ class PreferLowerCamelCaseConstantsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_lower_camel_case_constants',
     problemMessage:
-        '[prefer_lower_camel_case_constants] Constant name does not follow lowerCamelCase convention. Inconsistent casing breaks IDE autocompletion expectations and diverges from the Dart style guide.',
+        '[prefer_lower_camel_case_constants] Constant name does not follow lowerCamelCase convention. Inconsistent casing breaks IDE autocompletion expectations and diverges from the Dart style guide. {v3}',
     correctionMessage:
         'Rename the constant to lowerCamelCase (e.g., maxRetries) to match the Dart style-guide convention.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -1104,6 +1136,8 @@ class PreferLowerCamelCaseConstantsRule extends SaropaLintRule {
 
 /// Warns when method names use underscores (non-private).
 ///
+/// Since: v4.9.11 | Updated: v4.13.0 | Rule version: v2
+///
 /// This is an **opinionated rule** - not included in any tier by default.
 ///
 /// ## Good Example
@@ -1132,7 +1166,7 @@ class PreferCamelCaseMethodNamesRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_camel_case_method_names',
     problemMessage:
-        '[prefer_camel_case_method_names] Method name does not follow lowerCamelCase convention. Non-standard casing breaks IDE autocompletion and makes the API inconsistent with Dart SDK and package conventions.',
+        '[prefer_camel_case_method_names] Method name does not follow lowerCamelCase convention. Non-standard casing breaks IDE autocompletion and makes the API inconsistent with Dart SDK and package conventions. {v2}',
     correctionMessage:
         'Rename the method to lowerCamelCase (e.g., fetchUserData) to follow the Dart naming convention.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -1168,6 +1202,8 @@ class PreferCamelCaseMethodNamesRule extends SaropaLintRule {
 
 /// Warns when variable names are too short (less than 3 characters).
 ///
+/// Since: v2.7.0 | Updated: v4.13.0 | Rule version: v3
+///
 /// This is an **opinionated rule** - not included in any tier by default.
 ///
 /// ## Good Example
@@ -1198,7 +1234,7 @@ class PreferDescriptiveVariableNamesRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_descriptive_variable_names',
     problemMessage:
-        '[prefer_descriptive_variable_names] Variable name is shorter than 3 characters, making its purpose unclear without reading surrounding context. Use a descriptive name that communicates intent at the point of use.',
+        '[prefer_descriptive_variable_names] Variable name is shorter than 3 characters, making its purpose unclear without reading surrounding context. Use a descriptive name that communicates intent at the point of use. {v3}',
     correctionMessage:
         'Rename the variable to a descriptive name that communicates its purpose without requiring surrounding context.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -1226,6 +1262,8 @@ class PreferDescriptiveVariableNamesRule extends SaropaLintRule {
 }
 
 /// Warns when variable names are too long (more than 30 characters).
+///
+/// Since: v4.9.11 | Updated: v4.13.0 | Rule version: v2
 ///
 /// This is an **opinionated rule** - not included in any tier by default.
 ///
@@ -1255,7 +1293,7 @@ class PreferConciseVariableNamesRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_concise_variable_names',
     problemMessage:
-        '[prefer_concise_variable_names] Variable name exceeds 30 characters, which reduces readability and makes code harder to scan. Shorten it to a concise name that still conveys its purpose.',
+        '[prefer_concise_variable_names] Variable name exceeds 30 characters, which reduces readability and makes code harder to scan. Shorten it to a concise name that still conveys its purpose. {v2}',
     correctionMessage:
         'Shorten the variable name to 30 characters or fewer while still communicating its purpose clearly.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -1281,6 +1319,8 @@ class PreferConciseVariableNamesRule extends SaropaLintRule {
 // =============================================================================
 
 /// Warns when explicit `this.` is not used for field access.
+///
+/// Since: v2.7.0 | Updated: v4.13.0 | Rule version: v3
 ///
 /// This is an **opinionated rule** - not included in any tier by default.
 ///
@@ -1314,7 +1354,7 @@ class PreferExplicitThisRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_explicit_this',
     problemMessage:
-        '[prefer_explicit_this] Instance field accessed without an explicit this. prefix, making it ambiguous whether the identifier refers to a local variable or a field. Add this. to clarify ownership and improve readability.',
+        '[prefer_explicit_this] Instance field accessed without an explicit this. prefix, making it ambiguous whether the identifier refers to a local variable or a field. Add this. to clarify ownership and improve readability. {v3}',
     correctionMessage:
         'Add an explicit this. prefix to every instance-field reference so readers can distinguish fields from locals.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -1360,6 +1400,8 @@ class PreferExplicitThisRule extends SaropaLintRule {
 
 /// Warns when `== true` is used for boolean expressions.
 ///
+/// Since: v2.7.0 | Updated: v4.13.0 | Rule version: v4
+///
 /// This is an **opinionated rule** - not included in any tier by default.
 ///
 /// ## Good Example
@@ -1388,7 +1430,7 @@ class PreferImplicitBooleanComparisonRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_implicit_boolean_comparison',
     problemMessage:
-        '[prefer_implicit_boolean_comparison] Comparing a boolean expression to a boolean literal (== true or == false) is redundant and adds visual noise. Remove the comparison and use the expression directly for cleaner, idiomatic Dart.',
+        '[prefer_implicit_boolean_comparison] Comparing a boolean expression to a boolean literal (== true or == false) is redundant and adds visual noise. Remove the comparison and use the expression directly for cleaner, idiomatic Dart. {v4}',
     correctionMessage:
         'Remove the redundant == true or == false comparison — the expression is already a bool and reads more naturally.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -1420,6 +1462,8 @@ class PreferImplicitBooleanComparisonRule extends SaropaLintRule {
 
 /// Warns when explicit `== true` is not used for nullable boolean expressions.
 ///
+/// Since: v2.7.0 | Updated: v4.13.0 | Rule version: v4
+///
 /// This is an **opinionated rule** - not included in any tier by default.
 ///
 /// ## Good Example
@@ -1447,7 +1491,7 @@ class PreferExplicitBooleanComparisonRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_explicit_boolean_comparison',
     problemMessage:
-        '[prefer_explicit_boolean_comparison] A nullable boolean expression is used without an explicit comparison, which can hide null-is-false behavior and confuse readers. Add == true to make the intent clear and self-documenting.',
+        '[prefer_explicit_boolean_comparison] A nullable boolean expression is used without an explicit comparison, which can hide null-is-false behavior and confuse readers. Add == true to make the intent clear and self-documenting. {v4}',
     correctionMessage:
         'Add an explicit == true comparison so the nullable bool intent is clear and avoids implicit null-is-false confusion.',
     errorSeverity: DiagnosticSeverity.INFO,

@@ -18,6 +18,8 @@ import '../saropa_lint_rule.dart';
 
 /// Warns when location permission is requested without showing rationale.
 ///
+/// Since: v4.2.0 | Updated: v4.13.0 | Rule version: v2
+///
 /// Alias: location_rationale, permission_explanation
 ///
 /// Explain why you need location before requesting. "Weather app needs location
@@ -64,7 +66,7 @@ class RequireLocationPermissionRationaleRule extends SaropaLintRule {
     name: 'require_location_permission_rationale',
     problemMessage:
         '[require_location_permission_rationale] Location permission requested '
-        'without showing rationale. Users may deny without understanding why.',
+        'without showing rationale. Users may deny without understanding why. {v2}',
     correctionMessage:
         'Show a dialog explaining why location is needed before requesting.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -131,6 +133,8 @@ class RequireLocationPermissionRationaleRule extends SaropaLintRule {
 
 /// Warns when camera is accessed without permission check.
 ///
+/// Since: v4.2.0 | Updated: v4.13.0 | Rule version: v3
+///
 /// Alias: camera_permission, check_camera_access
 ///
 /// Camera access without permission crashes on iOS, throws on Android. Always
@@ -180,7 +184,7 @@ class RequireCameraPermissionCheckRule extends SaropaLintRule {
     name: 'require_camera_permission_check',
     problemMessage:
         '[require_camera_permission_check] Camera initialized without permission '
-        'check. This crashes on iOS and throws on Android.',
+        'check. This crashes on iOS and throws on Android. {v3}',
     correctionMessage:
         'Request Permission.camera before creating CameraController.',
     errorSeverity: DiagnosticSeverity.ERROR,
@@ -289,6 +293,8 @@ class RequireCameraPermissionCheckRule extends SaropaLintRule {
 
 /// Warns when image picker is used for profile photos without cropping.
 ///
+/// Since: v4.2.0 | Updated: v4.13.0 | Rule version: v2
+///
 /// Alias: crop_profile_image, image_cropping
 ///
 /// Profile photos should be cropped to square. Offer cropping UI after
@@ -333,7 +339,7 @@ class PreferImageCroppingRule extends SaropaLintRule {
     name: 'prefer_image_cropping',
     problemMessage:
         '[prefer_image_cropping] Profile/avatar image picked without cropping. '
-        'Raw photos may have wrong aspect ratio for profile display.',
+        'Raw photos may have wrong aspect ratio for profile display. {v2}',
     correctionMessage:
         'Use ImageCropper to let users crop the image to the correct aspect ratio.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -413,6 +419,9 @@ class PreferImageCroppingRule extends SaropaLintRule {
 // =============================================================================
 
 /// Warns when deprecated permission_handler APIs from pre-null-safety versions
+///
+/// Since: v4.14.0 | Updated: vunreleased | Rule version: v2
+///
 /// are detected.
 ///
 /// Alias: permission_handler_null_safety, outdated_permission_handler
@@ -452,7 +461,7 @@ class AvoidPermissionHandlerNullSafetyRule extends SaropaLintRule {
         'and PermissionGroup enum were removed in permission_handler 8.0+. '
         'Using these deprecated APIs prevents migration to null-safe versions '
         'and causes compile errors when updating the package. The modern API '
-        'uses Permission.camera.status and Permission.camera.request() instead.',
+        'uses Permission.camera.status and Permission.camera.request() instead. {v2}',
     correctionMessage: 'Migrate to the null-safe permission_handler API: use '
         'Permission.camera.status instead of '
         'PermissionHandler().checkPermissionStatus(PermissionGroup.camera).',

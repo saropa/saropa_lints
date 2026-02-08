@@ -17,6 +17,8 @@ import '../type_annotation_utils.dart';
 
 /// Warns when `as` cast is used without null check.
 ///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v5
+///
 /// Direct casting with `as` can throw if the value is null or wrong type.
 /// Prefer `is` check first or use `as?` for nullable result.
 ///
@@ -54,7 +56,7 @@ class AvoidUnsafeCastRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_unsafe_cast',
     problemMessage:
-        '[avoid_unsafe_cast] Direct cast with "as" may throw at runtime. Direct casting with as can throw if the value is null or wrong type. Prefer is check first or use as? for nullable result.',
+        '[avoid_unsafe_cast] Direct cast with "as" may throw at runtime. Direct casting with as can throw if the value is null or wrong type. Prefer is check first or use as? for nullable result. {v5}',
     correctionMessage:
         'Use "is" check or pattern matching instead. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -110,6 +112,8 @@ class AvoidUnsafeCastRule extends SaropaLintRule {
 
 /// Warns when generic type parameter is not constrained.
 ///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v4
+///
 /// Unconstrained type parameters accept any type including null,
 /// which can lead to unexpected behavior.
 ///
@@ -139,7 +143,7 @@ class PreferConstrainedGenericsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_constrained_generics',
     problemMessage:
-        '[prefer_constrained_generics] Generic type parameter has no constraint. Unconstrained type parameters accept any type including null, which can lead to unexpected behavior. This weakens type safety, allowing errors to reach runtime where they crash instead of being caught at compile time.',
+        '[prefer_constrained_generics] Generic type parameter has no constraint. Unconstrained type parameters accept any type including null, which can lead to unexpected behavior. This weakens type safety, allowing errors to reach runtime where they crash instead of being caught at compile time. {v4}',
     correctionMessage:
         'Add extends clause to constrain the type. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -165,6 +169,8 @@ class PreferConstrainedGenericsRule extends SaropaLintRule {
 }
 
 /// Warns when covariant keyword is used without documentation.
+///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v5
 ///
 /// Covariant parameters weaken type safety and can cause runtime errors.
 /// They should be documented to explain why they're necessary.
@@ -196,7 +202,7 @@ class RequireCovariantDocumentationRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_covariant_documentation',
     problemMessage:
-        '[require_covariant_documentation] Covariant parameter must be documented. Covariant parameters weaken type safety and can cause runtime errors. They must be documented to explain why they\'re necessary.',
+        '[require_covariant_documentation] Covariant parameter must be documented. Covariant parameters weaken type safety and can cause runtime errors. They must be documented to explain why they\'re necessary. {v5}',
     correctionMessage:
         'Add documentation explaining why covariant is necessary. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -235,6 +241,8 @@ class RequireCovariantDocumentationRule extends SaropaLintRule {
 
 /// Warns when fromJson doesn't handle missing keys.
 ///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v4
+///
 /// JSON parsing should handle missing or null values gracefully
 /// to avoid runtime exceptions.
 ///
@@ -268,7 +276,7 @@ class RequireSafeJsonParsingRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_safe_json_parsing',
     problemMessage:
-        '[require_safe_json_parsing] JSON parsing may throw on missing keys. JSON parsing should handle missing or null values gracefully to avoid runtime exceptions. This weakens type safety, allowing errors to reach runtime where they crash instead of being caught at compile time.',
+        '[require_safe_json_parsing] JSON parsing may throw on missing keys. JSON parsing should handle missing or null values gracefully to avoid runtime exceptions. This weakens type safety, allowing errors to reach runtime where they crash instead of being caught at compile time. {v4}',
     correctionMessage:
         'Use null-aware operators or provide defaults. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -309,6 +317,8 @@ class RequireSafeJsonParsingRule extends SaropaLintRule {
 
 /// Warns when extension method doesn't handle null receiver.
 ///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v4
+///
 /// Extension methods on nullable types should check for null.
 ///
 /// **BAD:**
@@ -337,7 +347,7 @@ class RequireNullSafeExtensionsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_null_safe_extensions',
     problemMessage:
-        '[require_null_safe_extensions] Extension method on a nullable type does not handle null receivers. This can cause runtime exceptions. Extension methods on nullable types should check for null.',
+        '[require_null_safe_extensions] Extension method on a nullable type does not handle null receivers. This can cause runtime exceptions. Extension methods on nullable types should check for null. {v4}',
     correctionMessage:
         'Add null checks or use ?. to safely handle nullable receivers in extension methods.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -370,6 +380,8 @@ class RequireNullSafeExtensionsRule extends SaropaLintRule {
 
 /// Warns when num is used instead of int or double.
 ///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v4
+///
 /// Using specific numeric types improves type safety and performance.
 ///
 /// **BAD:**
@@ -394,7 +406,7 @@ class PreferSpecificNumericTypesRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_specific_numeric_types',
     problemMessage:
-        '[prefer_specific_numeric_types] Prefer int or double over num to improve type safety. This weakens type safety, allowing errors to reach runtime where they crash instead of being caught at compile time.',
+        '[prefer_specific_numeric_types] Prefer int or double over num to improve type safety. This weakens type safety, allowing errors to reach runtime where they crash instead of being caught at compile time. {v4}',
     correctionMessage:
         'Use int or double instead of num. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -431,6 +443,8 @@ class PreferSpecificNumericTypesRule extends SaropaLintRule {
 
 /// Warns when the non-null assertion operator (!) is used.
 ///
+/// Since: v4.9.16 | Updated: v4.13.0 | Rule version: v2
+///
 /// The `!` operator can cause runtime crashes if the value is null.
 /// Prefer null-aware operators or explicit null checks.
 ///
@@ -458,7 +472,7 @@ class AvoidNonNullAssertionRule extends SaropaLintRule {
     name: 'avoid_non_null_assertion',
     problemMessage:
         '[avoid_non_null_assertion] Non-null assertion operator (!) throws a runtime exception if the value is null, crashing the app. '
-        'The resulting _CastError provides no context about which variable was null or why, making production crashes from error reports and stack traces alone difficult to diagnose and reproduce.',
+        'The resulting _CastError provides no context about which variable was null or why, making production crashes from error reports and stack traces alone difficult to diagnose and reproduce. {v2}',
     correctionMessage:
         'Use null-aware operators (?., ??) or explicit null checks (if (value != null)) to handle nullability safely. '
         'When null is truly impossible due to prior validation, add an assert with a descriptive message or use a guard clause that throws a meaningful exception.',
@@ -480,6 +494,8 @@ class AvoidNonNullAssertionRule extends SaropaLintRule {
 }
 
 /// Warns when `as` keyword is used for type casting.
+///
+/// Since: v4.1.0 | Updated: v4.13.0 | Rule version: v2
 ///
 /// Type casts with `as` can throw at runtime. Prefer `is` checks
 /// or pattern matching for safer type narrowing.
@@ -507,7 +523,7 @@ class AvoidTypeCastsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_type_casts',
     problemMessage:
-        '[avoid_type_casts] Type cast with "as" may throw at runtime. Type casts with as can throw at runtime. Prefer is checks or pattern matching for safer type narrowing.',
+        '[avoid_type_casts] Type cast with "as" may throw at runtime. Type casts with as can throw at runtime. Prefer is checks or pattern matching for safer type narrowing. {v2}',
     correctionMessage:
         'Use "is" check or pattern matching instead. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -526,6 +542,8 @@ class AvoidTypeCastsRule extends SaropaLintRule {
 }
 
 /// Warns when FutureOr is used in public API without documentation.
+///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v4
 ///
 /// FutureOr can be confusing for API consumers and should be documented.
 ///
@@ -552,7 +570,7 @@ class RequireFutureOrDocumentationRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_futureor_documentation',
     problemMessage:
-        '[require_futureor_documentation] FutureOr return type must be documented. FutureOr can be confusing for API consumers and must be documented. FutureOr is used in public API without documentation.',
+        '[require_futureor_documentation] FutureOr return type must be documented. FutureOr can be confusing for API consumers and must be documented. FutureOr is used in public API without documentation. {v4}',
     correctionMessage:
         'Add documentation explaining when sync vs async. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -580,6 +598,8 @@ class RequireFutureOrDocumentationRule extends SaropaLintRule {
 }
 
 /// Warns when generic types lack explicit type arguments.
+///
+/// Since: v2.0.0 | Updated: v4.13.0 | Rule version: v5
 ///
 /// Explicit type arguments improve code clarity and prevent
 /// accidental type inference issues.
@@ -614,7 +634,7 @@ class PreferExplicitTypeArgumentsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_explicit_type_arguments',
     problemMessage:
-        '[prefer_explicit_type_arguments] Generic type without explicit type arguments. Explicit type arguments improve code clarity and prevent accidental type inference issues.',
+        '[prefer_explicit_type_arguments] Generic type without explicit type arguments. Explicit type arguments improve code clarity and prevent accidental type inference issues. {v5}',
     correctionMessage:
         'Add explicit type arguments to the generic type so that the intended types are visible without relying on inference.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -778,6 +798,8 @@ class _PreferExplicitTypeArgumentsFix extends DartFix {
 
 /// Detects casts between unrelated types that will always fail at runtime.
 ///
+/// Since: v2.3.7 | Updated: v4.13.0 | Rule version: v3
+///
 /// When casting between types that have no inheritance relationship,
 /// the cast will always throw a TypeError at runtime.
 ///
@@ -813,7 +835,7 @@ class AvoidUnrelatedTypeCastsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_unrelated_type_casts',
     problemMessage:
-        '[avoid_unrelated_type_casts] Casting between unrelated types (such as String to int) will always throw a runtime error, leading to crashes and unpredictable behavior. This often indicates a logic error or misunderstanding of the type system. Always ensure types are compatible before casting to prevent runtime failures and improve code safety.',
+        '[avoid_unrelated_type_casts] Casting between unrelated types (such as String to int) will always throw a runtime error, leading to crashes and unpredictable behavior. This often indicates a logic error or misunderstanding of the type system. Always ensure types are compatible before casting to prevent runtime failures and improve code safety. {v3}',
     correctionMessage:
         'Before casting, use an "is" check or verify the type hierarchy to ensure the cast is valid. Refactor code to avoid unnecessary or unsafe casts and rely on type-safe patterns.',
     errorSeverity: DiagnosticSeverity.ERROR,
@@ -881,6 +903,8 @@ class AvoidUnrelatedTypeCastsRule extends SaropaLintRule {
 
 /// Detects chained JSON access without null checks.
 ///
+/// Since: v2.3.7 | Updated: v4.13.0 | Rule version: v6
+///
 /// Accessing nested JSON with chained bracket notation like
 /// `json['key']['nested']` without null checks can cause
 /// null pointer exceptions when intermediate keys don't exist.
@@ -913,7 +937,7 @@ class AvoidDynamicJsonAccessRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_dynamic_json_access',
     problemMessage:
-        '[avoid_dynamic_json_access] Chained dynamic JSON access without null checks throws NoSuchMethodError at runtime when any intermediate key is missing or null. This causes unhandled crashes in production when API responses deviate from the expected schema, with no compile-time safety net.',
+        '[avoid_dynamic_json_access] Chained dynamic JSON access without null checks throws NoSuchMethodError at runtime when any intermediate key is missing or null. This causes unhandled crashes in production when API responses deviate from the expected schema, with no compile-time safety net. {v6}',
     correctionMessage:
         'Use null-aware operators (?.) for safe access, or validate each level exists before accessing nested properties to prevent runtime crashes.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -968,6 +992,8 @@ class AvoidDynamicJsonAccessRule extends SaropaLintRule {
 
 /// Detects JSON map access without null safety handling.
 ///
+/// Since: v2.3.7 | Updated: v4.13.0 | Rule version: v4
+///
 /// Accessing a JSON map with bracket notation `json['key']` returns
 /// dynamic and can be null. Directly using this value without
 /// null check causes runtime errors.
@@ -1002,7 +1028,7 @@ class RequireNullSafeJsonAccessRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_null_safe_json_access',
     problemMessage:
-        '[require_null_safe_json_access] Accessing values from a JSON map without checking for key existence or null values can throw exceptions (such as NoSuchMethodError or TypeError) if the key is missing or the value is null. This is a common source of runtime crashes and unstable code, especially when dealing with data from APIs, user input, or external sources. Null-safe access is essential for robust, production-quality Dart and Flutter applications.',
+        '[require_null_safe_json_access] Accessing values from a JSON map without checking for key existence or null values can throw exceptions (such as NoSuchMethodError or TypeError) if the key is missing or the value is null. This is a common source of runtime crashes and unstable code, especially when dealing with data from APIs, user input, or external sources. Null-safe access is essential for robust, production-quality Dart and Flutter applications. {v4}',
     correctionMessage:
         'Always use null-aware operators (such as ?. or ??) or explicitly check for key existence before accessing values in a JSON map. This prevents runtime exceptions and makes your code safer and more maintainable. Audit your codebase for direct JSON map access and refactor to use null-safe patterns, especially in code that handles external or untrusted data.',
     errorSeverity: DiagnosticSeverity.ERROR,
@@ -1061,6 +1087,8 @@ class RequireNullSafeJsonAccessRule extends SaropaLintRule {
 
 /// Detects deeply chained JSON access patterns.
 ///
+/// Since: v2.3.7 | Updated: v4.13.0 | Rule version: v3
+///
 /// Accessing JSON with deeply chained bracket notation like
 /// `json['a']['b']['c']` is error-prone and difficult to maintain.
 /// Prefer flattening or using helper methods.
@@ -1096,7 +1124,7 @@ class AvoidDynamicJsonChainsRule extends SaropaLintRule {
     name: 'avoid_dynamic_json_chains',
     problemMessage:
         '[avoid_dynamic_json_chains] Deep dynamic access throws NoSuchMethodError '
-        'or TypeError at runtime when any nested key is missing. Chaining multiple dynamic map accesses (e.g., json["a"]["b"]["c"]) is fragile and will crash if any key is missing or null. This leads to runtime exceptions, broken features, and poor user experience. Always check each level for null before accessing the next.',
+        'or TypeError at runtime when any nested key is missing. Chaining multiple dynamic map accesses (e.g., json["a"]["b"]["c"]) is fragile and will crash if any key is missing or null. This leads to runtime exceptions, broken features, and poor user experience. Always check each level for null before accessing the next. {v3}',
     correctionMessage:
         'Break deep dynamic map accesses into separate statements with null checks at each level. Use safe navigation (?.) or explicit checks to prevent runtime errors and improve code robustness.',
     errorSeverity: DiagnosticSeverity.ERROR,
@@ -1141,6 +1169,8 @@ class AvoidDynamicJsonChainsRule extends SaropaLintRule {
 
 /// Detects enum parsing from API without fallback for unknown values.
 ///
+/// Since: v2.3.7 | Updated: v4.13.0 | Rule version: v6
+///
 /// When parsing enums from external data (API responses, JSON), new
 /// values may be added that the app doesn't know about. Without a
 /// fallback, this crashes the app.
@@ -1180,7 +1210,7 @@ class RequireEnumUnknownValueRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_enum_unknown_value',
     problemMessage:
-        '[require_enum_unknown_value] Enum parsing without a fallback value throws an ArgumentError when the input string does not match any enum member. Backend API changes or new enum values added server-side will crash the app in production for all users until a client update is deployed.',
+        '[require_enum_unknown_value] Enum parsing without a fallback value throws an ArgumentError when the input string does not match any enum member. Backend API changes or new enum values added server-side will crash the app in production for all users until a client update is deployed. {v6}',
     correctionMessage:
         'Add a fallback enum value (e.g., .unknown) using the orElse parameter, or use MyEnum.values.tryByName() to safely handle unknown values.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -1251,6 +1281,8 @@ class RequireEnumUnknownValueRule extends SaropaLintRule {
 
 /// Detects form validators that don't return null for valid input.
 ///
+/// Since: v2.3.7 | Updated: v4.13.0 | Rule version: v3
+///
 /// Form validators in Flutter must return null when input is valid.
 /// Returning a string always shows an error message. Forgetting to
 /// return null for the valid case breaks form validation.
@@ -1296,7 +1328,7 @@ class RequireValidatorReturnNullRule extends SaropaLintRule {
     name: 'require_validator_return_null',
     problemMessage:
         '[require_validator_return_null] Non-null return on valid input shows '
-        'error message even when field is correct, confusing users. Validator functions in forms must return null for valid input. Returning a non-null value causes error messages to display even when the field is correct, leading to user frustration and broken form validation.',
+        'error message even when field is correct, confusing users. Validator functions in forms must return null for valid input. Returning a non-null value causes error messages to display even when the field is correct, leading to user frustration and broken form validation. {v3}',
     correctionMessage:
         'Always return null from validator functions when the input is valid. This ensures error messages are only shown for invalid input and provides a correct user experience.',
     errorSeverity: DiagnosticSeverity.ERROR,

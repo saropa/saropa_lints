@@ -13,6 +13,8 @@ import '../saropa_lint_rule.dart';
 
 /// Warns when platform-specific APIs are used without Platform checks.
 ///
+/// Since: v4.1.6 | Updated: v4.13.0 | Rule version: v2
+///
 /// Using dart:io APIs without platform checks can cause crashes on web.
 /// Always guard platform-specific code with appropriate conditionals.
 ///
@@ -45,7 +47,7 @@ class RequirePlatformCheckRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_platform_check',
     problemMessage:
-        '[require_platform_check] Platform-specific API from dart:io used without a platform guard. On Flutter web, dart:io classes throw UnsupportedError at runtime because they are unavailable in the browser environment. This crashes the app immediately when the code path executes, making the web version completely unusable for affected features.',
+        '[require_platform_check] Platform-specific API from dart:io used without a platform guard. On Flutter web, dart:io classes throw UnsupportedError at runtime because they are unavailable in the browser environment. This crashes the app immediately when the code path executes, making the web version completely unusable for affected features. {v2}',
     correctionMessage:
         'Guard platform-specific code with if (!kIsWeb) before accessing dart:io APIs, or use conditional imports to provide web-compatible implementations.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -106,6 +108,8 @@ class RequirePlatformCheckRule extends SaropaLintRule {
 
 /// Warns when Platform is used for web checks instead of kIsWeb.
 ///
+/// Since: v4.1.6 | Updated: v4.13.0 | Rule version: v2
+///
 /// Platform from dart:io doesn't exist on web. Use kIsWeb from
 /// foundation for web detection.
 ///
@@ -135,7 +139,7 @@ class PreferPlatformIoConditionalRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_platform_io_conditional',
     problemMessage:
-        '[prefer_platform_io_conditional] Platform class from dart:io throws UnsupportedError at runtime on Flutter web because dart:io is unavailable in browser environments. Accessing Platform.isAndroid, Platform.isIOS, or any Platform property without first checking kIsWeb crashes the web app immediately with an unrecoverable runtime error.',
+        '[prefer_platform_io_conditional] Platform class from dart:io throws UnsupportedError at runtime on Flutter web because dart:io is unavailable in browser environments. Accessing Platform.isAndroid, Platform.isIOS, or any Platform property without first checking kIsWeb crashes the web app immediately with an unrecoverable runtime error. {v2}',
     correctionMessage:
         'Check kIsWeb first before accessing Platform properties: if (!kIsWeb && Platform.isAndroid) to prevent runtime crashes on Flutter web deployments.',
     errorSeverity: DiagnosticSeverity.ERROR,
@@ -216,6 +220,8 @@ class _AddKIsWebGuardFix extends DartFix {
 
 /// Warns when Platform is used in widget context instead of defaultTargetPlatform.
 ///
+/// Since: v4.1.6 | Updated: v4.13.0 | Rule version: v2
+///
 /// In widget code, defaultTargetPlatform from foundation is safer and
 /// allows for testing overrides. Platform requires dart:io which
 /// doesn't exist on web.
@@ -254,7 +260,7 @@ class PreferFoundationPlatformCheckRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_foundation_platform_check',
     problemMessage:
-        '[prefer_foundation_platform_check] Use defaultTargetPlatform in widget code. In widget code, defaultTargetPlatform from foundation is safer and allows for testing overrides. Platform requires dart:io which doesn\'t exist on web.',
+        '[prefer_foundation_platform_check] Use defaultTargetPlatform in widget code. In widget code, defaultTargetPlatform from foundation is safer and allows for testing overrides. Platform requires dart:io which doesn\'t exist on web. {v2}',
     correctionMessage:
         'Replace Platform.isX with defaultTargetPlatform == TargetPlatform.X. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,

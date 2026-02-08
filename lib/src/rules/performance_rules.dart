@@ -19,6 +19,8 @@ import '../saropa_lint_rule.dart';
 
 /// Warns when AnimatedList or AnimatedGrid items don't have keys.
 ///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v5
+///
 /// Without keys, Flutter cannot efficiently track which items have
 /// changed, leading to incorrect animations and poor performance.
 ///
@@ -60,7 +62,7 @@ class RequireKeysInAnimatedListsRule extends SaropaLintRule {
     name: 'require_keys_in_animated_lists',
     problemMessage:
         '[require_keys_in_animated_lists] Without keys, AnimatedList animations '
-        'target wrong items after insert/remove operations.',
+        'target wrong items after insert/remove operations. {v5}',
     correctionMessage:
         'Add a Key to the returned widget for correct animations.',
     errorSeverity: DiagnosticSeverity.ERROR,
@@ -180,6 +182,8 @@ class _ReturnVisitor extends RecursiveAstVisitor<void> {
 
 /// Warns when expensive operations are performed in build methods.
 ///
+/// Since: v1.7.2 | Updated: v4.13.0 | Rule version: v2
+///
 /// Operations like JSON parsing, file I/O, or complex calculations
 /// should not be done in build() as it's called frequently.
 ///
@@ -213,7 +217,7 @@ class AvoidExpensiveBuildRule extends SaropaLintRule {
     name: 'avoid_expensive_build',
     problemMessage:
         '[avoid_expensive_build] Expensive operations in build() run on every '
-        'frame, causing jank and dropped frames during animations.',
+        'frame, causing jank and dropped frames during animations. {v2}',
     correctionMessage:
         'Move expensive operations to initState, didChangeDependencies, or cache the result.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -298,6 +302,8 @@ class _ExpensiveOperationVisitor extends RecursiveAstVisitor<void> {
 
 /// Warns when synchronous file I/O is used instead of async.
 ///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v4
+///
 /// Synchronous file operations block the UI thread and cause jank.
 ///
 /// **BAD:**
@@ -323,7 +329,7 @@ class AvoidSynchronousFileIoRule extends SaropaLintRule {
     name: 'avoid_synchronous_file_io',
     problemMessage:
         '[avoid_synchronous_file_io] Synchronous file I/O blocks the main '
-        'thread, causing UI freezes and dropped frames during disk access.',
+        'thread, causing UI freezes and dropped frames during disk access. {v4}',
     correctionMessage: 'Use async file operations to avoid blocking the UI.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
@@ -359,6 +365,8 @@ class AvoidSynchronousFileIoRule extends SaropaLintRule {
 
 /// Warns when compute() should be used for heavy work.
 ///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v5
+///
 /// Operations taking more than 16ms block the UI thread.
 /// Use compute() or Isolate for heavy processing.
 ///
@@ -384,7 +392,7 @@ class PreferComputeForHeavyWorkRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_compute_for_heavy_work',
     problemMessage:
-        '[prefer_compute_for_heavy_work] Heavy computation such as encryption, compression, or parsing runs synchronously on the main UI thread. This blocks the rendering pipeline, freezing animations, dropping frames, and making the app unresponsive to touch input for the duration of the operation. On lower-end devices, this delay is especially pronounced and triggers ANR warnings on Android.',
+        '[prefer_compute_for_heavy_work] Heavy computation such as encryption, compression, or parsing runs synchronously on the main UI thread. This blocks the rendering pipeline, freezing animations, dropping frames, and making the app unresponsive to touch input for the duration of the operation. On lower-end devices, this delay is especially pronounced and triggers ANR warnings on Android. {v5}',
     correctionMessage:
         'Move heavy work to a separate isolate using compute() or Isolate.run(). This keeps the UI responsive and prevents dropped frames or slow user interactions, especially on lower-end devices.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -446,6 +454,8 @@ class PreferComputeForHeavyWorkRule extends SaropaLintRule {
 
 /// Warns when objects are created inside hot loops.
 ///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v5
+///
 /// Creating objects in frequently-executed loops causes GC pressure.
 ///
 /// **BAD:**
@@ -476,7 +486,7 @@ class AvoidObjectCreationInHotLoopsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_object_creation_in_hot_loops',
     problemMessage:
-        '[avoid_object_creation_in_hot_loops] Creating objects inside hot loops triggers frequent garbage collection pauses that freeze the UI thread. Each allocation adds GC pressure proportionally to iteration count, causing visible jank, dropped frames during animations, and degraded scrolling performance on lower-end devices.',
+        '[avoid_object_creation_in_hot_loops] Creating objects inside hot loops triggers frequent garbage collection pauses that freeze the UI thread. Each allocation adds GC pressure proportionally to iteration count, causing visible jank, dropped frames during animations, and degraded scrolling performance on lower-end devices. {v5}',
     correctionMessage:
         'Move object creation outside the loop body and reuse instances across iterations. For collections, preallocate with a known capacity to minimize allocation overhead.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -556,6 +566,8 @@ class _CreationInLoopVisitor extends RecursiveAstVisitor<void> {
 
 /// Warns when an expensive getter is called multiple times.
 ///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v5
+///
 /// Getters that perform computation should be cached.
 ///
 /// **BAD:**
@@ -586,7 +598,7 @@ class PreferCachedGetterRule extends SaropaLintRule {
     name: 'prefer_cached_getter',
     problemMessage:
         '[prefer_cached_getter] Repeated getter calls recompute expensive values '
-        'each time, wasting CPU cycles when caching would suffice.',
+        'each time, wasting CPU cycles when caching would suffice. {v5}',
     correctionMessage:
         'Store the getter result in a local variable if called multiple times.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -649,6 +661,8 @@ class _GetterCallCollector extends RecursiveAstVisitor<void> {
 
 /// Warns when widget tree depth is excessive.
 ///
+/// Since: v1.7.2 | Updated: v4.13.0 | Rule version: v2
+///
 /// Very deep widget trees can cause performance issues and
 /// are hard to maintain.
 ///
@@ -695,7 +709,7 @@ class AvoidExcessiveWidgetDepthRule extends SaropaLintRule {
     name: 'avoid_excessive_widget_depth',
     problemMessage:
         '[avoid_excessive_widget_depth] Deep widget nesting rebuilds entire '
-        'subtree on changes, hurting performance and making code hard to maintain.',
+        'subtree on changes, hurting performance and making code hard to maintain. {v2}',
     correctionMessage:
         'Extract nested widgets into separate widget classes for better performance.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -755,6 +769,8 @@ class _DepthVisitor extends RecursiveAstVisitor<void> {
 
 /// Warns when large lists don't specify itemExtent.
 ///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v5
+///
 /// For lists with many items, specifying itemExtent improves
 /// scrolling performance significantly.
 ///
@@ -787,7 +803,7 @@ class RequireItemExtentForLargeListsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_item_extent_for_large_lists',
     problemMessage:
-        '[require_item_extent_for_large_lists] ListView with many items but no itemExtent forces Flutter to lay out every child widget to calculate scroll extent. This causes expensive initial rendering, prevents efficient jump-to-index operations, and degrades scroll bar accuracy, resulting in slow list initialization and janky scrolling.',
+        '[require_item_extent_for_large_lists] ListView with many items but no itemExtent forces Flutter to lay out every child widget to calculate scroll extent. This causes expensive initial rendering, prevents efficient jump-to-index operations, and degrades scroll bar accuracy, resulting in slow list initialization and janky scrolling. {v5}',
     correctionMessage:
         'Add itemExtent for fixed-height items or prototypeItem for consistent sizes to enable O(1) scroll position calculations and smoother scrolling performance.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -844,6 +860,8 @@ class RequireItemExtentForLargeListsRule extends SaropaLintRule {
 
 /// Warns when images should be precached for smooth display.
 ///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v5
+///
 /// Large images displayed immediately after navigation can cause
 /// visible loading delays. Use precacheImage for critical images.
 ///
@@ -875,7 +893,7 @@ class PreferImagePrecacheRule extends SaropaLintRule {
     name: 'prefer_image_precache',
     problemMessage:
         '[prefer_image_precache] Large images without precaching cause visible '
-        'loading delays and layout shifts when they appear on screen.',
+        'loading delays and layout shifts when they appear on screen. {v5}',
     correctionMessage:
         'Use precacheImage() in didChangeDependencies for smoother UX.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -928,6 +946,8 @@ class PreferImagePrecacheRule extends SaropaLintRule {
 
 /// Warns when ScrollController is created in build method.
 ///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v5
+///
 /// Controllers created in build will be recreated on every rebuild,
 /// losing scroll position and causing memory leaks.
 ///
@@ -960,7 +980,7 @@ class AvoidControllerInBuildRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_controller_in_build',
     problemMessage:
-        '[avoid_controller_in_build] Creating controllers (e.g., TextEditingController, AnimationController) inside the build() method causes a new instance to be created on every rebuild. This leads to memory leaks, lost state, and degraded performance, as old controllers are never disposed.',
+        '[avoid_controller_in_build] Creating controllers (e.g., TextEditingController, AnimationController) inside the build() method causes a new instance to be created on every rebuild. This leads to memory leaks, lost state, and degraded performance, as old controllers are never disposed. {v5}',
     correctionMessage:
         'Always create controllers as class fields in your State class and dispose of them in the dispose() method to prevent leaks and ensure proper resource management.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -1015,6 +1035,8 @@ class _ControllerCreationVisitor extends RecursiveAstVisitor<void> {
 
 /// Warns when setState is called during build.
 ///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v6
+///
 /// Alias: avoid_set_state_in_build, setstate_in_build, no_setstate_in_build
 ///
 /// Calling setState during build causes infinite rebuild loops.
@@ -1056,7 +1078,7 @@ class AvoidSetStateInBuildRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_setstate_in_build',
     problemMessage:
-        '[avoid_setstate_in_build] Calling setState inside the build() method causes the widget to rebuild recursively, leading to stack overflows, app crashes, and unpredictable UI behavior. This makes your app unstable and difficult to debug. Always trigger state changes outside build().',
+        '[avoid_setstate_in_build] Calling setState inside the build() method causes the widget to rebuild recursively, leading to stack overflows, app crashes, and unpredictable UI behavior. This makes your app unstable and difficult to debug. Always trigger state changes outside build(). {v6}',
     correctionMessage:
         'Move setState calls to event handlers or use WidgetsBinding.instance.addPostFrameCallback to schedule state changes after build completes.',
     errorSeverity: DiagnosticSeverity.ERROR,
@@ -1147,6 +1169,8 @@ class _SetStateVisitor extends RecursiveAstVisitor<void> {
 
 /// Warns when string concatenation is used inside loops.
 ///
+/// Since: v1.3.0 | Updated: v4.13.0 | Rule version: v3
+///
 /// String concatenation with + creates new String objects each iteration.
 /// Use StringBuffer for building strings in loops.
 ///
@@ -1180,7 +1204,7 @@ class AvoidStringConcatenationLoopRule extends SaropaLintRule {
     name: 'avoid_string_concatenation_loop',
     problemMessage:
         '[avoid_string_concatenation_loop] Each += creates new String object, '
-        'causing O(n²) memory allocations in loops.',
+        'causing O(n²) memory allocations in loops. {v3}',
     correctionMessage: 'Use StringBuffer for building strings in loops.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -1264,6 +1288,8 @@ class AvoidStringConcatenationLoopRule extends SaropaLintRule {
 
 /// Warns when scroll listener is added in build method.
 ///
+/// Since: v1.7.2 | Updated: v4.13.0 | Rule version: v2
+///
 /// Adding listeners in build() causes multiple subscriptions on every rebuild,
 /// leading to memory leaks and performance issues.
 ///
@@ -1304,7 +1330,7 @@ class AvoidScrollListenerInBuildRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_scroll_listener_in_build',
     problemMessage:
-        '[avoid_scroll_listener_in_build] Scroll listener registered in build() accumulates duplicate subscriptions on every widget rebuild. Each rebuild adds another listener that is never removed, causing memory leaks, duplicate callback executions, and progressively degrading scroll performance as listeners compound over the widget lifecycle.',
+        '[avoid_scroll_listener_in_build] Scroll listener registered in build() accumulates duplicate subscriptions on every widget rebuild. Each rebuild adds another listener that is never removed, causing memory leaks, duplicate callback executions, and progressively degrading scroll performance as listeners compound over the widget lifecycle. {v2}',
     correctionMessage:
         'Register the scroll listener once in initState() and remove it in dispose() to prevent listener accumulation across widget rebuilds.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -1341,6 +1367,8 @@ class _AddListenerVisitor extends RecursiveAstVisitor<void> {
 }
 
 /// Warns when ValueListenableBuilder could simplify state management.
+///
+/// Since: v1.7.2 | Updated: v4.13.0 | Rule version: v3
 ///
 /// For single values that need to trigger rebuilds, ValueListenableBuilder
 /// is more efficient than StatefulWidget + setState.
@@ -1380,7 +1408,7 @@ class PreferValueListenableBuilderRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_value_listenable_builder',
     problemMessage:
-        '[prefer_value_listenable_builder] Simple single-value state managed with setState causes the entire widget subtree to rebuild on every change. ValueListenableBuilder isolates rebuilds to only the affected subtree, significantly reducing unnecessary widget tree comparisons, improving frame rendering performance, and lowering battery consumption.',
+        '[prefer_value_listenable_builder] Simple single-value state managed with setState causes the entire widget subtree to rebuild on every change. ValueListenableBuilder isolates rebuilds to only the affected subtree, significantly reducing unnecessary widget tree comparisons, improving frame rendering performance, and lowering battery consumption. {v3}',
     correctionMessage:
         'Replace setState with a ValueNotifier field and wrap the dependent UI in ValueListenableBuilder to isolate rebuilds to only the affected subtree.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -1445,6 +1473,8 @@ class _SetStateCounterVisitor extends RecursiveAstVisitor<void> {
 
 /// Warns when GlobalKey is overused or misused.
 ///
+/// Since: v1.7.2 | Updated: v4.13.0 | Rule version: v2
+///
 /// GlobalKeys are expensive - they persist across rebuilds and maintain
 /// global state. Only use them when absolutely necessary (Form validation,
 /// accessing state from outside, etc.).
@@ -1480,7 +1510,7 @@ class AvoidGlobalKeyMisuseRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_global_key_misuse',
     problemMessage:
-        '[avoid_global_key_misuse] Multiple GlobalKey instances in a single class indicate overuse of an expensive mechanism. Each GlobalKey prevents Flutter from efficiently diffing the widget tree, forces cross-tree reference tracking, and can cause unexpected widget reparenting that corrupts state and degrades rendering performance.',
+        '[avoid_global_key_misuse] Multiple GlobalKey instances in a single class indicate overuse of an expensive mechanism. Each GlobalKey prevents Flutter from efficiently diffing the widget tree, forces cross-tree reference tracking, and can cause unexpected widget reparenting that corrupts state and degrades rendering performance. {v2}',
     correctionMessage:
         'Use ValueKey or ObjectKey for list item identification. Reserve GlobalKey only for Form validation, accessing widget state, or navigator operations.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -1526,6 +1556,8 @@ class AvoidGlobalKeyMisuseRule extends SaropaLintRule {
 }
 
 /// Warns when complex animations don't use RepaintBoundary.
+///
+/// Since: v1.7.2 | Updated: v4.13.0 | Rule version: v2
 ///
 /// RepaintBoundary isolates paint operations, preventing expensive
 /// repaints from affecting the entire widget tree.
@@ -1576,7 +1608,7 @@ class RequireRepaintBoundaryRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_repaint_boundary',
     problemMessage:
-        '[require_repaint_boundary] When animating complex widgets without a RepaintBoundary, the entire widget subtree is repainted on every frame, causing jank, dropped frames, and high CPU/GPU usage. This degrades performance, especially in lists or nested animations.',
+        '[require_repaint_boundary] When animating complex widgets without a RepaintBoundary, the entire widget subtree is repainted on every frame, causing jank, dropped frames, and high CPU/GPU usage. This degrades performance, especially in lists or nested animations. {v2}',
     correctionMessage:
         'Wrap the animated widget or subtree with a RepaintBoundary to isolate repaints and improve performance.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -1647,6 +1679,8 @@ class RequireRepaintBoundaryRule extends SaropaLintRule {
 
 /// Warns when TextSpan is created in build method.
 ///
+/// Since: v1.7.0 | Updated: v4.13.0 | Rule version: v4
+///
 /// TextSpan objects created in build() cannot be cached by Flutter's
 /// rendering pipeline, causing unnecessary text layout calculations.
 ///
@@ -1691,7 +1725,7 @@ class AvoidTextSpanInBuildRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_text_span_in_build',
     problemMessage:
-        '[avoid_text_span_in_build] TextSpan recreated inside the build() method forces the Flutter rendering pipeline to recalculate expensive text layout metrics on every widget rebuild. This includes glyph positioning, line breaking, and paragraph layout. The repeated computation causes visible jank during scrolling and animations, especially for RichText with multiple styled spans.',
+        '[avoid_text_span_in_build] TextSpan recreated inside the build() method forces the Flutter rendering pipeline to recalculate expensive text layout metrics on every widget rebuild. This includes glyph positioning, line breaking, and paragraph layout. The repeated computation causes visible jank during scrolling and animations, especially for RichText with multiple styled spans. {v4}',
     correctionMessage:
         'Cache TextSpan as a final field or extract to a method that returns cached spans.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -1743,6 +1777,8 @@ class _TextSpanVisitor extends RecursiveAstVisitor<void> {
 
 /// Warns when List.from() or toList() copies large collections.
 ///
+/// Since: v1.3.0 | Updated: v4.13.0 | Rule version: v3
+///
 /// These methods copy all elements to a new list, which is expensive
 /// for large collections. Consider using lazy operations instead.
 ///
@@ -1772,7 +1808,7 @@ class AvoidLargeListCopyRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_large_list_copy',
     problemMessage:
-        '[avoid_large_list_copy] List.from() and toList() allocate a new list and copy every element, doubling memory consumption for the duration of the operation. For large collections, this triggers garbage collection pauses that freeze the UI and degrade scrolling performance. The unnecessary allocation pressure accumulates rapidly in loops or frequently called methods.',
+        '[avoid_large_list_copy] List.from() and toList() allocate a new list and copy every element, doubling memory consumption for the duration of the operation. For large collections, this triggers garbage collection pauses that freeze the UI and degrade scrolling performance. The unnecessary allocation pressure accumulates rapidly in loops or frequently called methods. {v3}',
     correctionMessage:
         'Use lazy Iterable operations (like map, where, or take) instead of copying large lists, unless a full copy is required. If you must copy, document why to help maintainers understand the performance tradeoff.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -1823,6 +1859,8 @@ class AvoidLargeListCopyRule extends SaropaLintRule {
 
 /// Warns when widgets that could be const are not declared as const.
 ///
+/// Since: v2.7.0 | Updated: v4.13.0 | Rule version: v4
+///
 /// Widgets that can be const are created once and reused. Without const,
 /// Flutter creates new instances on every parent rebuild.
 ///
@@ -1855,7 +1893,7 @@ class PreferConstWidgetsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_const_widgets',
     problemMessage:
-        '[prefer_const_widgets] Widget constructor could use const but is recreated on every build() call. Non-const widgets force Flutter to allocate new instances, compare entire subtrees, and perform unnecessary rebuilds. This wastes CPU cycles and battery, degrading frame rendering performance especially in frequently rebuilt parent widgets.',
+        '[prefer_const_widgets] Widget constructor could use const but is recreated on every build() call. Non-const widgets force Flutter to allocate new instances, compare entire subtrees, and perform unnecessary rebuilds. This wastes CPU cycles and battery, degrading frame rendering performance especially in frequently rebuilt parent widgets. {v4}',
     correctionMessage:
         'Add the const keyword to the widget constructor call to enable compile-time canonicalization and skip unnecessary widget tree comparisons during rebuilds.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -1916,6 +1954,8 @@ class PreferConstWidgetsRule extends SaropaLintRule {
 
 /// Warns when expensive computations are performed in build method.
 ///
+/// Since: v1.7.2 | Updated: v4.13.0 | Rule version: v2
+///
 /// build() is called frequently (60fps during animations). Sorting,
 /// filtering, or complex calculations here cause frame drops.
 ///
@@ -1949,7 +1989,7 @@ class AvoidExpensiveComputationInBuildRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_expensive_computation_in_build',
     problemMessage:
-        '[avoid_expensive_computation_in_build] Expensive computation detected inside build() method. Build runs on every frame during animations and on every state change, so heavy operations here cause jank, dropped frames, and sluggish UI responsiveness. Users will experience visible stuttering especially during transitions and scrolling.',
+        '[avoid_expensive_computation_in_build] Expensive computation detected inside build() method. Build runs on every frame during animations and on every state change, so heavy operations here cause jank, dropped frames, and sluggish UI responsiveness. Users will experience visible stuttering especially during transitions and scrolling. {v2}',
     correctionMessage:
         'Cache the computation result in a field, compute it in initState() or didChangeDependencies(), or use memoization to avoid repeated expensive work.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -1996,6 +2036,8 @@ class _ExpensiveMethodVisitor extends RecursiveAstVisitor<void> {
 
 /// Warns when widgets are created inside loops in build method.
 ///
+/// Since: v1.7.2 | Updated: v4.13.0 | Rule version: v3
+///
 /// Creating widgets inside loops (.map()) in build creates new instances
 /// every rebuild. Extract to a method or use ListView.builder.
 ///
@@ -2033,7 +2075,7 @@ class AvoidWidgetCreationInLoopRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_widget_creation_in_loop',
     problemMessage:
-        '[avoid_widget_creation_in_loop] Widgets created in .map() or a loop are all instantiated eagerly on every rebuild, including those currently off-screen. This causes jank, high memory usage, and slow rendering for long lists because Flutter allocates and lays out every item upfront instead of lazily constructing only visible items.',
+        '[avoid_widget_creation_in_loop] Widgets created in .map() or a loop are all instantiated eagerly on every rebuild, including those currently off-screen. This causes jank, high memory usage, and slow rendering for long lists because Flutter allocates and lays out every item upfront instead of lazily constructing only visible items. {v3}',
     correctionMessage:
         'Use ListView.builder or SliverList.builder for lazy construction that only creates widgets as they scroll into view, reducing memory usage and improving performance.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -2079,6 +2121,8 @@ class _MapWidgetVisitor extends RecursiveAstVisitor<void> {
 
 /// Warns when Theme.of or MediaQuery.of is called multiple times in build.
 ///
+/// Since: v1.7.2 | Updated: v4.13.0 | Rule version: v3
+///
 /// These methods traverse the widget tree. Call once and store in a
 /// local variable, or use specific methods like MediaQuery.sizeOf().
 ///
@@ -2118,7 +2162,7 @@ class AvoidCallingOfInBuildRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_calling_of_in_build',
     problemMessage:
-        '[avoid_calling_of_in_build] Multiple .of(context) lookups walk the InheritedWidget ancestor chain on every rebuild call. Each lookup traverses the widget tree upward, adding cumulative overhead that slows frame rendering. This is especially costly when called multiple times in a single build method for the same provider type.',
+        '[avoid_calling_of_in_build] Multiple .of(context) lookups walk the InheritedWidget ancestor chain on every rebuild call. Each lookup traverses the widget tree upward, adding cumulative overhead that slows frame rendering. This is especially costly when called multiple times in a single build method for the same provider type. {v3}',
     correctionMessage:
         'Cache the lookup result in a local variable at the top of build(): final theme = Theme.of(context); then reference the variable throughout the method.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -2182,6 +2226,8 @@ class _OfCallVisitor extends RecursiveAstVisitor<void> {
 
 /// Warns when image cache is not managed in apps with many images.
 ///
+/// Since: v1.7.0 | Updated: v4.13.0 | Rule version: v3
+///
 /// Flutter's ImageCache grows unbounded by default. Large images
 /// accumulate in memory. Call imageCache.clear() when appropriate.
 ///
@@ -2215,7 +2261,7 @@ class RequireImageCacheManagementRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_image_cache_management',
     problemMessage:
-        '[require_image_cache_management] Loading many images without cache management causes unbounded memory growth. The default ImageCache retains decoded images indefinitely, and without explicit eviction, memory usage climbs until the OS kills the app. Users on devices with limited RAM will experience crashes and degraded multitasking.',
+        '[require_image_cache_management] Loading many images without cache management causes unbounded memory growth. The default ImageCache retains decoded images indefinitely, and without explicit eviction, memory usage climbs until the OS kills the app. Users on devices with limited RAM will experience crashes and degraded multitasking. {v3}',
     correctionMessage:
         'Call PaintingBinding.instance.imageCache.evict(url) in dispose() or set imageCache.maximumSize to limit retained images and prevent unbounded memory growth.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -2254,6 +2300,8 @@ class RequireImageCacheManagementRule extends SaropaLintRule {
 
 /// Warns when memory-intensive operations are detected.
 ///
+/// Since: v1.7.2 | Updated: v4.13.0 | Rule version: v2
+///
 /// Allocating large lists, loading full images into memory, or string
 /// concatenation in loops can cause out-of-memory crashes.
 ///
@@ -2286,7 +2334,7 @@ class AvoidMemoryIntensiveOperationsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_memory_intensive_operations',
     problemMessage:
-        '[avoid_memory_intensive_operations] String concatenation using += inside a loop creates a new String object on every iteration, resulting in O(n squared) memory allocations. Each iteration copies the entire accumulated string, causing excessive garbage collection pressure, UI thread pauses, and visible jank in animations or scrolling.',
+        '[avoid_memory_intensive_operations] String concatenation using += inside a loop creates a new String object on every iteration, resulting in O(n squared) memory allocations. Each iteration copies the entire accumulated string, causing excessive garbage collection pressure, UI thread pauses, and visible jank in animations or scrolling. {v2}',
     correctionMessage:
         'Use StringBuffer to build strings incrementally inside loops. StringBuffer.write() appends in-place without creating intermediate String copies, reducing allocation to O(n).',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -2340,6 +2388,8 @@ class _StringConcatVisitor extends RecursiveAstVisitor<void> {
 
 /// Warns when closures capture widget references causing memory leaks.
 ///
+/// Since: v1.7.2 | Updated: v4.13.0 | Rule version: v3
+///
 /// Closures capture their enclosing scope. A closure referencing `this`
 /// in a callback keeps the entire widget alive even after disposal.
 ///
@@ -2382,7 +2432,7 @@ class AvoidClosureMemoryLeakRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_closure_memory_leak',
     problemMessage:
-        '[avoid_closure_memory_leak] Closure capturing setState retains a strong reference to the State object, preventing garbage collection after the widget is disposed. The entire parent widget subtree leaks memory, and calling setState on an unmounted widget throws a framework error that crashes the app during subsequent navigation.',
+        '[avoid_closure_memory_leak] Closure capturing setState retains a strong reference to the State object, preventing garbage collection after the widget is disposed. The entire parent widget subtree leaks memory, and calling setState on an unmounted widget throws a framework error that crashes the app during subsequent navigation. {v3}',
     correctionMessage:
         'Store the subscription in a field, cancel it in dispose(), and add a mounted check before calling setState to prevent leaks and post-disposal crashes.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -2429,6 +2479,8 @@ class _StreamListenVisitor extends RecursiveAstVisitor<void> {
 
 /// Warns when widgets could be static const for better performance.
 ///
+/// Since: v1.7.0 | Updated: v4.13.0 | Rule version: v3
+///
 /// `static const` widgets are created once at compile time. Instance
 /// widgets are recreated on every parent rebuild.
 ///
@@ -2462,7 +2514,7 @@ class PreferStaticConstWidgetsRule extends SaropaLintRule {
     name: 'prefer_static_const_widgets',
     problemMessage:
         '[prefer_static_const_widgets] Non-static const field is created per '
-        'instance instead of sharing single compile-time object.',
+        'instance instead of sharing single compile-time object. {v3}',
     correctionMessage: 'Add static modifier: static const widget = Widget();',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -2492,6 +2544,8 @@ class PreferStaticConstWidgetsRule extends SaropaLintRule {
 
 /// Warns when dispose pattern is not followed for resource classes.
 ///
+/// Since: v1.7.0 | Updated: v4.13.0 | Rule version: v4
+///
 /// Objects holding resources (streams, controllers, subscriptions)
 /// must be disposed. Undisposed resources leak memory and cause crashes.
 ///
@@ -2519,7 +2573,7 @@ class RequireDisposePatternRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_dispose_pattern',
     problemMessage:
-        '[require_dispose_pattern] Class has StreamController, AnimationController, or other disposable fields but no cleanup method. These controllers leak memory and can crash when accessed after disposal.',
+        '[require_dispose_pattern] Class has StreamController, AnimationController, or other disposable fields but no cleanup method. These controllers leak memory and can crash when accessed after disposal. {v4}',
     correctionMessage:
         'Add dispose() or close() method to clean up resources. Profile the affected code path to confirm the improvement under realistic workloads.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -2592,6 +2646,8 @@ class RequireDisposePatternRule extends SaropaLintRule {
 
 /// Warns when list is grown dynamically instead of preallocated.
 ///
+/// Since: v4.13.0 | Rule version: v1
+///
 /// Growing a list dynamically with add() in a loop causes multiple
 /// reallocations. Preallocate with List.filled() or List.generate().
 ///
@@ -2624,7 +2680,7 @@ class RequireListPreallocateRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_list_preallocate',
     problemMessage:
-        '[require_list_preallocate] Using List.add() inside a loop without preallocating the list causes repeated memory reallocations (O(n^2) time), which slows down your app and wastes resources. This is especially problematic for large lists or performance-critical code.',
+        '[require_list_preallocate] Using List.add() inside a loop without preallocating the list causes repeated memory reallocations (O(n^2) time), which slows down your app and wastes resources. This is especially problematic for large lists or performance-critical code. {v1}',
     correctionMessage:
         'Preallocate the list with List.generate(), List.filled(), or use growable: false and set an initial size to avoid repeated reallocations.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -2725,6 +2781,8 @@ class _EmptyListFinder extends RecursiveAstVisitor<void> {
 
 /// Suggests using if/return instead of ternary for expensive widgets.
 ///
+/// Since: v4.13.0 | Rule version: v1
+///
 /// While ternary expressions only return one branch, complex widget
 /// constructors in both branches can make the code harder to read.
 /// Consider using early return for cleaner code with expensive widgets.
@@ -2757,7 +2815,7 @@ class PreferBuilderForConditionalRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_builder_for_conditional',
     problemMessage:
-        '[prefer_builder_for_conditional] Complex widget in ternary conditional. Prefer if/return for readability. This introduces unnecessary computational overhead that degrades responsiveness and increases battery drain on mobile.',
+        '[prefer_builder_for_conditional] Complex widget in ternary conditional. Prefer if/return for readability. This introduces unnecessary computational overhead that degrades responsiveness and increases battery drain on mobile. {v1}',
     correctionMessage:
         'Use if/return pattern for cleaner code: if (cond) return A(); return B();. Profile the affected code path to confirm the improvement under realistic workloads.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -2814,6 +2872,8 @@ class PreferBuilderForConditionalRule extends SaropaLintRule {
 
 /// Warns when widgets in lists don't have consistent key strategy.
 ///
+/// Since: v4.13.0 | Rule version: v1
+///
 /// Keys help Flutter efficiently update widget trees. Without keys or with
 /// inconsistent keys, Flutter may rebuild more than necessary.
 ///
@@ -2856,7 +2916,7 @@ class RequireWidgetKeyStrategyRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_widget_key_strategy',
     problemMessage:
-        '[require_widget_key_strategy] Inconsistent key usage in itemBuilder - some returns have keys, others do not. Keys help Flutter efficiently update widget trees. Without keys or with inconsistent keys, Flutter may rebuild more than necessary.',
+        '[require_widget_key_strategy] Inconsistent key usage in itemBuilder - some returns have keys, others do not. Keys help Flutter efficiently update widget trees. Without keys or with inconsistent keys, Flutter may rebuild more than necessary. {v1}',
     correctionMessage:
         'Apply consistent key strategy: either all items have keys or none do. Profile the affected code path to confirm the improvement under realistic workloads.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -2945,6 +3005,8 @@ class _KeyConsistencyVisitor extends RecursiveAstVisitor<void> {
 
 /// Warns when desktop app lacks menu bar.
 ///
+/// Since: v2.0.0 | Updated: v4.13.0 | Rule version: v4
+///
 /// Desktop apps should have a menu bar for keyboard shortcuts and
 /// standard desktop interactions.
 ///
@@ -2977,7 +3039,7 @@ class RequireMenuBarForDesktopRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_menu_bar_for_desktop',
     problemMessage:
-        '[require_menu_bar_for_desktop] Desktop app without PlatformMenuBar lacks standard keyboard shortcuts. Desktop apps must have a menu bar for keyboard shortcuts and standard desktop interactions.',
+        '[require_menu_bar_for_desktop] Desktop app without PlatformMenuBar lacks standard keyboard shortcuts. Desktop apps must have a menu bar for keyboard shortcuts and standard desktop interactions. {v4}',
     correctionMessage:
         'Add PlatformMenuBar for standard desktop experience. Profile the affected code path to confirm the improvement under realistic workloads.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -3023,6 +3085,8 @@ class RequireMenuBarForDesktopRule extends SaropaLintRule {
 
 /// Warns when desktop app lacks window close confirmation.
 ///
+/// Since: v2.0.0 | Updated: v4.13.0 | Rule version: v3
+///
 /// Desktop apps with unsaved data should confirm before closing to
 /// prevent data loss.
 ///
@@ -3062,7 +3126,7 @@ class RequireWindowCloseConfirmationRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_window_close_confirmation',
     problemMessage:
-        '[require_window_close_confirmation] Desktop app should handle window close confirmation. Desktop apps with unsaved data should confirm before closing to prevent data loss. This introduces unnecessary computational overhead that degrades responsiveness and increases battery drain on mobile.',
+        '[require_window_close_confirmation] Desktop app should handle window close confirmation. Desktop apps with unsaved data should confirm before closing to prevent data loss. This introduces unnecessary computational overhead that degrades responsiveness and increases battery drain on mobile. {v3}',
     correctionMessage:
         'Implement didRequestAppExit for save confirmation. Profile the affected code path to confirm the improvement under realistic workloads.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -3115,6 +3179,8 @@ class RequireWindowCloseConfirmationRule extends SaropaLintRule {
 
 /// Warns when custom file dialog is used instead of native on desktop.
 ///
+/// Since: v2.0.0 | Updated: v4.13.0 | Rule version: v2
+///
 /// Desktop platforms have native file dialogs that users expect.
 /// Using custom dialogs creates inconsistent UX.
 ///
@@ -3143,7 +3209,7 @@ class PreferNativeFileDialogsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_native_file_dialogs',
     problemMessage:
-        '[prefer_native_file_dialogs] Use native file dialogs on desktop. Desktop platforms have native file dialogs that users expect. Using custom dialogs creates inconsistent UX.',
+        '[prefer_native_file_dialogs] Use native file dialogs on desktop. Desktop platforms have native file dialogs that users expect. Using custom dialogs creates inconsistent UX. {v2}',
     correctionMessage:
         'Use file_picker or file_selector for native experience. Profile the affected code path to confirm the improvement under realistic workloads.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -3176,6 +3242,8 @@ class PreferNativeFileDialogsRule extends SaropaLintRule {
 }
 
 /// Warns when same InheritedWidget is accessed multiple times in a method.
+///
+/// Since: v2.1.0 | Updated: v4.13.0 | Rule version: v2
 ///
 /// Multiple .of(context) calls for the same type trigger redundant lookups.
 /// Cache the result in a local variable for better performance.
@@ -3222,7 +3290,7 @@ class PreferInheritedWidgetCacheRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_inherited_widget_cache',
     problemMessage:
-        '[prefer_inherited_widget_cache] Multiple .of(context) calls for same type. Cache in local variable. Multiple .of(context) calls for the same type trigger redundant lookups. Cache the result in a local variable to improve performance.',
+        '[prefer_inherited_widget_cache] Multiple .of(context) calls for same type. Cache in local variable. Multiple .of(context) calls for the same type trigger redundant lookups. Cache the result in a local variable to improve performance. {v2}',
     correctionMessage:
         'Extract to: final theme = Theme.of(context); then use theme. Profile the affected code path to confirm the improvement under realistic workloads.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -3272,6 +3340,8 @@ class PreferInheritedWidgetCacheRule extends SaropaLintRule {
 
 /// Warns when MediaQuery.of is used inside ListView item builder.
 ///
+/// Since: v2.1.0 | Updated: v4.13.0 | Rule version: v2
+///
 /// MediaQuery.of in list item builders causes rebuilds on every scroll.
 /// Use LayoutBuilder or pass dimensions from parent for better performance.
 ///
@@ -3310,7 +3380,7 @@ class PreferLayoutBuilderOverMediaQueryRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_layout_builder_over_media_query',
     problemMessage:
-        '[prefer_layout_builder_over_media_query] MediaQuery.of in list item builder. Causes unnecessary rebuilds. MediaQuery.of in list item builders causes rebuilds on every scroll. Use LayoutBuilder or pass dimensions from parent to improve performance.',
+        '[prefer_layout_builder_over_media_query] MediaQuery.of in list item builder. Causes unnecessary rebuilds. MediaQuery.of in list item builders causes rebuilds on every scroll. Use LayoutBuilder or pass dimensions from parent to improve performance. {v2}',
     correctionMessage:
         'Use LayoutBuilder above the list or pass dimensions from parent. Profile the affected code path to confirm the improvement under realistic workloads.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -3367,6 +3437,8 @@ class PreferLayoutBuilderOverMediaQueryRule extends SaropaLintRule {
 
 /// Warns when database operations are performed on the main UI thread.
 ///
+/// Since: v2.3.11 | Updated: v4.13.0 | Rule version: v2
+///
 /// Alias: db_ui_thread, blocking_database, database_main_thread
 ///
 /// Database operations like Hive, sqflite, or Isar can block the UI thread
@@ -3408,7 +3480,7 @@ class AvoidBlockingDatabaseUiRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_blocking_database_ui',
     problemMessage:
-        '[avoid_blocking_database_ui] Database operation executed in build() or on the main UI thread blocks rendering until the query completes. Users experience frozen screens, unresponsive touch input, and dropped animation frames. Long-running queries can trigger ANR dialogs on Android and watchdog termination on iOS.',
+        '[avoid_blocking_database_ui] Database operation executed in build() or on the main UI thread blocks rendering until the query completes. Users experience frozen screens, unresponsive touch input, and dropped animation frames. Long-running queries can trigger ANR dialogs on Android and watchdog termination on iOS. {v2}',
     correctionMessage:
         'Move database operations to initState(), a FutureBuilder, or StreamBuilder so queries run asynchronously without blocking the UI rendering pipeline.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -3454,6 +3526,8 @@ class AvoidBlockingDatabaseUiRule extends SaropaLintRule {
 
 /// Warns when arithmetic operations are performed on double for money.
 ///
+/// Since: v2.3.11 | Updated: v4.13.0 | Rule version: v3
+///
 /// Alias: money_double, decimal_money, float_currency
 ///
 /// HEURISTIC: Floating point arithmetic causes rounding errors in money
@@ -3483,7 +3557,7 @@ class AvoidMoneyArithmeticOnDoubleRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_money_arithmetic_on_double',
     problemMessage:
-        '[avoid_money_arithmetic_on_double] Floating point arithmetic on double values introduces rounding errors in financial calculations. For example, 0.1 + 0.2 yields 0.30000000000000004 instead of 0.3. This causes users to see incorrect totals, be charged wrong amounts, and produces accounting discrepancies that compound over multiple transactions and are difficult to trace.',
+        '[avoid_money_arithmetic_on_double] Floating point arithmetic on double values introduces rounding errors in financial calculations. For example, 0.1 + 0.2 yields 0.30000000000000004 instead of 0.3. This causes users to see incorrect totals, be charged wrong amounts, and produces accounting discrepancies that compound over multiple transactions and are difficult to trace. {v3}',
     correctionMessage:
         'Use int for cents, Decimal package, or money package for financial calculations.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -3552,6 +3626,8 @@ class AvoidMoneyArithmeticOnDoubleRule extends SaropaLintRule {
 
 /// Warns when scroll listeners are registered in build method.
 ///
+/// Since: v2.3.11 | Updated: v4.13.0 | Rule version: v3
+///
 /// Alias: scroll_listener_build, scroll_handler_build
 ///
 /// Adding scroll listeners in build() causes them to be added multiple
@@ -3590,7 +3666,7 @@ class AvoidRebuildOnScrollRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_rebuild_on_scroll',
     problemMessage:
-        '[avoid_rebuild_on_scroll] Scroll listener registered inside build() is re-added on every widget rebuild without removing the previous one. Duplicate listeners accumulate over time, firing multiple callbacks per scroll event, causing memory leaks, compounding performance degradation, and eventually crashes from excessive callback execution.',
+        '[avoid_rebuild_on_scroll] Scroll listener registered inside build() is re-added on every widget rebuild without removing the previous one. Duplicate listeners accumulate over time, firing multiple callbacks per scroll event, causing memory leaks, compounding performance degradation, and eventually crashes from excessive callback execution. {v3}',
     correctionMessage:
         'Register the scroll listener once in initState() and remove it in dispose() to prevent listener accumulation and ensure proper cleanup on widget destruction.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -3633,6 +3709,8 @@ class AvoidRebuildOnScrollRule extends SaropaLintRule {
 // =============================================================================
 
 /// Warns when animations are used inside list item builders.
+///
+/// Since: v4.2.0 | Updated: v4.13.0 | Rule version: v2
 ///
 /// Alias: list_item_animation, listview_animation
 ///
@@ -3691,7 +3769,7 @@ class AvoidAnimationInLargeListRule extends SaropaLintRule {
     name: 'avoid_animation_in_large_list',
     problemMessage:
         '[avoid_animation_in_large_list] Animation widget inside ListView builder. '
-        'All items run animations even when off-screen, causing performance issues.',
+        'All items run animations even when off-screen, causing performance issues. {v2}',
     correctionMessage:
         'Use AnimatedList for enter/exit animations, or animate only visible items.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -3762,6 +3840,8 @@ class AvoidAnimationInLargeListRule extends SaropaLintRule {
 
 /// Warns when images are loaded without lazy loading in scrollable views.
 ///
+/// Since: v4.2.0 | Updated: v4.13.0 | Rule version: v2
+///
 /// Alias: lazy_load_images, image_preload
 ///
 /// Loading all images immediately in a scrollable list wastes bandwidth and
@@ -3810,7 +3890,7 @@ class PreferLazyLoadingImagesRule extends SaropaLintRule {
     name: 'prefer_lazy_loading_images',
     problemMessage:
         '[prefer_lazy_loading_images] Image.network in ListView builder without '
-        'lazy loading. All images load immediately, wasting bandwidth and memory.',
+        'lazy loading. All images load immediately, wasting bandwidth and memory. {v2}',
     correctionMessage:
         'Use CachedNetworkImage or FadeInImage for lazy loading with placeholders.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -3862,6 +3942,8 @@ class PreferLazyLoadingImagesRule extends SaropaLintRule {
 
 /// Warns when widget types change conditionally, destroying Elements.
 ///
+/// Since: v4.1.8 | Updated: v4.13.0 | Rule version: v2
+///
 /// Returning the same widget type with same key reuses Elements. Changing
 /// widget types or keys destroys Elements, losing state and causing expensive
 /// rebuilds.
@@ -3900,7 +3982,7 @@ class PreferElementRebuildRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_element_rebuild',
     problemMessage:
-        '[prefer_element_rebuild] Conditional return of different widget types destroys Elements. Returning the same widget type with same key reuses Elements. Changing widget types or keys destroys Elements, losing state and causing expensive rebuilds.',
+        '[prefer_element_rebuild] Conditional return of different widget types destroys Elements. Returning the same widget type with same key reuses Elements. Changing widget types or keys destroys Elements, losing state and causing expensive rebuilds. {v2}',
     correctionMessage:
         'Use Stack, Visibility, or AnimatedSwitcher to preserve Element state. Profile the affected code path to confirm the improvement under realistic workloads.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -3955,6 +4037,8 @@ class PreferElementRebuildRule extends SaropaLintRule {
 
 /// Warns when heavy computation is done on the main isolate.
 ///
+/// Since: v4.1.8 | Updated: v4.13.0 | Rule version: v2
+///
 /// Heavy computation on main isolate blocks UI (16ms budget per frame).
 /// Use `compute()` or `Isolate.run()` for JSON parsing, image processing,
 /// or data transforms.
@@ -3986,7 +4070,7 @@ class RequireIsolateForHeavyRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_isolate_for_heavy',
     problemMessage:
-        '[require_isolate_for_heavy] Heavy computation such as JSON decoding, image processing, or data parsing runs on the main thread, blocking the UI event loop. This prevents frame rendering, freezes animations, and makes the app unresponsive to user input. On lower-end devices, operations exceeding 16ms per frame cause visible stutter and dropped frames that degrade the user experience.',
+        '[require_isolate_for_heavy] Heavy computation such as JSON decoding, image processing, or data parsing runs on the main thread, blocking the UI event loop. This prevents frame rendering, freezes animations, and makes the app unresponsive to user input. On lower-end devices, operations exceeding 16ms per frame cause visible stutter and dropped frames that degrade the user experience. {v2}',
     correctionMessage:
         'Use compute(_parse, data) or Isolate.run(() => _parse(data)) to run in background.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -4026,6 +4110,8 @@ class RequireIsolateForHeavyRule extends SaropaLintRule {
 
 /// Warns when Dart Finalizers are misused.
 ///
+/// Since: v4.1.8 | Updated: v4.13.0 | Rule version: v2
+///
 /// Dart Finalizers run non-deterministically and add GC overhead.
 /// Prefer explicit dispose() methods. Finalizers are only for native
 /// resource cleanup as a safety net.
@@ -4064,7 +4150,7 @@ class AvoidFinalizerMisuseRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_finalizer_misuse',
     problemMessage:
-        '[avoid_finalizer_misuse] Finalizer used for non-native resources. Prefer explicit dispose(). Dart Finalizers run non-deterministically and add GC overhead. Prefer explicit dispose() methods. Finalizers are only for native resource cleanup as a safety net.',
+        '[avoid_finalizer_misuse] Finalizer used for non-native resources. Prefer explicit dispose(). Dart Finalizers run non-deterministically and add GC overhead. Prefer explicit dispose() methods. Finalizers are only for native resource cleanup as a safety net. {v2}',
     correctionMessage:
         'Use dispose() pattern for deterministic cleanup. Finalizers are only for native FFI resources.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -4116,6 +4202,8 @@ class AvoidFinalizerMisuseRule extends SaropaLintRule {
 
 /// Warns when jsonDecode is called on main thread without isolate.
 ///
+/// Since: v4.1.8 | Updated: v4.13.0 | Rule version: v2
+///
 /// `[HEURISTIC]` - Detects jsonDecode without compute/isolate wrapper.
 ///
 /// `jsonDecode()` for large payloads (>100KB) blocks the main thread.
@@ -4148,7 +4236,7 @@ class AvoidJsonInMainRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_json_in_main',
     problemMessage:
-        '[avoid_json_in_main] jsonDecode on main thread blocks UI for large payloads (100KB+). jsonDecode() for large payloads (>100KB) blocks the main thread. Use compute() to parse JSON in a background isolate.',
+        '[avoid_json_in_main] jsonDecode on main thread blocks UI for large payloads (100KB+). jsonDecode() for large payloads (>100KB) blocks the main thread. Use compute() to parse JSON in a background isolate. {v2}',
     correctionMessage:
         'Use compute(jsonDecode, data) or Isolate.run(() => jsonDecode(data)). Profile the affected code path to confirm the improvement under realistic workloads.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -4170,6 +4258,90 @@ class AvoidJsonInMainRule extends SaropaLintRule {
       if (isInAsyncContext(node)) {
         reporter.atNode(node, code);
       }
+    });
+  }
+}
+
+/// Warns when synchronous I/O methods are called on the main isolate.
+///
+/// Since: v4.14.0 | Rule version: v1
+///
+/// `[HEURISTIC]` - Detects `*Sync()` method calls outside compute/Isolate.run.
+///
+/// Synchronous I/O (readAsStringSync, writeAsStringSync, etc.) blocks the main
+/// isolate, freezing the UI and causing jank or ANR errors on mobile platforms.
+///
+/// **BAD:**
+/// ```dart
+/// void loadConfig() {
+///   final content = File('config.json').readAsStringSync(); // Blocks UI!
+/// }
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// Future<void> loadConfig() async {
+///   final content = await File('config.json').readAsString();
+/// }
+/// ```
+///
+/// GitHub: https://github.com/saropa/saropa_lints/issues/17
+class AvoidBlockingMainThreadRule extends SaropaLintRule {
+  const AvoidBlockingMainThreadRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  static const LintCode _code = LintCode(
+    name: 'avoid_blocking_main_thread',
+    problemMessage:
+        '[avoid_blocking_main_thread] Synchronous I/O blocks the main isolate, '
+        'freezing the UI and causing jank or ANR (Application Not Responding) '
+        'errors on mobile platforms. Even brief blocking degrades perceived '
+        'performance and user experience significantly. {v1}',
+    correctionMessage:
+        'Use the async equivalent (e.g., readAsString instead of '
+        'readAsStringSync) or offload heavy work to an isolate with '
+        'compute() or Isolate.run().',
+    errorSeverity: DiagnosticSeverity.WARNING,
+  );
+
+  /// Synchronous I/O methods that block the main thread.
+  static const Set<String> _syncMethods = <String>{
+    'readAsStringSync',
+    'readAsBytesSync',
+    'readAsLinesSync',
+    'writeAsStringSync',
+    'writeAsBytesSync',
+    'createSync',
+    'deleteSync',
+    'existsSync',
+    'copySync',
+    'renameSync',
+    'listSync',
+    'createTempSync',
+    'mkdirSync',
+    'statSync',
+    'resolveSymbolicLinksSync',
+    'openSync',
+  };
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      if (!_syncMethods.contains(node.methodName.name)) return;
+
+      // Skip if inside compute() or Isolate.run()
+      if (isInsideIsolate(node)) return;
+
+      reporter.atNode(node, code);
     });
   }
 }
