@@ -15,6 +15,8 @@ import '../saropa_lint_rule.dart';
 
 /// Warns when large objects are stored in widget state.
 ///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v4
+///
 /// Large data structures in State classes can cause memory issues,
 /// especially if they're not properly cleaned up. Consider using
 /// external state management or streaming data instead.
@@ -49,7 +51,7 @@ class AvoidLargeObjectsInStateRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_large_objects_in_state',
     problemMessage:
-        '[avoid_large_objects_in_state] Unbounded List, Map, Set, or ByteData field declared in a State class grows without limit as data accumulates. Without pagination or size constraints, this allocates excessive memory that degrades scroll performance, increases garbage collection pressure, and eventually crashes the app with an out-of-memory error on devices with limited RAM.',
+        '[avoid_large_objects_in_state] Unbounded List, Map, Set, or ByteData field declared in a State class grows without limit as data accumulates. Without pagination or size constraints, this allocates excessive memory that degrades scroll performance, increases garbage collection pressure, and eventually crashes the app with an out-of-memory error on devices with limited RAM. {v4}',
     correctionMessage:
         'Use pagination to load data in fixed-size chunks, stream results lazily from the data source, or move large collections to external state management with disposal and lifecycle control.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -105,6 +107,8 @@ class AvoidLargeObjectsInStateRule extends SaropaLintRule {
 
 /// Warns when image memory is not properly managed.
 ///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v6
+///
 /// Images consume significant memory. Without proper lifecycle management,
 /// they can cause out-of-memory errors, especially on lower-end devices.
 ///
@@ -143,7 +147,7 @@ class RequireImageDisposalRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_image_disposal',
     problemMessage:
-        '[require_image_disposal] Failing to dispose of images or image streams can lead to memory leaks, increased memory usage, and eventual app crashes, especially in image-heavy applications. This is critical for apps that load or manipulate images dynamically. See https://docs.flutter.dev/perf/memory#images.',
+        '[require_image_disposal] Failing to dispose of images or image streams can lead to memory leaks, increased memory usage, and eventual app crashes, especially in image-heavy applications. This is critical for apps that load or manipulate images dynamically. See https://docs.flutter.dev/perf/memory#images. {v6}',
     correctionMessage:
         'Dispose of images and image streams when they are no longer needed to free memory and maintain app performance. See https://docs.flutter.dev/perf/memory#images for best practices.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -196,6 +200,8 @@ class RequireImageDisposalRule extends SaropaLintRule {
 
 /// Warns when closures capture more context than needed.
 ///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v4
+///
 /// Closures that capture `this` or large objects can prevent garbage
 /// collection and cause memory leaks, especially in long-lived callbacks.
 ///
@@ -247,7 +253,7 @@ class AvoidCapturingThisInCallbacksRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_capturing_this_in_callbacks',
     problemMessage:
-        '[avoid_capturing_this_in_callbacks] Closure callback captures a reference to the entire enclosing object instance via implicit this. This prevents garbage collection of the object and all its fields for as long as the callback exists. Long-lived callbacks such as stream listeners, timers, or global event handlers create memory leaks that accumulate over the app session lifetime.',
+        '[avoid_capturing_this_in_callbacks] Closure callback captures a reference to the entire enclosing object instance via implicit this. This prevents garbage collection of the object and all its fields for as long as the callback exists. Long-lived callbacks such as stream listeners, timers, or global event handlers create memory leaks that accumulate over the app session lifetime. {v4}',
     correctionMessage:
         'Extract only the specific values needed into local variables before the closure, or use a static method reference that does not capture the enclosing object instance.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -298,6 +304,8 @@ class AvoidCapturingThisInCallbacksRule extends SaropaLintRule {
 
 /// Warns when caches lack eviction policies.
 ///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v3
+///
 /// Unbounded caches grow indefinitely and cause out-of-memory errors.
 /// Always implement eviction (LRU, TTL, max size) for caches.
 ///
@@ -341,7 +349,7 @@ class RequireCacheEvictionPolicyRule extends SaropaLintRule {
     name: 'require_cache_eviction_policy',
     problemMessage:
         '[require_cache_eviction_policy] Unbounded cache consumes memory until '
-        'app crashes with OutOfMemoryError after extended use.',
+        'app crashes with OutOfMemoryError after extended use. {v3}',
     correctionMessage: 'Implement LRU eviction, TTL, or max size limit.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
@@ -384,6 +392,8 @@ class RequireCacheEvictionPolicyRule extends SaropaLintRule {
 
 /// Warns when WeakReference should be used for cached references.
 ///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v5
+///
 /// Strong references to large objects prevent garbage collection.
 /// Use WeakReference for caches that should yield to memory pressure.
 ///
@@ -416,7 +426,7 @@ class PreferWeakReferencesForCacheRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_weak_references_for_cache',
     problemMessage:
-        '[prefer_weak_references_for_cache] Strong cache references prevent garbage collection under memory pressure. Strong references to large objects prevent garbage collection. Use WeakReference for caches that should yield to memory pressure.',
+        '[prefer_weak_references_for_cache] Strong cache references prevent garbage collection under memory pressure. Strong references to large objects prevent garbage collection. Use WeakReference for caches that should yield to memory pressure. {v5}',
     correctionMessage:
         'WeakReference allows garbage collection under memory pressure. Use the DevTools memory profiler to verify the leak is resolved after the fix.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -454,6 +464,8 @@ class PreferWeakReferencesForCacheRule extends SaropaLintRule {
 }
 
 /// Warns when Expando is used without understanding its memory implications.
+///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v5
 ///
 /// Expando keeps weak references to keys but strong references to values.
 /// This can cause memory leaks if values reference keys.
@@ -493,7 +505,7 @@ class AvoidExpandoCircularReferencesRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_expando_circular_references',
     problemMessage:
-        '[avoid_expando_circular_references] Creating a circular reference by storing a reference to an Expando key inside its own value prevents Dart’s garbage collector from reclaiming memory, resulting in memory leaks. This subtle bug can cause your app’s memory usage to grow over time, degrade performance, and eventually lead to crashes or out-of-memory errors, especially in long-running or data-intensive applications. Such leaks are difficult to detect and debug, making it critical to avoid circular references when using Expando for metadata or caching.',
+        '[avoid_expando_circular_references] Creating a circular reference by storing a reference to an Expando key inside its own value prevents Dart’s garbage collector from reclaiming memory, resulting in memory leaks. This subtle bug can cause your app’s memory usage to grow over time, degrade performance, and eventually lead to crashes or out-of-memory errors, especially in long-running or data-intensive applications. Such leaks are difficult to detect and debug, making it critical to avoid circular references when using Expando for metadata or caching. {v5}',
     correctionMessage:
         'Never store a reference to the Expando key (such as an object or identifier) inside the value associated with that key. Refactor your code to ensure Expando values do not reference their own keys, breaking any potential cycles. Regularly review and test code that uses Expando for memory safety, and use memory profiling tools to detect leaks in production.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -535,6 +547,8 @@ class AvoidExpandoCircularReferencesRule extends SaropaLintRule {
 
 /// Warns when isolate communication sends large objects.
 ///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v3
+///
 /// Sending large objects between isolates requires copying, which is
 /// expensive. Use SendPort with TransferableTypedData for large data.
 ///
@@ -569,7 +583,7 @@ class AvoidLargeIsolateCommunicationRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_large_isolate_communication',
     problemMessage:
-        '[avoid_large_isolate_communication] Sending large objects between isolates is expensive. Sending large objects between isolates requires copying, which is expensive. Use SendPort with TransferableTypedData for large data.',
+        '[avoid_large_isolate_communication] Sending large objects between isolates is expensive. Sending large objects between isolates requires copying, which is expensive. Use SendPort with TransferableTypedData for large data. {v3}',
     correctionMessage:
         'Use TransferableTypedData or process data in chunks. Use the DevTools memory profiler to verify the leak is resolved after the fix.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -630,6 +644,8 @@ class AvoidLargeIsolateCommunicationRule extends SaropaLintRule {
 
 /// Warns when cache implementations lack expiration logic.
 ///
+/// Since: v4.1.8 | Updated: v4.13.0 | Rule version: v2
+///
 /// `[HEURISTIC]` - Detects cache-like classes without TTL/expiration.
 ///
 /// Caches without TTL serve stale data indefinitely. Implement expiration
@@ -671,7 +687,7 @@ class RequireCacheExpirationRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_cache_expiration',
     problemMessage:
-        '[require_cache_expiration] Cache implementation lacks expiration logic. Caches without TTL serve stale data indefinitely. Implement expiration to ensure data freshness. Unreleased memory grows over time, increasing garbage collection pressure and risking out-of-memory crashes.',
+        '[require_cache_expiration] Cache implementation lacks expiration logic. Caches without TTL serve stale data indefinitely. Implement expiration to ensure data freshness. Unreleased memory grows over time, increasing garbage collection pressure and risking out-of-memory crashes. {v2}',
     correctionMessage:
         'Add TTL/expiration to prevent serving stale data indefinitely. Use the DevTools memory profiler to verify the leak is resolved after the fix.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -712,6 +728,8 @@ class RequireCacheExpirationRule extends SaropaLintRule {
 }
 
 /// Warns when caches can grow without bounds.
+///
+/// Since: v4.1.8 | Updated: v4.13.0 | Rule version: v4
 ///
 /// `[HEURISTIC]` - Detects Map-based caches without size limits.
 ///
@@ -787,7 +805,7 @@ class AvoidUnboundedCacheGrowthRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_unbounded_cache_growth',
     problemMessage:
-        '[avoid_unbounded_cache_growth] Map or collection used as a cache has no maximum size constraint. Without eviction logic, the cache grows indefinitely as new entries are added, consuming increasing amounts of device memory. This eventually exhausts available RAM and crashes the app with an out-of-memory error, particularly on mobile devices with limited memory resources.',
+        '[avoid_unbounded_cache_growth] Map or collection used as a cache has no maximum size constraint. Without eviction logic, the cache grows indefinitely as new entries are added, consuming increasing amounts of device memory. This eventually exhausts available RAM and crashes the app with an out-of-memory error, particularly on mobile devices with limited memory resources. {v4}',
     correctionMessage:
         'Implement a bounded cache with a maximum entry count and LRU (Least Recently Used) eviction policy, or use a cache library that manages size limits automatically.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -1012,6 +1030,8 @@ class _AvoidUnboundedCacheGrowthFix extends DartFix {
 
 /// Warns when cache keys may not be unique.
 ///
+/// Since: v4.1.8 | Updated: v4.13.0 | Rule version: v2
+///
 /// Cache keys must be deterministic. Using objects without stable
 /// hashCode/equality as cache keys causes missed cache hits.
 ///
@@ -1046,7 +1066,7 @@ class RequireCacheKeyUniquenessRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_cache_key_uniqueness',
     problemMessage:
-        '[require_cache_key_uniqueness] Cache key type may have unstable hashCode. Cache keys must be deterministic. Using objects without stable hashCode/equality as cache keys causes missed cache hits.',
+        '[require_cache_key_uniqueness] Cache key type may have unstable hashCode. Cache keys must be deterministic. Using objects without stable hashCode/equality as cache keys causes missed cache hits. {v2}',
     correctionMessage:
         'Use String, int, or objects with stable hashCode/equality as cache keys. Use the DevTools memory profiler to verify the leak is resolved after the fix.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -1107,6 +1127,8 @@ class RequireCacheKeyUniquenessRule extends SaropaLintRule {
 
 /// Warns when widget or State references are stored in non-widget classes.
 ///
+/// Since: v4.14.0 | Updated: vunreleased | Rule version: v2
+///
 /// Alias: widget_reference_leak, no_widget_in_service
 ///
 /// Storing references to widgets or State objects in services, controllers,
@@ -1159,7 +1181,7 @@ class AvoidRetainingDisposedWidgetsRule extends SaropaLintRule {
         'this reference prevents garbage collection and may cause '
         'use-after-dispose crashes. Widget and State objects are tied to the '
         'Flutter lifecycle and should not be retained outside the widget tree. '
-        'This creates a strong reference that outlives the widget\'s lifecycle.',
+        'This creates a strong reference that outlives the widget\'s lifecycle. {v2}',
     correctionMessage:
         'Store only the data you need (not the widget itself), or use '
         'callbacks (VoidCallback, ValueChanged) to communicate between '

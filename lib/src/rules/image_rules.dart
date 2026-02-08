@@ -8,6 +8,8 @@ import 'package:saropa_lints/src/saropa_lint_rule.dart';
 
 /// Warns when Image.network is used inside ListView.builder without caching.
 ///
+/// Since: v1.8.2 | Updated: v4.13.0 | Rule version: v2
+///
 /// Alias: cache_list_images, image_in_listview, use_cached_network_image
 ///
 /// Images in scrollable lists will be rebuilt on every scroll, causing
@@ -39,7 +41,7 @@ class AvoidImageRebuildOnScrollRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_image_rebuild_on_scroll',
     problemMessage:
-        '[avoid_image_rebuild_on_scroll] Image.network in ListView.builder will rebuild on scroll. Images in scrollable lists will be rebuilt on every scroll, causing unnecessary network requests and poor performance.',
+        '[avoid_image_rebuild_on_scroll] Image.network in ListView.builder will rebuild on scroll. Images in scrollable lists will be rebuilt on every scroll, causing unnecessary network requests and poor performance. {v2}',
     correctionMessage:
         'Use CachedNetworkImage or move image loading outside the builder. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -101,6 +103,8 @@ class AvoidImageRebuildOnScrollRule extends SaropaLintRule {
 
 /// Warns when CircleAvatar with NetworkImage lacks error handling.
 ///
+/// Since: v1.8.2 | Updated: v4.13.0 | Rule version: v3
+///
 /// Alias: avatar_error_handler, circle_avatar_fallback, network_avatar_error
 ///
 /// CircleAvatar's backgroundImage doesn't have a built-in errorBuilder like
@@ -145,7 +149,7 @@ class RequireAvatarFallbackRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_avatar_fallback',
     problemMessage:
-        '[require_avatar_fallback] CircleAvatar with NetworkImage fails silently when image load fails. Users will see a broken or blank avatar with no indication of the error, leading to confusion, poor UX, and missed identity cues. This can also mask backend or connectivity issues during development.',
+        '[require_avatar_fallback] CircleAvatar with NetworkImage fails silently when image load fails. Users will see a broken or blank avatar with no indication of the error, leading to confusion, poor UX, and missed identity cues. This can also mask backend or connectivity issues during development. {v3}',
     correctionMessage:
         'Add onBackgroundImageError callback or use Image with ClipOval and provide a fallback asset or initials. Audit all avatar usage for error handling and add tests for image failure scenarios. Document fallback logic for maintainability.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -198,6 +202,8 @@ class RequireAvatarFallbackRule extends SaropaLintRule {
 
 /// Warns when video player widgets lack a placeholder.
 ///
+/// Since: v1.8.2 | Updated: v4.13.0 | Rule version: v2
+///
 /// Alias: video_placeholder, video_loading_indicator, video_loader
 ///
 /// Video widgets should show a placeholder while loading to provide
@@ -232,7 +238,7 @@ class PreferVideoLoadingPlaceholderRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_video_loading_placeholder',
     problemMessage:
-        '[prefer_video_loading_placeholder] Video player must have a loading placeholder. Video widgets should show a placeholder while loading to provide visual feedback and prevent layout shifts.',
+        '[prefer_video_loading_placeholder] Video player must have a loading placeholder. Video widgets should show a placeholder while loading to provide visual feedback and prevent layout shifts. {v2}',
     correctionMessage:
         'Add placeholder parameter to improve UX during load. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -276,6 +282,8 @@ class PreferVideoLoadingPlaceholderRule extends SaropaLintRule {
 
 /// Warns when Image lacks cacheWidth/cacheHeight for memory optimization.
 ///
+/// Since: v1.8.2 | Updated: v4.13.0 | Rule version: v3
+///
 /// Alias: image_memory_optimization, cache_image_size, decode_image_size
 ///
 /// Images decoded at full resolution consume excessive memory. Use cacheWidth
@@ -314,7 +322,7 @@ class PreferImageSizeConstraintsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_image_size_constraints',
     problemMessage:
-        '[prefer_image_size_constraints] Missing cacheWidth/cacheHeight decodes full resolution into memory. Images decoded at full resolution consume excessive memory. Use cacheWidth or cacheHeight to decode images at display size, significantly reducing memory usage for large images.',
+        '[prefer_image_size_constraints] Missing cacheWidth/cacheHeight decodes full resolution into memory. Images decoded at full resolution consume excessive memory. Use cacheWidth or cacheHeight to decode images at display size, significantly reducing memory usage for large images. {v3}',
     correctionMessage:
         'Set cacheWidth/cacheHeight to avoid decoding at full resolution. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -394,6 +402,8 @@ class _PreferImageSizeConstraintsFix extends DartFix {
 
 /// Warns when Image.network is used without an errorBuilder callback.
 ///
+/// Since: v4.2.0 | Updated: v4.13.0 | Rule version: v2
+///
 /// Alias: image_error_handler, network_image_fallback, image_error_callback
 ///
 /// Network images can fail to load due to connectivity issues, invalid URLs,
@@ -426,7 +436,7 @@ class RequireImageErrorFallbackRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_image_error_fallback',
     problemMessage:
-        '[require_image_error_fallback] Image.network used without an errorBuilder callback. When the network request fails due to connectivity issues, 404 errors, or server timeouts, Flutter displays a broken image icon placeholder. Users see an ugly, unexplained error state instead of a meaningful fallback such as a retry button or alternative content that maintains the visual layout.',
+        '[require_image_error_fallback] Image.network used without an errorBuilder callback. When the network request fails due to connectivity issues, 404 errors, or server timeouts, Flutter displays a broken image icon placeholder. Users see an ugly, unexplained error state instead of a meaningful fallback such as a retry button or alternative content that maintains the visual layout. {v2}',
     correctionMessage:
         'Add an errorBuilder callback to Image.network that returns a fallback widget, such as an error icon with retry functionality or a placeholder image, when the network request fails.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -462,6 +472,8 @@ class RequireImageErrorFallbackRule extends SaropaLintRule {
 }
 
 /// Warns when Image.network is used without a loadingBuilder callback.
+///
+/// Since: v2.0.0 | Updated: v4.13.0 | Rule version: v4
 ///
 /// Alias: image_loading_indicator, image_progress, network_image_loader
 ///
@@ -500,7 +512,7 @@ class RequireImageLoadingPlaceholderRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_image_loading_placeholder',
     problemMessage:
-        '[require_image_loading_placeholder] Image.network without loadingBuilder shows blank space during load. Network images take time to download. Without a loading indicator, users see an empty space which creates a poor user experience.',
+        '[require_image_loading_placeholder] Image.network without loadingBuilder shows blank space during load. Network images take time to download. Without a loading indicator, users see an empty space which creates a poor user experience. {v4}',
     correctionMessage:
         'Add loadingBuilder to show progress while loading. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -536,6 +548,8 @@ class RequireImageLoadingPlaceholderRule extends SaropaLintRule {
 }
 
 /// Warns when VideoPlayer is used without checking isInitialized.
+///
+/// Since: v2.0.0 | Updated: v4.13.0 | Rule version: v4
 ///
 /// Alias: video_initialized_check, video_controller_ready, video_loading_state
 ///
@@ -573,7 +587,7 @@ class RequireMediaLoadingStateRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_media_loading_state',
     problemMessage:
-        '[require_media_loading_state] VideoPlayer displayed without checking isInitialized shows a black rectangle or crashes. The video player needs time to load the video before the build method can render it properly.',
+        '[require_media_loading_state] VideoPlayer displayed without checking isInitialized shows a black rectangle or crashes. The video player needs time to load the video before the build method can render it properly. {v4}',
     correctionMessage:
         'Wrap VideoPlayer in a conditional checking controller.value.isInitialized. This prevents errors and ensures the video is ready before display.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -624,6 +638,8 @@ class RequireMediaLoadingStateRule extends SaropaLintRule {
 
 /// Warns when PDF viewer is used without a loading indicator.
 ///
+/// Since: v2.0.0 | Updated: v4.13.0 | Rule version: v2
+///
 /// Alias: pdf_loading_state, pdf_viewer_progress, pdf_loader
 ///
 /// PDF loading can be slow, especially for large documents or over network.
@@ -667,7 +683,7 @@ class RequirePdfLoadingIndicatorRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_pdf_loading_indicator',
     problemMessage:
-        '[require_pdf_loading_indicator] PDF viewer should provide loading feedback. PDF loading can be slow, especially for large documents or over network. Users should see progress feedback during load.',
+        '[require_pdf_loading_indicator] PDF viewer should provide loading feedback. PDF loading can be slow, especially for large documents or over network. Users should see progress feedback during load. {v2}',
     correctionMessage:
         'Add loading state handling or use onDocumentLoaded callback. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -717,6 +733,8 @@ class RequirePdfLoadingIndicatorRule extends SaropaLintRule {
 
 /// Warns when Clipboard.setData is used without user feedback.
 ///
+/// Since: v2.0.0 | Updated: v4.13.0 | Rule version: v2
+///
 /// Alias: clipboard_snackbar, copy_feedback, clipboard_toast
 ///
 /// Clipboard operations should provide user feedback (SnackBar, Toast, etc.)
@@ -751,7 +769,7 @@ class PreferClipboardFeedbackRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_clipboard_feedback',
     problemMessage:
-        '[prefer_clipboard_feedback] Clipboard.setData should provide user feedback. Clipboard operations should provide user feedback (SnackBar, Toast, etc.) to confirm the action was successful. Without feedback, users won\'t know if the copy succeeded.',
+        '[prefer_clipboard_feedback] Clipboard.setData should provide user feedback. Clipboard operations should provide user feedback (SnackBar, Toast, etc.) to confirm the action was successful. Without feedback, users won\'t know if the copy succeeded. {v2}',
     correctionMessage:
         'Add SnackBar or Toast to confirm clipboard operation. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -807,6 +825,8 @@ class PreferClipboardFeedbackRule extends SaropaLintRule {
 
 /// Warns when CachedNetworkImage is used without memory cache dimensions.
 ///
+/// Since: v4.9.0 | Updated: v4.13.0 | Rule version: v4
+///
 /// Large images without cache dimensions cause OOM errors. Always specify
 /// memCacheWidth or memCacheHeight.
 ///
@@ -835,7 +855,7 @@ class RequireCachedImageDimensionsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_cached_image_dimensions',
     problemMessage:
-        '[require_cached_image_dimensions] CachedNetworkImage without cache dimensions loads full-resolution images into memory, causing out-of-memory errors and app crashes on devices with limited RAM. Large images (such as high-resolution photos from modern cameras) can consume hundreds of megabytes when decoded, quickly exhausting available memory.',
+        '[require_cached_image_dimensions] CachedNetworkImage without cache dimensions loads full-resolution images into memory, causing out-of-memory errors and app crashes on devices with limited RAM. Large images (such as high-resolution photos from modern cameras) can consume hundreds of megabytes when decoded, quickly exhausting available memory. {v4}',
     correctionMessage:
         'Add memCacheWidth/memCacheHeight to limit decoded image size. This reduces memory usage and prevents crashes.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -914,6 +934,8 @@ class _RequireCachedImageDimensionsFix extends DartFix {
 
 /// Warns when CachedNetworkImage is used without placeholder.
 ///
+/// Since: v2.1.0 | Updated: v4.13.0 | Rule version: v2
+///
 /// Placeholders provide visual feedback while the image loads.
 ///
 /// **BAD:**
@@ -940,7 +962,7 @@ class RequireCachedImagePlaceholderRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_cached_image_placeholder',
     problemMessage:
-        '[require_cached_image_placeholder] CachedNetworkImage without placeholder. User sees blank during load. Placeholders provide visual feedback while the image loads. This image handling causes excessive memory usage, visual artifacts, or slow load times.',
+        '[require_cached_image_placeholder] CachedNetworkImage without placeholder. User sees blank during load. Placeholders provide visual feedback while the image loads. This image handling causes excessive memory usage, visual artifacts, or slow load times. {v2}',
     correctionMessage:
         'Add placeholder parameter for loading state. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -978,6 +1000,8 @@ class RequireCachedImagePlaceholderRule extends SaropaLintRule {
 
 /// Warns when CachedNetworkImage is used without error widget.
 ///
+/// Since: v2.1.0 | Updated: v4.13.0 | Rule version: v2
+///
 /// Network images can fail. Always provide fallback for broken images.
 ///
 /// **BAD:**
@@ -1007,7 +1031,7 @@ class RequireCachedImageErrorWidgetRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_cached_image_error_widget',
     problemMessage:
-        '[require_cached_image_error_widget] CachedNetworkImage without errorWidget. Broken images show nothing. Network images can fail. Always provide fallback for broken images. CachedNetworkImage is used without error widget.',
+        '[require_cached_image_error_widget] CachedNetworkImage without errorWidget. Broken images show nothing. Network images can fail. Always provide fallback for broken images. CachedNetworkImage is used without error widget. {v2}',
     correctionMessage:
         'Add errorWidget parameter to handle failed loads. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -1042,6 +1066,8 @@ class RequireCachedImageErrorWidgetRule extends SaropaLintRule {
 }
 
 /// Warns when Image.file is used without EXIF orientation handling.
+///
+/// Since: v2.1.0 | Updated: v4.13.0 | Rule version: v2
 ///
 /// Photos from cameras often have EXIF orientation metadata.
 /// Without handling, images may appear rotated incorrectly.
@@ -1079,7 +1105,7 @@ class RequireExifHandlingRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_exif_handling',
     problemMessage:
-        '[require_exif_handling] Image.file may show photos rotated. Prefer EXIF handling. Photos from cameras often have EXIF orientation metadata. Without handling, images may appear rotated incorrectly.',
+        '[require_exif_handling] Image.file may show photos rotated. Prefer EXIF handling. Photos from cameras often have EXIF orientation metadata. Without handling, images may appear rotated incorrectly. {v2}',
     correctionMessage:
         'Use flutter_image_compress or similar to auto-rotate camera photos. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -1118,6 +1144,8 @@ class RequireExifHandlingRule extends SaropaLintRule {
 }
 
 /// Suggests explicitly setting fadeInDuration on CachedNetworkImage.
+///
+/// Since: v2.3.2 | Updated: v4.13.0 | Rule version: v3
 ///
 /// Alias: cached_image_fade, smooth_image_loading
 ///
@@ -1166,7 +1194,7 @@ class PreferCachedImageFadeAnimationRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_cached_image_fade_animation',
     problemMessage:
-        '[prefer_cached_image_fade_animation] CachedNetworkImage without fadeInDuration causes abrupt image pop-in. CachedNetworkImage has a default fadeInDuration of 500ms, which works well for most cases. However, explicitly setting this value signals intentional UX design and allows customization for different contexts: - Fast transitions: 150-200ms for thumbnail grids - Smooth transitions: 300-400ms for hero images - No transition: Duration.zero for instant display.',
+        '[prefer_cached_image_fade_animation] CachedNetworkImage without fadeInDuration causes abrupt image pop-in. CachedNetworkImage has a default fadeInDuration of 500ms, which works well for most cases. However, explicitly setting this value signals intentional UX design and allows customization for different contexts: - Fast transitions: 150-200ms for thumbnail grids - Smooth transitions: 300-400ms for hero images - No transition: Duration.zero for instant display. {v3}',
     correctionMessage:
         'Add fadeInDuration for a smoother loading experience. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -1239,6 +1267,8 @@ class _PreferCachedImageFadeAnimationFix extends DartFix {
 
 /// Warns when ImageStream is used without removeListener cleanup.
 ///
+/// Since: v2.3.7 | Updated: v4.13.0 | Rule version: v2
+///
 /// Alias: image_stream_dispose, image_stream_listener, image_listener_leak
 ///
 /// ImageStream listeners must be removed when the widget is disposed to
@@ -1302,7 +1332,7 @@ class RequireImageStreamDisposeRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_image_stream_dispose',
     problemMessage:
-        '[require_image_stream_dispose] ImageStream listener is not removed in the dispose() method. The listener retains a reference to the widget State object, preventing garbage collection after the widget is removed from the tree. This creates a memory leak where decoded image data and the entire widget state remain allocated indefinitely, consuming device memory.',
+        '[require_image_stream_dispose] ImageStream listener is not removed in the dispose() method. The listener retains a reference to the widget State object, preventing garbage collection after the widget is removed from the tree. This creates a memory leak where decoded image data and the entire widget state remain allocated indefinitely, consuming device memory. {v2}',
     correctionMessage:
         'Add _imageStream?.removeListener(_listener) in the dispose() method before calling super.dispose() to release the ImageStream reference and prevent memory leaks.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -1386,6 +1416,8 @@ class RequireImageStreamDisposeRule extends SaropaLintRule {
 
 /// Warns when pickImage is called without requestFullMetadata: false.
 ///
+/// Since: v2.3.7 | Updated: v4.13.0 | Rule version: v3
+///
 /// By default, image_picker includes full EXIF metadata (GPS location, camera
 /// info, timestamps). If your app doesn't need this metadata, set
 /// requestFullMetadata: false to improve privacy and reduce permissions needed.
@@ -1423,7 +1455,7 @@ class PreferImagePickerRequestFullMetadataRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_image_picker_request_full_metadata',
     problemMessage:
-        '[prefer_image_picker_request_full_metadata] pickImage collects EXIF metadata (GPS, timestamps) by default. By default, image_picker includes full EXIF metadata (GPS location, camera info, timestamps). If your app doesn\'t need this metadata, set requestFullMetadata: false to improve privacy and reduce permissions needed.',
+        '[prefer_image_picker_request_full_metadata] pickImage collects EXIF metadata (GPS, timestamps) by default. By default, image_picker includes full EXIF metadata (GPS location, camera info, timestamps). If your app doesn\'t need this metadata, set requestFullMetadata: false to improve privacy and reduce permissions needed. {v3}',
     correctionMessage:
         'Add requestFullMetadata: false if EXIF data (GPS, timestamps) not needed. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -1515,6 +1547,8 @@ class _PreferImagePickerRequestFullMetadataFix extends DartFix {
 
 /// Warns when pickImage is called without imageQuality for compression.
 ///
+/// Since: v2.3.7 | Updated: v4.13.0 | Rule version: v5
+///
 /// Photos from modern cameras can be 5-20+ MB. Without compression, apps waste
 /// bandwidth, storage, and memory. Use imageQuality to reduce file size for
 /// typical use cases like profile pictures, thumbnails, or uploads.
@@ -1556,7 +1590,7 @@ class AvoidImagePickerLargeFilesRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_image_picker_large_files',
     problemMessage:
-        '[avoid_image_picker_large_files] pickImage without imageQuality allows raw photos that can be 10+ MB in size, creating slow uploads and wasteful bandwidth consumption. Large image files cause network timeouts, drain battery, consume expensive mobile data, and may trigger out-of-memory errors when the app attempts to process them.',
+        '[avoid_image_picker_large_files] pickImage without imageQuality allows raw photos that can be 10+ MB in size, creating slow uploads and wasteful bandwidth consumption. Large image files cause network timeouts, drain battery, consume expensive mobile data, and may trigger out-of-memory errors when the app attempts to process them. {v5}',
     correctionMessage:
         'Add imageQuality (e.g., 85) to compress images and reduce file size. This improves performance and reliability.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -1649,6 +1683,8 @@ class _AvoidImagePickerLargeFilesFix extends DartFix {
 
 /// Warns when CachedNetworkImage doesn't use a custom CacheManager.
 ///
+/// Since: v2.3.10 | Updated: v4.13.0 | Rule version: v2
+///
 /// Alias: network_image_cache, custom_cache_manager
 ///
 /// Without a custom CacheManager, cached images can grow unbounded and
@@ -1687,7 +1723,7 @@ class PreferCachedImageCacheManagerRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_cached_image_cache_manager',
     problemMessage:
-        '[prefer_cached_image_cache_manager] CachedNetworkImage without CacheManager. Cache may grow unbounded. Without a custom CacheManager, cached images can grow unbounded and consume excessive storage. Configure limits for production apps.',
+        '[prefer_cached_image_cache_manager] CachedNetworkImage without CacheManager. Cache may grow unbounded. Without a custom CacheManager, cached images can grow unbounded and consume excessive storage. Configure limits for production apps. {v2}',
     correctionMessage:
         'Add cacheManager parameter to limit cache size and stale period. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -1723,6 +1759,8 @@ class PreferCachedImageCacheManagerRule extends SaropaLintRule {
 
 /// Warns when Image.network is used without a cacheWidth/cacheHeight.
 ///
+/// Since: v2.3.10 | Updated: v4.13.0 | Rule version: v6
+///
 /// Alias: image_cache_dimensions, network_image_size
 ///
 /// Without cacheWidth/cacheHeight, images are decoded at full resolution,
@@ -1754,7 +1792,7 @@ class RequireImageCacheDimensionsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_image_cache_dimensions',
     problemMessage:
-        '[require_image_cache_dimensions] Image.network loads the full-resolution image into memory without cacheWidth or cacheHeight constraints. A 4000x3000 pixel photo decodes to approximately 48MB of uncompressed bitmap data in memory. Without cache dimensions, displaying multiple images causes excessive memory consumption that leads to out-of-memory crashes on lower-end devices.',
+        '[require_image_cache_dimensions] Image.network loads the full-resolution image into memory without cacheWidth or cacheHeight constraints. A 4000x3000 pixel photo decodes to approximately 48MB of uncompressed bitmap data in memory. Without cache dimensions, displaying multiple images causes excessive memory consumption that leads to out-of-memory crashes on lower-end devices. {v6}',
     correctionMessage:
         'Add cacheWidth and cacheHeight parameters matching the display dimensions to limit the decoded image size in memory and reduce overall memory consumption.',
     errorSeverity: DiagnosticSeverity.WARNING,

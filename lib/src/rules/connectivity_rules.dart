@@ -18,6 +18,8 @@ import '../saropa_lint_rule.dart';
 
 /// Warns when connectivity check is called without error handling.
 ///
+/// Since: v4.2.0 | Updated: v4.13.0 | Rule version: v2
+///
 /// Alias: connectivity_error, handle_connectivity_check
 ///
 /// Connectivity checks can fail (e.g., airplane mode, no network interface).
@@ -56,7 +58,7 @@ class RequireConnectivityErrorHandlingRule extends SaropaLintRule {
     name: 'require_connectivity_error_handling',
     problemMessage:
         '[require_connectivity_error_handling] Connectivity check without '
-        'error handling. checkConnectivity() can throw platform exceptions.',
+        'error handling. checkConnectivity() can throw platform exceptions. {v2}',
     correctionMessage:
         'Wrap connectivity checks in try-catch to handle platform exceptions.',
     errorSeverity: DiagnosticSeverity.WARNING,

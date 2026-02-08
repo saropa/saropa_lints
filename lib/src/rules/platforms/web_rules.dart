@@ -33,6 +33,8 @@ import '../../saropa_lint_rule.dart';
 
 /// Warns when MethodChannel is used without web platform check.
 ///
+/// Since: v2.0.0 | Updated: v4.13.0 | Rule version: v4
+///
 /// MethodChannel is not available on web. Using it without a platform check
 /// will crash the web build.
 ///
@@ -68,7 +70,7 @@ class AvoidPlatformChannelOnWebRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_platform_channel_on_web',
     problemMessage: '[avoid_platform_channel_on_web] MethodChannel throws '
-        'MissingPluginException on web, crashing the application.',
+        'MissingPluginException on web, crashing the application. {v4}',
     correctionMessage: 'Wrap with kIsWeb check or use conditional imports.',
     errorSeverity: DiagnosticSeverity.ERROR,
   );
@@ -130,6 +132,8 @@ class AvoidPlatformChannelOnWebRule extends SaropaLintRule {
 
 /// Warns when HTTP calls on web lack CORS handling.
 ///
+/// Since: v2.0.0 | Updated: v4.13.0 | Rule version: v3
+///
 /// Web browsers enforce CORS restrictions. HTTP calls may fail without
 /// proper CORS headers from the server or proxy configuration.
 ///
@@ -159,7 +163,7 @@ class RequireCorsHandlingRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_cors_handling',
     problemMessage:
-        '[require_cors_handling] HTTP calls from a Flutter web app fail silently without proper CORS headers from the server. The browser blocks cross-origin requests by default, causing network errors that prevent data loading, authentication, and API communication. Users see blank screens or broken functionality with no clear error message.',
+        '[require_cors_handling] HTTP calls from a Flutter web app fail silently without proper CORS headers from the server. The browser blocks cross-origin requests by default, causing network errors that prevent data loading, authentication, and API communication. Users see blank screens or broken functionality with no clear error message. {v3}',
     correctionMessage:
         'Configure the server to return Access-Control-Allow-Origin headers for your app domain, or route requests through a CORS proxy during development.',
     errorSeverity: DiagnosticSeverity.ERROR,
@@ -214,6 +218,8 @@ class RequireCorsHandlingRule extends SaropaLintRule {
 
 /// Warns when large imports are not deferred on web.
 ///
+/// Since: v2.0.0 | Updated: v4.13.0 | Rule version: v4
+///
 /// Web apps should defer loading large libraries to improve initial load time.
 /// Use deferred loading for heavy packages.
 ///
@@ -242,7 +248,7 @@ class PreferDeferredLoadingWebRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_deferred_loading_web',
     problemMessage:
-        '[prefer_deferred_loading_web] Large package imported eagerly increases initial bundle size. Web apps should defer loading large libraries to improve initial load time. Use deferred loading for heavy packages.',
+        '[prefer_deferred_loading_web] Large package imported eagerly increases initial bundle size. Web apps should defer loading large libraries to improve initial load time. Use deferred loading for heavy packages. {v4}',
     correctionMessage:
         'Use "deferred as" import to reduce initial load time. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -296,6 +302,8 @@ class PreferDeferredLoadingWebRule extends SaropaLintRule {
 
 /// Warns when web-only packages are imported in non-web code.
 ///
+/// Since: v4.1.6 | Updated: v4.13.0 | Rule version: v3
+///
 /// dart:html and related web APIs don't exist on mobile/desktop.
 /// Use conditional imports for cross-platform code.
 ///
@@ -326,7 +334,7 @@ class AvoidWebOnlyDependenciesRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_web_only_dependencies',
     problemMessage:
-        '[avoid_web_only_dependencies] Importing web-only libraries such as dart:html, dart:js, or dart:indexed_db in a Flutter or Dart app that targets mobile or desktop platforms will cause the app to crash with UnsupportedError at startup. This makes the app completely unusable for non-web users and can result in poor user experience, negative reviews, and lost users. Web-only dependencies must be isolated to web-specific code.',
+        '[avoid_web_only_dependencies] Importing web-only libraries such as dart:html, dart:js, or dart:indexed_db in a Flutter or Dart app that targets mobile or desktop platforms will cause the app to crash with UnsupportedError at startup. This makes the app completely unusable for non-web users and can result in poor user experience, negative reviews, and lost users. Web-only dependencies must be isolated to web-specific code. {v3}',
     correctionMessage:
         'Use conditional imports or platform-agnostic alternatives to ensure your app runs on all supported platforms. Refactor code to isolate web-only dependencies behind platform checks or abstractions, and test your app on all target platforms to catch unsupported imports before release.',
     errorSeverity: DiagnosticSeverity.ERROR,
@@ -370,6 +378,8 @@ class AvoidWebOnlyDependenciesRule extends SaropaLintRule {
 
 /// Warns when web apps don't use path URL strategy.
 ///
+/// Since: v2.3.3 | Updated: v4.13.0 | Rule version: v2
+///
 /// Hash URLs (/#/page) look ugly and hurt SEO. Use PathUrlStrategy for
 /// clean URLs in production web apps.
 ///
@@ -389,7 +399,6 @@ class AvoidWebOnlyDependenciesRule extends SaropaLintRule {
 ///   runApp(MyApp());
 /// }
 /// ```
-
 class PreferUrlStrategyForWebRule extends SaropaLintRule {
   const PreferUrlStrategyForWebRule() : super(code: _code);
 
@@ -407,7 +416,7 @@ class PreferUrlStrategyForWebRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_url_strategy_for_web',
     problemMessage:
-        '[prefer_url_strategy_for_web] Flutter web defaults to hash-based URLs (e.g. /#/page) which are unfriendly to search engines, break social media link previews, and look unprofessional. Path-based URLs (/page) enable proper SEO indexing, shareable deep links, and server-side routing support.',
+        '[prefer_url_strategy_for_web] Flutter web defaults to hash-based URLs (e.g. /#/page) which are unfriendly to search engines, break social media link previews, and look unprofessional. Path-based URLs (/page) enable proper SEO indexing, shareable deep links, and server-side routing support. {v2}',
     correctionMessage:
         'Call usePathUrlStrategy() before runApp() in main(), or configure url_strategy in your router package to produce clean path-based URLs.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -450,6 +459,8 @@ class PreferUrlStrategyForWebRule extends SaropaLintRule {
 
 /// Warns when kIsWeb is used without considering renderer type.
 ///
+/// Since: v2.1.0 | Updated: v4.13.0 | Rule version: v3
+///
 /// Flutter web has different renderers (HTML, CanvasKit, Skia) with
 /// different capabilities. Code assuming one renderer may fail on others.
 ///
@@ -475,7 +486,6 @@ class PreferUrlStrategyForWebRule extends SaropaLintRule {
 ///
 /// **Note:** This is an INFO-level reminder. Not all web code is
 /// renderer-dependent.
-
 class RequireWebRendererAwarenessRule extends SaropaLintRule {
   const RequireWebRendererAwarenessRule() : super(code: _code);
 
@@ -492,7 +502,7 @@ class RequireWebRendererAwarenessRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_web_renderer_awareness',
     problemMessage:
-        '[require_web_renderer_awareness] kIsWeb check without renderer consideration. Behavior may vary. Flutter web has different renderers (HTML, CanvasKit, Skia) with different capabilities. Code assuming one renderer may fail on others.',
+        '[require_web_renderer_awareness] kIsWeb check without renderer consideration. Behavior may vary. Flutter web has different renderers (HTML, CanvasKit, Skia) with different capabilities. Code assuming one renderer may fail on others. {v3}',
     correctionMessage:
         'Check if the web-specific code depends on HTML DOM access (HTML renderer only) or canvas features (CanvasKit only). Use dart:js_interop or conditional imports for renderer-specific behavior.',
     errorSeverity: DiagnosticSeverity.INFO,

@@ -13,6 +13,8 @@ import '../saropa_lint_rule.dart';
 
 /// Warns when a getter name starts with 'get'.
 ///
+/// Since: v4.8.2 | Updated: v4.13.0 | Rule version: v2
+///
 /// Formerly: `avoid_getter_prefix`
 class AvoidGetterPrefixRule extends SaropaLintRule {
   const AvoidGetterPrefixRule() : super(code: _code);
@@ -30,7 +32,7 @@ class AvoidGetterPrefixRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_no_getter_prefix',
     problemMessage:
-        "[prefer_no_getter_prefix] Getter with 'get' prefix is redundant. Dart convention omits it. Formerly: avoid_getter_prefix. A getter name starts with \'get\'.",
+        "[prefer_no_getter_prefix] Getter with 'get' prefix is redundant. Dart convention omits it. Formerly: avoid_getter_prefix. A getter name starts with \'get\'. {v2}",
     correctionMessage:
         "Remove the 'get' prefix from the getter name. For example, rename getName to name, or getValue to value.",
     errorSeverity: DiagnosticSeverity.INFO,
@@ -58,6 +60,8 @@ class AvoidGetterPrefixRule extends SaropaLintRule {
 }
 
 /// Warns when string literals contain non-ASCII characters.
+///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v4
 ///
 /// Non-ASCII characters can cause encoding issues and may be
 /// hard to distinguish visually (e.g., different types of spaces).
@@ -88,7 +92,7 @@ class AvoidNonAsciiSymbolsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_non_ascii_symbols',
     problemMessage:
-        '[avoid_non_ascii_symbols] String contains non-ASCII characters. Non-ASCII characters can cause encoding issues and may be hard to distinguish visually (e.g., different types of spaces).',
+        '[avoid_non_ascii_symbols] String contains non-ASCII characters. Non-ASCII characters can cause encoding issues and may be hard to distinguish visually (e.g., different types of spaces). {v4}',
     correctionMessage:
         'Replace non-ASCII characters with ASCII equivalents or Unicode escape sequences (e.g., \\u00E9 for e-acute).',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -115,6 +119,8 @@ class AvoidNonAsciiSymbolsRule extends SaropaLintRule {
 }
 
 /// Warns when single-line comments don't start with a capital letter.
+///
+/// Since: v4.3.0 | Updated: v4.13.0 | Rule version: v3
 ///
 /// Prose comments should start with a capital letter for readability.
 /// Commented-out code is automatically detected and skipped to avoid false
@@ -164,7 +170,7 @@ class FormatCommentRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_capitalized_comment_start',
     problemMessage:
-        '[prefer_capitalized_comment_start] Comment should start with capital letter. Prose comments should start with a capital letter for readability. Commented-out code is automatically detected and skipped to avoid false positives on patterns like // foo.bar() or // return x;.',
+        '[prefer_capitalized_comment_start] Comment should start with capital letter. Prose comments should start with a capital letter for readability. Commented-out code is automatically detected and skipped to avoid false positives on patterns like // foo.bar() or // return x;. {v3}',
     correctionMessage:
         'Capitalize the first letter of the comment text. Prose comments that start with lowercase letters reduce readability.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -291,6 +297,8 @@ class _CapitalizeCommentFix extends DartFix {
 
 /// Warns when class names don't match expected patterns.
 ///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v4
+///
 /// Class names should follow naming conventions for their purpose.
 ///
 /// ### Example
@@ -317,7 +325,7 @@ class MatchClassNamePatternRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'match_class_name_pattern',
     problemMessage:
-        '[match_class_name_pattern] Class name does not follow expected pattern. Class names should follow naming conventions for their purpose.',
+        '[match_class_name_pattern] Class name does not follow expected pattern. Class names should follow naming conventions for their purpose. {v4}',
     correctionMessage:
         'Rename the class to follow Dart naming conventions. Use UpperCamelCase and include a suffix matching its purpose (e.g., Widget, State, Screen).',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -382,6 +390,8 @@ class MatchClassNamePatternRule extends SaropaLintRule {
 
 /// Warns when getter/setter names don't match backing field names.
 ///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v4
+///
 /// Getter/setter should have the same name as the backing field (without underscore).
 ///
 /// ### Example
@@ -410,7 +420,7 @@ class MatchGetterSetterFieldNamesRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'match_getter_setter_field_names',
     problemMessage:
-        '[match_getter_setter_field_names] Getter/setter name should match the backing field. Getter/setter must have the same name as the backing field (without underscore).',
+        '[match_getter_setter_field_names] Getter/setter name should match the backing field. Getter/setter must have the same name as the backing field (without underscore). {v4}',
     correctionMessage:
         'Rename the getter or setter to match the backing field name without the leading underscore. For example, _count must have getter count, not total.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -465,6 +475,8 @@ class MatchGetterSetterFieldNamesRule extends SaropaLintRule {
 
 /// Warns when test files don't match lib folder structure.
 ///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v4
+///
 /// Test files should mirror the lib directory structure.
 ///
 /// ### Example
@@ -493,7 +505,7 @@ class MatchLibFolderStructureRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'match_lib_folder_structure',
     problemMessage:
-        '[match_lib_folder_structure] Test file location should mirror lib folder structure. This naming violation reduces readability and makes the codebase harder for teams to navigate.',
+        '[match_lib_folder_structure] Test file location should mirror lib folder structure. This naming violation reduces readability and makes the codebase harder for teams to navigate. {v4}',
     correctionMessage:
         'Move the test file so its path mirrors the lib folder structure. For example, lib/src/utils/helper.dart must have test/src/utils/helper_test.dart.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -529,6 +541,8 @@ class MatchLibFolderStructureRule extends SaropaLintRule {
 }
 
 /// Warns when positional field names don't match the variable being assigned.
+///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v5
 class MatchPositionalFieldNamesOnAssignmentRule extends SaropaLintRule {
   const MatchPositionalFieldNamesOnAssignmentRule() : super(code: _code);
 
@@ -542,7 +556,7 @@ class MatchPositionalFieldNamesOnAssignmentRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'match_positional_field_names_on_assignment',
     problemMessage:
-        '[match_positional_field_names_on_assignment] Positional field name should match the variable being assigned. This naming violation reduces readability and makes the codebase harder for teams to navigate.',
+        '[match_positional_field_names_on_assignment] Positional field name should match the variable being assigned. This naming violation reduces readability and makes the codebase harder for teams to navigate. {v5}',
     correctionMessage:
         'Rename the positional field to match the variable it is assigned to. Mismatched names cause confusion when reading destructured assignments.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -592,6 +606,8 @@ class MatchPositionalFieldNamesOnAssignmentRule extends SaropaLintRule {
 
 /// Warns when boolean field prefixes are missing (is/has/can/should/will/did).
 ///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v7
+///
 /// This rule only checks class fields and top-level variables, not local
 /// variables inside functions/methods. Local variables are implementation
 /// details and don't need strict naming conventions.
@@ -628,7 +644,7 @@ class PreferBooleanPrefixesRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_boolean_prefixes',
     problemMessage:
-        '[prefer_boolean_prefixes] Boolean variable must have a prefix (is/has/can/should/will/did). This rule only checks class fields and top-level variables, not local variables inside functions/methods. Local variables are implementation details and don\'t need strict naming conventions.',
+        '[prefer_boolean_prefixes] Boolean variable must have a prefix (is/has/can/should/will/did). This rule only checks class fields and top-level variables, not local variables inside functions/methods. Local variables are implementation details and don\'t need strict naming conventions. {v7}',
     correctionMessage:
         'Rename this boolean field to use a standard prefix (is, has, can, should, will, did) or suffix (Enabled, Active, Visible). Example: enabled becomes isEnabled.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -792,6 +808,8 @@ class PreferBooleanPrefixesRule extends SaropaLintRule {
 
 /// Warns when local boolean variables are missing prefixes or suffixes.
 ///
+/// Since: v1.4.0 | Updated: v4.13.0 | Rule version: v4
+///
 /// **Stylistic rule (opt-in only).** Naming convention with no performance or correctness impact.
 ///
 /// This rule only checks local variables inside functions/methods.
@@ -827,7 +845,7 @@ class PreferBooleanPrefixesForLocalsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_boolean_prefixes_for_locals',
     problemMessage:
-        '[prefer_boolean_prefixes_for_locals] Prefixing boolean local variables with is/has/can/should is a naming convention with no impact on code behavior or performance. Enable via the stylistic tier.',
+        '[prefer_boolean_prefixes_for_locals] Prefixing boolean local variables with is/has/can/should is a naming convention with no impact on code behavior or performance. Enable via the stylistic tier. {v4}',
     correctionMessage:
         'Rename this local boolean variable to use a standard prefix (is, has, can, should, will, did) or suffix (Enabled, Active, Visible). Example: status becomes isActive.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -972,6 +990,8 @@ class PreferBooleanPrefixesForLocalsRule extends SaropaLintRule {
 
 /// Warns when boolean parameters are missing prefixes.
 ///
+/// Since: v1.4.0 | Updated: v4.13.0 | Rule version: v4
+///
 /// **Stylistic rule (opt-in only).** Naming convention with no performance or correctness impact.
 ///
 /// This rule only checks function/method/constructor parameters.
@@ -1001,7 +1021,7 @@ class PreferBooleanPrefixesForParamsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_boolean_prefixes_for_params',
     problemMessage:
-        '[prefer_boolean_prefixes_for_params] Prefixing boolean parameters with is/has/can/should is a naming convention with no impact on code behavior or performance. Enable via the stylistic tier.',
+        '[prefer_boolean_prefixes_for_params] Prefixing boolean parameters with is/has/can/should is a naming convention with no impact on code behavior or performance. Enable via the stylistic tier. {v4}',
     correctionMessage:
         'Rename this boolean parameter to use a standard prefix (is, has, can, should, will, did) or suffix (Enabled, Active, Visible). Example: visible becomes isVisible.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -1196,6 +1216,8 @@ class PreferBooleanPrefixesForParamsRule extends SaropaLintRule {
 
 /// Warns when callback fields don't follow onX naming convention.
 ///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v5
+///
 /// **Stylistic rule (opt-in only).** Naming convention with no performance or correctness impact.
 class PreferCorrectCallbackFieldNameRule extends SaropaLintRule {
   const PreferCorrectCallbackFieldNameRule() : super(code: _code);
@@ -1210,7 +1232,7 @@ class PreferCorrectCallbackFieldNameRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_correct_callback_field_name',
     problemMessage:
-        '[prefer_correct_callback_field_name] Using onXxx naming for callback fields is a Dart API convention. Callback naming does not affect code behavior or performance. Enable via the stylistic tier.',
+        '[prefer_correct_callback_field_name] Using onXxx naming for callback fields is a Dart API convention. Callback naming does not affect code behavior or performance. Enable via the stylistic tier. {v5}',
     correctionMessage:
         "Rename callback fields to use the 'on' prefix following Flutter convention. For example, callback becomes onCallback and tapHandler becomes onTap.",
     errorSeverity: DiagnosticSeverity.INFO,
@@ -1304,6 +1326,8 @@ class PreferCorrectCallbackFieldNameRule extends SaropaLintRule {
 
 /// Warns when catch block parameter is not named 'e' or 'error'.
 ///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v4
+///
 /// Consistent naming of catch parameters improves readability.
 ///
 /// ### Example
@@ -1339,7 +1363,7 @@ class PreferCorrectErrorNameRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_correct_error_name',
     problemMessage:
-        '[prefer_correct_error_name] Catch parameter uses nonstandard name. Use "e" or "error" for consistency and readability. Consistent naming of catch parameters improves readability.',
+        '[prefer_correct_error_name] Catch parameter uses nonstandard name. Use "e" or "error" for consistency and readability. Consistent naming of catch parameters improves readability. {v4}',
     correctionMessage:
         'Rename the catch parameter to "e" or "error" for consistency. Example: catch (e) { } or catch (error) { }.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -1374,6 +1398,8 @@ class PreferCorrectErrorNameRule extends SaropaLintRule {
 
 /// Warns when event handler names don't follow conventions.
 ///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v3
+///
 /// **Stylistic rule (opt-in only).** Naming convention with no performance or correctness impact.
 ///
 /// Event handlers should be named consistently.
@@ -1399,7 +1425,7 @@ class PreferCorrectHandlerNameRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_correct_handler_name',
     problemMessage:
-        '[prefer_correct_handler_name] Using handleXxx or onXxx naming for handler methods is a convention. Handler naming does not affect code behavior or performance. Enable via the stylistic tier.',
+        '[prefer_correct_handler_name] Using handleXxx or onXxx naming for handler methods is a convention. Handler naming does not affect code behavior or performance. Enable via the stylistic tier. {v3}',
     correctionMessage:
         'Rename the event handler method to start with "on" or "_on" prefix. For example, buttonPressed becomes onButtonPressed.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -1452,6 +1478,8 @@ class PreferCorrectHandlerNameRule extends SaropaLintRule {
 
 /// Warns when identifier names are too short or too long.
 ///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v6
+///
 /// **Readability benefit:** Research shows 8-20 character identifiers have optimal comprehension speed. Very short or very long names measurably slow code review.
 ///
 /// Very short names (except common ones like i, j, x, y) hurt readability.
@@ -1481,7 +1509,7 @@ class PreferCorrectIdentifierLengthRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_correct_identifier_length',
     problemMessage:
-        '[prefer_correct_identifier_length] Very short (1-2 char) or very long (>30 char) identifiers measurably impact code comprehension speed. Optimal readability is achieved with 8-20 character names.',
+        '[prefer_correct_identifier_length] Very short (1-2 char) or very long (>30 char) identifiers measurably impact code comprehension speed. Optimal readability is achieved with 8-20 character names. {v6}',
     correctionMessage:
         'Use names between 2 and 40 characters long. Single-character names (except i, j, k, x, y, z, e, n) reduce readability; overly long names hinder scanning.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -1553,6 +1581,8 @@ class PreferCorrectIdentifierLengthRule extends SaropaLintRule {
 
 /// Warns when setter parameter is not named 'value'.
 ///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v4
+///
 /// **Stylistic rule (opt-in only).** Naming convention with no performance or correctness impact.
 ///
 /// Convention is to name setter parameters 'value' for consistency.
@@ -1583,7 +1613,7 @@ class PreferCorrectSetterParameterNameRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_correct_setter_parameter_name',
     problemMessage:
-        '[prefer_correct_setter_parameter_name] Using value as the setter parameter name is a Dart convention. The parameter name does not affect setter behavior or performance. Enable via the stylistic tier.',
+        '[prefer_correct_setter_parameter_name] Using value as the setter parameter name is a Dart convention. The parameter name does not affect setter behavior or performance. Enable via the stylistic tier. {v4}',
     correctionMessage:
         'Rename the setter parameter to "value" for consistency with Dart conventions. Example: set name(String value) => _name = value;',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -1622,6 +1652,8 @@ class PreferCorrectSetterParameterNameRule extends SaropaLintRule {
 
 /// Warns when function type parameters don't have names.
 ///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v4
+///
 /// Parameter names in function types improve documentation.
 ///
 /// ### Example
@@ -1648,7 +1680,7 @@ class PreferExplicitParameterNamesRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_explicit_parameter_names',
     problemMessage:
-        '[prefer_explicit_parameter_names] Function type parameters must have descriptive names. Unnamed parameters lose intent and force callers to guess what each positional argument represents.',
+        '[prefer_explicit_parameter_names] Function type parameters must have descriptive names. Unnamed parameters lose intent and force callers to guess what each positional argument represents. {v4}',
     correctionMessage:
         'Add descriptive names to function type parameters. Unnamed parameters lose intent: void Function(String) becomes void Function(String message).',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -1677,6 +1709,8 @@ class PreferExplicitParameterNamesRule extends SaropaLintRule {
 
 /// Warns when the file name doesn't match the primary class/type name.
 ///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v5
+///
 /// **Discoverability benefit:** When the primary class name does not match the file name, IDE file search cannot find declarations, measurably slowing navigation.
 ///
 /// By convention, the file name should match the main class or type defined
@@ -1694,7 +1728,7 @@ class PreferMatchFileNameRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_match_file_name',
     problemMessage:
-        '[prefer_match_file_name] When the primary class name does not match the file name, developers cannot use IDE file search to find declarations. This measurably slows navigation in large codebases.',
+        '[prefer_match_file_name] When the primary class name does not match the file name, developers cannot use IDE file search to find declarations. This measurably slows navigation in large codebases. {v5}',
     correctionMessage:
         'Rename either the file or the primary class so they match. For example, user_service.dart should contain class UserService.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -1734,6 +1768,8 @@ class PreferMatchFileNameRule extends SaropaLintRule {
 
 /// Warns when global constants don't have a prefix.
 ///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v5
+///
 /// Global constants should be prefixed with 'k' or similar.
 ///
 /// ### Example
@@ -1762,7 +1798,7 @@ class PreferPrefixedGlobalConstantsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_prefixed_global_constants',
     problemMessage:
-        '[prefer_prefixed_global_constants] Global constant must have a descriptive prefix. Global constants must be prefixed with \'k\' or similar.',
+        '[prefer_prefixed_global_constants] Global constant must have a descriptive prefix. Global constants must be prefixed with \'k\' or similar. {v5}',
     correctionMessage:
         'Prefix the global constant with "k" (e.g., kMaxRetries) or use a longer descriptive name to distinguish it from local variables.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -1816,6 +1852,8 @@ class PreferPrefixedGlobalConstantsRule extends SaropaLintRule {
 }
 
 /// Warns when widget tag names don't follow conventions.
+///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v4
 class TagNameRule extends SaropaLintRule {
   const TagNameRule() : super(code: _code);
 
@@ -1830,7 +1868,7 @@ class TagNameRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_kebab_tag_name',
     problemMessage:
-        '[prefer_kebab_tag_name] Tag name should follow naming conventions. Widget tag names don\'t follow conventions. This naming violation reduces readability and makes the codebase harder for teams to navigate.',
+        '[prefer_kebab_tag_name] Tag name should follow naming conventions. Widget tag names don\'t follow conventions. This naming violation reduces readability and makes the codebase harder for teams to navigate. {v4}',
     correctionMessage:
         'Use kebab-case (lowercase with hyphens) for tag names. Tag names must start with a lowercase letter and contain only lowercase letters, digits, and hyphens.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -1869,6 +1907,9 @@ class TagNameRule extends SaropaLintRule {
 // =============================================================================
 
 /// Future rule: prefer-named-extensions
+///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v5
+///
 /// Warns when an anonymous extension should be named.
 ///
 /// Example of **bad** code:
@@ -1897,7 +1938,7 @@ class PreferNamedExtensionsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_named_extensions',
     problemMessage:
-        '[prefer_named_extensions] Anonymous extension must be named. This naming violation reduces readability and makes the codebase harder for teams to navigate.',
+        '[prefer_named_extensions] Anonymous extension must be named. This naming violation reduces readability and makes the codebase harder for teams to navigate. {v5}',
     correctionMessage:
         'Add a name to the extension to improve debugging and documentation. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -1918,6 +1959,9 @@ class PreferNamedExtensionsRule extends SaropaLintRule {
 }
 
 /// Future rule: prefer-typedef-for-callbacks
+///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v5
+///
 /// Warns when inline function types are repeated and should use typedef.
 ///
 /// Example of **bad** code:
@@ -1947,7 +1991,7 @@ class PreferTypedefForCallbacksRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_typedef_for_callbacks',
     problemMessage:
-        '[prefer_typedef_for_callbacks] Use typedef for repeated function types. Duplicate inline function types reduce readability and make signature changes error-prone across the codebase.',
+        '[prefer_typedef_for_callbacks] Use typedef for repeated function types. Duplicate inline function types reduce readability and make signature changes error-prone across the codebase. {v5}',
     correctionMessage:
         'Create a typedef for this function type to improve readability. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -1987,6 +2031,9 @@ class PreferTypedefForCallbacksRule extends SaropaLintRule {
 }
 
 /// Future rule: prefer-enhanced-enums
+///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v4
+///
 /// Warns when an enum could use enhanced enum features instead of extensions.
 ///
 /// Example of **bad** code:
@@ -2020,7 +2067,7 @@ class PreferEnhancedEnumsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_enhanced_enums',
     problemMessage:
-        '[prefer_enhanced_enums] Use enhanced enum instead of extension. An enum could use enhanced enum features instead of extensions.',
+        '[prefer_enhanced_enums] Use enhanced enum instead of extension. An enum could use enhanced enum features instead of extensions. {v4}',
     correctionMessage:
         'Move extension members into the enum itself. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -2057,6 +2104,8 @@ class PreferEnhancedEnumsRule extends SaropaLintRule {
 
 /// Warns when a parameter is unused and could use wildcard `_`.
 ///
+/// Since: v1.3.0 | Updated: v4.13.0 | Rule version: v4
+///
 /// Dart 3.7 introduced true wildcard variables where `_` doesn't bind.
 /// Unused parameters should use `_` to signal intent.
 ///
@@ -2083,7 +2132,7 @@ class PreferWildcardForUnusedParamRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_wildcard_for_unused_param',
     problemMessage:
-        '[prefer_wildcard_for_unused_param] Unused parameter obscures intent and signals incomplete API design. Replacing it with a _ wildcard (Dart 3.7+) makes the function signature self-documenting, communicating that the parameter exists for interface conformance but is intentionally ignored in this implementation.',
+        '[prefer_wildcard_for_unused_param] Unused parameter obscures intent and signals incomplete API design. Replacing it with a _ wildcard (Dart 3.7+) makes the function signature self-documenting, communicating that the parameter exists for interface conformance but is intentionally ignored in this implementation. {v4}',
     correctionMessage:
         'Replace the parameter with _ to make the function signature self-documenting and signal that the value is intentionally unused.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -2217,6 +2266,8 @@ class _ReplaceWithWildcardFix extends DartFix {
 
 /// Warns when a `library` directive name doesn't follow Dart naming conventions.
 ///
+/// Since: v4.14.0 | Updated: vunreleased | Rule version: v2
+///
 /// Alias: package_name_convention, library_name_convention
 ///
 /// Dart package and library names must be lowercase_with_underscores per the
@@ -2260,7 +2311,7 @@ class PreferCorrectPackageNameRule extends SaropaLintRule {
         'lowercase_with_underscores format: start with a lowercase letter, '
         'use only lowercase letters, digits, and underscores. Names with '
         'hyphens, dots, uppercase letters, or starting with digits break '
-        'pub publish, import resolution, and IDE tooling.',
+        'pub publish, import resolution, and IDE tooling. {v2}',
     correctionMessage:
         'Rename the library to use lowercase_with_underscores format '
         '(e.g., "my_package" instead of "MyPackage" or "my-package").',

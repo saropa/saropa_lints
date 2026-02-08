@@ -20,6 +20,8 @@ import '../../saropa_lint_rule.dart';
 
 /// Warns when Dio is used without timeout configuration.
 ///
+/// Since: v2.1.0 | Updated: v4.13.0 | Rule version: v3
+///
 /// Network requests without timeouts can hang indefinitely, causing poor UX.
 /// Always configure connectTimeout and receiveTimeout.
 ///
@@ -48,7 +50,7 @@ class RequireDioTimeoutRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_dio_timeout',
     problemMessage:
-        '[require_dio_timeout] Creating a Dio instance for network requests without setting connectTimeout and receiveTimeout in BaseOptions can cause HTTP requests to hang indefinitely if the server is slow or unresponsive. This can freeze the UI, degrade user experience, and make error recovery impossible, especially in mobile apps with unreliable networks. Always configure timeouts to ensure your app remains responsive and can handle network failures gracefully. See https://pub.dev/packages/dio#timeouts.',
+        '[require_dio_timeout] Creating a Dio instance for network requests without setting connectTimeout and receiveTimeout in BaseOptions can cause HTTP requests to hang indefinitely if the server is slow or unresponsive. This can freeze the UI, degrade user experience, and make error recovery impossible, especially in mobile apps with unreliable networks. Always configure timeouts to ensure your app remains responsive and can handle network failures gracefully. See https://pub.dev/packages/dio#timeouts. {v3}',
     correctionMessage:
         'Set connectTimeout and receiveTimeout in Dio BaseOptions to ensure all HTTP requests fail fast and can be retried or handled appropriately. This prevents the UI from hanging and improves reliability. See https://pub.dev/packages/dio#timeouts.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -93,6 +95,8 @@ class RequireDioTimeoutRule extends SaropaLintRule {
 
 /// Warns when Dio requests are made without error handling.
 ///
+/// Since: v2.1.0 | Updated: v4.13.0 | Rule version: v3
+///
 /// Dio throws DioException on network errors. Unhandled exceptions crash the app.
 ///
 /// **BAD:**
@@ -120,7 +124,7 @@ class RequireDioErrorHandlingRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_dio_error_handling',
     problemMessage:
-        '[require_dio_error_handling] Making a Dio HTTP request without wrapping it in a try-catch block means any DioException (such as network errors, timeouts, or invalid responses) will crash the app and leave users with no feedback. This is especially problematic in production apps where network conditions are unpredictable. Always handle Dio errors to provide a robust and user-friendly experience. See https://pub.dev/packages/dio#handling-errors.',
+        '[require_dio_error_handling] Making a Dio HTTP request without wrapping it in a try-catch block means any DioException (such as network errors, timeouts, or invalid responses) will crash the app and leave users with no feedback. This is especially problematic in production apps where network conditions are unpredictable. Always handle Dio errors to provide a robust and user-friendly experience. See https://pub.dev/packages/dio#handling-errors. {v3}',
     correctionMessage:
         'Wrap all Dio requests in try-catch blocks and handle DioException to show user-friendly error messages, retry logic, or fallback behavior. This prevents crashes and improves reliability. See https://pub.dev/packages/dio#handling-errors.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -170,6 +174,8 @@ class RequireDioErrorHandlingRule extends SaropaLintRule {
 
 /// Warns when Dio InterceptorsWrapper doesn't have onError handler.
 ///
+/// Since: v2.1.0 | Updated: v4.13.0 | Rule version: v3
+///
 /// Interceptors without error handling let errors propagate unexpectedly.
 ///
 /// **BAD:**
@@ -198,7 +204,7 @@ class RequireDioInterceptorErrorHandlerRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_dio_interceptor_error_handler',
     problemMessage:
-        '[require_dio_interceptor_error_handler] InterceptorsWrapper without onError handler. Errors may be unhandled. Interceptors without error handling let errors propagate unexpectedly. This pattern increases maintenance cost and the likelihood of introducing bugs during future changes.',
+        '[require_dio_interceptor_error_handler] InterceptorsWrapper without onError handler. Errors may be unhandled. Interceptors without error handling let errors propagate unexpectedly. This pattern increases maintenance cost and the likelihood of introducing bugs during future changes. {v3}',
     correctionMessage:
         'Add onError callback to handle request errors in interceptor. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -234,6 +240,8 @@ class RequireDioInterceptorErrorHandlerRule extends SaropaLintRule {
 
 /// Warns when long-running Dio requests don't use CancelToken.
 ///
+/// Since: v2.1.0 | Updated: v4.13.0 | Rule version: v3
+///
 /// Requests should be cancellable to avoid wasting resources when the user
 /// navigates away.
 ///
@@ -260,7 +268,7 @@ class PreferDioCancelTokenRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_dio_cancel_token',
     problemMessage:
-        '[prefer_dio_cancel_token] Long-running Dio request without CancelToken. Cannot be cancelled. Requests must be cancellable to avoid wasting resources when the user navigates away.',
+        '[prefer_dio_cancel_token] Long-running Dio request without CancelToken. Cannot be cancelled. Requests must be cancellable to avoid wasting resources when the user navigates away. {v3}',
     correctionMessage:
         'Add cancelToken parameter for cancellable requests. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -304,6 +312,8 @@ class PreferDioCancelTokenRule extends SaropaLintRule {
 
 /// Warns when Dio is used for auth endpoints without SSL pinning.
 ///
+/// Since: v2.1.0 | Updated: v4.13.0 | Rule version: v3
+///
 /// Sensitive endpoints should use certificate pinning to prevent MITM attacks.
 ///
 /// **BAD:**
@@ -334,7 +344,7 @@ class RequireDioSslPinningRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_dio_ssl_pinning',
     problemMessage:
-        '[require_dio_ssl_pinning] Making authentication or sensitive API requests with Dio without SSL pinning exposes your app to man-in-the-middle (MITM) attacks, where attackers can intercept or modify network traffic. This is a critical security risk for login, registration, and token endpoints. Always configure SSL pinning for all sensitive endpoints to protect user credentials and data. See https://pub.dev/packages/dio#ssl-pinning.',
+        '[require_dio_ssl_pinning] Making authentication or sensitive API requests with Dio without SSL pinning exposes your app to man-in-the-middle (MITM) attacks, where attackers can intercept or modify network traffic. This is a critical security risk for login, registration, and token endpoints. Always configure SSL pinning for all sensitive endpoints to protect user credentials and data. See https://pub.dev/packages/dio#ssl-pinning. {v3}',
     correctionMessage:
         'Set up SSL pinning in Dio by configuring httpClientAdapter with certificate validation for all authentication and sensitive endpoints. This prevents MITM attacks and protects user data. See https://pub.dev/packages/dio#ssl-pinning.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -389,6 +399,8 @@ class RequireDioSslPinningRule extends SaropaLintRule {
 
 /// Warns when FormData with files is not properly cleaned up.
 ///
+/// Since: v2.1.0 | Updated: v4.13.0 | Rule version: v3
+///
 /// FormData with file streams should be cleaned up to avoid resource leaks.
 ///
 /// **BAD:**
@@ -416,7 +428,7 @@ class AvoidDioFormDataLeakRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_dio_form_data_leak',
     problemMessage:
-        '[avoid_dio_form_data_leak] FormData with file. Ensure proper cleanup of file resources. FormData with file streams must be cleaned up to avoid resource leaks. FormData with files is not properly cleaned up.',
+        '[avoid_dio_form_data_leak] FormData with file. Ensure proper cleanup of file resources. FormData with file streams must be cleaned up to avoid resource leaks. FormData with files is not properly cleaned up. {v3}',
     correctionMessage:
         'Prefer cleanup or using try-finally for file uploads. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -460,6 +472,8 @@ class AvoidDioFormDataLeakRule extends SaropaLintRule {
 
 /// Warns when Dio debug logging is enabled without kDebugMode check.
 ///
+/// Since: v2.3.0 | Updated: v4.13.0 | Rule version: v3
+///
 /// Alias: dio_debug_logging_prod, dio_debug_interceptor
 ///
 /// Debug logging in production exposes sensitive data and hurts performance.
@@ -487,7 +501,7 @@ class AvoidDioDebugPrintProductionRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_dio_debug_print_production',
     problemMessage:
-        '[avoid_dio_debug_print_production] Using Dio LogInterceptor in production exposes sensitive request and response data\u2014including authentication tokens, user information, and API payloads\u2014to device logs. This can lead to data leaks, privacy violations, and compliance issues, especially on shared or rooted devices. Always restrict debug logging to development builds only.',
+        '[avoid_dio_debug_print_production] Using Dio LogInterceptor in production exposes sensitive request and response data\u2014including authentication tokens, user information, and API payloads\u2014to device logs. This can lead to data leaks, privacy violations, and compliance issues, especially on shared or rooted devices. Always restrict debug logging to development builds only. {v3}',
     correctionMessage:
         'Wrap LogInterceptor usage in an if (kDebugMode) block to ensure it is only active in development. Never log sensitive data in production. Review your build configuration and audit for accidental log exposure.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -551,6 +565,8 @@ class AvoidDioDebugPrintProductionRule extends SaropaLintRule {
 
 /// Warns when multiple Dio instances are created instead of using singleton.
 ///
+/// Since: v2.3.9 | Updated: v4.13.0 | Rule version: v2
+///
 /// Alias: dio_multiple_instances, dio_no_singleton
 ///
 /// Creating multiple Dio instances wastes resources and makes interceptor
@@ -584,7 +600,7 @@ class RequireDioSingletonRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_dio_singleton',
     problemMessage:
-        '[require_dio_singleton] Use a singleton Dio instance. Creating multiple Dio instances wastes resources and makes interceptor configuration inconsistent.',
+        '[require_dio_singleton] Use a singleton Dio instance. Creating multiple Dio instances wastes resources and makes interceptor configuration inconsistent. {v2}',
     correctionMessage:
         'Create a shared Dio instance with consistent configuration. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -630,6 +646,8 @@ class RequireDioSingletonRule extends SaropaLintRule {
 
 /// Warns when request options are repeated instead of using BaseOptions.
 ///
+/// Since: v2.3.9 | Updated: v4.13.0 | Rule version: v2
+///
 /// Alias: dio_repeated_options, dio_use_base_options
 ///
 /// Repeated headers/timeouts across requests should be in BaseOptions.
@@ -658,7 +676,7 @@ class PreferDioBaseOptionsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_dio_base_options',
     problemMessage:
-        '[prefer_dio_base_options] Repeated options in Dio requests. Use BaseOptions. Repeated headers/timeouts across requests must be in BaseOptions.',
+        '[prefer_dio_base_options] Repeated options in Dio requests. Use BaseOptions. Repeated headers/timeouts across requests must be in BaseOptions. {v2}',
     correctionMessage:
         'Move common headers/timeouts to BaseOptions in Dio constructor. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -703,6 +721,8 @@ class PreferDioBaseOptionsRule extends SaropaLintRule {
 
 /// Warns when Dio is used without baseUrl.
 ///
+/// Since: v2.3.9 | Updated: v4.13.0 | Rule version: v2
+///
 /// Alias: dio_missing_base_url, dio_full_urls
 ///
 /// Using full URLs in each request is error-prone. Set baseUrl once.
@@ -731,7 +751,7 @@ class AvoidDioWithoutBaseUrlRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_dio_without_base_url',
     problemMessage:
-        '[avoid_dio_without_base_url] Dio request with full URL. Prefer setting baseUrl. Using full URLs in each request is error-prone. Set baseUrl once.',
+        '[avoid_dio_without_base_url] Dio request with full URL. Prefer setting baseUrl. Using full URLs in each request is error-prone. Set baseUrl once. {v2}',
     correctionMessage:
         'Set baseUrl in BaseOptions and use relative paths in requests. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -772,6 +792,8 @@ class AvoidDioWithoutBaseUrlRule extends SaropaLintRule {
 
 /// Warns when using the http package instead of Dio.
 ///
+/// Since: v2.3.10 | Updated: v4.13.0 | Rule version: v2
+///
 /// Alias: use_dio, prefer_dio, http_to_dio
 ///
 /// Dio provides better features than the http package: interceptors,
@@ -802,7 +824,7 @@ class PreferDioOverHttpRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_dio_over_http',
     problemMessage:
-        '[prefer_dio_over_http] Using http package. Dio provides interceptors, cancellation, and structured error handling suited for production apps.',
+        '[prefer_dio_over_http] Using http package. Dio provides interceptors, cancellation, and structured error handling suited for production apps. {v2}',
     correctionMessage:
         'Use Dio for interceptors, cancellation, and error handling. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -828,6 +850,8 @@ class PreferDioOverHttpRule extends SaropaLintRule {
 // =============================================================================
 
 /// Explicitly set responseType when processing binary data.
+///
+/// Since: v2.6.0 | Updated: v4.13.0 | Rule version: v2
 ///
 /// Dio defaults responseType to JSON, which causes issues when downloading
 /// files or handling binary responses.
@@ -857,7 +881,7 @@ class RequireDioResponseTypeRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_dio_response_type',
     problemMessage:
-        '[require_dio_response_type] Dio download without explicit responseType may corrupt binary data. Dio defaults responseType to JSON, which causes issues when downloading files or handling binary responses.',
+        '[require_dio_response_type] Dio download without explicit responseType may corrupt binary data. Dio defaults responseType to JSON, which causes issues when downloading files or handling binary responses. {v2}',
     correctionMessage:
         'Add options: Options(responseType: ResponseType.bytes) for downloads. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -909,6 +933,8 @@ class RequireDioResponseTypeRule extends SaropaLintRule {
 
 /// Network requests should have retry logic for resilience.
 ///
+/// Since: v2.6.0 | Updated: v4.13.0 | Rule version: v2
+///
 /// Network failures are common on mobile. Without retry logic, transient
 /// failures cause unnecessary errors.
 ///
@@ -938,7 +964,7 @@ class RequireDioRetryInterceptorRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_dio_retry_interceptor',
     problemMessage:
-        '[require_dio_retry_interceptor] Dio instance without retry interceptor. Network failures are common on mobile. Without retry logic, transient failures cause unnecessary errors.',
+        '[require_dio_retry_interceptor] Dio instance without retry interceptor. Network failures are common on mobile. Without retry logic, transient failures cause unnecessary errors. {v2}',
     correctionMessage:
         'Add RetryInterceptor for network resilience. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -980,6 +1006,8 @@ class RequireDioRetryInterceptorRule extends SaropaLintRule {
 
 /// Large JSON parsing should use custom transformer with isolates.
 ///
+/// Since: v2.6.0 | Updated: v4.13.0 | Rule version: v2
+///
 /// Parsing large JSON responses on the main thread causes jank.
 /// Use BackgroundTransformer or compute() for heavy parsing.
 ///
@@ -1006,7 +1034,7 @@ class PreferDioTransformerRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_dio_transformer',
     problemMessage:
-        '[prefer_dio_transformer] Dio instance without custom transformer for large data. Parsing large JSON responses on the main thread causes jank. Use BackgroundTransformer or compute() for heavy parsing.',
+        '[prefer_dio_transformer] Dio instance without custom transformer for large data. Parsing large JSON responses on the main thread causes jank. Use BackgroundTransformer or compute() for heavy parsing. {v2}',
     correctionMessage:
         'Set dio.transformer = BackgroundTransformer() for off-main-thread parsing. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,

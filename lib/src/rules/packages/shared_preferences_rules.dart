@@ -19,6 +19,8 @@ import '../../saropa_lint_rule.dart';
 
 /// Warns when SharedPreferences is used to store large data.
 ///
+/// Since: v1.6.0 | Updated: v4.13.0 | Rule version: v3
+///
 /// Alias: no_large_prefs, use_database_for_large_data
 ///
 /// SharedPreferences loads the entire file on first access. Storing large
@@ -56,7 +58,7 @@ class AvoidPrefsForLargeDataRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_prefs_for_large_data',
     problemMessage:
-        '[avoid_prefs_for_large_data] SharedPreferences loads its entire file into memory on first access, making it unsuitable for large datasets. Storing collections or large JSON blobs here causes slow app startup, excessive memory consumption, UI freezes, and potential data corruption on write failures.',
+        '[avoid_prefs_for_large_data] SharedPreferences loads its entire file into memory on first access, making it unsuitable for large datasets. Storing collections or large JSON blobs here causes slow app startup, excessive memory consumption, UI freezes, and potential data corruption on write failures. {v3}',
     correctionMessage:
         'Use a database such as Hive, Isar, or SQLite for collections and large data. Reserve SharedPreferences for small, simple settings like booleans and locale strings.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -117,6 +119,8 @@ class AvoidPrefsForLargeDataRule extends SaropaLintRule {
 
 /// Warns when SharedPreferences.setPrefix is not called for app isolation.
 ///
+/// Since: v4.1.4 | Updated: v4.13.0 | Rule version: v2
+///
 /// Setting a prefix avoids key conflicts between different apps or plugins
 /// that use SharedPreferences.
 ///
@@ -145,7 +149,7 @@ class RequireSharedPrefsPrefixRule extends SaropaLintRule {
     name: 'require_shared_prefs_prefix',
     problemMessage:
         '[require_shared_prefs_prefix] SharedPreferences usage detected. '
-        'Consider calling SharedPreferences.setPrefix() to avoid key conflicts.',
+        'Consider calling SharedPreferences.setPrefix() to avoid key conflicts. {v2}',
     correctionMessage:
         'Call SharedPreferences.setPrefix("myapp_") at app startup.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -177,6 +181,8 @@ class RequireSharedPrefsPrefixRule extends SaropaLintRule {
 
 /// Warns when legacy SharedPreferences API is used instead of SharedPreferencesAsync.
 ///
+/// Since: v4.1.4 | Updated: v4.13.0 | Rule version: v2
+///
 /// SharedPreferencesAsync provides better error handling and is the recommended
 /// API for new code.
 ///
@@ -204,7 +210,7 @@ class PreferSharedPrefsAsyncApiRule extends SaropaLintRule {
     name: 'prefer_shared_prefs_async_api',
     problemMessage:
         '[prefer_shared_prefs_async_api] Legacy SharedPreferences.getInstance() '
-        'detected. Consider using SharedPreferencesAsync for new code.',
+        'detected. Consider using SharedPreferencesAsync for new code. {v2}',
     correctionMessage:
         'Use SharedPreferencesAsync() instead of SharedPreferences.getInstance().',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -233,6 +239,8 @@ class PreferSharedPrefsAsyncApiRule extends SaropaLintRule {
 // =============================================================================
 
 /// Warns when SharedPreferences is used inside an isolate.
+///
+/// Since: v4.1.4 | Updated: v4.13.0 | Rule version: v2
 ///
 /// SharedPreferences doesn't work in isolates. Use alternative storage
 /// or pass data through ports.
@@ -264,7 +272,7 @@ class AvoidSharedPrefsInIsolateRule extends SaropaLintRule {
     name: 'avoid_shared_prefs_in_isolate',
     problemMessage:
         '[avoid_shared_prefs_in_isolate] SharedPreferences used in isolate context. '
-        'SharedPreferences does not work in isolates.',
+        'SharedPreferences does not work in isolates. {v2}',
     correctionMessage:
         'Pass required data through SendPort/ReceivePort instead.',
     errorSeverity: DiagnosticSeverity.ERROR,
@@ -345,6 +353,8 @@ class AvoidSharedPrefsInIsolateRule extends SaropaLintRule {
 
 /// Warns when SharedPreferences is used directly without a typed wrapper.
 ///
+/// Since: v4.2.0 | Updated: v4.13.0 | Rule version: v2
+///
 /// Alias: typed_prefs, shared_preferences_wrapper
 ///
 /// Direct SharedPreferences access scatters string keys throughout code and
@@ -391,7 +401,7 @@ class PreferTypedPrefsWrapperRule extends SaropaLintRule {
     name: 'prefer_typed_prefs_wrapper',
     problemMessage:
         '[prefer_typed_prefs_wrapper] Direct SharedPreferences access with '
-        'string literal key. Scattered keys are error-prone.',
+        'string literal key. Scattered keys are error-prone. {v2}',
     correctionMessage:
         'Create a typed wrapper class with properties for each preference.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -439,6 +449,8 @@ class PreferTypedPrefsWrapperRule extends SaropaLintRule {
 
 /// Warns when auth tokens are stored in SharedPreferences instead of secure storage.
 ///
+/// Since: v2.3.5 | Updated: v4.13.0 | Rule version: v2
+///
 /// SharedPreferences stores data as plain text on disk. Auth tokens, session
 /// data, and credentials must use flutter_secure_storage or platform keychain.
 ///
@@ -476,7 +488,7 @@ class AvoidAuthStateInPrefsRule extends SaropaLintRule {
     name: 'avoid_auth_state_in_prefs',
     problemMessage:
         '[avoid_auth_state_in_prefs] SharedPreferences stores tokens in '
-        'plaintext, exposing credentials on rooted devices or backups.',
+        'plaintext, exposing credentials on rooted devices or backups. {v2}',
     correctionMessage:
         'Use flutter_secure_storage or platform keychain for sensitive data.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -574,6 +586,8 @@ class _AddSecureStorageTodoFix extends DartFix {
 
 /// Warns when sensitive data uses SharedPreferences instead of encrypted storage.
 ///
+/// Since: v2.3.5 | Updated: v4.13.0 | Rule version: v2
+///
 /// SharedPreferences are plain text. Use encrypted_shared_preferences or
 /// flutter_secure_storage for passwords, PINs, and personal data.
 ///
@@ -612,7 +626,7 @@ class PreferEncryptedPrefsRule extends SaropaLintRule {
     name: 'prefer_encrypted_prefs',
     problemMessage:
         '[prefer_encrypted_prefs] Unencrypted sensitive data is exposed via '
-        'device backup, file browser, or rooted device access.',
+        'device backup, file browser, or rooted device access. {v2}',
     correctionMessage:
         'Use flutter_secure_storage or encrypted_shared_preferences.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -708,6 +722,8 @@ class _AddEncryptedPrefsTodoFix extends DartFix {
 
 /// Warns when sensitive data is stored in SharedPreferences.
 ///
+/// Since: v2.1.0 | Updated: v4.13.0 | Rule version: v3
+///
 /// Alias: avoid_storing_sensitive_in_prefs, no_sensitive_prefs, prefs_sensitive_data
 ///
 /// SharedPreferences stores data unencrypted on disk, making it readable
@@ -744,7 +760,7 @@ class AvoidSharedPrefsSensitiveDataRule extends SaropaLintRule {
     name: 'avoid_shared_prefs_sensitive_data',
     problemMessage:
         '[avoid_shared_prefs_sensitive_data] SharedPreferences stores data '
-        'as plaintext XML, readable via backup extraction or rooted device.',
+        'as plaintext XML, readable via backup extraction or rooted device. {v3}',
     correctionMessage:
         'Use flutter_secure_storage for passwords, tokens, and API keys.',
     errorSeverity: DiagnosticSeverity.ERROR,
@@ -847,6 +863,8 @@ class _UseSecureStorageFix extends DartFix {
 
 /// Warns when SharedPreferences getter results are used without null handling.
 ///
+/// Since: v2.1.0 | Updated: v4.13.0 | Rule version: v3
+///
 /// SharedPreferences getters return null when the key doesn't exist.
 /// Using the result without null handling causes crashes.
 ///
@@ -875,7 +893,7 @@ class RequireSharedPrefsNullHandlingRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_shared_prefs_null_handling',
     problemMessage:
-        '[require_shared_prefs_null_handling] SharedPreferences getter with null assertion (!) crashes with a NoSuchMethodError if the key does not exist. This is a common source of production crashes on first launch, after app updates that add new preference keys, or when storage is cleared by the OS under memory pressure.',
+        '[require_shared_prefs_null_handling] SharedPreferences getter with null assertion (!) crashes with a NoSuchMethodError if the key does not exist. This is a common source of production crashes on first launch, after app updates that add new preference keys, or when storage is cleared by the OS under memory pressure. {v3}',
     correctionMessage:
         'Use the null-aware operator (??) with a sensible default value, or handle the nullable return type explicitly to prevent null assertion crashes in production.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -924,6 +942,8 @@ class RequireSharedPrefsNullHandlingRule extends SaropaLintRule {
 
 /// Warns when string literals are used as SharedPreferences keys.
 ///
+/// Since: v2.1.0 | Updated: v4.13.0 | Rule version: v4
+///
 /// Using string literals for keys is error-prone and makes refactoring difficult.
 /// Define keys as constants for type safety and easier maintenance.
 ///
@@ -951,7 +971,7 @@ class RequireSharedPrefsKeyConstantsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_shared_prefs_key_constants',
     problemMessage:
-        '[require_shared_prefs_key_constants] String literal used as SharedPreferences key. Use named constants. Using string literals for keys is error-prone and makes refactoring difficult. Define keys as constants for type safety and easier maintenance.',
+        '[require_shared_prefs_key_constants] String literal used as SharedPreferences key. Use named constants. Using string literals for keys is error-prone and makes refactoring difficult. Define keys as constants for type safety and easier maintenance. {v4}',
     correctionMessage:
         'Define keys as constants (e.g., static const kUserName = "user_name"). Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,

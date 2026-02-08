@@ -16,6 +16,8 @@ import 'package:custom_lint_builder/custom_lint_builder.dart';
 
 /// Warns against any usage of adjacent strings.
 ///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v4
+///
 /// Adjacent strings can be confusing and error-prone.
 ///
 /// Example of **bad** code:
@@ -40,7 +42,7 @@ class AvoidAdjacentStringsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_adjacent_strings',
     problemMessage:
-        '[avoid_adjacent_strings] Adjacent string literals detected without an explicit concatenation operator. Dart implicitly joins adjacent strings, which can mask accidental line breaks or missing commas in list literals, leading to silently merged values that are difficult to debug.',
+        '[avoid_adjacent_strings] Adjacent string literals detected without an explicit concatenation operator. Dart implicitly joins adjacent strings, which can mask accidental line breaks or missing commas in list literals, leading to silently merged values that are difficult to debug. {v4}',
     correctionMessage:
         'Combine into a single string literal, use the + operator for explicit concatenation, or use string interpolation to make the intent clear.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -59,6 +61,8 @@ class AvoidAdjacentStringsRule extends SaropaLintRule {
 }
 
 /// Warns when accessing enum values by index (`EnumName.values[i]`).
+///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v4
 class AvoidEnumValuesByIndexRule extends SaropaLintRule {
   const AvoidEnumValuesByIndexRule() : super(code: _code);
 
@@ -72,7 +76,7 @@ class AvoidEnumValuesByIndexRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_enum_values_by_index',
     problemMessage:
-        '[avoid_enum_values_by_index] Enum value accessed by numeric index on the .values list. If enum members are reordered or new values are inserted, the index silently resolves to the wrong constant, causing incorrect behavior that the compiler cannot catch.',
+        '[avoid_enum_values_by_index] Enum value accessed by numeric index on the .values list. If enum members are reordered or new values are inserted, the index silently resolves to the wrong constant, causing incorrect behavior that the compiler cannot catch. {v4}',
     correctionMessage:
         'Use EnumName.values.byName() for string-based lookup, or switch on specific enum values to get compile-time exhaustiveness checking.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -114,6 +118,8 @@ class AvoidEnumValuesByIndexRule extends SaropaLintRule {
 
 /// Warns when Uri constructor is called with an invalid URI string.
 ///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v4
+///
 /// ### Example
 ///
 /// #### BAD:
@@ -138,7 +144,7 @@ class AvoidIncorrectUriRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_incorrect_uri',
     problemMessage:
-        '[avoid_incorrect_uri] URI string appears to be malformed or contains invalid characters. Malformed URIs cause runtime exceptions when parsed by Uri.parse(), leading to unhandled errors in network requests, routing logic, or deep link handling.',
+        '[avoid_incorrect_uri] URI string appears to be malformed or contains invalid characters. Malformed URIs cause runtime exceptions when parsed by Uri.parse(), leading to unhandled errors in network requests, routing logic, or deep link handling. {v4}',
     correctionMessage:
         'Verify the URI syntax matches RFC 3986, ensure special characters are percent-encoded, and test with Uri.parse() to confirm validity.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -218,6 +224,8 @@ class AvoidIncorrectUriRule extends SaropaLintRule {
 
 /// Warns when late keyword is used.
 ///
+/// Since: v1.8.2 | Updated: v4.13.0 | Rule version: v7
+///
 /// Late variables can lead to runtime errors if accessed before initialization.
 /// Consider using nullable types or initializing in the constructor.
 class AvoidLateKeywordRule extends SaropaLintRule {
@@ -233,7 +241,7 @@ class AvoidLateKeywordRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_late_keyword',
     problemMessage:
-        "[avoid_late_keyword] Field declared with the 'late' keyword defers initialization checking to runtime. If the field is accessed before assignment, Dart throws a LateInitializationError that crashes the app, bypassing the null safety guarantees the type system provides at compile time.",
+        "[avoid_late_keyword] Field declared with the 'late' keyword defers initialization checking to runtime. If the field is accessed before assignment, Dart throws a LateInitializationError that crashes the app, bypassing the null safety guarantees the type system provides at compile time. {v7}",
     correctionMessage:
         'Use a nullable type with a null check, provide a default value, or initialize the field in the constructor to keep initialization errors visible at compile time.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -262,6 +270,8 @@ class AvoidLateKeywordRule extends SaropaLintRule {
 
 /// Warns when a getter is called without parentheses in print/debugPrint.
 ///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v5
+///
 /// This catches common cases where a method/getter reference is passed to
 /// print instead of calling it.
 ///
@@ -288,7 +298,7 @@ class AvoidMissedCallsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_missed_calls',
     problemMessage:
-        '[avoid_missed_calls] Function reference passed without parentheses where a call was likely intended. Without the () invocation, the function is not executed and the reference is silently discarded, meaning the intended side effect or return value is lost.',
+        '[avoid_missed_calls] Function reference passed without parentheses where a call was likely intended. Without the () invocation, the function is not executed and the reference is silently discarded, meaning the intended side effect or return value is lost. {v5}',
     correctionMessage:
         'Add parentheses () to invoke the function, or if the reference is intentional, assign it to a variable with an explicit function type.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -362,6 +372,8 @@ class AvoidMissedCallsRule extends SaropaLintRule {
 
 /// Warns when a set literal is used where another type is expected.
 ///
+/// Since: v1.7.2 | Updated: v4.13.0 | Rule version: v2
+///
 /// This catches cases where `{}` is used but interpreted as a Set
 /// when a Map was likely intended.
 ///
@@ -389,7 +401,7 @@ class AvoidMisusedSetLiteralsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_misused_set_literals',
     problemMessage: '[avoid_misused_set_literals] Set literal may be misused. '
-        'Empty `{}` without type annotation creates a Map, not a Set.',
+        'Empty `{}` without type annotation creates a Map, not a Set. {v2}',
     correctionMessage: 'Add explicit type annotation: `<Type>{}` for Set '
         'or `<K, V>{}` for Map.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -421,6 +433,8 @@ class AvoidMisusedSetLiteralsRule extends SaropaLintRule {
 }
 
 /// Warns when an object is passed as an argument to its own method.
+///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v4
 ///
 /// This rule catches potential circular reference bugs where an object
 /// reference is passed to its own method.
@@ -454,7 +468,7 @@ class AvoidPassingSelfAsArgumentRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_passing_self_as_argument',
     problemMessage:
-        '[avoid_passing_self_as_argument] Object passed as an argument to its own method, creating a self-referential call. This pattern often indicates a logic error and can lead to infinite recursion, stack overflow, or unexpected mutation of the object state during method execution.',
+        '[avoid_passing_self_as_argument] Object passed as an argument to its own method, creating a self-referential call. This pattern often indicates a logic error and can lead to infinite recursion, stack overflow, or unexpected mutation of the object state during method execution. {v4}',
     correctionMessage:
         'Extract the shared logic into a separate method, pass a different object, or restructure the call to eliminate the self-reference.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -489,6 +503,8 @@ class AvoidPassingSelfAsArgumentRule extends SaropaLintRule {
 }
 
 /// Warns when a function calls itself directly (recursive call).
+///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v5
 ///
 /// Recursive functions can lead to stack overflow if not properly guarded.
 /// Consider using iteration or ensuring proper base cases.
@@ -528,7 +544,7 @@ class AvoidRecursiveCallsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_recursive_calls',
     problemMessage:
-        '[avoid_recursive_calls] Function contains a direct recursive call to itself. Without a guaranteed base case or depth limit, unbounded recursion exhausts the call stack and crashes the application with a StackOverflowError, which cannot be caught in Dart.',
+        '[avoid_recursive_calls] Function contains a direct recursive call to itself. Without a guaranteed base case or depth limit, unbounded recursion exhausts the call stack and crashes the application with a StackOverflowError, which cannot be caught in Dart. {v5}',
     correctionMessage:
         'Verify a terminating base case exists for all input paths, or convert the recursion to an iterative approach using a loop or explicit stack.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -593,6 +609,8 @@ class _RecursiveCallVisitor extends RecursiveAstVisitor<void> {
 
 /// Warns when toString() method calls itself, causing infinite recursion.
 ///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v5
+///
 /// Example of **bad** code:
 /// ```dart
 /// class User {
@@ -622,7 +640,7 @@ class AvoidRecursiveToStringRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_recursive_tostring',
     problemMessage:
-        '[avoid_recursive_tostring] toString() method references itself through \$this or this.toString(), creating infinite recursion. The runtime repeatedly invokes toString() until the call stack overflows, crashing the application with an unrecoverable StackOverflowError.',
+        '[avoid_recursive_tostring] toString() method references itself through \$this or this.toString(), creating infinite recursion. The runtime repeatedly invokes toString() until the call stack overflows, crashing the application with an unrecoverable StackOverflowError. {v5}',
     correctionMessage:
         'Reference individual fields directly (e.g. \$name, \$id) instead of \$this, or build the string using a StringBuffer to control the representation explicitly.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -681,6 +699,8 @@ class _ToStringRecursionVisitor extends RecursiveAstVisitor<void> {
 
 /// Warns when referencing discarded/underscore-prefixed variables.
 ///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v5
+///
 /// Variables starting with underscore are meant to be unused.
 ///
 /// ### Example
@@ -709,7 +729,7 @@ class AvoidReferencingDiscardedVariablesRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_referencing_discarded_variables',
     problemMessage:
-        '[avoid_referencing_discarded_variables] Variable prefixed with underscore is referenced after declaration. The underscore prefix signals that the value is intentionally discarded, so reading it later contradicts the naming convention and confuses developers who expect underscore-prefixed variables to be unused.',
+        '[avoid_referencing_discarded_variables] Variable prefixed with underscore is referenced after declaration. The underscore prefix signals that the value is intentionally discarded, so reading it later contradicts the naming convention and confuses developers who expect underscore-prefixed variables to be unused. {v5}',
     correctionMessage:
         'Rename the variable without the underscore prefix if it is actually used, or remove the reference if the variable should remain discarded.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -761,6 +781,8 @@ class AvoidReferencingDiscardedVariablesRule extends SaropaLintRule {
 
 /// Warns when @pragma('vm:prefer-inline') is used redundantly.
 ///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v5
+///
 /// Pragma inline annotations should only be used when necessary.
 ///
 /// ### Example
@@ -791,7 +813,7 @@ class AvoidRedundantPragmaInlineRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_redundant_pragma_inline',
     problemMessage:
-        '[avoid_redundant_pragma_inline] Pragma inline annotation applied to a trivial method that the compiler already inlines automatically. Redundant annotations add noise to the codebase, and overusing pragma inline can prevent the compiler from making better optimization decisions.',
+        '[avoid_redundant_pragma_inline] Pragma inline annotation applied to a trivial method that the compiler already inlines automatically. Redundant annotations add noise to the codebase, and overusing pragma inline can prevent the compiler from making better optimization decisions. {v5}',
     correctionMessage:
         'Remove the @pragma(vm:prefer-inline) annotation from simple getters, setters, and one-line methods that the compiler inlines by default.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -844,6 +866,8 @@ class AvoidRedundantPragmaInlineRule extends SaropaLintRule {
 
 /// Warns when String.substring() is used.
 ///
+/// Since: v4.1.3 | Updated: v4.13.0 | Rule version: v3
+///
 /// `substring` can cause runtime errors if indices are out of bounds.
 /// Prefer safer alternatives like pattern matching, split, or replaceRange.
 ///
@@ -871,7 +895,7 @@ class AvoidSubstringRule extends SaropaLintRule {
     name: 'avoid_string_substring',
     problemMessage:
         '[avoid_string_substring] substring() throws RangeError if start or end indices are out of bounds, causing runtime crashes when input lengths vary. '
-        'This is especially dangerous with user input, API responses, or dynamically sized strings where the length cannot be guaranteed at compile time.',
+        'This is especially dangerous with user input, API responses, or dynamically sized strings where the length cannot be guaranteed at compile time. {v3}',
     correctionMessage:
         'Check string length before calling substring(), or use safer alternatives such as split(), replaceRange(), or pattern matching. '
         'For optional extraction, consider an extension method that returns null for invalid ranges instead of throwing.',
@@ -897,6 +921,8 @@ class AvoidSubstringRule extends SaropaLintRule {
 
 /// Warns when unknown pragma annotations are used.
 ///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v3
+///
 /// Only known pragma values should be used.
 ///
 /// ### Example
@@ -918,7 +944,7 @@ class AvoidUnknownPragmaRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_unknown_pragma',
     problemMessage:
-        '[avoid_unknown_pragma] Unrecognized pragma annotation detected. Unknown pragmas are silently ignored by the Dart compiler, which means the intended optimization or behavior hint has no effect and may mislead developers into thinking the code is optimized when it is not.',
+        '[avoid_unknown_pragma] Unrecognized pragma annotation detected. Unknown pragmas are silently ignored by the Dart compiler, which means the intended optimization or behavior hint has no effect and may mislead developers into thinking the code is optimized when it is not. {v3}',
     correctionMessage:
         'Use a recognized pragma value such as vm:prefer-inline, vm:never-inline, or dart2js:tryInline, or remove the annotation entirely.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -969,6 +995,8 @@ class AvoidUnknownPragmaRule extends SaropaLintRule {
 
 /// Warns when a function parameter is unused.
 ///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v6
+///
 /// Unused parameters can indicate dead code or incomplete implementation.
 ///
 /// Example of **bad** code:
@@ -999,7 +1027,7 @@ class AvoidUnusedParametersRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_unused_parameters',
     problemMessage:
-        '[avoid_unused_parameters] Function parameter is declared but never referenced in the function body. Unused parameters add cognitive overhead for callers who must provide a value that has no effect, and they mask API design issues — either remove the parameter or complete the implementation that was supposed to use it.',
+        '[avoid_unused_parameters] Function parameter is declared but never referenced in the function body. Unused parameters add cognitive overhead for callers who must provide a value that has no effect, and they mask API design issues — either remove the parameter or complete the implementation that was supposed to use it. {v6}',
     correctionMessage:
         'Remove the parameter from the function signature, or prefix it with an underscore to indicate it is intentionally unused for interface conformance.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -1075,6 +1103,8 @@ class _IdentifierCollector extends RecursiveAstVisitor<void> {
 
 /// Warns when weak cryptographic algorithms like MD5 or SHA1 are used.
 ///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v5
+///
 /// MD5 and SHA1 are considered cryptographically broken and should not be used
 /// for security purposes.
 ///
@@ -1104,7 +1134,7 @@ class AvoidWeakCryptographicAlgorithmsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_weak_cryptographic_algorithms',
     problemMessage:
-        '[avoid_weak_cryptographic_algorithms] Weak or deprecated cryptographic algorithm detected (e.g. MD5, SHA-1). These algorithms have known collision vulnerabilities that allow attackers to forge hashes, compromising data integrity verification, password storage, and digital signature validation.',
+        '[avoid_weak_cryptographic_algorithms] Weak or deprecated cryptographic algorithm detected (e.g. MD5, SHA-1). These algorithms have known collision vulnerabilities that allow attackers to forge hashes, compromising data integrity verification, password storage, and digital signature validation. {v5}',
     correctionMessage:
         'Replace with a stronger algorithm such as SHA-256, SHA-512, or bcrypt for password hashing. Use the crypto or pointycastle package for secure implementations.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -1132,13 +1162,15 @@ class AvoidWeakCryptographicAlgorithmsRule extends SaropaLintRule {
 }
 
 /// Warns when a function returns a value that should have @useResult.
+///
+/// Since: v4.9.5 | Updated: v4.13.0 | Rule version: v5
 class MissingUseResultAnnotationRule extends SaropaLintRule {
   const MissingUseResultAnnotationRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
     name: 'missing_use_result_annotation',
     problemMessage:
-        '[missing_use_result_annotation] Function returns a value without @useResult annotation. Callers may accidentally ignore the return value, leading to missed error handling, lost data transformations, or incorrectly assuming the function has side effects when it does not.',
+        '[missing_use_result_annotation] Function returns a value without @useResult annotation. Callers may accidentally ignore the return value, leading to missed error handling, lost data transformations, or incorrectly assuming the function has side effects when it does not. {v5}',
     correctionMessage:
         'Add @useResult annotation above the function declaration to signal that the returned value must be used. Include a reason parameter explaining what happens if the value is ignored.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -1191,6 +1223,8 @@ class MissingUseResultAnnotationRule extends SaropaLintRule {
 
 /// Warns when a member is declared with type `Object`.
 ///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v4
+///
 /// Using Object type is often a sign of missing generics or improper typing.
 ///
 /// Example of **bad** code:
@@ -1221,7 +1255,7 @@ class NoObjectDeclarationRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'no_object_declaration',
     problemMessage:
-        '[no_object_declaration] Member declared with type Object, which erases all type information. Accessing any property or method requires an unsafe downcast, bypassing compile-time type checking and risking runtime cast errors that could have been prevented with a more specific type.',
+        '[no_object_declaration] Member declared with type Object, which erases all type information. Accessing any property or method requires an unsafe downcast, bypassing compile-time type checking and risking runtime cast errors that could have been prevented with a more specific type. {v4}',
     correctionMessage:
         'Replace Object with the most specific type that applies, use generics to preserve type information, or use a sealed class hierarchy for known subtypes.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -1251,6 +1285,8 @@ class NoObjectDeclarationRule extends SaropaLintRule {
 
 /// Warns when only one inlining annotation is used.
 ///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v3
+///
 /// If using vm:prefer-inline, also use dart2js:tryInline for consistency.
 ///
 /// ### Example
@@ -1273,7 +1309,7 @@ class PreferBothInliningAnnotationsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_both_inlining_annotations',
     problemMessage:
-        '[prefer_both_inlining_annotations] Only one inlining pragma is present, but the Dart VM and dart2js compilers use different annotations. Without both vm:prefer-inline and dart2js:tryInline, the function is only inlined on one platform, leaving the other without the intended optimization.',
+        '[prefer_both_inlining_annotations] Only one inlining pragma is present, but the Dart VM and dart2js compilers use different annotations. Without both vm:prefer-inline and dart2js:tryInline, the function is only inlined on one platform, leaving the other without the intended optimization. {v3}',
     correctionMessage:
         'Add the missing counterpart annotation: use @pragma(dart2js:tryInline) alongside @pragma(vm:prefer-inline), or vice versa.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -1324,6 +1360,8 @@ class PreferBothInliningAnnotationsRule extends SaropaLintRule {
 
 /// Warns when using `MediaQuery.of(context).size` instead of dedicated methods.
 ///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v6
+///
 /// Alias: prefer_dedicated_media_query_methods
 ///
 /// Flutter provides dedicated methods like `MediaQuery.sizeOf(context)` which
@@ -1353,7 +1391,7 @@ class PreferDedicatedMediaQueryMethodRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_dedicated_media_query_method',
     problemMessage:
-        '[prefer_dedicated_media_query_method] MediaQuery.of(context) accessed for a single property. This registers a dependency on the entire MediaQueryData object, causing the widget to rebuild whenever any media query value changes (orientation, padding, text scale), even if only one property is needed.',
+        '[prefer_dedicated_media_query_method] MediaQuery.of(context) accessed for a single property. This registers a dependency on the entire MediaQueryData object, causing the widget to rebuild whenever any media query value changes (orientation, padding, text scale), even if only one property is needed. {v6}',
     correctionMessage:
         'Use the dedicated method such as MediaQuery.sizeOf(context), MediaQuery.paddingOf(context), or MediaQuery.textScaleFactorOf(context) to depend only on the specific property.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -1398,6 +1436,8 @@ class PreferDedicatedMediaQueryMethodRule extends SaropaLintRule {
 
 /// Warns when enum values are found using firstWhere instead of byName.
 ///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v5
+///
 /// Example of **bad** code:
 /// ```dart
 /// MyEnum.values.firstWhere((e) => e.name == 'value');
@@ -1420,7 +1460,7 @@ class PreferEnumsByNameRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_enums_by_name',
     problemMessage:
-        '[prefer_enums_by_name] Enum lookup uses firstWhere with name comparison instead of the built-in byName() method. The manual approach is more verbose, less readable, and throws a generic StateError on mismatch instead of the descriptive ArgumentError that byName() provides.',
+        '[prefer_enums_by_name] Enum lookup uses firstWhere with name comparison instead of the built-in byName() method. The manual approach is more verbose, less readable, and throws a generic StateError on mismatch instead of the descriptive ArgumentError that byName() provides. {v5}',
     correctionMessage:
         'Replace .firstWhere((e) => e.name == x) with .byName(x) for cleaner code and a more descriptive error message on lookup failure.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -1475,6 +1515,8 @@ class PreferEnumsByNameRule extends SaropaLintRule {
 }
 
 /// Warns when inline function callbacks should be extracted.
+///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v4
 class PreferExtractingFunctionCallbacksRule extends SaropaLintRule {
   const PreferExtractingFunctionCallbacksRule() : super(code: _code);
 
@@ -1488,7 +1530,7 @@ class PreferExtractingFunctionCallbacksRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_extracting_function_callbacks',
     problemMessage:
-        '[prefer_extracting_function_callbacks] Large inline callback detected spanning 10+ lines. Inline callbacks make code harder to read, test in isolation, and reuse across multiple call sites, reducing code maintainability and increasing complexity.',
+        '[prefer_extracting_function_callbacks] Large inline callback detected spanning 10+ lines. Inline callbacks make code harder to read, test in isolation, and reuse across multiple call sites, reducing code maintainability and increasing complexity. {v4}',
     correctionMessage:
         'Extract this callback to a separate named method or private function. This enables unit testing the logic independently, improves readability by giving the behavior a descriptive name, and allows reuse.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -1525,6 +1567,8 @@ class PreferExtractingFunctionCallbacksRule extends SaropaLintRule {
 
 /// Warns when spreading a nullable collection without null-aware spread.
 ///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v4
+///
 /// ### Example
 ///
 /// #### BAD:
@@ -1551,7 +1595,7 @@ class PreferNullAwareSpreadRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_null_aware_spread',
     problemMessage:
-        '[prefer_null_aware_spread] Nullable collection spread without null-aware operator. Spreading a nullable list or set without ...? throws a runtime TypeError when the value is null, crashing the collection literal construction instead of gracefully contributing zero elements.',
+        '[prefer_null_aware_spread] Nullable collection spread without null-aware operator. Spreading a nullable list or set without ...? throws a runtime TypeError when the value is null, crashing the collection literal construction instead of gracefully contributing zero elements. {v4}',
     correctionMessage:
         'Replace ...nullableCollection with ...?nullableCollection so that null values are treated as empty and contribute no elements to the result.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -1602,6 +1646,8 @@ class PreferNullAwareSpreadRule extends SaropaLintRule {
 
 /// Warns when @visibleForTesting should be used on members.
 ///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v4
+///
 /// Test-only members should be annotated.
 ///
 /// ### Example
@@ -1634,7 +1680,7 @@ class PreferVisibleForTestingOnMembersRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_visible_for_testing_on_members',
     problemMessage:
-        '[prefer_visible_for_testing_on_members] Member exposed solely for testing lacks the @visibleForTesting annotation. Without the annotation, the analyzer cannot warn when production code accidentally calls the test-only member, breaking the intended encapsulation boundary.',
+        '[prefer_visible_for_testing_on_members] Member exposed solely for testing lacks the @visibleForTesting annotation. Without the annotation, the analyzer cannot warn when production code accidentally calls the test-only member, breaking the intended encapsulation boundary. {v4}',
     correctionMessage:
         'Add the @visibleForTesting annotation from package:meta so the analyzer flags any non-test usage of this member as a warning.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -1702,6 +1748,8 @@ class PreferVisibleForTestingOnMembersRule extends SaropaLintRule {
 
 /// Warns when a named parameter is passed as null explicitly.
 ///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v4
+///
 /// Example of **bad** code:
 /// ```dart
 /// void foo({String? name}) { }
@@ -1726,7 +1774,7 @@ class AvoidAlwaysNullParametersRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_always_null_parameters',
     problemMessage:
-        '[avoid_always_null_parameters] Parameter is explicitly passed as null at every call site. Passing null as a constant argument adds noise, makes the call site harder to read, and defeats the purpose of optional parameters, which default to null when omitted.',
+        '[avoid_always_null_parameters] Parameter is explicitly passed as null at every call site. Passing null as a constant argument adds noise, makes the call site harder to read, and defeats the purpose of optional parameters, which default to null when omitted. {v4}',
     correctionMessage:
         'Omit the parameter entirely and let the default value apply, or if null has semantic meaning, document why it is passed explicitly.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -1762,6 +1810,8 @@ class AvoidAlwaysNullParametersRule extends SaropaLintRule {
 
 /// Warns when an instance method assigns to a static field.
 ///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v3
+///
 /// Example of **bad** code:
 /// ```dart
 /// class Foo {
@@ -1777,7 +1827,7 @@ class AvoidAssigningToStaticFieldRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_assigning_to_static_field',
     problemMessage:
-        '[avoid_assigning_to_static_field] Instance method modifies a static field, coupling instance behavior to global state. This makes the class unpredictable because any instance can silently alter shared state, causing race conditions in concurrent code and making tests unreliable.',
+        '[avoid_assigning_to_static_field] Instance method modifies a static field, coupling instance behavior to global state. This makes the class unpredictable because any instance can silently alter shared state, causing race conditions in concurrent code and making tests unreliable. {v3}',
     correctionMessage:
         'Move the assignment to a static method if the modification is class-level, or convert the static field to an instance field if the state should be per-instance.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -1861,6 +1911,8 @@ class _StaticFieldAssignmentVisitor extends RecursiveAstVisitor<void> {
 
 /// Warns when an async method is called in a sync function without await.
 ///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v5
+///
 /// Example of **bad** code:
 /// ```dart
 /// void doWork() {
@@ -1880,7 +1932,7 @@ class AvoidAsyncCallInSyncFunctionRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_async_call_in_sync_function',
     problemMessage:
-        '[avoid_async_call_in_sync_function] Async function called inside a synchronous function without handling the returned Future. The Future is silently discarded, so any errors thrown by the async operation are swallowed and any result is lost, making failures invisible.',
+        '[avoid_async_call_in_sync_function] Async function called inside a synchronous function without handling the returned Future. The Future is silently discarded, so any errors thrown by the async operation are swallowed and any result is lost, making failures invisible. {v5}',
     correctionMessage:
         'Mark the enclosing function as async and await the call, chain with .then()/.catchError() for explicit handling, or wrap with unawaited() to document the intentional fire-and-forget.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -2004,6 +2056,8 @@ class AvoidAsyncCallInSyncFunctionRule extends SaropaLintRule {
 
 /// Warns when loop conditions are too complex.
 ///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v4
+///
 /// Example of **bad** code:
 /// ```dart
 /// while (a && b || c && d && e) { }
@@ -2021,7 +2075,7 @@ class AvoidComplexLoopConditionsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_complex_loop_conditions',
     problemMessage:
-        '[avoid_complex_loop_conditions] Loop condition contains too many operators or nested expressions, making it difficult to reason about when the loop terminates. Complex conditions increase the risk of off-by-one errors and infinite loops that are hard to diagnose.',
+        '[avoid_complex_loop_conditions] Loop condition contains too many operators or nested expressions, making it difficult to reason about when the loop terminates. Complex conditions increase the risk of off-by-one errors and infinite loops that are hard to diagnose. {v4}',
     correctionMessage:
         'Extract the condition into a named boolean variable or a separate method with a descriptive name that communicates the loop termination intent.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -2080,6 +2134,8 @@ class AvoidComplexLoopConditionsRule extends SaropaLintRule {
 
 /// Warns when both sides of a binary expression are constants.
 ///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v4
+///
 /// Example of **bad** code:
 /// ```dart
 /// if (1 > 2) { }  // Always false
@@ -2098,7 +2154,7 @@ class AvoidConstantConditionsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_constant_conditions',
     problemMessage:
-        '[avoid_constant_conditions] Condition evaluates to a compile-time constant, making one branch unreachable dead code. This usually indicates a logic error where the condition was intended to be dynamic, or leftover debugging code that was never cleaned up.',
+        '[avoid_constant_conditions] Condition evaluates to a compile-time constant, making one branch unreachable dead code. This usually indicates a logic error where the condition was intended to be dynamic, or leftover debugging code that was never cleaned up. {v4}',
     correctionMessage:
         'Remove the condition and keep only the reachable branch, or replace the constant with the intended dynamic expression that varies at runtime.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -2141,6 +2197,8 @@ class AvoidConstantConditionsRule extends SaropaLintRule {
 
 /// Warns when contradicting conditions are used.
 ///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v3
+///
 /// Example of **bad** code:
 /// ```dart
 /// if (x > 5 && x < 3) { }  // Always false
@@ -2152,7 +2210,7 @@ class AvoidContradictoryExpressionsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_contradictory_expressions',
     problemMessage:
-        '[avoid_contradictory_expressions] Contradictory conditions detected where two expressions cannot both be true simultaneously. This creates unreachable code paths that silently skip intended logic, indicating a logic error that may cause incorrect behavior or missed edge cases.',
+        '[avoid_contradictory_expressions] Contradictory conditions detected where two expressions cannot both be true simultaneously. This creates unreachable code paths that silently skip intended logic, indicating a logic error that may cause incorrect behavior or missed edge cases. {v3}',
     correctionMessage:
         'Review the boolean logic to ensure conditions are compatible, remove the contradictory branch, or correct the expression to reflect the intended behavior.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -2266,6 +2324,8 @@ class AvoidContradictoryExpressionsRule extends SaropaLintRule {
 
 /// Warns when catch blocks have identical bodies.
 ///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v5
+///
 /// Example of **bad** code:
 /// ```dart
 /// try { ... }
@@ -2288,7 +2348,7 @@ class AvoidIdenticalExceptionHandlingBlocksRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_identical_exception_handling_blocks',
     problemMessage:
-        '[avoid_identical_exception_handling_blocks] Multiple catch blocks contain identical handling code. Duplicated exception handling increases maintenance burden because changes must be applied to every copy, and missed updates lead to inconsistent error recovery behavior.',
+        '[avoid_identical_exception_handling_blocks] Multiple catch blocks contain identical handling code. Duplicated exception handling increases maintenance burden because changes must be applied to every copy, and missed updates lead to inconsistent error recovery behavior. {v5}',
     correctionMessage:
         'Combine the exception types into a single catch clause (e.g. on FormatException, IOException catch (e)) or extract the shared handling into a helper method.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -2323,6 +2383,8 @@ class AvoidIdenticalExceptionHandlingBlocksRule extends SaropaLintRule {
 
 /// Warns when a late final field is assigned twice.
 ///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v4
+///
 /// Example of **bad** code:
 /// ```dart
 /// late final int value;
@@ -2344,7 +2406,7 @@ class AvoidLateFinalReassignmentRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_late_final_reassignment',
     problemMessage:
-        '[avoid_late_final_reassignment] Late final field has multiple assignment paths, which throws a LateInitializationError at runtime on the second write. The compiler cannot catch this statically, so the crash only surfaces during execution of the specific code path that triggers the duplicate assignment.',
+        '[avoid_late_final_reassignment] Late final field has multiple assignment paths, which throws a LateInitializationError at runtime on the second write. The compiler cannot catch this statically, so the crash only surfaces during execution of the specific code path that triggers the duplicate assignment. {v4}',
     correctionMessage:
         'Ensure the late final field is assigned exactly once across all code paths, or convert it to a non-final late field if reassignment is intentional.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -2419,6 +2481,8 @@ class _LateFinalAssignmentCounter extends RecursiveAstVisitor<void> {
 
 /// Warns when Completer.completeError is called without stack trace.
 ///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v4
+///
 /// Example of **bad** code:
 /// ```dart
 /// completer.completeError(error);  // Missing stack trace
@@ -2441,7 +2505,7 @@ class AvoidMissingCompleterStackTraceRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_missing_completer_stack_trace',
     problemMessage:
-        '[avoid_missing_completer_stack_trace] Completer.completeError() called without passing the stack trace as the second argument. Without the original stack trace, error reports show only the completeError() call site instead of the actual failure origin, making debugging asynchronous errors significantly harder.',
+        '[avoid_missing_completer_stack_trace] Completer.completeError() called without passing the stack trace as the second argument. Without the original stack trace, error reports show only the completeError() call site instead of the actual failure origin, making debugging asynchronous errors significantly harder. {v4}',
     correctionMessage:
         'Pass the stack trace as the second argument to completeError(error, stackTrace) to preserve the full async error chain for debugging.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -2467,6 +2531,8 @@ class AvoidMissingCompleterStackTraceRule extends SaropaLintRule {
 
 /// Warns when a map indexed by enum is missing some enum values.
 ///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v3
+///
 /// Example of **bad** code:
 /// ```dart
 /// enum Status { active, inactive, pending }
@@ -2478,7 +2544,7 @@ class AvoidMissingEnumConstantInMapRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_missing_enum_constant_in_map',
     problemMessage:
-        '[avoid_missing_enum_constant_in_map] Map literal keyed by enum values does not include all enum constants. When a new enum value is added, this map silently returns null for the missing key instead of producing a compile-time error, leading to unexpected null values or fallback behavior at runtime.',
+        '[avoid_missing_enum_constant_in_map] Map literal keyed by enum values does not include all enum constants. When a new enum value is added, this map silently returns null for the missing key instead of producing a compile-time error, leading to unexpected null values or fallback behavior at runtime. {v3}',
     correctionMessage:
         'Add entries for all enum constants to the map, or use a switch expression with exhaustiveness checking to ensure every enum value is handled.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -2524,6 +2590,8 @@ class AvoidMissingEnumConstantInMapRule extends SaropaLintRule {
 }
 
 /// Warns when function parameters are reassigned.
+///
+/// Since: v4.2.0 | Updated: v4.13.0 | Rule version: v3
 ///
 /// Alias: avoid_mutating_parameters (deprecated)
 ///
@@ -2572,7 +2640,7 @@ class AvoidParameterReassignmentRule extends SaropaLintRule {
     name: 'avoid_parameter_reassignment',
     problemMessage:
         '[avoid_parameter_reassignment] Parameter is being reassigned. '
-        'This hides the original input value.',
+        'This hides the original input value. {v3}',
     correctionMessage:
         'Create a local variable instead of reassigning the parameter.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -2663,6 +2731,8 @@ class _ParameterReassignmentVisitor extends RecursiveAstVisitor<void> {
 
 /// Warns when function parameters are mutated (object state modified).
 ///
+/// Since: v4.2.0 | Updated: v4.13.0 | Rule version: v2
+///
 /// Mutating a parameter modifies the caller's object, which is a hidden
 /// side effect that can cause bugs. The caller may not expect their data
 /// to change. This is different from parameter reassignment (which only
@@ -2714,7 +2784,7 @@ class AvoidParameterMutationRule extends SaropaLintRule {
     name: 'avoid_parameter_mutation',
     problemMessage:
         '[avoid_parameter_mutation] Parameter object is being mutated. '
-        'This modifies the caller\'s data.',
+        'This modifies the caller\'s data. {v2}',
     correctionMessage:
         'Create a copy of the data instead of mutating the parameter.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -2874,6 +2944,8 @@ class _ParameterMutationVisitor extends RecursiveAstVisitor<void> {
 // cspell:ignore valuel
 /// Warns when variable names are too similar.
 ///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v4
+///
 /// Example of **bad** code:
 /// ```dart
 /// final value1 = 1;
@@ -2892,7 +2964,7 @@ class AvoidSimilarNamesRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_similar_names',
     problemMessage:
-        '[avoid_similar_names] Variable name differs from another in-scope variable by only one or two characters. Near-identical names increase the risk of accidentally using the wrong variable, producing subtle bugs that pass code review because the names look correct at a glance.',
+        '[avoid_similar_names] Variable name differs from another in-scope variable by only one or two characters. Near-identical names increase the risk of accidentally using the wrong variable, producing subtle bugs that pass code review because the names look correct at a glance. {v4}',
     correctionMessage:
         'Rename one or both variables to be more distinct, using descriptive names that clearly convey their different purposes (e.g. userInput vs validatedInput).',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -2990,6 +3062,8 @@ class _VariableCollector extends RecursiveAstVisitor<void> {
 
 /// Warns when nullable parameters are never passed null.
 ///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v4
+///
 /// Example of **bad** code:
 /// ```dart
 /// void foo(String? x) { }
@@ -3009,7 +3083,7 @@ class AvoidUnnecessaryNullableParametersRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_unnecessary_nullable_parameters',
     problemMessage:
-        '[avoid_unnecessary_nullable_parameters] Parameter declared as nullable but null is never passed at any call site. The unnecessary nullable type forces every usage within the function body to handle a null case that cannot occur, adding defensive checks and reducing code clarity.',
+        '[avoid_unnecessary_nullable_parameters] Parameter declared as nullable but null is never passed at any call site. The unnecessary nullable type forces every usage within the function body to handle a null case that cannot occur, adding defensive checks and reducing code clarity. {v4}',
     correctionMessage:
         'Change the parameter type to non-nullable. If null support is needed for future callers, add it when the requirement actually arises rather than preemptively.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -3052,6 +3126,8 @@ class AvoidUnnecessaryNullableParametersRule extends SaropaLintRule {
 }
 
 /// Warns when a function always returns null.
+///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v6
 ///
 /// A function that always returns null likely has the wrong return type (should
 /// be `void`) or is missing meaningful implementation. This indicates dead code
@@ -3096,7 +3172,7 @@ class FunctionAlwaysReturnsNullRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'function_always_returns_null',
     problemMessage:
-        '[function_always_returns_null] Function returns null on every code path, making the return type effectively void. Callers that check or use the return value are performing dead logic, and the nullable return type misleads developers into thinking the function can return meaningful data.',
+        '[function_always_returns_null] Function returns null on every code path, making the return type effectively void. Callers that check or use the return value are performing dead logic, and the nullable return type misleads developers into thinking the function can return meaningful data. {v6}',
     correctionMessage:
         'Change the return type to void if the function is purely side-effecting, or add meaningful return values for different code paths to make the function useful to callers.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -3232,6 +3308,8 @@ class _ReturnCollector extends RecursiveAstVisitor<void> {
 
 /// Warns when accessing collection elements by constant index in a loop.
 ///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v5
+///
 /// Example of **bad** code:
 /// ```dart
 /// for (var i = 0; i < items.length; i++) {
@@ -3251,7 +3329,7 @@ class AvoidAccessingCollectionsByConstantIndexRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_accessing_collections_by_constant_index',
     problemMessage:
-        '[avoid_accessing_collections_by_constant_index] Collection accessed by a constant index inside a loop body. This retrieves the same element on every iteration, which is wasteful and usually indicates a logic error where the loop variable was intended as the index instead.',
+        '[avoid_accessing_collections_by_constant_index] Collection accessed by a constant index inside a loop body. This retrieves the same element on every iteration, which is wasteful and usually indicates a logic error where the loop variable was intended as the index instead. {v5}',
     correctionMessage:
         'Replace the constant index with the loop variable, or extract the element into a local variable before the loop to make the single-access intent explicit.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -3295,6 +3373,8 @@ class _ConstantIndexVisitor extends RecursiveAstVisitor<void> {
 
 /// Warns when a class doesn't override toString().
 ///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v5
+///
 /// Example of **bad** code:
 /// ```dart
 /// class User {
@@ -3316,7 +3396,7 @@ class AvoidDefaultToStringRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_default_tostring',
     problemMessage:
-        '[avoid_default_tostring] Class relies on default toString() implementation which returns unhelpful output like "Instance of \'ClassName\'". During debugging, logging, or error messages, developers see meaningless object identifiers instead of the actual state values needed to diagnose issues.',
+        '[avoid_default_tostring] Class relies on default toString() implementation which returns unhelpful output like "Instance of \'ClassName\'". During debugging, logging, or error messages, developers see meaningless object identifiers instead of the actual state values needed to diagnose issues. {v5}',
     correctionMessage:
         'Override toString() to return a string representation of the object\'s key fields and current state. Format as "ClassName(field1: value1, field2: value2)" for easy inspection during debugging.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -3352,6 +3432,8 @@ class AvoidDefaultToStringRule extends SaropaLintRule {
 
 /// Warns when the same constant value is defined multiple times.
 ///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v3
+///
 /// Example of **bad** code:
 /// ```dart
 /// const errorMessage = 'Error occurred';
@@ -3363,7 +3445,7 @@ class AvoidDuplicateConstantValuesRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_duplicate_constant_values',
     problemMessage:
-        '[avoid_duplicate_constant_values] Multiple constants share the same value in this scope. Duplicate constant definitions increase maintenance cost because changes must be applied to every copy, and inconsistent updates lead to subtle logic errors when the values diverge.',
+        '[avoid_duplicate_constant_values] Multiple constants share the same value in this scope. Duplicate constant definitions increase maintenance cost because changes must be applied to every copy, and inconsistent updates lead to subtle logic errors when the values diverge. {v3}',
     correctionMessage:
         'Consolidate duplicates into a single named constant and reference it from all usage sites to ensure changes propagate consistently.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -3402,6 +3484,8 @@ class AvoidDuplicateConstantValuesRule extends SaropaLintRule {
 
 /// Warns when the same initializer expression is used twice.
 ///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v4
+///
 /// Example of **bad** code:
 /// ```dart
 /// class Foo {
@@ -3423,7 +3507,7 @@ class AvoidDuplicateInitializersRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_duplicate_initializers',
     problemMessage:
-        '[avoid_duplicate_initializers] Same initialization expression appears in multiple initializer list entries. Duplicate expressions waste computation, increase the risk of inconsistent updates when one copy is changed but others are missed, and obscure the intended initialization logic.',
+        '[avoid_duplicate_initializers] Same initialization expression appears in multiple initializer list entries. Duplicate expressions waste computation, increase the risk of inconsistent updates when one copy is changed but others are missed, and obscure the intended initialization logic. {v4}',
     correctionMessage:
         'Extract the shared expression into a local variable or factory method and reference it from each initializer to keep the logic in a single place.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -3460,6 +3544,8 @@ class AvoidDuplicateInitializersRule extends SaropaLintRule {
 
 /// Warns when an override just calls super without additional logic.
 ///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v4
+///
 /// Example of **bad** code:
 /// ```dart
 /// @override
@@ -3480,7 +3566,7 @@ class AvoidUnnecessaryOverridesRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_unnecessary_overrides',
     problemMessage:
-        '[avoid_unnecessary_overrides] Method override only delegates to super without adding any logic. Unnecessary overrides clutter the class, obscure the inheritance chain, and add a maintenance burden because developers must inspect each override to confirm it does nothing beyond the parent implementation.',
+        '[avoid_unnecessary_overrides] Method override only delegates to super without adding any logic. Unnecessary overrides clutter the class, obscure the inheritance chain, and add a maintenance burden because developers must inspect each override to confirm it does nothing beyond the parent implementation. {v4}',
     correctionMessage:
         'Remove the override entirely so the parent class implementation is used directly. Add the override back only when custom behavior is actually needed.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -3537,6 +3623,8 @@ class AvoidUnnecessaryOverridesRule extends SaropaLintRule {
 
 /// Warns when a statement has no effect.
 ///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v4
+///
 /// Example of **bad** code:
 /// ```dart
 /// void foo() {
@@ -3557,7 +3645,7 @@ class AvoidUnnecessaryStatementsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_unnecessary_statements',
     problemMessage:
-        '[avoid_unnecessary_statements] Statement produces a value or expression result that is never used and has no side effects. Dead statements clutter the code, mislead readers into thinking meaningful work is being done, and may indicate a missing assignment or function call.',
+        '[avoid_unnecessary_statements] Statement produces a value or expression result that is never used and has no side effects. Dead statements clutter the code, mislead readers into thinking meaningful work is being done, and may indicate a missing assignment or function call. {v4}',
     correctionMessage:
         'Remove the statement if it is truly unused, assign the result to a variable, or call the intended method to produce the expected side effect.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -3597,6 +3685,8 @@ class AvoidUnnecessaryStatementsRule extends SaropaLintRule {
 
 /// Warns when an assignment is never used.
 ///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v3
+///
 /// Example of **bad** code:
 /// ```dart
 /// void foo() {
@@ -3610,7 +3700,7 @@ class AvoidUnusedAssignmentRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_unused_assignment',
     problemMessage:
-        '[avoid_unused_assignment] Variable is assigned a value that is never read before being overwritten or going out of scope. The assignment wastes computation, and the unused result often signals a logic error where the value was meant to be used in a subsequent expression or return statement.',
+        '[avoid_unused_assignment] Variable is assigned a value that is never read before being overwritten or going out of scope. The assignment wastes computation, and the unused result often signals a logic error where the value was meant to be used in a subsequent expression or return statement. {v3}',
     correctionMessage:
         'Remove the assignment if the value is not needed, or use the variable in the intended expression. Check for missing return statements or conditional branches.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -3668,6 +3758,8 @@ class _AssignmentUsageVisitor extends RecursiveAstVisitor<void> {
 
 /// Warns when an instance is created but never used.
 ///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v5
+///
 /// Skips known fire-and-forget constructors (e.g. `Future.delayed`,
 /// `Timer`, `Timer.periodic`) whose side effects are the intended use.
 ///
@@ -3705,7 +3797,7 @@ class AvoidUnusedInstancesRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_unused_instances',
     problemMessage:
-        '[avoid_unused_instances] Object instance created but never assigned to a variable or used in an expression. The constructor runs its side effects (if any) but the resulting object is immediately garbage-collected, wasting memory allocation and usually indicating a missing assignment.',
+        '[avoid_unused_instances] Object instance created but never assigned to a variable or used in an expression. The constructor runs its side effects (if any) but the resulting object is immediately garbage-collected, wasting memory allocation and usually indicating a missing assignment. {v5}',
     correctionMessage:
         'Assign the instance to a variable for later use, pass it directly as an argument, or remove the creation entirely if the side effects are not needed.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -3731,6 +3823,8 @@ class AvoidUnusedInstancesRule extends SaropaLintRule {
 
 /// Warns when a variable is null-checked but not used afterward.
 ///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v3
+///
 /// Example of **bad** code:
 /// ```dart
 /// if (x != null) {
@@ -3743,7 +3837,7 @@ class AvoidUnusedAfterNullCheckRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_unused_after_null_check',
     problemMessage:
-        '[avoid_unused_after_null_check] Variable is null-checked in a condition but never referenced inside the guarded block. The null check implies the variable is needed, so the missing reference likely indicates a logic error where the intended usage was accidentally omitted.',
+        '[avoid_unused_after_null_check] Variable is null-checked in a condition but never referenced inside the guarded block. The null check implies the variable is needed, so the missing reference likely indicates a logic error where the intended usage was accidentally omitted. {v3}',
     correctionMessage:
         'Reference the variable inside the guarded block where the null check applies, or remove the null check entirely if the variable is genuinely not needed.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -3804,6 +3898,8 @@ class _IdentifierFinder extends RecursiveAstVisitor<void> {
 
 /// Warns when using default/wildcard case with enums.
 ///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v5
+///
 /// Example of **bad** code:
 /// ```dart
 /// switch (status) {
@@ -3824,7 +3920,7 @@ class AvoidWildcardCasesWithEnumsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_wildcard_cases_with_enums',
     problemMessage:
-        '[avoid_wildcard_cases_with_enums] Switch on an enum uses a default or wildcard case, suppressing exhaustiveness checking. When new enum values are added, the compiler will not flag this switch as incomplete, allowing the new case to silently fall into the default branch instead of being explicitly handled.',
+        '[avoid_wildcard_cases_with_enums] Switch on an enum uses a default or wildcard case, suppressing exhaustiveness checking. When new enum values are added, the compiler will not flag this switch as incomplete, allowing the new case to silently fall into the default branch instead of being explicitly handled. {v5}',
     correctionMessage:
         'Remove the default/wildcard case and add explicit case clauses for every enum value so the compiler reports an error when new values are introduced.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -3869,6 +3965,8 @@ class AvoidWildcardCasesWithEnumsRule extends SaropaLintRule {
 
 /// Warns when a function always returns the same value.
 ///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v5
+///
 /// Example of **bad** code:
 /// ```dart
 /// int getValue(bool condition) {
@@ -3889,7 +3987,7 @@ class FunctionAlwaysReturnsSameValueRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'function_always_returns_same_value',
     problemMessage:
-        '[function_always_returns_same_value] Function returns the same value on every code path regardless of input. The function body adds complexity without varying the output, suggesting the logic branches are incomplete or the function can be replaced by a constant.',
+        '[function_always_returns_same_value] Function returns the same value on every code path regardless of input. The function body adds complexity without varying the output, suggesting the logic branches are incomplete or the function can be replaced by a constant. {v5}',
     correctionMessage:
         'Replace the function with a constant or static field if the value is truly fixed, or add the missing branches that return different values based on input.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -3946,6 +4044,8 @@ class FunctionAlwaysReturnsSameValueRule extends SaropaLintRule {
 
 /// Warns when the same condition appears in nested if statements.
 ///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v4
+///
 /// Example of **bad** code:
 /// ```dart
 /// if (x > 0) {
@@ -3967,7 +4067,7 @@ class NoEqualNestedConditionsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'no_equal_nested_conditions',
     problemMessage:
-        '[no_equal_nested_conditions] Inner condition is identical to an enclosing outer condition. The nested check is always true at that point because the outer condition already guarantees it, making the inner branch redundant dead logic that adds nesting depth without any behavioral effect.',
+        '[no_equal_nested_conditions] Inner condition is identical to an enclosing outer condition. The nested check is always true at that point because the outer condition already guarantees it, making the inner branch redundant dead logic that adds nesting depth without any behavioral effect. {v4}',
     correctionMessage:
         'Remove the redundant nested condition and keep only the code inside it, since the outer condition already provides the same guarantee.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -4006,6 +4106,8 @@ class _NestedConditionChecker extends RecursiveAstVisitor<void> {
 
 /// Warns when switch cases have identical bodies.
 ///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v4
+///
 /// Example of **bad** code:
 /// ```dart
 /// switch (x) {
@@ -4026,7 +4128,7 @@ class NoEqualSwitchCaseRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'no_equal_switch_case',
     problemMessage:
-        '[no_equal_switch_case] Multiple switch cases contain identical body code. Duplicated case logic increases maintenance cost because changes must be applied to every copy, and missed updates cause inconsistent behavior across cases that are meant to be equivalent.',
+        '[no_equal_switch_case] Multiple switch cases contain identical body code. Duplicated case logic increases maintenance cost because changes must be applied to every copy, and missed updates cause inconsistent behavior across cases that are meant to be equivalent. {v4}',
     correctionMessage:
         'Combine the cases using comma-separated patterns (case a, b:) or extract the shared logic into a helper method referenced by each case.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -4064,6 +4166,8 @@ class NoEqualSwitchCaseRule extends SaropaLintRule {
 
 /// Warns when isEmpty/isNotEmpty is used after where().
 ///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v5
+///
 /// Example of **bad** code:
 /// ```dart
 /// list.where((e) => e > 5).isEmpty;
@@ -4086,7 +4190,7 @@ class PreferAnyOrEveryRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_any_or_every',
     problemMessage:
-        '[prefer_any_or_every] Collection filtered with where() only to check isEmpty/isNotEmpty. The where() call creates an intermediate lazy iterable and allocates a closure, while any() and every() short-circuit on the first matching element without creating intermediate objects.',
+        '[prefer_any_or_every] Collection filtered with where() only to check isEmpty/isNotEmpty. The where() call creates an intermediate lazy iterable and allocates a closure, while any() and every() short-circuit on the first matching element without creating intermediate objects. {v5}',
     correctionMessage:
         'Replace where(predicate).isEmpty with !any(predicate), and where(predicate).isNotEmpty with any(predicate) for clearer intent and better performance.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -4111,6 +4215,8 @@ class PreferAnyOrEveryRule extends SaropaLintRule {
 }
 
 /// Warns when index-based for loop can be replaced with for-in.
+///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v4
 ///
 /// **Stylistic rule (opt-in only).** No performance or correctness benefit.
 ///
@@ -4140,7 +4246,7 @@ class PreferForInRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_for_in',
     problemMessage:
-        '[prefer_for_in] Using for-in loops instead of index-based for loops is a stylistic preference. Both have equivalent performance for most Dart collections. Enable via the stylistic tier.',
+        '[prefer_for_in] Using for-in loops instead of index-based for loops is a stylistic preference. Both have equivalent performance for most Dart collections. Enable via the stylistic tier. {v4}',
     correctionMessage:
         'Replace the index-based loop with a for-in loop (for (final item in list)) to iterate directly over elements without managing an index variable.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -4194,6 +4300,8 @@ class PreferForInRule extends SaropaLintRule {
 
 /// Warns when duplicate patterns appear in pattern matching.
 ///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v4
+///
 /// Example of **bad** code:
 /// ```dart
 /// switch (value) {
@@ -4214,7 +4322,7 @@ class AvoidDuplicatePatternsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_duplicate_patterns',
     problemMessage:
-        '[avoid_duplicate_patterns] Same pattern appears multiple times in a switch or if-case chain. Duplicate patterns mean the second occurrence is unreachable dead code because the first match always wins, indicating a copy-paste error or incomplete refactoring.',
+        '[avoid_duplicate_patterns] Same pattern appears multiple times in a switch or if-case chain. Duplicate patterns mean the second occurrence is unreachable dead code because the first match always wins, indicating a copy-paste error or incomplete refactoring. {v4}',
     correctionMessage:
         'Remove the duplicate pattern clause, or if different handling is intended, adjust the pattern to be distinct so both branches are reachable.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -4256,6 +4364,8 @@ class AvoidDuplicatePatternsRule extends SaropaLintRule {
 
 /// Warns when an extension type contains another extension type.
 ///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v3
+///
 /// Example of **bad** code:
 /// ```dart
 /// extension type Inner(int value) {}
@@ -4267,7 +4377,7 @@ class AvoidNestedExtensionTypesRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_nested_extension_types',
     problemMessage:
-        '[avoid_nested_extension_types] Extension type wraps another extension type, creating multiple layers of zero-cost abstraction. Each layer adds indirection to the representation type, making the code harder to reason about and increasing the chance of applying the wrong extension methods to the underlying value.',
+        '[avoid_nested_extension_types] Extension type wraps another extension type, creating multiple layers of zero-cost abstraction. Each layer adds indirection to the representation type, making the code harder to reason about and increasing the chance of applying the wrong extension methods to the underlying value. {v3}',
     correctionMessage:
         'Use the underlying representation type directly in the outer extension type to flatten the abstraction and reduce confusion about which methods are available.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -4296,6 +4406,8 @@ class AvoidNestedExtensionTypesRule extends SaropaLintRule {
 
 /// Warns when slow collection methods are used.
 ///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v5
+///
 /// Methods like `sync*` generators for simple collections can be slow.
 ///
 /// Example of **bad** code:
@@ -4318,7 +4430,7 @@ class AvoidSlowCollectionMethodsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_slow_collection_methods',
     problemMessage:
-        '[avoid_slow_collection_methods] sync* generator used for a simple collection that yields a small, fixed number of elements. Generator functions have overhead from creating state machines and lazy iterables that exceeds the cost of building a plain list for small collections.',
+        '[avoid_slow_collection_methods] sync* generator used for a simple collection that yields a small, fixed number of elements. Generator functions have overhead from creating state machines and lazy iterables that exceeds the cost of building a plain list for small collections. {v5}',
     correctionMessage:
         'Return a List literal directly (e.g. [a, b, c]) for small fixed collections. Reserve sync* generators for large or computed sequences where lazy evaluation provides a real benefit.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -4371,6 +4483,8 @@ class _YieldCounter extends RecursiveAstVisitor<void> {
 
 /// Warns when a class field is never assigned a value.
 ///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v4
+///
 /// Example of **bad** code:
 /// ```dart
 /// class Foo {
@@ -4393,7 +4507,7 @@ class AvoidUnassignedFieldsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_unassigned_fields',
     problemMessage:
-        '[avoid_unassigned_fields] Field declared without an initializer and no constructor or method assigns it a value. Reading this field returns the default value (null for nullable types), which may cause unexpected NullPointerExceptions or logic errors if the caller expects a meaningful value.',
+        '[avoid_unassigned_fields] Field declared without an initializer and no constructor or method assigns it a value. Reading this field returns the default value (null for nullable types), which may cause unexpected NullPointerExceptions or logic errors if the caller expects a meaningful value. {v4}',
     correctionMessage:
         'Add an initializer at the declaration site, assign the field in the constructor, or mark it as late if initialization is deferred to a lifecycle method.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -4487,6 +4601,8 @@ class _FieldAssignmentVisitor extends RecursiveAstVisitor<void> {
 
 /// Warns when a late field is never assigned a value.
 ///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v4
+///
 /// Example of **bad** code:
 /// ```dart
 /// class Foo {
@@ -4506,7 +4622,7 @@ class AvoidUnassignedLateFieldsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_unassigned_late_fields',
     problemMessage:
-        '[avoid_unassigned_late_fields] Late field has no assignment in any constructor, initializer, or lifecycle method. Accessing an unassigned late field throws a LateInitializationError at runtime, crashing the app at a point that the compiler cannot check statically.',
+        '[avoid_unassigned_late_fields] Late field has no assignment in any constructor, initializer, or lifecycle method. Accessing an unassigned late field throws a LateInitializationError at runtime, crashing the app at a point that the compiler cannot check statically. {v4}',
     correctionMessage:
         'Assign the field in the constructor, an initializer list, or a lifecycle method such as initState(). If initialization is conditional, use a nullable type instead of late.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -4562,6 +4678,8 @@ class AvoidUnassignedLateFieldsRule extends SaropaLintRule {
 
 /// Warns when late is used but field is assigned in constructor.
 ///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v5
+///
 /// Example of **bad** code:
 /// ```dart
 /// class Foo {
@@ -4582,7 +4700,7 @@ class AvoidUnnecessaryLateFieldsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_unnecessary_late_fields',
     problemMessage:
-        '[avoid_unnecessary_late_fields] Field marked as late but already assigned in the constructor or initializer list. The late keyword is redundant here and misleads readers into thinking initialization is deferred, while also disabling the compile-time guarantee that the field is always initialized.',
+        '[avoid_unnecessary_late_fields] Field marked as late but already assigned in the constructor or initializer list. The late keyword is redundant here and misleads readers into thinking initialization is deferred, while also disabling the compile-time guarantee that the field is always initialized. {v5}',
     correctionMessage:
         'Remove the late keyword since the field is already assigned during construction. This restores compile-time initialization checking and clarifies the intent.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -4659,6 +4777,8 @@ class AvoidUnnecessaryLateFieldsRule extends SaropaLintRule {
 
 /// Warns when a nullable field is always non-null.
 ///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v4
+///
 /// Example of **bad** code:
 /// ```dart
 /// class Foo {
@@ -4679,7 +4799,7 @@ class AvoidUnnecessaryNullableFieldsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_unnecessary_nullable_fields',
     problemMessage:
-        '[avoid_unnecessary_nullable_fields] Nullable field is always assigned a non-null value across all constructors and assignment sites. The unnecessary nullable type forces every read site to handle null even though it can never occur, adding redundant null checks and obscuring the actual data flow.',
+        '[avoid_unnecessary_nullable_fields] Nullable field is always assigned a non-null value across all constructors and assignment sites. The unnecessary nullable type forces every read site to handle null even though it can never occur, adding redundant null checks and obscuring the actual data flow. {v4}',
     correctionMessage:
         'Change the field type to non-nullable and remove the ? suffix. Add null checks only if a future code path genuinely needs to store null.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -4776,6 +4896,8 @@ class _NullAssignmentChecker extends RecursiveAstVisitor<void> {
 
 /// Warns when a pattern doesn't affect type narrowing.
 ///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v5
+///
 /// Example of **bad** code:
 /// ```dart
 /// void foo(int x) {
@@ -4797,7 +4919,7 @@ class AvoidUnnecessaryPatternsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_unnecessary_patterns',
     problemMessage:
-        '[avoid_unnecessary_patterns] Pattern matching syntax used where it does not narrow types or destructure values. The pattern adds syntactic complexity without any type-safety benefit, making the code harder to read compared to a plain variable declaration or assignment.',
+        '[avoid_unnecessary_patterns] Pattern matching syntax used where it does not narrow types or destructure values. The pattern adds syntactic complexity without any type-safety benefit, making the code harder to read compared to a plain variable declaration or assignment. {v5}',
     correctionMessage:
         'Replace the pattern with a simple variable declaration or assignment. Use pattern matching only when it provides destructuring or type narrowing.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -4834,6 +4956,8 @@ class AvoidUnnecessaryPatternsRule extends SaropaLintRule {
 
 /// Warns when using default/wildcard case with sealed classes.
 ///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v4
+///
 /// Example of **bad** code:
 /// ```dart
 /// sealed class Shape {}
@@ -4855,7 +4979,7 @@ class AvoidWildcardCasesWithSealedClassesRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_wildcard_cases_with_sealed_classes',
     problemMessage:
-        '[avoid_wildcard_cases_with_sealed_classes] Switch on a sealed class uses a default or wildcard case, suppressing exhaustiveness checking. When new subtypes are added to the sealed hierarchy, the compiler will not flag this switch as incomplete, allowing unhandled subtypes to silently fall through.',
+        '[avoid_wildcard_cases_with_sealed_classes] Switch on a sealed class uses a default or wildcard case, suppressing exhaustiveness checking. When new subtypes are added to the sealed hierarchy, the compiler will not flag this switch as incomplete, allowing unhandled subtypes to silently fall through. {v4}',
     correctionMessage:
         'Remove the default/wildcard case and add explicit case clauses for every sealed subtype so the compiler reports an error when new subtypes are introduced.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -4902,6 +5026,8 @@ class AvoidWildcardCasesWithSealedClassesRule extends SaropaLintRule {
 
 /// Warns when switch expression cases have identical expressions.
 ///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v4
+///
 /// Example of **bad** code:
 /// ```dart
 /// final result = switch (x) {
@@ -4923,7 +5049,7 @@ class NoEqualSwitchExpressionCasesRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'no_equal_switch_expression_cases',
     problemMessage:
-        '[no_equal_switch_expression_cases] Multiple switch expression cases produce identical result values. Duplicate results increase maintenance cost because changes must be applied to every copy, and they obscure whether the cases were truly intended to behave the same.',
+        '[no_equal_switch_expression_cases] Multiple switch expression cases produce identical result values. Duplicate results increase maintenance cost because changes must be applied to every copy, and they obscure whether the cases were truly intended to behave the same. {v4}',
     correctionMessage:
         'Combine the cases using comma-separated patterns (case a, b => result) or extract the shared value into a named constant.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -4954,6 +5080,8 @@ class NoEqualSwitchExpressionCasesRule extends SaropaLintRule {
 
 /// Warns when a BytesBuilder should be used for byte operations.
 ///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v5
+///
 /// Example of **bad** code:
 /// ```dart
 /// final bytes = <int>[];
@@ -4973,7 +5101,7 @@ class PreferBytesBuilderRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_bytes_builder',
     problemMessage:
-        '[prefer_bytes_builder] List<int> with repeated addAll operations detected. Each addAll call may trigger memory reallocation and copying, causing O(n²) performance when building large byte arrays, resulting in slow processing and excessive memory churn.',
+        '[prefer_bytes_builder] List<int> with repeated addAll operations detected. Each addAll call may trigger memory reallocation and copying, causing O(n²) performance when building large byte arrays, resulting in slow processing and excessive memory churn. {v5}',
     correctionMessage:
         'Replace with BytesBuilder which preallocates memory efficiently and avoids repeated copying. Use BytesBuilder.add() or addByte() to accumulate bytes, then call toBytes() once at the end for O(n) performance.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -5004,6 +5132,8 @@ class PreferBytesBuilderRule extends SaropaLintRule {
 
 /// Warns when a ternary expression can be pushed into arguments.
 ///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v4
+///
 /// **Stylistic rule (opt-in only).** No performance or correctness benefit.
 ///
 /// Example of **bad** code:
@@ -5028,7 +5158,7 @@ class PreferPushingConditionalExpressionsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_pushing_conditional_expressions',
     problemMessage:
-        '[prefer_pushing_conditional_expressions] Moving conditional logic into return expressions is a code shape preference. No performance or correctness difference between forms. Enable via the stylistic tier.',
+        '[prefer_pushing_conditional_expressions] Moving conditional logic into return expressions is a code shape preference. No performance or correctness difference between forms. Enable via the stylistic tier. {v4}',
     correctionMessage:
         'Move the conditional expression inside the single differing argument so the constructor or function call appears once with all shared arguments visible.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -5077,6 +5207,8 @@ class PreferPushingConditionalExpressionsRule extends SaropaLintRule {
 
 /// Warns when `.new` constructor shorthand can be used.
 ///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v4
+///
 /// Example of **bad** code:
 /// ```dart
 /// final items = list.map((e) => Item(e));
@@ -5099,7 +5231,7 @@ class PreferShorthandsWithConstructorsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_shorthands_with_constructors',
     problemMessage:
-        '[prefer_shorthands_with_constructors] Lambda wraps a constructor call without adding any logic (e.g. (x) => MyClass(x)). The closure allocates an extra function object on each evaluation and obscures the simple delegation, making the code harder to read at a glance.',
+        '[prefer_shorthands_with_constructors] Lambda wraps a constructor call without adding any logic (e.g. (x) => MyClass(x)). The closure allocates an extra function object on each evaluation and obscures the simple delegation, making the code harder to read at a glance. {v4}',
     correctionMessage:
         'Replace the lambda with a constructor tear-off (ClassName.new) to eliminate the wrapper function and communicate the delegation intent directly.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -5147,6 +5279,8 @@ class PreferShorthandsWithConstructorsRule extends SaropaLintRule {
 
 /// Warns when enum shorthand can be used.
 ///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v4
+///
 /// Example of **bad** code:
 /// ```dart
 /// final status = Status.values.where((e) => e == Status.active);
@@ -5164,7 +5298,7 @@ class PreferShorthandsWithEnumsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_shorthands_with_enums',
     problemMessage:
-        '[prefer_shorthands_with_enums] Enum accessed using verbose qualification (EnumType.enumValue) where shorthand (.enumValue) is available. This adds unnecessary repetition, makes code harder to read, and increases the chance of errors when refactoring enum names.',
+        '[prefer_shorthands_with_enums] Enum accessed using verbose qualification (EnumType.enumValue) where shorthand (.enumValue) is available. This adds unnecessary repetition, makes code harder to read, and increases the chance of errors when refactoring enum names. {v4}',
     correctionMessage:
         'Use the shorthand enum syntax by omitting the enum type prefix. Within contexts that accept the enum type, write .enumValue instead of EnumType.enumValue for cleaner, more maintainable code.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -5205,6 +5339,8 @@ class PreferShorthandsWithEnumsRule extends SaropaLintRule {
 
 /// Warns when static field shorthand can be used.
 ///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v4
+///
 /// Example of **bad** code:
 /// ```dart
 /// final color = Colors.values.firstWhere((c) => c == Colors.red);
@@ -5222,7 +5358,7 @@ class PreferShorthandsWithStaticFieldsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_shorthands_with_static_fields',
     problemMessage:
-        '[prefer_shorthands_with_static_fields] Static field accessed through unnecessary collection search (firstWhere, where) when direct access is available. This wastes CPU cycles iterating through values and makes code less efficient and harder to understand.',
+        '[prefer_shorthands_with_static_fields] Static field accessed through unnecessary collection search (firstWhere, where) when direct access is available. This wastes CPU cycles iterating through values and makes code less efficient and harder to understand. {v4}',
     correctionMessage:
         'Replace the collection search with direct static field access (e.g., Colors.red instead of Colors.values.firstWhere((c) => c == Colors.red)). Direct access is instant, clearer, and cannot fail.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -5268,6 +5404,8 @@ class PreferShorthandsWithStaticFieldsRule extends SaropaLintRule {
 
 /// Warns when a parameter type doesn't match the accepted type annotation.
 ///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v4
+///
 /// Example of **bad** code:
 /// ```dart
 /// void process(@Accept(String) int value) {} // Type mismatch
@@ -5278,7 +5416,7 @@ class PassCorrectAcceptedTypeRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'pass_correct_accepted_type',
     problemMessage:
-        '[pass_correct_accepted_type] Argument type does not match the parameter type declared by the @Accept annotation. Passing an incompatible type circumvents the annotation contract, which may cause runtime cast failures or incorrect behavior in the called function.',
+        '[pass_correct_accepted_type] Argument type does not match the parameter type declared by the @Accept annotation. Passing an incompatible type circumvents the annotation contract, which may cause runtime cast failures or incorrect behavior in the called function. {v4}',
     correctionMessage:
         'Change the argument to match the type declared in the @Accept annotation, or update the annotation if the accepted type has intentionally changed.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -5323,6 +5461,8 @@ class PassCorrectAcceptedTypeRule extends SaropaLintRule {
 
 /// Warns when an optional argument is not passed but could improve clarity.
 ///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v4
+///
 /// Detects method calls that are missing commonly-used optional boolean
 /// arguments like `verbose`, `recursive`, `force`, etc.
 ///
@@ -5344,7 +5484,7 @@ class PassOptionalArgumentRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'pass_optional_argument',
     problemMessage:
-        '[pass_optional_argument] Function call omits important optional parameter, relying on default value. Future readers must hunt for the function definition to understand the omitted behavior, making code harder to comprehend and maintain at the call site.',
+        '[pass_optional_argument] Function call omits important optional parameter, relying on default value. Future readers must hunt for the function definition to understand the omitted behavior, making code harder to comprehend and maintain at the call site. {v4}',
     correctionMessage:
         'Explicitly pass the optional parameter with its intended value, even if it matches the default. This documents your intent at the call site and prevents confusion if the default changes, improving code clarity.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -5392,6 +5532,8 @@ class PassOptionalArgumentRule extends SaropaLintRule {
 
 /// Warns when a file contains multiple top-level declarations.
 ///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v3
+///
 /// Example of **bad** code:
 /// ```dart
 /// // my_file.dart
@@ -5404,7 +5546,7 @@ class PreferSingleDeclarationPerFileRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_single_declaration_per_file',
     problemMessage:
-        '[prefer_single_declaration_per_file] File contains multiple top-level class, enum, or extension declarations. Combining unrelated declarations in one file makes it harder to locate definitions, increases merge conflicts when multiple developers edit the same file, and breaks the convention of one-declaration-per-file.',
+        '[prefer_single_declaration_per_file] File contains multiple top-level class, enum, or extension declarations. Combining unrelated declarations in one file makes it harder to locate definitions, increases merge conflicts when multiple developers edit the same file, and breaks the convention of one-declaration-per-file. {v3}',
     correctionMessage:
         'Split each top-level declaration into its own file, named after the declaration (e.g. my_class.dart for MyClass), to improve discoverability and reduce merge conflicts.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -5450,6 +5592,8 @@ class PreferSingleDeclarationPerFileRule extends SaropaLintRule {
 
 /// Warns when a switch statement could be converted to a switch expression.
 ///
+/// Since: v2.7.0 | Updated: v4.13.0 | Rule version: v5
+///
 /// Example of **bad** code:
 /// ```dart
 /// String result;
@@ -5479,7 +5623,7 @@ class PreferSwitchExpressionRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_switch_expression',
     problemMessage:
-        '[prefer_switch_expression] Switch statement with only return/assignment detected. Using statement syntax for simple value mapping adds unnecessary boilerplate (break statements, case keywords) and makes the code more verbose and harder to scan.',
+        '[prefer_switch_expression] Switch statement with only return/assignment detected. Using statement syntax for simple value mapping adds unnecessary boilerplate (break statements, case keywords) and makes the code more verbose and harder to scan. {v5}',
     correctionMessage:
         'Replace with a switch expression that directly produces the mapped value. Switch expressions are more concise, cannot forget break statements, and guarantee exhaustiveness checking, reducing bugs and improving readability.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -5557,6 +5701,8 @@ class PreferSwitchExpressionRule extends SaropaLintRule {
 
 /// Warns when if-else chains on enum values could use a switch.
 ///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v4
+///
 /// Example of **bad** code:
 /// ```dart
 /// if (status == Status.active) {
@@ -5586,7 +5732,7 @@ class PreferSwitchWithEnumsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_switch_with_enums',
     problemMessage:
-        '[prefer_switch_with_enums] Enum compared using if-else chain instead of switch statement. Without exhaustiveness checking, adding new enum values will not trigger compile errors in this code location, allowing silent bugs where new cases are unhandled.',
+        '[prefer_switch_with_enums] Enum compared using if-else chain instead of switch statement. Without exhaustiveness checking, adding new enum values will not trigger compile errors in this code location, allowing silent bugs where new cases are unhandled. {v4}',
     correctionMessage:
         'Replace the if-else chain with a switch statement over the enum. The compiler will verify all enum values are handled and flag warnings when you add new enum cases, preventing missed implementations.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -5678,6 +5824,8 @@ class PreferSwitchWithEnumsRule extends SaropaLintRule {
 
 /// Warns when if-else chains on sealed class could use exhaustive switch.
 ///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v5
+///
 /// Example of **bad** code:
 /// ```dart
 /// if (result is Success) {
@@ -5707,7 +5855,7 @@ class PreferSwitchWithSealedClassesRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_switch_with_sealed_classes',
     problemMessage:
-        '[prefer_switch_with_sealed_classes] Sealed class handled with if-else or type checks instead of switch. Missing exhaustiveness verification allows unhandled subtypes to silently pass through, causing runtime errors or incorrect behavior when new subtypes are added.',
+        '[prefer_switch_with_sealed_classes] Sealed class handled with if-else or type checks instead of switch. Missing exhaustiveness verification allows unhandled subtypes to silently pass through, causing runtime errors or incorrect behavior when new subtypes are added. {v5}',
     correctionMessage:
         'Replace with a switch statement using pattern matching on the sealed class subtypes. The compiler enforces that all possible subtypes are handled, preventing bugs when the sealed class hierarchy grows.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -5758,6 +5906,8 @@ class PreferSwitchWithSealedClassesRule extends SaropaLintRule {
 
 /// Warns when test assertions could use more specific matchers.
 ///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v4
+///
 /// Example of **bad** code:
 /// ```dart
 /// expect(list.length, equals(0));
@@ -5782,7 +5932,7 @@ class PreferTestMatchersRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_test_matchers',
     problemMessage:
-        '[prefer_test_matchers] Generic expect(value, equals(x)) or expect(value, isTrue) used where a more specific matcher exists. Specific matchers produce clearer failure messages that show the actual vs expected difference, reducing debugging time when tests fail.',
+        '[prefer_test_matchers] Generic expect(value, equals(x)) or expect(value, isTrue) used where a more specific matcher exists. Specific matchers produce clearer failure messages that show the actual vs expected difference, reducing debugging time when tests fail. {v4}',
     correctionMessage:
         'Replace with the appropriate specific matcher (e.g. expect(list, contains(x)), expect(map, containsPair(k, v)), expect(fn, throwsA(isA<MyError>()))) for better diagnostics.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -5848,6 +5998,8 @@ class PreferTestMatchersRule extends SaropaLintRule {
 
 /// Warns when `FutureOr<T>` could be unwrapped for cleaner handling.
 ///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v4
+///
 /// Example of **bad** code:
 /// ```dart
 /// FutureOr<int> getValue() => 42;
@@ -5882,7 +6034,7 @@ class PreferUnwrappingFutureOrRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_unwrapping_future_or',
     problemMessage:
-        '[prefer_unwrapping_future_or] FutureOr type detected requiring manual type checking and unwrapping. This forces runtime type inspection (is Future checks) and adds branching complexity, making the code harder to understand and more error-prone.',
+        '[prefer_unwrapping_future_or] FutureOr type detected requiring manual type checking and unwrapping. This forces runtime type inspection (is Future checks) and adds branching complexity, making the code harder to understand and more error-prone. {v4}',
     correctionMessage:
         'Convert the function to async and use await to unwrap values uniformly. Async/await eliminates the need for runtime type checking, produces cleaner control flow, and ensures consistent handling of both synchronous and asynchronous values.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -5946,6 +6098,8 @@ class _AwaitFinderVisitor extends RecursiveAstVisitor<void> {
 
 /// Warns when type arguments can be inferred and are redundant.
 ///
+/// Since: v4.5.2 | Updated: v4.13.0 | Rule version: v3
+///
 /// Example of **bad** code:
 /// ```dart
 /// final list = <String>['a', 'b'];  // Type can be inferred
@@ -5976,7 +6130,7 @@ class AvoidInferrableTypeArgumentsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_inferred_type_arguments',
     problemMessage:
-        '[prefer_inferred_type_arguments] Explicit generic type arguments match what the compiler already infers from context. Redundant type parameters add visual noise without providing additional type safety, and they must be manually updated if the underlying types change.',
+        '[prefer_inferred_type_arguments] Explicit generic type arguments match what the compiler already infers from context. Redundant type parameters add visual noise without providing additional type safety, and they must be manually updated if the underlying types change. {v3}',
     correctionMessage:
         'Remove the explicit type arguments and let the compiler infer them. This reduces verbosity and keeps the code in sync with the actual types automatically.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -6031,6 +6185,8 @@ class AvoidInferrableTypeArgumentsRule extends SaropaLintRule {
 
 /// Warns when an empty collection default value is passed explicitly.
 ///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v4
+///
 /// This is a conservative rule that only flags clearly redundant patterns:
 /// - Empty list literals: `[]` or `const []`
 /// - Empty map literals: `{}` or `const {}`
@@ -6059,7 +6215,7 @@ class AvoidPassingDefaultValuesRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_passing_default_values',
     problemMessage:
-        '[avoid_passing_default_values] Argument explicitly passes a value that matches the parameter default (e.g. empty list, false, 0). Passing the default adds noise to the call site without changing behavior, and if the library updates its default, this call site will not benefit from the change.',
+        '[avoid_passing_default_values] Argument explicitly passes a value that matches the parameter default (e.g. empty list, false, 0). Passing the default adds noise to the call site without changing behavior, and if the library updates its default, this call site will not benefit from the change. {v4}',
     correctionMessage:
         'Omit the argument to use the default value. This keeps call sites concise and automatically picks up any default changes from the callee.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -6110,6 +6266,8 @@ class AvoidPassingDefaultValuesRule extends SaropaLintRule {
 
 /// Warns when an extension method shadows a class method.
 ///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v3
+///
 /// Example of **bad** code:
 /// ```dart
 /// extension StringExt on String {
@@ -6122,7 +6280,7 @@ class AvoidShadowedExtensionMethodsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_shadowed_extension_methods',
     problemMessage:
-        '[avoid_shadowed_extension_methods] Extension method has the same name as an instance method on the target class. The instance method always takes precedence, so the extension method is never called through normal dispatch, making it dead code that misleads developers.',
+        '[avoid_shadowed_extension_methods] Extension method has the same name as an instance method on the target class. The instance method always takes precedence, so the extension method is never called through normal dispatch, making it dead code that misleads developers. {v3}',
     correctionMessage:
         'Rename the extension method to a unique name, or remove it if the instance method already provides the needed behavior.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -6167,6 +6325,8 @@ class AvoidShadowedExtensionMethodsRule extends SaropaLintRule {
 
 /// Warns when a late local variable is initialized immediately.
 ///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v5
+///
 /// Example of **bad** code:
 /// ```dart
 /// void foo() {
@@ -6193,7 +6353,7 @@ class AvoidUnnecessaryLocalLateRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_unnecessary_local_late',
     problemMessage:
-        '[avoid_unnecessary_local_late] Local variable declared as late but assigned a value on the same line. The late keyword is designed for deferred initialization, so using it on an immediately initialized variable is misleading and disables the compile-time check that ensures the variable is assigned.',
+        '[avoid_unnecessary_local_late] Local variable declared as late but assigned a value on the same line. The late keyword is designed for deferred initialization, so using it on an immediately initialized variable is misleading and disables the compile-time check that ensures the variable is assigned. {v5}',
     correctionMessage:
         'Remove the late keyword and keep the immediate initializer. Use final or var to declare the variable with full compile-time initialization safety.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -6221,6 +6381,8 @@ class AvoidUnnecessaryLocalLateRule extends SaropaLintRule {
 }
 
 /// Warns when an overriding method specifies default values that look suspicious.
+///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v3
 ///
 /// This rule flags overriding methods that specify non-standard default values,
 /// which may indicate they differ from the parent class definition.
@@ -6252,7 +6414,7 @@ class MatchBaseClassDefaultValueRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'match_base_class_default_value',
     problemMessage:
-        '[match_base_class_default_value] Overridden method parameter has a different default value than the parent class. Callers using the parent type see the parent default, while callers using the subtype see the override default, creating inconsistent behavior depending on the variable type.',
+        '[match_base_class_default_value] Overridden method parameter has a different default value than the parent class. Callers using the parent type see the parent default, while callers using the subtype see the override default, creating inconsistent behavior depending on the variable type. {v3}',
     correctionMessage:
         'Match the parent class default value exactly, or remove the default to inherit it. If a different default is intentional, document why the override diverges.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -6323,6 +6485,8 @@ class MatchBaseClassDefaultValueRule extends SaropaLintRule {
 
 /// Warns when a variable could be declared closer to its usage.
 ///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v7
+///
 /// Alias: move_variable_closer_to_usage
 ///
 /// Example of **bad** code:
@@ -6355,7 +6519,7 @@ class MoveVariableCloserToUsageRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'move_variable_closer_to_its_usage',
     problemMessage:
-        '[move_variable_closer_to_its_usage] Variable declared far from its first use, with many unrelated statements in between. This forces readers to hold the variable in memory while reading irrelevant code, reducing comprehension and increasing the risk of accidental reuse or shadowing.',
+        '[move_variable_closer_to_its_usage] Variable declared far from its first use, with many unrelated statements in between. This forces readers to hold the variable in memory while reading irrelevant code, reducing comprehension and increasing the risk of accidental reuse or shadowing. {v7}',
     correctionMessage:
         'Move the variable declaration to just before its first usage. This narrows the scope, improves readability, and makes the data flow easier to follow.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -6435,6 +6599,8 @@ class _FirstUsageVisitor extends RecursiveAstVisitor<void> {
 
 /// Warns when a variable could be moved outside a loop.
 ///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v4
+///
 /// Alias: move_variable_outside_iteration
 ///
 /// Example of **bad** code:
@@ -6465,7 +6631,7 @@ class MoveVariableOutsideIterationRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'move_variable_outside_iteration',
     problemMessage:
-        '[move_variable_outside_iteration] Variable declared and assigned inside a loop body produces the same value on every iteration. Recreating the same object or computing the same expression repeatedly wastes CPU cycles and puts unnecessary pressure on the garbage collector.',
+        '[move_variable_outside_iteration] Variable declared and assigned inside a loop body produces the same value on every iteration. Recreating the same object or computing the same expression repeatedly wastes CPU cycles and puts unnecessary pressure on the garbage collector. {v4}',
     correctionMessage:
         'Move the variable declaration above the loop so it is computed once and reused on each iteration, reducing allocation overhead and improving clarity.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -6547,6 +6713,8 @@ class MoveVariableOutsideIterationRule extends SaropaLintRule {
 
 /// Warns when a class overrides == but not the parent's ==.
 ///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v4
+///
 /// Example of **bad** code:
 /// ```dart
 /// class Parent {
@@ -6565,7 +6733,7 @@ class PreferOverridingParentEqualityRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_overriding_parent_equality',
     problemMessage:
-        '[prefer_overriding_parent_equality] Subclass overrides == without incorporating the parent class equality check. If the parent class compares fields that the subclass ignores, two objects may be considered equal even though their parent fields differ, breaking the transitivity contract of ==.',
+        '[prefer_overriding_parent_equality] Subclass overrides == without incorporating the parent class equality check. If the parent class compares fields that the subclass ignores, two objects may be considered equal even though their parent fields differ, breaking the transitivity contract of ==. {v4}',
     correctionMessage:
         'Call super == other as part of the equality check, or explicitly compare all parent fields alongside the subclass fields to ensure consistent equality behavior.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -6658,6 +6826,8 @@ class _SuperEqualityChecker extends RecursiveAstVisitor<void> {
 
 /// Warns when more specific switch cases should come before general ones.
 ///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v4
+///
 /// Example of **bad** code:
 /// ```dart
 /// switch (value) {
@@ -6686,7 +6856,7 @@ class PreferSpecificCasesFirstRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_specific_cases_first',
     problemMessage:
-        '[prefer_specific_cases_first] General switch case appears before a more specific case. In Dart, the first matching case wins, so a broad pattern placed early shadows narrower patterns below it, making those specific cases unreachable dead code.',
+        '[prefer_specific_cases_first] General switch case appears before a more specific case. In Dart, the first matching case wins, so a broad pattern placed early shadows narrower patterns below it, making those specific cases unreachable dead code. {v4}',
     correctionMessage:
         'Reorder the cases so more specific patterns appear first and general catch-all patterns appear last, ensuring every case is reachable.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -6757,6 +6927,8 @@ class PreferSpecificCasesFirstRule extends SaropaLintRule {
 
 /// Warns when a property is accessed after destructuring provides it.
 ///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v5
+///
 /// Example of **bad** code:
 /// ```dart
 /// final (x, y) = point;
@@ -6781,7 +6953,7 @@ class UseExistingDestructuringRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'use_existing_destructuring',
     problemMessage:
-        '[use_existing_destructuring] Property accessed through the original object despite an existing destructured variable that already holds the same value. The redundant access obscures the data flow and ignores the destructuring that was set up to simplify property access.',
+        '[use_existing_destructuring] Property accessed through the original object despite an existing destructured variable that already holds the same value. The redundant access obscures the data flow and ignores the destructuring that was set up to simplify property access. {v5}',
     correctionMessage:
         'Replace the property access with the destructured variable name. This communicates that the value was already extracted and avoids redundant lookups.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -6878,6 +7050,8 @@ class _DestructuredPropertyAccessChecker extends RecursiveAstVisitor<void> {
 
 /// Warns when a new variable is created that duplicates an existing one.
 ///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v4
+///
 /// Example of **bad** code:
 /// ```dart
 /// final name = user.name;
@@ -6896,7 +7070,7 @@ class UseExistingVariableRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'use_existing_variable',
     problemMessage:
-        '[use_existing_variable] New variable created with the same value as an existing in-scope variable. The duplicate adds an unnecessary name to the scope, increases cognitive load, and risks divergence if one copy is later modified while the other is not.',
+        '[use_existing_variable] New variable created with the same value as an existing in-scope variable. The duplicate adds an unnecessary name to the scope, increases cognitive load, and risks divergence if one copy is later modified while the other is not. {v4}',
     correctionMessage:
         'Reference the existing variable directly instead of creating a new one. If a different name is needed for clarity, consider renaming the original.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -6938,6 +7112,8 @@ class UseExistingVariableRule extends SaropaLintRule {
 }
 
 /// Warns when the same string literal appears 3 or more times in a file.
+///
+/// Since: v4.13.0 | Rule version: v1
 ///
 /// Duplicate string literals are candidates for extraction to constants,
 /// which improves maintainability and reduces the risk of typos.
@@ -6984,7 +7160,7 @@ class AvoidDuplicateStringLiteralsRule extends SaropaLintRule {
     name: 'avoid_duplicate_string_literals',
     problemMessage:
         '[avoid_duplicate_string_literals] String literal appears 3+ times in this file. Consider extracting '
-        'to a constant.',
+        'to a constant. {v1}',
     correctionMessage:
         'Extract this string to a named constant for maintainability.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -7055,6 +7231,8 @@ class AvoidDuplicateStringLiteralsRule extends SaropaLintRule {
 
 /// Warns when the same string literal appears 2 or more times in a file.
 ///
+/// Since: v4.13.0 | Rule version: v1
+///
 /// This is a stricter version of `avoid_duplicate_string_literals` that
 /// triggers at just 2 occurrences (Comprehensive tier).
 ///
@@ -7098,7 +7276,7 @@ class AvoidDuplicateStringLiteralsPairRule extends SaropaLintRule {
     name: 'avoid_duplicate_string_literals_pair',
     problemMessage:
         '[avoid_duplicate_string_literals_pair] String literal appears 2+ times in this file. Consider extracting '
-        'to a constant.',
+        'to a constant. {v1}',
     correctionMessage:
         'Extract this string to a named constant for maintainability.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -7169,6 +7347,8 @@ class AvoidDuplicateStringLiteralsPairRule extends SaropaLintRule {
 
 /// Suggests using typedefs for callback function types.
 ///
+/// Since: v2.0.0 | Updated: v4.13.0 | Rule version: v2
+///
 /// Inline function types are harder to read and reuse.
 ///
 /// **BAD:**
@@ -7193,7 +7373,7 @@ class PreferTypedefsForCallbacksRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_typedefs_for_callbacks',
     problemMessage:
-        '[prefer_typedefs_for_callbacks] Inline function type could be a typedef. Inline function types are harder to read and reuse. Suggests using typedefs for callback function types.',
+        '[prefer_typedefs_for_callbacks] Inline function type could be a typedef. Inline function types are harder to read and reuse. Suggests using typedefs for callback function types. {v2}',
     correctionMessage:
         'Create a named typedef for this callback signature and reference it by name, improving readability and allowing reuse across multiple parameters.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -7219,6 +7399,8 @@ class PreferTypedefsForCallbacksRule extends SaropaLintRule {
 }
 
 /// Suggests using redirecting constructors for super calls.
+///
+/// Since: v2.0.0 | Updated: v4.13.0 | Rule version: v2
 ///
 /// Redirecting constructors are cleaner than calling super directly.
 ///
@@ -7247,7 +7429,7 @@ class PreferRedirectingSuperclassConstructorRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_redirecting_superclass_constructor',
     problemMessage:
-        '[prefer_redirecting_superclass_constructor] Constructor forwards parameters to super() without modification, which can be simplified with Dart 3 super parameters.',
+        '[prefer_redirecting_superclass_constructor] Constructor forwards parameters to super() without modification, which can be simplified with Dart 3 super parameters. {v2}',
     correctionMessage:
         'Replace the explicit super(paramName) call with super.paramName in the parameter list to reduce boilerplate and keep the forwarding relationship visible in the signature.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -7289,6 +7471,8 @@ class PreferRedirectingSuperclassConstructorRule extends SaropaLintRule {
 
 /// Warns when buildWhen callback is empty or always returns true.
 ///
+/// Since: v2.0.0 | Updated: v4.13.0 | Rule version: v2
+///
 /// Empty buildWhen defeats the purpose of BlocBuilder optimization.
 ///
 /// **BAD:**
@@ -7318,7 +7502,7 @@ class AvoidEmptyBuildWhenRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_empty_build_when',
     problemMessage:
-        '[avoid_empty_build_when] buildWhen callback always returns true, which is the default behavior. The callback adds code without filtering any rebuilds, defeating the purpose of the optimization that buildWhen provides in BlocBuilder and BlocListener.',
+        '[avoid_empty_build_when] buildWhen callback always returns true, which is the default behavior. The callback adds code without filtering any rebuilds, defeating the purpose of the optimization that buildWhen provides in BlocBuilder and BlocListener. {v2}',
     correctionMessage:
         'Add a meaningful state comparison that returns false for states that do not require a rebuild, or remove buildWhen entirely to use the default behavior.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -7369,6 +7553,8 @@ class AvoidEmptyBuildWhenRule extends SaropaLintRule {
 
 /// Suggests using 'use' prefix for custom hooks.
 ///
+/// Since: v2.0.0 | Updated: v4.13.0 | Rule version: v2
+///
 /// **Stylistic rule (opt-in only).** No performance or correctness benefit.
 ///
 /// Flutter Hooks convention requires hooks to start with 'use'.
@@ -7394,7 +7580,7 @@ class PreferUsePrefixRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_use_prefix',
     problemMessage:
-        '[prefer_use_prefix] Prefixing Flutter Hooks function names with use is a naming convention. The prefix does not affect hook behavior or performance. Enable via the stylistic tier.',
+        '[prefer_use_prefix] Prefixing Flutter Hooks function names with use is a naming convention. The prefix does not affect hook behavior or performance. Enable via the stylistic tier. {v2}',
     correctionMessage:
         'Rename the function to start with "use" (e.g. useMyHook) following the hooks convention, so it is recognizable as a hook and subject to hook linting rules.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -7459,6 +7645,8 @@ class _HookCallVisitor extends RecursiveAstVisitor<void> {
 
 /// Warns when a late mutable variable could be late final.
 ///
+/// Since: v2.3.7 | Updated: v4.13.0 | Rule version: v3
+///
 /// When a late variable is only assigned once, it should be declared as
 /// `late final` to prevent accidental reassignment and signal intent.
 ///
@@ -7496,7 +7684,7 @@ class PreferLateFinalRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_late_final',
     problemMessage:
-        '[prefer_late_final] Late variable is never reassigned after its initial assignment, so it can be declared as late final for stronger immutability guarantees.',
+        '[prefer_late_final] Late variable is never reassigned after its initial assignment, so it can be declared as late final for stronger immutability guarantees. {v3}',
     correctionMessage:
         'Change late to late final so that any accidental reassignment is caught at compile time, preventing unintended state mutations.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -7719,6 +7907,8 @@ bool _allVariablesHaveInitializers(VariableDeclarationList fields) {
 
 /// Warns when late is used for a value that could simply be nullable.
 ///
+/// Since: v2.3.7 | Updated: v4.13.0 | Rule version: v4
+///
 /// Using `late` for optional values that might not be initialized is risky.
 /// A nullable type with null checks is safer and more explicit.
 ///
@@ -7754,7 +7944,7 @@ class AvoidLateForNullableRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_late_for_nullable',
     problemMessage:
-        '[avoid_late_for_nullable] Nullable type declared with late keyword. Since the type already accepts null, the late keyword adds no initialization safety and instead introduces a hidden crash path: accessing the variable before assignment throws LateInitializationError rather than returning null.',
+        '[avoid_late_for_nullable] Nullable type declared with late keyword. Since the type already accepts null, the late keyword adds no initialization safety and instead introduces a hidden crash path: accessing the variable before assignment throws LateInitializationError rather than returning null. {v4}',
     correctionMessage:
         'Remove the late keyword and rely on the nullable type (T?) with null checks. The variable will default to null until explicitly assigned, which is safer and more predictable.',
     errorSeverity: DiagnosticSeverity.ERROR,
@@ -7823,6 +8013,8 @@ bool _isHookFunction(String name) {
 
 /// Warns when enum value could use Dart 3 dot shorthand.
 ///
+/// Since: v2.1.0 | Updated: v4.13.0 | Rule version: v2
+///
 /// Dart 3 allows `.value` syntax when enum type can be inferred.
 /// This makes code more concise without losing clarity.
 ///
@@ -7851,7 +8043,7 @@ class PreferDotShorthandRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_dot_shorthand',
     problemMessage:
-        '[prefer_dot_shorthand] Fully qualified enum reference detected where the type is already known from context. Use dot shorthand (.value) available in Dart 3 to reduce verbosity while preserving type safety.',
+        '[prefer_dot_shorthand] Fully qualified enum reference detected where the type is already known from context. Use dot shorthand (.value) available in Dart 3 to reduce verbosity while preserving type safety. {v2}',
     correctionMessage:
         'Replace the fully qualified EnumType.value with .value where the type is already known from context, reducing verbosity while keeping the code type-safe.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -7906,6 +8098,8 @@ class PreferDotShorthandRule extends SaropaLintRule {
 
 /// Warns when comparing boolean expressions to boolean literals.
 ///
+/// Since: v2.5.0 | Updated: v4.13.0 | Rule version: v3
+///
 /// **Stylistic rule (opt-in only).** No performance or correctness benefit.
 ///
 /// Alias: boolean_literal_compare, unnecessary_bool_compare, redundant_bool_literal
@@ -7941,7 +8135,7 @@ class NoBooleanLiteralCompareRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'no_boolean_literal_compare',
     problemMessage:
-        '[no_boolean_literal_compare] Comparing a boolean to true/false literally (x == true) instead of using the value directly (x) is a stylistic choice with no correctness or performance impact. Enable via the stylistic tier.',
+        '[no_boolean_literal_compare] Comparing a boolean to true/false literally (x == true) instead of using the value directly (x) is a stylistic choice with no correctness or performance impact. Enable via the stylistic tier. {v3}',
     correctionMessage:
         'Use the boolean expression directly: write x instead of x == true, and !x instead of x == false. '
         '!x instead of x == false.',
@@ -8068,6 +8262,8 @@ class _SimplifyBooleanComparisonFix extends DartFix {
 
 /// Return conditional expressions directly instead of if/else blocks.
 ///
+/// Since: v2.6.0 | Updated: v4.13.0 | Rule version: v2
+///
 /// **Stylistic rule (opt-in only).** No performance or correctness benefit.
 ///
 /// When an if/else block simply returns different values, use a ternary
@@ -8103,7 +8299,7 @@ class PreferReturningConditionalExpressionsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_returning_conditional_expressions',
     problemMessage:
-        '[prefer_returning_conditional_expressions] Returning a ternary expression instead of if-else is a stylistic preference. Both compile to the same code with no performance difference. Enable via the stylistic tier.',
+        '[prefer_returning_conditional_expressions] Returning a ternary expression instead of if-else is a stylistic preference. Both compile to the same code with no performance difference. Enable via the stylistic tier. {v2}',
     correctionMessage:
         'Collapse to return condition ? valueA : valueB; for value returns, or return condition; when directly returning a boolean expression.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -8221,6 +8417,9 @@ class _PreferReturningConditionalExpressionsFix extends DartFix {
 }
 
 /// Warns when `// ignore:` or `// ignore_for_file:` has a trailing `//`
+///
+/// Since: v4.9.5 | Updated: v4.13.0 | Rule version: v2
+///
 /// comment after the rule names.
 ///
 /// The `custom_lint_builder` framework parses everything after the colon as
@@ -8253,7 +8452,7 @@ class AvoidIgnoreTrailingCommentRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_ignore_trailing_comment',
     problemMessage: '[avoid_ignore_trailing_comment] '
-        'Trailing comment breaks ignore suppression.',
+        'Trailing comment breaks ignore suppression. {v2}',
     correctionMessage:
         'Move the comment to the line above the ignore directive.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -8380,6 +8579,9 @@ class _MoveTrailingCommentFix extends DartFix {
 // =============================================================================
 
 /// Warns when string concatenation with + is used where string interpolation
+///
+/// Since: v4.12.0 | Updated: v4.13.0 | Rule version: v2
+///
 /// would be clearer.
 ///
 /// String interpolation is more readable, less error-prone, and performs

@@ -20,6 +20,8 @@ import '../../saropa_lint_rule.dart';
 
 /// Warns when Supabase calls lack try-catch error handling.
 ///
+/// Since: v2.2.0 | Updated: v4.13.0 | Rule version: v3
+///
 /// Alias: supabase_try_catch, handle_supabase_errors
 ///
 /// Supabase operations can fail due to network issues, auth problems, or
@@ -54,7 +56,7 @@ class RequireSupabaseErrorHandlingRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_supabase_error_handling',
     problemMessage:
-        '[require_supabase_error_handling] Supabase operation called without error handling crashes when the network is unavailable, authentication tokens expire, or the database rejects the query. Users see an unhandled exception crash screen instead of a friendly error message, causing data loss and a broken user experience.',
+        '[require_supabase_error_handling] Supabase operation called without error handling crashes when the network is unavailable, authentication tokens expire, or the database rejects the query. Users see an unhandled exception crash screen instead of a friendly error message, causing data loss and a broken user experience. {v3}',
     correctionMessage:
         'Wrap Supabase operations in a try-catch block that handles PostgrestException and network errors, and display user-friendly messages with retry options.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -95,6 +97,8 @@ class RequireSupabaseErrorHandlingRule extends SaropaLintRule {
 
 /// Warns when Supabase anon key is hardcoded in source code.
 ///
+/// Since: v2.2.0 | Updated: v4.13.0 | Rule version: v2
+///
 /// Alias: no_supabase_key_in_code, supabase_key_security
 ///
 /// Supabase anon keys should come from environment variables or secure storage,
@@ -128,7 +132,7 @@ class AvoidSupabaseAnonKeyInCodeRule extends SaropaLintRule {
     name: 'avoid_supabase_anon_key_in_code',
     problemMessage:
         '[avoid_supabase_anon_key_in_code] Hardcoded keys can be extracted '
-        'from app binary. Attackers gain direct access to your Supabase project.',
+        'from app binary. Attackers gain direct access to your Supabase project. {v2}',
     correctionMessage:
         'Use environment variables or secure configuration for API keys.',
     errorSeverity: DiagnosticSeverity.ERROR,
@@ -170,6 +174,8 @@ class AvoidSupabaseAnonKeyInCodeRule extends SaropaLintRule {
 }
 
 /// Warns when Supabase realtime subscriptions are not unsubscribed in dispose.
+///
+/// Since: v2.2.0 | Updated: v4.13.0 | Rule version: v2
 ///
 /// Alias: supabase_realtime_dispose, unsubscribe_supabase_channel
 ///
@@ -221,7 +227,7 @@ class RequireSupabaseRealtimeUnsubscribeRule extends SaropaLintRule {
     name: 'require_supabase_realtime_unsubscribe',
     problemMessage:
         '[require_supabase_realtime_unsubscribe] Unsubscribed channel keeps '
-        'WebSocket open, leaking connections and receiving stale updates.',
+        'WebSocket open, leaking connections and receiving stale updates. {v2}',
     correctionMessage:
         'Add channel.unsubscribe() in dispose() to prevent memory leaks.',
     errorSeverity: DiagnosticSeverity.ERROR,

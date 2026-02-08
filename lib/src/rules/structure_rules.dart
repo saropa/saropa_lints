@@ -11,6 +11,8 @@ import '../saropa_lint_rule.dart';
 
 /// Warns when a file only contains export statements (barrel file).
 ///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v6
+///
 /// Barrel files can cause unnecessary code to be pulled into the build
 /// and make dependency tracking harder.
 ///
@@ -44,7 +46,7 @@ class AvoidBarrelFilesRule extends SaropaLintRule {
     problemMessage:
         '[avoid_barrel_files] File contains only export statements (barrel file). '
         'Barrel files increase build times by pulling in unused code and obscure dependency tracking, '
-        'making it harder to identify which modules depend on which implementations.',
+        'making it harder to identify which modules depend on which implementations. {v6}',
     correctionMessage:
         'Import specific files where needed instead of using barrel files. '
         'Direct imports make dependency graphs explicit and enable tree-shaking.',
@@ -86,6 +88,8 @@ class AvoidBarrelFilesRule extends SaropaLintRule {
 
 /// Warns when double slashes are used in import paths.
 ///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v5
+///
 /// Example of **bad** code:
 /// ```dart
 /// import 'package:foo//bar.dart';
@@ -114,7 +118,7 @@ class AvoidDoubleSlashImportsRule extends SaropaLintRule {
     problemMessage:
         '[avoid_double_slash_imports] Import path contains double slashes. '
         'Double slashes in import paths cause resolution failures on some platforms and may silently '
-        'import the wrong file, leading to runtime errors or missing symbols.',
+        'import the wrong file, leading to runtime errors or missing symbols. {v5}',
     correctionMessage:
         'Remove the extra slash from the import path to ensure consistent '
         'resolution across all platforms and build systems.',
@@ -154,6 +158,8 @@ class AvoidDoubleSlashImportsRule extends SaropaLintRule {
 
 /// Warns when the same file is exported multiple times.
 ///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v5
+///
 /// Example of **bad** code:
 /// ```dart
 /// export 'violation_parser.dart';
@@ -181,7 +187,7 @@ class AvoidDuplicateExportsRule extends SaropaLintRule {
     problemMessage:
         '[avoid_duplicate_exports] File is exported multiple times. '
         'Duplicate exports increase compilation time, confuse IDE auto-imports, and '
-        'may cause unexpected symbol visibility when show/hide combinators differ between duplicates.',
+        'may cause unexpected symbol visibility when show/hide combinators differ between duplicates. {v5}',
     correctionMessage:
         'Remove the duplicate export directive. Keep a single export with '
         'the correct show/hide combinators for the intended API surface.',
@@ -216,6 +222,8 @@ class AvoidDuplicateExportsRule extends SaropaLintRule {
 
 /// Warns when the same mixin is applied multiple times in a class hierarchy.
 ///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v5
+///
 /// Example of **bad** code:
 /// ```dart
 /// class MyClass extends BaseClass with MixinA, MixinA { }  // Duplicate mixin
@@ -242,7 +250,7 @@ class AvoidDuplicateMixinsRule extends SaropaLintRule {
     problemMessage:
         '[avoid_duplicate_mixins] Mixin is applied multiple times in the same class declaration. '
         'Duplicate mixin applications have no additional effect and indicate a copy-paste error '
-        'or misunderstanding of the class hierarchy.',
+        'or misunderstanding of the class hierarchy. {v5}',
     correctionMessage:
         'Remove the duplicate mixin application. Each mixin only needs '
         'to appear once in the with clause to apply its members.',
@@ -277,6 +285,8 @@ class AvoidDuplicateMixinsRule extends SaropaLintRule {
 
 /// Warns when the same import is declared with different prefixes.
 ///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v6
+///
 /// Example of **bad** code:
 /// ```dart
 /// import 'package:foo/foo.dart' as foo;
@@ -304,7 +314,7 @@ class AvoidDuplicateNamedImportsRule extends SaropaLintRule {
     problemMessage:
         '[avoid_duplicate_named_imports] Import is declared multiple times with different prefixes. '
         'Multiple imports of the same URI with different prefixes create ambiguity about which prefix to use, '
-        'increase cognitive load, and may cause IDE auto-import confusion.',
+        'increase cognitive load, and may cause IDE auto-import confusion. {v6}',
     correctionMessage:
         'Use a single import with one prefix. Consolidate all usages to '
         'reference the same prefix for consistent and readable code.',
@@ -339,6 +349,8 @@ class AvoidDuplicateNamedImportsRule extends SaropaLintRule {
 
 /// Warns when mutable global state is declared.
 ///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v5
+///
 /// Mutable global state can lead to hard-to-track bugs and makes testing difficult.
 ///
 /// Example of **bad** code:
@@ -368,7 +380,7 @@ class AvoidGlobalStateRule extends SaropaLintRule {
     name: 'avoid_global_state',
     problemMessage: '[avoid_global_state] Mutable global state detected. '
         'Top-level mutable variables create hidden dependencies between functions, make unit testing unreliable '
-        'because tests share state, and cause race conditions in concurrent or isolate-based code.',
+        'because tests share state, and cause race conditions in concurrent or isolate-based code. {v5}',
     correctionMessage:
         'Use const or final for immutable values, or encapsulate mutable state '
         'in a class with controlled access to enable proper testing and prevent unintended side effects.',
@@ -473,6 +485,9 @@ void _checkFileLength({
 }
 
 /// **OPINIONATED**: Suggests keeping files under 200 lines for maximum
+///
+/// Since: v3.1.2 | Updated: v4.13.0 | Rule version: v5
+///
 /// maintainability.
 ///
 /// Small files are easier to understand at a glance, have clearer
@@ -502,7 +517,7 @@ class PreferSmallFilesRule extends SaropaLintRule {
     name: 'prefer_small_length_files',
     problemMessage:
         '[prefer_small_length_files] File has more than $_maxLines lines. '
-        'Smaller files are easier to understand and maintain.',
+        'Smaller files are easier to understand and maintain. {v5}',
     correctionMessage:
         'Split this file into focused modules with single responsibilities. '
         'For data/enum files, disable with: // ignore_for_file: prefer_small_length_files',
@@ -528,6 +543,8 @@ class PreferSmallFilesRule extends SaropaLintRule {
 
 /// **OPINIONATED**: Flags files exceeding 300 lines.
 ///
+/// Since: v3.1.2 | Updated: v4.13.0 | Rule version: v4
+///
 /// This is ESLint's default threshold. Many valid files exceed this.
 ///
 /// Disable for files where size is intentional:
@@ -550,7 +567,7 @@ class AvoidMediumFilesRule extends SaropaLintRule {
     problemMessage:
         '[avoid_medium_length_files] File exceeds $_maxLines lines. '
         'Files beyond this threshold often contain multiple responsibilities, '
-        'which makes navigation harder and increases merge conflict risk in team development.',
+        'which makes navigation harder and increases merge conflict risk in team development. {v4}',
     correctionMessage:
         'Split into smaller modules with single responsibilities, or disable '
         'this rule for data/enum files where large size is intentional.',
@@ -576,6 +593,8 @@ class AvoidMediumFilesRule extends SaropaLintRule {
 
 /// **OPINIONATED**: Flags files exceeding 500 lines.
 ///
+/// Since: v3.1.2 | Updated: v4.13.0 | Rule version: v4
+///
 /// A common threshold in style guides. Many valid files exceed this.
 ///
 /// Disable for files where size is intentional:
@@ -597,7 +616,7 @@ class AvoidLongFilesRule extends SaropaLintRule {
     name: 'avoid_long_length_files',
     problemMessage: '[avoid_long_length_files] File exceeds $_maxLines lines. '
         'Files this long are difficult to navigate, increase code review time, '
-        'and frequently indicate that the file handles multiple unrelated concerns.',
+        'and frequently indicate that the file handles multiple unrelated concerns. {v4}',
     correctionMessage:
         'Split into smaller modules with single responsibilities, or disable '
         'this rule for data/enum files where large size is intentional.',
@@ -623,6 +642,8 @@ class AvoidLongFilesRule extends SaropaLintRule {
 
 /// **OPINIONATED**: Flags files exceeding 1000 lines.
 ///
+/// Since: v3.1.2 | Updated: v4.13.0 | Rule version: v4
+///
 /// Large files are often necessary for data, enums, constants, configs,
 /// generated code, and lookup tables. This rule is a style preference,
 /// not a quality indicator.
@@ -647,7 +668,7 @@ class AvoidVeryLongFilesRule extends SaropaLintRule {
     problemMessage:
         '[avoid_very_long_length_files] File exceeds $_maxLines lines. '
         'Files this large significantly slow down IDE indexing, increase build times, '
-        'and make it nearly impossible to understand the full scope of changes during code review.',
+        'and make it nearly impossible to understand the full scope of changes during code review. {v4}',
     correctionMessage:
         'Split into smaller modules with single responsibilities, or disable '
         'this rule for data/enum files where large size is intentional.',
@@ -686,6 +707,8 @@ class AvoidVeryLongFilesRule extends SaropaLintRule {
 // =============================================================================
 
 /// **OPINIONATED**: Suggests keeping test files under 400 lines.
+///
+/// Since: v4.5.1 | Updated: v4.13.0 | Rule version: v3
 ///
 /// While test files typically need more room than production code, very large
 /// test files can still indicate poor organization. Consider splitting by
@@ -727,7 +750,7 @@ class PreferSmallTestFilesRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_small_length_test_files',
     problemMessage:
-        '[prefer_small_length_test_files] Test file has more than $_maxLines lines. While test files typically need more room than production code, very large test files can still indicate poor organization. Split by feature, scenario, or test category.',
+        '[prefer_small_length_test_files] Test file has more than $_maxLines lines. While test files typically need more room than production code, very large test files can still indicate poor organization. Split by feature, scenario, or test category. {v3}',
     correctionMessage:
         'Split tests by feature or scenario to improve organization. Verify the change works correctly with existing tests and add coverage for the new behavior.'
         'Disable with: // ignore_for_file: prefer_small_length_test_files',
@@ -752,6 +775,8 @@ class PreferSmallTestFilesRule extends SaropaLintRule {
 }
 
 /// **OPINIONATED**: Flags test files exceeding 600 lines.
+///
+/// Since: v4.5.1 | Updated: v4.13.0 | Rule version: v2
 ///
 /// At 600+ lines, a test file may be covering too many scenarios or features.
 /// Consider splitting tests by domain, widget, or use case for better
@@ -779,7 +804,7 @@ class AvoidMediumTestFilesRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_medium_length_test_files',
     problemMessage:
-        '[avoid_medium_length_test_files] Test file exceeds $_maxLines lines. At 600+ lines, a test file may be covering too many scenarios or features. Split tests by domain, widget, or use case to improve maintainability and faster test runs.',
+        '[avoid_medium_length_test_files] Test file exceeds $_maxLines lines. At 600+ lines, a test file may be covering too many scenarios or features. Split tests by domain, widget, or use case to improve maintainability and faster test runs. {v2}',
     correctionMessage:
         'Split tests by feature or scenario. Verify the change works correctly with existing tests and add coverage for the new behavior.'
         'Disable with: // ignore_for_file: avoid_medium_length_test_files',
@@ -804,6 +829,8 @@ class AvoidMediumTestFilesRule extends SaropaLintRule {
 }
 
 /// **OPINIONATED**: Flags test files exceeding 1000 lines.
+///
+/// Since: v4.5.1 | Updated: v4.13.0 | Rule version: v2
 ///
 /// A 1000+ line test file is difficult to navigate and likely tests multiple
 /// distinct features. Consider extracting test groups into separate files
@@ -831,7 +858,7 @@ class AvoidLongTestFilesRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_long_length_test_files',
     problemMessage:
-        '[avoid_long_length_test_files] Test file exceeds $_maxLines lines. A 1000+ line test file is difficult to navigate and likely tests multiple distinct features. Extract test groups into separate files organized by feature area.',
+        '[avoid_long_length_test_files] Test file exceeds $_maxLines lines. A 1000+ line test file is difficult to navigate and likely tests multiple distinct features. Extract test groups into separate files organized by feature area. {v2}',
     correctionMessage:
         'Split tests by feature or scenario. Verify the change works correctly with existing tests and add coverage for the new behavior.'
         'Disable with: // ignore_for_file: avoid_long_length_test_files',
@@ -856,6 +883,8 @@ class AvoidLongTestFilesRule extends SaropaLintRule {
 }
 
 /// **OPINIONATED**: Flags test files exceeding 2000 lines.
+///
+/// Since: v4.5.1 | Updated: v4.13.0 | Rule version: v2
 ///
 /// Even with test files' higher tolerance for length, 2000+ lines indicates
 /// the file is testing too much. Consider splitting into separate test files
@@ -883,7 +912,7 @@ class AvoidVeryLongTestFilesRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_very_long_length_test_files',
     problemMessage:
-        '[avoid_very_long_length_test_files] Test file exceeds $_maxLines lines. Even with test files\' higher tolerance for length, 2000+ lines indicates the file is testing too much. Split into separate test files organized by feature, screen, or use case.',
+        '[avoid_very_long_length_test_files] Test file exceeds $_maxLines lines. Even with test files\' higher tolerance for length, 2000+ lines indicates the file is testing too much. Split into separate test files organized by feature, screen, or use case. {v2}',
     correctionMessage:
         'Split tests by feature or scenario. Verify the change works correctly with existing tests and add coverage for the new behavior.'
         'Disable with: // ignore_for_file: avoid_very_long_length_test_files',
@@ -909,6 +938,8 @@ class AvoidVeryLongTestFilesRule extends SaropaLintRule {
 
 /// Warns when a function or method body exceeds the maximum line count.
 ///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v4
+///
 /// Long functions are harder to understand and test. Consider
 /// extracting parts into smaller functions.
 ///
@@ -931,7 +962,7 @@ class AvoidLongFunctionsRule extends SaropaLintRule {
     problemMessage:
         '[avoid_long_functions] Function body exceeds $_maxLines lines. '
         'Long functions are harder to understand, test in isolation, and debug '
-        'because they typically handle multiple concerns and have complex control flow paths.',
+        'because they typically handle multiple concerns and have complex control flow paths. {v4}',
     correctionMessage:
         'Extract logical sections into smaller, well-named private functions. '
         'Each function should do one thing and be testable independently.',
@@ -973,6 +1004,8 @@ class AvoidLongFunctionsRule extends SaropaLintRule {
 
 /// Warns when a function has too many parameters.
 ///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v6
+///
 /// Example of **bad** code:
 /// ```dart
 /// void process(int a, int b, int c, int d, int e, int f, int g) { }
@@ -997,7 +1030,7 @@ class AvoidLongParameterListRule extends SaropaLintRule {
     problemMessage:
         '[avoid_long_parameter_list] Function has too many parameters (max 5). '
         'Functions with many parameters are difficult to call correctly, hard to test with all combinations, '
-        'and indicate the function may be doing too much work.',
+        'and indicate the function may be doing too much work. {v6}',
     correctionMessage:
         'Group related parameters into a configuration object or convert '
         'positional parameters to named parameters for self-documenting call sites.',
@@ -1031,6 +1064,8 @@ class AvoidLongParameterListRule extends SaropaLintRule {
 
 /// Warns when local functions are declared inside other functions.
 ///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v5
+///
 /// Example of **bad** code:
 /// ```dart
 /// void outer() {
@@ -1062,7 +1097,7 @@ class AvoidLocalFunctionsRule extends SaropaLintRule {
     problemMessage:
         '[avoid_local_functions] Local function declared inside another function. '
         'Local functions increase nesting depth, cannot be tested independently, '
-        'and make the enclosing function harder to read and reason about.',
+        'and make the enclosing function harder to read and reason about. {v5}',
     correctionMessage:
         'Extract to a private top-level function or a class method so it can be '
         'tested in isolation and reused across the codebase.',
@@ -1083,6 +1118,8 @@ class AvoidLocalFunctionsRule extends SaropaLintRule {
 }
 
 /// Warns when a file has too many import statements.
+///
+/// Since: v4.1.3 | Updated: v4.13.0 | Rule version: v3
 ///
 /// Too many imports may indicate the file has too many responsibilities.
 ///
@@ -1105,7 +1142,7 @@ class MaxImportsRule extends SaropaLintRule {
     problemMessage:
         '[limit_max_imports] File has more than $_maxImports imports. '
         'A high import count signals the file depends on too many modules, '
-        'which increases coupling, makes refactoring risky, and slows incremental compilation.',
+        'which increases coupling, makes refactoring risky, and slows incremental compilation. {v3}',
     correctionMessage:
         'Split the file into focused modules with fewer dependencies, or '
         'consolidate related imports behind a facade to reduce direct coupling.',
@@ -1136,6 +1173,8 @@ class MaxImportsRule extends SaropaLintRule {
 
 /// Warns when class members are not in a consistent order.
 ///
+/// Since: v4.10.2 | Updated: v4.13.0 | Rule version: v2
+///
 /// A consistent member ordering makes code easier to navigate. Typical order:
 /// 1. Static fields
 /// 2. Instance fields
@@ -1152,7 +1191,7 @@ class MemberOrderingRule extends SaropaLintRule {
     problemMessage:
         '[prefer_sorted_members] Class members are not in conventional order. '
         'Inconsistent member ordering forces developers to scan the entire class to find '
-        'constructors, fields, or methods, which slows navigation and code review.',
+        'constructors, fields, or methods, which slows navigation and code review. {v2}',
     correctionMessage:
         'Reorder members: static fields, instance fields, constructors, '
         'static methods, instance methods. Consistent ordering enables quick navigation.',
@@ -1198,6 +1237,8 @@ class MemberOrderingRule extends SaropaLintRule {
 
 /// Warns when function parameters are not in alphabetical order.
 ///
+/// Since: v0.1.2 | Updated: v4.13.0 | Rule version: v6
+///
 /// Consistent parameter ordering improves readability.
 ///
 /// ### Example
@@ -1227,7 +1268,7 @@ class PreferSortedParametersRule extends SaropaLintRule {
     problemMessage:
         '[prefer_sorted_parameters] Named parameters are not in alphabetical order. '
         'Unsorted parameters force developers to scan all parameters to find the one they need, '
-        'and inconsistent ordering across functions creates unnecessary cognitive load during code review.',
+        'and inconsistent ordering across functions creates unnecessary cognitive load during code review. {v6}',
     correctionMessage:
         'Reorder named parameters alphabetically so developers can quickly '
         'locate parameters by name without scanning the entire parameter list.',
@@ -1275,6 +1316,8 @@ class PreferSortedParametersRule extends SaropaLintRule {
 
 /// Warns when boolean parameters are positional instead of named.
 ///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v5
+///
 /// Positional boolean parameters make call sites unclear about what
 /// the boolean value means.
 ///
@@ -1304,7 +1347,7 @@ class PreferNamedBooleanParametersRule extends SaropaLintRule {
     problemMessage:
         '[prefer_named_boolean_parameters] Positional boolean parameter detected. '
         'Call sites like doThing(true) give no indication what the boolean controls, '
-        'forcing readers to look up the function signature to understand the intent.',
+        'forcing readers to look up the function signature to understand the intent. {v5}',
     correctionMessage:
         'Convert to a named parameter so call sites read as doThing(enabled: true), '
         'making the code self-documenting without requiring signature lookup.',
@@ -1343,6 +1386,8 @@ class PreferNamedBooleanParametersRule extends SaropaLintRule {
 }
 
 /// Warns when imports should use named imports for clarity.
+///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v5
 class PreferNamedImportsRule extends SaropaLintRule {
   const PreferNamedImportsRule() : super(code: _code);
 
@@ -1351,7 +1396,7 @@ class PreferNamedImportsRule extends SaropaLintRule {
     problemMessage:
         '[prefer_named_imports] Package import without show/hide combinators detected. '
         'Unfiltered imports pull the entire package namespace into scope, increasing the risk of name '
-        'collisions and making it unclear which symbols the file actually depends on.',
+        'collisions and making it unclear which symbols the file actually depends on. {v5}',
     correctionMessage:
         'Use show to explicitly list imported symbols, e.g. import "package:foo/foo.dart" show Bar, Baz. '
         'This documents dependencies and prevents accidental usage of unintended symbols.',
@@ -1383,6 +1428,8 @@ class PreferNamedImportsRule extends SaropaLintRule {
 }
 
 /// Warns when a function has many positional parameters.
+///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v6
 ///
 /// Functions with many positional parameters are hard to call correctly.
 /// Consider using named parameters for clarity.
@@ -1418,7 +1465,7 @@ class PreferNamedParametersRule extends SaropaLintRule {
     problemMessage:
         '[prefer_named_parameters] Function has too many positional parameters. '
         'Call sites with multiple positional arguments like create("a", 1, true, null) are error-prone '
-        'because argument order is easy to confuse and provides no self-documentation.',
+        'because argument order is easy to confuse and provides no self-documentation. {v6}',
     correctionMessage:
         'Convert positional parameters to named parameters so call sites read '
         'as create(name: "a", count: 1) and argument purpose is clear without checking the signature.',
@@ -1451,6 +1498,8 @@ class PreferNamedParametersRule extends SaropaLintRule {
 
 /// Warns when a class only has static members and could be a namespace.
 ///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v5
+///
 /// Classes with only static members are essentially namespaces. Consider
 /// using top-level functions and constants instead.
 class PreferStaticClassRule extends SaropaLintRule {
@@ -1461,7 +1510,7 @@ class PreferStaticClassRule extends SaropaLintRule {
     problemMessage:
         '[prefer_static_class] Class contains only static members and acts as a namespace. '
         'Static-only classes cannot be instantiated meaningfully, add unnecessary boilerplate, '
-        'and prevent tree-shaking of unused members in the class.',
+        'and prevent tree-shaking of unused members in the class. {v5}',
     correctionMessage:
         'Replace with top-level functions and constants, which are simpler, '
         'support tree-shaking, and follow idiomatic Dart conventions.',
@@ -1517,6 +1566,8 @@ class PreferStaticClassRule extends SaropaLintRule {
 
 /// Warns when a variable is declared, used once, and returned immediately.
 ///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v4
+///
 /// Example of **bad** code:
 /// ```dart
 /// int calculate() {
@@ -1546,7 +1597,7 @@ class AvoidUnnecessaryLocalVariableRule extends SaropaLintRule {
     problemMessage:
         '[avoid_unnecessary_local_variable] Variable is declared, used once, and returned on the next line. '
         'This intermediate variable adds a line of code without improving readability '
-        'and forces readers to track an extra name through the function.',
+        'and forces readers to track an extra name through the function. {v4}',
     correctionMessage:
         'Return the expression directly to reduce cognitive load. If the expression is complex, '
         'use a descriptive comment instead of an intermediate variable.',
@@ -1591,6 +1642,8 @@ class AvoidUnnecessaryLocalVariableRule extends SaropaLintRule {
 
 /// Warns when a variable is assigned the same value it already has.
 ///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v5
+///
 /// Example of **bad** code:
 /// ```dart
 /// String value = 'default';
@@ -1617,7 +1670,7 @@ class AvoidUnnecessaryReassignmentRule extends SaropaLintRule {
     problemMessage:
         '[avoid_unnecessary_reassignment] Variable is assigned the same value it already holds (x = x). '
         'Self-assignment has no effect and typically indicates a copy-paste error '
-        'or a missing right-hand-side expression that was intended.',
+        'or a missing right-hand-side expression that was intended. {v5}',
     correctionMessage:
         'Remove the self-assignment statement, or fix the right-hand side '
         'if a different value was intended.',
@@ -1651,6 +1704,8 @@ class AvoidUnnecessaryReassignmentRule extends SaropaLintRule {
 
 /// Warns when an instance method doesn't use `this` and could be static.
 ///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v4
+///
 /// Example of **bad** code:
 /// ```dart
 /// class Utils {
@@ -1674,7 +1729,7 @@ class PreferStaticMethodRule extends SaropaLintRule {
     problemMessage:
         '[prefer_static_method] Method does not reference any instance members and could be static. '
         'Non-static methods that ignore instance state mislead readers into thinking the method '
-        'depends on object state, and they prevent calling the method without an instance.',
+        'depends on object state, and they prevent calling the method without an instance. {v4}',
     correctionMessage:
         'Mark the method as static to communicate that it operates independently '
         'of instance state and can be called without constructing the class.',
@@ -1752,6 +1807,8 @@ class _ThisUsageFinder extends RecursiveAstVisitor<void> {
 
 /// Warns when a class with only static members could be abstract final.
 ///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v4
+///
 /// Example of **bad** code:
 /// ```dart
 /// class Constants {
@@ -1779,7 +1836,7 @@ class PreferAbstractFinalStaticClassRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_abstract_final_static_class',
     problemMessage:
-        '[prefer_abstract_final_static_class] Class with only static members must be declared abstract final to prevent instantiation. Creating instances of a static-only class is meaningless and misleads readers about its intended usage.',
+        '[prefer_abstract_final_static_class] Class with only static members must be declared abstract final to prevent instantiation. Creating instances of a static-only class is meaningless and misleads readers about its intended usage. {v4}',
     correctionMessage:
         'Use "abstract final class" to prevent instantiation. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -1839,6 +1896,8 @@ class PreferAbstractFinalStaticClassRule extends SaropaLintRule {
 
 /// Warns when Color values are hardcoded instead of using theme colors.
 ///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v6
+///
 /// Example of **bad** code:
 /// ```dart
 /// Container(color: Color(0xFF000000));
@@ -1864,7 +1923,7 @@ class AvoidHardcodedColorsRule extends SaropaLintRule {
     name: 'avoid_hardcoded_colors',
     problemMessage:
         '[avoid_hardcoded_colors] Hardcoded color value bypasses the theme system, breaking dark mode and dynamic theming. '
-        'When users switch themes, hardcoded colors remain unchanged, creating contrast issues, illegible text, and an inconsistent visual experience that can fail accessibility requirements.',
+        'When users switch themes, hardcoded colors remain unchanged, creating contrast issues, illegible text, and an inconsistent visual experience that can fail accessibility requirements. {v6}',
     correctionMessage:
         'Use theme colors from Theme.of(context).colorScheme (e.g., colorScheme.primary, colorScheme.surface) or define semantic color tokens in your ThemeData. '
         'This ensures colors adapt automatically when the theme changes and maintains WCAG contrast ratios across all theme variants.',
@@ -1909,6 +1968,8 @@ class AvoidHardcodedColorsRule extends SaropaLintRule {
 
 /// Warns when type parameters are declared but never used.
 ///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v4
+///
 /// Example of **bad** code:
 /// ```dart
 /// class Container<T> {
@@ -1930,7 +1991,7 @@ class AvoidUnusedGenericsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_unused_generics',
     problemMessage:
-        '[avoid_unused_generics] Type parameter is declared but never used in the class or method body. Unused generics add false complexity and mislead callers into thinking the type affects behavior.',
+        '[avoid_unused_generics] Type parameter is declared but never used in the class or method body. Unused generics add false complexity and mislead callers into thinking the type affects behavior. {v4}',
     correctionMessage:
         'Remove unused type parameter or use it in the declaration. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -2034,6 +2095,8 @@ class _TypeNameFinder extends RecursiveAstVisitor<void> {
 
 /// Warns when unused parameters don't have underscore prefix.
 ///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v4
+///
 /// **Stylistic rule (opt-in only).** No performance or correctness benefit.
 ///
 /// Example of **bad** code:
@@ -2058,7 +2121,7 @@ class PreferTrailingUnderscoreForUnusedRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_trailing_underscore_for_unused',
     problemMessage:
-        '[prefer_trailing_underscore_for_unused] Naming unused variables with a trailing underscore is a convention. The Dart compiler handles unused variables the same either way. Enable via the stylistic tier.',
+        '[prefer_trailing_underscore_for_unused] Naming unused variables with a trailing underscore is a convention. The Dart compiler handles unused variables the same either way. Enable via the stylistic tier. {v4}',
     correctionMessage:
         'Rename to _ or _paramName to indicate it is unused. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -2103,6 +2166,8 @@ class _IdentifierCollectorStructure extends RecursiveAstVisitor<void> {
 
 /// Warns when async/await is used unnecessarily.
 ///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v4
+///
 /// Example of **bad** code:
 /// ```dart
 /// Future<int> getValue() async {
@@ -2131,7 +2196,7 @@ class AvoidUnnecessaryFuturesRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_unnecessary_futures',
     problemMessage:
-        '[avoid_unnecessary_futures] Async function has no await expressions and gains nothing from being async. The unnecessary Future wrapper adds overhead and misleads callers about asynchronous behavior.',
+        '[avoid_unnecessary_futures] Async function has no await expressions and gains nothing from being async. The unnecessary Future wrapper adds overhead and misleads callers about asynchronous behavior. {v4}',
     correctionMessage:
         'Remove async keyword or add await expressions. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -2184,6 +2249,8 @@ class _AwaitExpressionFinder extends RecursiveAstVisitor<void> {
 
 /// Warns when throw is used in finally blocks.
 ///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v5
+///
 /// Example of **bad** code:
 /// ```dart
 /// try {
@@ -2218,7 +2285,7 @@ class AvoidThrowInFinallyRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_throw_in_finally',
     problemMessage:
-        '[avoid_throw_in_finally] Throw statement inside a finally block silently replaces the original exception. If the try block throws an error, the finally throw overwrites it, making the root cause invisible in crash logs and error handlers.',
+        '[avoid_throw_in_finally] Throw statement inside a finally block silently replaces the original exception. If the try block throws an error, the finally throw overwrites it, making the root cause invisible in crash logs and error handlers. {v5}',
     correctionMessage:
         'Move the throw out of the finally block, or catch and log the finally-block error separately to preserve the original exception.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -2256,6 +2323,8 @@ class _ThrowFinder extends RecursiveAstVisitor<void> {
 
 /// Warns when a function's return type is nullable but never returns null.
 ///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v3
+///
 /// Example of **bad** code:
 /// ```dart
 /// String? getValue() {
@@ -2275,7 +2344,7 @@ class AvoidUnnecessaryNullableReturnTypeRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_unnecessary_nullable_return_type',
     problemMessage:
-        '[avoid_unnecessary_nullable_return_type] Return type is nullable but function never returns null. Unnecessary nullability forces callers to add redundant null checks, reducing code clarity and type safety.',
+        '[avoid_unnecessary_nullable_return_type] Return type is nullable but function never returns null. Unnecessary nullability forces callers to add redundant null checks, reducing code clarity and type safety. {v3}',
     correctionMessage:
         'Remove the ? from the return type. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
