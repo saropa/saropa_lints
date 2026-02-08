@@ -1919,7 +1919,7 @@ class _WrapHiveInAsyncCommentFix extends DartFix {
 
 /// Warns when Hive.initFlutter() is called without a subDir parameter on
 ///
-/// Since: v4.14.0 | Updated: vunreleased | Rule version: v2
+/// Since: v4.14.0 | Rule version: v2
 ///
 /// web platform.
 ///
