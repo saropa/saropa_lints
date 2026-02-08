@@ -53,7 +53,7 @@ class AvoidFreezedJsonSerializableConflictRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_freezed_json_serializable_conflict',
     problemMessage:
-        'Combining Freezed and json_serializable annotations incorrectly can result in code generation conflicts, leading to broken serialization, runtime errors, or data loss. This can cause your app to fail when parsing or serializing JSON, especially in production environments. Always follow the recommended integration patterns to ensure reliable code generation. See https://pub.dev/packages/freezed#json_serializable.',
+        '[avoid_freezed_json_serializable_conflict] Combining Freezed and json_serializable annotations incorrectly can result in code generation conflicts, leading to broken serialization, runtime errors, or data loss. This can cause your app to fail when parsing or serializing JSON, especially in production environments. Always follow the recommended integration patterns to ensure reliable code generation. See https://pub.dev/packages/freezed#json_serializable.',
     correctionMessage:
         'Review and adjust your Freezed and json_serializable usage to avoid annotation conflicts, following the official documentation for correct integration. This ensures consistent and reliable serialization behavior. See https://pub.dev/packages/freezed#json_serializable for best practices.',
     errorSeverity: DiagnosticSeverity.ERROR,

@@ -226,7 +226,7 @@ class PreferTryParseForDynamicDataRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_try_parse_for_dynamic_data',
     problemMessage:
-        'Using parse methods (like int.parse or double.parse) on dynamic or user-provided data can throw exceptions and crash your app if the input is invalid. This exposes your app to stability and security risks, especially when handling external or untrusted data. Always use tryParse to safely handle potentially malformed input and provide a fallback for invalid values. See https://dart.dev/guides/libraries/library-tour#numbers.',
+        '[prefer_try_parse_for_dynamic_data] Using parse methods (like int.parse or double.parse) on dynamic or user-provided data can throw exceptions and crash your app if the input is invalid. This exposes your app to stability and security risks, especially when handling external or untrusted data. Always use tryParse to safely handle potentially malformed input and provide a fallback for invalid values. See https://dart.dev/guides/libraries/library-tour#numbers.',
     correctionMessage:
         'Replace parse with tryParse when converting dynamic or user-controlled data to prevent runtime exceptions and improve app robustness. This practice aligns with Dart’s recommendations for safe type conversion. See https://dart.dev/guides/libraries/library-tour#numbers for guidance.',
     errorSeverity: DiagnosticSeverity.ERROR,
