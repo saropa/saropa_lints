@@ -111,18 +111,18 @@ final text = 'text';
 // expect_lint: require_test_widget_pump
 void _bad1185() async {
   testWidgets('button tap', (tester) async {
-  await tester.pumpWidget(MyWidget());
-  await tester.tap(find.byType(ElevatedButton)); // Missing pump!
-  expect(find.text('Tapped'), findsOneWidget); // Fails
+    await tester.pumpWidget(MyWidget());
+    await tester.tap(find.byType(ElevatedButton)); // Missing pump!
+    expect(find.text('Tapped'), findsOneWidget); // Fails
   });
 }
 
 // GOOD: Should NOT trigger require_test_widget_pump
 void _good1185() async {
   testWidgets('button tap', (tester) async {
-  await tester.pumpWidget(MyWidget());
-  await tester.tap(find.byType(ElevatedButton));
-  await tester.pump(); // Process the tap
-  expect(find.text('Tapped'), findsOneWidget);
+    await tester.pumpWidget(MyWidget());
+    await tester.tap(find.byType(ElevatedButton));
+    await tester.pump(); // Process the tap
+    expect(find.text('Tapped'), findsOneWidget);
   });
 }

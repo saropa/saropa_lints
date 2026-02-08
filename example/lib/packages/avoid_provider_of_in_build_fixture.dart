@@ -114,22 +114,23 @@ final userName = 'John';
 // BAD: Should trigger avoid_provider_of_in_build
 // expect_lint: avoid_provider_of_in_build
 Widget _bad704_build(BuildContext context) {
-final user = Provider.of<User>(context); // Rebuilds on every change
-return ElevatedButton(
-onPressed: () => user.logout(),
-child: Text('Logout'),
-);
+  final user = Provider.of<User>(context); // Rebuilds on every change
+  return ElevatedButton(
+    onPressed: () => user.logout(),
+    child: Text('Logout'),
+  );
 }
 
 // GOOD: Should NOT trigger avoid_provider_of_in_build
 Widget _good704_build(BuildContext context) {
-return ElevatedButton(
-onPressed: () => context.read<User>().logout(),
-child: Text('Logout'),
-);
+  return ElevatedButton(
+    onPressed: () => context.read<User>().logout(),
+    child: Text('Logout'),
+  );
 }
+
 // Or if you need reactive updates:
 Widget build(BuildContext context) {
-final userName = context.watch<User>().name;
-return Text(userName);
+  final userName = context.watch<User>().name;
+  return Text(userName);
 }

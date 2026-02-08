@@ -110,13 +110,13 @@ dynamic event;
 // BAD: Should trigger avoid_bloc_event_in_constructor
 // expect_lint: avoid_bloc_event_in_constructor
 class _bad550_MyBloc extends Bloc<Event, State> {
-MyBloc() : super(Initial()) {
-add(LoadEvent()); // Anti-pattern
-}
+  _bad550_MyBloc() : super(Initial()) {
+    add(LoadEvent()); // Anti-pattern
+  }
 }
 
 // GOOD: Should NOT trigger avoid_bloc_event_in_constructor
 class _good550_MyBloc extends Bloc<Event, State> {
-MyBloc() : super(Initial());
+  _good550_MyBloc() : super(Initial());
 }
 // Add event from outside: bloc.add(LoadEvent());

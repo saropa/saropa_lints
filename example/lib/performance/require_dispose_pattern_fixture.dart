@@ -108,15 +108,15 @@ import '../flutter_mocks.dart';
 // BAD: Should trigger require_dispose_pattern
 // expect_lint: require_dispose_pattern
 class _bad803_MyManager {
-final _controller = StreamController<int>();
+  final _controller = StreamController<int>();
 // Missing close!
 }
 
 // GOOD: Should NOT trigger require_dispose_pattern
 class _good803_MyManager {
-final _controller = StreamController<int>();
+  final _controller = StreamController<int>();
 
-void dispose() {
-_controller.close();
-}
+  void dispose() {
+    _controller.close();
+  }
 }

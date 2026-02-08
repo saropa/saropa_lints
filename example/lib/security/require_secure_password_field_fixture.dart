@@ -111,19 +111,19 @@ dynamic controller;
 // expect_lint: require_secure_password_field
 void _bad1013() {
   TextField(
-  controller: passwordController,
-  obscureText: true,
-  // Missing security settings
+    controller: passwordController,
+    obscureText: true,
+    // Missing security settings
   );
 }
 
 // GOOD: Should NOT trigger require_secure_password_field
 void _good1013() {
   TextField(
-  controller: passwordController,
-  obscureText: true,
-  enableSuggestions: false,
-  autocorrect: false,
-  keyboardType: TextInputType.visiblePassword,
+    controller: passwordController,
+    obscureText: true,
+    enableSuggestions: false,
+    autocorrect: false,
+    keyboardType: TextInputType.visiblePassword,
   );
 }

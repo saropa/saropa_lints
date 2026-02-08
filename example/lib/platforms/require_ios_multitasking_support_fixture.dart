@@ -116,21 +116,21 @@ final context = BuildContext();
 void _bad914() {
   // Assumes full screen
   Container(
-  width: MediaQuery.of(context).size.width,
-  child: Row(
-  children: [sidebar, content], // Breaks in Split View
-  ),
+    width: MediaQuery.of(context).size.width,
+    child: Row(
+      children: [sidebar, content], // Breaks in Split View
+    ),
   );
 }
 
 // GOOD: Should NOT trigger require_ios_multitasking_support
 void _good914() {
   LayoutBuilder(
-  builder: (context, constraints) {
-  if (constraints.maxWidth > 600) {
-  return Row(children: [sidebar, content]);
-  }
-  return Column(children: [content]); // Navigation via drawer
-  },
+    builder: (context, constraints) {
+      if (constraints.maxWidth > 600) {
+        return Row(children: [sidebar, content]);
+      }
+      return Column(children: [content]); // Navigation via drawer
+    },
   );
 }

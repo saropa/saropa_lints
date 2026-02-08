@@ -116,39 +116,51 @@ dynamic widget;
 // BAD: Should trigger avoid_getx_context_outside_widget
 // expect_lint: avoid_getx_context_outside_widget
 class _bad640_MyController extends GetxController {
-void showMessage(String msg) {
-ScaffoldMessenger.of(Get.context!).showSnackBar(
-SnackBar(content: Text(msg)),
-);
-}
+  void showMessage(String msg) {
+    void _topLevel119() {
+      ScaffoldMessenger.of(Get.context!).showSnackBar(
+        SnackBar(content: Text(msg)),
+      );
+    }
+  }
 
-void navigate() {
-Navigator.of(Get.overlayContext!).push();
-}
+  void navigate() {
+    void _topLevel125() {
+      Navigator.of(Get.overlayContext!).push();
+    }
+  }
 }
 
 // GOOD: Should NOT trigger avoid_getx_context_outside_widget
 // Option 1: Use GetX snackbar/dialog methods
 class _good640_MyController extends GetxController {
-void showMessage(String msg) {
-Get.snackbar('Title', msg);
-}
+  void showMessage(String msg) {
+    void _topLevel133() {
+      Get.snackbar('Title', msg);
+    }
+  }
 
-void navigate() {
-Get.to(MyPage());
-}
+  void navigate() {
+    void _topLevel137() {
+      Get.to(MyPage());
+    }
+  }
 }
 
 // Option 2: Trigger UI from widget using reactive state
 class _good640_MyController extends GetxController {
-final message = RxnString();
+  final message = RxnString();
 
-void triggerMessage(String msg) {
-message.value = msg;
-}
+  void triggerMessage(String msg) {
+    void _topLevel146() {
+      message.value = msg;
+    }
+  }
 }
 
 // In widget:
-ever(controller.message, (msg) {
-if (msg != null) showSnackBar(context, msg);
-});
+void _topLevel151() {
+  ever(controller.message, (msg) {
+    if (msg != null) showSnackBar(context, msg);
+  });
+}

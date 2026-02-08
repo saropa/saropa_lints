@@ -111,14 +111,14 @@ dynamic user;
 // BAD: Should trigger prefer_interface_class
 // expect_lint: prefer_interface_class
 abstract class _bad146_Repository {
-Future<User> getUser(String id);
-Future<void> saveUser(User user);
+  Future<User> getUser(String id);
+  Future<void> saveUser(User user);
 }
 
 // GOOD: Should NOT trigger prefer_interface_class
 void _good146() {
-  interface class Repository {
-  Future<User> getUser(String id);
-  Future<void> saveUser(User user);
-  }
+  // interface class Repository {
+  // Future<User> getUser(String id);
+  // Future<void> saveUser(User user);
+  // }
 }

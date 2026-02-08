@@ -113,5 +113,7 @@ class _bad79_AppManager {
 
 // GOOD: Should NOT trigger avoid_god_class
 class _good79_UserManager {}
+
 class AuthManager {}
+
 class CacheManager {}

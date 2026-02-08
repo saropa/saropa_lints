@@ -108,31 +108,31 @@ import '../flutter_mocks.dart';
 // BAD: Should trigger require_timer_cancellation
 // expect_lint: require_timer_cancellation
 class _bad1345__MyState extends State<MyWidget> {
-Timer? _timer;
+  Timer? _timer;
 
-@override
-void initState() {
-super.initState();
-_timer = Timer.periodic(Duration(seconds: 1), (_) {
-setState(() => _count++);  // 💥 Crashes after dispose!
-});
-}
+  @override
+  void initState() {
+    super.initState();
+    _timer = Timer.periodic(Duration(seconds: 1), (_) {
+      setState(() => _count++); // 💥 Crashes after dispose!
+    });
+  }
 
-@override
-void dispose() {
+  @override
+  void dispose() {
 // Missing: _timer?.cancel();
-super.dispose();
-}
+    super.dispose();
+  }
 }
 
 // GOOD: Should NOT trigger require_timer_cancellation
 class _good1345__MyState extends State<MyWidget> {
-Timer? _timer;
+  Timer? _timer;
 
-@override
-void dispose() {
-_timer?.cancel();
-_timer = null;
-super.dispose();
-}
+  @override
+  void dispose() {
+    _timer?.cancel();
+    _timer = null;
+    super.dispose();
+  }
 }

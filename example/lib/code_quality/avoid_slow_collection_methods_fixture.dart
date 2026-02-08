@@ -109,8 +109,8 @@ import '../flutter_mocks.dart';
 // expect_lint: avoid_slow_collection_methods
 void _bad199() {
   Iterable<int> getItems() sync* {
-  yield 1;
-  yield 2;
+    yield 1;
+    yield 2;
   }
 }
 

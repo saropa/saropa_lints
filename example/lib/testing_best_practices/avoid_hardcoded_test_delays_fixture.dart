@@ -112,20 +112,20 @@ dynamic widget;
 // expect_lint: avoid_hardcoded_test_delays
 void _bad1190() async {
   test('should update after delay', () async {
-  triggerUpdate();
-  await Future.delayed(Duration(seconds: 2));
-  expect(widget.updated, true);
+    triggerUpdate();
+    await Future.delayed(Duration(seconds: 2));
+    expect(widget.updated, true);
   });
 }
 
 // GOOD: Should NOT trigger avoid_hardcoded_test_delays
 void _good1190() async {
   test('should update after delay', () async {
-  await tester.pumpAndSettle();
-  // or
-  await expectLater(
-  stream,
-  emitsInOrder([]),
-  );
+    await tester.pumpAndSettle();
+    // or
+    await expectLater(
+      stream,
+      emitsInOrder([]),
+    );
   });
 }

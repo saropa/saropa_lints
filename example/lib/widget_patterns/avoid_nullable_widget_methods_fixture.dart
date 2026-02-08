@@ -112,34 +112,34 @@ final context = BuildContext();
 // expect_lint: avoid_nullable_widget_methods
 void _bad1443() {
   Widget? _buildOptionalHeader() {
-  if (!showHeader) return null;
-  return Text('Header');
+    if (!showHeader) return null;
+    return Text('Header');
   }
-  
+
   @override
   Widget build(BuildContext context) {
-  return Column(
-  children: [
-  if (_buildOptionalHeader() != null) _buildOptionalHeader()!,
-  // or
-  _buildOptionalHeader() ?? SizedBox.shrink(),
-  ],
-  );
+    return Column(
+      children: [
+        if (_buildOptionalHeader() != null) _buildOptionalHeader()!,
+        // or
+        _buildOptionalHeader() ?? SizedBox.shrink(),
+      ],
+    );
   }
 }
 
 // GOOD: Should NOT trigger avoid_nullable_widget_methods
 Widget _good1443__buildHeader() {
-if (!showHeader) return const SizedBox.shrink();
-return Text('Header');
+  if (!showHeader) return const SizedBox.shrink();
+  return Text('Header');
 }
 
 // Or use conditional rendering directly:
 @override
 Widget build(BuildContext context) {
-return Column(
-children: [
-if (showHeader) const Text('Header'),
-],
-);
+  return Column(
+    children: [
+      if (showHeader) const Text('Header'),
+    ],
+  );
 }

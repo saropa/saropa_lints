@@ -110,18 +110,19 @@ dynamic state;
 // BAD: Should trigger require_app_lifecycle_handling
 // expect_lint: require_app_lifecycle_handling
 class _bad463__MyState extends State<MyWidget> {
-Timer? _timer;
-void initState() {
-super.initState();
-_timer = Timer.periodic(Duration(seconds: 1), (_) => refresh());
-}
+  Timer? _timer;
+  void initState() {
+    super.initState();
+    _timer = Timer.periodic(Duration(seconds: 1), (_) => refresh());
+  }
 }
 
 // GOOD: Should NOT trigger require_app_lifecycle_handling
 class _good463__MyState extends State<MyWidget> with WidgetsBindingObserver {
-Timer? _timer;
-void didChangeAppLifecycleState(AppLifecycleState state) {
-if (state == AppLifecycleState.paused) _timer?.cancel();
-else if (state == AppLifecycleState.resumed) _startTimer();
-}
+  Timer? _timer;
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.paused)
+      _timer?.cancel();
+    else if (state == AppLifecycleState.resumed) _startTimer();
+  }
 }

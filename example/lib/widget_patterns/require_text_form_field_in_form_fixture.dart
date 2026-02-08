@@ -112,20 +112,21 @@ final children = <Widget>[];
 // expect_lint: require_text_form_field_in_form
 void _bad1448() {
   Column(
-  children: [
-  TextFormField(  // validation won't work!
-  validator: (v) => v!.isEmpty ? 'Required' : null,
-  ),
-  ],
+    children: [
+      TextFormField(
+        // validation won't work!
+        validator: (v) => v!.isEmpty ? 'Required' : null,
+      ),
+    ],
   );
 }
 
 // GOOD: Should NOT trigger require_text_form_field_in_form
 void _good1448() {
   Form(
-  child: TextFormField(
-  validator: (v) => v!.isEmpty ? 'Required' : null,
-  ),
+    child: TextFormField(
+      validator: (v) => v!.isEmpty ? 'Required' : null,
+    ),
   );
   // Or use TextField if no form validation needed
 }

@@ -112,20 +112,20 @@ dynamic ref;
 // BAD: Should trigger avoid_riverpod_notifier_in_build
 // expect_lint: avoid_riverpod_notifier_in_build
 class _bad759_MyWidget extends ConsumerWidget {
-Widget build(BuildContext context, WidgetRef ref) {
-final notifier = StateNotifier<int>(0); // Recreated every build!
-return Text('$notifier');
-}
+  Widget build(BuildContext context, WidgetRef ref) {
+    final notifier = StateNotifier<int>(0); // Recreated every build!
+    return Text('$notifier');
+  }
 }
 
 // GOOD: Should NOT trigger avoid_riverpod_notifier_in_build
 final counterProvider = StateNotifierProvider<CounterNotifier, int>(
-(ref) => CounterNotifier(),
+  (ref) => CounterNotifier(),
 );
 
 class _good759_MyWidget extends ConsumerWidget {
-Widget build(BuildContext context, WidgetRef ref) {
-final count = ref.watch(counterProvider);
-return Text('$count');
-}
+  Widget build(BuildContext context, WidgetRef ref) {
+    final count = ref.watch(counterProvider);
+    return Text('$count');
+  }
 }

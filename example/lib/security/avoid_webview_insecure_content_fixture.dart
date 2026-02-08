@@ -111,25 +111,25 @@ final url = 'https://example.com';
 // expect_lint: avoid_webview_insecure_content
 void _bad1021() {
   InAppWebView(
-  initialSettings: InAppWebViewSettings(
-  mixedContentMode: MixedContentMode.MIXED_CONTENT_ALWAYS_ALLOW,
-  ),
+    initialSettings: InAppWebViewSettings(
+      mixedContentMode: MixedContentMode.MIXED_CONTENT_ALWAYS_ALLOW,
+    ),
   );
-  
+
   AndroidWebViewController()
-  ..setJavaScriptMode(JavaScriptMode.unrestricted)
-  ..loadRequest(Uri.parse(url))
-  ..enableDebugging(true)
-  ..setMediaPlaybackRequiresUserGesture(true)
-  ..setBackgroundColor(Colors.white);
+    ..setJavaScriptMode(JavaScriptMode.unrestricted)
+    ..loadRequest(Uri.parse(url))
+    ..enableDebugging(true)
+    ..setMediaPlaybackRequiresUserGesture(true)
+    ..setBackgroundColor(Colors.white);
   // Missing: setMixedContentMode
 }
 
 // GOOD: Should NOT trigger avoid_webview_insecure_content
 void _good1021() {
   InAppWebView(
-  initialSettings: InAppWebViewSettings(
-  mixedContentMode: MixedContentMode.MIXED_CONTENT_NEVER_ALLOW,
-  ),
+    initialSettings: InAppWebViewSettings(
+      mixedContentMode: MixedContentMode.MIXED_CONTENT_NEVER_ALLOW,
+    ),
   );
 }

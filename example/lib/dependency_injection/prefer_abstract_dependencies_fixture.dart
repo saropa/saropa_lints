@@ -110,12 +110,16 @@ dynamic repo;
 // BAD: Should trigger prefer_abstract_dependencies
 // expect_lint: prefer_abstract_dependencies
 class _bad314_OrderService {
-OrderService(this.repo);
-final PostgresUserRepository repo; // Depends on concrete class
+  void _topLevel112() {
+    _bad314_OrderService(this.repo);
+    final PostgresUserRepository repo; // Depends on concrete class
+  }
 }
 
 // GOOD: Should NOT trigger prefer_abstract_dependencies
 class _good314_OrderService {
-OrderService(this.repo);
-final UserRepository repo; // Depends on abstraction
+  void _topLevel118() {
+    _good314_OrderService(this.repo);
+    final UserRepository repo; // Depends on abstraction
+  }
 }

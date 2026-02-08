@@ -108,22 +108,22 @@ import '../flutter_mocks.dart';
 // BAD: Should trigger require_getx_permanent_cleanup
 // expect_lint: require_getx_permanent_cleanup
 class _bad639_MyApp extends StatelessWidget {
-@override
-void initState() {
-Get.put(AuthController(), permanent: true);
+  @override
+  void initState() {
+    Get.put(AuthController(), permanent: true);
 // Never cleaned up!
-}
+  }
 }
 
 // GOOD: Should NOT trigger require_getx_permanent_cleanup
 class _good639_MyApp extends StatelessWidget {
-@override
-void initState() {
-Get.put(AuthController(), permanent: true);
-}
+  @override
+  void initState() {
+    Get.put(AuthController(), permanent: true);
+  }
 
-void logout() {
+  void logout() {
 // Manually clean up when no longer needed
-Get.delete<AuthController>();
-}
+    Get.delete<AuthController>();
+  }
 }

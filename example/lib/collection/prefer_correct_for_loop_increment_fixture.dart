@@ -108,12 +108,12 @@ import '../flutter_mocks.dart';
 // BAD: Should trigger prefer_correct_for_loop_increment
 // expect_lint: prefer_correct_for_loop_increment
 void _bad253() {
-  for (int i = 0; i < 10; i += 2) { } // Non-standard increment
-  for (int i = 0; i < 10; i = i + 3) { } // Verbose increment
+  for (int i = 0; i < 10; i += 2) {} // Non-standard increment
+  for (int i = 0; i < 10; i = i + 3) {} // Verbose increment
 }
 
 // GOOD: Should NOT trigger prefer_correct_for_loop_increment
 void _good253() {
-  for (int i = 0; i < 10; i++) { } // Standard increment
-  for (int i = 0; i < 10; i += 1) { } // Also acceptable
+  for (int i = 0; i < 10; i++) {} // Standard increment
+  for (int i = 0; i < 10; i += 1) {} // Also acceptable
 }

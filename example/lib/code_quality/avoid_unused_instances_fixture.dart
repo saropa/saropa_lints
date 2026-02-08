@@ -108,11 +108,11 @@ import '../flutter_mocks.dart';
 // BAD: Should trigger avoid_unused_instances
 // expect_lint: avoid_unused_instances
 void _bad189_foo() {
-MyClass();  // Instance created but not used
+  MyClass(); // Instance created but not used
 }
 
 // GOOD: Should NOT trigger avoid_unused_instances
 void _good189_foo() {
-Future.delayed(Duration(seconds: 1), () => print('done'));
-Timer(Duration(seconds: 1), () => print('done'));
+  Future.delayed(Duration(seconds: 1), () => print('done'));
+  Timer(Duration(seconds: 1), () => print('done'));
 }

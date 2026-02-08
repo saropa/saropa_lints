@@ -112,13 +112,13 @@ dynamic state;
 // BAD: Should trigger avoid_bloc_listen_in_build
 // expect_lint: avoid_bloc_listen_in_build
 Widget _bad556_build(BuildContext context) {
-final bloc = BlocProvider.of<MyBloc>(context); // listen:true by default
-return Text('${bloc.state}');
+  final bloc = BlocProvider.of<MyBloc>(context); // listen:true by default
+  return Text('${bloc.state}');
 }
 
 // GOOD: Should NOT trigger avoid_bloc_listen_in_build
 Widget _good556_build(BuildContext context) {
-return BlocBuilder<MyBloc, MyState>(
-builder: (context, state) => Text('$state'),
-);
+  return BlocBuilder<MyBloc, MyState>(
+    builder: (context, state) => Text('$state'),
+  );
 }

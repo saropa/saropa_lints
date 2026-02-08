@@ -113,23 +113,23 @@ final children = <Widget>[];
 // expect_lint: prefer_safe_area_aware
 void _bad1326() {
   Scaffold(
-  body: Column(
-  children: [
-  Text('Title'), // May be hidden under notch!
-  ],
-  ),
+    body: Column(
+      children: [
+        Text('Title'), // May be hidden under notch!
+      ],
+    ),
   );
 }
 
 // GOOD: Should NOT trigger prefer_safe_area_aware
 void _good1326() {
   Scaffold(
-  body: SafeArea(
-  child: Column(
-  children: [
-  Text('Title'),
-  ],
-  ),
-  ),
+    body: SafeArea(
+      child: Column(
+        children: [
+          Text('Title'),
+        ],
+      ),
+    ),
   );
 }

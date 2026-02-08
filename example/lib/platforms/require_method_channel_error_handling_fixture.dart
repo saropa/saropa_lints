@@ -119,10 +119,10 @@ void _bad840() async {
 // GOOD: Should NOT trigger require_method_channel_error_handling
 void _good840() async {
   try {
-  final result = await channel.invokeMethod('getData');
-  return result;
+    final result = await channel.invokeMethod('getData');
+    return result;
   } on PlatformException catch (e) {
-  debugPrint('Platform error: ${e.message}');
-  return null;
+    debugPrint('Platform error: ${e.message}');
+    return null;
   }
 }

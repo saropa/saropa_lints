@@ -108,9 +108,11 @@ import '../flutter_mocks.dart';
 // BAD: Should trigger avoid_identical_exception_handling_blocks
 // expect_lint: avoid_identical_exception_handling_blocks
 void _bad176() {
-  try {}
-  on FormatException catch (e) { print(e); }
-  on IOException catch (e) { print(e); }  // Same as above
+  try {} on FormatException catch (e) {
+    print(e);
+  } on IOException catch (e) {
+    print(e);
+  } // Same as above
 }
 
 // GOOD: Should NOT trigger avoid_identical_exception_handling_blocks

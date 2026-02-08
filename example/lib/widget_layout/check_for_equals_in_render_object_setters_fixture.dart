@@ -110,17 +110,17 @@ dynamic value;
 // BAD: Should trigger check_for_equals_in_render_object_setters
 // expect_lint: check_for_equals_in_render_object_setters
 void _bad1286() {
-  set color(Color value) {
+  // set color(Color value) {
   _color = value;
   markNeedsPaint();
-  }
+  // }
 }
 
 // GOOD: Should NOT trigger check_for_equals_in_render_object_setters
 void _good1286() {
-  set color(Color value) {
+  // set color(Color value) {
   if (_color == value) return;
   _color = value;
   markNeedsPaint();
-  }
+  // }
 }

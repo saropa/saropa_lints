@@ -110,7 +110,7 @@ dynamic error;
 // BAD: Should trigger avoid_missing_completer_stack_trace
 // expect_lint: avoid_missing_completer_stack_trace
 void _bad178() {
-  completer.completeError(error);  // Missing stack trace
+  completer.completeError(error); // Missing stack trace
 }
 
 // GOOD: Should NOT trigger avoid_missing_completer_stack_trace

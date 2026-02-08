@@ -110,14 +110,19 @@ final message = 'Message';
 // BAD: Should trigger require_error_state
 // expect_lint: require_error_state
 sealed class _bad558_UserState {}
+
 class UserLoading extends UserState {}
+
 class UserLoaded extends UserState {}
 // Missing UserError!
 
 // GOOD: Should NOT trigger require_error_state
 sealed class _good558_UserState {}
+
 class UserLoading extends UserState {}
+
 class UserLoaded extends UserState {}
+
 class UserError extends UserState {
-final String message;
+  final String message;
 }

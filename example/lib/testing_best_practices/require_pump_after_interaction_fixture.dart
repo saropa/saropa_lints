@@ -111,21 +111,21 @@ final text = 'text';
 // expect_lint: require_pump_after_interaction
 void _bad1192() async {
   testWidgets('should show text', (tester) async {
-  await tester.pumpWidget(MyWidget());
-  expect(find.text('Hello'), findsOneWidget);
-  // Missing pump after interaction
-  await tester.tap(find.byType(Button));
-  expect(find.text('Tapped'), findsOneWidget); // May fail
+    await tester.pumpWidget(MyWidget());
+    expect(find.text('Hello'), findsOneWidget);
+    // Missing pump after interaction
+    await tester.tap(find.byType(Button));
+    expect(find.text('Tapped'), findsOneWidget); // May fail
   });
 }
 
 // GOOD: Should NOT trigger require_pump_after_interaction
 void _good1192() async {
   testWidgets('should show text', (tester) async {
-  await tester.pumpWidget(MyWidget());
-  expect(find.text('Hello'), findsOneWidget);
-  await tester.tap(find.byType(Button));
-  await tester.pump(); // Process the tap
-  expect(find.text('Tapped'), findsOneWidget);
+    await tester.pumpWidget(MyWidget());
+    expect(find.text('Hello'), findsOneWidget);
+    await tester.tap(find.byType(Button));
+    await tester.pump(); // Process the tap
+    expect(find.text('Tapped'), findsOneWidget);
   });
 }

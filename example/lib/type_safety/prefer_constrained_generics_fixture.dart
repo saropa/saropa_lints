@@ -107,11 +107,13 @@ import '../flutter_mocks.dart';
 
 // BAD: Should trigger prefer_constrained_generics
 // expect_lint: prefer_constrained_generics
-class _bad1236_Repository<T> { // T could be anything
-T? _cached;
+class _bad1236_Repository<T> {
+  // T could be anything
+  T? _cached;
 }
 
 // GOOD: Should NOT trigger prefer_constrained_generics
-class _good1236_Repository<T extends Entity> { // T must be Entity
-T? _cached;
+class _good1236_Repository<T extends Entity> {
+  // T must be Entity
+  T? _cached;
 }

@@ -112,23 +112,23 @@ final text = 'text';
 // expect_lint: require_keyboard_type
 void _bad393() {
   TextFormField(
-  decoration: InputDecoration(labelText: 'Email'),
-  // Uses default text keyboard without @ key
+    decoration: InputDecoration(labelText: 'Email'),
+    // Uses default text keyboard without @ key
   );
   TextFormField(
-  decoration: InputDecoration(labelText: 'Phone'),
-  // Uses default text keyboard, not number pad
+    decoration: InputDecoration(labelText: 'Phone'),
+    // Uses default text keyboard, not number pad
   );
 }
 
 // GOOD: Should NOT trigger require_keyboard_type
 void _good393() {
   TextFormField(
-  decoration: InputDecoration(labelText: 'Email'),
-  keyboardType: TextInputType.emailAddress,
+    decoration: InputDecoration(labelText: 'Email'),
+    keyboardType: TextInputType.emailAddress,
   );
   TextFormField(
-  decoration: InputDecoration(labelText: 'Phone'),
-  keyboardType: TextInputType.phone,
+    decoration: InputDecoration(labelText: 'Phone'),
+    keyboardType: TextInputType.phone,
   );
 }

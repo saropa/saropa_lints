@@ -112,11 +112,11 @@ final children = <Widget>[];
 // expect_lint: prefer_focus_traversal_order
 void _bad28() {
   Row(
-  children: [
-  TextField(decoration: InputDecoration(labelText: 'City')),
-  TextField(decoration: InputDecoration(labelText: 'State')),
-  TextField(decoration: InputDecoration(labelText: 'ZIP')),
-  ],
+    children: [
+      TextField(decoration: InputDecoration(labelText: 'City')),
+      TextField(decoration: InputDecoration(labelText: 'State')),
+      TextField(decoration: InputDecoration(labelText: 'ZIP')),
+    ],
   );
   // User tabs through in rendering order, which might not match visual order
 }
@@ -124,22 +124,22 @@ void _bad28() {
 // GOOD: Should NOT trigger prefer_focus_traversal_order
 void _good28() {
   FocusTraversalGroup(
-  policy: OrderedTraversalPolicy(),
-  child: Row(
-  children: [
-  FocusTraversalOrder(
-  order: NumericFocusOrder(1),
-  child: TextField(decoration: InputDecoration(labelText: 'City')),
-  ),
-  FocusTraversalOrder(
-  order: NumericFocusOrder(2),
-  child: TextField(decoration: InputDecoration(labelText: 'State')),
-  ),
-  FocusTraversalOrder(
-  order: NumericFocusOrder(3),
-  child: TextField(decoration: InputDecoration(labelText: 'ZIP')),
-  ),
-  ],
-  ),
+    policy: OrderedTraversalPolicy(),
+    child: Row(
+      children: [
+        FocusTraversalOrder(
+          order: NumericFocusOrder(1),
+          child: TextField(decoration: InputDecoration(labelText: 'City')),
+        ),
+        FocusTraversalOrder(
+          order: NumericFocusOrder(2),
+          child: TextField(decoration: InputDecoration(labelText: 'State')),
+        ),
+        FocusTraversalOrder(
+          order: NumericFocusOrder(3),
+          child: TextField(decoration: InputDecoration(labelText: 'ZIP')),
+        ),
+      ],
+    ),
   );
 }

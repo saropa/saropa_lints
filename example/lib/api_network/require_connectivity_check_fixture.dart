@@ -115,17 +115,17 @@ final url = 'https://example.com';
 // expect_lint: require_connectivity_check
 void _bad48() async {
   Future<void> syncData() async {
-  final response = await http.post(url, body: data);
+    final response = await http.post(url, body: data);
   }
 }
 
 // GOOD: Should NOT trigger require_connectivity_check
 void _good48() async {
   Future<void> syncData() async {
-  final connectivity = await Connectivity().checkConnectivity();
-  if (connectivity == ConnectivityResult.none) {
-  throw NoInternetException();
-  }
-  final response = await http.post(url, body: data);
+    final connectivity = await Connectivity().checkConnectivity();
+    if (connectivity == ConnectivityResult.none) {
+      throw NoInternetException();
+    }
+    final response = await http.post(url, body: data);
   }
 }

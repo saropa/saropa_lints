@@ -114,23 +114,21 @@ dynamic user;
 // expect_lint: prefer_test_data_builder
 void _bad1176() {
   test('user profile', () {
-  final user = User(
-  id: 1,
-  name: 'Test',
-  email: 'test@example.com',
-  age: 30,
-  address: Address(),
-  preferences: Preferences(),
-  );
+    final user = User(
+      id: 1,
+      name: 'Test',
+      email: 'test@example.com',
+      age: 30,
+      address: Address(),
+      preferences: Preferences(),
+    );
   });
 }
 
 // GOOD: Should NOT trigger prefer_test_data_builder
 void _good1176() {
   test('user profile', () {
-  final user = UserBuilder()
-  .withName('Test')
-  .withEmail('test@example.com')
-  .build();
+    final user =
+        UserBuilder().withName('Test').withEmail('test@example.com').build();
   });
 }

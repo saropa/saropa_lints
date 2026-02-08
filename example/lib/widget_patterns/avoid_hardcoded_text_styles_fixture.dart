@@ -111,15 +111,15 @@ final context = BuildContext();
 // expect_lint: avoid_hardcoded_text_styles
 void _bad1420() {
   Text(
-  'Hello',
-  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+    'Hello',
+    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
   );
 }
 
 // GOOD: Should NOT trigger avoid_hardcoded_text_styles
 void _good1420() {
   Text(
-  'Hello',
-  style: Theme.of(context).textTheme.bodyLarge,
+    'Hello',
+    style: Theme.of(context).textTheme.bodyLarge,
   );
 }

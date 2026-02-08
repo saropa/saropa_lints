@@ -124,6 +124,6 @@ void _bad834() {
 void _good834() {
   // Use flutter_secure_storage (excluded from backup on Android)
   secureStorage.write(key: 'auth_token', value: token);
-  
+
   // Or configure backup_rules.xml to exclude sensitive data
 }

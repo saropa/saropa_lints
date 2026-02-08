@@ -116,6 +116,7 @@ void _bad712() {
 
 // GOOD: Should NOT trigger prefer_provider_extensions
 extension MyProviderX on BuildContext {
-MyValue get myValue => read<MyProvider>().read<SubProvider>().value;
+  MyValue get myValue => read<MyProvider>().read<SubProvider>().value;
 }
+
 final value = context.myValue;

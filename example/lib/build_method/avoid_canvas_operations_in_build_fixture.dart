@@ -110,14 +110,14 @@ final context = BuildContext();
 // BAD: Should trigger avoid_canvas_operations_in_build
 // expect_lint: avoid_canvas_operations_in_build
 Widget _bad131_build(BuildContext context) {
-final canvas = Canvas(recorder);
-canvas.drawRect(); // Wrong place!
+  final canvas = Canvas(recorder);
+  canvas.drawRect(); // Wrong place!
 }
 
 // GOOD: Should NOT trigger avoid_canvas_operations_in_build
 class _good131_MyPainter extends CustomPainter {
-@override
-void paint(Canvas canvas, Size size) {
-canvas.drawRect();
-}
+  @override
+  void paint(Canvas canvas, Size size) {
+    canvas.drawRect();
+  }
 }

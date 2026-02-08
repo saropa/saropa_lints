@@ -111,8 +111,8 @@ void _bad906() {
   // Only syncs when app is open
   @override
   void initState() {
-  // super.initState();
-  syncData();
+    // super.initState();
+    syncData();
   }
 }
 
@@ -120,11 +120,11 @@ void _bad906() {
 void _good906() async {
   // Register background sync
   void main() async {
-  await Workmanager().initialize(callbackDispatcher);
-  await Workmanager().registerPeriodicTask(
-  'backgroundSync',
-  'syncData',
-  frequency: Duration(hours: 1),
-  );
+    await Workmanager().initialize(callbackDispatcher);
+    await Workmanager().registerPeriodicTask(
+      'backgroundSync',
+      'syncData',
+      frequency: Duration(hours: 1),
+    );
   }
 }

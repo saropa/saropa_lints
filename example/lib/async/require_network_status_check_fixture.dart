@@ -114,18 +114,18 @@ final url = 'https://example.com';
 // expect_lint: require_network_status_check
 void _bad114() async {
   Future<void> fetchData() async {
-  final response = await http.get(Uri.parse(url));
-  // May timeout with confusing error if offline
+    final response = await http.get(Uri.parse(url));
+    // May timeout with confusing error if offline
   }
 }
 
 // GOOD: Should NOT trigger require_network_status_check
 void _good114() async {
   Future<void> fetchData() async {
-  final connectivity = await Connectivity().checkConnectivity();
-  if (connectivity == ConnectivityResult.none) {
-  throw OfflineException('No internet connection');
-  }
-  final response = await http.get(Uri.parse(url));
+    final connectivity = await Connectivity().checkConnectivity();
+    if (connectivity == ConnectivityResult.none) {
+      throw OfflineException('No internet connection');
+    }
+    final response = await http.get(Uri.parse(url));
   }
 }

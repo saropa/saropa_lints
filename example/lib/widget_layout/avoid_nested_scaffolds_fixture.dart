@@ -111,17 +111,18 @@ dynamic body;
 // expect_lint: avoid_nested_scaffolds
 void _bad1303() {
   Scaffold(
-  body: Scaffold(  // Nested Scaffold
-  appBar: AppBar(),
-  body: Container(),
-  ),
+    body: Scaffold(
+      // Nested Scaffold
+      appBar: AppBar(),
+      body: Container(),
+    ),
   );
 }
 
 // GOOD: Should NOT trigger avoid_nested_scaffolds
 void _good1303() {
   Scaffold(
-  appBar: AppBar(),
-  body: CustomScrollView(),
+    appBar: AppBar(),
+    body: CustomScrollView(),
   );
 }

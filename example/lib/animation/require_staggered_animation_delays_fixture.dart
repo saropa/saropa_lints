@@ -115,25 +115,25 @@ final items = <dynamic>[];
 // expect_lint: require_staggered_animation_delays
 void _bad37() {
   ListView.builder(
-  itemBuilder: (context, index) {
-  return FadeTransition(
-  opacity: _animation, // Same animation for all items
-  child: ListTile(),
-  );
-  },
+    itemBuilder: (context, index) {
+      return FadeTransition(
+        opacity: _animation, // Same animation for all items
+        child: ListTile(),
+      );
+    },
   );
 }
 
 // GOOD: Should NOT trigger require_staggered_animation_delays
 void _good37() {
   ListView.builder(
-  itemBuilder: (context, index) {
-  final delay = index * 0.1;
-  final animation = CurvedAnimation(
-  parent: _controller,
-  curve: Interval(delay, delay + 0.3, curve: Curves.easeOut),
-  );
-  return FadeTransition(opacity: animation, child: ListTile());
-  },
+    itemBuilder: (context, index) {
+      final delay = index * 0.1;
+      final animation = CurvedAnimation(
+        parent: _controller,
+        curve: Interval(delay, delay + 0.3, curve: Curves.easeOut),
+      );
+      return FadeTransition(opacity: animation, child: ListTile());
+    },
   );
 }

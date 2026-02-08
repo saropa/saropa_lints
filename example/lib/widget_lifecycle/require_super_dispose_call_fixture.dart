@@ -114,8 +114,8 @@ void _bad1362() {
 
 // GOOD: Should NOT trigger require_super_dispose_call
 void _good1362_main() {
-SystemChrome.setPreferredOrientations([
-DeviceOrientation.portraitUp,
-]);
-runApp(MyApp());
+  SystemChrome.setPreferredOrientations([
+    DeviceOrientation.portraitUp,
+  ]);
+  runApp(MyApp());
 }

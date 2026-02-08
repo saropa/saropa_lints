@@ -111,19 +111,19 @@ final password = 'secret';
 // expect_lint: require_biometric_fallback
 void _bad993() async {
   final authenticated = await localAuth.authenticate(
-  localizedReason: 'Authenticate',
-  biometricOnly: true,
+    localizedReason: 'Authenticate',
+    biometricOnly: true,
   );
 }
 
 // GOOD: Should NOT trigger require_biometric_fallback
 void _good993() async {
   final authenticated = await localAuth.authenticate(
-  localizedReason: 'Authenticate',
-  biometricOnly: false, // Allow PIN/password fallback
+    localizedReason: 'Authenticate',
+    biometricOnly: false, // Allow PIN/password fallback
   );
   // Or provide manual fallback
   if (!canUseBiometrics) {
-  showPinDialog();
+    showPinDialog();
   }
 }

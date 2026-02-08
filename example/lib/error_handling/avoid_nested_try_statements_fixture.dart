@@ -111,30 +111,30 @@ dynamic error;
 // expect_lint: avoid_nested_try_statements
 void _bad358() async {
   try {
-  try {
-  await riskyOperation();
+    try {
+      await riskyOperation();
+    } catch (e) {
+      // Handle inner error
+    }
   } catch (e) {
-  // Handle inner error
-  }
-  } catch (e) {
-  // Handle outer error
+    // Handle outer error
   }
 }
 
 // GOOD: Should NOT trigger avoid_nested_try_statements
 void _good358() async {
   try {
-  await _safeRiskyOperation();
+    await _safeRiskyOperation();
   } catch (e) {
-  // Handle error
+    // Handle error
   }
-  
+
   Future<void> _safeRiskyOperation() async {
-  try {
-  await riskyOperation();
-  } catch (e) {
-  // Handle or transform error
-  rethrow;
-  }
+    try {
+      await riskyOperation();
+    } catch (e) {
+      // Handle or transform error
+      rethrow;
+    }
   }
 }

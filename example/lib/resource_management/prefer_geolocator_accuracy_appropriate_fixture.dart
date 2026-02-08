@@ -109,13 +109,13 @@ import '../flutter_mocks.dart';
 // expect_lint: prefer_geolocator_accuracy_appropriate
 void _bad976() async {
   await Geolocator.getCurrentPosition(
-  desiredAccuracy: LocationAccuracy.high,  // Overkill for city-level!
+    desiredAccuracy: LocationAccuracy.high, // Overkill for city-level!
   );
 }
 
 // GOOD: Should NOT trigger prefer_geolocator_accuracy_appropriate
 void _good976() async {
   await Geolocator.getCurrentPosition(
-  desiredAccuracy: LocationAccuracy.low,  // City-level is fine
+    desiredAccuracy: LocationAccuracy.low, // City-level is fine
   );
 }

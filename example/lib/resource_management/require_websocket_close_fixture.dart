@@ -108,26 +108,26 @@ import '../flutter_mocks.dart';
 // BAD: Should trigger require_websocket_close
 // expect_lint: require_websocket_close
 class _bad969__ChatState extends State<Chat> {
-late WebSocket _socket;
+  late WebSocket _socket;
 
-void initState() {
-super.initState();
-_socket = WebSocket.connect('wss://example.com');
-}
+  void initState() {
+    super.initState();
+    _socket = WebSocket.connect('wss://example.com');
+  }
 // Missing dispose
 }
 
 // GOOD: Should NOT trigger require_websocket_close
 class _good969__ChatState extends State<Chat> {
-late WebSocket _socket;
+  late WebSocket _socket;
 
-void initState() {
-super.initState();
-_socket = WebSocket.connect('wss://example.com');
-}
+  void initState() {
+    super.initState();
+    _socket = WebSocket.connect('wss://example.com');
+  }
 
-void dispose() {
-_socket.close();
-super.dispose();
-}
+  void dispose() {
+    _socket.close();
+    super.dispose();
+  }
 }

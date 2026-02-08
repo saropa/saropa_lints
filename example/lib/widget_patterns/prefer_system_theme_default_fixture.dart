@@ -111,17 +111,17 @@ dynamic user;
 // expect_lint: prefer_system_theme_default
 void _bad1437() {
   MaterialApp(
-  themeMode: ThemeMode.light, // Ignores user's dark mode preference
+    themeMode: ThemeMode.light, // Ignores user's dark mode preference
   );
 }
 
 // GOOD: Should NOT trigger prefer_system_theme_default
 void _good1437() {
   MaterialApp(
-  themeMode: ThemeMode.system, // Respects OS setting
+    themeMode: ThemeMode.system, // Respects OS setting
   );
   // Or let user choose with setting stored:
   MaterialApp(
-  themeMode: userThemePreference ?? ThemeMode.system,
+    themeMode: userThemePreference ?? ThemeMode.system,
   );
 }

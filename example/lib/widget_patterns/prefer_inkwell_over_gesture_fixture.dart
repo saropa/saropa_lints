@@ -111,15 +111,15 @@ dynamic child;
 // expect_lint: prefer_inkwell_over_gesture
 void _bad1401() {
   GestureDetector(
-  onTap: () { },
-  child: MyWidget(),
+    onTap: () {},
+    child: MyWidget(),
   );
 }
 
 // GOOD: Should NOT trigger prefer_inkwell_over_gesture
 void _good1401() {
   InkWell(
-  onTap: () { },
-  child: MyWidget(),
+    onTap: () {},
+    child: MyWidget(),
   );
 }

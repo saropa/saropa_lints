@@ -111,17 +111,18 @@ dynamic value;
 // expect_lint: avoid_redundant_async
 void _bad90() async {
   Future<int> getValue() async {
-  return 42;  // No await needed
+    return 42; // No await needed
   }
 }
 
 // GOOD: Should NOT trigger avoid_redundant_async
 void _good90() async {
   Future<int> getValue() {
-  return Future.value(42);
+    return Future.value(42);
   }
+
   // Or if await is actually needed:
   Future<int> getValue() async {
-  return await someAsyncOp();
+    return await someAsyncOp();
   }
 }

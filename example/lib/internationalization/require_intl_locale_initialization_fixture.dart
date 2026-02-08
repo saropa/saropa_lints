@@ -115,9 +115,9 @@ final message = 'Message';
 void _bad448() {
   // Using intl without initialization
   void main() {
-  runApp(MyApp());
+    runApp(MyApp());
   }
-  
+
   // Later in the code
   final formatted = DateFormat.yMd().format(date); // Uses unpredictable default
   final message = Intl.message('Hello'); // Locale unknown
@@ -126,15 +126,15 @@ void _bad448() {
 // GOOD: Should NOT trigger require_intl_locale_initialization
 
 void main() async {
-Intl.defaultLocale = 'en_US';
-await initializeDateFormatting('en_US');
-runApp(MyApp());
+  Intl.defaultLocale = 'en_US';
+  await initializeDateFormatting('en_US');
+  runApp(MyApp());
 }
 
 // Or with locale from device
 void main() async {
-final deviceLocale = Platform.localeName;
-Intl.defaultLocale = deviceLocale;
-await initializeDateFormatting(deviceLocale);
-runApp(MyApp());
+  final deviceLocale = Platform.localeName;
+  Intl.defaultLocale = deviceLocale;
+  await initializeDateFormatting(deviceLocale);
+  runApp(MyApp());
 }

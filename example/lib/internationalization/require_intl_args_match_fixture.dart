@@ -114,15 +114,15 @@ final name = 'example';
 // expect_lint: require_intl_args_match
 void _bad450() {
   Intl.message(
-  'Hello $name, you have $count items',
-  args: [name], // Missing count!
+    'Hello $name, you have $count items',
+    args: [name], // Missing count!
   );
 }
 
 // GOOD: Should NOT trigger require_intl_args_match
 void _good450() {
   Intl.message(
-  'Hello $name, you have $count items',
-  args: [name, count],
+    'Hello $name, you have $count items',
+    args: [name, count],
   );
 }

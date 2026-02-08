@@ -111,20 +111,22 @@ dynamic controller;
 // BAD: Should trigger avoid_scroll_listener_in_build
 // expect_lint: avoid_scroll_listener_in_build
 Widget _bad789_build(BuildContext context) {
-scrollController.addListener(() {
-print('Scrolled!');
-});
-return ListView(controller: scrollController);
+  scrollController.addListener(() {
+    print('Scrolled!');
+  });
+  return ListView(controller: scrollController);
 }
 
 // GOOD: Should NOT trigger avoid_scroll_listener_in_build
 void _good789_initState() {
 // super.initState();
-scrollController.addListener(_onScroll);
+  scrollController.addListener(_onScroll);
 }
 
-void _onScroll() { print('Scrolled!'); }
+void _onScroll() {
+  print('Scrolled!');
+}
 
 Widget build(BuildContext context) {
-return ListView(controller: scrollController);
+  return ListView(controller: scrollController);
 }

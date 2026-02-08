@@ -112,12 +112,12 @@ dynamic x;
 // BAD: Should trigger avoid_unnecessary_conditionals
 // expect_lint: avoid_unnecessary_conditionals
 void _bad289() {
-  if (true) { }  // Always true
-  if (false) { }  // Always false
-  final x = condition ? value : value;  // Same value for both branches
+  if (true) {} // Always true
+  if (false) {} // Always false
+  final x = condition ? value : value; // Same value for both branches
 }
 
 // GOOD: Should NOT trigger avoid_unnecessary_conditionals
 void _good289() {
-  if (someCondition) { }
+  if (someCondition) {}
 }

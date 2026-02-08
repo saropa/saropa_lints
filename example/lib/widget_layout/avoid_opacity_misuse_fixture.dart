@@ -111,16 +111,16 @@ dynamic child;
 // expect_lint: avoid_opacity_misuse
 void _bad1320() {
   Opacity(
-  opacity: _isVisible ? 1.0 : 0.0,
-  child: MyWidget(),
+    opacity: _isVisible ? 1.0 : 0.0,
+    child: MyWidget(),
   );
 }
 
 // GOOD: Should NOT trigger avoid_opacity_misuse
 void _good1320() {
   AnimatedOpacity(
-  opacity: _isVisible ? 1.0 : 0.0,
-  duration: Duration(milliseconds: 300),
-  child: MyWidget(),
+    opacity: _isVisible ? 1.0 : 0.0,
+    duration: Duration(milliseconds: 300),
+    child: MyWidget(),
   );
 }

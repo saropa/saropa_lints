@@ -111,16 +111,16 @@ dynamic child;
 // expect_lint: require_long_press_callback
 void _bad1430() {
   GestureDetector(
-  onTap: () => selectItem(),
-  child: ListTile(),
+    onTap: () => selectItem(),
+    child: ListTile(),
   );
 }
 
 // GOOD: Should NOT trigger require_long_press_callback
 void _good1430() {
   GestureDetector(
-  onTap: () => selectItem(),
-  onLongPress: () => showContextMenu(),
-  child: ListTile(),
+    onTap: () => selectItem(),
+    onLongPress: () => showContextMenu(),
+    child: ListTile(),
   );
 }

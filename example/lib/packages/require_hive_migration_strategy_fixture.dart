@@ -116,8 +116,8 @@ final name = 'example';
 // Version 2 - removed email, renamed name to fullName
 @HiveType(typeId: 0)
 class _bad669_User {
-@HiveField(0) // Was 'name', now 'fullName' - data corrupted!
-final String fullName;
+  @HiveField(0) // Was 'name', now 'fullName' - data corrupted!
+  final String fullName;
 // email field removed - existing data orphaned
 }
 
@@ -125,15 +125,15 @@ final String fullName;
 // Version 2 - properly migrated
 @HiveType(typeId: 0)
 class _good669_User {
-@HiveField(0) // Keep original index for 'name'
-final String name;
+  @HiveField(0) // Keep original index for 'name'
+  final String name;
 
-@HiveField(2, defaultValue: '') // New field with default
-final String fullName;
+  @HiveField(2, defaultValue: '') // New field with default
+  final String fullName;
 
-@HiveField(1) // Keep email field index even if not used
-@Deprecated('Use newEmail instead');
-final String? email;
+  @HiveField(1) // Keep email field index even if not used
+  @Deprecated('Use newEmail instead')
+  final String? email;
 }
 
 // Or create a new type with migration

@@ -118,8 +118,8 @@ void _bad446() {
 // GOOD: Should NOT trigger prefer_providing_intl_description
 void _good446() {
   Intl.message(
-  'Save',
-  name: 'save',
-  desc: 'Button label to save current document',
+    'Save',
+    name: 'save',
+    desc: 'Button label to save current document',
   );
 }

@@ -119,6 +119,6 @@ void _good852() async {
   // Request ATT permission first
   final status = await AppTrackingTransparency.requestTrackingAuthorization();
   if (status == TrackingStatus.authorized) {
-  await AdMob.initialize();
+    await AdMob.initialize();
   }
 }

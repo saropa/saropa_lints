@@ -117,14 +117,12 @@ void _bad939() async {
 // GOOD: Should NOT trigger avoid_platform_channel_on_web
 void _good_0939() async {
   if (!kIsWeb) {
-  final platform = MethodChannel('my_channel');
-  final result = await platform.invokeMethod('getData');
+    final platform = MethodChannel('my_channel');
+    final result = await platform.invokeMethod('getData');
   }
 }
 
 // GOOD: Should NOT trigger avoid_platform_channel_on_web
 void _good_1939() {
-  static const MethodChannel? _channel = kIsWeb
-  ? null
-  : MethodChannel('my_channel');
+  final MethodChannel? _channel = kIsWeb ? null : MethodChannel('my_channel');
 }

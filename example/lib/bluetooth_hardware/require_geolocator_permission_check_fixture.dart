@@ -115,10 +115,10 @@ void _bad124() async {
 void _good124() async {
   final permission = await Geolocator.checkPermission();
   if (permission == LocationPermission.denied) {
-  permission = await Geolocator.requestPermission();
+    permission = await Geolocator.requestPermission();
   }
   if (permission == LocationPermission.deniedForever) {
-  return; // Handle denial
+    return; // Handle denial
   }
   final position = await Geolocator.getCurrentPosition();
 }

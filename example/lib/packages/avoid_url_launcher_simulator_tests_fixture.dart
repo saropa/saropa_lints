@@ -109,17 +109,17 @@ import '../flutter_mocks.dart';
 // expect_lint: avoid_url_launcher_simulator_tests
 void _bad774() async {
   testWidgets('can make phone call', (tester) async {
-  await tester.tap(find.byKey(Key('call_button')));
-  // This will fail on simulator!
+    await tester.tap(find.byKey(Key('call_button')));
+    // This will fail on simulator!
   });
 }
 
 // GOOD: Should NOT trigger avoid_url_launcher_simulator_tests
 void _good774() async {
   testWidgets('can make phone call', (tester) async {
-  // Mock the url_launcher for testing
-  when(mockUrlLauncher.canLaunch(any)).thenAnswer((_) async => true);
-  await tester.tap(find.byKey(Key('call_button')));
-  verify(mockUrlLauncher.launch('tel:+1234567890'));
+    // Mock the url_launcher for testing
+    when(mockUrlLauncher.canLaunch(any)).thenAnswer((_) async => true);
+    await tester.tap(find.byKey(Key('call_button')));
+    verify(mockUrlLauncher.launch('tel:+1234567890'));
   }, skip: Platform.environment.containsKey('FLUTTER_TEST'));
 }

@@ -111,7 +111,7 @@ dynamic b;
 // BAD: Should trigger avoid_complex_loop_conditions
 // expect_lint: avoid_complex_loop_conditions
 void _bad173() {
-  while (a && b || c && d && e) { }
+  while (a && b || c && d && e) {}
 }
 
 // GOOD: Should NOT trigger avoid_complex_loop_conditions

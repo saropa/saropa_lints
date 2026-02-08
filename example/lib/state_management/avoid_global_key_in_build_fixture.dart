@@ -111,15 +111,15 @@ final key = 'key';
 // BAD: Should trigger avoid_global_key_in_build
 // expect_lint: avoid_global_key_in_build
 Widget _bad1030_build(BuildContext context) {
-final key = GlobalKey<FormState>();
-return Form(key: key);
+  final key = GlobalKey<FormState>();
+  return Form(key: key);
 }
 
 // GOOD: Should NOT trigger avoid_global_key_in_build
 void _good1030() {
   final _formKey = GlobalKey<FormState>();
-  
+
   Widget build(BuildContext context) {
-  return Form(key: _formKey);
+    return Form(key: _formKey);
   }
 }

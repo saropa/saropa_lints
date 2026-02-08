@@ -118,10 +118,10 @@ void _bad1235() {
 void _good1235() {
   final widget = context.widget;
   if (widget is MyWidget) {
-  // Use widget safely
+    // Use widget safely
   }
   // Or use pattern matching
   if (context.widget case MyWidget widget) {
-  // Use widget
+    // Use widget
   }
 }

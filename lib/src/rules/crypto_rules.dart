@@ -644,7 +644,7 @@ class _UseSecureRandomIvFix extends DartFix {
 /// final key = Key.fromUtf8(keyStr!);
 /// ```
 ///
-/// **OWASP:** [M5:Insecure-Communication] [M9:Reverse-Engineering]
+/// **OWASP:** `M5:Insecure-Communication` `M9:Reverse-Engineering`
 class RequireSecureKeyGenerationRule extends SaropaLintRule {
   const RequireSecureKeyGenerationRule() : super(code: _code);
 

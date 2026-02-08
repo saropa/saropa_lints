@@ -112,13 +112,13 @@ final url = 'https://example.com';
 // BAD: Should trigger require_dio_response_type
 // expect_lint: require_dio_response_type
 void _bad599() async {
-  final response = await dio.get(url);  // Defaults to JSON
+  final response = await dio.get(url); // Defaults to JSON
 }
 
 // GOOD: Should NOT trigger require_dio_response_type
 void _good599() async {
   final response = await dio.get(
-  url,
-  options: Options(responseType: ResponseType.bytes),
+    url,
+    options: Options(responseType: ResponseType.bytes),
   );
 }

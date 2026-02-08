@@ -113,17 +113,17 @@ dynamic value;
 // expect_lint: require_step_count_indicator
 void _bad513() {
   Column(children: [
-  if (step == 1) Step1Page(),
-  if (step == 2) Step2Page(),
-  if (step == 3) Step3Page(),
+    if (step == 1) Step1Page(),
+    if (step == 2) Step2Page(),
+    if (step == 3) Step3Page(),
   ]);
 }
 
 // GOOD: Should NOT trigger require_step_count_indicator
 void _good513() {
   Column(children: [
-  LinearProgressIndicator(value: step / totalSteps),
-  Text('Step $step of $totalSteps'),
-  if (step == 1) Step1Page(),
+    LinearProgressIndicator(value: step / totalSteps),
+    Text('Step $step of $totalSteps'),
+    if (step == 1) Step1Page(),
   ]);
 }

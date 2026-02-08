@@ -112,17 +112,17 @@ final items = <dynamic>[];
 // BAD: Should trigger require_intl_plural_rules
 // expect_lint: require_intl_plural_rules
 String _bad449_getMessage(int count) {
-if (count == 0) return 'No items';
-if (count == 1) return '1 item';
-return '$count items';
+  if (count == 0) return 'No items';
+  if (count == 1) return '1 item';
+  return '$count items';
 }
 
 // GOOD: Should NOT trigger require_intl_plural_rules
 String _good449_getMessage(int count) {
-return Intl.plural(
-count,
-zero: 'No items',
-one: 'One item',
-other: '$count items',
-);
+  return Intl.plural(
+    count,
+    zero: 'No items',
+    one: 'One item',
+    other: '$count items',
+  );
 }

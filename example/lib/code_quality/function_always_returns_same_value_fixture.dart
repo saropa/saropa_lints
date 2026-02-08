@@ -110,8 +110,8 @@ final condition = false;
 // BAD: Should trigger function_always_returns_same_value
 // expect_lint: function_always_returns_same_value
 int _bad192_getValue(bool condition) {
-if (condition) return 42;
-return 42;  // Always returns 42
+  if (condition) return 42;
+  return 42; // Always returns 42
 }
 
 // GOOD: Should NOT trigger function_always_returns_same_value

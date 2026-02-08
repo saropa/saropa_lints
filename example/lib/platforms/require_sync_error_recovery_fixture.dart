@@ -111,24 +111,24 @@ dynamic data;
 // expect_lint: require_sync_error_recovery
 void _bad907() async {
   try {
-  await syncToServer(data);
+    await syncToServer(data);
   } catch (e) {
-  print('Sync failed'); // Data lost!
+    print('Sync failed'); // Data lost!
   }
 }
 
 // GOOD: Should NOT trigger require_sync_error_recovery
 void _good907() async {
   Future<void> syncWithRetry(Data data, {int attempt = 0}) async {
-  try {
-  await syncToServer(data);
-  } catch (e) {
-  if (attempt < 3) {
-  await Future.delayed(Duration(seconds: pow(2, attempt).toInt()));
-  return syncWithRetry(data, attempt: attempt + 1);
-  }
-  await notifyUser('Sync failed. Changes saved locally.');
-  await saveLocally(data);
-  }
+    try {
+      await syncToServer(data);
+    } catch (e) {
+      if (attempt < 3) {
+        await Future.delayed(Duration(seconds: pow(2, attempt).toInt()));
+        return syncWithRetry(data, attempt: attempt + 1);
+      }
+      await notifyUser('Sync failed. Changes saved locally.');
+      await saveLocally(data);
+    }
   }
 }

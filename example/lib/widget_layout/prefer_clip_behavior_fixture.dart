@@ -111,14 +111,14 @@ final children = <Widget>[];
 // expect_lint: prefer_clip_behavior
 void _bad1321() {
   Stack(
-  children: [OverflowingWidget()],
+    children: [OverflowingWidget()],
   );
 }
 
 // GOOD: Should NOT trigger prefer_clip_behavior
 void _good1321() {
   Stack(
-  clipBehavior: Clip.none, // Intentionally allow overflow
-  children: [OverflowingWidget()],
+    clipBehavior: Clip.none, // Intentionally allow overflow
+    children: [OverflowingWidget()],
   );
 }

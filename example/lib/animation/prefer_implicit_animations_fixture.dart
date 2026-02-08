@@ -111,24 +111,24 @@ final context = BuildContext();
 // BAD: Should trigger prefer_implicit_animations
 // expect_lint: prefer_implicit_animations
 class _bad36__MyWidgetState extends State<MyWidget>
-with SingleTickerProviderStateMixin {
-late AnimationController _controller;
-late Animation<double> _opacity;
+    with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+  late Animation<double> _opacity;
 
-@override
-void initState() {
-_controller = AnimationController(duration: Duration(ms: 300), vsync: this);
-_opacity = Tween<double>(begin: 0, end: 1).animate(_controller);
-}
+  @override
+  void initState() {
+    _controller = AnimationController(duration: Duration(ms: 300), vsync: this);
+    _opacity = Tween<double>(begin: 0, end: 1).animate(_controller);
+  }
 
-Widget build(context) => FadeTransition(opacity: _opacity, child: child);
+  Widget build(context) => FadeTransition(opacity: _opacity, child: child);
 }
 
 // GOOD: Should NOT trigger prefer_implicit_animations
 void _good36() {
   AnimatedOpacity(
-  opacity: _isVisible ? 1.0 : 0.0,
-  duration: Duration(milliseconds: 300),
-  child: child,
+    opacity: _isVisible ? 1.0 : 0.0,
+    duration: Duration(milliseconds: 300),
+    child: child,
   );
 }

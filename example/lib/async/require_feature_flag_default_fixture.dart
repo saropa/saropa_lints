@@ -112,7 +112,7 @@ dynamic remoteConfig;
 // expect_lint: require_feature_flag_default
 void _bad103() {
   if (remoteConfig.getBool('new_feature')) {
-  // May throw if config not loaded!
+    // May throw if config not loaded!
   }
 }
 
@@ -120,6 +120,6 @@ void _bad103() {
 void _good103() {
   final isEnabled = remoteConfig.getBool('new_feature') ?? false;
   if (isEnabled) {
-  // Safe with default
+    // Safe with default
   }
 }

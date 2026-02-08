@@ -111,21 +111,33 @@ final context = BuildContext();
 // BAD: Should trigger avoid_deep_widget_nesting
 // expect_lint: avoid_deep_widget_nesting
 Widget _bad1325_build(BuildContext context) {
-return A(child: B(child: C(child: D(child: E(child: F(child: G(
-child: H(child: I(child: J(child: K(child: L(child: M(child: N(
-child: O(child: P()), // 16 levels deep!
-))))))))))))));
+  return A(
+      child: B(
+          child: C(
+              child: D(
+                  child: E(
+                      child: F(
+                          child: G(
+                              child: H(
+                                  child: I(
+                                      child: J(
+                                          child: K(
+                                              child: L(
+                                                  child: M(
+                                                      child: N(
+    child: O(child: P()), // 16 levels deep!
+  ))))))))))))));
 }
 
 // GOOD: Should NOT trigger avoid_deep_widget_nesting
 Widget _good1325_build(BuildContext context) {
-return A(
-child: B(
-child: _buildContent(),
-),
-);
+  return A(
+    child: B(
+      child: _buildContent(),
+    ),
+  );
 }
 
 Widget _buildContent() {
-return C(child: D(child: E()));
+  return C(child: D(child: E()));
 }

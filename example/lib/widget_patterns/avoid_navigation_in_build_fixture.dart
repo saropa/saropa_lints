@@ -108,17 +108,17 @@ import '../flutter_mocks.dart';
 // BAD: Should trigger avoid_navigation_in_build
 // expect_lint: avoid_navigation_in_build
 class _bad1447__MyWidgetState extends State<MyWidget> {
-@override
-void dispose() {
+  @override
+  void dispose() {
 // Missing super.dispose()!
-}
+  }
 }
 
 // GOOD: Should NOT trigger avoid_navigation_in_build
 class _good1447__MyWidgetState extends State<MyWidget> {
-@override
-void dispose() {
+  @override
+  void dispose() {
 // Clean up resources
-super.dispose();
-}
+    super.dispose();
+  }
 }

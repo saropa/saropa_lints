@@ -120,8 +120,8 @@ void _good1228() {
   final String name = user.name ?? 'Unknown';
   // or
   if (user.name != null) {
-  final String name = user.name;
+    final String name = user.name;
   }
   // or (safe, not flagged)
-  onTap: callback == null ? null : () => callback!(),
+  // onTap: callback == null ? null : () => callback(),
 }

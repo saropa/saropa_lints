@@ -111,16 +111,16 @@ final url = 'https://example.com';
 // BAD: Should trigger require_cache_key_uniqueness
 // expect_lint: require_cache_key_uniqueness
 class _bad475_RequestCache {
-final Map<Request, Response> _cache = {}; // Request hashCode changes!
+  final Map<Request, Response> _cache = {}; // Request hashCode changes!
 
-Response? get(Request request) => _cache[request];
+  Response? get(Request request) => _cache[request];
 }
 
 // GOOD: Should NOT trigger require_cache_key_uniqueness
 class _good475_RequestCache {
-final Map<String, Response> _cache = {};
+  final Map<String, Response> _cache = {};
 
-String _makeKey(Request r) => '${r.method}:${r.url}:${r.body.hashCode}';
+  String _makeKey(Request r) => '${r.method}:${r.url}:${r.body.hashCode}';
 
-Response? get(Request request) => _cache[_makeKey(request)];
+  Response? get(Request request) => _cache[_makeKey(request)];
 }

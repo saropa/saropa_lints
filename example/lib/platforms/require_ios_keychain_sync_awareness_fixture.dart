@@ -120,10 +120,10 @@ void _bad873() async {
 void _good873() async {
   // Device-only storage
   await secureStorage.write(
-  key: 'private_key',
-  value: key,
-  iOptions: IOSOptions(
-  accessibility: KeychainAccessibility.when_unlocked_this_device_only,
-  ),
+    key: 'private_key',
+    value: key,
+    iOptions: IOSOptions(
+      accessibility: KeychainAccessibility.when_unlocked_this_device_only,
+    ),
   );
 }

@@ -124,7 +124,7 @@ void _good1247() {
   final name = json['name'] as String? ?? 'default';
   final age = json['age'] as int?;
   if (age != null) {}
-  
+
   // Or with type check
   final nameValue = json['name'];
   if (nameValue is String) {}

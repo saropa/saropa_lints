@@ -119,10 +119,10 @@ void _bad973() async {
 // GOOD: Should NOT trigger require_image_compression
 void _good973() async {
   final image = await picker.pickImage(
-  source: ImageSource.camera,
-  maxWidth: 1920,
-  maxHeight: 1080,
-  imageQuality: 85,
+    source: ImageSource.camera,
+    maxWidth: 1920,
+    maxHeight: 1080,
+    imageQuality: 85,
   );
   await uploadFile(File(image!.path));
 }

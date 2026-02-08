@@ -119,7 +119,7 @@ void _bad743() {
 void _good743() {
   // Use ProviderScope for proper scoping
   ProviderScope(
-  overrides: [myProvider.overrideWith()],
-  child: MyApp(),
+    overrides: [myProvider.overrideWith()],
+    child: MyApp(),
   );
 }

@@ -115,19 +115,19 @@ final title = 'Title';
 // BAD: Should trigger require_scroll_physics
 // expect_lint: require_scroll_physics
 Widget _bad1311_build(BuildContext context) {
-return ListView.builder(
-itemBuilder: (context, index) => ListTile(title: Text(posts[index])),
-itemCount: posts.length,  // "posts" suggests remote data
-);
+  return ListView.builder(
+    itemBuilder: (context, index) => ListTile(title: Text(posts[index])),
+    itemCount: posts.length, // "posts" suggests remote data
+  );
 }
 
 // GOOD: Should NOT trigger require_scroll_physics
 void _good1311() {
   RefreshIndicator(
-  onRefresh: () => fetchPosts(),
-  child: ListView.builder(
-  itemBuilder: (context, index) => ListTile(title: Text(posts[index])),
-  itemCount: posts.length,
-  ),
+    onRefresh: () => fetchPosts(),
+    child: ListView.builder(
+      itemBuilder: (context, index) => ListTile(title: Text(posts[index])),
+      itemCount: posts.length,
+    ),
   );
 }

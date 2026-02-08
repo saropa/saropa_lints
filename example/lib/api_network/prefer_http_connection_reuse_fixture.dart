@@ -115,21 +115,21 @@ final url = 'https://example.com';
 // expect_lint: prefer_http_connection_reuse
 void _bad53() async {
   Future<Data> fetchData() async {
-  final client = http.Client(); // New client each call
-  final response = await client.get(url);
-  client.close();
-  return Data.fromJson(response.body);
+    final client = http.Client(); // New client each call
+    final response = await client.get(url);
+    client.close();
+    return Data.fromJson(response.body);
   }
 }
 
 // GOOD: Should NOT trigger prefer_http_connection_reuse
 class _good53_ApiService {
-final http.Client _client = http.Client(); // Reused client
+  final http.Client _client = http.Client(); // Reused client
 
-Future<Data> fetchData() async {
-final response = await _client.get(url);
-return Data.fromJson(response.body);
-}
+  Future<Data> fetchData() async {
+    final response = await _client.get(url);
+    return Data.fromJson(response.body);
+  }
 
-void dispose() => _client.close();
+  void dispose() => _client.close();
 }

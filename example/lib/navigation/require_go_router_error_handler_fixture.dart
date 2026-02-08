@@ -118,7 +118,7 @@ void _bad515() {
 // GOOD: Should NOT trigger require_go_router_error_handler
 void _good515() {
   GoRouter(
-  routes: myRoutes,
-  errorBuilder: (context, state) => ErrorPage(state.error),
+    routes: myRoutes,
+    errorBuilder: (context, state) => ErrorPage(state.error),
   );
 }

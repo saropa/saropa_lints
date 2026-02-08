@@ -112,7 +112,8 @@ void _bad950() {
 }
 
 // GOOD: Should NOT trigger avoid_function_type_in_records
+// typedef must be at top level
+typedef StringCallback = void Function(String);
 void _good950() {
-  typedef StringCallback = void Function(String);
   (int, StringCallback) record = (1, print);
 }

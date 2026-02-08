@@ -128,7 +128,7 @@ void _good1248() {
   final user = data?['user'] as Map<String, dynamic>?;
   final address = user?['address'] as Map<String, dynamic>?;
   final city = address?['city'] as String?;
-  
+
   // Or create a typed model
   final user = User.fromJson(json);
   final city = user.address?.city;

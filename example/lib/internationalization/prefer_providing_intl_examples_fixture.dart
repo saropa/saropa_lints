@@ -112,18 +112,18 @@ final name = 'example';
 // expect_lint: prefer_providing_intl_examples
 void _bad447() {
   Intl.message(
-  'Hello $name',
-  name: 'avoid_generic_greeting_text',
-  args: [name],
+    'Hello $name',
+    name: 'avoid_generic_greeting_text',
+    args: [name],
   );
 }
 
 // GOOD: Should NOT trigger prefer_providing_intl_examples
 void _good447() {
   Intl.message(
-  'Hello $name',
-  name: 'avoid_generic_greeting_text',
-  args: [name],
-  examples: const {'name': 'John'},
+    'Hello $name',
+    name: 'avoid_generic_greeting_text',
+    args: [name],
+    examples: const {'name': 'John'},
   );
 }

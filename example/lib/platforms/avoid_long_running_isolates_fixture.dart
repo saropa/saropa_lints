@@ -119,11 +119,11 @@ void _bad900() {
 void _good900() async {
   // Use workmanager for reliable background tasks
   Workmanager().registerOneOffTask(
-  'sync',
-  'syncTask',
-  constraints: Constraints(networkType: NetworkType.connected),
+    'sync',
+    'syncTask',
+    constraints: Constraints(networkType: NetworkType.connected),
   );
-  
+
   // compute() for short-lived foreground work is fine
   // Short-lived foreground processing - offloads CPU-bound work
   final result = await compute(convertModels, data);

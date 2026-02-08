@@ -111,21 +111,21 @@ dynamic child;
 // expect_lint: prefer_single_container
 void _bad135() {
   Padding(
-  padding: EdgeInsets.all(8),
-  child: DecoratedBox(
-  decoration: BoxDecoration(color: Colors.red),
-  child: SizedBox(width: 100, height: 100, child: child),
-  ),
+    padding: EdgeInsets.all(8),
+    child: DecoratedBox(
+      decoration: BoxDecoration(color: Colors.red),
+      child: SizedBox(width: 100, height: 100, child: child),
+    ),
   );
 }
 
 // GOOD: Should NOT trigger prefer_single_container
 void _good135() {
   Container(
-  padding: EdgeInsets.all(8),
-  decoration: BoxDecoration(color: Colors.red),
-  width: 100,
-  height: 100,
-  child: child,
+    padding: EdgeInsets.all(8),
+    decoration: BoxDecoration(color: Colors.red),
+    width: 100,
+    height: 100,
+    child: child,
   );
 }

@@ -112,14 +112,14 @@ final items = <dynamic>[];
 // expect_lint: avoid_unconditional_break
 void _bad288() {
   for (var item in items) {
-  break;  // Loop never iterates
+    break; // Loop never iterates
   }
 }
 
 // GOOD: Should NOT trigger avoid_unconditional_break
 void _good288() {
   for (var item in items) {
-  if (item == target) break;
-  process(item);
+    if (item == target) break;
+    process(item);
   }
 }

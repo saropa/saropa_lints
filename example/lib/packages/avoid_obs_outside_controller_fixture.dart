@@ -113,19 +113,19 @@ dynamic value;
 // BAD: Should trigger avoid_obs_outside_controller
 // expect_lint: avoid_obs_outside_controller
 class _bad645_MyWidget extends StatelessWidget {
-final count = 0.obs; // Reactive variable outside controller!
+  final count = 0.obs; // Reactive variable outside controller!
 
-Widget build(context) => Obx(() => Text('${count.value}'));
+  Widget build(context) => Obx(() => Text('${count.value}'));
 }
 
 // GOOD: Should NOT trigger avoid_obs_outside_controller
 class _good645_MyController extends GetxController {
-final count = 0.obs;
-void increment() => count.value++;
+  final count = 0.obs;
+  void increment() => count.value++;
 }
 
 class MyWidget extends StatelessWidget {
-final controller = Get.find<MyController>();
+  final controller = Get.find<MyController>();
 
-Widget build(context) => Obx(() => Text('${controller.count.value}'));
+  Widget build(context) => Obx(() => Text('${controller.count.value}'));
 }

@@ -111,17 +111,17 @@ dynamic controller;
 // expect_lint: always_remove_listener
 void _bad1347_initState() {
 // super.initState();
-controller.addListener(_onChanged);  // Never removed!
+  controller.addListener(_onChanged); // Never removed!
 }
 
 // GOOD: Should NOT trigger always_remove_listener
 void _good1347_initState() {
 // super.initState();
-controller.addListener(_onChanged);
+  controller.addListener(_onChanged);
 }
 
 @override
 void dispose() {
-controller.removeListener(_onChanged);
+  controller.removeListener(_onChanged);
 // super.dispose();
 }

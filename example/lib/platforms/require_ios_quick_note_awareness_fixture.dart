@@ -118,9 +118,9 @@ class _BadClass912 {}
 void _good912() {
   // Set user activity for Quick Note
   final activity = NSUserActivity(
-  activityType: 'com.example.viewDocument',
-  title: document.title,
-  webpageURL: 'https://example.com/doc/${document.id}',
+    activityType: 'com.example.viewDocument',
+    title: document.title,
+    webpageURL: 'https://example.com/doc/${document.id}',
   );
   activity.becomeCurrent();
 }

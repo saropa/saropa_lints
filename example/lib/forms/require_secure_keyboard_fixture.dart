@@ -109,15 +109,15 @@ import '../flutter_mocks.dart';
 // expect_lint: require_secure_keyboard
 void _bad395() {
   TextFormField(
-  decoration: InputDecoration(labelText: 'Password'),
-  // Password visible on screen!
+    decoration: InputDecoration(labelText: 'Password'),
+    // Password visible on screen!
   );
 }
 
 // GOOD: Should NOT trigger require_secure_keyboard
 void _good395() {
   TextFormField(
-  decoration: InputDecoration(labelText: 'Password'),
-  obscureText: true,
+    decoration: InputDecoration(labelText: 'Password'),
+    obscureText: true,
   );
 }

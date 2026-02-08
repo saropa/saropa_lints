@@ -109,10 +109,13 @@ dynamic library;
 
 // BAD: Should trigger avoid_unmarked_public_class
 // expect_lint: avoid_unmarked_public_class
-class _bad144_MyService { }  // Can be extended/implemented anywhere
+class _bad144_MyService {} // Can be extended/implemented anywhere
 
 // GOOD: Should NOT trigger avoid_unmarked_public_class
-final class _good144_MyService { }  // Cannot be extended
-base class _good144_MyService { }   // Can only be extended, not implemented
-interface class _good144_MyService { }  // Can only be implemented
-sealed class _good144_MyService { }  // Restricted to this library
+final class _good144_MyService {} // Cannot be extended
+
+base class _good144_MyService {} // Can only be extended, not implemented
+
+interface class _good144_MyService {} // Can only be implemented
+
+sealed class _good144_MyService {} // Restricted to this library

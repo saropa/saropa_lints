@@ -118,8 +118,8 @@ void _bad619() async {
 void _good619() async {
   final token = await messaging.getToken();
   sendToServer(token);
-  
+
   messaging.onTokenRefresh.listen((newToken) {
-  sendToServer(newToken);
+    sendToServer(newToken);
   });
 }

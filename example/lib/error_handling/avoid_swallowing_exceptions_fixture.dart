@@ -112,18 +112,18 @@ dynamic error;
 // expect_lint: avoid_swallowing_exceptions
 void _bad352() async {
   try {
-  await fetchData();
+    await fetchData();
   } catch (e) {
-  // Silent failure
+    // Silent failure
   }
 }
 
 // GOOD: Should NOT trigger avoid_swallowing_exceptions
 void _good352() async {
   try {
-  await fetchData();
+    await fetchData();
   } catch (e, stackTrace) {
-  logger.error('Failed to fetch data', e, stackTrace);
-  rethrow;
+    logger.error('Failed to fetch data', e, stackTrace);
+    rethrow;
   }
 }

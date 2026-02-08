@@ -112,10 +112,10 @@ dynamic result;
 void _bad867() async {
   // No receipt validation
   final result = await InAppPurchase.instance.buyNonConsumable(
-  purchaseParam: purchaseParam,
+    purchaseParam: purchaseParam,
   );
   if (result) {
-  // Unlock feature immediately
+    // Unlock feature immediately
   }
 }
 
@@ -123,10 +123,10 @@ void _bad867() async {
 void _good867() async {
   final result = await InAppPurchase.instance.buyNonConsumable();
   if (result) {
-  // Validate receipt with your server
-  final valid = await validateReceiptWithServer(result.receiptData);
-  if (valid) {
-  // Unlock feature
-  }
+    // Validate receipt with your server
+    final valid = await validateReceiptWithServer(result.receiptData);
+    if (valid) {
+      // Unlock feature
+    }
   }
 }

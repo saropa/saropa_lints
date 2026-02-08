@@ -113,23 +113,23 @@ final title = 'Title';
 // expect_lint: avoid_deeply_nested_widgets
 void _bad1293() {
   return Container(
-  child: Padding(
-  child: Column(
-  children: [
-  Row(
-  children: [
-  Expanded(
-  child: Card(
-  child: ListTile(
-  title: Text(''),  // Too deep!
-  ),
-  ),
-  ),
-  ],
-  ),
-  ],
-  ),
-  ),
+    child: Padding(
+      child: Column(
+        children: [
+          Row(
+            children: [
+              Expanded(
+                child: Card(
+                  child: ListTile(
+                    title: Text(''), // Too deep!
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    ),
   );
 }
 

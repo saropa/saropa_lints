@@ -108,31 +108,31 @@ import '../flutter_mocks.dart';
 // BAD: Should trigger require_debouncer_cancel
 // expect_lint: require_debouncer_cancel
 class _bad332__SearchState extends State<Search> {
-Timer? _debounce;
+  Timer? _debounce;
 
-void _onSearchChanged(String query) {
-_debounce?.cancel();
-_debounce = Timer(Duration(milliseconds: 500), () {
-performSearch(query);
-});
-}
+  void _onSearchChanged(String query) {
+    _debounce?.cancel();
+    _debounce = Timer(Duration(milliseconds: 500), () {
+      performSearch(query);
+    });
+  }
 // Missing cancel in dispose!
 }
 
 // GOOD: Should NOT trigger require_debouncer_cancel
 class _good332__SearchState extends State<Search> {
-Timer? _debounce;
+  Timer? _debounce;
 
-void _onSearchChanged(String query) {
-_debounce?.cancel();
-_debounce = Timer(Duration(milliseconds: 500), () {
-performSearch(query);
-});
-}
+  void _onSearchChanged(String query) {
+    _debounce?.cancel();
+    _debounce = Timer(Duration(milliseconds: 500), () {
+      performSearch(query);
+    });
+  }
 
-@override
-void dispose() {
-_debounce?.cancel();
-super.dispose();
-}
+  @override
+  void dispose() {
+    _debounce?.cancel();
+    super.dispose();
+  }
 }

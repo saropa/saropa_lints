@@ -121,9 +121,9 @@ void _bad457() async {
   final response = await http.get(Uri.parse('https://api.example.com/user'));
   final json = jsonDecode(response.body);
   final user = User(
-  name: json['name'],      // What if null?
-  email: json['email'],    // What if missing?
-  age: json['age'],        // What if string instead of int?
+    name: json['name'], // What if null?
+    email: json['email'], // What if missing?
+    age: json['age'], // What if string instead of int?
   );
 }
 
@@ -131,17 +131,17 @@ void _bad457() async {
 void _good457() async {
   final response = await http.get(Uri.parse('https://api.example.com/user'));
   final json = jsonDecode(response.body);
-  
+
   // Option 1: Use json_serializable with error handling
   try {
-  final user = User.fromJson(json);
+    final user = User.fromJson(json);
   } on TypeError catch (e) {
-  handleInvalidResponse(e);
+    handleInvalidResponse(e);
   }
-  
+
   // Option 2: Validate required fields
   if (!_validateUserResponse(json)) {
-  throw ApiException('Invalid user response');
+    throw ApiException('Invalid user response');
   }
   final user = User.fromJson(json);
 }

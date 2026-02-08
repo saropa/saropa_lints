@@ -110,19 +110,19 @@ final context = BuildContext();
 // BAD: Should trigger prefer_keep_alive
 // expect_lint: prefer_keep_alive
 class _bad1313__TabContentState extends State<TabContent> {
-@override
-Widget build(BuildContext context) => ListView();
+  @override
+  Widget build(BuildContext context) => ListView();
 }
 
 // GOOD: Should NOT trigger prefer_keep_alive
 class _good1313__TabContentState extends State<TabContent>
-with AutomaticKeepAliveClientMixin {
-@override
-bool get wantKeepAlive => true;
+    with AutomaticKeepAliveClientMixin {
+  @override
+  bool get wantKeepAlive => true;
 
-@override
-Widget build(BuildContext context) {
-super.build(context);
-return ListView();
-}
+  @override
+  Widget build(BuildContext context) {
+    super.build(context);
+    return ListView();
+  }
 }

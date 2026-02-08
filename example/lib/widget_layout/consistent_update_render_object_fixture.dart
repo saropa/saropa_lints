@@ -110,38 +110,38 @@ final context = BuildContext();
 // BAD: Should trigger consistent_update_render_object
 // expect_lint: consistent_update_render_object
 class _bad1287_MyWidget extends LeafRenderObjectWidget {
-final Color color;
-final double size;
+  final Color color;
+  final double size;
 
-@override
-RenderObject createRenderObject(BuildContext context) {
-return MyRenderObject()
-..color = color
-..size = size;
-}
+  @override
+  RenderObject createRenderObject(BuildContext context) {
+    return MyRenderObject()
+      ..color = color
+      ..size = size;
+  }
 
-@override
-void updateRenderObject(BuildContext context, MyRenderObject renderObject) {
-renderObject.color = color;  // Missing size update!
-}
+  @override
+  void updateRenderObject(BuildContext context, MyRenderObject renderObject) {
+    renderObject.color = color; // Missing size update!
+  }
 }
 
 // GOOD: Should NOT trigger consistent_update_render_object
 class _good1287_MyWidget extends LeafRenderObjectWidget {
-final Color color;
-final double size;
+  final Color color;
+  final double size;
 
-@override
-RenderObject createRenderObject(BuildContext context) {
-return MyRenderObject()
-..color = color
-..size = size;
-}
+  @override
+  RenderObject createRenderObject(BuildContext context) {
+    return MyRenderObject()
+      ..color = color
+      ..size = size;
+  }
 
-@override
-void updateRenderObject(BuildContext context, MyRenderObject renderObject) {
-renderObject
-..color = color
-..size = size;
-}
+  @override
+  void updateRenderObject(BuildContext context, MyRenderObject renderObject) {
+    renderObject
+      ..color = color
+      ..size = size;
+  }
 }

@@ -111,19 +111,19 @@ dynamic child;
 // expect_lint: avoid_empty_text_widgets
 void _bad1395() {
   Container(
-  color: Colors.red.withOpacity(0.5),
-  child: ExpensiveWidget(),  // Still fully rendered
+    color: Colors.red.withOpacity(0.5),
+    child: ExpensiveWidget(), // Still fully rendered
   );
 }
 
 // GOOD: Should NOT trigger avoid_empty_text_widgets
 void _good1395() {
   Opacity(
-  opacity: 0.5,
-  child: Container(
-  color: Colors.red,
-  child: ExpensiveWidget(),
-  ),
+    opacity: 0.5,
+    child: Container(
+      color: Colors.red,
+      child: ExpensiveWidget(),
+    ),
   );
   // Or better, use AnimatedOpacity for animations
 }

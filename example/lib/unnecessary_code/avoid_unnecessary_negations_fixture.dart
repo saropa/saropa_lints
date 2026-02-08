@@ -112,9 +112,9 @@ dynamic value;
 // BAD: Should trigger avoid_unnecessary_negations
 // expect_lint: avoid_unnecessary_negations
 void _bad1278() {
-  if (!!value) {}  // Double negation
-  if (!(a == b)) {}  // Use !=
-  if (!(a > b)) {}  // Use <=
+  if (!!value) {} // Double negation
+  if (!(a == b)) {} // Use !=
+  if (!(a > b)) {} // Use <=
 }
 
 // GOOD: Should NOT trigger avoid_unnecessary_negations

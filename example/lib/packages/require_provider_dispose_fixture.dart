@@ -112,22 +112,22 @@ final context = BuildContext();
 // expect_lint: require_provider_dispose
 void _bad708() {
   Provider<MyNotifier>(
-  create: (context) => MyNotifier(),
-  // Missing dispose! Memory leak.
-  child:,
+    create: (context) => MyNotifier(),
+    // Missing dispose! Memory leak.
+    child: child,
   );
 }
 
 // GOOD: Should NOT trigger require_provider_dispose
 void _good708() {
   ChangeNotifierProvider(
-  create: (context) => MyNotifier(), // Auto-disposes
-  child:,
+    create: (context) => MyNotifier(), // Auto-disposes
+    child: child,
   );
   // Or with manual dispose:
   Provider<MyNotifier>(
-  create: (context) => MyNotifier(),
-  dispose: (context, notifier) => notifier.dispose(),
-  child:,
+    create: (context) => MyNotifier(),
+    dispose: (context, notifier) => notifier.dispose(),
+    child: child,
   );
 }

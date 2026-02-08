@@ -110,16 +110,16 @@ final context = BuildContext();
 // BAD: Should trigger avoid_form_without_unfocus
 // expect_lint: avoid_form_without_unfocus
 void _bad400__onSubmit() {
-if (_formKey.currentState!.validate()) {
+  if (_formKey.currentState!.validate()) {
 // Submit without closing keyboard
-_doSubmit();
-}
+    _doSubmit();
+  }
 }
 
 // GOOD: Should NOT trigger avoid_form_without_unfocus
 void _good400__onSubmit() {
-FocusScope.of(context).unfocus(); // Close keyboard first
-if (_formKey.currentState!.validate()) {
-_doSubmit();
-}
+  FocusScope.of(context).unfocus(); // Close keyboard first
+  if (_formKey.currentState!.validate()) {
+    _doSubmit();
+  }
 }

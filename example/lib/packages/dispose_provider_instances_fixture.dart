@@ -112,16 +112,16 @@ dynamic service;
 // expect_lint: dispose_provider_instances
 void _bad711() {
   Provider<ApiService>(
-  create: (_) => ApiService(), // No dispose - may leak resources!
-  child: MyApp(),
+    create: (_) => ApiService(), // No dispose - may leak resources!
+    child: MyApp(),
   );
 }
 
 // GOOD: Should NOT trigger dispose_provider_instances
 void _good711() {
   Provider<ApiService>(
-  create: (_) => ApiService(),
-  dispose: (_, service) => service.dispose(),
-  child: MyApp(),
+    create: (_) => ApiService(),
+    dispose: (_, service) => service.dispose(),
+    child: MyApp(),
   );
 }

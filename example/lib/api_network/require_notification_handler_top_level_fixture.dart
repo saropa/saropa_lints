@@ -111,14 +111,17 @@ dynamic service;
 // BAD: Should trigger require_notification_handler_top_level
 // expect_lint: require_notification_handler_top_level
 class _bad67_MyService {
-void handleBackground(RemoteMessage msg) {}  // Won't work!
+  void handleBackground(RemoteMessage msg) {} // Won't work!
 }
-FirebaseMessaging.onBackgroundMessage(service.handleBackground);
+
+void _bad67_register() {
+  FirebaseMessaging.onBackgroundMessage(service.handleBackground);
+}
 
 // GOOD: Should NOT trigger require_notification_handler_top_level
 void _good67() {
-  @pragma('vm:entry-point');
+  @pragma('vm:entry-point')
   Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage msg) async {}
-  
+
   FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
 }

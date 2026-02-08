@@ -108,24 +108,24 @@ import '../flutter_mocks.dart';
 // BAD: Should trigger proper_super_calls
 // expect_lint: proper_super_calls
 void _bad143_initState() {
-_controller = TextEditingController();
-super.initState();  // Should be first!
+  _controller = TextEditingController();
+  super.initState(); // Should be first!
 }
 
 @override
 void dispose() {
-super.dispose();  // Should be last!
-_controller.dispose();
+  super.dispose(); // Should be last!
+  _controller.dispose();
 }
 
 // GOOD: Should NOT trigger proper_super_calls
 void _good143_initState() {
 // super.initState();
-_controller = TextEditingController();
+  _controller = TextEditingController();
 }
 
 @override
 void dispose() {
-_controller.dispose();
+  _controller.dispose();
 // super.dispose();
 }

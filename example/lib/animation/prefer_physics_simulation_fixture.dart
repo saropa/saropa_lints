@@ -111,20 +111,22 @@ dynamic value;
 // BAD: Should trigger prefer_physics_simulation
 // expect_lint: prefer_physics_simulation
 void _bad41() {
-  onPanEnd: (details) {
-  _controller.animateTo(0.0);  // Abrupt stop
-  }
+  onPanEnd:
+  (details) {
+    _controller.animateTo(0.0); // Abrupt stop
+  };
 }
 
 // GOOD: Should NOT trigger prefer_physics_simulation
 void _good41() {
-  onPanEnd: (details) {
-  final simulation = SpringSimulation(
-  SpringDescription.withDampingRatio(mass: 1, stiffness: 100),
-  _controller.value,
-  0.0,
-  details.velocity.pixelsPerSecond.dx,
-  );
-  _controller.animateWith(simulation);
-  }
+  onPanEnd:
+  (details) {
+    final simulation = SpringSimulation(
+      SpringDescription.withDampingRatio(mass: 1, stiffness: 100),
+      _controller.value,
+      0.0,
+      details.velocity.pixelsPerSecond.dx,
+    );
+    _controller.animateWith(simulation);
+  };
 }

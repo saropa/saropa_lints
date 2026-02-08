@@ -111,15 +111,15 @@ final context = BuildContext();
 // expect_lint: avoid_absorb_pointer_misuse
 void _bad1328() {
   Container(
-  color: Color(0xFF2196F3), // Hardcoded color
+    color: Color(0xFF2196F3), // Hardcoded color
   );
-  Icon(Icons.home, color: Colors.blue) // Material color constant
+  Icon(Icons.home, color: Colors.blue); // Material color constant
 }
 
 // GOOD: Should NOT trigger avoid_absorb_pointer_misuse
 void _good1328() {
   Container(
-  color: Theme.of(context).colorScheme.primary,
+    color: Theme.of(context).colorScheme.primary,
   );
   Icon(Icons.home, color: Theme.of(context).colorScheme.onSurface);
 }

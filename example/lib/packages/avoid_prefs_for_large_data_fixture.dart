@@ -116,7 +116,7 @@ final users = <dynamic>[];
 void _bad763() {
   // Storing large list in SharedPreferences
   prefs.setStringList('all_users', hundredsOfUsers);
-  
+
   // Storing large JSON blob
   prefs.setString('cache_data', jsonEncode(largeData));
 }
@@ -125,7 +125,7 @@ void _bad763() {
 void _good763() async {
   // Use Hive, Isar, or SQLite for collections
   await box.put('users', users);
-  
+
   // Use SharedPreferences only for small settings
   prefs.setBool('dark_mode', true);
   prefs.setString('locale', 'en_US');

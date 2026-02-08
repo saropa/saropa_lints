@@ -111,31 +111,31 @@ final users = <dynamic>[];
 // expect_lint: avoid_sequential_awaits
 void _bad118() async {
   Future<void> loadData() async {
-  final users = await fetchUsers();      // Takes 2 seconds
-  final products = await fetchProducts(); // Takes 2 seconds
-  final orders = await fetchOrders();     // Takes 2 seconds
-  // Total: 6 seconds
+    final users = await fetchUsers(); // Takes 2 seconds
+    final products = await fetchProducts(); // Takes 2 seconds
+    final orders = await fetchOrders(); // Takes 2 seconds
+    // Total: 6 seconds
   }
 }
 
 // GOOD: Should NOT trigger avoid_sequential_awaits
 void _good118() async {
   Future<void> loadData() async {
-  final results = await Future.wait([
-  fetchUsers(),
-  fetchProducts(),
-  fetchOrders(),
-  ]);
-  final users = results[0];
-  final products = results[1];
-  final orders = results[2];
-  // Total: 2 seconds (max of all three);
+    final results = await Future.wait([
+      fetchUsers(),
+      fetchProducts(),
+      fetchOrders(),
+    ]);
+    final users = results[0];
+    final products = results[1];
+    final orders = results[2];
+    // Total: 2 seconds (max of all three);
   }
-  
+
   // Or with record destructuring (Dart 3+):
   final (users, products, orders) = await (
-  fetchUsers(),
-  fetchProducts(),
-  fetchOrders(),
+    fetchUsers(),
+    fetchProducts(),
+    fetchOrders(),
   ).wait;
 }

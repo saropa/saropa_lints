@@ -108,21 +108,21 @@ import '../flutter_mocks.dart';
 // BAD: Should trigger require_window_close_confirmation
 // expect_lint: require_window_close_confirmation
 void _bad808_main() {
-runApp(MyApp());
+  runApp(MyApp());
 }
 
 // GOOD: Should NOT trigger require_window_close_confirmation
 void _good808_main() {
-WidgetsBinding.instance.addObserver(AppLifecycleObserver());
-runApp(MyApp());
+  WidgetsBinding.instance.addObserver(AppLifecycleObserver());
+  runApp(MyApp());
 }
 
 class AppLifecycleObserver extends WidgetsBindingObserver {
-@override
-Future<bool> didRequestAppExit() async {
-if (hasUnsavedChanges) {
-return showSaveDialog();
-}
-return true;
-}
+  @override
+  Future<bool> didRequestAppExit() async {
+    if (hasUnsavedChanges) {
+      return showSaveDialog();
+    }
+    return true;
+  }
 }

@@ -113,21 +113,21 @@ final users = <dynamic>[];
 // BAD: Should trigger require_firebase_init_before_use
 // expect_lint: require_firebase_init_before_use
 void _bad610_main() {
-runApp(MyApp());
+  runApp(MyApp());
 }
 
 class MyApp extends StatelessWidget {
-Widget build(context) {
+  Widget build(context) {
 // Crashes! Firebase not initialized
-return StreamBuilder(
-stream: FirebaseFirestore.instance.collection('users').snapshots(),
-);
-}
+    return StreamBuilder(
+      stream: FirebaseFirestore.instance.collection('users').snapshots(),
+    );
+  }
 }
 
 // GOOD: Should NOT trigger require_firebase_init_before_use
 void _good610_main() async {
-WidgetsFlutterBinding.ensureInitialized();
-await Firebase.initializeApp();
-runApp(MyApp());
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp();
+  runApp(MyApp());
 }

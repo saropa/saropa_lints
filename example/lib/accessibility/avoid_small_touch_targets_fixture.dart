@@ -111,17 +111,17 @@ dynamic child;
 // expect_lint: avoid_small_touch_targets
 void _bad1() {
   SizedBox(
-  width: 24,
-  height: 24,
-  child: IconButton(),
+    width: 24,
+    height: 24,
+    child: IconButton(),
   );
 }
 
 // GOOD: Should NOT trigger avoid_small_touch_targets
 void _good1() {
   SizedBox(
-  width: 48,
-  height: 48,
-  child: IconButton(),
+    width: 48,
+    height: 48,
+    child: IconButton(),
   );
 }

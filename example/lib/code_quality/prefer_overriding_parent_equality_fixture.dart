@@ -108,13 +108,14 @@ import '../flutter_mocks.dart';
 // BAD: Should trigger prefer_overriding_parent_equality
 // expect_lint: prefer_overriding_parent_equality
 class _bad226_Parent {
-@override
-bool operator ==(Object other) => other is Parent;
+  @override
+  bool operator ==(Object other) => other is Parent;
 }
+
 class Child extends Parent {
-@override
-bool operator ==(Object other) =>
-other is Child;  // Doesn't call super or check Parent equality
+  @override
+  bool operator ==(Object other) =>
+      other is Child; // Doesn't call super or check Parent equality
 }
 
 // GOOD: Should NOT trigger prefer_overriding_parent_equality

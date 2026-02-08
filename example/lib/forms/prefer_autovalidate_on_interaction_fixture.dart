@@ -113,8 +113,8 @@ dynamic user;
 // expect_lint: prefer_autovalidate_on_interaction
 void _bad392() {
   Form(
-  autovalidateMode: AutovalidateMode.always,
-  child: TextFormField(),
+    autovalidateMode: AutovalidateMode.always,
+    child: TextFormField(),
   );
   // Shows "Invalid email" while user is still typing
 }
@@ -122,8 +122,8 @@ void _bad392() {
 // GOOD: Should NOT trigger prefer_autovalidate_on_interaction
 void _good392() {
   Form(
-  autovalidateMode: AutovalidateMode.onUserInteraction,
-  child: TextFormField(),
+    autovalidateMode: AutovalidateMode.onUserInteraction,
+    child: TextFormField(),
   );
   // Validates when user moves to next field
 }

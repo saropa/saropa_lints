@@ -114,20 +114,20 @@ final title = 'Title';
 // expect_lint: avoid_shrink_wrap_in_scroll
 void _bad1324() {
   ListView.builder(
-  shrinkWrap: true,
-  itemBuilder: (context, index) => ListTile(title: Text('$index')),
+    shrinkWrap: true,
+    itemBuilder: (context, index) => ListTile(title: Text('$index')),
   );
 }
 
 // GOOD: Should NOT trigger avoid_shrink_wrap_in_scroll
 void _good1324() {
   CustomScrollView(
-  slivers: [
-  SliverList(
-  delegate: SliverChildBuilderDelegate(
-  (context, index) => ListTile(title: Text('$index')),
-  ),
-  ),
-  ],
+    slivers: [
+      SliverList(
+        delegate: SliverChildBuilderDelegate(
+          (context, index) => ListTile(title: Text('$index')),
+        ),
+      ),
+    ],
   );
 }

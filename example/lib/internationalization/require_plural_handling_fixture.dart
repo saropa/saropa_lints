@@ -118,9 +118,10 @@ void _bad439() {
 
 // GOOD: Should NOT trigger require_plural_handling
 void _good439() {
-  Text(Intl.plural(count,
-  zero: 'No items',
-  one: '1 item',
-  other: '$count items',
+  Text(Intl.plural(
+    count,
+    zero: 'No items',
+    one: '1 item',
+    other: '$count items',
   ));
 }

@@ -110,7 +110,7 @@ dynamic list;
 // BAD: Should trigger avoid_empty_spread
 // expect_lint: avoid_empty_spread
 void _bad1269() {
-  final list = [1, 2[], 3];
+  final list = [1, 2, ...[], 3];
 }
 
 // GOOD: Should NOT trigger avoid_empty_spread

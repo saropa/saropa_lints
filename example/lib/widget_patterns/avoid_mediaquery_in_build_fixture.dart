@@ -113,14 +113,14 @@ final index = 0;
 // expect_lint: avoid_mediaquery_in_build
 void _bad1392() {
   ListView.builder(
-  itemBuilder: (context, index) => ListTile(),
+    itemBuilder: (context, index) => ListTile(),
   );
 }
 
 // GOOD: Should NOT trigger avoid_mediaquery_in_build
 void _good1392() {
   ListView.builder(
-  itemExtent: 72.0,
-  itemBuilder: (context, index) => ListTile(),
+    itemExtent: 72.0,
+    itemBuilder: (context, index) => ListTile(),
   );
 }

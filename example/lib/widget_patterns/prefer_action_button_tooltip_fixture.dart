@@ -111,8 +111,8 @@ dynamic child;
 // expect_lint: prefer_action_button_tooltip
 void _bad1444() {
   OverflowBox(
-  maxWidth: 300,
-  child: MyWidget(),
+    maxWidth: 300,
+    child: MyWidget(),
   );
 }
 
@@ -120,7 +120,7 @@ void _bad1444() {
 void _good1444() {
   // OverflowBox needed: menu must extend beyond AppBar bounds
   OverflowBox(
-  maxWidth: 300,
-  child: MyWidget(),
+    maxWidth: 300,
+    child: MyWidget(),
   );
 }

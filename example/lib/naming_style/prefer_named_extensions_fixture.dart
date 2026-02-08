@@ -108,10 +108,10 @@ import '../flutter_mocks.dart';
 // BAD: Should trigger prefer_named_extensions
 // expect_lint: prefer_named_extensions
 extension on String {
-bool get isBlank => trim().isEmpty;
+  bool get isBlank => trim().isEmpty;
 }
 
 // GOOD: Should NOT trigger prefer_named_extensions
 extension StringExtension on String {
-bool get isBlank => trim().isEmpty;
+  bool get isBlank => trim().isEmpty;
 }

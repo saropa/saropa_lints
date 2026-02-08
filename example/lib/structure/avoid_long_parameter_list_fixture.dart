@@ -111,7 +111,7 @@ dynamic config;
 
 // BAD: Should trigger avoid_long_parameter_list
 // expect_lint: avoid_long_parameter_list
-void _bad1049_process(int a, int b, int c, int d, int e, int f, int g) { }
+void _bad1049_process(int a, int b, int c, int d, int e, int f, int g) {}
 
 // GOOD: Should NOT trigger avoid_long_parameter_list
-void _good1049_process(ProcessConfig config) { }
+void _good1049_process(ProcessConfig config) {}

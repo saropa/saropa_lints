@@ -113,13 +113,16 @@ dynamic user;
 // BAD: Should trigger require_hive_type_adapter
 // expect_lint: require_hive_type_adapter
 class _bad656_User {
-final String name;
+  final String name;
 }
-box.put('user', user); // Runtime error!
+
+void _bad656_usage() {
+  box.put('user', user); // Runtime error!
+}
 
 // GOOD: Should NOT trigger require_hive_type_adapter
 @HiveType(typeId: 0)
 class _good656_User {
-@HiveField(0);
-final String name;
+  @HiveField(0)
+  final String name;
 }

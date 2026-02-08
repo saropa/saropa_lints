@@ -109,11 +109,13 @@ dynamic x;
 
 // BAD: Should trigger avoid_unrelated_type_assertions
 // expect_lint: avoid_unrelated_type_assertions
-int _bad1231_x = 5;
-if (x is String) {}  // Always false
+void _bad1231() {
+  int x = 5;
+  if (x is String) {} // Always false
+}
 
 // GOOD: Should NOT trigger avoid_unrelated_type_assertions
 void _good1231() {
   Object x = getValue();
-  if (x is String) {}  // Could be true
+  if (x is String) {} // Could be true
 }

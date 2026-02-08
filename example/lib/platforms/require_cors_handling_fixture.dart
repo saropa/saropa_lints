@@ -121,8 +121,8 @@ void _bad940() async {
 void _good940() async {
   // Either configure server CORS headers, or:
   final response = await http.get(
-  Uri.parse('https://api.example.com/data'),
-  headers: {'Access-Control-Allow-Origin': '*'},
+    Uri.parse('https://api.example.com/data'),
+    headers: {'Access-Control-Allow-Origin': '*'},
   );
   // Or use a CORS proxy in development
 }

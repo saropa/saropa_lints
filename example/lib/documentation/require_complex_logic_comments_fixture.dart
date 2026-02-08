@@ -113,9 +113,10 @@ dynamic map;
 // BAD: Should trigger require_complex_logic_comments
 // expect_lint: require_complex_logic_comments
 double _bad340_calculate(List<Item> items) {
-return items.where((i) => i.active && i.price > 0)
-.map((i) => i.price * (1 - i.discount) * (i.taxable ? 1.08 : 1))
-.fold(0, (a, b) => a + b);
+  return items
+      .where((i) => i.active && i.price > 0)
+      .map((i) => i.price * (1 - i.discount) * (i.taxable ? 1.08 : 1))
+      .fold(0, (a, b) => a + b);
 }
 
 // GOOD: Should NOT trigger require_complex_logic_comments
@@ -123,7 +124,8 @@ double _good340_calculate(List<Item> items) {
 // Filter to only active items with valid prices
 // Apply discounts and tax as applicable
 // Sum all line totals
-return items.where((i) => i.active && i.price > 0)
-.map((i) => i.price * (1 - i.discount) * (i.taxable ? 1.08 : 1))
-.fold(0, (a, b) => a + b);
+  return items
+      .where((i) => i.active && i.price > 0)
+      .map((i) => i.price * (1 - i.discount) * (i.taxable ? 1.08 : 1))
+      .fold(0, (a, b) => a + b);
 }

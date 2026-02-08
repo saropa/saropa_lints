@@ -119,8 +119,8 @@ void _bad373() async {
 // GOOD: Should NOT trigger require_sqflite_transaction
 void _good373() async {
   await db.transaction((txn) async {
-  await txn.insert('users', user1);
-  await txn.insert('users', user2);
-  await txn.insert('users', user3);
+    await txn.insert('users', user1);
+    await txn.insert('users', user2);
+    await txn.insert('users', user3);
   });
 }

@@ -108,31 +108,31 @@ import '../flutter_mocks.dart';
 // BAD: Should trigger require_camera_dispose
 // expect_lint: require_camera_dispose
 class _bad972__CameraPageState extends State<CameraPage> {
-late CameraController _controller;
+  late CameraController _controller;
 
-@override
-void initState() {
-super.initState();
-_controller = CameraController(cameras[0], ResolutionPreset.high);
-_controller.initialize();
-}
+  @override
+  void initState() {
+    super.initState();
+    _controller = CameraController(cameras[0], ResolutionPreset.high);
+    _controller.initialize();
+  }
 // Missing dispose - camera stays locked!
 }
 
 // GOOD: Should NOT trigger require_camera_dispose
 class _good972__CameraPageState extends State<CameraPage> {
-late CameraController _controller;
+  late CameraController _controller;
 
-@override
-void initState() {
-super.initState();
-_controller = CameraController(cameras[0], ResolutionPreset.high);
-_controller.initialize();
-}
+  @override
+  void initState() {
+    super.initState();
+    _controller = CameraController(cameras[0], ResolutionPreset.high);
+    _controller.initialize();
+  }
 
-@override
-void dispose() {
-_controller.dispose();
-super.dispose();
-}
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
 }

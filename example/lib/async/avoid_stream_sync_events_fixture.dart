@@ -111,25 +111,25 @@ dynamic stream;
 // expect_lint: avoid_stream_sync_events
 void _bad117() {
   StreamController<int> _controller;
-  
+
   void init() {
-  _controller = StreamController<int>();
-  _controller.add(0); // Sync add - listeners may miss this!
-  return _controller.stream;
+    _controller = StreamController<int>();
+    _controller.add(0); // Sync add - listeners may miss this!
+    return _controller.stream;
   }
 }
 
 // GOOD: Should NOT trigger avoid_stream_sync_events
 void _good117() {
   StreamController<int> _controller;
-  
+
   void init() {
-  _controller = StreamController<int>();
-  // Give listeners time to attach
-  scheduleMicrotask(() => _controller.add(0));
-  return _controller.stream;
+    _controller = StreamController<int>();
+    // Give listeners time to attach
+    scheduleMicrotask(() => _controller.add(0));
+    return _controller.stream;
   }
-  
+
   // Or use sync: true if you intend synchronous delivery
   _controller = StreamController<int>.broadcast(sync: true);
 }

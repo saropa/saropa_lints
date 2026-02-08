@@ -111,16 +111,16 @@ dynamic theme;
 // expect_lint: require_dark_mode_testing
 void _bad1217() {
   MaterialApp(
-  theme: lightTheme,
-  home: MyHomePage(),
+    theme: lightTheme,
+    home: MyHomePage(),
   );
 }
 
 // GOOD: Should NOT trigger require_dark_mode_testing
 void _good1217() {
   MaterialApp(
-  theme: lightTheme,
-  darkTheme: darkTheme,
-  home: MyHomePage(),
+    theme: lightTheme,
+    darkTheme: darkTheme,
+    home: MyHomePage(),
   );
 }

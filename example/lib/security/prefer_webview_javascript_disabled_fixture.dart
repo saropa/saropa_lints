@@ -110,26 +110,26 @@ dynamic content;
 // BAD: Should trigger prefer_webview_javascript_disabled
 // expect_lint: prefer_webview_javascript_disabled
 void _bad1020() {
-  WebView(initialUrl: 'https://example.com') // JS enabled by default!
-  
+  WebView(initialUrl: 'https://example.com'); // JS enabled by default!
+
   InAppWebView(
-  initialSettings: InAppWebViewSettings(
-  javaScriptEnabled: true, // Explicitly enabling JS
-  ),
+    initialSettings: InAppWebViewSettings(
+      javaScriptEnabled: true, // Explicitly enabling JS
+    ),
   );
 }
 
 // GOOD: Should NOT trigger prefer_webview_javascript_disabled
 void _good1020() {
   WebView(
-  initialUrl: 'https://example.com',
-  javascriptMode: JavascriptMode.disabled, // Explicitly disabled
+    initialUrl: 'https://example.com',
+    javascriptMode: JavascriptMode.disabled, // Explicitly disabled
   );
-  
+
   // Or if JS is needed, document why:
   WebView(
-  initialUrl: trustedUrl, // Only trusted content
-  javascriptMode: JavascriptMode.unrestricted, // Required for X feature
-  navigationDelegate: validateNavigation, // With navigation validation
+    initialUrl: trustedUrl, // Only trusted content
+    javascriptMode: JavascriptMode.unrestricted, // Required for X feature
+    navigationDelegate: validateNavigation, // With navigation validation
   );
 }

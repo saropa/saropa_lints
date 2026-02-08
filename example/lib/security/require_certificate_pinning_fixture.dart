@@ -117,8 +117,8 @@ void _bad995() {
 // GOOD: Should NOT trigger require_certificate_pinning
 void _good995() {
   final client = HttpClient()
-  ..badCertificateCallback = (cert, host, port) {
-  // Validate against pinned certificate
-  return cert.sha256 == expectedSha256;
-  };
+    ..badCertificateCallback = (cert, host, port) {
+      // Validate against pinned certificate
+      return cert.sha256 == expectedSha256;
+    };
 }

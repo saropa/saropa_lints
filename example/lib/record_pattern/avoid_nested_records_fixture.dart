@@ -117,4 +117,9 @@ void _bad954() {
 
 // GOOD: Should NOT trigger avoid_nested_records
 (int, String, bool) flat;
-class _good954_MyRecord { int a; String b; bool c; }
+
+class _good954_MyRecord {
+  int a;
+  String b;
+  bool c;
+}

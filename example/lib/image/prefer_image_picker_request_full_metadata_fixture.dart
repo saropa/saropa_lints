@@ -118,13 +118,13 @@ void _bad434() async {
 void _good434() async {
   // When EXIF metadata is not needed:
   final image = await ImagePicker().pickImage(
-  source: ImageSource.gallery,
-  requestFullMetadata: false, // Skip EXIF for privacy
+    source: ImageSource.gallery,
+    requestFullMetadata: false, // Skip EXIF for privacy
   );
-  
+
   // When EXIF is needed, be explicit:
   final image = await ImagePicker().pickImage(
-  source: ImageSource.gallery,
-  requestFullMetadata: true, // Need GPS for geotagging feature
+    source: ImageSource.gallery,
+    requestFullMetadata: true, // Need GPS for geotagging feature
   );
 }

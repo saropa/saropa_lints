@@ -117,28 +117,28 @@ dynamic user;
 // expect_lint: avoid_long_event_handlers
 void _bad562() async {
   on<SubmitForm>((event, emit) async {
-  emit(Loading());
-  // 50+ lines of validation, API calls, error handling
-  final validated = validateForm(event.data);
-  if (!validated.isValid) {
-  emit(Error(validated.errors));
-  return;
-  }
-  final user = await api.createUser(validated.data);
-  //more logic
+    emit(Loading());
+    // 50+ lines of validation, API calls, error handling
+    final validated = validateForm(event.data);
+    if (!validated.isValid) {
+      emit(Error(validated.errors));
+      return;
+    }
+    final user = await api.createUser(validated.data);
+    //more logic
   });
 }
 
 // GOOD: Should NOT trigger avoid_long_event_handlers
 void _good562() async {
   on<SubmitForm>(_onSubmitForm);
-  
+
   Future<void> _onSubmitForm(SubmitForm event, Emitter<State> emit) async {
-  emit(Loading());
-  final result = await _submitFormUseCase(event.data);
-  emit(result.fold(
-  (error) => Error(error),
-  (user) => Success(user),
-  ));
+    emit(Loading());
+    final result = await _submitFormUseCase(event.data);
+    emit(result.fold(
+      (error) => Error(error),
+      (user) => Success(user),
+    ));
   }
 }

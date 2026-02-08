@@ -112,25 +112,25 @@ dynamic status;
 // expect_lint: require_arrange_act_assert
 void _bad1198() {
   test('should process order', () {
-  final order = Order();
-  order.addItem(item);
-  expect(order.total, 100);
-  order.checkout();
-  expect(order.status, OrderStatus.completed);
+    final order = Order();
+    order.addItem(item);
+    expect(order.total, 100);
+    order.checkout();
+    expect(order.status, OrderStatus.completed);
   });
 }
 
 // GOOD: Should NOT trigger require_arrange_act_assert
 void _good1198() {
   test('should process order', () {
-  // Arrange
-  final order = Order();
-  order.addItem(item);
-  
-  // Act
-  order.checkout();
-  
-  // Assert
-  expect(order.status, OrderStatus.completed);
+    // Arrange
+    final order = Order();
+    order.addItem(item);
+
+    // Act
+    order.checkout();
+
+    // Assert
+    expect(order.status, OrderStatus.completed);
   });
 }

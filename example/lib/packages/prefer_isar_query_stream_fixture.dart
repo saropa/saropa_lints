@@ -112,14 +112,14 @@ final users = <dynamic>[];
 // expect_lint: prefer_isar_query_stream
 void _bad682() async {
   Timer.periodic(Duration(seconds: 1), (_) async {
-  final users = await isar.users.where().findAll();
-  setState(() => _users = users);
+    final users = await isar.users.where().findAll();
+    setState(() => _users = users);
   });
 }
 
 // GOOD: Should NOT trigger prefer_isar_query_stream
 void _good682() {
   isar.users.where().watch().listen((users) {
-  setState(() => _users = users);
+    setState(() => _users = users);
   });
 }

@@ -108,16 +108,16 @@ import '../flutter_mocks.dart';
 // BAD: Should trigger prefer_boolean_prefixes
 // expect_lint: prefer_boolean_prefixes
 class _bad484_MyClass {
-bool enabled = true;  // Should be isEnabled
-bool visible = false; // Should be isVisible
+  bool enabled = true; // Should be isEnabled
+  bool visible = false; // Should be isVisible
 }
 
 // GOOD: Should NOT trigger prefer_boolean_prefixes
 class _good484_MyClass {
-bool isEnabled = true;
-bool isVisible = false;
+  bool isEnabled = true;
+  bool isVisible = false;
 }
 
 void myFunction() {
-bool enabled = true; // OK - local variable
+  bool enabled = true; // OK - local variable
 }

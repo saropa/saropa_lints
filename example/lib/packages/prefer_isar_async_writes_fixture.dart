@@ -113,11 +113,11 @@ final users = <dynamic>[];
 // BAD: Should trigger prefer_isar_async_writes
 // expect_lint: prefer_isar_async_writes
 Widget _bad676_build(BuildContext context) {
-isar.writeTxnSync(() => isar.users.putSync(user));  // Blocks UI!
-return Container();
+  isar.writeTxnSync(() => isar.users.putSync(user)); // Blocks UI!
+  return Container();
 }
 
 // GOOD: Should NOT trigger prefer_isar_async_writes
 void _good676__saveUser() async {
-await isar.writeTxn(() => isar.users.put(user));
+  await isar.writeTxn(() => isar.users.put(user));
 }

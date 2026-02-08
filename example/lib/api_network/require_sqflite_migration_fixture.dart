@@ -113,18 +113,18 @@ final users = <dynamic>[];
 // expect_lint: require_sqflite_migration
 void _bad71() async {
   database.onUpgrade = (db, oldVersion, newVersion) async {
-  await db.execute('ALTER TABLE users ADD COLUMN age INTEGER');
+    await db.execute('ALTER TABLE users ADD COLUMN age INTEGER');
   };
 }
 
 // GOOD: Should NOT trigger require_sqflite_migration
 void _good71() async {
   database.onUpgrade = (db, oldVersion, newVersion) async {
-  if (oldVersion < 2) {
-  await db.execute('ALTER TABLE users ADD COLUMN age INTEGER');
-  }
-  if (oldVersion < 3) {
-  await db.execute('ALTER TABLE users ADD COLUMN email TEXT');
-  }
+    if (oldVersion < 2) {
+      await db.execute('ALTER TABLE users ADD COLUMN age INTEGER');
+    }
+    if (oldVersion < 3) {
+      await db.execute('ALTER TABLE users ADD COLUMN email TEXT');
+    }
   };
 }

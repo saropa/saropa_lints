@@ -111,7 +111,7 @@ void _bad1294() {
   late AnimationController _controller;
   @override
   void initState() {
-  _controller = AnimationController(vsync: this);
+    _controller = AnimationController(vsync: this);
   }
   // Missing dispose!
 }
@@ -121,11 +121,12 @@ void _good1294() {
   late AnimationController _controller;
   @override
   void initState() {
-  _controller = AnimationController(vsync: this);
+    _controller = AnimationController(vsync: this);
   }
+
   @override
   void dispose() {
-  _controller.dispose();
-  // super.dispose();
+    _controller.dispose();
+    // super.dispose();
   }
 }

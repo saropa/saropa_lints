@@ -110,12 +110,12 @@ dynamic controller;
 // BAD: Should trigger avoid_undisposed_instances
 // expect_lint: avoid_undisposed_instances
 class _bad1354_MyWidget extends StatefulWidget {
-@override
-_MyWidgetState createState() => _MyWidgetState();
+  @override
+  _MyWidgetState createState() => _MyWidgetState();
 }
 
 class _MyWidgetState extends State<MyWidget> {
-late final controller = TextEditingController(); // Not disposed
+  late final controller = TextEditingController(); // Not disposed
 }
 
 // GOOD: Should NOT trigger avoid_undisposed_instances

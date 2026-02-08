@@ -112,8 +112,8 @@ dynamic value;
 void _bad177() {
   late final int value;
   void init() {
-  value = 1;
-  value = 2;  // Error at runtime
+    value = 1;
+    value = 2; // Error at runtime
   }
 }
 

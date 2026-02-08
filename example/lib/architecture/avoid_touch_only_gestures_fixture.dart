@@ -111,17 +111,17 @@ dynamic child;
 // expect_lint: avoid_touch_only_gestures
 void _bad83() {
   GestureDetector(
-  onTap: () => selectItem(),
-  child: ListTile(),
+    onTap: () => selectItem(),
+    child: ListTile(),
   );
 }
 
 // GOOD: Should NOT trigger avoid_touch_only_gestures
 void _good83() {
   GestureDetector(
-  onTap: () => selectItem(),
-  onSecondaryTap: () => showContextMenu(),
-  onLongPress: () => showContextMenu(), // Mobile fallback
-  child: ListTile(),
+    onTap: () => selectItem(),
+    onSecondaryTap: () => showContextMenu(),
+    onLongPress: () => showContextMenu(), // Mobile fallback
+    child: ListTile(),
   );
 }

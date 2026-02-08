@@ -113,8 +113,8 @@ dynamic value;
 // expect_lint: avoid_provider_value_rebuild
 void _bad722() {
   Provider.value(
-  value: MyNotifier(), // Created inline!
-  child: child,
+    value: MyNotifier(), // Created inline!
+    child: child,
   );
 }
 
@@ -122,15 +122,15 @@ void _bad722() {
 void _good722() {
   // Create notifier in state
   final _notifier = MyNotifier();
-  
+
   Provider.value(
-  value: _notifier, // Existing instance
-  child: child,
+    value: _notifier, // Existing instance
+    child: child,
   );
-  
+
   // Or use Provider constructor
   Provider(
-  create: (_) => MyNotifier(),
-  child: child,
+    create: (_) => MyNotifier(),
+    child: child,
   );
 }

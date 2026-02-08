@@ -113,7 +113,7 @@ final url = 'https://example.com';
 void _bad799() {
   // Loading many images without cache management
   for (final url in imageUrls) {
-  Image.network(url);
+    Image.network(url);
   }
 }
 
@@ -122,7 +122,7 @@ void _good799() {
   // Clear cache when navigating away from image-heavy screens
   @override
   void dispose() {
-  imageCache.clear();
-  // super.dispose();
+    imageCache.clear();
+    // super.dispose();
   }
 }

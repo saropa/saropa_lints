@@ -115,7 +115,7 @@ void _bad381() async {
   // For a 500MB log file, this allocates 500MB!
   final content = await file.readAsString();
   for (final line in content.split('\n')) {
-  processLine(line);
+    processLine(line);
   }
 }
 
@@ -123,8 +123,8 @@ void _bad381() async {
 void _good381() async {
   // Process line by line, constant memory usage
   await file
-  .openRead()
-  .transform(utf8.decoder)
-  .transform(LineSplitter())
-  .forEach(processLine);
+      .openRead()
+      .transform(utf8.decoder)
+      .transform(LineSplitter())
+      .forEach(processLine);
 }

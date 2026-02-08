@@ -112,16 +112,16 @@ final items = <dynamic>[];
 // expect_lint: prefer_no_continue_statement
 void _bad278() {
   for (final item in items) {
-  if (item.isEmpty) continue;
-  process(item);
+    if (item.isEmpty) continue;
+    process(item);
   }
 }
 
 // GOOD: Should NOT trigger prefer_no_continue_statement
 void _good278() {
   for (final item in items) {
-  if (item.isNotEmpty) {
-  process(item);
-  }
+    if (item.isNotEmpty) {
+      process(item);
+    }
   }
 }

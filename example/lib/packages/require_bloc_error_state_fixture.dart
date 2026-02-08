@@ -111,12 +111,17 @@ dynamic state;
 // BAD: Should trigger require_bloc_error_state
 // expect_lint: require_bloc_error_state
 sealed class _bad580_UserState {}
+
 class UserInitial extends UserState {}
+
 class UserLoaded extends UserState {}
 // Missing error state!
 
 // GOOD: Should NOT trigger require_bloc_error_state
 sealed class _good580_UserState {}
+
 class UserInitial extends UserState {}
+
 class UserLoaded extends UserState {}
+
 class UserError extends UserState {}

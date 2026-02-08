@@ -116,7 +116,7 @@ void _good858() async {
   // Use package_info_plus to get bundle ID at runtime
   final info = await PackageInfo.fromPlatform();
   final bundleId = info.packageName;
-  
+
   // Or use build configuration
   const bundleId = String.fromEnvironment('BUNDLE_ID');
 }

@@ -111,14 +111,16 @@ final name = 'example';
 // BAD: Should trigger avoid_bloc_event_mutation
 // expect_lint: avoid_bloc_event_mutation
 class _bad554_UpdateEvent extends MyEvent {
-String name; // Mutable!
+  String name; // Mutable!
 }
 
-bloc.add(event);
-event.name = 'changed'; // Mutating after dispatch!
+void _bad554_usage() {
+  bloc.add(event);
+  event.name = 'changed'; // Mutating after dispatch!
+}
 
 // GOOD: Should NOT trigger avoid_bloc_event_mutation
 class _good554_UpdateEvent extends MyEvent {
-final String name; // Immutable
-const UpdateEvent(this.name);
+  final String name; // Immutable
+  const _good554_UpdateEvent(this.name);
 }

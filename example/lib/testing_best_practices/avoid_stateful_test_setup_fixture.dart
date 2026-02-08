@@ -112,17 +112,17 @@ dynamic list;
 // expect_lint: avoid_stateful_test_setup
 void _bad1205() {
   List<Item> items = [];
-  
+
   setUp(() {
-  items.add(Item());  // Accumulates across tests!
+    items.add(Item()); // Accumulates across tests!
   });
 }
 
 // GOOD: Should NOT trigger avoid_stateful_test_setup
 void _good1205() {
   late List<Item> items;
-  
+
   setUp(() {
-  items = [Item()];  // Fresh list each test
+    items = [Item()]; // Fresh list each test
   });
 }

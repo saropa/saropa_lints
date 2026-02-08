@@ -112,18 +112,18 @@ final children = <Widget>[];
 // expect_lint: require_error_widget
 void _bad1432() {
   SingleChildScrollView(
-  child: Column(
-  children: [Expanded(child: Container())], // Expanded won't work!
-  ),
+    child: Column(
+      children: [Expanded(child: Container())], // Expanded won't work!
+    ),
   );
 }
 
 // GOOD: Should NOT trigger require_error_widget
 void _good1432() {
   SingleChildScrollView(
-  child: ConstrainedBox(
-  constraints: BoxConstraints(minHeight: viewportHeight),
-  child: Column(children: []),
-  ),
+    child: ConstrainedBox(
+      constraints: BoxConstraints(minHeight: viewportHeight),
+      child: Column(children: []),
+    ),
   );
 }

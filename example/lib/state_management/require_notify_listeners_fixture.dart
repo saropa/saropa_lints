@@ -108,17 +108,17 @@ import '../flutter_mocks.dart';
 // BAD: Should trigger require_notify_listeners
 // expect_lint: require_notify_listeners
 class _bad1027_Counter extends ChangeNotifier {
-int _count = 0;
-void increment() {
-_count++; // Missing notifyListeners();
-}
+  int _count = 0;
+  void increment() {
+    _count++; // Missing notifyListeners();
+  }
 }
 
 // GOOD: Should NOT trigger require_notify_listeners
 class _good1027_Counter extends ChangeNotifier {
-int _count = 0;
-void increment() {
-_count++;
-notifyListeners();
-}
+  int _count = 0;
+  void increment() {
+    _count++;
+    notifyListeners();
+  }
 }

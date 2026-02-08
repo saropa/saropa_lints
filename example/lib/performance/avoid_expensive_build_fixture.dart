@@ -112,15 +112,15 @@ final name = 'example';
 // BAD: Should trigger avoid_expensive_build
 // expect_lint: avoid_expensive_build
 Widget _bad778_build(BuildContext context) {
-final data = jsonDecode(jsonString);
-return Text(data['name']);
+  final data = jsonDecode(jsonString);
+  return Text(data['name']);
 }
 
 // GOOD: Should NOT trigger avoid_expensive_build
 void _good778() {
   late final data = jsonDecode(jsonString); // In initState or outside build
-  
+
   Widget build(BuildContext context) {
-  return Text(data['name']);
+    return Text(data['name']);
   }
 }

@@ -114,18 +114,18 @@ final title = 'Title';
 // expect_lint: require_refresh_indicator_on_lists
 void _bad986() {
   ListView.builder(
-  itemCount: items.length,
-  itemBuilder: (ctx, i) => ListTile(title: Text(items[i])),
+    itemCount: items.length,
+    itemBuilder: (ctx, i) => ListTile(title: Text(items[i])),
   );
 }
 
 // GOOD: Should NOT trigger require_refresh_indicator_on_lists
 void _good986() {
   RefreshIndicator(
-  onRefresh: () => fetchItems(),
-  child: ListView.builder(
-  itemCount: items.length,
-  itemBuilder: (ctx, i) => ListTile(title: Text(items[i])),
-  ),
+    onRefresh: () => fetchItems(),
+    child: ListView.builder(
+      itemCount: items.length,
+      itemBuilder: (ctx, i) => ListTile(title: Text(items[i])),
+    ),
   );
 }

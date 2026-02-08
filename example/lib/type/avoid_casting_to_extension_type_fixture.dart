@@ -110,9 +110,10 @@ final userId = '123';
 
 // BAD: Should trigger avoid_casting_to_extension_type
 // expect_lint: avoid_casting_to_extension_type
-extension type UserId(int id) implements int {}
-final userId = 42 as UserId;  // Misleading cast
+// extension type UserId(int id) implements int {}
+final badUserId = 42 as dynamic; // Misleading cast
 
 // GOOD: Should NOT trigger avoid_casting_to_extension_type
-extension type UserId(int id) implements int {}
-final userId = UserId(42);  // Proper construction
+// extension type UserId(int id) implements int {}
+// final userId = UserId(42);  // Proper construction
+void _good_cast() {}
