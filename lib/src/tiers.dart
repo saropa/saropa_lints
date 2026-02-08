@@ -653,6 +653,14 @@ const Set<String> essentialRules = <String>{
   // ROADMAP ⭐ Rules - Essential (new batch)
   'avoid_context_dependency_in_callback', // WARNING - stale context in async callbacks
   'avoid_hive_synchronous_in_ui', // WARNING - sync Hive I/O blocks UI thread
+
+  // ROADMAP 🚨 Rules (Essential - ERROR severity)
+  'prefer_correct_package_name', // ERROR - package naming convention
+  'avoid_getx_build_context_bypass', // ERROR - bypasses BuildContext
+  'avoid_permission_handler_null_safety', // ERROR - deprecated API
+  'avoid_retaining_disposed_widgets', // ERROR - memory leak from widget refs
+  'require_secure_key_generation', // ERROR - hardcoded encryption keys
+  'require_hive_web_subdirectory', // ERROR - web storage conflicts
 };
 
 /// Recommended tier rules - Essential + common mistakes, performance basics.
