@@ -1112,6 +1112,10 @@ class RequireLogLevelForProductionRule extends SaropaLintRule {
   );
 
   /// Verbose log methods that should be guarded.
+  ///
+  /// Methods like `fine`, `finer`, `finest` are specific to `dart:developer`
+  /// Logger. Generic names like `log` require receiver filtering to avoid
+  /// false positives on unrelated APIs (e.g., `math.log()`).
   static const Set<String> _verboseLogMethods = <String>{
     'log',
     'fine',
@@ -1122,6 +1126,12 @@ class RequireLogLevelForProductionRule extends SaropaLintRule {
     'verbose',
   };
 
+  /// Receivers that indicate a logging context (case-insensitive match).
+  static final RegExp _loggerTargetPattern = RegExp(
+    r'(log|logger|logging|_log|_logger)',
+    caseSensitive: false,
+  );
+
   @override
   void runWithReporter(
     CustomLintResolver resolver,
@@ -1131,12 +1141,20 @@ class RequireLogLevelForProductionRule extends SaropaLintRule {
     context.registry.addMethodInvocation((MethodInvocation node) {
       if (!_verboseLogMethods.contains(node.methodName.name)) return;
 
+      // Require a logger-like receiver to avoid false positives on
+      // unrelated APIs (e.g., math.log(), myObject.trace()).
+      final Expression? target = node.target;
+      if (target != null && !_loggerTargetPattern.hasMatch(target.toSource())) {
+        return;
+      }
+
       // Skip if already inside a debug guard
       if (_isInsideDebugContext(node)) return;
 
       reporter.atNode(node, code);
     });
 
+    // Bare function calls: log('message'), debug('info'), etc.
     context.registry
         .addFunctionExpressionInvocation((FunctionExpressionInvocation node) {
       final Expression function = node.function;

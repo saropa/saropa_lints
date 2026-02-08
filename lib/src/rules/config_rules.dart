@@ -380,8 +380,9 @@ class RequireFeatureFlagTypeSafetyRule extends SaropaLintRule {
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
+  /// Unambiguous flag methods - still require a flag-like receiver to
+  /// avoid false positives on generic `isEnabled('push')` calls.
   static const Set<String> _flagSpecificMethods = <String>{
-    'isEnabled',
     'isFeatureEnabled',
     'getFeatureFlag',
     'getFlag',
@@ -389,7 +390,10 @@ class RequireFeatureFlagTypeSafetyRule extends SaropaLintRule {
     'evaluateFlag',
   };
 
+  /// Ambiguous methods that could appear on many classes - require both
+  /// a flag-like receiver AND a string literal argument.
   static const Set<String> _genericAccessors = <String>{
+    'isEnabled',
     'getBool',
     'getString',
     'getInt',
@@ -397,8 +401,9 @@ class RequireFeatureFlagTypeSafetyRule extends SaropaLintRule {
     'getValue',
   };
 
+  /// Receiver patterns that indicate a feature flag context.
   static final RegExp _flagTargetPattern = RegExp(
-    r'(featureFlag|featureToggle|featureSwitch|abTest|experiment|remoteConfig|FirebaseRemoteConfig|launchDarkly)',
+    r'(featureFlag|featureToggle|featureSwitch|abTest|experiment|remoteConfig|FirebaseRemoteConfig|launchDarkly|featureClient|flagsmith|unleash|configCat)',
     caseSensitive: false,
   );
 
@@ -410,19 +415,21 @@ class RequireFeatureFlagTypeSafetyRule extends SaropaLintRule {
   ) {
     context.registry.addMethodInvocation((MethodInvocation node) {
       final String methodName = node.methodName.name;
+
       if (_flagSpecificMethods.contains(methodName)) {
-        if (_hasStringLiteralFirstArg(node)) {
-          reporter.atNode(node.methodName, code);
-        }
+        if (!_hasStringLiteralFirstArg(node)) return;
+        // Unambiguous names like getFeatureFlag always trigger
+        reporter.atNode(node.methodName, code);
         return;
       }
+
       if (_genericAccessors.contains(methodName)) {
+        // Ambiguous names require a flag-related receiver
         final Expression? target = node.target;
         if (target == null) return;
         if (!_flagTargetPattern.hasMatch(target.toSource())) return;
-        if (_hasStringLiteralFirstArg(node)) {
-          reporter.atNode(node.methodName, code);
-        }
+        if (!_hasStringLiteralFirstArg(node)) return;
+        reporter.atNode(node.methodName, code);
       }
     });
   }
