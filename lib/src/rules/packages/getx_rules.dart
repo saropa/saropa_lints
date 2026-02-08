@@ -2101,3 +2101,76 @@ class _AddGetxConstructorInjectionCommentFix extends DartFix {
     });
   }
 }
+
+// =============================================================================
+// avoid_getx_build_context_bypass
+// =============================================================================
+
+/// Warns when Get.context is used to bypass Flutter's BuildContext mechanism.
+///
+/// Alias: getx_context_bypass, no_get_context
+///
+/// Using Get.context bypasses Flutter's widget tree context propagation,
+/// hiding dependencies and making code harder to test. Prefer passing
+/// BuildContext explicitly through widget methods.
+///
+/// **BAD:**
+/// ```dart
+/// class MyController extends GetxController {
+///   void showMessage() {
+///     ScaffoldMessenger.of(Get.context!).showSnackBar(...);
+///   }
+/// }
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// class MyController extends GetxController {
+///   void showMessage(BuildContext context) {
+///     ScaffoldMessenger.of(context).showSnackBar(...);
+///   }
+/// }
+/// ```
+class AvoidGetxBuildContextBypassRule extends SaropaLintRule {
+  const AvoidGetxBuildContextBypassRule() : super(code: _code);
+
+  /// Using Get.context hides widget tree dependencies and breaks testability.
+  @override
+  LintImpact get impact => LintImpact.critical;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  static const LintCode _code = LintCode(
+    name: 'avoid_getx_build_context_bypass',
+    problemMessage:
+        '[avoid_getx_build_context_bypass] Get.context or Get.overlayContext '
+        'bypasses Flutter\'s BuildContext propagation. This hides widget tree '
+        'dependencies, makes code untestable without GetX runtime, and '
+        'circumvents Flutter\'s fundamental context-based service location '
+        'pattern. The retrieved context may be stale or from an unexpected '
+        'part of the widget tree, causing subtle bugs.',
+    correctionMessage:
+        'Pass BuildContext explicitly as a parameter to the method, or use '
+        'GetX navigation methods (Get.to, Get.snackbar) that manage context '
+        'internally.',
+    errorSeverity: DiagnosticSeverity.ERROR,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addPrefixedIdentifier((PrefixedIdentifier node) {
+      // Check for Get.context or Get.overlayContext
+      if (node.prefix.name != 'Get') return;
+
+      final String property = node.identifier.name;
+      if (property != 'context' && property != 'overlayContext') return;
+
+      reporter.atNode(node, code);
+    });
+  }
+}

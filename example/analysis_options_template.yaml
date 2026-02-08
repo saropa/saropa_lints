@@ -319,6 +319,7 @@ custom_lint:
     - avoid_hive_field_index_reuse: false     # ERROR - duplicate indices (v2.3.9)
     - avoid_sqflite_reserved_words: false     # WARNING - SQL reserved words (v2.3.9)
     - prefer_sqflite_singleton: false        # INFO - use singleton for database (v2.6.0)
+    - require_hive_web_subdirectory: false   # ERROR - Hive web needs explicit subDir (v4.14.0)
     - prefer_sqflite_column_constants: false # INFO - constants for column names (v2.6.0)
     - require_yield_after_db_write: false  # WARNING - yield after DB write to prevent UI jank
     - suggest_yield_after_db_read: false   # INFO - yield after bulk DB read (findFirst excluded)
@@ -370,6 +371,7 @@ custom_lint:
     - avoid_storing_context: false              # ERROR - context in fields (v2.3.10)
     - avoid_context_across_async: false         # ERROR - context after await (v2.3.10)
     - avoid_context_dependency_in_callback: false # WARNING - context dependency in async callback (v4.12.0)
+    - avoid_retaining_disposed_widgets: false  # ERROR - widget refs in non-widget classes (v4.14.0)
     - avoid_context_in_static_methods: false    # ERROR - context in static methods (v2.3.10)
     - avoid_inherited_widget_in_initstate: false
     - avoid_build_context_in_providers: false
@@ -701,6 +703,7 @@ custom_lint:
     - match_getter_setter_field_names: false
     - match_class_name_pattern: false
     - match_base_class_default_value: false
+    - prefer_correct_package_name: false      # ERROR - library name must be lowercase_with_underscores (v4.14.0)
     - tag_name: false
     - prefer_kebab_tag_name: false
 
@@ -825,6 +828,7 @@ custom_lint:
     - require_auth_check: false
     - require_token_refresh: false
     - avoid_jwt_decode_client: false
+    - require_secure_key_generation: false    # ERROR - predictable encryption keys (v4.14.0)
     - require_logout_cleanup: false
     - avoid_auth_in_query_params: false
     - avoid_auth_state_in_prefs: false
@@ -889,6 +893,7 @@ custom_lint:
     - require_error_handling_in_async: false
     - prefer_notifier_over_state: false
     - require_getx_controller_dispose: false
+    - avoid_getx_build_context_bypass: false  # ERROR - Get.context bypasses BuildContext (v4.14.0)
     - avoid_obs_outside_controller: false
     - require_bloc_transformer: false
     - avoid_long_event_handlers: false
@@ -1101,8 +1106,8 @@ custom_lint:
     - require_svg_error_handler: false
     - require_google_fonts_fallback: false
     - prefer_uuid_v4: false
-      # Isar
-      - avoid_cached_isar_stream: false           # PROFESSIONAL - New in 4.1.3: Prevents caching Isar query streams (runtime crash risk)
+    # Isar
+    - avoid_cached_isar_stream: false           # PROFESSIONAL - New in 4.1.3: Prevents caching Isar query streams (runtime crash risk)
 
     # =========================================================================
     # ROADMAP PART 7 RULES (v2.3.0)
@@ -1321,6 +1326,7 @@ custom_lint:
     - require_location_permission_rationale: false # WARNING - location permission without rationale (v4.2.0)
     - require_camera_permission_check: false       # ERROR - camera without permission check (v4.2.0)
     - prefer_image_cropping: false                 # INFO - profile image without cropping option (v4.2.0)
+    - avoid_permission_handler_null_safety: false  # ERROR - deprecated pre-null-safety API (v4.14.0)
 
     # --- Connectivity & Geolocator Rules ---
     - require_connectivity_error_handling: false   # INFO - connectivity check without error handling (v4.2.0)
