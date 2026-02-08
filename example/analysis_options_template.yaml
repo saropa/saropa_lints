@@ -449,6 +449,7 @@ custom_lint:
     - avoid_getit_in_build: false
     - avoid_canvas_operations_in_build: false
     - avoid_hardcoded_feature_flags: false
+    - require_feature_flag_type_safety: false  # INFO - typed feature flag accessors (v4.14.0)
     # Scroll and list rules
     - avoid_shrinkwrap_in_scrollview: false
     - avoid_nested_scrollables_conflict: false
@@ -466,6 +467,7 @@ custom_lint:
     - require_isolate_for_heavy: false        # WARNING - heavy computation blocks UI (v4.1.8)
     - avoid_finalizer_misuse: false           # INFO - prefer dispose() over Finalizer (v4.1.8)
     - avoid_json_in_main: false               # INFO - jsonDecode in async should use compute() (v4.1.8)
+    - avoid_blocking_main_thread: false       # WARNING - sync I/O blocks main isolate (v4.14.0)
 
     # =========================================================================
     # FLUTTER WIDGETS
@@ -565,6 +567,7 @@ custom_lint:
     - require_graphql_operation_names: false
     - avoid_badge_without_meaning: false
     - prefer_logger_over_print: false
+    - require_log_level_for_production: false  # INFO - guard verbose logs for production (v4.14.0)
     - prefer_itemextent_when_known: false
     - require_tab_state_preservation: false
     - prefer_spring_animation: false           # INFO - prefer SpringSimulation over bounce curves (v4.12.0)
@@ -758,6 +761,7 @@ custom_lint:
     - require_dio_response_type: false           # INFO - explicit responseType for downloads (v2.6.0)
     - require_dio_retry_interceptor: false       # INFO - retry logic for network failures (v2.6.0)
     - prefer_dio_transformer: false              # INFO - custom transformer for large JSON (v2.6.0)
+    - require_analytics_event_naming: false    # INFO - snake_case analytics event names (v4.14.0)
 
     # =========================================================================
     # NUMBERS & STRINGS
@@ -1029,6 +1033,7 @@ custom_lint:
     # Freezed v2.6.0
     - require_freezed_json_converter: false      # INFO - JsonConverter for DateTime/Color (v2.6.0)
     - require_freezed_lint_package: false        # INFO - add freezed_lint package (v2.6.0)
+    - require_timezone_display: false           # INFO - timezone context in time display (v4.14.0)
 
     # =========================================================================
     # DEPENDENCY INJECTION (v2.3.11)
