@@ -18,6 +18,7 @@ Standard linters see valid Dart code. saropa_lints understands Hive's requiremen
 | Unencrypted sensitive data | Security vulnerability | `prefer_hive_encryption` |
 | Hardcoded encryption key | Key extractable from APK | `require_hive_encryption_key_secure` |
 | Missing adapter registration | Runtime crash | `require_type_adapter_registration` |
+| Missing web subdirectory | Data conflicts on web | `require_hive_web_subdirectory` |
 | Large data in regular box | Memory bloat | `prefer_lazy_box_for_large` |
 | Database not closed | Resource leak | `require_hive_database_close` |
 | Missing field default value | Null errors on migration | `require_hive_field_default_value` |

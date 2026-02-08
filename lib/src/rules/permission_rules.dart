@@ -407,3 +407,112 @@ class PreferImageCroppingRule extends SaropaLintRule {
     });
   }
 }
+
+// =============================================================================
+// avoid_permission_handler_null_safety
+// =============================================================================
+
+/// Warns when deprecated permission_handler APIs from pre-null-safety versions
+/// are detected.
+///
+/// Alias: permission_handler_null_safety, outdated_permission_handler
+///
+/// Older permission_handler versions (pre-8.0) used deprecated API patterns
+/// like `PermissionHandler()` singleton and `checkPermissionStatus` method.
+/// These are removed in null-safe versions and cause compile errors.
+///
+/// **BAD:**
+/// ```dart
+/// final handler = PermissionHandler();
+/// var status = await handler.checkPermissionStatus(PermissionGroup.camera);
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// var status = await Permission.camera.status;
+/// if (!status.isGranted) {
+///   status = await Permission.camera.request();
+/// }
+/// ```
+class AvoidPermissionHandlerNullSafetyRule extends SaropaLintRule {
+  const AvoidPermissionHandlerNullSafetyRule() : super(code: _code);
+
+  /// Using deprecated APIs causes compile errors after migration.
+  @override
+  LintImpact get impact => LintImpact.critical;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  static const LintCode _code = LintCode(
+    name: 'avoid_permission_handler_null_safety',
+    problemMessage:
+        '[avoid_permission_handler_null_safety] Deprecated pre-null-safety '
+        'permission_handler API detected. The PermissionHandler() constructor '
+        'and PermissionGroup enum were removed in permission_handler 8.0+. '
+        'Using these deprecated APIs prevents migration to null-safe versions '
+        'and causes compile errors when updating the package. The modern API '
+        'uses Permission.camera.status and Permission.camera.request() instead.',
+    correctionMessage: 'Migrate to the null-safe permission_handler API: use '
+        'Permission.camera.status instead of '
+        'PermissionHandler().checkPermissionStatus(PermissionGroup.camera).',
+    errorSeverity: DiagnosticSeverity.ERROR,
+  );
+
+  /// Deprecated class names from pre-null-safety permission_handler
+  static const Set<String> _deprecatedClasses = <String>{
+    'PermissionHandler',
+    'PermissionGroup',
+    'ServiceStatus',
+  };
+
+  /// Deprecated method names from pre-null-safety permission_handler
+  static const Set<String> _deprecatedMethods = <String>{
+    'checkPermissionStatus',
+    'requestPermissions',
+    'checkServiceStatus',
+    'shouldShowRequestPermissionRationale',
+  };
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    // Detect deprecated constructor: PermissionHandler()
+    context.registry
+        .addInstanceCreationExpression((InstanceCreationExpression node) {
+      final String typeName = node.constructorName.type.name2.lexeme;
+      if (_deprecatedClasses.contains(typeName)) {
+        reporter.atNode(node, code);
+      }
+    });
+
+    // Detect deprecated method calls on PermissionHandler instances
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      final String methodName = node.methodName.name;
+      if (!_deprecatedMethods.contains(methodName)) return;
+
+      // Check if target is a PermissionHandler identifier or constructor
+      final Expression? target = node.target;
+      if (target == null) return;
+
+      if (target is SimpleIdentifier &&
+          _deprecatedClasses.contains(target.name)) {
+        reporter.atNode(node, code);
+      } else if (target is InstanceCreationExpression &&
+          _deprecatedClasses
+              .contains(target.constructorName.type.name2.lexeme)) {
+        reporter.atNode(node, code);
+      }
+    });
+
+    // Detect PermissionGroup enum usage
+    context.registry.addPrefixedIdentifier((PrefixedIdentifier node) {
+      if (node.prefix.name == 'PermissionGroup') {
+        reporter.atNode(node, code);
+      }
+    });
+  }
+}
