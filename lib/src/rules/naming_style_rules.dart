@@ -2211,6 +2211,82 @@ class _ReplaceWithWildcardFix extends DartFix {
   }
 }
 
+// =============================================================================
+// prefer_correct_package_name
+// =============================================================================
+
+/// Warns when a `library` directive name doesn't follow Dart naming conventions.
+///
+/// Alias: package_name_convention, library_name_convention
+///
+/// Dart package and library names must be lowercase_with_underscores per the
+/// Dart style guide (https://dart.dev/effective-dart/style#do-name-packages-and-file-sources-using-lowercase_with_underscores).
+/// The pub.dev naming rules require: only lowercase letters, digits, and
+/// underscores; must start with a lowercase letter; no hyphens, dots, or
+/// uppercase letters.
+///
+/// **BAD:**
+/// ```dart
+/// library MyPackage;       // LINT - uppercase letters
+/// library my-package;      // LINT - hyphens not allowed
+/// library 1_bad;           // LINT - starts with digit
+/// library my.package.name; // LINT - dots not allowed
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// library my_package;      // OK - lowercase_with_underscores
+/// library;                 // OK - unnamed library (Dart 2.19+)
+/// ```
+class PreferCorrectPackageNameRule extends SaropaLintRule {
+  const PreferCorrectPackageNameRule() : super(code: _code);
+
+  /// Invalid names break pub publish, import resolution, and tooling.
+  @override
+  LintImpact get impact => LintImpact.critical;
+
+  @override
+  RuleCost get cost => RuleCost.trivial;
+
+  /// Matches valid Dart package/library names per pub.dev rules:
+  /// lowercase letter start, then lowercase letters, digits, underscores.
+  static final RegExp _validPackageName = RegExp(r'^[a-z][a-z0-9_]*$');
+
+  static const LintCode _code = LintCode(
+    name: 'prefer_correct_package_name',
+    problemMessage:
+        '[prefer_correct_package_name] Library directive name does not follow '
+        'Dart naming conventions. Library and package names must use '
+        'lowercase_with_underscores format: start with a lowercase letter, '
+        'use only lowercase letters, digits, and underscores. Names with '
+        'hyphens, dots, uppercase letters, or starting with digits break '
+        'pub publish, import resolution, and IDE tooling.',
+    correctionMessage:
+        'Rename the library to use lowercase_with_underscores format '
+        '(e.g., "my_package" instead of "MyPackage" or "my-package").',
+    errorSeverity: DiagnosticSeverity.ERROR,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addLibraryDirective((LibraryDirective node) {
+      final LibraryIdentifier? name = node.name2;
+      if (name == null) return; // `library;` without name is valid
+
+      final String libraryName = name.name;
+      if (libraryName.isEmpty) return;
+
+      if (!_validPackageName.hasMatch(libraryName)) {
+        reporter.atNode(name, code);
+      }
+    });
+  }
+}
+
 class _IdentifierUsageVisitor extends RecursiveAstVisitor<void> {
   _IdentifierUsageVisitor(this.name);
 

@@ -1,7 +1,7 @@
-# Roadmap: Aiming for 2,000 Lint Rules
+# Roadmap: Aiming for 2,200 Lint Rules
 <!-- cspell:disable -->
 
-See [CHANGELOG.md](CHANGELOG.md) for implemented rules. Goal: 2000 rules.
+See [CHANGELOG.md](CHANGELOG.md) for implemented rules. Goal: 2200 rules (1716 implemented, 473 remaining).
 
 > **When implementing**: Remove from ROADMAP, add to CHANGELOG, register in `all_rules.dart` + `tiers.dart`. See [CONTRIBUTING.md](CONTRIBUTING.md).
 
@@ -438,7 +438,6 @@ See [CHANGELOG.md](CHANGELOG.md) for implemented rules. Goal: 2000 rules.
 | ℹ️ `newline_before_pubspec_entry` | Stylistic | INFO | Add blank lines between major pubspec sections. |
 | ℹ️ `prefer_caret_version_syntax` | Stylistic | INFO | Use `^1.0.0` caret syntax for version constraints. |
 | ℹ️ `prefer_commenting_pubspec_ignores` | Professional | INFO | Document why pubspec rules are ignored. |
-| 🚨 `prefer_correct_package_name` | Essential | ERROR | Package name must follow Dart naming conventions. |
 | ℹ️ `prefer_correct_screenshots` | Professional | INFO | Screenshots in pubspec should have valid paths and descriptions. |
 | ℹ️ `prefer_correct_topics` | Professional | INFO | Topics should be valid pub.dev topics. |
 | ℹ️ `prefer_pinned_version_syntax` | Professional | INFO | Pin exact versions for production stability. |
@@ -693,7 +692,6 @@ Rules for popular Flutter packages based on common gotchas, anti-patterns, and b
 |-----------|------|----------|-------------|
 | ℹ️ `prefer_getx_builder_over_obx` | Recommended | INFO | GetBuilder is more explicit than Obx for state. Detect mixed patterns. |
 | ⚠️ `avoid_getx_rx_nested_obs` | Professional | WARNING | Nested .obs creates complex reactive trees. Detect Rx<List<Rx<Type>>>. |
-| 🚨 `avoid_getx_build_context_bypass` | Essential | ERROR | Bypassing BuildContext hides Flutter fundamentals. Detect excessive Get.context usage. |
 
 ### 5.7 Hive Database Rules
 
@@ -736,7 +734,6 @@ Rules for popular Flutter packages based on common gotchas, anti-patterns, and b
 | Rule Name | Tier | Severity | Description |
 |-----------|------|----------|-------------|
 | ℹ️⭐ `prefer_permission_request_in_context` | Professional | INFO | Request permissions when needed, not at startup. Detect all permissions in main(). |
-| 🚨 `avoid_permission_handler_null_safety | Essential | ERROR | Use null-safe permission_handler version. Detect outdated package version. |
 | ℹ️ `require_permission_lifecycle_observer` | Professional | INFO | Re-check permissions on app resume. Detect missing WidgetsBindingObserver. |
 | ℹ️ `prefer_permission_minimal_request` | Recommended | INFO | Request only needed permissions. Detect requesting unused permissions. |
 | ⚠️ `avoid_permission_request_loop` | Professional | WARNING | Don't repeatedly request denied permission. Detect request in loop or retry. |
@@ -905,7 +902,6 @@ Rules for popular Flutter packages based on common gotchas, anti-patterns, and b
 |-----------|------|----------|-------------|
 | ⚠️ `avoid_large_object_in_state` | Professional | WARNING | Large objects in widget state cause memory issues. Detect >1MB objects in state. |
 | ℹ️ `require_image_memory_cache_limit` | Professional | INFO | Set PaintingBinding.imageCache limits. Detect default unlimited cache. |
-| 🚨 `avoid_retaining_disposed_widgets` | Essential | ERROR | Don't store references to disposed widgets. Detect widget references in non-widget classes. |
 | ℹ️ `prefer_weak_references` | Comprehensive | INFO | Use Expando for optional associations. Detect strong refs where weak would work. |
 | ⚠️ `avoid_closure_capture_leaks` | Professional | WARNING | Closures can capture and retain objects. Detect closures capturing large objects. |
 | ⚠️ `avoid_unbounded_collections` | Essential | WARNING | Collections without size limits cause OOM. Detect growing collections without limits. |
@@ -1031,7 +1027,6 @@ Rules for popular Flutter packages based on common gotchas, anti-patterns, and b
 | Rule Name | Tier | Severity | Description |
 |-----------|------|----------|-------------|
 | ℹ️ `prefer_biometric_protection` | Professional | INFO | Use biometric protection for sensitive data. Detect authenticationRequired option. |
-| 🚨 `require_secure_key_generation` | Essential | ERROR | Encryption keys need secure generation. Detect hardcoded or predictable keys. |
 | ⚠️ `avoid_secure_storage_in_background` | Professional | WARNING | Secure storage may fail in background. Detect background access without handling. |
 
 ### 5.50 Late Initialization Rules
@@ -1051,7 +1046,6 @@ Rules for popular Flutter packages based on common gotchas, anti-patterns, and b
 |-----------|------|----------|-------------|
 | ℹ️ `prefer_hive_compact_periodically` | Professional | INFO | Hive files grow without compaction. Call box.compact() after bulk deletes to reclaim space. |
 | ⚠️ `avoid_hive_large_single_entry` | Professional | WARNING | Entries >1MB degrade performance. Split large data across multiple keys or use chunking. |
-| 🚨 `require_hive_web_subdirectory` | Essential | ERROR | Hive web needs explicit subDir in init. Detect Hive.initFlutter without subDir on web platform. |
 | ⚠️ `avoid_hive_datetime_local` | Professional | WARNING | DateTime stored as-is loses timezone. Convert to UTC before storing, local after reading. |
 
 ---

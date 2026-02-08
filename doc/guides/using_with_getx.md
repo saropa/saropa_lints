@@ -18,6 +18,7 @@ GetX is powerful but has patterns that fail silently. Standard linters see valid
 | Undisposed Worker fields | Memory leaks | `dispose_getx_fields` |
 | .obs without Obx wrapper | UI doesn't react to changes | `prefer_getx_builder` |
 | Get.put in build | Poor lifecycle management | `require_getx_binding` |
+| Get.context bypass | Hidden dependencies, untestable | `avoid_getx_build_context_bypass` |
 
 ## What saropa_lints Catches
 

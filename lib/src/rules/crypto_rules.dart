@@ -600,3 +600,129 @@ class _UseSecureRandomIvFix extends DartFix {
     });
   }
 }
+
+// =============================================================================
+// require_secure_key_generation
+// =============================================================================
+
+/// Warns when encryption keys are generated from predictable byte patterns.
+///
+/// Alias: secure_key_generation, predictable_key
+///
+/// Complementary to `avoid_hardcoded_encryption_keys` which catches string
+/// literal keys. This rule detects **non-string** predictable patterns:
+/// - `Key(Uint8List.fromList([1, 2, 3, ...]))` — hardcoded byte arrays
+/// - `Key(List.filled(16, 0))` — predictable fill patterns
+/// - `Key.fromLength(N)` — uses `dart:math` Random (NOT SecureRandom)
+///
+/// These patterns produce deterministic or guessable keys that compromise
+/// all encrypted data.
+///
+/// **BAD:**
+/// ```dart
+/// final key = Key(Uint8List.fromList([1, 2, 3, 4, 5, 6, 7, 8,
+///   9, 10, 11, 12, 13, 14, 15, 16]));
+/// final key = Key.fromLength(16); // uses dart:math Random, not secure
+/// final key = Key(List.filled(32, 0));
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// final key = Key.fromSecureRandom(32);
+/// final key = Key(SecureRandom(32).bytes);
+/// final keyStr = await secureStorage.read(key: 'enc_key');
+/// final key = Key.fromUtf8(keyStr!);
+/// ```
+///
+/// **OWASP:** [M5:Insecure-Communication] [M9:Reverse-Engineering]
+class RequireSecureKeyGenerationRule extends SaropaLintRule {
+  const RequireSecureKeyGenerationRule() : super(code: _code);
+
+  /// Predictable keys are extractable from binaries — critical security flaw.
+  @override
+  LintImpact get impact => LintImpact.critical;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  @override
+  OwaspMapping get owasp => const OwaspMapping(
+        mobile: <OwaspMobile>{OwaspMobile.m5, OwaspMobile.m10},
+        web: <OwaspWeb>{OwaspWeb.a02},
+      );
+
+  static const LintCode _code = LintCode(
+    name: 'require_secure_key_generation',
+    problemMessage:
+        '[require_secure_key_generation] Encryption key generated from a '
+        'predictable source. Key.fromLength() uses dart:math Random which is '
+        'NOT cryptographically secure. Hardcoded byte arrays in '
+        'Uint8List.fromList() or List.filled() produce deterministic keys '
+        'extractable from compiled binaries. Predictable keys compromise all '
+        'data encrypted with them and cannot be rotated without data loss.',
+    correctionMessage:
+        'Use Key.fromSecureRandom(32) for AES-256 or Key.fromSecureRandom(16) '
+        'for AES-128. For runtime keys, load from secure storage or derive '
+        'from user credentials with a proper KDF.',
+    errorSeverity: DiagnosticSeverity.ERROR,
+  );
+
+  /// Known encryption Key class names from popular Dart crypto libraries
+  static const Set<String> _keyClasses = <String>{
+    'Key',
+    'SecretKey',
+    'EncryptionKey',
+    'AesKey',
+    'CipherKey',
+  };
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    // Detect Key.fromLength(N) — uses dart:math Random, not SecureRandom
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      if (node.methodName.name != 'fromLength') return;
+
+      final Expression? target = node.target;
+      if (target is SimpleIdentifier && _keyClasses.contains(target.name)) {
+        reporter.atNode(node, code);
+      }
+    });
+
+    // Detect Key(literal_list) or Key(Uint8List.fromList([...]))
+    context.registry
+        .addInstanceCreationExpression((InstanceCreationExpression node) {
+      final String typeName = node.constructorName.type.name2.lexeme;
+      if (!_keyClasses.contains(typeName)) return;
+
+      final NodeList<Expression> args = node.argumentList.arguments;
+      if (args.isEmpty) return;
+
+      final Expression firstArg = args.first;
+
+      // Key([1, 2, 3, ...]) — direct list literal
+      if (firstArg is ListLiteral) {
+        reporter.atNode(node, code);
+        return;
+      }
+
+      // Key(Uint8List.fromList([...])) or Key(List.filled(N, M))
+      if (firstArg is MethodInvocation) {
+        final String method = firstArg.methodName.name;
+        if (method == 'fromList' || method == 'filled') {
+          final NodeList<Expression> innerArgs =
+              firstArg.argumentList.arguments;
+          if (innerArgs.isNotEmpty && innerArgs.first is ListLiteral) {
+            reporter.atNode(node, code);
+          } else if (method == 'filled') {
+            // List.filled always produces predictable output
+            reporter.atNode(node, code);
+          }
+        }
+      }
+    });
+  }
+}

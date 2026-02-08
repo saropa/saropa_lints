@@ -11,6 +11,21 @@ Dates are not included in version headers — [pub.dev](https://pub.dev/packages
 ** See the current published changelog: [saropa_lints/changelog](https://pub.dev/packages/saropa_lints/changelog)
 
 ---
+## [4.14.0]
+
+### Added
+
+- **6 new Essential rules (ERROR severity)**:
+  - `prefer_correct_package_name`: Library directive names must use lowercase_with_underscores format per Dart naming conventions
+  - `avoid_getx_build_context_bypass`: Detects Get.context and Get.overlayContext usage that bypasses Flutter's BuildContext propagation
+  - `avoid_permission_handler_null_safety`: Detects deprecated pre-null-safety permission_handler APIs (PermissionHandler(), PermissionGroup)
+  - `avoid_retaining_disposed_widgets`: Detects Widget/State/BuildContext references stored in non-widget classes causing memory leaks
+  - `require_secure_key_generation`: Detects predictable encryption key generation (Key.fromLength, hardcoded byte arrays, List.filled)
+  - `require_hive_web_subdirectory`: Detects Hive.initFlutter() without subDir parameter causing web storage conflicts
+
+- **Quick fix for `require_hive_web_subdirectory`**: Adds subdirectory parameter to Hive.initFlutter() calls
+
+---
 ## [4.13.0]
 
 ### Changed
