@@ -340,6 +340,8 @@ class AvoidMixedEnvironmentsRule extends SaropaLintRule {
 
 /// Warns when feature flags are accessed with raw string literal keys.
 ///
+/// Since: v4.14.0 | Rule version: v1
+///
 /// GitHub: https://github.com/saropa/saropa_lints/issues/21
 ///
 /// `[HEURISTIC]` - Uses a two-tier matching approach:
@@ -371,7 +373,7 @@ class RequireFeatureFlagTypeSafetyRule extends SaropaLintRule {
         'raw string literal key. String-based lookups are error-prone: '
         'typos compile successfully but fail silently at runtime, renames '
         'require a fragile codebase-wide search-and-replace, and there '
-        'is no compile-time guarantee the flag name exists.',
+        'is no compile-time guarantee the flag name exists. {v1}',
     correctionMessage:
         'Define flag keys as typed constants (enum values or static '
         'const fields) and reference those instead of string literals.',

@@ -3409,6 +3409,8 @@ class RequireWebsocketReconnectionRule extends SaropaLintRule {
 
 /// Warns when analytics event names do not follow snake_case convention.
 ///
+/// Since: v4.14.0 | Rule version: v1
+///
 /// GitHub: https://github.com/saropa/saropa_lints/issues/19
 ///
 /// `[HEURISTIC]` - Detects calls to known analytics methods and checks
@@ -3439,7 +3441,7 @@ class RequireAnalyticsEventNamingRule extends SaropaLintRule {
         'follow snake_case convention. Inconsistent naming fragments '
         'dashboards, breaks funnel queries, and makes cross-platform '
         'analysis unreliable. Most analytics platforms recommend or '
-        'require snake_case for event names.',
+        'require snake_case for event names. {v1}',
     correctionMessage: 'Rename the event to snake_case (e.g., "user_signed_up" '
         'instead of "UserSignedUp" or "user-signed-up").',
     errorSeverity: DiagnosticSeverity.INFO,

@@ -491,7 +491,7 @@ class PreferCommentingAnalyzerIgnoresRule extends SaropaLintRule {
 
 /// Suggests using debugPrint instead of print for better output throttling.
 ///
-/// Since: vunknown | Rule version: v1
+/// Since: unknown | Rule version: v1
 ///
 /// The print() function can overwhelm the system console and cause message
 /// loss when called rapidly. debugPrint() throttles output to avoid this
