@@ -1,6 +1,6 @@
 # Systemic False Positives: `String.contains()` Anti-Pattern Audit
 
-## Status: PLAN
+## Status: RESOLVED
 
 ## Summary
 
@@ -291,6 +291,22 @@ Body-source keyword matching, method name pattern matching.
 | 2026-02-08 | provider_rules.dart | `avoid_context_access_in_callback`, `avoid_imperative_provider_mutation`, `avoid_provider_for_single_value`, `avoid_inherited_widget` | Context `SimpleIdentifier` check, Notifier/Controller `endsWith`, InheritedWidget exact match |
 | 2026-02-08 | animation_rules.dart | `require_animation_controller_dispose`, `ticker_rule`, `avoid_uncurved_tween_animation` | Regex disposal patterns, AnimationController exact match, Tween `endsWith` |
 | 2026-02-08 | widget_lifecycle_rules.dart | `require_scroll_controller_dispose`, `require_focus_node_dispose` | Exact type names, regex disposal patterns |
+
+## Prevention Infrastructure (2026-02-08)
+
+Three guardrails now prevent new `.contains()` anti-patterns:
+
+1. **CI guard test** (`test/anti_pattern_detection_test.dart`) — Scans all rule
+   files for 9 dangerous `.contains()` patterns. Maintains per-file baseline
+   counts. Fails CI if any file's count increases.
+
+2. **Shared utility** (`lib/src/target_matcher_utils.dart`) — Four functions
+   (`extractTargetName`, `isExactTarget`, `isFieldCleanedUp`, `hasChainedMethod`)
+   that make correct detection easier than `.contains()`.
+
+3. **Regression tests** (`test/false_positive_fixes_test.dart`) — Documents
+   the v4.12.4 fixes with 7 test cases covering location timeout, Navigator,
+   context, HTTP status, and ScrollController matching.
 
 ## References
 
