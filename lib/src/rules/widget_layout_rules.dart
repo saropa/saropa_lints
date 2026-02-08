@@ -27,7 +27,7 @@ class AvoidExpandedAsSpacerRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_expanded_as_spacer',
     problemMessage:
-        '[avoid_expanded_as_spacer] Use Spacer() instead of Expanded with empty child. This layout configuration can trigger RenderFlex overflow errors or unexpected visual behavior at runtime.',
+        '[avoid_expanded_as_spacer] Use Spacer() instead of Expanded with empty child. This layout configuration can trigger RenderFlex overflow errors or unexpected visual behavior at runtime. {v6}',
     correctionMessage:
         'Replace Expanded(child: SizedBox/Container()) with Spacer(). Test on multiple screen sizes to verify the layout adapts correctly.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -71,6 +71,8 @@ class AvoidExpandedAsSpacerRule extends SaropaLintRule {
 
 /// Warns when Flexible or Expanded is used outside of a Flex widget.
 ///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v6
+///
 /// Flexible and Expanded widgets only work inside Row, Column, or Flex.
 /// Using them elsewhere has no effect and indicates a bug.
 ///
@@ -91,7 +93,6 @@ class AvoidExpandedAsSpacerRule extends SaropaLintRule {
 ///   ],
 /// )
 /// ```
-
 class AvoidFlexibleOutsideFlexRule extends SaropaLintRule {
   const AvoidFlexibleOutsideFlexRule() : super(code: _code);
 
@@ -108,7 +109,7 @@ class AvoidFlexibleOutsideFlexRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_flexible_outside_flex',
     problemMessage:
-        '[avoid_flexible_outside_flex] The Flexible or Expanded widget is being used outside of a Row, Column, or Flex parent. This breaks layout expectations and can cause runtime errors or unexpected UI behavior, as Flexible/Expanded are only designed to work within Flex-based widgets. Using them elsewhere will not provide the intended flexible sizing and may result in layout exceptions.',
+        '[avoid_flexible_outside_flex] The Flexible or Expanded widget is being used outside of a Row, Column, or Flex parent. This breaks layout expectations and can cause runtime errors or unexpected UI behavior, as Flexible/Expanded are only designed to work within Flex-based widgets. Using them elsewhere will not provide the intended flexible sizing and may result in layout exceptions. {v6}',
     correctionMessage:
         'Wrap Flexible or Expanded widgets only inside Row, Column, or Flex parents. Refactor your widget tree so that Flexible/Expanded are direct children of a Flex-based widget, ensuring proper layout behavior and avoiding runtime errors. See Flutter documentation on Flex widgets for correct usage patterns.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -155,6 +156,8 @@ class AvoidFlexibleOutsideFlexRule extends SaropaLintRule {
 
 /// Warns when an Image widget is wrapped in Opacity instead of using Image.color.
 ///
+/// Since: v1.7.2 | Updated: v4.13.0 | Rule version: v2
+///
 /// Example of **bad** code:
 /// ```dart
 /// Opacity(
@@ -171,7 +174,6 @@ class AvoidFlexibleOutsideFlexRule extends SaropaLintRule {
 ///   colorBlendMode: BlendMode.modulate,
 /// )
 /// ```
-
 class AvoidMisnamedPaddingRule extends SaropaLintRule {
   const AvoidMisnamedPaddingRule() : super(code: _code);
 
@@ -188,7 +190,7 @@ class AvoidMisnamedPaddingRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_misnamed_padding',
     problemMessage:
-        '[avoid_misnamed_padding] A parameter or field named "padding" is being used to provide margin (spacing outside a widget) rather than actual padding (spacing inside a widget). This can confuse maintainers and lead to incorrect UI adjustments, as padding and margin serve distinct layout purposes in Flutter.',
+        '[avoid_misnamed_padding] A parameter or field named "padding" is being used to provide margin (spacing outside a widget) rather than actual padding (spacing inside a widget). This can confuse maintainers and lead to incorrect UI adjustments, as padding and margin serve distinct layout purposes in Flutter. {v2}',
     correctionMessage:
         'Rename the parameter or field to "margin" if it is used to control space outside the widget, or refactor the code to use it for true padding (space inside the widget). Ensure naming accurately reflects the widget’s layout intent to improve code clarity and maintainability. See Flutter layout documentation for guidance.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -297,6 +299,8 @@ class _PaddingMisuseVisitor extends RecursiveAstVisitor<void> {
 
 /// Warns when Image widget is missing semanticLabel (alt text).
 ///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v4
+///
 /// Example of **bad** code:
 /// ```dart
 /// Image.asset('logo.png')  // No semantic label
@@ -309,14 +313,13 @@ class _PaddingMisuseVisitor extends RecursiveAstVisitor<void> {
 ///   semanticLabel: 'Company logo',
 /// )
 /// ```
-
 class AvoidShrinkWrapInListsRule extends SaropaLintRule {
   const AvoidShrinkWrapInListsRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
     name: 'avoid_shrink_wrap_in_lists',
     problemMessage:
-        "[avoid_shrink_wrap_in_lists] Using 'shrinkWrap: true' inside a nested scrollable (such as a ListView within another scrollable) can cause significant performance issues. It forces the inner list to compute the size of all its children, leading to poor scroll performance and increased memory usage, especially with large or dynamic lists.",
+        "[avoid_shrink_wrap_in_lists] Using 'shrinkWrap: true' inside a nested scrollable (such as a ListView within another scrollable) can cause significant performance issues. It forces the inner list to compute the size of all its children, leading to poor scroll performance and increased memory usage, especially with large or dynamic lists. {v4}",
     correctionMessage:
         'Avoid using shrinkWrap: true in nested scrollables. Instead, provide a fixed height for the inner list using SizedBox, or use Expanded/Flexible within a Flex parent. This ensures efficient rendering and smooth scrolling. See Flutter documentation for guidance on nested scrollables and performance best practices.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -370,6 +373,8 @@ class AvoidShrinkWrapInListsRule extends SaropaLintRule {
 
 /// Warns when a Column or Row has only a single child.
 ///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v5
+///
 /// Example of **bad** code:
 /// ```dart
 /// Column(children: [Text('Hello')])
@@ -379,7 +384,6 @@ class AvoidShrinkWrapInListsRule extends SaropaLintRule {
 /// ```dart
 /// Text('Hello')  // or use Align/Center if alignment needed
 /// ```
-
 class AvoidSingleChildColumnRowRule extends SaropaLintRule {
   const AvoidSingleChildColumnRowRule() : super(code: _code);
 
@@ -396,7 +400,7 @@ class AvoidSingleChildColumnRowRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_single_child_column_row',
     problemMessage:
-        '[avoid_single_child_column_row] Column/Row with single child is unnecessary. A Column or Row has only a single child. This layout configuration can trigger RenderFlex overflow errors or unexpected visual behavior at runtime.',
+        '[avoid_single_child_column_row] Column/Row with single child is unnecessary. A Column or Row has only a single child. This layout configuration can trigger RenderFlex overflow errors or unexpected visual behavior at runtime. {v5}',
     correctionMessage:
         'Use the child directly or Align/Center for alignment. Test on multiple screen sizes to verify the layout adapts correctly.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -446,6 +450,8 @@ class AvoidSingleChildColumnRowRule extends SaropaLintRule {
 
 /// Warns when a State class has a constructor body.
 ///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v6
+///
 /// Example of **bad** code:
 /// ```dart
 /// class _MyWidgetState extends State<MyWidget> {
@@ -465,7 +471,6 @@ class AvoidSingleChildColumnRowRule extends SaropaLintRule {
 ///   }
 /// }
 /// ```
-
 class AvoidWrappingInPaddingRule extends SaropaLintRule {
   const AvoidWrappingInPaddingRule() : super(code: _code);
 
@@ -482,7 +487,7 @@ class AvoidWrappingInPaddingRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_wrapping_in_padding',
     problemMessage:
-        '[avoid_wrapping_in_padding] Widget has its own padding property, avoid wrapping in Padding. This layout configuration can trigger RenderFlex overflow errors or unexpected visual behavior at runtime.',
+        '[avoid_wrapping_in_padding] Widget has its own padding property, avoid wrapping in Padding. This layout configuration can trigger RenderFlex overflow errors or unexpected visual behavior at runtime. {v6}',
     correctionMessage:
         'Use the padding property of the child widget instead. Test on multiple screen sizes to verify the layout adapts correctly.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -534,6 +539,8 @@ class AvoidWrappingInPaddingRule extends SaropaLintRule {
 
 /// Warns when RenderObject setters don't check for equality.
 ///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v5
+///
 /// RenderObject property setters should check if the new value equals
 /// the old value before updating and marking needs layout/paint.
 ///
@@ -553,14 +560,13 @@ class AvoidWrappingInPaddingRule extends SaropaLintRule {
 ///   markNeedsPaint();
 /// }
 /// ```
-
 class CheckForEqualsInRenderObjectSettersRule extends SaropaLintRule {
   const CheckForEqualsInRenderObjectSettersRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
     name: 'check_for_equals_in_render_object_setters',
     problemMessage:
-        '[check_for_equals_in_render_object_setters] RenderObject setter should check equality before updating. RenderObject property setters should check if the new value equals the old value before updating and marking needs layout/paint.',
+        '[check_for_equals_in_render_object_setters] RenderObject setter should check equality before updating. RenderObject property setters should check if the new value equals the old value before updating and marking needs layout/paint. {v5}',
     correctionMessage:
         'Add equality check: if (_field == value) return; before assignment. Test on multiple screen sizes to verify the layout adapts correctly.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -649,6 +655,8 @@ class _RenderObjectSetterVisitor extends RecursiveAstVisitor<void> {
 
 /// Warns when updateRenderObject doesn't update all properties set in createRenderObject.
 ///
+/// Since: v1.1.19 | Updated: v4.13.0 | Rule version: v4
+///
 /// When a RenderObjectWidget creates a RenderObject with properties, the
 /// updateRenderObject method should update all those same properties.
 ///
@@ -693,7 +701,6 @@ class _RenderObjectSetterVisitor extends RecursiveAstVisitor<void> {
 ///   }
 /// }
 /// ```
-
 class ConsistentUpdateRenderObjectRule extends SaropaLintRule {
   const ConsistentUpdateRenderObjectRule() : super(code: _code);
 
@@ -710,7 +717,7 @@ class ConsistentUpdateRenderObjectRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'consistent_update_render_object',
     problemMessage:
-        '[consistent_update_render_object] updateRenderObject may be missing property updates from createRenderObject. When a RenderObjectWidget creates a RenderObject with properties, the updateRenderObject method should update all those same properties.',
+        '[consistent_update_render_object] updateRenderObject may be missing property updates from createRenderObject. When a RenderObjectWidget creates a RenderObject with properties, the updateRenderObject method should update all those same properties. {v4}',
     correctionMessage:
         'Ensure all properties set in createRenderObject are also updated in updateRenderObject.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -811,6 +818,8 @@ class _PropertyAssignmentFinder extends RecursiveAstVisitor<void> {
 
 /// Warns when non-const BorderRadius constructors are used.
 ///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v6
+///
 /// Example of **bad** code:
 /// ```dart
 /// BorderRadius.circular(8)  // Not const
@@ -820,7 +829,6 @@ class _PropertyAssignmentFinder extends RecursiveAstVisitor<void> {
 /// ```dart
 /// const BorderRadius.all(Radius.circular(8))
 /// ```
-
 class PreferConstBorderRadiusRule extends SaropaLintRule {
   const PreferConstBorderRadiusRule() : super(code: _code);
 
@@ -837,7 +845,7 @@ class PreferConstBorderRadiusRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_const_border_radius',
     problemMessage:
-        '[prefer_const_border_radius] Prefer const BorderRadius.all for constant border radius. Non-const BorderRadius constructors are used. This layout configuration can trigger RenderFlex overflow errors or unexpected visual behavior at runtime.',
+        '[prefer_const_border_radius] Prefer const BorderRadius.all for constant border radius. Non-const BorderRadius constructors are used. This layout configuration can trigger RenderFlex overflow errors or unexpected visual behavior at runtime. {v6}',
     correctionMessage:
         'Use const BorderRadius.all(Radius.circular(x)) instead. Test on multiple screen sizes to verify the layout adapts correctly.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -878,6 +886,8 @@ class PreferConstBorderRadiusRule extends SaropaLintRule {
 
 /// Warns when incorrect EdgeInsets constructor is used.
 ///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v5
+///
 /// Suggests using more specific constructors when appropriate.
 ///
 /// Example of **bad** code:
@@ -891,14 +901,13 @@ class PreferConstBorderRadiusRule extends SaropaLintRule {
 /// EdgeInsets.all(8)
 /// EdgeInsets.symmetric(horizontal: 8)
 /// ```
-
 class PreferCorrectEdgeInsetsConstructorRule extends SaropaLintRule {
   const PreferCorrectEdgeInsetsConstructorRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
     name: 'prefer_correct_edge_insets_constructor',
     problemMessage:
-        '[prefer_correct_edge_insets_constructor] EdgeInsets constructor is more verbose than necessary when all values are equal or symmetric. Use .all() or .symmetric() to improve readability and communicate intent more clearly.',
+        '[prefer_correct_edge_insets_constructor] EdgeInsets constructor is more verbose than necessary when all values are equal or symmetric. Use .all() or .symmetric() to improve readability and communicate intent more clearly. {v5}',
     correctionMessage:
         'Use .all() for equal values or .symmetric() for symmetric values. Test on multiple screen sizes to verify the layout adapts correctly.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -993,6 +1002,8 @@ class PreferCorrectEdgeInsetsConstructorRule extends SaropaLintRule {
 
 /// Warns when Hero widget is used without defining heroTag.
 ///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v5
+///
 /// **Stylistic rule (opt-in only).** Naming convention with no performance or correctness impact.
 ///
 /// Example of **bad** code:
@@ -1009,7 +1020,6 @@ class PreferCorrectEdgeInsetsConstructorRule extends SaropaLintRule {
 ///   child: Image.asset('image.png'),
 /// )
 /// ```
-
 class PreferSliverPrefixRule extends SaropaLintRule {
   const PreferSliverPrefixRule() : super(code: _code);
 
@@ -1026,7 +1036,7 @@ class PreferSliverPrefixRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_sliver_prefix',
     problemMessage:
-        '[prefer_sliver_prefix] Prefixing sliver widget class names with Sliver is a naming convention. It does not affect widget behavior or performance. Enable via the stylistic tier.',
+        '[prefer_sliver_prefix] Prefixing sliver widget class names with Sliver is a naming convention. It does not affect widget behavior or performance. Enable via the stylistic tier. {v5}',
     correctionMessage:
         'Rename the class to start with "Sliver" (e.g., SliverHeader instead of Header) to communicate its sliver layout protocol.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -1099,6 +1109,8 @@ class PreferSliverPrefixRule extends SaropaLintRule {
 
 /// Warns when RichText is used instead of Text.rich.
 ///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v6
+///
 /// Example of **bad** code:
 /// ```dart
 /// RichText(
@@ -1112,14 +1124,13 @@ class PreferSliverPrefixRule extends SaropaLintRule {
 ///   TextSpan(text: 'Hello'),
 /// )
 /// ```
-
 class PreferUsingListViewRule extends SaropaLintRule {
   const PreferUsingListViewRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
     name: 'prefer_using_list_view',
     problemMessage:
-        '[prefer_using_list_view] Column inside SingleChildScrollView. A "Column" is being used inside a "SingleChildScrollView" Flutter to pre-render the entire list, bypassing "Lazy Loading" optimizations. This layout configuration can also trigger RenderFlex overflow errors or unexpected visual behavior at runtime.',
+        '[prefer_using_list_view] Column inside SingleChildScrollView. A "Column" is being used inside a "SingleChildScrollView" Flutter to pre-render the entire list, bypassing "Lazy Loading" optimizations. This layout configuration can also trigger RenderFlex overflow errors or unexpected visual behavior at runtime. {v6}',
     correctionMessage:
         'Refactor this layout into a single "ListView" to leverage viewport-based optimizations and memory management. To maintain the layout logic of a "Column" with a "spacing" property, use the "ListView.separated" constructor; this allows you to define a "separatorBuilder" that injects consistent spacing only between elements, effectively replacing manual "SizedBox" additions or the "spacing" attribute. Ensure the new "ListView" is wrapped in a "Flexible" or "Expanded" widget if it resides within a "Flex" container to avoid unbounded height errors. This transition ensures that off-screen items are lazily loaded and disposed of, preventing "RenderFlex" overflows and significantly improving scrolling performance on resource-constrained devices.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -1159,6 +1170,9 @@ class PreferUsingListViewRule extends SaropaLintRule {
 }
 
 /// Warns when Widget class has public non-final fields or public methods
+///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v6
+///
 /// that could be private.
 ///
 /// ### Example
@@ -1178,7 +1192,6 @@ class PreferUsingListViewRule extends SaropaLintRule {
 ///   void _helper() {}
 /// }
 /// ```
-
 class AvoidBorderAllRule extends SaropaLintRule {
   const AvoidBorderAllRule() : super(code: _code);
 
@@ -1195,7 +1208,7 @@ class AvoidBorderAllRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_border_all',
     problemMessage:
-        '[avoid_border_all] Prefer Border.fromBorderSide for const borders. This layout configuration can trigger RenderFlex overflow errors or unexpected visual behavior at runtime.',
+        '[avoid_border_all] Prefer Border.fromBorderSide for const borders. This layout configuration can trigger RenderFlex overflow errors or unexpected visual behavior at runtime. {v6}',
     correctionMessage:
         'Use const Border.fromBorderSide(BorderSide(..)) instead. Test on multiple screen sizes to verify the layout adapts correctly.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -1224,6 +1237,9 @@ class AvoidBorderAllRule extends SaropaLintRule {
 // =============================================================================
 
 /// Future rule: avoid-deeply-nested-widgets
+///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v6
+///
 /// Warns when widget tree nesting exceeds a reasonable depth.
 ///
 /// Deep nesting makes code hard to read and maintain. Extract subtrees
@@ -1251,7 +1267,6 @@ class AvoidBorderAllRule extends SaropaLintRule {
 ///   ),
 /// );
 /// ```
-
 class AvoidDeeplyNestedWidgetsRule extends SaropaLintRule {
   const AvoidDeeplyNestedWidgetsRule() : super(code: _code);
 
@@ -1268,7 +1283,7 @@ class AvoidDeeplyNestedWidgetsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_deeply_nested_widgets',
     problemMessage:
-        '[avoid_deeply_nested_widgets] Widget tree is too deeply nested, exceeding the recommended nesting depth. Deep nesting reduces build method readability and increases the risk of layout overflow errors at runtime.',
+        '[avoid_deeply_nested_widgets] Widget tree is too deeply nested, exceeding the recommended nesting depth. Deep nesting reduces build method readability and increases the risk of layout overflow errors at runtime. {v6}',
     correctionMessage:
         'Extract subtrees into separate widgets to improve readability. Test on multiple screen sizes to verify the layout adapts correctly.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -1342,6 +1357,8 @@ class _WidgetDepthVisitor extends RecursiveAstVisitor<void> {
 
 /// Warns when AnimationController is created without proper disposal.
 ///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v4
+///
 /// Alias: require_animation_controller_dispose
 ///
 /// Example of **bad** code:
@@ -1367,14 +1384,13 @@ class _WidgetDepthVisitor extends RecursiveAstVisitor<void> {
 ///   super.dispose();
 /// }
 /// ```
-
 class PreferConstWidgetsInListsRule extends SaropaLintRule {
   const PreferConstWidgetsInListsRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
     name: 'prefer_const_widgets_in_lists',
     problemMessage:
-        '[prefer_const_widgets_in_lists] Widget list recreated on every rebuild. If elements are constant, the entire list can be const. This layout configuration can trigger RenderFlex overflow errors or unexpected visual behavior at runtime.',
+        '[prefer_const_widgets_in_lists] Widget list recreated on every rebuild. If elements are constant, the entire list can be const. This layout configuration can trigger RenderFlex overflow errors or unexpected visual behavior at runtime. {v4}',
     correctionMessage:
         'Add const keyword: const [Text("a"), Text("b")]. Test on multiple screen sizes to verify the layout adapts correctly.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -1505,6 +1521,9 @@ class PreferConstWidgetsInListsRule extends SaropaLintRule {
 }
 
 /// Future rule: avoid-scaffold-messenger-of-context
+///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v5
+///
 /// Warns when using ScaffoldMessenger.of(context) directly instead of storing it.
 ///
 /// Example of **bad** code:
@@ -1523,14 +1542,13 @@ class PreferConstWidgetsInListsRule extends SaropaLintRule {
 ///   messenger.showSnackBar(...);
 /// }
 /// ```
-
 class AvoidListViewWithoutItemExtentRule extends SaropaLintRule {
   const AvoidListViewWithoutItemExtentRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
     name: 'avoid_listview_without_item_extent',
     problemMessage:
-        '[avoid_listview_without_item_extent] ListView.builder should specify itemExtent to improve scroll performance. This layout configuration can trigger RenderFlex overflow errors or unexpected visual behavior at runtime.',
+        '[avoid_listview_without_item_extent] ListView.builder should specify itemExtent to improve scroll performance. This layout configuration can trigger RenderFlex overflow errors or unexpected visual behavior at runtime. {v5}',
     correctionMessage:
         'Add itemExtent or prototypeItem parameter. Test on multiple screen sizes to verify the layout adapts correctly.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -1568,6 +1586,9 @@ class AvoidListViewWithoutItemExtentRule extends SaropaLintRule {
 }
 
 /// Future rule: avoid-mediaquery-in-build
+///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v6
+///
 /// Warns when MediaQuery.of is called directly in build method.
 ///
 /// Example of **bad** code:
@@ -1585,7 +1606,6 @@ class AvoidListViewWithoutItemExtentRule extends SaropaLintRule {
 ///   return Container(width: width);
 /// }
 /// ```
-
 class PreferSliverListDelegateRule extends SaropaLintRule {
   const PreferSliverListDelegateRule() : super(code: _code);
 
@@ -1602,7 +1622,7 @@ class PreferSliverListDelegateRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_sliver_list_delegate',
     problemMessage:
-        '[prefer_sliver_list_delegate] Use SliverChildBuilderDelegate to improve performance with large lists. This layout configuration can trigger RenderFlex overflow errors or unexpected visual behavior at runtime.',
+        '[prefer_sliver_list_delegate] Use SliverChildBuilderDelegate to improve performance with large lists. This layout configuration can trigger RenderFlex overflow errors or unexpected visual behavior at runtime. {v6}',
     correctionMessage:
         'Replace SliverChildListDelegate with SliverChildBuilderDelegate. Test on multiple screen sizes to verify the layout adapts correctly.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -1633,6 +1653,9 @@ class PreferSliverListDelegateRule extends SaropaLintRule {
 }
 
 /// Future rule: avoid-layout-builder-in-build
+///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v6
+///
 /// Warns when LayoutBuilder is used inefficiently.
 ///
 /// Example of **bad** code:
@@ -1654,7 +1677,6 @@ class PreferSliverListDelegateRule extends SaropaLintRule {
 ///   },
 /// )
 /// ```
-
 class AvoidLayoutBuilderMisuseRule extends SaropaLintRule {
   const AvoidLayoutBuilderMisuseRule() : super(code: _code);
 
@@ -1671,7 +1693,7 @@ class AvoidLayoutBuilderMisuseRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_layout_builder_misuse',
     problemMessage:
-        '[avoid_layout_builder_misuse] LayoutBuilder should use constraints in its builder. LayoutBuilder is used inefficiently. This layout configuration can trigger RenderFlex overflow errors or unexpected visual behavior at runtime.',
+        '[avoid_layout_builder_misuse] LayoutBuilder should use constraints in its builder. LayoutBuilder is used inefficiently. This layout configuration can trigger RenderFlex overflow errors or unexpected visual behavior at runtime. {v6}',
     correctionMessage:
         'Ensure the builder actually uses the constraints parameter. Test on multiple screen sizes to verify the layout adapts correctly.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -1727,6 +1749,9 @@ class _SimpleIdentifierCollector extends RecursiveAstVisitor<void> {
 }
 
 /// Future rule: avoid-repainting-boundary-misuse
+///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v6
+///
 /// Warns when RepaintBoundary is used around static content.
 ///
 /// Example of **bad** code:
@@ -1742,7 +1767,6 @@ class _SimpleIdentifierCollector extends RecursiveAstVisitor<void> {
 ///   child: AnimatedWidget(),  // Isolates frequently changing content
 /// )
 /// ```
-
 class AvoidRepaintBoundaryMisuseRule extends SaropaLintRule {
   const AvoidRepaintBoundaryMisuseRule() : super(code: _code);
 
@@ -1759,7 +1783,7 @@ class AvoidRepaintBoundaryMisuseRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_repaint_boundary_misuse',
     problemMessage:
-        '[avoid_repaint_boundary_misuse] RepaintBoundary around const/static content provides no benefit. RepaintBoundary is used around static content. This layout configuration can trigger RenderFlex overflow errors or unexpected visual behavior at runtime.',
+        '[avoid_repaint_boundary_misuse] RepaintBoundary around const/static content provides no benefit. RepaintBoundary is used around static content. This layout configuration can trigger RenderFlex overflow errors or unexpected visual behavior at runtime. {v6}',
     correctionMessage:
         'Use RepaintBoundary for frequently repainting content. Test on multiple screen sizes to verify the layout adapts correctly.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -1792,6 +1816,9 @@ class AvoidRepaintBoundaryMisuseRule extends SaropaLintRule {
 }
 
 /// Future rule: avoid-singlechildscrollview-with-column
+///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v6
+///
 /// Warns when SingleChildScrollView wraps a Column with Expanded children.
 ///
 /// Alias: avoid_single_child_scroll_view_list
@@ -1813,7 +1840,6 @@ class AvoidRepaintBoundaryMisuseRule extends SaropaLintRule {
 ///   children: [...],
 /// )
 /// ```
-
 class AvoidSingleChildScrollViewWithColumnRule extends SaropaLintRule {
   const AvoidSingleChildScrollViewWithColumnRule() : super(code: _code);
 
@@ -1831,7 +1857,7 @@ class AvoidSingleChildScrollViewWithColumnRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_singlechildscrollview_with_column',
     problemMessage:
-        '[avoid_singlechildscrollview_with_column] SingleChildScrollView with Column may cause layout issues. SingleChildScrollView wraps a Column with Expanded children. This layout configuration can trigger RenderFlex overflow errors or unexpected visual behavior at runtime.',
+        '[avoid_singlechildscrollview_with_column] SingleChildScrollView with Column may cause layout issues. SingleChildScrollView wraps a Column with Expanded children. This layout configuration can trigger RenderFlex overflow errors or unexpected visual behavior at runtime. {v6}',
     correctionMessage:
         'Use ListView instead, or remove Expanded/Flexible children. Test on multiple screen sizes to verify the layout adapts correctly.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -1887,6 +1913,9 @@ class AvoidSingleChildScrollViewWithColumnRule extends SaropaLintRule {
 }
 
 /// Future rule: prefer-cached-network-image
+///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v6
+///
 /// Warns when Image.network is used instead of CachedNetworkImage.
 ///
 /// Example of **bad** code:
@@ -1898,7 +1927,6 @@ class AvoidSingleChildScrollViewWithColumnRule extends SaropaLintRule {
 /// ```dart
 /// CachedNetworkImage(imageUrl: 'https://example.com/image.png')
 /// ```
-
 class AvoidGestureDetectorInScrollViewRule extends SaropaLintRule {
   const AvoidGestureDetectorInScrollViewRule() : super(code: _code);
 
@@ -1915,7 +1943,7 @@ class AvoidGestureDetectorInScrollViewRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_gesture_detector_in_scrollview',
     problemMessage:
-        '[avoid_gesture_detector_in_scrollview] GestureDetector around scrollable can cause gesture conflicts. This layout configuration can trigger RenderFlex overflow errors or unexpected visual behavior at runtime.',
+        '[avoid_gesture_detector_in_scrollview] GestureDetector around scrollable can cause gesture conflicts. This layout configuration can trigger RenderFlex overflow errors or unexpected visual behavior at runtime. {v6}',
     correctionMessage:
         'Move GestureDetector to individual items inside the scrollable. Test on multiple screen sizes to verify the layout adapts correctly.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -1958,6 +1986,9 @@ class AvoidGestureDetectorInScrollViewRule extends SaropaLintRule {
 }
 
 /// Future rule: avoid-stateful-widget-in-list
+///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v6
+///
 /// Warns when StatefulWidget is created inline in a list builder.
 ///
 /// Example of **bad** code:
@@ -1973,7 +2004,6 @@ class AvoidGestureDetectorInScrollViewRule extends SaropaLintRule {
 ///   itemBuilder: (context, index) => StatelessWidget(key: ValueKey(index)),
 /// )
 /// ```
-
 class PreferOpacityWidgetRule extends SaropaLintRule {
   const PreferOpacityWidgetRule() : super(code: _code);
 
@@ -1990,7 +2020,7 @@ class PreferOpacityWidgetRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_opacity_widget',
     problemMessage:
-        '[prefer_opacity_widget] Use Opacity widget for complex child widgets. StatefulWidget is created inline in a list builder. This layout configuration can trigger RenderFlex overflow errors or unexpected visual behavior at runtime.',
+        '[prefer_opacity_widget] Use Opacity widget for complex child widgets. StatefulWidget is created inline in a list builder. This layout configuration can trigger RenderFlex overflow errors or unexpected visual behavior at runtime. {v6}',
     correctionMessage:
         'Opacity widget can optimize rendering of transparent content. Test on multiple screen sizes to verify the layout adapts correctly.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -2030,6 +2060,8 @@ class PreferOpacityWidgetRule extends SaropaLintRule {
 
 /// Warns when dependOnInheritedWidgetOfExactType is called in initState.
 ///
+/// Since: v1.7.2 | Updated: v4.13.0 | Rule version: v3
+///
 /// **Performance benefit:** Container internally creates DecoratedBox, ConstrainedBox, and other widgets. SizedBox is a single lightweight widget with fewer allocations.
 ///
 /// Example of **bad** code:
@@ -2049,7 +2081,6 @@ class PreferOpacityWidgetRule extends SaropaLintRule {
 ///   final theme = Theme.of(context); // OK
 /// }
 /// ```
-
 class PreferSizedBoxForWhitespaceRule extends SaropaLintRule {
   const PreferSizedBoxForWhitespaceRule() : super(code: _code);
 
@@ -2066,7 +2097,7 @@ class PreferSizedBoxForWhitespaceRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_sized_box_for_whitespace',
     problemMessage:
-        '[prefer_sized_box_for_whitespace] Container creates unnecessary intermediate widgets (DecoratedBox, ConstrainedBox) when used only for whitespace. SizedBox is a single lightweight widget with fewer allocations and faster layout.',
+        '[prefer_sized_box_for_whitespace] Container creates unnecessary intermediate widgets (DecoratedBox, ConstrainedBox) when used only for whitespace. SizedBox is a single lightweight widget with fewer allocations and faster layout. {v3}',
     correctionMessage:
         'SizedBox is more efficient for spacing. Use SizedBox(width:) or SizedBox(height:).',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -2203,6 +2234,8 @@ class _ReplaceContainerWithSizedBoxFix extends DartFix {
 
 /// Warns when Scaffold widgets are nested inside other Scaffolds.
 ///
+/// Since: v1.7.2 | Updated: v4.13.0 | Rule version: v5
+///
 /// Nested Scaffolds can cause layout issues, unexpected behavior with
 /// drawers, snackbars, and other Scaffold features.
 ///
@@ -2223,7 +2256,6 @@ class _ReplaceContainerWithSizedBoxFix extends DartFix {
 ///   body: CustomScrollView(...),
 /// )
 /// ```
-
 class AvoidNestedScaffoldsRule extends SaropaLintRule {
   const AvoidNestedScaffoldsRule() : super(code: _code);
 
@@ -2240,7 +2272,7 @@ class AvoidNestedScaffoldsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_nested_scaffolds',
     problemMessage:
-        '[avoid_nested_scaffolds] Nested Scaffold widget detected inside another Scaffold. This creates duplicate app bars, floating action buttons, and bottom navigation, leading to broken layout, gesture conflicts, and a confusing user experience.',
+        '[avoid_nested_scaffolds] Nested Scaffold widget detected inside another Scaffold. This creates duplicate app bars, floating action buttons, and bottom navigation, leading to broken layout, gesture conflicts, and a confusing user experience. {v5}',
     correctionMessage:
         'Remove the inner Scaffold and use its body content directly. Share app bars and bottom navigation from the outer Scaffold.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -2281,6 +2313,8 @@ class AvoidNestedScaffoldsRule extends SaropaLintRule {
 
 /// Warns when multiple MaterialApp widgets exist in the widget tree.
 ///
+/// Since: v1.3.0 | Updated: v4.13.0 | Rule version: v3
+///
 /// Having multiple MaterialApp widgets can cause routing issues,
 /// theme inconsistencies, and memory problems. There should be only
 /// one MaterialApp at the root of your application.
@@ -2300,7 +2334,6 @@ class AvoidNestedScaffoldsRule extends SaropaLintRule {
 ///   home: MyHomePage(),
 /// )
 /// ```
-
 class PreferListViewBuilderRule extends SaropaLintRule {
   const PreferListViewBuilderRule() : super(code: _code);
 
@@ -2317,7 +2350,7 @@ class PreferListViewBuilderRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_listview_builder',
     problemMessage:
-        '[prefer_listview_builder] Use ListView.builder to improve performance. This layout configuration can trigger RenderFlex overflow errors or unexpected visual behavior at runtime.',
+        '[prefer_listview_builder] Use ListView.builder to improve performance. This layout configuration can trigger RenderFlex overflow errors or unexpected visual behavior at runtime. {v3}',
     correctionMessage:
         'Replace ListView(children:) with ListView.builder. Test on multiple screen sizes to verify the layout adapts correctly.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -2360,6 +2393,8 @@ class PreferListViewBuilderRule extends SaropaLintRule {
 
 /// Warns when Opacity widget is animated instead of FadeTransition.
 ///
+/// Since: v1.3.0 | Updated: v4.13.0 | Rule version: v3
+///
 /// Alias: avoid_opacity_widget_animation
 ///
 /// Animating Opacity causes rebuilds. FadeTransition is more performant.
@@ -2375,7 +2410,6 @@ class PreferListViewBuilderRule extends SaropaLintRule {
 /// ```dart
 /// FadeTransition(opacity: _ctrl, child: child)
 /// ```
-
 class AvoidSizedBoxExpandRule extends SaropaLintRule {
   const AvoidSizedBoxExpandRule() : super(code: _code);
 
@@ -2383,7 +2417,7 @@ class AvoidSizedBoxExpandRule extends SaropaLintRule {
     name: 'avoid_sized_box_expand',
     problemMessage:
         '[avoid_sized_box_expand] SizedBox.expand() fills all available space unconditionally, causing unpredictable layout overflow in constrained parents. '
-        'Inside a Column, Row, or other flex widget without explicit constraints, expand() can trigger unbounded height/width errors or silently push sibling widgets off-screen.',
+        'Inside a Column, Row, or other flex widget without explicit constraints, expand() can trigger unbounded height/width errors or silently push sibling widgets off-screen. {v3}',
     correctionMessage:
         'Use SizedBox with explicit width and height values for predictable sizing, or use Expanded/Flexible inside flex widgets to share space proportionally. '
         'If you need to fill available space, use LayoutBuilder to measure constraints before deciding dimensions.',
@@ -2423,6 +2457,8 @@ class AvoidSizedBoxExpandRule extends SaropaLintRule {
 /// ```
 
 /// **Stylistic rule (opt-in only).** No performance or correctness benefit.
+///
+/// Since: v1.3.0 | Updated: v4.13.0 | Rule version: v4
 ///
 /// Warns when Row or Column children alternate between content widgets and
 /// identical spacer widgets (SizedBox or Spacer), suggesting the `spacing`
@@ -2477,7 +2513,7 @@ class PreferSpacingOverSizedBoxRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_spacing_over_sizedbox',
     problemMessage:
-        '[prefer_spacing_over_sizedbox] Using SizedBox for gaps instead of the spacing parameter is a stylistic API choice. Both achieve the same layout with no performance difference. Enable via the stylistic tier.',
+        '[prefer_spacing_over_sizedbox] Using SizedBox for gaps instead of the spacing parameter is a stylistic API choice. Both achieve the same layout with no performance difference. Enable via the stylistic tier. {v4}',
     correctionMessage:
         'Remove spacer children and add spacing: <value> to the. Test on multiple screen sizes to verify the layout adapts correctly.'
         'Row/Column constructor.',
@@ -2703,6 +2739,8 @@ class _PreferSpacingOverSizedBoxFix extends DartFix {
 
 /// Warns when Material 2 is explicitly enabled via useMaterial3: false.
 ///
+/// Since: v1.7.2 | Updated: v4.13.0 | Rule version: v2
+///
 /// Material 3 is the default since Flutter 3.16. Explicitly disabling it
 /// prevents access to M3 features and may cause issues in future Flutter
 /// versions.
@@ -2726,7 +2764,6 @@ class _PreferSpacingOverSizedBoxFix extends DartFix {
 ///   useMaterial3: true,  // Explicitly enabling is fine
 /// )
 /// ```
-
 class AvoidNestedScrollablesRule extends SaropaLintRule {
   const AvoidNestedScrollablesRule() : super(code: _code);
 
@@ -2743,7 +2780,7 @@ class AvoidNestedScrollablesRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_nested_scrollables',
     problemMessage:
-        '[avoid_nested_scrollables] Nested scrollable widgets can cause scroll conflicts. This layout configuration can trigger RenderFlex overflow errors or unexpected visual behavior at runtime.',
+        '[avoid_nested_scrollables] Nested scrollable widgets can cause scroll conflicts. This layout configuration can trigger RenderFlex overflow errors or unexpected visual behavior at runtime. {v2}',
     correctionMessage:
         'Use NestedScrollView, or add shrinkWrap: true and NeverScrollableScrollPhysics().',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -2819,6 +2856,8 @@ class AvoidNestedScrollablesRule extends SaropaLintRule {
 
 /// Warns when hardcoded numeric values are used in layout widgets.
 ///
+/// Since: v1.4.2 | Updated: v4.13.0 | Rule version: v6
+///
 /// Magic numbers in layout make responsive design difficult and
 /// reduce code maintainability.
 ///
@@ -2835,7 +2874,6 @@ class AvoidNestedScrollablesRule extends SaropaLintRule {
 /// Padding(padding: EdgeInsets.all(AppSpacing.medium));
 /// Container(margin: EdgeInsets.only(left: context.spacing.large));
 /// ```
-
 class AvoidHardcodedLayoutValuesRule extends SaropaLintRule {
   const AvoidHardcodedLayoutValuesRule() : super(code: _code);
 
@@ -2853,7 +2891,7 @@ class AvoidHardcodedLayoutValuesRule extends SaropaLintRule {
     name: 'avoid_hardcoded_layout_values',
     problemMessage:
         '[avoid_hardcoded_layout_values] Hardcoded numeric value in layout widget prevents responsive adaptation across screen sizes and text scales. '
-        'Fixed pixel values that look correct on one device may cause overflow, clipping, or wasted space on devices with different screen densities, orientations, or accessibility font size settings.',
+        'Fixed pixel values that look correct on one device may cause overflow, clipping, or wasted space on devices with different screen densities, orientations, or accessibility font size settings. {v6}',
     correctionMessage:
         'Extract layout values to named constants in a spacing/dimension system (e.g., AppSpacing.medium, AppDimensions.buttonHeight) or use MediaQuery-based calculations for responsive sizing. '
         'Named constants centralize layout decisions and enable consistent updates across the entire app.',
@@ -2947,6 +2985,8 @@ class AvoidHardcodedLayoutValuesRule extends SaropaLintRule {
 
 /// Suggests IgnorePointer when AbsorbPointer may not be needed.
 ///
+/// Since: v1.4.2 | Updated: v4.13.0 | Rule version: v4
+///
 /// - **AbsorbPointer**: Absorbs events and prevents them from reaching
 ///   widgets behind it. Use when you need to block underlying interactions.
 /// - **IgnorePointer**: Lets events pass through completely. Use when you
@@ -2971,7 +3011,6 @@ class AvoidHardcodedLayoutValuesRule extends SaropaLintRule {
 ///   child: MyWidget(),
 /// )
 /// ```
-
 class PreferIgnorePointerRule extends SaropaLintRule {
   const PreferIgnorePointerRule() : super(code: _code);
 
@@ -2988,7 +3027,7 @@ class PreferIgnorePointerRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_ignore_pointer',
     problemMessage:
-        '[prefer_ignore_pointer] AbsorbPointer blocks underlying widgets - is IgnorePointer better? - AbsorbPointer: Absorbs events and prevents them from reaching widgets behind it. Use when you need to block underlying interactions. - IgnorePointer: Lets events pass through completely. Use when you just want to disable this widget\'s interaction.',
+        '[prefer_ignore_pointer] AbsorbPointer blocks underlying widgets - is IgnorePointer better? - AbsorbPointer: Absorbs events and prevents them from reaching widgets behind it. Use when you need to block underlying interactions. - IgnorePointer: Lets events pass through completely. Use when you just want to disable this widget\'s interaction. {v4}',
     correctionMessage:
         'Use IgnorePointer if you don\'t need to block background interactions. Test on multiple screen sizes to verify the layout adapts correctly.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -3013,6 +3052,8 @@ class PreferIgnorePointerRule extends SaropaLintRule {
 
 /// Warns when GestureDetector is used without specifying HitTestBehavior.
 ///
+/// Since: v1.4.2 | Updated: v4.13.0 | Rule version: v5
+///
 /// Without explicit behavior, gesture detection may not work as expected,
 /// especially with overlapping widgets or transparent areas.
 ///
@@ -3032,7 +3073,6 @@ class PreferIgnorePointerRule extends SaropaLintRule {
 ///   child: Container(color: Colors.transparent),
 /// )
 /// ```
-
 class PreferPageStorageKeyRule extends SaropaLintRule {
   const PreferPageStorageKeyRule() : super(code: _code);
 
@@ -3049,7 +3089,7 @@ class PreferPageStorageKeyRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_page_storage_key',
     problemMessage:
-        '[prefer_page_storage_key] Use PageStorageKey to preserve scroll position. This layout configuration can trigger RenderFlex overflow errors or unexpected visual behavior at runtime.',
+        '[prefer_page_storage_key] Use PageStorageKey to preserve scroll position. This layout configuration can trigger RenderFlex overflow errors or unexpected visual behavior at runtime. {v5}',
     correctionMessage:
         'Add key: PageStorageKey("unique_key") to the scrollable. Test on multiple screen sizes to verify the layout adapts correctly.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -3095,6 +3135,8 @@ class PreferPageStorageKeyRule extends SaropaLintRule {
 
 /// Suggests RefreshIndicator for lists that appear to show remote data.
 ///
+/// Since: v1.4.2 | Updated: v4.13.0 | Rule version: v5
+///
 /// Pull-to-refresh is expected for lists showing fetchable content.
 /// This rule only triggers when the list name suggests remote data.
 ///
@@ -3118,7 +3160,6 @@ class PreferPageStorageKeyRule extends SaropaLintRule {
 ///   ),
 /// )
 /// ```
-
 class RequireScrollPhysicsRule extends SaropaLintRule {
   const RequireScrollPhysicsRule() : super(code: _code);
 
@@ -3135,7 +3176,7 @@ class RequireScrollPhysicsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_scroll_physics',
     problemMessage:
-        '[require_scroll_physics] Scrollable widget should specify scroll physics. This layout configuration can trigger RenderFlex overflow errors or unexpected visual behavior at runtime.',
+        '[require_scroll_physics] Scrollable widget should specify scroll physics. This layout configuration can trigger RenderFlex overflow errors or unexpected visual behavior at runtime. {v5}',
     correctionMessage:
         'Add physics: BouncingScrollPhysics() or ClampingScrollPhysics(). Test on multiple screen sizes to verify the layout adapts correctly.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -3178,6 +3219,8 @@ class RequireScrollPhysicsRule extends SaropaLintRule {
 
 /// Warns when ListView is used inside CustomScrollView instead of SliverList.
 ///
+/// Since: v1.4.2 | Updated: v4.13.0 | Rule version: v6
+///
 /// Using ListView inside CustomScrollView creates nested scrollables.
 /// Use SliverList for proper sliver composition.
 ///
@@ -3200,7 +3243,6 @@ class RequireScrollPhysicsRule extends SaropaLintRule {
 ///   ],
 /// )
 /// ```
-
 class PreferSliverListRule extends SaropaLintRule {
   const PreferSliverListRule() : super(code: _code);
 
@@ -3217,7 +3259,7 @@ class PreferSliverListRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_sliver_list',
     problemMessage:
-        '[prefer_sliver_list] Use SliverList instead of ListView inside CustomScrollView. Using ListView inside CustomScrollView creates nested scrollables. Use SliverList for proper sliver composition.',
+        '[prefer_sliver_list] Use SliverList instead of ListView inside CustomScrollView. Using ListView inside CustomScrollView creates nested scrollables. Use SliverList for proper sliver composition. {v6}',
     correctionMessage:
         'Replace ListView with SliverList for proper sliver composition. Test on multiple screen sizes to verify the layout adapts correctly.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -3252,6 +3294,9 @@ class PreferSliverListRule extends SaropaLintRule {
 }
 
 /// Warns when StatefulWidget doesn't use AutomaticKeepAliveClientMixin
+///
+/// Since: v1.4.2 | Updated: v4.13.0 | Rule version: v5
+///
 /// for preserving state in TabView/PageView.
 ///
 /// Without AutomaticKeepAliveClientMixin, tab content is rebuilt when
@@ -3279,7 +3324,6 @@ class PreferSliverListRule extends SaropaLintRule {
 ///   }
 /// }
 /// ```
-
 class PreferKeepAliveRule extends SaropaLintRule {
   const PreferKeepAliveRule() : super(code: _code);
 
@@ -3296,7 +3340,7 @@ class PreferKeepAliveRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_keep_alive',
     problemMessage:
-        '[prefer_keep_alive] Use AutomaticKeepAliveClientMixin to preserve state. Without AutomaticKeepAliveClientMixin, tab content is rebuilt when switching tabs, losing scroll position and state.',
+        '[prefer_keep_alive] Use AutomaticKeepAliveClientMixin to preserve state. Without AutomaticKeepAliveClientMixin, tab content is rebuilt when switching tabs, losing scroll position and state. {v5}',
     correctionMessage:
         'Add "with AutomaticKeepAliveClientMixin" to preserve state in tabs. Test on multiple screen sizes to verify the layout adapts correctly.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -3342,6 +3386,8 @@ class PreferKeepAliveRule extends SaropaLintRule {
 
 /// Warns when Text widgets are not wrapped with DefaultTextStyle.
 ///
+/// Since: v1.4.2 | Updated: v4.13.0 | Rule version: v5
+///
 /// DefaultTextStyle provides consistent typography without repeating styles.
 ///
 /// **BAD:**
@@ -3363,7 +3409,6 @@ class PreferKeepAliveRule extends SaropaLintRule {
 ///   ),
 /// )
 /// ```
-
 class PreferWrapOverOverflowRule extends SaropaLintRule {
   const PreferWrapOverOverflowRule() : super(code: _code);
 
@@ -3380,7 +3425,7 @@ class PreferWrapOverOverflowRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_wrap_over_overflow',
     problemMessage:
-        '[prefer_wrap_over_overflow] Row with many children may overflow - Use Wrap. DefaultTextStyle provides consistent typography without repeating styles. Text widgets are not wrapped with DefaultTextStyle.',
+        '[prefer_wrap_over_overflow] Row with many children may overflow - Use Wrap. DefaultTextStyle provides consistent typography without repeating styles. Text widgets are not wrapped with DefaultTextStyle. {v5}',
     correctionMessage:
         'Replace Row with Wrap for automatic wrapping. Test on multiple screen sizes to verify the layout adapts correctly.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -3431,6 +3476,8 @@ class PreferWrapOverOverflowRule extends SaropaLintRule {
 
 /// Warns when FileImage is used for bundled assets instead of AssetImage.
 ///
+/// Since: v1.4.2 | Updated: v4.13.0 | Rule version: v6
+///
 /// AssetImage is optimized for bundled assets and handles resolution properly.
 ///
 /// **BAD:**
@@ -3444,7 +3491,6 @@ class PreferWrapOverOverflowRule extends SaropaLintRule {
 /// // Or simply:
 /// Image.asset('assets/logo.png')
 /// ```
-
 class AvoidLayoutBuilderInScrollableRule extends SaropaLintRule {
   const AvoidLayoutBuilderInScrollableRule() : super(code: _code);
 
@@ -3461,7 +3507,7 @@ class AvoidLayoutBuilderInScrollableRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_layout_builder_in_scrollable',
     problemMessage:
-        '[avoid_layout_builder_in_scrollable] LayoutBuilder inside scrollable causes performance issues. This layout configuration can trigger RenderFlex overflow errors or unexpected visual behavior at runtime.',
+        '[avoid_layout_builder_in_scrollable] LayoutBuilder inside scrollable causes performance issues. This layout configuration can trigger RenderFlex overflow errors or unexpected visual behavior at runtime. {v6}',
     correctionMessage:
         'Move LayoutBuilder outside the scrollable widget. Test on multiple screen sizes to verify the layout adapts correctly.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -3504,6 +3550,8 @@ class AvoidLayoutBuilderInScrollableRule extends SaropaLintRule {
 
 /// Warns when IntrinsicWidth/Height could improve layout.
 ///
+/// Since: v1.4.2 | Updated: v4.13.0 | Rule version: v5
+///
 /// IntrinsicWidth/Height can help with sizing widgets to their content.
 ///
 /// **BAD:**
@@ -3525,7 +3573,6 @@ class AvoidLayoutBuilderInScrollableRule extends SaropaLintRule {
 ///   ),
 /// )
 /// ```
-
 class PreferIntrinsicDimensionsRule extends SaropaLintRule {
   const PreferIntrinsicDimensionsRule() : super(code: _code);
 
@@ -3542,7 +3589,7 @@ class PreferIntrinsicDimensionsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_intrinsic_dimensions',
     problemMessage:
-        '[prefer_intrinsic_dimensions] Use IntrinsicWidth/Height for content-based sizing. IntrinsicWidth/Height can help with sizing widgets to their content. IntrinsicWidth/Height could improve layout.',
+        '[prefer_intrinsic_dimensions] Use IntrinsicWidth/Height for content-based sizing. IntrinsicWidth/Height can help with sizing widgets to their content. IntrinsicWidth/Height could improve layout. {v5}',
     correctionMessage:
         'Wrap with IntrinsicWidth or IntrinsicHeight. Test on multiple screen sizes to verify the layout adapts correctly.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -3587,6 +3634,9 @@ class PreferIntrinsicDimensionsRule extends SaropaLintRule {
 }
 
 /// Warns when Column/Row inside SingleChildScrollView may have unbounded
+///
+/// Since: v1.4.2 | Updated: v4.13.0 | Rule version: v8
+///
 /// constraints.
 ///
 /// Expanded/Flexible children in an unbounded scroll axis throw
@@ -3616,7 +3666,6 @@ class PreferIntrinsicDimensionsRule extends SaropaLintRule {
 ///   ),
 /// )
 /// ```
-
 class AvoidUnboundedConstraintsRule extends SaropaLintRule {
   const AvoidUnboundedConstraintsRule() : super(code: _code);
 
@@ -3634,7 +3683,7 @@ class AvoidUnboundedConstraintsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_unbounded_constraints',
     problemMessage:
-        '[avoid_unbounded_constraints] Column/Row in SingleChildScrollView may have unbounded constraints. Expanded/Flexible children in an unbounded scroll axis throw RenderFlex overflow errors at runtime. Crash path — Expanded/Flexible in unbounded scroll axis throws RenderFlex overflow. Even 10+ violations need immediate attention.',
+        '[avoid_unbounded_constraints] Column/Row in SingleChildScrollView may have unbounded constraints. Expanded/Flexible children in an unbounded scroll axis throw RenderFlex overflow errors at runtime. Crash path — Expanded/Flexible in unbounded scroll axis throws RenderFlex overflow. Even 10+ violations need immediate attention. {v8}',
     correctionMessage:
         'Wrap with ConstrainedBox or avoid Expanded/Flexible children. Test on multiple screen sizes to verify the layout adapts correctly.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -3766,6 +3815,8 @@ class _ScrollAncestorInfo {
 
 /// Warns when percentage-based sizing uses hardcoded calculations.
 ///
+/// Since: v1.4.2 | Updated: v4.13.0 | Rule version: v5
+///
 /// FractionallySizedBox is cleaner for percentage-based layouts.
 ///
 /// **BAD:**
@@ -3783,7 +3834,6 @@ class _ScrollAncestorInfo {
 ///   child: MyWidget(),
 /// )
 /// ```
-
 class PreferFractionalSizingRule extends SaropaLintRule {
   const PreferFractionalSizingRule() : super(code: _code);
 
@@ -3800,7 +3850,7 @@ class PreferFractionalSizingRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_fractional_sizing',
     problemMessage:
-        '[prefer_fractional_sizing] Use FractionallySizedBox for percentage-based sizing. FractionallySizedBox is cleaner for percentage-based layouts. Percentage-based sizing uses hardcoded calculations.',
+        '[prefer_fractional_sizing] Use FractionallySizedBox for percentage-based sizing. FractionallySizedBox is cleaner for percentage-based layouts. Percentage-based sizing uses hardcoded calculations. {v5}',
     correctionMessage:
         'Replace MediaQuery.size multiplication with FractionallySizedBox. Test on multiple screen sizes to verify the layout adapts correctly.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -3868,6 +3918,8 @@ class PreferFractionalSizingRule extends SaropaLintRule {
 
 /// Warns when UnconstrainedBox is used improperly causing overflow.
 ///
+/// Since: v1.4.2 | Updated: v4.13.0 | Rule version: v5
+///
 /// UnconstrainedBox removes constraints which can cause overflow.
 ///
 /// **BAD:**
@@ -3890,14 +3942,13 @@ class PreferFractionalSizingRule extends SaropaLintRule {
 ///   ),
 /// )
 /// ```
-
 class AvoidUnconstrainedBoxMisuseRule extends SaropaLintRule {
   const AvoidUnconstrainedBoxMisuseRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
     name: 'avoid_unconstrained_box_misuse',
     problemMessage:
-        '[avoid_unconstrained_box_misuse] UnconstrainedBox in constrained parent may cause overflow. UnconstrainedBox removes constraints which can cause overflow. UnconstrainedBox is used improperly causing overflow.',
+        '[avoid_unconstrained_box_misuse] UnconstrainedBox in constrained parent may cause overflow. UnconstrainedBox removes constraints which can cause overflow. UnconstrainedBox is used improperly causing overflow. {v5}',
     correctionMessage:
         'Use FittedBox or OverflowBox instead. Test on multiple screen sizes to verify the layout adapts correctly.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -3936,6 +3987,8 @@ class AvoidUnconstrainedBoxMisuseRule extends SaropaLintRule {
 
 /// Warns when AppBar is used inside CustomScrollView instead of SliverAppBar.
 ///
+/// Since: v1.4.2 | Updated: v4.13.0 | Rule version: v5
+///
 /// SliverAppBar integrates with CustomScrollView for scroll-based effects
 /// like collapsing, floating, and pinning.
 ///
@@ -3958,7 +4011,6 @@ class AvoidUnconstrainedBoxMisuseRule extends SaropaLintRule {
 ///   ],
 /// )
 /// ```
-
 class PreferSliverAppBarRule extends SaropaLintRule {
   const PreferSliverAppBarRule() : super(code: _code);
 
@@ -3975,7 +4027,7 @@ class PreferSliverAppBarRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_sliver_app_bar',
     problemMessage:
-        '[prefer_sliver_app_bar] Use SliverAppBar inside CustomScrollView, not AppBar. SliverAppBar integrates with CustomScrollView for scroll-based effects like collapsing, floating, and pinning.',
+        '[prefer_sliver_app_bar] Use SliverAppBar inside CustomScrollView, not AppBar. SliverAppBar integrates with CustomScrollView for scroll-based effects like collapsing, floating, and pinning. {v5}',
     correctionMessage:
         'Replace AppBar with SliverAppBar for scroll effects. Test on multiple screen sizes to verify the layout adapts correctly.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -4012,6 +4064,8 @@ class PreferSliverAppBarRule extends SaropaLintRule {
 
 /// Warns when Opacity is used for animations instead of AnimatedOpacity.
 ///
+/// Since: v1.4.2 | Updated: v4.13.0 | Rule version: v6
+///
 /// AnimatedOpacity is more performant for opacity animations.
 ///
 /// **BAD:**
@@ -4030,7 +4084,6 @@ class PreferSliverAppBarRule extends SaropaLintRule {
 ///   child: MyWidget(),
 /// )
 /// ```
-
 class AvoidOpacityMisuseRule extends SaropaLintRule {
   const AvoidOpacityMisuseRule() : super(code: _code);
 
@@ -4047,7 +4100,7 @@ class AvoidOpacityMisuseRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_opacity_misuse',
     problemMessage:
-        '[avoid_opacity_misuse] Use AnimatedOpacity for opacity animations. Opacity is used for animations instead of AnimatedOpacity. This layout configuration can trigger RenderFlex overflow errors or unexpected visual behavior at runtime.',
+        '[avoid_opacity_misuse] Use AnimatedOpacity for opacity animations. Opacity is used for animations instead of AnimatedOpacity. This layout configuration can trigger RenderFlex overflow errors or unexpected visual behavior at runtime. {v6}',
     correctionMessage:
         'Replace Opacity with AnimatedOpacity for smoother animations. Test on multiple screen sizes to verify the layout adapts correctly.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -4084,6 +4137,8 @@ class AvoidOpacityMisuseRule extends SaropaLintRule {
 
 /// Warns when widgets don't specify clipBehavior for performance.
 ///
+/// Since: v1.4.2 | Updated: v4.13.0 | Rule version: v4
+///
 /// Explicit clipBehavior helps optimize rendering.
 ///
 /// **BAD:**
@@ -4100,7 +4155,6 @@ class AvoidOpacityMisuseRule extends SaropaLintRule {
 ///   children: [OverflowingWidget()],
 /// )
 /// ```
-
 class PreferClipBehaviorRule extends SaropaLintRule {
   const PreferClipBehaviorRule() : super(code: _code);
 
@@ -4117,7 +4171,7 @@ class PreferClipBehaviorRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_clip_behavior',
     problemMessage:
-        '[prefer_clip_behavior] Widget does not specify clipBehavior explicitly. Default clipping wastes rendering performance when no overflow occurs, and obscures whether overflow is intentionally allowed or prevented.',
+        '[prefer_clip_behavior] Widget does not specify clipBehavior explicitly. Default clipping wastes rendering performance when no overflow occurs, and obscures whether overflow is intentionally allowed or prevented. {v4}',
     correctionMessage:
         'Add clipBehavior: Clip.none or Clip.hardEdge. Test on multiple screen sizes to verify the layout adapts correctly.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -4160,6 +4214,8 @@ class PreferClipBehaviorRule extends SaropaLintRule {
 
 /// Warns when scrollable lists should have a ScrollController.
 ///
+/// Since: v1.4.2 | Updated: v4.13.0 | Rule version: v3
+///
 /// ScrollController is needed for infinite scroll and scroll position tracking.
 ///
 /// **BAD:**
@@ -4178,14 +4234,13 @@ class PreferClipBehaviorRule extends SaropaLintRule {
 ///   itemCount: items.length,
 /// )
 /// ```
-
 class RequireScrollControllerRule extends SaropaLintRule {
   const RequireScrollControllerRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
     name: 'require_scroll_controller',
     problemMessage:
-        '[require_scroll_controller] Add ScrollController for scroll tracking. ScrollController is needed for infinite scroll and scroll position tracking. Scrollable lists must have a ScrollController.',
+        '[require_scroll_controller] Add ScrollController for scroll tracking. ScrollController is needed for infinite scroll and scroll position tracking. Scrollable lists must have a ScrollController. {v3}',
     correctionMessage:
         'Add controller: _scrollController for infinite scroll. Test on multiple screen sizes to verify the layout adapts correctly.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -4223,6 +4278,8 @@ class RequireScrollControllerRule extends SaropaLintRule {
 
 /// Warns when Positioned is used instead of PositionedDirectional.
 ///
+/// Since: v1.4.2 | Updated: v4.13.0 | Rule version: v3
+///
 /// PositionedDirectional respects text direction for RTL languages.
 ///
 /// **BAD:**
@@ -4242,7 +4299,6 @@ class RequireScrollControllerRule extends SaropaLintRule {
 ///   ],
 /// )
 /// ```
-
 class PreferPositionedDirectionalRule extends SaropaLintRule {
   const PreferPositionedDirectionalRule() : super(code: _code);
 
@@ -4259,7 +4315,7 @@ class PreferPositionedDirectionalRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_positioned_directional',
     problemMessage:
-        '[prefer_positioned_directional] Use PositionedDirectional for RTL support. PositionedDirectional respects text direction for RTL languages. Positioned is used instead of PositionedDirectional.',
+        '[prefer_positioned_directional] Use PositionedDirectional for RTL support. PositionedDirectional respects text direction for RTL languages. Positioned is used instead of PositionedDirectional. {v3}',
     correctionMessage:
         'Replace Positioned with PositionedDirectional. Test on multiple screen sizes to verify the layout adapts correctly.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -4298,6 +4354,8 @@ class PreferPositionedDirectionalRule extends SaropaLintRule {
 
 /// Warns when shrinkWrap: true is used on scrollable widgets.
 ///
+/// Since: v1.4.3 | Updated: v4.13.0 | Rule version: v6
+///
 /// shrinkWrap: true causes O(n) layout cost and defeats lazy loading.
 /// However, shrinkWrap is sometimes required (e.g. ListView inside a Column)
 /// and is safe when paired with NeverScrollableScrollPhysics and a small
@@ -4325,7 +4383,6 @@ class PreferPositionedDirectionalRule extends SaropaLintRule {
 ///   ],
 /// )
 /// ```
-
 class AvoidShrinkWrapInScrollRule extends SaropaLintRule {
   const AvoidShrinkWrapInScrollRule() : super(code: _code);
 
@@ -4342,7 +4399,7 @@ class AvoidShrinkWrapInScrollRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_shrink_wrap_in_scroll',
     problemMessage:
-        '[avoid_shrink_wrap_in_scroll] shrinkWrap: true causes O(n) layout cost and defeats lazy loading. shrinkWrap: true causes O(n) layout cost and defeats lazy loading. However, shrinkWrap is sometimes required (e.g. ListView inside a Column) and is safe when paired with NeverScrollableScrollPhysics and a small bounded itemCount. This is a stylistic preference for Slivers over shrinkWrap — see avoid_shrinkwrap_in_scrollview for the context-aware rule that targets the genuinely dangerous nested-scrollable case.',
+        '[avoid_shrink_wrap_in_scroll] shrinkWrap: true causes O(n) layout cost and defeats lazy loading. shrinkWrap: true causes O(n) layout cost and defeats lazy loading. However, shrinkWrap is sometimes required (e.g. ListView inside a Column) and is safe when paired with NeverScrollableScrollPhysics and a small bounded itemCount. This is a stylistic preference for Slivers over shrinkWrap — see avoid_shrinkwrap_in_scrollview for the context-aware rule that targets the genuinely dangerous nested-scrollable case. {v6}',
     correctionMessage:
         'Use CustomScrollView with Slivers for efficient lazy loading. If this ListView is inside a Column/Row with a small bounded itemCount and NeverScrollableScrollPhysics, shrinkWrap: true is acceptable.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -4390,6 +4447,8 @@ class AvoidShrinkWrapInScrollRule extends SaropaLintRule {
 
 /// Warns when widget nesting exceeds 15 levels in a build method.
 ///
+/// Since: v1.4.3 | Updated: v4.13.0 | Rule version: v5
+///
 /// Deeply nested widget trees are hard to read, maintain, and debug.
 /// They often indicate a need to extract widgets into separate components.
 ///
@@ -4417,7 +4476,6 @@ class AvoidShrinkWrapInScrollRule extends SaropaLintRule {
 ///   return C(child: D(child: E()));
 /// }
 /// ```
-
 class AvoidDeepWidgetNestingRule extends SaropaLintRule {
   const AvoidDeepWidgetNestingRule() : super(code: _code);
 
@@ -4434,7 +4492,7 @@ class AvoidDeepWidgetNestingRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_deep_widget_nesting',
     problemMessage:
-        '[avoid_deep_widget_nesting] Widget tree exceeds 15 levels of nesting. Deeply nested widget trees are hard to read, maintain, and debug. They often indicate a need to extract widgets into separate components.',
+        '[avoid_deep_widget_nesting] Widget tree exceeds 15 levels of nesting. Deeply nested widget trees are hard to read, maintain, and debug. They often indicate a need to extract widgets into separate components. {v5}',
     correctionMessage:
         'Extract nested widgets into separate methods or widget classes. Test on multiple screen sizes to verify the layout adapts correctly.'
         'for better readability and maintainability.',
@@ -4462,6 +4520,8 @@ class AvoidDeepWidgetNestingRule extends SaropaLintRule {
 }
 
 /// Warns when Scaffold body content may overlap device notches or system UI.
+///
+/// Since: v1.4.3 | Updated: v4.13.0 | Rule version: v4
 ///
 /// Modern phones have notches, rounded corners, and system UI overlays.
 /// Content should be wrapped in SafeArea to avoid being obscured.
@@ -4506,7 +4566,6 @@ class AvoidDeepWidgetNestingRule extends SaropaLintRule {
 ///   body: FullScreenImage(),
 /// )
 /// ```
-
 class PreferSafeAreaAwareRule extends SaropaLintRule {
   const PreferSafeAreaAwareRule() : super(code: _code);
 
@@ -4523,7 +4582,7 @@ class PreferSafeAreaAwareRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_safe_area_aware',
     problemMessage:
-        '[prefer_safe_area_aware] Content may overlap device notch or system UI. This layout configuration can trigger RenderFlex overflow errors or unexpected visual behavior at runtime.',
+        '[prefer_safe_area_aware] Content may overlap device notch or system UI. This layout configuration can trigger RenderFlex overflow errors or unexpected visual behavior at runtime. {v4}',
     correctionMessage:
         'Wrap body content in SafeArea, or use AppBar which handles it. Test on multiple screen sizes to verify the layout adapts correctly.'
         'automatically.',
@@ -4604,6 +4663,8 @@ class PreferSafeAreaAwareRule extends SaropaLintRule {
 
 /// Warns when SizedBox or Container uses fixed pixel dimensions.
 ///
+/// Since: v1.6.0 | Updated: v4.13.0 | Rule version: v4
+///
 /// Fixed pixel dimensions break on different screen sizes. Use responsive
 /// sizing with Flexible, Expanded, FractionallySizedBox, or constraints.
 ///
@@ -4623,7 +4684,6 @@ class PreferSafeAreaAwareRule extends SaropaLintRule {
 /// );
 /// Expanded(child: content);
 /// ```
-
 class AvoidFixedDimensionsRule extends SaropaLintRule {
   const AvoidFixedDimensionsRule() : super(code: _code);
 
@@ -4640,7 +4700,7 @@ class AvoidFixedDimensionsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_fixed_dimensions',
     problemMessage:
-        '[avoid_fixed_dimensions] Fixed pixel dimensions may not work on all screen sizes. Fixed pixel dimensions break on different screen sizes. Use responsive sizing with Flexible, Expanded, FractionallySizedBox, or constraints.',
+        '[avoid_fixed_dimensions] Fixed pixel dimensions may not work on all screen sizes. Fixed pixel dimensions break on different screen sizes. Use responsive sizing with Flexible, Expanded, FractionallySizedBox, or constraints. {v4}',
     correctionMessage:
         'Use responsive sizing (Flexible, Expanded, FractionallySizedBox, or LayoutBuilder).',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -4695,6 +4755,8 @@ class AvoidFixedDimensionsRule extends SaropaLintRule {
 
 /// Warns when hardcoded Color values are used instead of theme colors.
 ///
+/// Since: v1.7.2 | Updated: v4.13.0 | Rule version: v3
+///
 /// Hardcoded colors break theming (light/dark mode) and make style changes
 /// difficult. Use colorScheme colors from the theme.
 ///
@@ -4713,7 +4775,6 @@ class AvoidFixedDimensionsRule extends SaropaLintRule {
 /// )
 /// Icon(Icons.home, color: Theme.of(context).colorScheme.onSurface)
 /// ```
-
 class AvoidAbsorbPointerMisuseRule extends SaropaLintRule {
   const AvoidAbsorbPointerMisuseRule() : super(code: _code);
 
@@ -4730,7 +4791,7 @@ class AvoidAbsorbPointerMisuseRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_absorb_pointer_misuse',
     problemMessage:
-        '[avoid_absorb_pointer_misuse] AbsorbPointer blocks ALL touch events. Prefer IgnorePointer instead. This layout configuration can trigger RenderFlex overflow errors or unexpected visual behavior at runtime.',
+        '[avoid_absorb_pointer_misuse] AbsorbPointer blocks ALL touch events. Prefer IgnorePointer instead. This layout configuration can trigger RenderFlex overflow errors or unexpected visual behavior at runtime. {v3}',
     correctionMessage:
         'IgnorePointer lets events pass through; AbsorbPointer stops them completely. Test on multiple screen sizes to verify the layout adapts correctly.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -4755,6 +4816,8 @@ class AvoidAbsorbPointerMisuseRule extends SaropaLintRule {
 
 /// Warns when Theme.of(context).brightness is used instead of colorScheme.
 ///
+/// Since: v2.3.3 | Updated: v4.13.0 | Rule version: v2
+///
 /// Checking brightness manually to pick colors is error-prone and ignores
 /// the theme system. Use colorScheme which already provides appropriate
 /// colors for the current theme.
@@ -4771,7 +4834,6 @@ class AvoidAbsorbPointerMisuseRule extends SaropaLintRule {
 /// // Or for background:
 /// final bgColor = Theme.of(context).colorScheme.surface;
 /// ```
-
 class RequireOverflowBoxRationaleRule extends SaropaLintRule {
   const RequireOverflowBoxRationaleRule() : super(code: _code);
 
@@ -4788,7 +4850,7 @@ class RequireOverflowBoxRationaleRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_overflow_box_rationale',
     problemMessage:
-        '[require_overflow_box_rationale] OverflowBox used without comment explaining why overflow is needed. This layout configuration can trigger RenderFlex overflow errors or unexpected visual behavior at runtime.',
+        '[require_overflow_box_rationale] OverflowBox used without comment explaining why overflow is needed. This layout configuration can trigger RenderFlex overflow errors or unexpected visual behavior at runtime. {v2}',
     correctionMessage:
         'Add a comment above OverflowBox explaining the intentional overflow. Test on multiple screen sizes to verify the layout adapts correctly.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -4869,6 +4931,8 @@ class _AddOverflowBoxCommentFix extends DartFix {
 
 /// Warns when Image widgets don't have sizing constraints.
 ///
+/// Since: v2.3.3 | Updated: v4.13.0 | Rule version: v2
+///
 /// Images without sizing constraints cause layout shifts when they load.
 /// Always constrain images with explicit dimensions, AspectRatio, or
 /// a parent Expanded/Flexible/SizedBox.
@@ -4892,7 +4956,6 @@ class _AddOverflowBoxCommentFix extends DartFix {
 ///   child: Image.network('https://example.com/image.jpg'),
 /// )
 /// ```
-
 class AvoidUnconstrainedImagesRule extends SaropaLintRule {
   const AvoidUnconstrainedImagesRule() : super(code: _code);
 
@@ -4909,7 +4972,7 @@ class AvoidUnconstrainedImagesRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_unconstrained_images',
     problemMessage:
-        '[avoid_unconstrained_images] Image without sizing constraints causes layout shifts on load. This layout configuration can trigger RenderFlex overflow errors or unexpected visual behavior at runtime.',
+        '[avoid_unconstrained_images] Image without sizing constraints causes layout shifts on load. This layout configuration can trigger RenderFlex overflow errors or unexpected visual behavior at runtime. {v2}',
     correctionMessage:
         'Add width/height, wrap in SizedBox, or use AspectRatio parent. Test on multiple screen sizes to verify the layout adapts correctly.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -5042,6 +5105,8 @@ class AvoidUnconstrainedImagesRule extends SaropaLintRule {
 
 /// Warns when `SizedBox(width: X, height: X)` with identical dimensions is used.
 ///
+/// Since: v2.0.0 | Updated: v4.13.0 | Rule version: v3
+///
 /// **Stylistic rule (opt-in only).** No performance or correctness benefit.
 ///
 /// Use `SizedBox.square(dimension: X)` for clearer intent when width and height
@@ -5060,7 +5125,6 @@ class AvoidUnconstrainedImagesRule extends SaropaLintRule {
 /// ```
 ///
 /// **Quick fix available:** Replaces with `SizedBox.square(dimension: X)`.
-
 class PreferSizedBoxSquareRule extends SaropaLintRule {
   const PreferSizedBoxSquareRule() : super(code: _code);
 
@@ -5077,7 +5141,7 @@ class PreferSizedBoxSquareRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_sized_box_square',
     problemMessage:
-        '[prefer_sized_box_square] Using SizedBox(width: x, height: x) instead of SizedBox.square(dimension: x) is a stylistic choice — same widget at runtime, no performance benefit. Enable via the stylistic tier.',
+        '[prefer_sized_box_square] Using SizedBox(width: x, height: x) instead of SizedBox.square(dimension: x) is a stylistic choice — same widget at runtime, no performance benefit. Enable via the stylistic tier. {v3}',
     correctionMessage:
         'Replace with SizedBox.square(dimension: X) for clearer intent. Test on multiple screen sizes to verify the layout adapts correctly.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -5211,6 +5275,8 @@ class _PreferSizedBoxSquareFix extends DartFix {
 
 /// Warns when `Align(alignment: Alignment.center, ...)` is used.
 ///
+/// Since: v2.0.0 | Updated: v4.13.0 | Rule version: v3
+///
 /// **Stylistic rule (opt-in only).** No performance or correctness benefit.
 ///
 /// Use `Center` widget for clearer intent when centering content.
@@ -5232,7 +5298,6 @@ class _PreferSizedBoxSquareFix extends DartFix {
 /// ```
 ///
 /// **Quick fix available:** Replaces with `Center(child: ...)`.
-
 class PreferCenterOverAlignRule extends SaropaLintRule {
   const PreferCenterOverAlignRule() : super(code: _code);
 
@@ -5249,7 +5314,7 @@ class PreferCenterOverAlignRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_center_over_align',
     problemMessage:
-        '[prefer_center_over_align] Center is identical to Align(alignment: Alignment.center) at runtime — same class, same behavior. Purely stylistic preference with no performance benefit. Enable via the stylistic tier.',
+        '[prefer_center_over_align] Center is identical to Align(alignment: Alignment.center) at runtime — same class, same behavior. Purely stylistic preference with no performance benefit. Enable via the stylistic tier. {v3}',
     correctionMessage:
         'Replace with Center(child: ..) for clearer intent. Test on multiple screen sizes to verify the layout adapts correctly.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -5378,6 +5443,8 @@ class _PreferCenterOverAlignFix extends DartFix {
 
 /// Warns when `Container` is used only for alignment.
 ///
+/// Since: v2.0.0 | Updated: v4.13.0 | Rule version: v4
+///
 /// **Performance benefit:** Container with only alignment creates unnecessary intermediate widgets. Align is a single-purpose widget with fewer allocations.
 ///
 /// Use `Align` widget when Container is only used for the alignment property.
@@ -5400,7 +5467,6 @@ class _PreferCenterOverAlignFix extends DartFix {
 /// ```
 ///
 /// **Quick fix available:** Replaces with `Align(alignment: ..., child: ...)`.
-
 class PreferAlignOverContainerRule extends SaropaLintRule {
   const PreferAlignOverContainerRule() : super(code: _code);
 
@@ -5417,7 +5483,7 @@ class PreferAlignOverContainerRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_align_over_container',
     problemMessage:
-        '[prefer_align_over_container] Container with only alignment creates unnecessary intermediate widgets. Align is a single-purpose widget with fewer allocations and faster layout computation.',
+        '[prefer_align_over_container] Container with only alignment creates unnecessary intermediate widgets. Align is a single-purpose widget with fewer allocations and faster layout computation. {v4}',
     correctionMessage:
         'Replace with Align(alignment: .., child: ..) for clearer intent. Test on multiple screen sizes to verify the layout adapts correctly.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -5552,6 +5618,8 @@ class _PreferAlignOverContainerFix extends DartFix {
 
 /// Warns when `Container` is used only for padding.
 ///
+/// Since: v2.0.0 | Updated: v4.13.0 | Rule version: v4
+///
 /// **Performance benefit:** Container with only padding creates unnecessary intermediate widgets. Padding is a single-purpose widget with fewer allocations.
 ///
 /// Use `Padding` widget when Container is only used for the padding property.
@@ -5574,7 +5642,6 @@ class _PreferAlignOverContainerFix extends DartFix {
 /// ```
 ///
 /// **Quick fix available:** Replaces with `Padding(padding: ..., child: ...)`.
-
 class PreferPaddingOverContainerRule extends SaropaLintRule {
   const PreferPaddingOverContainerRule() : super(code: _code);
 
@@ -5591,7 +5658,7 @@ class PreferPaddingOverContainerRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_padding_over_container',
     problemMessage:
-        '[prefer_padding_over_container] Container with only padding creates unnecessary intermediate widgets (DecoratedBox, ConstrainedBox). Padding is a single-purpose widget with fewer allocations and faster layout.',
+        '[prefer_padding_over_container] Container with only padding creates unnecessary intermediate widgets (DecoratedBox, ConstrainedBox). Padding is a single-purpose widget with fewer allocations and faster layout. {v4}',
     correctionMessage:
         'Replace with Padding(padding: .., child: ..) for clearer intent. Test on multiple screen sizes to verify the layout adapts correctly.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -5726,6 +5793,8 @@ class _PreferPaddingOverContainerFix extends DartFix {
 
 /// Warns when `Container` is used only for constraints.
 ///
+/// Since: v2.0.0 | Updated: v4.13.0 | Rule version: v3
+///
 /// Use `ConstrainedBox` widget when Container is only used for constraints.
 /// This makes the intent clearer and is more efficient.
 ///
@@ -5746,7 +5815,6 @@ class _PreferPaddingOverContainerFix extends DartFix {
 /// ```
 ///
 /// **Quick fix available:** Replaces with `ConstrainedBox(constraints: ..., child: ...)`.
-
 class PreferConstrainedBoxOverContainerRule extends SaropaLintRule {
   const PreferConstrainedBoxOverContainerRule() : super(code: _code);
 
@@ -5763,7 +5831,7 @@ class PreferConstrainedBoxOverContainerRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_constrained_box_over_container',
     problemMessage:
-        '[prefer_constrained_box_over_container] Container with only constraints should use ConstrainedBox instead. Use ConstrainedBox widget when Container is only used for constraints. This makes the intent clearer and is more efficient.',
+        '[prefer_constrained_box_over_container] Container with only constraints should use ConstrainedBox instead. Use ConstrainedBox widget when Container is only used for constraints. This makes the intent clearer and is more efficient. {v3}',
     correctionMessage:
         'Replace with ConstrainedBox(constraints: ..) for clearer intent. Test on multiple screen sizes to verify the layout adapts correctly.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -5898,6 +5966,8 @@ class _PreferConstrainedBoxOverContainerFix extends DartFix {
 
 /// Warns when Container is used only for a transform.
 ///
+/// Since: v2.0.0 | Updated: v4.13.0 | Rule version: v2
+///
 /// When Container only has a transform property, use Transform widget
 /// instead for better semantics and performance.
 ///
@@ -5918,7 +5988,6 @@ class _PreferConstrainedBoxOverContainerFix extends DartFix {
 ///   child: Text('Rotated'),
 /// )
 /// ```
-
 class PreferTransformOverContainerRule extends SaropaLintRule {
   const PreferTransformOverContainerRule() : super(code: _code);
 
@@ -5935,7 +6004,7 @@ class PreferTransformOverContainerRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_transform_over_container',
     problemMessage:
-        '[prefer_transform_over_container] Container with only transform must be a Transform. When Container only has a transform property, use Transform widget instead to improve semantics and performance.',
+        '[prefer_transform_over_container] Container with only transform must be a Transform. When Container only has a transform property, use Transform widget instead to improve semantics and performance. {v2}',
     correctionMessage:
         'Use Transform widget for transform-only containers. Test on multiple screen sizes to verify the layout adapts correctly.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -5978,6 +6047,8 @@ class PreferTransformOverContainerRule extends SaropaLintRule {
 
 /// Warns when IconButton lacks a tooltip for accessibility.
 ///
+/// Since: v2.3.3 | Updated: v4.13.0 | Rule version: v3
+///
 /// IconButtons should have tooltips for accessibility - they describe
 /// the action for screen readers and on long-press for all users.
 ///
@@ -5999,7 +6070,6 @@ class PreferTransformOverContainerRule extends SaropaLintRule {
 ///   tooltip: 'Delete item',
 /// )
 /// ```
-
 class RequirePhysicsForNestedScrollRule extends SaropaLintRule {
   const RequirePhysicsForNestedScrollRule() : super(code: _code);
 
@@ -6015,7 +6085,7 @@ class RequirePhysicsForNestedScrollRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_physics_for_nested_scroll',
     problemMessage:
-        '[require_physics_for_nested_scroll] Nested scrollable widget lacks NeverScrollableScrollPhysics, causing competing scroll gestures between parent and child. This produces unpredictable scroll behavior, jank, and a confusing user experience where swipes affect the wrong scrollable.',
+        '[require_physics_for_nested_scroll] Nested scrollable widget lacks NeverScrollableScrollPhysics, causing competing scroll gestures between parent and child. This produces unpredictable scroll behavior, jank, and a confusing user experience where swipes affect the wrong scrollable. {v3}',
     correctionMessage:
         'Add physics: NeverScrollableScrollPhysics() to the inner scrollable so only the parent scrollable responds to user gestures.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -6073,6 +6143,8 @@ class RequirePhysicsForNestedScrollRule extends SaropaLintRule {
 
 /// Warns when Stack children are not wrapped in Positioned or Align.
 ///
+/// Since: v2.3.10 | Updated: v4.13.0 | Rule version: v2
+///
 /// Non-first Stack children without explicit positioning use the Stack's
 /// default alignment, which may produce unexpected overlap. The first child
 /// is skipped because it typically defines the Stack's base size.
@@ -6099,7 +6171,6 @@ class RequirePhysicsForNestedScrollRule extends SaropaLintRule {
 ///   ],
 /// )
 /// ```
-
 class AvoidStackWithoutPositionedRule extends SaropaLintRule {
   const AvoidStackWithoutPositionedRule() : super(code: _code);
 
@@ -6116,7 +6187,7 @@ class AvoidStackWithoutPositionedRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_stack_without_positioned',
     problemMessage:
-        '[avoid_stack_without_positioned] Stack child without Positioned. Layout may be unexpected. Non-first Stack children without explicit positioning use the Stack\'s default alignment, which may produce unexpected overlap. The first child is skipped because it typically defines the Stack\'s base size.',
+        '[avoid_stack_without_positioned] Stack child without Positioned. Layout may be unexpected. Non-first Stack children without explicit positioning use the Stack\'s default alignment, which may produce unexpected overlap. The first child is skipped because it typically defines the Stack\'s base size. {v2}',
     correctionMessage:
         'Wrap child in Positioned to explicitly control its position. Test on multiple screen sizes to verify the layout adapts correctly.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -6189,6 +6260,8 @@ class AvoidStackWithoutPositionedRule extends SaropaLintRule {
 }
 
 /// Warns when Expanded or Flexible is used outside Row, Column, or Flex.
+///
+/// Since: v2.3.10 | Updated: v4.13.0 | Rule version: v7
 ///
 /// Alias: expanded_outside_flex, flexible_parent
 ///
@@ -6278,7 +6351,6 @@ class AvoidStackWithoutPositionedRule extends SaropaLintRule {
 /// Prefer adding Expanded at the **call site** rather than inside widget
 /// definitions. This makes the flex behavior explicit and avoids crashes
 /// when the widget is wrapped with Padding, GestureDetector, etc.
-
 class AvoidExpandedOutsideFlexRule extends SaropaLintRule {
   const AvoidExpandedOutsideFlexRule() : super(code: _code);
 
@@ -6302,7 +6374,7 @@ class AvoidExpandedOutsideFlexRule extends SaropaLintRule {
         'unrecoverable "Incorrect use of ParentDataWidget" FlutterError at '
         'runtime. This also happens indirectly when a widget\'s build() '
         'returns Expanded and the widget is later wrapped by a non-Flex '
-        'container, breaking the Flex→Expanded parent chain.',
+        'container, breaking the Flex→Expanded parent chain. {v7}',
     correctionMessage:
         'Move Expanded/Flexible/Spacer so it is a direct child of Row, '
         'Column, or Flex. If a reusable widget needs to expand, remove '
@@ -6447,6 +6519,8 @@ class AvoidExpandedOutsideFlexRule extends SaropaLintRule {
 
 /// Warns when a widget's build() method returns Expanded/Flexible/Spacer.
 ///
+/// Since: v3.0.0 | Updated: v4.13.0 | Rule version: v4
+///
 /// Alias: expanded_in_build, flexible_in_build
 ///
 /// Returning Expanded/Flexible/Spacer from build() couples the widget to Flex
@@ -6482,7 +6556,6 @@ class AvoidExpandedOutsideFlexRule extends SaropaLintRule {
 ///
 /// Use `// ignore: prefer_expanded_at_call_site` if the widget is intentionally
 /// designed to always be a direct Flex child and will never be wrapped.
-
 class PreferExpandedAtCallSiteRule extends SaropaLintRule {
   const PreferExpandedAtCallSiteRule() : super(code: _code);
 
@@ -6500,7 +6573,7 @@ class PreferExpandedAtCallSiteRule extends SaropaLintRule {
     name: 'prefer_expanded_at_call_site',
     problemMessage:
         '[prefer_expanded_at_call_site] Expanded/Flexible/Spacer returned from build() forces flex layout on all callers, breaking reuse in non-flex contexts. '
-        'If this widget is placed inside a Stack, SingleChildScrollView, or any non-flex parent, the Expanded wrapper triggers a runtime ParentDataWidget error and crashes the app.',
+        'If this widget is placed inside a Stack, SingleChildScrollView, or any non-flex parent, the Expanded wrapper triggers a runtime ParentDataWidget error and crashes the app. {v4}',
     correctionMessage:
         'Return the child widget directly and let the caller wrap with Expanded or Flexible as needed. '
         'This keeps the widget reusable in any layout context (Row, Column, Stack, etc.) and follows the principle of letting the parent control how its children are sized and positioned.',
@@ -6652,6 +6725,8 @@ class _PreferExpandedAtCallSiteFix extends DartFix {
 
 /// Warns when ListView.builder itemBuilder may access index out of bounds.
 ///
+/// Since: v2.3.11 | Updated: v4.13.0 | Rule version: v6
+///
 /// Alias: builder_bounds, itembuilder_bounds, list_index_check
 ///
 /// When itemCount is based on a variable that might change, accessing
@@ -6682,7 +6757,6 @@ class _PreferExpandedAtCallSiteFix extends DartFix {
 /// each list access has a visible bounds check, or use an ignore comment if
 /// you've ensured the lists are synchronized. The lint cannot detect cross-method
 /// relationships like `List.generate(otherList.length, ...)`.
-
 class AvoidBuilderIndexOutOfBoundsRule extends SaropaLintRule {
   const AvoidBuilderIndexOutOfBoundsRule() : super(code: _code);
 
@@ -6699,7 +6773,7 @@ class AvoidBuilderIndexOutOfBoundsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_builder_index_out_of_bounds',
     problemMessage:
-        '[avoid_builder_index_out_of_bounds] itemBuilder accesses list without bounds check. If the index is out of bounds due to list changes, this will cause runtime exceptions, app crashes, and unpredictable UI behavior. This is a common source of production bugs in dynamic lists and can lead to negative user reviews.',
+        '[avoid_builder_index_out_of_bounds] itemBuilder accesses list without bounds check. If the index is out of bounds due to list changes, this will cause runtime exceptions, app crashes, and unpredictable UI behavior. This is a common source of production bugs in dynamic lists and can lead to negative user reviews. {v6}',
     correctionMessage:
         'Add bounds check: if (index >= items.length) return a fallback widget or null. Always validate index before accessing list elements in itemBuilder. Add tests for edge cases and dynamic list updates.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -6813,6 +6887,8 @@ class AvoidBuilderIndexOutOfBoundsRule extends SaropaLintRule {
 
 /// Warns when WidgetsBinding.instance.addPostFrameCallback is not used properly.
 ///
+/// Since: v4.1.8 | Updated: v4.13.0 | Rule version: v2
+///
 /// Use addPostFrameCallback for operations that need to run after the frame
 /// is rendered, like showing dialogs or measuring widgets.
 ///
@@ -6835,7 +6911,6 @@ class AvoidBuilderIndexOutOfBoundsRule extends SaropaLintRule {
 ///   });
 /// }
 /// ```
-
 class PreferCustomSingleChildLayoutRule extends SaropaLintRule {
   const PreferCustomSingleChildLayoutRule() : super(code: _code);
 
@@ -6851,7 +6926,7 @@ class PreferCustomSingleChildLayoutRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_custom_single_child_layout',
     problemMessage:
-        '[prefer_custom_single_child_layout] Deeply nested positioning widgets. Prefer CustomSingleChildLayout. This layout configuration can trigger RenderFlex overflow errors or unexpected visual behavior at runtime.',
+        '[prefer_custom_single_child_layout] Deeply nested positioning widgets. Prefer CustomSingleChildLayout. This layout configuration can trigger RenderFlex overflow errors or unexpected visual behavior at runtime. {v2}',
     correctionMessage:
         'Use CustomSingleChildLayout with a delegate for complex single-child positioning.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -7061,6 +7136,8 @@ bool _isSubtypeOfAny(DartType? type, Set<String> targetNames) {
 
 /// Warns when `TableCell` is used outside of a `Table` widget.
 ///
+/// Since: v4.9.14 | Updated: v4.13.0 | Rule version: v4
+///
 /// `TableCell` is a `ParentDataWidget` that requires a `Table` parent
 /// to provide the correct `TableCellParentData`. Using it elsewhere
 /// causes a ParentData crash at runtime.
@@ -7090,7 +7167,7 @@ class AvoidTableCellOutsideTableRule extends SaropaLintRule {
     name: 'avoid_table_cell_outside_table',
     problemMessage:
         '[avoid_table_cell_outside_table] TableCell used outside of a '
-        'Table widget. This causes a ParentData crash at runtime.',
+        'Table widget. This causes a ParentData crash at runtime. {v4}',
     correctionMessage:
         'Place TableCell inside a TableRow within a Table widget.',
     errorSeverity: DiagnosticSeverity.ERROR,
@@ -7126,6 +7203,8 @@ class AvoidTableCellOutsideTableRule extends SaropaLintRule {
 
 /// Warns when `Positioned` is used outside of a `Stack` widget.
 ///
+/// Since: v4.9.14 | Updated: v4.13.0 | Rule version: v5
+///
 /// `Positioned` is a `ParentDataWidget` that communicates position
 /// coordinates to a `Stack` parent. Using it outside a `Stack` (or a
 /// subclass of `Stack`) causes a ParentData crash at runtime.
@@ -7158,7 +7237,7 @@ class AvoidPositionedOutsideStackRule extends SaropaLintRule {
     name: 'avoid_positioned_outside_stack',
     problemMessage:
         '[avoid_positioned_outside_stack] Positioned widget used outside '
-        'of a Stack. This causes a ParentData crash at runtime.',
+        'of a Stack. This causes a ParentData crash at runtime. {v5}',
     correctionMessage:
         'Place Positioned widgets only inside a Stack or Stack subclass.',
     errorSeverity: DiagnosticSeverity.ERROR,
@@ -7201,6 +7280,8 @@ class AvoidPositionedOutsideStackRule extends SaropaLintRule {
 
 /// Warns when `Spacer` or `Expanded` is used inside a `Wrap` widget.
 ///
+/// Since: v4.9.14 | Updated: v4.13.0 | Rule version: v3
+///
 /// `Wrap` does not extend `Flex` and does not support flex-based sizing.
 /// `Spacer` and `Expanded` require a `Flex` parent (Row/Column/Flex)
 /// to calculate their size. Using them inside `Wrap` causes a crash.
@@ -7230,7 +7311,7 @@ class AvoidSpacerInWrapRule extends SaropaLintRule {
     name: 'avoid_spacer_in_wrap',
     problemMessage:
         '[avoid_spacer_in_wrap] Spacer/Expanded inside Wrap causes a '
-        'flex paradox crash. Wrap does not support flex-based sizing.',
+        'flex paradox crash. Wrap does not support flex-based sizing. {v3}',
     correctionMessage: 'Use SizedBox or Padding for spacing inside Wrap.',
     errorSeverity: DiagnosticSeverity.ERROR,
   );
@@ -7278,6 +7359,9 @@ class AvoidSpacerInWrapRule extends SaropaLintRule {
 // =========================================================================
 
 /// Warns when a scrollable widget is placed inside `IntrinsicHeight` or
+///
+/// Since: v4.9.14 | Updated: v4.13.0 | Rule version: v2
+///
 /// `IntrinsicWidth`.
 ///
 /// `IntrinsicHeight`/`IntrinsicWidth` require children to report their
@@ -7309,7 +7393,7 @@ class AvoidScrollableInIntrinsicRule extends SaropaLintRule {
     name: 'avoid_scrollable_in_intrinsic',
     problemMessage: '[avoid_scrollable_in_intrinsic] Scrollable widget inside '
         'IntrinsicHeight/IntrinsicWidth causes a geometry loop crash. '
-        'Scrollables have no natural size.',
+        'Scrollables have no natural size. {v2}',
     correctionMessage: 'Use SizedBox with explicit dimensions instead of '
         'IntrinsicHeight/IntrinsicWidth around scrollable widgets.',
     errorSeverity: DiagnosticSeverity.ERROR,
@@ -7358,6 +7442,9 @@ class AvoidScrollableInIntrinsicRule extends SaropaLintRule {
 // =========================================================================
 
 /// Warns when `Row` or `Column` uses `CrossAxisAlignment.baseline`
+///
+/// Since: v4.9.14 | Updated: v4.13.0 | Rule version: v2
+///
 /// without specifying the `textBaseline` property.
 ///
 /// Flutter requires a `textBaseline` value to know whether to use
@@ -7397,7 +7484,7 @@ class RequireBaselineTextBaselineRule extends SaropaLintRule {
     problemMessage:
         '[require_baseline_text_baseline] CrossAxisAlignment.baseline '
         'requires a textBaseline property. Omitting it causes an '
-        'assertion failure at runtime.',
+        'assertion failure at runtime. {v2}',
     correctionMessage:
         'Add textBaseline: TextBaseline.alphabetic (or .ideographic).',
     errorSeverity: DiagnosticSeverity.ERROR,
@@ -7482,6 +7569,9 @@ class _RequireBaselineTextBaselineFix extends DartFix {
 // =========================================================================
 
 /// Warns when a `Column` inside an `AlertDialog` or `SimpleDialog` is
+///
+/// Since: v4.9.14 | Updated: v4.13.0 | Rule version: v2
+///
 /// missing `mainAxisSize: MainAxisSize.min`.
 ///
 /// `Column` defaults to `MainAxisSize.max`, which tries to fill all
@@ -7521,7 +7611,7 @@ class AvoidUnconstrainedDialogColumnRule extends SaropaLintRule {
     problemMessage:
         '[avoid_unconstrained_dialog_column] Column inside a dialog '
         'without mainAxisSize: MainAxisSize.min can overflow and push '
-        'buttons off-screen.',
+        'buttons off-screen. {v2}',
     correctionMessage: 'Add mainAxisSize: MainAxisSize.min to the Column.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
@@ -7618,6 +7708,9 @@ const Set<String> _constraintWrappers = <String>{
 // =========================================================================
 
 /// Warns when `ListView`, `GridView`, or `CustomScrollView` is placed
+///
+/// Since: v4.9.14 | Updated: v4.13.0 | Rule version: v3
+///
 /// inside a `Column` without being wrapped in `Expanded` or `Flexible`.
 ///
 /// `Column` provides unbounded height to its children. Scrollable widgets
@@ -7649,7 +7742,7 @@ class AvoidUnboundedListviewInColumnRule extends SaropaLintRule {
     problemMessage:
         '[avoid_unbounded_listview_in_column] Scrollable widget inside '
         'a Column without Expanded/Flexible causes an unbounded '
-        'constraints crash.',
+        'constraints crash. {v3}',
     correctionMessage:
         'Wrap the scrollable widget in Expanded or Flexible, or use '
         'shrinkWrap: true (with performance cost).',
@@ -7748,6 +7841,9 @@ class AvoidUnboundedListviewInColumnRule extends SaropaLintRule {
 // =========================================================================
 
 /// Warns when `TextField` or `TextFormField` is placed inside a `Row`
+///
+/// Since: v4.9.14 | Updated: v4.13.0 | Rule version: v3
+///
 /// without width constraints.
 ///
 /// `TextField` tries to expand to fill its parent's width. `Row` provides
@@ -7778,7 +7874,7 @@ class AvoidTextfieldInRowRule extends SaropaLintRule {
     name: 'avoid_textfield_in_row',
     problemMessage:
         '[avoid_textfield_in_row] TextField/TextFormField inside a Row '
-        'without width constraints causes an unbounded width crash.',
+        'without width constraints causes an unbounded width crash. {v3}',
     correctionMessage:
         'Wrap the TextField in Expanded, Flexible, or a fixed-width '
         'SizedBox.',
@@ -7863,6 +7959,9 @@ class AvoidTextfieldInRowRule extends SaropaLintRule {
 // =========================================================================
 
 /// Warns when a `Scaffold` body contains a `Column` with `TextField`
+///
+/// Since: v4.9.14 | Updated: v4.13.0 | Rule version: v2
+///
 /// descendants but no `SingleChildScrollView` wrapper.
 ///
 /// When the keyboard appears, the `Scaffold` viewport shrinks. If the
@@ -7895,7 +7994,7 @@ class AvoidFixedSizeInScaffoldBodyRule extends SaropaLintRule {
     problemMessage:
         '[avoid_fixed_size_in_scaffold_body] Scaffold body has a Column '
         'with text input fields but no ScrollView. The keyboard will '
-        'cause overflow.',
+        'cause overflow. {v2}',
     correctionMessage:
         'Wrap the Column in SingleChildScrollView to handle keyboard '
         'resize.',

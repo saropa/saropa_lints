@@ -15,6 +15,8 @@ import '../saropa_lint_rule.dart';
 
 /// Warns when MaterialApp is created without a darkTheme parameter.
 ///
+/// Since: v2.1.0 | Updated: v4.13.0 | Rule version: v2
+///
 /// Apps should support dark mode for accessibility and user preference.
 /// Without darkTheme, the app won't adapt when the user enables dark mode.
 ///
@@ -47,7 +49,7 @@ class RequireDarkModeTestingRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_dark_mode_testing',
     problemMessage:
-        '[require_dark_mode_testing] MaterialApp missing darkTheme. App won\'t adapt to dark mode. Apps should support dark mode for accessibility and user preference. Without darkTheme, the app won\'t adapt when the user enables dark mode.',
+        '[require_dark_mode_testing] MaterialApp missing darkTheme. App won\'t adapt to dark mode. Apps should support dark mode for accessibility and user preference. Without darkTheme, the app won\'t adapt when the user enables dark mode. {v2}',
     correctionMessage:
         'Add darkTheme parameter to support dark mode. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -89,6 +91,8 @@ class RequireDarkModeTestingRule extends SaropaLintRule {
 
 /// Warns when Card or Material uses elevation without checking brightness.
 ///
+/// Since: v2.1.0 | Updated: v4.13.0 | Rule version: v2
+///
 /// Elevation shadows appear differently in dark mode. Material Design
 /// recommends using surface overlays instead of shadows in dark themes.
 ///
@@ -129,7 +133,7 @@ class AvoidElevationOpacityInDarkRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_elevation_opacity_in_dark',
     problemMessage:
-        '[avoid_elevation_opacity_in_dark] High elevation (>4) without brightness check. Shadows look poor in dark mode. Elevation shadows appear differently in dark mode. Material Design recommends using surface overlays instead of shadows in dark themes.',
+        '[avoid_elevation_opacity_in_dark] High elevation (>4) without brightness check. Shadows look poor in dark mode. Elevation shadows appear differently in dark mode. Material Design recommends using surface overlays instead of shadows in dark themes. {v2}',
     correctionMessage:
         'Check Theme.of(context).brightness or use lower elevation in dark mode. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -178,6 +182,8 @@ class AvoidElevationOpacityInDarkRule extends SaropaLintRule {
 
 /// Warns when ThemeData uses ad-hoc color fields instead of ThemeExtension.
 ///
+/// Since: v2.1.0 | Updated: v4.13.0 | Rule version: v2
+///
 /// ThemeExtension provides type-safe, documented custom theme properties.
 /// Ad-hoc fields on ThemeData are not standardized and harder to maintain.
 ///
@@ -216,7 +222,7 @@ class PreferThemeExtensionsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_theme_extensions',
     problemMessage:
-        '[prefer_theme_extensions] ThemeData.copyWith used for custom colors. Prefer ThemeExtension. ThemeExtension provides type-safe, documented custom theme properties. Ad-hoc fields on ThemeData are not standardized and harder to maintain.',
+        '[prefer_theme_extensions] ThemeData.copyWith used for custom colors. Prefer ThemeExtension. ThemeExtension provides type-safe, documented custom theme properties. Ad-hoc fields on ThemeData are not standardized and harder to maintain. {v2}',
     correctionMessage:
         'Create a ThemeExtension subclass for type-safe custom theme properties. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -302,6 +308,9 @@ class PreferThemeExtensionsRule extends SaropaLintRule {
 // =============================================================================
 
 /// Warns when Color variables are named by their appearance (redColor,
+///
+/// Since: v4.12.0 | Updated: v4.13.0 | Rule version: v2
+///
 /// blueBackground) instead of their semantic purpose (errorColor,
 /// primaryBackground).
 ///
@@ -332,7 +341,7 @@ class RequireSemanticColorsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_semantic_colors',
     problemMessage:
-        '[require_semantic_colors] Color variable is named by its visual appearance (e.g., redColor, blueBackground) rather than its semantic purpose (e.g., errorColor, primaryBackground). Appearance-based color names become misleading when themes change, dark mode inverts colors, or branding updates alter the palette. Developers reading the code assume the color is literally red, leading to confusion when it is actually orange after a theme update, and making it impossible to safely refactor theme colors without auditing every usage site.',
+        '[require_semantic_colors] Color variable is named by its visual appearance (e.g., redColor, blueBackground) rather than its semantic purpose (e.g., errorColor, primaryBackground). Appearance-based color names become misleading when themes change, dark mode inverts colors, or branding updates alter the palette. Developers reading the code assume the color is literally red, leading to confusion when it is actually orange after a theme update, and making it impossible to safely refactor theme colors without auditing every usage site. {v2}',
     correctionMessage:
         'Rename the variable to describe its purpose (errorColor, successColor, primaryBackground, surfaceColor) rather than its appearance (redColor, blueText).',
     errorSeverity: DiagnosticSeverity.INFO,

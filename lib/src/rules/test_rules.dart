@@ -13,6 +13,8 @@ import '../saropa_lint_rule.dart';
 
 /// Warns when duplicate test assertions are made.
 ///
+/// Since: v4.1.1 | Updated: v4.13.0 | Rule version: v6
+///
 /// Alias: duplicate_expect, redundant_assertion, repeated_test_check
 ///
 /// Example of **bad** code:
@@ -46,7 +48,7 @@ class AvoidDuplicateTestAssertionsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_duplicate_test_assertions',
     problemMessage:
-        '[avoid_duplicate_test_assertions] Duplicate test assertion detected. Duplicate test assertions are made. This reduces test maintainability and makes it harder to identify which behavior failed when tests break.',
+        '[avoid_duplicate_test_assertions] Duplicate test assertion detected. Duplicate test assertions are made. This reduces test maintainability and makes it harder to identify which behavior failed when tests break. {v6}',
     correctionMessage:
         'Remove the duplicate assertion or verify different values. Update related tests to reflect the new structure and verify they still pass.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -80,6 +82,8 @@ class AvoidDuplicateTestAssertionsRule extends SaropaLintRule {
 
 /// Warns when a test group() has an empty body.
 ///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v4
+///
 /// Alias: empty_group, empty_test_group, no_tests_in_group
 class AvoidEmptyTestGroupsRule extends SaropaLintRule {
   const AvoidEmptyTestGroupsRule() : super(code: _code);
@@ -97,7 +101,7 @@ class AvoidEmptyTestGroupsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_empty_test_groups',
     problemMessage:
-        '[avoid_empty_test_groups] Test group has an empty body with no test cases. Empty groups clutter the test suite, provide false organization, and reduce confidence in actual test coverage.',
+        '[avoid_empty_test_groups] Test group has an empty body with no test cases. Empty groups clutter the test suite, provide false organization, and reduce confidence in actual test coverage. {v4}',
     correctionMessage:
         'Add tests to the group or remove it. Update related tests to reflect the new structure and verify they still pass.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -139,6 +143,8 @@ class AvoidEmptyTestGroupsRule extends SaropaLintRule {
 
 /// Warns when public top-level members are declared in test files.
 ///
+/// Since: v1.7.2 | Updated: v4.13.0 | Rule version: v3
+///
 /// Alias: private_test_helpers, test_file_scope, no_public_test_members
 ///
 /// Test files should only contain test cases and test setup code.
@@ -173,7 +179,7 @@ class AvoidTopLevelMembersInTestsRule extends SaropaLintRule {
     name: 'avoid_top_level_members_in_tests',
     problemMessage:
         '[avoid_top_level_members_in_tests] Public top-level member in test file leaks implementation details and pollutes the library namespace. '
-        'Other files can accidentally import test helpers, creating fragile dependencies on code that was never designed for reuse and may change without notice.',
+        'Other files can accidentally import test helpers, creating fragile dependencies on code that was never designed for reuse and may change without notice. {v3}',
     correctionMessage:
         'Make the member private by prefixing with an underscore (e.g., _createTestWidget()) to prevent accidental imports. '
         'If the helper is genuinely reusable across multiple test files, extract it to a dedicated test utilities file in the test/ directory.',
@@ -237,6 +243,8 @@ class AvoidTopLevelMembersInTestsRule extends SaropaLintRule {
 
 /// Warns when test names don't follow the expected format.
 ///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v7
+///
 /// Alias: test_naming, descriptive_test, meaningful_test_name
 ///
 /// Test names should be descriptive and follow conventions.
@@ -270,7 +278,7 @@ class PreferDescriptiveTestNameRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_descriptive_test_name',
     problemMessage:
-        '[prefer_descriptive_test_name] Test name must be descriptive. Test names must be descriptive and follow conventions. Test names don\'t follow the expected format. This reduces test maintainability and makes it harder to identify which behavior failed when tests break.',
+        '[prefer_descriptive_test_name] Test name must be descriptive. Test names must be descriptive and follow conventions. Test names don\'t follow the expected format. This reduces test maintainability and makes it harder to identify which behavior failed when tests break. {v7}',
     correctionMessage:
         'Use a descriptive test name that explains what is being tested. Update related tests to reflect the new structure and verify they still pass.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -328,6 +336,8 @@ class PreferDescriptiveTestNameRule extends SaropaLintRule {
 
 /// Warns when a test file doesn't follow naming conventions.
 ///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v6
+///
 /// **Test discovery benefit:** Test files not following _test.dart convention are invisible to dart test and CI runners, causing tests to be silently skipped.
 ///
 /// Alias: test_file_naming, test_file_convention, test_dart_suffix
@@ -362,7 +372,7 @@ class PreferCorrectTestFileNameRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_correct_test_file_name',
     problemMessage:
-        '[prefer_correct_test_file_name] Test files not following the _test.dart naming convention are invisible to dart test and CI runners. Non-matching names cause tests to be silently skipped.',
+        '[prefer_correct_test_file_name] Test files not following the _test.dart naming convention are invisible to dart test and CI runners. Non-matching names cause tests to be silently skipped. {v6}',
     correctionMessage:
         'Test files should end with `_test.dart` and be in test/ directory. Update related tests to reflect the new structure and verify they still pass.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -420,6 +430,8 @@ class _TestCallFinder extends RecursiveAstVisitor<void> {
 
 /// Warns when expect() is used with a Future instead of expectLater().
 ///
+/// Since: v1.5.1 | Updated: v4.13.0 | Rule version: v5
+///
 /// Alias: use_expect_later, future_expect, async_expect
 ///
 /// **Quick fix available:** Replaces `expect` with `expectLater`.
@@ -439,7 +451,7 @@ class PreferExpectLaterRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_expect_later',
     problemMessage:
-        '[prefer_expect_later] Use expectLater() for Future assertions. Quick fix available: Replaces expect with expectLater. Expect() is used with a Future instead of expectLater().',
+        '[prefer_expect_later] Use expectLater() for Future assertions. Quick fix available: Replaces expect with expectLater. Expect() is used with a Future instead of expectLater(). {v5}',
     correctionMessage:
         'Replace expect() with expectLater() for Futures. Update related tests to reflect the new structure and verify they still pass.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -509,6 +521,8 @@ class _ReplaceExpectWithExpectLaterFix extends DartFix {
 }
 
 /// Warns when test files don't follow proper structure.
+///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v4
 class PreferTestStructureRule extends SaropaLintRule {
   const PreferTestStructureRule() : super(code: _code);
 
@@ -525,7 +539,7 @@ class PreferTestStructureRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_test_structure',
     problemMessage:
-        '[prefer_test_structure] Test file should follow proper structure conventions. Test files don\'t follow proper structure. This reduces test maintainability and makes it harder to identify which behavior failed when tests break.',
+        '[prefer_test_structure] Test file should follow proper structure conventions. Test files don\'t follow proper structure. This reduces test maintainability and makes it harder to identify which behavior failed when tests break. {v4}',
     correctionMessage:
         'Wrap tests in group() and use descriptive names. Update related tests to reflect the new structure and verify they still pass.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -599,6 +613,8 @@ class _TestStructureVisitor extends RecursiveAstVisitor<void> {
 
 /// Warns when test names are duplicated within a test file.
 ///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v5
+///
 /// Each test should have a unique name.
 ///
 /// ### Example
@@ -630,7 +646,7 @@ class PreferUniqueTestNamesRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_unique_test_names',
     problemMessage:
-        '[prefer_unique_test_names] Duplicate test name found. Each test must have a unique name. Test names are duplicated within a test file. This reduces test maintainability and makes it harder to identify which behavior failed when tests break.',
+        '[prefer_unique_test_names] Duplicate test name found. Each test must have a unique name. Test names are duplicated within a test file. This reduces test maintainability and makes it harder to identify which behavior failed when tests break. {v5}',
     correctionMessage:
         'Use a unique name for each test. Update related tests to reflect the new structure and verify they still pass.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -681,6 +697,8 @@ class _UniqueTestNameVisitor extends RecursiveAstVisitor<void> {
 
 /// Warns when test file has many tests without group() organization.
 ///
+/// Since: v1.6.0 | Updated: v4.13.0 | Rule version: v3
+///
 /// Large test files without groups are hard to navigate and maintain.
 /// Use group() to organize related tests by feature or scenario.
 ///
@@ -727,7 +745,7 @@ class RequireTestGroupsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_test_groups',
     problemMessage:
-        '[require_test_groups] Many tests without group() organization. Group related tests. Large test files without groups are hard to navigate and maintain. Use group() to organize related tests by feature or scenario.',
+        '[require_test_groups] Many tests without group() organization. Group related tests. Large test files without groups are hard to navigate and maintain. Use group() to organize related tests by feature or scenario. {v3}',
     correctionMessage:
         'Use group() to organize tests by feature, scenario, or component. Update related tests to reflect the new structure and verify they still pass.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -786,6 +804,8 @@ class RequireTestGroupsRule extends SaropaLintRule {
 
 /// Warns when tests depend on other tests' side effects.
 ///
+/// Since: v1.7.2 | Updated: v4.13.0 | Rule version: v2
+///
 /// Tests should be independent and run in any order. Depending on
 /// state from previous tests creates fragile, unreliable tests.
 ///
@@ -827,7 +847,7 @@ class AvoidTestCouplingRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_test_coupling',
     problemMessage:
-        '[avoid_test_coupling] Test appears to depend on shared mutable state from other tests. Tests must be independent and run in any order. Depending on state from previous tests creates fragile, unreliable tests.',
+        '[avoid_test_coupling] Test appears to depend on shared mutable state from other tests. Tests must be independent and run in any order. Depending on state from previous tests creates fragile, unreliable tests. {v2}',
     correctionMessage:
         'Make tests independent. Use setUp/tearDown for shared state,. Update related tests to reflect the new structure and verify they still pass.'
         'or combine dependent tests.',
@@ -986,6 +1006,8 @@ class _VarAccessVisitor extends RecursiveAstVisitor<void> {
 
 /// Warns when tests share mutable state without proper isolation.
 ///
+/// Since: v4.1.1 | Updated: v4.13.0 | Rule version: v4
+///
 /// Tests should not share mutable state. Use setUp/tearDown to
 /// reset state between tests for proper isolation.
 ///
@@ -1032,7 +1054,7 @@ class RequireTestIsolationRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_test_isolation',
     problemMessage:
-        '[require_test_isolation] Mutable top-level variable may cause test coupling. Tests must not share mutable state. Use setUp/tearDown to reset state between tests for proper isolation.',
+        '[require_test_isolation] Mutable top-level variable may cause test coupling. Tests must not share mutable state. Use setUp/tearDown to reset state between tests for proper isolation. {v4}',
     correctionMessage:
         'Use setUp() to initialize shared state before each test,. Update related tests to reflect the new structure and verify they still pass.'
         'ensuring tests are isolated.',
@@ -1084,6 +1106,8 @@ class RequireTestIsolationRule extends SaropaLintRule {
 
 /// Warns when tests use real network/database calls.
 ///
+/// Since: v1.7.0 | Updated: v4.13.0 | Rule version: v3
+///
 /// Tests should be fast, reliable, and not depend on external systems.
 /// Use mocks or fakes for external dependencies.
 ///
@@ -1123,7 +1147,7 @@ class AvoidRealDependenciesInTestsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_real_dependencies_in_tests',
     problemMessage:
-        '[avoid_real_dependencies_in_tests] Test uses real network/database call. Use mocks instead. Tests must be fast, reliable, and not depend on external systems. Use mocks or fakes for external dependencies.',
+        '[avoid_real_dependencies_in_tests] Test uses real network/database call. Use mocks instead. Tests must be fast, reliable, and not depend on external systems. Use mocks or fakes for external dependencies. {v3}',
     correctionMessage:
         'Replace real HTTP/database calls with mocks for faster,. Update related tests to reflect the new structure and verify they still pass.'
         'more reliable tests.',
@@ -1208,6 +1232,8 @@ class AvoidRealDependenciesInTestsRule extends SaropaLintRule {
 
 /// Warns when widget tests with scrollable content don't test scrolling.
 ///
+/// Since: v1.7.2 | Updated: v4.13.0 | Rule version: v2
+///
 /// Scrollable widgets should be tested for scroll behavior to catch
 /// overflow issues and ensure content is accessible.
 ///
@@ -1248,7 +1274,7 @@ class RequireScrollTestsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_scroll_tests',
     problemMessage:
-        '[require_scroll_tests] Widget test creates scrollable widget but does not test scrolling. Scrollable widgets must be tested for scroll behavior to catch overflow issues and ensure content is accessible.',
+        '[require_scroll_tests] Widget test creates scrollable widget but does not test scrolling. Scrollable widgets must be tested for scroll behavior to catch overflow issues and ensure content is accessible. {v2}',
     correctionMessage:
         'Add tester.drag() or tester.scroll() to verify scroll behavior. Update related tests to reflect the new structure and verify they still pass.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -1316,6 +1342,8 @@ class RequireScrollTestsRule extends SaropaLintRule {
 
 /// Warns when widget tests with text input don't test input behavior.
 ///
+/// Since: v1.7.0 | Updated: v4.13.0 | Rule version: v3
+///
 /// Text fields should be tested for user input, validation, and
 /// submission behavior.
 ///
@@ -1357,7 +1385,7 @@ class RequireTextInputTestsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_text_input_tests',
     problemMessage:
-        '[require_text_input_tests] Widget test creates text input but does not test user input. Text fields must be tested for user input, validation, and submission behavior. This reduces test maintainability and makes it harder to identify which behavior failed when tests break.',
+        '[require_text_input_tests] Widget test creates text input but does not test user input. Text fields must be tested for user input, validation, and submission behavior. This reduces test maintainability and makes it harder to identify which behavior failed when tests break. {v3}',
     correctionMessage:
         'Add tester.enterText() to verify text input behavior. Update related tests to reflect the new structure and verify they still pass.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -1421,6 +1449,8 @@ class RequireTextInputTestsRule extends SaropaLintRule {
 
 /// Warns when tests use excessive mocking instead of simpler fakes.
 ///
+/// Since: v1.7.8 | Updated: v4.13.0 | Rule version: v4
+///
 /// Fakes (simple implementations) are easier to maintain than mocks with
 /// verify() chains. Use mocks only when you need to verify interactions.
 ///
@@ -1463,7 +1493,7 @@ class PreferFakeOverMockRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_fake_over_mock',
     problemMessage:
-        '[prefer_fake_over_mock] Test uses mock with verify(). A hand-written fake keeps the test simpler and avoids mock-framework coupling.',
+        '[prefer_fake_over_mock] Test uses mock with verify(). A hand-written fake keeps the test simpler and avoids mock-framework coupling. {v4}',
     correctionMessage:
         'Create a hand-written Fake subclass instead of a Mock — fakes are easier to maintain and do not require verify() calls.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -1523,6 +1553,8 @@ class PreferFakeOverMockRule extends SaropaLintRule {
 
 /// Warns when tests don't cover edge cases.
 ///
+/// Since: v1.7.8 | Updated: v4.13.0 | Rule version: v3
+///
 /// Test boundary conditions: empty lists, null values, max int, empty strings,
 /// unicode, negative numbers. Edge cases cause most production bugs.
 ///
@@ -1562,7 +1594,7 @@ class RequireEdgeCaseTestsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_edge_case_tests',
     problemMessage:
-        '[require_edge_case_tests] Test file may be missing edge case tests (empty, null, boundary). Test boundary conditions: empty lists, null values, max int, empty strings, unicode, negative numbers. Edge cases cause most production bugs.',
+        '[require_edge_case_tests] Test file may be missing edge case tests (empty, null, boundary). Test boundary conditions: empty lists, null values, max int, empty strings, unicode, negative numbers. Edge cases cause most production bugs. {v3}',
     correctionMessage:
         'Add tests for: empty collections, null values, boundary numbers, etc. Update related tests to reflect the new structure and verify they still pass.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -1633,6 +1665,8 @@ class RequireEdgeCaseTestsRule extends SaropaLintRule {
 
 /// Warns when tests create complex test objects without using builders.
 ///
+/// Since: v1.7.8 | Updated: v4.13.0 | Rule version: v4
+///
 /// Builder pattern for test objects is cleaner than constructors with many
 /// parameters and makes tests more readable.
 ///
@@ -1675,7 +1709,7 @@ class PreferTestDataBuilderRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_test_data_builder',
     problemMessage:
-        '[prefer_test_data_builder] Complex object construction in test duplicates setup logic across multiple test cases. Builder pattern for test objects is cleaner than constructors with many parameters and makes tests more readable.',
+        '[prefer_test_data_builder] Complex object construction in test duplicates setup logic across multiple test cases. Builder pattern for test objects is cleaner than constructors with many parameters and makes tests more readable. {v4}',
     correctionMessage:
         "Extract a TestDataBuilder class (e.g., UserBuilder().withName('Test').build()) to share setup logic across tests.",
     errorSeverity: DiagnosticSeverity.INFO,
@@ -1743,6 +1777,8 @@ class PreferTestDataBuilderRule extends SaropaLintRule {
 
 /// Warns when tests verify internal implementation details.
 ///
+/// Since: v1.7.8 | Updated: v4.13.0 | Rule version: v3
+///
 /// Tests that verify internal method calls break when you refactor.
 /// Test observable behavior (outputs, state changes) instead.
 ///
@@ -1783,7 +1819,7 @@ class AvoidTestImplementationDetailsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_test_implementation_details',
     problemMessage:
-        '[avoid_test_implementation_details] Test verifies internal calls. Test behavior, not implementation. Tests that verify internal method calls break when you refactor. Test observable behavior (outputs, state changes) instead.',
+        '[avoid_test_implementation_details] Test verifies internal calls. Test behavior, not implementation. Tests that verify internal method calls break when you refactor. Test observable behavior (outputs, state changes) instead. {v3}',
     correctionMessage:
         'Focus on outputs and state changes, not internal method calls. Update related tests to reflect the new structure and verify they still pass.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -1842,6 +1878,8 @@ class AvoidTestImplementationDetailsRule extends SaropaLintRule {
 }
 
 /// Warns when a test body has no assertions.
+///
+/// Since: v2.0.0 | Updated: v4.13.0 | Rule version: v5
 ///
 /// Alias: no_assertion_in_test, test_without_expect, empty_test_body
 ///
@@ -1946,7 +1984,7 @@ class MissingTestAssertionRule extends SaropaLintRule {
     name: 'missing_test_assertion',
     problemMessage:
         '[missing_test_assertion] Test without assertions always passes, giving '
-        'false confidence. Bugs slip through undetected.',
+        'false confidence. Bugs slip through undetected. {v5}',
     correctionMessage:
         'Add expect(), verify(), or other assertion to validate behavior.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -2162,6 +2200,8 @@ class _AssertionFinder extends RecursiveAstVisitor<void> {
 
 /// Warns when an async callback is used inside fakeAsync.
 ///
+/// Since: v2.0.0 | Updated: v4.13.0 | Rule version: v2
+///
 /// Using async inside fakeAsync defeats the purpose of fake time control.
 /// The async operations won't use the fake clock and can cause test flakiness.
 ///
@@ -2199,7 +2239,7 @@ class AvoidAsyncCallbackInFakeAsyncRule extends SaropaLintRule {
     name: 'avoid_async_callback_in_fake_async',
     problemMessage:
         '[avoid_async_callback_in_fake_async] Async callback uses real time, '
-        'making tests hang or timeout instead of using controlled fake time.',
+        'making tests hang or timeout instead of using controlled fake time. {v2}',
     correctionMessage:
         'Remove async keyword. Use synchronous code with fake.elapse() '
         'to control time.',
@@ -2239,6 +2279,8 @@ class AvoidAsyncCallbackInFakeAsyncRule extends SaropaLintRule {
 
 /// Warns when string keys are used in tests instead of Symbols.
 ///
+/// Since: v2.0.0 | Updated: v4.13.0 | Rule version: v2
+///
 /// Using Symbols for test keys provides compile-time checking and better
 /// refactoring support compared to magic string keys.
 ///
@@ -2274,7 +2316,7 @@ class PreferSymbolOverKeyRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_symbol_over_key',
     problemMessage:
-        '[prefer_symbol_over_key] Use a constant Key instead of string literal. Using Symbols for test keys provides compile-time checking and better refactoring support compared to magic string keys.',
+        '[prefer_symbol_over_key] Use a constant Key instead of string literal. Using Symbols for test keys provides compile-time checking and better refactoring support compared to magic string keys. {v2}',
     correctionMessage:
         'Define a constant for the Key to improve maintainability. Update related tests to reflect the new structure and verify they still pass.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -2313,6 +2355,8 @@ class PreferSymbolOverKeyRule extends SaropaLintRule {
 }
 
 /// Warns when test creates files/data without tearDown cleanup.
+///
+/// Since: v2.0.0 | Updated: v4.13.0 | Rule version: v3
 ///
 /// Tests that create files, directories, or database entries should clean
 /// up in tearDown to prevent test pollution and disk space issues.
@@ -2360,7 +2404,7 @@ class RequireTestCleanupRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_test_cleanup',
     problemMessage:
-        '[require_test_cleanup] Test creates resources without tearDown cleanup. Tests that create files, directories, or database entries should clean up in tearDown to prevent test pollution and disk space issues.',
+        '[require_test_cleanup] Test creates resources without tearDown cleanup. Tests that create files, directories, or database entries should clean up in tearDown to prevent test pollution and disk space issues. {v3}',
     correctionMessage:
         'Add tearDown to clean up created files or data. Update related tests to reflect the new structure and verify they still pass.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -2458,6 +2502,8 @@ class RequireTestCleanupRule extends SaropaLintRule {
 
 /// Warns when tests could use variant for different configurations.
 ///
+/// Since: v2.0.0 | Updated: v4.13.0 | Rule version: v3
+///
 /// Duplicate tests for different screen sizes, locales, or themes should
 /// use testVariants for cleaner code and better coverage reporting.
 ///
@@ -2498,7 +2544,7 @@ class PreferTestVariantRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_test_variant',
     problemMessage:
-        '[prefer_test_variant] Similar tests could use variant for different configurations. Duplicate tests for different screen sizes, locales, or themes should use testVariants for cleaner code and better coverage reporting.',
+        '[prefer_test_variant] Similar tests could use variant for different configurations. Duplicate tests for different screen sizes, locales, or themes should use testVariants for cleaner code and better coverage reporting. {v3}',
     correctionMessage:
         'Use testWidgets variant parameter for configuration testing. Update related tests to reflect the new structure and verify they still pass.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -2551,6 +2597,8 @@ class PreferTestVariantRule extends SaropaLintRule {
 
 /// Warns when widget tests lack accessibility guidelines check.
 ///
+/// Since: v2.0.0 | Updated: v4.13.0 | Rule version: v2
+///
 /// Widget tests should verify accessibility to catch issues early.
 /// Use meetsGuideline matcher for automated accessibility testing.
 ///
@@ -2589,7 +2637,7 @@ class RequireAccessibilityTestsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_accessibility_tests',
     problemMessage:
-        '[require_accessibility_tests] Widget tests should include accessibility checks. Widget tests should verify accessibility to catch issues early. Use meetsGuideline matcher for automated accessibility testing.',
+        '[require_accessibility_tests] Widget tests should include accessibility checks. Widget tests should verify accessibility to catch issues early. Use meetsGuideline matcher for automated accessibility testing. {v2}',
     correctionMessage:
         'Add meetsGuideline assertions for accessibility. Update related tests to reflect the new structure and verify they still pass.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -2633,6 +2681,8 @@ class RequireAccessibilityTestsRule extends SaropaLintRule {
 
 /// Warns when animated widget tests don't use pump with duration.
 ///
+/// Since: v2.0.0 | Updated: v4.13.0 | Rule version: v3
+///
 /// Animations need time to complete. Tests must use pumpAndSettle or
 /// pump(duration) to advance animation frames.
 ///
@@ -2669,7 +2719,7 @@ class RequireAnimationTestsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_animation_tests',
     problemMessage:
-        '[require_animation_tests] Animated widget test should use pump with duration. Animations need time to complete. Tests must use pumpAndSettle or pump(duration) to advance animation frames.',
+        '[require_animation_tests] Animated widget test should use pump with duration. Animations need time to complete. Tests must use pumpAndSettle or pump(duration) to advance animation frames. {v3}',
     correctionMessage:
         'Use pump(Duration) or pumpAndSettle for animations. Update related tests to reflect the new structure and verify they still pass.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -2738,6 +2788,8 @@ class RequireAnimationTestsRule extends SaropaLintRule {
 
 /// Warns when print() is used in test files.
 ///
+/// Since: v2.3.10 | Updated: v4.13.0 | Rule version: v2
+///
 /// Alias: no_print_in_tests, test_print, debug_print_test
 ///
 /// Print statements in tests add noise to test output and can hide
@@ -2774,7 +2826,7 @@ class AvoidTestPrintStatementsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_test_print_statements',
     problemMessage:
-        '[avoid_test_print_statements] Print statement in test file clutters output. Print statements in tests add noise to test output and can hide actual test failures. Use proper logging or debugging tools instead.',
+        '[avoid_test_print_statements] Print statement in test file clutters output. Print statements in tests add noise to test output and can hide actual test failures. Use proper logging or debugging tools instead. {v2}',
     correctionMessage:
         'Remove debug print or use proper logging for test debugging. Update related tests to reflect the new structure and verify they still pass.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -2811,6 +2863,8 @@ class AvoidTestPrintStatementsRule extends SaropaLintRule {
 }
 
 /// Warns when real HTTP clients are used in tests without mocking.
+///
+/// Since: v2.3.10 | Updated: v4.13.0 | Rule version: v5
 ///
 /// Alias: mock_http, real_http_in_tests, no_network_tests
 ///
@@ -2851,7 +2905,7 @@ class RequireMockHttpClientRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_mock_http_client',
     problemMessage:
-        '[require_mock_http_client] Real HTTP calls in tests create network dependencies that cause flaky failures and slow CI pipelines. Tests become non-deterministic, failing on timeout when servers are slow and passing inconsistently across environments, making test results unreliable for merge decisions.',
+        '[require_mock_http_client] Real HTTP calls in tests create network dependencies that cause flaky failures and slow CI pipelines. Tests become non-deterministic, failing on timeout when servers are slow and passing inconsistently across environments, making test results unreliable for merge decisions. {v5}',
     correctionMessage:
         'Use MockClient from the http package or inject a mock HTTP implementation to create fast, deterministic tests that run reliably without network access.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -2908,6 +2962,8 @@ class RequireMockHttpClientRule extends SaropaLintRule {
 
 /// Warns when widget test interactions are not followed by pump.
 ///
+/// Since: v2.3.11 | Updated: v4.13.0 | Rule version: v3
+///
 /// Alias: pump_after_tap, widget_test_pump, test_pump_required
 ///
 /// In widget tests, user interactions like tap, enterText, and drag need
@@ -2949,7 +3005,7 @@ class RequireTestWidgetPumpRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_test_widget_pump',
     problemMessage:
-        '[require_test_widget_pump] After simulating a tap or text entry in a widget test, failing to call pump() or pumpAndSettle() means the widget tree will not rebuild, so your test may pass even though the user experience is broken. Always process pending build events to ensure your test reflects real app behavior.',
+        '[require_test_widget_pump] After simulating a tap or text entry in a widget test, failing to call pump() or pumpAndSettle() means the widget tree will not rebuild, so your test may pass even though the user experience is broken. Always process pending build events to ensure your test reflects real app behavior. {v3}',
     correctionMessage:
         'After calling tester.tap() or tester.enterText(), always call await tester.pump() or await tester.pumpAndSettle() to process UI changes and verify correct behavior.',
     errorSeverity: DiagnosticSeverity.ERROR,
@@ -3092,6 +3148,8 @@ class _AddPumpAfterInteractionFix extends DartFix {
 
 /// Warns when integration tests don't have a timeout.
 ///
+/// Since: v2.3.11 | Updated: v4.13.0 | Rule version: v2
+///
 /// Alias: test_timeout, integration_test_limit, test_time_limit
 ///
 /// Long-running tests without timeouts can hang CI indefinitely.
@@ -3126,7 +3184,7 @@ class RequireIntegrationTestTimeoutRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_integration_test_timeout',
     problemMessage:
-        '[require_integration_test_timeout] Integration test without timeout. May hang CI indefinitely. Long-running tests without timeouts can hang CI indefinitely. Always set timeouts on integration tests to catch infinite loops.',
+        '[require_integration_test_timeout] Integration test without timeout. May hang CI indefinitely. Long-running tests without timeouts can hang CI indefinitely. Always set timeouts on integration tests to catch infinite loops. {v2}',
     correctionMessage:
         'Add timeout: Timeout(Duration(minutes: X)) to the test. Update related tests to reflect the new structure and verify they still pass.',
     errorSeverity: DiagnosticSeverity.WARNING,

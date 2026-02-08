@@ -14,6 +14,8 @@ import '../../saropa_lint_rule.dart';
 
 /// Warns when `ref.read()` is used inside a `build()` method.
 ///
+/// Since: v2.0.0 | Updated: v4.13.0 | Rule version: v2
+///
 /// Alias: no_ref_read_in_build, use_ref_watch, ref_read_in_build
 ///
 /// `ref.read()` does not set up subscriptions, so the widget won't rebuild
@@ -41,7 +43,7 @@ class AvoidRefReadInsideBuildRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_ref_read_inside_build',
     problemMessage:
-        '[avoid_ref_read_inside_build] ref.read() called inside build() bypasses Riverpod reactivity. The widget will not rebuild when the provider state changes, resulting in stale data displayed to the user. This creates inconsistent UI state that fails silently and produces hard-to-diagnose rendering errors across dependent widgets.',
+        '[avoid_ref_read_inside_build] ref.read() called inside build() bypasses Riverpod reactivity. The widget will not rebuild when the provider state changes, resulting in stale data displayed to the user. This creates inconsistent UI state that fails silently and produces hard-to-diagnose rendering errors across dependent widgets. {v2}',
     correctionMessage:
         'Replace ref.read() with ref.watch() inside build() to subscribe to provider changes and trigger automatic widget rebuilds on state updates.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -90,6 +92,8 @@ class _RefReadVisitor extends RecursiveAstVisitor<void> {
 
 /// Warns when `ref.watch()` is used outside a `build()` method.
 ///
+/// Since: v2.0.0 | Updated: v4.13.0 | Rule version: v3
+///
 /// Alias: ref_watch_in_callback, ref_watch_leak, ref_watch_outside_build
 ///
 /// `ref.watch()` creates subscriptions that expect to be managed by
@@ -115,7 +119,7 @@ class AvoidRefWatchOutsideBuildRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_ref_watch_outside_build',
     problemMessage:
-        '[avoid_ref_watch_outside_build] ref.watch() detected outside build() method, breaking the Riverpod widget lifecycle. Subscriptions created outside build() leak memory, produce stale data, and cause missed UI updates that lead to inconsistent state and hard-to-debug rendering errors across dependent widgets.',
+        '[avoid_ref_watch_outside_build] ref.watch() detected outside build() method, breaking the Riverpod widget lifecycle. Subscriptions created outside build() leak memory, produce stale data, and cause missed UI updates that lead to inconsistent state and hard-to-debug rendering errors across dependent widgets. {v3}',
     correctionMessage:
         'Move ref.watch() calls into the build() method where Riverpod manages subscription lifecycle and automatic widget rebuilds on provider state changes.',
     errorSeverity: DiagnosticSeverity.ERROR,
@@ -159,6 +163,8 @@ class AvoidRefWatchOutsideBuildRule extends SaropaLintRule {
 
 /// Warns when `ref` is accessed inside a `dispose()` method.
 ///
+/// Since: v2.0.0 | Updated: v4.13.0 | Rule version: v3
+///
 /// Alias: ref_in_dispose, dispose_ref_access, cache_ref_in_initstate, avoid_riverpod_ref_in_dispose
 ///
 /// The `ref` object is not available during widget disposal. Accessing it
@@ -197,7 +203,7 @@ class AvoidRefInsideStateDisposeRule extends SaropaLintRule {
     name: 'avoid_ref_inside_state_dispose',
     problemMessage:
         '[avoid_ref_inside_state_dispose] Ref may already be disposed when '
-        'dispose() runs, causing "already disposed" errors or crashes.',
+        'dispose() runs, causing "already disposed" errors or crashes. {v3}',
     correctionMessage: 'Cache values in initState instead.',
     errorSeverity: DiagnosticSeverity.ERROR,
   );
@@ -243,6 +249,8 @@ class _RefAccessVisitor extends RecursiveAstVisitor<void> {
 
 /// Warns when `ref.read()` is called after an `await` in an async method.
 ///
+/// Since: v2.0.0 | Updated: v4.13.0 | Rule version: v2
+///
 /// Alias: ref_read_after_await, stale_ref_read, cache_ref_before_await
 ///
 /// After an async gap, provider state may have changed. Call `ref.read()`
@@ -271,7 +279,7 @@ class UseRefReadSynchronouslyRule extends SaropaLintRule {
     name: 'use_ref_read_synchronously',
     problemMessage:
         '[use_ref_read_synchronously] ref.read() after await may access a '
-        'disposed or invalidated provider, causing crashes or stale reads.',
+        'disposed or invalidated provider, causing crashes or stale reads. {v2}',
     correctionMessage: 'Cache ref.read() result before async gap.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
@@ -327,6 +335,8 @@ class _RefReadAfterAwaitVisitor extends RecursiveAstVisitor<void> {
 
 /// Warns when `ref` is used after an await in an async method.
 ///
+/// Since: v2.0.0 | Updated: v4.13.0 | Rule version: v2
+///
 /// After an async gap, the provider state may have changed. Access `ref`
 /// before the await or cache values you need.
 ///
@@ -356,7 +366,7 @@ class UseRefAndStateSynchronouslyRule extends SaropaLintRule {
     name: 'use_ref_and_state_synchronously',
     problemMessage:
         '[use_ref_and_state_synchronously] Using ref after await risks '
-        'accessing disposed provider, causing runtime errors or stale data.',
+        'accessing disposed provider, causing runtime errors or stale data. {v2}',
     correctionMessage: 'Cache ref values before await.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
@@ -410,6 +420,8 @@ class _RefAfterAwaitVisitor extends RecursiveAstVisitor<void> {
 
 /// Warns when assigning directly to a Riverpod notifier variable.
 ///
+/// Since: v2.0.0 | Updated: v4.13.0 | Rule version: v3
+///
 /// Notifiers manage their own state through provider lifecycle.
 /// Direct assignment breaks the provider contract and can cause
 /// unexpected behavior.
@@ -446,7 +458,7 @@ class AvoidAssigningNotifiersRule extends SaropaLintRule {
     name: 'avoid_assigning_notifiers',
     problemMessage:
         '[avoid_assigning_notifiers] Reassigning Notifier breaks provider '
-        'contract. State updates are lost and listeners receive stale data.',
+        'contract. State updates are lost and listeners receive stale data. {v3}',
     correctionMessage: 'Modify state through Notifier methods instead.',
     errorSeverity: DiagnosticSeverity.ERROR,
   );
@@ -595,6 +607,8 @@ class _CommentOutNotifierAssignmentFix extends DartFix {
 
 /// Warns when a Riverpod Notifier class has an explicit constructor.
 ///
+/// Since: v2.0.0 | Updated: v4.13.0 | Rule version: v2
+///
 /// Notifier classes should use the `build()` method for initialization,
 /// not constructors. Constructors run before the provider is set up.
 ///
@@ -626,7 +640,7 @@ class AvoidNotifierConstructorsRule extends SaropaLintRule {
     name: 'avoid_notifier_constructors',
     problemMessage:
         '[avoid_notifier_constructors] Notifier constructors break Riverpod '
-        'lifecycle management. Initialization logic is skipped during rebuild.',
+        'lifecycle management. Initialization logic is skipped during rebuild. {v2}',
     correctionMessage: 'Use build() method for initialization.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
@@ -686,6 +700,8 @@ class AvoidNotifierConstructorsRule extends SaropaLintRule {
 
 /// Suggests marking provider function arguments as `final`.
 ///
+/// Since: v2.0.0 | Updated: v4.13.0 | Rule version: v3
+///
 /// Provider arguments should be immutable for consistent behavior.
 /// Mutable arguments can lead to unexpected state changes within
 /// the provider callback.
@@ -714,7 +730,7 @@ class PreferImmutableProviderArgumentsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_immutable_provider_arguments',
     problemMessage:
-        '[prefer_immutable_provider_arguments] Mutable provider arguments cause unpredictable rebuilds. Provider arguments must be immutable for consistent behavior. Mutable arguments can lead to unexpected state changes within the provider callback.',
+        '[prefer_immutable_provider_arguments] Mutable provider arguments cause unpredictable rebuilds. Provider arguments must be immutable for consistent behavior. Mutable arguments can lead to unexpected state changes within the provider callback. {v3}',
     correctionMessage:
         'Use final for provider arguments. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -754,6 +770,8 @@ class PreferImmutableProviderArgumentsRule extends SaropaLintRule {
 
 /// Warns when ConsumerWidget doesn't use ref.
 ///
+/// Since: v2.0.0 | Updated: v4.13.0 | Rule version: v2
+///
 /// If a widget extends ConsumerWidget but doesn't use ref, it should
 /// be a regular StatelessWidget instead.
 ///
@@ -791,7 +809,7 @@ class AvoidUnnecessaryConsumerWidgetsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_unnecessary_consumer_widgets',
     problemMessage:
-        '[avoid_unnecessary_consumer_widgets] ConsumerWidget does not use ref parameter. If a widget extends ConsumerWidget but doesn\'t use ref, it must be a regular StatelessWidget instead.',
+        '[avoid_unnecessary_consumer_widgets] ConsumerWidget does not use ref parameter. If a widget extends ConsumerWidget but doesn\'t use ref, it must be a regular StatelessWidget instead. {v2}',
     correctionMessage:
         'Use StatelessWidget instead if ref is not needed. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -848,6 +866,8 @@ class _RefUsageVisitor extends RecursiveAstVisitor<void> {
 
 /// Warns when nullable AsyncValue patterns are used incorrectly.
 ///
+/// Since: v2.0.0 | Updated: v4.13.0 | Rule version: v3
+///
 /// AsyncValue should be used with proper when/map methods, not
 /// nullable access patterns.
 ///
@@ -881,7 +901,7 @@ class AvoidNullableAsyncValuePatternRule extends SaropaLintRule {
     name: 'avoid_nullable_async_value_pattern',
     problemMessage:
         '[avoid_nullable_async_value_pattern] Nullable access on AsyncValue bypasses the type system error and loading state handling. '
-        'Accessing .value directly returns null during loading and error states, which can propagate nulls through the UI and hide error conditions that users should see.',
+        'Accessing .value directly returns null during loading and error states, which can propagate nulls through the UI and hide error conditions that users should see. {v3}',
     correctionMessage:
         'Use when() or map() to handle all three AsyncValue states (data, loading, error) explicitly. '
         'This ensures loading indicators are shown, errors are surfaced to the user, and the data path only executes when a value is actually available.',
@@ -931,6 +951,8 @@ class AvoidNullableAsyncValuePatternRule extends SaropaLintRule {
 
 /// Warns when AsyncValue is used without error handling.
 ///
+/// Since: v2.1.0 | Updated: v4.13.0 | Rule version: v2
+///
 /// AsyncValue can be loading, data, or error. Always handle all states.
 ///
 /// **BAD:**
@@ -962,7 +984,7 @@ class RequireRiverpodErrorHandlingRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_riverpod_error_handling',
     problemMessage:
-        '[require_riverpod_error_handling] AsyncValue from a Riverpod provider accessed without handling error and loading states. When the async operation fails or is in progress, accessing .value directly throws a StateError or returns null, causing crashes or displaying stale data. Users see broken UI instead of loading indicators or error messages.',
+        '[require_riverpod_error_handling] AsyncValue from a Riverpod provider accessed without handling error and loading states. When the async operation fails or is in progress, accessing .value directly throws a StateError or returns null, causing crashes or displaying stale data. Users see broken UI instead of loading indicators or error messages. {v2}',
     correctionMessage:
         'Use .when(data: _, loading: _, error: _) or .maybeWhen() to handle all AsyncValue states explicitly, providing loading indicators and error messages.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -997,6 +1019,8 @@ class RequireRiverpodErrorHandlingRule extends SaropaLintRule {
 
 /// Warns when state is mutated directly instead of using state assignment.
 ///
+/// Since: v2.1.0 | Updated: v4.13.0 | Rule version: v2
+///
 /// In Riverpod Notifiers, state should be replaced, not mutated.
 ///
 /// **BAD:**
@@ -1029,7 +1053,7 @@ class AvoidRiverpodStateMutationRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_riverpod_state_mutation',
     problemMessage:
-        '[avoid_riverpod_state_mutation] Riverpod state mutated directly instead of replaced. Direct mutations don\'t trigger Notifier rebuilds, causing the UI to display stale, inconsistent data. Listeners and consumers will not receive the updated values.',
+        '[avoid_riverpod_state_mutation] Riverpod state mutated directly instead of replaced. Direct mutations don\'t trigger Notifier rebuilds, causing the UI to display stale, inconsistent data. Listeners and consumers will not receive the updated values. {v2}',
     correctionMessage:
         'Use state = state.copyWith(..) to replace state. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -1087,6 +1111,8 @@ class AvoidRiverpodStateMutationRule extends SaropaLintRule {
 
 /// Warns when ref.watch is used to access only one field.
 ///
+/// Since: v2.1.0 | Updated: v4.13.0 | Rule version: v2
+///
 /// Using select() limits rebuilds to when that specific field changes.
 ///
 /// **BAD:**
@@ -1115,7 +1141,7 @@ class PreferRiverpodSelectRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_riverpod_select',
     problemMessage:
-        '[prefer_riverpod_select] ref.watch() accessing single field. Use .select() for efficiency. This pattern increases maintenance cost and the likelihood of introducing bugs during future changes.',
+        '[prefer_riverpod_select] ref.watch() accessing single field. Use .select() for efficiency. This pattern increases maintenance cost and the likelihood of introducing bugs during future changes. {v2}',
     correctionMessage:
         'Use ref.watch(provider.select((s) => s.field)) for targeted rebuilds. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -1156,6 +1182,8 @@ class PreferRiverpodSelectRule extends SaropaLintRule {
 
 /// Warns when `riverpod` is imported without `flutter_riverpod` in Flutter.
 ///
+/// Since: v4.13.0 | Rule version: v1
+///
 /// Alias: wrong_riverpod_import, riverpod_without_flutter
 ///
 /// In Flutter apps, use `flutter_riverpod` not the base `riverpod` package.
@@ -1186,7 +1214,7 @@ class RequireFlutterRiverpodPackageRule extends SaropaLintRule {
     name: 'require_flutter_riverpod_package',
     problemMessage:
         '[require_flutter_riverpod_package] Base riverpod package lacks '
-        'Flutter widgets (ProviderScope, ConsumerWidget), causing errors.',
+        'Flutter widgets (ProviderScope, ConsumerWidget), causing errors. {v1}',
     correctionMessage:
         'Import package:flutter_riverpod/flutter_riverpod.dart instead.',
     errorSeverity: DiagnosticSeverity.ERROR,
@@ -1217,6 +1245,8 @@ class RequireFlutterRiverpodPackageRule extends SaropaLintRule {
 
 /// Providers should use autoDispose to free memory when unused.
 ///
+/// Since: v2.6.0 | Updated: v4.13.0 | Rule version: v3
+///
 /// Without autoDispose, providers live forever and can cause memory leaks.
 /// Use .autoDispose modifier to automatically dispose providers when
 /// no longer watched.
@@ -1246,7 +1276,7 @@ class PreferRiverpodAutoDisposeRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_riverpod_auto_dispose',
     problemMessage:
-        '[prefer_riverpod_auto_dispose] Provider declared without the autoDispose modifier retains its state and resources indefinitely even after all listening child widgets are destroyed from the widget tree. This causes memory leaks, stale data accumulation, and unnecessary background computation that grows over the app lifetime, degrading performance progressively.',
+        '[prefer_riverpod_auto_dispose] Provider declared without the autoDispose modifier retains its state and resources indefinitely even after all listening child widgets are destroyed from the widget tree. This causes memory leaks, stale data accumulation, and unnecessary background computation that grows over the app lifetime, degrading performance progressively. {v3}',
     correctionMessage:
         'Add the .autoDispose modifier to the provider declaration (e.g., StateProvider.autoDispose<T>) so resources are released when no consumer is actively listening.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -1302,6 +1332,8 @@ class PreferRiverpodAutoDisposeRule extends SaropaLintRule {
 
 /// Providers with parameters should use .family modifier.
 ///
+/// Since: v2.6.0 | Updated: v4.13.0 | Rule version: v2
+///
 /// Using state to pass parameters to providers is error-prone. The .family
 /// modifier provides type-safe parameter passing.
 ///
@@ -1334,7 +1366,7 @@ class PreferRiverpodFamilyForParamsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_riverpod_family_for_params',
     problemMessage:
-        '[prefer_riverpod_family_for_params] Provider uses nullable state for parameterized data. Use .family instead. Using state to pass parameters to providers is error-prone. The .family modifier provides type-safe parameter passing.',
+        '[prefer_riverpod_family_for_params] Provider uses nullable state for parameterized data. Use .family instead. Using state to pass parameters to providers is error-prone. The .family modifier provides type-safe parameter passing. {v2}',
     correctionMessage:
         'Use FutureProvider.family<T, Param>((ref, param) => ..) for parameterized providers.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -1374,6 +1406,8 @@ class PreferRiverpodFamilyForParamsRule extends SaropaLintRule {
 
 /// Warns when Riverpod providers are not properly scoped.
 ///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v5
+///
 /// Global providers can cause state leaks between tests.
 ///
 /// **BAD:**
@@ -1406,7 +1440,7 @@ class AvoidGlobalRiverpodProvidersRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_global_riverpod_providers',
     problemMessage:
-        '[avoid_global_riverpod_providers] Defining providers at the global scope creates implicit dependencies, makes testing difficult, and can cause state to leak between tests or app sessions. This leads to flaky tests, unpredictable bugs, and hard-to-maintain code.',
+        '[avoid_global_riverpod_providers] Defining providers at the global scope creates implicit dependencies, makes testing difficult, and can cause state to leak between tests or app sessions. This leads to flaky tests, unpredictable bugs, and hard-to-maintain code. {v5}',
     correctionMessage:
         'Define providers inside a ProviderScope or document their scope clearly to ensure test isolation and predictable state management.',
     errorSeverity: DiagnosticSeverity.ERROR,
@@ -1455,6 +1489,8 @@ class AvoidGlobalRiverpodProvidersRule extends SaropaLintRule {
 
 /// Warns when Consumer widget is used instead of ConsumerWidget.
 ///
+/// Since: v1.7.2 | Updated: v4.13.0 | Rule version: v4
+///
 /// Wrapping widgets with Consumer adds unnecessary nesting and boilerplate
 /// instead of using ConsumerWidget directly.
 ///
@@ -1500,7 +1536,7 @@ class PreferConsumerWidgetRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_consumer_widget',
     problemMessage:
-        '[prefer_consumer_widget] Wrapping widgets with Consumer adds unnecessary nesting and boilerplate instead of using ConsumerWidget directly. The extra widget layer causes redundant rebuilds and increases the widget tree depth, leading to harder-to-debug rebuild cascades and degraded rendering performance.',
+        '[prefer_consumer_widget] Wrapping widgets with Consumer adds unnecessary nesting and boilerplate instead of using ConsumerWidget directly. The extra widget layer causes redundant rebuilds and increases the widget tree depth, leading to harder-to-debug rebuild cascades and degraded rendering performance. {v4}',
     correctionMessage:
         'Extend ConsumerWidget instead of wrapping with Consumer to simplify your widget tree and improve code clarity.',
     errorSeverity: DiagnosticSeverity.ERROR,
@@ -1552,6 +1588,8 @@ class PreferConsumerWidgetRule extends SaropaLintRule {
 
 /// Suggests using autoDispose modifier on Riverpod providers.
 ///
+/// Since: v1.7.2 | Updated: v4.13.0 | Rule version: v2
+///
 /// Providers without autoDispose will stay in memory forever once created.
 /// Using autoDispose ensures the provider is disposed when no longer watched.
 ///
@@ -1583,7 +1621,7 @@ class RequireAutoDisposeRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_auto_dispose',
     problemMessage:
-        '[require_auto_dispose] Not using autoDispose with Riverpod providers can cause memory leaks, as providers and their resources may remain in memory after they are no longer needed. This can lead to increased memory usage and degraded app performance.',
+        '[require_auto_dispose] Not using autoDispose with Riverpod providers can cause memory leaks, as providers and their resources may remain in memory after they are no longer needed. This can lead to increased memory usage and degraded app performance. {v2}',
     correctionMessage:
         'Use Provider.autoDispose, StateProvider.autoDispose, etc., to ensure providers are disposed when no longer needed and prevent memory leaks.',
     errorSeverity: DiagnosticSeverity.ERROR,
@@ -1652,6 +1690,8 @@ class RequireAutoDisposeRule extends SaropaLintRule {
 
 /// Warns when ref.read() is used inside a build() method body.
 ///
+/// Since: v1.4.3 | Updated: v4.13.0 | Rule version: v4
+///
 /// In Riverpod, ref.read() doesn't set up reactivity - it reads the value once.
 /// Using ref.read() in build() means the widget won't rebuild when the provider
 /// changes. Use ref.watch() instead for reactive updates.
@@ -1693,7 +1733,7 @@ class AvoidRefInBuildBodyRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_ref_in_build_body',
     problemMessage:
-        '[avoid_ref_in_build_body] Using ref.read() in build() does not trigger widget rebuilds when the provider changes, leading to stale UI, missed updates, and confusing bugs. This breaks the reactive model of Riverpod and can cause your app to display outdated information.',
+        '[avoid_ref_in_build_body] Using ref.read() in build() does not trigger widget rebuilds when the provider changes, leading to stale UI, missed updates, and confusing bugs. This breaks the reactive model of Riverpod and can cause your app to display outdated information. {v4}',
     correctionMessage:
         'Use ref.watch() for reactive updates in build(), or move ref.read() to a callback like onPressed to ensure the UI updates correctly.',
     errorSeverity: DiagnosticSeverity.ERROR,
@@ -1803,6 +1843,8 @@ class _RefReadInBuildVisitor extends RecursiveAstVisitor<void> {
 
 /// Warns when ref is used in dispose method.
 ///
+/// Since: v4.13.0 | Rule version: v1
+///
 /// The `ref` object in Riverpod becomes invalid during dispose - providers
 /// may already be destroyed. Accessing ref in dispose can throw exceptions
 /// or access stale data.
@@ -1835,7 +1877,7 @@ class AvoidRefInDisposeRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_ref_in_dispose',
     problemMessage:
-        '[avoid_ref_in_dispose] Using ref in dispose() is unsafe because the provider may already be destroyed, leading to runtime errors, crashes, or accessing invalid state. This can cause unpredictable bugs and app instability.',
+        '[avoid_ref_in_dispose] Using ref in dispose() is unsafe because the provider may already be destroyed, leading to runtime errors, crashes, or accessing invalid state. This can cause unpredictable bugs and app instability. {v1}',
     correctionMessage:
         'Remove ref usage from dispose(). Access provider values earlier in the widget lifecycle if needed to ensure safe and predictable behavior.',
     errorSeverity: DiagnosticSeverity.ERROR,
@@ -1886,6 +1928,8 @@ class _RefInDisposeVisitor extends RecursiveAstVisitor<void> {
 
 /// Warns when ProviderScope is missing from the app root.
 ///
+/// Since: v1.7.2 | Updated: v4.13.0 | Rule version: v2
+///
 /// Riverpod requires ProviderScope at the widget tree root. Without it,
 /// all provider access throws "ProviderScope not found" errors at runtime.
 ///
@@ -1922,7 +1966,7 @@ class RequireProviderScopeRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_provider_scope',
     problemMessage:
-        '[require_provider_scope] If your Riverpod app is missing ProviderScope at the root, any attempt to access providers will throw runtime exceptions and crash the app. This makes the app unusable and breaks all provider-based state management.',
+        '[require_provider_scope] If your Riverpod app is missing ProviderScope at the root, any attempt to access providers will throw runtime exceptions and crash the app. This makes the app unusable and breaks all provider-based state management. {v2}',
     correctionMessage:
         'Wrap your app with ProviderScope: runApp(ProviderScope(child: MyApp())) to enable provider access and prevent crashes.',
     errorSeverity: DiagnosticSeverity.ERROR,
@@ -1968,6 +2012,8 @@ class RequireProviderScopeRule extends SaropaLintRule {
 
 /// Warns when using ref.watch() for entire provider when only part is needed.
 ///
+/// Since: v1.7.2 | Updated: v4.13.0 | Rule version: v2
+///
 /// Watching an entire object rebuilds when any field changes. Use
 /// ref.watch(provider.select((s) => s.field)) to rebuild only when
 /// specific fields change, improving performance.
@@ -2001,7 +2047,7 @@ class PreferSelectForPartialRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_select_for_partial',
     problemMessage:
-        '[prefer_select_for_partial] Watching the entire provider when only one field is needed causes unnecessary widget tree rebuilds, wasting memory and CPU cycles and reducing app performance. This makes your UI less efficient and responsive.',
+        '[prefer_select_for_partial] Watching the entire provider when only one field is needed causes unnecessary widget tree rebuilds, wasting memory and CPU cycles and reducing app performance. This makes your UI less efficient and responsive. {v2}',
     correctionMessage:
         'Use ref.watch(provider.select((s) => s.field)) for partial watching to optimize rebuilds and improve performance.',
     errorSeverity: DiagnosticSeverity.ERROR,
@@ -2101,6 +2147,8 @@ class _ProviderUsageVisitor extends RecursiveAstVisitor<void> {
 
 /// Warns when ref.watch is used with .family without proper parameter.
 ///
+/// Since: v1.7.2 | Updated: v4.13.0 | Rule version: v2
+///
 /// When using .family providers, you must pass the parameter to get the
 /// correct provider instance. Forgetting the parameter or passing the
 /// wrong one creates a new provider instance unexpectedly.
@@ -2129,7 +2177,7 @@ class PreferFamilyForParamsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_family_for_params',
     problemMessage:
-        '[prefer_family_for_params] Not using .family for parameterized providers creates a new provider instance on each call, breaking caching and causing duplicate providers. This leads to wasted resources, memory leaks, and unpredictable app behavior.',
+        '[prefer_family_for_params] Not using .family for parameterized providers creates a new provider instance on each call, breaking caching and causing duplicate providers. This leads to wasted resources, memory leaks, and unpredictable app behavior. {v2}',
     correctionMessage:
         'Use Provider.family((ref, param) => ...) and watch with provider(param) to ensure proper caching and a single provider instance per parameter.',
     errorSeverity: DiagnosticSeverity.ERROR,
@@ -2170,6 +2218,8 @@ class PreferFamilyForParamsRule extends SaropaLintRule {
 
 /// Warns when ref.read is used instead of ref.watch in build methods.
 ///
+/// Since: v1.7.2 | Updated: v4.13.0 | Rule version: v2
+///
 /// ref.read doesn't subscribe to changes - widget won't rebuild when
 /// provider updates. Use ref.watch in build methods for reactive updates.
 ///
@@ -2206,7 +2256,7 @@ class PreferRefWatchOverReadRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_ref_watch_over_read',
     problemMessage:
-        '[prefer_ref_watch_over_read] ref.read in build() won\'t rebuild widget when provider changes. ref.read doesn\'t subscribe to changes - widget won\'t rebuild when provider updates. Use ref.watch in build methods for reactive updates.',
+        '[prefer_ref_watch_over_read] ref.read in build() won\'t rebuild widget when provider changes. ref.read doesn\'t subscribe to changes - widget won\'t rebuild when provider updates. Use ref.watch in build methods for reactive updates. {v2}',
     correctionMessage:
         'Use ref.watch() in build methods for reactive updates. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -2273,6 +2323,8 @@ class _ReplaceReadWithWatchFix extends DartFix {
 
 /// Warns when Riverpod providers reference each other in a cycle.
 ///
+/// Since: v4.13.0 | Rule version: v1
+///
 /// Circular dependencies between providers cause runtime errors or infinite
 /// loops. Analyze your dependency graph to break cycles.
 ///
@@ -2312,7 +2364,7 @@ class AvoidCircularProviderDepsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_circular_provider_deps',
     problemMessage:
-        '[avoid_circular_provider_deps] Circular dependencies between providers cause stack overflows, infinite loops, and unpredictable initialization order. This leads to runtime crashes, hard-to-debug errors, and broken state management. If not fixed, your app may crash or behave unpredictably in production. Always design provider graphs to be acyclic for reliability and maintainability.',
+        '[avoid_circular_provider_deps] Circular dependencies between providers cause stack overflows, infinite loops, and unpredictable initialization order. This leads to runtime crashes, hard-to-debug errors, and broken state management. If not fixed, your app may crash or behave unpredictably in production. Always design provider graphs to be acyclic for reliability and maintainability. {v1}',
     correctionMessage:
         'Analyze the provider dependency graph and break cycles by extracting shared logic, refactoring providers, or using ref.read in callbacks instead of ref.watch. Ensure no provider directly or indirectly depends on itself. Use tools or diagrams to visualize dependencies if needed.',
     errorSeverity: DiagnosticSeverity.ERROR,
@@ -2418,6 +2470,8 @@ class _ProviderDepVisitor extends RecursiveAstVisitor<void> {
 
 /// Warns when async provider lacks error handling.
 ///
+/// Since: v4.8.5 | Updated: v4.13.0 | Rule version: v3
+///
 /// FutureProvider and AsyncNotifierProvider can fail. Without onError or
 /// try-catch, errors crash the app or show uncaught exception UI.
 ///
@@ -2457,7 +2511,7 @@ class RequireErrorHandlingInAsyncRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_error_handling_in_async',
     problemMessage:
-        '[require_error_handling_in_async] Async provider without error handling allows exceptions to propagate unhandled. Unhandled errors in FutureProvider or StreamProvider surface as uncaught exceptions that crash the app or leave the UI in a permanent loading state with no recovery path.',
+        '[require_error_handling_in_async] Async provider without error handling allows exceptions to propagate unhandled. Unhandled errors in FutureProvider or StreamProvider surface as uncaught exceptions that crash the app or leave the UI in a permanent loading state with no recovery path. {v3}',
     correctionMessage:
         'Add try-catch in the provider body or handle AsyncValue.error in the UI with .when() to show error states and enable user recovery.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -2510,6 +2564,8 @@ class RequireErrorHandlingInAsyncRule extends SaropaLintRule {
 
 /// Warns when StateProvider is used instead of StateNotifierProvider/Notifier.
 ///
+/// Since: v4.9.0 | Updated: v4.13.0 | Rule version: v2
+///
 /// StateProvider is fine for simple state but Notifier provides:
 /// - Encapsulated business logic
 /// - Methods instead of raw state mutation
@@ -2550,7 +2606,7 @@ class PreferNotifierOverStateRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_notifier_over_state',
     problemMessage:
-        '[prefer_notifier_over_state] StateProvider exposes raw state to uncontrolled mutation. StateProvider is fine for simple state but Notifier provides: - Encapsulated business logic - Methods instead of raw state mutation - Better testability.',
+        '[prefer_notifier_over_state] StateProvider exposes raw state to uncontrolled mutation. StateProvider is fine for simple state but Notifier provides: - Encapsulated business logic - Methods instead of raw state mutation - Better testability. {v2}',
     correctionMessage:
         'Use NotifierProvider for encapsulated business logic and testability. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -2612,6 +2668,8 @@ class PreferNotifierOverStateRule extends SaropaLintRule {
 
 /// Warns when a Riverpod project doesn't include riverpod_lint.
 ///
+/// Since: v1.7.8 | Updated: v4.13.0 | Rule version: v2
+///
 /// The official riverpod_lint package catches Riverpod-specific mistakes
 /// that general linters miss. Use it alongside saropa_lints for complete
 /// coverage.
@@ -2648,7 +2706,7 @@ class RequireRiverpodLintRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_riverpod_lint',
     problemMessage:
-        '[require_riverpod_lint] Project uses Riverpod but riverpod_lint is not configured. The official riverpod_lint package catches Riverpod-specific mistakes that general linters miss. Use it alongside saropa_lints for complete coverage.',
+        '[require_riverpod_lint] Project uses Riverpod but riverpod_lint is not configured. The official riverpod_lint package catches Riverpod-specific mistakes that general linters miss. Use it alongside saropa_lints for complete coverage. {v2}',
     correctionMessage:
         'Add riverpod_lint to dev_dependencies for Riverpod-specific linting. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -2704,6 +2762,8 @@ class RequireRiverpodLintRule extends SaropaLintRule {
 
 /// Warns when context.watch() is used inside async callback.
 ///
+/// Since: v2.1.0 | Updated: v4.13.0 | Rule version: v4
+///
 /// watch() subscribes to changes and should only be used synchronously
 /// in build. Using it in async callbacks causes subscription leaks.
 ///
@@ -2735,7 +2795,7 @@ class AvoidListenInAsyncRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_listen_in_async',
     problemMessage:
-        '[avoid_listen_in_async] Using context.watch() inside an async callback triggers widget rebuilds during asynchronous execution, creating stale closures that capture outdated state. This causes data races where async operations complete with wrong values, leading to corrupted state or duplicate side effects.',
+        '[avoid_listen_in_async] Using context.watch() inside an async callback triggers widget rebuilds during asynchronous execution, creating stale closures that capture outdated state. This causes data races where async operations complete with wrong values, leading to corrupted state or duplicate side effects. {v4}',
     correctionMessage:
         'Replace context.watch() with context.read() in async callbacks to capture the current value without subscribing to rebuilds.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -2782,6 +2842,8 @@ class AvoidListenInAsyncRule extends SaropaLintRule {
 
 /// Warns when AsyncValue.when() has incorrect parameter order.
 ///
+/// Since: v2.1.0 | Updated: v4.13.0 | Rule version: v2
+///
 /// The standard order is data, error, loading. Incorrect order makes
 /// code harder to read and may indicate confusion about the API.
 ///
@@ -2815,7 +2877,7 @@ class RequireAsyncValueOrderRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_async_value_order',
     problemMessage:
-        '[require_async_value_order] AsyncValue.when() has non-standard parameter order. The standard order is data, error, loading. Incorrect order makes code harder to read and may indicate confusion about the API.',
+        '[require_async_value_order] AsyncValue.when() has non-standard parameter order. The standard order is data, error, loading. Incorrect order makes code harder to read and may indicate confusion about the API. {v2}',
     correctionMessage:
         'Use order: data, error, loading for consistency. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -2856,6 +2918,8 @@ class RequireAsyncValueOrderRule extends SaropaLintRule {
 
 /// Warns when `context.watch<T>()` is used without `select()`.
 ///
+/// Since: v4.1.3 | Updated: v4.13.0 | Rule version: v2
+///
 /// watch() rebuilds on any change to the provider. Using select()
 /// limits rebuilds to specific property changes.
 ///
@@ -2883,7 +2947,7 @@ class PreferSelectorRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_context_selector',
     problemMessage:
-        '[prefer_context_selector] context.watch() accessing property. Use select() for efficiency. watch() rebuilds on any change to the provider. Using select() limits rebuilds to specific property changes.',
+        '[prefer_context_selector] context.watch() accessing property. Use select() for efficiency. watch() rebuilds on any change to the provider. Using select() limits rebuilds to specific property changes. {v2}',
     correctionMessage:
         'Replace with context.select((notifier) => notifier.field). Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -2914,6 +2978,8 @@ class PreferSelectorRule extends SaropaLintRule {
 }
 
 /// Warns when Riverpod Notifiers are instantiated in build methods.
+///
+/// Since: v2.3.11 | Updated: v4.13.0 | Rule version: v5
 ///
 /// Alias: riverpod_notifier_build, no_notifier_in_build
 ///
@@ -2959,7 +3025,7 @@ class AvoidRiverpodNotifierInBuildRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_riverpod_notifier_in_build',
     problemMessage:
-        '[avoid_riverpod_notifier_in_build] Creating a Riverpod Notifier inside the build method reinstantiates it on every widget rebuild, discarding all accumulated state. Users experience lost form input, reset scroll positions, and flickering UI as the notifier repeatedly initializes from scratch.',
+        '[avoid_riverpod_notifier_in_build] Creating a Riverpod Notifier inside the build method reinstantiates it on every widget rebuild, discarding all accumulated state. Users experience lost form input, reset scroll positions, and flickering UI as the notifier repeatedly initializes from scratch. {v5}',
     correctionMessage:
         'Define the provider outside the widget class (at the file level as a global) and use ref.watch() to access it, ensuring stable state across rebuilds.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -3009,6 +3075,8 @@ class AvoidRiverpodNotifierInBuildRule extends SaropaLintRule {
 
 /// Warns when try-catch is used instead of AsyncValue.guard in Riverpod.
 ///
+/// Since: v2.3.11 | Updated: v4.13.0 | Rule version: v2
+///
 /// Alias: use_async_value_guard, riverpod_error_handling
 ///
 /// AsyncValue.guard provides better error handling and state management
@@ -3051,7 +3119,7 @@ class RequireRiverpodAsyncValueGuardRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_riverpod_async_value_guard',
     problemMessage:
-        '[require_riverpod_async_value_guard] Try-catch in async provider. Use AsyncValue.guard for consistent error handling. AsyncValue.guard provides better error handling and state management for async operations in Riverpod providers.',
+        '[require_riverpod_async_value_guard] Try-catch in async provider. Use AsyncValue.guard for consistent error handling. AsyncValue.guard provides better error handling and state management for async operations in Riverpod providers. {v2}',
     correctionMessage:
         'Replace try-catch with AsyncValue.guard(() => yourAsyncOperation()). Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -3104,6 +3172,8 @@ class RequireRiverpodAsyncValueGuardRule extends SaropaLintRule {
 
 /// Flutter apps need flutter_riverpod, not just riverpod.
 ///
+/// Since: v4.1.5 | Updated: v4.13.0 | Rule version: v2
+///
 /// The base `riverpod` package doesn't include Flutter-specific widgets
 /// like `ConsumerWidget` and `ProviderScope`. Flutter apps need
 /// `flutter_riverpod` or `hooks_riverpod`.
@@ -3132,7 +3202,7 @@ class RequireFlutterRiverpodNotRiverpodRule extends SaropaLintRule {
     name: 'require_flutter_riverpod_not_riverpod',
     problemMessage:
         '[require_flutter_riverpod_not_riverpod] Flutter apps should use '
-        'flutter_riverpod, not riverpod package directly.',
+        'flutter_riverpod, not riverpod package directly. {v2}',
     correctionMessage: 'Replace "package:riverpod/riverpod.dart" with '
         '"package:flutter_riverpod/flutter_riverpod.dart".',
     errorSeverity: DiagnosticSeverity.ERROR,
@@ -3157,6 +3227,8 @@ class RequireFlutterRiverpodNotRiverpodRule extends SaropaLintRule {
 }
 
 /// Riverpod shouldn't handle navigation via global navigator keys.
+///
+/// Since: v4.1.5 | Updated: v4.13.0 | Rule version: v2
 ///
 /// Navigation belongs in widgets, not state management. Using Riverpod
 /// to control navigation creates tight coupling and makes testing harder.
@@ -3200,7 +3272,7 @@ class AvoidRiverpodNavigationRule extends SaropaLintRule {
     name: 'avoid_riverpod_navigation',
     problemMessage:
         '[avoid_riverpod_navigation] Riverpod provider managing navigation. '
-        'Navigation belongs in widgets, not state management.',
+        'Navigation belongs in widgets, not state management. {v2}',
     correctionMessage:
         'Move navigation logic to widgets using Navigator.of(context).',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -3299,6 +3371,8 @@ class AvoidRiverpodNavigationRule extends SaropaLintRule {
 
 /// Warns when Riverpod is used only for network/API access.
 ///
+/// Since: v4.1.8 | Updated: v4.13.0 | Rule version: v2
+///
 /// `[HEURISTIC]` - Detects providers that only wrap HTTP clients.
 ///
 /// Using Riverpod just to access a network layer when direct injection
@@ -3330,7 +3404,7 @@ class AvoidRiverpodForNetworkOnlyRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_riverpod_for_network_only',
     problemMessage:
-        '[avoid_riverpod_for_network_only] Provider adds unnecessary indirection for a simple network client. Harder to debug. Using Riverpod just to access a network layer when direct injection would suffice adds unnecessary complexity.',
+        '[avoid_riverpod_for_network_only] Provider adds unnecessary indirection for a simple network client. Harder to debug. Using Riverpod just to access a network layer when direct injection would suffice adds unnecessary complexity. {v2}',
     correctionMessage:
         'Use direct dependency injection instead of wrapping in a Provider. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,

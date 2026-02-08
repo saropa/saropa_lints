@@ -16,6 +16,8 @@ import '../saropa_lint_rule.dart';
 
 /// Warns when test has no assertions.
 ///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v4
+///
 /// Alias: test_needs_assertion, no_assertion_test
 ///
 /// Tests without assertions don't actually verify anything. This rule uses
@@ -74,7 +76,7 @@ class RequireTestAssertionsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_test_assertions',
     problemMessage:
-        '[require_test_assertions] Test has no assertions. Tests without assertions don\'t actually verify anything. This rule uses simple string matching on the test body source code for fast detection.',
+        '[require_test_assertions] Test has no assertions. Tests without assertions don\'t actually verify anything. This rule uses simple string matching on the test body source code for fast detection. {v4}',
     correctionMessage:
         'Add expect(), verify(), or other assertions. Run the full test suite to confirm the refactored tests maintain equivalent coverage.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -142,6 +144,8 @@ class RequireTestAssertionsRule extends SaropaLintRule {
 
 /// Warns when test description is too vague.
 ///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v5
+///
 /// Test names should clearly describe what is being tested.
 ///
 /// **BAD:**
@@ -172,7 +176,7 @@ class AvoidVagueTestDescriptionsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_vague_test_descriptions',
     problemMessage:
-        '[avoid_vague_test_descriptions] Test description is too vague. Test names should clearly describe what is being tested. This weakens test quality, making failures harder to diagnose and reducing confidence in the test suite.',
+        '[avoid_vague_test_descriptions] Test description is too vague. Test names should clearly describe what is being tested. This weakens test quality, making failures harder to diagnose and reducing confidence in the test suite. {v5}',
     correctionMessage:
         'Use descriptive names like "should [action] when [condition]". Run the full test suite to confirm the refactored tests maintain equivalent coverage.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -243,6 +247,8 @@ class AvoidVagueTestDescriptionsRule extends SaropaLintRule {
 
 /// Warns when test uses real network calls.
 ///
+/// Since: v4.1.1 | Updated: v4.13.0 | Rule version: v5
+///
 /// Alias: avoid_real_dependencies
 ///
 /// Tests should mock external dependencies for reliability.
@@ -279,7 +285,7 @@ class AvoidRealNetworkCallsInTestsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_real_network_calls_in_tests',
     problemMessage:
-        '[avoid_real_network_calls_in_tests] Test may be making real network calls. Tests should mock external dependencies for reliability. This weakens test quality, making failures harder to diagnose and reducing confidence in the test suite.',
+        '[avoid_real_network_calls_in_tests] Test may be making real network calls. Tests should mock external dependencies for reliability. This weakens test quality, making failures harder to diagnose and reducing confidence in the test suite. {v5}',
     correctionMessage:
         'Mock HTTP clients and other external dependencies. Run the full test suite to confirm the refactored tests maintain equivalent coverage.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -346,6 +352,8 @@ class AvoidRealNetworkCallsInTestsRule extends SaropaLintRule {
 
 /// Warns when test has hardcoded delays.
 ///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v5
+///
 /// Tests with hardcoded delays are slow and flaky.
 ///
 /// **BAD:**
@@ -384,7 +392,7 @@ class AvoidHardcodedTestDelaysRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_hardcoded_test_delays',
     problemMessage:
-        '[avoid_hardcoded_test_delays] Test has hardcoded delay which makes tests slow and flaky. This weakens test quality, making failures harder to diagnose and reducing confidence in the test suite.',
+        '[avoid_hardcoded_test_delays] Test has hardcoded delay which makes tests slow and flaky. This weakens test quality, making failures harder to diagnose and reducing confidence in the test suite. {v5}',
     correctionMessage:
         'Use pumpAndSettle(), stream matchers, or fake timers instead. Run the full test suite to confirm the refactored tests maintain equivalent coverage.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -425,6 +433,8 @@ class AvoidHardcodedTestDelaysRule extends SaropaLintRule {
 }
 
 /// Warns when test file lacks setUp or tearDown.
+///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v5
 ///
 /// Tests should properly set up and clean up resources.
 ///
@@ -469,7 +479,7 @@ class RequireTestSetupTeardownRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_test_setup_teardown',
     problemMessage:
-        '[require_test_setup_teardown] Test file lacks setUp/tearDown for shared resources. Tests should properly set up and clean up resources. This weakens test quality, making failures harder to diagnose and reducing confidence in the test suite.',
+        '[require_test_setup_teardown] Test file lacks setUp/tearDown for shared resources. Tests should properly set up and clean up resources. This weakens test quality, making failures harder to diagnose and reducing confidence in the test suite. {v5}',
     correctionMessage:
         'Add setUp() and tearDown() to initialize and clean up test state. Run the full test suite to confirm the refactored tests maintain equivalent coverage.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -513,6 +523,8 @@ class RequireTestSetupTeardownRule extends SaropaLintRule {
 
 /// Warns when widget test doesn't pump the widget tree.
 ///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v6
+///
 /// Widget tests need to pump to process the widget lifecycle.
 ///
 /// **BAD:**
@@ -552,7 +564,7 @@ class RequirePumpAfterInteractionRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_pump_after_interaction',
     problemMessage:
-        '[require_pump_after_interaction] Widget test may need pump() or pumpAndSettle() after interaction. Widget tests need to pump to process the widget lifecycle. This weakens test quality, making failures harder to diagnose and reducing confidence in the test suite.',
+        '[require_pump_after_interaction] Widget test may need pump() or pumpAndSettle() after interaction. Widget tests need to pump to process the widget lifecycle. This weakens test quality, making failures harder to diagnose and reducing confidence in the test suite. {v6}',
     correctionMessage:
         'Call pump() or pumpAndSettle() after tap(), drag(), or other interactions. Run the full test suite to confirm the refactored tests maintain equivalent coverage.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -649,6 +661,8 @@ class RequirePumpAfterInteractionRule extends SaropaLintRule {
 
 /// Warns when test uses production configuration.
 ///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v4
+///
 /// Tests should use test-specific configuration.
 ///
 /// **BAD:**
@@ -681,7 +695,7 @@ class AvoidProductionConfigInTestsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_production_config_in_tests',
     problemMessage:
-        '[avoid_production_config_in_tests] Test may be using production configuration. Tests should use test-specific configuration. This weakens test quality, making failures harder to diagnose and reducing confidence in the test suite.',
+        '[avoid_production_config_in_tests] Test may be using production configuration. Tests should use test-specific configuration. This weakens test quality, making failures harder to diagnose and reducing confidence in the test suite. {v4}',
     correctionMessage:
         'Use test-specific or mocked configuration. Run the full test suite to confirm the refactored tests maintain equivalent coverage.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -731,6 +745,8 @@ class AvoidProductionConfigInTestsRule extends SaropaLintRule {
 
 /// Suggests using pumpAndSettle() after user interactions in widget tests.
 ///
+/// Since: v1.7.2 | Updated: v4.13.0 | Rule version: v2
+///
 /// After tap(), drag(), or other interactions, using pumpAndSettle() ensures
 /// all animations complete before assertions. Using pump() alone may miss
 /// animations or scheduled frames.
@@ -773,7 +789,7 @@ class PreferPumpAndSettleRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_pump_and_settle',
     problemMessage:
-        '[prefer_pump_and_settle] Use pumpAndSettle() after interactions to wait for animations. After tap(), drag(), or other interactions, using pumpAndSettle() ensures all animations complete before assertions. Using pump() alone may miss animations or scheduled frames.',
+        '[prefer_pump_and_settle] Use pumpAndSettle() after interactions to wait for animations. After tap(), drag(), or other interactions, using pumpAndSettle() ensures all animations complete before assertions. Using pump() alone may miss animations or scheduled frames. {v2}',
     correctionMessage:
         'Use pumpAndSettle() after tap/drag/etc. to ensure animations complete. Run the full test suite to confirm the refactored tests maintain equivalent coverage.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -850,6 +866,8 @@ class PreferPumpAndSettleRule extends SaropaLintRule {
 
 /// Warns when sleep() or blocking delays are used in tests.
 ///
+/// Since: v1.4.2 | Updated: v4.13.0 | Rule version: v5
+///
 /// Real delays make tests slow and flaky. Use fake timers instead.
 ///
 /// **BAD:**
@@ -885,7 +903,7 @@ class AvoidTestSleepRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_test_sleep',
     problemMessage:
-        '[avoid_test_sleep] Real sleep() or Future.delayed() call in test code blocks the test runner, slows the suite, and produces flaky failures when system load varies. Tests with real delays waste CI minutes and give inconsistent results across machines.',
+        '[avoid_test_sleep] Real sleep() or Future.delayed() call in test code blocks the test runner, slows the suite, and produces flaky failures when system load varies. Tests with real delays waste CI minutes and give inconsistent results across machines. {v5}',
     correctionMessage:
         'Replace with fakeAsync and clock.elapse() to simulate time passing instantly, keeping tests fast and deterministic.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -938,6 +956,8 @@ class AvoidTestSleepRule extends SaropaLintRule {
 
 /// Suggests find.byKey() over find.text() for interactive widgets.
 ///
+/// Since: v1.4.2 | Updated: v4.13.0 | Rule version: v3
+///
 /// - **find.text()** is appropriate for verifying displayed content.
 /// - **find.byKey()** is preferred for tapping/interacting with widgets
 ///   because it's stable when text changes (e.g., i18n, A/B testing).
@@ -974,7 +994,7 @@ class AvoidFindByTextRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_find_by_text',
     problemMessage:
-        '[avoid_find_by_text] Prefer find.byKey() for widget interactions instead of find.text(). - find.text() is appropriate for verifying displayed content. - find.byKey() is preferred for tapping/interacting with widgets because it\'s stable when text changes (e.g., i18n, A/B testing).',
+        '[avoid_find_by_text] Prefer find.byKey() for widget interactions instead of find.text(). - find.text() is appropriate for verifying displayed content. - find.byKey() is preferred for tapping/interacting with widgets because it\'s stable when text changes (e.g., i18n, A/B testing). {v3}',
     correctionMessage:
         'Add a Key to the widget and use find.byKey() for tap/drag operations. Run the full test suite to confirm the refactored tests maintain equivalent coverage.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -1030,6 +1050,8 @@ class AvoidFindByTextRule extends SaropaLintRule {
 
 /// Warns when widgets in tests don't have keys for findability.
 ///
+/// Since: v1.4.2 | Updated: v4.13.0 | Rule version: v4
+///
 /// Without keys, tests rely on fragile methods like find.text().
 ///
 /// **BAD:**
@@ -1069,7 +1091,7 @@ class RequireTestKeysRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_test_keys',
     problemMessage:
-        '[require_test_keys] Interactive widget in test code lacks a Key, making it difficult to locate with find.byKey() in widget tests. Without a Key, tests rely on fragile finders like find.byType() that break when multiple instances of the same widget type exist in the tree.',
+        '[require_test_keys] Interactive widget in test code lacks a Key, making it difficult to locate with find.byKey() in widget tests. Without a Key, tests rely on fragile finders like find.byType() that break when multiple instances of the same widget type exist in the tree. {v4}',
     correctionMessage:
         'Add a descriptive Key (e.g., key: Key("submit_button")) so the widget is reliably identifiable in widget test finders.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -1132,6 +1154,8 @@ class RequireTestKeysRule extends SaropaLintRule {
 
 /// Warns when tests don't follow the Arrange-Act-Assert pattern.
 ///
+/// Since: v1.4.2 | Updated: v4.13.0 | Rule version: v3
+///
 /// AAA pattern makes tests more readable and maintainable.
 ///
 /// **BAD:**
@@ -1175,7 +1199,7 @@ class RequireArrangeActAssertRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_arrange_act_assert',
     problemMessage:
-        '[require_arrange_act_assert] Test should follow Arrange-Act-Assert pattern. AAA pattern makes tests more readable and maintainable. This weakens test quality, making failures harder to diagnose and reducing confidence in the test suite.',
+        '[require_arrange_act_assert] Test should follow Arrange-Act-Assert pattern. AAA pattern makes tests more readable and maintainable. This weakens test quality, making failures harder to diagnose and reducing confidence in the test suite. {v3}',
     correctionMessage:
         'Add // Arrange, // Act, // Assert comments to structure the test. Run the full test suite to confirm the refactored tests maintain equivalent coverage.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -1225,6 +1249,8 @@ class RequireArrangeActAssertRule extends SaropaLintRule {
 
 /// Warns when Navigator is used in tests without mocking.
 ///
+/// Since: v1.4.2 | Updated: v4.13.0 | Rule version: v4
+///
 /// Real navigation in tests can cause issues and makes tests harder to verify.
 ///
 /// **BAD:**
@@ -1266,7 +1292,7 @@ class PreferMockNavigatorRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_mock_navigator',
     problemMessage:
-        '[prefer_mock_navigator] Navigator usage in test must be mocked for verification. Real navigation in tests can cause issues and makes tests harder to verify. Navigator is used in tests without mocking.',
+        '[prefer_mock_navigator] Navigator usage in test must be mocked for verification. Real navigation in tests can cause issues and makes tests harder to verify. Navigator is used in tests without mocking. {v4}',
     correctionMessage:
         'Use MockNavigatorObserver to verify navigation. Run the full test suite to confirm the refactored tests maintain equivalent coverage.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -1311,6 +1337,8 @@ class PreferMockNavigatorRule extends SaropaLintRule {
 
 /// Warns when Timer is used in widget tests without fakeAsync.
 ///
+/// Since: v1.4.2 | Updated: v4.13.0 | Rule version: v6
+///
 /// Real timers make tests slow and flaky.
 ///
 /// **BAD:**
@@ -1346,7 +1374,7 @@ class AvoidRealTimerInWidgetTestRule extends SaropaLintRule {
     name: 'avoid_real_timer_in_widget_test',
     problemMessage:
         '[avoid_real_timer_in_widget_test] Real Timer in widget test causes flaky results and slow execution due to actual time delays. '
-        'Timer callbacks execute asynchronously outside the test framework control, leading to race conditions where assertions run before or after the timer fires depending on system load.',
+        'Timer callbacks execute asynchronously outside the test framework control, leading to race conditions where assertions run before or after the timer fires depending on system load. {v6}',
     correctionMessage:
         'Use fakeAsync to control time advancement deterministically, or wrap timer-dependent code in tester.runAsync(). '
         'This eliminates real-time waits, prevents race conditions, and ensures tests produce consistent results regardless of system load or CI environment speed.',
@@ -1390,6 +1418,8 @@ class AvoidRealTimerInWidgetTestRule extends SaropaLintRule {
 
 /// Warns when mocks are created but not verified.
 ///
+/// Since: v1.4.2 | Updated: v4.13.0 | Rule version: v4
+///
 /// Creating mocks without verification means the test doesn't check behavior.
 ///
 /// **BAD:**
@@ -1427,7 +1457,7 @@ class RequireMockVerificationRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_mock_verification',
     problemMessage:
-        '[require_mock_verification] Mock is stubbed but never verified. Creating mocks without verification means the test doesn\'t check behavior. This weakens test quality, making failures harder to diagnose and reducing confidence in the test suite.',
+        '[require_mock_verification] Mock is stubbed but never verified. Creating mocks without verification means the test doesn\'t check behavior. This weakens test quality, making failures harder to diagnose and reducing confidence in the test suite. {v4}',
     correctionMessage:
         'Add verify() call to check mock interactions. Run the full test suite to confirm the refactored tests maintain equivalent coverage.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -1476,6 +1506,8 @@ class RequireMockVerificationRule extends SaropaLintRule {
 
 /// Warns when expect uses equality instead of matchers.
 ///
+/// Since: v1.4.2 | Updated: v4.13.0 | Rule version: v7
+///
 /// Matchers provide better error messages and more expressive tests.
 ///
 /// **BAD:**
@@ -1507,7 +1539,7 @@ class PreferMatcherOverEqualsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_matcher_over_equals',
     problemMessage:
-        '[prefer_matcher_over_equals] Use matchers instead of direct equality to improve messages. Matchers provide better error messages and more expressive tests. Expect uses equality instead of matchers.',
+        '[prefer_matcher_over_equals] Use matchers instead of direct equality to improve messages. Matchers provide better error messages and more expressive tests. Expect uses equality instead of matchers. {v7}',
     correctionMessage:
         'Replace with isTrue, isFalse, isNull, hasLength(), etc. Run the full test suite to confirm the refactored tests maintain equivalent coverage.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -1561,6 +1593,8 @@ class PreferMatcherOverEqualsRule extends SaropaLintRule {
 
 /// Warns when widget tests don't wrap with MaterialApp/Scaffold.
 ///
+/// Since: v1.4.2 | Updated: v4.13.0 | Rule version: v4
+///
 /// Most widgets need MaterialApp ancestor for theming and localization.
 ///
 /// **Note:** This rule ignores teardown patterns where simple widgets like
@@ -1608,7 +1642,7 @@ class PreferTestWrapperRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_test_wrapper',
     problemMessage:
-        '[prefer_test_wrapper] Widget test should wrap with MaterialApp/CupertinoApp. Most widgets need MaterialApp ancestor for theming and localization. Note: This rule ignores teardown patterns where simple widgets like SizedBox, Container, or Placeholder are pumped to unmount the widget tree before disposal.',
+        '[prefer_test_wrapper] Widget test should wrap with MaterialApp/CupertinoApp. Most widgets need MaterialApp ancestor for theming and localization. Note: This rule ignores teardown patterns where simple widgets like SizedBox, Container, or Placeholder are pumped to unmount the widget tree before disposal. {v4}',
     correctionMessage:
         'Wrap the widget with MaterialApp(home: Scaffold(body: ..)). Run the full test suite to confirm the refactored tests maintain equivalent coverage.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -1737,6 +1771,8 @@ class _WrapWithMaterialAppFix extends DartFix {
 
 /// Warns when widget tests don't test multiple screen sizes.
 ///
+/// Since: v1.4.2 | Updated: v4.13.0 | Rule version: v3
+///
 /// Responsive apps should be tested at different screen sizes.
 ///
 /// **BAD:**
@@ -1775,7 +1811,7 @@ class RequireScreenSizeTestsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_screen_size_tests',
     problemMessage:
-        '[require_screen_size_tests] Widget test does not verify behavior at multiple screen sizes. Responsive layouts can break on different devices, and single-size tests miss overflow and layout errors at runtime.',
+        '[require_screen_size_tests] Widget test does not verify behavior at multiple screen sizes. Responsive layouts can break on different devices, and single-size tests miss overflow and layout errors at runtime. {v3}',
     correctionMessage:
         'Use tester.binding.window.physicalSizeTestValue to test responsive layouts. Run the full test suite to confirm the refactored tests maintain equivalent coverage.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -1824,6 +1860,8 @@ class RequireScreenSizeTestsRule extends SaropaLintRule {
 
 /// Warns when test setUp uses mutable shared state.
 ///
+/// Since: v1.4.2 | Updated: v4.13.0 | Rule version: v4
+///
 /// Shared mutable state can cause test pollution.
 ///
 /// **BAD:**
@@ -1859,7 +1897,7 @@ class AvoidStatefulTestSetupRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_stateful_test_setup',
     problemMessage:
-        '[avoid_stateful_test_setup] setUp must not mutate shared state. Shared mutable state can cause test pollution. This weakens test quality, making failures harder to diagnose and reducing confidence in the test suite.',
+        '[avoid_stateful_test_setup] setUp must not mutate shared state. Shared mutable state can cause test pollution. This weakens test quality, making failures harder to diagnose and reducing confidence in the test suite. {v4}',
     correctionMessage:
         'Reassign variables instead of mutating them in setUp. Run the full test suite to confirm the refactored tests maintain equivalent coverage.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -1902,6 +1940,8 @@ class AvoidStatefulTestSetupRule extends SaropaLintRule {
 
 /// Warns when real HTTP client is used in tests.
 ///
+/// Since: v1.4.2 | Updated: v4.13.0 | Rule version: v5
+///
 /// Real network calls make tests slow and flaky.
 ///
 /// **BAD:**
@@ -1935,7 +1975,7 @@ class PreferMockHttpRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_mock_http',
     problemMessage:
-        '[prefer_mock_http] Use mock HTTP client in tests instead of real network calls. Real network calls make tests slow and flaky. This weakens test quality, making failures harder to diagnose and reducing confidence in the test suite.',
+        '[prefer_mock_http] Use mock HTTP client in tests instead of real network calls. Real network calls make tests slow and flaky. This weakens test quality, making failures harder to diagnose and reducing confidence in the test suite. {v5}',
     correctionMessage:
         'Replace http.Client() with MockClient. Run the full test suite to confirm the refactored tests maintain equivalent coverage.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -1971,6 +2011,8 @@ class PreferMockHttpRule extends SaropaLintRule {
 
 /// Warns when visual widgets should have golden tests.
 ///
+/// Since: v1.4.2 | Updated: v4.13.0 | Rule version: v3
+///
 /// Golden tests catch visual regressions automatically.
 ///
 /// **BAD:**
@@ -1998,7 +2040,7 @@ class RequireGoldenTestRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_golden_test',
     problemMessage:
-        '[require_golden_test] Add golden test for visual verification. Golden tests catch visual regressions automatically. Visual widgets must have golden tests. This weakens test quality, making failures harder to diagnose and reducing confidence in the test suite.',
+        '[require_golden_test] Add golden test for visual verification. Golden tests catch visual regressions automatically. Visual widgets must have golden tests. This weakens test quality, making failures harder to diagnose and reducing confidence in the test suite. {v3}',
     correctionMessage:
         'Add matchesGoldenFile() for visual regression testing. Run the full test suite to confirm the refactored tests maintain equivalent coverage.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -2051,6 +2093,8 @@ class RequireGoldenTestRule extends SaropaLintRule {
 
 /// Warns when tests contain patterns that cause flakiness.
 ///
+/// Since: v1.4.3 | Updated: v4.13.0 | Rule version: v4
+///
 /// Flaky tests fail intermittently, eroding confidence in the test suite.
 /// This rule detects common causes of test flakiness.
 ///
@@ -2094,7 +2138,7 @@ class AvoidFlakyTestsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_flaky_tests',
     problemMessage:
-        '[avoid_flaky_tests] Test contains patterns that may cause flakiness. Flaky tests fail intermittently, eroding confidence in the test suite. This rule detects common causes of test flakiness.',
+        '[avoid_flaky_tests] Test contains patterns that may cause flakiness. Flaky tests fail intermittently, eroding confidence in the test suite. This rule detects common causes of test flakiness. {v4}',
     correctionMessage:
         'Use seeded Random, mock time sources, use tester.pump() instead of. Run the full test suite to confirm the refactored tests maintain equivalent coverage.'
         'Future.delayed, and mock network/file system access.',
@@ -2208,6 +2252,8 @@ class AvoidFlakyTestsRule extends SaropaLintRule {
 
 /// Warns when a test has multiple assertions testing different behaviors.
 ///
+/// Since: v1.7.2 | Updated: v4.13.0 | Rule version: v2
+///
 /// Tests with multiple assertions are harder to debug - you only see the
 /// first failure. One logical assertion per test clarifies what broke.
 ///
@@ -2253,7 +2299,7 @@ class PreferSingleAssertionRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_single_assertion',
     problemMessage:
-        '[prefer_single_assertion] Test has many assertions. Split into focused tests. Tests with multiple assertions are harder to debug - you only see the first failure. One logical assertion per test clarifies what broke.',
+        '[prefer_single_assertion] Test has many assertions. Split into focused tests. Tests with multiple assertions are harder to debug - you only see the first failure. One logical assertion per test clarifies what broke. {v2}',
     correctionMessage:
         'One logical assertion per test makes failures easier to debug. Run the full test suite to confirm the refactored tests maintain equivalent coverage.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -2297,6 +2343,8 @@ class PreferSingleAssertionRule extends SaropaLintRule {
 
 /// Warns when find.byType() is used without a specific type.
 ///
+/// Since: v1.7.2 | Updated: v4.13.0 | Rule version: v2
+///
 /// Using generic finders like find.byType(Text) matches many widgets and
 /// makes tests fragile. Use more specific finders.
 ///
@@ -2330,7 +2378,7 @@ class AvoidFindAllRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_find_all',
     problemMessage:
-        '[avoid_find_all] Generic finder (Text, Container, etc.) matches many widgets. Use specific finder. Using generic finders like find.byType(Text) matches many widgets and makes tests fragile. Use more specific finders.',
+        '[avoid_find_all] Generic finder (Text, Container, etc.) matches many widgets. Use specific finder. Using generic finders like find.byType(Text) matches many widgets and makes tests fragile. Use more specific finders. {v2}',
     correctionMessage:
         'Use find.text(), find.byKey(), find.byIcon(), or find your custom widget type. Run the full test suite to confirm the refactored tests maintain equivalent coverage.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -2396,6 +2444,8 @@ class AvoidFindAllRule extends SaropaLintRule {
 
 /// Warns when integration tests don't initialize the test binding.
 ///
+/// Since: v1.7.2 | Updated: v4.13.0 | Rule version: v2
+///
 /// Integration tests need IntegrationTestWidgetsFlutterBinding.ensureInitialized()
 /// in main(). Without it, tests hang or crash on device.
 ///
@@ -2436,7 +2486,7 @@ class RequireIntegrationTestSetupRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_integration_test_setup',
     problemMessage:
-        '[require_integration_test_setup] Integration test missing IntegrationTestWidgetsFlutterBinding.ensureInitialized(). Integration tests need IntegrationTestWidgetsFlutterBinding.ensureInitialized() in main(). Without it, tests hang or crash on device.',
+        '[require_integration_test_setup] Integration test missing IntegrationTestWidgetsFlutterBinding.ensureInitialized(). Integration tests need IntegrationTestWidgetsFlutterBinding.ensureInitialized() in main(). Without it, tests hang or crash on device. {v2}',
     correctionMessage:
         'Add IntegrationTestWidgetsFlutterBinding.ensureInitialized() at start of main().',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -2505,6 +2555,8 @@ class _AddIntegrationTestBindingFix extends DartFix {
 
 /// Warns when Future.delayed is used with hardcoded duration in tests.
 ///
+/// Since: v4.13.0 | Rule version: v1
+///
 /// Hardcoded delays are flaky - too short and tests fail intermittently,
 /// too long and tests waste time. Use pumpAndSettle() or wait for conditions.
 ///
@@ -2544,7 +2596,7 @@ class AvoidHardcodedDelaysRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_hardcoded_delays',
     problemMessage:
-        '[avoid_hardcoded_delays] Hardcoded delay in test is flaky. Use pumpAndSettle() instead. Hardcoded delays are flaky - too short and tests fail intermittently, too long and tests waste time. Use pumpAndSettle() or wait for conditions.',
+        '[avoid_hardcoded_delays] Hardcoded delay in test is flaky. Use pumpAndSettle() instead. Hardcoded delays are flaky - too short and tests fail intermittently, too long and tests waste time. Use pumpAndSettle() or wait for conditions. {v1}',
     correctionMessage:
         'Replace Future.delayed with tester.pumpAndSettle() or condition-based waiting. Run the full test suite to confirm the refactored tests maintain equivalent coverage.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -2607,6 +2659,8 @@ class _AddPumpAndSettleTodoFix extends DartFix {
 }
 
 /// Warns when test files don't include error case or boundary tests.
+///
+/// Since: v4.1.1 | Updated: v4.13.0 | Rule version: v4
 ///
 /// Happy-path-only tests miss critical edge cases. Tests should verify
 /// error handling, boundary conditions, or defensive behavior. The rule
@@ -2673,7 +2727,7 @@ class RequireErrorCaseTestsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_error_case_tests',
     problemMessage:
-        '[require_error_case_tests] Test file has no error case tests. Consider adding tests for exceptions.',
+        '[require_error_case_tests] Test file has no error case tests. Consider adding tests for exceptions. {v4}',
     correctionMessage:
         'Add tests using throwsA(), throwsException, or expect(..., isA<Exception>()). '
         'If the source code has no error-throwing paths (e.g. pure enums, '
@@ -2772,6 +2826,8 @@ class RequireErrorCaseTestsRule extends SaropaLintRule {
 
 /// Warns when find.byType is used instead of find.byKey in widget tests.
 ///
+/// Since: v2.5.0 | Updated: v4.13.0 | Rule version: v3
+///
 /// Alias: find_by_key, widget_test_key, prefer_key_finder
 ///
 /// Using find.byType can be fragile when widget structure changes.
@@ -2839,7 +2895,7 @@ class PreferTestFindByKeyRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_test_find_by_key',
     problemMessage:
-        '[prefer_test_find_by_key] find.byType() is fragile. Use find.byKey() for reliable widget testing. Using find.byType can be fragile when widget structure changes. Using find.byKey with ValueKey or Key is more reliable and explicit.',
+        '[prefer_test_find_by_key] find.byType() is fragile. Use find.byKey() for reliable widget testing. Using find.byType can be fragile when widget structure changes. Using find.byKey with ValueKey or Key is more reliable and explicit. {v3}',
     correctionMessage:
         'Add a Key to your widget and use find.byKey(Key(\'my_key\')) instead. Run the full test suite to confirm the refactored tests maintain equivalent coverage.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -2865,6 +2921,8 @@ class PreferTestFindByKeyRule extends SaropaLintRule {
 }
 
 /// Warns when test setup code is duplicated instead of using setUp/tearDown.
+///
+/// Since: v2.5.0 | Updated: v4.13.0 | Rule version: v5
 ///
 /// Alias: setup_teardown, test_setup, dry_tests
 ///
@@ -2921,7 +2979,7 @@ class PreferSetupTeardownRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_setup_teardown',
     problemMessage:
-        '[prefer_setup_teardown] Duplicated test setup code. Use setUp()/tearDown(). Repeated setup code in tests violates DRY and makes maintenance harder. Use setUp() and tearDown() for common test initialization.',
+        '[prefer_setup_teardown] Duplicated test setup code. Use setUp()/tearDown(). Repeated setup code in tests violates DRY and makes maintenance harder. Use setUp() and tearDown() for common test initialization. {v5}',
     correctionMessage:
         'Move common initialization to setUp() and cleanup to tearDown(). Run the full test suite to confirm the refactored tests maintain equivalent coverage.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -3055,6 +3113,8 @@ class _TestCallCollector extends RecursiveAstVisitor<void> {
 
 /// Warns when test descriptions don't follow conventions.
 ///
+/// Since: v2.5.0 | Updated: v4.13.0 | Rule version: v3
+///
 /// Alias: test_description, test_naming_convention
 ///
 /// Test descriptions should explain WHAT is being tested and WHAT the
@@ -3089,7 +3149,7 @@ class RequireTestDescriptionConventionRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_test_description_convention',
     problemMessage:
-        '[require_test_description_convention] Test description should explain what is being tested and expected behavior. Test descriptions should explain WHAT is being tested and WHAT the expected behavior is. This helps with test maintenance and debugging.',
+        '[require_test_description_convention] Test description should explain what is being tested and expected behavior. Test descriptions should explain WHAT is being tested and WHAT the expected behavior is. This helps with test maintenance and debugging. {v3}',
     correctionMessage:
         'Use format: "should [action] when [condition]" or "[Subject].[method] [expectation]".',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -3154,6 +3214,8 @@ class RequireTestDescriptionConventionRule extends SaropaLintRule {
 
 /// Warns when Bloc is tested without bloc_test package.
 ///
+/// Since: v2.5.0 | Updated: v4.13.0 | Rule version: v3
+///
 /// Alias: bloc_test, bloc_testing, use_bloc_test
 ///
 /// The bloc_test package provides `blocTest()` which is specifically designed
@@ -3196,7 +3258,7 @@ class PreferBlocTestPackageRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_bloc_test_package',
     problemMessage:
-        '[prefer_bloc_test_package] Use blocTest() from bloc_test package for Bloc testing. The bloc_test package provides blocTest() which is specifically designed for testing Blocs with better state and event assertions.',
+        '[prefer_bloc_test_package] Use blocTest() from bloc_test package for Bloc testing. The bloc_test package provides blocTest() which is specifically designed for testing Blocs with better state and event assertions. {v3}',
     correctionMessage:
         'Add bloc_test to dev_dependencies and use blocTest<Bloc, State>(). Run the full test suite to confirm the refactored tests maintain equivalent coverage.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -3228,6 +3290,8 @@ class PreferBlocTestPackageRule extends SaropaLintRule {
 }
 
 /// Warns when mock verify() is not used to check method calls.
+///
+/// Since: v2.5.0 | Updated: v4.13.0 | Rule version: v3
 ///
 /// Alias: mock_verify, verify_mock_calls, mockito_verify
 ///
@@ -3274,7 +3338,7 @@ class PreferMockVerifyRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_mock_verify',
     problemMessage:
-        '[prefer_mock_verify] Mock setup with when() but no verify(). Test may pass without calling mock. Using verify() ensures that expected method calls actually happened. Without verification, tests may pass even when methods aren\'t called.',
+        '[prefer_mock_verify] Mock setup with when() but no verify(). Test may pass without calling mock. Using verify() ensures that expected method calls actually happened. Without verification, tests may pass even when methods aren\'t called. {v3}',
     correctionMessage:
         'Add verify(mock.method()).called(n) to ensure method was called. Run the full test suite to confirm the refactored tests maintain equivalent coverage.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -3311,6 +3375,8 @@ class PreferMockVerifyRule extends SaropaLintRule {
 // =============================================================================
 
 /// Warns when dialog tests don't handle special testing requirements.
+///
+/// Since: v4.1.8 | Updated: v4.13.0 | Rule version: v2
 ///
 /// Dialogs require special handling: tap to open, find within dialog
 /// context, test dismiss behavior. Don't forget barrier dismiss tests.
@@ -3353,7 +3419,7 @@ class RequireDialogTestsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_dialog_tests',
     problemMessage:
-        '[require_dialog_tests] Dialog test may be incomplete. Ensure pumpAndSettle after showing dialog. Dialogs require special handling: tap to open, find within dialog context, test dismiss behavior. Don\'t forget barrier dismiss tests.',
+        '[require_dialog_tests] Dialog test may be incomplete. Ensure pumpAndSettle after showing dialog. Dialogs require special handling: tap to open, find within dialog context, test dismiss behavior. Don\'t forget barrier dismiss tests. {v2}',
     correctionMessage:
         'Add pumpAndSettle() after showing dialog to wait for animations. Run the full test suite to confirm the refactored tests maintain equivalent coverage.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -3416,6 +3482,8 @@ class RequireDialogTestsRule extends SaropaLintRule {
 
 /// Warns when platform channels are used without fakes in tests.
 ///
+/// Since: v4.1.8 | Updated: v4.13.0 | Rule version: v2
+///
 /// Platform channels (camera, GPS, storage) need fakes in tests.
 /// Use `TestDefaultBinaryMessengerBinding` to mock platform responses.
 ///
@@ -3450,7 +3518,7 @@ class PreferFakePlatformRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_fake_platform',
     problemMessage:
-        '[prefer_fake_platform] Platform-dependent widget in test without mock. Platform channels (camera, GPS, storage) need fakes in tests. Use TestDefaultBinaryMessengerBinding to mock platform responses.',
+        '[prefer_fake_platform] Platform-dependent widget in test without mock. Platform channels (camera, GPS, storage) need fakes in tests. Use TestDefaultBinaryMessengerBinding to mock platform responses. {v2}',
     correctionMessage:
         'Use TestDefaultBinaryMessengerBinding to mock platform channel responses. Run the full test suite to confirm the refactored tests maintain equivalent coverage.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -3536,6 +3604,8 @@ class PreferFakePlatformRule extends SaropaLintRule {
 
 /// Warns when complex tests lack documentation.
 ///
+/// Since: v4.1.8 | Updated: v4.13.0 | Rule version: v2
+///
 /// `[HEURISTIC]` - Detects long tests without comments.
 ///
 /// Complex integration tests with unusual setup or assertions need
@@ -3580,7 +3650,7 @@ class RequireTestDocumentationRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_test_documentation',
     problemMessage:
-        '[require_test_documentation] Complex test lacks documentation. Complex integration tests with unusual setup or assertions need comments explaining the test scenario and why it matters.',
+        '[require_test_documentation] Complex test lacks documentation. Complex integration tests with unusual setup or assertions need comments explaining the test scenario and why it matters. {v2}',
     correctionMessage:
         'Add comments explaining the test scenario and why it matters. Run the full test suite to confirm the refactored tests maintain equivalent coverage.',
     errorSeverity: DiagnosticSeverity.INFO,

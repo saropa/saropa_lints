@@ -8,6 +8,8 @@ import 'package:saropa_lints/src/saropa_lint_rule.dart';
 
 /// Warns when SnackBar is created without explicit duration.
 ///
+/// Since: v1.8.2 | Updated: v4.13.0 | Rule version: v3
+///
 /// The default SnackBar duration (4 seconds) may not be appropriate for
 /// all messages. Explicitly setting duration makes intent clear and
 /// ensures UX consistency.
@@ -42,7 +44,7 @@ class RequireSnackbarDurationRule extends SaropaLintRule {
     name: 'require_snackbar_duration',
     problemMessage:
         '[require_snackbar_duration] Default duration varies by platform, '
-        'causing inconsistent UX across devices.',
+        'causing inconsistent UX across devices. {v3}',
     correctionMessage: 'Add duration parameter for consistent UX timing.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -117,6 +119,8 @@ class _AddDurationFix extends DartFix {
 
 /// Warns when showDialog is called without explicit barrierDismissible.
 ///
+/// Since: v1.8.2 | Updated: v4.13.0 | Rule version: v3
+///
 /// The barrierDismissible parameter controls whether tapping outside
 /// the dialog closes it. Making this explicit improves code clarity
 /// and prevents accidental dialog dismissals.
@@ -151,7 +155,7 @@ class RequireDialogBarrierDismissibleRule extends SaropaLintRule {
     name: 'require_dialog_barrier_dismissible',
     problemMessage:
         '[require_dialog_barrier_dismissible] Default barrier behavior may '
-        'allow accidental dismissal, losing unsaved user input.',
+        'allow accidental dismissal, losing unsaved user input. {v3}',
     correctionMessage:
         'Add barrierDismissible: true or false to make intent clear.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -223,6 +227,8 @@ class _AddBarrierDismissibleFix extends DartFix {
 
 /// Warns when showDialog result is not handled.
 ///
+/// Since: v1.8.2 | Updated: v4.13.0 | Rule version: v2
+///
 /// Dialogs that return values (like confirmation dialogs) should have
 /// their results awaited and processed. Ignoring the result can lead
 /// to missed user actions.
@@ -265,7 +271,7 @@ class RequireDialogResultHandlingRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_dialog_result_handling',
     problemMessage:
-        '[require_dialog_result_handling] showDialog result must be awaited or handled. Dialogs that return values (like confirmation dialogs) must have their results awaited and processed. Ignoring the result can lead to missed user actions.',
+        '[require_dialog_result_handling] showDialog result must be awaited or handled. Dialogs that return values (like confirmation dialogs) must have their results awaited and processed. Ignoring the result can lead to missed user actions. {v2}',
     correctionMessage:
         'Use await showDialog() or .then() to handle the dialog result. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -305,6 +311,8 @@ class RequireDialogResultHandlingRule extends SaropaLintRule {
 
 /// Warns when showSnackBar is called without clearing previous snackbars.
 ///
+/// Since: v1.8.2 | Updated: v4.13.0 | Rule version: v2
+///
 /// Multiple snackbars can queue up, leading to poor UX where users
 /// see stale messages. Consider clearing or hiding previous snackbars
 /// before showing new ones.
@@ -337,7 +345,7 @@ class AvoidSnackbarQueueBuildupRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_snackbar_queue_buildup',
     problemMessage:
-        '[avoid_snackbar_queue_buildup] Prefer clearing snackbars before showing new ones. Multiple snackbars can queue up, leading to poor UX where users see stale messages. Prefer clearing or hiding previous snackbars before showing new ones.',
+        '[avoid_snackbar_queue_buildup] Prefer clearing snackbars before showing new ones. Multiple snackbars can queue up, leading to poor UX where users see stale messages. Prefer clearing or hiding previous snackbars before showing new ones. {v2}',
     correctionMessage:
         'Call clearSnackBars() or hideCurrentSnackBar() before showSnackBar(). Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -387,6 +395,8 @@ class AvoidSnackbarQueueBuildupRule extends SaropaLintRule {
 
 /// Warns when showDialog doesn't use adaptive styling.
 ///
+/// Since: v4.10.0 | Updated: v4.13.0 | Rule version: v3
+///
 /// Dialogs should adapt to the platform (Material on Android,
 /// Cupertino on iOS) for native look and feel.
 ///
@@ -435,7 +445,7 @@ class PreferAdaptiveDialogRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_adaptive_dialog',
     problemMessage:
-        '[prefer_adaptive_dialog] AlertDialog without adaptive styling. May look non-native on iOS. Dialogs should adapt to the platform (Material on Android, Cupertino on iOS) for native look and feel.',
+        '[prefer_adaptive_dialog] AlertDialog without adaptive styling. May look non-native on iOS. Dialogs should adapt to the platform (Material on Android, Cupertino on iOS) for native look and feel. {v3}',
     correctionMessage:
         'Use AlertDialog.adaptive() or platform-specific dialogs. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -517,6 +527,8 @@ class _UseAdaptiveDialogFix extends DartFix {
 
 /// Warns when SnackBar for delete operation doesn't have undo action.
 ///
+/// Since: v2.1.0 | Updated: v4.13.0 | Rule version: v2
+///
 /// Destructive actions should provide an undo option. SnackBars
 /// are perfect for this pattern with their action button.
 ///
@@ -552,7 +564,7 @@ class RequireSnackbarActionForUndoRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_snackbar_action_for_undo',
     problemMessage:
-        '[require_snackbar_action_for_undo] SnackBar for delete/remove without undo action. Users can\'t recover. Destructive actions should provide an undo option. SnackBars are perfect for this pattern with their action button.',
+        '[require_snackbar_action_for_undo] SnackBar for delete/remove without undo action. Users can\'t recover. Destructive actions should provide an undo option. SnackBars are perfect for this pattern with their action button. {v2}',
     correctionMessage:
         'Add action parameter with SnackBarAction for undo functionality. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,

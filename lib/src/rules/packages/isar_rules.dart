@@ -17,6 +17,8 @@ import '../../saropa_lint_rule.dart';
 
 /// Warns when enum types are used directly as fields in Isar `@collection` classes.
 ///
+/// Since: v1.7.6 | Updated: v4.13.0 | Rule version: v3
+///
 /// Alias: avoid_isar_enum_index_change, isar_enum_corruption, isar_enum_index
 ///
 /// Storing enums directly in Isar is dangerous because:
@@ -59,7 +61,7 @@ class AvoidIsarEnumFieldRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_isar_enum_field',
     problemMessage:
-        '[avoid_isar_enum_field] Storing enums directly in Isar collections is dangerous: renaming or reordering enum values will silently corrupt your data, breaking existing records and causing unpredictable bugs.',
+        '[avoid_isar_enum_field] Storing enums directly in Isar collections is dangerous: renaming or reordering enum values will silently corrupt your data, breaking existing records and causing unpredictable bugs. {v3}',
     correctionMessage:
         'Store the enum as a String field in the database and use an @ignore getter to parse it into an enum. See the rule documentation for a safe pattern.',
     errorSeverity: DiagnosticSeverity.ERROR,
@@ -367,6 +369,8 @@ class _AvoidIsarEnumFieldFix extends DartFix {
 
 /// Warns when a class is used with Isar operations but lacks @collection.
 ///
+/// Since: v4.13.0 | Rule version: v1
+///
 /// Classes passed to Isar operations (put, get, delete) must have the
 /// @collection annotation to be properly persisted.
 ///
@@ -399,7 +403,7 @@ class RequireIsarCollectionAnnotationRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_isar_collection_annotation',
     problemMessage:
-        '[require_isar_collection_annotation] This class is missing the @collection annotation, so Isar will not generate an adapter for it. As a result, any attempt to persist or query this type will fail at runtime, and your build will break with missing adapter errors.',
+        '[require_isar_collection_annotation] This class is missing the @collection annotation, so Isar will not generate an adapter for it. As a result, any attempt to persist or query this type will fail at runtime, and your build will break with missing adapter errors. {v1}',
     correctionMessage:
         'Add the @collection annotation to this class to enable Isar code generation and ensure persistence works.',
     errorSeverity: DiagnosticSeverity.ERROR,
@@ -448,6 +452,8 @@ class RequireIsarCollectionAnnotationRule extends SaropaLintRule {
 
 /// Warns when @collection class is missing the required Id field.
 ///
+/// Since: v4.13.0 | Rule version: v1
+///
 /// Every Isar collection must have an `Id? id` field to store the
 /// auto-generated primary key.
 ///
@@ -479,7 +485,7 @@ class RequireIsarIdFieldRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_isar_id_field',
     problemMessage:
-        '[require_isar_id_field] Every Isar collection must have an "Id? id" field as the primary key. Without it, Isar cannot uniquely identify records, and code generation will fail, causing your build to break and all database operations to be unusable.',
+        '[require_isar_id_field] Every Isar collection must have an "Id? id" field as the primary key. Without it, Isar cannot uniquely identify records, and code generation will fail, causing your build to break and all database operations to be unusable. {v1}',
     correctionMessage:
         'Add "Id? id;" as the first field in your @collection class to enable Isar persistence and code generation.',
     errorSeverity: DiagnosticSeverity.ERROR,
@@ -528,6 +534,8 @@ class RequireIsarIdFieldRule extends SaropaLintRule {
 
 /// Warns when Isar.open/openSync is used without closing in dispose.
 ///
+/// Since: v4.13.0 | Rule version: v1
+///
 /// Isar instances hold file handles that must be released. Failure to close
 /// causes resource leaks and can prevent database access in other parts.
 ///
@@ -570,7 +578,7 @@ class RequireIsarCloseOnDisposeRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_isar_close_on_dispose',
     problemMessage:
-        '[require_isar_close_on_dispose] If you do not close the Isar instance in dispose(), file handles and system resources will leak. This can cause database corruption, prevent reopening the database, and lead to crashes or data loss on app restart.',
+        '[require_isar_close_on_dispose] If you do not close the Isar instance in dispose(), file handles and system resources will leak. This can cause database corruption, prevent reopening the database, and lead to crashes or data loss on app restart. {v1}',
     correctionMessage:
         'Always call isar.close() in your dispose() method to safely release resources and prevent leaks.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -627,6 +635,8 @@ class RequireIsarCloseOnDisposeRule extends SaropaLintRule {
 
 /// Warns when writeTxnSync is used in build methods.
 ///
+/// Since: v4.13.0 | Rule version: v1
+///
 /// Synchronous database writes block the UI thread. Use writeTxn
 /// (async) instead, especially in widget build methods.
 ///
@@ -656,7 +666,7 @@ class PreferIsarAsyncWritesRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_isar_async_writes',
     problemMessage:
-        '[prefer_isar_async_writes] Using writeTxnSync in build methods will block the UI thread, causing your app to freeze, stutter, or become unresponsive. This leads to poor user experience and can trigger platform watchdogs to kill your app.',
+        '[prefer_isar_async_writes] Using writeTxnSync in build methods will block the UI thread, causing your app to freeze, stutter, or become unresponsive. This leads to poor user experience and can trigger platform watchdogs to kill your app. {v1}',
     correctionMessage:
         'Always use writeTxn (async) instead of writeTxnSync in build methods or UI code. Refactor any synchronous database writes to be asynchronous to keep your app responsive.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -690,6 +700,8 @@ class PreferIsarAsyncWritesRule extends SaropaLintRule {
 
 /// Warns when writeTxn is called inside another writeTxn.
 ///
+/// Since: v4.13.0 | Rule version: v1
+///
 /// Nested write transactions cause deadlocks in Isar. Each writeTxn
 /// acquires an exclusive lock that cannot be acquired again.
 ///
@@ -721,7 +733,7 @@ class AvoidIsarTransactionNestingRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_isar_transaction_nesting',
     problemMessage:
-        '[avoid_isar_transaction_nesting] Calling writeTxn inside another writeTxn causes a deadlock: Isar cannot acquire a second write lock while the first is held. This will freeze your app and block all database writes until a restart.',
+        '[avoid_isar_transaction_nesting] Calling writeTxn inside another writeTxn causes a deadlock: Isar cannot acquire a second write lock while the first is held. This will freeze your app and block all database writes until a restart. {v1}',
     correctionMessage:
         'Combine all write operations into a single writeTxn block to avoid deadlocks and ensure your app remains responsive.',
     errorSeverity: DiagnosticSeverity.ERROR,
@@ -777,6 +789,8 @@ class AvoidIsarTransactionNestingRule extends SaropaLintRule {
 
 /// Warns when put() is called in a loop instead of putAll().
 ///
+/// Since: v4.13.0 | Rule version: v1
+///
 /// Individual put() calls in loops are ~100x slower than batch operations.
 /// Isar optimizes putAll() for bulk inserts.
 ///
@@ -803,7 +817,7 @@ class PreferIsarBatchOperationsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_isar_batch_operations',
     problemMessage:
-        '[prefer_isar_batch_operations] Using put() in a loop for many records is extremely slow: each call triggers a separate database write. This can make your app hang or take minutes to save data. Batch operations like putAll() are up to 100x faster and prevent UI freezes.',
+        '[prefer_isar_batch_operations] Using put() in a loop for many records is extremely slow: each call triggers a separate database write. This can make your app hang or take minutes to save data. Batch operations like putAll() are up to 100x faster and prevent UI freezes. {v1}',
     correctionMessage:
         'Collect items into a list and use putAll() for batch writes instead of calling put() repeatedly. Refactor loops to use batch operations for better performance and user experience.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -840,6 +854,8 @@ class PreferIsarBatchOperationsRule extends SaropaLintRule {
 
 /// Warns when using equalTo() on double/float fields.
 ///
+/// Since: v4.13.0 | Rule version: v1
+///
 /// Float equality is imprecise due to floating-point representation.
 /// Use between() with a small epsilon for float comparisons.
 ///
@@ -864,7 +880,7 @@ class AvoidIsarFloatEqualityQueriesRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_isar_float_equality_queries',
     problemMessage:
-        '[avoid_isar_float_equality_queries] Querying floats for exact equality is unreliable: due to rounding errors, you may miss matching records or get inconsistent results. This can break features that depend on accurate data retrieval.',
+        '[avoid_isar_float_equality_queries] Querying floats for exact equality is unreliable: due to rounding errors, you may miss matching records or get inconsistent results. This can break features that depend on accurate data retrieval. {v1}',
     correctionMessage:
         'Use .between(value - epsilon, value + epsilon) for float comparisons to ensure all relevant records are found and avoid subtle bugs.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -899,6 +915,8 @@ class AvoidIsarFloatEqualityQueriesRule extends SaropaLintRule {
 
 /// Warns when Isar Inspector is used without kDebugMode guard.
 ///
+/// Since: v4.13.0 | Rule version: v1
+///
 /// Isar Inspector exposes all database contents. It should only be
 /// enabled in debug builds.
 ///
@@ -923,7 +941,7 @@ class RequireIsarInspectorDebugOnlyRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_isar_inspector_debug_only',
     problemMessage:
-        '[require_isar_inspector_debug_only] Enabling Isar Inspector in production exposes internal database details and can create security risks or performance issues. Inspector should only be enabled in debug mode to protect user data and app integrity.',
+        '[require_isar_inspector_debug_only] Enabling Isar Inspector in production exposes internal database details and can create security risks or performance issues. Inspector should only be enabled in debug mode to protect user data and app integrity. {v1}',
     correctionMessage:
         'Set inspector: kDebugMode to ensure Inspector is only active during development. Never use inspector: true in production builds.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -962,6 +980,8 @@ class RequireIsarInspectorDebugOnlyRule extends SaropaLintRule {
 
 /// Warns when `Isar.clear()` is called without a debug mode guard.
 ///
+/// Since: v4.8.5 | Updated: v4.13.0 | Rule version: v3
+///
 /// `Isar.clear()` deletes ALL data in the database. This should never
 /// happen in production accidentally. Only flags `.clear()` on receivers
 /// whose static type is `Isar` — does not flag `Map.clear()`,
@@ -990,7 +1010,7 @@ class AvoidIsarClearInProductionRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_isar_clear_in_production',
     problemMessage:
-        '[avoid_isar_clear_in_production] Calling isar.clear() will permanently delete ALL user data in the database. If this code runs in production, users will lose their data irreversibly, leading to catastrophic data loss.',
+        '[avoid_isar_clear_in_production] Calling isar.clear() will permanently delete ALL user data in the database. If this code runs in production, users will lose their data irreversibly, leading to catastrophic data loss. {v3}',
     correctionMessage:
         'Wrap isar.clear() in an if (kDebugMode) guard to ensure it only runs in development and never in production.',
     errorSeverity: DiagnosticSeverity.ERROR,
@@ -1035,6 +1055,8 @@ class AvoidIsarClearInProductionRule extends SaropaLintRule {
 
 /// Warns when IsarLinks properties are accessed without calling load().
 ///
+/// Since: v4.13.0 | Rule version: v1
+///
 /// IsarLinks are lazily loaded. Accessing .length, .first, etc. without
 /// calling load() first returns incorrect results.
 ///
@@ -1060,7 +1082,7 @@ class RequireIsarLinksLoadRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_isar_links_load',
     problemMessage:
-        '[require_isar_links_load] Accessing IsarLinks without calling load() first will return incorrect or empty results. This leads to subtle data bugs, such as missing related records, and can break app features that depend on linked data.',
+        '[require_isar_links_load] Accessing IsarLinks without calling load() first will return incorrect or empty results. This leads to subtle data bugs, such as missing related records, and can break app features that depend on linked data. {v1}',
     correctionMessage:
         'Call await links.load() or links.loadSync() before accessing IsarLinks properties to ensure data is loaded and accurate.',
     errorSeverity: DiagnosticSeverity.ERROR,
@@ -1110,6 +1132,8 @@ class RequireIsarLinksLoadRule extends SaropaLintRule {
 
 /// Warns when Timer-based polling is used instead of Isar's watch().
 ///
+/// Since: v4.13.0 | Rule version: v1
+///
 /// Isar provides reactive queries via watch() that are more efficient
 /// than periodic polling.
 ///
@@ -1139,7 +1163,7 @@ class PreferIsarQueryStreamRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_isar_query_stream',
     problemMessage:
-        '[prefer_isar_query_stream] Using Timer.periodic or manual polling for reactive queries is inefficient and can drain battery, waste CPU, and miss real-time updates. Isar watch() streams are event-driven and update instantly when data changes.',
+        '[prefer_isar_query_stream] Using Timer.periodic or manual polling for reactive queries is inefficient and can drain battery, waste CPU, and miss real-time updates. Isar watch() streams are event-driven and update instantly when data changes. {v1}',
     correctionMessage:
         'Replace Timer.periodic polling with collection.where().watch().listen() to get instant, efficient updates and avoid unnecessary resource usage.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -1179,6 +1203,8 @@ class PreferIsarQueryStreamRule extends SaropaLintRule {
 
 /// Warns when Isar sync APIs are used on web platform.
 ///
+/// Since: v4.13.0 | Rule version: v1
+///
 /// Isar web uses IndexedDB which doesn't support synchronous operations.
 /// Sync methods throw on web.
 ///
@@ -1203,7 +1229,7 @@ class AvoidIsarWebLimitationsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_isar_web_limitations',
     problemMessage:
-        '[avoid_isar_web_limitations] Isar sync APIs (e.g., putSync, getSync) will throw runtime errors or silently fail on web platforms. This can break your app for web users and cause data loss or missing features.',
+        '[avoid_isar_web_limitations] Isar sync APIs (e.g., putSync, getSync) will throw runtime errors or silently fail on web platforms. This can break your app for web users and cause data loss or missing features. {v1}',
     correctionMessage:
         'Replace all sync methods with async equivalents (e.g., put, get) to ensure your app works reliably on web and avoids runtime failures.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -1243,6 +1269,8 @@ class AvoidIsarWebLimitationsRule extends SaropaLintRule {
 
 /// Warns when querying fields that should be indexed.
 ///
+/// Since: v4.13.0 | Rule version: v1
+///
 /// Queries on non-indexed fields perform full table scans. Add @Index
 /// to frequently queried fields.
 ///
@@ -1272,7 +1300,7 @@ class PreferIsarIndexForQueriesRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_isar_index_for_queries',
     problemMessage:
-        '[prefer_isar_index_for_queries] Querying fields without an @Index annotation forces Isar to scan the entire collection, resulting in slow queries and poor performance as your data grows. Indexed fields enable fast lookups and scalable apps.',
+        '[prefer_isar_index_for_queries] Querying fields without an @Index annotation forces Isar to scan the entire collection, resulting in slow queries and poor performance as your data grows. Indexed fields enable fast lookups and scalable apps. {v1}',
     correctionMessage:
         'Add @Index() annotation to any field you query frequently to ensure fast, indexed lookups and avoid performance bottlenecks.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -1311,6 +1339,8 @@ class PreferIsarIndexForQueriesRule extends SaropaLintRule {
 
 /// Warns when large objects are embedded in Isar collections.
 ///
+/// Since: v4.13.0 | Rule version: v1
+///
 /// Embedded objects are duplicated in every record. Use IsarLinks
 /// for large or shared objects.
 ///
@@ -1342,7 +1372,7 @@ class AvoidIsarEmbeddedLargeObjectsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_isar_embedded_large_objects',
     problemMessage:
-        '[avoid_isar_embedded_large_objects] Using @embedded for large objects will duplicate the data in every record, causing excessive storage use and slow queries. For shared or large objects, this can make your database unmanageable.',
+        '[avoid_isar_embedded_large_objects] Using @embedded for large objects will duplicate the data in every record, causing excessive storage use and slow queries. For shared or large objects, this can make your database unmanageable. {v1}',
     correctionMessage:
         'Use IsarLink<T> instead of @embedded for large or shared objects to avoid duplication and keep your database efficient.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -1386,6 +1416,8 @@ class AvoidIsarEmbeddedLargeObjectsRule extends SaropaLintRule {
 
 /// Warns when IsarLinks is used without .lazy for large collections.
 ///
+/// Since: v4.13.0 | Rule version: v1
+///
 /// Regular IsarLinks loads all related objects eagerly. Use IsarLinks.lazy
 /// for collections with many items.
 ///
@@ -1410,7 +1442,7 @@ class PreferIsarLazyLinksRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_isar_lazy_links',
     problemMessage:
-        '[prefer_isar_lazy_links] Using IsarLinks<T>() for large linked collections loads all linked records at once, which can slow down your app and waste memory. IsarLinks.lazy() loads records on demand for better performance.',
+        '[prefer_isar_lazy_links] Using IsarLinks<T>() for large linked collections loads all linked records at once, which can slow down your app and waste memory. IsarLinks.lazy() loads records on demand for better performance. {v1}',
     correctionMessage:
         'Replace IsarLinks<T>() with IsarLinks<T>.lazy() for large or frequently accessed collections to keep your app fast and efficient.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -1443,6 +1475,8 @@ class PreferIsarLazyLinksRule extends SaropaLintRule {
 
 /// Warns about potential Isar schema breaking changes.
 ///
+/// Since: v4.13.0 | Rule version: v1
+///
 /// Removing fields, changing types, or renaming without @Name breaks migrations.
 ///
 /// Note: Full detection requires comparing against previous schema versions,
@@ -1459,7 +1493,7 @@ class AvoidIsarSchemaBreakingChangesRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_isar_schema_breaking_changes',
     problemMessage:
-        '[avoid_isar_schema_breaking_changes] Renaming, removing, or changing the type of a field in an Isar collection without using @Name will break migrations. This can cause data loss, failed upgrades, or app crashes for existing users.',
+        '[avoid_isar_schema_breaking_changes] Renaming, removing, or changing the type of a field in an Isar collection without using @Name will break migrations. This can cause data loss, failed upgrades, or app crashes for existing users. {v1}',
     correctionMessage:
         'When renaming a field, always add @Name("originalFieldName") to preserve the database mapping and ensure safe migrations.',
     errorSeverity: DiagnosticSeverity.ERROR,
@@ -1580,6 +1614,8 @@ class AvoidIsarSchemaBreakingChangesRule extends SaropaLintRule {
 
 /// Enforces nullable types for all Isar fields to prevent migration crashes.
 ///
+/// Since: v4.9.4 | Updated: v4.13.0 | Rule version: v3
+///
 /// Isar TypeAdapters bypass Dart constructors during hydration. If a field
 /// is non-nullable but the disk record is from an older version (NULL),
 /// the app will crash with a fatal TypeError.
@@ -1611,7 +1647,7 @@ class RequireIsarNullableFieldRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_isar_nullable_field',
     problemMessage:
-        '[require_isar_nullable_field] Isar TypeAdapters bypass constructors during hydration. Non-nullable fields trigger fatal TypeErrors when encountering NULL values from legacy disk records created in previous app versions where the field did not exist.',
+        '[require_isar_nullable_field] Isar TypeAdapters bypass constructors during hydration. Non-nullable fields trigger fatal TypeErrors when encountering NULL values from legacy disk records created in previous app versions where the field did not exist. {v3}',
     correctionMessage:
         'Convert the field to a nullable type (e.g., String?). This ensures the database safely loads legacy records. Handle the null state via a Domain Mapper or Repository to maintain strict application logic safely.',
     errorSeverity: DiagnosticSeverity.ERROR,
@@ -1699,6 +1735,8 @@ class _MakeNullableFix extends DartFix {
 
 /// Warns when multi-field queries lack composite indexes.
 ///
+/// Since: v4.13.0 | Rule version: v1
+///
 /// Queries on multiple fields need composite @Index for efficiency.
 ///
 /// **BAD:**
@@ -1729,7 +1767,7 @@ class PreferIsarCompositeIndexRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_isar_composite_index',
     problemMessage:
-        '[prefer_isar_composite_index] Querying multiple fields together without a composite index will force Isar to scan every record, making queries slow and unscalable as your data grows. Composite indexes enable fast, efficient lookups for multi-field queries.',
+        '[prefer_isar_composite_index] Querying multiple fields together without a composite index will force Isar to scan every record, making queries slow and unscalable as your data grows. Composite indexes enable fast, efficient lookups for multi-field queries. {v1}',
     correctionMessage:
         'Add @Index(composite: [...]) for any field combinations you frequently query together to ensure fast, indexed lookups and scalable performance.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -1768,6 +1806,8 @@ class PreferIsarCompositeIndexRule extends SaropaLintRule {
 
 /// Warns when string contains() is used without a full-text index.
 ///
+/// Since: v4.13.0 | Rule version: v1
+///
 /// String contains queries without index perform full table scans.
 /// Add @Index(type: IndexType.value) for text search fields.
 ///
@@ -1796,7 +1836,7 @@ class AvoidIsarStringContainsWithoutIndexRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_isar_string_contains_without_index',
     problemMessage:
-        '[avoid_isar_string_contains_without_index] Running contains or matches queries on string fields without a full-text index will force Isar to scan every record, making queries extremely slow and potentially freezing your app as data grows.',
+        '[avoid_isar_string_contains_without_index] Running contains or matches queries on string fields without a full-text index will force Isar to scan every record, making queries extremely slow and potentially freezing your app as data grows. {v1}',
     correctionMessage:
         'Add @Index(type: IndexType.value) to the field being searched to enable fast, indexed text queries and prevent performance bottlenecks.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -1843,6 +1883,8 @@ class AvoidIsarStringContainsWithoutIndexRule extends SaropaLintRule {
 
 /// Detects and prevents caching of Isar query streams, which must be created inline.
 ///
+/// Since: v4.1.1 | Updated: v4.13.0 | Rule version: v2
+///
 /// # Why this matters
 /// Isar's `.watch()` streams are single-subscription and must be created inline for each use.
 /// Caching or reusing these streams (e.g., storing in a variable or field) leads to runtime errors:
@@ -1881,7 +1923,6 @@ class AvoidIsarStringContainsWithoutIndexRule extends SaropaLintRule {
 /// // GOOD:
 /// StreamBuilder(stream: isar.users.where().watch(), ...)
 /// ```
-
 class AvoidCachedIsarStreamRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.high;
@@ -1895,7 +1936,7 @@ class AvoidCachedIsarStreamRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_cached_isar_stream',
     problemMessage:
-        '[avoid_cached_isar_stream] Caching or storing Isar/single-subscription streams in variables or fields will cause runtime errors: these streams can only be listened to once and must be created inline each time. If you cache them, your app will throw a StateError or fail to update as expected.',
+        '[avoid_cached_isar_stream] Caching or storing Isar/single-subscription streams in variables or fields will cause runtime errors: these streams can only be listened to once and must be created inline each time. If you cache them, your app will throw a StateError or fail to update as expected. {v2}',
     correctionMessage:
         'Always create Isar streams directly inside StreamBuilder, listeners, or widgets that consume them. Do NOT assign Isar streams to variables, fields, or properties. Refactor any code that stores an Isar stream so it is created inline at the point of use.',
     errorSeverity: DiagnosticSeverity.ERROR,

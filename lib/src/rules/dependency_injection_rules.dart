@@ -16,6 +16,8 @@ import '../type_annotation_utils.dart';
 
 /// Warns when service locator is accessed directly in widgets.
 ///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v5
+///
 /// Widgets should receive dependencies through constructors or providers,
 /// not by directly accessing a service locator. This improves testability
 /// and makes dependencies explicit.
@@ -57,7 +59,7 @@ class AvoidServiceLocatorInWidgetsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_service_locator_in_widgets',
     problemMessage:
-        '[avoid_service_locator_in_widgets] Service locator in widget hides dependencies. Cannot mock in widget tests. This reduces testability, maintainability, and makes code harder to refactor.',
+        '[avoid_service_locator_in_widgets] Service locator in widget hides dependencies. Cannot mock in widget tests. This reduces testability, maintainability, and makes code harder to refactor. {v5}',
     correctionMessage:
         'Add required constructor parameter: MyWidget({required this.service}). Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -104,6 +106,8 @@ class AvoidServiceLocatorInWidgetsRule extends SaropaLintRule {
 
 /// Warns when constructor has too many dependencies.
 ///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v5
+///
 /// Classes with many dependencies often violate single responsibility.
 /// Consider breaking the class into smaller, focused components.
 ///
@@ -143,7 +147,7 @@ class AvoidTooManyDependenciesRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_too_many_dependencies',
     problemMessage:
-        '[avoid_too_many_dependencies] Constructor has >5 dependencies. Class likely violates Single Responsibility. Classes with many dependencies often violate single responsibility. Break the class into smaller, focused components.',
+        '[avoid_too_many_dependencies] Constructor has >5 dependencies. Class likely violates Single Responsibility. Classes with many dependencies often violate single responsibility. Break the class into smaller, focused components. {v5}',
     correctionMessage:
         'Group related dependencies into a facade class, or split this class. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -219,6 +223,8 @@ class AvoidTooManyDependenciesRule extends SaropaLintRule {
 
 /// Warns when dependencies are created inside the class instead of injected.
 ///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v5
+///
 /// Creating dependencies internally makes testing difficult and creates
 /// tight coupling. Dependencies should be injected from outside.
 ///
@@ -251,7 +257,7 @@ class AvoidInternalDependencyCreationRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_internal_dependency_creation',
     problemMessage:
-        '[avoid_internal_dependency_creation] Dependency created internally instead of being injected. Cannot substitute mock implementations for testing. This tight coupling reduces testability and makes the component harder to reuse.',
+        '[avoid_internal_dependency_creation] Dependency created internally instead of being injected. Cannot substitute mock implementations for testing. This tight coupling reduces testability and makes the component harder to reuse. {v5}',
     correctionMessage:
         'Add constructor parameter: MyClass(this._repo); then inject from outside. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -301,6 +307,8 @@ class AvoidInternalDependencyCreationRule extends SaropaLintRule {
 
 /// Warns when abstract class is not used for dependency contracts.
 ///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v5
+///
 /// Dependencies should depend on abstractions (interfaces/abstract classes),
 /// not concrete implementations, following the Dependency Inversion Principle.
 ///
@@ -332,7 +340,7 @@ class PreferAbstractDependenciesRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_abstract_dependencies',
     problemMessage:
-        '[prefer_abstract_dependencies] Depends on concrete implementation. Tight coupling prevents substitution. Dependencies should depend on abstractions (interfaces/abstract classes), not concrete implementations, following the Dependency Inversion Principle.',
+        '[prefer_abstract_dependencies] Depends on concrete implementation. Tight coupling prevents substitution. Dependencies should depend on abstractions (interfaces/abstract classes), not concrete implementations, following the Dependency Inversion Principle. {v5}',
     correctionMessage:
         'Use abstract type: replace PostgresUserRepo with UserRepository interface. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -395,6 +403,8 @@ class PreferAbstractDependenciesRule extends SaropaLintRule {
 
 /// Warns when scoped dependencies are registered as singletons.
 ///
+/// Since: v4.9.0 | Updated: v4.13.0 | Rule version: v6
+///
 /// Some dependencies should be scoped to a specific lifecycle (e.g., per request,
 /// per screen) rather than being global singletons.
 ///
@@ -424,7 +434,7 @@ class AvoidSingletonForScopedDependenciesRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_singleton_for_scoped_dependencies',
     problemMessage:
-        '[avoid_singleton_for_scoped_dependencies] Scoped data as singleton. State will persist across sessions/screens. Some dependencies must be scoped to a specific lifecycle (e.g., per request, per screen) rather than being global singletons.',
+        '[avoid_singleton_for_scoped_dependencies] Scoped data as singleton. State will persist across sessions/screens. Some dependencies must be scoped to a specific lifecycle (e.g., per request, per screen) rather than being global singletons. {v6}',
     correctionMessage:
         'Use registerFactory(() => MySession()) for fresh instance per scope. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -513,6 +523,8 @@ class _AvoidSingletonForScopedDependenciesFix extends DartFix {
 
 /// Warns when circular dependencies are detected in DI registration.
 ///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v5
+///
 /// Circular dependencies cause runtime errors or infinite loops during
 /// dependency resolution.
 ///
@@ -552,7 +564,7 @@ class AvoidCircularDiDependenciesRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_circular_di_dependencies',
     problemMessage:
-        '[avoid_circular_di_dependencies] Potential circular dependency detected. Circular dependencies cause runtime errors or infinite loops during dependency resolution. Circular dependencies are detected in DI registration.',
+        '[avoid_circular_di_dependencies] Potential circular dependency detected. Circular dependencies cause runtime errors or infinite loops during dependency resolution. Circular dependencies are detected in DI registration. {v5}',
     correctionMessage:
         'Refactor to break the cycle using interfaces or events. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -626,6 +638,8 @@ class AvoidCircularDiDependenciesRule extends SaropaLintRule {
 
 /// Warns when optional dependencies use null instead of null object pattern.
 ///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v5
+///
 /// Using null for optional dependencies leads to null checks everywhere.
 /// The null object pattern provides a default implementation instead.
 ///
@@ -665,7 +679,7 @@ class PreferNullObjectPatternRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_null_object_pattern',
     problemMessage:
-        '[prefer_null_object_pattern] Optional dependency (Logger, Analytics, etc.) registered as nullable type. Callers must perform null checks before every use, scattering defensive code throughout the application and increasing the risk of NullPointerExceptions.',
+        '[prefer_null_object_pattern] Optional dependency (Logger, Analytics, etc.) registered as nullable type. Callers must perform null checks before every use, scattering defensive code throughout the application and increasing the risk of NullPointerExceptions. {v5}',
     correctionMessage:
         'Implement a no-op or stub version of the dependency interface and register it instead of null. This eliminates null checks at call sites while preserving the optional behavior through safe default implementation.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -707,6 +721,8 @@ class PreferNullObjectPatternRule extends SaropaLintRule {
 
 /// Warns when dependency registration lacks type safety.
 ///
+/// Since: v4.9.0 | Updated: v4.13.0 | Rule version: v6
+///
 /// Untyped registrations can cause runtime errors that are hard to debug.
 ///
 /// **BAD:**
@@ -732,7 +748,7 @@ class RequireTypedDiRegistrationRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_typed_di_registration',
     problemMessage:
-        '[require_typed_di_registration] Dependency injection registration lacks explicit type parameter, relying on type inference. Type inference can fail or infer incorrect types when implementations differ from interfaces, causing runtime resolution errors that could be caught at compile time.',
+        '[require_typed_di_registration] Dependency injection registration lacks explicit type parameter, relying on type inference. Type inference can fail or infer incorrect types when implementations differ from interfaces, causing runtime resolution errors that could be caught at compile time. {v6}',
     correctionMessage:
         'Add explicit type parameter to the registration method (e.g., registerSingleton<UserRepository>(UserRepositoryImpl())) to document the registered type and catch mismatches early during development.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -819,6 +835,8 @@ class _RequireTypedDiRegistrationFix extends DartFix {
 
 /// Warns when a function literal is passed to registerSingleton.
 ///
+/// Since: v2.0.0 | Updated: v4.13.0 | Rule version: v3
+///
 /// registerSingleton expects an already-created instance, not a factory
 /// function. Use registerLazySingleton or registerFactory for factories.
 ///
@@ -851,7 +869,7 @@ class AvoidFunctionsInRegisterSingletonRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_functions_in_register_singleton',
     problemMessage:
-        '[avoid_functions_in_register_singleton] registerSingleton expects an instance, not a factory function.',
+        '[avoid_functions_in_register_singleton] registerSingleton expects an instance, not a factory function. {v3}',
     correctionMessage:
         'Use registerLazySingleton(() => ...) or registerFactory(() => ...) '
         'for lazy instantiation. Use registerSingleton(MyService()) for eager.',
@@ -922,6 +940,8 @@ class _AvoidFunctionsInRegisterSingletonFix extends DartFix {
 
 /// Warns when config access doesn't provide defaults for missing values.
 ///
+/// Since: v2.3.11 | Updated: v4.13.0 | Rule version: v4
+///
 /// Alias: config_default, env_default, settings_fallback
 ///
 /// Environment variables and config values can be missing. Always provide
@@ -951,7 +971,7 @@ class RequireDefaultConfigRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_default_config',
     problemMessage:
-        '[require_default_config] Accessing configuration values without providing a default or fallback can cause runtime crashes if the value is missing or misconfigured. This leads to unpredictable app behavior, poor user experience, and failed startup. It may also result in app store rejection for reliability issues.',
+        '[require_default_config] Accessing configuration values without providing a default or fallback can cause runtime crashes if the value is missing or misconfigured. This leads to unpredictable app behavior, poor user experience, and failed startup. It may also result in app store rejection for reliability issues. {v4}',
     correctionMessage:
         'Always provide a fallback value or use nullable access with a null check when reading config values. Document default values and ensure your app can start and function even if a config value is missing.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -1013,6 +1033,8 @@ class RequireDefaultConfigRule extends SaropaLintRule {
 
 /// Warns when setter injection is used instead of constructor injection.
 ///
+/// Since: v2.5.0 | Updated: v4.13.0 | Rule version: v2
+///
 /// Alias: constructor_injection, di_constructor, setter_injection
 ///
 /// Constructor injection makes dependencies explicit and ensures objects are
@@ -1061,7 +1083,7 @@ class PreferConstructorInjectionRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_constructor_injection',
     problemMessage:
-        '[prefer_constructor_injection] Setter/method injection hides dependencies. Use constructor injection. Constructor injection makes dependencies explicit and ensures objects are fully initialized when created. Setter injection allows partially initialized objects and makes dependencies implicit.',
+        '[prefer_constructor_injection] Setter/method injection hides dependencies. Use constructor injection. Constructor injection makes dependencies explicit and ensures objects are fully initialized when created. Setter injection allows partially initialized objects and makes dependencies implicit. {v2}',
     correctionMessage:
         'Make this a final field and add a constructor parameter:. Verify the change works correctly with existing tests and add coverage for the new behavior.'
         'MyClass(this._service);',
@@ -1223,6 +1245,8 @@ class PreferConstructorInjectionRule extends SaropaLintRule {
 
 /// Understand singleton vs factory vs lazySingleton scopes in GetIt.
 ///
+/// Since: v2.6.0 | Updated: v4.13.0 | Rule version: v2
+///
 /// Misusing DI scopes causes lifecycle bugs:
 /// - singleton: Created once, lives forever
 /// - lazySingleton: Created on first access, lives forever
@@ -1255,7 +1279,7 @@ class RequireDiScopeAwarenessRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_di_scope_awareness',
     problemMessage:
-        '[require_di_scope_awareness] Review DI scope: singleton retains state, factory creates each time. Misusing DI scopes causes lifecycle bugs: - singleton: Created once, lives forever - lazySingleton: Created on first access, lives forever - factory: Created fresh each time.',
+        '[require_di_scope_awareness] Review DI scope: singleton retains state, factory creates each time. Misusing DI scopes causes lifecycle bugs: - singleton: Created once, lives forever - lazySingleton: Created on first access, lives forever - factory: Created fresh each time. {v2}',
     correctionMessage:
         'Use lazySingleton for expensive objects, factory for stateless handlers. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -1341,6 +1365,8 @@ class RequireDiScopeAwarenessRule extends SaropaLintRule {
 
 /// Widgets should get dependencies via InheritedWidget/Provider, not GetIt.
 ///
+/// Since: v4.1.5 | Updated: v4.13.0 | Rule version: v3
+///
 /// Direct service locator calls in widgets:
 /// - Couple widgets tightly to DI container
 /// - Make widgets harder to test
@@ -1383,7 +1409,7 @@ class AvoidDiInWidgetsRule extends SaropaLintRule {
     name: 'avoid_di_in_widgets',
     problemMessage:
         '[avoid_di_in_widgets] GetIt.I access in widgets creates hidden dependencies that break testability and widget reuse. '
-        'Direct service locator calls tightly couple widgets to the DI container, making it impossible to substitute mock dependencies in tests and preventing widget extraction to other packages.',
+        'Direct service locator calls tightly couple widgets to the DI container, making it impossible to substitute mock dependencies in tests and preventing widget extraction to other packages. {v3}',
     correctionMessage:
         'Pass dependencies via constructor injection or use context-based lookup (e.g., context.read<T>() with Provider, or InheritedWidget). '
         'This makes dependencies explicit, enables easy mocking in widget tests, and keeps widgets reusable across different dependency configurations.',
@@ -1462,6 +1488,8 @@ class AvoidDiInWidgetsRule extends SaropaLintRule {
 
 /// Inject interfaces/abstract classes, not concrete implementations.
 ///
+/// Since: v4.1.5 | Updated: v4.13.0 | Rule version: v2
+///
 /// Injecting concrete types:
 /// - Prevents mocking in tests
 /// - Creates tight coupling
@@ -1495,7 +1523,7 @@ class PreferAbstractionInjectionRule extends SaropaLintRule {
     name: 'prefer_abstraction_injection',
     problemMessage:
         '[prefer_abstraction_injection] Injecting concrete implementation. '
-        'Prefer injecting abstract types for testability.',
+        'Prefer injecting abstract types for testability. {v2}',
     correctionMessage:
         'Create an abstract class or interface and inject that instead.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -1565,6 +1593,8 @@ class PreferAbstractionInjectionRule extends SaropaLintRule {
 
 /// Warns when eager singleton registration is used for expensive objects.
 ///
+/// Since: v4.1.8 | Updated: v4.13.0 | Rule version: v3
+///
 /// `[HEURISTIC]` - Detects registerSingleton with expensive constructors.
 ///
 /// Eager registration creates all singletons at startup.
@@ -1599,7 +1629,7 @@ class PreferLazySingletonRegistrationRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_lazy_singleton_registration',
     problemMessage:
-        '[prefer_lazy_singleton_registration] Expensive service (Database, Analytics, Cache) registered as eager singleton. The service initializes immediately at app startup, slowing down launch time and consuming resources even if the service is never used during the session.',
+        '[prefer_lazy_singleton_registration] Expensive service (Database, Analytics, Cache) registered as eager singleton. The service initializes immediately at app startup, slowing down launch time and consuming resources even if the service is never used during the session. {v3}',
     correctionMessage:
         'Replace registerSingleton with registerLazySingleton(() => Service()) to defer initialization until first access. This improves app startup time and reduces memory usage when features are conditionally accessed.',
     errorSeverity: DiagnosticSeverity.INFO,

@@ -11,6 +11,8 @@ import '../saropa_lint_rule.dart';
 
 /// Warns when digit separators are not grouped consistently.
 ///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v4
+///
 /// Digit separators should group digits by 3 for readability.
 ///
 /// ### Example
@@ -39,7 +41,7 @@ class AvoidInconsistentDigitSeparatorsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_inconsistent_digit_separators',
     problemMessage:
-        '[avoid_inconsistent_digit_separators] Digit separators are not grouped consistently. Digit separators should group digits by 3 for readability.',
+        '[avoid_inconsistent_digit_separators] Digit separators are not grouped consistently. Digit separators should group digits by 3 for readability. {v4}',
     correctionMessage:
         'Use consistent groups of 3 digits. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -104,6 +106,8 @@ class AvoidInconsistentDigitSeparatorsRule extends SaropaLintRule {
 
 /// Warns when digit separators are used unnecessarily.
 ///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v5
+///
 /// Digit separators should improve readability, not hinder it.
 ///
 /// ### Example
@@ -132,7 +136,7 @@ class AvoidUnnecessaryDigitSeparatorsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_unnecessary_digit_separators',
     problemMessage:
-        '[avoid_unnecessary_digit_separators] Unnecessary or poorly placed digit separator. Digit separators should improve readability, not hinder it.',
+        '[avoid_unnecessary_digit_separators] Unnecessary or poorly placed digit separator. Digit separators should improve readability, not hinder it. {v5}',
     correctionMessage:
         'Use digit separators consistently for large numbers only. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -172,6 +176,8 @@ class AvoidUnnecessaryDigitSeparatorsRule extends SaropaLintRule {
 
 /// Warns when double literals don't follow a consistent format.
 ///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v4
+///
 /// **Stylistic rule (opt-in only).** No performance or correctness benefit.
 ///
 /// Double literals should be formatted consistently, e.g., always include
@@ -189,7 +195,7 @@ class DoubleLiteralFormatRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'double_literal_format',
     problemMessage:
-        '[double_literal_format] Formatting double literals in a specific way (e.g., 1.0 vs 1.) is a stylistic preference. All forms represent the same value with no performance difference. Enable via the stylistic tier.',
+        '[double_literal_format] Formatting double literals in a specific way (e.g., 1.0 vs 1.) is a stylistic preference. All forms represent the same value with no performance difference. Enable via the stylistic tier. {v4}',
     correctionMessage:
         'Include leading zero before decimal point (e.g., 0.5). Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -217,6 +223,8 @@ class DoubleLiteralFormatRule extends SaropaLintRule {
 
 /// Warns when magic numbers are used instead of named constants.
 ///
+/// Since: v1.8.2 | Updated: v4.13.0 | Rule version: v7
+///
 /// Magic numbers make code harder to understand and maintain. Use named
 /// constants to give meaning to numeric values.
 class NoMagicNumberRule extends SaropaLintRule {
@@ -233,7 +241,7 @@ class NoMagicNumberRule extends SaropaLintRule {
     name: 'no_magic_number',
     problemMessage:
         '[no_magic_number] Unexplained numeric literal makes the code harder to understand, maintain, and update consistently. '
-        'When the same value appears in multiple locations, a typo in one creates a subtle bug. Readers cannot determine whether the number represents a timeout, a threshold, a count, or an index without surrounding context.',
+        'When the same value appears in multiple locations, a typo in one creates a subtle bug. Readers cannot determine whether the number represents a timeout, a threshold, a count, or an index without surrounding context. {v7}',
     correctionMessage:
         'Extract the number to a named constant (e.g., static const maxRetries = 3) that communicates its purpose. '
         'Group related constants in a dedicated class or file so they can be updated in one place and are discoverable by other developers.',
@@ -277,6 +285,8 @@ class NoMagicNumberRule extends SaropaLintRule {
 
 /// Warns when string literals are used directly (magic strings).
 ///
+/// Since: v4.3.0 | Updated: v4.13.0 | Rule version: v7
+///
 /// Magic strings make code harder to maintain. Use constants instead.
 ///
 /// Example of **bad** code:
@@ -307,7 +317,7 @@ class NoMagicStringRule extends SaropaLintRule {
     name: 'no_magic_string',
     problemMessage:
         '[no_magic_string] Unexplained string literal makes the code harder to understand, maintain, and update consistently. '
-        'Duplicate string values across the codebase lead to inconsistencies when one occurrence is updated but others are missed, causing hard-to-trace bugs in routing, API calls, or status checks.',
+        'Duplicate string values across the codebase lead to inconsistencies when one occurrence is updated but others are missed, causing hard-to-trace bugs in routing, API calls, or status checks. {v7}',
     correctionMessage:
         'Extract the string to a named constant (e.g., static const kStatusActive = \'active\') that communicates its purpose. '
         'Group related constants in a dedicated class or file so they can be updated in one place and are discoverable by other developers.',
@@ -371,6 +381,8 @@ class NoMagicStringRule extends SaropaLintRule {
 
 /// Warns when x = x + 1 could be x += 1 (or similar).
 ///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v4
+///
 /// Compound assignment operators are more concise.
 ///
 /// ### Example
@@ -401,7 +413,7 @@ class PreferAdditionSubtractionAssignmentsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_addition_subtraction_assignments',
     problemMessage:
-        '[prefer_addition_subtraction_assignments] Use compound assignment operator. This numeric literal usage can cause precision errors or make the intended value unclear.',
+        '[prefer_addition_subtraction_assignments] Use compound assignment operator. This numeric literal usage can cause precision errors or make the intended value unclear. {v4}',
     correctionMessage:
         'Replace with +=, -=, *=, /=, etc. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -453,6 +465,8 @@ class PreferAdditionSubtractionAssignmentsRule extends SaropaLintRule {
 
 /// Warns when binary operators can be simplified to compound assignment.
 ///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v4
+///
 /// Similar to PreferAdditionSubtractionAssignmentsRule but focuses on
 /// less common operators.
 ///
@@ -482,7 +496,7 @@ class PreferCompoundAssignmentOperatorsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_compound_assignment_operators',
     problemMessage:
-        '[prefer_compound_assignment_operators] Use compound assignment operator. Similar to PreferAdditionSubtractionAssignmentsRule but focuses on less common operators.',
+        '[prefer_compound_assignment_operators] Use compound assignment operator. Similar to PreferAdditionSubtractionAssignmentsRule but focuses on less common operators. {v4}',
     correctionMessage:
         'Replace with compound assignment (e.g., &=, |=, ^=). Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -519,6 +533,8 @@ class PreferCompoundAssignmentOperatorsRule extends SaropaLintRule {
 
 /// Warns when large numbers don't use digit separators.
 ///
+/// Since: v1.3.0 | Updated: v4.13.0 | Rule version: v4
+///
 /// Digit separators improve readability of large numbers.
 ///
 /// ### Example
@@ -549,7 +565,7 @@ class PreferDigitSeparatorsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_digit_separators',
     problemMessage:
-        '[prefer_digit_separators] Large number should use digit separators. Digit separators improve readability of large numbers. This numeric literal usage can cause precision errors or make the intended value unclear.',
+        '[prefer_digit_separators] Large number should use digit separators. Digit separators improve readability of large numbers. This numeric literal usage can cause precision errors or make the intended value unclear. {v4}',
     correctionMessage:
         'Add underscores to group digits (e.g., 1_000_000). Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -654,6 +670,8 @@ class _AddDigitSeparatorsFix extends DartFix {
 
 /// Warns when digit separators are used unnecessarily.
 ///
+/// Since: v0.1.2 | Updated: v4.13.0 | Rule version: v6
+///
 /// Digit separators in small numbers don't improve readability.
 ///
 /// ### Example
@@ -682,7 +700,7 @@ class AvoidDigitSeparatorsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_digit_separators',
     problemMessage:
-        '[avoid_digit_separators] Unnecessary digit separator in small number. Digit separators in small numbers don\'t improve readability.',
+        '[avoid_digit_separators] Unnecessary digit separator in small number. Digit separators in small numbers don\'t improve readability. {v6}',
     correctionMessage:
         'Remove digit separators from small numbers. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -721,6 +739,8 @@ class AvoidDigitSeparatorsRule extends SaropaLintRule {
 }
 
 /// Warns when magic numbers are used in test files.
+///
+/// Since: v4.3.0 | Updated: v4.13.0 | Rule version: v3
 ///
 /// **Context**: This is the test-specific variant of `no_magic_number`, which
 /// skips test files entirely (default `TestRelevance.never`). The production rule
@@ -809,7 +829,7 @@ class NoMagicNumberInTestsRule extends SaropaLintRule {
     name: 'no_magic_number_in_tests',
     problemMessage:
         '[no_magic_number_in_tests] Unexplained numeric literal in test file obscures the purpose of expected values and assertions. '
-        'When a test fails, readers cannot tell whether the number is an arbitrary fixture value, a meaningful boundary, or a calculated expected result, making failures harder to diagnose and fix.',
+        'When a test fails, readers cannot tell whether the number is an arbitrary fixture value, a meaningful boundary, or a calculated expected result, making failures harder to diagnose and fix. {v3}',
     correctionMessage:
         'Extract test values to named constants (e.g., const expectedCount = 42) that describe their role in the test. '
         'This makes assertions self-documenting, failures easier to diagnose, and test data easier to update when requirements change.',
@@ -972,6 +992,8 @@ class _NoMagicNumberInTestsFix extends DartFix {
 
 /// Warns when magic strings are used in test files.
 ///
+/// Since: v4.3.0 | Updated: v4.13.0 | Rule version: v4
+///
 /// **Context**: This is the test-specific variant of `no_magic_string`, which
 /// skips test files entirely (default `TestRelevance.never`). The production rule
 /// enforces strict avoidance of magic strings in application code, while this
@@ -1085,7 +1107,7 @@ class NoMagicStringInTestsRule extends SaropaLintRule {
     name: 'no_magic_string_in_tests',
     problemMessage:
         '[no_magic_string_in_tests] Unexplained string literal in test file obscures the purpose of expected values and assertions. '
-        'When a test fails, readers cannot tell whether the string is an arbitrary fixture, a meaningful expected output, or a format-specific value, making failures harder to diagnose.',
+        'When a test fails, readers cannot tell whether the string is an arbitrary fixture, a meaningful expected output, or a format-specific value, making failures harder to diagnose. {v4}',
     correctionMessage:
         'Extract test strings to named constants (e.g., const expectedName = \'John Doe\') that describe their role in the test. '
         'This makes assertions self-documenting, failures easier to diagnose, and test data easier to update when requirements change.',

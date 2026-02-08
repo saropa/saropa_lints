@@ -16,6 +16,8 @@ import '../type_annotation_utils.dart';
 
 /// Warns when VideoPlayerController or AudioPlayer is not disposed.
 ///
+/// Since: v1.7.9 | Updated: v4.13.0 | Rule version: v2
+///
 /// Alias: dispose_media_player, media_player_leak, require_video_player_controller_dispose
 ///
 /// Media players hold native resources that must be released.
@@ -71,7 +73,7 @@ class RequireMediaPlayerDisposeRule extends SaropaLintRule {
     name: 'require_media_player_dispose',
     problemMessage:
         '[require_media_player_dispose] Undisposed media controller holds '
-        'audio/video hardware, blocking other apps and draining battery. This can cause resource leaks, app crashes, and poor user experience.',
+        'audio/video hardware, blocking other apps and draining battery. This can cause resource leaks, app crashes, and poor user experience. {v2}',
     correctionMessage:
         'Add controller.dispose() in the dispose() method before super.dispose().',
     errorSeverity: DiagnosticSeverity.ERROR,
@@ -158,6 +160,8 @@ class RequireMediaPlayerDisposeRule extends SaropaLintRule {
 
 /// Warns when TabController is not disposed.
 ///
+/// Since: v1.7.9 | Updated: v4.13.0 | Rule version: v2
+///
 /// Alias: dispose_tab_controller, tab_controller_leak
 ///
 /// TabController with vsync must be disposed to free animation resources.
@@ -212,7 +216,7 @@ class RequireTabControllerDisposeRule extends SaropaLintRule {
     name: 'require_tab_controller_dispose',
     problemMessage:
         '[require_tab_controller_dispose] Undisposed TabController leaks '
-        'AnimationController, causing memory exhaustion over time.',
+        'AnimationController, causing memory exhaustion over time. {v2}',
     correctionMessage:
         'Add _tabController.dispose() in the dispose() method before super.dispose().',
     errorSeverity: DiagnosticSeverity.ERROR,
@@ -408,6 +412,8 @@ void _reportUndisposedFields(
 
 /// Warns when TextEditingController is not disposed.
 ///
+/// Since: v1.8.2 | Updated: v4.13.0 | Rule version: v3
+///
 /// Alias: dispose_text_controller, text_controller_leak
 ///
 /// TextEditingController attaches listeners that must be released.
@@ -461,7 +467,7 @@ class RequireTextEditingControllerDisposeRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_text_editing_controller_dispose',
     problemMessage:
-        '[require_text_editing_controller_dispose] When a State class creates a TextEditingController for a TextField, search bar, or form input and fails to dispose of it in dispose(), the controller’s internal listeners and text buffers will persist after the widget is removed from the widget tree. This can cause memory leaks, input lag, and unpredictable or stale text field behavior, especially in dynamic forms, chat UIs, or lists where widgets are frequently created and destroyed. In severe cases, this can lead to app slowdowns or crashes due to uncollected resources. Always dispose of every TextEditingController in the owning State object’s dispose() method to ensure proper cleanup. See: https://api.flutter.dev/flutter/widgets/TextEditingController-class.html',
+        '[require_text_editing_controller_dispose] When a State class creates a TextEditingController for a TextField, search bar, or form input and fails to dispose of it in dispose(), the controller’s internal listeners and text buffers will persist after the widget is removed from the widget tree. This can cause memory leaks, input lag, and unpredictable or stale text field behavior, especially in dynamic forms, chat UIs, or lists where widgets are frequently created and destroyed. In severe cases, this can lead to app slowdowns or crashes due to uncollected resources. Always dispose of every TextEditingController in the owning State object’s dispose() method to ensure proper cleanup. See: https://api.flutter.dev/flutter/widgets/TextEditingController-class.html {v3}',
     correctionMessage:
         'For every State class that owns a TextEditingController (for a TextField, search, or form), call controller.dispose() in the dispose() method before calling super.dispose(). This ensures all listeners and buffers are released when the widget is removed, preventing memory leaks, input lag, and unpredictable text field state. Review your widget’s lifecycle and always pair controller creation with proper disposal. See: https://api.flutter.dev/flutter/widgets/TextEditingController-class.html',
     errorSeverity: DiagnosticSeverity.ERROR,
@@ -489,6 +495,8 @@ class RequireTextEditingControllerDisposeRule extends SaropaLintRule {
 }
 
 /// Warns when PageController is not disposed.
+///
+/// Since: v1.8.2 | Updated: v4.13.0 | Rule version: v4
 ///
 /// Alias: dispose_page_controller, page_controller_leak
 ///
@@ -534,7 +542,7 @@ class RequirePageControllerDisposeRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_page_controller_dispose',
     problemMessage:
-        '[require_page_controller_dispose] Not disposing of a PageController when a widget is removed from the tree can cause memory leaks and continued resource usage, leading to performance issues and potential crashes in long-running apps. This is especially critical in apps with dynamic navigation or frequent page changes. See https://api.flutter.dev/flutter/widgets/PageController/dispose.html.',
+        '[require_page_controller_dispose] Not disposing of a PageController when a widget is removed from the tree can cause memory leaks and continued resource usage, leading to performance issues and potential crashes in long-running apps. This is especially critical in apps with dynamic navigation or frequent page changes. See https://api.flutter.dev/flutter/widgets/PageController/dispose.html. {v4}',
     correctionMessage:
         'Dispose of your PageController in the widget’s dispose method to ensure all resources are released and prevent memory leaks. See https://api.flutter.dev/flutter/widgets/PageController/dispose.html for best practices.',
     errorSeverity: DiagnosticSeverity.ERROR,
@@ -561,6 +569,8 @@ class RequirePageControllerDisposeRule extends SaropaLintRule {
 }
 
 /// Warns when Timer.periodic is used without WidgetsBindingObserver lifecycle handling.
+///
+/// Since: v1.8.2 | Updated: v4.13.0 | Rule version: v4
 ///
 /// Alias: pause_timer_on_background, timer_lifecycle
 ///
@@ -624,7 +634,7 @@ class RequireLifecycleObserverRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_lifecycle_observer',
     problemMessage:
-        '[require_lifecycle_observer] Long-running timers, streams, or background tasks must be paused or stopped when the app is backgrounded. Failing to observe lifecycle changes can drain battery, consume CPU, and cause stale callbacks to execute when the app resumes, leading to inconsistent state and poor user experience. This may also violate platform guidelines and result in app store rejection.',
+        '[require_lifecycle_observer] Long-running timers, streams, or background tasks must be paused or stopped when the app is backgrounded. Failing to observe lifecycle changes can drain battery, consume CPU, and cause stale callbacks to execute when the app resumes, leading to inconsistent state and poor user experience. This may also violate platform guidelines and result in app store rejection. {v4}',
     correctionMessage:
         'Implement WidgetsBindingObserver and handle didChangeAppLifecycleState to pause, stop, or clean up background tasks when the app is not active. Document lifecycle handling to ensure resources are managed correctly and the app remains responsive.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -674,6 +684,8 @@ class RequireLifecycleObserverRule extends SaropaLintRule {
 }
 
 /// Warns when WebSocketChannel is used without proper cleanup in dispose.
+///
+/// Since: v4.1.0 | Updated: v4.13.0 | Rule version: v3
 ///
 /// Alias: close_websocket, websocket_leak
 ///
@@ -727,7 +739,7 @@ class AvoidWebsocketMemoryLeakRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_websocket_memory_leak',
     problemMessage:
-        '[avoid_websocket_memory_leak] WebSocketChannel is not closed in dispose(). This leaves network connections open, wasting bandwidth, battery, and server resources. Unclosed sockets can also cause app crashes or server-side issues.',
+        '[avoid_websocket_memory_leak] WebSocketChannel is not closed in dispose(). This leaves network connections open, wasting bandwidth, battery, and server resources. Unclosed sockets can also cause app crashes or server-side issues. {v3}',
     correctionMessage:
         'Call channel.sink.close() in dispose() to properly close the WebSocket connection and free resources.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -788,6 +800,8 @@ class AvoidWebsocketMemoryLeakRule extends SaropaLintRule {
 
 /// Warns when VideoPlayerController field is not disposed.
 ///
+/// Since: v4.1.0 | Updated: v4.13.0 | Rule version: v3
+///
 /// Alias: dispose_video_controller, video_controller_leak
 ///
 /// VideoPlayerController holds resources that must be released when
@@ -840,7 +854,7 @@ class RequireVideoPlayerControllerDisposeRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_video_player_controller_dispose',
     problemMessage:
-        '[require_video_player_controller_dispose] When a State class creates a VideoPlayerController for a video widget (such as a video player, gallery, carousel, or story view) and does not dispose of it in dispose(), the controller will keep video and audio resources alive after the widget is removed from the widget tree. This can cause memory leaks, background playback, battery drain, and even prevent other apps from acquiring audio focus. In video-heavy UIs or dynamic lists, this can quickly exhaust device resources and degrade app performance. Always dispose of every VideoPlayerController in the owning State object’s dispose() method to ensure proper cleanup. See: https://pub.dev/packages/video_player#disposing',
+        '[require_video_player_controller_dispose] When a State class creates a VideoPlayerController for a video widget (such as a video player, gallery, carousel, or story view) and does not dispose of it in dispose(), the controller will keep video and audio resources alive after the widget is removed from the widget tree. This can cause memory leaks, background playback, battery drain, and even prevent other apps from acquiring audio focus. In video-heavy UIs or dynamic lists, this can quickly exhaust device resources and degrade app performance. Always dispose of every VideoPlayerController in the owning State object’s dispose() method to ensure proper cleanup. See: https://pub.dev/packages/video_player#disposing {v3}',
     correctionMessage:
         'For every State class that owns a VideoPlayerController (for a video player, gallery, carousel, or story view), call controller.dispose() in the dispose() method before calling super.dispose(). This ensures all video and audio resources are released when the widget is removed, preventing leaks, background playback, and resource exhaustion. Review your widget’s lifecycle and always pair controller creation with proper disposal. See: https://pub.dev/packages/video_player#disposing',
     errorSeverity: DiagnosticSeverity.ERROR,
@@ -896,6 +910,8 @@ class RequireVideoPlayerControllerDisposeRule extends SaropaLintRule {
 }
 
 /// Warns when StreamSubscription is not cancelled in dispose().
+///
+/// Since: v2.0.0 | Updated: v4.13.0 | Rule version: v4
 ///
 /// Alias: cancel_stream_subscription, stream_subscription_leak, avoid_unassigned_stream_subscriptions
 ///
@@ -974,7 +990,7 @@ class RequireStreamSubscriptionCancelRule extends SaropaLintRule {
     name: 'require_stream_subscription_cancel',
     problemMessage:
         '[require_stream_subscription_cancel] StreamSubscription field without cancel(). '
-        'Callbacks fire after State disposal, causing setState errors and memory leaks.',
+        'Callbacks fire after State disposal, causing setState errors and memory leaks. {v4}',
     correctionMessage:
         'Add _sub?.cancel() in dispose(), or for-in loop for collections.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -1298,6 +1314,8 @@ class _SubscriptionField {
 
 /// Warns when an owned ChangeNotifier-derived field is not disposed.
 ///
+/// Since: v4.2.0 | Updated: v4.13.0 | Rule version: v4
+///
 /// Alias: dispose_change_notifier, change_notifier_leak
 ///
 /// Covers: ChangeNotifier, ValueNotifier, ScrollController,
@@ -1347,7 +1365,7 @@ class RequireChangeNotifierDisposeRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_change_notifier_dispose',
     problemMessage:
-        '[require_change_notifier_dispose] Failing to dispose a ChangeNotifier (or ValueNotifier, etc.) in the dispose() method causes it to retain all listeners and references in the widget tree, resulting in memory leaks and potential crashes when notifications are sent to unmounted widgets. This is a common source of subtle bugs and degraded performance in Flutter apps.',
+        '[require_change_notifier_dispose] Failing to dispose a ChangeNotifier (or ValueNotifier, etc.) in the dispose() method causes it to retain all listeners and references in the widget tree, resulting in memory leaks and potential crashes when notifications are sent to unmounted widgets. This is a common source of subtle bugs and degraded performance in Flutter apps. {v4}',
     correctionMessage:
         'Always call notifier.dispose() in your widget’s dispose() method before calling super.dispose(). This ensures all listeners are removed and resources are released. Audit your codebase for all ChangeNotifier instances and verify they are disposed properly.',
     errorSeverity: DiagnosticSeverity.ERROR,
@@ -1390,6 +1408,8 @@ class RequireChangeNotifierDisposeRule extends SaropaLintRule {
 }
 
 /// Warns when ReceivePort is not closed in dispose().
+///
+/// Since: v4.2.0 | Updated: v4.13.0 | Rule version: v2
 ///
 /// Alias: close_receive_port, receive_port_leak
 ///
@@ -1439,7 +1459,7 @@ class RequireReceivePortCloseRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_receive_port_close',
     problemMessage:
-        '[require_receive_port_close] Leaving a ReceivePort open after it is no longer needed can cause memory leaks and keep isolates alive unnecessarily, leading to wasted resources and potential app instability. This can also prevent garbage collection of related objects. See https://dart.dev/guides/libraries/concurrency#isolates.',
+        '[require_receive_port_close] Leaving a ReceivePort open after it is no longer needed can cause memory leaks and keep isolates alive unnecessarily, leading to wasted resources and potential app instability. This can also prevent garbage collection of related objects. See https://dart.dev/guides/libraries/concurrency#isolates. {v2}',
     correctionMessage:
         'Close the ReceivePort when it is no longer needed to free resources and allow isolates to terminate cleanly. See https://dart.dev/guides/libraries/concurrency#isolates for best practices.',
     errorSeverity: DiagnosticSeverity.ERROR,
@@ -1502,6 +1522,8 @@ class RequireReceivePortCloseRule extends SaropaLintRule {
 
 /// Warns when Socket is not closed in dispose().
 ///
+/// Since: v4.2.0 | Updated: v4.13.0 | Rule version: v2
+///
 /// Alias: close_socket, socket_leak
 ///
 /// Socket connections must be closed to release network resources.
@@ -1546,7 +1568,7 @@ class RequireSocketCloseRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_socket_close',
     problemMessage:
-        '[require_socket_close] Not closing a Socket keeps the TCP connection open indefinitely, occupying server connection slots, leaking file descriptors, and potentially exhausting OS resources. This can prevent new network connections and degrade app or system performance.',
+        '[require_socket_close] Not closing a Socket keeps the TCP connection open indefinitely, occupying server connection slots, leaking file descriptors, and potentially exhausting OS resources. This can prevent new network connections and degrade app or system performance. {v2}',
     correctionMessage:
         'Always call _socket?.close() in your widget’s dispose() method before calling super.dispose(). This ensures the connection is closed and resources are released. Audit your codebase for all Socket instances and verify they are closed properly.',
     errorSeverity: DiagnosticSeverity.ERROR,
@@ -1614,6 +1636,8 @@ class RequireSocketCloseRule extends SaropaLintRule {
 
 /// Warns when a debouncer Timer is not cancelled in dispose().
 ///
+/// Since: v4.13.0 | Rule version: v1
+///
 /// Alias: cancel_debouncer, debouncer_leak
 ///
 /// Debounce timers used for search or input delay must be cancelled
@@ -1666,7 +1690,7 @@ class RequireDebouncerCancelRule extends SaropaLintRule {
     name: 'require_debouncer_cancel',
     problemMessage:
         '[require_debouncer_cancel] Uncancelled debounce timer fires after '
-        'dispose, calling setState on unmounted widget causing crashes.',
+        'dispose, calling setState on unmounted widget causing crashes. {v1}',
     correctionMessage: 'Add _debounce?.cancel() in the dispose() method.',
     errorSeverity: DiagnosticSeverity.ERROR,
   );
@@ -1729,6 +1753,8 @@ class RequireDebouncerCancelRule extends SaropaLintRule {
 
 /// Warns when Timer.periodic is not cancelled in dispose().
 ///
+/// Since: v4.0.1 | Updated: v4.13.0 | Rule version: v2
+///
 /// Alias: cancel_interval_timer, periodic_timer_leak
 ///
 /// Periodic timers keep firing indefinitely. Not cancelling them
@@ -1783,7 +1809,7 @@ class RequireIntervalTimerCancelRule extends SaropaLintRule {
     name: 'require_interval_timer_cancel',
     problemMessage:
         '[require_interval_timer_cancel] Timer.periodic without cancel(). '
-        'Timer keeps firing after State disposal, draining battery and causing setState errors.',
+        'Timer keeps firing after State disposal, draining battery and causing setState errors. {v2}',
     correctionMessage:
         'Add _timer?.cancel() in dispose() before super.dispose().',
     errorSeverity: DiagnosticSeverity.ERROR,
@@ -1863,6 +1889,8 @@ class RequireIntervalTimerCancelRule extends SaropaLintRule {
 
 /// Warns when RandomAccessFile is not closed.
 ///
+/// Since: v4.5.6 | Updated: v4.13.0 | Rule version: v2
+///
 /// Alias: close_file_handle, file_handle_leak
 ///
 /// RandomAccessFile holds a file handle that must be released.
@@ -1908,7 +1936,7 @@ class RequireFileHandleCloseRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_file_handle_close',
     problemMessage:
-        '[require_file_handle_close] File handles (e.g., RandomAccessFile) must be closed to release system resources. Failing to close files can cause resource leaks, file access errors, and may prevent other apps or processes from accessing the file. This can lead to app crashes, data loss, and degraded device performance.',
+        '[require_file_handle_close] File handles (e.g., RandomAccessFile) must be closed to release system resources. Failing to close files can cause resource leaks, file access errors, and may prevent other apps or processes from accessing the file. This can lead to app crashes, data loss, and degraded device performance. {v2}',
     correctionMessage:
         'Always call close() or closeSync() on file handles in dispose() or finally blocks. Document file cleanup to prevent resource leaks and ensure reliable file access.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -1979,6 +2007,8 @@ class RequireFileHandleCloseRule extends SaropaLintRule {
 
 /// Warns when a StatefulWidget has disposable resources but no dispose() method.
 ///
+/// Since: v2.3.7 | Updated: v4.13.0 | Rule version: v3
+///
 /// StatefulWidgets that create controllers, subscriptions, timers, or other
 /// resources must implement dispose() to clean up those resources. Missing
 /// dispose() leads to memory leaks, dangling callbacks, and resource exhaustion.
@@ -2040,7 +2070,7 @@ class RequireDisposeImplementationRule extends SaropaLintRule {
     name: 'require_dispose_implementation',
     problemMessage:
         '[require_dispose_implementation] Controllers, subscriptions, or timers '
-        'without cleanup cause memory leaks and setState errors.',
+        'without cleanup cause memory leaks and setState errors. {v3}',
     correctionMessage:
         'Add dispose() method to clean up controllers, subscriptions, and timers.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -2158,6 +2188,8 @@ class _AddDisposeMethodFix extends DartFix {
 
 /// Warns when a disposable field is reassigned without disposing the old value.
 ///
+/// Since: v2.3.7 | Updated: v4.13.0 | Rule version: v4
+///
 /// When a field holding a disposable resource (controller, subscription, etc.)
 /// is reassigned, the old value must be disposed first. Otherwise, the old
 /// resource leaks and continues holding memory or executing callbacks.
@@ -2212,7 +2244,7 @@ class PreferDisposeBeforeNewInstanceRule extends SaropaLintRule {
     name: 'prefer_dispose_before_new_instance',
     problemMessage:
         '[prefer_dispose_before_new_instance] Reassigning without dispose leaks '
-        'the old instance. Listeners and resources remain active forever.',
+        'the old instance. Listeners and resources remain active forever. {v4}',
     correctionMessage:
         'Call dispose() on the old value before assigning a new instance.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -2413,6 +2445,8 @@ class _AddDisposeBeforeAssignmentFix extends DartFix {
 
 /// Warns when class fields of disposable types are not disposed.
 ///
+/// Since: v4.1.4 | Updated: v4.13.0 | Rule version: v2
+///
 /// Classes with disposable fields (controllers, subscriptions, etc.) should
 /// implement disposal to prevent memory leaks.
 ///
@@ -2447,7 +2481,7 @@ class DisposeClassFieldsRule extends SaropaLintRule {
     name: 'dispose_class_fields',
     problemMessage:
         '[dispose_class_fields] Class has disposable fields but no dispose/close method. '
-        'This may cause memory leaks.',
+        'This may cause memory leaks. {v2}',
     correctionMessage:
         'Add a dispose() or close() method that cleans up all disposable fields.',
     errorSeverity: DiagnosticSeverity.WARNING,

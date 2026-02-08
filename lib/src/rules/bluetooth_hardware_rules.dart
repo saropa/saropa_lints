@@ -8,6 +8,8 @@ import 'package:saropa_lints/src/saropa_lint_rule.dart';
 
 /// Warns when Bluetooth scan is started without timeout parameter.
 ///
+/// Since: v1.8.2 | Updated: v4.13.0 | Rule version: v3
+///
 /// BLE scanning drains battery quickly. Without a timeout, scans run
 /// indefinitely, causing excessive battery drain and degraded user experience.
 ///
@@ -35,7 +37,7 @@ class AvoidBluetoothScanWithoutTimeoutRule extends SaropaLintRule {
     name: 'avoid_bluetooth_scan_without_timeout',
     problemMessage:
         '[avoid_bluetooth_scan_without_timeout] Infinite Bluetooth scan drains '
-        'battery and may run until app termination.',
+        'battery and may run until app termination. {v3}',
     correctionMessage:
         'Add timeout parameter: startScan(timeout: Duration(seconds: 10))',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -118,6 +120,8 @@ class _AddScanTimeoutFix extends DartFix {
 
 /// Warns when Bluetooth operations start without checking adapter state.
 ///
+/// Since: v1.8.2 | Updated: v4.13.0 | Rule version: v3
+///
 /// BLE operations fail silently or throw if Bluetooth is disabled. Always
 /// check adapter state before starting scans or connections.
 ///
@@ -152,7 +156,7 @@ class RequireBluetoothStateCheckRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_bluetooth_state_check',
     problemMessage:
-        '[require_bluetooth_state_check] Bluetooth Low Energy (BLE) operations must check the adapter state before attempting connections, scans, or service discovery. Failing to check adapter state can result in failed connections, wasted battery due to repeated attempts, degraded user experience, and hard-to-debug errors—especially on devices where Bluetooth is disabled or unavailable. This can also cause your app to be rejected during app store review for reliability issues.',
+        '[require_bluetooth_state_check] Bluetooth Low Energy (BLE) operations must check the adapter state before attempting connections, scans, or service discovery. Failing to check adapter state can result in failed connections, wasted battery due to repeated attempts, degraded user experience, and hard-to-debug errors—especially on devices where Bluetooth is disabled or unavailable. This can also cause your app to be rejected during app store review for reliability issues. {v3}',
     correctionMessage:
         'Always check FlutterBluePlus.adapterState (or equivalent) before performing BLE operations. If the adapter is not powered on, prompt the user to enable Bluetooth or handle the error gracefully. Document this check in your connection logic to ensure robust and user-friendly BLE workflows.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -230,6 +234,8 @@ class RequireBluetoothStateCheckRule extends SaropaLintRule {
 
 /// Warns when BLE device connection lacks disconnect state listener.
 ///
+/// Since: v1.8.2 | Updated: v4.13.0 | Rule version: v3
+///
 /// BLE devices disconnect unexpectedly (out of range, battery, interference).
 /// Without disconnect handling, the app shows stale state or crashes.
 ///
@@ -262,7 +268,7 @@ class RequireBleDisconnectHandlingRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_ble_disconnect_handling',
     problemMessage:
-        '[require_ble_disconnect_handling] BLE connections must handle disconnect events to maintain app stability and resource management. Ignoring disconnects can lead to stale UI (showing devices as connected when they are not), resource leaks (unreleased connections or streams), and user confusion when devices unexpectedly disappear or fail to reconnect. This can also cause battery drain and degraded reliability, especially in apps that manage multiple devices.',
+        '[require_ble_disconnect_handling] BLE connections must handle disconnect events to maintain app stability and resource management. Ignoring disconnects can lead to stale UI (showing devices as connected when they are not), resource leaks (unreleased connections or streams), and user confusion when devices unexpectedly disappear or fail to reconnect. This can also cause battery drain and degraded reliability, especially in apps that manage multiple devices. {v3}',
     correctionMessage:
         'Listen to device.connectionState (or equivalent) for disconnect events and update your UI and resources accordingly. Clean up streams, subscriptions, and device references when a disconnect occurs. Provide user feedback and attempt reconnection only when appropriate, to avoid infinite loops or excessive battery usage.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -326,6 +332,8 @@ class RequireBleDisconnectHandlingRule extends SaropaLintRule {
 
 /// Warns when audio playback lacks AudioSession configuration.
 ///
+/// Since: v1.8.2 | Updated: v4.13.0 | Rule version: v2
+///
 /// Without proper audio session handling, your app may conflict with other
 /// audio sources (music apps, calls, navigation). Use audio_session package
 /// to configure proper audio focus behavior.
@@ -356,7 +364,7 @@ class RequireAudioFocusHandlingRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_audio_focus_handling',
     problemMessage:
-        '[require_audio_focus_handling] Audio playback should configure AudioSession for proper focus handling. Without proper audio session handling, your app may conflict with other audio sources (music apps, calls, navigation). Use audio_session package to configure proper audio focus behavior.',
+        '[require_audio_focus_handling] Audio playback should configure AudioSession for proper focus handling. Without proper audio session handling, your app may conflict with other audio sources (music apps, calls, navigation). Use audio_session package to configure proper audio focus behavior. {v2}',
     correctionMessage:
         'Use AudioSession.instance to configure audio behavior. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -421,6 +429,8 @@ class RequireAudioFocusHandlingRule extends SaropaLintRule {
 
 /// Warns when QR scanner is used without checking camera permission.
 ///
+/// Since: v1.8.2 | Updated: v4.13.0 | Rule version: v2
+///
 /// QR scanning requires camera access. Using scanner widgets without
 /// permission handling causes crashes on iOS or exceptions on Android.
 /// This is also an App Store compliance requirement.
@@ -459,7 +469,7 @@ class RequireQrPermissionCheckRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_qr_permission_check',
     problemMessage:
-        '[require_qr_permission_check] If you open the QR scanner without first requesting camera permission, your app will show a black screen on iOS or crash on some Android devices. This breaks user experience and can cause app store rejection.',
+        '[require_qr_permission_check] If you open the QR scanner without first requesting camera permission, your app will show a black screen on iOS or crash on some Android devices. This breaks user experience and can cause app store rejection. {v2}',
     correctionMessage:
         'Always request Permission.camera before showing the QR scanner to ensure your app works reliably and passes app store review.',
     errorSeverity: DiagnosticSeverity.ERROR,
@@ -522,6 +532,8 @@ class RequireQrPermissionCheckRule extends SaropaLintRule {
 
 /// Warns when Geolocator is used without permission check.
 ///
+/// Since: v2.1.0 | Updated: v4.13.0 | Rule version: v2
+///
 /// Location access without permission check crashes on iOS and throws on Android.
 ///
 /// **BAD:**
@@ -552,7 +564,7 @@ class RequireGeolocatorPermissionCheckRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_geolocator_permission_check',
     problemMessage:
-        '[require_geolocator_permission_check] Accessing location without checking permission will crash your app on iOS and may cause unpredictable behavior on Android. This can result in app store rejection and poor user experience.',
+        '[require_geolocator_permission_check] Accessing location without checking permission will crash your app on iOS and may cause unpredictable behavior on Android. This can result in app store rejection and poor user experience. {v2}',
     correctionMessage:
         'Always call Geolocator.checkPermission() before getCurrentPosition() or any location access to ensure your app works reliably and passes app store review.',
     errorSeverity: DiagnosticSeverity.ERROR,
@@ -602,6 +614,8 @@ class RequireGeolocatorPermissionCheckRule extends SaropaLintRule {
 
 /// Warns when Geolocator is used without checking if service is enabled.
 ///
+/// Since: v2.1.0 | Updated: v4.13.0 | Rule version: v3
+///
 /// Location service can be disabled. Check before requesting position.
 ///
 /// **BAD:**
@@ -629,7 +643,7 @@ class RequireGeolocatorServiceEnabledRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_geolocator_service_enabled',
     problemMessage:
-        '[require_geolocator_service_enabled] Location requests must check if the location service (GPS) is enabled before attempting to access position data. Failing to check service status can cause runtime errors, user confusion, and app store rejection due to non-compliance with platform requirements. On devices where GPS is disabled, location requests will fail, resulting in poor UX and potentially lost functionality.',
+        '[require_geolocator_service_enabled] Location requests must check if the location service (GPS) is enabled before attempting to access position data. Failing to check service status can cause runtime errors, user confusion, and app store rejection due to non-compliance with platform requirements. On devices where GPS is disabled, location requests will fail, resulting in poor UX and potentially lost functionality. {v3}',
     correctionMessage:
         'Always call Geolocator.isLocationServiceEnabled() before requesting location. If the service is disabled, prompt the user to enable it or handle the error gracefully. Document this check in your location logic to ensure robust and compliant location workflows.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -674,6 +688,8 @@ class RequireGeolocatorServiceEnabledRule extends SaropaLintRule {
 
 /// Warns when getPositionStream subscription is not cancelled.
 ///
+/// Since: v2.1.0 | Updated: v4.13.0 | Rule version: v3
+///
 /// Stream subscriptions must be cancelled to stop location updates.
 ///
 /// **BAD:**
@@ -706,7 +722,7 @@ class RequireGeolocatorStreamCancelRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_geolocator_stream_cancel',
     problemMessage:
-        '[require_geolocator_stream_cancel] Position stream subscriptions must be cancelled when no longer needed. Failing to cancel subscriptions leads to battery drain, memory leaks, and background location updates that persist after the UI is disposed. This can degrade device performance and violate privacy expectations.',
+        '[require_geolocator_stream_cancel] Position stream subscriptions must be cancelled when no longer needed. Failing to cancel subscriptions leads to battery drain, memory leaks, and background location updates that persist after the UI is disposed. This can degrade device performance and violate privacy expectations. {v3}',
     correctionMessage:
         'Store the stream subscription and always call cancel() in dispose() or when the subscription is no longer needed. Document this cleanup to prevent resource leaks and ensure responsible location usage.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -744,6 +760,8 @@ class RequireGeolocatorStreamCancelRule extends SaropaLintRule {
 
 /// Warns when Geolocator requests are made without error handling.
 ///
+/// Since: v4.9.7 | Updated: v4.13.0 | Rule version: v4
+///
 /// Location requests can fail. Always handle errors gracefully.
 ///
 /// **BAD:**
@@ -771,7 +789,7 @@ class RequireGeolocatorErrorHandlingRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_geolocator_error_handling',
     problemMessage:
-        '[require_geolocator_error_handling] Location requests must be wrapped in error handling logic. Failing to handle errors can cause app crashes, lost user trust, and poor reviews—especially when location permissions are denied or hardware fails. Unhandled exceptions may also prevent your app from passing app store review.',
+        '[require_geolocator_error_handling] Location requests must be wrapped in error handling logic. Failing to handle errors can cause app crashes, lost user trust, and poor reviews—especially when location permissions are denied or hardware fails. Unhandled exceptions may also prevent your app from passing app store review. {v4}',
     correctionMessage:
         'Wrap location requests in try-catch blocks to handle errors such as permission denial, hardware failure, or service unavailability. Provide user feedback and fallback logic to maintain a robust and user-friendly experience.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -813,6 +831,8 @@ class RequireGeolocatorErrorHandlingRule extends SaropaLintRule {
 
 /// Warns when BLE data transfer occurs without MTU negotiation.
 ///
+/// Since: v2.3.7 | Updated: v4.13.0 | Rule version: v2
+///
 /// BLE default MTU is only 23 bytes (20 bytes payload). Without negotiating
 /// a larger MTU, data transfers are fragmented into many small packets,
 /// causing poor throughput and increased latency. Always request MTU
@@ -847,7 +867,7 @@ class PreferBleMtuNegotiationRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_ble_mtu_negotiation',
     problemMessage:
-        '[prefer_ble_mtu_negotiation] BLE data transfer without MTU negotiation causes slow, fragmented transfers. BLE default MTU is only 23 bytes (20 bytes payload). Without negotiating a larger MTU, data transfers are fragmented into many small packets, causing poor throughput and increased latency. Always request MTU negotiation before transferring data.',
+        '[prefer_ble_mtu_negotiation] BLE data transfer without MTU negotiation causes slow, fragmented transfers. BLE default MTU is only 23 bytes (20 bytes payload). Without negotiating a larger MTU, data transfers are fragmented into many small packets, causing poor throughput and increased latency. Always request MTU negotiation before transferring data. {v2}',
     correctionMessage:
         'Call device.requestMtu(512) after connect() and before write operations. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
