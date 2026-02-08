@@ -111,19 +111,19 @@ dynamic api;
 // expect_lint: require_rethrow_preserve_stack
 void _bad1451() async {
   try {
-  await api.call();
+    await api.call();
   } catch (e) {
-  log(e);
-  throw e;  // Loses stack trace!
+    log(e);
+    throw e; // Loses stack trace!
   }
 }
 
 // GOOD: Should NOT trigger require_rethrow_preserve_stack
 void _good1451() async {
   try {
-  await api.call();
+    await api.call();
   } catch (e) {
-  log(e);
-  rethrow;  // Preserves stack trace
+    log(e);
+    rethrow; // Preserves stack trace
   }
 }

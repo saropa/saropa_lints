@@ -110,14 +110,14 @@ dynamic x;
 // BAD: Should trigger move_variable_closer_to_its_usage
 // expect_lint: move_variable_closer_to_its_usage
 void _bad224_foo() {
-final x = 1;
+  final x = 1;
 //20 lines of code not using x
-print(x);
+  print(x);
 }
 
 // GOOD: Should NOT trigger move_variable_closer_to_its_usage
 void _good224_foo() {
 //20 lines of code
-final x = 1;
-print(x);
+  final x = 1;
+  print(x);
 }

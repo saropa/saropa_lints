@@ -113,21 +113,21 @@ dynamic value;
 // expect_lint: require_websocket_message_validation
 void _bad102() {
   socket.listen((message) {
-  final data = jsonDecode(message);
-  processData(data['value']);  // No validation!
+    final data = jsonDecode(message);
+    processData(data['value']); // No validation!
   });
 }
 
 // GOOD: Should NOT trigger require_websocket_message_validation
 void _good102() {
   socket.listen((message) {
-  try {
-  final data = jsonDecode(message);
-  if (data is Map && data.containsKey('value')) {
-  processData(data['value']);
-  }
-  } catch (e) {
-  handleError(e);
-  }
+    try {
+      final data = jsonDecode(message);
+      if (data is Map && data.containsKey('value')) {
+        processData(data['value']);
+      }
+    } catch (e) {
+      handleError(e);
+    }
   });
 }

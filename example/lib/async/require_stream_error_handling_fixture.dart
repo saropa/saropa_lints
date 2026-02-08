@@ -118,7 +118,7 @@ void _bad107() {
 // GOOD: Should NOT trigger require_stream_error_handling
 void _good107() {
   stream.listen(
-  (data) => print(data),
-  onError: (error) => handleError(error),
+    (data) => print(data),
+    onError: (error) => handleError(error),
   );
 }

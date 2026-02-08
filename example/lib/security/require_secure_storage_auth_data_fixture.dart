@@ -114,12 +114,12 @@ dynamic value;
 // expect_lint: require_secure_storage_auth_data
 void _bad1019() async {
   final prefs = await SharedPreferences.getInstance();
-  await prefs.setString('jwt', token);  // Unencrypted!
+  await prefs.setString('jwt', token); // Unencrypted!
   await prefs.setString('access_token', token);
 }
 
 // GOOD: Should NOT trigger require_secure_storage_auth_data
 void _good1019() async {
   final storage = FlutterSecureStorage();
-  await storage.write(key: 'jwt', value: token);  // Encrypted
+  await storage.write(key: 'jwt', value: token); // Encrypted
 }

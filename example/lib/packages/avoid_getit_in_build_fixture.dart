@@ -112,17 +112,17 @@ dynamic value;
 // BAD: Should trigger avoid_getit_in_build
 // expect_lint: avoid_getit_in_build
 Widget _bad635_build(BuildContext context) {
-final service = GetIt.I<MyService>();
-return Text(service.value);
+  final service = GetIt.I<MyService>();
+  return Text(service.value);
 }
 
 // GOOD: Should NOT trigger avoid_getit_in_build
 class _good635_MyWidget extends StatelessWidget {
-const MyWidget({required this.service});
-final MyService service;
+  const _good635_MyWidget({required this.service});
+  final MyService service;
 
-@override
-Widget build(BuildContext context) {
-return Text(service.value);
-}
+  @override
+  Widget build(BuildContext context) {
+    return Text(service.value);
+  }
 }

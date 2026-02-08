@@ -115,38 +115,38 @@ dynamic widget;
 class _bad1031__MyPageState extends State<MyPage> {
 //200+ lines of code, many fields and methods
 
-void _onTap() {
-setState(() {
-_counter++; // Rebuilds entire large widget tree
-});
-}
+  void _onTap() {
+    setState(() {
+      _counter++; // Rebuilds entire large widget tree
+    });
+  }
 
-@override
-Widget build(BuildContext context) {
+  @override
+  Widget build(BuildContext context) {
 //complex widget tree
-}
+  }
 }
 
 // GOOD: Should NOT trigger avoid_setstate_in_large_state_class
 // Option 1: Break into smaller widgets
 class _good1031__MyPageState extends State<MyPage> {
-@override
-Widget build(BuildContext context) {
-return Column(
-children: [
-const HeaderWidget(), // Won't rebuild
-CounterWidget(), // Only this rebuilds
-const FooterWidget(), // Won't rebuild
-],
-);
-}
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        const HeaderWidget(), // Won't rebuild
+        CounterWidget(), // Only this rebuilds
+        const FooterWidget(), // Won't rebuild
+      ],
+    );
+  }
 }
 
 // Option 2: Use ValueNotifier for granular updates
 class _good1031__MyPageState extends State<MyPage> {
-final _counter = ValueNotifier<int>(0);
+  final _counter = ValueNotifier<int>(0);
 
-void _onTap() {
-_counter.value++; // Only ValueListenableBuilder rebuilds
-}
+  void _onTap() {
+    _counter.value++; // Only ValueListenableBuilder rebuilds
+  }
 }

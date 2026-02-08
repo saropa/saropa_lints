@@ -108,12 +108,12 @@ import '../flutter_mocks.dart';
 // BAD: Should trigger require_geolocator_timeout
 // expect_lint: require_geolocator_timeout
 void _bad65() async {
-  final position = await Geolocator.getCurrentPosition();  // May hang!
+  final position = await Geolocator.getCurrentPosition(); // May hang!
 }
 
 // GOOD: Should NOT trigger require_geolocator_timeout
 void _good65() async {
   final position = await Geolocator.getCurrentPosition(
-  timeLimit: Duration(seconds: 10),
+    timeLimit: Duration(seconds: 10),
   );
 }

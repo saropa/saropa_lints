@@ -111,15 +111,16 @@ dynamic value;
 // expect_lint: avoid_unnecessary_futures
 void _bad1065() async {
   Future<int> getValue() async {
-  return 42;  // No await needed
+    return 42; // No await needed
   }
 }
 
 // GOOD: Should NOT trigger avoid_unnecessary_futures
 void _good1065() {
   Future<int> getValue() {
-  return Future.value(42);
+    return Future.value(42);
   }
+
   // Or just:
   int getValue() => 42;
 }

@@ -110,7 +110,7 @@ dynamic isar;
 // BAD: Should trigger avoid_isar_float_equality_queries
 // expect_lint: avoid_isar_float_equality_queries
 void _bad679() {
-  isar.products.filter().priceEqualTo(19.99);  // May miss matches!
+  isar.products.filter().priceEqualTo(19.99); // May miss matches!
 }
 
 // GOOD: Should NOT trigger avoid_isar_float_equality_queries

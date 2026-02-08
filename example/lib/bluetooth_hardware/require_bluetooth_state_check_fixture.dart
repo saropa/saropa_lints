@@ -111,15 +111,15 @@ dynamic state;
 // BAD: Should trigger require_bluetooth_state_check
 // expect_lint: require_bluetooth_state_check
 void _bad120_connect() {
-device.connect(); // May fail if Bluetooth is off!
+  device.connect(); // May fail if Bluetooth is off!
 }
 
 // GOOD: Should NOT trigger require_bluetooth_state_check
 void _good120_connect() async {
-final state = await FlutterBluePlus.adapterState.first;
-if (state != BluetoothAdapterState.on) {
-showError('Please enable Bluetooth');
-return;
-}
-device.connect();
+  final state = await FlutterBluePlus.adapterState.first;
+  if (state != BluetoothAdapterState.on) {
+    showError('Please enable Bluetooth');
+    return;
+  }
+  device.connect();
 }

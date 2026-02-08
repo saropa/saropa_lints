@@ -109,13 +109,13 @@ import '../flutter_mocks.dart';
 // expect_lint: require_integration_test_timeout
 void _bad1186() {
   testWidgets('complex flow', (tester) async {
-  // Long test without timeout
+    // Long test without timeout
   });
 }
 
 // GOOD: Should NOT trigger require_integration_test_timeout
 void _good1186() {
   testWidgets('complex flow', (tester) async {
-  // Test code
+    // Test code
   }, timeout: Timeout(Duration(minutes: 2)));
 }

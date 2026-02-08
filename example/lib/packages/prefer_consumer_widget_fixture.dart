@@ -114,22 +114,22 @@ dynamic value;
 // BAD: Should trigger prefer_consumer_widget
 // expect_lint: prefer_consumer_widget
 class _bad744_MyWidget extends StatelessWidget {
-@override
-Widget build(BuildContext context) {
-return Consumer(
-builder: (context, ref, child) {
-final value = ref.watch(myProvider);
-return Text(value);
-},
-);
-}
+  @override
+  Widget build(BuildContext context) {
+    return Consumer(
+      builder: (context, ref, child) {
+        final value = ref.watch(myProvider);
+        return Text(value);
+      },
+    );
+  }
 }
 
 // GOOD: Should NOT trigger prefer_consumer_widget
 class _good744_MyWidget extends ConsumerWidget {
-@override
-Widget build(BuildContext context, WidgetRef ref) {
-final value = ref.watch(myProvider);
-return Text(value);
-}
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final value = ref.watch(myProvider);
+    return Text(value);
+  }
 }

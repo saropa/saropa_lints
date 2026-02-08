@@ -116,16 +116,16 @@ dynamic map;
 // BAD: Should trigger prefer_hive_value_listenable
 // expect_lint: prefer_hive_value_listenable
 void _bad668__saveItem(Item item) async {
-await box.put(item.id, item);
-setState(() {});  // Manual!
+  await box.put(item.id, item);
+  setState(() {}); // Manual!
 }
 
 // GOOD: Should NOT trigger prefer_hive_value_listenable
 void _good668() {
   ValueListenableBuilder(
-  valueListenable: box.listenable(),
-  builder: (context, Box<Item> box, _) {
-  return ListView(children: box.values.map().toList());
-  },
+    valueListenable: box.listenable(),
+    builder: (context, Box<Item> box, _) {
+      return ListView(children: box.values.map().toList());
+    },
   );
 }

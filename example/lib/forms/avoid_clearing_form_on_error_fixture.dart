@@ -110,16 +110,16 @@ dynamic input;
 // BAD: Should trigger avoid_clearing_form_on_error
 // expect_lint: avoid_clearing_form_on_error
 void _bad402__onSubmit() {
-if (!_formKey.currentState!.validate()) {
-_nameController.clear(); // User loses input!
-return;
-}
+  if (!_formKey.currentState!.validate()) {
+    _nameController.clear(); // User loses input!
+    return;
+  }
 }
 
 // GOOD: Should NOT trigger avoid_clearing_form_on_error
 void _good402__onSubmit() {
-if (!_formKey.currentState!.validate()) {
+  if (!_formKey.currentState!.validate()) {
 // Keep input, just show errors
-return;
-}
+    return;
+  }
 }

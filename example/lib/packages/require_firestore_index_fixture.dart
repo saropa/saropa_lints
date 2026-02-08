@@ -115,11 +115,11 @@ dynamic json;
 void _bad628() {
   // This query needs a composite index
   final query = FirebaseFirestore.instance
-  .collection('products')
-  .where('category', isEqualTo: 'electronics')
-  .where('price', isLessThan: 100)
-  .orderBy('rating', descending: true)
-  .get(); // Fails if index doesn't exist!
+      .collection('products')
+      .where('category', isEqualTo: 'electronics')
+      .where('price', isLessThan: 100)
+      .orderBy('rating', descending: true)
+      .get(); // Fails if index doesn't exist!
 }
 
 // GOOD: Should NOT trigger require_firestore_index
@@ -134,9 +134,9 @@ void _good628() {
   //   ]
   // }
   final query = FirebaseFirestore.instance
-  .collection('products')
-  .where('category', isEqualTo: 'electronics')
-  .where('price', isLessThan: 100)
-  .orderBy('rating', descending: true)
-  .get();
+      .collection('products')
+      .where('category', isEqualTo: 'electronics')
+      .where('price', isLessThan: 100)
+      .orderBy('rating', descending: true)
+      .get();
 }

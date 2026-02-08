@@ -112,7 +112,7 @@ dynamic image;
 // expect_lint: require_exclude_semantics_justification
 void _bad2() {
   ExcludeSemantics(
-  child: DecorativeImage(),
+    child: DecorativeImage(),
   );
 }
 
@@ -120,6 +120,6 @@ void _bad2() {
 void _good2() {
   // Decorative image, no semantic meaning
   ExcludeSemantics(
-  child: DecorativeImage(),
+    child: DecorativeImage(),
   );
 }

@@ -113,14 +113,14 @@ final userName = 'John';
 // BAD: Should trigger require_text_overflow_handling
 // expect_lint: require_text_overflow_handling
 void _bad1410() {
-  Text(userName) // Dynamic content may overflow
-  Text('$firstName $lastName') // Interpolated string
-  Expanded(child: Text(description)) // Constrained width
+  Text(userName); // Dynamic content may overflow
+  Text('$firstName $lastName'); // Interpolated string
+  Expanded(child: Text(description)); // Constrained width
 }
 
 // GOOD: Should NOT trigger require_text_overflow_handling
 void _good1410() {
   Text(userName, overflow: TextOverflow.ellipsis, maxLines: 1);
-  Text('OK') // Static short text is fine
-  Text('Submit', maxLines: 1) // Has maxLines
+  Text('OK'); // Static short text is fine
+  Text('Submit', maxLines: 1); // Has maxLines
 }

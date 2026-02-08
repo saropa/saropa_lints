@@ -121,12 +121,13 @@ void _bad503() {
 // GOOD: Should NOT trigger require_route_transition_consistency
 void _good503() {
   // Use consistent transitions via ThemeData or custom PageTransitionsBuilder
-  theme: ThemeData(
-  pageTransitionsTheme: PageTransitionsTheme(
-  builders: {
-  TargetPlatform.android: CupertinoPageTransitionsBuilder(),
-  TargetPlatform.iOS: CupertinoPageTransitionsBuilder(),
-  },
-  ),
+  theme:
+  ThemeData(
+    pageTransitionsTheme: PageTransitionsTheme(
+      builders: {
+        TargetPlatform.android: CupertinoPageTransitionsBuilder(),
+        TargetPlatform.iOS: CupertinoPageTransitionsBuilder(),
+      },
+    ),
   );
 }

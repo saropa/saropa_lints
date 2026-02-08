@@ -112,14 +112,14 @@ dynamic user;
 // BAD: Should trigger require_public_api_documentation
 // expect_lint: require_public_api_documentation
 class _bad337_UserService {
-Future<User> getUser(String id) async {}
+  Future<User> getUser(String id) async {}
 }
 
 // GOOD: Should NOT trigger require_public_api_documentation
 /// Service for managing user operations.
 class _good337_UserService {
-/// Retrieves a user by their unique identifier.
-///
-/// Throws [UserNotFoundException] if user doesn't exist.
-Future<User> getUser(String id) async {}
+  /// Retrieves a user by their unique identifier.
+  ///
+  /// Throws [UserNotFoundException] if user doesn't exist.
+  Future<User> getUser(String id) async {}
 }

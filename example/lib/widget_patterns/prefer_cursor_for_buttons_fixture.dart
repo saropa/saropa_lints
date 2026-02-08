@@ -111,16 +111,16 @@ dynamic child;
 // expect_lint: prefer_cursor_for_buttons
 void _bad1417() {
   InkWell(
-  onTap: () => doSomething(),
-  child: Text('Click me'),
+    onTap: () => doSomething(),
+    child: Text('Click me'),
   );
 }
 
 // GOOD: Should NOT trigger prefer_cursor_for_buttons
 void _good1417() {
   InkWell(
-  onTap: () => doSomething(),
-  mouseCursor: SystemMouseCursors.click,
-  child: Text('Click me'),
+    onTap: () => doSomething(),
+    mouseCursor: SystemMouseCursors.click,
+    child: Text('Click me'),
   );
 }

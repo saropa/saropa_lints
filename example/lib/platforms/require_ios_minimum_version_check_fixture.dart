@@ -120,6 +120,6 @@ void _good850() async {
   // Check iOS version first
   final version = await channel.invokeMethod('getIOSVersion');
   if (version >= 16.1) {
-  await channel.invokeMethod('startLiveActivity', data);
+    await channel.invokeMethod('startLiveActivity', data);
   }
 }

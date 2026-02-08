@@ -121,10 +121,10 @@ void _bad538() async {
 // GOOD: Should NOT trigger avoid_notification_silent_failure
 void _good538() async {
   try {
-  await flutterLocalNotificationsPlugin.show(0, 'Title', 'Body', details);
+    await flutterLocalNotificationsPlugin.show(0, 'Title', 'Body', details);
   } catch (e) {
-  // Handle error - maybe permissions were revoked
-  debugPrint('Failed to show notification: $e');
-  // Optionally show in-app message instead
+    // Handle error - maybe permissions were revoked
+    debugPrint('Failed to show notification: $e');
+    // Optionally show in-app message instead
   }
 }

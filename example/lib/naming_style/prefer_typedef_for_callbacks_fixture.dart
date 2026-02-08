@@ -105,15 +105,17 @@
 
 import '../flutter_mocks.dart';
 
+typedef StringCallback = void Function(String);
+
 // BAD: Should trigger prefer_typedef_for_callbacks
 // expect_lint: prefer_typedef_for_callbacks
-void _bad497_Function(String) onComplete;
+void Function(String) onComplete;
 void Function(String) onError;
 void Function(String) onProgress;
 
 // GOOD: Should NOT trigger prefer_typedef_for_callbacks
 void _good497() {
-  typedef StringCallback = void Function(String);
+  // typedef StringCallback = void Function(String);
   StringCallback onComplete;
   StringCallback onError;
   StringCallback onProgress;

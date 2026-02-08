@@ -113,7 +113,7 @@ final email = 'test@example.com';
 void _bad692() async {
   // INSECURE: No nonce means tokens can be replayed by attackers
   final credential = await SignInWithApple.getAppleIDCredential(
-  scopes: [AppleIDAuthorizationScopes.email],
+    scopes: [AppleIDAuthorizationScopes.email],
   );
 }
 
@@ -122,16 +122,16 @@ void _good692() async {
   // Generate nonce using Supabase's built-in method
   final rawNonce = Supabase.instance.client.auth.generateRawNonce();
   final hashedNonce = sha256.convert(utf8.encode(rawNonce)).toString();
-  
+
   final credential = await SignInWithApple.getAppleIDCredential(
-  scopes: [AppleIDAuthorizationScopes.email],
-  nonce: hashedNonce, // Hash goes to Apple
+    scopes: [AppleIDAuthorizationScopes.email],
+    nonce: hashedNonce, // Hash goes to Apple
   );
-  
+
   // Pass raw nonce to Supabase for verification
   await Supabase.instance.client.auth.signInWithIdToken(
-  provider: OAuthProvider.apple,
-  idToken: credential.identityToken!,
-  nonce: rawNonce, // Raw nonce goes to Supabase
+    provider: OAuthProvider.apple,
+    idToken: credential.identityToken!,
+    nonce: rawNonce, // Raw nonce goes to Supabase
   );
 }

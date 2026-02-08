@@ -113,24 +113,24 @@ final context = BuildContext();
 // expect_lint: require_focus_indicator
 void _bad22() {
   GestureDetector(
-  onTap: _handleTap,
-  child: Container(),
+    onTap: _handleTap,
+    child: Container(),
   );
 }
 
 // GOOD: Should NOT trigger require_focus_indicator
 void _good22() {
   Focus(
-  child: Builder(builder: (context) {
-  final hasFocus = Focus.of(context).hasFocus;
-  return GestureDetector(
-  onTap: _handleTap,
-  child: Container(
-  decoration: BoxDecoration(
-  border: hasFocus ? Border.all(color: Colors.blue, width: 2) : null,
-  ),
-  ),
-  );
-  }),
+    child: Builder(builder: (context) {
+      final hasFocus = Focus.of(context).hasFocus;
+      return GestureDetector(
+        onTap: _handleTap,
+        child: Container(
+          decoration: BoxDecoration(
+            border: hasFocus ? Border.all(color: Colors.blue, width: 2) : null,
+          ),
+        ),
+      );
+    }),
   );
 }

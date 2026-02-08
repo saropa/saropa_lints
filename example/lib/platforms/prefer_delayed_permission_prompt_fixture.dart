@@ -115,31 +115,31 @@ dynamic user;
 // BAD: Should trigger prefer_delayed_permission_prompt
 // expect_lint: prefer_delayed_permission_prompt
 void _bad902_main() async {
-await requestNotificationPermission(); // Too early!
-runApp(MyApp());
+  await requestNotificationPermission(); // Too early!
+  runApp(MyApp());
 }
 
 // GOOD: Should NOT trigger prefer_delayed_permission_prompt
 void _good902() async {
   // After user creates first reminder
   showDialog(
-  context: context,
-  builder: (context) => AlertDialog(
-  title: Text('Enable notifications?'),
-  content: Text("We'll remind you about your tasks on time."),
-  actions: [
-  TextButton(
-  onPressed: () => Navigator.pop(context),
-  child: Text('Not now'),
-  ),
-  TextButton(
-  onPressed: () async {
-  Navigator.pop(context);
-  await requestNotificationPermission();
-  },
-  child: Text('Enable'),
-  ),
-  ],
-  ),
+    context: context,
+    builder: (context) => AlertDialog(
+      title: Text('Enable notifications?'),
+      content: Text("We'll remind you about your tasks on time."),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(context),
+          child: Text('Not now'),
+        ),
+        TextButton(
+          onPressed: () async {
+            Navigator.pop(context);
+            await requestNotificationPermission();
+          },
+          child: Text('Enable'),
+        ),
+      ],
+    ),
   );
 }

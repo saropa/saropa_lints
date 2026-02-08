@@ -112,14 +112,15 @@ dynamic userProvider;
 // BAD: Should trigger avoid_static_state
 // expect_lint: avoid_static_state
 class _bad1033_AppState {
-static User? currentUser;  // Global mutable state!
-static List<String> cache = [];
+  static User? currentUser; // Global mutable state!
+  static List<String> cache = [];
 }
 
 // GOOD: Should NOT trigger avoid_static_state
 // Use proper state management:
 final userProvider = StateProvider<User?>((ref) => null);
+
 // Or dependency injection:
 class _good1033_AppState {
-User? currentUser;  // Instance field, not static
+  User? currentUser; // Instance field, not static
 }

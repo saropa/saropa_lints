@@ -114,14 +114,15 @@ dynamic x;
 // BAD: Should trigger prefer_iterable_operations
 // expect_lint: prefer_iterable_operations
 void _bad256() {
-  for (final item in items.map((x) => x.name).where((n) => n.isNotEmpty).toList()) {
-  print(item);
+  for (final item
+      in items.map((x) => x.name).where((n) => n.isNotEmpty).toList()) {
+    print(item);
   }
 }
 
 // GOOD: Should NOT trigger prefer_iterable_operations
 void _good256() {
   for (final item in items.map((x) => x.name).where((n) => n.isNotEmpty)) {
-  print(item);
+    print(item);
   }
 }

@@ -120,9 +120,9 @@ void _good473() async {
   // Use TransferableTypedData for byte arrays
   final transferable = TransferableTypedData.fromList([bytes]);
   isolatePort.send(transferable);
-  
+
   // Or process in chunks
   for (final chunk in largeList.chunked(1000)) {
-  await compute(processChunk, chunk);
+    await compute(processChunk, chunk);
   }
 }

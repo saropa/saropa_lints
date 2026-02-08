@@ -111,24 +111,24 @@ dynamic user;
 // BAD: Should trigger require_test_groups
 // expect_lint: require_test_groups
 void _bad1168_main() {
-test('login succeeds with valid credentials', () {});
-test('login fails with invalid password', () {});
-test('login fails with unknown user', () {});
-test('logout clears session', () {});
-test('logout redirects to login', () {});
+  test('login succeeds with valid credentials', () {});
+  test('login fails with invalid password', () {});
+  test('login fails with unknown user', () {});
+  test('logout clears session', () {});
+  test('logout redirects to login', () {});
 // 10+ tests without organization
 }
 
 // GOOD: Should NOT trigger require_test_groups
 void _good1168_main() {
-group('login', () {
-test('succeeds with valid credentials', () {});
-test('fails with invalid password', () {});
-test('fails with unknown user', () {});
-});
+  group('login', () {
+    test('succeeds with valid credentials', () {});
+    test('fails with invalid password', () {});
+    test('fails with unknown user', () {});
+  });
 
-group('logout', () {
-test('clears session', () {});
-test('redirects to login', () {});
-});
+  group('logout', () {
+    test('clears session', () {});
+    test('redirects to login', () {});
+  });
 }

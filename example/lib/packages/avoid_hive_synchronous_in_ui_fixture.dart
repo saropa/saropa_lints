@@ -112,22 +112,22 @@ final name = 'example';
 // BAD: Should trigger avoid_hive_synchronous_in_ui
 // expect_lint: avoid_hive_synchronous_in_ui
 Widget _bad670_build(BuildContext context) {
-final name = box.get('name'); // Blocks UI rendering!
-return Text(name ?? 'Unknown');
+  final name = box.get('name'); // Blocks UI rendering!
+  return Text(name ?? 'Unknown');
 }
 
 // GOOD: Should NOT trigger avoid_hive_synchronous_in_ui
 void _good670() async {
   String? _name;
-  
+
   @override
   void initState() {
-  // super.initState();
-  _loadName();
+    // super.initState();
+    _loadName();
   }
-  
+
   Future<void> _loadName() async {
-  final name = await compute((_) => box.get('name'), null);
-  setState(() => _name = name);
+    final name = await compute((_) => box.get('name'), null);
+    setState(() => _name = name);
   }
 }

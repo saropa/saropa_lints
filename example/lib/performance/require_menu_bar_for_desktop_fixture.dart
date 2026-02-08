@@ -113,17 +113,17 @@ final context = BuildContext();
 // expect_lint: require_menu_bar_for_desktop
 void _bad807() {
   MaterialApp(
-  home: Scaffold(),
+    home: Scaffold(),
   );
 }
 
 // GOOD: Should NOT trigger require_menu_bar_for_desktop
 void _good807() {
   MaterialApp(
-  builder: (context, child) => PlatformMenuBar(
-  menus: [],
-  child: child!,
-  ),
-  home: Scaffold(),
+    builder: (context, child) => PlatformMenuBar(
+      menus: [],
+      child: child!,
+    ),
+    home: Scaffold(),
   );
 }

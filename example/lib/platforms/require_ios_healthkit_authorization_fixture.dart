@@ -110,9 +110,9 @@ import '../flutter_mocks.dart';
 void _bad864() async {
   // Reading without authorization check
   final steps = await health.getHealthDataFromTypes(
-  startTime: yesterday,
-  endTime: now,
-  types: [HealthDataType.STEPS],
+    startTime: yesterday,
+    endTime: now,
+    types: [HealthDataType.STEPS],
   );
 }
 
@@ -121,6 +121,6 @@ void _good864() async {
   // Request authorization first
   final authorized = await health.requestAuthorization([HealthDataType.STEPS]);
   if (authorized) {
-  final steps = await health.getHealthDataFromTypes();
+    final steps = await health.getHealthDataFromTypes();
   }
 }

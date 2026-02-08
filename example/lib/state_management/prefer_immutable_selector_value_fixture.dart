@@ -116,15 +116,15 @@ dynamic value;
 // expect_lint: prefer_immutable_selector_value
 void _bad1032() {
   Selector<Model, List<Item>>(
-  selector: (_, model) => model.items, // List is mutable
-  builder: (context, items, child) =>
+    selector: (_, model) => model.items, // List is mutable
+    builder: (context, items, child) => Container(),
   );
 }
 
 // GOOD: Should NOT trigger prefer_immutable_selector_value
 void _good1032() {
   Selector<Model, int>(
-  selector: (_, model) => model.items.length, // Immutable value
-  builder: (context, count, child) =>
+    selector: (_, model) => model.items.length, // Immutable value
+    builder: (context, count, child) => Container(),
   );
 }

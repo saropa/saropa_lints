@@ -113,12 +113,12 @@ dynamic value;
 // BAD: Should trigger avoid_isar_string_contains_without_index
 // expect_lint: avoid_isar_string_contains_without_index
 void _bad690() {
-  isar.products.filter().nameContains('phone');  // Full scan!
+  isar.products.filter().nameContains('phone'); // Full scan!
 }
 
 // GOOD: Should NOT trigger avoid_isar_string_contains_without_index
 @collection
 class _good690_Product {
-@Index(type: IndexType.value);
-String? name;  // Indexed for contains queries
+  @Index(type: IndexType.value)
+  String? name; // Indexed for contains queries
 }

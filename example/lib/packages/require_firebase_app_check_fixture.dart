@@ -111,14 +111,14 @@ final users = <dynamic>[];
 // BAD: Should trigger require_firebase_app_check
 // expect_lint: require_firebase_app_check
 void _bad625_initFirebase() async {
-await Firebase.initializeApp();
+  await Firebase.initializeApp();
 // Using Firestore without App Check
-FirebaseFirestore.instance.collection('users').get();
+  FirebaseFirestore.instance.collection('users').get();
 }
 
 // GOOD: Should NOT trigger require_firebase_app_check
 void _good625_initFirebase() async {
-await Firebase.initializeApp();
-await FirebaseAppCheck.instance.activate();
-FirebaseFirestore.instance.collection('users').get();
+  await Firebase.initializeApp();
+  await FirebaseAppCheck.instance.activate();
+  FirebaseFirestore.instance.collection('users').get();
 }

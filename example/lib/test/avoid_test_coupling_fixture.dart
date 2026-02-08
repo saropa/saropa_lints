@@ -113,22 +113,22 @@ final userId = '123';
 // expect_lint: avoid_test_coupling
 void _bad1169() async {
   late String userId;
-  
+
   test('creates user', () async {
-  userId = await createUser('test'); // Sets shared state
-  expect(userId, isNotNull);
+    userId = await createUser('test'); // Sets shared state
+    expect(userId, isNotNull);
   });
-  
+
   test('deletes user', () async {
-  await deleteUser(userId); // Depends on previous test!
+    await deleteUser(userId); // Depends on previous test!
   });
 }
 
 // GOOD: Should NOT trigger avoid_test_coupling
 void _good1169() async {
   test('creates and deletes user', () async {
-  final userId = await createUser('test');
-  expect(userId, isNotNull);
-  await deleteUser(userId);
+    final userId = await createUser('test');
+    expect(userId, isNotNull);
+    await deleteUser(userId);
   });
 }

@@ -110,22 +110,22 @@ final name = 'example';
 // BAD: Should trigger require_equatable_copy_with
 // expect_lint: require_equatable_copy_with
 class _bad603_Person extends Equatable {
-final String name;
-final int age;
+  final String name;
+  final int age;
 
-@override
-List<Object?> get props => [name, age];
+  @override
+  List<Object?> get props => [name, age];
 }
 
 // GOOD: Should NOT trigger require_equatable_copy_with
 class _good603_Person extends Equatable {
-final String name;
-final int age;
+  final String name;
+  final int age;
 
-Person copyWith({String? name, int? age}) {
-return Person(name: name ?? this.name, age: age ?? this.age);
-}
+  Person copyWith({String? name, int? age}) {
+    return Person(name: name ?? this.name, age: age ?? this.age);
+  }
 
-@override
-List<Object?> get props => [name, age];
+  @override
+  List<Object?> get props => [name, age];
 }

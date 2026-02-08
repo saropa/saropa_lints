@@ -112,27 +112,27 @@ final text = 'text';
 // BAD: Should trigger avoid_text_span_in_build
 // expect_lint: avoid_text_span_in_build
 Widget _bad793_build(BuildContext context) {
-return RichText(
-text: TextSpan(
-children: [
-TextSpan(text: 'Hello ', style: TextStyle(color: Colors.black)),
-TextSpan(text: 'World', style: TextStyle(color: Colors.blue)),
-],
-),
-);
+  return RichText(
+    text: TextSpan(
+      children: [
+        TextSpan(text: 'Hello ', style: TextStyle(color: Colors.black)),
+        TextSpan(text: 'World', style: TextStyle(color: Colors.blue)),
+      ],
+    ),
+  );
 }
 
 // GOOD: Should NOT trigger avoid_text_span_in_build
 void _good793() {
   // Cache as static const or class field
-  static const _textSpan = TextSpan(
-  children: [
-  TextSpan(text: 'Hello ', style: TextStyle(color: Colors.black)),
-  TextSpan(text: 'World', style: TextStyle(color: Colors.blue)),
-  ],
+  final _textSpan = TextSpan(
+    children: [
+      TextSpan(text: 'Hello ', style: TextStyle(color: Colors.black)),
+      TextSpan(text: 'World', style: TextStyle(color: Colors.blue)),
+    ],
   );
-  
+
   Widget build(BuildContext context) {
-  return RichText(text: _textSpan);
+    return RichText(text: _textSpan);
   }
 }

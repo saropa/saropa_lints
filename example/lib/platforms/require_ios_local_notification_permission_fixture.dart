@@ -118,11 +118,11 @@ void _bad861() async {
 void _good861() async {
   // Request permission first
   final granted = await flutterLocalNotificationsPlugin
-  .resolvePlatformSpecificImplementation<
-  IOSFlutterLocalNotificationsPlugin>()
-  ?.requestPermissions(alert: true, badge: true, sound: true);
-  
+      .resolvePlatformSpecificImplementation<
+          IOSFlutterLocalNotificationsPlugin>()
+      ?.requestPermissions(alert: true, badge: true, sound: true);
+
   if (granted ?? false) {
-  await flutterLocalNotificationsPlugin.zonedSchedule();
+    await flutterLocalNotificationsPlugin.zonedSchedule();
   }
 }

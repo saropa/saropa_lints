@@ -110,12 +110,12 @@ final items = <dynamic>[];
 // BAD: Should trigger prefer_unmodifiable_collections
 // expect_lint: prefer_unmodifiable_collections
 class _bad605_State {
-final List<Item> items;
-State(this.items);  // Can be mutated externally!
+  final List<Item> items;
+  _bad605_State(this.items); // Can be mutated externally!
 }
 
 // GOOD: Should NOT trigger prefer_unmodifiable_collections
 class _good605_State {
-final List<Item> items;
-State(List<Item> items) : items = List.unmodifiable(items);
+  final List<Item> items;
+  _good605_State(List<Item> items) : items = List.unmodifiable(items);
 }

@@ -111,13 +111,13 @@ final message = 'Message';
 // BAD: Should trigger require_live_region
 // expect_lint: require_live_region
 void _bad7() {
-  Text(errorMessage) // Error message that changes dynamically
+  Text(errorMessage); // Error message that changes dynamically
 }
 
 // GOOD: Should NOT trigger require_live_region
 void _good7() {
   Semantics(
-  liveRegion: true,
-  child: Text(errorMessage),
+    liveRegion: true,
+    child: Text(errorMessage),
   );
 }

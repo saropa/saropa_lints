@@ -111,16 +111,16 @@ dynamic timer;
 // expect_lint: avoid_real_timer_in_widget_test
 void _bad1200() async {
   testWidgets('shows loading', (tester) async {
-  Timer(Duration(seconds: 1), () => completer.complete());
-  await tester.pump(Duration(seconds: 2));
+    Timer(Duration(seconds: 1), () => completer.complete());
+    await tester.pump(Duration(seconds: 2));
   });
 }
 
 // GOOD: Should NOT trigger avoid_real_timer_in_widget_test
 void _good1200() async {
   testWidgets('shows loading', (tester) async {
-  await tester.runAsync(() async {
-  // Use fakeAsync for timer-based code
-  });
+    await tester.runAsync(() async {
+      // Use fakeAsync for timer-based code
+    });
   });
 }

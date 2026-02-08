@@ -121,7 +121,7 @@ void _bad996() {
 // GOOD: Should NOT trigger avoid_token_in_url
 void _good996() async {
   final response = await http.get(
-  Uri.parse('https://api.example.com'),
-  headers: {'Authorization': 'Bearer $apiToken'},
+    Uri.parse('https://api.example.com'),
+    headers: {'Authorization': 'Bearer $apiToken'},
   );
 }

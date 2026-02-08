@@ -111,14 +111,14 @@ final name = 'example';
 // BAD: Should trigger avoid_freezed_json_serializable_conflict
 // expect_lint: avoid_freezed_json_serializable_conflict
 @freezed
-@JsonSerializable()  // Conflict!
+@JsonSerializable() // Conflict!
 class _bad412_User with _$User {
-factory User({String? name}) = _User;
+  factory User({String? name}) = _User;
 }
 
 // GOOD: Should NOT trigger avoid_freezed_json_serializable_conflict
 @freezed
 class _good412_User with _$User {
-factory User({String? name}) = _User;
-factory User.fromJson(Map<String, dynamic> json) => _$UserFromJson(json);
+  factory User({String? name}) = _User;
+  factory User.fromJson(Map<String, dynamic> json) => _$UserFromJson(json);
 }

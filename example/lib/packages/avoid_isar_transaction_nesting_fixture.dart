@@ -113,16 +113,17 @@ final users = <dynamic>[];
 // expect_lint: avoid_isar_transaction_nesting
 void _bad677() async {
   await isar.writeTxn(() async {
-  await isar.writeTxn(() async {  // DEADLOCK!
-  await isar.users.put(user);
-  });
+    await isar.writeTxn(() async {
+      // DEADLOCK!
+      await isar.users.put(user);
+    });
   });
 }
 
 // GOOD: Should NOT trigger avoid_isar_transaction_nesting
 void _good677() async {
   await isar.writeTxn(() async {
-  await isar.users.put(user);
-  await isar.posts.put(post);
+    await isar.users.put(user);
+    await isar.posts.put(post);
   });
 }

@@ -111,19 +111,19 @@ final id = '1';
 // expect_lint: require_api_error_mapping
 void _bad49() async {
   try {
-  await fetchUser(id);
+    await fetchUser(id);
   } catch (e) {
-  print('Error: $e'); // Generic handling
+    print('Error: $e'); // Generic handling
   }
 }
 
 // GOOD: Should NOT trigger require_api_error_mapping
 void _good49() async {
   try {
-  await fetchUser(id);
+    await fetchUser(id);
   } on SocketException {
-  throw NetworkException('No internet connection');
+    throw NetworkException('No internet connection');
   } on HttpException catch (e) {
-  throw ApiException.fromStatusCode(e.statusCode);
+    throw ApiException.fromStatusCode(e.statusCode);
   }
 }

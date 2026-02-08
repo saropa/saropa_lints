@@ -117,24 +117,24 @@ dynamic userProvider;
 // expect_lint: prefer_selector_over_consumer
 void _bad721() {
   Consumer(
-  builder: (context, ref, child) {
-  final user = ref.watch(userProvider);
-  return Text(user.name); // Rebuilds on ANY user change
-  },
+    builder: (context, ref, child) {
+      final user = ref.watch(userProvider);
+      return Text(user.name); // Rebuilds on ANY user change
+    },
   );
 }
 
 // GOOD: Should NOT trigger prefer_selector_over_consumer
 void _good721() {
   Selector<UserNotifier, String>(
-  selector: (_, notifier) => notifier.user.name,
-  builder: (_, name, __) => Text(name), // Only rebuilds when name changes
+    selector: (_, notifier) => notifier.user.name,
+    builder: (_, name, __) => Text(name), // Only rebuilds when name changes
   );
   // Or with Riverpod:
   Consumer(
-  builder: (context, ref, child) {
-  final name = ref.watch(userProvider.select((u) => u.name));
-  return Text(name);
-  },
+    builder: (context, ref, child) {
+      final name = ref.watch(userProvider.select((u) => u.name));
+      return Text(name);
+    },
   );
 }

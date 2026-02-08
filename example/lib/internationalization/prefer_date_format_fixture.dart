@@ -113,7 +113,7 @@ dynamic locale;
 void _bad444() {
   Text(dateTime.toString());
   Text('${date.year}-${date.month}-${date.day}');
-  Text(date.toIso8601String()) // In UI
+  Text(date.toIso8601String()); // In UI
 }
 
 // GOOD: Should NOT trigger prefer_date_format

@@ -112,7 +112,7 @@ dynamic box;
 void _bad657() async {
   late Box box;
   void initState() {
-  box = await Hive.openBox('myBox');
+    box = await Hive.openBox('myBox');
   }
   // dispose() doesn't close box
 }
@@ -121,7 +121,7 @@ void _bad657() async {
 void _good657() {
   late Box box;
   void dispose() {
-  box.close();
-  // super.dispose();
+    box.close();
+    // super.dispose();
   }
 }

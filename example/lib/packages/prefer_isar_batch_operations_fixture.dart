@@ -113,11 +113,11 @@ final users = <dynamic>[];
 // expect_lint: prefer_isar_batch_operations
 void _bad678() async {
   for (final user in users) {
-  await isar.users.put(user);  // Slow!
+    await isar.users.put(user); // Slow!
   }
 }
 
 // GOOD: Should NOT trigger prefer_isar_batch_operations
 void _good678() async {
-  await isar.users.putAll(users);  // Fast!
+  await isar.users.putAll(users); // Fast!
 }

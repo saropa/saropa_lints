@@ -110,8 +110,10 @@ final name = 'example';
 // BAD: Should trigger avoid_unnecessary_late_fields
 // expect_lint: avoid_unnecessary_late_fields
 class _bad202_Foo {
-late final String name;
-Foo(this.name);  // late is unnecessary
+  late final String name;
+  void _topLevel113() {
+    _bad202_Foo(this.name); // late is unnecessary
+  }
 }
 
 // GOOD: Should NOT trigger avoid_unnecessary_late_fields

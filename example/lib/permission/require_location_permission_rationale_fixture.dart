@@ -115,29 +115,32 @@ final title = 'Title';
 // BAD: Should trigger require_location_permission_rationale
 // expect_lint: require_location_permission_rationale
 void _bad822() async {
-  onTap: () async {
-  await Permission.location.request(); // No explanation!
-  // User has no idea why location is needed
-  }
+  onTap:
+  () async {
+    await Permission.location.request(); // No explanation!
+    // User has no idea why location is needed
+  };
 }
 
 // GOOD: Should NOT trigger require_location_permission_rationale
 void _good822() async {
-  onTap: () async {
-  final status = await Permission.location.status;
-  if (status.isDenied) {
-  // Show rationale first
-  await showDialog(
-  context: context,
-  builder: (_) => AlertDialog(
-  title: Text('Location Access'),
-  content: Text('We need your location to show nearby restaurants.'),
-  actions: [
-  TextButton(onPressed: () => Navigator.pop(context), child: Text('OK')),
-  ],
-  ),
-  );
-  }
-  await Permission.location.request();
-  }
+  onTap:
+  () async {
+    final status = await Permission.location.status;
+    if (status.isDenied) {
+      // Show rationale first
+      await showDialog(
+        context: context,
+        builder: (_) => AlertDialog(
+          title: Text('Location Access'),
+          content: Text('We need your location to show nearby restaurants.'),
+          actions: [
+            TextButton(
+                onPressed: () => Navigator.pop(context), child: Text('OK')),
+          ],
+        ),
+      );
+    }
+    await Permission.location.request();
+  };
 }

@@ -111,7 +111,7 @@ final users = <dynamic>[];
 // BAD: Should trigger avoid_isar_web_limitations
 // expect_lint: avoid_isar_web_limitations
 void _bad683() {
-  final users = isar.users.where().findAllSync();  // Throws on web!
+  final users = isar.users.where().findAllSync(); // Throws on web!
 }
 
 // GOOD: Should NOT trigger avoid_isar_web_limitations

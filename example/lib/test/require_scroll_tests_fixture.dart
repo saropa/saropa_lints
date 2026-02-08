@@ -112,21 +112,21 @@ final text = 'text';
 // expect_lint: require_scroll_tests
 void _bad1172() async {
   testWidgets('shows list', (tester) async {
-  await tester.pumpWidget(MyListWidget());
-  expect(find.byType(ListView), findsOneWidget);
-  // Missing scroll test!
+    await tester.pumpWidget(MyListWidget());
+    expect(find.byType(ListView), findsOneWidget);
+    // Missing scroll test!
   });
 }
 
 // GOOD: Should NOT trigger require_scroll_tests
 void _good1172() async {
   testWidgets('shows list and scrolls', (tester) async {
-  await tester.pumpWidget(MyListWidget());
-  expect(find.byType(ListView), findsOneWidget);
-  
-  // Test scrolling
-  await tester.drag(find.byType(ListView), const Offset(0, -500));
-  await tester.pumpAndSettle();
-  expect(find.text('Item 10'), findsOneWidget);
+    await tester.pumpWidget(MyListWidget());
+    expect(find.byType(ListView), findsOneWidget);
+
+    // Test scrolling
+    await tester.drag(find.byType(ListView), const Offset(0, -500));
+    await tester.pumpAndSettle();
+    expect(find.text('Item 10'), findsOneWidget);
   });
 }

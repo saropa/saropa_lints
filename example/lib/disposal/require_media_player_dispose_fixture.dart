@@ -108,31 +108,31 @@ import '../flutter_mocks.dart';
 // BAD: Should trigger require_media_player_dispose
 // expect_lint: require_media_player_dispose
 class _bad325__VideoPageState extends State<VideoPage> {
-late VideoPlayerController _controller;
+  late VideoPlayerController _controller;
 
-@override
-void initState() {
-super.initState();
-_controller = VideoPlayerController.asset('video.mp4');
-_controller.initialize();
-}
+  @override
+  void initState() {
+    super.initState();
+    _controller = VideoPlayerController.asset('video.mp4');
+    _controller.initialize();
+  }
 // Missing dispose - video hardware stays locked!
 }
 
 // GOOD: Should NOT trigger require_media_player_dispose
 class _good325__VideoPageState extends State<VideoPage> {
-late VideoPlayerController _controller;
+  late VideoPlayerController _controller;
 
-@override
-void initState() {
-super.initState();
-_controller = VideoPlayerController.asset('video.mp4');
-_controller.initialize();
-}
+  @override
+  void initState() {
+    super.initState();
+    _controller = VideoPlayerController.asset('video.mp4');
+    _controller.initialize();
+  }
 
-@override
-void dispose() {
-_controller.dispose();
-super.dispose();
-}
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
 }

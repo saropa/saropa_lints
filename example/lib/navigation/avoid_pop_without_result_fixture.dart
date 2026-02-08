@@ -120,6 +120,6 @@ void _bad507() async {
 void _good507() async {
   final result = await Navigator.push<String>(context);
   if (result != null) {
-  saveData(result);
+    saveData(result);
   }
 }

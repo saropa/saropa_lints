@@ -113,29 +113,29 @@ final title = 'Title';
 // expect_lint: require_purchase_restoration
 // No restore functionality
 class _bad905_SettingsScreen extends StatelessWidget {
-@override
-Widget build(BuildContext context) {
-return ListView(
-children: [
-ListTile(title: Text('Account')),
-ListTile(title: Text('Privacy')),
-],
-);
-}
+  @override
+  Widget build(BuildContext context) {
+    return ListView(
+      children: [
+        ListTile(title: Text('Account')),
+        ListTile(title: Text('Privacy')),
+      ],
+    );
+  }
 }
 
 // GOOD: Should NOT trigger require_purchase_restoration
 class _good905_SettingsScreen extends StatelessWidget {
-@override
-Widget build(BuildContext context) {
-return ListView(
-children: [
-ListTile(title: Text('Account')),
-ListTile(
-title: Text('Restore Purchases'),
-onTap: () => InAppPurchase.instance.restorePurchases(),
-),
-],
-);
-}
+  @override
+  Widget build(BuildContext context) {
+    return ListView(
+      children: [
+        ListTile(title: Text('Account')),
+        ListTile(
+          title: Text('Restore Purchases'),
+          onTap: () => InAppPurchase.instance.restorePurchases(),
+        ),
+      ],
+    );
+  }
 }

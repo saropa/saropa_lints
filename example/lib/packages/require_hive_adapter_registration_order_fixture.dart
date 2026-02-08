@@ -111,14 +111,14 @@ final users = <dynamic>[];
 // BAD: Should trigger require_hive_adapter_registration_order
 // expect_lint: require_hive_adapter_registration_order
 void _bad665_main() async {
-await Hive.initFlutter();
-final box = await Hive.openBox<User>('users'); // Crash!
-Hive.registerAdapter(UserAdapter()); // Too late
+  await Hive.initFlutter();
+  final box = await Hive.openBox<User>('users'); // Crash!
+  Hive.registerAdapter(UserAdapter()); // Too late
 }
 
 // GOOD: Should NOT trigger require_hive_adapter_registration_order
 void _good665_main() async {
-await Hive.initFlutter();
-Hive.registerAdapter(UserAdapter());
-final box = await Hive.openBox<User>('users');
+  await Hive.initFlutter();
+  Hive.registerAdapter(UserAdapter());
+  final box = await Hive.openBox<User>('users');
 }

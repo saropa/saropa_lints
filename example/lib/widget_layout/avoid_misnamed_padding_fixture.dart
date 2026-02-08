@@ -111,16 +111,16 @@ dynamic child;
 // expect_lint: avoid_misnamed_padding
 void _bad1283() {
   Opacity(
-  opacity: 0.5,
-  child: Image.asset('icon.png'),
+    opacity: 0.5,
+    child: Image.asset('icon.png'),
   );
 }
 
 // GOOD: Should NOT trigger avoid_misnamed_padding
 void _good1283() {
   Image.asset(
-  'icon.png',
-  color: Colors.white.withOpacity(0.5),
-  colorBlendMode: BlendMode.modulate,
+    'icon.png',
+    color: Colors.white.withOpacity(0.5),
+    colorBlendMode: BlendMode.modulate,
   );
 }

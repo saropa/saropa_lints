@@ -121,8 +121,8 @@ void _bad857() async {
 void _good857() async {
   // Explicit accessibility
   await secureStorage.write(
-  key: 'token',
-  value: token,
-  iOptions: IOSOptions(accessibility: KeychainAccessibility.first_unlock),
+    key: 'token',
+    value: token,
+    iOptions: IOSOptions(accessibility: KeychainAccessibility.first_unlock),
   );
 }

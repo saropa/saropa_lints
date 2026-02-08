@@ -111,9 +111,10 @@ final mounted = true;
 // expect_lint: avoid_returning_widgets
 void _bad1367() {
   setState(() {
-  if (mounted) {  // Wrong place to check
-  _value = newValue;
-  }
+    if (mounted) {
+      // Wrong place to check
+      _value = newValue;
+    }
   });
 }
 
@@ -121,6 +122,6 @@ void _bad1367() {
 void _good1367() {
   if (!mounted) return;
   setState(() {
-  _value = newValue;
+    _value = newValue;
   });
 }

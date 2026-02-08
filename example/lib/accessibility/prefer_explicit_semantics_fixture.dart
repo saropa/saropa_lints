@@ -113,25 +113,29 @@ final label = 'label';
 // BAD: Should trigger prefer_explicit_semantics
 // expect_lint: prefer_explicit_semantics
 class _bad15_StarRating extends StatelessWidget {
-Widget build(context) {
-return Row(
-children: List.generate(5, (i) => Icon(
-i < rating ? Icons.star : Icons.star_border,
-)),
-); // Screen reader sees nothing useful
-}
+  Widget build(context) {
+    return Row(
+      children: List.generate(
+          5,
+          (i) => Icon(
+                i < rating ? Icons.star : Icons.star_border,
+              )),
+    ); // Screen reader sees nothing useful
+  }
 }
 
 // GOOD: Should NOT trigger prefer_explicit_semantics
 class _good15_StarRating extends StatelessWidget {
-Widget build(context) {
-return Semantics(
-label: '$rating out of 5 stars',
-child: Row(
-children: List.generate(5, (i) => Icon(
-i < rating ? Icons.star : Icons.star_border,
-)),
-),
-);
-}
+  Widget build(context) {
+    return Semantics(
+      label: '$rating out of 5 stars',
+      child: Row(
+        children: List.generate(
+            5,
+            (i) => Icon(
+                  i < rating ? Icons.star : Icons.star_border,
+                )),
+      ),
+    );
+  }
 }

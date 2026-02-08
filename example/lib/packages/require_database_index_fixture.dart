@@ -113,25 +113,25 @@ dynamic isar;
 // expect_lint: require_database_index
 @collection
 class _bad612_Product {
-Id id = Isar.autoIncrement;
-String category; // Queried but not indexed
-double price;
+  Id id = Isar.autoIncrement;
+  String category; // Queried but not indexed
+  double price;
 }
 
 // Slow query!
-final products = await isar.products
-.filter()
-.categoryEqualTo('electronics')
-.findAll();
+Future<void> _bad612_usage() async {
+  final products =
+      await isar.products.filter().categoryEqualTo('electronics').findAll();
+}
 
 // GOOD: Should NOT trigger require_database_index
 @collection
 class _good612_Product {
-Id id = Isar.autoIncrement;
+  Id id = Isar.autoIncrement;
 
-@Index();
-String category;
+  @Index()
+  String category;
 
-@Index()
-double price;
+  @Index()
+  double price;
 }

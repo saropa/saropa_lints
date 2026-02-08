@@ -111,8 +111,8 @@ dynamic value;
 // BAD: Should trigger avoid_unnecessary_nullable_fields
 // expect_lint: avoid_unnecessary_nullable_fields
 class _bad203_Foo {
-String? name;  // Always assigned non-null value
-Foo(String n) : name = n;
+  String? name; // Always assigned non-null value
+  _bad203_Foo(String n) : name = n;
 }
 
 // GOOD: Should NOT trigger avoid_unnecessary_nullable_fields

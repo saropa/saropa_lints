@@ -108,8 +108,8 @@ import '../flutter_mocks.dart';
 // BAD: Should trigger avoid_bloc_public_methods
 // expect_lint: avoid_bloc_public_methods
 class _bad574_MyBloc extends Bloc<Event, State> {
-void loadData() {}  // Direct method call!
-void reset() {}
+  void loadData() {} // Direct method call!
+  void reset() {}
 }
 
 // GOOD: Should NOT trigger avoid_bloc_public_methods

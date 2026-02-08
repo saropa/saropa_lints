@@ -115,26 +115,26 @@ final users = <dynamic>[];
 // BAD: Should trigger avoid_database_in_build
 // expect_lint: avoid_database_in_build
 Widget _bad608_build(BuildContext context) {
-return FutureBuilder(
-future: db.collection('users').get(), // Query on every rebuild!
-builder:,
-);
+  return FutureBuilder(
+    future: db.collection('users').get(), // Query on every rebuild!
+    builder: (_, __) => Container(),
+  );
 }
 
 // GOOD: Should NOT trigger avoid_database_in_build
 void _good608() {
   late Future<QuerySnapshot> _usersFuture;
-  
+
   @override
   void initState() {
-  // super.initState();
-  _usersFuture = db.collection('users').limit(100).get();
+    // super.initState();
+    _usersFuture = db.collection('users').limit(100).get();
   }
-  
+
   Widget build(BuildContext context) {
-  return FutureBuilder(
-  future: _usersFuture,
-  builder:,
-  );
+    return FutureBuilder(
+      future: _usersFuture,
+      builder: (_, __) => Container(),
+    );
   }
 }

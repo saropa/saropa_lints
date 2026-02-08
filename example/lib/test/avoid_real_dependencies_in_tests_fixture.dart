@@ -114,20 +114,20 @@ dynamic user;
 // expect_lint: avoid_real_dependencies_in_tests
 void _bad1171() async {
   test('fetches user', () async {
-  final user = await http.get(Uri.parse('https://api.example.com/user'));
-  expect(user, isNotNull);
+    final user = await http.get(Uri.parse('https://api.example.com/user'));
+    expect(user, isNotNull);
   });
 }
 
 // GOOD: Should NOT trigger avoid_real_dependencies_in_tests
 void _good1171() async {
   test('fetches user', () async {
-  final mockClient = MockClient();
-  when(() => mockClient.get(any())).thenAnswer(
-  (_) async => Response('{"name": "Test"}', 200),
-  );
-  
-  final user = await fetchUser(mockClient);
-  expect(user.name, 'Test');
+    final mockClient = MockClient();
+    when(() => mockClient.get(any())).thenAnswer(
+      (_) async => Response('{"name": "Test"}', 200),
+    );
+
+    final user = await fetchUser(mockClient);
+    expect(user.name, 'Test');
   });
 }

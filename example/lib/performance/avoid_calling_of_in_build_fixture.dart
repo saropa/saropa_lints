@@ -112,20 +112,20 @@ dynamic theme;
 // BAD: Should trigger avoid_calling_of_in_build
 // expect_lint: avoid_calling_of_in_build
 Widget _bad798_build(BuildContext context) {
-return Container(
-color: Theme.of(context).primaryColor,
-child: Text(
-'Hello',
-style: Theme.of(context).textTheme.bodyLarge, // Second call!
-),
-);
+  return Container(
+    color: Theme.of(context).primaryColor,
+    child: Text(
+      'Hello',
+      style: Theme.of(context).textTheme.bodyLarge, // Second call!
+    ),
+  );
 }
 
 // GOOD: Should NOT trigger avoid_calling_of_in_build
 Widget _good798_build(BuildContext context) {
-final theme = Theme.of(context);
-return Container(
-color: theme.primaryColor,
-child: Text('Hello', style: theme.textTheme.bodyLarge),
-);
+  final theme = Theme.of(context);
+  return Container(
+    color: theme.primaryColor,
+    child: Text('Hello', style: theme.textTheme.bodyLarge),
+  );
 }

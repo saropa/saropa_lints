@@ -110,23 +110,23 @@ dynamic state;
 // BAD: Should trigger require_resume_state_refresh
 // expect_lint: require_resume_state_refresh
 class _bad461__MyState extends State<MyWidget> with WidgetsBindingObserver {
-@override
-void didChangeAppLifecycleState(AppLifecycleState state) {
-if (state == AppLifecycleState.paused) {
-saveData();
-}
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.paused) {
+      saveData();
+    }
 // Missing resumed handling!
-}
+  }
 }
 
 // GOOD: Should NOT trigger require_resume_state_refresh
 class _good461__MyState extends State<MyWidget> with WidgetsBindingObserver {
-@override
-void didChangeAppLifecycleState(AppLifecycleState state) {
-if (state == AppLifecycleState.paused) {
-saveData();
-} else if (state == AppLifecycleState.resumed) {
-refreshData();
-}
-}
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.paused) {
+      saveData();
+    } else if (state == AppLifecycleState.resumed) {
+      refreshData();
+    }
+  }
 }

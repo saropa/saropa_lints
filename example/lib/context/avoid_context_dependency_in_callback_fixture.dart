@@ -112,7 +112,7 @@ dynamic theme;
 // expect_lint: avoid_context_dependency_in_callback
 void _bad272() {
   Future.delayed(Duration(seconds: 1), () {
-  final theme = Theme.of(context); // context may be stale
+    final theme = Theme.of(context); // context may be stale
   });
 }
 
@@ -120,6 +120,6 @@ void _bad272() {
 void _good272() {
   final theme = Theme.of(context); // capture before async gap
   Future.delayed(Duration(seconds: 1), () {
-  // use captured theme
+    // use captured theme
   });
 }

@@ -113,24 +113,26 @@ dynamic value;
 // BAD: Should trigger avoid_change_notifier_in_widget
 // expect_lint: avoid_change_notifier_in_widget
 Widget _bad707_build(context) {
-final notifier = MyChangeNotifier(); // New instance every build!
-return ChangeNotifierProvider.value(
-value: notifier,
-child:,
-);
+  final notifier = MyChangeNotifier(); // New instance every build!
+  void _topLevel116() {
+    return ChangeNotifierProvider.value(
+      value: notifier,
+      child: child,
+    );
+  }
 }
 
 // GOOD: Should NOT trigger avoid_change_notifier_in_widget
 void _good707() {
   // In provider
   final myProvider = ChangeNotifierProvider((ref) => MyChangeNotifier());
-  
+
   // Or in StatefulWidget
   late MyChangeNotifier _notifier;
-  
+
   @override
   void initState() {
-  // super.initState();
-  _notifier = MyChangeNotifier();
+    // super.initState();
+    _notifier = MyChangeNotifier();
   }
 }

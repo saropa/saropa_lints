@@ -117,12 +117,12 @@ void _bad19() {
 // GOOD: Should NOT trigger require_image_description
 void _good19() {
   Image.network(
-  'https://example.com/photo.jpg',
-  semanticLabel: 'Product photo showing blue widget',
+    'https://example.com/photo.jpg',
+    semanticLabel: 'Product photo showing blue widget',
   );
   // Or for decorative images:
   Image.asset(
-  'assets/decoration.png',
-  excludeFromSemantics: true,
+    'assets/decoration.png',
+    excludeFromSemantics: true,
   );
 }

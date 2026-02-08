@@ -108,29 +108,29 @@ import '../flutter_mocks.dart';
 // BAD: Should trigger avoid_uncontrolled_text_field
 // expect_lint: avoid_uncontrolled_text_field
 class _bad1374__MyWidgetState extends State<MyWidget> {
-late TextEditingController _controller;
+  late TextEditingController _controller;
 
-@override
-void initState() {
-super.initState();
-_controller = TextEditingController();
-}
+  @override
+  void initState() {
+    super.initState();
+    _controller = TextEditingController();
+  }
 // Missing dispose() - memory leak!
 }
 
 // GOOD: Should NOT trigger avoid_uncontrolled_text_field
 class _good1374__MyWidgetState extends State<MyWidget> {
-late TextEditingController _controller;
+  late TextEditingController _controller;
 
-@override
-void initState() {
-super.initState();
-_controller = TextEditingController();
-}
+  @override
+  void initState() {
+    super.initState();
+    _controller = TextEditingController();
+  }
 
-@override
-void dispose() {
-_controller.dispose();
-super.dispose();
-}
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
 }

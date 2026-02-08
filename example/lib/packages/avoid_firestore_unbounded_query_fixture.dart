@@ -112,14 +112,12 @@ final users = <dynamic>[];
 // expect_lint: avoid_firestore_unbounded_query
 void _bad607() async {
   final snapshot = await FirebaseFirestore.instance
-  .collection('users')
-  .get(); // Could return millions of documents!
+      .collection('users')
+      .get(); // Could return millions of documents!
 }
 
 // GOOD: Should NOT trigger avoid_firestore_unbounded_query
 void _good607() async {
-  final snapshot = await FirebaseFirestore.instance
-  .collection('users')
-  .limit(100)
-  .get();
+  final snapshot =
+      await FirebaseFirestore.instance.collection('users').limit(100).get();
 }

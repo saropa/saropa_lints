@@ -110,29 +110,29 @@ final url = 'https://example.com';
 // BAD: Should trigger require_video_player_controller_dispose
 // expect_lint: require_video_player_controller_dispose
 class _bad328_MyState extends State<MyWidget> {
-late VideoPlayerController _controller;
+  late VideoPlayerController _controller;
 
-@override
-void initState() {
-super.initState();
-_controller = VideoPlayerController.network(url);
-}
+  @override
+  void initState() {
+    super.initState();
+    _controller = VideoPlayerController.network(url);
+  }
 // Missing dispose!
 }
 
 // GOOD: Should NOT trigger require_video_player_controller_dispose
 class _good328_MyState extends State<MyWidget> {
-late VideoPlayerController _controller;
+  late VideoPlayerController _controller;
 
-@override
-void initState() {
-super.initState();
-_controller = VideoPlayerController.network(url);
-}
+  @override
+  void initState() {
+    super.initState();
+    _controller = VideoPlayerController.network(url);
+  }
 
-@override
-void dispose() {
-_controller.dispose();
-super.dispose();
-}
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
 }

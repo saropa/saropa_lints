@@ -110,10 +110,10 @@ final name = 'example';
 // BAD: Should trigger avoid_unassigned_fields
 // expect_lint: avoid_unassigned_fields
 class _bad200_Foo {
-String? name;  // Never assigned
-void bar() {
-print(name);  // Always null
-}
+  String? name; // Never assigned
+  void bar() {
+    print(name); // Always null
+  }
 }
 
 // GOOD: Should NOT trigger avoid_unassigned_fields

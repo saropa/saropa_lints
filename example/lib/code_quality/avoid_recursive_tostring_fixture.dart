@@ -110,13 +110,13 @@ final name = 'example';
 // BAD: Should trigger avoid_recursive_tostring
 // expect_lint: avoid_recursive_tostring
 class _bad156_User {
-@override
-String toString() => 'User: $this';  // Calls toString() recursively
+  @override
+  String toString() => 'User: $this'; // Calls toString() recursively
 }
 
 // GOOD: Should NOT trigger avoid_recursive_tostring
 class _good156_User {
-final String name;
-@override
-String toString() => 'User: $name';
+  final String name;
+  @override
+  String toString() => 'User: $name';
 }

@@ -119,8 +119,8 @@ void _bad736() {
 // GOOD: Should NOT trigger avoid_nullable_async_value_pattern
 void _good736() {
   asyncValue.when(
-  data: (value) => Text('$value'),
-  loading: () => CircularProgressIndicator(),
-  error: (e, s) => Text('Error: $e'),
+    data: (value) => Text('$value'),
+    loading: () => CircularProgressIndicator(),
+    error: (e, s) => Text('Error: $e'),
   );
 }

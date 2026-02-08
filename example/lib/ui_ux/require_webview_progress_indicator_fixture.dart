@@ -114,35 +114,34 @@ dynamic value;
 // expect_lint: require_webview_progress_indicator
 void _bad1266() {
   WebView(
-  initialUrl: 'https://example.com',
-  ) // No loading feedback!
-  
+    initialUrl: 'https://example.com',
+  ); // No loading feedback!
+
   InAppWebView(
-  initialUrlRequest: URLRequest(url: Uri.parse(url)),
-  ) // User sees blank page during load
+    initialUrlRequest: URLRequest(url: Uri.parse(url)),
+  ); // User sees blank page during load
 }
 
 // GOOD: Should NOT trigger require_webview_progress_indicator
 void _good1266() {
   Stack(
-  children: [
-  WebView(
-  initialUrl: 'https://example.com',
-  onProgress: (progress) => setState(() => _progress = progress),
-  onPageFinished: (_) => setState(() => _isLoading = false),
-  ),
-  if (_isLoading);
-  LinearProgressIndicator(value: _progress / 100),
-  ],
+    children: [
+      WebView(
+        initialUrl: 'https://example.com',
+        onProgress: (progress) => setState(() => _progress = progress),
+        onPageFinished: (_) => setState(() => _isLoading = false),
+      ),
+      if (_isLoading) LinearProgressIndicator(value: _progress / 100),
+    ],
   );
-  
+
   InAppWebView(
-  initialUrlRequest: URLRequest(url: Uri.parse(url)),
-  onProgressChanged: (controller, progress) {
-  setState(() => _progress = progress / 100);
-  },
-  onLoadStop: (controller, url) {
-  setState(() => _isLoading = false);
-  },
+    initialUrlRequest: URLRequest(url: Uri.parse(url)),
+    onProgressChanged: (controller, progress) {
+      setState(() => _progress = progress / 100);
+    },
+    onLoadStop: (controller, url) {
+      setState(() => _isLoading = false);
+    },
   );
 }

@@ -113,13 +113,13 @@ final url = 'https://example.com';
 // expect_lint: require_https_only_test
 void _bad1025() {
   test('parses URL', () {
-  final url = 'http://example.com/path'; // INFO
+    final url = 'http://example.com/path'; // INFO
   });
 }
 
 // GOOD: Should NOT trigger require_https_only_test
 void _good1025() {
   test('parses URL', () {
-  final url = 'https://example.com/path';
+    final url = 'https://example.com/path';
   });
 }

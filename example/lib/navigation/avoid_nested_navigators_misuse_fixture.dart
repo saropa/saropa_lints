@@ -114,10 +114,10 @@ dynamic navigator;
 // expect_lint: avoid_nested_navigators_misuse
 void _bad529() {
   TabBarView(
-  children: [
-  Navigator(key: _tab1Key),
-  Navigator(key: _tab2Key),
-  ],
+    children: [
+      Navigator(key: _tab1Key),
+      Navigator(key: _tab2Key),
+    ],
   );
   // No WillPopScope handling!
 }
@@ -125,19 +125,19 @@ void _bad529() {
 // GOOD: Should NOT trigger avoid_nested_navigators_misuse
 void _good529() {
   WillPopScope(
-  onWillPop: () async {
-  final navigator = _getCurrentNavigator();
-  if (navigator.canPop()) {
-  navigator.pop();
-  return false;
-  }
-  return true;
-  },
-  child: TabBarView(
-  children: [
-  Navigator(key: _tab1Key),
-  Navigator(key: _tab2Key),
-  ],
-  ),
+    onWillPop: () async {
+      final navigator = _getCurrentNavigator();
+      if (navigator.canPop()) {
+        navigator.pop();
+        return false;
+      }
+      return true;
+    },
+    child: TabBarView(
+      children: [
+        Navigator(key: _tab1Key),
+        Navigator(key: _tab2Key),
+      ],
+    ),
   );
 }

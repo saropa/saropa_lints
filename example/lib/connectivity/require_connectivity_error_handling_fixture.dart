@@ -111,20 +111,20 @@ dynamic result;
 // expect_lint: require_connectivity_error_handling
 void _bad271() async {
   Future<bool> isOnline() async {
-  final result = await Connectivity().checkConnectivity();
-  return result != ConnectivityResult.none;
+    final result = await Connectivity().checkConnectivity();
+    return result != ConnectivityResult.none;
   }
 }
 
 // GOOD: Should NOT trigger require_connectivity_error_handling
 void _good271() async {
   Future<bool> isOnline() async {
-  try {
-  final result = await Connectivity().checkConnectivity();
-  return result != ConnectivityResult.none;
-  } catch (e) {
-  // Handle platform exceptions
-  return false;
-  }
+    try {
+      final result = await Connectivity().checkConnectivity();
+      return result != ConnectivityResult.none;
+    } catch (e) {
+      // Handle platform exceptions
+      return false;
+    }
   }
 }

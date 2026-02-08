@@ -113,7 +113,9 @@ dynamic list;
 // expect_lint: prefer_add_all
 void _bad248() {
   items.forEach((item) => list.add(item));
-  for (final item in items) { list.add(item); }
+  for (final item in items) {
+    list.add(item);
+  }
 }
 
 // GOOD: Should NOT trigger prefer_add_all

@@ -115,6 +115,6 @@ void _bad930() async {
 // GOOD: Should NOT trigger avoid_macos_catalyst_unsupported_apis
 void _good930() async {
   if (!Platform.isMacOS) {
-  await ARKitController.create();
+    await ARKitController.create();
   }
 }

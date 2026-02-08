@@ -120,7 +120,7 @@ void _bad61() {
 void _good61() {
   final channel = WebSocketChannel.connect(Uri.parse('wss://'));
   Timer.periodic(Duration(seconds: 30), (_) {
-  channel.sink.add('ping');
+    channel.sink.add('ping');
   });
   channel.stream.listen((data) => handleData(data));
 }

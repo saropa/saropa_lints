@@ -110,7 +110,7 @@ final name = 'example';
 // BAD: Should trigger avoid_unassigned_late_fields
 // expect_lint: avoid_unassigned_late_fields
 class _bad201_Foo {
-late String name;  // Never assigned - will throw at runtime
+  late String name; // Never assigned - will throw at runtime
 }
 
 // GOOD: Should NOT trigger avoid_unassigned_late_fields

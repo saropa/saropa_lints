@@ -113,20 +113,20 @@ final title = 'Title';
 // expect_lint: require_calendar_timezone_handling
 void _bad694() {
   final event = Event(
-  calendarId,
-  title: 'Meeting',
-  start: TZDateTime.now(local),
-  end: TZDateTime.now(local).add(Duration(hours: 1)),
+    calendarId,
+    title: 'Meeting',
+    start: TZDateTime.now(local),
+    end: TZDateTime.now(local).add(Duration(hours: 1)),
   );
 }
 
 // GOOD: Should NOT trigger require_calendar_timezone_handling
 void _good694() {
   final event = Event(
-  calendarId,
-  title: 'Meeting',
-  start: TZDateTime.now(local),
-  end: TZDateTime.now(local).add(Duration(hours: 1)),
-  timeZone: 'America/New_York', // or local.name
+    calendarId,
+    title: 'Meeting',
+    start: TZDateTime.now(local),
+    end: TZDateTime.now(local).add(Duration(hours: 1)),
+    timeZone: 'America/New_York', // or local.name
   );
 }

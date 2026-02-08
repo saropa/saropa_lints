@@ -108,16 +108,16 @@ import '../flutter_mocks.dart';
 // BAD: Should trigger require_vsync_mixin
 // expect_lint: require_vsync_mixin
 class _bad29__MyState extends State<MyWidget> {
-late final _controller = AnimationController(
-duration: Duration(seconds: 1),
-); // Missing vsync!
+  late final _controller = AnimationController(
+    duration: Duration(seconds: 1),
+  ); // Missing vsync!
 }
 
 // GOOD: Should NOT trigger require_vsync_mixin
 class _good29__MyState extends State<MyWidget>
-with SingleTickerProviderStateMixin {
-late final _controller = AnimationController(
-duration: Duration(seconds: 1),
-vsync: this,
-);
+    with SingleTickerProviderStateMixin {
+  late final _controller = AnimationController(
+    duration: Duration(seconds: 1),
+    vsync: this,
+  );
 }

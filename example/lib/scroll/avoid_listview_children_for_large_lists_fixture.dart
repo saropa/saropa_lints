@@ -114,14 +114,14 @@ final title = 'Title';
 // expect_lint: avoid_listview_children_for_large_lists
 void _bad983() {
   ListView(
-  children: List.generate(100, (i) => ListTile(title: Text('$i'))),
+    children: List.generate(100, (i) => ListTile(title: Text('$i'))),
   );
 }
 
 // GOOD: Should NOT trigger avoid_listview_children_for_large_lists
 void _good983() {
   ListView.builder(
-  itemCount: 100,
-  itemBuilder: (context, i) => ListTile(title: Text('$i')),
+    itemCount: 100,
+    itemBuilder: (context, i) => ListTile(title: Text('$i')),
   );
 }

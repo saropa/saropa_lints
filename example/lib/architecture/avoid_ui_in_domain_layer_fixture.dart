@@ -113,14 +113,16 @@ dynamic user;
 // expect_lint: avoid_ui_in_domain_layer
 // In domain layer
 class _bad80_User {
-Widget toWidget() => Text(name); // Flutter dependency
+  Widget toWidget() => Text(name); // Flutter dependency
 }
 
 // GOOD: Should NOT trigger avoid_ui_in_domain_layer
 // Domain layer
-class _good80_User { String name; }
+class _good80_User {
+  String name;
+}
 
 // Presentation layer
 class _good80_UserWidget extends StatelessWidget {
-Widget build(context) => Text(user.name);
+  Widget build(context) => Text(user.name);
 }

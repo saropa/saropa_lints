@@ -113,17 +113,17 @@ final path = '/path';
 // BAD: Should trigger prefer_shell_route_shared_layout
 // expect_lint: prefer_shell_route_shared_layout
 void _bad524() {
-  GoRoute(path: '/home', builder: (_, __) => Scaffold(appBar: AppBar())),
-  GoRoute(path: '/settings', builder: (_, __) => Scaffold(appBar: AppBar())),
+  GoRoute(path: '/home', builder: (_, __) => Scaffold(appBar: AppBar()));
+  GoRoute(path: '/settings', builder: (_, __) => Scaffold(appBar: AppBar()));
 }
 
 // GOOD: Should NOT trigger prefer_shell_route_shared_layout
 void _good524() {
   ShellRoute(
-  builder: (_, __, child) => Scaffold(appBar: AppBar(), body: child),
-  routes: [
-  GoRoute(path: '/home'),
-  GoRoute(path: '/settings'),
-  ],
+    builder: (_, __, child) => Scaffold(appBar: AppBar(), body: child),
+    routes: [
+      GoRoute(path: '/home'),
+      GoRoute(path: '/settings'),
+    ],
   );
 }

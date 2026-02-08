@@ -113,8 +113,8 @@ dynamic list;
 // BAD: Should trigger avoid_duplicate_string_elements
 // expect_lint: avoid_duplicate_string_elements
 void _bad250() {
-  final list = ['a', 'b', 'a'];  // 'a' is duplicated
-  final set = {'hello', 'world', 'hello'};  // Set silently ignores duplicate
+  final list = ['a', 'b', 'a']; // 'a' is duplicated
+  final set = {'hello', 'world', 'hello'}; // Set silently ignores duplicate
   final urls = ['https://api.com', 'https://backup.com', 'https://api.com'];
 }
 

@@ -114,14 +114,17 @@ final users = <dynamic>[];
 // BAD: Should trigger prefer_sqflite_column_constants
 // expect_lint: prefer_sqflite_column_constants
 void _bad380() async {
-  await db.query('users', columns: ['id', 'name', 'emial']);  // Typo!
+  await db.query('users', columns: ['id', 'name', 'emial']); // Typo!
 }
 
 // GOOD: Should NOT trigger prefer_sqflite_column_constants
 class _good380_UserTable {
-static const table = 'users';
-static const colId = 'id';
-static const colName = 'name';
-static const colEmail = 'email';
+  static const table = 'users';
+  static const colId = 'id';
+  static const colName = 'name';
+  static const colEmail = 'email';
 }
-await db.query(UserTable.table, columns: [UserTable.colId]);
+
+void _good380() async {
+  await db.query(UserTable.table, columns: [UserTable.colId]);
+}

@@ -111,11 +111,11 @@ dynamic x;
 // expect_lint: avoid_unnecessary_type_assertions
 void _bad1229() {
   final String x = 'hello';
-  if (x is String) {}  // Always true
+  if (x is String) {} // Always true
 }
 
 // GOOD: Should NOT trigger avoid_unnecessary_type_assertions
 void _good1229() {
   final Object x = getValue();
-  if (x is String) {}  // Useful check
+  if (x is String) {} // Useful check
 }

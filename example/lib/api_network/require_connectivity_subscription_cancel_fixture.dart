@@ -108,26 +108,26 @@ import '../flutter_mocks.dart';
 // BAD: Should trigger require_connectivity_subscription_cancel
 // expect_lint: require_connectivity_subscription_cancel
 class _bad66__State extends State<W> {
-@override
-void initState() {
-super.initState();
-Connectivity().onConnectivityChanged.listen((_) {});  // Leak!
-}
+  @override
+  void initState() {
+    super.initState();
+    Connectivity().onConnectivityChanged.listen((_) {}); // Leak!
+  }
 }
 
 // GOOD: Should NOT trigger require_connectivity_subscription_cancel
 class _good66__State extends State<W> {
-StreamSubscription? _connectivitySub;
+  StreamSubscription? _connectivitySub;
 
-@override
-void initState() {
-super.initState();
-_connectivitySub = Connectivity().onConnectivityChanged.listen((_) {});
-}
+  @override
+  void initState() {
+    super.initState();
+    _connectivitySub = Connectivity().onConnectivityChanged.listen((_) {});
+  }
 
-@override
-void dispose() {
-_connectivitySub?.cancel();
-super.dispose();
-}
+  @override
+  void dispose() {
+    _connectivitySub?.cancel();
+    super.dispose();
+  }
 }

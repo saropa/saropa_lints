@@ -110,7 +110,7 @@ import '../flutter_mocks.dart';
 void _bad804() {
   final List<int> squares = [];
   for (int i = 0; i < 10000; i++) {
-  squares.add(i * i); // Multiple reallocations!
+    squares.add(i * i); // Multiple reallocations!
   }
 }
 
@@ -120,6 +120,6 @@ void _good804() {
   // Or:
   final List<int> squares = List.filled(10000, 0);
   for (int i = 0; i < 10000; i++) {
-  squares[i] = i * i;
+    squares[i] = i * i;
   }
 }

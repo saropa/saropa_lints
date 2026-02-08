@@ -115,19 +115,19 @@ dynamic list;
 // expect_lint: avoid_gesture_without_behavior
 void _bad1415() {
   ListView(
-  children: [
-  ListView.builder(), // Nested scrollable!
-  ],
+    children: [
+      ListView.builder(), // Nested scrollable!
+    ],
   );
 }
 
 // GOOD: Should NOT trigger avoid_gesture_without_behavior
 void _good1415() {
   NestedScrollView(
-  headerSliverBuilder: (context, innerBoxIsScrolled) => [
-  SliverAppBar(),
-  ],
-  body: ListView.builder(),
+    headerSliverBuilder: (context, innerBoxIsScrolled) => [
+      SliverAppBar(),
+    ],
+    body: ListView.builder(),
   );
   // Or use shrinkWrap + NeverScrollableScrollPhysics for inner list
 }

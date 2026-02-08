@@ -113,8 +113,8 @@ dynamic user;
 // expect_lint: require_form_auto_validate_mode
 void _bad408() {
   Form(
-  key: _formKey,
-  child: TextFormField(),
+    key: _formKey,
+    child: TextFormField(),
   );
   // Uses default AutovalidateMode.disabled - no automatic validation
 }
@@ -122,9 +122,9 @@ void _bad408() {
 // GOOD: Should NOT trigger require_form_auto_validate_mode
 void _good408() {
   Form(
-  key: _formKey,
-  autovalidateMode: AutovalidateMode.onUserInteraction,
-  child: TextFormField(),
+    key: _formKey,
+    autovalidateMode: AutovalidateMode.onUserInteraction,
+    child: TextFormField(),
   );
   // Validates when user interacts with fields
 }

@@ -113,7 +113,7 @@ dynamic value;
 // expect_lint: prefer_notifier_over_state
 void _bad754() {
   final counterProvider = StateProvider<int>((ref) => 0);
-  
+
   // Consumer directly mutates state
   ref.read(counterProvider.notifier).state++;
   ref.read(counterProvider.notifier).state += 10;
@@ -121,13 +121,13 @@ void _bad754() {
 
 // GOOD: Should NOT trigger prefer_notifier_over_state
 class _good754_CounterNotifier extends Notifier<int> {
-@override
-int build() => 0;
+  @override
+  int build() => 0;
 
-void increment() => state++;
-void add(int value) => state += value;
+  void increment() => state++;
+  void add(int value) => state += value;
 }
 
 final counterProvider = NotifierProvider<CounterNotifier, int>(
-CounterNotifier.new,
+  CounterNotifier.new,
 );

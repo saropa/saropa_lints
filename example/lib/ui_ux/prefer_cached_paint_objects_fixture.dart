@@ -108,19 +108,19 @@ import '../flutter_mocks.dart';
 // BAD: Should trigger prefer_cached_paint_objects
 // expect_lint: prefer_cached_paint_objects
 class _bad1252_MyPainter extends CustomPainter {
-@override
-void paint(Canvas canvas, Size size) {
-final paint = Paint()..color = Colors.red; // Recreated every frame!
-canvas.drawRect(rect, paint);
-}
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()..color = Colors.red; // Recreated every frame!
+    canvas.drawRect(rect, paint);
+  }
 }
 
 // GOOD: Should NOT trigger prefer_cached_paint_objects
 class _good1252_MyPainter extends CustomPainter {
-static final _paint = Paint()..color = Colors.red;
+  static final _paint = Paint()..color = Colors.red;
 
-@override
-void paint(Canvas canvas, Size size) {
-canvas.drawRect(rect, _paint);
-}
+  @override
+  void paint(Canvas canvas, Size size) {
+    canvas.drawRect(rect, _paint);
+  }
 }

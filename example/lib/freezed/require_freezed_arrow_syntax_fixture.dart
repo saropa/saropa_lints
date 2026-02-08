@@ -112,13 +112,13 @@ dynamic json;
 // expect_lint: require_freezed_arrow_syntax
 @freezed
 class _bad413_User with _$User {
-factory User.fromJson(Map<String, dynamic> json) {
-return _$UserFromJson(json);  // Block body - won't work!
-}
+  factory User.fromJson(Map<String, dynamic> json) {
+    return _$UserFromJson(json); // Block body - won't work!
+  }
 }
 
 // GOOD: Should NOT trigger require_freezed_arrow_syntax
 @freezed
 class _good413_User with _$User {
-factory User.fromJson(Map<String, dynamic> json) => _$UserFromJson(json);
+  factory User.fromJson(Map<String, dynamic> json) => _$UserFromJson(json);
 }

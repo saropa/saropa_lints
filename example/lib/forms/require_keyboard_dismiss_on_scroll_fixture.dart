@@ -111,14 +111,14 @@ final children = <Widget>[];
 // expect_lint: require_keyboard_dismiss_on_scroll
 void _bad406() {
   ListView(
-  children: [TextField(), TextField()],
+    children: [TextField(), TextField()],
   );
 }
 
 // GOOD: Should NOT trigger require_keyboard_dismiss_on_scroll
 void _good406() {
   ListView(
-  keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
-  children: [TextField(), TextField()],
+    keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
+    children: [TextField(), TextField()],
   );
 }

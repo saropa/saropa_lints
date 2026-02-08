@@ -113,15 +113,15 @@ dynamic details;
 // expect_lint: avoid_navigator_push_unnamed
 void _bad504() {
   Navigator.push(
-  context,
-  MaterialPageRoute(builder: (_) => DetailsPage()),
+    context,
+    MaterialPageRoute(builder: (_) => DetailsPage()),
   );
 }
 
 // GOOD: Should NOT trigger avoid_navigator_push_unnamed
 void _good504() {
   Navigator.pushNamed(context, '/details');
-  
+
   // Or use go_router
   context.go('/details');
 }

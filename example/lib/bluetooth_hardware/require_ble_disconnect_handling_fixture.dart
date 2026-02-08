@@ -119,9 +119,9 @@ void _bad121() async {
 void _good121() async {
   await device.connect();
   device.connectionState.listen((state) {
-  if (state == BluetoothConnectionState.disconnected) {
-  showError('Device disconnected');
-  cleanup();
-  }
+    if (state == BluetoothConnectionState.disconnected) {
+      showError('Device disconnected');
+      cleanup();
+    }
   });
 }

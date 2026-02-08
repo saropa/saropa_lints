@@ -112,17 +112,19 @@ final text = 'text';
 // BAD: Should trigger prefer_clipboard_feedback
 // expect_lint: prefer_clipboard_feedback
 void _bad427() async {
-  onPressed: () async {
-  await Clipboard.setData(ClipboardData(text: 'copied'));
-  }
+  onPressed:
+  () async {
+    await Clipboard.setData(ClipboardData(text: 'copied'));
+  };
 }
 
 // GOOD: Should NOT trigger prefer_clipboard_feedback
 void _good427() async {
-  onPressed: () async {
-  await Clipboard.setData(ClipboardData(text: 'copied'));
-  ScaffoldMessenger.of(context).showSnackBar(
-  SnackBar(content: Text('Copied to clipboard')),
-  );
-  }
+  onPressed:
+  () async {
+    await Clipboard.setData(ClipboardData(text: 'copied'));
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('Copied to clipboard')),
+    );
+  };
 }

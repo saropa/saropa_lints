@@ -121,7 +121,7 @@ void _good442() {
   Image.asset('assets/welcome_banner_${locale.languageCode}.png');
   // Or use separate text overlay
   Stack(children: [
-  Image.asset('assets/welcome_banner.png'),
-  Text(l10n.welcomeMessage),
+    Image.asset('assets/welcome_banner.png'),
+    Text(l10n.welcomeMessage),
   ]);
 }

@@ -111,18 +111,18 @@ dynamic child;
 // expect_lint: avoid_gesture_conflict
 void _bad1427() {
   GestureDetector(
-  onTap: handleOuterTap,
-  child: GestureDetector(
-  onTap: handleInnerTap, // Conflicts with outer!
-  child: Content(),
-  ),
+    onTap: handleOuterTap,
+    child: GestureDetector(
+      onTap: handleInnerTap, // Conflicts with outer!
+      child: Content(),
+    ),
   );
 }
 
 // GOOD: Should NOT trigger avoid_gesture_conflict
 void _good1427() {
   GestureDetector(
-  onTap: handleTap,
-  child: Content(),
+    onTap: handleTap,
+    child: Content(),
   );
 }

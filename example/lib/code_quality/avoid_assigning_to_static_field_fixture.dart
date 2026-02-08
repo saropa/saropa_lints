@@ -108,10 +108,10 @@ import '../flutter_mocks.dart';
 // BAD: Should trigger avoid_assigning_to_static_field
 // expect_lint: avoid_assigning_to_static_field
 class _bad172_Foo {
-static int counter = 0;
-void increment() {
-counter++;  // Instance method modifying static
-}
+  static int counter = 0;
+  void increment() {
+    counter++; // Instance method modifying static
+  }
 }
 
 // GOOD: Should NOT trigger avoid_assigning_to_static_field

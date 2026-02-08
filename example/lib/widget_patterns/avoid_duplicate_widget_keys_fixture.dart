@@ -112,15 +112,15 @@ final key = 'key';
 // expect_lint: avoid_duplicate_widget_keys
 void _bad1387() {
   [
-  Container(key: Key('item')),
-  Container(key: Key('item')),  // Duplicate key
+    Container(key: Key('item')),
+    Container(key: Key('item')), // Duplicate key
   ];
 }
 
 // GOOD: Should NOT trigger avoid_duplicate_widget_keys
 void _good1387() {
   [
-  Container(key: Key('item1')),
-  Container(key: Key('item2')),
+    Container(key: Key('item1')),
+    Container(key: Key('item2')),
   ];
 }

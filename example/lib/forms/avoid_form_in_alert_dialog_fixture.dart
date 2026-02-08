@@ -114,19 +114,21 @@ final context = BuildContext();
 // expect_lint: avoid_form_in_alert_dialog
 void _bad404() {
   showDialog(
-  builder: (context) => AlertDialog(
-  content: Form(
-  child: TextFormField(), // State lost on dialog rebuild!
-  ),
-  ),
+    builder: (context) => AlertDialog(
+      content: Form(
+        child: TextFormField(), // State lost on dialog rebuild!
+      ),
+    ),
   );
 }
 
 // GOOD: Should NOT trigger avoid_form_in_alert_dialog
-showDialog(
-builder: (context) => AlertDialog(
-content: _FormContent(), // Separate StatefulWidget
-),
-);
+void _topLevel125() {
+  showDialog(
+    builder: (context) => AlertDialog(
+      content: _FormContent(), // Separate StatefulWidget
+    ),
+  );
+}
 
 class _good404__FormContent extends StatefulWidget {}

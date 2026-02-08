@@ -118,9 +118,9 @@ void _bad423() {
 // GOOD: Should NOT trigger require_image_error_fallback
 void _good423() {
   Image.network(
-  'https://example.com/image.jpg',
-  errorBuilder: (context, error, stackTrace) {
-  return Icon(Icons.error);
-  },
+    'https://example.com/image.jpg',
+    errorBuilder: (context, error, stackTrace) {
+      return Icon(Icons.error);
+    },
   );
 }

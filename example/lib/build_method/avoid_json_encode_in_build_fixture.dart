@@ -111,22 +111,22 @@ dynamic json;
 // BAD: Should trigger avoid_json_encode_in_build
 // expect_lint: avoid_json_encode_in_build
 Widget _bad130_build(BuildContext context) {
-final json = jsonEncode(largeObject); // Expensive!
-return Text(json);
+  final json = jsonEncode(largeObject); // Expensive!
+  return Text(json);
 }
 
 // GOOD: Should NOT trigger avoid_json_encode_in_build
 void _good130() {
   String? _cachedJson;
-  
+
   @override
   void initState() {
-  // super.initState();
-  _cachedJson = jsonEncode(largeObject);
+    // super.initState();
+    _cachedJson = jsonEncode(largeObject);
   }
-  
+
   @override
   Widget build(BuildContext context) {
-  return Text(_cachedJson ?? '');
+    return Text(_cachedJson ?? '');
   }
 }

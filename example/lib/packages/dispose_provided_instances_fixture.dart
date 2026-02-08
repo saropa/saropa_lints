@@ -112,16 +112,16 @@ dynamic service;
 // expect_lint: dispose_provided_instances
 void _bad713() {
   Provider<MyService>(
-  create: (_) => MyService(), // MyService has dispose()!
-  child: MyApp(),
+    create: (_) => MyService(), // MyService has dispose()!
+    child: MyApp(),
   );
 }
 
 // GOOD: Should NOT trigger dispose_provided_instances
 void _good713() {
   Provider<MyService>(
-  create: (_) => MyService(),
-  dispose: (_, service) => service.dispose(),
-  child: MyApp(),
+    create: (_) => MyService(),
+    dispose: (_, service) => service.dispose(),
+    child: MyApp(),
   );
 }

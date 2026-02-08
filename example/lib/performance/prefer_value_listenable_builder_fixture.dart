@@ -113,21 +113,21 @@ dynamic value;
 // BAD: Should trigger prefer_value_listenable_builder
 // expect_lint: prefer_value_listenable_builder
 class _bad790__MyState extends State<MyWidget> {
-int _counter = 0;
+  int _counter = 0;
 
-Widget build(BuildContext context) {
-return Text('$_counter');
-}
+  Widget build(BuildContext context) {
+    return Text('$_counter');
+  }
 }
 
 // GOOD: Should NOT trigger prefer_value_listenable_builder
 void _good790() {
   final _counter = ValueNotifier<int>(0);
-  
+
   Widget build(BuildContext context) {
-  return ValueListenableBuilder<int>(
-  valueListenable: _counter,
-  builder: (context, value, child) => Text('$value'),
-  );
+    return ValueListenableBuilder<int>(
+      valueListenable: _counter,
+      builder: (context, value, child) => Text('$value'),
+    );
   }
 }

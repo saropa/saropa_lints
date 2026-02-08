@@ -112,18 +112,18 @@ dynamic ref;
 // BAD: Should trigger avoid_ref_in_build_body
 // expect_lint: avoid_ref_in_build_body
 class _bad746_MyWidget extends ConsumerWidget {
-@override
-Widget build(BuildContext context, WidgetRef ref) {
-final count = ref.read(counterProvider); // Won't rebuild on changes!
-return Text('Count: $count');
-}
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final count = ref.read(counterProvider); // Won't rebuild on changes!
+    return Text('Count: $count');
+  }
 }
 
 // GOOD: Should NOT trigger avoid_ref_in_build_body
 class _good746_MyWidget extends ConsumerWidget {
-@override
-Widget build(BuildContext context, WidgetRef ref) {
-final count = ref.watch(counterProvider); // Rebuilds on changes
-return Text('Count: $count');
-}
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final count = ref.watch(counterProvider); // Rebuilds on changes
+    return Text('Count: $count');
+  }
 }

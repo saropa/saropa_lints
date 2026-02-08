@@ -114,12 +114,12 @@ dynamic userProvider;
 // BAD: Should trigger prefer_select_for_partial
 // expect_lint: prefer_select_for_partial
 Widget _bad749_build(BuildContext context, WidgetRef ref) {
-final user = ref.watch(userProvider); // Rebuilds on any user change
-return Text(user.name); // Only uses name!
+  final user = ref.watch(userProvider); // Rebuilds on any user change
+  return Text(user.name); // Only uses name!
 }
 
 // GOOD: Should NOT trigger prefer_select_for_partial
 Widget _good749_build(BuildContext context, WidgetRef ref) {
-final name = ref.watch(userProvider.select((u) => u.name));
-return Text(name); // Only rebuilds when name changes
+  final name = ref.watch(userProvider.select((u) => u.name));
+  return Text(name); // Only rebuilds when name changes
 }

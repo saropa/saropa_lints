@@ -108,13 +108,13 @@ import '../flutter_mocks.dart';
 // BAD: Should trigger avoid_local_functions
 // expect_lint: avoid_local_functions
 void _bad1050_outer() {
-void inner() { }  // Local function
-inner();
+  void inner() {} // Local function
+  inner();
 }
 
 // GOOD: Should NOT trigger avoid_local_functions
-void _good1050__inner() { }
+void _good1050__inner() {}
 
 void outer() {
-_inner();
+  _inner();
 }

@@ -113,7 +113,6 @@ void _bad941() {
 
 // GOOD: Should NOT trigger prefer_deferred_loading_web
 void _good941() async {
-  
   // Then load when needed:
   await charts.loadLibrary();
   charts.LineChart();

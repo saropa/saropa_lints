@@ -113,7 +113,7 @@ final users = <dynamic>[];
 // expect_lint: prefer_sqflite_batch
 void _bad375() async {
   for (final user in users) {
-  await db.insert('users', user.toMap());
+    await db.insert('users', user.toMap());
   }
 }
 
@@ -121,7 +121,7 @@ void _bad375() async {
 void _good375() async {
   final batch = db.batch();
   for (final user in users) {
-  batch.insert('users', user.toMap());
+    batch.insert('users', user.toMap());
   }
   await batch.commit();
 }

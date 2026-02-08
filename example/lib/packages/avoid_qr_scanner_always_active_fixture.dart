@@ -111,20 +111,21 @@ dynamic state;
 // BAD: Should trigger avoid_qr_scanner_always_active
 // expect_lint: avoid_qr_scanner_always_active
 class _bad725__ScannerState extends State<Scanner> {
-final controller = MobileScannerController();
+  final controller = MobileScannerController();
 // No lifecycle handling - camera runs in background!
 }
 
 // GOOD: Should NOT trigger avoid_qr_scanner_always_active
-class _good725__ScannerState extends State<Scanner> with WidgetsBindingObserver {
-final controller = MobileScannerController();
+class _good725__ScannerState extends State<Scanner>
+    with WidgetsBindingObserver {
+  final controller = MobileScannerController();
 
-@override
-void didChangeAppLifecycleState(AppLifecycleState state) {
-if (state == AppLifecycleState.paused) {
-controller.stop();
-} else if (state == AppLifecycleState.resumed) {
-controller.start();
-}
-}
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.paused) {
+      controller.stop();
+    } else if (state == AppLifecycleState.resumed) {
+      controller.start();
+    }
+  }
 }

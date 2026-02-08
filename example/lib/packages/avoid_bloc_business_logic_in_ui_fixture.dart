@@ -112,15 +112,15 @@ dynamic state;
 // BAD: Should trigger avoid_bloc_business_logic_in_ui
 // expect_lint: avoid_bloc_business_logic_in_ui
 class _bad586_MyBloc extends Bloc<Event, State> {
-void _onEvent(Event event, Emitter<State> emit) {
-Navigator.of(context).push(); // UI in Bloc!
-ScaffoldMessenger.of(context).showSnackBar(); // UI in Bloc!
-}
+  void _onEvent(Event event, Emitter<State> emit) {
+    Navigator.of(context).push(); // UI in Bloc!
+    ScaffoldMessenger.of(context).showSnackBar(); // UI in Bloc!
+  }
 }
 
 // GOOD: Should NOT trigger avoid_bloc_business_logic_in_ui
 class _good586_MyBloc extends Bloc<Event, State> {
-void _onEvent(Event event, Emitter<State> emit) {
-emit(NavigateToDetailState()); // Emit state for UI to handle
-}
+  void _onEvent(Event event, Emitter<State> emit) {
+    emit(NavigateToDetailState()); // Emit state for UI to handle
+  }
 }

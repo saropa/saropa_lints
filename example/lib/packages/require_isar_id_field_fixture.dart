@@ -113,12 +113,12 @@ final name = 'example';
 // expect_lint: require_isar_id_field
 @collection
 class _bad674_User {
-String? name;  // Missing Id field!
+  String? name; // Missing Id field!
 }
 
 // GOOD: Should NOT trigger require_isar_id_field
 @collection
 class _good674_User {
-Id? id;
-String? name;
+  Id? id;
+  String? name;
 }

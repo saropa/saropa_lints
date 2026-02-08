@@ -114,5 +114,5 @@ void _bad321() {
 // GOOD: Should NOT trigger require_di_scope_awareness
 void _good321() {
   GetIt.I.registerLazySingleton(() => DatabaseConnection());
-  GetIt.I.registerFactory(() => RequestHandler());  // Stateless, OK as factory
+  GetIt.I.registerFactory(() => RequestHandler()); // Stateless, OK as factory
 }

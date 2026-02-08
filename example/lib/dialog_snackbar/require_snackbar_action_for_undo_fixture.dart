@@ -114,19 +114,19 @@ final label = 'label';
 // expect_lint: require_snackbar_action_for_undo
 void _bad324() {
   ScaffoldMessenger.of(context).showSnackBar(
-  SnackBar(content: Text('Item deleted')),
+    SnackBar(content: Text('Item deleted')),
   );
 }
 
 // GOOD: Should NOT trigger require_snackbar_action_for_undo
 void _good324() {
   ScaffoldMessenger.of(context).showSnackBar(
-  SnackBar(
-  content: Text('Item deleted'),
-  action: SnackBarAction(
-  label: 'Undo',
-  onPressed: () => restoreItem(item),
-  ),
-  ),
+    SnackBar(
+      content: Text('Item deleted'),
+      action: SnackBarAction(
+        label: 'Undo',
+        onPressed: () => restoreItem(item),
+      ),
+    ),
   );
 }

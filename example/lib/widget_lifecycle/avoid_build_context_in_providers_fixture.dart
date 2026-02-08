@@ -110,12 +110,12 @@ final context = BuildContext();
 // BAD: Should trigger avoid_build_context_in_providers
 // expect_lint: avoid_build_context_in_providers
 class _bad1350_MyProvider extends ChangeNotifier {
-late BuildContext _context;
-void setContext(BuildContext context) => _context = context;
+  late BuildContext _context;
+  void setContext(BuildContext context) => _context = context;
 }
 
 // GOOD: Should NOT trigger avoid_build_context_in_providers
 // Use callbacks or pass context only when needed
 class _good1350_MyProvider extends ChangeNotifier {
-void showMessage(BuildContext context, String msg) {}
+  void showMessage(BuildContext context, String msg) {}
 }

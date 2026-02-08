@@ -123,12 +123,12 @@ void _bad530() {
 void _good530() {
   // Route accessible via deep link
   GoRouter(
-  routes: [
-  GoRoute(
-  path: '/product/:id',
-  builder: (context, state) =>
-  ProductDetailScreen(id: state.params['id']!),
-  ),
-  ],
+    routes: [
+      GoRoute(
+        path: '/product/:id',
+        builder: (context, state) =>
+            ProductDetailScreen(id: state.params['id']!),
+      ),
+    ],
   );
 }

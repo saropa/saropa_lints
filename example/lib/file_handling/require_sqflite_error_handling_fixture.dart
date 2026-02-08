@@ -117,8 +117,8 @@ void _bad374() async {
 // GOOD: Should NOT trigger require_sqflite_error_handling
 void _good374() async {
   try {
-  await db.insert('users', userData);
+    await db.insert('users', userData);
   } on DatabaseException catch (e) {
-  handleDatabaseError(e);
+    handleDatabaseError(e);
   }
 }

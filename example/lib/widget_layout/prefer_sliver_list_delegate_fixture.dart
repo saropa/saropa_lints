@@ -110,12 +110,14 @@ final context = BuildContext();
 // BAD: Should trigger prefer_sliver_list_delegate
 // expect_lint: prefer_sliver_list_delegate
 Widget _bad1296_build(BuildContext context) {
-final width = MediaQuery.of(context).size.width;  // Rebuilds on any MediaQuery change
-return Container(width: width);
+  final width =
+      MediaQuery.of(context).size.width; // Rebuilds on any MediaQuery change
+  return Container(width: width);
 }
 
 // GOOD: Should NOT trigger prefer_sliver_list_delegate
 Widget _good1296_build(BuildContext context) {
-final width = MediaQuery.sizeOf(context).width;  // Only rebuilds on size change
-return Container(width: width);
+  final width =
+      MediaQuery.sizeOf(context).width; // Only rebuilds on size change
+  return Container(width: width);
 }

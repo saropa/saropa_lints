@@ -113,17 +113,17 @@ dynamic stream;
 // expect_lint: pass_existing_stream_to_stream_builder
 void _bad1358() {
   StreamBuilder(
-  stream: getDataStream(), // Creates new stream on every build
-  builder: (context, snapshot) =>,
+    stream: getDataStream(), // Creates new stream on every build
+    builder: (context, snapshot) => Container(),
   );
 }
 
 // GOOD: Should NOT trigger pass_existing_stream_to_stream_builder
 void _good1358() {
   late final Stream<Data> _dataStream = getDataStream();
-  
+
   StreamBuilder(
-  stream: _dataStream,
-  builder: (context, snapshot) =>,
+    stream: _dataStream,
+    builder: (context, snapshot) => Container(),
   );
 }

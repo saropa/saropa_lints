@@ -113,19 +113,19 @@ dynamic service;
 // expect_lint: require_mock_verification
 void _bad1201() {
   test('should call api', () {
-  final mockApi = MockApi();
-  when(mockApi.fetch()).thenAnswer((_) async => data);
-  service.loadData();
-  // Missing verify!
+    final mockApi = MockApi();
+    when(mockApi.fetch()).thenAnswer((_) async => data);
+    service.loadData();
+    // Missing verify!
   });
 }
 
 // GOOD: Should NOT trigger require_mock_verification
 void _good1201() {
   test('should call api', () {
-  final mockApi = MockApi();
-  when(mockApi.fetch()).thenAnswer((_) async => data);
-  service.loadData();
-  verify(mockApi.fetch()).called(1);
+    final mockApi = MockApi();
+    when(mockApi.fetch()).thenAnswer((_) async => data);
+    service.loadData();
+    verify(mockApi.fetch()).called(1);
   });
 }

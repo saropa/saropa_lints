@@ -108,10 +108,10 @@ import '../flutter_mocks.dart';
 // BAD: Should trigger avoid_declaring_call_method
 // expect_lint: avoid_declaring_call_method
 class _bad136_MyClass {
-void call() { }
+  void call() {}
 }
 
 // GOOD: Should NOT trigger avoid_declaring_call_method
 class _good136_MyClass {
-void execute() { }
+  void execute() {}
 }

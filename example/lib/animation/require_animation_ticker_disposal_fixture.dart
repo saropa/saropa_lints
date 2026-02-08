@@ -110,37 +110,37 @@ dynamic callback;
 // BAD: Should trigger require_animation_ticker_disposal
 // expect_lint: require_animation_ticker_disposal
 class _bad42__MyWidgetState extends State<MyWidget>
-with SingleTickerProviderStateMixin {
-late Ticker _ticker;
+    with SingleTickerProviderStateMixin {
+  late Ticker _ticker;
 
-@override
-void initState() {
-super.initState();
-_ticker = createTicker((elapsed) {
+  @override
+  void initState() {
+    super.initState();
+    _ticker = createTicker((elapsed) {
 // Frame callback
-});
-_ticker.start();
-}
+    });
+    _ticker.start();
+  }
 // Missing stop() in dispose - memory leak!
 }
 
 // GOOD: Should NOT trigger require_animation_ticker_disposal
 class _good42__MyWidgetState extends State<MyWidget>
-with SingleTickerProviderStateMixin {
-late Ticker _ticker;
+    with SingleTickerProviderStateMixin {
+  late Ticker _ticker;
 
-@override
-void initState() {
-super.initState();
-_ticker = createTicker((elapsed) {
+  @override
+  void initState() {
+    super.initState();
+    _ticker = createTicker((elapsed) {
 // Frame callback
-});
-_ticker.start();
-}
+    });
+    _ticker.start();
+  }
 
-@override
-void dispose() {
-_ticker.stop();
-super.dispose();
-}
+  @override
+  void dispose() {
+    _ticker.stop();
+    super.dispose();
+  }
 }

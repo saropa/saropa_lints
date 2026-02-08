@@ -110,26 +110,26 @@ dynamic stream;
 // BAD: Should trigger require_getx_controller_dispose
 // expect_lint: require_getx_controller_dispose
 class _bad644_MyController extends GetxController {
-final textController = TextEditingController();
-late StreamSubscription sub;
+  final textController = TextEditingController();
+  late StreamSubscription sub;
 
-@override
-void onInit() {
-sub = stream.listen((_) {});
-super.onInit();
-}
+  @override
+  void onInit() {
+    sub = stream.listen((_) {});
+    super.onInit();
+  }
 // Missing onClose! Memory leak.
 }
 
 // GOOD: Should NOT trigger require_getx_controller_dispose
 class _good644_MyController extends GetxController {
-final textController = TextEditingController();
-late StreamSubscription sub;
+  final textController = TextEditingController();
+  late StreamSubscription sub;
 
-@override
-void onClose() {
-textController.dispose();
-sub.cancel();
-super.onClose();
-}
+  @override
+  void onClose() {
+    textController.dispose();
+    sub.cancel();
+    super.onClose();
+  }
 }

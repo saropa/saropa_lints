@@ -112,13 +112,13 @@ final text = 'text';
 // BAD: Should trigger prefer_intl_message_description
 // expect_lint: prefer_intl_message_description
 void _bad453() {
-  Intl.message('Submit');  // No context for translator
+  Intl.message('Submit'); // No context for translator
 }
 
 // GOOD: Should NOT trigger prefer_intl_message_description
 void _good453() {
   Intl.message(
-  'Submit',
-  desc: 'Button text to submit the registration form',
+    'Submit',
+    desc: 'Button text to submit the registration form',
   );
 }

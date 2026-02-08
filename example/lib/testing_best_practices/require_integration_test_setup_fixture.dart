@@ -112,9 +112,9 @@ dynamic device;
 void _bad1211() {
   // integration_test/app_test.dart
   void main() {
-  testWidgets('app launches', (tester) async {
-  // Hangs on device without binding!
-  });
+    testWidgets('app launches', (tester) async {
+      // Hangs on device without binding!
+    });
   }
 }
 
@@ -122,10 +122,10 @@ void _bad1211() {
 void _good1211() {
   // integration_test/app_test.dart
   void main() {
-  IntegrationTestWidgetsFlutterBinding.ensureInitialized();
-  
-  testWidgets('app launches', (tester) async {
-  // Works correctly
-  });
+    IntegrationTestWidgetsFlutterBinding.ensureInitialized();
+
+    testWidgets('app launches', (tester) async {
+      // Works correctly
+    });
   }
 }

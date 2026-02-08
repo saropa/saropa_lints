@@ -110,29 +110,29 @@ var count = 0;
 // BAD: Should trigger dispose_getx_fields
 // expect_lint: dispose_getx_fields
 class _bad648_MyController extends GetxController {
-late Worker _worker;
+  late Worker _worker;
 
-@override
-void onInit() {
-super.onInit();
-_worker = ever(count, (_) => print('changed'));
-}
+  @override
+  void onInit() {
+    super.onInit();
+    _worker = ever(count, (_) => print('changed'));
+  }
 // Missing onClose with _worker.dispose()!
 }
 
 // GOOD: Should NOT trigger dispose_getx_fields
 class _good648_MyController extends GetxController {
-late Worker _worker;
+  late Worker _worker;
 
-@override
-void onInit() {
-super.onInit();
-_worker = ever(count, (_) => print('changed'));
-}
+  @override
+  void onInit() {
+    super.onInit();
+    _worker = ever(count, (_) => print('changed'));
+  }
 
-@override
-void onClose() {
-_worker.dispose();
-super.onClose();
-}
+  @override
+  void onClose() {
+    _worker.dispose();
+    super.onClose();
+  }
 }

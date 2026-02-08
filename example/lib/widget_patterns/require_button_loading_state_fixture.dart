@@ -114,21 +114,23 @@ final isLoading = false;
 // expect_lint: require_button_loading_state
 void _bad1419() async {
   ElevatedButton(
-  onPressed: () async {
-  await api.submit(data);
-  },
-  child: Text('Submit'),
+    onPressed: () async {
+      await api.submit(data);
+    },
+    child: Text('Submit'),
   );
 }
 
 // GOOD: Should NOT trigger require_button_loading_state
 void _good1419() async {
   ElevatedButton(
-  onPressed: isLoading ? null : () async {
-  setState(() => isLoading = true);
-  await api.submit(data);
-  setState(() => isLoading = false);
-  },
-  child: isLoading ? CircularProgressIndicator() : Text('Submit'),
+    onPressed: isLoading
+        ? null
+        : () async {
+            setState(() => isLoading = true);
+            await api.submit(data);
+            setState(() => isLoading = false);
+          },
+    child: isLoading ? CircularProgressIndicator() : Text('Submit'),
   );
 }

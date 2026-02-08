@@ -114,13 +114,13 @@ dynamic value;
 // BAD: Should trigger avoid_passing_self_as_argument
 // expect_lint: avoid_passing_self_as_argument
 void _bad154() {
-  list.add(list);  // Adding list to itself
-  map[key] = map;  // Assigning map to itself
+  list.add(list); // Adding list to itself
+  map[key] = map; // Assigning map to itself
 }
 
 // GOOD: Should NOT trigger avoid_passing_self_as_argument
 void _good154() {
   list.add(item);
   map[key] = value;
-  0.isBetween(0, 10);  // OK - literals are values, not references
+  0.isBetween(0, 10); // OK - literals are values, not references
 }

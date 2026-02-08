@@ -111,14 +111,14 @@ dynamic child;
 // expect_lint: require_field_dispose
 void _bad1344() {
   Padding(
-  padding: EdgeInsets.all(8),
-  child: Container(),  // Container has padding property
+    padding: EdgeInsets.all(8),
+    child: Container(), // Container has padding property
   );
 }
 
 // GOOD: Should NOT trigger require_field_dispose
 void _good1344() {
   Container(
-  padding: EdgeInsets.all(8),
+    padding: EdgeInsets.all(8),
   );
 }

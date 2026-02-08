@@ -111,24 +111,25 @@ final children = <Widget>[];
 // expect_lint: require_animated_builder_child
 void _bad1450() {
   ListView(
-  children: [
-  ListView(  // Gesture conflict!
-  shrinkWrap: true,
-  children: [],
-  ),
-  ],
+    children: [
+      ListView(
+        // Gesture conflict!
+        shrinkWrap: true,
+        children: [],
+      ),
+    ],
   );
 }
 
 // GOOD: Should NOT trigger require_animated_builder_child
 void _good1450() {
   ListView(
-  children: [
-  ListView(
-  shrinkWrap: true,
-  physics: NeverScrollableScrollPhysics(),
-  children: [],
-  ),
-  ],
+    children: [
+      ListView(
+        shrinkWrap: true,
+        physics: NeverScrollableScrollPhysics(),
+        children: [],
+      ),
+    ],
   );
 }
