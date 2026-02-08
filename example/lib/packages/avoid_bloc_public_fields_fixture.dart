@@ -110,12 +110,12 @@ final items = <dynamic>[];
 // BAD: Should trigger avoid_bloc_public_fields
 // expect_lint: avoid_bloc_public_fields
 class _bad573_MyBloc extends Bloc<Event, State> {
-int counter = 0;  // Public mutable field
-List<Item> items = [];
+  int counter = 0; // Public mutable field
+  List<Item> items = [];
 }
 
 // GOOD: Should NOT trigger avoid_bloc_public_fields
 class _good573_MyBloc extends Bloc<Event, State> {
-int _counter = 0;  // Private
-final List<Item> _items = [];
+  int _counter = 0; // Private
+  final List<Item> _items = [];
 }

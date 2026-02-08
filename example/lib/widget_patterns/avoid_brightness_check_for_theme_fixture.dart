@@ -112,21 +112,21 @@ final isLoading = false;
 // expect_lint: avoid_brightness_check_for_theme
 void _bad1438() {
   AbsorbPointer(
-  absorbing: isLoading,
-  child: Form(), // Blocks scrolling in parent ListView too!
+    absorbing: isLoading,
+    child: Form(), // Blocks scrolling in parent ListView too!
   );
 }
 
 // GOOD: Should NOT trigger avoid_brightness_check_for_theme
 void _good1438() {
   IgnorePointer(
-  ignoring: isLoading,
-  child: Form(), // Events pass through to parent
+    ignoring: isLoading,
+    child: Form(), // Events pass through to parent
   );
   // Or use AbsorbPointer only when you specifically need to block events:
   AbsorbPointer(
-  absorbing: true,
-  // ignore: avoid_absorb_pointer_misuse
-  child: OverlayBlocker(),
+    absorbing: true,
+    // ignore: avoid_absorb_pointer_misuse
+    child: OverlayBlocker(),
   );
 }

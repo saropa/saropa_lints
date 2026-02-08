@@ -110,18 +110,18 @@ dynamic image;
 // BAD: Should trigger require_image_disposal
 // expect_lint: require_image_disposal
 class _bad468__GalleryState extends State<Gallery> {
-final List<ui.Image> loadedImages = []; // Never disposed
+  final List<ui.Image> loadedImages = []; // Never disposed
 }
 
 // GOOD: Should NOT trigger require_image_disposal
 class _good468__GalleryState extends State<Gallery> {
-final List<ui.Image> loadedImages = [];
+  final List<ui.Image> loadedImages = [];
 
-@override
-void dispose() {
-for (final image in loadedImages) {
-image.dispose();
-}
-super.dispose();
-}
+  @override
+  void dispose() {
+    for (final image in loadedImages) {
+      image.dispose();
+    }
+    super.dispose();
+  }
 }

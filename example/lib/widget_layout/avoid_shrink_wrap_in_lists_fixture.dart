@@ -110,13 +110,13 @@ final label = 'label';
 // BAD: Should trigger avoid_shrink_wrap_in_lists
 // expect_lint: avoid_shrink_wrap_in_lists
 void _bad1284() {
-  Image.asset('logo.png')  // No semantic label
+  Image.asset('logo.png'); // No semantic label
 }
 
 // GOOD: Should NOT trigger avoid_shrink_wrap_in_lists
 void _good1284() {
   Image.asset(
-  'logo.png',
-  semanticLabel: 'Company logo',
+    'logo.png',
+    semanticLabel: 'Company logo',
   );
 }

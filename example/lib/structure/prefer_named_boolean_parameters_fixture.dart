@@ -108,8 +108,12 @@ import '../flutter_mocks.dart';
 // BAD: Should trigger prefer_named_boolean_parameters
 // expect_lint: prefer_named_boolean_parameters
 void _bad1054_setEnabled(bool enabled) {}
-setEnabled(true);  // Unclear what true means
+void _bad1054_call() {
+  _bad1054_setEnabled(true); // Unclear what true means
+}
 
 // GOOD: Should NOT trigger prefer_named_boolean_parameters
 void _good1054_setEnabled({required bool enabled}) {}
-setEnabled(enabled: true);  // Clear intent
+void _good1054_call() {
+  _good1054_setEnabled(enabled: true); // Clear intent
+}

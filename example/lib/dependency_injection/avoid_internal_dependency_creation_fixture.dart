@@ -108,13 +108,15 @@ import '../flutter_mocks.dart';
 // BAD: Should trigger avoid_internal_dependency_creation
 // expect_lint: avoid_internal_dependency_creation
 class _bad313_UserViewModel {
-final _userRepo = UserRepository(); // Created internally
-final _api = ApiClient(); // Created internally
+  final _userRepo = UserRepository(); // Created internally
+  final _api = ApiClient(); // Created internally
 }
 
 // GOOD: Should NOT trigger avoid_internal_dependency_creation
 class _good313_UserViewModel {
-UserViewModel(this._userRepo, this._api);
-final UserRepository _userRepo;
-final ApiClient _api;
+  void _topLevel116() {
+    _good313_UserViewModel(this._userRepo, this._api);
+    final UserRepository _userRepo;
+    final ApiClient _api;
+  }
 }

@@ -117,9 +117,9 @@ void _bad39() {
 // GOOD: Should NOT trigger require_animation_status_listener
 void _good39() {
   _controller.addStatusListener((status) {
-  if (status == AnimationStatus.completed) {
-  setState(() => _showContent = true);
-  }
+    if (status == AnimationStatus.completed) {
+      setState(() => _showContent = true);
+    }
   });
   _controller.forward();
 }

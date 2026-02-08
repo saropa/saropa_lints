@@ -108,7 +108,7 @@ import '../flutter_mocks.dart';
 // BAD: Should trigger prefer_const_border_radius
 // expect_lint: prefer_const_border_radius
 void _bad1288() {
-  BorderRadius.circular(8)  // Not const
+  BorderRadius.circular(8); // Not const
 }
 
 // GOOD: Should NOT trigger prefer_const_border_radius

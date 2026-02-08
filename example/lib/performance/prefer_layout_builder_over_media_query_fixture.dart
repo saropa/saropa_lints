@@ -113,22 +113,22 @@ final index = 0;
 // expect_lint: prefer_layout_builder_over_media_query
 void _bad811() {
   ListView.builder(
-  itemBuilder: (context, index) {
-  final width = MediaQuery.of(context).size.width;
-  return SizedBox(width: width * 0.8);
-  },
+    itemBuilder: (context, index) {
+      final width = MediaQuery.of(context).size.width;
+      return SizedBox(width: width * 0.8);
+    },
   );
 }
 
 // GOOD: Should NOT trigger prefer_layout_builder_over_media_query
 void _good811() {
   LayoutBuilder(
-  builder: (context, constraints) {
-  return ListView.builder(
-  itemBuilder: (context, index) {
-  return SizedBox(width: constraints.maxWidth * 0.8);
-  },
-  );
-  },
+    builder: (context, constraints) {
+      return ListView.builder(
+        itemBuilder: (context, index) {
+          return SizedBox(width: constraints.maxWidth * 0.8);
+        },
+      );
+    },
   );
 }

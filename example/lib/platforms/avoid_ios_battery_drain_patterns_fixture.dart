@@ -110,7 +110,7 @@ import '../flutter_mocks.dart';
 void _bad917() {
   // Polling too frequently
   Timer.periodic(Duration(seconds: 1), (_) => checkForUpdates());
-  
+
   // High-accuracy location continuously
   Geolocator.getPositionStream(desiredAccuracy: LocationAccuracy.best);
 }
@@ -119,10 +119,10 @@ void _bad917() {
 void _good917() async {
   // Use push notifications instead of polling
   await FirebaseMessaging.instance.subscribeToTopic('updates');
-  
+
   // Use significant location changes
   Geolocator.getPositionStream(
-  desiredAccuracy: LocationAccuracy.low,
-  distanceFilter: 100, // meters
+    desiredAccuracy: LocationAccuracy.low,
+    distanceFilter: 100, // meters
   );
 }

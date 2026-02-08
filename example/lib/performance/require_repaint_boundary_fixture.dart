@@ -114,33 +114,33 @@ dynamic value;
 // expect_lint: require_repaint_boundary
 void _bad792() {
   Stack(
-  children: [
-  AnimatedBuilder(
-  animation: _controller,
-  builder: (_, __) => Transform.rotate(
-  angle: _controller.value * 2 * pi,
-  child: ComplexWidget(),
-  ),
-  ),
-  StaticContent(),
-  ],
+    children: [
+      AnimatedBuilder(
+        animation: _controller,
+        builder: (_, __) => Transform.rotate(
+          angle: _controller.value * 2 * pi,
+          child: ComplexWidget(),
+        ),
+      ),
+      StaticContent(),
+    ],
   );
 }
 
 // GOOD: Should NOT trigger require_repaint_boundary
 void _good792() {
   Stack(
-  children: [
-  RepaintBoundary(
-  child: AnimatedBuilder(
-  animation: _controller,
-  builder: (_, __) => Transform.rotate(
-  angle: _controller.value * 2 * pi,
-  child: ComplexWidget(),
-  ),
-  ),
-  ),
-  StaticContent(),
-  ],
+    children: [
+      RepaintBoundary(
+        child: AnimatedBuilder(
+          animation: _controller,
+          builder: (_, __) => Transform.rotate(
+            angle: _controller.value * 2 * pi,
+            child: ComplexWidget(),
+          ),
+        ),
+      ),
+      StaticContent(),
+    ],
   );
 }

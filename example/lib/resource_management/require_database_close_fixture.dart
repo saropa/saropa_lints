@@ -114,22 +114,22 @@ final users = <dynamic>[];
 // expect_lint: require_database_close
 void _bad966() async {
   Future<User> getUser(int id) async {
-  final db = await openDatabase('app.db');
-  final result = await db.query('users', where: 'id = ?', whereArgs: [id]);
-  return User.fromMap(result.first);
-  // db never closed
+    final db = await openDatabase('app.db');
+    final result = await db.query('users', where: 'id = ?', whereArgs: [id]);
+    return User.fromMap(result.first);
+    // db never closed
   }
 }
 
 // GOOD: Should NOT trigger require_database_close
 void _good966() async {
   Future<User> getUser(int id) async {
-  final db = await openDatabase('app.db');
-  try {
-  final result = await db.query('users', where: 'id = ?', whereArgs: [id]);
-  return User.fromMap(result.first);
-  } finally {
-  await db.close();
-  }
+    final db = await openDatabase('app.db');
+    try {
+      final result = await db.query('users', where: 'id = ?', whereArgs: [id]);
+      return User.fromMap(result.first);
+    } finally {
+      await db.close();
+    }
   }
 }

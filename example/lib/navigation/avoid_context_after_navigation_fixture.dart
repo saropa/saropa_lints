@@ -114,16 +114,16 @@ dynamic result;
 // expect_lint: avoid_context_after_navigation
 void _bad502() async {
   Future<void> navigate() async {
-  final result = await Navigator.pushNamed(context, '/details');
-  ScaffoldMessenger.of(context).showSnackBar(); // Context may be invalid!
+    final result = await Navigator.pushNamed(context, '/details');
+    ScaffoldMessenger.of(context).showSnackBar(); // Context may be invalid!
   }
 }
 
 // GOOD: Should NOT trigger avoid_context_after_navigation
 void _good502() async {
   Future<void> navigate() async {
-  final result = await Navigator.pushNamed(context, '/details');
-  if (!mounted) return;
-  ScaffoldMessenger.of(context).showSnackBar();
+    final result = await Navigator.pushNamed(context, '/details');
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar();
   }
 }

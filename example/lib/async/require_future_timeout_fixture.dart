@@ -115,6 +115,5 @@ void _bad108() async {
 
 // GOOD: Should NOT trigger require_future_timeout
 void _good108() async {
-  final result = await expensiveOperation()
-  .timeout(Duration(seconds: 30));
+  final result = await expensiveOperation().timeout(Duration(seconds: 30));
 }

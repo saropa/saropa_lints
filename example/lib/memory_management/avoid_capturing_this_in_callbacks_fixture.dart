@@ -111,31 +111,31 @@ dynamic timer;
 // BAD: Should trigger avoid_capturing_this_in_callbacks
 // expect_lint: avoid_capturing_this_in_callbacks
 class _bad469__MyWidgetState extends State<MyWidget> {
-late Timer _timer;
+  late Timer _timer;
 
-void initState() {
-super.initState();
-_timer = Timer.periodic(Duration(seconds: 1), (_) {
-setState(() {}); // Captures entire State object
-});
-}
+  void initState() {
+    super.initState();
+    _timer = Timer.periodic(Duration(seconds: 1), (_) {
+      setState(() {}); // Captures entire State object
+    });
+  }
 }
 
 // GOOD: Should NOT trigger avoid_capturing_this_in_callbacks
 class _good469__MyWidgetState extends State<MyWidget> {
-late Timer _timer;
+  late Timer _timer;
 
-void initState() {
-super.initState();
-_timer = Timer.periodic(Duration(seconds: 1), _onTick);
-}
+  void initState() {
+    super.initState();
+    _timer = Timer.periodic(Duration(seconds: 1), _onTick);
+  }
 
-void _onTick(Timer timer) {
-if (mounted) setState(() {});
-}
+  void _onTick(Timer timer) {
+    if (mounted) setState(() {});
+  }
 
-void dispose() {
-_timer.cancel();
-super.dispose();
-}
+  void dispose() {
+    _timer.cancel();
+    super.dispose();
+  }
 }

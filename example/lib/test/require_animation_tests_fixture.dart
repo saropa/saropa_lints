@@ -109,18 +109,18 @@ import '../flutter_mocks.dart';
 // expect_lint: require_animation_tests
 void _bad1184() async {
   testWidgets('animation plays', (tester) async {
-  await tester.pumpWidget(AnimatedWidget());
-  await tester.pump();  // Only one frame!
-  expect(find.byType(AnimatedWidget), findsOneWidget);
+    await tester.pumpWidget(AnimatedWidget());
+    await tester.pump(); // Only one frame!
+    expect(find.byType(AnimatedWidget), findsOneWidget);
   });
 }
 
 // GOOD: Should NOT trigger require_animation_tests
 void _good1184() async {
   testWidgets('animation completes', (tester) async {
-  await tester.pumpWidget(AnimatedWidget());
-  await tester.pump(const Duration(milliseconds: 500));
-  // Or
-  await tester.pumpAndSettle();
+    await tester.pumpWidget(AnimatedWidget());
+    await tester.pump(const Duration(milliseconds: 500));
+    // Or
+    await tester.pumpAndSettle();
   });
 }

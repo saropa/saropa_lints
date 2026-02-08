@@ -110,11 +110,11 @@ dynamic box;
 // BAD: Should trigger require_hive_initialization
 // expect_lint: require_hive_initialization
 void _bad655_main() async {
-final box = await Hive.openBox('myBox'); // Crashes!
+  final box = await Hive.openBox('myBox'); // Crashes!
 }
 
 // GOOD: Should NOT trigger require_hive_initialization
 void _good655_main() async {
-await Hive.initFlutter();
-final box = await Hive.openBox('myBox');
+  await Hive.initFlutter();
+  final box = await Hive.openBox('myBox');
 }

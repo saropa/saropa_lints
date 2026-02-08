@@ -112,17 +112,17 @@ final message = 'Message';
 // expect_lint: require_empty_results_state
 void _bad1262() {
   ListView.builder(
-  itemCount: searchResults.length,
-  itemBuilder: (ctx, i) => ResultTile(searchResults[i]),
+    itemCount: searchResults.length,
+    itemBuilder: (ctx, i) => ResultTile(searchResults[i]),
   );
 }
 
 // GOOD: Should NOT trigger require_empty_results_state
 void _good1262() {
   searchResults.isEmpty
-  ? EmptyState(message: 'No results found')
-  : ListView.builder(
-  itemCount: searchResults.length,
-  itemBuilder: (ctx, i) => ResultTile(searchResults[i]),
-  );
+      ? EmptyState(message: 'No results found')
+      : ListView.builder(
+          itemCount: searchResults.length,
+          itemBuilder: (ctx, i) => ResultTile(searchResults[i]),
+        );
 }

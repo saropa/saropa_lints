@@ -112,15 +112,15 @@ dynamic stream;
 // expect_lint: require_stream_on_done
 void _bad110() {
   stream.listen((data) {
-  updateUI(data);
+    updateUI(data);
   });
 }
 
 // GOOD: Should NOT trigger require_stream_on_done
 void _good110() {
   stream.listen(
-  (data) => updateUI(data),
-  onDone: () => showCompleted(),
-  onError: (e) => showError(e),
+    (data) => updateUI(data),
+    onDone: () => showCompleted(),
+    onError: (e) => showError(e),
   );
 }

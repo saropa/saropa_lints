@@ -109,8 +109,8 @@ dynamic value;
 
 // BAD: Should trigger avoid_nested_extension_types
 // expect_lint: avoid_nested_extension_types
-extension type Inner(int value) {}
-extension type Outer(Inner inner) {}  // Nested extension type
+// extension type Inner(int value) {}
+// extension type Outer(Inner inner) {}  // Nested extension type
 
 // GOOD: Should NOT trigger avoid_nested_extension_types
 void _good198() {

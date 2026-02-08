@@ -110,10 +110,10 @@ final name = 'example';
 // BAD: Should trigger prefer_redirecting_superclass_constructor
 // expect_lint: prefer_redirecting_superclass_constructor
 class _bad233_Child extends Parent {
-Child(String name) : super(name);
+  _bad233_Child(String name) : super(name);
 }
 
 // GOOD: Should NOT trigger prefer_redirecting_superclass_constructor
 class _good233_Child extends Parent {
-Child(super.name);
+  _good233_Child(super.name);
 }

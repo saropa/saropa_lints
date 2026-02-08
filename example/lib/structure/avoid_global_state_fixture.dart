@@ -111,11 +111,11 @@ dynamic collection;
 
 // BAD: Should trigger avoid_global_state
 // expect_lint: avoid_global_state
-int _bad1039_globalCounter = 0;  // Mutable global
-List<String> globalItems = [];  // Mutable global collection
+int _bad1039_globalCounter = 0; // Mutable global
+List<String> globalItems = []; // Mutable global collection
 
 // GOOD: Should NOT trigger avoid_global_state
 void _good1039() {
-  const int maxItems = 100;  // Immutable
-  final List<String> defaultItems = const ['a', 'b'];  // Immutable
+  const int maxItems = 100; // Immutable
+  final List<String> defaultItems = const ['a', 'b']; // Immutable
 }

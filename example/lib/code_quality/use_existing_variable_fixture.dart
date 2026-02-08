@@ -113,7 +113,7 @@ final userName = 'John';
 // expect_lint: use_existing_variable
 void _bad229() {
   final name = user.name;
-  final userName = user.name;  // Redundant
+  final userName = user.name; // Redundant
   print('$name, $userName');
 }
 

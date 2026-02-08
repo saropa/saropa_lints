@@ -114,16 +114,16 @@ final label = 'label';
 // expect_lint: avoid_badge_without_meaning
 void _bad1257() {
   Badge(
-  label: Text('0'), // Why show a badge for 0?
-  child: Icon(Icons.notifications),
+    label: Text('0'), // Why show a badge for 0?
+    child: Icon(Icons.notifications),
   );
 }
 
 // GOOD: Should NOT trigger avoid_badge_without_meaning
 void _good1257() {
   Badge(
-  isLabelVisible: count > 0,
-  label: Text('$count'),
-  child: Icon(Icons.notifications),
+    isLabelVisible: count > 0,
+    label: Text('$count'),
+    child: Icon(Icons.notifications),
   );
 }

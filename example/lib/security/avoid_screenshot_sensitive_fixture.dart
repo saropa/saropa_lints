@@ -110,23 +110,23 @@ final context = BuildContext();
 // BAD: Should trigger avoid_screenshot_sensitive
 // expect_lint: avoid_screenshot_sensitive
 class _bad1012_PaymentScreen extends StatelessWidget {
-@override
-Widget build(BuildContext context) {
-return Scaffold(); // No screenshot protection
-}
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(); // No screenshot protection
+  }
 }
 
 // GOOD: Should NOT trigger avoid_screenshot_sensitive
 class _good1012_PaymentScreen extends StatefulWidget {
-@override
-void initState() {
-super.initState();
-FlutterWindowManager.addFlags(FlutterWindowManager.FLAG_SECURE);
-}
+  @override
+  void initState() {
+    super.initState();
+    FlutterWindowManager.addFlags(FlutterWindowManager.FLAG_SECURE);
+  }
 
-@override
-void dispose() {
-FlutterWindowManager.clearFlags(FlutterWindowManager.FLAG_SECURE);
-super.dispose();
-}
+  @override
+  void dispose() {
+    FlutterWindowManager.clearFlags(FlutterWindowManager.FLAG_SECURE);
+    super.dispose();
+  }
 }

@@ -112,8 +112,8 @@ dynamic y;
 // BAD: Should trigger avoid_explicit_pattern_field_name
 // expect_lint: avoid_explicit_pattern_field_name
 void _bad948() {
-  final Point(:x, :y) = point;  // OK
-  final Point(x: x, y: y) = point;  // Redundant
+  final Point(:x, :y) = point; // OK
+  final Point(x: x, y: y) = point; // Redundant
 }
 
 // GOOD: Should NOT trigger avoid_explicit_pattern_field_name

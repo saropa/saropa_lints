@@ -112,19 +112,19 @@ final context = BuildContext();
 // expect_lint: avoid_layout_builder_misuse
 void _bad1297() {
   LayoutBuilder(
-  builder: (context, constraints) {
-  return ExpensiveWidget();  // Rebuilds on every layout
-  },
+    builder: (context, constraints) {
+      return ExpensiveWidget(); // Rebuilds on every layout
+    },
   );
 }
 
 // GOOD: Should NOT trigger avoid_layout_builder_misuse
 void _good1297() {
   LayoutBuilder(
-  builder: (context, constraints) {
-  return constraints.maxWidth > 600
-  ? const WideLayout()
-  : const NarrowLayout();
-  },
+    builder: (context, constraints) {
+      return constraints.maxWidth > 600
+          ? const WideLayout()
+          : const NarrowLayout();
+    },
   );
 }

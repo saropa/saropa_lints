@@ -116,9 +116,9 @@ void _bad1335() {
 // GOOD: Should NOT trigger avoid_empty_setstate
 void _good1335() {
   setState(() {
-  _value = newValue;
+    _value = newValue;
   });
-  
+
   // Also OK — mounted guard makes the intent clear:
   if (mounted) setState(() {});
 }

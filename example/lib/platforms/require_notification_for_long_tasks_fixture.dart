@@ -119,8 +119,8 @@ void _good901() async {
   // Show progress notification
   await showProgressNotification('Uploading');
   await uploadLargeFile(
-  file,
-  onProgress: (progress) => updateNotification(progress),
+    file,
+    onProgress: (progress) => updateNotification(progress),
   );
   await cancelNotification();
 }

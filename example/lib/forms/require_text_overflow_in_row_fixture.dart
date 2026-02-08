@@ -114,22 +114,22 @@ final userName = 'John';
 // expect_lint: require_text_overflow_in_row
 void _bad394() {
   Row(
-  children: [
-  Text(userName), // Can overflow if name is long!
-  ],
+    children: [
+      Text(userName), // Can overflow if name is long!
+    ],
   );
 }
 
 // GOOD: Should NOT trigger require_text_overflow_in_row
 void _good394() {
   Row(
-  children: [
-  Expanded(
-  child: Text(
-  userName,
-  overflow: TextOverflow.ellipsis,
-  ),
-  ),
-  ],
+    children: [
+      Expanded(
+        child: Text(
+          userName,
+          overflow: TextOverflow.ellipsis,
+        ),
+      ),
+    ],
   );
 }

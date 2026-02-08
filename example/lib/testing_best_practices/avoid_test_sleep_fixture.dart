@@ -111,17 +111,17 @@ dynamic result;
 // expect_lint: avoid_test_sleep
 void _bad1195() async {
   test('should timeout', () async {
-  await Future.delayed(Duration(seconds: 2));
-  expect(result, isTrue);
+    await Future.delayed(Duration(seconds: 2));
+    expect(result, isTrue);
   });
 }
 
 // GOOD: Should NOT trigger avoid_test_sleep
 void _good1195() {
   test('should timeout', () {
-  fakeAsync((async) {
-  async.elapse(Duration(seconds: 2));
-  expect(result, isTrue);
-  });
+    fakeAsync((async) {
+      async.elapse(Duration(seconds: 2));
+      expect(result, isTrue);
+    });
   });
 }

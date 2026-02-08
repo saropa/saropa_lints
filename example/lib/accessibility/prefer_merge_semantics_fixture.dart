@@ -112,17 +112,17 @@ final children = <Widget>[];
 // expect_lint: prefer_merge_semantics
 void _bad21() {
   Row(children: [
-  Icon(Icons.star),
-  Text('Favorite'),
+    Icon(Icons.star),
+    Text('Favorite'),
   ]);
 }
 
 // GOOD: Should NOT trigger prefer_merge_semantics
 void _good21() {
   MergeSemantics(
-  child: Row(children: [
-  Icon(Icons.star),
-  Text('Favorite'),
-  ]),
+    child: Row(children: [
+      Icon(Icons.star),
+      Text('Favorite'),
+    ]),
   );
 }

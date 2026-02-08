@@ -111,24 +111,26 @@ final path = '/path';
 // BAD: Should trigger prefer_image_cropping
 // expect_lint: prefer_image_cropping
 void _bad824() async {
-  onTap: () async {
-  final image = await ImagePicker().pickImage(source: ImageSource.gallery);
-  // Using raw image for profile - may have wrong aspect ratio
-  updateProfilePhoto(image);
-  }
+  onTap:
+  () async {
+    final image = await ImagePicker().pickImage(source: ImageSource.gallery);
+    // Using raw image for profile - may have wrong aspect ratio
+    updateProfilePhoto(image);
+  };
 }
 
 // GOOD: Should NOT trigger prefer_image_cropping
 void _good824() async {
-  onTap: () async {
-  final image = await ImagePicker().pickImage(source: ImageSource.gallery);
-  if (image != null) {
-  // Crop to square for profile
-  final croppedFile = await ImageCropper().cropImage(
-  sourcePath: image.path,
-  aspectRatio: CropAspectRatio(ratioX: 1, ratioY: 1),
-  );
-  if (croppedFile != null) updateProfilePhoto(croppedFile);
-  }
-  }
+  onTap:
+  () async {
+    final image = await ImagePicker().pickImage(source: ImageSource.gallery);
+    if (image != null) {
+      // Crop to square for profile
+      final croppedFile = await ImageCropper().cropImage(
+        sourcePath: image.path,
+        aspectRatio: CropAspectRatio(ratioX: 1, ratioY: 1),
+      );
+      if (croppedFile != null) updateProfilePhoto(croppedFile);
+    }
+  };
 }

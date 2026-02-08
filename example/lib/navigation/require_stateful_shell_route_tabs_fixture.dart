@@ -112,15 +112,15 @@ dynamic child;
 // expect_lint: require_stateful_shell_route_tabs
 void _bad525() {
   ShellRoute(
-  builder: (_, __, child) => TabScaffold(child: child),
-  routes: [tab1Route, tab2Route],
+    builder: (_, __, child) => TabScaffold(child: child),
+    routes: [tab1Route, tab2Route],
   );
 }
 
 // GOOD: Should NOT trigger require_stateful_shell_route_tabs
 void _good525() {
   StatefulShellRoute.indexedStack(
-  builder: (_, __, navigationShell) => TabScaffold(shell: navigationShell),
-  branches: [branch1, branch2],
+    builder: (_, __, navigationShell) => TabScaffold(shell: navigationShell),
+    branches: [branch1, branch2],
   );
 }

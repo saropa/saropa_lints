@@ -116,6 +116,6 @@ void _bad74() async {
 // GOOD: Should NOT trigger require_notification_permission_android13
 void _good74() async {
   if (await Permission.notification.isGranted) {
-  await notificationsPlugin.show(0, 'Title', 'Body', details);
+    await notificationsPlugin.show(0, 'Title', 'Body', details);
   }
 }

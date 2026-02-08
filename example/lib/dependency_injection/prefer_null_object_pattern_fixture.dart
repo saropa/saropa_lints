@@ -110,20 +110,20 @@ dynamic event;
 // BAD: Should trigger prefer_null_object_pattern
 // expect_lint: prefer_null_object_pattern
 class _bad317_AnalyticsService {
-AnalyticsService({this.logger}); // Nullable
-final Logger? logger;
+  _bad317_AnalyticsService({this.logger}); // Nullable
+  final Logger? logger;
 
-void track(String event) {
-logger?.log(event); // Null checks everywhere
-}
+  void track(String event) {
+    logger?.log(event); // Null checks everywhere
+  }
 }
 
 // GOOD: Should NOT trigger prefer_null_object_pattern
 class _good317_AnalyticsService {
-AnalyticsService({Logger? logger}) : logger = logger ?? NoOpLogger();
-final Logger logger;
+  _good317_AnalyticsService({Logger? logger}) : logger = logger ?? NoOpLogger();
+  final Logger logger;
 
-void track(String event) {
-logger.log(event); // No null checks needed
-}
+  void track(String event) {
+    logger.log(event); // No null checks needed
+  }
 }

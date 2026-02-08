@@ -111,22 +111,22 @@ final key = 'key';
 // BAD: Should trigger require_cache_eviction_policy
 // expect_lint: require_cache_eviction_policy
 class _bad470_ImageCache {
-final Map<String, Uint8List> _cache = {}; // Grows forever
+  final Map<String, Uint8List> _cache = {}; // Grows forever
 
-void add(String key, Uint8List data) {
-_cache[key] = data;
-}
+  void add(String key, Uint8List data) {
+    _cache[key] = data;
+  }
 }
 
 // GOOD: Should NOT trigger require_cache_eviction_policy
 class _good470_ImageCache {
-final _cache = LinkedHashMap<String, Uint8List>();
-static const int _maxSize = 100;
+  final _cache = LinkedHashMap<String, Uint8List>();
+  static const int _maxSize = 100;
 
-void add(String key, Uint8List data) {
-if (_cache.length >= _maxSize) {
-_cache.remove(_cache.keys.first); // LRU eviction
-}
-_cache[key] = data;
-}
+  void add(String key, Uint8List data) {
+    if (_cache.length >= _maxSize) {
+      _cache.remove(_cache.keys.first); // LRU eviction
+    }
+    _cache[key] = data;
+  }
 }

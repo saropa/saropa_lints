@@ -118,7 +118,7 @@ void _bad838() async {
 // GOOD: Should NOT trigger require_ios_platform_check
 void _good838() async {
   if (Platform.isIOS) {
-  final channel = MethodChannel('com.example/ios_feature');
-  final result = await channel.invokeMethod('doThing');
+    final channel = MethodChannel('com.example/ios_feature');
+    final result = await channel.invokeMethod('doThing');
   }
 }

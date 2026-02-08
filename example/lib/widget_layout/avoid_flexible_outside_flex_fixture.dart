@@ -112,17 +112,17 @@ final children = <Widget>[];
 // expect_lint: avoid_flexible_outside_flex
 void _bad1282() {
   Stack(
-  children: [
-  Expanded(child: Text('Hello')),  // Expanded does nothing here
-  ],
+    children: [
+      Expanded(child: Text('Hello')), // Expanded does nothing here
+    ],
   );
 }
 
 // GOOD: Should NOT trigger avoid_flexible_outside_flex
 void _good1282() {
   Column(
-  children: [
-  Expanded(child: Text('Hello')),  // Correct usage
-  ],
+    children: [
+      Expanded(child: Text('Hello')), // Correct usage
+    ],
   );
 }

@@ -120,11 +120,15 @@ final controller = Get.put(MyController());
 
 // GOOD: Should NOT trigger require_getx_binding
 class _good650_MyBinding extends Bindings {
-@override
-void dependencies() {
-Get.lazyPut(() => MyController());
-}
+  @override
+  void dependencies() {
+    void _topLevel124() {
+      Get.lazyPut(() => MyController());
+    }
+  }
 }
 
 // In route:
-GetPage(name: '/my', page: () => MyPage(), binding: MyBinding());
+void _topLevel129() {
+  GetPage(name: '/my', page: () => MyPage(), binding: MyBinding());
+}

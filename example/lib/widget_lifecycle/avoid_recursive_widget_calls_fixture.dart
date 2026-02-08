@@ -110,10 +110,10 @@ final context = BuildContext();
 // BAD: Should trigger avoid_recursive_widget_calls
 // expect_lint: avoid_recursive_widget_calls
 class _bad1353_MyWidget extends StatelessWidget {
-@override
-Widget build(BuildContext context) {
-return MyWidget(); // Infinite recursion
-}
+  @override
+  Widget build(BuildContext context) {
+    return MyWidget(); // Infinite recursion
+  }
 }
 
 // GOOD: Should NOT trigger avoid_recursive_widget_calls

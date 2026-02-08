@@ -109,8 +109,8 @@ import '../flutter_mocks.dart';
 // expect_lint: move_variable_outside_iteration
 void _bad225() {
   for (int i = 0; i < 10; i++) {
-  final regex = RegExp(r'\d+');  // Created every iteration
-  print(regex.hasMatch('$i'));
+    final regex = RegExp(r'\d+'); // Created every iteration
+    print(regex.hasMatch('$i'));
   }
 }
 
@@ -118,6 +118,6 @@ void _bad225() {
 void _good225() {
   final regex = RegExp(r'\d+');
   for (int i = 0; i < 10; i++) {
-  print(regex.hasMatch('$i'));
+    print(regex.hasMatch('$i'));
   }
 }

@@ -113,20 +113,20 @@ final title = 'Title';
 // expect_lint: require_notification_channel_android
 void _bad532() {
   final notification = NotificationDetails(
-  android: AndroidNotificationDetails('title', 'body'),
+    android: AndroidNotificationDetails('title', 'body'),
   );
-  
+
   flutterLocalNotificationsPlugin.show(0, 'title', 'body', notification);
 }
 
 // GOOD: Should NOT trigger require_notification_channel_android
 void _good532() {
   final notification = NotificationDetails(
-  android: AndroidNotificationDetails(
-  'channel_id',  // Required for Android 8.0+
-  'Channel Name',
-  channelDescription: 'Channel description',
-  importance: Importance.high,
-  ),
+    android: AndroidNotificationDetails(
+      'channel_id', // Required for Android 8.0+
+      'Channel Name',
+      channelDescription: 'Channel description',
+      importance: Importance.high,
+    ),
   );
 }

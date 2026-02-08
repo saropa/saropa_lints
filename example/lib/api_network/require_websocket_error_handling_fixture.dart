@@ -113,15 +113,15 @@ dynamic stream;
 // expect_lint: require_websocket_error_handling
 void _bad59() {
   socket.stream.listen((data) {
-  processData(data);
+    processData(data);
   });
 }
 
 // GOOD: Should NOT trigger require_websocket_error_handling
 void _good59() {
   socket.stream.listen(
-  (data) => processData(data),
-  onError: (error) => handleError(error),
-  onDone: () => handleDisconnect(),
+    (data) => processData(data),
+    onError: (error) => handleError(error),
+    onDone: () => handleDisconnect(),
   );
 }

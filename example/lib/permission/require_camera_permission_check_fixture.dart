@@ -111,28 +111,28 @@ dynamic status;
 // expect_lint: require_camera_permission_check
 void _bad823() {
   late CameraController _controller;
-  
+
   void initState() {
-  // super.initState();
-  _controller = CameraController(camera, ResolutionPreset.high);
-  _controller.initialize(); // Crashes without permission!
+    // super.initState();
+    _controller = CameraController(camera, ResolutionPreset.high);
+    _controller.initialize(); // Crashes without permission!
   }
 }
 
 // GOOD: Should NOT trigger require_camera_permission_check
 void _good823() async {
   late CameraController _controller;
-  
+
   void initState() {
-  // super.initState();
-  _initCamera();
+    // super.initState();
+    _initCamera();
   }
-  
+
   Future<void> _initCamera() async {
-  final status = await Permission.camera.request();
-  if (status.isGranted) {
-  _controller = CameraController(camera, ResolutionPreset.high);
-  await _controller.initialize();
-  }
+    final status = await Permission.camera.request();
+    if (status.isGranted) {
+      _controller = CameraController(camera, ResolutionPreset.high);
+      await _controller.initialize();
+    }
   }
 }

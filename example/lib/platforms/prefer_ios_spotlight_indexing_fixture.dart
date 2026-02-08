@@ -119,12 +119,12 @@ class _BadClass915 {}
 void _good915() async {
   // Index content for Spotlight
   final item = CSSearchableItem(
-  uniqueIdentifier: 'document-\${doc.id}',
-  domainIdentifier: 'com.example.documents',
-  attributeSet: CSSearchableItemAttributeSet(
-  title: doc.title,
-  contentDescription: doc.summary,
-  ),
+    uniqueIdentifier: 'document-\${doc.id}',
+    domainIdentifier: 'com.example.documents',
+    attributeSet: CSSearchableItemAttributeSet(
+      title: doc.title,
+      contentDescription: doc.summary,
+    ),
   );
   await CSSearchableIndex.defaultSearchableIndex().indexSearchableItems([item]);
 }

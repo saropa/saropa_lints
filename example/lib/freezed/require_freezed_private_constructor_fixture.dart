@@ -111,13 +111,13 @@ final name = 'example';
 // expect_lint: require_freezed_private_constructor
 @freezed
 class _bad414_User with _$User {
-factory User({String? name}) = _User;
-// Missing: const User._();
+  factory _bad414_User({String? name}) = _User;
+// Missing: const _bad414_User._();
 }
 
 // GOOD: Should NOT trigger require_freezed_private_constructor
 @freezed
 class _good414_User with _$User {
-const User._();  // Required for custom methods
-factory User({String? name}) = _User;
+  const _good414_User._(); // Required for custom methods
+  factory _good414_User({String? name}) = _User;
 }

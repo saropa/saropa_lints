@@ -112,7 +112,7 @@ dynamic widget;
 void _bad1245() {
   final str = 'hello';
   final num = str as int; // String and int are unrelated!
-  
+
   final widget = myButton as TextField; // Always fails if unrelated
 }
 
@@ -120,10 +120,10 @@ void _bad1245() {
 void _good1245() {
   final obj = getValue();
   if (obj is int) {
-  // Use obj safely as int
+    // Use obj safely as int
   }
   // Or check relationship first
   if (widget is TextField) {
-  // Use widget as TextField
+    // Use widget as TextField
   }
 }

@@ -108,23 +108,27 @@ import '../flutter_mocks.dart';
 // BAD: Should trigger require_currency_code_with_amount
 // expect_lint: require_currency_code_with_amount
 class _bad477_Price {
-final double amount; // USD? EUR? BTC?
+  final double amount; // USD? EUR? BTC?
 
-Price(this.amount);
+  void _topLevel112() {
+    _bad477_Price(this.amount);
+  }
 }
 
 class Order {
-final double total; // What currency?
+  final double total; // What currency?
 }
 
 // GOOD: Should NOT trigger require_currency_code_with_amount
 class _good477_Price {
-final double amount;
-final String currency; // 'USD', 'EUR', etc.
+  final double amount;
+  final String currency; // 'USD', 'EUR', etc.
 
-Price(this.amount, this.currency);
+  void _topLevel124() {
+    _good477_Price(this.amount, this.currency);
+  }
 }
 
 class Order {
-final Money total; // Money class includes currency
+  final Money total; // Money class includes currency
 }

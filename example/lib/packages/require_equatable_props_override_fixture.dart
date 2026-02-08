@@ -110,13 +110,13 @@ final name = 'example';
 // BAD: Should trigger require_equatable_props_override
 // expect_lint: require_equatable_props_override
 class _bad606_User extends Equatable {
-final String name;
+  final String name;
 // Missing props!
 }
 
 // GOOD: Should NOT trigger require_equatable_props_override
 class _good606_User extends Equatable {
-final String name;
-@override
-List<Object?> get props => [name];
+  final String name;
+  @override
+  List<Object?> get props => [name];
 }

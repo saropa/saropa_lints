@@ -114,18 +114,18 @@ dynamic state;
 // expect_lint: require_bloc_selector
 void _bad575() {
   BlocBuilder<MyBloc, MyState>(
-  builder: (context, state) {
-  return Text(state.name);  // Only uses one field
-  },
+    builder: (context, state) {
+      return Text(state.name); // Only uses one field
+    },
   );
 }
 
 // GOOD: Should NOT trigger require_bloc_selector
 void _good575() {
   BlocSelector<MyBloc, MyState, String>(
-  selector: (state) => state.name,
-  builder: (context, name) {
-  return Text(name);
-  },
+    selector: (state) => state.name,
+    builder: (context, name) {
+      return Text(name);
+    },
   );
 }

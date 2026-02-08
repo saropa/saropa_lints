@@ -112,7 +112,7 @@ dynamic status;
 void _bad904() {
   // Client-side only verification
   if (purchaseDetails.status == PurchaseStatus.purchased) {
-  unlockPremium(); // Easily bypassed!
+    unlockPremium(); // Easily bypassed!
   }
 }
 
@@ -120,11 +120,11 @@ void _bad904() {
 void _good904() async {
   // Server-side verification
   if (purchaseDetails.status == PurchaseStatus.purchased) {
-  final verified = await verifyPurchaseOnServer(
-  purchaseDetails.verificationData.serverVerificationData,
-  );
-  if (verified) {
-  unlockPremium();
-  }
+    final verified = await verifyPurchaseOnServer(
+      purchaseDetails.verificationData.serverVerificationData,
+    );
+    if (verified) {
+      unlockPremium();
+    }
   }
 }

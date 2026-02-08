@@ -110,25 +110,25 @@ dynamic state;
 // BAD: Should trigger avoid_work_in_paused_state
 // expect_lint: avoid_work_in_paused_state
 class _bad460__MyState extends State<MyWidget> {
-Timer? _timer;
+  Timer? _timer;
 
-@override
-void initState() {
-super.initState();
-_timer = Timer.periodic(Duration(seconds: 1), (_) => refresh());
-}
+  @override
+  void initState() {
+    super.initState();
+    _timer = Timer.periodic(Duration(seconds: 1), (_) => refresh());
+  }
 }
 
 // GOOD: Should NOT trigger avoid_work_in_paused_state
 class _good460__MyState extends State<MyWidget> with WidgetsBindingObserver {
-Timer? _timer;
+  Timer? _timer;
 
-@override
-void didChangeAppLifecycleState(AppLifecycleState state) {
-if (state == AppLifecycleState.paused) {
-_timer?.cancel();
-} else if (state == AppLifecycleState.resumed) {
-_startTimer();
-}
-}
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.paused) {
+      _timer?.cancel();
+    } else if (state == AppLifecycleState.resumed) {
+      _startTimer();
+    }
+  }
 }

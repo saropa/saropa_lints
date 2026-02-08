@@ -111,25 +111,25 @@ final context = BuildContext();
 // BAD: Should trigger prefer_keyboard_shortcuts
 // expect_lint: prefer_keyboard_shortcuts
 class _bad1442_MyDesktopApp extends StatelessWidget {
-Widget build(context) {
-return MaterialApp(
-home: MyHomePage(), // No keyboard shortcuts
-);
-}
+  Widget build(context) {
+    return MaterialApp(
+      home: MyHomePage(), // No keyboard shortcuts
+    );
+  }
 }
 
 // GOOD: Should NOT trigger prefer_keyboard_shortcuts
 class _good1442_MyDesktopApp extends StatelessWidget {
-Widget build(context) {
-return Shortcuts(
-shortcuts: {
-LogicalKeySet(LogicalKeyboardKey.control, LogicalKeyboardKey.keyS):
-SaveIntent(),
-},
-child: Actions(
-actions: {SaveIntent: SaveAction()},
-child: MaterialApp(home: MyHomePage()),
-),
-);
-}
+  Widget build(context) {
+    return Shortcuts(
+      shortcuts: {
+        LogicalKeySet(LogicalKeyboardKey.control, LogicalKeyboardKey.keyS):
+            SaveIntent(),
+      },
+      child: Actions(
+        actions: {SaveIntent: SaveAction()},
+        child: MaterialApp(home: MyHomePage()),
+      ),
+    );
+  }
 }

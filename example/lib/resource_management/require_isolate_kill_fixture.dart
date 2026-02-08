@@ -110,24 +110,24 @@ dynamic data;
 // BAD: Should trigger require_isolate_kill
 // expect_lint: require_isolate_kill
 class _bad971_Processor {
-late Isolate _isolate;
+  late Isolate _isolate;
 
-Future<void> start() async {
-_isolate = await Isolate.spawn(processData, data);
-}
+  Future<void> start() async {
+    _isolate = await Isolate.spawn(processData, data);
+  }
 // Isolate never killed
 }
 
 // GOOD: Should NOT trigger require_isolate_kill
 class _good971_Processor {
-Isolate? _isolate;
+  Isolate? _isolate;
 
-Future<void> start() async {
-_isolate = await Isolate.spawn(processData, data);
-}
+  Future<void> start() async {
+    _isolate = await Isolate.spawn(processData, data);
+  }
 
-void dispose() {
-_isolate?.kill();
-_isolate = null;
-}
+  void dispose() {
+    _isolate?.kill();
+    _isolate = null;
+  }
 }

@@ -115,21 +115,21 @@ final users = <dynamic>[];
 // expect_lint: prefer_result_pattern
 void _bad356() async {
   Future<User> getUser(String id) async {
-  final response = await api.get('/users/$id');
-  if (response.statusCode != 200) {
-  throw UserNotFoundException(id);
-  }
-  return User.fromJson(response.body);
+    final response = await api.get('/users/$id');
+    if (response.statusCode != 200) {
+      throw UserNotFoundException(id);
+    }
+    return User.fromJson(response.body);
   }
 }
 
 // GOOD: Should NOT trigger prefer_result_pattern
 void _good356() async {
   Future<Result<User, UserError>> getUser(String id) async {
-  final response = await api.get('/users/$id');
-  if (response.statusCode != 200) {
-  return Failure(UserError.notFound(id));
-  }
-  return Success(User.fromJson(response.body));
+    final response = await api.get('/users/$id');
+    if (response.statusCode != 200) {
+      return Failure(UserError.notFound(id));
+    }
+    return Success(User.fromJson(response.body));
   }
 }

@@ -111,13 +111,13 @@ final text = 'text';
 // expect_lint: require_search_debounce
 void _bad1264() {
   TextField(
-  onChanged: (text) => searchApi(text),
+    onChanged: (text) => searchApi(text),
   );
 }
 
 // GOOD: Should NOT trigger require_search_debounce
 void _good1264() {
   TextField(
-  onChanged: (text) => _debouncer.run(() => searchApi(text)),
+    onChanged: (text) => _debouncer.run(() => searchApi(text)),
   );
 }

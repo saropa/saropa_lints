@@ -113,23 +113,23 @@ final url = 'https://example.com';
 // expect_lint: require_http_client_close
 void _bad967() async {
   Future<String> fetch(String url) async {
-  final client = HttpClient();
-  final request = await client.getUrl(Uri.parse(url));
-  final response = await request.close();
-  // client never closed
+    final client = HttpClient();
+    final request = await client.getUrl(Uri.parse(url));
+    final response = await request.close();
+    // client never closed
   }
 }
 
 // GOOD: Should NOT trigger require_http_client_close
 void _good967() async {
   Future<String> fetch(String url) async {
-  final client = HttpClient();
-  try {
-  final request = await client.getUrl(Uri.parse(url));
-  final response = await request.close();
-  return await response.transform(utf8.decoder).join();
-  } finally {
-  client.close();
-  }
+    final client = HttpClient();
+    try {
+      final request = await client.getUrl(Uri.parse(url));
+      final response = await request.close();
+      return await response.transform(utf8.decoder).join();
+    } finally {
+      client.close();
+    }
   }
 }

@@ -115,20 +115,20 @@ final users = <dynamic>[];
 // expect_lint: require_retry_logic
 void _bad46() async {
   Future<User> fetchUser(String id) async {
-  final response = await http.get(Uri.parse('$baseUrl/users/$id'));
-  return User.fromJson(jsonDecode(response.body));
+    final response = await http.get(Uri.parse('$baseUrl/users/$id'));
+    return User.fromJson(jsonDecode(response.body));
   }
 }
 
 // GOOD: Should NOT trigger require_retry_logic
 void _good46() async {
   Future<User> fetchUser(String id) async {
-  return retry(
-  () async {
-  final response = await http.get(Uri.parse('$baseUrl/users/$id'));
-  return User.fromJson(jsonDecode(response.body));
-  },
-  retryIf: (e) => e is SocketException || e is TimeoutException,
-  );
+    return retry(
+      () async {
+        final response = await http.get(Uri.parse('$baseUrl/users/$id'));
+        return User.fromJson(jsonDecode(response.body));
+      },
+      retryIf: (e) => e is SocketException || e is TimeoutException,
+    );
   }
 }

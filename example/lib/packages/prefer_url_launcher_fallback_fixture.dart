@@ -112,19 +112,22 @@ final uri = Uri.parse('https://example.com');
 // BAD: Should trigger prefer_url_launcher_fallback
 // expect_lint: prefer_url_launcher_fallback
 void _bad775() {
-  onTap: () => launchUrl(Uri.parse('mailto:support@example.com'));
+  onTap:
+  () => launchUrl(Uri.parse('mailto:support@example.com'));
 }
 
 // GOOD: Should NOT trigger prefer_url_launcher_fallback
 void _good775() async {
-  onTap: () async {
-  final uri = Uri.parse('mailto:support@example.com');
-  if (await canLaunchUrl(uri)) {
-  await launchUrl(uri);
-  } else {
-  // Fallback: copy email to clipboard
-  await Clipboard.setData(ClipboardData(text: 'support@example.com'));
-  showSnackBar('Email copied to clipboard');
-  }
-  }
+  onTap:
+  () async {
+    final uri = Uri.parse('mailto:support@example.com');
+    if (await canLaunchUrl(uri)) {
+      await launchUrl(uri);
+    } else {
+      // Fallback: copy email to clipboard
+      await Clipboard.setData(ClipboardData(text: 'support@example.com'));
+      showSnackBar('Email copied to clipboard');
+    }
+    ;
+  };
 }

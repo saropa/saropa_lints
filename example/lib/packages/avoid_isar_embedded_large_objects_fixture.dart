@@ -112,12 +112,12 @@ dynamic data;
 // expect_lint: avoid_isar_embedded_large_objects
 @collection
 class _bad685_Order {
-@embedded
-LargeProduct? product;  // Duplicates product data in every order!
+  @embedded
+  LargeProduct? product; // Duplicates product data in every order!
 }
 
 // GOOD: Should NOT trigger avoid_isar_embedded_large_objects
 @collection
 class _good685_Order {
-final product = IsarLink<Product>();  // Links to shared product
+  final product = IsarLink<Product>(); // Links to shared product
 }

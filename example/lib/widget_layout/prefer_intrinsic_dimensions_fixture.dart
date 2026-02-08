@@ -112,19 +112,19 @@ final children = <Widget>[];
 // expect_lint: prefer_intrinsic_dimensions
 void _bad1316() {
   Row(
-  children: [
-  Expanded(child: TextField()),
-  ElevatedButton(child: Text('Submit')),
-  ],
+    children: [
+      Expanded(child: TextField()),
+      ElevatedButton(child: Text('Submit')),
+    ],
   );
 }
 
 // GOOD: Should NOT trigger prefer_intrinsic_dimensions
 void _good1316() {
   IntrinsicWidth(
-  child: Column(
-  crossAxisAlignment: CrossAxisAlignment.stretch,
-  children: [],
-  ),
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [],
+    ),
   );
 }

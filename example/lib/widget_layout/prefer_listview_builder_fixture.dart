@@ -109,15 +109,16 @@ import '../flutter_mocks.dart';
 // expect_lint: prefer_listview_builder
 void _bad1304() {
   MaterialApp(
-  home: MaterialApp(  // Multiple MaterialApp!
-  home: MyHomePage(),
-  ),
+    home: MaterialApp(
+      // Multiple MaterialApp!
+      home: MyHomePage(),
+    ),
   );
 }
 
 // GOOD: Should NOT trigger prefer_listview_builder
 void _good1304() {
   MaterialApp(
-  home: MyHomePage(),
+    home: MyHomePage(),
   );
 }

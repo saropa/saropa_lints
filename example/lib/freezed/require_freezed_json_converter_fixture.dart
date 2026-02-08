@@ -109,16 +109,16 @@ import '../flutter_mocks.dart';
 // expect_lint: require_freezed_json_converter
 @freezed
 class _bad415_User with _$User {
-factory User({
-required DateTime createdAt,  // Needs converter!
-}) = _User;
+  factory User({
+    required DateTime createdAt, // Needs converter!
+  }) = _User;
 }
 
 // GOOD: Should NOT trigger require_freezed_json_converter
 @freezed
 class _good415_User with _$User {
-@JsonSerializable(converters: [DateTimeConverter()])
-factory User({
-required DateTime createdAt,
-}) = _User;
+  @JsonSerializable(converters: [DateTimeConverter()])
+  factory User({
+    required DateTime createdAt,
+  }) = _User;
 }

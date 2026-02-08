@@ -112,17 +112,18 @@ dynamic x;
 // expect_lint: no_equal_conditions
 void _bad292() {
   if (x > 5) {
-  doA();
-  } else if (x > 5) {  // Same condition!
-  doB();
+    doA();
+  } else if (x > 5) {
+    // Same condition!
+    doB();
   }
 }
 
 // GOOD: Should NOT trigger no_equal_conditions
 void _good292() {
   if (x > 5) {
-  doA();
+    doA();
   } else if (x > 10) {
-  doB();
+    doB();
   }
 }

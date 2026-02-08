@@ -111,12 +111,19 @@ final users = <dynamic>[];
 // BAD: Should trigger avoid_circular_dependencies
 // expect_lint: avoid_circular_dependencies
 // user_service.dart
-class _bad78_UserService { OrderService orders; }
+class _bad78_UserService {
+  OrderService orders;
+}
 
 // order_service.dart
-class _bad78_OrderService { UserService users; }
+class _bad78_OrderService {
+  UserService users;
+}
 
 // GOOD: Should NOT trigger avoid_circular_dependencies
 // Break cycle with interfaces or event bus
 abstract class _good78_IUserService {}
-class _good78_OrderService { IUserService users; }
+
+class _good78_OrderService {
+  IUserService users;
+}

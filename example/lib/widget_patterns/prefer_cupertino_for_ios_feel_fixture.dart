@@ -114,11 +114,11 @@ final title = 'Title';
 void _bad1440() {
   // Using Material AlertDialog on iOS
   showDialog(
-  context: context,
-  builder: (context) => AlertDialog(
-  title: Text('Confirm'),
-  actions: [],
-  ),
+    context: context,
+    builder: (context) => AlertDialog(
+      title: Text('Confirm'),
+      actions: [],
+    ),
   );
 }
 
@@ -126,10 +126,10 @@ void _bad1440() {
 void _good1440() {
   // Platform-adaptive approach
   showDialog(
-  context: context,
-  builder: (context) => Platform.isIOS
-  ? CupertinoAlertDialog(title: Text('Confirm'), actions: [])
-  : AlertDialog(title: Text('Confirm'), actions: []),
+    context: context,
+    builder: (context) => Platform.isIOS
+        ? CupertinoAlertDialog(title: Text('Confirm'), actions: [])
+        : AlertDialog(title: Text('Confirm'), actions: []),
   );
   // Or use adaptive widgets
   showAdaptiveDialog();

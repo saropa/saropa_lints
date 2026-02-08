@@ -113,16 +113,16 @@ dynamic map;
 // BAD: Should trigger avoid_expensive_computation_in_build
 // expect_lint: avoid_expensive_computation_in_build
 Widget _bad796_build(BuildContext context) {
-final sorted = items.toList()..sort(); // Sorts every rebuild!
-return ListView(children: sorted.map((e) => Text(e)).toList());
+  final sorted = items.toList()..sort(); // Sorts every rebuild!
+  return ListView(children: sorted.map((e) => Text(e)).toList());
 }
 
 // GOOD: Should NOT trigger avoid_expensive_computation_in_build
 void _good796() {
   List<String>? _sortedItems;
-  
+
   Widget build(BuildContext context) {
-  _sortedItems ??= items.toList()..sort();
-  return ListView(children: _sortedItems!.map((e) => Text(e)).toList());
+    _sortedItems ??= items.toList()..sort();
+    return ListView(children: _sortedItems!.map((e) => Text(e)).toList());
   }
 }

@@ -115,7 +115,7 @@ final userId = '123';
 // expect_lint: prefer_go_router_extra_typed
 void _bad520() {
   context.go('/profile', extra: {'userId': 123, 'name': 'John'});
-  
+
   // In route builder:
   final extra = state.extra as Map<String, dynamic>; // Unsafe cast
   final userId = extra['userId'] as int; // Another unsafe cast
@@ -123,12 +123,14 @@ void _bad520() {
 
 // GOOD: Should NOT trigger prefer_go_router_extra_typed
 class _good520_ProfileParams {
-final int userId;
-final String name;
-ProfileParams({required this.userId, required this.name});
+  final int userId;
+  final String name;
+  _good520_ProfileParams({required this.userId, required this.name});
 }
 
-context.go('/profile', extra: ProfileParams(userId: 123, name: 'John'));
+void _good520_usage() {
+  context.go('/profile', extra: ProfileParams(userId: 123, name: 'John'));
 
-// In route builder:
-final params = state.extra as ProfileParams; // Single typed cast
+  // In route builder:
+  final params = state.extra as ProfileParams; // Single typed cast
+}

@@ -116,22 +116,22 @@ dynamic service;
 // expect_lint: avoid_test_implementation_details
 void _bad1177() async {
   test('loads data', () async {
-  await service.loadData();
-  
-  // Testing implementation details:
-  verify(mockCache.get('key')).called(1);
-  verify(mockApi.fetch()).called(1);
-  verify(mockCache.set('key', any)).called(1);
+    await service.loadData();
+
+    // Testing implementation details:
+    verify(mockCache.get('key')).called(1);
+    verify(mockApi.fetch()).called(1);
+    verify(mockCache.set('key', any)).called(1);
   });
 }
 
 // GOOD: Should NOT trigger avoid_test_implementation_details
 void _good1177() async {
   test('loads data', () async {
-  final result = await service.loadData();
-  
-  // Testing observable behavior:
-  expect(result.items, hasLength(3));
-  expect(result.isLoaded, isTrue);
+    final result = await service.loadData();
+
+    // Testing observable behavior:
+    expect(result.items, hasLength(3));
+    expect(result.isLoaded, isTrue);
   });
 }

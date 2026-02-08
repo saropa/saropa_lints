@@ -112,14 +112,14 @@ dynamic user;
 // BAD: Should trigger require_hero_tag_uniqueness
 // expect_lint: require_hero_tag_uniqueness
 void _bad32() {
-  Hero(tag: 'profile', child: avatar1),
-  Hero(tag: 'profile', child: avatar2), // Same tag!
+  Hero(tag: 'profile', child: avatar1);
+  Hero(tag: 'profile', child: avatar2); // Same tag!
 }
 
 // GOOD: Should NOT trigger require_hero_tag_uniqueness
 void _good32() {
-  Hero(tag: 'profile-1', child: avatar1),
-  Hero(tag: 'profile-2', child: avatar2),
+  Hero(tag: 'profile-1', child: avatar1);
+  Hero(tag: 'profile-2', child: avatar2);
   // Or use unique identifiers:
-  Hero(tag: 'profile-${user.id}', child: avatar),
+  Hero(tag: 'profile-${user.id}', child: avatar);
 }

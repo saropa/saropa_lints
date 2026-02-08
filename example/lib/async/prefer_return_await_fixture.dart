@@ -109,17 +109,18 @@ import '../flutter_mocks.dart';
 // expect_lint: prefer_return_await
 void _bad99() async {
   Future<int> getValue() async {
-  return fetchData();  // Missing await
+    return fetchData(); // Missing await
   }
 }
 
 // GOOD: Should NOT trigger prefer_return_await
 void _good99() async {
   Future<int> getValue() async {
-  return await fetchData();
+    return await fetchData();
   }
+
   // Or if not async:
   Future<int> getValue() {
-  return fetchData();
+    return fetchData();
   }
 }

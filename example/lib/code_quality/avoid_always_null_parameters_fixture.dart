@@ -109,9 +109,13 @@ final name = 'example';
 
 // BAD: Should trigger avoid_always_null_parameters
 // expect_lint: avoid_always_null_parameters
-void _bad171_foo({String? name}) { }
-foo(name: null);  // Explicitly passing null
+void _bad171_foo({String? name}) {}
+void _topLevel112() {
+  foo(name: null); // Explicitly passing null
+}
 
 // GOOD: Should NOT trigger avoid_always_null_parameters
-void _good171_foo({String? name}) { }
-foo();  // Omit the parameter instead of passing null
+void _good171_foo({String? name}) {}
+void _topLevel116() {
+  foo(); // Omit the parameter instead of passing null
+}

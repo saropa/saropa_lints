@@ -112,15 +112,15 @@ final items = <dynamic>[];
 // expect_lint: avoid_regex_in_loop
 void _bad1379() {
   for (final item in items) {
-  final regex = RegExp(r'\d+');  // Created every iteration
-  if (regex.hasMatch(item)) { }
+    final regex = RegExp(r'\d+'); // Created every iteration
+    if (regex.hasMatch(item)) {}
   }
 }
 
 // GOOD: Should NOT trigger avoid_regex_in_loop
 void _good1379() {
-  final regex = RegExp(r'\d+');  // Created once
+  final regex = RegExp(r'\d+'); // Created once
   for (final item in items) {
-  if (regex.hasMatch(item)) { }
+    if (regex.hasMatch(item)) {}
   }
 }

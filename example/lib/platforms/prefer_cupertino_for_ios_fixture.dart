@@ -113,19 +113,19 @@ final title = 'Title';
 // expect_lint: prefer_cupertino_for_ios
 void _bad842() {
   if (Platform.isIOS) {
-  return AlertDialog(
-  title: Text('Confirm'),
-  content: Text('Delete this item?'),
-  );
+    return AlertDialog(
+      title: Text('Confirm'),
+      content: Text('Delete this item?'),
+    );
   }
 }
 
 // GOOD: Should NOT trigger prefer_cupertino_for_ios
 void _good842() {
   if (Platform.isIOS) {
-  return CupertinoAlertDialog(
-  title: Text('Confirm'),
-  content: Text('Delete this item?'),
-  );
+    return CupertinoAlertDialog(
+      title: Text('Confirm'),
+      content: Text('Delete this item?'),
+    );
   }
 }

@@ -112,16 +112,16 @@ var count = 0;
 // BAD: Should trigger avoid_getx_rx_inside_build
 // expect_lint: avoid_getx_rx_inside_build
 Widget _bad646_build(BuildContext context) {
-final count = 0.obs; // Creates new Rx every rebuild!
-return Obx(() => Text('$count'));
+  final count = 0.obs; // Creates new Rx every rebuild!
+  return Obx(() => Text('$count'));
 }
 
 // GOOD: Should NOT trigger avoid_getx_rx_inside_build
 class _good646_MyController extends GetxController {
-final count = 0.obs;
+  final count = 0.obs;
 }
 
 @override
 Widget build(BuildContext context) {
-return Obx(() => Text('${controller.count}'));
+  return Obx(() => Text('${controller.count}'));
 }

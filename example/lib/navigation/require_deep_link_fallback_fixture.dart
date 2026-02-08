@@ -112,21 +112,21 @@ final uri = Uri.parse('https://example.com');
 // BAD: Should trigger require_deep_link_fallback
 // expect_lint: require_deep_link_fallback
 void _bad509_handleDeepLink(Uri uri) {
-final productId = uri.pathSegments[1];
-Navigator.push(context, ProductPage(id: productId));
+  final productId = uri.pathSegments[1];
+  Navigator.push(context, ProductPage(id: productId));
 }
 
 // GOOD: Should NOT trigger require_deep_link_fallback
 void _good509_handleDeepLink(Uri uri) async {
-final productId = uri.pathSegments.length > 1 ? uri.pathSegments[1] : null;
-if (productId == null) {
-Navigator.pushReplacement(context, NotFoundPage());
-return;
-}
-final product = await productService.getProduct(productId);
-if (product == null) {
-Navigator.pushReplacement(context, NotFoundPage());
-return;
-}
-Navigator.push(context, ProductPage(product: product));
+  final productId = uri.pathSegments.length > 1 ? uri.pathSegments[1] : null;
+  if (productId == null) {
+    Navigator.pushReplacement(context, NotFoundPage());
+    return;
+  }
+  final product = await productService.getProduct(productId);
+  if (product == null) {
+    Navigator.pushReplacement(context, NotFoundPage());
+    return;
+  }
+  Navigator.push(context, ProductPage(product: product));
 }

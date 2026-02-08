@@ -115,16 +115,16 @@ final items = <dynamic>[];
 // expect_lint: require_scroll_controller
 void _bad1322() {
   ListView.builder(
-  itemBuilder: (context, index) => ListTile(),
-  itemCount: items.length,
+    itemBuilder: (context, index) => ListTile(),
+    itemCount: items.length,
   );
 }
 
 // GOOD: Should NOT trigger require_scroll_controller
 void _good1322() {
   ListView.builder(
-  controller: _scrollController,
-  itemBuilder: (context, index) => ListTile(),
-  itemCount: items.length,
+    controller: _scrollController,
+    itemBuilder: (context, index) => ListTile(),
+    itemCount: items.length,
   );
 }

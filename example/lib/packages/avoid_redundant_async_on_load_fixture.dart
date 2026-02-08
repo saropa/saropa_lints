@@ -110,19 +110,19 @@ import '../flutter_mocks.dart';
 void _bad630() async {
   @override
   Future<void> onLoad() async {
-  // No await statements
-  add(SpriteComponent());
+    // No await statements
+    add(SpriteComponent());
   }
 }
 
 // GOOD: Should NOT trigger avoid_redundant_async_on_load
 void _good630_onLoad() async {
-add(SpriteComponent());
+  add(SpriteComponent());
 }
 
 // Or if actually async:
 @override
 Future<void> onLoad() async {
-final sprite = await loadSprite('player.png');
-add(SpriteComponent(sprite: sprite));
+  final sprite = await loadSprite('player.png');
+  add(SpriteComponent(sprite: sprite));
 }

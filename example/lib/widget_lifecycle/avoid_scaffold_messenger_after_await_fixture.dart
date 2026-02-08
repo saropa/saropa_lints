@@ -112,14 +112,14 @@ dynamic value;
 // expect_lint: avoid_scaffold_messenger_after_await
 void _bad1349() {
   TextField(
-  onChanged: (value) { },
+    onChanged: (value) {},
   );
 }
 
 // GOOD: Should NOT trigger avoid_scaffold_messenger_after_await
 void _good1349() {
   TextField(
-  controller: _textController,
-  onChanged: (value) { },
+    controller: _textController,
+    onChanged: (value) {},
   );
 }

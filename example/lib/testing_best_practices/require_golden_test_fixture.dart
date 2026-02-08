@@ -109,19 +109,19 @@ import '../flutter_mocks.dart';
 // expect_lint: require_golden_test
 void _bad1207() async {
   testWidgets('shows custom button', (tester) async {
-  await tester.pumpWidget(MaterialApp(home: CustomButton()));
-  expect(find.byType(CustomButton), findsOneWidget);
-  // No visual verification!
+    await tester.pumpWidget(MaterialApp(home: CustomButton()));
+    expect(find.byType(CustomButton), findsOneWidget);
+    // No visual verification!
   });
 }
 
 // GOOD: Should NOT trigger require_golden_test
 void _good1207() async {
   testWidgets('shows custom button', (tester) async {
-  await tester.pumpWidget(MaterialApp(home: CustomButton()));
-  await expectLater(
-  find.byType(CustomButton),
-  matchesGoldenFile('goldens/custom_button.png'),
-  );
+    await tester.pumpWidget(MaterialApp(home: CustomButton()));
+    await expectLater(
+      find.byType(CustomButton),
+      matchesGoldenFile('goldens/custom_button.png'),
+    );
   });
 }

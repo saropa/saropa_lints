@@ -108,20 +108,24 @@ import '../flutter_mocks.dart';
 // BAD: Should trigger avoid_too_many_dependencies
 // expect_lint: avoid_too_many_dependencies
 class _bad312_OrderService {
-OrderService(
-this.userRepo,
-this.productRepo,
-this.paymentService,
-this.shippingService,
-this.notificationService,
-this.analyticsService,
-this.cacheService,
-);
+  void _topLevel110() {
+    _bad312_OrderService(
+      this.userRepo,
+      this.productRepo,
+      this.paymentService,
+      this.shippingService,
+      this.notificationService,
+      this.analyticsService,
+      this.cacheService,
+    );
+  }
 }
 
 // GOOD: Should NOT trigger avoid_too_many_dependencies
 class _good312_OrderService {
-OrderService(this.orderProcessor, this.orderNotifier);
-final OrderProcessor orderProcessor;
-final OrderNotifier orderNotifier;
+  void _topLevel123() {
+    _good312_OrderService(this.orderProcessor, this.orderNotifier);
+    final OrderProcessor orderProcessor;
+    final OrderNotifier orderNotifier;
+  }
 }

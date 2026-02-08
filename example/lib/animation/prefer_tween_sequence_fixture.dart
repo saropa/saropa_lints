@@ -109,17 +109,17 @@ import '../flutter_mocks.dart';
 // expect_lint: prefer_tween_sequence
 void _bad38() {
   _controller1.forward().then((_) {
-  _controller2.forward().then((_) {
-  _controller3.forward();
-  });
+    _controller2.forward().then((_) {
+      _controller3.forward();
+    });
   });
 }
 
 // GOOD: Should NOT trigger prefer_tween_sequence
 void _good38() {
   TweenSequence([
-  TweenSequenceItem(tween: Tween(begin: 0.0, end: 1.0), weight: 1),
-  TweenSequenceItem(tween: Tween(begin: 1.0, end: 0.5), weight: 1),
-  TweenSequenceItem(tween: Tween(begin: 0.5, end: 1.0), weight: 1),
+    TweenSequenceItem(tween: Tween(begin: 0.0, end: 1.0), weight: 1),
+    TweenSequenceItem(tween: Tween(begin: 1.0, end: 0.5), weight: 1),
+    TweenSequenceItem(tween: Tween(begin: 0.5, end: 1.0), weight: 1),
   ]).animate(_controller);
 }

@@ -117,21 +117,21 @@ final userId = '123';
 // expect_lint: prefer_typed_route_params
 void _bad511() {
   GoRoute(
-  path: '/user/:id',
-  builder: (context, state) {
-  final id = state.pathParameters['id']!;  // String!
-  return UserPage(userId: id);  // Expects int?
-  },
+    path: '/user/:id',
+    builder: (context, state) {
+      final id = state.pathParameters['id']!; // String!
+      return UserPage(userId: id); // Expects int?
+    },
   );
 }
 
 // GOOD: Should NOT trigger prefer_typed_route_params
 void _good511() {
   GoRoute(
-  path: '/user/:id',
-  builder: (context, state) {
-  final id = int.tryParse(state.pathParameters['id'] ?? '') ?? 0;
-  return UserPage(userId: id);
-  },
+    path: '/user/:id',
+    builder: (context, state) {
+      final id = int.tryParse(state.pathParameters['id'] ?? '') ?? 0;
+      return UserPage(userId: id);
+    },
   );
 }

@@ -112,18 +112,19 @@ dynamic state;
 // expect_lint: prefer_cubit_for_simple_state
 // Events
 abstract class _bad582_CounterEvent {}
+
 class _bad582_IncrementEvent extends CounterEvent {}
 
 // Bloc with only one event type
 class _bad582_CounterBloc extends Bloc<CounterEvent, int> {
-CounterBloc() : super(0) {
-on<IncrementEvent>((event, emit) => emit(state + 1));
-}
+  _bad582_CounterBloc() : super(0) {
+    on<IncrementEvent>((event, emit) => emit(state + 1));
+  }
 }
 
 // GOOD: Should NOT trigger prefer_cubit_for_simple_state
 class _good582_CounterCubit extends Cubit<int> {
-CounterCubit() : super(0);
+  _good582_CounterCubit() : super(0);
 
-void increment() => emit(state + 1);
+  void increment() => emit(state + 1);
 }

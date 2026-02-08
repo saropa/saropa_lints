@@ -113,20 +113,20 @@ final userId = '123';
 // BAD: Should trigger avoid_redundant_requests
 // expect_lint: avoid_redundant_requests
 class _bad54_UserWidget extends StatelessWidget {
-Future<User> build() async {
-return await api.getUser(userId); // Called in multiple widgets
-}
+  Future<User> build() async {
+    return await api.getUser(userId); // Called in multiple widgets
+  }
 }
 
 // GOOD: Should NOT trigger avoid_redundant_requests
 class _good54_UserRepository {
-final Map<String, Future<User>> _pending = {};
+  final Map<String, Future<User>> _pending = {};
 
-Future<User> getUser(String id) {
-return _pending.putIfAbsent(id, () async {
-final user = await api.getUser(id);
-_pending.remove(id);
-return user;
-});
-}
+  Future<User> getUser(String id) {
+    return _pending.putIfAbsent(id, () async {
+      final user = await api.getUser(id);
+      _pending.remove(id);
+      return user;
+    });
+  }
 }

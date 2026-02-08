@@ -111,19 +111,19 @@ final text = 'text';
 // expect_lint: prefer_pump_and_settle
 void _bad1194() async {
   testWidgets('should animate', (tester) async {
-  await tester.pumpWidget(AnimatedWidget());
-  await tester.tap(find.byType(Button));
-  await tester.pump(); // May not wait for animation
-  expect(find.text('Done'), findsOneWidget);
+    await tester.pumpWidget(AnimatedWidget());
+    await tester.tap(find.byType(Button));
+    await tester.pump(); // May not wait for animation
+    expect(find.text('Done'), findsOneWidget);
   });
 }
 
 // GOOD: Should NOT trigger prefer_pump_and_settle
 void _good1194() async {
   testWidgets('should animate', (tester) async {
-  await tester.pumpWidget(AnimatedWidget());
-  await tester.tap(find.byType(Button));
-  await tester.pumpAndSettle(); // Waits for animations
-  expect(find.text('Done'), findsOneWidget);
+    await tester.pumpWidget(AnimatedWidget());
+    await tester.tap(find.byType(Button));
+    await tester.pumpAndSettle(); // Waits for animations
+    expect(find.text('Done'), findsOneWidget);
   });
 }

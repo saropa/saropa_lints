@@ -113,15 +113,15 @@ dynamic result;
 // expect_lint: require_pop_result_type
 void _bad527() async {
   final result = await Navigator.push(
-  context,
-  MaterialPageRoute(builder: (_) => SelectionPage()),  // Untyped!
+    context,
+    MaterialPageRoute(builder: (_) => SelectionPage()), // Untyped!
   );
 }
 
 // GOOD: Should NOT trigger require_pop_result_type
 void _good527() async {
   final result = await Navigator.push<String>(
-  context,
-  MaterialPageRoute<String>(builder: (_) => SelectionPage()),
+    context,
+    MaterialPageRoute<String>(builder: (_) => SelectionPage()),
   );
 }

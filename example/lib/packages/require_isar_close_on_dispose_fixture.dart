@@ -110,21 +110,22 @@ dynamic isar;
 // BAD: Should trigger require_isar_close_on_dispose
 // expect_lint: require_isar_close_on_dispose
 class _bad675_MyState extends State<MyWidget> {
-late Isar isar;
-void initState() {
-isar = Isar.openSync([UserSchema]);
-}
+  late Isar isar;
+  void initState() {
+    isar = Isar.openSync([UserSchema]);
+  }
 // Missing close in dispose!
 }
 
 // GOOD: Should NOT trigger require_isar_close_on_dispose
 class _good675_MyState extends State<MyWidget> {
-late Isar isar;
-void initState() {
-isar = Isar.openSync([UserSchema]);
-}
-void dispose() {
-isar.close();
-super.dispose();
-}
+  late Isar isar;
+  void initState() {
+    isar = Isar.openSync([UserSchema]);
+  }
+
+  void dispose() {
+    isar.close();
+    super.dispose();
+  }
 }

@@ -112,18 +112,15 @@ final context = BuildContext();
 // expect_lint: prefer_proxy_provider
 void _bad719() {
   Provider<MyService>(
-  create: (context) {
-  final auth = context.read<AuthService>(); // Dependency hidden in create
-  return MyService(auth);
-  },
-  child:
-  );
+      create: (context) {
+        final auth = context.read<AuthService>(); // Dependency hidden in create
+        return MyService(auth);
+      },
+      child: child);
 }
 
 // GOOD: Should NOT trigger prefer_proxy_provider
 void _good719() {
   ProxyProvider<AuthService, MyService>(
-  update: (context, auth, previous) => MyService(auth),
-  child:
-  );
+      update: (context, auth, previous) => MyService(auth), child: child);
 }

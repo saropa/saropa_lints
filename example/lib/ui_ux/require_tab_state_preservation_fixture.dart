@@ -112,16 +112,16 @@ dynamic state;
 // expect_lint: require_tab_state_preservation
 void _bad1260() {
   TabBarView(
-  children: [
-  MyFormWidget(), // Form state lost when switching tabs!
-  MyListWidget(),
-  ],
+    children: [
+      MyFormWidget(), // Form state lost when switching tabs!
+      MyListWidget(),
+    ],
   );
 }
 
 // GOOD: Should NOT trigger require_tab_state_preservation
 class _good1260__MyFormState extends State<MyFormWidget>
-with AutomaticKeepAliveClientMixin {
-@override
-bool get wantKeepAlive => true;
+    with AutomaticKeepAliveClientMixin {
+  @override
+  bool get wantKeepAlive => true;
 }

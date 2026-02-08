@@ -108,29 +108,29 @@ import '../flutter_mocks.dart';
 // BAD: Should trigger require_receive_port_close
 // expect_lint: require_receive_port_close
 class _bad330__MyWidgetState extends State<MyWidget> {
-late ReceivePort _receivePort;
+  late ReceivePort _receivePort;
 
-@override
-void initState() {
-super.initState();
-_receivePort = ReceivePort();
-}
+  @override
+  void initState() {
+    super.initState();
+    _receivePort = ReceivePort();
+  }
 // Missing close!
 }
 
 // GOOD: Should NOT trigger require_receive_port_close
 class _good330__MyWidgetState extends State<MyWidget> {
-late ReceivePort _receivePort;
+  late ReceivePort _receivePort;
 
-@override
-void initState() {
-super.initState();
-_receivePort = ReceivePort();
-}
+  @override
+  void initState() {
+    super.initState();
+    _receivePort = ReceivePort();
+  }
 
-@override
-void dispose() {
-_receivePort.close();
-super.dispose();
-}
+  @override
+  void dispose() {
+    _receivePort.close();
+    super.dispose();
+  }
 }

@@ -124,8 +124,9 @@ void _bad60() async {
 void _good60() async {
   final response = await http.get(url);
   if (response.headers['content-type']?.contains('application/json') == true) {
-  final data = jsonDecode(response.body);
+    final data = jsonDecode(response.body);
   } else {
-  throw FormatException('Expected JSON but got ${response.headers['content-type']}');
+    throw FormatException(
+        'Expected JSON but got ${response.headers['content-type']}');
   }
 }

@@ -110,14 +110,14 @@ dynamic details;
 // BAD: Should trigger prefer_local_auth
 // expect_lint: prefer_local_auth
 void _bad1018_processPayment(PaymentDetails details) async {
-await paymentApi.charge(details);
+  await paymentApi.charge(details);
 }
 
 // GOOD: Should NOT trigger prefer_local_auth
 void _good1018_processPayment(PaymentDetails details) async {
-final authenticated = await LocalAuthentication().authenticate(
-localizedReason: 'Confirm payment',
-);
-if (!authenticated) return;
-await paymentApi.charge(details);
+  final authenticated = await LocalAuthentication().authenticate(
+    localizedReason: 'Confirm payment',
+  );
+  if (!authenticated) return;
+  await paymentApi.charge(details);
 }

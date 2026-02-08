@@ -108,14 +108,15 @@ import '../flutter_mocks.dart';
 // BAD: Should trigger prefer_lazy_singleton_registration
 // expect_lint: prefer_lazy_singleton_registration
 void _bad322_setupDI() {
-GetIt.I.registerSingleton(DatabaseService()); // Created immediately!
-GetIt.I.registerSingleton(AnalyticsService()); // Created immediately!
-GetIt.I.registerSingleton(CacheService()); // All at startup!
+  GetIt.I.registerSingleton(DatabaseService()); // Created immediately!
+  GetIt.I.registerSingleton(AnalyticsService()); // Created immediately!
+  GetIt.I.registerSingleton(CacheService()); // All at startup!
 }
 
 // GOOD: Should NOT trigger prefer_lazy_singleton_registration
 void _good322_setupDI() {
-GetIt.I.registerLazySingleton(() => DatabaseService()); // Created on first use
-GetIt.I.registerLazySingleton(() => AnalyticsService());
-GetIt.I.registerLazySingleton(() => CacheService());
+  GetIt.I
+      .registerLazySingleton(() => DatabaseService()); // Created on first use
+  GetIt.I.registerLazySingleton(() => AnalyticsService());
+  GetIt.I.registerLazySingleton(() => CacheService());
 }

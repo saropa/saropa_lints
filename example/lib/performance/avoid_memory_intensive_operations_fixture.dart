@@ -111,16 +111,18 @@ dynamic result;
 
 // BAD: Should trigger avoid_memory_intensive_operations
 // expect_lint: avoid_memory_intensive_operations
-String _bad800_result = '';
-for (final item in items) {
-result += item.toString(); // O(n²) string allocation!
+void _bad800() {
+  String result = '';
+  for (final item in items) {
+    result += item.toString(); // O(n²) string allocation!
+  }
 }
 
 // GOOD: Should NOT trigger avoid_memory_intensive_operations
 void _good800() {
   final buffer = StringBuffer();
   for (final item in items) {
-  buffer.write(item.toString());
+    buffer.write(item.toString());
   }
   final result = buffer.toString();
 }

@@ -113,8 +113,8 @@ dynamic user;
 void _bad343() {
   /// Gets the user.
   User getUser(String id) {
-  if (id.isEmpty) throw ArgumentError('ID required');
-  return _users[id] ?? throw UserNotFoundException(id);
+    if (id.isEmpty) throw ArgumentError('ID required');
+    return _users[id] ?? (throw UserNotFoundException(id));
   }
 }
 

@@ -111,15 +111,16 @@ final items = <dynamic>[];
 // expect_lint: prefer_null_aware_elements
 void _bad255() {
   final items = [
-  item1,
-  if (item2 != null) item2,
+    item1,
+    if (item2 != null) item2,
   ];
 }
 
 // GOOD: Should NOT trigger prefer_null_aware_elements
 void _good255() {
   final items = [
-  item1,
-  ?item2,
+    item1,
+    // ?item2, // Dart 3.7+ null-aware elements
+    if (item2 != null) item2,
   ];
 }

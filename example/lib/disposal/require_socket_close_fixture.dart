@@ -108,25 +108,25 @@ import '../flutter_mocks.dart';
 // BAD: Should trigger require_socket_close
 // expect_lint: require_socket_close
 class _bad331__MyWidgetState extends State<MyWidget> {
-Socket? _socket;
+  Socket? _socket;
 
-Future<void> connect() async {
-_socket = await Socket.connect('host', 80);
-}
+  Future<void> connect() async {
+    _socket = await Socket.connect('host', 80);
+  }
 // Missing close!
 }
 
 // GOOD: Should NOT trigger require_socket_close
 class _good331__MyWidgetState extends State<MyWidget> {
-Socket? _socket;
+  Socket? _socket;
 
-Future<void> connect() async {
-_socket = await Socket.connect('host', 80);
-}
+  Future<void> connect() async {
+    _socket = await Socket.connect('host', 80);
+  }
 
-@override
-void dispose() {
-_socket?.close();
-super.dispose();
-}
+  @override
+  void dispose() {
+    _socket?.close();
+    super.dispose();
+  }
 }

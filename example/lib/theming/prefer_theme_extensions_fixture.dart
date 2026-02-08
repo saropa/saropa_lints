@@ -109,22 +109,22 @@ import '../flutter_mocks.dart';
 // expect_lint: prefer_theme_extensions
 void _bad1219() {
   ThemeData(
-  primaryColor: Colors.blue,
-  extensions: [],
+    primaryColor: Colors.blue,
+    extensions: [],
   ).copyWith(
-  // Using copyWith to add custom "fields"
-  );
+      // Using copyWith to add custom "fields"
+      );
 }
 
 // GOOD: Should NOT trigger prefer_theme_extensions
 void _good1219() {
   ThemeData(
-  primaryColor: Colors.blue,
-  extensions: [
-  MyAppColors(
-  brandPrimary: Colors.blue,
-  brandSecondary: Colors.green,
-  ),
-  ],
+    primaryColor: Colors.blue,
+    extensions: [
+      MyAppColors(
+        brandPrimary: Colors.blue,
+        brandSecondary: Colors.green,
+      ),
+    ],
   );
 }

@@ -112,19 +112,19 @@ final context = BuildContext();
 // expect_lint: prefer_context_read_in_callbacks
 void _bad718() {
   ElevatedButton(
-  onPressed: () {
-  context.watch<Counter>().increment(); // Causes rebuild!
-  },
-  child: Text('Increment'),
+    onPressed: () {
+      context.watch<Counter>().increment(); // Causes rebuild!
+    },
+    child: Text('Increment'),
   );
 }
 
 // GOOD: Should NOT trigger prefer_context_read_in_callbacks
 void _good718() {
   ElevatedButton(
-  onPressed: () {
-  context.read<Counter>().increment(); // One-time access
-  },
-  child: Text('Increment'),
+    onPressed: () {
+      context.read<Counter>().increment(); // One-time access
+    },
+    child: Text('Increment'),
   );
 }

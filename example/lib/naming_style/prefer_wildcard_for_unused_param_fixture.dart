@@ -114,14 +114,22 @@ dynamic map;
 // BAD: Should trigger prefer_wildcard_for_unused_param
 // expect_lint: prefer_wildcard_for_unused_param
 void _bad499_onClick(BuildContext context, int index) {
-print('Clicked'); // context and index not used
+  void _topLevel116() {
+    print('Clicked'); // context and index not used
+  }
 }
 
-list.map((item) => 42); // item not used
+void _topLevel119() {
+  list.map((item) => 42); // item not used
+}
 
 // GOOD: Should NOT trigger prefer_wildcard_for_unused_param
 void _good499_onClick(BuildContext _, int __) {
-print('Clicked');
+  void _topLevel123() {
+    print('Clicked');
+  }
 }
 
-list.map((_) => 42);
+void _topLevel126() {
+  list.map((_) => 42);
+}

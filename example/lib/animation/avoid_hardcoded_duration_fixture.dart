@@ -109,19 +109,19 @@ import '../flutter_mocks.dart';
 // expect_lint: avoid_hardcoded_duration
 void _bad34() {
   AnimationController(
-  duration: Duration(milliseconds: 300),
-  vsync: this,
+    duration: Duration(milliseconds: 300),
+    vsync: this,
   );
   Future.delayed(Duration(seconds: 2));
 }
 
 // GOOD: Should NOT trigger avoid_hardcoded_duration
 void _good34() {
-  static const kAnimationDuration = Duration(milliseconds: 300);
-  
+  const kAnimationDuration = Duration(milliseconds: 300);
+
   AnimationController(
-  duration: kAnimationDuration,
-  vsync: this,
+    duration: kAnimationDuration,
+    vsync: this,
   );
   Future.delayed(kDelayDuration);
 }

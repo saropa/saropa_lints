@@ -117,24 +117,24 @@ final key = 'key';
 // expect_lint: require_widget_key_strategy
 void _bad806() {
   ListView.builder(
-  itemBuilder: (context, index) {
-  // Sometimes uses key, sometimes doesn't
-  if (items[index].important) {
-  return ImportantItem(key: ValueKey(items[index].id));
-  }
-  return NormalItem(); // No key!
-  },
+    itemBuilder: (context, index) {
+      // Sometimes uses key, sometimes doesn't
+      if (items[index].important) {
+        return ImportantItem(key: ValueKey(items[index].id));
+      }
+      return NormalItem(); // No key!
+    },
   );
 }
 
 // GOOD: Should NOT trigger require_widget_key_strategy
 void _good806() {
   ListView.builder(
-  itemBuilder: (context, index) {
-  final item = items[index];
-  return item.important
-  ? ImportantItem(key: ValueKey(item.id), item: item)
-  : NormalItem(key: ValueKey(item.id), item: item);
-  },
+    itemBuilder: (context, index) {
+      final item = items[index];
+      return item.important
+          ? ImportantItem(key: ValueKey(item.id), item: item)
+          : NormalItem(key: ValueKey(item.id), item: item);
+    },
   );
 }

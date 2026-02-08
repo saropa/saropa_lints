@@ -112,23 +112,23 @@ dynamic theme;
 // BAD: Should trigger prefer_inherited_widget_cache
 // expect_lint: prefer_inherited_widget_cache
 Widget _bad810_build(BuildContext context) {
-return Column(
-children: [
-Text(Theme.of(context).textTheme.bodyLarge),
-Icon(color: Theme.of(context).colorScheme.primary),
-Container(color: Theme.of(context).scaffoldBackgroundColor),
-],
-);
+  return Column(
+    children: [
+      Text(Theme.of(context).textTheme.bodyLarge),
+      Icon(color: Theme.of(context).colorScheme.primary),
+      Container(color: Theme.of(context).scaffoldBackgroundColor),
+    ],
+  );
 }
 
 // GOOD: Should NOT trigger prefer_inherited_widget_cache
 Widget _good810_build(BuildContext context) {
-final theme = Theme.of(context);
-return Column(
-children: [
-Text(theme.textTheme.bodyLarge),
-Icon(color: theme.colorScheme.primary),
-Container(color: theme.scaffoldBackgroundColor),
-],
-);
+  final theme = Theme.of(context);
+  return Column(
+    children: [
+      Text(theme.textTheme.bodyLarge),
+      Icon(color: theme.colorScheme.primary),
+      Container(color: theme.scaffoldBackgroundColor),
+    ],
+  );
 }

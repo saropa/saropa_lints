@@ -108,15 +108,15 @@ import '../flutter_mocks.dart';
 // BAD: Should trigger avoid_large_images_in_memory
 // expect_lint: avoid_large_images_in_memory
 void _bad1428() {
-  Image.asset('large_photo.png') // Could be 4000x3000 pixels!
+  Image.asset('large_photo.png'); // Could be 4000x3000 pixels!
 }
 
 // GOOD: Should NOT trigger avoid_large_images_in_memory
 void _good1428() {
   Image.asset(
-  'large_photo.png',
-  width: 300,
-  height: 200,
-  cacheWidth: 300,
+    'large_photo.png',
+    width: 300,
+    height: 200,
+    cacheWidth: 300,
   );
 }

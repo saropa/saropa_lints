@@ -113,16 +113,16 @@ final items = <dynamic>[];
 // expect_lint: prefer_prototype_item
 void _bad987() {
   ListView.builder(
-  itemCount: items.length,
-  itemBuilder: (context, i) => MyCard(items[i]),
+    itemCount: items.length,
+    itemBuilder: (context, i) => MyCard(items[i]),
   );
 }
 
 // GOOD: Should NOT trigger prefer_prototype_item
 void _good987() {
   ListView.builder(
-  itemCount: items.length,
-  prototypeItem: MyCard(items.first), // For consistent sizing
-  itemBuilder: (context, i) => MyCard(items[i]),
+    itemCount: items.length,
+    prototypeItem: MyCard(items.first), // For consistent sizing
+    itemBuilder: (context, i) => MyCard(items[i]),
   );
 }

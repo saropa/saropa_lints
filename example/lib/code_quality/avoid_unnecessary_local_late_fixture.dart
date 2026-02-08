@@ -110,10 +110,10 @@ dynamic x;
 // BAD: Should trigger avoid_unnecessary_local_late
 // expect_lint: avoid_unnecessary_local_late
 void _bad222_foo() {
-late final x = compute();  // late is unnecessary
+  late final x = compute(); // late is unnecessary
 }
 
 // GOOD: Should NOT trigger avoid_unnecessary_local_late
 void _good222_foo() {
-final x = compute();  // No late needed
+  final x = compute(); // No late needed
 }

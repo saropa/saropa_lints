@@ -1,0 +1,4 @@
+Microsoft Windows [Version 10.0.22631.6199]
+(c) Microsoft Corporation. All rights reserved.
+
+d:\src\saropa_lints>

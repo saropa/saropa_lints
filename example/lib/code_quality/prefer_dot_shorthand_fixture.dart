@@ -113,5 +113,6 @@ void _bad236() {
 
 // GOOD: Should NOT trigger prefer_dot_shorthand
 void _good236() {
-  TextAlign align = .center;
+  // TextAlign align = .center; // Dart 3.7+ dot shorthand
+  TextAlign align = TextAlign.center;
 }

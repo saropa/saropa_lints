@@ -110,13 +110,19 @@ final message = 'Message';
 // BAD: Should trigger avoid_throw_objects_without_tostring
 // expect_lint: avoid_throw_objects_without_tostring
 class _bad367_MyError {}
-throw MyError();  // toString() returns "Instance of 'MyError'"
+
+void _bad367_usage() {
+  throw MyError(); // toString() returns "Instance of 'MyError'"
+}
 
 // GOOD: Should NOT trigger avoid_throw_objects_without_tostring
 class _good367_MyError {
-final String message;
-MyError(this.message);
-@override
-String toString() => 'MyError: $message';
+  final String message;
+  _good367_MyError(this.message);
+  @override
+  String toString() => 'MyError: $message';
 }
-throw MyError('Something went wrong');
+
+void _good367_usage() {
+  throw MyError('Something went wrong');
+}

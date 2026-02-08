@@ -110,12 +110,12 @@ dynamic value;
 // BAD: Should trigger avoid_unused_generics
 // expect_lint: avoid_unused_generics
 class _bad1063_Container<T> {
-final Object value;  // T is not used
-Container(this.value);
+  final Object value; // T is not used
+  _bad1063_Container(this.value);
 }
 
 // GOOD: Should NOT trigger avoid_unused_generics
 class _good1063_Container<T> {
-final T value;
-Container(this.value);
+  final T value;
+  _good1063_Container(this.value);
 }

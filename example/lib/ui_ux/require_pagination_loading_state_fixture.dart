@@ -112,22 +112,22 @@ final items = <dynamic>[];
 // expect_lint: require_pagination_loading_state
 void _bad1265() {
   ListView.builder(
-  itemCount: items.length,
-  itemBuilder: (ctx, i) {
-  if (i == items.length - 1) loadMore();
-  return ItemTile(items[i]);
-  },
+    itemCount: items.length,
+    itemBuilder: (ctx, i) {
+      if (i == items.length - 1) loadMore();
+      return ItemTile(items[i]);
+    },
   );
 }
 
 // GOOD: Should NOT trigger require_pagination_loading_state
 void _good1265() {
   ListView.builder(
-  itemCount: items.length + (isLoadingMore ? 1 : 0),
-  itemBuilder: (ctx, i) {
-  if (i == items.length) return LoadingIndicator();
-  if (i == items.length - 1) loadMore();
-  return ItemTile(items[i]);
-  },
+    itemCount: items.length + (isLoadingMore ? 1 : 0),
+    itemBuilder: (ctx, i) {
+      if (i == items.length) return LoadingIndicator();
+      if (i == items.length - 1) loadMore();
+      return ItemTile(items[i]);
+    },
   );
 }

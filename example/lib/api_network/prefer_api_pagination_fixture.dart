@@ -114,15 +114,15 @@ dynamic response;
 // expect_lint: prefer_api_pagination
 void _bad56() async {
   Future<List<Item>> getAllItems() async {
-  final response = await api.get('/items');
-  return response.map((e) => Item.fromJson(e)).toList();
+    final response = await api.get('/items');
+    return response.map((e) => Item.fromJson(e)).toList();
   }
 }
 
 // GOOD: Should NOT trigger prefer_api_pagination
 void _good56() async {
   Future<List<Item>> getItems({int page = 0, int limit = 20}) async {
-  final response = await api.get('/items?page=$page&limit=$limit');
-  return response.map((e) => Item.fromJson(e)).toList();
+    final response = await api.get('/items?page=$page&limit=$limit');
+    return response.map((e) => Item.fromJson(e)).toList();
   }
 }

@@ -113,16 +113,16 @@ final index = 0;
 // expect_lint: prefer_itemextent_when_known
 void _bad1259() {
   ListView.builder(
-  itemCount: 100,
-  itemBuilder: (context, index) => ListTile(), // All same height
+    itemCount: 100,
+    itemBuilder: (context, index) => ListTile(), // All same height
   );
 }
 
 // GOOD: Should NOT trigger prefer_itemextent_when_known
 void _good1259() {
   ListView.builder(
-  itemCount: 100,
-  itemExtent: 72.0, // ListTile standard height
-  itemBuilder: (context, index) => ListTile(),
+    itemCount: 100,
+    itemExtent: 72.0, // ListTile standard height
+    itemBuilder: (context, index) => ListTile(),
   );
 }

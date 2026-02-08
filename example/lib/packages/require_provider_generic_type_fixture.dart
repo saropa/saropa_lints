@@ -110,7 +110,7 @@ final context = BuildContext();
 // BAD: Should trigger require_provider_generic_type
 // expect_lint: require_provider_generic_type
 void _bad716() {
-  final model = Provider.of(context);  // Returns dynamic!
+  final model = Provider.of(context); // Returns dynamic!
 }
 
 // GOOD: Should NOT trigger require_provider_generic_type

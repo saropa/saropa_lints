@@ -108,13 +108,14 @@ import '../flutter_mocks.dart';
 // BAD: Should trigger require_dio_singleton
 // expect_lint: require_dio_singleton
 class _bad596_ApiService {
-Future<Response> get() => Dio().get('/endpoint');
+  Future<Response> get() => Dio().get('/endpoint');
 }
+
 class OtherService {
-Future<Response> get() => Dio().get('/other');  // Another instance!
+  Future<Response> get() => Dio().get('/other'); // Another instance!
 }
 
 // GOOD: Should NOT trigger require_dio_singleton
 class _good596_DioClient {
-static final Dio instance = Dio()..interceptors.add();
+  static final Dio instance = Dio()..interceptors.add();
 }

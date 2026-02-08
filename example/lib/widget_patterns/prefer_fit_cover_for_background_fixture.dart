@@ -111,20 +111,20 @@ dynamic image;
 // expect_lint: prefer_fit_cover_for_background
 void _bad1424() {
   Container(
-  decoration: BoxDecoration(
-  image: DecorationImage(image: AssetImage('bg.png')),
-  ),
+    decoration: BoxDecoration(
+      image: DecorationImage(image: AssetImage('bg.png')),
+    ),
   );
 }
 
 // GOOD: Should NOT trigger prefer_fit_cover_for_background
 void _good1424() {
   Container(
-  decoration: BoxDecoration(
-  image: DecorationImage(
-  image: AssetImage('bg.png'),
-  fit: BoxFit.cover,
-  ),
-  ),
+    decoration: BoxDecoration(
+      image: DecorationImage(
+        image: AssetImage('bg.png'),
+        fit: BoxFit.cover,
+      ),
+    ),
   );
 }

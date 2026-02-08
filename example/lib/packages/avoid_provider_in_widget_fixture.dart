@@ -111,18 +111,18 @@ dynamic ref;
 // BAD: Should trigger avoid_provider_in_widget
 // expect_lint: avoid_provider_in_widget
 class _bad706_MyWidget extends ConsumerWidget {
-final myProvider = StateProvider<int>((ref) => 0); // Wrong!
+  final myProvider = StateProvider<int>((ref) => 0); // Wrong!
 
-Widget build(BuildContext context, WidgetRef ref) {
-return Text(ref.watch(myProvider).toString());
-}
+  Widget build(BuildContext context, WidgetRef ref) {
+    return Text(ref.watch(myProvider).toString());
+  }
 }
 
 // GOOD: Should NOT trigger avoid_provider_in_widget
 final myProvider = StateProvider<int>((ref) => 0);
 
 class _good706_MyWidget extends ConsumerWidget {
-Widget build(BuildContext context, WidgetRef ref) {
-return Text(ref.watch(myProvider).toString());
-}
+  Widget build(BuildContext context, WidgetRef ref) {
+    return Text(ref.watch(myProvider).toString());
+  }
 }

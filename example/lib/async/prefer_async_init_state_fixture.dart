@@ -113,32 +113,30 @@ dynamic future;
 // BAD: Should trigger prefer_async_init_state
 // expect_lint: prefer_async_init_state
 class _bad113__MyState extends State<MyWidget> {
-String? _data;
+  String? _data;
 
-@override
-void initState() {
-super.initState();
-fetchData().then((data) {
-setState(() => _data = data);
-});
-}
+  @override
+  void initState() {
+    super.initState();
+    fetchData().then((data) {
+      setState(() => _data = data);
+    });
+  }
 }
 
 // GOOD: Should NOT trigger prefer_async_init_state
 class _good113__MyState extends State<MyWidget> {
-late final Future<String> _dataFuture;
+  late final Future<String> _dataFuture;
 
-@override
-void initState() {
-super.initState();
-_dataFuture = fetchData();
-}
+  @override
+  void initState() {
+    super.initState();
+    _dataFuture = fetchData();
+  }
 
-@override
-Widget build(BuildContext context) {
-return FutureBuilder(
-future: _dataFuture,
-builder: (context, snapshot) =>
-);
-}
+  @override
+  Widget build(BuildContext context) {
+    return FutureBuilder(
+        future: _dataFuture, builder: (context, snapshot) => Container());
+  }
 }

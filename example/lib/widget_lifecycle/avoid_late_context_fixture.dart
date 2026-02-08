@@ -112,21 +112,21 @@ final children = <Widget>[];
 // expect_lint: avoid_late_context
 void _bad1336() {
   Row(
-  children: [
-  Text('Start'),
-  Expanded(child: SizedBox()),  // Use Spacer instead
-  Text('End'),
-  ],
+    children: [
+      Text('Start'),
+      Expanded(child: SizedBox()), // Use Spacer instead
+      Text('End'),
+    ],
   );
 }
 
 // GOOD: Should NOT trigger avoid_late_context
 void _good1336() {
   Row(
-  children: [
-  Text('Start'),
-  Spacer(),
-  Text('End'),
-  ],
+    children: [
+      Text('Start'),
+      Spacer(),
+      Text('End'),
+    ],
   );
 }

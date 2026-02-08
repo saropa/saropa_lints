@@ -111,16 +111,16 @@ dynamic ref;
 // BAD: Should trigger avoid_unnecessary_consumer_widgets
 // expect_lint: avoid_unnecessary_consumer_widgets
 class _bad735_MyWidget extends ConsumerWidget {
-@override
-Widget build(BuildContext context, WidgetRef ref) {
-return Text('Hello'); // ref not used
-}
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    return Text('Hello'); // ref not used
+  }
 }
 
 // GOOD: Should NOT trigger avoid_unnecessary_consumer_widgets
 class _good735_MyWidget extends StatelessWidget {
-@override
-Widget build(BuildContext context) {
-return Text('Hello');
-}
+  @override
+  Widget build(BuildContext context) {
+    return Text('Hello');
+  }
 }

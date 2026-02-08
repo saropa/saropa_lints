@@ -111,14 +111,13 @@ dynamic result;
 // expect_lint: prefer_switch_with_sealed_classes
 void _bad216() {
   if (result is Success) {
-  } else if (result is Error) {
-  }
+  } else if (result is Error) {}
 }
 
 // GOOD: Should NOT trigger prefer_switch_with_sealed_classes
 void _good216() {
   switch (result) {
-  case Success(): //
-  case Error(): //
+    case Success(): //
+    case Error(): //
   }
 }

@@ -110,26 +110,26 @@ dynamic child;
 // BAD: Should trigger require_multi_provider
 // expect_lint: require_multi_provider
 void _bad709() {
-  Provider<A>(
-  create: (_) => A(),
-  child: Provider<B>(
-  create: (_) => B(),
-  child: Provider<C>(
-  create: (_) => C(),
-  child: MyApp(),
-  ),
-  ),
-  ),
+  var x = Provider<A>(
+    create: (_) => A(),
+    child: Provider<B>(
+      create: (_) => B(),
+      child: Provider<C>(
+        create: (_) => C(),
+        child: MyApp(),
+      ),
+    ),
+  );
 }
 
 // GOOD: Should NOT trigger require_multi_provider
 void _good709() {
-  MultiProvider(
-  providers: [
-  Provider<A>(create: (_) => A()),
-  Provider<B>(create: (_) => B()),
-  Provider<C>(create: (_) => C()),
-  ],
-  child: MyApp(),
-  ),
+  var x = MultiProvider(
+    providers: [
+      Provider<A>(create: (_) => A()),
+      Provider<B>(create: (_) => B()),
+      Provider<C>(create: (_) => C()),
+    ],
+    child: MyApp(),
+  );
 }

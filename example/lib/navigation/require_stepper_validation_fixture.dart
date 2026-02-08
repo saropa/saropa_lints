@@ -109,19 +109,19 @@ import '../flutter_mocks.dart';
 // expect_lint: require_stepper_validation
 void _bad512() {
   Stepper(
-  onStepContinue: () {
-  setState(() => _currentStep++);
-  },
+    onStepContinue: () {
+      setState(() => _currentStep++);
+    },
   );
 }
 
 // GOOD: Should NOT trigger require_stepper_validation
 void _good512() {
   Stepper(
-  onStepContinue: () {
-  if (_formKeys[_currentStep].currentState!.validate()) {
-  setState(() => _currentStep++);
-  }
-  },
+    onStepContinue: () {
+      if (_formKeys[_currentStep].currentState!.validate()) {
+        setState(() => _currentStep++);
+      }
+    },
   );
 }

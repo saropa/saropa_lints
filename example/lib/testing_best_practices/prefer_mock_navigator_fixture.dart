@@ -111,23 +111,23 @@ dynamic details;
 // expect_lint: prefer_mock_navigator
 void _bad1199() async {
   testWidgets('navigates to details', (tester) async {
-  await tester.tap(find.byType(ListTile));
-  await tester.pumpAndSettle();
-  // Can't verify navigation happened!
+    await tester.tap(find.byType(ListTile));
+    await tester.pumpAndSettle();
+    // Can't verify navigation happened!
   });
 }
 
 // GOOD: Should NOT trigger prefer_mock_navigator
 void _good1199() async {
   testWidgets('navigates to details', (tester) async {
-  final mockNavigator = MockNavigatorObserver();
-  await tester.pumpWidget(
-  MaterialApp(
-  navigatorObservers: [mockNavigator],
-  home: MyWidget(),
-  ),
-  );
-  await tester.tap(find.byType(ListTile));
-  verify(mockNavigator.didPush(any, any));
+    final mockNavigator = MockNavigatorObserver();
+    await tester.pumpWidget(
+      MaterialApp(
+        navigatorObservers: [mockNavigator],
+        home: MyWidget(),
+      ),
+    );
+    await tester.tap(find.byType(ListTile));
+    verify(mockNavigator.didPush(any, any));
   });
 }

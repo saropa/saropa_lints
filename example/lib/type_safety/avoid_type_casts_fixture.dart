@@ -116,6 +116,6 @@ void _bad1242() {
 // GOOD: Should NOT trigger avoid_type_casts
 void _good1242() {
   if (obj is Widget) {
-  // obj is automatically cast to Widget
+    // obj is automatically cast to Widget
   }
 }

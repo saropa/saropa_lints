@@ -111,25 +111,25 @@ dynamic value;
 // BAD: Should trigger avoid_validation_in_build
 // expect_lint: avoid_validation_in_build
 Widget _bad398_build(BuildContext context) async {
-return TextFormField(
-validator: (value) async {
-final isAvailable = await checkUsernameAvailability(value!);
-return isAvailable ? null : 'Username taken';
-},
-);
+  return TextFormField(
+    validator: (value) async {
+      final isAvailable = await checkUsernameAvailability(value!);
+      return isAvailable ? null : 'Username taken';
+    },
+  );
 }
 
 // GOOD: Should NOT trigger avoid_validation_in_build
 void _good398() async {
   // Use async validation on submit
   void _onSubmit() async {
-  if (_formKey.currentState!.validate()) {
-  final isAvailable = await checkUsernameAvailability(_username);
-  if (!isAvailable) {
-  _showError('Username taken');
-  return;
-  }
-  // proceed
-  }
+    if (_formKey.currentState!.validate()) {
+      final isAvailable = await checkUsernameAvailability(_username);
+      if (!isAvailable) {
+        _showError('Username taken');
+        return;
+      }
+      // proceed
+    }
   }
 }

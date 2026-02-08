@@ -110,11 +110,11 @@ dynamic result;
 // BAD: Should trigger avoid_unnecessary_local_variable
 // expect_lint: avoid_unnecessary_local_variable
 int _bad1058_calculate() {
-final result = 2 + 2;
-return result;
+  final result = 2 + 2;
+  return result;
 }
 
 // GOOD: Should NOT trigger avoid_unnecessary_local_variable
 int _good1058_calculate() {
-return 2 + 2;
+  return 2 + 2;
 }

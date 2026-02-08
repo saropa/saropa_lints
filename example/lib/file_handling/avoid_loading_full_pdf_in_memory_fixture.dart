@@ -125,11 +125,11 @@ void _good378() async {
   final doc = await PdfDocument.openFile(file.path);
   // Only render pages as needed
   final page = await doc.getPage(pageNumber);
-  
+
   // Or use a PDF viewer that handles pagination
   PDFView(
-  filePath: file.path,
-  pageSnap: true,
-  swipeHorizontal: false,
+    filePath: file.path,
+    pageSnap: true,
+    swipeHorizontal: false,
   );
 }

@@ -110,17 +110,19 @@ final context = BuildContext();
 // BAD: Should trigger avoid_listview_without_item_extent
 // expect_lint: avoid_listview_without_item_extent
 void _bad1295() async {
-  onPressed: () async {
-  await someAsyncWork();
-  ScaffoldMessenger.of(context).showSnackBar();
-  }
+  onPressed:
+  () async {
+    await someAsyncWork();
+    ScaffoldMessenger.of(context).showSnackBar();
+  };
 }
 
 // GOOD: Should NOT trigger avoid_listview_without_item_extent
 void _good1295() async {
-  onPressed: () async {
-  final messenger = ScaffoldMessenger.of(context);
-  await someAsyncWork();
-  messenger.showSnackBar();
-  }
+  onPressed:
+  () async {
+    final messenger = ScaffoldMessenger.of(context);
+    await someAsyncWork();
+    messenger.showSnackBar();
+  };
 }

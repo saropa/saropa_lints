@@ -118,7 +118,7 @@ void _bad68() async {
 void _good68() async {
   final status = await Permission.camera.request();
   if (status.isDenied || status.isPermanentlyDenied) {
-  // Show explanation or alternative
-  return;
+    // Show explanation or alternative
+    return;
   }
 }

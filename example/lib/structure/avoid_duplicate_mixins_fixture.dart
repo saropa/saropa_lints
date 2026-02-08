@@ -107,7 +107,8 @@ import '../flutter_mocks.dart';
 
 // BAD: Should trigger avoid_duplicate_mixins
 // expect_lint: avoid_duplicate_mixins
-class _bad1037_MyClass extends BaseClass with MixinA, MixinA { }  // Duplicate mixin
+class _bad1037_MyClass extends BaseClass
+    with MixinA, MixinA {} // Duplicate mixin
 
 // GOOD: Should NOT trigger avoid_duplicate_mixins
-class _good1037_MyClass extends BaseClass with MixinA, MixinB { }
+class _good1037_MyClass extends BaseClass with MixinA, MixinB {}

@@ -112,15 +112,15 @@ final children = <Widget>[];
 // expect_lint: prefer_widget_private_members
 void _bad1373() {
   SingleChildScrollView(
-  child: Column(
-  children: widgets,
-  ),
+    child: Column(
+      children: widgets,
+    ),
   );
 }
 
 // GOOD: Should NOT trigger prefer_widget_private_members
 void _good1373() {
   ListView(
-  children: widgets,
+    children: widgets,
   );
 }

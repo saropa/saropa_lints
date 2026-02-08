@@ -115,21 +115,21 @@ dynamic subscription;
 // expect_lint: require_subscription_status_check
 // Only checking once after purchase
 class _bad419_PremiumFeature extends StatelessWidget {
-Widget build(context) {
+  Widget build(context) {
 // Just assuming subscription is still valid
-return PremiumContent();
-}
+    return PremiumContent();
+  }
 }
 
 // GOOD: Should NOT trigger require_subscription_status_check
 class _good419_PremiumFeature extends StatelessWidget {
-Widget build(context) {
-return FutureBuilder<bool>(
-future: SubscriptionService.checkStatus(),
-builder: (context, snapshot) {
-if (snapshot.data == true) return PremiumContent();
-return UpgradePrompt();
-},
-);
-}
+  Widget build(context) {
+    return FutureBuilder<bool>(
+      future: SubscriptionService.checkStatus(),
+      builder: (context, snapshot) {
+        if (snapshot.data == true) return PremiumContent();
+        return UpgradePrompt();
+      },
+    );
+  }
 }

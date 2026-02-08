@@ -112,11 +112,11 @@ dynamic value;
 // expect_lint: avoid_unnecessary_nullable_return_type
 void _bad1067() {
   String? getValue() {
-  return 'always a value';
+    return 'always a value';
   }
 }
 
 // GOOD: Should NOT trigger avoid_unnecessary_nullable_return_type
 String _good1067_getValue() {
-return 'always a value';
+  return 'always a value';
 }

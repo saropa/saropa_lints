@@ -108,11 +108,11 @@ import '../flutter_mocks.dart';
 // BAD: Should trigger avoid_unnecessary_return
 // expect_lint: avoid_unnecessary_return
 void _bad980_doSomething() {
-print('hello');
-return;  // Unnecessary
+  print('hello');
+  return; // Unnecessary
 }
 
 // GOOD: Should NOT trigger avoid_unnecessary_return
 void _good980_doSomething() {
-print('hello');
+  print('hello');
 }

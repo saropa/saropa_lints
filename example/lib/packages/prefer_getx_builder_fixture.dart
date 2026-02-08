@@ -113,10 +113,10 @@ dynamic value;
 // BAD: Should trigger prefer_getx_builder
 // expect_lint: prefer_getx_builder
 Widget _bad649_build(context) {
-return Text(controller.count.value.toString());  // No rebuild!
+  return Text(controller.count.value.toString()); // No rebuild!
 }
 
 // GOOD: Should NOT trigger prefer_getx_builder
 Widget _good649_build(context) {
-return Obx(() => Text(controller.count.value.toString()));
+  return Obx(() => Text(controller.count.value.toString()));
 }

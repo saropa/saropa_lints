@@ -108,9 +108,12 @@ import '../flutter_mocks.dart';
 // BAD: Should trigger avoid_wildcard_cases_with_sealed_classes
 // expect_lint: avoid_wildcard_cases_with_sealed_classes
 sealed class _bad205_Shape {}
-switch (shape) {
-case Circle():
-default:// May hide unhandled subclasses
+
+void _topLevel110() {
+  switch (shape) {
+    case Circle():
+    default: // May hide unhandled subclasses
+  }
 }
 
 // GOOD: Should NOT trigger avoid_wildcard_cases_with_sealed_classes

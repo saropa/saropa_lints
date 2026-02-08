@@ -109,11 +109,11 @@ import '../flutter_mocks.dart';
 // expect_lint: avoid_top_level_members_in_tests
 void _bad1162() {
   // In my_test.dart
-  String helperFunction() => 'test';  // Public helper
+  String helperFunction() => 'test'; // Public helper
 }
 
 // GOOD: Should NOT trigger avoid_top_level_members_in_tests
 void _good1162() {
   // In my_test.dart
-  String _helperFunction() => 'test';  // Private helper
+  String _helperFunction() => 'test'; // Private helper
 }

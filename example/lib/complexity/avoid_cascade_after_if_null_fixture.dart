@@ -110,7 +110,8 @@ dynamic list;
 // BAD: Should trigger avoid_cascade_after_if_null
 // expect_lint: avoid_cascade_after_if_null
 void _bad258() {
-  final list = possibleList ?? <int>[]..add(1);
+  final list = possibleList ?? <int>[]
+    ..add(1);
   // This is parsed as: possibleList ?? (<int>[]..add(1));
   // NOT: (possibleList ?? <int>[])..add(1);
 }

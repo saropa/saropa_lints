@@ -111,16 +111,16 @@ dynamic x;
 // BAD: Should trigger avoid_unguarded_debug
 // expect_lint: avoid_unguarded_debug
 void _bad307_someMethod() {
-debugPrint('Value: $x');  // Unguarded - will print in production
+  debugPrint('Value: $x'); // Unguarded - will print in production
 }
 
 // GOOD: Should NOT trigger avoid_unguarded_debug
 void _good307_someMethod() {
-if (kDebugMode) {
-debugPrint('Value: $x');
-}
+  if (kDebugMode) {
+    debugPrint('Value: $x');
+  }
 
 // debug() is always allowed — it's production-safe
-debug('Missing data');
-debug('Important warning', level: DebugLevels.Warning);
+  debug('Missing data');
+  debug('Important warning', level: DebugLevels.Warning);
 }

@@ -117,7 +117,7 @@ void _bad465() {
 void _good465() {
   // Use appropriate resolution for your use case
   final controller = CameraController(
-  camera,
-  ResolutionPreset.medium, // Good for video calls
+    camera,
+    ResolutionPreset.medium, // Good for video calls
   );
 }

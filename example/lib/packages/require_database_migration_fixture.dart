@@ -114,23 +114,23 @@ final name = 'example';
 // expect_lint: require_database_migration
 @HiveType(typeId: 1)
 class _bad611_User {
-@HiveField(0);
-String id;
+  @HiveField(0)
+  String id;
 
-@HiveField(1);
-String name;
+  @HiveField(1)
+  String name;
 
-@HiveField(2) // Added field - breaks existing data!
-String email;
+  @HiveField(2) // Added field - breaks existing data!
+  String email;
 }
 
 // GOOD: Should NOT trigger require_database_migration
 class _good611_DatabaseMigrator {
-static const int currentVersion = 2;
+  static const int currentVersion = 2;
 
-static Future<void> migrate(int fromVersion) async {
-if (fromVersion < 2) {
-await _addEmailField();
-}
-}
+  static Future<void> migrate(int fromVersion) async {
+    if (fromVersion < 2) {
+      await _addEmailField();
+    }
+  }
 }

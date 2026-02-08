@@ -111,23 +111,23 @@ final text = 'text';
 // expect_lint: require_dialog_tests
 void _bad1214() async {
   testWidgets('shows dialog', (tester) async {
-  await tester.pumpWidget(MyApp());
-  await tester.tap(find.byType(ElevatedButton));
-  // Missing pump for dialog animation!
-  expect(find.text('Dialog Title'), findsOneWidget);
+    await tester.pumpWidget(MyApp());
+    await tester.tap(find.byType(ElevatedButton));
+    // Missing pump for dialog animation!
+    expect(find.text('Dialog Title'), findsOneWidget);
   });
 }
 
 // GOOD: Should NOT trigger require_dialog_tests
 void _good1214() async {
   testWidgets('shows dialog', (tester) async {
-  await tester.pumpWidget(MyApp());
-  await tester.tap(find.byType(ElevatedButton));
-  await tester.pumpAndSettle(); // Wait for dialog animation
-  expect(find.text('Dialog Title'), findsOneWidget);
-  
-  // Test barrier dismiss
-  await tester.tapAt(Offset.zero);
-  await tester.pumpAndSettle();
+    await tester.pumpWidget(MyApp());
+    await tester.tap(find.byType(ElevatedButton));
+    await tester.pumpAndSettle(); // Wait for dialog animation
+    expect(find.text('Dialog Title'), findsOneWidget);
+
+    // Test barrier dismiss
+    await tester.tapAt(Offset.zero);
+    await tester.pumpAndSettle();
   });
 }

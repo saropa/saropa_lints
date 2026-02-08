@@ -120,7 +120,7 @@ void _bad742() {
 // GOOD: Should NOT trigger prefer_riverpod_family_for_params
 void _good742() {
   final userProvider = FutureProvider.family<User, String>((ref, userId) {
-  return fetchUser(userId);
+    return fetchUser(userId);
   });
   // Usage: ref.watch(userProvider(userId));
 }

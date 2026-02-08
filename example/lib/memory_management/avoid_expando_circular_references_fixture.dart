@@ -111,21 +111,21 @@ dynamic widget;
 // expect_lint: avoid_expando_circular_references
 void _bad472() {
   final _metadata = Expando<Map<String, dynamic>>();
-  
+
   void attachMetadata(Widget widget) {
-  _metadata[widget] = {
-  'widget': widget, // Circular reference!
-  };
+    _metadata[widget] = {
+      'widget': widget, // Circular reference!
+    };
   }
 }
 
 // GOOD: Should NOT trigger avoid_expando_circular_references
 void _good472() {
   final _metadata = Expando<WidgetMetadata>();
-  
+
   void attachMetadata(Widget widget) {
-  _metadata[widget] = WidgetMetadata(
-  createdAt: DateTime.now(),
-  ); // No reference back to widget
+    _metadata[widget] = WidgetMetadata(
+      createdAt: DateTime.now(),
+    ); // No reference back to widget
   }
 }

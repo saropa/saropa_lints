@@ -111,17 +111,17 @@ final name = 'example';
 // expect_lint: require_getx_binding_routes
 void _bad642() {
   GetPage(
-  name: '/home',
-  page: () => HomePage(),
-  // Missing binding!
+    name: '/home',
+    page: () => HomePage(),
+    // Missing binding!
   );
 }
 
 // GOOD: Should NOT trigger require_getx_binding_routes
 void _good642() {
   GetPage(
-  name: '/home',
-  page: () => HomePage(),
-  binding: HomeBinding(),
+    name: '/home',
+    page: () => HomePage(),
+    binding: HomeBinding(),
   );
 }

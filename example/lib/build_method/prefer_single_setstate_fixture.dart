@@ -108,16 +108,22 @@ import '../flutter_mocks.dart';
 // BAD: Should trigger prefer_single_setstate
 // expect_lint: prefer_single_setstate
 void _bad132_updateData() {
-setState(() { _name = 'John'; });
-setState(() { _age = 30; });
-setState(() { _email = 'j@e.com'; });
+  setState(() {
+    _name = 'John';
+  });
+  setState(() {
+    _age = 30;
+  });
+  setState(() {
+    _email = 'j@e.com';
+  });
 }
 
 // GOOD: Should NOT trigger prefer_single_setstate
 void _good132_updateData() {
-setState(() {
-_name = 'John';
-_age = 30;
-_email = 'j@e.com';
-});
+  setState(() {
+    _name = 'John';
+    _age = 30;
+    _email = 'j@e.com';
+  });
 }

@@ -111,17 +111,18 @@ dynamic response;
 // expect_lint: require_notification_action_handling
 void _bad361() {
   NotificationDetails(
-  android: AndroidNotificationDetails(
-  actions: [AndroidNotificationAction('reply', 'Reply')],
-  // No action handler!
-  ),
+    android: AndroidNotificationDetails(
+      actions: [AndroidNotificationAction('reply', 'Reply')],
+      // No action handler!
+    ),
   );
 }
 
 // GOOD: Should NOT trigger require_notification_action_handling
 void _good361() {
   // Set up action handler
-  onDidReceiveNotificationResponse: (response) {
-  if (response.actionId == 'reply') handleReply();
-  }
+  onDidReceiveNotificationResponse:
+  (response) {
+    if (response.actionId == 'reply') handleReply();
+  };
 }

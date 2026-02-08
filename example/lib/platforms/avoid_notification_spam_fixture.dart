@@ -115,7 +115,7 @@ final title = 'Title';
 void _bad903() async {
   // Notification for every single event
   for (final item in items) {
-  await showNotification('New: ${item.title}');
+    await showNotification('New: ${item.title}');
   }
 }
 
@@ -123,8 +123,8 @@ void _bad903() async {
 void _good903() async {
   // Batch notifications
   if (items.length > 1) {
-  await showNotification('${items.length} new items');
+    await showNotification('${items.length} new items');
   } else {
-  await showNotification('New: ${items.first.title}');
+    await showNotification('New: ${items.first.title}');
   }
 }

@@ -115,46 +115,46 @@ final text = 'text';
 void _bad537() async {
   // Multiple notifications without grouping
   for (final message in messages) {
-  await flutterLocalNotificationsPlugin.show(
-  message.id,
-  'New Message',
-  message.text,
-  NotificationDetails(android: AndroidNotificationDetails()),
-  );
+    await flutterLocalNotificationsPlugin.show(
+      message.id,
+      'New Message',
+      message.text,
+      NotificationDetails(android: AndroidNotificationDetails()),
+    );
   }
 }
 
 // GOOD: Should NOT trigger prefer_notification_grouping
 void _good537() async {
   const String groupKey = 'com.example.messages';
-  
+
   for (final message in messages) {
-  await flutterLocalNotificationsPlugin.show(
-  message.id,
-  'New Message',
-  message.text,
-  NotificationDetails(
-  android: AndroidNotificationDetails(
-  'channel_id',
-  'Channel Name',
-  groupKey: groupKey, // Group related notifications
-  ),
-  ),
-  );
+    await flutterLocalNotificationsPlugin.show(
+      message.id,
+      'New Message',
+      message.text,
+      NotificationDetails(
+        android: AndroidNotificationDetails(
+          'channel_id',
+          'Channel Name',
+          groupKey: groupKey, // Group related notifications
+        ),
+      ),
+    );
   }
-  
+
   // Show summary notification
   await flutterLocalNotificationsPlugin.show(
-  0,
-  '${messages.length} new messages',
-  '',
-  NotificationDetails(
-  android: AndroidNotificationDetails(
-  'channel_id',
-  'Channel Name',
-  groupKey: groupKey,
-  setAsGroupSummary: true,
-  ),
-  ),
+    0,
+    '${messages.length} new messages',
+    '',
+    NotificationDetails(
+      android: AndroidNotificationDetails(
+        'channel_id',
+        'Channel Name',
+        groupKey: groupKey,
+        setAsGroupSummary: true,
+      ),
+    ),
   );
 }

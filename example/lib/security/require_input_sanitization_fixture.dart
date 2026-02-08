@@ -120,8 +120,8 @@ void _bad991() {
 void _good991() {
   final query = 'SELECT * FROM users WHERE name = ?';
   db.rawQuery(query, [userInput]);
-  
+
   if (Uri.tryParse(userProvidedUrl)?.hasScheme == true) {
-  webView.loadUrl(userProvidedUrl);
+    webView.loadUrl(userProvidedUrl);
   }
 }

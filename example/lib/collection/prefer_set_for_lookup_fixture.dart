@@ -113,11 +113,11 @@ dynamic value;
 // expect_lint: prefer_set_for_lookup
 void _bad252() {
   final allowedItems = ['a', 'b', 'c'];
-  if (allowedItems.contains(value)) {}  // O(n) lookup
+  if (allowedItems.contains(value)) {} // O(n) lookup
 }
 
 // GOOD: Should NOT trigger prefer_set_for_lookup
 void _good252() {
   final allowedItems = {'a', 'b', 'c'};
-  if (allowedItems.contains(value)) {}  // O(1) lookup
+  if (allowedItems.contains(value)) {} // O(1) lookup
 }
