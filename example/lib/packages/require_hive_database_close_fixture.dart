@@ -110,20 +110,21 @@ dynamic data;
 // BAD: Should trigger require_hive_database_close
 // expect_lint: require_hive_database_close
 class _bad660_MyService {
-late Box _box;
-Future<void> init() async {
-_box = await Hive.openBox('data');
-}
+  late Box _box;
+  Future<void> init() async {
+    _box = await Hive.openBox('data');
+  }
 // No dispose method!
 }
 
 // GOOD: Should NOT trigger require_hive_database_close
 class _good660_MyService {
-late Box _box;
-Future<void> init() async {
-_box = await Hive.openBox('data');
-}
-Future<void> dispose() async {
-await _box.close();
-}
+  late Box _box;
+  Future<void> init() async {
+    _box = await Hive.openBox('data');
+  }
+
+  Future<void> dispose() async {
+    await _box.close();
+  }
 }

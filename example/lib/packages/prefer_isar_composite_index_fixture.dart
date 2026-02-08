@@ -113,15 +113,16 @@ final users = <dynamic>[];
 // BAD: Should trigger prefer_isar_composite_index
 // expect_lint: prefer_isar_composite_index
 void _bad689() {
-  isar.users.filter()
-  .firstNameEqualTo('John')
-  .lastNameEqualTo('Doe');  // No composite index!
+  isar.users
+      .filter()
+      .firstNameEqualTo('John')
+      .lastNameEqualTo('Doe'); // No composite index!
 }
 
 // GOOD: Should NOT trigger prefer_isar_composite_index
 @collection
 class _good689_User {
-@Index(composite: [CompositeIndex('lastName')]);
-String? firstName;
-String? lastName;
+  @Index(composite: [CompositeIndex('lastName')])
+  String? firstName;
+  String? lastName;
 }

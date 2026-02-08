@@ -112,18 +112,18 @@ dynamic value;
 // BAD: Should trigger avoid_if_with_many_branches
 // expect_lint: avoid_if_with_many_branches
 void _bad280() {
-  if (a) { }
-  else if (b) { }
-  else if (c) { }
-  else if (d) { }
-  else if (e) { }
-  else { }
+  if (a) {
+  } else if (b) {
+  } else if (c) {
+  } else if (d) {
+  } else if (e) {
+  } else {}
 }
 
 // GOOD: Should NOT trigger avoid_if_with_many_branches
 void _good280() {
   switch (value) {
-  case a:
-  case b:
+    case a:
+    case b:
   }
 }

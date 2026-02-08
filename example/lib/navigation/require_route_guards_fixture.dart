@@ -114,19 +114,19 @@ dynamic state;
 // expect_lint: require_route_guards
 void _bad505() {
   GoRoute(
-  path: '/profile',
-  builder: (_, __) => ProfilePage(), // No auth check!
+    path: '/profile',
+    builder: (_, __) => ProfilePage(), // No auth check!
   );
 }
 
 // GOOD: Should NOT trigger require_route_guards
 void _good505() {
   GoRoute(
-  path: '/profile',
-  redirect: (context, state) {
-  if (!authService.isLoggedIn) return '/login';
-  return null;
-  },
-  builder: (_, __) => ProfilePage(),
+    path: '/profile',
+    redirect: (context, state) {
+      if (!authService.isLoggedIn) return '/login';
+      return null;
+    },
+    builder: (_, __) => ProfilePage(),
   );
 }

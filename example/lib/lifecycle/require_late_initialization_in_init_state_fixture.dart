@@ -111,27 +111,27 @@ dynamic controller;
 // BAD: Should trigger require_late_initialization_in_init_state
 // expect_lint: require_late_initialization_in_init_state
 class _bad462__MyState extends State<MyWidget> {
-late TextEditingController _controller;
+  late TextEditingController _controller;
 
-@override
-Widget build(BuildContext context) {
-_controller = TextEditingController(); // Wrong! Recreated on every build!
-return TextField(controller: _controller);
-}
+  @override
+  Widget build(BuildContext context) {
+    _controller = TextEditingController(); // Wrong! Recreated on every build!
+    return TextField(controller: _controller);
+  }
 }
 
 // GOOD: Should NOT trigger require_late_initialization_in_init_state
 class _good462__MyState extends State<MyWidget> {
-late TextEditingController _controller;
+  late TextEditingController _controller;
 
-@override
-void initState() {
-super.initState();
-_controller = TextEditingController(); // Correct!
-}
+  @override
+  void initState() {
+    super.initState();
+    _controller = TextEditingController(); // Correct!
+  }
 
-@override
-Widget build(BuildContext context) {
-return TextField(controller: _controller);
-}
+  @override
+  Widget build(BuildContext context) {
+    return TextField(controller: _controller);
+  }
 }

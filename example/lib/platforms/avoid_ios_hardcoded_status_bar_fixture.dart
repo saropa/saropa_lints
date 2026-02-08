@@ -112,18 +112,18 @@ final context = BuildContext();
 // expect_lint: avoid_ios_hardcoded_status_bar
 void _bad836() {
   Padding(
-  padding: EdgeInsets.only(top: 44), // Only works on iPhone X
+    padding: EdgeInsets.only(top: 44), // Only works on iPhone X
   );
-  
-  SizedBox(height: 59) // Only works on iPhone 14 Pro
+
+  SizedBox(height: 59); // Only works on iPhone 14 Pro
 }
 
 // GOOD: Should NOT trigger avoid_ios_hardcoded_status_bar
 void _good836() {
   Padding(
-  padding: EdgeInsets.only(top: MediaQuery.of(context).padding.top),
+    padding: EdgeInsets.only(top: MediaQuery.of(context).padding.top),
   );
-  
+
   // Or use SafeArea which handles this automatically
   SafeArea(child: YourWidget());
 }

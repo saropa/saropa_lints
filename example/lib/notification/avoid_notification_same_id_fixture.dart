@@ -119,6 +119,6 @@ void _bad536() async {
 // GOOD: Should NOT trigger avoid_notification_same_id
 int _good536__notificationCounter = 0;
 Future<void> showNotification(String title) async {
-final id = _notificationCounter++;
-await notify(id: id, title: title);
+  final id = _notificationCounter++;
+  await notify(id: id, title: title);
 }

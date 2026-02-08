@@ -111,24 +111,24 @@ final context = BuildContext();
 // expect_lint: prefer_scalable_text
 void _bad13() {
   Text(
-  'Hello',
-  style: TextStyle(fontSize: 14), // Fixed size - won't scale!
+    'Hello',
+    style: TextStyle(fontSize: 14), // Fixed size - won't scale!
   );
   Text(
-  'Hello',
-  textScaleFactor: 1.0, // Forces no scaling!
+    'Hello',
+    textScaleFactor: 1.0, // Forces no scaling!
   );
 }
 
 // GOOD: Should NOT trigger prefer_scalable_text
 void _good13() {
   Text(
-  'Hello',
-  style: Theme.of(context).textTheme.bodyMedium, // Scales with system
+    'Hello',
+    style: Theme.of(context).textTheme.bodyMedium, // Scales with system
   );
   // Or use relative sizing:
   Text(
-  'Hello',
-  style: TextStyle(fontSize: 14 * MediaQuery.textScaleFactorOf(context)),
+    'Hello',
+    style: TextStyle(fontSize: 14 * MediaQuery.textScaleFactorOf(context)),
   );
 }

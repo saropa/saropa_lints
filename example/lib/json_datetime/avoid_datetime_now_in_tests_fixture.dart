@@ -112,8 +112,8 @@ dynamic file;
 void _bad456() {
   // In *_test.dart file:
   test('checks expiry', () {
-  final now = DateTime.now(); // Flaky!
-  expect(isExpired(now), isFalse);
+    final now = DateTime.now(); // Flaky!
+    expect(isExpired(now), isFalse);
   });
 }
 
@@ -121,7 +121,7 @@ void _bad456() {
 void _good456() {
   // Use fixed datetime or clock package
   test('checks expiry', () {
-  final fixedTime = DateTime(2024, 1, 15, 10, 30);
-  expect(isExpired(fixedTime), isFalse);
+    final fixedTime = DateTime(2024, 1, 15, 10, 30);
+    expect(isExpired(fixedTime), isFalse);
   });
 }

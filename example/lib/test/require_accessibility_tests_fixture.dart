@@ -111,20 +111,20 @@ final text = 'text';
 // expect_lint: require_accessibility_tests
 void _bad1183() async {
   testWidgets('button works', (tester) async {
-  await tester.pumpWidget(MyWidget());
-  await tester.tap(find.byType(ElevatedButton));
-  expect(find.text('Clicked'), findsOneWidget);
+    await tester.pumpWidget(MyWidget());
+    await tester.tap(find.byType(ElevatedButton));
+    expect(find.text('Clicked'), findsOneWidget);
   });
 }
 
 // GOOD: Should NOT trigger require_accessibility_tests
 void _good1183() async {
   testWidgets('button is accessible', (tester) async {
-  await tester.pumpWidget(MyWidget());
-  
-  final SemanticsHandle handle = tester.ensureSemantics();
-  await expectLater(tester, meetsGuideline(androidTapTargetGuideline));
-  await expectLater(tester, meetsGuideline(labeledTapTargetGuideline));
-  handle.dispose();
+    await tester.pumpWidget(MyWidget());
+
+    final SemanticsHandle handle = tester.ensureSemantics();
+    await expectLater(tester, meetsGuideline(androidTapTargetGuideline));
+    await expectLater(tester, meetsGuideline(labeledTapTargetGuideline));
+    handle.dispose();
   });
 }

@@ -112,16 +112,16 @@ dynamic state;
 // expect_lint: require_go_router_refresh_listenable
 void _bad516() {
   GoRouter(
-  redirect: (context, state) => authState.isLoggedIn ? null : '/login',
-  routes: [],
+    redirect: (context, state) => authState.isLoggedIn ? null : '/login',
+    routes: [],
   );
 }
 
 // GOOD: Should NOT trigger require_go_router_refresh_listenable
 void _good516() {
   GoRouter(
-  redirect: (context, state) => authState.isLoggedIn ? null : '/login',
-  refreshListenable: authState, // Refreshes on auth changes
-  routes: [],
+    redirect: (context, state) => authState.isLoggedIn ? null : '/login',
+    refreshListenable: authState, // Refreshes on auth changes
+    routes: [],
   );
 }

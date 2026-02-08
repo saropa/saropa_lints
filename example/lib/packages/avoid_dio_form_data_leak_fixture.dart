@@ -114,7 +114,7 @@ final path = '/path';
 // expect_lint: avoid_dio_form_data_leak
 void _bad594() async {
   final formData = FormData.fromMap({
-  'file': await MultipartFile.fromFile(path),
+    'file': await MultipartFile.fromFile(path),
   });
   await dio.post('/upload', data: formData);
   // FormData never cleaned up

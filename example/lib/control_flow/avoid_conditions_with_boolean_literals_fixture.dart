@@ -113,16 +113,16 @@ dynamic y;
 // BAD: Should trigger avoid_conditions_with_boolean_literals
 // expect_lint: avoid_conditions_with_boolean_literals
 void _bad275() {
-  if (y || false) { }  // Redundant: just use y
-  if (z && true) { }   // Redundant: just use z
+  if (y || false) {} // Redundant: just use y
+  if (z && true) {} // Redundant: just use z
   final a = x || true; // Always true!
   final b = x && false; // Always false!
 }
 
 // GOOD: Should NOT trigger avoid_conditions_with_boolean_literals
 void _good275() {
-  if (y) { }
-  if (z) { }
+  if (y) {}
+  if (z) {}
   final a = true;
   final b = false;
 }

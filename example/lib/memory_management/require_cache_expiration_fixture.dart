@@ -113,21 +113,21 @@ dynamic value;
 // BAD: Should trigger require_cache_expiration
 // expect_lint: require_cache_expiration
 class _bad474_UserCache {
-final Map<String, User> _cache = {};
+  final Map<String, User> _cache = {};
 
-User? get(String id) => _cache[id];
-void set(String id, User user) => _cache[id] = user;
+  User? get(String id) => _cache[id];
+  void set(String id, User user) => _cache[id] = user;
 // No expiration - data stays forever!
 }
 
 // GOOD: Should NOT trigger require_cache_expiration
 class _good474_UserCache {
-final Map<String, CacheEntry<User>> _cache = {};
-final Duration ttl = Duration(minutes: 5);
+  final Map<String, CacheEntry<User>> _cache = {};
+  final Duration ttl = Duration(minutes: 5);
 
-User? get(String id) {
-final entry = _cache[id];
-if (entry == null || entry.isExpired) return null;
-return entry.value;
-}
+  User? get(String id) {
+    final entry = _cache[id];
+    if (entry == null || entry.isExpired) return null;
+    return entry.value;
+  }
 }

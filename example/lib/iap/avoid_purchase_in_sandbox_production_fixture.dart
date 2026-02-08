@@ -114,10 +114,10 @@ dynamic response;
 void _bad418() async {
   // Hardcoded sandbox URL in production code
   final response = await http.post(
-  Uri.parse('https://sandbox.itunes.apple.com/verifyReceipt'),
-  body: receiptData,
+    Uri.parse('https://sandbox.itunes.apple.com/verifyReceipt'),
+    body: receiptData,
   );
-  
+
   // No environment check for purchases
   await InAppPurchase.instance.buyNonConsumable(purchaseParam: param);
 }
@@ -125,9 +125,9 @@ void _bad418() async {
 // GOOD: Should NOT trigger avoid_purchase_in_sandbox_production
 void _good418() async {
   final verifyUrl = kReleaseMode
-  ? 'https://buy.itunes.apple.com/verifyReceipt'
-  : 'https://sandbox.itunes.apple.com/verifyReceipt';
-  
+      ? 'https://buy.itunes.apple.com/verifyReceipt'
+      : 'https://sandbox.itunes.apple.com/verifyReceipt';
+
   // Or use RevenueCat/other SDK that handles this automatically
   await Purchases.purchaseProduct(productId);
 }

@@ -112,21 +112,21 @@ final path = '/path';
 // expect_lint: require_edge_case_tests
 void _bad1175() {
   test('calculates total', () {
-  expect(calculateTotal([10, 20, 30]), 60); // Only happy path
+    expect(calculateTotal([10, 20, 30]), 60); // Only happy path
   });
 }
 
 // GOOD: Should NOT trigger require_edge_case_tests
 void _good1175() {
   test('calculates total', () {
-  expect(calculateTotal([10, 20, 30]), 60);
+    expect(calculateTotal([10, 20, 30]), 60);
   });
-  
+
   test('calculates total with empty list', () {
-  expect(calculateTotal([]), 0);
+    expect(calculateTotal([]), 0);
   });
-  
+
   test('calculates total with negative numbers', () {
-  expect(calculateTotal([-10, 20]), 10);
+    expect(calculateTotal([-10, 20]), 10);
   });
 }

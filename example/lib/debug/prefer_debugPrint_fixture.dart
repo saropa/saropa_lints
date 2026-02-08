@@ -113,13 +113,13 @@ dynamic output;
 // expect_lint: prefer_debugPrint
 void _bad309() {
   for (final item in largeList) {
-  print('Processing: $item'); // Can overflow console buffer!
+    print('Processing: $item'); // Can overflow console buffer!
   }
 }
 
 // GOOD: Should NOT trigger prefer_debugPrint
 void _good309() {
   for (final item in largeList) {
-  debugPrint('Processing: $item'); // Throttled output
+    debugPrint('Processing: $item'); // Throttled output
   }
 }

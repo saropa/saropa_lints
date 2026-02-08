@@ -111,7 +111,7 @@ dynamic user;
 // BAD: Should trigger require_isar_links_load
 // expect_lint: require_isar_links_load
 void _bad681() {
-  final count = user.posts.length;  // Always 0 if not loaded!
+  final count = user.posts.length; // Always 0 if not loaded!
 }
 
 // GOOD: Should NOT trigger require_isar_links_load

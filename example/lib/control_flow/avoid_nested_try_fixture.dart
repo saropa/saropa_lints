@@ -109,10 +109,10 @@ import '../flutter_mocks.dart';
 // expect_lint: avoid_nested_try
 void _bad286() {
   try {
-  try {
-  // nested try
-  } catch (e) { }
-  } catch (e) { }
+    try {
+      // nested try
+    } catch (e) {}
+  } catch (e) {}
 }
 
 // GOOD: Should NOT trigger avoid_nested_try

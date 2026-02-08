@@ -111,9 +111,10 @@ dynamic y;
 // BAD: Should trigger avoid_unnecessary_patterns
 // expect_lint: avoid_unnecessary_patterns
 void _bad204_foo(int x) {
-if (x case int y) {  // Pattern doesn't narrow type
-print(y);
-}
+  if (x case int y) {
+    // Pattern doesn't narrow type
+    print(y);
+  }
 }
 
 // GOOD: Should NOT trigger avoid_unnecessary_patterns

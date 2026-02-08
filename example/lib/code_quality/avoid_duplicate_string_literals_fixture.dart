@@ -108,18 +108,18 @@ import '../flutter_mocks.dart';
 // BAD: Should trigger avoid_duplicate_string_literals
 // expect_lint: avoid_duplicate_string_literals
 void _bad230_process() {
-print('Loading');
-showMessage('Loading');
-log('Loading');
+  print('Loading');
+  showMessage('Loading');
+  log('Loading');
 }
 
 // GOOD: Should NOT trigger avoid_duplicate_string_literals
 void _good230() {
   const kLoadingMessage = 'Loading';
-  
+
   void process() {
-  print(kLoadingMessage);
-  showMessage(kLoadingMessage);
-  log(kLoadingMessage);
+    print(kLoadingMessage);
+    showMessage(kLoadingMessage);
+    log(kLoadingMessage);
   }
 }

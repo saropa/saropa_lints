@@ -118,7 +118,7 @@ void _bad133() async {
 // GOOD: Should NOT trigger prefer_compute_over_isolate_run
 void _good133() async {
   final result = a + b; // Simple math - no isolate needed
-  
+
   // For heavy computation:
   final result = await compute(parseJson, jsonString);
 }

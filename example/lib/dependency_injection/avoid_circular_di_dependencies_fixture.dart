@@ -108,20 +108,20 @@ import '../flutter_mocks.dart';
 // BAD: Should trigger avoid_circular_di_dependencies
 // expect_lint: avoid_circular_di_dependencies
 class _bad316_ServiceA {
-ServiceA(this.serviceB);
-final ServiceB serviceB;
-}
-class ServiceB {
-ServiceB(this.serviceA); // Circular!
-final ServiceA serviceA;
+  _bad316_ServiceA(this.serviceB);
+  final ServiceB serviceB;
+  // class ServiceB {
+  // ServiceB(this.serviceA); // Circular!
+  // final ServiceA serviceA;
+  // }
 }
 
 // GOOD: Should NOT trigger avoid_circular_di_dependencies
 class _good316_ServiceA {
-ServiceA(this.serviceB);
-final ServiceB serviceB;
-}
-class ServiceB {
-ServiceB(this.dataProvider); // No circular reference
-final DataProvider dataProvider;
+  _good316_ServiceA(this.serviceB);
+  final ServiceB serviceB;
+  // class ServiceB {
+  // ServiceB(this.dataProvider); // No circular reference
+  // final DataProvider dataProvider;
+  // }
 }

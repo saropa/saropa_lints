@@ -108,19 +108,19 @@ import '../flutter_mocks.dart';
 // BAD: Should trigger avoid_finalizer_misuse
 // expect_lint: avoid_finalizer_misuse
 class _bad819_MyResource {
-static final Finalizer<MyResource> _finalizer =
-Finalizer((r) => r._cleanup());
+  static final Finalizer<MyResource> _finalizer =
+      Finalizer((r) => r._cleanup());
 
-MyResource() {
-_finalizer.attach(this, this);
-}
+  MyResource() {
+    _finalizer.attach(this, this);
+  }
 
-void _cleanup() => print('Cleaned up'); // Non-deterministic!
+  void _cleanup() => print('Cleaned up'); // Non-deterministic!
 }
 
 // GOOD: Should NOT trigger avoid_finalizer_misuse
 class _good819_MyResource {
-void dispose() {
-_cleanup(); // Explicit, deterministic
-}
+  void dispose() {
+    _cleanup(); // Explicit, deterministic
+  }
 }

@@ -119,13 +119,13 @@ void _bad1413() {
 // GOOD: Should NOT trigger require_placeholder_for_network
 void _good1413() {
   Image.network(
-  'https://example.com/image.png',
-  loadingBuilder: (context, child, progress) =>
-  progress == null ? child : CircularProgressIndicator(),
+    'https://example.com/image.png',
+    loadingBuilder: (context, child, progress) =>
+        progress == null ? child : CircularProgressIndicator(),
   );
   // Or with CachedNetworkImage:
   CachedNetworkImage(
-  imageUrl: url,
-  placeholder: (context, url) => CircularProgressIndicator(),
+    imageUrl: url,
+    placeholder: (context, url) => CircularProgressIndicator(),
   );
 }

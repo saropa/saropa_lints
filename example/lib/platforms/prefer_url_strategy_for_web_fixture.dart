@@ -110,7 +110,7 @@ import '../flutter_mocks.dart';
 void _bad943() {
   // URLs like: myapp.com/#/home, myapp.com/#/settings
   void main() {
-  runApp(MyApp()); // Uses hash URLs by default
+    runApp(MyApp()); // Uses hash URLs by default
   }
 }
 
@@ -118,7 +118,7 @@ void _bad943() {
 void _good943() {
   // URLs like: myapp.com/home, myapp.com/settings
   void main() {
-  usePathUrlStrategy(); // Call before runApp
-  runApp(MyApp());
+    usePathUrlStrategy(); // Call before runApp
+    runApp(MyApp());
   }
 }

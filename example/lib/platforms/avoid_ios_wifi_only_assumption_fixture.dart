@@ -123,18 +123,21 @@ void _bad908() async {
 void _good908() async {
   final connectivity = await Connectivity().checkConnectivity();
   if (connectivity == ConnectivityResult.wifi) {
-  await downloadLargeFile(url);
+    await downloadLargeFile(url);
   } else {
-  showDialog(
-  context: context,
-  builder: (_) => AlertDialog(
-  title: Text('Large Download'),
-  content: Text('Download 500MB over cellular?'),
-  actions: [
-  TextButton(onPressed: () => Navigator.pop(context), child: Text('Wait for WiFi')),
-  TextButton(onPressed: () => downloadLargeFile(url), child: Text('Download')),
-  ],
-  ),
-  );
+    showDialog(
+      context: context,
+      builder: (_) => AlertDialog(
+        title: Text('Large Download'),
+        content: Text('Download 500MB over cellular?'),
+        actions: [
+          TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: Text('Wait for WiFi')),
+          TextButton(
+              onPressed: () => downloadLargeFile(url), child: Text('Download')),
+        ],
+      ),
+    );
   }
 }

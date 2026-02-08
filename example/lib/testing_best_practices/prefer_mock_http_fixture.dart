@@ -115,15 +115,15 @@ dynamic response;
 // expect_lint: prefer_mock_http
 void _bad1206() async {
   test('fetches data', () async {
-  final client = http.Client();
-  final response = await client.get(Uri.parse('https://api.example.com'));
+    final client = http.Client();
+    final response = await client.get(Uri.parse('https://api.example.com'));
   });
 }
 
 // GOOD: Should NOT trigger prefer_mock_http
 void _good1206() async {
   test('fetches data', () async {
-  final client = MockClient((request) async => Response('{}', 200));
-  final response = await client.get(Uri.parse('https://api.example.com'));
+    final client = MockClient((request) async => Response('{}', 200));
+    final response = await client.get(Uri.parse('https://api.example.com'));
   });
 }

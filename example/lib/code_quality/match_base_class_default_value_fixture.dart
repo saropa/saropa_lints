@@ -110,18 +110,20 @@ dynamic x;
 // BAD: Should trigger match_base_class_default_value
 // expect_lint: match_base_class_default_value
 class _bad223_Parent {
-void foo({int x = 0}) {}
+  void foo({int x = 0}) {}
 }
+
 class Child extends Parent {
-@override
-void foo({int x = 42}) {}  // Non-zero default is suspicious
+  @override
+  void foo({int x = 42}) {} // Non-zero default is suspicious
 }
 
 // GOOD: Should NOT trigger match_base_class_default_value
 class _good223_Parent {
-void foo({int x = 0}) {}
+  void foo({int x = 0}) {}
 }
+
 class Child extends Parent {
-@override
-void foo({int x = 0}) {}  // Matches parent
+  @override
+  void foo({int x = 0}) {} // Matches parent
 }

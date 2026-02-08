@@ -125,7 +125,7 @@ void _good1246() {
   final user = json['user'] as Map<String, dynamic>?;
   final profile = user?['profile'] as Map<String, dynamic>?;
   final name = profile?['name'];
-  
+
   // Or use extension methods
   final name = json.optionalString(['user', 'profile', 'name']);
 }

@@ -108,16 +108,16 @@ import '../flutter_mocks.dart';
 // BAD: Should trigger avoid_wrapping_in_padding
 // expect_lint: avoid_wrapping_in_padding
 class _bad1285__MyWidgetState extends State<MyWidget> {
-_MyWidgetState() {
+  _MyWidgetState() {
 // initialization code
-}
+  }
 }
 
 // GOOD: Should NOT trigger avoid_wrapping_in_padding
 class _good1285__MyWidgetState extends State<MyWidget> {
-@override
-void initState() {
-super.initState();
+  @override
+  void initState() {
+    super.initState();
 // initialization code
-}
+  }
 }

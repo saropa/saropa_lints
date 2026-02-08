@@ -111,8 +111,8 @@ dynamic image;
 // expect_lint: avoid_image_repeat
 void _bad1399() {
   Image.asset(
-  'image.png',
-  repeat: ImageRepeat.repeat,
+    'image.png',
+    repeat: ImageRepeat.repeat,
   );
 }
 

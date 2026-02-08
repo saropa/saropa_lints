@@ -113,14 +113,14 @@ final index = 0;
 // expect_lint: require_default_text_style
 void _bad1422() {
   ListView.builder(
-  itemBuilder: (context, index) => ListTile(),
+    itemBuilder: (context, index) => ListTile(),
   );
 }
 
 // GOOD: Should NOT trigger require_default_text_style
 void _good1422() {
   ListView.builder(
-  physics: const BouncingScrollPhysics(),
-  itemBuilder: (context, index) => ListTile(),
+    physics: const BouncingScrollPhysics(),
+    itemBuilder: (context, index) => ListTile(),
   );
 }

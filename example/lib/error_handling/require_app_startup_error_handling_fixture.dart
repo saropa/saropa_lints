@@ -111,22 +111,22 @@ dynamic error;
 // BAD: Should trigger require_app_startup_error_handling
 // expect_lint: require_app_startup_error_handling
 void _bad362_main() {
-runApp(MyApp()); // Unhandled errors crash silently
+  runApp(MyApp()); // Unhandled errors crash silently
 }
 
 // GOOD: Should NOT trigger require_app_startup_error_handling
 void _good362_main() {
-runZonedGuarded(
-() {
-WidgetsFlutterBinding.ensureInitialized();
-FlutterError.onError = (details) {
-FlutterError.presentError(details);
-reportToCrashlytics(details);
-};
-runApp(MyApp());
-},
-(error, stack) {
-reportToCrashlytics(error, stack);
-},
-);
+  runZonedGuarded(
+    () {
+      WidgetsFlutterBinding.ensureInitialized();
+      FlutterError.onError = (details) {
+        FlutterError.presentError(details);
+        reportToCrashlytics(details);
+      };
+      runApp(MyApp());
+    },
+    (error, stack) {
+      reportToCrashlytics(error, stack);
+    },
+  );
 }

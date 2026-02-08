@@ -115,13 +115,13 @@ dynamic future;
 // expect_lint: avoid_loading_flash
 void _bad1267() {
   FutureBuilder<Data>(
-  future: fetchData(),
-  builder: (context, snapshot) {
-  if (snapshot.connectionState == ConnectionState.waiting) {
-  return CircularProgressIndicator(); // Flashes for fast loads!
-  }
-  return DataWidget(snapshot.data!);
-  },
+    future: fetchData(),
+    builder: (context, snapshot) {
+      if (snapshot.connectionState == ConnectionState.waiting) {
+        return CircularProgressIndicator(); // Flashes for fast loads!
+      }
+      return DataWidget(snapshot.data!);
+    },
   );
 }
 
@@ -129,19 +129,19 @@ void _bad1267() {
 void _good1267() {
   // Option 1: Use shimmer with minimum display time
   Shimmer.fromColors(
-  baseColor: Colors.grey[300]!,
-  highlightColor: Colors.grey[100]!,
-  child: PlaceholderWidget(),
+    baseColor: Colors.grey[300]!,
+    highlightColor: Colors.grey[100]!,
+    child: PlaceholderWidget(),
   );
-  
+
   // Option 2: Delay showing loading indicator
   FutureBuilder<Data>(
-  future: fetchData(),
-  builder: (context, snapshot) {
-  if (snapshot.connectionState == ConnectionState.waiting) {
-  return DelayedLoader(delay: Duration(milliseconds: 200));
-  }
-  return DataWidget(snapshot.data!);
-  },
+    future: fetchData(),
+    builder: (context, snapshot) {
+      if (snapshot.connectionState == ConnectionState.waiting) {
+        return DelayedLoader(delay: Duration(milliseconds: 200));
+      }
+      return DataWidget(snapshot.data!);
+    },
   );
 }

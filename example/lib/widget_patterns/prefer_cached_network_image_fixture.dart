@@ -113,16 +113,16 @@ final items = <dynamic>[];
 // expect_lint: prefer_cached_network_image
 void _bad1393() {
   SliverList(
-  delegate: SliverChildListDelegate([100 items]),
+    delegate: SliverChildListDelegate(items),
   );
 }
 
 // GOOD: Should NOT trigger prefer_cached_network_image
 void _good1393() {
   SliverList(
-  delegate: SliverChildBuilderDelegate(
-  (context, index) => Item(items[index]),
-  childCount: items.length,
-  ),
+    delegate: SliverChildBuilderDelegate(
+      (context, index) => Item(items[index]),
+      childCount: items.length,
+    ),
   );
 }

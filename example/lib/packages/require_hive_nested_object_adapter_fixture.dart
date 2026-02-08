@@ -109,16 +109,18 @@ import '../flutter_mocks.dart';
 // expect_lint: require_hive_nested_object_adapter
 @HiveType(typeId: 1)
 class _bad666_User {
-@HiveField(0);
-Address address; // Address has no TypeAdapter!
+  @HiveField(0)
+  Address address; // Address has no TypeAdapter!
 }
+
 class _bad666_Address {} // Missing @HiveType
 
 // GOOD: Should NOT trigger require_hive_nested_object_adapter
 @HiveType(typeId: 1)
 class _good666_User {
-@HiveField(0);
-Address address;
+  @HiveField(0)
+  Address address;
 }
+
 @HiveType(typeId: 2)
 class _good666_Address {}

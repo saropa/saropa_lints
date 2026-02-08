@@ -112,12 +112,12 @@ dynamic json;
 // BAD: Should trigger avoid_blocking_main_thread
 // expect_lint: avoid_blocking_main_thread
 void _bad821_loadConfig() {
-final content = File('config.json').readAsStringSync(); // Blocks UI!
+  final content = File('config.json').readAsStringSync(); // Blocks UI!
 }
 
 // GOOD: Should NOT trigger avoid_blocking_main_thread
 void _good821() async {
   Future<void> loadConfig() async {
-  final content = await File('config.json').readAsString();
+    final content = await File('config.json').readAsString();
   }
 }

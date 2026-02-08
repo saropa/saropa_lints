@@ -114,15 +114,15 @@ dynamic value;
 // expect_lint: avoid_empty_build_when
 void _bad234() {
   BlocBuilder<MyBloc, MyState>(
-  buildWhen: (previous, current) => true, // Always rebuilds
-  builder: (context, state) => Text('$state'),
+    buildWhen: (previous, current) => true, // Always rebuilds
+    builder: (context, state) => Text('$state'),
   );
 }
 
 // GOOD: Should NOT trigger avoid_empty_build_when
 void _good234() {
   BlocBuilder<MyBloc, MyState>(
-  buildWhen: (previous, current) => previous.value != current.value,
-  builder: (context, state) => Text('${state.value}'),
+    buildWhen: (previous, current) => previous.value != current.value,
+    builder: (context, state) => Text('${state.value}'),
   );
 }

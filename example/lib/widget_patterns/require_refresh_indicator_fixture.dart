@@ -114,16 +114,16 @@ final key = 'key';
 // expect_lint: require_refresh_indicator
 void _bad1421() {
   ListView.builder(
-  itemBuilder: (context, index) => ListTile(),
-  itemCount: 100,
+    itemBuilder: (context, index) => ListTile(),
+    itemCount: 100,
   );
 }
 
 // GOOD: Should NOT trigger require_refresh_indicator
 void _good1421() {
   ListView.builder(
-  key: PageStorageKey('my_list'),
-  itemBuilder: (context, index) => ListTile(),
-  itemCount: 100,
+    key: PageStorageKey('my_list'),
+    itemBuilder: (context, index) => ListTile(),
+    itemCount: 100,
   );
 }

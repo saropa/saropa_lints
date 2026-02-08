@@ -112,8 +112,8 @@ dynamic x;
 // BAD: Should trigger avoid_constant_conditions
 // expect_lint: avoid_constant_conditions
 void _bad174() {
-  if (1 > 2) { }  // Always false
-  final x = 'a' + 'b';  // Should be 'ab'
+  if (1 > 2) {} // Always false
+  final x = 'a' + 'b'; // Should be 'ab'
 }
 
 // GOOD: Should NOT trigger avoid_constant_conditions

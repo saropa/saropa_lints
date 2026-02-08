@@ -120,6 +120,6 @@ void _good829() async {
   // Request permission before using
   final status = await Permission.location.request();
   if (status.isGranted) {
-  final position = await Geolocator.getCurrentPosition();
+    final position = await Geolocator.getCurrentPosition();
   }
 }

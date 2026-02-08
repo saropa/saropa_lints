@@ -111,12 +111,12 @@ dynamic value;
 // expect_lint: avoid_duplicate_switch_case_conditions
 void _bad279() {
   switch (value) {
-  case 1:
-  doSomething();
-  break;
-  case 1:  // Duplicate!
-  doSomethingElse();
-  break;
+    case 1:
+      doSomething();
+      break;
+    case 1: // Duplicate!
+      doSomethingElse();
+      break;
   }
 }
 

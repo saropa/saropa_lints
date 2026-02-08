@@ -113,12 +113,10 @@ final users = <dynamic>[];
 // BAD: Should trigger avoid_hardcoded_api_urls
 // expect_lint: avoid_hardcoded_api_urls
 void _bad45() async {
-  final response = await http.get(
-  Uri.parse('https://api.example.com/users'));
+  final response = await http.get(Uri.parse('https://api.example.com/users'));
 }
 
 // GOOD: Should NOT trigger avoid_hardcoded_api_urls
 void _good45() async {
-  final response = await http.get(
-  Uri.parse('${ApiConfig.baseUrl}/users'));
+  final response = await http.get(Uri.parse('${ApiConfig.baseUrl}/users'));
 }

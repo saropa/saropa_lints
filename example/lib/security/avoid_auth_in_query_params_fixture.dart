@@ -121,7 +121,7 @@ void _bad1008() async {
 // GOOD: Should NOT trigger avoid_auth_in_query_params
 void _good1008() async {
   await http.get(
-  Uri.parse('https://api.example.com/user'),
-  headers: {'Authorization': 'Bearer $accessToken'},
+    Uri.parse('https://api.example.com/user'),
+    headers: {'Authorization': 'Bearer $accessToken'},
   );
 }

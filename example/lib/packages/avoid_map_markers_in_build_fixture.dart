@@ -112,22 +112,25 @@ dynamic map;
 // BAD: Should trigger avoid_map_markers_in_build
 // expect_lint: avoid_map_markers_in_build
 Widget _bad621_build(BuildContext context) {
-return GoogleMap(
-markers: locations.map((loc) => Marker(
-markerId: MarkerId(loc.id),
-position: loc.position,
-)).toSet(),
-);
+  return GoogleMap(
+    markers: locations
+        .map((loc) => Marker(
+              markerId: MarkerId(loc.id),
+              position: loc.position,
+            ))
+        .toSet(),
+  );
 }
 
 // GOOD: Should NOT trigger avoid_map_markers_in_build
 void _good621() {
   Set<Marker>? _cachedMarkers;
-  
-  Set<Marker> get markers {
-  return _cachedMarkers ??= locations.map((loc) => Marker(
-  markerId: MarkerId(loc.id),
-  position: loc.position,
-  )).toSet();
-  }
+
+  // Getter would be on a class; here just show the caching pattern:
+  _cachedMarkers ??= locations
+      .map((loc) => Marker(
+            markerId: MarkerId(loc.id),
+            position: loc.position,
+          ))
+      .toSet();
 }

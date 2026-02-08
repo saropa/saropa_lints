@@ -111,15 +111,15 @@ dynamic value;
 // expect_lint: avoid_duplicate_test_assertions
 void _bad1160() {
   test('example', () {
-  expect(value, equals(1));
-  expect(value, equals(1));  // Duplicate
+    expect(value, equals(1));
+    expect(value, equals(1)); // Duplicate
   });
 }
 
 // GOOD: Should NOT trigger avoid_duplicate_test_assertions
 void _good1160() {
   test('example', () {
-  expect(value, equals(1));
-  expect(otherValue, equals(2));
+    expect(value, equals(1));
+    expect(otherValue, equals(2));
   });
 }

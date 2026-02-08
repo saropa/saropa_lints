@@ -109,13 +109,12 @@ import '../flutter_mocks.dart';
 // expect_lint: avoid_webview_file_access
 void _bad693() {
   WebViewController()
-  ..setJavaScriptMode(JavaScriptMode.unrestricted)
-  ..allowFileAccess(true);
+    ..setJavaScriptMode(JavaScriptMode.unrestricted)
+    ..allowFileAccess(true);
 }
 
 // GOOD: Should NOT trigger avoid_webview_file_access
 void _good693() {
-  WebViewController()
-  ..setJavaScriptMode(JavaScriptMode.unrestricted);
+  WebViewController()..setJavaScriptMode(JavaScriptMode.unrestricted);
   // File access disabled by default
 }

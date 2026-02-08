@@ -111,17 +111,17 @@ dynamic value;
 // BAD: Should trigger avoid_unnecessary_hook_widgets
 // expect_lint: avoid_unnecessary_hook_widgets
 class _bad633_MyWidget extends HookWidget {
-@override
-Widget build(BuildContext context) {
-return Text('No hooks used!'); // Should be StatelessWidget
-}
+  @override
+  Widget build(BuildContext context) {
+    return Text('No hooks used!'); // Should be StatelessWidget
+  }
 }
 
 // GOOD: Should NOT trigger avoid_unnecessary_hook_widgets
 class _good633_MyWidget extends HookWidget {
-@override
-Widget build(BuildContext context) {
-final counter = useState(0); // Using hooks!
-return Text('${counter.value}');
-}
+  @override
+  Widget build(BuildContext context) {
+    final counter = useState(0); // Using hooks!
+    return Text('${counter.value}');
+  }
 }

@@ -111,15 +111,15 @@ dynamic event;
 // expect_lint: avoid_yield_in_on_event
 void _bad571() {
   on<MyEvent>((event, emit) async* {
-  yield LoadingState();  // Wrong!
-  yield LoadedState();
+    yield LoadingState(); // Wrong!
+    yield LoadedState();
   });
 }
 
 // GOOD: Should NOT trigger avoid_yield_in_on_event
 void _good571() {
   on<MyEvent>((event, emit) async {
-  emit(LoadingState());
-  emit(LoadedState());
+    emit(LoadingState());
+    emit(LoadedState());
   });
 }

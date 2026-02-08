@@ -112,7 +112,7 @@ dynamic image;
 void _bad435() async {
   final image = await ImagePicker().pickImage(source: ImageSource.camera);
   // May be 10+ MB raw from camera!
-  
+
   await uploadProfilePicture(image); // Wastes bandwidth
 }
 
@@ -120,15 +120,15 @@ void _bad435() async {
 void _good435() async {
   // For profile pictures (80-85% quality is usually indistinguishable):
   final image = await ImagePicker().pickImage(
-  source: ImageSource.camera,
-  imageQuality: 85,
+    source: ImageSource.camera,
+    imageQuality: 85,
   );
-  
+
   // For thumbnails or previews:
   final thumbnail = await ImagePicker().pickImage(
-  source: ImageSource.gallery,
-  imageQuality: 50, // Smaller for previews
-  maxWidth: 300,
-  maxHeight: 300,
+    source: ImageSource.gallery,
+    imageQuality: 50, // Smaller for previews
+    maxWidth: 300,
+    maxHeight: 300,
   );
 }

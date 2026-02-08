@@ -109,14 +109,14 @@ import '../flutter_mocks.dart';
 // expect_lint: avoid_circular_imports
 void _bad84() {
   // file_a.dart
-  
+
   // file_b.dart
 }
 
 // GOOD: Should NOT trigger avoid_circular_imports
 void _good84() {
   // file_a.dart
-  
+
   // file_b.dart
   // Both depend on shared module, no cycle
 }

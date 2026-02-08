@@ -114,27 +114,27 @@ dynamic state;
 // expect_lint: prefer_go_router_redirect_auth
 void _bad518() {
   GoRoute(
-  path: '/profile',
-  builder: (context, state) {
-  if (!authService.isLoggedIn) {
-  return LoginPage(); // Auth check in builder
-  }
-  return ProfilePage();
-  },
+    path: '/profile',
+    builder: (context, state) {
+      if (!authService.isLoggedIn) {
+        return LoginPage(); // Auth check in builder
+      }
+      return ProfilePage();
+    },
   );
 }
 
 // GOOD: Should NOT trigger prefer_go_router_redirect_auth
 void _good518() {
   GoRouter(
-  redirect: (context, state) {
-  if (!authService.isLoggedIn && state.matchedLocation != '/login') {
-  return '/login';
-  }
-  return null;
-  },
-  routes: [
-  GoRoute(path: '/profile', builder: (_, __) => ProfilePage()),
-  ],
+    redirect: (context, state) {
+      if (!authService.isLoggedIn && state.matchedLocation != '/login') {
+        return '/login';
+      }
+      return null;
+    },
+    routes: [
+      GoRoute(path: '/profile', builder: (_, __) => ProfilePage()),
+    ],
   );
 }

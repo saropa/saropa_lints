@@ -109,18 +109,18 @@ import '../flutter_mocks.dart';
 // expect_lint: require_map_idle_callback
 void _bad622() {
   GoogleMap(
-  onCameraMove: (position) {
-  fetchMarkersForRegion(position.target);  // Fires 60x/second!
-  },
+    onCameraMove: (position) {
+      fetchMarkersForRegion(position.target); // Fires 60x/second!
+    },
   );
 }
 
 // GOOD: Should NOT trigger require_map_idle_callback
 void _good622() {
   GoogleMap(
-  onCameraIdle: () {
-  final position = mapController.camera;
-  fetchMarkersForRegion(position.center);
-  },
+    onCameraIdle: () {
+      final position = mapController.camera;
+      fetchMarkersForRegion(position.center);
+    },
   );
 }

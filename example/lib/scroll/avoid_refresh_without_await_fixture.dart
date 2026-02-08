@@ -111,19 +111,19 @@ dynamic child;
 // expect_lint: avoid_refresh_without_await
 void _bad985() {
   RefreshIndicator(
-  onRefresh: () {
-  loadData(); // Returns void!
-  },
-  child: ListView(),
+    onRefresh: () {
+      loadData(); // Returns void!
+    },
+    child: ListView(),
   );
 }
 
 // GOOD: Should NOT trigger avoid_refresh_without_await
 void _good985() async {
   RefreshIndicator(
-  onRefresh: () async {
-  await loadData();
-  },
-  child: ListView(),
+    onRefresh: () async {
+      await loadData();
+    },
+    child: ListView(),
   );
 }

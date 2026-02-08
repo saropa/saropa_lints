@@ -117,32 +117,32 @@ dynamic widget;
 // expect_lint: avoid_animation_rebuild_waste
 void _bad40() {
   AnimatedBuilder(
-  animation: _controller,
-  builder: (context, child) => Scaffold(
-  appBar: AppBar(),
-  body: Column(
-  children: [
-  Transform.scale(scale: _controller.value, child: widget),
-  // Many other widgets that don't animate
-  ],
-  ),
-  ),
+    animation: _controller,
+    builder: (context, child) => Scaffold(
+      appBar: AppBar(),
+      body: Column(
+        children: [
+          Transform.scale(scale: _controller.value, child: widget),
+          // Many other widgets that don't animate
+        ],
+      ),
+    ),
   );
 }
 
 // GOOD: Should NOT trigger avoid_animation_rebuild_waste
 void _good40() {
   Scaffold(
-  appBar: AppBar(),
-  body: Column(
-  children: [
-  AnimatedBuilder(
-  animation: _controller,
-  builder: (context, child) =>
-  Transform.scale(scale: _controller.value, child: child),
-  child: widget,  // Static child passed through
-  ),
-  ],
-  ),
+    appBar: AppBar(),
+    body: Column(
+      children: [
+        AnimatedBuilder(
+          animation: _controller,
+          builder: (context, child) =>
+              Transform.scale(scale: _controller.value, child: child),
+          child: widget, // Static child passed through
+        ),
+      ],
+    ),
   );
 }

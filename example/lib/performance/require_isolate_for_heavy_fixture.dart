@@ -111,15 +111,15 @@ dynamic json;
 // expect_lint: require_isolate_for_heavy
 void _bad818() {
   Future<List<User>> parseUsers(String json) async {
-  return jsonDecode(json); // Blocks main thread for large JSON!
+    return jsonDecode(json); // Blocks main thread for large JSON!
   }
 }
 
 // GOOD: Should NOT trigger require_isolate_for_heavy
 void _good818() {
   Future<List<User>> parseUsers(String json) async {
-  return compute(_parseJson, json);
+    return compute(_parseJson, json);
   }
-  
+
   List<User> _parseJson(String json) => jsonDecode(json);
 }

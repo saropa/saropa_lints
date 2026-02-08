@@ -108,17 +108,17 @@ import '../flutter_mocks.dart';
 // BAD: Should trigger require_change_notifier_dispose
 // expect_lint: require_change_notifier_dispose
 class _bad329__MyWidgetState extends State<MyWidget> {
-final MyNotifier _notifier = MyNotifier();
+  final MyNotifier _notifier = MyNotifier();
 // Missing dispose — listeners leak!
 }
 
 // GOOD: Should NOT trigger require_change_notifier_dispose
 class _good329__MyWidgetState extends State<MyWidget> {
-final MyNotifier _notifier = MyNotifier();
+  final MyNotifier _notifier = MyNotifier();
 
-@override
-void dispose() {
-_notifier.dispose();
-super.dispose();
-}
+  @override
+  void dispose() {
+    _notifier.dispose();
+    super.dispose();
+  }
 }

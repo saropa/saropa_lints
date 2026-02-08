@@ -113,16 +113,16 @@ final isError = false;
 // expect_lint: avoid_color_only_indicators
 void _bad3() {
   Container(
-  color: isError ? Colors.red : Colors.green,
+    color: isError ? Colors.red : Colors.green,
   );
 }
 
 // GOOD: Should NOT trigger avoid_color_only_indicators
 void _good3() {
   Row(
-  children: [
-  Icon(isError ? Icons.error : Icons.check),
-  Container(color: isError ? Colors.red : Colors.green),
-  ],
+    children: [
+      Icon(isError ? Icons.error : Icons.check),
+      Container(color: isError ? Colors.red : Colors.green),
+    ],
   );
 }

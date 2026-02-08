@@ -110,14 +110,14 @@ final context = BuildContext();
 // BAD: Should trigger avoid_getx_build_context_bypass
 // expect_lint: avoid_getx_build_context_bypass
 class _bad653_MyController extends GetxController {
-void showMessage() {
-ScaffoldMessenger.of(Get.context!).showSnackBar();
-}
+  void showMessage() {
+    ScaffoldMessenger.of(Get.context!).showSnackBar();
+  }
 }
 
 // GOOD: Should NOT trigger avoid_getx_build_context_bypass
 class _good653_MyController extends GetxController {
-void showMessage(BuildContext context) {
-ScaffoldMessenger.of(context).showSnackBar();
-}
+  void showMessage(BuildContext context) {
+    ScaffoldMessenger.of(context).showSnackBar();
+  }
 }

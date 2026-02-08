@@ -113,25 +113,27 @@ dynamic result;
 // expect_lint: require_file_path_sanitization
 void _bad382() async {
   Future<File> getUserFile(String filename) async {
-  final dir = await getApplicationDocumentsDirectory();
-  return File('${dir.path}/$filename'); // User could pass '../../../etc/passwd'!
+    final dir = await getApplicationDocumentsDirectory();
+    return File(
+        '${dir.path}/$filename'); // User could pass '../../../etc/passwd'!
   }
 }
 
 // GOOD: Should NOT trigger require_file_path_sanitization
 void _good382() async {
   Future<File> getUserFile(String filename) async {
-  final dir = await getApplicationDocumentsDirectory();
-  
-  // Sanitize: remove path separators and special sequences
-  final sanitized = path.basename(filename).replaceAll(RegExp(r'[^\w.-]'), '');
-  
-  // Verify result is within intended directory
-  final file = File(path.join(dir.path, sanitized));
-  if (!path.isWithin(dir.path, file.path)) {
-  throw SecurityException('Invalid file path');
-  }
-  
-  return file;
+    final dir = await getApplicationDocumentsDirectory();
+
+    // Sanitize: remove path separators and special sequences
+    final sanitized =
+        path.basename(filename).replaceAll(RegExp(r'[^\w.-]'), '');
+
+    // Verify result is within intended directory
+    final file = File(path.join(dir.path, sanitized));
+    if (!path.isWithin(dir.path, file.path)) {
+      throw SecurityException('Invalid file path');
+    }
+
+    return file;
   }
 }

@@ -108,24 +108,24 @@ import '../flutter_mocks.dart';
 // BAD: Should trigger require_bloc_manual_dispose
 // expect_lint: require_bloc_manual_dispose
 class _bad581_MyBloc extends Bloc<MyEvent, MyState> {
-final _controller = StreamController<int>();
-final _textController = TextEditingController();
+  final _controller = StreamController<int>();
+  final _textController = TextEditingController();
 
-MyBloc() : super(MyInitial());
+  _bad581_MyBloc() : super(MyInitial());
 // Missing close() - resources leak!
 }
 
 // GOOD: Should NOT trigger require_bloc_manual_dispose
 class _good581_MyBloc extends Bloc<MyEvent, MyState> {
-final _controller = StreamController<int>();
-final _textController = TextEditingController();
+  final _controller = StreamController<int>();
+  final _textController = TextEditingController();
 
-MyBloc() : super(MyInitial());
+  _good581_MyBloc() : super(MyInitial());
 
-@override
-Future<void> close() {
-_controller.close();
-_textController.dispose();
-return super.close();
-}
+  @override
+  Future<void> close() {
+    _controller.close();
+    _textController.dispose();
+    return super.close();
+  }
 }

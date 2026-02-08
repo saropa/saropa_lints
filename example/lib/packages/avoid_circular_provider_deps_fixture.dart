@@ -113,13 +113,13 @@ dynamic ref;
 // expect_lint: avoid_circular_provider_deps
 void _bad752() {
   final providerA = Provider((ref) {
-  final b = ref.watch(providerB); // A depends on B
-  return 'A: $b';
+    final b = ref.watch(providerB); // A depends on B
+    return 'A: $b';
   });
-  
+
   final providerB = Provider((ref) {
-  final a = ref.watch(providerA); // B depends on A - circular!
-  return 'B: $a';
+    final a = ref.watch(providerA); // B depends on A - circular!
+    return 'B: $a';
   });
 }
 
@@ -127,7 +127,7 @@ void _bad752() {
 void _good752() {
   final providerA = Provider((ref) => 'A');
   final providerB = Provider((ref) {
-  final a = ref.watch(providerA); // One-way dependency
-  return 'B: $a';
+    final a = ref.watch(providerA); // One-way dependency
+    return 'B: $a';
   });
 }

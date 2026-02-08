@@ -111,16 +111,16 @@ dynamic data;
 // expect_lint: avoid_storing_user_data_in_auth
 void _bad626() async {
   await admin.auth().setCustomUserClaims(uid, {
-  'profile': userProfile,  // Large object!
-  'preferences': allPrefs,
+    'profile': userProfile, // Large object!
+    'preferences': allPrefs,
   });
 }
 
 // GOOD: Should NOT trigger avoid_storing_user_data_in_auth
 void _good626() async {
   await admin.auth().setCustomUserClaims(uid, {
-  'role': 'admin',
-  'tier': 'premium',
+    'role': 'admin',
+    'tier': 'premium',
   });
   // Store large data in Firestore instead
 }

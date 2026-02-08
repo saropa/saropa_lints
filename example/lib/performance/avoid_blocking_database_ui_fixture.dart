@@ -113,19 +113,19 @@ final users = <dynamic>[];
 // BAD: Should trigger avoid_blocking_database_ui
 // expect_lint: avoid_blocking_database_ui
 Widget _bad812_build(BuildContext context) {
-final users = box.values.toList(); // Blocking in build!
-return ListView.builder();
+  final users = box.values.toList(); // Blocking in build!
+  return ListView.builder();
 }
 
 // GOOD: Should NOT trigger avoid_blocking_database_ui
 void _good812() async {
   Future<void> initState() {
-  // super.initState();
-  _loadUsers();
+    // super.initState();
+    _loadUsers();
   }
-  
+
   Future<void> _loadUsers() async {
-  final users = await compute(loadUsersFromBox, null);
-  setState(() => _users = users);
+    final users = await compute(loadUsersFromBox, null);
+    setState(() => _users = users);
   }
 }

@@ -112,11 +112,11 @@ dynamic user;
 void _bad701() {
   // Fires constantly, even for 1-meter movements - battery drain!
   Geolocator.getPositionStream().listen((position) {
-  updateMap(position);
+    updateMap(position);
   });
-  
+
   Geolocator.getPositionStream(
-  locationSettings: LocationSettings(accuracy: LocationAccuracy.high),
+    locationSettings: LocationSettings(accuracy: LocationAccuracy.high),
   ).listen((position) {});
 }
 
@@ -124,11 +124,11 @@ void _bad701() {
 void _good701() {
   // Only fires when user moves 10+ meters
   Geolocator.getPositionStream(
-  locationSettings: LocationSettings(
-  accuracy: LocationAccuracy.high,
-  distanceFilter: 10, // meters
-  ),
+    locationSettings: LocationSettings(
+      accuracy: LocationAccuracy.high,
+      distanceFilter: 10, // meters
+    ),
   ).listen((position) {
-  updateMap(position);
+    updateMap(position);
   });
 }

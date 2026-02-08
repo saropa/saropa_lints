@@ -112,11 +112,11 @@ final name = 'example';
 // expect_lint: require_isar_nullable_field
 @collection
 class _bad688_User {
-String name = 'default';  // Crash if loading old record!
+  String name = 'default'; // Crash if loading old record!
 }
 
 // GOOD: Should NOT trigger require_isar_nullable_field
 @collection
 class _good688_User {
-String? name;  // Safe
+  String? name; // Safe
 }

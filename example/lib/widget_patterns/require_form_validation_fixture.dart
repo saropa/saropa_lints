@@ -112,19 +112,19 @@ final title = 'Title';
 // expect_lint: require_form_validation
 void _bad1433() {
   CustomScrollView(
-  slivers: [
-  SliverToBoxAdapter(child: AppBar(title: Text('Title'))),
-  SliverList(),
-  ],
+    slivers: [
+      SliverToBoxAdapter(child: AppBar(title: Text('Title'))),
+      SliverList(),
+    ],
   );
 }
 
 // GOOD: Should NOT trigger require_form_validation
 void _good1433() {
   CustomScrollView(
-  slivers: [
-  SliverAppBar(title: Text('Title'), floating: true),
-  SliverList(),
-  ],
+    slivers: [
+      SliverAppBar(title: Text('Title'), floating: true),
+      SliverList(),
+    ],
   );
 }

@@ -112,14 +112,14 @@ dynamic http;
 // expect_lint: avoid_production_config_in_tests
 void _bad1193() {
   test('should connect', () async {
-  final api = Api(baseUrl: 'https://production.api.com');
+    final api = Api(baseUrl: 'https://production.api.com');
   });
 }
 
 // GOOD: Should NOT trigger avoid_production_config_in_tests
 void _good1193() {
   test('should connect', () async {
-  final api = Api(baseUrl: 'http://localhost:8080');
-  // or use mock
+    final api = Api(baseUrl: 'http://localhost:8080');
+    // or use mock
   });
 }

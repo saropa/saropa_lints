@@ -112,11 +112,11 @@ dynamic state;
 // BAD: Should trigger avoid_bloc_state_mutation
 // expect_lint: avoid_bloc_state_mutation
 void _bad577__onUpdate(UpdateEvent event, Emitter<State> emit) {
-state.name = event.name;  // Direct mutation!
-emit(state);
+  state.name = event.name; // Direct mutation!
+  emit(state);
 }
 
 // GOOD: Should NOT trigger avoid_bloc_state_mutation
 void _good577__onUpdate(UpdateEvent event, Emitter<State> emit) {
-emit(state.copyWith(name: event.name));
+  emit(state.copyWith(name: event.name));
 }

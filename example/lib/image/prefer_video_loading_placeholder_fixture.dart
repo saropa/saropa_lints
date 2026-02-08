@@ -118,10 +118,10 @@ void _bad421() {
 // GOOD: Should NOT trigger prefer_video_loading_placeholder
 void _good421() {
   Chewie(
-  controller: chewieController,
-  placeholder: Container(
-  color: Colors.black,
-  child: Center(child: CircularProgressIndicator()),
-  ),
+    controller: chewieController,
+    placeholder: Container(
+      color: Colors.black,
+      child: Center(child: CircularProgressIndicator()),
+    ),
   );
 }

@@ -118,7 +118,9 @@ void _bad50() async {
 
 // GOOD: Should NOT trigger require_request_timeout
 void _good50() async {
-  final response = await http.get(
-  Uri.parse('https://api.example.com/data'),
-  ).timeout(Duration(seconds: 30));
+  final response = await http
+      .get(
+        Uri.parse('https://api.example.com/data'),
+      )
+      .timeout(Duration(seconds: 30));
 }

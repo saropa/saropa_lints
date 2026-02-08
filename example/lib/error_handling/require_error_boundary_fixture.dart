@@ -113,14 +113,14 @@ final context = BuildContext();
 // expect_lint: require_error_boundary
 void _bad359() {
   MaterialApp(
-  home: MyHomePage(), // Errors crash the app
+    home: MyHomePage(), // Errors crash the app
   );
 }
 
 // GOOD: Should NOT trigger require_error_boundary
 void _good359() {
   MaterialApp(
-  builder: (context, child) => ErrorBoundary(child: child!),
-  home: MyHomePage(),
+    builder: (context, child) => ErrorBoundary(child: child!),
+    home: MyHomePage(),
   );
 }

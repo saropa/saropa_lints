@@ -109,17 +109,17 @@ import '../flutter_mocks.dart';
 // expect_lint: require_future_wait_error_handling
 void _bad109() async {
   final results = await Future.wait([
-  fetchUser(),
-  fetchPosts(),
-  fetchComments(),
+    fetchUser(),
+    fetchPosts(),
+    fetchComments(),
   ]);
 }
 
 // GOOD: Should NOT trigger require_future_wait_error_handling
 void _good109() async {
   final results = await Future.wait([
-  fetchUser(),
-  fetchPosts(),
-  fetchComments(),
+    fetchUser(),
+    fetchPosts(),
+    fetchComments(),
   ], eagerError: false);
 }

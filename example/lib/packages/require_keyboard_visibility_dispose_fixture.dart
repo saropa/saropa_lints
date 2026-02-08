@@ -108,32 +108,32 @@ import '../flutter_mocks.dart';
 // BAD: Should trigger require_keyboard_visibility_dispose
 // expect_lint: require_keyboard_visibility_dispose
 class _bad695__MyState extends State<MyWidget> {
-late KeyboardVisibilityController _keyboardController;
+  late KeyboardVisibilityController _keyboardController;
 
-@override
-void initState() {
-super.initState();
-_keyboardController = KeyboardVisibilityController();
-_keyboardController.onChange.listen((visible) {});
-}
+  @override
+  void initState() {
+    super.initState();
+    _keyboardController = KeyboardVisibilityController();
+    _keyboardController.onChange.listen((visible) {});
+  }
 // Missing dispose!
 }
 
 // GOOD: Should NOT trigger require_keyboard_visibility_dispose
 class _good695__MyState extends State<MyWidget> {
-late KeyboardVisibilityController _keyboardController;
-StreamSubscription? _subscription;
+  late KeyboardVisibilityController _keyboardController;
+  StreamSubscription? _subscription;
 
-@override
-void initState() {
-super.initState();
-_keyboardController = KeyboardVisibilityController();
-_subscription = _keyboardController.onChange.listen((visible) {});
-}
+  @override
+  void initState() {
+    super.initState();
+    _keyboardController = KeyboardVisibilityController();
+    _subscription = _keyboardController.onChange.listen((visible) {});
+  }
 
-@override
-void dispose() {
-_subscription?.cancel();
-super.dispose();
-}
+  @override
+  void dispose() {
+    _subscription?.cancel();
+    super.dispose();
+  }
 }

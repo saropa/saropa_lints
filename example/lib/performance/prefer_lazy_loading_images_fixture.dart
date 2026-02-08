@@ -116,27 +116,27 @@ final url = 'https://example.com';
 // expect_lint: prefer_lazy_loading_images
 void _bad816() {
   ListView.builder(
-  itemBuilder: (context, index) {
-  return Image.network(imageUrls[index]); // Loads all images immediately
-  },
+    itemBuilder: (context, index) {
+      return Image.network(imageUrls[index]); // Loads all images immediately
+    },
   );
 }
 
 // GOOD: Should NOT trigger prefer_lazy_loading_images
 void _good816() {
   ListView.builder(
-  itemBuilder: (context, index) {
-  return CachedNetworkImage(
-  imageUrl: imageUrls[index],
-  placeholder: (context, url) => CircularProgressIndicator(),
-  errorWidget: (context, url, error) => Icon(Icons.error),
+    itemBuilder: (context, index) {
+      return CachedNetworkImage(
+        imageUrl: imageUrls[index],
+        placeholder: (context, url) => CircularProgressIndicator(),
+        errorWidget: (context, url, error) => Icon(Icons.error),
+      );
+    },
   );
-  },
-  );
-  
+
   // Or use FadeInImage for built-in placeholder support
   FadeInImage.memoryNetwork(
-  placeholder: kTransparentImage,
-  image: imageUrls[index],
+    placeholder: kTransparentImage,
+    image: imageUrls[index],
   );
 }

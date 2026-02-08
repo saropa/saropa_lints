@@ -114,6 +114,6 @@ void _bad1396() {
 
 // GOOD: Should NOT trigger avoid_font_weight_as_number
 void _good1396() {
-  TextStyle(fontWeight: FontWeight.normal)  // w400
-  TextStyle(fontWeight: FontWeight.bold)    // w700
+  TextStyle(fontWeight: FontWeight.normal); // w400
+  TextStyle(fontWeight: FontWeight.bold); // w700
 }

@@ -111,39 +111,40 @@ final name = 'example';
 // BAD: Should trigger prefer_json_serializable
 // expect_lint: prefer_json_serializable
 class _bad458_User {
-final String name;
-final int age;
-final DateTime? createdAt;
+  final String name;
+  final int age;
+  final DateTime? createdAt;
 
-User({required this.name, required this.age, this.createdAt});
+  _bad458_User({required this.name, required this.age, this.createdAt});
 
-factory User.fromJson(Map<String, dynamic> json) {
-return User(
-name: json['name'] as String,
-age: json['age'] as int,
-createdAt: json['created_at'] != null
-? DateTime.parse(json['created_at'] as String)
-: null,
-);
-}
+  factory _bad458_User.fromJson(Map<String, dynamic> json) {
+    return _bad458_User(
+      name: json['name'] as String,
+      age: json['age'] as int,
+      createdAt: json['created_at'] != null
+          ? DateTime.parse(json['created_at'] as String)
+          : null,
+    );
+  }
 
-Map<String, dynamic> toJson() => {
-'name': name,
-'age': age,
-'created_at': createdAt?.toIso8601String(),
-};
+  Map<String, dynamic> toJson() => {
+        'name': name,
+        'age': age,
+        'created_at': createdAt?.toIso8601String(),
+      };
 }
 
 // GOOD: Should NOT trigger prefer_json_serializable
 @JsonSerializable()
 class _good458_User {
-final String name;
-final int age;
-@JsonKey(name: 'created_at');
-final DateTime? createdAt;
+  final String name;
+  final int age;
+  @JsonKey(name: 'created_at')
+  final DateTime? createdAt;
 
-User({required this.name, required this.age, this.createdAt});
+  _good458_User({required this.name, required this.age, this.createdAt});
 
-factory User.fromJson(Map<String, dynamic> json) => _$UserFromJson(json);
-Map<String, dynamic> toJson() => _$UserToJson(this);
+  factory _good458_User.fromJson(Map<String, dynamic> json) =>
+      _$UserFromJson(json);
+  Map<String, dynamic> toJson() => _$UserToJson(this);
 }

@@ -117,25 +117,25 @@ dynamic user;
 // expect_lint: avoid_notification_payload_sensitive
 void _bad533() {
   showNotification(
-  title: 'New Payment',
-  body: 'Your card ending in 1234 was charged \$100. Token: $token',
+    title: 'New Payment',
+    body: 'Your card ending in 1234 was charged \$100. Token: $token',
   );
-  
+
   pushNotification(
-  title: 'Login Alert',
-  body: 'Password changed for user: $email',
+    title: 'Login Alert',
+    body: 'Password changed for user: $email',
   );
 }
 
 // GOOD: Should NOT trigger avoid_notification_payload_sensitive
 void _good533() {
   showNotification(
-  title: 'New Payment',
-  body: 'You have a new transaction. Tap to view details.',
+    title: 'New Payment',
+    body: 'You have a new transaction. Tap to view details.',
   );
-  
+
   pushNotification(
-  title: 'Security Alert',
-  body: 'Your account settings were updated.',
+    title: 'Security Alert',
+    body: 'Your account settings were updated.',
   );
 }

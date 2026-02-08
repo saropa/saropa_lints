@@ -111,29 +111,29 @@ final uri = Uri.parse('https://example.com');
 // BAD: Should trigger avoid_websocket_memory_leak
 // expect_lint: avoid_websocket_memory_leak
 class _bad327_MyState extends State<MyWidget> {
-late WebSocketChannel channel;
+  late WebSocketChannel channel;
 
-@override
-void initState() {
-super.initState();
-channel = WebSocketChannel.connect(uri);
-}
+  @override
+  void initState() {
+    super.initState();
+    channel = WebSocketChannel.connect(uri);
+  }
 // Missing dispose!
 }
 
 // GOOD: Should NOT trigger avoid_websocket_memory_leak
 class _good327_MyState extends State<MyWidget> {
-late WebSocketChannel channel;
+  late WebSocketChannel channel;
 
-@override
-void initState() {
-super.initState();
-channel = WebSocketChannel.connect(uri);
-}
+  @override
+  void initState() {
+    super.initState();
+    channel = WebSocketChannel.connect(uri);
+  }
 
-@override
-void dispose() {
-channel.sink.close();
-super.dispose();
-}
+  @override
+  void dispose() {
+    channel.sink.close();
+    super.dispose();
+  }
 }

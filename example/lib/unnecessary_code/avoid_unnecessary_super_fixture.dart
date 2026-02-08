@@ -108,10 +108,10 @@ import '../flutter_mocks.dart';
 // BAD: Should trigger avoid_unnecessary_super
 // expect_lint: avoid_unnecessary_super
 class _bad1279_Child extends Parent {
-Child() : super();  // Unnecessary super();
+  _bad1279_Child() : super(); // Unnecessary super();
 }
 
 // GOOD: Should NOT trigger avoid_unnecessary_super
 class _good1279_Child extends Parent {
-Child();  // Implicit super();
+  _good1279_Child(); // Implicit super();
 }

@@ -112,40 +112,40 @@ final name = 'example';
 // BAD: Should trigger prefer_freezed_for_data_classes
 // expect_lint: prefer_freezed_for_data_classes
 class _bad417_User {
-final String name;
-final int age;
-final String? email;
+  final String name;
+  final int age;
+  final String? email;
 
-User({required this.name, required this.age, this.email});
+  User({required this.name, required this.age, this.email});
 
-User copyWith({String? name, int? age, String? email}) {
-return User(
-name: name ?? this.name,
-age: age ?? this.age,
-email: email ?? this.email,
-);
-}
+  User copyWith({String? name, int? age, String? email}) {
+    return User(
+      name: name ?? this.name,
+      age: age ?? this.age,
+      email: email ?? this.email,
+    );
+  }
 
-@override
-bool operator ==(Object other) =>
-identical(this, other) ||
-other is User &&
-name == other.name &&
-age == other.age &&
-email == other.email;
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is User &&
+          name == other.name &&
+          age == other.age &&
+          email == other.email;
 
-@override
-int get hashCode => name.hashCode ^ age.hashCode ^ email.hashCode;
+  @override
+  int get hashCode => name.hashCode ^ age.hashCode ^ email.hashCode;
 }
 
 // GOOD: Should NOT trigger prefer_freezed_for_data_classes
 @freezed
 class _good417_User with _$User {
-const factory User({
-required String name,
-required int age,
-String? email,
-}) = _User;
+  const factory User({
+    required String name,
+    required int age,
+    String? email,
+  }) = _User;
 
-factory User.fromJson(Map<String, dynamic> json) => _$UserFromJson(json);
+  factory User.fromJson(Map<String, dynamic> json) => _$UserFromJson(json);
 }

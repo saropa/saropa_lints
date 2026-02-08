@@ -108,10 +108,14 @@ import '../flutter_mocks.dart';
 // BAD: Should trigger prefer_sealed_events
 // expect_lint: prefer_sealed_events
 abstract class _bad560_CounterEvent {}
+
 class Increment extends CounterEvent {}
+
 class Decrement extends CounterEvent {}
 
 // GOOD: Should NOT trigger prefer_sealed_events
 sealed class _good560_CounterEvent {}
+
 class Increment extends CounterEvent {}
+
 class Decrement extends CounterEvent {}

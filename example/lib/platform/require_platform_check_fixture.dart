@@ -111,14 +111,14 @@ dynamic file;
 // BAD: Should trigger require_platform_check
 // expect_lint: require_platform_check
 void _bad826_saveFile() {
-final file = File('data.txt'); // Crashes on web!
-file.writeAsStringSync('Hello');
+  final file = File('data.txt'); // Crashes on web!
+  file.writeAsStringSync('Hello');
 }
 
 // GOOD: Should NOT trigger require_platform_check
 void _good826_saveFile() {
-if (!kIsWeb) {
-final file = File('data.txt');
-file.writeAsStringSync('Hello');
-}
+  if (!kIsWeb) {
+    final file = File('data.txt');
+    file.writeAsStringSync('Hello');
+  }
 }

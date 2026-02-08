@@ -111,20 +111,20 @@ dynamic child;
 // expect_lint: avoid_unconstrained_box_misuse
 void _bad1318() {
   SizedBox(
-  width: 100,
-  child: UnconstrainedBox(
-  child: Image.asset('wide_image.png'), // May overflow!
-  ),
+    width: 100,
+    child: UnconstrainedBox(
+      child: Image.asset('wide_image.png'), // May overflow!
+    ),
   );
 }
 
 // GOOD: Should NOT trigger avoid_unconstrained_box_misuse
 void _good1318() {
   SizedBox(
-  width: 100,
-  child: FittedBox(
-  fit: BoxFit.contain,
-  child: Image.asset('wide_image.png'),
-  ),
+    width: 100,
+    child: FittedBox(
+      fit: BoxFit.contain,
+      child: Image.asset('wide_image.png'),
+    ),
   );
 }

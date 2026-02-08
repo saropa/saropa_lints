@@ -111,15 +111,15 @@ dynamic child;
 // expect_lint: prefer_widget_state_mixin
 void _bad1351() {
   Container(
-  decoration: BoxDecoration(color: Colors.red),
-  child: child,
+    decoration: BoxDecoration(color: Colors.red),
+    child: child,
   );
 }
 
 // GOOD: Should NOT trigger prefer_widget_state_mixin
 void _good1351() {
   DecoratedBox(
-  decoration: BoxDecoration(color: Colors.red),
-  child: child,
+    decoration: BoxDecoration(color: Colors.red),
+    child: child,
   );
 }

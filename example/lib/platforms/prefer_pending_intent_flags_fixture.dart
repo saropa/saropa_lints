@@ -112,16 +112,16 @@ dynamic channel;
 void _bad832() async {
   // Platform channel creating PendingIntent without flag
   await platform.invokeMethod('createPendingIntent', {
-  'requestCode': 0,
-  'intent': intentData,
+    'requestCode': 0,
+    'intent': intentData,
   });
 }
 
 // GOOD: Should NOT trigger prefer_pending_intent_flags
 void _good832() async {
   await platform.invokeMethod('createPendingIntent', {
-  'requestCode': 0,
-  'intent': intentData,
-  'flags': 'FLAG_IMMUTABLE', // or FLAG_MUTABLE if needed
+    'requestCode': 0,
+    'intent': intentData,
+    'flags': 'FLAG_IMMUTABLE', // or FLAG_MUTABLE if needed
   });
 }

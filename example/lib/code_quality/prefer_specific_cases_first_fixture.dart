@@ -112,15 +112,19 @@ dynamic x;
 // expect_lint: prefer_specific_cases_first
 void _bad227() {
   switch (value) {
-  case int _: print('int');
-  case int x when x > 0: print('positive');  // Unreachable
+    case int _:
+      print('int');
+    case int x when x > 0:
+      print('positive'); // Unreachable
   }
 }
 
 // GOOD: Should NOT trigger prefer_specific_cases_first
 void _good227() {
   switch (value) {
-  case int x when x > 0: print('positive');
-  case int _: print('other int');
+    case int x when x > 0:
+      print('positive');
+    case int _:
+      print('other int');
   }
 }

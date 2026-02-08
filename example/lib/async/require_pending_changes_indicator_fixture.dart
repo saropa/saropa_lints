@@ -110,17 +110,21 @@ import '../flutter_mocks.dart';
 void _bad116() {
   // Silent save with no indication
   void save() {
-  _pendingChanges.add(change);
-  _syncLater();
+    _pendingChanges.add(change);
+    _syncLater();
   }
 }
 
 // GOOD: Should NOT trigger require_pending_changes_indicator
 void _good116_save() {
-_pendingChanges.add(change);
-notifyListeners(); // Shows pending indicator
-_syncLater();
+  void _topLevel119() {
+    _pendingChanges.add(change);
+    notifyListeners(); // Shows pending indicator
+    _syncLater();
+  }
 }
 
 // In UI:
-if (pendingCount > 0) Text('Saving $pendingCount changes');
+void _topLevel125() {
+  if (pendingCount > 0) Text('Saving $pendingCount changes');
+}

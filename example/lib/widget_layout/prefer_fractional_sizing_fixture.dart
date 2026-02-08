@@ -112,15 +112,15 @@ final context = BuildContext();
 // expect_lint: prefer_fractional_sizing
 void _bad1317() {
   Container(
-  width: MediaQuery.of(context).size.width * 0.5,
-  child: MyWidget(),
+    width: MediaQuery.of(context).size.width * 0.5,
+    child: MyWidget(),
   );
 }
 
 // GOOD: Should NOT trigger prefer_fractional_sizing
 void _good1317() {
   FractionallySizedBox(
-  widthFactor: 0.5,
-  child: MyWidget(),
+    widthFactor: 0.5,
+    child: MyWidget(),
   );
 }

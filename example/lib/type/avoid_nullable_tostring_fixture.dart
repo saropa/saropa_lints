@@ -111,7 +111,7 @@ final name = 'example';
 // expect_lint: avoid_nullable_tostring
 void _bad1227() {
   String? name;
-  print(name.toString());  // Could be 'null' string
+  print(name.toString()); // Could be 'null' string
 }
 
 // GOOD: Should NOT trigger avoid_nullable_tostring

@@ -112,17 +112,17 @@ final index = 0;
 // expect_lint: avoid_isar_enum_field
 @collection
 class _bad672_Contact {
-CountryEnum? country;  // DANGEROUS: stored as index
+  CountryEnum? country; // DANGEROUS: stored as index
 }
 
 // GOOD: Should NOT trigger avoid_isar_enum_field
 @collection
 class _good672_Contact {
-String? countryCode;  // Store as string in DB
+  String? countryCode; // Store as string in DB
 
-@ignore
-CountryEnum? _country;  // Cached (ignored by Isar);
+  @ignore
+  CountryEnum? _country; // Cached (ignored by Isar);
 
-@ignore
-CountryEnum? get country => _country ??= CountryEnum.tryParse(countryCode);
+  @ignore
+  CountryEnum? get country => _country ??= CountryEnum.tryParse(countryCode);
 }

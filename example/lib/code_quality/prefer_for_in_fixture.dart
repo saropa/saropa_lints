@@ -112,13 +112,13 @@ dynamic list;
 // expect_lint: prefer_for_in
 void _bad196() {
   for (var i = 0; i < list.length; i++) {
-  print(list[i]);
+    print(list[i]);
   }
 }
 
 // GOOD: Should NOT trigger prefer_for_in
 void _good196() {
   for (final item in list) {
-  print(item);
+    print(item);
   }
 }

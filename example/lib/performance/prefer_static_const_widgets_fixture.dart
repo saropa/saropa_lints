@@ -108,10 +108,10 @@ import '../flutter_mocks.dart';
 // BAD: Should trigger prefer_static_const_widgets
 // expect_lint: prefer_static_const_widgets
 class _bad802_MyWidget extends StatelessWidget {
-final divider = const Divider(); // Created per instance
+  final divider = const Divider(); // Created per instance
 }
 
 // GOOD: Should NOT trigger prefer_static_const_widgets
 class _good802_MyWidget extends StatelessWidget {
-static const divider = Divider(); // Created once at compile time
+  static const divider = Divider(); // Created once at compile time
 }

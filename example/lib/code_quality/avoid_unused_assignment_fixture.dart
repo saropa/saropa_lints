@@ -110,8 +110,8 @@ dynamic x;
 // BAD: Should trigger avoid_unused_assignment
 // expect_lint: avoid_unused_assignment
 void _bad188_foo() {
-var x = 1;
-x = 2;  // x is never read after this
+  var x = 1;
+  x = 2; // x is never read after this
 }
 
 // GOOD: Should NOT trigger avoid_unused_assignment

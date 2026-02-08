@@ -113,32 +113,32 @@ dynamic value;
 // expect_lint: prefer_regex_validation
 void _bad411() {
   TextFormField(
-  decoration: InputDecoration(labelText: 'Email'),
-  validator: (value) {
-  if (value == null || value.isEmpty) {
-  return 'Please enter an email';
-  }
-  return null; // Accepts "not an email"!
-  },
+    decoration: InputDecoration(labelText: 'Email'),
+    validator: (value) {
+      if (value == null || value.isEmpty) {
+        return 'Please enter an email';
+      }
+      return null; // Accepts "not an email"!
+    },
   );
 }
 
 // GOOD: Should NOT trigger prefer_regex_validation
 void _good411() {
   TextFormField(
-  decoration: InputDecoration(labelText: 'Email'),
-  validator: (value) {
-  if (value == null || value.isEmpty) {
-  return 'Please enter an email';
-  }
-  final emailRegex = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
-  if (!emailRegex.hasMatch(value)) {
-  return 'Please enter a valid email';
-  }
-  return null;
-  },
+    decoration: InputDecoration(labelText: 'Email'),
+    validator: (value) {
+      if (value == null || value.isEmpty) {
+        return 'Please enter an email';
+      }
+      final emailRegex = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
+      if (!emailRegex.hasMatch(value)) {
+        return 'Please enter a valid email';
+      }
+      return null;
+    },
   );
-  
+
   // Or use a validation package
-  validator: (value) => isEmail(value) ? null : 'Invalid email',
+  // validator: (value) => isEmail(value) ? null : 'Invalid email',
 }

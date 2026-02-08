@@ -114,8 +114,8 @@ void _bad127() async {
 // GOOD: Should NOT trigger require_geolocator_error_handling
 void _good127() async {
   try {
-  final position = await Geolocator.getCurrentPosition();
+    final position = await Geolocator.getCurrentPosition();
   } catch (e) {
-  handleLocationError(e);
+    handleLocationError(e);
   }
 }

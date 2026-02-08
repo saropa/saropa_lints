@@ -114,21 +114,21 @@ final text = 'text';
 // expect_lint: avoid_text_scale_factor_ignore
 void _bad10() {
   Text(
-  'Hello',
-  textScaleFactor: 1.0, // Ignores accessibility settings!
+    'Hello',
+    textScaleFactor: 1.0, // Ignores accessibility settings!
   );
   MediaQuery(
-  data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),
-  child: child,
+    data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),
+    child: child,
   );
 }
 
 // GOOD: Should NOT trigger avoid_text_scale_factor_ignore
 void _good10() {
-  Text('Hello') // Respects system text scale
+  Text('Hello'); // Respects system text scale
   // Or if you need to limit scaling:
   Text(
-  'Hello',
-  textScaleFactor: MediaQuery.of(context).textScaleFactor.clamp(1.0, 1.5),
+    'Hello',
+    textScaleFactor: MediaQuery.of(context).textScaleFactor.clamp(1.0, 1.5),
   );
 }

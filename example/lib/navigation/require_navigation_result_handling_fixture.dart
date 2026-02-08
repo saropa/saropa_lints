@@ -119,8 +119,8 @@ void _bad531() {
 // GOOD: Should NOT trigger require_navigation_result_handling
 void _good531() async {
   final result = await Navigator.push<bool>(
-  context,
-  MaterialPageRoute(builder: (_) => EditPage()),
+    context,
+    MaterialPageRoute(builder: (_) => EditPage()),
   );
   if (result == true) refreshData();
 }

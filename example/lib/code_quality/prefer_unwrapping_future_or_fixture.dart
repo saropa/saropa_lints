@@ -112,12 +112,12 @@ dynamic value;
 void _bad218() {
   FutureOr<int> getValue() => 42;
   void process() {
-  final value = getValue();
-  if (value is Future<int>) {
-  value.then((v) => print(v));
-  } else {
-  print(value);
-  }
+    final value = getValue();
+    if (value is Future<int>) {
+      value.then((v) => print(v));
+    } else {
+      print(value);
+    }
   }
 }
 
@@ -125,7 +125,7 @@ void _bad218() {
 void _good218() async {
   Future<int> getValue() async => 42;
   void process() async {
-  final value = await getValue();
-  print(value);
+    final value = await getValue();
+    print(value);
   }
 }

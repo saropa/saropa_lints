@@ -111,12 +111,12 @@ dynamic list;
 // BAD: Should trigger avoid_negated_conditions
 // expect_lint: avoid_negated_conditions
 void _bad282() {
-  if (!list.isEmpty) { }
-  if (!condition == false) { }
+  if (!list.isEmpty) {}
+  if (!condition == false) {}
 }
 
 // GOOD: Should NOT trigger avoid_negated_conditions
 void _good282() {
-  if (list.isNotEmpty) { }
-  if (condition) { }
+  if (list.isNotEmpty) {}
+  if (condition) {}
 }

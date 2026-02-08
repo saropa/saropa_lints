@@ -117,11 +117,11 @@ void _bad920() async {
 // GOOD: Should NOT trigger require_ios_version_check
 void _good920() async {
   if (Platform.isIOS) {
-  final version = await DeviceInfo.iosVersion;
-  if (version >= 17) {
-  await ShareExtension.shareWithPreview(data);
-  } else {
-  await Share.share(data);
-  }
+    final version = await DeviceInfo.iosVersion;
+    if (version >= 17) {
+      await ShareExtension.shareWithPreview(data);
+    } else {
+      await Share.share(data);
+    }
   }
 }

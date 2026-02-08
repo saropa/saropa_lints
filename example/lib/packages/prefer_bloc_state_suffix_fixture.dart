@@ -107,9 +107,11 @@ import '../flutter_mocks.dart';
 
 // BAD: Should trigger prefer_bloc_state_suffix
 // expect_lint: prefer_bloc_state_suffix
-abstract class _bad570_UserStatus {}  // Should end with State
+abstract class _bad570_UserStatus {} // Should end with State
+
 class UserLoading extends UserStatus {}
 
 // GOOD: Should NOT trigger prefer_bloc_state_suffix
 abstract class _good570_UserState {}
+
 class UserLoadingState extends UserState {}

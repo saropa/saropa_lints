@@ -114,26 +114,26 @@ dynamic state;
 // expect_lint: prefer_bloc_listener_for_side_effects
 void _bad583() {
   BlocBuilder<AuthBloc, AuthState>(
-  builder: (context, state) {
-  if (state is AuthSuccess) {
-  Navigator.pushNamed(context, '/home'); // Called on every rebuild!
-  }
-  return Container();
-  },
+    builder: (context, state) {
+      if (state is AuthSuccess) {
+        Navigator.pushNamed(context, '/home'); // Called on every rebuild!
+      }
+      return Container();
+    },
   );
 }
 
 // GOOD: Should NOT trigger prefer_bloc_listener_for_side_effects
 void _good583() {
   BlocListener<AuthBloc, AuthState>(
-  listener: (context, state) {
-  if (state is AuthSuccess) {
-  Navigator.pushNamed(context, '/home'); // Called once per state
-  }
-  },
-  child: BlocBuilder<AuthBloc, AuthState>(
-  builder: (context, state) => Container(),
-  ),
+    listener: (context, state) {
+      if (state is AuthSuccess) {
+        Navigator.pushNamed(context, '/home'); // Called once per state
+      }
+    },
+    child: BlocBuilder<AuthBloc, AuthState>(
+      builder: (context, state) => Container(),
+    ),
   );
   // Or use BlocConsumer for both
 }

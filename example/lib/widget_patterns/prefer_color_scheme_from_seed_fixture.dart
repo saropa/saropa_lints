@@ -109,17 +109,17 @@ import '../flutter_mocks.dart';
 // expect_lint: prefer_color_scheme_from_seed
 void _bad1435() {
   ColorScheme(
-  primary: Color(0xFF6750A4),
-  onPrimary: Colors.white,
-  secondary: Color(0xFF625B71),
-  // 15+ more colors to define manually
+    primary: Color(0xFF6750A4),
+    onPrimary: Colors.white,
+    secondary: Color(0xFF625B71),
+    // 15+ more colors to define manually
   );
 }
 
 // GOOD: Should NOT trigger prefer_color_scheme_from_seed
 void _good1435() {
   ColorScheme.fromSeed(
-  seedColor: Color(0xFF6750A4),
-  brightness: Brightness.light,
+    seedColor: Color(0xFF6750A4),
+    brightness: Brightness.light,
   );
 }

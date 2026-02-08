@@ -111,13 +111,13 @@ final text = 'text';
 // expect_lint: prefer_using_list_view
 void _bad1291() {
   RichText(
-  text: TextSpan(text: 'Hello'),
+    text: TextSpan(text: 'Hello'),
   );
 }
 
 // GOOD: Should NOT trigger prefer_using_list_view
 void _good1291() {
   Text.rich(
-  TextSpan(text: 'Hello'),
+    TextSpan(text: 'Hello'),
   );
 }

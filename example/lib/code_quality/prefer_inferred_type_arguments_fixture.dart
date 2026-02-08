@@ -113,12 +113,12 @@ dynamic map;
 // BAD: Should trigger prefer_inferred_type_arguments
 // expect_lint: prefer_inferred_type_arguments
 void _bad219() {
-  final list = <String>['a', 'b'];  // Type can be inferred
-  final map = Map<String, int>();   // Type can be inferred from usage
+  final list = <String>['a', 'b']; // Type can be inferred
+  final map = Map<String, int>(); // Type can be inferred from usage
 }
 
 // GOOD: Should NOT trigger prefer_inferred_type_arguments
 void _good219() {
-  final list = ['a', 'b'];  // Type inferred as List<String>
-  final map = <String, int>{};  // Explicit when needed
+  final list = ['a', 'b']; // Type inferred as List<String>
+  final map = <String, int>{}; // Explicit when needed
 }

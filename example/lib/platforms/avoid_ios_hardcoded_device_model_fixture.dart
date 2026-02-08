@@ -111,7 +111,7 @@ final context = BuildContext();
 // expect_lint: avoid_ios_hardcoded_device_model
 void _bad862() {
   if (deviceModel.contains('iPhone 14') || deviceModel.contains('iPhone 15')) {
-  // Dynamic Island handling
+    // Dynamic Island handling
   }
 }
 

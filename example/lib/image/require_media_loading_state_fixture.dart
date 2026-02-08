@@ -112,15 +112,15 @@ dynamic value;
 // BAD: Should trigger require_media_loading_state
 // expect_lint: require_media_loading_state
 Widget _bad425_build(BuildContext context) {
-return VideoPlayer(_controller);
+  return VideoPlayer(_controller);
 }
 
 // GOOD: Should NOT trigger require_media_loading_state
 Widget _good425_build(BuildContext context) {
-return _controller.value.isInitialized
-? AspectRatio(
-aspectRatio: _controller.value.aspectRatio,
-child: VideoPlayer(_controller),
-)
-: Center(child: CircularProgressIndicator());
+  return _controller.value.isInitialized
+      ? AspectRatio(
+          aspectRatio: _controller.value.aspectRatio,
+          child: VideoPlayer(_controller),
+        )
+      : Center(child: CircularProgressIndicator());
 }

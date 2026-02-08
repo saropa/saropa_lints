@@ -111,8 +111,12 @@ dynamic value;
 // BAD: Should trigger avoid_passing_default_values
 // expect_lint: avoid_passing_default_values
 void _bad220_foo({List<int> items = const []}) {}
-foo(items: const []);  // Passing default value explicitly
+void _topLevel113() {
+  foo(items: const []); // Passing default value explicitly
+}
 
 // GOOD: Should NOT trigger avoid_passing_default_values
 void _good220_foo({List<int> items = const []}) {}
-foo();  // Omit argument when using default
+void _topLevel117() {
+  foo(); // Omit argument when using default
+}

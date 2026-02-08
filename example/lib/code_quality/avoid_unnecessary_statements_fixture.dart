@@ -110,8 +110,8 @@ dynamic x;
 // BAD: Should trigger avoid_unnecessary_statements
 // expect_lint: avoid_unnecessary_statements
 void _bad187_foo() {
-x;  // Statement has no effect
-1 + 2;  // Result is not used
+  x; // Statement has no effect
+  1 + 2; // Result is not used
 }
 
 // GOOD: Should NOT trigger avoid_unnecessary_statements

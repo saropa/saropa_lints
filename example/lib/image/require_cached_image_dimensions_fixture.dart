@@ -116,8 +116,8 @@ void _bad428() {
 // GOOD: Should NOT trigger require_cached_image_dimensions
 void _good428() {
   CachedNetworkImage(
-  imageUrl: url,
-  memCacheWidth: 300,
-  memCacheHeight: 300,
+    imageUrl: url,
+    memCacheWidth: 300,
+    memCacheHeight: 300,
   );
 }

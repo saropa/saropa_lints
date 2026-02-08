@@ -110,16 +110,16 @@ dynamic data;
 // BAD: Should trigger avoid_duplicate_string_literals_pair
 // expect_lint: avoid_duplicate_string_literals_pair
 void _bad231_process() {
-print('Processing data');
-log('Processing data');
+  print('Processing data');
+  log('Processing data');
 }
 
 // GOOD: Should NOT trigger avoid_duplicate_string_literals_pair
 void _good231() {
   const kProcessingMessage = 'Processing data';
-  
+
   void process() {
-  print(kProcessingMessage);
-  log(kProcessingMessage);
+    print(kProcessingMessage);
+    log(kProcessingMessage);
   }
 }

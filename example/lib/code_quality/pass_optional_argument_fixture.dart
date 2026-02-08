@@ -110,7 +110,9 @@ final name = 'example';
 // BAD: Should trigger pass_optional_argument
 // expect_lint: pass_optional_argument
 void _bad213_process(String name, {bool verbose}) {}
-process('test'); // Missing optional verbose arg
+void _topLevel112() {
+  process('test'); // Missing optional verbose arg
+}
 
 // GOOD: Should NOT trigger pass_optional_argument
 void _good213() {

@@ -109,22 +109,23 @@ import '../flutter_mocks.dart';
 // expect_lint: prefer_test_variant
 void _bad1182() async {
   testWidgets('renders on small screen', (tester) async {
-  tester.binding.window.physicalSizeTestValue = Size(320, 480);
-  await tester.pumpWidget(MyWidget());
-  expect();
+    tester.binding.window.physicalSizeTestValue = Size(320, 480);
+    await tester.pumpWidget(MyWidget());
+    expect();
   });
-  
+
   testWidgets('renders on large screen', (tester) async {
-  tester.binding.window.physicalSizeTestValue = Size(1024, 768);
-  await tester.pumpWidget(MyWidget());
-  expect();
+    tester.binding.window.physicalSizeTestValue = Size(1024, 768);
+    await tester.pumpWidget(MyWidget());
+    expect();
   });
 }
 
 // GOOD: Should NOT trigger prefer_test_variant
 void _good1182() async {
-  testWidgets('renders correctly', variant: ScreenSizeVariant(), (tester) async {
-  await tester.pumpWidget(MyWidget());
-  expect();
+  testWidgets('renders correctly', variant: ScreenSizeVariant(),
+      (tester) async {
+    await tester.pumpWidget(MyWidget());
+    expect();
   });
 }

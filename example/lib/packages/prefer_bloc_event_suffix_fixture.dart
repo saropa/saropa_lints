@@ -107,9 +107,11 @@ import '../flutter_mocks.dart';
 
 // BAD: Should trigger prefer_bloc_event_suffix
 // expect_lint: prefer_bloc_event_suffix
-abstract class _bad569_UserAction {}  // Should end with Event
+abstract class _bad569_UserAction {} // Should end with Event
+
 class LoadUser extends UserAction {}
 
 // GOOD: Should NOT trigger prefer_bloc_event_suffix
 abstract class _good569_UserEvent {}
+
 class LoadUserEvent extends UserEvent {}

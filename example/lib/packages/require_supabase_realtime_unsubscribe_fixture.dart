@@ -110,29 +110,29 @@ dynamic channel;
 // BAD: Should trigger require_supabase_realtime_unsubscribe
 // expect_lint: require_supabase_realtime_unsubscribe
 class _bad772__ChatState extends State<Chat> {
-late RealtimeChannel _channel;
+  late RealtimeChannel _channel;
 
-@override
-void initState() {
-super.initState();
-_channel = supabase.channel('room').subscribe();
-}
+  @override
+  void initState() {
+    super.initState();
+    _channel = supabase.channel('room').subscribe();
+  }
 // Missing unsubscribe in dispose!
 }
 
 // GOOD: Should NOT trigger require_supabase_realtime_unsubscribe
 class _good772__ChatState extends State<Chat> {
-late RealtimeChannel _channel;
+  late RealtimeChannel _channel;
 
-@override
-void initState() {
-super.initState();
-_channel = supabase.channel('room').subscribe();
-}
+  @override
+  void initState() {
+    super.initState();
+    _channel = supabase.channel('room').subscribe();
+  }
 
-@override
-void dispose() {
-_channel.unsubscribe();
-super.dispose();
-}
+  @override
+  void dispose() {
+    _channel.unsubscribe();
+    super.dispose();
+  }
 }

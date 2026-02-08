@@ -110,12 +110,12 @@ final dio = Dio();
 // BAD: Should trigger avoid_dio_debug_print_production
 // expect_lint: avoid_dio_debug_print_production
 void _bad595() {
-  dio.interceptors.add(LogInterceptor());  // Logs in prod!
+  dio.interceptors.add(LogInterceptor()); // Logs in prod!
 }
 
 // GOOD: Should NOT trigger avoid_dio_debug_print_production
 void _good595() {
   if (kDebugMode) {
-  dio.interceptors.add(LogInterceptor());
+    dio.interceptors.add(LogInterceptor());
   }
 }

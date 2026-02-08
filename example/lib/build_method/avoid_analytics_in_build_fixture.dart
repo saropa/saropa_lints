@@ -110,12 +110,12 @@ final context = BuildContext();
 // BAD: Should trigger avoid_analytics_in_build
 // expect_lint: avoid_analytics_in_build
 Widget _bad129_build(BuildContext context) {
-analytics.logEvent('page_view'); // Fires repeatedly!
-return Container();
+  analytics.logEvent('page_view'); // Fires repeatedly!
+  return Container();
 }
 
 // GOOD: Should NOT trigger avoid_analytics_in_build
 void _good129_initState() {
 // super.initState();
-analytics.logEvent('page_view');
+  analytics.logEvent('page_view');
 }

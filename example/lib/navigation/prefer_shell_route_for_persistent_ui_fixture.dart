@@ -115,37 +115,39 @@ final path = '/path';
 void _bad508() {
   // Bottom nav rebuilds on every navigation
   GoRouter(
-  routes: [
-  GoRoute(path: '/home', builder: (_, __) =>
-  Scaffold(
-  body: HomePage(),
-  bottomNavigationBar: BottomNav(), // Rebuilds!
-  ),
-  ),
-  GoRoute(path: '/profile', builder: (_, __) =>
-  Scaffold(
-  body: ProfilePage(),
-  bottomNavigationBar: BottomNav(), // Duplicate!
-  ),
-  ),
-  ],
+    routes: [
+      GoRoute(
+        path: '/home',
+        builder: (_, __) => Scaffold(
+          body: HomePage(),
+          bottomNavigationBar: BottomNav(), // Rebuilds!
+        ),
+      ),
+      GoRoute(
+        path: '/profile',
+        builder: (_, __) => Scaffold(
+          body: ProfilePage(),
+          bottomNavigationBar: BottomNav(), // Duplicate!
+        ),
+      ),
+    ],
   );
 }
 
 // GOOD: Should NOT trigger prefer_shell_route_for_persistent_ui
 void _good508() {
   GoRouter(
-  routes: [
-  ShellRoute(
-  builder: (_, __, child) => Scaffold(
-  body: child,
-  bottomNavigationBar: BottomNav(),
-  ),
-  routes: [
-  GoRoute(path: '/home', builder: (_, __) => HomePage()),
-  GoRoute(path: '/profile', builder: (_, __) => ProfilePage()),
-  ],
-  ),
-  ],
+    routes: [
+      ShellRoute(
+        builder: (_, __, child) => Scaffold(
+          body: child,
+          bottomNavigationBar: BottomNav(),
+        ),
+        routes: [
+          GoRoute(path: '/home', builder: (_, __) => HomePage()),
+          GoRoute(path: '/profile', builder: (_, __) => ProfilePage()),
+        ],
+      ),
+    ],
   );
 }

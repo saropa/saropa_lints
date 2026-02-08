@@ -111,8 +111,8 @@ final secureStorage = FlutterSecureStorage();
 // BAD: Should trigger require_secure_key_generation
 // expect_lint: require_secure_key_generation
 void _bad302() {
-  final key = Key(Uint8List.fromList([1, 2, 3, 4, 5, 6, 7, 8,
-  9, 10, 11, 12, 13, 14, 15, 16]));
+  final key = Key(Uint8List.fromList(
+      [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16]));
   final key = Key.fromLength(16); // uses dart:math Random, not secure
   final key = Key(List.filled(32, 0));
 }

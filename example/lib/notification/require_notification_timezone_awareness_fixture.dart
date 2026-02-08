@@ -114,13 +114,13 @@ final title = 'Title';
 // expect_lint: require_notification_timezone_awareness
 void _bad535() async {
   await flutterLocalNotificationsPlugin.zonedSchedule(
-  0,
-  'title',
-  'body',
-  DateTime.now().add(Duration(hours: 1)), // Wrong type!
-  notificationDetails,
+    0,
+    'title',
+    'body',
+    DateTime.now().add(Duration(hours: 1)), // Wrong type!
+    notificationDetails,
   );
-  
+
   // Using DateTime.parse or DateTime.now() for scheduling
   final scheduledTime = DateTime.now().add(Duration(days: 1));
   await plugin.schedule(0, 'title', 'body', scheduledTime, details);
@@ -128,14 +128,13 @@ void _bad535() async {
 
 // GOOD: Should NOT trigger require_notification_timezone_awareness
 void _good535() async {
-  
   await flutterLocalNotificationsPlugin.zonedSchedule(
-  0,
-  'title',
-  'body',
-  tz.TZDateTime.now(tz.local).add(Duration(hours: 1)),
-  notificationDetails,
-  uiLocalNotificationDateInterpretation:
-  UILocalNotificationDateInterpretation.absoluteTime,
+    0,
+    'title',
+    'body',
+    tz.TZDateTime.now(tz.local).add(Duration(hours: 1)),
+    notificationDetails,
+    uiLocalNotificationDateInterpretation:
+        UILocalNotificationDateInterpretation.absoluteTime,
   );
 }

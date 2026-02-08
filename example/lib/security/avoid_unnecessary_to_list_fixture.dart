@@ -114,7 +114,7 @@ final users = <dynamic>[];
 void _bad1003() {
   final names = users.map((u) => u.name).toList();
   for (final name in names) {}
-  
+
   final adults = users.where((u) => u.age >= 18).toList();
   return adults.length;
 }
@@ -123,7 +123,7 @@ void _bad1003() {
 void _good1003() {
   final names = users.map((u) => u.name);
   for (final name in names) {}
-  
+
   final adults = users.where((u) => u.age >= 18);
   return adults.length;
 }

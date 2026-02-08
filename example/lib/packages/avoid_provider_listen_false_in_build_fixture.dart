@@ -112,12 +112,12 @@ dynamic value;
 // BAD: Should trigger avoid_provider_listen_false_in_build
 // expect_lint: avoid_provider_listen_false_in_build
 Widget _bad723_build(BuildContext context) {
-final counter = Provider.of<Counter>(context, listen: false);
-return Text('${counter.value}'); // Shows stale data!
+  final counter = Provider.of<Counter>(context, listen: false);
+  return Text('${counter.value}'); // Shows stale data!
 }
 
 // GOOD: Should NOT trigger avoid_provider_listen_false_in_build
 Widget _good723_build(BuildContext context) {
-final counter = Provider.of<Counter>(context); // listen: true by default
-return Text('${counter.value}');
+  final counter = Provider.of<Counter>(context); // listen: true by default
+  return Text('${counter.value}');
 }

@@ -112,24 +112,24 @@ dynamic result;
 // BAD: Should trigger require_offline_indicator
 // expect_lint: require_offline_indicator
 class _bad51_MyApp extends StatefulWidget {
-void initState() {
-Connectivity().onConnectivityChanged.listen((result) {
-_isOnline = result != ConnectivityResult.none;
+  void initState() {
+    Connectivity().onConnectivityChanged.listen((result) {
+      _isOnline = result != ConnectivityResult.none;
 // No UI feedback!
-});
-}
+    });
+  }
 }
 
 // GOOD: Should NOT trigger require_offline_indicator
 class _good51_MyApp extends StatefulWidget {
-void initState() {
-Connectivity().onConnectivityChanged.listen((result) {
-_isOnline = result != ConnectivityResult.none;
-if (!_isOnline) {
-ScaffoldMessenger.of(context).showSnackBar(
-SnackBar(content: Text('You are offline')),
-);
-}
-});
-}
+  void initState() {
+    Connectivity().onConnectivityChanged.listen((result) {
+      _isOnline = result != ConnectivityResult.none;
+      if (!_isOnline) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('You are offline')),
+        );
+      }
+    });
+  }
 }

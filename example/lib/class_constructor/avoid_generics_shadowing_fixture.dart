@@ -108,6 +108,7 @@ import '../flutter_mocks.dart';
 // BAD: Should trigger avoid_generics_shadowing
 // expect_lint: avoid_generics_shadowing
 class _bad137_String {} // top-level
+
 class Container<String> {} // shadows top-level String
 
 // GOOD: Should NOT trigger avoid_generics_shadowing

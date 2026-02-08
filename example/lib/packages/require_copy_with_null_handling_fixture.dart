@@ -112,14 +112,14 @@ dynamic value;
 // expect_lint: require_copy_with_null_handling
 void _bad604() {
   User copyWith({String? name}) {
-  return User(name: name ?? this.name); // Can't set name to null!
+    return User(name: name ?? this.name); // Can't set name to null!
   }
 }
 
 // GOOD: Should NOT trigger require_copy_with_null_handling
 void _good604() {
   User copyWith({Optional<String>? name}) {
-  return User(name: name != null ? name.value : this.name);
+    return User(name: name != null ? name.value : this.name);
   }
   // Or using freezed with @Default
 }

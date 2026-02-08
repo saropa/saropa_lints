@@ -111,11 +111,11 @@ dynamic user;
 // expect_lint: require_test_documentation
 void _bad1216() async {
   testWidgets('complex scenario', (tester) async {
-  await tester.pumpWidget(App());
-  await tester.tap(find.byKey(Key('step1')));
-  await tester.pump(Duration(seconds: 2));
-  await tester.drag(find.byType(ListView), Offset(0, -500));
-  //20 more lines of setup without explanation
+    await tester.pumpWidget(App());
+    await tester.tap(find.byKey(Key('step1')));
+    await tester.pump(Duration(seconds: 2));
+    await tester.drag(find.byType(ListView), Offset(0, -500));
+    //20 more lines of setup without explanation
   });
 }
 
@@ -124,10 +124,10 @@ void _good1216() async {
   // Tests the checkout flow when user has expired promo code.
   // This scenario caused bug #1234 in production.
   testWidgets('checkout with expired promo', (tester) async {
-  // Setup: User with expired promo code
-  await tester.pumpWidget(App(user: userWithExpiredPromo));
-  
-  // Act: Try to apply the expired code
-  await tester.tap(find.byKey(Key('apply_promo')));
+    // Setup: User with expired promo code
+    await tester.pumpWidget(App(user: userWithExpiredPromo));
+
+    // Act: Try to apply the expired code
+    await tester.tap(find.byKey(Key('apply_promo')));
   });
 }

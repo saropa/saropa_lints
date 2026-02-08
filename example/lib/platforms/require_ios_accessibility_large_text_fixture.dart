@@ -116,9 +116,9 @@ void _bad910() {
 // GOOD: Should NOT trigger require_ios_accessibility_large_text
 void _good910() {
   Text(
-  'Hello',
-  style: Theme.of(context).textTheme.bodyMedium,
-  // Or explicitly scale:
-  // style: TextStyle(fontSize: 14 * MediaQuery.textScaleFactorOf(context)),
+    'Hello',
+    style: Theme.of(context).textTheme.bodyMedium,
+    // Or explicitly scale:
+    // style: TextStyle(fontSize: 14 * MediaQuery.textScaleFactorOf(context)),
   );
 }

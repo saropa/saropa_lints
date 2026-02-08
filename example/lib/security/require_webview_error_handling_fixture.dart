@@ -114,30 +114,30 @@ final url = 'https://example.com';
 // expect_lint: require_webview_error_handling
 void _bad1022() {
   WebView(
-  initialUrl: 'https://example.com',
-  ) // No error handling!
-  
+    initialUrl: 'https://example.com',
+  ); // No error handling!
+
   InAppWebView(
-  initialUrlRequest: URLRequest(url: Uri.parse(url)),
-  ) // No onLoadError or onReceivedError
+    initialUrlRequest: URLRequest(url: Uri.parse(url)),
+  ); // No onLoadError or onReceivedError
 }
 
 // GOOD: Should NOT trigger require_webview_error_handling
 void _good1022() {
   WebView(
-  initialUrl: 'https://example.com',
-  onWebResourceError: (error) {
-  showErrorDialog(error.description);
-  },
+    initialUrl: 'https://example.com',
+    onWebResourceError: (error) {
+      showErrorDialog(error.description);
+    },
   );
-  
+
   InAppWebView(
-  initialUrlRequest: URLRequest(url: Uri.parse(url)),
-  onLoadError: (controller, url, code, message) {
-  showErrorPage(message);
-  },
-  onReceivedError: (controller, request, error) {
-  handleError(error);
-  },
+    initialUrlRequest: URLRequest(url: Uri.parse(url)),
+    onLoadError: (controller, url, code, message) {
+      showErrorPage(message);
+    },
+    onReceivedError: (controller, request, error) {
+      handleError(error);
+    },
   );
 }

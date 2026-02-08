@@ -114,16 +114,16 @@ dynamic list;
 // expect_lint: require_add_automatic_keep_alives_off
 void _bad988() {
   ListView.builder(
-  itemCount: 1000, // Long list with automatic keep-alives
-  itemBuilder: (context, i) => ExpensiveWidget(items[i]),
+    itemCount: 1000, // Long list with automatic keep-alives
+    itemBuilder: (context, i) => ExpensiveWidget(items[i]),
   );
 }
 
 // GOOD: Should NOT trigger require_add_automatic_keep_alives_off
 void _good988() {
   ListView.builder(
-  itemCount: 1000,
-  addAutomaticKeepAlives: false, // Better memory usage
-  itemBuilder: (context, i) => ExpensiveWidget(items[i]),
+    itemCount: 1000,
+    addAutomaticKeepAlives: false, // Better memory usage
+    itemBuilder: (context, i) => ExpensiveWidget(items[i]),
   );
 }

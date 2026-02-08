@@ -109,17 +109,18 @@ import '../flutter_mocks.dart';
 // expect_lint: avoid_catching_generic_exception
 void _bad1376() {
   try {
-  doSomething();
-  } catch (e) {  // Catches everything
-  print(e);
+    doSomething();
+  } catch (e) {
+    // Catches everything
+    print(e);
   }
 }
 
 // GOOD: Should NOT trigger avoid_catching_generic_exception
 void _good1376() {
   try {
-  doSomething();
+    doSomething();
   } on FormatException catch (e) {
-  // Handle specific exception
+    // Handle specific exception
   }
 }

@@ -110,14 +110,14 @@ dynamic child;
 // BAD: Should trigger require_provider_scope
 // expect_lint: require_provider_scope
 void _bad748_main() {
-runApp(MyApp()); // Missing ProviderScope!
+  runApp(MyApp()); // Missing ProviderScope!
 }
 
 // GOOD: Should NOT trigger require_provider_scope
 void _good748_main() {
-runApp(
-ProviderScope(
-child: MyApp(),
-),
-);
+  runApp(
+    ProviderScope(
+      child: MyApp(),
+    ),
+  );
 }

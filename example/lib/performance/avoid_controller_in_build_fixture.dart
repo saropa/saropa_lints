@@ -111,15 +111,15 @@ dynamic controller;
 // BAD: Should trigger avoid_controller_in_build
 // expect_lint: avoid_controller_in_build
 Widget _bad786_build(BuildContext context) {
-final controller = ScrollController();
-return ListView(controller: controller);
+  final controller = ScrollController();
+  return ListView(controller: controller);
 }
 
 // GOOD: Should NOT trigger avoid_controller_in_build
 void _good786() {
   late final ScrollController _controller = ScrollController();
-  
+
   Widget build(BuildContext context) {
-  return ListView(controller: _controller);
+    return ListView(controller: _controller);
   }
 }

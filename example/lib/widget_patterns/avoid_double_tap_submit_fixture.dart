@@ -111,15 +111,15 @@ dynamic child;
 // expect_lint: avoid_double_tap_submit
 void _bad1416() {
   ElevatedButton(
-  onPressed: () => submitForm(),
-  child: Text('Submit'),
+    onPressed: () => submitForm(),
+    child: Text('Submit'),
   );
 }
 
 // GOOD: Should NOT trigger avoid_double_tap_submit
 void _good1416() {
   ElevatedButton(
-  onPressed: isSubmitting ? null : () => submitForm(),
-  child: isSubmitting ? CircularProgressIndicator() : Text('Submit'),
+    onPressed: isSubmitting ? null : () => submitForm(),
+    child: isSubmitting ? CircularProgressIndicator() : Text('Submit'),
   );
 }

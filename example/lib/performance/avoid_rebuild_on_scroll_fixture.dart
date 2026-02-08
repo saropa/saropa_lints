@@ -111,17 +111,17 @@ dynamic controller;
 // BAD: Should trigger avoid_rebuild_on_scroll
 // expect_lint: avoid_rebuild_on_scroll
 Widget _bad814_build(BuildContext context) {
-_scrollController.addListener(() => print('scrolling'));
-return ListView(controller: _scrollController);
+  _scrollController.addListener(() => print('scrolling'));
+  return ListView(controller: _scrollController);
 }
 
 // GOOD: Should NOT trigger avoid_rebuild_on_scroll
 void _good814_initState() {
 // super.initState();
-_scrollController.addListener(_onScroll);
+  _scrollController.addListener(_onScroll);
 }
 
 void dispose() {
-_scrollController.removeListener(_onScroll);
+  _scrollController.removeListener(_onScroll);
 // super.dispose();
 }

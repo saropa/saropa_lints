@@ -108,11 +108,11 @@ import '../flutter_mocks.dart';
 // BAD: Should trigger require_covariant_documentation
 // expect_lint: require_covariant_documentation
 class _bad1237_Animal {
-void eat(covariant Food food) {} // Why covariant?
+  void eat(covariant Food food) {} // Why covariant?
 }
 
 // GOOD: Should NOT trigger require_covariant_documentation
 class _good1237_Animal {
-/// Uses covariant because subclasses need specific Food types.
-void eat(covariant Food food) {}
+  /// Uses covariant because subclasses need specific Food types.
+  void eat(covariant Food food) {}
 }

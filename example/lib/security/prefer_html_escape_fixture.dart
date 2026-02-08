@@ -115,17 +115,17 @@ final text = 'text';
 // expect_lint: prefer_html_escape
 void _bad1014() {
   WebView(
-  initialUrl: 'data:text/html,<html><body>$userComment</body></html>',
+    initialUrl: 'data:text/html,<html><body>$userComment</body></html>',
   );
 }
 
 // GOOD: Should NOT trigger prefer_html_escape
 void _good1014() {
-  
   WebView(
-  initialUrl: 'data:text/html,<html><body>${htmlEscape.convert(userComment)}</body></html>',
+    initialUrl:
+        'data:text/html,<html><body>${htmlEscape.convert(userComment)}</body></html>',
   );
-  
+
   // Or use a sanitization library
   final sanitized = sanitizeHtml(userComment);
 }

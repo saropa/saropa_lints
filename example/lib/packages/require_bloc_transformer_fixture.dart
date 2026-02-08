@@ -110,24 +110,24 @@ dynamic event;
 // BAD: Should trigger require_bloc_transformer
 // expect_lint: require_bloc_transformer
 class _bad561_SearchBloc extends Bloc<SearchEvent, SearchState> {
-SearchBloc() : super(SearchInitial()) {
-on<SearchQueryChanged>((event, emit) async {
+  _bad561_SearchBloc() : super(SearchInitial()) {
+    on<SearchQueryChanged>((event, emit) async {
 // Processes every keystroke - excessive API calls!
-final results = await search(event.query);
-emit(SearchResults(results));
-});
-}
+      final results = await search(event.query);
+      emit(SearchResults(results));
+    });
+  }
 }
 
 // GOOD: Should NOT trigger require_bloc_transformer
 class _good561_SearchBloc extends Bloc<SearchEvent, SearchState> {
-SearchBloc() : super(SearchInitial()) {
-on<SearchQueryChanged>(
-(event, emit) async {
-final results = await search(event.query);
-emit(SearchResults(results));
-},
-transformer: debounce(Duration(milliseconds: 300)),
-);
-}
+  _good561_SearchBloc() : super(SearchInitial()) {
+    on<SearchQueryChanged>(
+      (event, emit) async {
+        final results = await search(event.query);
+        emit(SearchResults(results));
+      },
+      transformer: debounce(Duration(milliseconds: 300)),
+    );
+  }
 }

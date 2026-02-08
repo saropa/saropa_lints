@@ -114,12 +114,12 @@ final users = <dynamic>[];
 // expect_lint: prefer_isar_index_for_queries
 void _bad684() {
   // Without @Index on email field
-  isar.users.filter().emailEqualTo('test@test.com');  // Slow!
+  isar.users.filter().emailEqualTo('test@test.com'); // Slow!
 }
 
 // GOOD: Should NOT trigger prefer_isar_index_for_queries
 @collection
 class _good684_User {
-@Index();
-String? email;  // Indexed for fast queries
+  @Index()
+  String? email; // Indexed for fast queries
 }

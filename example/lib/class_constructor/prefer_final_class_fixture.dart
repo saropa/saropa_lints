@@ -107,9 +107,9 @@ import '../flutter_mocks.dart';
 
 // BAD: Should trigger prefer_final_class
 // expect_lint: prefer_final_class
-class _bad145_ApiService { }  // Can be extended anywhere
+class _bad145_ApiService {} // Can be extended anywhere
 
 // GOOD: Should NOT trigger prefer_final_class
 void _good145() {
-  final class ApiService { }  // Cannot be extended
+  // final class ApiService { }  // Cannot be extended
 }

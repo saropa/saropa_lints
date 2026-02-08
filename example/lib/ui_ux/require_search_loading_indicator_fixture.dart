@@ -111,18 +111,18 @@ final isLoading = false;
 // expect_lint: require_search_loading_indicator
 void _bad1263() {
   TextField(
-  onSubmitted: (query) => searchApi(query),
+    onSubmitted: (query) => searchApi(query),
   );
 }
 
 // GOOD: Should NOT trigger require_search_loading_indicator
 void _good1263() {
   TextField(
-  onSubmitted: (query) {
-  setState(() => isLoading = true);
-  searchApi(query).whenComplete(() {
-  setState(() => isLoading = false);
-  });
-  },
+    onSubmitted: (query) {
+      setState(() => isLoading = true);
+      searchApi(query).whenComplete(() {
+        setState(() => isLoading = false);
+      });
+    },
   );
 }

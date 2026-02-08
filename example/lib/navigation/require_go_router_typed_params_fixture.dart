@@ -118,21 +118,21 @@ final userId = '123';
 // expect_lint: require_go_router_typed_params
 void _bad519() {
   GoRoute(
-  path: '/user/:id',
-  builder: (context, state) {
-  final int userId = state.pathParameters['id']; // Type error!
-  return UserPage(userId: userId);
-  },
+    path: '/user/:id',
+    builder: (context, state) {
+      final int userId = state.pathParameters['id']; // Type error!
+      return UserPage(userId: userId);
+    },
   );
 }
 
 // GOOD: Should NOT trigger require_go_router_typed_params
 void _good519() {
   GoRoute(
-  path: '/user/:id',
-  builder: (context, state) {
-  final userId = int.tryParse(state.pathParameters['id'] ?? '') ?? 0;
-  return UserPage(userId: userId);
-  },
+    path: '/user/:id',
+    builder: (context, state) {
+      final userId = int.tryParse(state.pathParameters['id'] ?? '') ?? 0;
+      return UserPage(userId: userId);
+    },
   );
 }

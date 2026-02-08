@@ -113,20 +113,21 @@ dynamic result;
 // expect_lint: avoid_nested_switch_expressions
 void _bad285() {
   final result = switch (a) {
-  1 => switch (b) {  // Nested switch
-  true => 'yes',
-  false => 'no',
-  },
-  _ => 'other',
+    1 => switch (b) {
+        // Nested switch
+        true => 'yes',
+        false => 'no',
+      },
+    _ => 'other',
   };
 }
 
 // GOOD: Should NOT trigger avoid_nested_switch_expressions
 String _good285_getInnerResult(bool b) => switch (b) {
-true => 'yes',
-false => 'no',
-};
+      true => 'yes',
+      false => 'no',
+    };
 final result = switch (a) {
-1 => getInnerResult(b),
-_ => 'other',
+  1 => getInnerResult(b),
+  _ => 'other',
 };

@@ -110,10 +110,10 @@ dynamic state;
 // BAD: Should trigger require_initial_state
 // expect_lint: require_initial_state
 class _bad557_MyBloc extends Bloc<Event, State> {
-MyBloc() : super(); // Missing initial state!
+  _bad557_MyBloc() : super(); // Missing initial state!
 }
 
 // GOOD: Should NOT trigger require_initial_state
 class _good557_MyBloc extends Bloc<Event, State> {
-MyBloc() : super(InitialState());
+  _good557_MyBloc() : super(InitialState());
 }

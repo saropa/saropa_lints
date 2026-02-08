@@ -112,19 +112,19 @@ dynamic value;
 // expect_lint: require_web_renderer_awareness
 void _bad944() {
   if (kIsWeb) {
-  // Assumes HTML renderer capabilities
-  html.window.localStorage['key'] = value;
+    // Assumes HTML renderer capabilities
+    html.window.localStorage['key'] = value;
   }
 }
 
 // GOOD: Should NOT trigger require_web_renderer_awareness
 void _good944() {
   if (kIsWeb) {
-  // Check renderer if using renderer-specific features
-  if (isCanvasKit) {
-  // CanvasKit-specific code
-  } else {
-  // HTML renderer code
-  }
+    // Check renderer if using renderer-specific features
+    if (isCanvasKit) {
+      // CanvasKit-specific code
+    } else {
+      // HTML renderer code
+    }
   }
 }

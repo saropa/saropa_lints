@@ -116,24 +116,24 @@ dynamic userProvider;
 // expect_lint: require_error_handling_in_async
 void _bad753() async {
   final userProvider = FutureProvider((ref) async {
-  return await fetchUser(); // Throws on network error
+    return await fetchUser(); // Throws on network error
   });
 }
 
 // GOOD: Should NOT trigger require_error_handling_in_async
 void _good753() async {
   final userProvider = FutureProvider((ref) async {
-  try {
-  return await fetchUser();
-  } catch (e) {
-  throw UserFetchException(e.toString());
-  }
+    try {
+      return await fetchUser();
+    } catch (e) {
+      throw UserFetchException(e.toString());
+    }
   });
-  
+
   // Or handle in UI:
   ref.watch(userProvider).when(
-  data: (user) => Text(user.name),
-  loading: () => CircularProgressIndicator(),
-  error: (e, st) => Text('Error: $e'),
-  );
+        data: (user) => Text(user.name),
+        loading: () => CircularProgressIndicator(),
+        error: (e, st) => Text('Error: $e'),
+      );
 }

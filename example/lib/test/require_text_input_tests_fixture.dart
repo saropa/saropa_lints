@@ -112,22 +112,22 @@ final text = 'text';
 // expect_lint: require_text_input_tests
 void _bad1173() async {
   testWidgets('shows form', (tester) async {
-  await tester.pumpWidget(MyForm());
-  expect(find.byType(TextField), findsOneWidget);
-  // Missing input test!
+    await tester.pumpWidget(MyForm());
+    expect(find.byType(TextField), findsOneWidget);
+    // Missing input test!
   });
 }
 
 // GOOD: Should NOT trigger require_text_input_tests
 void _good1173() async {
   testWidgets('form accepts input', (tester) async {
-  await tester.pumpWidget(MyForm());
-  
-  await tester.enterText(find.byType(TextField), 'test@example.com');
-  await tester.pump();
-  expect(find.text('test@example.com'), findsOneWidget);
-  
-  await tester.tap(find.byType(ElevatedButton));
-  await tester.pumpAndSettle();
+    await tester.pumpWidget(MyForm());
+
+    await tester.enterText(find.byType(TextField), 'test@example.com');
+    await tester.pump();
+    expect(find.text('test@example.com'), findsOneWidget);
+
+    await tester.tap(find.byType(ElevatedButton));
+    await tester.pumpAndSettle();
   });
 }

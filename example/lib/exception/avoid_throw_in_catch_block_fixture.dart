@@ -109,17 +109,17 @@ import '../flutter_mocks.dart';
 // expect_lint: avoid_throw_in_catch_block
 void _bad366() {
   try {
-  something();
+    something();
   } catch (e) {
-  throw Exception('Failed');  // Loses original stack trace
+    throw Exception('Failed'); // Loses original stack trace
   }
 }
 
 // GOOD: Should NOT trigger avoid_throw_in_catch_block
 void _good366() {
   try {
-  something();
+    something();
   } catch (e, stackTrace) {
-  throw Exception('Failed: $e');  // Or use Error.throwWithStackTrace
+    throw Exception('Failed: $e'); // Or use Error.throwWithStackTrace
   }
 }

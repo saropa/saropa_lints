@@ -114,6 +114,6 @@ void _bad104() async {
 // GOOD: Should NOT trigger require_location_timeout
 void _good104() async {
   final position = await Geolocator.getCurrentPosition(
-  timeLimit: Duration(seconds: 10),
+    timeLimit: Duration(seconds: 10),
   );
 }

@@ -113,21 +113,22 @@ dynamic widget;
 // expect_lint: avoid_unsafe_setstate
 void _bad1343() async {
   Future<void> loadData() async {
-  final data = await fetchData();
-  setState(() {  // BAD: widget may be unmounted
-  _data = data;
-  });
+    final data = await fetchData();
+    setState(() {
+      // BAD: widget may be unmounted
+      _data = data;
+    });
   }
 }
 
 // GOOD: Should NOT trigger avoid_unsafe_setstate
 void _good1343() async {
   Future<void> loadData() async {
-  final data = await fetchData();
-  if (mounted) {
-  setState(() {
-  _data = data;
-  });
-  }
+    final data = await fetchData();
+    if (mounted) {
+      setState(() {
+        _data = data;
+      });
+    }
   }
 }

@@ -112,24 +112,25 @@ dynamic event;
 // expect_lint: avoid_gesture_only_interactions
 void _bad4() {
   GestureDetector(
-  onTap: () => doSomething(),
-  child: MyWidget(),
+    onTap: () => doSomething(),
+    child: MyWidget(),
   );
 }
 
 // GOOD: Should NOT trigger avoid_gesture_only_interactions
 void _good4() {
   Focus(
-  onKeyEvent: (node, event) {
-  if (event is KeyDownEvent && event.logicalKey == LogicalKeyboardKey.enter) {
-  doSomething();
-  return KeyEventResult.handled;
-  }
-  return KeyEventResult.ignored;
-  },
-  child: GestureDetector(
-  onTap: () => doSomething(),
-  child: MyWidget(),
-  ),
+    onKeyEvent: (node, event) {
+      if (event is KeyDownEvent &&
+          event.logicalKey == LogicalKeyboardKey.enter) {
+        doSomething();
+        return KeyEventResult.handled;
+      }
+      return KeyEventResult.ignored;
+    },
+    child: GestureDetector(
+      onTap: () => doSomething(),
+      child: MyWidget(),
+    ),
   );
 }

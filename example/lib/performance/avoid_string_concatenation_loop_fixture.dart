@@ -112,16 +112,18 @@ dynamic result;
 
 // BAD: Should trigger avoid_string_concatenation_loop
 // expect_lint: avoid_string_concatenation_loop
-String _bad788_result = '';
-for (final item in items) {
-result = result + item.name;  // Creates new String each time
+void _bad788() {
+  String result = '';
+  for (final item in items) {
+    result = result + item.name; // Creates new String each time
+  }
 }
 
 // GOOD: Should NOT trigger avoid_string_concatenation_loop
 void _good788() {
   final buffer = StringBuffer();
   for (final item in items) {
-  buffer.write(item.name);
+    buffer.write(item.name);
   }
   final result = buffer.toString();
 }

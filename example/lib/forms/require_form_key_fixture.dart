@@ -112,7 +112,7 @@ final key = 'key';
 // expect_lint: require_form_key
 void _bad397() {
   Form(
-  child: TextFormField(),
+    child: TextFormField(),
   );
   // Can't call form.currentState!.validate();
 }
@@ -120,10 +120,10 @@ void _bad397() {
 // GOOD: Should NOT trigger require_form_key
 void _good397() {
   final _formKey = GlobalKey<FormState>();
-  
+
   Form(
-  key: _formKey,
-  child: TextFormField(),
+    key: _formKey,
+    child: TextFormField(),
   );
   // _formKey.currentState!.validate();
 }

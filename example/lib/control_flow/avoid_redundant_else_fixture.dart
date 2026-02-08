@@ -111,16 +111,16 @@ final condition = false;
 // expect_lint: avoid_redundant_else
 void _bad287() {
   if (condition) {
-  return 1;
+    return 1;
   } else {
-  return 2;
+    return 2;
   }
 }
 
 // GOOD: Should NOT trigger avoid_redundant_else
 void _good287() {
   if (condition) {
-  return 1;
+    return 1;
   }
   return 2;
 }

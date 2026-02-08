@@ -108,11 +108,11 @@ import '../flutter_mocks.dart';
 // BAD: Should trigger prefer_abstract_final_static_class
 // expect_lint: prefer_abstract_final_static_class
 class _bad1061_Constants {
-Constants._();  // Private constructor to prevent instantiation
-static const pi = 3.14;
+  _bad1061_Constants._(); // Private constructor to prevent instantiation
+  static const pi = 3.14;
 }
 
 // GOOD: Should NOT trigger prefer_abstract_final_static_class
 abstract final class _good1061_Constants {
-static const pi = 3.14;
+  static const pi = 3.14;
 }

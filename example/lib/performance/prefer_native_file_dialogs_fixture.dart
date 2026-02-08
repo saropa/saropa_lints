@@ -113,8 +113,8 @@ dynamic result;
 // expect_lint: prefer_native_file_dialogs
 void _bad809() {
   showDialog(
-  context: context,
-  builder: (context) => CustomFilePicker(),
+    context: context,
+    builder: (context) => CustomFilePicker(),
   );
 }
 

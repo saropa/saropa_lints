@@ -114,13 +114,13 @@ void _bad126() {
 // GOOD: Should NOT trigger require_geolocator_stream_cancel
 void _good126() {
   late StreamSubscription<Position> _subscription;
-  
+
   void initState() {
-  _subscription = Geolocator.getPositionStream().listen();
+    _subscription = Geolocator.getPositionStream().listen();
   }
-  
+
   void dispose() {
-  _subscription.cancel();
-  // super.dispose();
+    _subscription.cancel();
+    // super.dispose();
   }
 }

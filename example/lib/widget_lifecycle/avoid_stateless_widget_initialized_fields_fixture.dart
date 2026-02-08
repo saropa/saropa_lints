@@ -110,11 +110,11 @@ final items = <dynamic>[];
 // BAD: Should trigger avoid_stateless_widget_initialized_fields
 // expect_lint: avoid_stateless_widget_initialized_fields
 class _bad1339_MyWidget extends StatelessWidget {
-final List<int> items = [];  // Initialized in StatelessWidget
+  final List<int> items = []; // Initialized in StatelessWidget
 }
 
 // GOOD: Should NOT trigger avoid_stateless_widget_initialized_fields
 class _good1339_MyWidget extends StatelessWidget {
-final List<int> items;
-const MyWidget({required this.items});
+  final List<int> items;
+  const _good1339_MyWidget({required this.items});
 }

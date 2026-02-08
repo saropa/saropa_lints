@@ -109,8 +109,10 @@ dynamic value;
 
 // BAD: Should trigger avoid_unnecessary_reassignment
 // expect_lint: avoid_unnecessary_reassignment
-String _bad1059_value = 'default';
-value = value;  // Pointless reassignment
+void _bad1059() {
+  var value = 'default';
+  value = value; // Pointless reassignment
+}
 
 // GOOD: Should NOT trigger avoid_unnecessary_reassignment
 String _good1059_value = 'default';

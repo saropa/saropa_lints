@@ -112,17 +112,17 @@ dynamic error;
 // expect_lint: require_async_value_order
 void _bad757() {
   asyncValue.when(
-  loading: () => CircularProgressIndicator(),
-  error: (e, s) => ErrorWidget(e),
-  data: (d) => DataWidget(d),  // Wrong order
+    loading: () => CircularProgressIndicator(),
+    error: (e, s) => ErrorWidget(e),
+    data: (d) => DataWidget(d), // Wrong order
   );
 }
 
 // GOOD: Should NOT trigger require_async_value_order
 void _good757() {
   asyncValue.when(
-  data: (d) => DataWidget(d),
-  error: (e, s) => ErrorWidget(e),
-  loading: () => CircularProgressIndicator(),
+    data: (d) => DataWidget(d),
+    error: (e, s) => ErrorWidget(e),
+    loading: () => CircularProgressIndicator(),
   );
 }

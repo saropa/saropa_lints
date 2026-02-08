@@ -111,18 +111,12 @@ final name = 'example';
 // BAD: Should trigger require_safe_json_parsing
 // expect_lint: require_safe_json_parsing
 void _bad1238() {
-  factory User.fromJson(Map<String, dynamic> json) {
-  return User(
-  name: json['name'] as String, // Throws if missing
-  );
-  }
+  // factory User.fromJson
+  final name = json['name'] as String; // Throws if missing
 }
 
 // GOOD: Should NOT trigger require_safe_json_parsing
 void _good1238() {
-  factory User.fromJson(Map<String, dynamic> json) {
-  return User(
-  name: json['name'] as String? ?? 'Unknown',
-  );
-  }
+  // factory User.fromJson
+  final name = json['name'] as String? ?? 'Unknown';
 }

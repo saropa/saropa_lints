@@ -111,7 +111,7 @@ dynamic content;
 // BAD: Should trigger avoid_collection_equality_checks
 // expect_lint: avoid_collection_equality_checks
 void _bad239() {
-  if (list1 == list2) {}  // Reference equality, not content
+  if (list1 == list2) {} // Reference equality, not content
 }
 
 // GOOD: Should NOT trigger avoid_collection_equality_checks

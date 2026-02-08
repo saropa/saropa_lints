@@ -118,15 +118,15 @@ final title = 'Title';
 // expect_lint: require_theme_color_from_scheme
 void _bad1434() {
   ListView(
-  shrinkWrap: true,
-  children: items.map((item) => ListTile(title: Text(item))).toList(),
+    shrinkWrap: true,
+    children: items.map((item) => ListTile(title: Text(item))).toList(),
   );
 }
 
 // GOOD: Should NOT trigger require_theme_color_from_scheme
 void _good1434() {
   ListView.builder(
-  itemCount: items.length,
-  itemBuilder: (context, index) => ListTile(title: Text(items[index])),
+    itemCount: items.length,
+    itemBuilder: (context, index) => ListTile(title: Text(items[index])),
   );
 }

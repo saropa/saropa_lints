@@ -112,25 +112,25 @@ dynamic future;
 // expect_lint: require_completer_error_handling
 void _bad111() async {
   Future<String> fetch() {
-  final completer = Completer<String>();
-  try {
-  completer.complete(await api.get());
-  } catch (e) {
-  // Completer never completed!
-  }
-  return completer.future;
+    final completer = Completer<String>();
+    try {
+      completer.complete(await api.get());
+    } catch (e) {
+      // Completer never completed!
+    }
+    return completer.future;
   }
 }
 
 // GOOD: Should NOT trigger require_completer_error_handling
 void _good111() async {
   Future<String> fetch() {
-  final completer = Completer<String>();
-  try {
-  completer.complete(await api.get());
-  } catch (e) {
-  completer.completeError(e);
-  }
-  return completer.future;
+    final completer = Completer<String>();
+    try {
+      completer.complete(await api.get());
+    } catch (e) {
+      completer.completeError(e);
+    }
+    return completer.future;
   }
 }

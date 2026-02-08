@@ -109,13 +109,13 @@ import '../flutter_mocks.dart';
 // expect_lint: require_envied_obfuscation
 @Envied()
 abstract class _bad697_Env {
-@EnviedField()
-static const String apiKey = _Env.apiKey;
+  @EnviedField()
+  static const String apiKey = _Env.apiKey;
 }
 
 // GOOD: Should NOT trigger require_envied_obfuscation
 @Envied(obfuscate: true)
 abstract class _good697_Env {
-@EnviedField(obfuscate: true)
-static const String apiKey = _Env.apiKey;
+  @EnviedField(obfuscate: true)
+  static const String apiKey = _Env.apiKey;
 }

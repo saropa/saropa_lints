@@ -115,7 +115,7 @@ final name = 'example';
 // expect_lint: require_android_12_splash
 // Custom splash screen without Android 12 configuration
 class _bad831_SplashScreen extends StatelessWidget {
-Widget build(context) => Container(color: Colors.blue, child: Logo());
+  Widget build(context) => Container(color: Colors.blue, child: Logo());
 }
 
 // GOOD: Should NOT trigger require_android_12_splash

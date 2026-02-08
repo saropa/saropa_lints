@@ -110,37 +110,37 @@ dynamic stream;
 // BAD: Should trigger require_dispose_implementation
 // expect_lint: require_dispose_implementation
 class _bad335__MyWidgetState extends State<MyWidget> {
-final TextEditingController _controller = TextEditingController();
-StreamSubscription? _subscription;
-Timer? _timer;
+  final TextEditingController _controller = TextEditingController();
+  StreamSubscription? _subscription;
+  Timer? _timer;
 
-@override
-void initState() {
-super.initState();
-_subscription = stream.listen((_) {});
-_timer = Timer.periodic(Duration(seconds: 1), (_) {});
-}
+  @override
+  void initState() {
+    super.initState();
+    _subscription = stream.listen((_) {});
+    _timer = Timer.periodic(Duration(seconds: 1), (_) {});
+  }
 // Missing dispose() - all resources leak!
 }
 
 // GOOD: Should NOT trigger require_dispose_implementation
 class _good335__MyWidgetState extends State<MyWidget> {
-final TextEditingController _controller = TextEditingController();
-StreamSubscription? _subscription;
-Timer? _timer;
+  final TextEditingController _controller = TextEditingController();
+  StreamSubscription? _subscription;
+  Timer? _timer;
 
-@override
-void initState() {
-super.initState();
-_subscription = stream.listen((_) {});
-_timer = Timer.periodic(Duration(seconds: 1), (_) {});
-}
+  @override
+  void initState() {
+    super.initState();
+    _subscription = stream.listen((_) {});
+    _timer = Timer.periodic(Duration(seconds: 1), (_) {});
+  }
 
-@override
-void dispose() {
-_controller.dispose();
-_subscription?.cancel();
-_timer?.cancel();
-super.dispose();
-}
+  @override
+  void dispose() {
+    _controller.dispose();
+    _subscription?.cancel();
+    _timer?.cancel();
+    super.dispose();
+  }
 }

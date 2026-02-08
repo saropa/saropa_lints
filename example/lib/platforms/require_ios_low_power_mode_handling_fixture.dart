@@ -116,8 +116,6 @@ void _bad909() {
 void _good909() async {
   final isLowPower = await ProcessInfo.isLowPowerModeEnabled;
   AnimationController(
-  duration: isLowPower
-  ? Duration(milliseconds: 200)
-  : Duration(seconds: 2),
+    duration: isLowPower ? Duration(milliseconds: 200) : Duration(seconds: 2),
   );
 }

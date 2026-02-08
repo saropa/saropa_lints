@@ -113,30 +113,30 @@ dynamic future;
 // expect_lint: pass_existing_future_to_future_builder
 void _bad1357() {
   FutureBuilder(
-  future: fetchData(), // Creates new future on every build!
-  builder: (context, snapshot) =>,
+    future: fetchData(), // Creates new future on every build!
+    builder: (context, snapshot) => Container(),
   );
-  
+
   // Also bad in helper methods:
   Widget _buildContent() {
-  return FutureBuilder(
-  future: fetchData(), // Still restarts on every rebuild!
-  builder: (context, snapshot) =>,
-  );
+    return FutureBuilder(
+      future: fetchData(), // Still restarts on every rebuild!
+      builder: (context, snapshot) => Container(),
+    );
   }
 }
 
 // GOOD: Should NOT trigger pass_existing_future_to_future_builder
 void _good1357() {
   late final Future<Data> _dataFuture;
-  
+
   void initState() {
-  // super.initState();
-  _dataFuture = fetchData();
+    // super.initState();
+    _dataFuture = fetchData();
   }
-  
+
   FutureBuilder(
-  future: _dataFuture,
-  builder: (context, snapshot) =>,
+    future: _dataFuture,
+    builder: (context, snapshot) => Container(),
   );
 }

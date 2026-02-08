@@ -110,13 +110,13 @@ dynamic data;
 // BAD: Should trigger avoid_large_objects_in_state
 // expect_lint: avoid_large_objects_in_state
 class _bad467__MyWidgetState extends State<MyWidget> {
-List<LargeDataModel> allItems = []; // May grow unbounded
-Map<String, Uint8List> imageCache = {}; // Large binary data
+  List<LargeDataModel> allItems = []; // May grow unbounded
+  Map<String, Uint8List> imageCache = {}; // Large binary data
 }
 
 // GOOD: Should NOT trigger avoid_large_objects_in_state
 class _good467__MyWidgetState extends State<MyWidget> {
 // Use pagination or streaming
-late final ScrollController _controller;
+  late final ScrollController _controller;
 // Or use external cache with LRU eviction
 }

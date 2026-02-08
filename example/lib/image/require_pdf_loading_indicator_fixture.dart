@@ -120,9 +120,9 @@ void _bad426() {
 // GOOD: Should NOT trigger require_pdf_loading_indicator
 void _good426() {
   Stack(
-  children: [
-  PdfViewer.openFile(filePath),
-  if (isLoading) CircularProgressIndicator(),
-  ],
+    children: [
+      PdfViewer.openFile(filePath),
+      if (isLoading) CircularProgressIndicator(),
+    ],
   );
 }

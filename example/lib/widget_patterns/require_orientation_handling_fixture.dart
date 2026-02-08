@@ -111,20 +111,20 @@ dynamic data;
 // BAD: Should trigger require_orientation_handling
 // expect_lint: require_orientation_handling
 class _bad1446_MyInherited extends InheritedWidget {
-final String data;
-const MyInherited({required this.data, required Widget child})
-: super(child: child);
+  final String data;
+  const _bad1446_MyInherited({required this.data, required Widget child})
+      : super(child: child);
 // Missing updateShouldNotify!
 }
 
 // GOOD: Should NOT trigger require_orientation_handling
 class _good1446_MyInherited extends InheritedWidget {
-final String data;
-const MyInherited({required this.data, required Widget child})
-: super(child: child);
+  final String data;
+  const _good1446_MyInherited({required this.data, required Widget child})
+      : super(child: child);
 
-@override
-bool updateShouldNotify(MyInherited oldWidget) {
-return data != oldWidget.data;
-}
+  @override
+  bool updateShouldNotify(MyInherited oldWidget) {
+    return data != oldWidget.data;
+  }
 }

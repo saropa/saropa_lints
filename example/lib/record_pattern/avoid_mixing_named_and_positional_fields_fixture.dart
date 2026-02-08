@@ -110,12 +110,12 @@ final name = 'example';
 // BAD: Should trigger avoid_mixing_named_and_positional_fields
 // expect_lint: avoid_mixing_named_and_positional_fields
 void _bad953() {
-  (int, {String name}) person;  // Mixed positional and named
+  (int, {String name}) person; // Mixed positional and named
 }
 
 // GOOD: Should NOT trigger avoid_mixing_named_and_positional_fields
 void _good953() {
-  ({int age, String name}) person;  // All named
+  ({int age, String name}) person; // All named
   // or
-  (int, String) pair;  // All positional
+  (int, String) pair; // All positional
 }

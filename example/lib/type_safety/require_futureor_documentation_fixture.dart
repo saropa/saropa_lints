@@ -110,11 +110,11 @@ dynamic value;
 // BAD: Should trigger require_futureor_documentation
 // expect_lint: require_futureor_documentation
 void _bad1243() {
-  FutureOr<String> getValue(); // Sync or async?
+  FutureOr<String> getValue; // Sync or async?
 }
 
 // GOOD: Should NOT trigger require_futureor_documentation
 void _good1243() {
   /// Returns cached value sync, or fetches async if not cached.
-  FutureOr<String> getValue();
+  FutureOr<String> getValue;
 }

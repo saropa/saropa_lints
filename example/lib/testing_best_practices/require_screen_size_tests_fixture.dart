@@ -109,20 +109,20 @@ import '../flutter_mocks.dart';
 // expect_lint: require_screen_size_tests
 void _bad1204() async {
   testWidgets('shows layout', (tester) async {
-  await tester.pumpWidget(MyResponsiveWidget());
-  // Only tests default size
+    await tester.pumpWidget(MyResponsiveWidget());
+    // Only tests default size
   });
 }
 
 // GOOD: Should NOT trigger require_screen_size_tests
 void _good1204() async {
   testWidgets('shows layout on phone', (tester) async {
-  tester.binding.window.physicalSizeTestValue = Size(400, 800);
-  await tester.pumpWidget(MyResponsiveWidget());
+    tester.binding.window.physicalSizeTestValue = Size(400, 800);
+    await tester.pumpWidget(MyResponsiveWidget());
   });
-  
+
   testWidgets('shows layout on tablet', (tester) async {
-  tester.binding.window.physicalSizeTestValue = Size(800, 1200);
-  await tester.pumpWidget(MyResponsiveWidget());
+    tester.binding.window.physicalSizeTestValue = Size(800, 1200);
+    await tester.pumpWidget(MyResponsiveWidget());
   });
 }

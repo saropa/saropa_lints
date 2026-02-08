@@ -113,17 +113,18 @@ dynamic value;
 // BAD: Should trigger avoid_get_find_in_build
 // expect_lint: avoid_get_find_in_build
 Widget _bad643_build(BuildContext context) {
-final controller = Get.find<MyController>(); // Called on every rebuild
-return Text(controller.value.toString());
+  final controller = Get.find<MyController>(); // Called on every rebuild
+  return Text(controller.value.toString());
 }
 
 // GOOD: Should NOT trigger avoid_get_find_in_build
 Widget _good643_build(BuildContext context) {
-return GetBuilder<MyController>(
-builder: (controller) => Text(controller.value.toString()),
-);
+  return GetBuilder<MyController>(
+    builder: (controller) => Text(controller.value.toString()),
+  );
 }
+
 // Or with Obx:
 Widget build(BuildContext context) {
-return Obx(() => Text(controller.value.toString()));
+  return Obx(() => Text(controller.value.toString()));
 }

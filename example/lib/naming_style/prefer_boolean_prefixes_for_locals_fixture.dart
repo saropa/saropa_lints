@@ -110,12 +110,12 @@ dynamic status;
 // BAD: Should trigger prefer_boolean_prefixes_for_locals
 // expect_lint: prefer_boolean_prefixes_for_locals
 void _bad485_myFunction() {
-bool status = true;  // Should be isEnabled, hasStatus, etc.
+  bool status = true; // Should be isEnabled, hasStatus, etc.
 }
 
 // GOOD: Should NOT trigger prefer_boolean_prefixes_for_locals
 void _good485_myFunction() {
-bool isEnabled = true;
-bool _deviceEnabled = false; // OK - ends with Enabled
-bool defaultHideIcons = true; // OK - default prefix + Hide
+  bool isEnabled = true;
+  bool _deviceEnabled = false; // OK - ends with Enabled
+  bool defaultHideIcons = true; // OK - default prefix + Hide
 }

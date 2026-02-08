@@ -108,7 +108,7 @@ import '../flutter_mocks.dart';
 // BAD: Should trigger avoid_unnecessary_constructor
 // expect_lint: avoid_unnecessary_constructor
 class _bad1272_MyClass {
-MyClass();  // Unnecessary
+  MyClass(); // Unnecessary
 }
 
 // GOOD: Should NOT trigger avoid_unnecessary_constructor

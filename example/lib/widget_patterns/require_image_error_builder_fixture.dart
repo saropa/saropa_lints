@@ -122,8 +122,8 @@ void _bad1411() {
 // GOOD: Should NOT trigger require_image_error_builder
 void _good1411() {
   Image.network(
-  'https://example.com/image.png',
-  errorBuilder: (context, error, stackTrace) => Icon(Icons.broken_image),
+    'https://example.com/image.png',
+    errorBuilder: (context, error, stackTrace) => Icon(Icons.broken_image),
   );
   // User sees a fallback icon or message when image fails to load
 }

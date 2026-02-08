@@ -110,14 +110,18 @@ final name = 'example';
 
 // BAD: Should trigger prefer_named_parameters
 // expect_lint: prefer_named_parameters
-void _bad1056_createUser(String name, int age, String email, String phone, bool active) {}
-createUser('John', 30, 'john@example.com', '555-1234', true);  // What's what?
+void _bad1056_createUser(
+    String name, int age, String email, String phone, bool active) {}
+void _bad1056_call() {
+  _bad1056_createUser(
+      'John', 30, 'john@example.com', '555-1234', true); // What's what?
+}
 
 // GOOD: Should NOT trigger prefer_named_parameters
 void _good1056_createUser({
-required String name,
-required int age,
-required String email,
-String? phone,
-bool active = true,
+  required String name,
+  required int age,
+  required String email,
+  String? phone,
+  bool active = true,
 }) {}

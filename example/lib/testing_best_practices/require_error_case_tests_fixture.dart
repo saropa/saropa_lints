@@ -117,29 +117,29 @@ dynamic user;
 void _bad1213() async {
   // user_service_test.dart - only happy path
   void main() {
-  test('login returns user', () async {
-  final user = await service.login('valid@email.com', 'password');
-  expect(user.name, isNotEmpty);
-  });
+    test('login returns user', () async {
+      final user = await service.login('valid@email.com', 'password');
+      expect(user.name, isNotEmpty);
+    });
   }
 }
 
 // GOOD: Should NOT trigger require_error_case_tests
 void _good1213_main() async {
-test('login returns user', () async {
-final user = await service.login('valid@email.com', 'password');
-expect(user.name, isNotEmpty);
-});
+  test('login returns user', () async {
+    final user = await service.login('valid@email.com', 'password');
+    expect(user.name, isNotEmpty);
+  });
 
-test('login throws on invalid credentials', () async {
-expect(
-() => service.login('invalid@email.com', 'wrong'),
-throwsA(isA<AuthException>()),
-);
-});
+  test('login throws on invalid credentials', () async {
+    expect(
+      () => service.login('invalid@email.com', 'wrong'),
+      throwsA(isA<AuthException>()),
+    );
+  });
 
-test('returns null for missing user', () async {
-final user = await service.findUser('nonexistent');
-expect(user, isNull);
-});
+  test('returns null for missing user', () async {
+    final user = await service.findUser('nonexistent');
+    expect(user, isNull);
+  });
 }

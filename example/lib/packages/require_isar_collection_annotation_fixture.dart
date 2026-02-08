@@ -115,14 +115,17 @@ final users = <dynamic>[];
 // BAD: Should trigger require_isar_collection_annotation
 // expect_lint: require_isar_collection_annotation
 class _bad673_User {
-Id? id;
-String? name;
+  Id? id;
+  String? name;
 }
-await isar.writeTxn(() => isar.users.put(user)); // Error!
+
+void _topLevel120() {
+  await isar.writeTxn(() => isar.users.put(user)); // Error!
+}
 
 // GOOD: Should NOT trigger require_isar_collection_annotation
 @collection
 class _good673_User {
-Id? id;
-String? name;
+  Id? id;
+  String? name;
 }

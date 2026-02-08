@@ -108,7 +108,7 @@ import '../flutter_mocks.dart';
 // BAD: Should trigger avoid_shadowed_extension_methods
 // expect_lint: avoid_shadowed_extension_methods
 extension StringExt on String {
-int get length => 0;  // Shadows String.length
+  int get length => 0; // Shadows String.length
 }
 
 // GOOD: Should NOT trigger avoid_shadowed_extension_methods

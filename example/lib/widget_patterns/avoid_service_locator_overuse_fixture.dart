@@ -112,16 +112,16 @@ dynamic value;
 // BAD: Should trigger avoid_service_locator_overuse
 // expect_lint: avoid_service_locator_overuse
 class _bad1377_MyWidget extends StatelessWidget {
-@override
-Widget build(BuildContext context) {
-final service = GetIt.I<MyService>();  // Scattered DI
-return Text(service.value);
-}
+  @override
+  Widget build(BuildContext context) {
+    final service = GetIt.I<MyService>(); // Scattered DI
+    return Text(service.value);
+  }
 }
 
 // GOOD: Should NOT trigger avoid_service_locator_overuse
 class _good1377_MyWidget extends StatelessWidget {
-final MyService service;
-const MyWidget({required this.service});
+  final MyService service;
+  const _good1377_MyWidget({required this.service});
 // Constructor injection
 }

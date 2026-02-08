@@ -111,18 +111,18 @@ dynamic user;
 // expect_lint: require_qr_scan_feedback
 void _bad724() {
   MobileScanner(
-  onDetect: (capture) {
-  processBarcode(capture.barcodes.first); // No feedback to user
-  },
+    onDetect: (capture) {
+      processBarcode(capture.barcodes.first); // No feedback to user
+    },
   );
 }
 
 // GOOD: Should NOT trigger require_qr_scan_feedback
 void _good724() {
   MobileScanner(
-  onDetect: (capture) {
-  HapticFeedback.mediumImpact(); // User feels the scan
-  processBarcode(capture.barcodes.first);
-  },
+    onDetect: (capture) {
+      HapticFeedback.mediumImpact(); // User feels the scan
+      processBarcode(capture.barcodes.first);
+    },
   );
 }

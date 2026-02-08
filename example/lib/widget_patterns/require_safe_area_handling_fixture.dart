@@ -114,26 +114,26 @@ final context = BuildContext();
 // expect_lint: require_safe_area_handling
 void _bad1439() {
   Scaffold(
-  body: Column(
-  children: [], // May be clipped by notch!
-  ),
+    body: Column(
+      children: [], // May be clipped by notch!
+    ),
   );
 }
 
 // GOOD: Should NOT trigger require_safe_area_handling
 void _good1439() {
   Scaffold(
-  body: SafeArea(
-  child: Column(
-  children: [],
-  ),
-  ),
+    body: SafeArea(
+      child: Column(
+        children: [],
+      ),
+    ),
   );
   // Or handle manually:
   Scaffold(
-  body: Padding(
-  padding: MediaQuery.of(context).padding,
-  child: Column(),
-  ),
+    body: Padding(
+      padding: MediaQuery.of(context).padding,
+      child: Column(),
+    ),
   );
 }

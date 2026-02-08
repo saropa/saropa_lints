@@ -111,18 +111,22 @@ final id = '1';
 // BAD: Should trigger prefer_base_class
 // expect_lint: prefer_base_class
 abstract class _bad147_BaseRepository {
-final Database db;
-BaseRepository(this.db);
+  final Database db;
+  void _topLevel114() {
+    _bad147_BaseRepository(this.db);
+  }
 
-Future<void> close() => db.close();
-Future<T> get<T>(String id);  // Abstract
+  Future<void> close() => db.close();
+  Future<T> get<T>(String id); // Abstract
 }
 
 // GOOD: Should NOT trigger prefer_base_class
 abstract base class _good147_BaseRepository {
-final Database db;
-BaseRepository(this.db);
+  final Database db;
+  void _topLevel123() {
+    _bad147_BaseRepository(this.db);
+  }
 
-Future<void> close() => db.close();
-Future<T> get<T>(String id);  // Abstract
+  Future<void> close() => db.close();
+  Future<T> get<T>(String id); // Abstract
 }

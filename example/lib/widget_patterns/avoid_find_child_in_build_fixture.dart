@@ -114,18 +114,18 @@ final key = 'key';
 // expect_lint: avoid_find_child_in_build
 void _bad1431() {
   ListView.builder(
-  findChildIndexCallback: (key) => items.indexWhere(),
-  itemBuilder:,
+    findChildIndexCallback: (key) => items.indexWhere((e) => true),
+    itemBuilder: (_, __) => Container(),
   );
 }
 
 // GOOD: Should NOT trigger avoid_find_child_in_build
 void _good1431() {
   // Define callback outside build or use memoization
-  final _findChildIndex = (Key key) =>;
-  
+  final _findChildIndex = (Key key) => 0;
+
   ListView.builder(
-  findChildIndexCallback: _findChildIndex,
-  itemBuilder:,
+    findChildIndexCallback: _findChildIndex,
+    itemBuilder: (_, __) => Container(),
   );
 }

@@ -110,33 +110,33 @@ dynamic timer;
 // BAD: Should trigger require_interval_timer_cancel
 // expect_lint: require_interval_timer_cancel
 class _bad333__ClockState extends State<Clock> {
-Timer? _timer;
+  Timer? _timer;
 
-@override
-void initState() {
-super.initState();
-_timer = Timer.periodic(Duration(seconds: 1), (_) {
-setState(() {});
-});
-}
+  @override
+  void initState() {
+    super.initState();
+    _timer = Timer.periodic(Duration(seconds: 1), (_) {
+      setState(() {});
+    });
+  }
 // Missing cancel - timer runs forever!
 }
 
 // GOOD: Should NOT trigger require_interval_timer_cancel
 class _good333__ClockState extends State<Clock> {
-Timer? _timer;
+  Timer? _timer;
 
-@override
-void initState() {
-super.initState();
-_timer = Timer.periodic(Duration(seconds: 1), (_) {
-setState(() {});
-});
-}
+  @override
+  void initState() {
+    super.initState();
+    _timer = Timer.periodic(Duration(seconds: 1), (_) {
+      setState(() {});
+    });
+  }
 
-@override
-void dispose() {
-_timer?.cancel();
-super.dispose();
-}
+  @override
+  void dispose() {
+    _timer?.cancel();
+    super.dispose();
+  }
 }

@@ -110,11 +110,11 @@ final name = 'example';
 // BAD: Should trigger prefer_immediate_return
 // expect_lint: prefer_immediate_return
 String _bad981_getName() {
-final name = computeName();
-return name;
+  final name = computeName();
+  return name;
 }
 
 // GOOD: Should NOT trigger prefer_immediate_return
 String _good981_getName() {
-return computeName();
+  return computeName();
 }

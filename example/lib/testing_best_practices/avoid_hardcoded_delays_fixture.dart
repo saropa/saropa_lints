@@ -111,19 +111,20 @@ final condition = false;
 // expect_lint: avoid_hardcoded_delays
 void _bad1212() async {
   testWidgets('shows loading', (tester) async {
-  await tester.pumpWidget(MyApp());
-  await Future.delayed(Duration(seconds: 2)); // Flaky!
-  expect(find.byType(LoadingIndicator), findsNothing);
+    await tester.pumpWidget(MyApp());
+    await Future.delayed(Duration(seconds: 2)); // Flaky!
+    expect(find.byType(LoadingIndicator), findsNothing);
   });
 }
 
 // GOOD: Should NOT trigger avoid_hardcoded_delays
 void _good1212() async {
   testWidgets('shows loading', (tester) async {
-  await tester.pumpWidget(MyApp());
-  await tester.pumpAndSettle(); // Waits for animations
-  expect(find.byType(LoadingIndicator), findsNothing);
+    await tester.pumpWidget(MyApp());
+    await tester.pumpAndSettle(); // Waits for animations
+    expect(find.byType(LoadingIndicator), findsNothing);
   });
   // Or wait for specific condition:
-  await tester.pumpUntil(() => find.byType(LoadingIndicator).evaluate().isEmpty);
+  await tester
+      .pumpUntil(() => find.byType(LoadingIndicator).evaluate().isEmpty);
 }

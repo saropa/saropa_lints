@@ -113,19 +113,19 @@ dynamic value;
 // expect_lint: avoid_sync_on_every_change
 void _bad115() async {
   TextField(
-  onChanged: (value) async {
-  await api.saveNote(value); // Syncs on every keystroke!
-  },
+    onChanged: (value) async {
+      await api.saveNote(value); // Syncs on every keystroke!
+    },
   );
 }
 
 // GOOD: Should NOT trigger avoid_sync_on_every_change
 void _good115() {
   TextField(
-  onChanged: (value) {
-  _pendingValue = value;
-  _debouncer.run(() => api.saveNote(_pendingValue));
-  },
+    onChanged: (value) {
+      _pendingValue = value;
+      _debouncer.run(() => api.saveNote(_pendingValue));
+    },
   );
   // Or sync when user stops typing or leaves screen
 }

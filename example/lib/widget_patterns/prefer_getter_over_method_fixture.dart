@@ -111,8 +111,10 @@ final name = 'example';
 // BAD: Should trigger prefer_getter_over_method
 // expect_lint: prefer_getter_over_method
 String _bad1380_getName() => _name;
-int getCount() { return _count; }
+int getCount() {
+  return _count;
+}
 
 // GOOD: Should NOT trigger prefer_getter_over_method
-String _good1380_get name => _name;
-int get count => _count;
+String get _good1380_name => _name;
+int get _good1380_count => _count;

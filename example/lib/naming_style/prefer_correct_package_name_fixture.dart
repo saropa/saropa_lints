@@ -116,5 +116,5 @@ void _bad500() {
 
 // GOOD: Should NOT trigger prefer_correct_package_name
 void _good500() {
-  library;                 // OK - unnamed library (Dart 2.19+);
+  library; // OK - unnamed library (Dart 2.19+);
 }

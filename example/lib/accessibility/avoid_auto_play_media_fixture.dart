@@ -109,17 +109,17 @@ import '../flutter_mocks.dart';
 // expect_lint: avoid_auto_play_media
 void _bad27() {
   VideoPlayer(
-  autoPlay: true,
+    autoPlay: true,
   );
   AudioPlayer(
-  autoPlay: true,
+    autoPlay: true,
   );
 }
 
 // GOOD: Should NOT trigger avoid_auto_play_media
 void _good27() {
   VideoPlayer(
-  autoPlay: false,
+    autoPlay: false,
   );
   // Or without autoPlay (defaults to false in most players);
   VideoPlayer();

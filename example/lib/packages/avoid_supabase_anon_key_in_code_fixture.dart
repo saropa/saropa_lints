@@ -111,15 +111,15 @@ final url = 'https://example.com';
 // expect_lint: avoid_supabase_anon_key_in_code
 void _bad771() {
   final supabase = Supabase.initialize(
-  url: 'https://xxx.supabase.co',
-  anonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9',
+    url: 'https://xxx.supabase.co',
+    anonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9',
   );
 }
 
 // GOOD: Should NOT trigger avoid_supabase_anon_key_in_code
 void _good771() {
   final supabase = Supabase.initialize(
-  url: Env.supabaseUrl,
-  anonKey: Env.supabaseAnonKey,
+    url: Env.supabaseUrl,
+    anonKey: Env.supabaseAnonKey,
   );
 }

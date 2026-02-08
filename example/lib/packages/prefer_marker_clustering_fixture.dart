@@ -112,7 +112,7 @@ dynamic map;
 // expect_lint: prefer_marker_clustering
 void _bad623() {
   GoogleMap(
-  markers: allLocations.map((loc) => Marker()).toSet(),  // 500 markers!
+    markers: allLocations.map((loc) => Marker()).toSet(), // 500 markers!
   );
 }
 
@@ -120,12 +120,12 @@ void _bad623() {
 void _good623() {
   // Use flutter_map_marker_cluster or google_maps_cluster_manager
   FlutterMap(
-  children: [
-  MarkerClusterLayerWidget(
-  options: MarkerClusterLayerOptions(
-  markers: markers,
-  ),
-  ),
-  ],
+    children: [
+      MarkerClusterLayerWidget(
+        options: MarkerClusterLayerOptions(
+          markers: markers,
+        ),
+      ),
+    ],
   );
 }

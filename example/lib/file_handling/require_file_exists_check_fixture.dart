@@ -117,12 +117,12 @@ void _bad369() async {
 // GOOD: Should NOT trigger require_file_exists_check
 void _good369() async {
   if (await file.exists()) {
-  final content = await file.readAsString();
+    final content = await file.readAsString();
   }
   // OR
   try {
-  final content = await file.readAsString();
+    final content = await file.readAsString();
   } on FileSystemException {
-  handleMissingFile();
+    handleMissingFile();
   }
 }

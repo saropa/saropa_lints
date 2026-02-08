@@ -111,18 +111,18 @@ final name = 'example';
 // BAD: Should trigger avoid_service_locator_in_widgets
 // expect_lint: avoid_service_locator_in_widgets
 class _bad311_UserWidget extends StatelessWidget {
-Widget build(BuildContext context) {
-final userService = GetIt.I<UserService>(); // Direct access
-return Text(userService.currentUser.name);
-}
+  Widget build(BuildContext context) {
+    final userService = GetIt.I<UserService>(); // Direct access
+    return Text(userService.currentUser.name);
+  }
 }
 
 // GOOD: Should NOT trigger avoid_service_locator_in_widgets
 class _good311_UserWidget extends StatelessWidget {
-const UserWidget({required this.userService});
-final UserService userService;
+  const _good311_UserWidget({required this.userService});
+  final UserService userService;
 
-Widget build(BuildContext context) {
-return Text(userService.currentUser.name);
-}
+  Widget build(BuildContext context) {
+    return Text(userService.currentUser.name);
+  }
 }

@@ -122,10 +122,10 @@ void _bad654() async {
   }
   }
   ''');
-  
+
   // Or using graphql_flutter
   final result = await client.query(QueryOptions(
-  document: gql('{ users { id name } }'),
+    document: gql('{ users { id name } }'),
   ));
 }
 
@@ -133,7 +133,7 @@ void _bad654() async {
 void _good654() async {
   // Use generated query classes from graphql_codegen
   final result = await client.query(GetUsersQuery().options);
-  
+
   // Or use .graphql files with code generation
   final result = await client.query(Options$Query$GetUsers());
 }

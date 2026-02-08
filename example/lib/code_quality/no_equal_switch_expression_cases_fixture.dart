@@ -112,9 +112,9 @@ dynamic x;
 // expect_lint: no_equal_switch_expression_cases
 void _bad206() {
   final result = switch (x) {
-  1 => 'one',
-  2 => 'one',  // Same as case 1
-  _ => 'other',
+    1 => 'one',
+    2 => 'one', // Same as case 1
+    _ => 'other',
   };
 }
 

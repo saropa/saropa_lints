@@ -108,8 +108,10 @@ import '../flutter_mocks.dart';
 // BAD: Should trigger prefer_text_rich
 // expect_lint: prefer_text_rich
 class _bad1372_MyList extends SliverChildDelegate {}
+
 class CustomGrid extends SliverGridDelegate {}
 
 // GOOD: Should NOT trigger prefer_text_rich
 class _good1372_SliverMyList extends SliverChildDelegate {}
+
 class SliverCustomGrid extends SliverGridDelegate {}

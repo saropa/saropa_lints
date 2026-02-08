@@ -114,13 +114,13 @@ dynamic user;
 // BAD: Should trigger prefer_consumer_over_provider_of
 // expect_lint: prefer_consumer_over_provider_of
 Widget _bad715_build(BuildContext context) {
-final user = Provider.of<User>(context);
-return Text(user.name);
+  final user = Provider.of<User>(context);
+  return Text(user.name);
 }
 
 // GOOD: Should NOT trigger prefer_consumer_over_provider_of
 Widget _good715_build(BuildContext context) {
-return Consumer<User>(
-builder: (context, user, child) => Text(user.name),
-);
+  return Consumer<User>(
+    builder: (context, user, child) => Text(user.name),
+  );
 }

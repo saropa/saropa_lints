@@ -113,7 +113,7 @@ final users = <dynamic>[];
 // expect_lint: avoid_dio_without_base_url
 void _bad598() {
   dio.get('https://api.example.com/users');
-  dio.get('https://api.example.com/posts');  // Repeated base!
+  dio.get('https://api.example.com/posts'); // Repeated base!
 }
 
 // GOOD: Should NOT trigger avoid_dio_without_base_url

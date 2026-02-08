@@ -111,22 +111,22 @@ dynamic state;
 // BAD: Should trigger require_test_setup_teardown
 // expect_lint: require_test_setup_teardown
 void _bad1191_main() {
-test('test 1', () {});
-test('test 2', () {}); // May depend on test 1's state
+  test('test 1', () {});
+  test('test 2', () {}); // May depend on test 1's state
 }
 
 // GOOD: Should NOT trigger require_test_setup_teardown
 void _good1191_main() {
-late UserRepository repo;
+  late UserRepository repo;
 
-setUp(() {
-repo = UserRepository();
-});
+  setUp(() {
+    repo = UserRepository();
+  });
 
-tearDown(() {
-repo.dispose();
-});
+  tearDown(() {
+    repo.dispose();
+  });
 
-test('test 1', () {});
-test('test 2', () {});
+  test('test 1', () {});
+  test('test 2', () {});
 }

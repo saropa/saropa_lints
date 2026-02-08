@@ -110,39 +110,39 @@ dynamic image;
 // BAD: Should trigger require_image_stream_dispose
 // expect_lint: require_image_stream_dispose
 class _bad433__MyWidgetState extends State<MyWidget> {
-ImageStream? _imageStream;
-late ImageStreamListener _listener;
+  ImageStream? _imageStream;
+  late ImageStreamListener _listener;
 
-@override
-void initState() {
-super.initState();
-_listener = ImageStreamListener((image, sync) {
+  @override
+  void initState() {
+    super.initState();
+    _listener = ImageStreamListener((image, sync) {
 // Handle image
-});
-_imageStream = ImageProvider.resolve(configuration);
-_imageStream?.addListener(_listener);
-}
+    });
+    _imageStream = ImageProvider.resolve(configuration);
+    _imageStream?.addListener(_listener);
+  }
 // Missing removeListener in dispose!
 }
 
 // GOOD: Should NOT trigger require_image_stream_dispose
 class _good433__MyWidgetState extends State<MyWidget> {
-ImageStream? _imageStream;
-late ImageStreamListener _listener;
+  ImageStream? _imageStream;
+  late ImageStreamListener _listener;
 
-@override
-void initState() {
-super.initState();
-_listener = ImageStreamListener((image, sync) {
+  @override
+  void initState() {
+    super.initState();
+    _listener = ImageStreamListener((image, sync) {
 // Handle image
-});
-_imageStream = ImageProvider.resolve(configuration);
-_imageStream?.addListener(_listener);
-}
+    });
+    _imageStream = ImageProvider.resolve(configuration);
+    _imageStream?.addListener(_listener);
+  }
 
-@override
-void dispose() {
-_imageStream?.removeListener(_listener);
-super.dispose();
-}
+  @override
+  void dispose() {
+    _imageStream?.removeListener(_listener);
+    super.dispose();
+  }
 }

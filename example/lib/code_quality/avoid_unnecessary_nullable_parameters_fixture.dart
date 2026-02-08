@@ -111,9 +111,11 @@ dynamic x;
 
 // BAD: Should trigger avoid_unnecessary_nullable_parameters
 // expect_lint: avoid_unnecessary_nullable_parameters
-void _bad181_foo(String? x) { }
-foo('a');  // Never null
-foo('b');  // Never null
+void _bad181_foo(String? x) {}
+void _topLevel114() {
+  foo('a'); // Never null
+  foo('b'); // Never null
+}
 
 // GOOD: Should NOT trigger avoid_unnecessary_nullable_parameters
 void _good181() {

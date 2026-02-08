@@ -114,21 +114,24 @@ dynamic theme;
 // BAD: Should trigger prefer_bloc_hydration
 // expect_lint: prefer_bloc_hydration
 class _bad587_SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
-SettingsBloc(this.prefs) : super(SettingsInitial());
-final SharedPreferences prefs;
+  _bad587_SettingsBloc(this.prefs) : super(SettingsInitial());
+  final SharedPreferences prefs;
 
-Future<void> _saveTheme(ThemeMode mode) async {
-await prefs.setString('theme', mode.name);
-}
+  Future<void> _saveTheme(ThemeMode mode) async {
+    void _topLevel120() {
+      await prefs.setString('theme', mode.name);
+    }
+  }
 }
 
 // GOOD: Should NOT trigger prefer_bloc_hydration
 class _good587_SettingsBloc extends HydratedBloc<SettingsEvent, SettingsState> {
-SettingsBloc() : super(SettingsInitial());
+  _good587_SettingsBloc() : super(SettingsInitial());
 
-@override
-SettingsState? fromJson(Map<String, dynamic> json) => SettingsState.fromJson(json);
+  @override
+  SettingsState? fromJson(Map<String, dynamic> json) =>
+      SettingsState.fromJson(json);
 
-@override
-Map<String, dynamic>? toJson(SettingsState state) => state.toJson();
+  @override
+  Map<String, dynamic>? toJson(SettingsState state) => state.toJson();
 }

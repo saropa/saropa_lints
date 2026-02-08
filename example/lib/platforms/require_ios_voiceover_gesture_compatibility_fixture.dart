@@ -113,7 +113,7 @@ dynamic details;
 void _bad923() {
   // Custom gesture without accessibility action
   GestureDetector(
-  onHorizontalDragEnd: (details) => dismissItem(),
+    onHorizontalDragEnd: (details) => dismissItem(),
   );
 }
 
@@ -121,9 +121,9 @@ void _bad923() {
 void _good923() {
   // Provide accessibility action
   Semantics(
-  onDismiss: () => dismissItem(),
-  child: GestureDetector(
-  onHorizontalDragEnd: (details) => dismissItem(),
-  ),
+    onDismiss: () => dismissItem(),
+    child: GestureDetector(
+      onHorizontalDragEnd: (details) => dismissItem(),
+    ),
   );
 }

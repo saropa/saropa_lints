@@ -112,20 +112,20 @@ final mounted = true;
 // expect_lint: require_mounted_check
 void _bad1029() async {
   Future<void> loadData() async {
-  final data = await fetchData();
-  setState(() {
-  _data = data; // Widget may be disposed
-  });
+    final data = await fetchData();
+    setState(() {
+      _data = data; // Widget may be disposed
+    });
   }
 }
 
 // GOOD: Should NOT trigger require_mounted_check
 void _good1029() async {
   Future<void> loadData() async {
-  final data = await fetchData();
-  if (!mounted) return;
-  setState(() {
-  _data = data;
-  });
+    final data = await fetchData();
+    if (!mounted) return;
+    setState(() {
+      _data = data;
+    });
   }
 }

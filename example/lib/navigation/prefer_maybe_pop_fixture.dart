@@ -112,28 +112,28 @@ final context = BuildContext();
 // expect_lint: prefer_maybe_pop
 void _bad521() {
   ElevatedButton(
-  onPressed: () {
-  Navigator.pop(context); // Crashes if no route to pop!
-  },
-  child: Text('Back'),
+    onPressed: () {
+      Navigator.pop(context); // Crashes if no route to pop!
+    },
+    child: Text('Back'),
   );
 }
 
 // GOOD: Should NOT trigger prefer_maybe_pop
 void _good521() {
   ElevatedButton(
-  onPressed: () {
-  Navigator.maybePop(context); // Safely checks before popping
-  },
-  child: Text('Back'),
+    onPressed: () {
+      Navigator.maybePop(context); // Safely checks before popping
+    },
+    child: Text('Back'),
   );
   // Or check explicitly:
   ElevatedButton(
-  onPressed: () {
-  if (Navigator.canPop(context)) {
-  Navigator.pop(context);
-  }
-  },
-  child: Text('Back'),
+    onPressed: () {
+      if (Navigator.canPop(context)) {
+        Navigator.pop(context);
+      }
+    },
+    child: Text('Back'),
   );
 }

@@ -113,18 +113,18 @@ final secureStorage = FlutterSecureStorage();
 // expect_lint: require_logout_cleanup
 void _bad1007() async {
   Future<void> logout() async {
-  await api.logout();
-  // Token still in storage! User data still cached!
+    await api.logout();
+    // Token still in storage! User data still cached!
   }
 }
 
 // GOOD: Should NOT trigger require_logout_cleanup
 void _good1007() async {
   Future<void> logout() async {
-  await api.logout();
-  await secureStorage.deleteAll();
-  await cache.clear();
-  _userController.add(null);
-  _isLoggedIn = false;
+    await api.logout();
+    await secureStorage.deleteAll();
+    await cache.clear();
+    _userController.add(null);
+    _isLoggedIn = false;
   }
 }

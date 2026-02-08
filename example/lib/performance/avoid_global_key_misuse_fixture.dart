@@ -124,9 +124,9 @@ void _bad791() {
 void _good791() {
   // Only use GlobalKey when needed
   final _formKey = GlobalKey<FormState>();
-  
+
   // Use ObjectKey or ValueKey for list items
   ListView.builder(
-  itemBuilder: (_, i) => ListTile(key: ValueKey(items[i].id)),
+    itemBuilder: (_, i) => ListTile(key: ValueKey(items[i].id)),
   );
 }

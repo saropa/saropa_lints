@@ -110,7 +110,7 @@ import '../flutter_mocks.dart';
 void _bad847() async {
   // Heavy processing in background - will be killed
   void handleBackgroundFetch() async {
-  await syncAllData(); // May take minutes
+    await syncAllData(); // May take minutes
   }
 }
 
@@ -118,7 +118,7 @@ void _bad847() async {
 void _good847() async {
   // Light processing, defer heavy work
   void handleBackgroundFetch() async {
-  await syncCriticalDataOnly(); // Complete in <25 seconds
-  scheduleBGProcessingTask(); // Heavy work later
+    await syncCriticalDataOnly(); // Complete in <25 seconds
+    scheduleBGProcessingTask(); // Heavy work later
   }
 }

@@ -108,13 +108,13 @@ import '../flutter_mocks.dart';
 // BAD: Should trigger require_window_size_constraints
 // expect_lint: require_window_size_constraints
 void _bad1441_main() {
-runApp(MyDesktopApp()); // No size constraints - can resize to 1x1!
+  runApp(MyDesktopApp()); // No size constraints - can resize to 1x1!
 }
 
 // GOOD: Should NOT trigger require_window_size_constraints
 void _good1441_main() async {
-WidgetsFlutterBinding.ensureInitialized();
-await windowManager.ensureInitialized();
-await windowManager.setMinimumSize(Size(800, 600));
-runApp(MyDesktopApp());
+  WidgetsFlutterBinding.ensureInitialized();
+  await windowManager.ensureInitialized();
+  await windowManager.setMinimumSize(Size(800, 600));
+  runApp(MyDesktopApp());
 }

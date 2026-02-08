@@ -113,24 +113,24 @@ final userId = '123';
 // BAD: Should trigger require_deep_link_validation
 // expect_lint: require_deep_link_validation
 void _bad1009_handleDeepLink(Uri uri) {
-final userId = uri.queryParameters['user_id'];
-fetchUser(userId!); // No validation!
+  final userId = uri.queryParameters['user_id'];
+  fetchUser(userId!); // No validation!
 }
 
 void onGenerateRoute(RouteSettings settings) {
-final args = settings.arguments as Map<String, dynamic>;
-return UserPage(userId: args['id']); // No validation!
+  final args = settings.arguments as Map<String, dynamic>;
+  return UserPage(userId: args['id']); // No validation!
 }
 
 // GOOD: Should NOT trigger require_deep_link_validation
 void _good1009_handleDeepLink(Uri uri) {
-final userId = uri.queryParameters['user_id'];
-if (userId == null || !_isValidUserId(userId)) {
-throw InvalidDeepLinkException('Invalid user_id');
-}
-fetchUser(userId);
+  final userId = uri.queryParameters['user_id'];
+  if (userId == null || !_isValidUserId(userId)) {
+    throw InvalidDeepLinkException('Invalid user_id');
+  }
+  fetchUser(userId);
 }
 
 bool _isValidUserId(String id) {
-return RegExp(r'^[a-zA-Z0-9_-]+$').hasMatch(id) && id.length <= 36;
+  return RegExp(r'^[a-zA-Z0-9_-]+$').hasMatch(id) && id.length <= 36;
 }

@@ -109,17 +109,17 @@ import '../flutter_mocks.dart';
 // expect_lint: avoid_losing_stack_trace
 void _bad353() async {
   try {
-  await riskyOperation();
+    await riskyOperation();
   } catch (e) {
-  throw CustomException(e.toString());
+    throw CustomException(e.toString());
   }
 }
 
 // GOOD: Should NOT trigger avoid_losing_stack_trace
 void _good353() async {
   try {
-  await riskyOperation();
+    await riskyOperation();
   } catch (e, stackTrace) {
-  throw CustomException(e.toString(), stackTrace);
+    throw CustomException(e.toString(), stackTrace);
   }
 }

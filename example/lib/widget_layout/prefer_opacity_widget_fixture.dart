@@ -114,13 +114,14 @@ final key = 'key';
 // expect_lint: prefer_opacity_widget
 void _bad1301() {
   ListView.builder(
-  itemBuilder: (context, index) => StatefulWidget(),  // Creates new instance each rebuild
+    itemBuilder: (context, index) =>
+        StatefulWidget(), // Creates new instance each rebuild
   );
 }
 
 // GOOD: Should NOT trigger prefer_opacity_widget
 void _good1301() {
   ListView.builder(
-  itemBuilder: (context, index) => StatelessWidget(key: ValueKey(index)),
+    itemBuilder: (context, index) => StatelessWidget(key: ValueKey(index)),
   );
 }

@@ -113,34 +113,34 @@ final uri = Uri.parse('https://example.com');
 // expect_lint: require_qr_content_validation
 void _bad726() {
   MobileScanner(
-  onDetect: (capture) {
-  final barcode = capture.barcodes.first;
-  launchUrl(Uri.parse(barcode.rawValue!)); // Dangerous!
-  },
+    onDetect: (capture) {
+      final barcode = capture.barcodes.first;
+      launchUrl(Uri.parse(barcode.rawValue!)); // Dangerous!
+    },
   );
 }
 
 // GOOD: Should NOT trigger require_qr_content_validation
 void _good726() {
   MobileScanner(
-  onDetect: (capture) {
-  final barcode = capture.barcodes.first;
-  final content = barcode.rawValue;
-  if (content == null) return;
-  
-  // Validate URL scheme
-  final uri = Uri.tryParse(content);
-  if (uri == null || !['http', 'https'].contains(uri.scheme)) {
-  showError('Invalid QR code');
-  return;
-  }
-  
-  // Optional: Check against allowlist of domains
-  if (!_allowedDomains.contains(uri.host)) {
-  showWarning('Unknown domain: ${uri.host}');
-  }
-  
-  launchUrl(uri);
-  },
+    onDetect: (capture) {
+      final barcode = capture.barcodes.first;
+      final content = barcode.rawValue;
+      if (content == null) return;
+
+      // Validate URL scheme
+      final uri = Uri.tryParse(content);
+      if (uri == null || !['http', 'https'].contains(uri.scheme)) {
+        showError('Invalid QR code');
+        return;
+      }
+
+      // Optional: Check against allowlist of domains
+      if (!_allowedDomains.contains(uri.host)) {
+        showWarning('Unknown domain: ${uri.host}');
+      }
+
+      launchUrl(uri);
+    },
   );
 }

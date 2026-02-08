@@ -121,6 +121,6 @@ void _bad833() async {
 void _good833() async {
   // Use HTTPS
   final response = await http.get(Uri.parse('https://api.example.com/data'));
-  
+
   // Or configure network_security_config.xml for specific debug domains
 }

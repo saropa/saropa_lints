@@ -112,10 +112,10 @@ dynamic stream;
 void _bad634() {
   // High accuracy continuous tracking drains battery fast
   final stream = Geolocator.getPositionStream(
-  locationSettings: LocationSettings(
-  accuracy: LocationAccuracy.best, // Maximum battery drain!
-  distanceFilter: 0, // Updates every tiny movement
-  ),
+    locationSettings: LocationSettings(
+      accuracy: LocationAccuracy.best, // Maximum battery drain!
+      distanceFilter: 0, // Updates every tiny movement
+    ),
   );
 }
 
@@ -123,19 +123,19 @@ void _bad634() {
 void _good634() {
   // Battery-aware settings
   final stream = Geolocator.getPositionStream(
-  locationSettings: LocationSettings(
-  accuracy: LocationAccuracy.balanced, // Good enough for most cases
-  distanceFilter: 100, // Only update every 100 meters
-  ),
+    locationSettings: LocationSettings(
+      accuracy: LocationAccuracy.balanced, // Good enough for most cases
+      distanceFilter: 100, // Only update every 100 meters
+    ),
   );
-  
+
   // Or use AndroidSettings with battery optimization
   final stream = Geolocator.getPositionStream(
-  locationSettings: AndroidSettings(
-  accuracy: LocationAccuracy.high,
-  distanceFilter: 50,
-  forceLocationManager: true,
-  intervalDuration: Duration(seconds: 10),
-  ),
+    locationSettings: AndroidSettings(
+      accuracy: LocationAccuracy.high,
+      distanceFilter: 50,
+      forceLocationManager: true,
+      intervalDuration: Duration(seconds: 10),
+    ),
   );
 }

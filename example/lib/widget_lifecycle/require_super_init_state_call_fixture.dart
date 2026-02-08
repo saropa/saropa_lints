@@ -108,18 +108,18 @@ import '../flutter_mocks.dart';
 // BAD: Should trigger require_super_init_state_call
 // expect_lint: require_super_init_state_call
 class _bad1363__MyWidgetState extends State<MyWidget> {
-@override
-void initState() {
+  @override
+  void initState() {
 // Missing super.initState()!
-_initSomething();
-}
+    _initSomething();
+  }
 }
 
 // GOOD: Should NOT trigger require_super_init_state_call
 class _good1363__MyWidgetState extends State<MyWidget> {
-@override
-void initState() {
-super.initState();
-_initSomething();
-}
+  @override
+  void initState() {
+    super.initState();
+    _initSomething();
+  }
 }

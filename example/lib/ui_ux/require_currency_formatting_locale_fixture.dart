@@ -118,5 +118,6 @@ void _bad1254() {
 // GOOD: Should NOT trigger require_currency_formatting_locale
 void _good1254() {
   NumberFormat.currency(locale: 'en_US').format(amount);
-  NumberFormat.currency(locale: Localizations.localeOf(context).toString()).format(amount);
+  NumberFormat.currency(locale: Localizations.localeOf(context).toString())
+      .format(amount);
 }

@@ -111,15 +111,15 @@ dynamic list;
 // expect_lint: avoid_duplicate_cascades
 void _bad261() {
   list
-  ..add(1)
-  ..add(2)
-  ..add(1);  // Duplicate
+    ..add(1)
+    ..add(2)
+    ..add(1); // Duplicate
 }
 
 // GOOD: Should NOT trigger avoid_duplicate_cascades
 void _good261() {
   list
-  ..add(1)
-  ..add(2)
-  ..add(3);
+    ..add(1)
+    ..add(2)
+    ..add(3);
 }

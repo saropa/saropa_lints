@@ -111,18 +111,21 @@ final mounted = true;
 // BAD: Should trigger avoid_dialog_context_after_async
 // expect_lint: avoid_dialog_context_after_async
 void _bad101() async {
-  onPressed: () async {
-  await saveData();
-  Navigator.pop(context);  // Context may be invalid!
-  }
+  onPressed:
+  () async {
+    await saveData();
+    Navigator.pop(context); // Context may be invalid!
+  };
 }
 
 // GOOD: Should NOT trigger avoid_dialog_context_after_async
 void _good101() async {
-  onPressed: () async {
-  await saveData();
-  if (context.mounted) {
-  Navigator.pop(context);
-  }
-  }
+  onPressed:
+  () async {
+    await saveData();
+    if (context.mounted) {
+      Navigator.pop(context);
+    }
+    ;
+  };
 }

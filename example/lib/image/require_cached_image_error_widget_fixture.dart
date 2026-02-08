@@ -118,7 +118,7 @@ void _bad430() {
 // GOOD: Should NOT trigger require_cached_image_error_widget
 void _good430() {
   CachedNetworkImage(
-  imageUrl: url,
-  errorWidget: (context, url, error) => Icon(Icons.error),
+    imageUrl: url,
+    errorWidget: (context, url, error) => Icon(Icons.error),
   );
 }

@@ -110,8 +110,10 @@ final name = 'example';
 // BAD: Should trigger avoid_default_tostring
 // expect_lint: avoid_default_tostring
 class _bad183_User {
-final String name;
-User(this.name);
+  final String name;
+  void _topLevel113() {
+    _bad183_User(this.name);
+  }
 // Missing toString override
 }
 

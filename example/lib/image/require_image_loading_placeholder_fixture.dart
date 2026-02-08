@@ -119,15 +119,15 @@ void _bad424() {
 // GOOD: Should NOT trigger require_image_loading_placeholder
 void _good424() {
   Image.network(
-  'https://example.com/image.jpg',
-  loadingBuilder: (context, child, loadingProgress) {
-  if (loadingProgress == null) return child;
-  return CircularProgressIndicator(
-  value: loadingProgress.expectedTotalBytes != null
-  ? loadingProgress.cumulativeBytesLoaded /
-  loadingProgress.expectedTotalBytes!
-  : null,
-  );
-  },
+    'https://example.com/image.jpg',
+    loadingBuilder: (context, child, loadingProgress) {
+      if (loadingProgress == null) return child;
+      return CircularProgressIndicator(
+        value: loadingProgress.expectedTotalBytes != null
+            ? loadingProgress.cumulativeBytesLoaded /
+                loadingProgress.expectedTotalBytes!
+            : null,
+      );
+    },
   );
 }

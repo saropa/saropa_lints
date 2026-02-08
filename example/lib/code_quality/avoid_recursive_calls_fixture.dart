@@ -110,19 +110,20 @@ dynamic result;
 // BAD: Should trigger avoid_recursive_calls
 // expect_lint: avoid_recursive_calls
 int _bad155_factorial(int n) {
-return n * factorial(n - 1);  // Missing base case check
+  return n * factorial(n - 1); // Missing base case check
 }
 
 // GOOD: Should NOT trigger avoid_recursive_calls
 int _good155_factorial(int n) {
-if (n <= 1) return 1;
-return n * factorial(n - 1);
+  if (n <= 1) return 1;
+  return n * factorial(n - 1);
 }
+
 // or use iteration
 int factorial(int n) {
-int result = 1;
-for (int i = 2; i <= n; i++) {
-result *= i;
-}
-return result;
+  int result = 1;
+  for (int i = 2; i <= n; i++) {
+    result *= i;
+  }
+  return result;
 }

@@ -111,7 +111,7 @@ final email = 'test@example.com';
 // expect_lint: require_autofill_hints
 void _bad409() {
   TextFormField(
-  decoration: InputDecoration(labelText: 'Email'),
+    decoration: InputDecoration(labelText: 'Email'),
   );
   // User must type email manually
 }
@@ -119,8 +119,8 @@ void _bad409() {
 // GOOD: Should NOT trigger require_autofill_hints
 void _good409() {
   TextFormField(
-  decoration: InputDecoration(labelText: 'Email'),
-  autofillHints: [AutofillHints.email],
+    decoration: InputDecoration(labelText: 'Email'),
+    autofillHints: [AutofillHints.email],
   );
   // System can suggest saved email addresses
 }

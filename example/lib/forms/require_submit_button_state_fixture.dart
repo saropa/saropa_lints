@@ -111,21 +111,23 @@ dynamic child;
 // expect_lint: require_submit_button_state
 void _bad399() async {
   ElevatedButton(
-  onPressed: () async {
-  await submitForm();
-  },
-  child: Text('Submit'),
+    onPressed: () async {
+      await submitForm();
+    },
+    child: Text('Submit'),
   );
 }
 
 // GOOD: Should NOT trigger require_submit_button_state
 void _good399() async {
   ElevatedButton(
-  onPressed: _isLoading ? null : () async {
-  setState(() => _isLoading = true);
-  await submitForm();
-  setState(() => _isLoading = false);
-  },
-  child: _isLoading ? CircularProgressIndicator() : Text('Submit'),
+    onPressed: _isLoading
+        ? null
+        : () async {
+            setState(() => _isLoading = true);
+            await submitForm();
+            setState(() => _isLoading = false);
+          },
+    child: _isLoading ? CircularProgressIndicator() : Text('Submit'),
   );
 }

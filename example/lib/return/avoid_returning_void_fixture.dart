@@ -108,10 +108,11 @@ import '../flutter_mocks.dart';
 // BAD: Should trigger avoid_returning_void
 // expect_lint: avoid_returning_void
 void _bad979_doSomething() {
-return;  // unnecessary
+  return; // unnecessary
 }
+
 void doOther() {
-return void;  // confusing
+  return; // confusing - was return void
 }
 
 // GOOD: Should NOT trigger avoid_returning_void

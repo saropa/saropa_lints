@@ -113,26 +113,26 @@ final children = <Widget>[];
 // expect_lint: avoid_keyboard_overlap
 void _bad407() {
   Scaffold(
-  body: Column(
-  children: [
-  Spacer(),
-  TextField(), // Hidden when keyboard shows
-  ],
-  ),
+    body: Column(
+      children: [
+        Spacer(),
+        TextField(), // Hidden when keyboard shows
+      ],
+    ),
   );
 }
 
 // GOOD: Should NOT trigger avoid_keyboard_overlap
 void _good407() {
   Scaffold(
-  resizeToAvoidBottomInset: true,
-  body: SingleChildScrollView(
-  child: Column(
-  children: [
-  Spacer(),
-  TextField(),
-  ],
-  ),
-  ),
+    resizeToAvoidBottomInset: true,
+    body: SingleChildScrollView(
+      child: Column(
+        children: [
+          Spacer(),
+          TextField(),
+        ],
+      ),
+    ),
   );
 }

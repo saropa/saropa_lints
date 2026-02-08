@@ -115,8 +115,8 @@ class _bad703_MyData extends InheritedWidget {
 
 // GOOD: Should NOT trigger require_update_should_notify
 class _good703_MyData extends InheritedWidget {
-@override
-bool updateShouldNotify(MyData oldWidget) {
-return data != oldWidget.data;
-}
+  @override
+  bool updateShouldNotify(MyData oldWidget) {
+    return data != oldWidget.data;
+  }
 }

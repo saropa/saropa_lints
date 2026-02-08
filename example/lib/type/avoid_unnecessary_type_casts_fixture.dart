@@ -112,11 +112,11 @@ dynamic y;
 // expect_lint: avoid_unnecessary_type_casts
 void _bad1230() {
   final String x = 'hello';
-  final y = x as String;  // Unnecessary cast
+  final y = x as String; // Unnecessary cast
 }
 
 // GOOD: Should NOT trigger avoid_unnecessary_type_casts
 void _good1230() {
   final Object x = getValue();
-  final y = x as String;  // Necessary cast
+  final y = x as String; // Necessary cast
 }

@@ -113,22 +113,22 @@ final label = 'label';
 // expect_lint: avoid_hidden_interactive
 void _bad12() {
   Semantics(
-  excludeFromSemantics: true,
-  child: GestureDetector(
-  onTap: () => doSomething(),
-  child: Icon(Icons.add),
-  ),
+    excludeFromSemantics: true,
+    child: GestureDetector(
+      onTap: () => doSomething(),
+      child: Icon(Icons.add),
+    ),
   );
 }
 
 // GOOD: Should NOT trigger avoid_hidden_interactive
 void _good12() {
   Semantics(
-  button: true,
-  label: 'Add item',
-  child: GestureDetector(
-  onTap: () => doSomething(),
-  child: Icon(Icons.add),
-  ),
+    button: true,
+    label: 'Add item',
+    child: GestureDetector(
+      onTap: () => doSomething(),
+      child: Icon(Icons.add),
+    ),
   );
 }

@@ -111,12 +111,12 @@ dynamic y;
 // BAD: Should trigger avoid_assignments_as_conditions
 // expect_lint: avoid_assignments_as_conditions
 void _bad273() {
-  if (x = 5) { }
-  while (y = getValue()) { }
+  if (x = 5) {}
+  while (y = getValue()) {}
 }
 
 // GOOD: Should NOT trigger avoid_assignments_as_conditions
 void _good273() {
   x = 5;
-  if (x != 0) { }
+  if (x != 0) {}
 }

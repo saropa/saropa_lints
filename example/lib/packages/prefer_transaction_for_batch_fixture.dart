@@ -121,9 +121,9 @@ void _bad613() async {
 // GOOD: Should NOT trigger prefer_transaction_for_batch
 void _good613() async {
   await isar.writeTxn(() async {
-  await isar.users.putAll([user1, user2, user3]);
+    await isar.users.putAll([user1, user2, user3]);
   });
-  
+
   // Or with Firestore:
   final batch = firestore.batch();
   batch.set(ref1, data1);

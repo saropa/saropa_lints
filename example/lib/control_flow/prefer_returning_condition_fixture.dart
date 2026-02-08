@@ -111,14 +111,14 @@ dynamic x;
 // BAD: Should trigger prefer_returning_condition
 // expect_lint: prefer_returning_condition
 bool _bad297_isValid(int x) {
-if (x > 0) {
-return true;
-} else {
-return false;
-}
+  if (x > 0) {
+    return true;
+  } else {
+    return false;
+  }
 }
 
 // GOOD: Should NOT trigger prefer_returning_condition
 bool _good297_isValid(int x) {
-return x > 0;
+  return x > 0;
 }

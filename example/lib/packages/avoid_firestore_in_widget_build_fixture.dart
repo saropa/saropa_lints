@@ -115,13 +115,13 @@ final users = <dynamic>[];
 // BAD: Should trigger avoid_firestore_in_widget_build
 // expect_lint: avoid_firestore_in_widget_build
 Widget _bad617_build(BuildContext context) {
-final data = FirebaseFirestore.instance.collection('users').get();
+  final data = FirebaseFirestore.instance.collection('users').get();
 }
 
 // GOOD: Should NOT trigger avoid_firestore_in_widget_build
 Widget _good617_build(BuildContext context) {
-return StreamBuilder<QuerySnapshot>(
-stream: FirebaseFirestore.instance.collection('users').snapshots(),
-builder: (context, snapshot) =>,
-);
+  return StreamBuilder<QuerySnapshot>(
+    stream: FirebaseFirestore.instance.collection('users').snapshots(),
+    builder: (context, snapshot) => Container(),
+  );
 }

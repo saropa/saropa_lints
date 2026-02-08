@@ -110,7 +110,7 @@ import '../flutter_mocks.dart';
 void _bad855() {
   // OAuth in WebView - blocked by Google/Apple
   WebView(
-  initialUrl: 'https://accounts.google.com/o/oauth2/auth?',
+    initialUrl: 'https://accounts.google.com/o/oauth2/auth?',
   );
 }
 
@@ -118,6 +118,6 @@ void _bad855() {
 void _good855() async {
   // Use flutter_appauth for proper OAuth flow
   await appAuth.authorizeAndExchangeCode(
-  AuthorizationTokenRequest('client_id', 'redirect_uri'),
+    AuthorizationTokenRequest('client_id', 'redirect_uri'),
   );
 }

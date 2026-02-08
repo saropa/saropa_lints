@@ -118,7 +118,8 @@ void _bad885() async {
 // GOOD: Should NOT trigger require_ios_pasteboard_privacy_handling
 void _good885() async {
   // Only read after user taps paste button
-  onPastePressed: () async {
-  final data = await Clipboard.getData(Clipboard.kTextPlain);
-  }
+  onPastePressed:
+  () async {
+    final data = await Clipboard.getData(Clipboard.kTextPlain);
+  };
 }

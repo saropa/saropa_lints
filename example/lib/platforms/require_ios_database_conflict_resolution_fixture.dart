@@ -115,8 +115,8 @@ void _bad868() async {
 // GOOD: Should NOT trigger require_ios_database_conflict_resolution
 void _good868() {
   realm.syncSession.connectionStateChanges.listen((change) {
-  if (change.current == ConnectionState.connected) {
-  // Handle sync conflicts
-  }
+    if (change.current == ConnectionState.connected) {
+      // Handle sync conflicts
+    }
   });
 }

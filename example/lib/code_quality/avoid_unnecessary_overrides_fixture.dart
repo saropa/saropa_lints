@@ -108,7 +108,7 @@ import '../flutter_mocks.dart';
 // BAD: Should trigger avoid_unnecessary_overrides
 // expect_lint: avoid_unnecessary_overrides
 void _bad186_dispose() {
-super.dispose();  // Just calls super, no additional logic
+  super.dispose(); // Just calls super, no additional logic
 }
 
 // GOOD: Should NOT trigger avoid_unnecessary_overrides

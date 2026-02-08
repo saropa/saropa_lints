@@ -111,23 +111,23 @@ dynamic child;
 // expect_lint: require_minimum_contrast
 void _bad18() {
   Text(
-  'Hello',
-  style: TextStyle(color: Colors.grey[300]), // Light gray on white
+    'Hello',
+    style: TextStyle(color: Colors.grey[300]), // Light gray on white
   );
   Container(
-  color: Colors.black,
-  child: Text('Hello', style: TextStyle(color: Colors.grey[700])),
+    color: Colors.black,
+    child: Text('Hello', style: TextStyle(color: Colors.grey[700])),
   );
 }
 
 // GOOD: Should NOT trigger require_minimum_contrast
 void _good18() {
   Text(
-  'Hello',
-  style: TextStyle(color: Colors.grey[700]), // Darker gray on white
+    'Hello',
+    style: TextStyle(color: Colors.grey[700]), // Darker gray on white
   );
   Container(
-  color: Colors.black,
-  child: Text('Hello', style: TextStyle(color: Colors.white)),
+    color: Colors.black,
+    child: Text('Hello', style: TextStyle(color: Colors.white)),
   );
 }

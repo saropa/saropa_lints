@@ -111,14 +111,14 @@ final children = <Widget>[];
 // expect_lint: prefer_asset_image_for_local
 void _bad1423() {
   Row(
-  children: [Chip(), Chip(), Chip(), Chip()], // May overflow
+    children: [Chip(), Chip(), Chip(), Chip()], // May overflow
   );
 }
 
 // GOOD: Should NOT trigger prefer_asset_image_for_local
 void _good1423() {
   Wrap(
-  spacing: 8,
-  children: [Chip(), Chip(), Chip(), Chip()],
+    spacing: 8,
+    children: [Chip(), Chip(), Chip(), Chip()],
   );
 }

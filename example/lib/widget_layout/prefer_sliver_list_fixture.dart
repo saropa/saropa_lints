@@ -111,19 +111,19 @@ dynamic child;
 // expect_lint: prefer_sliver_list
 void _bad1312() {
   CustomScrollView(
-  slivers: [
-  SliverAppBar(),
-  SliverToBoxAdapter(child: ListView()), // Wrong!
-  ],
+    slivers: [
+      SliverAppBar(),
+      SliverToBoxAdapter(child: ListView()), // Wrong!
+    ],
   );
 }
 
 // GOOD: Should NOT trigger prefer_sliver_list
 void _good1312() {
   CustomScrollView(
-  slivers: [
-  SliverAppBar(),
-  SliverList(delegate: SliverChildBuilderDelegate()),
-  ],
+    slivers: [
+      SliverAppBar(),
+      SliverList(delegate: SliverChildBuilderDelegate()),
+    ],
   );
 }

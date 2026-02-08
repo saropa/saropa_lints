@@ -110,8 +110,8 @@ import '../flutter_mocks.dart';
 void _bad856() {
   // In initState or main - too early!
   void initState() {
-  // super.initState();
-  InAppReview.instance.requestReview();
+    // super.initState();
+    InAppReview.instance.requestReview();
   }
 }
 
@@ -119,8 +119,8 @@ void _bad856() {
 void _good856() async {
   // After positive engagement
   void onOrderCompleted() {
-  if (await shouldRequestReview()) {
-  await InAppReview.instance.requestReview();
-  }
+    if (await shouldRequestReview()) {
+      await InAppReview.instance.requestReview();
+    }
   }
 }

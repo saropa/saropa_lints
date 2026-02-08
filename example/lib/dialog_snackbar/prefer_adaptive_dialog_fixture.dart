@@ -113,21 +113,21 @@ final title = 'Title';
 // expect_lint: prefer_adaptive_dialog
 void _bad323() {
   showDialog(
-  context: context,
-  builder: (ctx) => AlertDialog(
-  title: Text('Confirm'),
-  actions: [TextButton()],
-  ),
+    context: context,
+    builder: (ctx) => AlertDialog(
+      title: Text('Confirm'),
+      actions: [TextButton()],
+    ),
   );
 }
 
 // GOOD: Should NOT trigger prefer_adaptive_dialog
 void _good323() {
   showDialog(
-  context: context,
-  builder: (ctx) => AlertDialog.adaptive(
-  title: Text('Confirm'),
-  actions: [TextButton()],
-  ),
+    context: context,
+    builder: (ctx) => AlertDialog.adaptive(
+      title: Text('Confirm'),
+      actions: [TextButton()],
+    ),
   );
 }

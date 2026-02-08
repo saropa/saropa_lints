@@ -110,7 +110,7 @@ final context = BuildContext();
 // BAD: Should trigger avoid_hardcoded_locale_strings
 // expect_lint: avoid_hardcoded_locale_strings
 void _bad454() {
-  Text('Welcome back!');  // Hardcoded English
+  Text('Welcome back!'); // Hardcoded English
 }
 
 // GOOD: Should NOT trigger avoid_hardcoded_locale_strings

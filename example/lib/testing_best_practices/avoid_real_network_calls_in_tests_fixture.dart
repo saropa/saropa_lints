@@ -114,16 +114,16 @@ final users = <dynamic>[];
 // expect_lint: avoid_real_network_calls_in_tests
 void _bad1189() async {
   test('should fetch user', () async {
-  final client = HttpClient();
-  final user = await client.get('https://api.example.com/users/1');
+    final client = HttpClient();
+    final user = await client.get('https://api.example.com/users/1');
   });
 }
 
 // GOOD: Should NOT trigger avoid_real_network_calls_in_tests
 void _good1189() async {
   test('should fetch user', () async {
-  final client = MockHttpClient();
-  when(client.get(any)).thenAnswer((_) async => mockUserResponse);
-  final user = await client.get('https://api.example.com/users/1');
+    final client = MockHttpClient();
+    when(client.get(any)).thenAnswer((_) async => mockUserResponse);
+    final user = await client.get('https://api.example.com/users/1');
   });
 }

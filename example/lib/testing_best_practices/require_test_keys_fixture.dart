@@ -112,21 +112,21 @@ final key = 'key';
 // expect_lint: require_test_keys
 void _bad1197() async {
   testWidgets('shows button', (tester) async {
-  await tester.pumpWidget(
-  ElevatedButton(onPressed: () {}, child: Text('Click')),
-  );
+    await tester.pumpWidget(
+      ElevatedButton(onPressed: () {}, child: Text('Click')),
+    );
   });
 }
 
 // GOOD: Should NOT trigger require_test_keys
 void _good1197() async {
   testWidgets('shows button', (tester) async {
-  await tester.pumpWidget(
-  ElevatedButton(
-  key: Key('submit_button'),
-  onPressed: () {},
-  child: Text('Click'),
-  ),
-  );
+    await tester.pumpWidget(
+      ElevatedButton(
+        key: Key('submit_button'),
+        onPressed: () {},
+        child: Text('Click'),
+      ),
+    );
   });
 }

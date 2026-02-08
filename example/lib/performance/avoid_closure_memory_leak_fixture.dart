@@ -111,25 +111,25 @@ final mounted = true;
 // BAD: Should trigger avoid_closure_memory_leak
 // expect_lint: avoid_closure_memory_leak
 void _bad801_initState() {
-someStream.listen((data) {
-setState(() => _data = data); // Captures State
-});
+  someStream.listen((data) {
+    setState(() => _data = data); // Captures State
+  });
 // super.initState();
 }
 
 // GOOD: Should NOT trigger avoid_closure_memory_leak
 void _good801() {
   StreamSubscription? _subscription;
-  
+
   void initState() {
-  _subscription = someStream.listen((data) {
-  if (mounted) setState(() => _data = data);
-  });
-  // super.initState();
+    _subscription = someStream.listen((data) {
+      if (mounted) setState(() => _data = data);
+    });
+    // super.initState();
   }
-  
+
   void dispose() {
-  _subscription?.cancel();
-  // super.dispose();
+    _subscription?.cancel();
+    // super.dispose();
   }
 }

@@ -110,16 +110,17 @@ final context = BuildContext();
 // BAD: Should trigger avoid_unnecessary_stateful_widgets
 // expect_lint: avoid_unnecessary_stateful_widgets
 class _bad1341_MyWidget extends StatefulWidget {
-@override
-State<MyWidget> createState() => _MyWidgetState();
+  @override
+  State<MyWidget> createState() => _MyWidgetState();
 }
+
 class _MyWidgetState extends State<MyWidget> {
-@override
-Widget build(BuildContext context) => Text('Hello');
+  @override
+  Widget build(BuildContext context) => Text('Hello');
 }
 
 // GOOD: Should NOT trigger avoid_unnecessary_stateful_widgets
 class _good1341_MyWidget extends StatelessWidget {
-@override
-Widget build(BuildContext context) => Text('Hello');
+  @override
+  Widget build(BuildContext context) => Text('Hello');
 }

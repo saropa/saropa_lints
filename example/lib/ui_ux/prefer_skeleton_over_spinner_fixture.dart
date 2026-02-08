@@ -112,13 +112,13 @@ final isLoading = false;
 // expect_lint: prefer_skeleton_over_spinner
 void _bad1261() {
   if (isLoading) {
-  return Center(child: CircularProgressIndicator());
+    return Center(child: CircularProgressIndicator());
   }
 }
 
 // GOOD: Should NOT trigger prefer_skeleton_over_spinner
 void _good1261() {
   if (isLoading) {
-  return ShimmerLoading(child: ContentSkeleton());
+    return ShimmerLoading(child: ContentSkeleton());
   }
 }

@@ -113,11 +113,11 @@ final items = <dynamic>[];
 // expect_lint: avoid_collection_methods_with_unrelated_types
 void _bad1222() {
   List<String> items = ['a', 'b'];
-  items.contains(42);  // int can never be in List<String>
+  items.contains(42); // int can never be in List<String>
 }
 
 // GOOD: Should NOT trigger avoid_collection_methods_with_unrelated_types
 void _good1222() {
   List<String> items = ['a', 'b'];
-  items.contains('a');  // Correct type
+  items.contains('a'); // Correct type
 }

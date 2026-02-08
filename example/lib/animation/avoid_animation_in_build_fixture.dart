@@ -111,17 +111,17 @@ dynamic controller;
 // BAD: Should trigger avoid_animation_in_build
 // expect_lint: avoid_animation_in_build
 Widget _bad30_build(BuildContext context) {
-final controller = AnimationController();
-return AnimatedWidget(animation: controller);
+  final controller = AnimationController();
+  return AnimatedWidget(animation: controller);
 }
 
 // GOOD: Should NOT trigger avoid_animation_in_build
 void _good30() {
   late final AnimationController _controller;
-  
+
   @override
   void initState() {
-  // super.initState();
-  _controller = AnimationController();
+    // super.initState();
+    _controller = AnimationController();
   }
 }

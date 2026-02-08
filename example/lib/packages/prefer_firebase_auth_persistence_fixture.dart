@@ -114,8 +114,8 @@ dynamic user;
 void _bad627() async {
   // On web, user will be logged out when closing browser tab
   await FirebaseAuth.instance.signInWithEmailAndPassword(
-  email: email,
-  password: password,
+    email: email,
+    password: password,
   );
 }
 
@@ -124,7 +124,7 @@ void _good627() async {
   // Set persistence before sign-in for "remember me" on web
   await FirebaseAuth.instance.setPersistence(Persistence.LOCAL);
   await FirebaseAuth.instance.signInWithEmailAndPassword(
-  email: email,
-  password: password,
+    email: email,
+    password: password,
   );
 }

@@ -108,17 +108,17 @@ import '../flutter_mocks.dart';
 // BAD: Should trigger require_focus_node_dispose
 // expect_lint: require_focus_node_dispose
 class _bad1360__MyState extends State<MyWidget> {
-final _focusNode = FocusNode();
+  final _focusNode = FocusNode();
 // Missing dispose - MEMORY LEAK!
 }
 
 // GOOD: Should NOT trigger require_focus_node_dispose
 class _good1360__MyState extends State<MyWidget> {
-final _focusNode = FocusNode();
+  final _focusNode = FocusNode();
 
-@override
-void dispose() {
-_focusNode.dispose();
-super.dispose();
-}
+  @override
+  void dispose() {
+    _focusNode.dispose();
+    super.dispose();
+  }
 }

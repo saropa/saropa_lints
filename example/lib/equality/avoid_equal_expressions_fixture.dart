@@ -111,13 +111,13 @@ dynamic value;
 // BAD: Should trigger avoid_equal_expressions
 // expect_lint: avoid_equal_expressions
 void _bad345() {
-  if (value == value) {}  // Always true (unless NaN);
-  if (list.length > list.length) {}  // Always false
+  if (value == value) {} // Always true (unless NaN);
+  if (list.length > list.length) {} // Always false
 }
 
 // GOOD: Should NOT trigger avoid_equal_expressions
 void _good345() {
   if (value == expectedValue) {}
   // For NaN checks:
-  if (value != value) {}  // This is intentional for NaN detection
+  if (value != value) {} // This is intentional for NaN detection
 }

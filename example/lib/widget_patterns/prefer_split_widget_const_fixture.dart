@@ -112,11 +112,11 @@ dynamic widget;
 // expect_lint: prefer_split_widget_const
 void _bad1385() {
   Column(
-  children: [
-  Text('Title'),
-  Text('Subtitle'),
-  Icon(Icons.star),
-  ],
+    children: [
+      Text('Title'),
+      Text('Subtitle'),
+      Icon(Icons.star),
+    ],
   );
 }
 

@@ -118,8 +118,8 @@ void _bad921() {
 void _good921() async {
   // Mark critical notifications as time-sensitive
   await NotificationService.show(
-  title: 'Payment Due',
-  body: 'Your payment is due today',
-  interruptionLevel: InterruptionLevel.timeSensitive,
+    title: 'Payment Due',
+    body: 'Your payment is due today',
+    interruptionLevel: InterruptionLevel.timeSensitive,
   );
 }

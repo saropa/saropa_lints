@@ -117,12 +117,13 @@ final title = 'Title';
 // expect_lint: avoid_animation_in_large_list
 void _bad815() {
   ListView.builder(
-  itemCount: 1000,
-  itemBuilder: (context, index) {
-  return FadeInAnimation( // 1000 animations!
-  child: ListTile(title: Text(items[index].name)),
-  );
-  },
+    itemCount: 1000,
+    itemBuilder: (context, index) {
+      return FadeInAnimation(
+        // 1000 animations!
+        child: ListTile(title: Text(items[index].name)),
+      );
+    },
   );
 }
 
@@ -130,23 +131,23 @@ void _bad815() {
 void _good815() {
   // Option 1: Use AnimatedList for add/remove animations
   AnimatedList(
-  itemBuilder: (context, index, animation) {
-  return SizeTransition(
-  sizeFactor: animation,
-  child: ListTile(title: Text(items[index].name)),
+    itemBuilder: (context, index, animation) {
+      return SizeTransition(
+        sizeFactor: animation,
+        child: ListTile(title: Text(items[index].name)),
+      );
+    },
   );
-  },
-  );
-  
+
   // Option 2: Animate only visible items
   ListView.builder(
-  itemBuilder: (context, index) {
-  return VisibilityDetector(
-  onVisibilityChanged: (info) {
-  if (info.visibleFraction > 0.5) startAnimation();
-  },
-  child: ListTile(),
-  );
-  },
+    itemBuilder: (context, index) {
+      return VisibilityDetector(
+        onVisibilityChanged: (info) {
+          if (info.visibleFraction > 0.5) startAnimation();
+        },
+        child: ListTile(),
+      );
+    },
   );
 }

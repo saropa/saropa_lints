@@ -116,8 +116,8 @@ void _bad776() {
 void _good776() {
   // Use workmanager for background tasks
   Workmanager().registerPeriodicTask(
-  'hourlySync',
-  'syncData',
-  frequency: Duration(hours: 1),
+    'hourlySync',
+    'syncData',
+    frequency: Duration(hours: 1),
   );
 }

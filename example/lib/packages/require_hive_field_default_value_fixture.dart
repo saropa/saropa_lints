@@ -111,13 +111,13 @@ dynamic data;
 // expect_lint: require_hive_field_default_value
 @HiveType(typeId: 1)
 class _bad664_User {
-@HiveField(0);
-String? nickname; // Existing data won't have this field!
+  @HiveField(0)
+  String? nickname; // Existing data won't have this field!
 }
 
 // GOOD: Should NOT trigger require_hive_field_default_value
 @HiveType(typeId: 1)
 class _good664_User {
-@HiveField(0, defaultValue: null);
-String? nickname; // Safe for existing data
+  @HiveField(0, defaultValue: null)
+  String? nickname; // Safe for existing data
 }

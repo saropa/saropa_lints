@@ -108,15 +108,17 @@ import '../flutter_mocks.dart';
 // BAD: Should trigger avoid_creating_vector_in_update
 // expect_lint: avoid_creating_vector_in_update
 void _bad629_update(double dt) {
-position.add(Vector2(10, 20) * dt); // New vector every frame!
+  void _topLevel110() {
+    position.add(Vector2(10, 20) * dt); // New vector every frame!
+  }
 }
 
 // GOOD: Should NOT trigger avoid_creating_vector_in_update
 void _good629() {
-  static final _velocity = Vector2(10, 20);
-  
+  final _velocity = Vector2(10, 20);
+
   @override
   void update(double dt) {
-  position.add(_velocity * dt);
+    position.add(_velocity * dt);
   }
 }

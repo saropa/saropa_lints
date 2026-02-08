@@ -111,16 +111,18 @@ dynamic data;
 // BAD: Should trigger avoid_listen_in_async
 // expect_lint: avoid_listen_in_async
 void _bad756() async {
-  onPressed: () async {
-  final data = context.watch<MyData>();  // Wrong!
-  await doSomething(data);
-  }
+  onPressed:
+  () async {
+    final data = context.watch<MyData>(); // Wrong!
+    await doSomething(data);
+  };
 }
 
 // GOOD: Should NOT trigger avoid_listen_in_async
 void _good756() async {
-  onPressed: () async {
-  final data = context.read<MyData>();  // Correct
-  await doSomething(data);
-  }
+  onPressed:
+  () async {
+    final data = context.read<MyData>(); // Correct
+    await doSomething(data);
+  };
 }

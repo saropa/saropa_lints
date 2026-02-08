@@ -108,16 +108,16 @@ import '../flutter_mocks.dart';
 // BAD: Should trigger require_native_resource_cleanup
 // expect_lint: require_native_resource_cleanup
 void _bad968_processImage() {
-final pointer = calloc<Uint8>(1024);
+  final pointer = calloc<Uint8>(1024);
 // pointer never freed
 }
 
 // GOOD: Should NOT trigger require_native_resource_cleanup
 void _good968_processImage() {
-final pointer = calloc<Uint8>(1024);
-try {
+  final pointer = calloc<Uint8>(1024);
+  try {
 // Use pointer
-} finally {
-calloc.free(pointer);
-}
+  } finally {
+    calloc.free(pointer);
+  }
 }

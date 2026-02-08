@@ -112,19 +112,19 @@ dynamic image;
 // expect_lint: prefer_image_size_constraints
 void _bad422() {
   Image.network(
-  'https://example.com/large-image.jpg',
-  width: 100,
-  height: 100,
-  ) // Decodes at full resolution, then scales!
+    'https://example.com/large-image.jpg',
+    width: 100,
+    height: 100,
+  ); // Decodes at full resolution, then scales!
 }
 
 // GOOD: Should NOT trigger prefer_image_size_constraints
 void _good422() {
   Image.network(
-  'https://example.com/large-image.jpg',
-  width: 100,
-  height: 100,
-  cacheWidth: 200, // 2x for device pixel ratio
-  cacheHeight: 200,
+    'https://example.com/large-image.jpg',
+    width: 100,
+    height: 100,
+    cacheWidth: 200, // 2x for device pixel ratio
+    cacheHeight: 200,
   );
 }

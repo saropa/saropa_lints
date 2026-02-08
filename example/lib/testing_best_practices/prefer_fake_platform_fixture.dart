@@ -111,16 +111,16 @@ dynamic channel;
 // expect_lint: prefer_fake_platform
 void _bad1215() async {
   testWidgets('camera test', (tester) async {
-  await tester.pumpWidget(CameraWidget());
-  // Platform channel will fail in test!
+    await tester.pumpWidget(CameraWidget());
+    // Platform channel will fail in test!
   });
 }
 
 // GOOD: Should NOT trigger prefer_fake_platform
 void _good1215() async {
   testWidgets('camera test', (tester) async {
-  TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
-  .setMockMethodCallHandler(channel, (call) async => mockResponse);
-  await tester.pumpWidget(CameraWidget());
+    TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+        .setMockMethodCallHandler(channel, (call) async => mockResponse);
+    await tester.pumpWidget(CameraWidget());
   });
 }

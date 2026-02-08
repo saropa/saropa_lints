@@ -117,7 +117,7 @@ void _bad769() {
 
 // GOOD: Should NOT trigger require_shared_prefs_key_constants
 void _good769() {
-  static const String kUserName = 'user_name';
+  const String kUserName = 'user_name';
   prefs.getString(kUserName);
   prefs.setInt(PrefsKeys.loginCount, count);
 }

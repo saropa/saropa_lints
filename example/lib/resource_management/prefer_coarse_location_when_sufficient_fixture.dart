@@ -112,7 +112,7 @@ dynamic a;
 void _bad974() async {
   // For a weather app - city-level is sufficient
   final position = await Geolocator.getCurrentPosition(
-  desiredAccuracy: LocationAccuracy.high, // Unnecessary precision
+    desiredAccuracy: LocationAccuracy.high, // Unnecessary precision
   );
 }
 
@@ -120,10 +120,10 @@ void _bad974() async {
 void _good974() async {
   // Weather only needs city
   final position = await Geolocator.getCurrentPosition(
-  desiredAccuracy: LocationAccuracy.low,
+    desiredAccuracy: LocationAccuracy.low,
   );
   // Or for navigation that needs precision:
   final position = await Geolocator.getCurrentPosition(
-  desiredAccuracy: LocationAccuracy.high, // Justified for turn-by-turn
+    desiredAccuracy: LocationAccuracy.high, // Justified for turn-by-turn
   );
 }

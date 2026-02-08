@@ -123,8 +123,8 @@ void _bad44() async {
 void _good44() async {
   final response = await http.get(url);
   if (response.statusCode == 200) {
-  final data = jsonDecode(response.body);
+    final data = jsonDecode(response.body);
   } else {
-  throw HttpException('Failed: ${response.statusCode}');
+    throw HttpException('Failed: ${response.statusCode}');
   }
 }

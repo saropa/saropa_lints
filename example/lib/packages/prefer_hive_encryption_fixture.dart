@@ -121,7 +121,7 @@ void _bad658() async {
 void _good658() async {
   final key = await secureStorage.read(key: 'hive_key');
   final encryptedBox = await Hive.openBox(
-  'secrets',
-  encryptionCipher: HiveAesCipher(key),
+    'secrets',
+    encryptionCipher: HiveAesCipher(key),
   );
 }

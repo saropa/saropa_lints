@@ -121,9 +121,9 @@ void _bad1327() {
 void _good1327() {
   FractionallySizedBox(widthFactor: 0.8, child: content);
   LayoutBuilder(
-  builder: (context, constraints) => SizedBox(
-  width: constraints.maxWidth * 0.5,
-  ),
+    builder: (context, constraints) => SizedBox(
+      width: constraints.maxWidth * 0.5,
+    ),
   );
   Expanded(child: content);
 }

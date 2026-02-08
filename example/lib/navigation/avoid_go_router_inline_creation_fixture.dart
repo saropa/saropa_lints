@@ -111,16 +111,16 @@ dynamic router;
 // BAD: Should trigger avoid_go_router_inline_creation
 // expect_lint: avoid_go_router_inline_creation
 Widget _bad514_build(BuildContext context) {
-return MaterialApp.router(
-routerConfig: GoRouter(routes: []), // Hot reload issues!
-);
+  return MaterialApp.router(
+    routerConfig: GoRouter(routes: []), // Hot reload issues!
+  );
 }
 
 // GOOD: Should NOT trigger avoid_go_router_inline_creation
 void _good514() {
   late final GoRouter _router = GoRouter(routes: []);
-  
+
   Widget build(BuildContext context) {
-  return MaterialApp.router(routerConfig: _router);
+    return MaterialApp.router(routerConfig: _router);
   }
 }

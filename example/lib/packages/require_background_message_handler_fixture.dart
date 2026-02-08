@@ -112,18 +112,18 @@ dynamic point;
 // expect_lint: require_background_message_handler
 void _bad620() {
   FirebaseMessaging.onMessage.listen((message) {
-  // Only handles foreground messages!
+    // Only handles foreground messages!
   });
 }
 
 // GOOD: Should NOT trigger require_background_message_handler
 void _good620() {
-  @pragma('vm:entry-point');
+  @pragma('vm:entry-point')
   Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage msg) async {
-  // Handle background message
+    // Handle background message
   }
-  
+
   void main() async {
-  FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
+    FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
   }
 }

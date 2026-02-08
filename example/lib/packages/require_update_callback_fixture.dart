@@ -113,20 +113,20 @@ dynamic service;
 // expect_lint: require_update_callback
 void _bad720() {
   ProxyProvider<AuthService, MyService>(
-  update: (context, auth, _) => MyService(auth), // Ignores previous!
-  child:
+    update: (context, auth, _) => MyService(auth), // Ignores previous!
+    child: child,
   );
 }
 
 // GOOD: Should NOT trigger require_update_callback
 void _good720() {
   ProxyProvider<AuthService, MyService>(
-  update: (context, auth, previous) {
-  // Dispose previous if needed, or reuse it
-  previous?.dispose();
-  return MyService(auth);
-  },
-  dispose: (context, service) => service.dispose(),
-  child:
+    update: (context, auth, previous) {
+      // Dispose previous if needed, or reuse it
+      previous?.dispose();
+      return MyService(auth);
+    },
+    dispose: (context, service) => service.dispose(),
+    child: child,
   );
 }

@@ -111,7 +111,7 @@ dynamic state;
 // expect_lint: prefer_define_hero_tag
 void _bad1369_initState() {
 // super.initState();
-setState(() {});  // Wrong - causes issues
+  setState(() {}); // Wrong - causes issues
 }
 
 // GOOD: Should NOT trigger prefer_define_hero_tag

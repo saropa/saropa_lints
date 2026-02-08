@@ -105,6 +105,8 @@
 
 import '../flutter_mocks.dart';
 
+typedef ErrorCallback = void Function(String error);
+
 dynamic error;
 
 // BAD: Should trigger prefer_typedefs_for_callbacks
@@ -113,6 +115,6 @@ void _bad232_doAsync(void Function(String error) onError) {}
 
 // GOOD: Should NOT trigger prefer_typedefs_for_callbacks
 void _good232() {
-  typedef ErrorCallback = void Function(String error);
+  // typedef ErrorCallback = void Function(String error);
   void doAsync(ErrorCallback onError) {}
 }

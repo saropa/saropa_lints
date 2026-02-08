@@ -118,8 +118,8 @@ void _bad590() async {
 // GOOD: Should NOT trigger require_dio_error_handling
 void _good590() async {
   try {
-  final response = await dio.get('/users');
+    final response = await dio.get('/users');
   } on DioException catch (e) {
-  handleNetworkError(e);
+    handleNetworkError(e);
   }
 }

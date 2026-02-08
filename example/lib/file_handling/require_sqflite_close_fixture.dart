@@ -119,8 +119,8 @@ void _bad376() async {
 void _good376() async {
   final db = await openDatabase('my_db.db');
   try {
-  //use db
+    //use db
   } finally {
-  await db.close();
+    await db.close();
   }
 }

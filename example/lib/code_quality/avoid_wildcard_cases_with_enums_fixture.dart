@@ -111,8 +111,8 @@ dynamic status;
 // expect_lint: avoid_wildcard_cases_with_enums
 void _bad191() {
   switch (status) {
-  case Status.active:
-  default:// May hide unhandled enum values
+    case Status.active:
+    default: // May hide unhandled enum values
   }
 }
 

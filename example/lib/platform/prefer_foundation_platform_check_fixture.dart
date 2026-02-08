@@ -110,16 +110,17 @@ final context = BuildContext();
 // BAD: Should trigger prefer_foundation_platform_check
 // expect_lint: prefer_foundation_platform_check
 Widget _bad828_build(BuildContext context) {
-if (Platform.isIOS) { // dart:io import required, crashes on web
-return CupertinoButton();
-}
-return ElevatedButton();
+  if (Platform.isIOS) {
+    // dart:io import required, crashes on web
+    return CupertinoButton();
+  }
+  return ElevatedButton();
 }
 
 // GOOD: Should NOT trigger prefer_foundation_platform_check
 Widget _good828_build(BuildContext context) {
-if (defaultTargetPlatform == TargetPlatform.iOS) {
-return CupertinoButton();
-}
-return ElevatedButton();
+  if (defaultTargetPlatform == TargetPlatform.iOS) {
+    return CupertinoButton();
+  }
+  return ElevatedButton();
 }

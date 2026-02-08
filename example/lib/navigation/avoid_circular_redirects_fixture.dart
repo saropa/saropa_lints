@@ -112,23 +112,23 @@ final path = '/path';
 void _bad506() {
   // login redirects to home, home redirects to login for unauthenticated
   GoRoute(
-  path: '/login',
-  redirect: (_, __) => '/home', // Always redirects!
-  ),
+    path: '/login',
+    redirect: (_, __) => '/home', // Always redirects!
+  );
   GoRoute(
-  path: '/home',
-  redirect: (_, __) => isLoggedIn ? null : '/login',
+    path: '/home',
+    redirect: (_, __) => isLoggedIn ? null : '/login',
   );
 }
 
 // GOOD: Should NOT trigger avoid_circular_redirects
 void _good506() {
   GoRoute(
-  path: '/login',
-  redirect: (_, __) => isLoggedIn ? '/home' : null,
-  ),
+    path: '/login',
+    redirect: (_, __) => isLoggedIn ? '/home' : null,
+  );
   GoRoute(
-  path: '/home',
-  redirect: (_, __) => isLoggedIn ? null : '/login',
+    path: '/home',
+    redirect: (_, __) => isLoggedIn ? null : '/login',
   );
 }

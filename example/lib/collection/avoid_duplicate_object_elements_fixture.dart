@@ -111,9 +111,9 @@ dynamic value;
 // BAD: Should trigger avoid_duplicate_object_elements
 // expect_lint: avoid_duplicate_object_elements
 void _bad251() {
-  final list = [myObj, otherObj, myObj];  // myObj is duplicated
-  final bools = [true, false, true];  // true is duplicated
-  final nulls = [null, value, null];  // null is duplicated
+  final list = [myObj, otherObj, myObj]; // myObj is duplicated
+  final bools = [true, false, true]; // true is duplicated
+  final nulls = [null, value, null]; // null is duplicated
 }
 
 // GOOD: Should NOT trigger avoid_duplicate_object_elements

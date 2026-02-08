@@ -108,17 +108,17 @@ import '../flutter_mocks.dart';
 // BAD: Should trigger prefer_text_theme
 // expect_lint: prefer_text_theme
 class _bad1414__MyState extends State<MyWidget> {
-final _scrollController = ScrollController();
+  final _scrollController = ScrollController();
 // Missing dispose - MEMORY LEAK!
 }
 
 // GOOD: Should NOT trigger prefer_text_theme
 class _good1414__MyState extends State<MyWidget> {
-final _scrollController = ScrollController();
+  final _scrollController = ScrollController();
 
-@override
-void dispose() {
-_scrollController.dispose();
-super.dispose();
-}
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
 }

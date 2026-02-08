@@ -112,7 +112,7 @@ dynamic library;
 // expect_lint: avoid_web_only_dependencies
 
 void main() {
-document.body?.append(DivElement());
+  document.body?.append(DivElement());
 }
 
 // GOOD: Should NOT trigger avoid_web_only_dependencies

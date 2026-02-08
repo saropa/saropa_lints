@@ -114,20 +114,20 @@ dynamic response;
 // expect_lint: require_openai_error_handling
 void _bad698() async {
   Future<String> chat(String message) async {
-  final response = await openAI.onChatCompletion(request: request);
-  return response!.choices.first.message!.content;
+    final response = await openAI.onChatCompletion(request: request);
+    return response!.choices.first.message!.content;
   }
 }
 
 // GOOD: Should NOT trigger require_openai_error_handling
 void _good698() async {
   Future<String?> chat(String message) async {
-  try {
-  final response = await openAI.onChatCompletion(request: request);
-  return response?.choices.first.message?.content;
-  } catch (e) {
-  // Handle API error
-  return null;
-  }
+    try {
+      final response = await openAI.onChatCompletion(request: request);
+      return response?.choices.first.message?.content;
+    } catch (e) {
+      // Handle API error
+      return null;
+    }
   }
 }

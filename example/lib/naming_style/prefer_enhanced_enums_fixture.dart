@@ -110,15 +110,16 @@ final name = 'example';
 // BAD: Should trigger prefer_enhanced_enums
 // expect_lint: prefer_enhanced_enums
 enum Status { pending, active, completed }
+
 extension StatusExtension on Status {
-String get displayName => name.toUpperCase();
+  String get displayName => name.toUpperCase();
 }
 
 // GOOD: Should NOT trigger prefer_enhanced_enums
 enum Status {
-pending,
-active,
-completed;
+  pending,
+  active,
+  completed;
 
-String get displayName => name.toUpperCase();
+  String get displayName => name.toUpperCase();
 }

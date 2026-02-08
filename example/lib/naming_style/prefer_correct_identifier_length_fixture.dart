@@ -111,7 +111,7 @@ final userName = 'John';
 
 // BAD: Should trigger prefer_correct_identifier_length
 // expect_lint: prefer_correct_identifier_length
-int _bad490_a = 5;  // Too short
+int _bad490_a = 5; // Too short
 String thisIsAnExtremelyLongVariableNameThatIsHardToRead = '';
 
 // GOOD: Should NOT trigger prefer_correct_identifier_length

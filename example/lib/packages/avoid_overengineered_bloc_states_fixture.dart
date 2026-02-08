@@ -114,18 +114,29 @@ dynamic user;
 // BAD: Should trigger avoid_overengineered_bloc_states
 // expect_lint: avoid_overengineered_bloc_states
 abstract class _bad588_UserState {}
+
 class UserInitial extends UserState {}
+
 class UserLoading extends UserState {}
-class UserIdle extends UserState {}  // Redundant with Initial
-class UserLoadingMore extends UserState {}  // Could be bool
-class UserRefreshing extends UserState {}  // Could be bool
-class UserLoaded extends UserState { final User user; }
-class UserError extends UserState { final String message; }
+
+class UserIdle extends UserState {} // Redundant with Initial
+
+class UserLoadingMore extends UserState {} // Could be bool
+
+class UserRefreshing extends UserState {} // Could be bool
+
+class UserLoaded extends UserState {
+  final User user;
+}
+
+class UserError extends UserState {
+  final String message;
+}
 
 // GOOD: Should NOT trigger avoid_overengineered_bloc_states
 class _good588_UserState {
-final User? user;
-final bool isLoading;
-final String? error;
+  final User? user;
+  final bool isLoading;
+  final String? error;
 // Single state class with clear properties
 }

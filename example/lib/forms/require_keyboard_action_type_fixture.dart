@@ -111,14 +111,14 @@ dynamic controller;
 // expect_lint: require_keyboard_action_type
 void _bad405() {
   TextField(
-  controller: _controller,
+    controller: _controller,
   );
 }
 
 // GOOD: Should NOT trigger require_keyboard_action_type
 void _good405() {
   TextField(
-  controller: _controller,
-  textInputAction: TextInputAction.next,
+    controller: _controller,
+    textInputAction: TextInputAction.next,
   );
 }

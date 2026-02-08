@@ -111,26 +111,26 @@ final context = BuildContext();
 // BAD: Should trigger avoid_mounted_in_setstate
 // expect_lint: avoid_mounted_in_setstate
 class _bad1337_MyWidget extends StatelessWidget {
-final EdgeInsets? padding;
+  final EdgeInsets? padding;
 
-@override
-Widget build(BuildContext context) {
-return Padding(
-padding: padding ?? EdgeInsets.zero,
-child: Container(),
-);  // Using "padding" parameter as margin!
-}
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: padding ?? EdgeInsets.zero,
+      child: Container(),
+    ); // Using "padding" parameter as margin!
+  }
 }
 
 // GOOD: Should NOT trigger avoid_mounted_in_setstate
 class _good1337_MyWidget extends StatelessWidget {
-final EdgeInsets? margin;  // Renamed to "margin"
+  final EdgeInsets? margin; // Renamed to "margin"
 
-@override
-Widget build(BuildContext context) {
-return Padding(
-padding: margin ?? EdgeInsets.zero,
-child: Container(),
-);
-}
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: margin ?? EdgeInsets.zero,
+      child: Container(),
+    );
+  }
 }

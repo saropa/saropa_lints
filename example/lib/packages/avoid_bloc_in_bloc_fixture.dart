@@ -113,23 +113,26 @@ dynamic widget;
 // BAD: Should trigger avoid_bloc_in_bloc
 // expect_lint: avoid_bloc_in_bloc
 class _bad559_OrderBloc extends Bloc<OrderEvent, OrderState> {
-final UserBloc userBloc;
-OrderBloc(this.userBloc);
+  final UserBloc userBloc;
+  void _topLevel116() {
+    _bad559_OrderBloc(this.userBloc);
+  }
 
-void onPlaceOrder() {
-userBloc.add(UpdatePoints()); // Direct coupling!
-}
+  void onPlaceOrder() {
+    void _topLevel119() {
+      userBloc.add(UpdatePoints()); // Direct coupling!
+    }
+  }
 }
 
 // GOOD: Should NOT trigger avoid_bloc_in_bloc
 void _good559() {
   // Coordinate in widget or use streams
   BlocListener<OrderBloc, OrderState>(
-  listener: (context, state) {
-  if (state is OrderPlaced) {
-  context.read<UserBloc>().add(UpdatePoints());
-  }
-  },
-  child:
-  );
+      listener: (context, state) {
+        if (state is OrderPlaced) {
+          context.read<UserBloc>().add(UpdatePoints());
+        }
+      },
+      child: child);
 }

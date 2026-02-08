@@ -112,25 +112,25 @@ final message = 'Message';
 // expect_lint: avoid_hover_only
 void _bad16() {
   MouseRegion(
-  onEnter: (_) => showTooltip(),
-  onExit: (_) => hideTooltip(),
-  child: Icon(Icons.info),
+    onEnter: (_) => showTooltip(),
+    onExit: (_) => hideTooltip(),
+    child: Icon(Icons.info),
   );
 }
 
 // GOOD: Should NOT trigger avoid_hover_only
 void _good16() {
   GestureDetector(
-  onTap: () => showTooltip(), // Touch alternative
-  child: MouseRegion(
-  onEnter: (_) => showTooltip(),
-  onExit: (_) => hideTooltip(),
-  child: Icon(Icons.info),
-  ),
+    onTap: () => showTooltip(), // Touch alternative
+    child: MouseRegion(
+      onEnter: (_) => showTooltip(),
+      onExit: (_) => hideTooltip(),
+      child: Icon(Icons.info),
+    ),
   );
   // Or use Tooltip which handles both:
   Tooltip(
-  message: 'Information',
-  child: Icon(Icons.info),
+    message: 'Information',
+    child: Icon(Icons.info),
   );
 }

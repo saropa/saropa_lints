@@ -112,15 +112,17 @@ dynamic child;
 // expect_lint: prefer_safe_area_consumer
 void _bad1388() {
   Scaffold(
-  body: SafeArea(  // Scaffold already handles safe area
-  child: ListView(),
-  ),
+    body: SafeArea(
+      // Scaffold already handles safe area
+      child: ListView(),
+    ),
   );
 }
 
 // GOOD: Should NOT trigger prefer_safe_area_consumer
 void _good1388() {
   Scaffold(
-  body: ListView(),  // Scaffold handles safe area via appBar, bottomNavigationBar
+    body:
+        ListView(), // Scaffold handles safe area via appBar, bottomNavigationBar
   );
 }
