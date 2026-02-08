@@ -372,6 +372,44 @@ def get_rules_with_corrections(
     return with_correction, without_correction
 
 
+def get_rules_missing_prefix(rules_dir: Path) -> list[str]:
+    """Find rules whose problemMessage does not start with [rule_name].
+
+    Every problemMessage must begin with ``[rule_name] `` where
+    ``rule_name`` matches the ``name:`` value in the same LintCode
+    definition.  This is a publish-blocking requirement.
+
+    This is a lightweight check that runs even when DX audit is
+    skipped.  For comprehensive message quality analysis including
+    prefix scoring, see ``RuleMessage.audit_dx()`` in ``_audit_dx.py``.
+
+    Returns:
+        Sorted list of rule names that are missing the prefix.
+    """
+    missing: list[str] = []
+
+    lint_code_pattern = re.compile(
+        r"LintCode\(\s*"
+        r"name:\s*'([a-z0-9_]+)',\s*"
+        r"problemMessage:\s*"
+        r"(?:'([^']*)'|\"([^\"]*)\")",
+        re.DOTALL,
+    )
+
+    for dart_file in rules_dir.glob("**/*.dart"):
+        if dart_file.name == "all_rules.dart":
+            continue
+        content = dart_file.read_text(encoding="utf-8")
+        for match in lint_code_pattern.finditer(content):
+            name = match.group(1)
+            problem_msg = match.group(2) or match.group(3) or ""
+            expected_prefix = f"[{name}]"
+            if not problem_msg.startswith(expected_prefix):
+                missing.append(name)
+
+    return sorted(missing)
+
+
 def get_owasp_coverage(rules_dir: Path) -> OwaspCoverage:
     """Extract OWASP coverage from rule files."""
     coverage = OwaspCoverage()

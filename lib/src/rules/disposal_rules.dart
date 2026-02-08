@@ -461,7 +461,7 @@ class RequireTextEditingControllerDisposeRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_text_editing_controller_dispose',
     problemMessage:
-        'When a State class creates a TextEditingController for a TextField, search bar, or form input and fails to dispose of it in dispose(), the controller’s internal listeners and text buffers will persist after the widget is removed from the widget tree. This can cause memory leaks, input lag, and unpredictable or stale text field behavior, especially in dynamic forms, chat UIs, or lists where widgets are frequently created and destroyed. In severe cases, this can lead to app slowdowns or crashes due to uncollected resources. Always dispose of every TextEditingController in the owning State object’s dispose() method to ensure proper cleanup. See: https://api.flutter.dev/flutter/widgets/TextEditingController-class.html',
+        '[require_text_editing_controller_dispose] When a State class creates a TextEditingController for a TextField, search bar, or form input and fails to dispose of it in dispose(), the controller’s internal listeners and text buffers will persist after the widget is removed from the widget tree. This can cause memory leaks, input lag, and unpredictable or stale text field behavior, especially in dynamic forms, chat UIs, or lists where widgets are frequently created and destroyed. In severe cases, this can lead to app slowdowns or crashes due to uncollected resources. Always dispose of every TextEditingController in the owning State object’s dispose() method to ensure proper cleanup. See: https://api.flutter.dev/flutter/widgets/TextEditingController-class.html',
     correctionMessage:
         'For every State class that owns a TextEditingController (for a TextField, search, or form), call controller.dispose() in the dispose() method before calling super.dispose(). This ensures all listeners and buffers are released when the widget is removed, preventing memory leaks, input lag, and unpredictable text field state. Review your widget’s lifecycle and always pair controller creation with proper disposal. See: https://api.flutter.dev/flutter/widgets/TextEditingController-class.html',
     errorSeverity: DiagnosticSeverity.ERROR,
@@ -534,7 +534,7 @@ class RequirePageControllerDisposeRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_page_controller_dispose',
     problemMessage:
-        'Not disposing of a PageController when a widget is removed from the tree can cause memory leaks and continued resource usage, leading to performance issues and potential crashes in long-running apps. This is especially critical in apps with dynamic navigation or frequent page changes. See https://api.flutter.dev/flutter/widgets/PageController/dispose.html.',
+        '[require_page_controller_dispose] Not disposing of a PageController when a widget is removed from the tree can cause memory leaks and continued resource usage, leading to performance issues and potential crashes in long-running apps. This is especially critical in apps with dynamic navigation or frequent page changes. See https://api.flutter.dev/flutter/widgets/PageController/dispose.html.',
     correctionMessage:
         'Dispose of your PageController in the widget’s dispose method to ensure all resources are released and prevent memory leaks. See https://api.flutter.dev/flutter/widgets/PageController/dispose.html for best practices.',
     errorSeverity: DiagnosticSeverity.ERROR,
@@ -840,7 +840,7 @@ class RequireVideoPlayerControllerDisposeRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_video_player_controller_dispose',
     problemMessage:
-        'When a State class creates a VideoPlayerController for a video widget (such as a video player, gallery, carousel, or story view) and does not dispose of it in dispose(), the controller will keep video and audio resources alive after the widget is removed from the widget tree. This can cause memory leaks, background playback, battery drain, and even prevent other apps from acquiring audio focus. In video-heavy UIs or dynamic lists, this can quickly exhaust device resources and degrade app performance. Always dispose of every VideoPlayerController in the owning State object’s dispose() method to ensure proper cleanup. See: https://pub.dev/packages/video_player#disposing',
+        '[require_video_player_controller_dispose] When a State class creates a VideoPlayerController for a video widget (such as a video player, gallery, carousel, or story view) and does not dispose of it in dispose(), the controller will keep video and audio resources alive after the widget is removed from the widget tree. This can cause memory leaks, background playback, battery drain, and even prevent other apps from acquiring audio focus. In video-heavy UIs or dynamic lists, this can quickly exhaust device resources and degrade app performance. Always dispose of every VideoPlayerController in the owning State object’s dispose() method to ensure proper cleanup. See: https://pub.dev/packages/video_player#disposing',
     correctionMessage:
         'For every State class that owns a VideoPlayerController (for a video player, gallery, carousel, or story view), call controller.dispose() in the dispose() method before calling super.dispose(). This ensures all video and audio resources are released when the widget is removed, preventing leaks, background playback, and resource exhaustion. Review your widget’s lifecycle and always pair controller creation with proper disposal. See: https://pub.dev/packages/video_player#disposing',
     errorSeverity: DiagnosticSeverity.ERROR,
@@ -1439,7 +1439,7 @@ class RequireReceivePortCloseRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_receive_port_close',
     problemMessage:
-        'Leaving a ReceivePort open after it is no longer needed can cause memory leaks and keep isolates alive unnecessarily, leading to wasted resources and potential app instability. This can also prevent garbage collection of related objects. See https://dart.dev/guides/libraries/concurrency#isolates.',
+        '[require_receive_port_close] Leaving a ReceivePort open after it is no longer needed can cause memory leaks and keep isolates alive unnecessarily, leading to wasted resources and potential app instability. This can also prevent garbage collection of related objects. See https://dart.dev/guides/libraries/concurrency#isolates.',
     correctionMessage:
         'Close the ReceivePort when it is no longer needed to free resources and allow isolates to terminate cleanly. See https://dart.dev/guides/libraries/concurrency#isolates for best practices.',
     errorSeverity: DiagnosticSeverity.ERROR,

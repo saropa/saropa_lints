@@ -55,6 +55,16 @@ class RuleMessage:
         Scoring: start at 100, deduct for issues.
         See inline comments for each check and its penalty.
         """
+        # --- Missing [rule_name] prefix (-40, publish-blocking) ---
+        # Also checked by get_rules_missing_prefix() in _audit_checks.py
+        # as a standalone blocking gate that runs even when DX is skipped.
+        expected_prefix = f"[{self.name}]"
+        if not self.problem_message.startswith(expected_prefix):
+            self.dx_issues.append(
+                f"Missing '{expected_prefix}' prefix in problemMessage"
+            )
+            self.dx_score -= 40
+
         msg = self.problem_message.lower()
         content = re.sub(r"^\[[a-z0-9_]+\]\s*", "", self.problem_message)
 

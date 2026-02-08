@@ -227,23 +227,22 @@ class _NavigationContextVisitor extends RecursiveAstVisitor<void> {
   void visitMethodInvocation(MethodInvocation node) {
     // Check for context usage after awaited navigation
     if (_awaitedNavigation && !_hasMountedCheck) {
-      final String source = node.toSource();
-      if (source.contains('context') || source.contains('Context')) {
-        // Check if it's using context
-        final Expression? target = node.target;
-        if (target != null) {
-          final String targetSource = target.toSource();
-          if (targetSource == 'context' ||
-              targetSource.contains('.of(context')) {
-            reporter.atNode(node, code);
-          }
+      // Check if target is a context-dependent call (e.g., Navigator.of(context))
+      final Expression? target = node.target;
+      if (target != null) {
+        final String targetSource = target.toSource();
+        if (targetSource == 'context' ||
+            targetSource == 'Navigator.of(context)' ||
+            targetSource == 'ScaffoldMessenger.of(context)' ||
+            targetSource == 'Theme.of(context)') {
+          reporter.atNode(node, code);
         }
-        // Check arguments for context
-        for (final Expression arg in node.argumentList.arguments) {
-          if (arg is SimpleIdentifier && arg.name == 'context') {
-            reporter.atNode(node, code);
-            break;
-          }
+      }
+      // Check arguments for direct context usage
+      for (final Expression arg in node.argumentList.arguments) {
+        if (arg is SimpleIdentifier && arg.name == 'context') {
+          reporter.atNode(node, code);
+          break;
         }
       }
     }
@@ -427,7 +426,10 @@ class AvoidNavigatorPushUnnamedRule extends SaropaLintRule {
       if (target == null) return;
 
       final String targetSource = target.toSource();
-      if (!targetSource.contains('Navigator')) return;
+      if (targetSource != 'Navigator' &&
+          !targetSource.startsWith('Navigator.')) {
+        return;
+      }
 
       // Check if second argument is a MaterialPageRoute/CupertinoPageRoute
       // (which indicates inline route definition)
@@ -693,7 +695,10 @@ class AvoidPopWithoutResultRule extends SaropaLintRule {
       // Check if target is Navigator
       final Expression? target = expression.target;
       if (target == null) return;
-      if (!target.toSource().contains('Navigator')) return;
+      final String navTarget = target.toSource();
+      if (navTarget != 'Navigator' && !navTarget.startsWith('Navigator.')) {
+        return;
+      }
 
       // Check if result is used without null check
       final AstNode? parent = node.parent;
@@ -2333,9 +2338,8 @@ class AvoidGoRouterPushReplacementConfusionRule extends SaropaLintRule {
       if (target == null) return;
 
       final String targetSource = target.toSource();
-      if (targetSource != 'context' && !targetSource.contains('context')) {
-        return;
-      }
+      // Only match direct 'context' usage, not variables with "context" as substring
+      if (targetSource != 'context') return;
 
       // Check if the path looks like a detail route
       final ArgumentList args = node.argumentList;
@@ -2964,9 +2968,11 @@ class AvoidNavigatorContextIssueRule extends SaropaLintRule {
 
       final String targetSource = target.toSource();
 
-      // Only flag Navigator operations, not Scrollable or other APIs
-      if (!targetSource.contains('Navigator')) return;
-      if (targetSource.contains('Scrollable')) return;
+      // Only flag Navigator operations
+      if (targetSource != 'Navigator' &&
+          !targetSource.startsWith('Navigator.')) {
+        return;
+      }
 
       // Check arguments for currentContext usage
       final ArgumentList args = node.argumentList;
@@ -2985,9 +2991,9 @@ class AvoidNavigatorContextIssueRule extends SaropaLintRule {
       final String constructorName = node.constructorName.toSource();
 
       // Only check Navigator-related instance creations
-      if (!constructorName.contains('Route') &&
-          !constructorName.contains('Page') &&
-          !constructorName.contains('Navigator')) {
+      if (!constructorName.endsWith('Route') &&
+          !constructorName.endsWith('Page') &&
+          !constructorName.startsWith('Navigator')) {
         return;
       }
 
@@ -3088,7 +3094,10 @@ class RequirePopResultTypeRule extends SaropaLintRule {
 
       // Check if it's a Navigator call
       final String targetSource = target.toSource();
-      if (!targetSource.contains('Navigator')) return;
+      if (targetSource != 'Navigator' &&
+          !targetSource.startsWith('Navigator.')) {
+        return;
+      }
 
       // Check if type argument is provided
       final TypeArgumentList? typeArgs = expr.typeArguments;

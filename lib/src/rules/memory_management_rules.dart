@@ -143,7 +143,7 @@ class RequireImageDisposalRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_image_disposal',
     problemMessage:
-        'Failing to dispose of images or image streams can lead to memory leaks, increased memory usage, and eventual app crashes, especially in image-heavy applications. This is critical for apps that load or manipulate images dynamically. See https://docs.flutter.dev/perf/memory#images.',
+        '[require_image_disposal] Failing to dispose of images or image streams can lead to memory leaks, increased memory usage, and eventual app crashes, especially in image-heavy applications. This is critical for apps that load or manipulate images dynamically. See https://docs.flutter.dev/perf/memory#images.',
     correctionMessage:
         'Dispose of images and image streams when they are no longer needed to free memory and maintain app performance. See https://docs.flutter.dev/perf/memory#images for best practices.',
     errorSeverity: DiagnosticSeverity.WARNING,

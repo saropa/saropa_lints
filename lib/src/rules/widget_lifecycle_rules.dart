@@ -3310,7 +3310,8 @@ class RequireScrollControllerDisposeRule extends SaropaLintRule {
         if (member is FieldDeclaration) {
           for (final VariableDeclaration variable in member.fields.variables) {
             final String? typeName = member.fields.type?.toSource();
-            if (typeName != null && typeName.contains('ScrollController')) {
+            if (typeName == 'ScrollController' ||
+                typeName == 'ScrollController?') {
               controllerNames.add(variable.name.lexeme);
               continue;
             }
@@ -3342,21 +3343,18 @@ class RequireScrollControllerDisposeRule extends SaropaLintRule {
 
       // Check if each controller is disposed
       for (final String name in controllerNames) {
-        // Direct disposal patterns
+        // Direct disposal patterns (whitespace-tolerant)
         final bool isDirectlyDisposed = disposeBody != null &&
-            (disposeBody.contains('$name.dispose(') ||
-                disposeBody.contains('$name?.dispose(') ||
-                disposeBody.contains('$name.disposeSafe(') ||
-                disposeBody.contains('$name?.disposeSafe(') ||
-                disposeBody.contains('$name..dispose('));
+            RegExp(
+              '${RegExp.escape(name)}\\s*[?.]+'
+              '\\s*dispose(Safe)?\\s*\\(',
+            ).hasMatch(disposeBody);
 
-        // Iteration-based disposal for List<ScrollController> or
-        // Map<..., ScrollController>
-        // Patterns like: "for (... in _name) { ...dispose()" or
-        // "for (... in _name.values) { ...dispose()"
+        // Iteration-based disposal
         final bool isIterationDisposed = disposeBody != null &&
-            (disposeBody.contains('in $name)') ||
-                disposeBody.contains('in $name.values)')) &&
+            RegExp(
+              'in\\s+${RegExp.escape(name)}(\\.values)?\\)',
+            ).hasMatch(disposeBody) &&
             disposeBody.contains('.dispose()');
 
         final bool isDisposed = isDirectlyDisposed || isIterationDisposed;
@@ -3535,9 +3533,10 @@ class RequireFocusNodeDisposeRule extends SaropaLintRule {
         if (member is FieldDeclaration) {
           for (final VariableDeclaration variable in member.fields.variables) {
             final String? typeName = member.fields.type?.toSource();
-            if (typeName != null &&
-                (typeName.contains('FocusNode') ||
-                    typeName.contains('FocusScopeNode'))) {
+            if (typeName == 'FocusNode' ||
+                typeName == 'FocusNode?' ||
+                typeName == 'FocusScopeNode' ||
+                typeName == 'FocusScopeNode?') {
               nodeNames.add(variable.name.lexeme);
               continue;
             }
@@ -3569,20 +3568,18 @@ class RequireFocusNodeDisposeRule extends SaropaLintRule {
 
       // Check if each node is disposed
       for (final String name in nodeNames) {
-        // Direct disposal patterns
+        // Direct disposal patterns (whitespace-tolerant)
         final bool isDirectlyDisposed = disposeBody != null &&
-            (disposeBody.contains('$name.dispose(') ||
-                disposeBody.contains('$name?.dispose(') ||
-                disposeBody.contains('$name.disposeSafe(') ||
-                disposeBody.contains('$name?.disposeSafe(') ||
-                disposeBody.contains('$name..dispose('));
+            RegExp(
+              '${RegExp.escape(name)}\\s*[?.]+'
+              '\\s*dispose(Safe)?\\s*\\(',
+            ).hasMatch(disposeBody);
 
-        // Iteration-based disposal for List<FocusNode> or Map<..., FocusNode>
-        // Patterns like: "for (... in _name) { ...dispose()" or
-        // "for (... in _name.values) { ...dispose()"
+        // Iteration-based disposal
         final bool isIterationDisposed = disposeBody != null &&
-            (disposeBody.contains('in $name)') ||
-                disposeBody.contains('in $name.values)')) &&
+            RegExp(
+              'in\\s+${RegExp.escape(name)}(\\.values)?\\)',
+            ).hasMatch(disposeBody) &&
             disposeBody.contains('.dispose()');
 
         final bool isDisposed = isDirectlyDisposed || isIterationDisposed;
