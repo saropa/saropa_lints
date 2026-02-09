@@ -642,6 +642,7 @@ const Set<String> essentialRules = <String>{
   'require_location_permission_rationale', // WARNING - location permission needs rationale
   'require_camera_permission_check', // ERROR - camera needs permission check
   'require_firestore_index', // ERROR - Firestore queries need composite indexes
+  'require_firebase_composite_index', // ERROR - RTDB queries need .indexOn rules
   'avoid_notification_silent_failure', // WARNING - notification failures should be handled
   'require_file_path_sanitization', // WARNING - file paths need sanitization
   'require_app_startup_error_handling', // WARNING - app startup needs error handling
@@ -3197,6 +3198,7 @@ const Set<String> firebasePackageRules = <String>{
   'require_firebase_error_handling',
   'avoid_firebase_realtime_in_build',
   'require_firestore_index',
+  'require_firebase_composite_index',
   'avoid_firestore_unbounded_query',
   'avoid_map_markers_in_build',
   'require_map_idle_callback',
