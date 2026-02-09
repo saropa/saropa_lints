@@ -11,6 +11,13 @@ Dates are not included in version headers — [pub.dev](https://pub.dev/packages
 ** See the current published changelog: [saropa_lints/changelog](https://pub.dev/packages/saropa_lints/changelog)
 
 ---
+## [Unreleased]
+
+### Added
+
+- **New Essential rule**: `require_firebase_composite_index` (ERROR) — detects Firebase Realtime Database queries using `orderByChild` with filter methods that need a `.indexOn` rule in database security rules
+
+---
 ## [4.14.0]
 
 ### Added
