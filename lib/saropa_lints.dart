@@ -2215,6 +2215,7 @@ final List<LintRule Function()> _allRuleFactories = <LintRule Function()>[
 
   // Firebase rules (firebase_rules.dart)
   RequireFirestoreIndexRule.new,
+  RequireFirebaseCompositeIndexRule.new,
 
   // Notification rules (notification_rules.dart)
   PreferNotificationGroupingRule.new,
@@ -2774,6 +2775,28 @@ void _captureReportConfig({
     maxIssues: ProgressTracker.maxIssues,
     outputMode: ProgressTracker.isFileOnly ? 'file' : 'both',
   ));
+
+  // Build OWASP lookup map for the structured JSON export.
+  // Iterates all rule factories once to extract OWASP mappings.
+  AnalysisReporter.setOwaspLookup(_buildOwaspLookup());
+}
+
+/// Build a map from rule name to OWASP mapping for all registered rules.
+///
+/// Iterates all rule factories once at config time. Rules without OWASP
+/// mappings are omitted from the map.
+Map<String, OwaspMapping> _buildOwaspLookup() {
+  final lookup = <String, OwaspMapping>{};
+  for (final factory in _allRuleFactories) {
+    final rule = factory();
+    if (rule is SaropaLintRule) {
+      final owasp = rule.owasp;
+      if (owasp != null && owasp.isNotEmpty) {
+        lookup[rule.code.name] = owasp;
+      }
+    }
+  }
+  return lookup;
 }
 
 /// Parsed platform and package settings from custom YAML.

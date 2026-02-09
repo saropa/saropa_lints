@@ -2438,3 +2438,128 @@ class RequireFirestoreIndexRule extends SaropaLintRule {
     });
   }
 }
+
+// =============================================================================
+// require_firebase_composite_index
+// =============================================================================
+
+/// Warns when Firebase Realtime Database query uses `orderByChild` with
+/// filtering and likely needs a `.indexOn` rule in database security rules.
+///
+/// Since: v4.15.0 | Rule version: v1
+///
+/// Alias: rtdb_index, realtime_database_index
+///
+/// Firebase Realtime Database queries that use `orderByChild` combined with
+/// range or equality filters (`equalTo`, `startAt`, `endAt`, `startAfter`,
+/// `endBefore`) download **all** data and sort client-side unless a
+/// corresponding `.indexOn` rule exists. This causes severe performance
+/// degradation on large datasets.
+///
+/// **BAD:**
+/// ```dart
+/// // Compound RTDB query — needs .indexOn for 'age'
+/// final snapshot = await FirebaseDatabase.instance
+///     .ref('users')
+///     .orderByChild('age')
+///     .startAt(18)
+///     .endAt(65)
+///     .once();
+///
+/// // Equality filter on ordered child — needs .indexOn
+/// final snapshot = await FirebaseDatabase.instance
+///     .ref('users')
+///     .orderByChild('status')
+///     .equalTo('active')
+///     .once();
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// // Ensure .indexOn exists in database.rules.json:
+/// // { "users": { ".indexOn": ["age", "status"] } }
+/// final snapshot = await FirebaseDatabase.instance
+///     .ref('users')
+///     .orderByChild('age')
+///     .startAt(18)
+///     .endAt(65)
+///     .once();
+/// ```
+class RequireFirebaseCompositeIndexRule extends SaropaLintRule {
+  const RequireFirebaseCompositeIndexRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  static const LintCode _code = LintCode(
+    name: 'require_firebase_composite_index',
+    problemMessage:
+        '[require_firebase_composite_index] Firebase Realtime Database query '
+        'uses orderByChild with filtering but may lack a .indexOn rule. '
+        'Without the index the SDK downloads all data and sorts client-side, '
+        'causing severe performance degradation on large datasets. {v1}',
+    correctionMessage: 'Add a .indexOn rule for the ordered child key in your '
+        'database.rules.json or Firebase Console security rules.',
+    errorSeverity: DiagnosticSeverity.ERROR,
+  );
+
+  /// Terminal methods that execute an RTDB query.
+  /// Note: stream getters (onValue, onChildAdded, etc.) are property accesses,
+  /// not method invocations, so they cannot be caught by addMethodInvocation.
+  static const Set<String> _terminalMethods = <String>{
+    'once',
+    'get',
+  };
+
+  /// RTDB filter methods that benefit from an index.
+  static const Set<String> _filterMethods = <String>{
+    'equalTo',
+    'startAt',
+    'endAt',
+    'startAfter',
+    'endBefore',
+  };
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      final String methodName = node.methodName.name;
+
+      // Only trigger on terminal RTDB query methods
+      if (!_terminalMethods.contains(methodName)) return;
+
+      // Walk up the method chain looking for RTDB patterns
+      bool hasOrderByChild = false;
+      bool hasFilter = false;
+      bool hasRef = false;
+
+      Expression? current = node.target;
+      while (current is MethodInvocation) {
+        final MethodInvocation call = current;
+        final String name = call.methodName.name;
+
+        if (name == 'orderByChild') {
+          hasOrderByChild = true;
+        } else if (_filterMethods.contains(name)) {
+          hasFilter = true;
+        } else if (name == 'ref' || name == 'reference' || name == 'child') {
+          hasRef = true;
+        }
+
+        current = call.target;
+      }
+
+      // Report when we see orderByChild + filter on an RTDB reference
+      if (hasRef && hasOrderByChild && hasFilter) {
+        reporter.atNode(node, code);
+      }
+    });
+  }
+}
