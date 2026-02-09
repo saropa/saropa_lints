@@ -856,7 +856,7 @@ Rules for popular Flutter packages based on common gotchas, anti-patterns, and b
 | ⚠️ `require_firebase_token_refresh` | Essential | WARNING | Handle token refresh on idTokenChanges. Detect missing refresh handler. |
 | ⚠️ `avoid_firebase_user_data_in_auth` | Professional | WARNING | Auth claims limited to 1000 bytes. Detect large data in custom claims. |
 | ℹ️ `require_firebase_offline_persistence` | Recommended | INFO | Configure Firestore offline persistence. Detect Firestore without persistence settings. |
-| 🚨 `require_firebase_composite_index` | Essential | ERROR | Compound queries need indexes. Detect complex queries without index. |
+| ✅ `require_firebase_composite_index` | Essential | ERROR | RTDB compound queries need `.indexOn`. Detect `orderByChild` + filter without index. |
 | ℹ️ `prefer_firebase_transaction_for_counters` | Professional | INFO | Use transactions for counters. Detect read-then-write pattern. |
 | ⚠️ `require_firebase_app_check_production` | Professional | WARNING | Enable App Check for production. Detect production without App Check. |
 

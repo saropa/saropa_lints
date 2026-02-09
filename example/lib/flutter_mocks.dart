@@ -1948,6 +1948,31 @@ class FirebaseFirestore {
   dynamic doc(String path) => null;
 }
 
+class FirebaseDatabase {
+  static FirebaseDatabase get instance => FirebaseDatabase();
+  DatabaseReference ref([String? path]) => DatabaseReference();
+}
+
+class DatabaseReference {
+  DatabaseReference child(String path) => DatabaseReference();
+  DatabaseReference orderByChild(String key) => DatabaseReference();
+  DatabaseReference orderByKey() => DatabaseReference();
+  DatabaseReference orderByValue() => DatabaseReference();
+  DatabaseReference equalTo(dynamic value) => DatabaseReference();
+  DatabaseReference startAt(dynamic value) => DatabaseReference();
+  DatabaseReference endAt(dynamic value) => DatabaseReference();
+  DatabaseReference startAfter(dynamic value) => DatabaseReference();
+  DatabaseReference endBefore(dynamic value) => DatabaseReference();
+  DatabaseReference limitToFirst(int limit) => DatabaseReference();
+  DatabaseReference limitToLast(int limit) => DatabaseReference();
+  Future<dynamic> once() async => null;
+  Future<dynamic> get() async => null;
+  Stream<dynamic> get onValue => const Stream.empty();
+  Stream<dynamic> get onChildAdded => const Stream.empty();
+  Stream<dynamic> get onChildChanged => const Stream.empty();
+  Stream<dynamic> get onChildRemoved => const Stream.empty();
+}
+
 class FirebaseAuth {
   static FirebaseAuth get instance => FirebaseAuth();
   dynamic get currentUser => null;
