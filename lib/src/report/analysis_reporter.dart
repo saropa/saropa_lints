@@ -7,6 +7,7 @@ import 'dart:math' show Random;
 import 'package:saropa_lints/src/report/batch_data.dart';
 import 'package:saropa_lints/src/report/import_graph_tracker.dart';
 import 'package:saropa_lints/src/report/report_consolidator.dart';
+import 'package:saropa_lints/src/report/violation_export.dart';
 import 'package:saropa_lints/src/saropa_lint_rule.dart';
 
 /// Snapshot of the analysis configuration captured at rule-loading time.
@@ -60,6 +61,7 @@ class AnalysisReporter {
   static bool _pathsLogged = false;
   static bool _reportWritten = false;
   static ReportConfig? _config;
+  static Map<String, OwaspMapping>? _owaspLookup;
 
   /// Debounce duration: write reports after this idle period.
   static const Duration _debounce = Duration(seconds: 3);
@@ -79,6 +81,14 @@ class AnalysisReporter {
   /// Called from `getLintRules()` where all config data is available.
   static void setAnalysisConfig(ReportConfig config) {
     _config = config;
+  }
+
+  /// Store the OWASP lookup map for the structured JSON export.
+  ///
+  /// Called from `getLintRules()` where all rule instances are available.
+  /// Maps rule name → [OwaspMapping] for rules that have OWASP mappings.
+  static void setOwaspLookup(Map<String, OwaspMapping> lookup) {
+    _owaspLookup = lookup;
   }
 
   /// Initialize the reporter with the project root directory.
@@ -196,6 +206,14 @@ class AnalysisReporter {
       // 3. Write the consolidated report
       final path = reportPath!;
       _writeCombinedReport(path, consolidated);
+
+      // 4. Write structured JSON export for Log Capture integration
+      ViolationExporter.write(
+        projectRoot: _projectRoot!,
+        sessionId: _sessionId!,
+        data: consolidated,
+        owaspLookup: _owaspLookup ?? const <String, OwaspMapping>{},
+      );
 
       _reportWritten = true;
       _cleanOldReports();
@@ -697,17 +715,9 @@ class AnalysisReporter {
   }
 
   /// Convert an absolute path to a relative path from project root.
-  ///
-  /// Normalizes separators to `/` before comparing so that Windows
-  /// paths (which may mix `\` and `/`) are handled correctly.
   static String _relativePath(String filePath) {
     if (_projectRoot == null) return filePath;
-    final root = _projectRoot!.replaceAll('\\', '/');
-    final file = filePath.replaceAll('\\', '/');
-    if (file.startsWith('$root/')) {
-      return file.substring(root.length + 1);
-    }
-    return filePath;
+    return toRelativePath(filePath, _projectRoot!);
   }
 
   /// Move old report files to `.trash/`, keeping only the
@@ -758,6 +768,7 @@ class AnalysisReporter {
     _pathsLogged = false;
     _reportWritten = false;
     _config = null;
+    _owaspLookup = null;
     ImportGraphTracker.reset();
   }
 }
