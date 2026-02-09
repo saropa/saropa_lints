@@ -1,6 +1,6 @@
 # Feature: Saropa Log Capture integration via structured violation export
 
-## Status: Proposed
+## Status: Implemented (v1.0)
 
 ## Problem
 
@@ -117,10 +117,12 @@ a history. Consumers can snapshot it if they need historical tracking.
   "config": {
     "tier": "comprehensive",
     "enabledRuleCount": 1590,
+    "enabledRuleCountNote": "After tier selection and user overrides",
     "enabledPlatforms": ["ios", "android"],
     "disabledPlatforms": ["macos", "web", "windows", "linux"],
     "enabledPackages": ["firebase", "riverpod"],
     "maxIssues": 1000,
+    "maxIssuesNote": "IDE Problems tab cap only; this export contains all violations",
     "outputMode": "both"
   },
 
@@ -154,14 +156,15 @@ a history. Consumers can snapshot it if they need historical tracking.
       // 1-indexed line number.
       "line": 42,
 
-      // 1-indexed column number.
-      "column": 5,
-
       // Rule identifier. Matches the rule name in analysis_options.yaml.
       "rule": "require_field_dispose",
 
       // Human-readable violation message.
       "message": "TextEditingController is never disposed",
+
+      // Optional correction message. Omitted when the rule has no
+      // correctionMessage. Consumers MUST treat this field as optional.
+      "correction": "Add a dispose() method that calls controller.dispose()",
 
       // Diagnostic severity as reported to the IDE.
       // One of: "error", "warning", "info".
@@ -172,10 +175,10 @@ a history. Consumers can snapshot it if they need historical tracking.
       "impact": "critical",
 
       // OWASP mappings, if any. Empty arrays when not applicable.
-      // Mobile: M1-M10 (OWASP Mobile Top 10 2024).
-      // Web: A01-A10 (OWASP Top 10 2021).
+      // Mobile: m1-m10 (OWASP Mobile Top 10 2024, lowercase).
+      // Web: a01-a10 (OWASP Top 10 2021, lowercase).
       "owasp": {
-        "mobile": ["M9"],
+        "mobile": ["m9"],
         "web": []
       }
     }
@@ -226,8 +229,10 @@ by the file's existence and timestamp.
 
 ### R7: Atomic write
 
-The file MUST be written atomically (write to temp file, then rename) to prevent
-consumers from reading a partially-written file.
+The file MUST be written atomically to prevent consumers from reading a
+partially-written file. The implementation writes to a `.tmp` file, deletes
+the existing target, then renames. If any step fails (e.g., filesystem
+permissions), it falls back to a direct write.
 
 ### R8: OWASP field population
 
@@ -272,33 +277,26 @@ The data needed maps directly to existing structures:
 | `violations[].line` | `ViolationRecord.line` |
 | `violations[].rule` | `ViolationRecord.rule` |
 | `violations[].message` | `ViolationRecord.message` |
-| `violations[].severity` | `ConsolidatedData.ruleSeverities[rule]` |
+| `violations[].correction` | `ViolationRecord.correction` (optional, from `LintCode.correctionMessage`) |
+| `violations[].severity` | `ConsolidatedData.ruleSeverities[rule]` (lowercased) |
 | `violations[].impact` | Key from `ConsolidatedData.violations` map |
-| `violations[].owasp` | Requires rule registry lookup (see below) |
-| `violations[].column` | Not currently in `ViolationRecord` (see gap) |
+| `violations[].owasp` | `AnalysisReporter._owaspLookup` (built from rule registry at config time) |
 
-### Data gaps
+### Data gaps (resolved)
 
-1. **Column number:** `ViolationRecord` does not currently store `column`. The full
-   `Violation` model has it, but it's lost during batch serialization. Options:
-   - Add `column` to `ViolationRecord` and batch JSON format (`"c"` key)
-   - Omit from v1.0 export (make field optional, default to `1`)
-   - **Recommendation:** Make `column` optional in the export (`"column": 5` or
-     absent). Add to `ViolationRecord` as a follow-up.
+1. **Column number:** Omitted from v1.0. `ViolationRecord` does not store `column`.
+   Candidate for v1.1 alongside `endLine`/`endColumn`.
 
-2. **OWASP mapping:** `ViolationRecord` does not carry OWASP data. The mapping lives
-   on `SaropaLintRule.owasp`, accessible only during rule execution. Options:
-   - Build a static `Map<String, OwaspMapping>` from `allRules` at startup
-   - Include OWASP data in batch JSON (adds ~2 bytes per violation for empty mappings)
-   - **Recommendation:** Build a lookup map from `allRules` at export time. Rules are
-     already registered; iterating them once is trivial.
+2. **OWASP mapping:** Resolved. `_buildOwaspLookup()` in `saropa_lints.dart` iterates
+   all rule factories once at config time and passes the map via
+   `AnalysisReporter.setOwaspLookup()`.
 
-3. **Relative path conversion:** `ViolationRecord.file` stores absolute paths. The
-   reporter already has `_projectRoot`. Conversion:
-   ```dart
-   final relative = path.relative(violation.file, from: projectRoot)
-       .replaceAll(r'\', '/');
-   ```
+3. **Relative path conversion:** Resolved. Shared `toRelativePath()` utility in
+   `violation_export.dart` normalizes separators and strips the project root prefix.
+
+4. **Correction message:** Resolved. `ViolationRecord.correction` added, populated from
+   `LintCode.correctionMessage` at violation tracking time, serialized through the
+   batch pipeline (`c2` key).
 
 ### Estimated size
 
@@ -308,11 +306,12 @@ overwritten each run.
 
 ### Cleanup
 
-The file should be deleted during `cleanupSession()` only if the analysis produced no
-report. Otherwise, it persists until the next analysis overwrites it.
+The export file is **never** deleted during `cleanupSession()`. It persists as the
+latest snapshot and is overwritten on the next analysis run. Zero-violation runs still
+write the file with an empty `violations` array.
 
-The `reports/.saropa_lints/` directory should be created on first write and left in
-place. It should be added to the recommended `.gitignore` entries alongside `reports/`.
+The `reports/.saropa_lints/` directory is created on first write and left in place.
+It lives under the existing `reports/` directory which is already in `.gitignore`.
 
 ---
 
@@ -363,15 +362,16 @@ and does not require any Saropa Lints changes.
 
 ## File index for Saropa Lints implementation
 
-| File | Relevance |
-|------|-----------|
-| `lib/src/report/analysis_reporter.dart` | Add export write call after `_writeCombinedReport()` |
-| `lib/src/report/report_consolidator.dart` | Access to `ConsolidatedData`, session management |
-| `lib/src/report/batch_data.dart` | May need `column` field added to `ViolationRecord` |
-| `lib/src/models/violation.dart` | Reference for full `Violation` field set |
-| `lib/src/saropa_lint_rule.dart` | `LintImpact` enum, `SaropaLintRule.owasp` access |
+| File | Role |
+|------|------|
+| `lib/src/report/violation_export.dart` | `ViolationExporter` class, `toRelativePath()` utility |
+| `lib/src/report/analysis_reporter.dart` | Calls `ViolationExporter.write()` after markdown report; stores OWASP lookup |
+| `lib/src/report/report_consolidator.dart` | `ConsolidatedData` definition, session management |
+| `lib/src/report/batch_data.dart` | Serializes `correction` field (`c2` key) in batch JSON |
+| `lib/src/saropa_lint_rule.dart` | `ViolationRecord` (with `correction`), `LintImpact`, `ImpactTracker` |
 | `lib/src/owasp/owasp_category.dart` | `OwaspMapping`, `OwaspMobile`, `OwaspWeb` |
-| `lib/src/all_rules.dart` | Rule registry for OWASP lookup map |
+| `lib/saropa_lints.dart` | `_buildOwaspLookup()` iterates rule factories at config time |
+| `test/violation_export_test.dart` | 16 unit tests for the export |
 
 ## File index for Saropa Log Capture implementation
 
