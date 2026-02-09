@@ -118,9 +118,12 @@ a history. Consumers can snapshot it if they need historical tracking.
     "tier": "comprehensive",
     "enabledRuleCount": 1590,
     "enabledRuleCountNote": "After tier selection and user overrides",
+    "enabledRuleNames": ["avoid_print", "prefer_const", "..."],
     "enabledPlatforms": ["ios", "android"],
     "disabledPlatforms": ["macos", "web", "windows", "linux"],
     "enabledPackages": ["firebase", "riverpod"],
+    "disabledPackages": ["isar"],
+    "userExclusions": ["no_magic_numbers"],
     "maxIssues": 1000,
     "maxIssuesNote": "IDE Problems tab cap only; this export contains all violations",
     "outputMode": "both"
@@ -131,6 +134,7 @@ a history. Consumers can snapshot it if they need historical tracking.
     "filesAnalyzed": 147,
     "filesWithIssues": 42,
     "totalViolations": 234,
+    "batchCount": 2,
     "bySeverity": {
       "error": 45,
       "warning": 89,
@@ -142,7 +146,12 @@ a history. Consumers can snapshot it if they need historical tracking.
       "medium": 88,
       "low": 95,
       "opinionated": 5
-    }
+    },
+    // Per-file and per-rule counts for quick lookups.
+    "issuesByFile": { "lib/services/auth_service.dart": 8, "...": 0 },
+    "issuesByRule": { "require_field_dispose": 12, "avoid_print": 5, "...": 0 },
+    // Rule-to-severity lookup table (lowercase values).
+    "ruleSeverities": { "require_field_dispose": "error", "avoid_print": "warning" }
   },
 
   // All deduplicated violations.
@@ -371,7 +380,8 @@ and does not require any Saropa Lints changes.
 | `lib/src/saropa_lint_rule.dart` | `ViolationRecord` (with `correction`), `LintImpact`, `ImpactTracker` |
 | `lib/src/owasp/owasp_category.dart` | `OwaspMapping`, `OwaspMobile`, `OwaspWeb` |
 | `lib/saropa_lints.dart` | `_buildOwaspLookup()` iterates rule factories at config time |
-| `test/violation_export_test.dart` | 16 unit tests for the export |
+| `test/violation_export_test.dart` | 22 unit tests for the export |
+| `VIOLATION_EXPORT_API.md` | Exhaustive API reference for the JSON schema |
 
 ## File index for Saropa Log Capture implementation
 
@@ -421,7 +431,7 @@ and does not require any Saropa Lints changes.
 | File | Purpose |
 |------|---------|
 | `lib/src/report/violation_export.dart` | `ViolationExporter` class — builds JSON, writes atomically |
-| `test/violation_export_test.dart` | 16 unit tests covering schema, ordering, OWASP, paths, atomicity |
+| `test/violation_export_test.dart` | 22 unit tests covering schema, ordering, OWASP, paths, atomicity, new aggregate fields |
 
 ### Files modified
 
@@ -472,6 +482,36 @@ The following issues were identified during review and addressed in the implemen
    `reports/` directory which is already in `.gitignore`. No separate `.gitignore`
    changes needed.
 
+10. **`enabledRuleNames` added to config** — Full list of active rule names so consumers
+    know exactly which rules ran. Answers open question #4 (yes, include them).
+
+11. **`disabledPackages` added to config** — Available in `ReportConfig` but was not
+    exported in v1.0 initial implementation. Added for scope completeness.
+
+12. **`userExclusions` added to config** — Rules explicitly disabled by the user in
+    `analysis_options_custom.yaml`. Partially answers open question #4.
+
+13. **`batchCount` added to summary** — Number of isolate batches that contributed to
+    the session. Values >1 indicate the analyzer restarted isolates during the run.
+
+14. **`issuesByFile` added to summary** — Per-file violation counts for quick lookups
+    without iterating the violations array. Keys are relative forward-slash paths
+    (not the absolute paths from `ConsolidatedData`). Answers open question #3.
+
+15. **`issuesByRule` added to summary** — Per-rule violation counts for trend analysis
+    and dashboard summaries.
+
+16. **`ruleSeverities` added to summary** — Lookup table mapping rule names to lowercase
+    severity strings. Consumers don't need to extract severity from individual violations.
+
+17. **`issuesByFile` keys relativized** — `ConsolidatedData.issuesByFile` uses absolute
+    paths from the analyzer. The export converts these to relative forward-slash paths
+    matching the `file` field on violations for cross-machine compatibility.
+
+18. **`VIOLATION_EXPORT_API.md` created** — Exhaustive API reference document in the
+    project root. Defines field types, sort order, OWASP ID tables, consumer notes,
+    and full examples. Treats the export as a stable API contract.
+
 ---
 
 ## Open questions
@@ -486,12 +526,10 @@ The following issues were identified during review and addressed in the implemen
    would let Log Capture show "this file is a critical hub (importance: 92/100)" in bug
    reports. Current recommendation: defer to v1.1 if consumers request it.
 
-3. **Should the export include a per-file summary?** A `files` object mapping filenames
-   to `{violationCount, maxImpact, importanceScore}` would let consumers quickly check
-   if a file has any violations without scanning the full array. Current recommendation:
-   defer to v1.1.
+3. ~~**Should the export include a per-file summary?**~~ **Resolved:** `summary.issuesByFile`
+   now provides per-file violation counts with relative forward-slash keys. The full
+   `{violationCount, maxImpact, importanceScore}` triple is deferred to v1.1.
 
-4. **Should disabled rules be listed?** Knowing which rules were *not* run helps
-   consumers distinguish "no violations for rule X" from "rule X was disabled." Current
-   recommendation: the `config.enabledRuleCount` and `config.tier` fields provide
-   sufficient context. A full enabled/disabled rule list can be added in v1.1 if needed.
+4. ~~**Should disabled rules be listed?**~~ **Resolved:** `config.enabledRuleNames` lists
+   all active rules. `config.userExclusions` lists rules explicitly disabled by the user.
+   Consumers can derive disabled rules by comparing against the full rule catalog.
