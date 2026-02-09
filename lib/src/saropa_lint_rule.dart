@@ -1522,12 +1522,14 @@ class ImpactTracker {
     required String file,
     required int line,
     required String message,
+    String? correction,
   }) {
     _violations[impact]!.add(ViolationRecord(
       rule: rule,
       file: file,
       line: line,
       message: message,
+      correction: correction,
     ));
   }
 
@@ -1633,12 +1635,16 @@ class ViolationRecord {
     required this.file,
     required this.line,
     required this.message,
+    this.correction,
   });
 
   final String rule;
   final String file;
   final int line;
   final String message;
+
+  /// Optional correction message suggesting how to fix the violation.
+  final String? correction;
 
   @override
   bool operator ==(Object other) =>
@@ -2812,6 +2818,7 @@ class SaropaDiagnosticReporter {
       file: filePath,
       line: line,
       message: code.problemMessage,
+      correction: code.correctionMessage,
     );
 
     // Track for progress reporting with severity

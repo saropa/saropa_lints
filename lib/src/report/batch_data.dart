@@ -122,6 +122,7 @@ Map<String, List<Map<String, Object>>> _violationsToJson(
               'f': v.file,
               'l': v.line,
               'm': v.message,
+              if (v.correction != null) 'c2': v.correction!,
             })
         .toList();
   }
@@ -143,6 +144,7 @@ Map<LintImpact, List<ViolationRecord>> _violationsFromJson(dynamic raw) {
               file: m['f'] as String,
               line: m['l'] as int,
               message: m['m'] as String,
+              correction: m['c2'] as String?,
             ))
         .toList();
   }
