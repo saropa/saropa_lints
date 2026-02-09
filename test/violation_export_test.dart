@@ -27,11 +27,14 @@ void main() {
     ReportConfig? config,
     Map<LintImpact, List<ViolationRecord>>? violations,
     Map<String, String>? ruleSeverities,
+    Map<String, int>? issuesByFile,
+    Map<String, int>? issuesByRule,
     int filesAnalyzed = 10,
     int filesWithIssues = 3,
     int errorCount = 1,
     int warningCount = 2,
     int infoCount = 3,
+    int batchCount = 1,
   }) {
     return ConsolidatedData(
       config: config ?? _defaultConfig(),
@@ -40,11 +43,11 @@ void main() {
       errorCount: errorCount,
       warningCount: warningCount,
       infoCount: infoCount,
-      issuesByFile: const <String, int>{},
-      issuesByRule: const <String, int>{},
+      issuesByFile: issuesByFile ?? const <String, int>{},
+      issuesByRule: issuesByRule ?? const <String, int>{},
       ruleSeverities: ruleSeverities ?? const <String, String>{},
       violations: violations ?? const <LintImpact, List<ViolationRecord>>{},
-      batchCount: 1,
+      batchCount: batchCount,
     );
   }
 
@@ -415,6 +418,136 @@ void main() {
         configSection['enabledRuleCountNote'],
         contains('tier selection'),
       );
+    });
+
+    test('config includes enabledRuleNames', () {
+      final config = ReportConfig(
+        version: '4.14.0',
+        effectiveTier: 'comprehensive',
+        enabledRuleCount: 3,
+        enabledRuleNames: const ['rule_a', 'rule_b', 'rule_c'],
+        enabledPlatforms: const [],
+        disabledPlatforms: const [],
+        enabledPackages: const [],
+        disabledPackages: const [],
+        userExclusions: const [],
+        maxIssues: 1000,
+        outputMode: 'both',
+      );
+
+      ViolationExporter.write(
+        projectRoot: projectRoot,
+        sessionId: 'test_session',
+        data: buildData(config: config),
+        owaspLookup: const <String, OwaspMapping>{},
+      );
+
+      final configSection = readExport()['config'] as Map<String, dynamic>;
+      final names =
+          (configSection['enabledRuleNames'] as List<dynamic>).cast<String>();
+      expect(names, ['rule_a', 'rule_b', 'rule_c']);
+    });
+
+    test('config includes disabledPackages and userExclusions', () {
+      final config = ReportConfig(
+        version: '4.14.0',
+        effectiveTier: 'comprehensive',
+        enabledRuleCount: 10,
+        enabledRuleNames: const [],
+        enabledPlatforms: const ['ios'],
+        disabledPlatforms: const [],
+        enabledPackages: const ['firebase'],
+        disabledPackages: const ['isar', 'hive'],
+        userExclusions: const ['no_magic_numbers', 'prefer_const'],
+        maxIssues: 1000,
+        outputMode: 'both',
+      );
+
+      ViolationExporter.write(
+        projectRoot: projectRoot,
+        sessionId: 'test_session',
+        data: buildData(config: config),
+        owaspLookup: const <String, OwaspMapping>{},
+      );
+
+      final configSection = readExport()['config'] as Map<String, dynamic>;
+      final disabled =
+          (configSection['disabledPackages'] as List<dynamic>).cast<String>();
+      expect(disabled, ['isar', 'hive']);
+
+      final exclusions =
+          (configSection['userExclusions'] as List<dynamic>).cast<String>();
+      expect(exclusions, ['no_magic_numbers', 'prefer_const']);
+    });
+
+    test('summary includes batchCount', () {
+      ViolationExporter.write(
+        projectRoot: projectRoot,
+        sessionId: 'test_session',
+        data: buildData(batchCount: 4),
+        owaspLookup: const <String, OwaspMapping>{},
+      );
+
+      final summary = readExport()['summary'] as Map<String, dynamic>;
+      expect(summary['batchCount'], 4);
+    });
+
+    test('summary includes issuesByFile with relativized keys', () {
+      final byFile = {
+        '$projectRoot/lib/a.dart': 5,
+        '$projectRoot/lib/b.dart': 2,
+      };
+
+      ViolationExporter.write(
+        projectRoot: projectRoot,
+        sessionId: 'test_session',
+        data: buildData(issuesByFile: byFile),
+        owaspLookup: const <String, OwaspMapping>{},
+      );
+
+      final summary = readExport()['summary'] as Map<String, dynamic>;
+      final exported = summary['issuesByFile'] as Map<String, dynamic>;
+      expect(exported['lib/a.dart'], 5);
+      expect(exported['lib/b.dart'], 2);
+      // Absolute paths should not appear
+      expect(exported.keys.any((k) => k.contains(projectRoot)), isFalse);
+    });
+
+    test('summary includes issuesByRule', () {
+      final byRule = {'avoid_print': 12, 'prefer_const': 3};
+
+      ViolationExporter.write(
+        projectRoot: projectRoot,
+        sessionId: 'test_session',
+        data: buildData(issuesByRule: byRule),
+        owaspLookup: const <String, OwaspMapping>{},
+      );
+
+      final summary = readExport()['summary'] as Map<String, dynamic>;
+      final exported = summary['issuesByRule'] as Map<String, dynamic>;
+      expect(exported['avoid_print'], 12);
+      expect(exported['prefer_const'], 3);
+    });
+
+    test('summary ruleSeverities uses lowercase values', () {
+      ViolationExporter.write(
+        projectRoot: projectRoot,
+        sessionId: 'test_session',
+        data: buildData(
+          ruleSeverities: const {
+            'rule_a': 'ERROR',
+            'rule_b': 'WARNING',
+            'rule_c': 'INFO',
+          },
+        ),
+        owaspLookup: const <String, OwaspMapping>{},
+      );
+
+      final summary = readExport()['summary'] as Map<String, dynamic>;
+      final severities = summary['ruleSeverities'] as Map<String, dynamic>;
+      expect(severities['rule_a'], 'error');
+      expect(severities['rule_b'], 'warning');
+      expect(severities['rule_c'], 'info');
     });
   });
 }
