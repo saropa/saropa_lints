@@ -15,7 +15,8 @@ Dates are not included in version headers — [pub.dev](https://pub.dev/packages
 
 ### Added
 
-- **Structured JSON violation export** (`reports/.saropa_lints/violations.json`): Machine-readable export of all lint violations written alongside the markdown report after each analysis run. Enables Saropa Log Capture to cross-reference runtime errors with static analysis findings. Schema v1.0 includes per-violation OWASP mappings, correction messages, impact levels, and severity
+- **Structured JSON violation export** (`reports/.saropa_lints/violations.json`): Machine-readable export of all lint violations written alongside the markdown report after each analysis run. Enables Saropa Log Capture to cross-reference runtime errors with static analysis findings. Schema v1.0 includes per-violation OWASP mappings, correction messages, impact levels, severity, plus aggregate `issuesByFile`, `issuesByRule`, `ruleSeverities`, `enabledRuleNames`, `disabledPackages`, `userExclusions`, and `batchCount`
+- **`VIOLATION_EXPORT_API.md`**: Exhaustive API reference for the structured JSON export schema — field types, sort order, OWASP ID tables, consumer notes, and full examples
 - **`correction` field on `ViolationRecord`**: Carries `LintCode.correctionMessage` through the batch pipeline into both the markdown report and JSON export
 - **`toRelativePath` shared utility**: Extracted from duplicated path normalization logic in the report pipeline
 - **New Essential rule**: `require_firebase_composite_index` (ERROR) — detects Firebase Realtime Database queries using `orderByChild` with filter methods that need a `.indexOn` rule in database security rules

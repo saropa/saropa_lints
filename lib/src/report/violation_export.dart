@@ -65,7 +65,7 @@ class ViolationExporter {
       'timestamp': DateTime.now().toUtc().toIso8601String(),
       'sessionId': sessionId,
       'config': _buildConfig(config),
-      'summary': _buildSummary(data),
+      'summary': _buildSummary(data, projectRoot),
       'violations': _buildViolations(
         projectRoot: projectRoot,
         violations: data.violations,
@@ -85,9 +85,12 @@ class ViolationExporter {
       'tier': config.effectiveTier,
       'enabledRuleCount': config.enabledRuleCount,
       'enabledRuleCountNote': 'After tier selection and user overrides',
+      'enabledRuleNames': config.enabledRuleNames,
       'enabledPlatforms': config.enabledPlatforms,
       'disabledPlatforms': config.disabledPlatforms,
       'enabledPackages': config.enabledPackages,
+      'disabledPackages': config.disabledPackages,
+      'userExclusions': config.userExclusions,
       'maxIssues': config.maxIssues,
       'maxIssuesNote':
           'IDE Problems tab cap only; this export contains all violations',
@@ -96,11 +99,15 @@ class ViolationExporter {
   }
 
   /// Build the summary section with aggregate counts.
-  static Map<String, Object> _buildSummary(ConsolidatedData data) {
+  static Map<String, Object> _buildSummary(
+    ConsolidatedData data,
+    String projectRoot,
+  ) {
     return <String, Object>{
       'filesAnalyzed': data.filesAnalyzed,
       'filesWithIssues': data.filesWithIssues,
       'totalViolations': data.total,
+      'batchCount': data.batchCount,
       'bySeverity': <String, int>{
         'error': data.errorCount,
         'warning': data.warningCount,
@@ -110,6 +117,30 @@ class ViolationExporter {
         for (final impact in LintImpact.values)
           impact.name: data.impactCounts[impact] ?? 0,
       },
+      'issuesByFile': _relativizeFileKeys(data.issuesByFile, projectRoot),
+      'issuesByRule': data.issuesByRule,
+      'ruleSeverities': _lowercaseSeverities(data.ruleSeverities),
+    };
+  }
+
+  /// Lowercase all severity values for consistency with violation entries.
+  static Map<String, String> _lowercaseSeverities(
+    Map<String, String> severities,
+  ) {
+    return <String, String>{
+      for (final entry in severities.entries)
+        entry.key: entry.value.toLowerCase(),
+    };
+  }
+
+  /// Relativize file path keys for cross-machine compatibility.
+  static Map<String, int> _relativizeFileKeys(
+    Map<String, int> issuesByFile,
+    String projectRoot,
+  ) {
+    return <String, int>{
+      for (final entry in issuesByFile.entries)
+        toRelativePath(entry.key, projectRoot): entry.value,
     };
   }
 
@@ -234,7 +265,6 @@ class ViolationExporter {
   }
 }
 
-/// Internal holder for sorting violations before JSON serialization.
 /// Convert an absolute path to a relative forward-slash path.
 ///
 /// Strips [projectRoot] prefix and normalizes all separators to `/`.
@@ -248,6 +278,7 @@ String toRelativePath(String filePath, String projectRoot) {
   return file;
 }
 
+/// Internal holder for sorting violations before JSON serialization.
 class _SortableViolation {
   const _SortableViolation({
     required this.record,
