@@ -13,6 +13,12 @@ Dates are not included in version headers — [pub.dev](https://pub.dev/packages
 ---
 ## [Unreleased]
 
+### Changed
+
+- **Roadmap summary bars inverted**: Bars now show completion (0 remaining = full green bar) instead of remaining count, making progress more intuitive
+- **DX Message Quality label padding**: Widened impact label column from 10 to 12 chars so "Opinionated" aligns correctly
+- **Removed duplicate `_make_progress_bar`**: Consolidated with identical `_make_bar` function in rule metrics
+
 ### Added
 
 - **Structured JSON violation export** (`reports/.saropa_lints/violations.json`): Machine-readable export of all lint violations written alongside the markdown report after each analysis run. Enables Saropa Log Capture to cross-reference runtime errors with static analysis findings. Schema v1.0 includes per-violation OWASP mappings, correction messages, impact levels, severity, plus aggregate `issuesByFile`, `issuesByRule`, `ruleSeverities`, `enabledRuleNames`, `disabledPackages`, `userExclusions`, and `batchCount`

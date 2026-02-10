@@ -74,17 +74,6 @@ def _make_bar(value: int, max_value: int, width: int = _BAR_WIDTH) -> str:
     return _BAR_FILLED * filled + _BAR_EMPTY * (width - filled)
 
 
-def _make_progress_bar(
-    done: int, total: int, width: int = _BAR_WIDTH
-) -> str:
-    """Create a progress bar showing done/total as filled/empty."""
-    if total <= 0:
-        return _BAR_EMPTY * width
-    filled = int((done / total) * width)
-    filled = min(filled, width)
-    return _BAR_FILLED * filled + _BAR_EMPTY * (width - filled)
-
-
 def display_test_coverage(project_dir: Path) -> None:
     """Display test coverage report with bar chart visualization."""
     rules_dir = project_dir / "lib" / "src" / "rules"
@@ -133,7 +122,7 @@ def display_test_coverage(project_dir: Path) -> None:
     print()
 
     # Overall bar
-    bar = _make_progress_bar(total_fixtures, total_rules)
+    bar = _make_bar(total_fixtures, total_rules)
     print_colored(
         f"    Overall      {bar}  {total_fixtures:>4d}/{total_rules:<4d} "
         f"({coverage_pct:5.1f}%) {status}",
@@ -156,7 +145,7 @@ def display_test_coverage(project_dir: Path) -> None:
             if untested <= 0:
                 break
             pct = (fixtures / rules * 100) if rules > 0 else 0
-            bar = _make_progress_bar(fixtures, rules)
+            bar = _make_bar(fixtures, rules)
             if pct < 10:
                 row_color = Color.RED
             elif pct < 30:
@@ -289,11 +278,25 @@ def get_roadmap_summary(project_dir: Path) -> RoadmapSummary:
 def _format_severity_row(
     emoji: str, count: int, total: int, max_count: int
 ) -> str:
-    """Format a severity row with label, bar chart, and stats."""
+    """Format a severity row with inverted bar (less remaining = more filled).
+
+    The bar represents completion: 0 remaining → full bar, max remaining → empty.
+    """
     label, ascii_fallback = _SEVERITY_LABELS.get(emoji, ("OTHER", "[?]"))
     pct = (count / total * 100) if total > 0 else 0
-    bar = _make_bar(count, max_count)
+    bar = _make_bar(max_count - count, max_count)
     return f"    {label:<12s} {bar}  {count:>4d} ({pct:5.1f}%)"
+
+
+def _severity_color(emoji: str, count: int) -> Color:
+    """Pick color based on remaining count: green if done, else by severity."""
+    if count == 0:
+        return Color.GREEN
+    if emoji == "🚨":
+        return Color.RED
+    if emoji == "⚠️":
+        return Color.YELLOW
+    return Color.CYAN
 
 
 def display_roadmap_summary(project_dir: Path) -> None:
@@ -317,14 +320,7 @@ def display_roadmap_summary(project_dir: Path) -> None:
     for emoji in ["🚨", "⚠️", "ℹ️"]:
         count = summary.roadmap_by_severity.get(emoji, 0)
         row = _format_severity_row(emoji, count, summary.roadmap_total, roadmap_max)
-        # Color by severity
-        if emoji == "🚨":
-            color = Color.RED
-        elif emoji == "⚠️":
-            color = Color.YELLOW
-        else:
-            color = Color.CYAN
-        print_colored(row, color)
+        print_colored(row, _severity_color(emoji, count))
 
     # ROADMAP_DEFERRED.md breakdown by severity
     print()
@@ -338,14 +334,7 @@ def display_roadmap_summary(project_dir: Path) -> None:
         row = _format_severity_row(
             emoji, count, summary.deferred_total, deferred_max
         )
-        # Color by severity
-        if emoji == "🚨":
-            color = Color.RED
-        elif emoji == "⚠️":
-            color = Color.YELLOW
-        else:
-            color = Color.CYAN
-        print_colored(row, color)
+        print_colored(row, _severity_color(emoji, count))
 
     # Summary totals
     print()
