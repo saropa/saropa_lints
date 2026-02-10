@@ -103,7 +103,7 @@
 // Test fixture for: prefer_image_cropping
 // Source: lib\src\rules\permission_rules.dart
 
-import '../flutter_mocks.dart';
+import 'package:saropa_lints_example/flutter_mocks.dart';
 
 dynamic image;
 final path = '/path';

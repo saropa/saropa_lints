@@ -103,7 +103,7 @@
 // Test fixture for: avoid_cross_feature_dependencies
 // Source: lib\src\rules\architecture_rules.dart
 
-import '../flutter_mocks.dart';
+import 'package:saropa_lints_example/flutter_mocks.dart';
 
 dynamic cart;
 dynamic user;

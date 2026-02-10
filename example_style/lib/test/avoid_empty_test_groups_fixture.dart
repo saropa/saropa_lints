@@ -103,7 +103,7 @@
 // Test fixture for: avoid_empty_test_groups
 // Source: lib\src\rules\test_rules.dart
 
-import '../flutter_mocks.dart';
+import 'package:saropa_lints_example/flutter_mocks.dart';
 
 // BAD: Should trigger avoid_empty_test_groups
 // expect_lint: avoid_empty_test_groups

@@ -1,7 +1,7 @@
 // ignore_for_file: unused_local_variable, unused_element, unused_field
-// Test fixture for navigation rules added in v2.3.10
+// Test fixture for navigation rules
 
-import '../flutter_mocks.dart';
+import 'package:saropa_lints_example/flutter_mocks.dart';
 
 // =========================================================================
 // prefer_url_launcher_uri_over_string
@@ -111,7 +111,7 @@ extension GoRouterExtension on BuildContext {
 }
 
 // =========================================================================
-// Navigation Rules (from v4.1.4)
+// Navigation Rules
 // =========================================================================
 
 void testRouteSettings(BuildContext context) {

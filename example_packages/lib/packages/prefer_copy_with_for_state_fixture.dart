@@ -103,7 +103,7 @@
 // Test fixture for: prefer_copy_with_for_state
 // Source: lib\src\rules\packages\bloc_rules.dart
 
-import '../flutter_mocks.dart';
+import 'package:saropa_lints_example/flutter_mocks.dart';
 
 var count = 0;
 dynamic state;

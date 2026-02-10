@@ -103,7 +103,7 @@
 // Test fixture for: prefer_dynamic_over_object
 // Source: lib\src\rules\stylistic_additional_rules.dart
 
-import '../flutter_mocks.dart';
+import 'package:saropa_lints_example/flutter_mocks.dart';
 
 // BAD: Should trigger prefer_dynamic_over_object
 // expect_lint: prefer_dynamic_over_object

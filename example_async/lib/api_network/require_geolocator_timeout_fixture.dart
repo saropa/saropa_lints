@@ -103,7 +103,7 @@
 // Test fixture for: require_geolocator_timeout
 // Source: lib\src\rules\api_network_rules.dart
 
-import '../flutter_mocks.dart';
+import 'package:saropa_lints_example/flutter_mocks.dart';
 
 // BAD: Should trigger require_geolocator_timeout
 // expect_lint: require_geolocator_timeout

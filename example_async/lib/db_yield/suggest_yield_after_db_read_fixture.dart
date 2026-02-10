@@ -103,7 +103,7 @@
 // Test fixture for: suggest_yield_after_db_read
 // Source: lib\src\rules\db_yield_rules.dart
 
-import '../flutter_mocks.dart';
+import 'package:saropa_lints_example/flutter_mocks.dart';
 
 // BAD: Should trigger suggest_yield_after_db_read
 // expect_lint: suggest_yield_after_db_read

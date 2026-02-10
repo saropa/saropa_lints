@@ -103,7 +103,7 @@
 // Test fixture for: avoid_auth_in_query_params
 // Source: lib\src\rules\security_rules.dart
 
-import '../flutter_mocks.dart';
+import 'package:saropa_lints_example/flutter_mocks.dart';
 
 dynamic api;
 dynamic http;

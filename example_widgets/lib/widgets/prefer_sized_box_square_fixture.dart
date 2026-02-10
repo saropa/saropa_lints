@@ -1,7 +1,7 @@
 // ignore_for_file: unused_local_variable, prefer_const_constructors
 // Test fixture for prefer_sized_box_square rule
 
-import '../flutter_mocks.dart';
+import 'package:saropa_lints_example/flutter_mocks.dart';
 
 void testPreferSizedBoxSquare() {
   // BAD: SizedBox with identical width and height

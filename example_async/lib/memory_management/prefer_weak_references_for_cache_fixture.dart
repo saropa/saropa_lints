@@ -103,7 +103,7 @@
 // Test fixture for: prefer_weak_references_for_cache
 // Source: lib\src\rules\memory_management_rules.dart
 
-import '../flutter_mocks.dart';
+import 'package:saropa_lints_example/flutter_mocks.dart';
 
 final key = 'key';
 

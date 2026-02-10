@@ -103,7 +103,7 @@
 // Test fixture for: prefer_small_length_files
 // Source: lib\src\rules\structure_rules.dart
 
-import '../flutter_mocks.dart';
+import 'package:saropa_lints_example/flutter_mocks.dart';
 
 // BAD: Should trigger prefer_small_length_files
 // expect_lint: prefer_small_length_files

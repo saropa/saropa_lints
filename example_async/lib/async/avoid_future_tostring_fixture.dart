@@ -103,7 +103,7 @@
 // Test fixture for: avoid_future_tostring
 // Source: lib\src\rules\async_rules.dart
 
-import '../flutter_mocks.dart';
+import 'package:saropa_lints_example/flutter_mocks.dart';
 
 // BAD: Should trigger avoid_future_tostring
 // expect_lint: avoid_future_tostring

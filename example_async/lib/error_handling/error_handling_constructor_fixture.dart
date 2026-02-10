@@ -1,6 +1,6 @@
 // ignore_for_file: unused_local_variable, unused_element, unused_field
 // ignore_for_file: avoid_catches_without_on_clauses, prefer_const_declarations
-// Test fixture for error handling rules added in v2.3.11
+// Test fixture for error handling constructor rules
 
 // =========================================================================
 // avoid_exception_in_constructor

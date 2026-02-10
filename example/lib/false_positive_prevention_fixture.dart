@@ -1,4 +1,4 @@
-// Test fixture for v4.14.0 rules
+// Test fixture for false positive prevention rules
 // ignore_for_file: unused_local_variable, unused_element, prefer_const_declarations
 
 // =============================================================================

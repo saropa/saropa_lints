@@ -103,7 +103,7 @@
 // Test fixture for: avoid_redundant_else
 // Source: lib\src\rules\control_flow_rules.dart
 
-import '../flutter_mocks.dart';
+import 'package:saropa_lints_example/flutter_mocks.dart';
 
 final condition = false;
 

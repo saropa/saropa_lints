@@ -103,7 +103,7 @@
 // Test fixture for: require_json_schema_validation
 // Source: lib\src\rules\json_datetime_rules.dart
 
-import '../flutter_mocks.dart';
+import 'package:saropa_lints_example/flutter_mocks.dart';
 
 dynamic api;
 dynamic body;

@@ -103,7 +103,7 @@
 // Test fixture for: prefer_test_variant
 // Source: lib\src\rules\test_rules.dart
 
-import '../flutter_mocks.dart';
+import 'package:saropa_lints_example/flutter_mocks.dart';
 
 // BAD: Should trigger prefer_test_variant
 // expect_lint: prefer_test_variant

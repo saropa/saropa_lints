@@ -103,7 +103,7 @@
 // Test fixture for: prefer_immutable_bloc_state
 // Source: lib\src\rules\packages\bloc_rules.dart
 
-import '../flutter_mocks.dart';
+import 'package:saropa_lints_example/flutter_mocks.dart';
 
 // BAD: Should trigger prefer_immutable_bloc_state
 // expect_lint: prefer_immutable_bloc_state

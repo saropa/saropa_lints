@@ -103,7 +103,7 @@
 // Test fixture for: prefer_unmodifiable_collections
 // Source: lib\src\rules\packages\equatable_rules.dart
 
-import '../flutter_mocks.dart';
+import 'package:saropa_lints_example/flutter_mocks.dart';
 
 final items = <dynamic>[];
 

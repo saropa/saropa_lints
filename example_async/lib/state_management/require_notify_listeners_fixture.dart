@@ -103,7 +103,7 @@
 // Test fixture for: require_notify_listeners
 // Source: lib\src\rules\state_management_rules.dart
 
-import '../flutter_mocks.dart';
+import 'package:saropa_lints_example/flutter_mocks.dart';
 
 // BAD: Should trigger require_notify_listeners
 // expect_lint: require_notify_listeners

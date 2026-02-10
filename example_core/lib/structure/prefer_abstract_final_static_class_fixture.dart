@@ -103,7 +103,7 @@
 // Test fixture for: prefer_abstract_final_static_class
 // Source: lib\src\rules\structure_rules.dart
 
-import '../flutter_mocks.dart';
+import 'package:saropa_lints_example/flutter_mocks.dart';
 
 // BAD: Should trigger prefer_abstract_final_static_class
 // expect_lint: prefer_abstract_final_static_class

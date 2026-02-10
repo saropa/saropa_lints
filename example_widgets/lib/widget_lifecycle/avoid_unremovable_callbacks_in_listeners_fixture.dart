@@ -103,7 +103,7 @@
 // Test fixture for: avoid_unremovable_callbacks_in_listeners
 // Source: lib\src\rules\widget_lifecycle_rules.dart
 
-import '../flutter_mocks.dart';
+import 'package:saropa_lints_example/flutter_mocks.dart';
 
 // BAD: Should trigger avoid_unremovable_callbacks_in_listeners
 // expect_lint: avoid_unremovable_callbacks_in_listeners

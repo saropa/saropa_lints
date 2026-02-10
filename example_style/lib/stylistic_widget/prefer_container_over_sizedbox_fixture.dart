@@ -103,7 +103,7 @@
 // Test fixture for: prefer_container_over_sizedbox
 // Source: lib\src\rules\stylistic_widget_rules.dart
 
-import '../flutter_mocks.dart';
+import 'package:saropa_lints_example/flutter_mocks.dart';
 
 // BAD: Should trigger prefer_container_over_sizedbox
 // expect_lint: prefer_container_over_sizedbox

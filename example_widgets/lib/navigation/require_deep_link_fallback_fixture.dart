@@ -103,7 +103,7 @@
 // Test fixture for: require_deep_link_fallback
 // Source: lib\src\rules\navigation_rules.dart
 
-import '../flutter_mocks.dart';
+import 'package:saropa_lints_example/flutter_mocks.dart';
 
 final context = BuildContext();
 final id = '1';

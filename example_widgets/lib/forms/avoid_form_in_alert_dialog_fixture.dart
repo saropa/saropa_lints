@@ -103,7 +103,7 @@
 // Test fixture for: avoid_form_in_alert_dialog
 // Source: lib\src\rules\forms_rules.dart
 
-import '../flutter_mocks.dart';
+import 'package:saropa_lints_example/flutter_mocks.dart';
 
 dynamic builder;
 dynamic child;

@@ -103,7 +103,7 @@
 // Test fixture for: avoid_conditional_hooks
 // Source: lib\src\rules\packages\flutter_hooks_rules.dart
 
-import '../flutter_mocks.dart';
+import 'package:saropa_lints_example/flutter_mocks.dart';
 
 final condition = false;
 final context = BuildContext();

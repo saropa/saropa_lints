@@ -103,7 +103,7 @@
 // Test fixture for: avoid_assigning_notifiers
 // Source: lib\src\rules\packages\riverpod_rules.dart
 
-import '../flutter_mocks.dart';
+import 'package:saropa_lints_example/flutter_mocks.dart';
 
 // BAD: Should trigger avoid_assigning_notifiers
 // expect_lint: avoid_assigning_notifiers

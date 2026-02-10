@@ -103,7 +103,7 @@
 // Test fixture for: require_bloc_close
 // Source: lib\src\rules\packages\bloc_rules.dart
 
-import '../flutter_mocks.dart';
+import 'package:saropa_lints_example/flutter_mocks.dart';
 
 // BAD: Should trigger require_bloc_close
 // expect_lint: require_bloc_close

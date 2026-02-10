@@ -103,7 +103,7 @@
 // Test fixture for: avoid_url_launcher_simulator_tests
 // Source: lib\src\rules\packages\url_launcher_rules.dart
 
-import '../flutter_mocks.dart';
+import 'package:saropa_lints_example/flutter_mocks.dart';
 
 // BAD: Should trigger avoid_url_launcher_simulator_tests
 // expect_lint: avoid_url_launcher_simulator_tests

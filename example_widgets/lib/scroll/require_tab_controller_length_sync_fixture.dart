@@ -103,7 +103,7 @@
 // Test fixture for: require_tab_controller_length_sync
 // Source: lib\src\rules\scroll_rules.dart
 
-import '../flutter_mocks.dart';
+import 'package:saropa_lints_example/flutter_mocks.dart';
 
 // BAD: Should trigger require_tab_controller_length_sync
 // expect_lint: require_tab_controller_length_sync

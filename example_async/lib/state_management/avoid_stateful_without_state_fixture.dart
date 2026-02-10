@@ -2,7 +2,7 @@
 // ignore_for_file: override_on_non_overriding_member
 // Test fixture for avoid_stateful_without_state rule
 
-import '../flutter_mocks.dart';
+import 'package:saropa_lints_example/flutter_mocks.dart';
 
 // =========================================================================
 // BAD: StatefulWidget with no state, lifecycle methods, or setState calls

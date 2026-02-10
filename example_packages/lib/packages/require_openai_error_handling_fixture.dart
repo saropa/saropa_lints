@@ -103,7 +103,7 @@
 // Test fixture for: require_openai_error_handling
 // Source: lib\src\rules\packages\package_specific_rules.dart
 
-import '../flutter_mocks.dart';
+import 'package:saropa_lints_example/flutter_mocks.dart';
 
 dynamic content;
 dynamic error;

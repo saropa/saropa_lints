@@ -103,7 +103,7 @@
 // Test fixture for: avoid_isar_web_limitations
 // Source: lib\src\rules\packages\isar_rules.dart
 
-import '../flutter_mocks.dart';
+import 'package:saropa_lints_example/flutter_mocks.dart';
 
 dynamic isar;
 final users = <dynamic>[];

@@ -103,7 +103,7 @@
 // Test fixture for: prefer_tween_sequence
 // Source: lib\src\rules\animation_rules.dart
 
-import '../flutter_mocks.dart';
+import 'package:saropa_lints_example/flutter_mocks.dart';
 
 // BAD: Should trigger prefer_tween_sequence
 // expect_lint: prefer_tween_sequence

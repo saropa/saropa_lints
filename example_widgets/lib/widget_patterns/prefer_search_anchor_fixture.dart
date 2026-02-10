@@ -103,7 +103,7 @@
 // Test fixture for: prefer_search_anchor
 // Source: lib\src\rules\widget_patterns_rules.dart
 
-import '../flutter_mocks.dart';
+import 'package:saropa_lints_example/flutter_mocks.dart';
 
 // BAD: Should trigger prefer_search_anchor
 // expect_lint: prefer_search_anchor

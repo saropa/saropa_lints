@@ -103,7 +103,7 @@
 // Test fixture for: prefer_spring_animation
 // Source: lib\src\rules\animation_rules.dart
 
-import '../flutter_mocks.dart';
+import 'package:saropa_lints_example/flutter_mocks.dart';
 
 dynamic controller;
 

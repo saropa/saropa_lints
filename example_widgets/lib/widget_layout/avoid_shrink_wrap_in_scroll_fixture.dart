@@ -103,7 +103,7 @@
 // Test fixture for: avoid_shrink_wrap_in_scroll
 // Source: lib\src\rules\widget_layout_rules.dart
 
-import '../flutter_mocks.dart';
+import 'package:saropa_lints_example/flutter_mocks.dart';
 
 dynamic builder;
 final context = BuildContext();

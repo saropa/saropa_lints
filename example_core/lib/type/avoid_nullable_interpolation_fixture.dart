@@ -103,7 +103,7 @@
 // Test fixture for: avoid_nullable_interpolation
 // Source: lib\src\rules\type_rules.dart
 
-import '../flutter_mocks.dart';
+import 'package:saropa_lints_example/flutter_mocks.dart';
 
 // BAD: Should trigger avoid_nullable_interpolation
 // expect_lint: avoid_nullable_interpolation

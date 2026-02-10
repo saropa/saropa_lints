@@ -2,7 +2,7 @@
 // ignore_for_file: prefer_const_constructors
 // Test fixture for image rules (Plan Group A)
 
-import '../flutter_mocks.dart';
+import 'package:saropa_lints_example/flutter_mocks.dart';
 
 // =========================================================================
 // avoid_image_rebuild_on_scroll (A5)

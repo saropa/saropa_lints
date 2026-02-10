@@ -103,7 +103,7 @@
 // Test fixture for: prefer_blank_lines_between_members
 // Source: lib\src\rules\stylistic_whitespace_constructor_rules.dart
 
-import '../flutter_mocks.dart';
+import 'package:saropa_lints_example/flutter_mocks.dart';
 
 // BAD: Should trigger prefer_blank_lines_between_members
 // expect_lint: prefer_blank_lines_between_members

@@ -103,7 +103,7 @@
 // Test fixture for: avoid_macos_catalyst_unsupported_apis
 // Source: lib\src\rules\platforms\macos_rules.dart
 
-import '../flutter_mocks.dart';
+import 'package:saropa_lints_example/flutter_mocks.dart';
 
 // BAD: Should trigger avoid_macos_catalyst_unsupported_apis
 // expect_lint: avoid_macos_catalyst_unsupported_apis

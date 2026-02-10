@@ -103,7 +103,7 @@
 // Test fixture for: require_timezone_display
 // Source: lib\src\rules\json_datetime_rules.dart
 
-import '../flutter_mocks.dart';
+import 'package:saropa_lints_example/flutter_mocks.dart';
 
 // BAD: Should trigger require_timezone_display
 // expect_lint: require_timezone_display

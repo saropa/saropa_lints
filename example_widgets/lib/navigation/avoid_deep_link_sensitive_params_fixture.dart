@@ -103,7 +103,7 @@
 // Test fixture for: avoid_deep_link_sensitive_params
 // Source: lib\src\rules\navigation_rules.dart
 
-import '../flutter_mocks.dart';
+import 'package:saropa_lints_example/flutter_mocks.dart';
 
 final password = 'secret';
 final token = 'token';

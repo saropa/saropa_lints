@@ -103,7 +103,7 @@
 // Test fixture for: require_pending_changes_indicator
 // Source: lib\src\rules\async_rules.dart
 
-import '../flutter_mocks.dart';
+import 'package:saropa_lints_example/flutter_mocks.dart';
 
 // BAD: Should trigger require_pending_changes_indicator
 // expect_lint: require_pending_changes_indicator

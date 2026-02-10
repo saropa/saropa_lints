@@ -103,7 +103,7 @@
 // Test fixture for: require_feature_flag_type_safety
 // Source: lib\src\rules\config_rules.dart
 
-import '../flutter_mocks.dart';
+import 'package:saropa_lints_example/flutter_mocks.dart';
 
 // BAD: Should trigger require_feature_flag_type_safety
 // expect_lint: require_feature_flag_type_safety

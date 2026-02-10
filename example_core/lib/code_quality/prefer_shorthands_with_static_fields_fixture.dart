@@ -103,7 +103,7 @@
 // Test fixture for: prefer_shorthands_with_static_fields
 // Source: lib\src\rules\code_quality_rules.dart
 
-import '../flutter_mocks.dart';
+import 'package:saropa_lints_example/flutter_mocks.dart';
 
 // BAD: Should trigger prefer_shorthands_with_static_fields
 // expect_lint: prefer_shorthands_with_static_fields

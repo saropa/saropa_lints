@@ -103,7 +103,7 @@
 // Test fixture for: prefer_mock_http
 // Source: lib\src\rules\testing_best_practices_rules.dart
 
-import '../flutter_mocks.dart';
+import 'package:saropa_lints_example/flutter_mocks.dart';
 
 dynamic api;
 dynamic client;

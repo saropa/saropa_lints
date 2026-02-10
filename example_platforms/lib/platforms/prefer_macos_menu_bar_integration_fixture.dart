@@ -103,7 +103,7 @@
 // Test fixture for: prefer_macos_menu_bar_integration
 // Source: lib\src\rules\platforms\macos_rules.dart
 
-import '../flutter_mocks.dart';
+import 'package:saropa_lints_example/flutter_mocks.dart';
 
 // BAD: Should trigger prefer_macos_menu_bar_integration
 // expect_lint: prefer_macos_menu_bar_integration

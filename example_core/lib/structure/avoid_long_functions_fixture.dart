@@ -103,7 +103,7 @@
 // Test fixture for: avoid_long_functions
 // Source: lib\src\rules\structure_rules.dart
 
-import '../flutter_mocks.dart';
+import 'package:saropa_lints_example/flutter_mocks.dart';
 
 // BAD: Should trigger avoid_long_functions
 // expect_lint: avoid_long_functions

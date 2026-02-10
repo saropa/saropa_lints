@@ -1,8 +1,8 @@
 // ignore_for_file: unused_local_variable, unused_element, unused_field
 // ignore_for_file: prefer_const_constructors
-// Test fixture for widget rules added in v2.3.10
+// Test fixture for widget rules
 
-import '../flutter_mocks.dart';
+import 'package:saropa_lints_example/flutter_mocks.dart';
 
 // =========================================================================
 // avoid_expanded_outside_flex
@@ -501,7 +501,7 @@ class Color {
 }
 
 // =========================================================================
-// Widget Rules (from v4.1.7)
+// Widget Rules (continued)
 // =========================================================================
 
 // BAD: DateFormat without locale

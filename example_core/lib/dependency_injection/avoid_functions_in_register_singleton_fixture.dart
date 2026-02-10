@@ -103,7 +103,7 @@
 // Test fixture for: avoid_functions_in_register_singleton
 // Source: lib\src\rules\dependency_injection_rules.dart
 
-import '../flutter_mocks.dart';
+import 'package:saropa_lints_example/flutter_mocks.dart';
 
 // BAD: Should trigger avoid_functions_in_register_singleton
 // expect_lint: avoid_functions_in_register_singleton

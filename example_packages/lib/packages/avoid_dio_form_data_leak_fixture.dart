@@ -103,7 +103,7 @@
 // Test fixture for: avoid_dio_form_data_leak
 // Source: lib\src\rules\packages\dio_rules.dart
 
-import '../flutter_mocks.dart';
+import 'package:saropa_lints_example/flutter_mocks.dart';
 
 dynamic data;
 final dio = Dio();

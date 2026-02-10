@@ -103,7 +103,7 @@
 // Test fixture for: prefer_correct_setter_parameter_name
 // Source: lib\src\rules\naming_style_rules.dart
 
-import '../flutter_mocks.dart';
+import 'package:saropa_lints_example/flutter_mocks.dart';
 
 // BAD: Should trigger prefer_correct_setter_parameter_name
 // expect_lint: prefer_correct_setter_parameter_name

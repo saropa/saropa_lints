@@ -103,7 +103,7 @@
 // Test fixture for: prefer_void_callback
 // Source: lib\src\rules\widget_patterns_rules.dart
 
-import '../flutter_mocks.dart';
+import 'package:saropa_lints_example/flutter_mocks.dart';
 
 // BAD: Should trigger prefer_void_callback
 // expect_lint: prefer_void_callback

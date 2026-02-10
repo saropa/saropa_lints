@@ -103,7 +103,7 @@
 // Test fixture for: require_keyboard_dismiss_on_scroll
 // Source: lib\src\rules\forms_rules.dart
 
-import '../flutter_mocks.dart';
+import 'package:saropa_lints_example/flutter_mocks.dart';
 
 final children = <Widget>[];
 

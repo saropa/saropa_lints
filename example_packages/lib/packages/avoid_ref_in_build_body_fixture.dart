@@ -103,7 +103,7 @@
 // Test fixture for: avoid_ref_in_build_body
 // Source: lib\src\rules\packages\riverpod_rules.dart
 
-import '../flutter_mocks.dart';
+import 'package:saropa_lints_example/flutter_mocks.dart';
 
 final context = BuildContext();
 var count = 0;

@@ -103,7 +103,7 @@
 // Test fixture for: prefer_providing_intl_examples
 // Source: lib\src\rules\internationalization_rules.dart
 
-import '../flutter_mocks.dart';
+import 'package:saropa_lints_example/flutter_mocks.dart';
 
 final message = 'Message';
 final name = 'example';

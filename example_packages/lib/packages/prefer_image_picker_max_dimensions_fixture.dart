@@ -103,7 +103,7 @@
 // Test fixture for: prefer_image_picker_max_dimensions
 // Source: lib\src\rules\packages\package_specific_rules.dart
 
-import '../flutter_mocks.dart';
+import 'package:saropa_lints_example/flutter_mocks.dart';
 
 // BAD: Should trigger prefer_image_picker_max_dimensions
 // expect_lint: prefer_image_picker_max_dimensions

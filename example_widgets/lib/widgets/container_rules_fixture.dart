@@ -1,7 +1,7 @@
 // ignore_for_file: unused_local_variable, prefer_const_constructors
 // Test fixture for Container widget replacement rules
 
-import '../flutter_mocks.dart';
+import 'package:saropa_lints_example/flutter_mocks.dart';
 
 void testPreferAlignOverContainer() {
   // BAD: Container with only alignment

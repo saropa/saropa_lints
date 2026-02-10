@@ -103,7 +103,7 @@
 // Test fixture for: prefer_ios_context_menu
 // Source: lib\src\rules\platforms\ios_rules.dart
 
-import '../flutter_mocks.dart';
+import 'package:saropa_lints_example/flutter_mocks.dart';
 
 // BAD: Should trigger prefer_ios_context_menu
 // expect_lint: prefer_ios_context_menu

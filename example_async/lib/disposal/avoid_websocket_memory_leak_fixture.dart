@@ -103,7 +103,7 @@
 // Test fixture for: avoid_websocket_memory_leak
 // Source: lib\src\rules\disposal_rules.dart
 
-import '../flutter_mocks.dart';
+import 'package:saropa_lints_example/flutter_mocks.dart';
 
 dynamic channel;
 final uri = Uri.parse('https://example.com');

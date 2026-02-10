@@ -103,7 +103,7 @@
 // Test fixture for: avoid_hardcoded_api_urls
 // Source: lib\src\rules\api_network_rules.dart
 
-import '../flutter_mocks.dart';
+import 'package:saropa_lints_example/flutter_mocks.dart';
 
 dynamic api;
 dynamic http;

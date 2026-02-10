@@ -103,7 +103,7 @@
 // Test fixture for: require_debouncer_cancel
 // Source: lib\src\rules\disposal_rules.dart
 
-import '../flutter_mocks.dart';
+import 'package:saropa_lints_example/flutter_mocks.dart';
 
 // BAD: Should trigger require_debouncer_cancel
 // expect_lint: require_debouncer_cancel

@@ -103,7 +103,7 @@
 // Test fixture for: prefer_context_read_in_callbacks
 // Source: lib\src\rules\packages\provider_rules.dart
 
-import '../flutter_mocks.dart';
+import 'package:saropa_lints_example/flutter_mocks.dart';
 
 dynamic child;
 final context = BuildContext();

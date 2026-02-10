@@ -103,7 +103,7 @@
 // Test fixture for: require_permission_denied_handling
 // Source: lib\src\rules\api_network_rules.dart
 
-import '../flutter_mocks.dart';
+import 'package:saropa_lints_example/flutter_mocks.dart';
 
 dynamic status;
 

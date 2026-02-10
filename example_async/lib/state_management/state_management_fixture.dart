@@ -58,9 +58,9 @@
 // ignore_for_file: abstract_super_member_reference, equal_keys_in_map
 // ignore_for_file: unused_catch_stack, non_constant_default_value
 // ignore_for_file: not_a_type
-// Test fixture for state management rules added in v2.5.0
+// Test fixture for state management rules
 
-import '../flutter_mocks.dart';
+import 'package:saropa_lints_example/flutter_mocks.dart';
 
 // =========================================================================
 // prefer_change_notifier_proxy
@@ -241,7 +241,7 @@ EventTransformer<T> debounce<T>(Duration duration) {
 }
 
 // =========================================================================
-// State Management Rules (from v4.1.4)
+// State Management Rules
 // =========================================================================
 
 class AuthService extends ChangeNotifier {}
@@ -290,7 +290,7 @@ extension BuildContextRead on BuildContext {
 }
 
 // =========================================================================
-// State Management Rules (from v4.1.7)
+// State Management Rules (continued)
 // =========================================================================
 
 // BAD: Riverpod used only for network client

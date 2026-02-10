@@ -103,7 +103,7 @@
 // Test fixture for: prefer_explicit_type_arguments
 // Source: lib\src\rules\type_safety_rules.dart
 
-import '../flutter_mocks.dart';
+import 'package:saropa_lints_example/flutter_mocks.dart';
 
 dynamic future;
 dynamic list;

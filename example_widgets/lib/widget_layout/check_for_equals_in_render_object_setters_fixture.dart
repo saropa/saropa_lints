@@ -103,7 +103,7 @@
 // Test fixture for: check_for_equals_in_render_object_setters
 // Source: lib\src\rules\widget_layout_rules.dart
 
-import '../flutter_mocks.dart';
+import 'package:saropa_lints_example/flutter_mocks.dart';
 
 dynamic value;
 

@@ -103,7 +103,7 @@
 // Test fixture for: prefer_private_extension_type_field
 // Source: lib\src\rules\class_constructor_rules.dart
 
-import '../flutter_mocks.dart';
+import 'package:saropa_lints_example/flutter_mocks.dart';
 
 // BAD: Should trigger prefer_private_extension_type_field
 // expect_lint: prefer_private_extension_type_field

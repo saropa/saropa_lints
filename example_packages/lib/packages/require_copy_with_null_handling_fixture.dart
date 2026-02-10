@@ -103,7 +103,7 @@
 // Test fixture for: require_copy_with_null_handling
 // Source: lib\src\rules\packages\equatable_rules.dart
 
-import '../flutter_mocks.dart';
+import 'package:saropa_lints_example/flutter_mocks.dart';
 
 final name = 'example';
 dynamic value;

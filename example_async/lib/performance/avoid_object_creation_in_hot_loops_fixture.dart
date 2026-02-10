@@ -103,7 +103,7 @@
 // Test fixture for: avoid_object_creation_in_hot_loops
 // Source: lib\src\rules\performance_rules.dart
 
-import '../flutter_mocks.dart';
+import 'package:saropa_lints_example/flutter_mocks.dart';
 
 final date = DateTime.now();
 dynamic item;

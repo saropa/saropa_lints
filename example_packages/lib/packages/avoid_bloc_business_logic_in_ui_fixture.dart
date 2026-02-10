@@ -103,7 +103,7 @@
 // Test fixture for: avoid_bloc_business_logic_in_ui
 // Source: lib\src\rules\packages\bloc_rules.dart
 
-import '../flutter_mocks.dart';
+import 'package:saropa_lints_example/flutter_mocks.dart';
 
 final context = BuildContext();
 dynamic event;

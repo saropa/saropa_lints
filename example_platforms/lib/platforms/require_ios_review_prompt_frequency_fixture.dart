@@ -103,7 +103,7 @@
 // Test fixture for: require_ios_review_prompt_frequency
 // Source: lib\src\rules\platforms\ios_rules.dart
 
-import '../flutter_mocks.dart';
+import 'package:saropa_lints_example/flutter_mocks.dart';
 
 // BAD: Should trigger require_ios_review_prompt_frequency
 // expect_lint: require_ios_review_prompt_frequency

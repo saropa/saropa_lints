@@ -103,7 +103,7 @@
 // Test fixture for: require_cache_eviction_policy
 // Source: lib\src\rules\memory_management_rules.dart
 
-import '../flutter_mocks.dart';
+import 'package:saropa_lints_example/flutter_mocks.dart';
 
 dynamic data;
 final key = 'key';

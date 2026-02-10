@@ -103,7 +103,7 @@
 // Test fixture for: map_keys_ordering
 // Source: lib\src\rules\collection_rules.dart
 
-import '../flutter_mocks.dart';
+import 'package:saropa_lints_example/flutter_mocks.dart';
 
 // BAD: Should trigger map_keys_ordering
 // expect_lint: map_keys_ordering

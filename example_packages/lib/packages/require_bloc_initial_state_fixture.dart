@@ -103,7 +103,7 @@
 // Test fixture for: require_bloc_initial_state
 // Source: lib\src\rules\packages\bloc_rules.dart
 
-import '../flutter_mocks.dart';
+import 'package:saropa_lints_example/flutter_mocks.dart';
 
 // BAD: Should trigger require_bloc_initial_state
 // expect_lint: require_bloc_initial_state

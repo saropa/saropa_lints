@@ -103,7 +103,7 @@
 // Test fixture for: avoid_freezed_json_serializable_conflict
 // Source: lib\src\rules\freezed_rules.dart
 
-import '../flutter_mocks.dart';
+import 'package:saropa_lints_example/flutter_mocks.dart';
 
 dynamic json;
 final name = 'example';

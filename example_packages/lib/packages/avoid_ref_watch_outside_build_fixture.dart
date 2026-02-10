@@ -103,7 +103,7 @@
 // Test fixture for: avoid_ref_watch_outside_build
 // Source: lib\src\rules\packages\riverpod_rules.dart
 
-import '../flutter_mocks.dart';
+import 'package:saropa_lints_example/flutter_mocks.dart';
 
 // BAD: Should trigger avoid_ref_watch_outside_build
 // expect_lint: avoid_ref_watch_outside_build

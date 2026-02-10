@@ -103,7 +103,7 @@
 // Test fixture for: require_change_notifier_dispose
 // Source: lib\src\rules\disposal_rules.dart
 
-import '../flutter_mocks.dart';
+import 'package:saropa_lints_example/flutter_mocks.dart';
 
 // BAD: Should trigger require_change_notifier_dispose
 // expect_lint: require_change_notifier_dispose

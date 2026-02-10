@@ -103,7 +103,7 @@
 // Test fixture for: avoid_return_await_db
 // Source: lib\src\rules\db_yield_rules.dart
 
-import '../flutter_mocks.dart';
+import 'package:saropa_lints_example/flutter_mocks.dart';
 
 // BAD: Should trigger avoid_return_await_db
 // expect_lint: avoid_return_await_db

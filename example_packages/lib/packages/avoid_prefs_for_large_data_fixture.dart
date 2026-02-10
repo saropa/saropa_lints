@@ -103,7 +103,7 @@
 // Test fixture for: avoid_prefs_for_large_data
 // Source: lib\src\rules\packages\shared_preferences_rules.dart
 
-import '../flutter_mocks.dart';
+import 'package:saropa_lints_example/flutter_mocks.dart';
 
 dynamic box;
 dynamic list;

@@ -103,7 +103,7 @@
 // Test fixture for: avoid_string_concatenation_for_l10n
 // Source: lib\src\rules\internationalization_rules.dart
 
-import '../flutter_mocks.dart';
+import 'package:saropa_lints_example/flutter_mocks.dart';
 
 dynamic l10n;
 final userName = 'John';

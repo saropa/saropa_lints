@@ -103,7 +103,7 @@
 // Test fixture for: require_media_player_dispose
 // Source: lib\src\rules\disposal_rules.dart
 
-import '../flutter_mocks.dart';
+import 'package:saropa_lints_example/flutter_mocks.dart';
 
 // BAD: Should trigger require_media_player_dispose
 // expect_lint: require_media_player_dispose

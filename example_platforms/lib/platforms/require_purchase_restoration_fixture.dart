@@ -103,7 +103,7 @@
 // Test fixture for: require_purchase_restoration
 // Source: lib\src\rules\platforms\ios_rules.dart
 
-import '../flutter_mocks.dart';
+import 'package:saropa_lints_example/flutter_mocks.dart';
 
 final children = <Widget>[];
 final context = BuildContext();

@@ -103,7 +103,7 @@
 // Test fixture for: prefer_simpler_patterns_null_check
 // Source: lib\src\rules\record_pattern_rules.dart
 
-import '../flutter_mocks.dart';
+import 'package:saropa_lints_example/flutter_mocks.dart';
 
 // BAD: Should trigger prefer_simpler_patterns_null_check
 // expect_lint: prefer_simpler_patterns_null_check

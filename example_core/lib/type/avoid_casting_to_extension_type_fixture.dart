@@ -103,7 +103,7 @@
 // Test fixture for: avoid_casting_to_extension_type
 // Source: lib\src\rules\type_rules.dart
 
-import '../flutter_mocks.dart';
+import 'package:saropa_lints_example/flutter_mocks.dart';
 
 final id = '1';
 final userId = '123';

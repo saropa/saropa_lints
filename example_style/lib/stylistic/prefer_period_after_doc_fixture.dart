@@ -103,7 +103,7 @@
 // Test fixture for: prefer_period_after_doc
 // Source: lib\src\rules\stylistic_rules.dart
 
-import '../flutter_mocks.dart';
+import 'package:saropa_lints_example/flutter_mocks.dart';
 
 // BAD: Should trigger prefer_period_after_doc
 // expect_lint: prefer_period_after_doc

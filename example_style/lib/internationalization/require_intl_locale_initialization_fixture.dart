@@ -103,7 +103,7 @@
 // Test fixture for: require_intl_locale_initialization
 // Source: lib\src\rules\internationalization_rules.dart
 
-import '../flutter_mocks.dart';
+import 'package:saropa_lints_example/flutter_mocks.dart';
 
 final date = DateTime.now();
 dynamic device;

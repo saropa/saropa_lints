@@ -103,7 +103,7 @@
 // Test fixture for: prefer_specifying_future_value_type
 // Source: lib\src\rules\async_rules.dart
 
-import '../flutter_mocks.dart';
+import 'package:saropa_lints_example/flutter_mocks.dart';
 
 // BAD: Should trigger prefer_specifying_future_value_type
 // expect_lint: prefer_specifying_future_value_type

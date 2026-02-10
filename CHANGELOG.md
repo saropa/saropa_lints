@@ -17,9 +17,24 @@ Dates are not included in version headers — [pub.dev](https://pub.dev/packages
 
 - **US English spelling check** in publish pipeline: New `_us_spelling.py` module with ~90+ UK-to-US spelling pairs scans all source files for British English and blocks publish until fixed. Integrated as a blocking pre-publish audit step
 
+### Changed
+
+- **Split example project into 6 sub-packages**: Resolves Out of Memory crash during custom_lint analysis of 1,542 fixture files. Fixtures are now split across `example_core/`, `example_async/`, `example_widgets/`, `example_style/`, `example_packages/`, and `example_platforms/`, each independently analyzable within memory limits
+- **Fixture imports use package imports**: All fixtures now import `flutter_mocks.dart` via `package:saropa_lints_example/flutter_mocks.dart` instead of relative paths
+- **New convenience script**: `scripts/run_custom_lint_all.py` runs analysis across all sub-packages
+- **TODO audit in publish pipeline**: New `display_todo_audit()` shows per-package bar chart of placeholder TODOs and writes full log to `example/reports/todo_audit.log`
+- **VSCode analysis exclusion**: Example sub-packages excluded from Dart analysis via `.vscode/settings.json` to keep Problems view clean
+- **TODO/FIXME/HACK suppression**: All example `analysis_options.yaml` files suppress `todo`, `fixme`, and `hack` diagnostics
+
+### Changed (continued)
+
+- **Removed version numbers from fixture filenames**: 16 fixture files and 1 test file renamed to remove hard-coded version suffixes (e.g., `stylistic_v270_fixture.dart` → `stylistic_fixture.dart`)
+- **Stripped version references from comments**: Removed `(from vX.Y.Z)` and `added in vX.Y.Z` from ~22 section headers and comments across fixture files
+
 ### Fixed
 
 - **British spellings corrected**: Fixed UK spellings to US English in `prefer_fields_before_methods` correction message, `db_yield_rules` comment, and several CHANGELOG entries
+- **TODO audit path separator**: Fixed hardcoded backslash in TODO log grouping to use `os.sep` for cross-platform compatibility
 
 ---
 ## [4.14.1]

@@ -103,7 +103,7 @@
 // Test fixture for: move_records_to_typedefs
 // Source: lib\src\rules\record_pattern_rules.dart
 
-import '../flutter_mocks.dart';
+import 'package:saropa_lints_example/flutter_mocks.dart';
 
 // BAD: Should trigger move_records_to_typedefs
 // expect_lint: move_records_to_typedefs

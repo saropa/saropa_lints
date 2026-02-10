@@ -103,7 +103,7 @@
 // Test fixture for: avoid_static_state
 // Source: lib\src\rules\state_management_rules.dart
 
-import '../flutter_mocks.dart';
+import 'package:saropa_lints_example/flutter_mocks.dart';
 
 dynamic ref;
 dynamic state;

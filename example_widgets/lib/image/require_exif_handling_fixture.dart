@@ -103,7 +103,7 @@
 // Test fixture for: require_exif_handling
 // Source: lib\src\rules\image_rules.dart
 
-import '../flutter_mocks.dart';
+import 'package:saropa_lints_example/flutter_mocks.dart';
 
 dynamic a;
 dynamic file;

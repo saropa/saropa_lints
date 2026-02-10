@@ -103,7 +103,7 @@
 // Test fixture for: avoid_empty_spread
 // Source: lib\src\rules\unnecessary_code_rules.dart
 
-import '../flutter_mocks.dart';
+import 'package:saropa_lints_example/flutter_mocks.dart';
 
 dynamic list;
 

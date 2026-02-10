@@ -103,7 +103,7 @@
 // Test fixture for: avoid_immediately_invoked_functions
 // Source: lib\src\rules\complexity_rules.dart
 
-import '../flutter_mocks.dart';
+import 'package:saropa_lints_example/flutter_mocks.dart';
 
 // BAD: Should trigger avoid_immediately_invoked_functions
 // expect_lint: avoid_immediately_invoked_functions

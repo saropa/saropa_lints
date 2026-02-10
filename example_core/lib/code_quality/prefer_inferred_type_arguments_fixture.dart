@@ -103,7 +103,7 @@
 // Test fixture for: prefer_inferred_type_arguments
 // Source: lib\src\rules\code_quality_rules.dart
 
-import '../flutter_mocks.dart';
+import 'package:saropa_lints_example/flutter_mocks.dart';
 
 dynamic a;
 dynamic b;
