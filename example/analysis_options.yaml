@@ -78,3 +78,8 @@ custom_lint:
     - prefer_capitalized_comment_start: true
     # Explicitly enable animation rules for testing
     - avoid_overlapping_animations: true
+    # Explicitly enable control flow / variable rules for testing
+    - avoid_nested_assignments: true
+    - avoid_variable_shadowing: true
+    # Explicitly enable documentation rules for testing
+    - verify_documented_parameters_exist: true
