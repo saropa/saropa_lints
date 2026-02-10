@@ -231,8 +231,8 @@ void main() {
     });
 
     group('avoid_stream_subscription_in_field', () {
-      test('subscription field not cancelled in dispose SHOULD trigger', () {
-        expect('uncancelled subscription detected', isNotNull);
+      test('subscription field not canceled in dispose SHOULD trigger', () {
+        expect('uncanceled subscription detected', isNotNull);
       });
     });
 

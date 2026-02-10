@@ -59,7 +59,7 @@ Exit Codes:
     7  - Publish failed
     8  - Git operations failed
     9  - GitHub release failed
-    10 - User cancelled
+    10 - User canceled
     11 - Audit failed (tier integrity or duplicates)
 """
 
@@ -376,11 +376,11 @@ def main() -> int:
             .lower()
         )
         if response.startswith("n"):
-            print_warning("Publish cancelled by user.")
-            return ExitCode.USER_CANCELLED.value
+            print_warning("Publish canceled by user.")
+            return ExitCode.USER_CANCELED.value
     elif audit_only:
         print_warning("--audit-only and --skip-audit are contradictory.")
-        return ExitCode.USER_CANCELLED.value
+        return ExitCode.USER_CANCELED.value
 
     # --- Steps 2-7: Analysis workflow (version-independent) ---
     if not check_prerequisites():
@@ -388,7 +388,7 @@ def main() -> int:
 
     ok, _ = check_working_tree(project_dir)
     if not ok:
-        exit_with_error("Aborted.", ExitCode.USER_CANCELLED)
+        exit_with_error("Aborted.", ExitCode.USER_CANCELED)
 
     if not check_remote_sync(project_dir, branch):
         exit_with_error("Remote sync failed", ExitCode.WORKING_TREE_FAILED)

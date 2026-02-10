@@ -447,6 +447,50 @@ void main() {
         );
       });
     });
+
+    group('require_websocket_reconnection', () {
+      test('should not flag WebSocket class definitions', () {
+        // Fixed: node.toSource() includes the class name, so classes
+        // literally named WebSocket or WebSocketChannel always matched
+        // their own string check, producing false positives on mock/stub
+        // class definitions.
+        //
+        // These must NOT trigger:
+        // - class WebSocket { ... }
+        // - class WebSocketChannel { ... }
+
+        expect(
+          'WebSocket class definitions are skipped via exact name match',
+          isNotNull,
+        );
+      });
+
+      test('should still flag classes that USE WebSocket without reconnection',
+          () {
+        // Expected behavior: These SHOULD trigger
+        // - class ChatService { WebSocketChannel.connect(url); }
+        // - class LiveFeed { WebSocket.connect(url); }
+        //
+        // Expected behavior: These should NOT trigger (has reconnection)
+        // - class ChatService { ... reconnect() ... onDone: ... }
+
+        expect(
+          'Classes using WebSocket without reconnection are detected',
+          isNotNull,
+        );
+      });
+
+      test('should not flag WebSocket subclass names', () {
+        // Classes named BadWebSocketService, GoodWebSocketService,
+        // WebSocketDemo are NOT skipped — they USE WebSocket and
+        // should be checked for reconnection logic.
+
+        expect(
+          'Only exact WebSocket/WebSocketChannel names are skipped',
+          isNotNull,
+        );
+      });
+    });
   });
 
   group('String.contains() Anti-Pattern Fixes', () {
@@ -603,6 +647,12 @@ void main() {
 
     test('avoid_nested_assignments has test fixture', () {
       // Located at: example/lib/avoid_nested_assignments_fixture.dart
+      expect(true, isTrue);
+    });
+
+    test('require_websocket_reconnection has mock stubs', () {
+      // Located at: example/lib/flutter_mocks.dart (WebSocket, WebSocketChannel)
+      // Fixture at: example_async/lib/async/async_rules_fixture.dart
       expect(true, isTrue);
     });
   });

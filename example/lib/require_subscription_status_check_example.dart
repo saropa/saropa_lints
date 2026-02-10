@@ -1,5 +1,6 @@
 // ignore_for_file: unused_local_variable, unused_element
 // ignore_for_file: depend_on_referenced_packages, prefer_const_constructors
+// ignore_for_file: prefer_explicit_type_arguments
 // ignore_for_file: unnecessary_import, unused_import
 // ignore_for_file: avoid_unused_constructor_parameters, override_on_non_overriding_member
 // ignore_for_file: annotate_overrides, duplicate_ignore

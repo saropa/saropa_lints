@@ -14,8 +14,128 @@ custom_lint:
   saropa_lints:
     tier: recommended
   rules:
-    - prefer_no_commented_out_code: true
-    - prefer_capitalized_comment_start: true
-    - prefer_explicit_type_arguments: true
+    # Disable general disposal rules - not needed for style fixtures
     - require_dispose: false
     - avoid_undisposed_instances: false
+
+    # === Naming conventions ===
+    - prefer_capitalized_comment_start: true
+    - prefer_camel_case_method_names: true
+    - prefer_descriptive_bool_names: true
+    - prefer_descriptive_bool_names_strict: true
+    - prefer_concise_variable_names: true
+    - prefer_descriptive_variable_names: true
+    - prefer_lower_camel_case_constants: true
+    - prefer_private_underscore_prefix: true
+    - prefer_screaming_case_constants: true
+    - prefer_snake_case_files: true
+
+    # === Comments & Documentation ===
+    - prefer_no_commented_out_code: true
+    - prefer_doc_comments_over_regular: true
+    - prefer_fixme_format: true
+    - prefer_period_after_doc: true
+    - prefer_sentence_case_comments: true
+    - prefer_todo_format: true
+
+    # === Code style preferences ===
+    - prefer_all_named_parameters: true
+    - prefer_arrow_functions: true
+    - prefer_class_over_record_return: true
+    - prefer_early_return: true
+    - prefer_explicit_null_assignment: true
+    - prefer_explicit_this: true
+    - prefer_guard_clauses: true
+    - prefer_initializing_formals: true
+    - prefer_inline_callbacks: true
+    - prefer_null_aware_assignment: true
+    - prefer_positive_conditions: true
+    - prefer_positive_conditions_first: true
+    - prefer_required_before_optional: true
+    - prefer_rethrow_over_throw_e: true
+    - prefer_single_exit_point: true
+    - prefer_specific_exceptions: true
+    - prefer_super_parameters: true
+    - prefer_switch_statement: true
+    - prefer_sync_over_async_where_possible: true
+    - prefer_wheretype_over_where_is: true
+
+    # === Type preferences ===
+    - prefer_explicit_type_arguments: true
+    - prefer_explicit_types: true # Conflicts with prefer_var_over_explicit_type
+    - prefer_implicit_boolean_comparison: true # Conflicts with prefer_explicit_boolean_comparison
+    - prefer_object_over_dynamic: true # Conflicts with prefer_dynamic_over_object
+
+    # === Null & Collection preferences ===
+    - prefer_collection_if_over_ternary: true # Conflicts with prefer_ternary_over_collection_if
+    - prefer_if_null_over_ternary: true # Conflicts with prefer_ternary_over_if_null
+    - prefer_keys_with_lookup: true
+    - prefer_late_over_nullable: true # Conflicts with prefer_nullable_over_late
+    - prefer_map_entries_iteration: true
+    - prefer_mutable_collections: true
+    - prefer_spread_over_addall: true # Conflicts with prefer_addall_over_spread
+
+    # === Control flow ===
+    - prefer_await_over_then: true # Conflicts with prefer_then_over_await
+    - prefer_cascade_over_chained: true # Conflicts with prefer_chained_over_cascade
+    - prefer_default_enum_case: true
+    - prefer_exhaustive_enums: true
+
+    # === Formatting & Whitespace ===
+    - prefer_blank_line_after_declarations: true # Conflicts with prefer_compact_declarations
+    - prefer_blank_lines_between_members: true # Conflicts with prefer_compact_class_members
+    - prefer_constructor_assertion: true
+    - prefer_constructor_body_assignment: true
+    - prefer_factory_for_validation: true
+    - prefer_grouped_by_purpose: true
+    - prefer_no_blank_line_before_return: true
+    - prefer_no_blank_line_inside_blocks: true
+    - prefer_single_blank_line_max: true
+    - prefer_trailing_comma_always: true
+
+    # === Widget preferences ===
+    - avoid_small_text: true
+    - prefer_borderradius_circular: true
+    - prefer_clip_r_superellipse: true
+    - prefer_clip_r_superellipse_clipper: true
+    - prefer_edgeinsets_only: true
+    - prefer_edgeinsets_symmetric: true
+    - prefer_expanded_over_flexible: true # Conflicts with prefer_flexible_over_expanded
+    - prefer_explicit_colors: true
+    - prefer_material_theme_colors: true
+    - prefer_one_widget_per_file: true
+    - prefer_sizedbox_over_container: true # Conflicts with prefer_container_over_sizedbox
+    - prefer_text_rich_over_richtext: true # Conflicts with prefer_richtext_over_text_rich
+    - prefer_widget_methods_over_classes: true
+
+    # === Error handling & Testing ===
+    - prefer_catch_over_on: true # Conflicts with prefer_on_over_catch
+    - prefer_error_suffix: true
+    - prefer_exception_suffix: true
+    - prefer_expect_over_assert_in_tests: true
+    - prefer_generic_exception: true
+    - prefer_given_when_then_comments: true
+    - prefer_grouped_expectations: true
+    - prefer_self_documenting_tests: true
+    - prefer_single_expectation_per_test: true
+    - prefer_test_name_descriptive: true
+    - prefer_test_name_should_when: true
+
+    # === Import style ===
+    - prefer_absolute_imports: true # Conflicts with prefer_relative_imports
+    - prefer_flat_imports: true
+    - prefer_grouped_imports: true
+
+    # === Quote & Apostrophe style ===
+    - prefer_double_quotes: true # Conflicts with prefer_single_quotes
+    - prefer_straight_apostrophe: true # Conflicts with prefer_curly_apostrophe
+    - prefer_doc_straight_apostrophe: true # Conflicts with prefer_doc_curly_apostrophe
+
+    # === Ordering ===
+    - prefer_arguments_ordering: true
+    - prefer_instance_members_first: true # Conflicts with prefer_static_members_first
+    - prefer_methods_before_fields: true # Conflicts with prefer_fields_before_methods
+    - prefer_private_members_first: true # Conflicts with prefer_public_members_first
+
+    # === String style ===
+    - prefer_interpolation_over_concatenation: true # Conflicts with prefer_concatenation_over_interpolation

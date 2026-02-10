@@ -757,7 +757,7 @@ class _AddTimezoneParameterFix extends DartFix {
 ///
 /// Alias: dispose_keyboard_visibility, keyboard_visibility_leak
 ///
-/// KeyboardVisibilityController listeners must be cancelled to prevent
+/// KeyboardVisibilityController listeners must be canceled to prevent
 /// memory leaks and callbacks to disposed widgets.
 ///
 /// **BAD:**
@@ -810,7 +810,7 @@ class RequireKeyboardVisibilityDisposeRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_keyboard_visibility_dispose',
     problemMessage:
-        '[require_keyboard_visibility_dispose] Uncancelled subscription keeps '
+        '[require_keyboard_visibility_dispose] Uncanceled subscription keeps '
         'firing callbacks after dispose, causing setState errors. {v2}',
     correctionMessage: 'Store and cancel the stream subscription in dispose().',
     errorSeverity: DiagnosticSeverity.WARNING,

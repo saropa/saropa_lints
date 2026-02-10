@@ -362,10 +362,10 @@ class _GoodPageViewWidgetState extends State<GoodPageViewWidget> {
 // =========================================================================
 // require_stream_subscription_cancel
 // =========================================================================
-// Warns when StreamSubscription is not cancelled in dispose().
+// Warns when StreamSubscription is not canceled in dispose().
 // Supports both single subscriptions and collections of subscriptions.
 
-// BAD: Single StreamSubscription not cancelled
+// BAD: Single StreamSubscription not canceled
 class BadSingleSubscriptionWidget extends StatefulWidget {
   const BadSingleSubscriptionWidget({super.key});
 
@@ -394,7 +394,7 @@ class _BadSingleSubscriptionWidgetState
   Widget build(BuildContext context) => Container();
 }
 
-// GOOD: Single StreamSubscription cancelled with ?.cancel()
+// GOOD: Single StreamSubscription canceled with ?.cancel()
 class GoodSingleSubscriptionWidget extends StatefulWidget {
   const GoodSingleSubscriptionWidget({super.key});
 
@@ -426,7 +426,7 @@ class _GoodSingleSubscriptionWidgetState
   Widget build(BuildContext context) => Container();
 }
 
-// GOOD: Single StreamSubscription cancelled with .cancel()
+// GOOD: Single StreamSubscription canceled with .cancel()
 class GoodSingleSubscriptionNonNullWidget extends StatefulWidget {
   const GoodSingleSubscriptionNonNullWidget({super.key});
 
@@ -458,7 +458,7 @@ class _GoodSingleSubscriptionNonNullWidgetState
   Widget build(BuildContext context) => Container();
 }
 
-// BAD: Collection of StreamSubscriptions not cancelled
+// BAD: Collection of StreamSubscriptions not canceled
 class BadCollectionSubscriptionWidget extends StatefulWidget {
   const BadCollectionSubscriptionWidget({super.key});
 
@@ -486,7 +486,7 @@ class _BadCollectionSubscriptionWidgetState
   Widget build(BuildContext context) => Container();
 }
 
-// GOOD: Collection cancelled with for-in loop
+// GOOD: Collection canceled with for-in loop
 class GoodCollectionForInWidget extends StatefulWidget {
   const GoodCollectionForInWidget({super.key});
 
@@ -518,7 +518,7 @@ class _GoodCollectionForInWidgetState extends State<GoodCollectionForInWidget> {
   Widget build(BuildContext context) => Container();
 }
 
-// GOOD: Collection cancelled with for-in loop (typed)
+// GOOD: Collection canceled with for-in loop (typed)
 class GoodCollectionForInTypedWidget extends StatefulWidget {
   const GoodCollectionForInTypedWidget({super.key});
 
@@ -551,7 +551,7 @@ class _GoodCollectionForInTypedWidgetState
   Widget build(BuildContext context) => Container();
 }
 
-// GOOD: Collection cancelled with forEach
+// GOOD: Collection canceled with forEach
 class GoodCollectionForEachWidget extends StatefulWidget {
   const GoodCollectionForEachWidget({super.key});
 
@@ -582,7 +582,7 @@ class _GoodCollectionForEachWidgetState
   Widget build(BuildContext context) => Container();
 }
 
-// GOOD: Set of StreamSubscriptions cancelled
+// GOOD: Set of StreamSubscriptions canceled
 class GoodSetSubscriptionWidget extends StatefulWidget {
   const GoodSetSubscriptionWidget({super.key});
 

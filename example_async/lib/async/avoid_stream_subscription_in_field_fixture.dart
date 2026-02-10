@@ -110,7 +110,7 @@ dynamic data;
 // BAD: Should trigger avoid_stream_subscription_in_field
 // expect_lint: avoid_stream_subscription_in_field
 class _bad112__MyWidgetState extends State<MyWidget> {
-// Subscription created but never stored - cannot be cancelled!
+// Subscription created but never stored - cannot be canceled!
   final _ = someStream.listen((data) => print(data));
 
 // Or assigned to void
