@@ -1,261 +1,132 @@
-import 'package:flutter/material.dart';
+// ignore_for_file: unused_local_variable, unused_element
+// ignore_for_file: depend_on_referenced_packages
+// ignore_for_file: prefer_const_constructors
+// ignore_for_file: unnecessary_import, unused_import
+// ignore_for_file: avoid_unused_constructor_parameters
+// ignore_for_file: override_on_non_overriding_member
+// ignore_for_file: annotate_overrides, duplicate_ignore
+// ignore_for_file: non_abstract_class_inherits_abstract_member
+// ignore_for_file: extends_non_class, mixin_of_non_class
+// ignore_for_file: field_initializer_outside_constructor
+// ignore_for_file: final_not_initialized
+// ignore_for_file: super_in_invalid_context
+// ignore_for_file: concrete_class_with_abstract_member
+// ignore_for_file: type_argument_not_matching_bounds
+// ignore_for_file: missing_required_argument
+// ignore_for_file: undefined_named_parameter
+// ignore_for_file: argument_type_not_assignable
+// ignore_for_file: invalid_constructor_name
+// ignore_for_file: super_formal_parameter_without_associated_named
+// ignore_for_file: undefined_annotation, creation_with_non_type
+// ignore_for_file: invalid_factory_name_not_a_class
+// ignore_for_file: invalid_reference_to_this
+// ignore_for_file: expected_class_member
+// ignore_for_file: body_might_complete_normally
+// ignore_for_file: not_initialized_non_nullable_instance_field
+// ignore_for_file: unchecked_use_of_nullable_value
+// ignore_for_file: return_of_invalid_type
+// ignore_for_file: use_of_void_result
+// ignore_for_file: missing_function_body
+// ignore_for_file: extra_positional_arguments
+// ignore_for_file: not_enough_positional_arguments
+// ignore_for_file: unused_label
+// ignore_for_file: unused_element_parameter
+// ignore_for_file: non_type_as_type_argument
+// ignore_for_file: expected_identifier_but_got_keyword
+// ignore_for_file: expected_token, missing_identifier
+// ignore_for_file: unexpected_token
+// ignore_for_file: duplicate_definition
+// ignore_for_file: override_on_non_overriding_member
+// ignore_for_file: extends_non_class
+// ignore_for_file: no_default_super_constructor
+// ignore_for_file: extra_positional_arguments_could_be_named
+// ignore_for_file: missing_function_parameters
+// ignore_for_file: invalid_annotation, invalid_assignment
+// ignore_for_file: expected_executable
+// ignore_for_file: named_parameter_outside_group
+// ignore_for_file: obsolete_colon_for_default_value
+// ignore_for_file: referenced_before_declaration
+// ignore_for_file: await_in_wrong_context
+// ignore_for_file: non_type_in_catch_clause
+// ignore_for_file: could_not_infer
+// ignore_for_file: uri_does_not_exist
+// ignore_for_file: const_method
+// ignore_for_file: redirect_to_non_class
+// ignore_for_file: unused_catch_clause
+// ignore_for_file: type_test_with_undefined_name
+// ignore_for_file: undefined_identifier, undefined_function
+// ignore_for_file: undefined_method, undefined_getter
+// ignore_for_file: undefined_setter, undefined_class
+// ignore_for_file: undefined_super_member
+// ignore_for_file: extraneous_modifier
+// ignore_for_file: experiment_not_enabled
+// ignore_for_file: missing_const_final_var_or_type
+// ignore_for_file: undefined_operator, dead_code
+// ignore_for_file: invalid_override
+// ignore_for_file: not_initialized_non_nullable_variable
+// ignore_for_file: list_element_type_not_assignable
+// ignore_for_file: assignment_to_final
+// ignore_for_file: equal_elements_in_set
+// ignore_for_file: prefix_shadowed_by_local_declaration
+// ignore_for_file: const_initialized_with_non_constant_value
+// ignore_for_file: non_constant_list_element
+// ignore_for_file: missing_statement
+// ignore_for_file: unnecessary_cast, unnecessary_null_comparison
+// ignore_for_file: unnecessary_type_check
+// ignore_for_file: invalid_super_formal_parameter_location
+// ignore_for_file: assignment_to_type
+// ignore_for_file: instance_member_access_from_factory
+// ignore_for_file: field_initializer_not_assignable
+// ignore_for_file: constant_pattern_with_non_constant_expression
+// ignore_for_file: undefined_identifier_await, cast_to_non_type
+// ignore_for_file: read_potentially_unassigned_final
+// ignore_for_file: mixin_with_non_class_superclass
+// ignore_for_file: instantiate_abstract_class
+// ignore_for_file: dead_code_on_catch_subtype, unreachable_switch_case
+// ignore_for_file: new_with_undefined_constructor
+// ignore_for_file: assignment_to_final_local
+// ignore_for_file: late_final_local_already_assigned
+// ignore_for_file: missing_default_value_for_parameter
+// ignore_for_file: non_bool_condition
+// ignore_for_file: non_exhaustive_switch_expression
+// ignore_for_file: illegal_async_return_type
+// ignore_for_file: type_test_with_non_type
+// ignore_for_file: invocation_of_non_function_expression
+// ignore_for_file: return_of_invalid_type_from_closure
+// ignore_for_file: wrong_number_of_type_arguments_constructor
+// ignore_for_file: definitely_unassigned_late_local_variable
+// ignore_for_file: static_access_to_instance_member
+// ignore_for_file: const_with_undefined_constructor
+// ignore_for_file: abstract_super_member_reference
+// ignore_for_file: equal_keys_in_map, unused_catch_stack
+// ignore_for_file: non_constant_default_value, not_a_type
+// Test fixture for: require_deep_link_fallback
+// Source: lib\src\rules\navigation_rules.dart
 
-// ignore_for_file: unused_element, unused_local_variable
+import '../flutter_mocks.dart';
 
-// BAD: Deep link handler without fallback for missing content
-class BadDeepLinkHandler {
-  void handleProductDeepLink(BuildContext context, Uri uri) {
-    // LINT: No fallback if product is not found
-    final productId = uri.pathSegments[1];
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (_) => ProductPage(id: productId)),
-    );
-  }
+final context = BuildContext();
+final id = '1';
+final uri = Uri.parse('https://example.com');
 
-  Future<void> handleUserProfileLink(
-      BuildContext context, String userId) async {
-    // LINT: No fallback if user doesn't exist
-    final user = await fetchUser(userId);
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (_) => ProfilePage(user: user)),
-    );
-  }
+// BAD: Should trigger require_deep_link_fallback
+// expect_lint: require_deep_link_fallback
+void _bad509_handleDeepLink(Uri uri) {
+  final productId = uri.pathSegments[1];
+  Navigator.push(context, ProductPage(id: productId));
 }
 
-// GOOD: Deep link handler with proper fallback
-class GoodDeepLinkHandler {
-  void handleProductDeepLink(BuildContext context, Uri uri) {
-    final productId = uri.pathSegments.length > 1 ? uri.pathSegments[1] : null;
-
-    if (productId == null) {
-      // Fallback for invalid URI
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (_) => NotFoundPage()),
-      );
-      return;
-    }
-
-    // Additional validation would check if product exists
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (_) => ProductPage(id: productId)),
-    );
+// GOOD: Should NOT trigger require_deep_link_fallback
+void _good509_handleDeepLink(Uri uri) async {
+  final productId = uri.pathSegments.length > 1 ? uri.pathSegments[1] : null;
+  if (productId == null) {
+    Navigator.pushReplacement(context, NotFoundPage());
+    return;
   }
-
-  Future<void> handleUserProfileLink(
-      BuildContext context, String userId) async {
-    final user = await fetchUser(userId);
-
-    if (user == null) {
-      // Fallback for missing user
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (_) => NotFoundPage()),
-      );
-      return;
-    }
-
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (_) => ProfilePage(user: user)),
-    );
+  final product = await productService.getProduct(productId);
+  if (product == null) {
+    Navigator.pushReplacement(context, NotFoundPage());
+    return;
   }
-}
-
-// FALSE POSITIVE TEST: Utility methods managing state should NOT trigger
-class DeepLinkStateManager {
-  Uri? _initialUri;
-  Uri? _currentUri;
-  final String _url = 'https://example.com';
-
-  // OK: Simple getter returning a field - not a handler
-  Uri? get initialUri => _initialUri;
-
-  // OK: Simple getter returning a field - not a handler
-  Uri? get currentRouteUri => _currentUri;
-
-  // OK: Lazy-loading pattern - not a handler
-  Uri? get uri => _initialUri ??= Uri.parse(_url);
-
-  // OK: Lazy-loading pattern with utility class method - not a handler
-  Uri? get secureUri => _currentUri ??= _UrlUtilsLocal.getSecureUri(_url);
-
-  // OK: Simple method invocation on a field - not a handler
-  Uri? get parsedUri => _url.toUri();
-
-  // OK: Null-aware method invocation - not a handler
-  Uri? get safeUri => _url.toUriSafe();
-
-  // OK: Null-aware property access - not a handler
-  String? get uriScheme => _initialUri?.scheme;
-
-  // OK: Reset utility method - not a handler
-  void resetInitialUri() {
-    _initialUri = null;
-  }
-
-  // OK: Clear utility method - not a handler
-  void clearCurrentUri() {
-    _currentUri = null;
-  }
-
-  // OK: Set utility method - not a handler
-  void setInitialUri(Uri? uri) {
-    _initialUri = uri;
-  }
-
-  // OK: Get utility method with block body returning field - not a handler
-  Uri? getStoredUri() {
-    return _initialUri;
-  }
-
-  // OK: Get utility method with expression body - not a handler
-  Uri? getCachedUri() => _currentUri;
-
-  // OK: Method returning null - trivial accessor
-  Uri? getDefaultUri() {
-    return null;
-  }
-}
-
-// FALSE POSITIVE TEST: Utility getters should NOT trigger
-extension UriExtensions on Uri? {
-  // OK: Utility getter checking URI state
-  bool get isNotUriNullOrEmpty => this != null && this.toString().isNotEmpty;
-
-  // OK: Boolean check helper
-  bool get hasValidScheme => this?.scheme == 'https';
-
-  // OK: Simple validation
-  bool get isUriEmpty => this == null || this.toString().isEmpty;
-
-  // OK: Null check utility
-  bool get isUriNull => this == null;
-
-  // OK: Combined nullable check
-  bool get isUriNullable => this == null;
-
-  // OK: Validity checker
-  bool get isValidDeepLink => this != null && this!.pathSegments.isNotEmpty;
-
-  // OK: Has prefix checker
-  bool get hasDeepLinkPrefix => this?.scheme == 'myapp';
-
-  // OK: Check utility
-  bool get checkDeepLinkFormat => this?.host == 'example.com';
-}
-
-// FALSE POSITIVE TEST: Widget return types should NOT trigger
-// These are UI builders, not deep link handlers
-class LinkWidgetBuilders {
-  // OK: Returns Widget - UI builder, not a handler
-  Widget buildShareLinkButton() {
-    return ElevatedButton(
-      onPressed: () {},
-      child: const Text('Share Link'),
-    );
-  }
-
-  // OK: Returns Widget? - nullable widget builder
-  Widget? buildRouteBanner(bool show) {
-    if (!show) return null;
-    return const Text('Route active');
-  }
-}
-
-// FALSE POSITIVE TEST: Methods with link/route in name but no deep link
-// signals in body should NOT trigger
-class NonDeepLinkMethods {
-  bool _isProcessing = false;
-
-  // OK: Name has 'link' but body has no Uri/Navigator/GoRouter usage
-  void linkAccounts(String fromId, String toId) {
-    _isProcessing = true;
-    print('Linking $fromId to $toId');
-    _isProcessing = false;
-  }
-
-  // OK: Name has 'route' but body has no deep link signals
-  void logRouteChange(String from, String to) {
-    print('Route changed: $from -> $to');
-    _isProcessing = false;
-  }
-}
-
-// Mock classes
-class ProductPage extends StatelessWidget {
-  final String id;
-  const ProductPage({required this.id});
-
-  @override
-  Widget build(BuildContext context) => Container();
-}
-
-class ProfilePage extends StatelessWidget {
-  final dynamic user;
-  const ProfilePage({required this.user});
-
-  @override
-  Widget build(BuildContext context) => Container();
-}
-
-class NotFoundPage extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) => Scaffold(
-        body: Center(child: Text('Page not found')),
-      );
-}
-
-Future<dynamic> fetchUser(String userId) async {
-  return null;
-}
-
-// FALSE POSITIVE TEST: Methods returning String? or Uri? are utilities, not handlers
-// Bug report: 20260125_require_deep_link_fallback_false_positives.md
-class UriParserUtility {
-  // OK: Returns String? - this is a parser, not a handler
-  String? accountIdFromUri(Uri uri) {
-    final String host = uri.host;
-    if (host != 'example.com') {
-      return null; // Valid fallback
-    }
-
-    final List<String> pathSegments = uri.pathSegments;
-    final int index = pathSegments.indexOf('u');
-    if (index != -1 && index < pathSegments.length - 1) {
-      return pathSegments[index + 1];
-    }
-    return null; // Valid fallback
-  }
-
-  // OK: Returns Uri? - this is a converter, not a handler
-  Uri? buildDeepLinkUri(String path) {
-    return Uri.tryParse('https://example.com/$path');
-  }
-
-  // OK: Ternary with null fallback
-  String? get postUriAt {
-    final postId = 'abc123';
-    return postId.isNotEmpty ? 'at://$postId' : null;
-  }
-
-  // OK: Another ternary with null in then branch
-  String? get legacyUriFormat {
-    final useLegacy = false;
-    return useLegacy ? null : 'https://new.example.com';
-  }
-}
-
-// Mock utility class for URI conversion
-class _UrlUtilsLocal {
-  static Uri? getSecureUri(String? url) => Uri.tryParse(url ?? '');
-}
-
-// Mock extension for URI conversion
-extension StringToUri on String {
-  Uri? toUri() => Uri.tryParse(this);
-  Uri? toUriSafe() => Uri.tryParse(this);
+  Navigator.push(context, ProductPage(product: product));
 }

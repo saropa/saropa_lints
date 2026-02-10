@@ -32,7 +32,7 @@ class AvoidContextInInitStateDisposeRule extends SaropaLintRule {
     name: 'avoid_context_in_initstate_dispose',
     problemMessage:
         '[avoid_context_in_initstate_dispose] BuildContext used in initState or dispose may reference an unmounted widget, causing runtime errors or silent failures. '
-        'In initState the widget tree is not yet fully built, and in dispose the widget has been removed, so context-dependent lookups (Theme.of, Navigator.of) can return stale or invalid data.',
+        'In initState the widget tree is not yet fully built, and in dispose the widget has been removed, so context-dependent lookups (Theme.of, Navigator.of) can return stale or invalid data. {v7}',
     correctionMessage:
         'Use WidgetsBinding.instance.addPostFrameCallback to defer context access until after the widget is mounted. '
         'For dispose, move context-dependent cleanup to deactivate() or use a pre-captured reference to ensure the widget tree is in a valid state when context is accessed.',
@@ -169,10 +169,17 @@ class _ContextUsageVisitor extends RecursiveAstVisitor<void> {
   }
 }
 
-/// Warns when a setState callback body is empty.
+/// Warns when a setState callback body is empty without a `mounted` guard.
+///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v5
 ///
 /// An empty `setState(() {})` still triggers a rebuild, but moving state
 /// changes inside the callback makes the intent clearer.
+///
+/// The rule **does not fire** when the call is inside a `mounted` guard
+/// (`if (mounted) setState(() {})`, ternary, or early-return pattern),
+/// because these indicate intentional rebuilds after async gaps or
+/// external state mutations — a common and valid Flutter idiom.
 ///
 /// Example of **bad** code:
 /// ```dart
@@ -184,14 +191,17 @@ class _ContextUsageVisitor extends RecursiveAstVisitor<void> {
 /// setState(() {
 ///   _value = newValue;
 /// });
+///
+/// // Also OK — mounted guard makes the intent clear:
+/// if (mounted) setState(() {});
 /// ```
-
 class AvoidEmptySetStateRule extends SaropaLintRule {
   const AvoidEmptySetStateRule() : super(code: _code);
 
-  /// Code quality issue. Review when count exceeds 100.
+  /// Style preference. Large counts are normal in codebases that use the
+  /// `if (mounted) setState(() {})` idiom after async gaps.
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.low;
 
   @override
   RuleCost get cost => RuleCost.low;
@@ -202,7 +212,7 @@ class AvoidEmptySetStateRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_empty_setstate',
     problemMessage:
-        '[avoid_empty_setstate] setState callback is empty — state was likely modified before this call. An empty setState(() {}) still triggers a rebuild, but moving state changes inside the callback makes the intent clearer.',
+        '[avoid_empty_setstate] setState callback is empty — state was likely modified before this call. An empty setState(() {}) still triggers a rebuild, but moving state changes inside the callback makes the intent clearer. {v5}',
     correctionMessage:
         'Move state changes inside the callback for clarity, or suppress if intentional. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -224,14 +234,41 @@ class AvoidEmptySetStateRule extends SaropaLintRule {
       if (callback is FunctionExpression) {
         final FunctionBody body = callback.body;
         if (body is BlockFunctionBody && body.block.statements.isEmpty) {
+          if (_isInsideMountedGuard(node)) return;
           reporter.atNode(node, code);
         }
       }
     });
   }
+
+  /// Walk ancestors to check if [node] is inside a `mounted` guard.
+  ///
+  /// Handles `if (mounted) setState(…)`, ternary guards, and
+  /// early-return patterns (`if (!mounted) return;` before setState).
+  static bool _isInsideMountedGuard(AstNode node) {
+    AstNode? current = node.parent;
+    while (current != null) {
+      if (current is IfStatement &&
+          current.expression.toSource().contains('mounted')) {
+        return true;
+      }
+      if (current is ConditionalExpression &&
+          current.condition.toSource().contains('mounted')) {
+        return true;
+      }
+      // Stop at method/function boundary
+      if (current is MethodDeclaration || current is FunctionDeclaration) {
+        break;
+      }
+      current = current.parent;
+    }
+    return false;
+  }
 }
 
 /// Warns when Expanded with empty child is used instead of Spacer.
+///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v8
 ///
 /// `Spacer()` is clearer and more semantic than `Expanded(child: SizedBox())`.
 ///
@@ -256,7 +293,6 @@ class AvoidEmptySetStateRule extends SaropaLintRule {
 ///   ],
 /// )
 /// ```
-
 class AvoidLateContextRule extends SaropaLintRule {
   const AvoidLateContextRule() : super(code: _code);
 
@@ -274,7 +310,7 @@ class AvoidLateContextRule extends SaropaLintRule {
     name: 'avoid_late_context',
     problemMessage:
         '[avoid_late_context] BuildContext in late field initializer captures a stale reference that may become invalid after rebuilds. '
-        'Late fields are initialized once on first access, but BuildContext changes whenever the widget rebuilds, so the captured context points to an outdated element that may no longer exist in the tree.',
+        'Late fields are initialized once on first access, but BuildContext changes whenever the widget rebuilds, so the captured context points to an outdated element that may no longer exist in the tree. {v8}',
     correctionMessage:
         'Initialize context-dependent values in didChangeDependencies() (which runs after every dependency change) or directly in build(). '
         'For one-time initialization, use addPostFrameCallback in initState to safely access context after the first frame is rendered.',
@@ -344,6 +380,8 @@ class AvoidLateContextRule extends SaropaLintRule {
 
 /// Warns when a widget has a "padding" parameter that is used as margin.
 ///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v5
+///
 /// This occurs when a widget accepts a `padding` parameter but uses it
 /// to wrap the return value with a `Padding` widget or `.withPadding()` extension,
 /// which is semantically margin behavior.
@@ -377,7 +415,6 @@ class AvoidLateContextRule extends SaropaLintRule {
 ///   }
 /// }
 /// ```
-
 class AvoidMountedInSetStateRule extends SaropaLintRule {
   const AvoidMountedInSetStateRule() : super(code: _code);
 
@@ -394,7 +431,7 @@ class AvoidMountedInSetStateRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_mounted_in_setstate',
     problemMessage:
-        '[avoid_mounted_in_setstate] Checking the mounted property inside a setState callback is an anti-pattern. If the widget is not mounted, setState should not be called at all. Placing the check inside the callback can lead to subtle bugs where partial state updates execute before the mounted check runs.',
+        '[avoid_mounted_in_setstate] Checking the mounted property inside a setState callback is an anti-pattern. If the widget is not mounted, setState should not be called at all. Placing the check inside the callback can lead to subtle bugs where partial state updates execute before the mounted check runs. {v5}',
     correctionMessage:
         'Always check if the widget is mounted before calling setState, not inside the callback. This ensures state updates are only triggered when the widget is in the tree, preventing runtime errors and unexpected behavior. See Flutter documentation on widget lifecycle and setState usage.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -439,9 +476,10 @@ class _MountedVisitor extends RecursiveAstVisitor<void> {
 
 /// Warns when a method returns a Widget.
 ///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v4
+///
 /// Methods that return widgets can cause unnecessary rebuilds. Consider
 /// extracting to a separate widget class.
-
 class AvoidStateConstructorsRule extends SaropaLintRule {
   const AvoidStateConstructorsRule() : super(code: _code);
 
@@ -458,7 +496,7 @@ class AvoidStateConstructorsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_state_constructors',
     problemMessage:
-        '[avoid_state_constructors] State class must not have a constructor body. Constructor logic runs before the framework initializes the State object, risking errors that bypass the widget lifecycle contract.',
+        '[avoid_state_constructors] State class must not have a constructor body. Constructor logic runs before the framework initializes the State object, risking errors that bypass the widget lifecycle contract. {v4}',
     correctionMessage:
         'Use initState() for initialization instead. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -493,6 +531,8 @@ class AvoidStateConstructorsRule extends SaropaLintRule {
 
 /// Warns when a StatelessWidget has initialized fields.
 ///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v4
+///
 /// Example of **bad** code:
 /// ```dart
 /// class MyWidget extends StatelessWidget {
@@ -507,7 +547,6 @@ class AvoidStateConstructorsRule extends SaropaLintRule {
 ///   const MyWidget({required this.items});
 /// }
 /// ```
-
 class AvoidStatelessWidgetInitializedFieldsRule extends SaropaLintRule {
   const AvoidStatelessWidgetInitializedFieldsRule() : super(code: _code);
 
@@ -524,7 +563,7 @@ class AvoidStatelessWidgetInitializedFieldsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_stateless_widget_initialized_fields',
     problemMessage:
-        '[avoid_stateless_widget_initialized_fields] StatelessWidget must not have initialized fields. This violates the widget lifecycle, risking setState-after-dispose errors or silent state corruption.',
+        '[avoid_stateless_widget_initialized_fields] StatelessWidget must not have initialized fields. This violates the widget lifecycle, risking setState-after-dispose errors or silent state corruption. {v4}',
     correctionMessage:
         'Pass values through the constructor instead. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -562,6 +601,8 @@ class AvoidStatelessWidgetInitializedFieldsRule extends SaropaLintRule {
 
 /// Warns when GestureDetector has no gesture callbacks defined.
 ///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v6
+///
 /// ### Example
 ///
 /// #### BAD:
@@ -578,7 +619,6 @@ class AvoidStatelessWidgetInitializedFieldsRule extends SaropaLintRule {
 ///   child: Text('Hello'),
 /// )
 /// ```
-
 class AvoidUnnecessarySetStateRule extends SaropaLintRule {
   const AvoidUnnecessarySetStateRule() : super(code: _code);
 
@@ -595,7 +635,7 @@ class AvoidUnnecessarySetStateRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_unnecessary_setstate',
     problemMessage:
-        '[avoid_unnecessary_setstate] setState called in lifecycle method where not needed. This violates the widget lifecycle, risking setState-after-dispose errors or silent state corruption.',
+        '[avoid_unnecessary_setstate] setState called in lifecycle method where not needed. This violates the widget lifecycle, risking setState-after-dispose errors or silent state corruption. {v6}',
     correctionMessage:
         'In initState/dispose, modify state directly without setState. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -650,6 +690,8 @@ class _SetStateCallFinder extends RecursiveAstVisitor<void> {
 
 /// Warns when a StatefulWidget could be a StatelessWidget.
 ///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v6
+///
 /// If a State class never calls setState and has no mutable state,
 /// it should probably be a StatelessWidget.
 ///
@@ -672,7 +714,6 @@ class _SetStateCallFinder extends RecursiveAstVisitor<void> {
 ///   Widget build(BuildContext context) => Text('Hello');
 /// }
 /// ```
-
 class AvoidUnnecessaryStatefulWidgetsRule extends SaropaLintRule {
   const AvoidUnnecessaryStatefulWidgetsRule() : super(code: _code);
 
@@ -689,7 +730,7 @@ class AvoidUnnecessaryStatefulWidgetsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_unnecessary_stateful_widgets',
     problemMessage:
-        '[avoid_unnecessary_stateful_widgets] StatefulWidget may be unnecessary. If a State class never calls setState and has no mutable state, it should probably be a StatelessWidget. This violates the widget lifecycle, risking setState-after-dispose errors or silent state corruption.',
+        '[avoid_unnecessary_stateful_widgets] StatefulWidget may be unnecessary. If a State class never calls setState and has no mutable state, it should probably be a StatelessWidget. This violates the widget lifecycle, risking setState-after-dispose errors or silent state corruption. {v6}',
     correctionMessage:
         'Use StatelessWidget if no mutable state is needed. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -751,7 +792,8 @@ class _SetStatePresenceChecker extends RecursiveAstVisitor<void> {
 }
 
 /// Warns when anonymous functions are used in listener methods.
-
+///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v6
 class AvoidUnremovableCallbacksInListenersRule extends SaropaLintRule {
   const AvoidUnremovableCallbacksInListenersRule() : super(code: _code);
 
@@ -768,7 +810,7 @@ class AvoidUnremovableCallbacksInListenersRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_unremovable_callbacks_in_listeners',
     problemMessage:
-        '[avoid_unremovable_callbacks_in_listeners] Anonymous function cannot be removed from listener. This violates the widget lifecycle, risking setState-after-dispose errors or silent state corruption.',
+        '[avoid_unremovable_callbacks_in_listeners] Anonymous function cannot be removed from listener. This violates the widget lifecycle, risking setState-after-dispose errors or silent state corruption. {v6}',
     correctionMessage:
         'Use a named function or store reference to remove later. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -803,6 +845,8 @@ class AvoidUnremovableCallbacksInListenersRule extends SaropaLintRule {
 
 /// Warns when `setState()` is called without a `mounted` check.
 ///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v6
+///
 /// Calling `setState()` after a widget has been unmounted (e.g., after an
 /// async operation completes) can cause errors. Always check `mounted` before
 /// calling `setState()` in async contexts.
@@ -834,7 +878,6 @@ class AvoidUnremovableCallbacksInListenersRule extends SaropaLintRule {
 ///   }
 /// }
 /// ```
-
 class AvoidUnsafeSetStateRule extends SaropaLintRule {
   const AvoidUnsafeSetStateRule() : super(code: _code);
 
@@ -851,7 +894,7 @@ class AvoidUnsafeSetStateRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_unsafe_setstate',
     problemMessage:
-        '[avoid_unsafe_setstate] setState() called without a mounted check. Calling setState() after a widget has been unmounted (e.g., after an async operation completes) can cause errors. Always check mounted before calling setState() in async contexts.',
+        '[avoid_unsafe_setstate] setState() called without a mounted check. Calling setState() after a widget has been unmounted (e.g., after an async operation completes) can cause errors. Always check mounted before calling setState() in async contexts. {v6}',
     correctionMessage:
         'Wrap in `if (mounted)` or use `mounted ? setState(..) : null`. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -1005,6 +1048,8 @@ class _NodeFinder extends GeneralizingAstVisitor<void> {
 
 /// Warns when a widget that has its own padding property is wrapped in Padding.
 ///
+/// Since: v4.1.3 | Updated: v4.13.0 | Rule version: v3
+///
 /// Example of **bad** code:
 /// ```dart
 /// Padding(
@@ -1020,7 +1065,6 @@ class _NodeFinder extends GeneralizingAstVisitor<void> {
 ///   ...
 /// )
 /// ```
-
 class RequireDisposeRule extends SaropaLintRule {
   const RequireDisposeRule() : super(code: _code);
 
@@ -1037,7 +1081,7 @@ class RequireDisposeRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_field_dispose',
     problemMessage:
-        '[require_field_dispose] Disposable field may not be properly disposed.',
+        '[require_field_dispose] Disposable field may not be properly disposed. {v3}',
     correctionMessage: 'Add a dispose() method that disposes this field, '
         'or ensure the existing dispose() method handles it.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -1305,6 +1349,8 @@ class _DisposableField {
 
 /// Requires Timer and StreamSubscription fields to be cancelled in dispose().
 ///
+/// Since: v1.1.17 | Updated: v4.13.0 | Rule version: v5
+///
 /// Alias: require_timer_cancel
 ///
 /// Timers and stream subscriptions that aren't cancelled will continue running
@@ -1347,7 +1393,6 @@ class _DisposableField {
 ///   }
 /// }
 /// ```
-
 class RequireTimerCancellationRule extends SaropaLintRule {
   const RequireTimerCancellationRule() : super(code: _code);
 
@@ -1364,7 +1409,7 @@ class RequireTimerCancellationRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_timer_cancellation',
     problemMessage:
-        '[require_timer_cancellation] Timer or StreamSubscription must be cancelled in dispose(). Timers and stream subscriptions that aren\'t cancelled will continue running after the widget is disposed, causing: - Crashes if they call setState on a disposed widget - Memory leaks from retained references - Wasted CPU cycles.',
+        '[require_timer_cancellation] Timer or StreamSubscription must be cancelled in dispose(). Timers and stream subscriptions that aren\'t cancelled will continue running after the widget is disposed, causing: - Crashes if they call setState on a disposed widget - Memory leaks from retained references - Wasted CPU cycles. {v5}',
     correctionMessage:
         'Add cancel() in dispose() to prevent crashes and memory leaks. Verify the change works correctly with existing tests and add coverage for the new behavior.'
         'Uncancelled timers continue firing after widget disposal.',
@@ -1544,6 +1589,8 @@ class _CancellableField {
 
 /// Suggests nullifying nullable disposable fields after disposal.
 ///
+/// Since: v1.1.17 | Updated: v4.13.0 | Rule version: v7
+///
 /// When a nullable disposable field (Timer?, StreamSubscription?, etc.) is
 /// disposed/cancelled, it's good practice to also set it to null. This:
 /// - Helps garbage collection
@@ -1565,7 +1612,6 @@ class _CancellableField {
 ///   _timer = null;
 /// }
 /// ```
-
 class NullifyAfterDisposeRule extends SaropaLintRule {
   const NullifyAfterDisposeRule() : super(code: _code);
 
@@ -1582,7 +1628,7 @@ class NullifyAfterDisposeRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'nullify_after_dispose',
     problemMessage:
-        '[nullify_after_dispose] Nullable disposable field must be set to null after disposal. When a nullable disposable field (Timer?, StreamSubscription?, etc.) is disposed/cancelled, it\'s good practice to also set it to null. This: - Helps garbage collection - Prevents accidental reuse of disposed resources - Makes it clear the resource has been cleaned up.',
+        '[nullify_after_dispose] Nullable disposable field must be set to null after disposal. When a nullable disposable field (Timer?, StreamSubscription?, etc.) is disposed/cancelled, it\'s good practice to also set it to null. This: - Helps garbage collection - Prevents accidental reuse of disposed resources - Makes it clear the resource has been cleaned up. {v7}',
     correctionMessage:
         'Add `fieldName = null;` after disposing to help garbage collection. Verify the change works correctly with existing tests and add coverage for the new behavior.'
         'and prevent accidental reuse.',
@@ -1803,6 +1849,8 @@ class NullifyAfterDisposeRule extends SaropaLintRule {
 
 /// Warns when setState is called after an async gap without mounted check.
 ///
+/// Since: v2.3.5 | Updated: v4.13.0 | Rule version: v9
+///
 /// **Quick fix available:** Wraps the setState call in `if (mounted) { ... }`.
 ///
 /// Example of **bad** code:
@@ -1822,7 +1870,6 @@ class NullifyAfterDisposeRule extends SaropaLintRule {
 ///   }
 /// }
 /// ```
-
 class UseSetStateSynchronouslyRule extends SaropaLintRule {
   const UseSetStateSynchronouslyRule() : super(code: _code);
 
@@ -1839,7 +1886,7 @@ class UseSetStateSynchronouslyRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'use_setstate_synchronously',
     problemMessage:
-        '[use_setstate_synchronously] setState called after async gap without mounted check. Quick fix available: Wraps the setState call in if (mounted) { .. }. This violates the widget lifecycle, risking setState-after-dispose errors or silent state corruption.',
+        '[use_setstate_synchronously] setState called after async gap without mounted check. Quick fix available: Wraps the setState call in if (mounted) { .. }. This violates the widget lifecycle, risking setState-after-dispose errors or silent state corruption. {v9}',
     correctionMessage:
         'Check mounted before calling setState after await. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -1961,6 +2008,8 @@ class _WrapSetStateInMountedCheckFix extends DartFix {
 
 /// Warns when a listener is added but never removed.
 ///
+/// Since: v1.7.2 | Updated: v4.13.0 | Rule version: v3
+///
 /// Listeners that are not removed can cause memory leaks and unexpected
 /// behavior after the widget is disposed.
 ///
@@ -1987,7 +2036,6 @@ class _WrapSetStateInMountedCheckFix extends DartFix {
 ///   super.dispose();
 /// }
 /// ```
-
 class AlwaysRemoveListenerRule extends SaropaLintRule {
   const AlwaysRemoveListenerRule() : super(code: _code);
 
@@ -2004,7 +2052,7 @@ class AlwaysRemoveListenerRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'always_remove_listener',
     problemMessage:
-        '[always_remove_listener] Listener added via addListener() but no matching removeListener() call found in dispose(). Orphaned listeners retain references to the widget, preventing garbage collection and causing memory leaks that accumulate as users navigate between screens.',
+        '[always_remove_listener] Listener added via addListener() but no matching removeListener() call found in dispose(). Orphaned listeners retain references to the widget, preventing garbage collection and causing memory leaks that accumulate as users navigate between screens. {v3}',
     correctionMessage:
         'Call removeListener() in the dispose() method for every addListener() call to release references and prevent memory leaks.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -2124,6 +2172,8 @@ class _RemoveListenerFinder extends RecursiveAstVisitor<void> {
 
 /// Warns when Border.all is used instead of const Border.fromBorderSide.
 ///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v7
+///
 /// `Border.all` cannot be const, but `Border.fromBorderSide` can be.
 ///
 /// Example of **bad** code:
@@ -2135,7 +2185,6 @@ class _RemoveListenerFinder extends RecursiveAstVisitor<void> {
 /// ```dart
 /// const Border.fromBorderSide(BorderSide(color: Colors.red, width: 2))
 /// ```
-
 class RequireAnimationDisposalRule extends SaropaLintRule {
   const RequireAnimationDisposalRule() : super(code: _code);
 
@@ -2152,7 +2201,7 @@ class RequireAnimationDisposalRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_animation_disposal',
     problemMessage:
-        '[require_animation_disposal] Failing to dispose an AnimationController in the dispose() method causes it to retain resources, listeners, and animation frames, resulting in memory leaks and degraded performance. This is especially problematic in widgets that are frequently created and destroyed, such as in lists or navigation stacks, and can lead to app instability or crashes. Dispose every AnimationController to keep Flutter apps robust.',
+        '[require_animation_disposal] Failing to dispose an AnimationController in the dispose() method causes it to retain resources, listeners, and animation frames, resulting in memory leaks and degraded performance. This is especially problematic in widgets that are frequently created and destroyed, such as in lists or navigation stacks, and can lead to app instability or crashes. Dispose every AnimationController to keep Flutter apps robust. {v7}',
     correctionMessage:
         "Call _controller.dispose() in your widget's dispose() method before calling super.dispose(). This releases all resources and prevents memory leaks. Audit your codebase for all AnimationController instances and verify each one is disposed.",
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -2256,6 +2305,9 @@ class _DisposeCallFinder extends RecursiveAstVisitor<void> {
 }
 
 /// Future rule: avoid-uncontrolled-text-field
+///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v8
+///
 /// Warns when TextField is used without a controller.
 ///
 /// Example of **bad** code:
@@ -2272,7 +2324,6 @@ class _DisposeCallFinder extends RecursiveAstVisitor<void> {
 ///   onChanged: (value) { },
 /// )
 /// ```
-
 class AvoidScaffoldMessengerAfterAwaitRule extends SaropaLintRule {
   const AvoidScaffoldMessengerAfterAwaitRule() : super(code: _code);
 
@@ -2289,7 +2340,7 @@ class AvoidScaffoldMessengerAfterAwaitRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_scaffold_messenger_after_await',
     problemMessage:
-        '[avoid_scaffold_messenger_after_await] Using ScaffoldMessenger.of(context) after await may use an invalid context. This violates the widget lifecycle, risking setState-after-dispose errors or silent state corruption.',
+        '[avoid_scaffold_messenger_after_await] Using ScaffoldMessenger.of(context) after await may use an invalid context. This violates the widget lifecycle, risking setState-after-dispose errors or silent state corruption. {v8}',
     correctionMessage:
         'Store ScaffoldMessenger.of(context) before the await. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -2349,6 +2400,9 @@ class _ScaffoldMessengerFinderNew extends RecursiveAstVisitor<void> {
 }
 
 /// Future rule: avoid-build-context-in-providers
+///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v6
+///
 /// Warns when BuildContext is stored in providers or state managers.
 ///
 /// Example of **bad** code:
@@ -2366,7 +2420,6 @@ class _ScaffoldMessengerFinderNew extends RecursiveAstVisitor<void> {
 ///   void showMessage(BuildContext context, String msg) {...}
 /// }
 /// ```
-
 class AvoidBuildContextInProvidersRule extends SaropaLintRule {
   const AvoidBuildContextInProvidersRule() : super(code: _code);
 
@@ -2383,7 +2436,7 @@ class AvoidBuildContextInProvidersRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_build_context_in_providers',
     problemMessage:
-        '[avoid_build_context_in_providers] Storing BuildContext in providers can cause memory leaks. BuildContext is stored in providers or state managers. This violates the widget lifecycle, risking setState-after-dispose errors or silent state corruption.',
+        '[avoid_build_context_in_providers] Storing BuildContext in providers can cause memory leaks. BuildContext is stored in providers or state managers. This violates the widget lifecycle, risking setState-after-dispose errors or silent state corruption. {v6}',
     correctionMessage:
         'Pass BuildContext as a method parameter when needed instead. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -2429,6 +2482,9 @@ class AvoidBuildContextInProvidersRule extends SaropaLintRule {
 }
 
 /// Future rule: prefer-semantic-widget-names
+///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v5
+///
 /// Warns when widgets use generic names like Container instead of semantic alternatives.
 ///
 /// Example of **bad** code:
@@ -2446,14 +2502,13 @@ class AvoidBuildContextInProvidersRule extends SaropaLintRule {
 ///   child: child,
 /// )
 /// ```
-
 class PreferWidgetStateMixinRule extends SaropaLintRule {
   const PreferWidgetStateMixinRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
     name: 'prefer_widget_state_mixin',
     problemMessage:
-        '[prefer_widget_state_mixin] Use WidgetStateMixin for interaction states. Widgets use generic names like Container instead of semantic alternatives. This violates the widget lifecycle, risking setState-after-dispose errors or silent state corruption.',
+        '[prefer_widget_state_mixin] Use WidgetStateMixin for interaction states. Widgets use generic names like Container instead of semantic alternatives. This violates the widget lifecycle, risking setState-after-dispose errors or silent state corruption. {v5}',
     correctionMessage:
         'Use WidgetStateMixin to manage hover, pressed, and focus states. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -2512,6 +2567,9 @@ class PreferWidgetStateMixinRule extends SaropaLintRule {
 }
 
 /// Future rule: avoid-image-without-cache-headers
+///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v4
+///
 /// Warns when Image.network is used without cacheWidth/cacheHeight.
 ///
 /// Example of **bad** code:
@@ -2527,14 +2585,13 @@ class PreferWidgetStateMixinRule extends SaropaLintRule {
 ///   cacheHeight: 200,
 /// )
 /// ```
-
 class AvoidInheritedWidgetInInitStateRule extends SaropaLintRule {
   const AvoidInheritedWidgetInInitStateRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
     name: 'avoid_inherited_widget_in_initstate',
     problemMessage:
-        '[avoid_inherited_widget_in_initstate] InheritedWidget accessed in initState(), where the widget is not yet fully mounted in the element tree. This call returns stale or missing data and does not subscribe to updates, so the widget never rebuilds when the inherited value changes.',
+        '[avoid_inherited_widget_in_initstate] InheritedWidget accessed in initState(), where the widget is not yet fully mounted in the element tree. This call returns stale or missing data and does not subscribe to updates, so the widget never rebuilds when the inherited value changes. {v4}',
     correctionMessage:
         'Move the InheritedWidget lookup to didChangeDependencies(), which runs after initState and re-runs whenever dependencies change.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -2600,6 +2657,8 @@ class _InheritedWidgetVisitor extends RecursiveAstVisitor<void> {
 
 /// Warns when a widget references itself in its build method.
 ///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v6
+///
 /// Example of **bad** code:
 /// ```dart
 /// class MyWidget extends StatelessWidget {
@@ -2609,14 +2668,13 @@ class _InheritedWidgetVisitor extends RecursiveAstVisitor<void> {
 ///   }
 /// }
 /// ```
-
 class AvoidRecursiveWidgetCallsRule extends SaropaLintRule {
   const AvoidRecursiveWidgetCallsRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
     name: 'avoid_recursive_widget_calls',
     problemMessage:
-        '[avoid_recursive_widget_calls] Widget build method creates a new instance of itself, triggering infinite recursion. This crashes the app with a stack overflow as Flutter repeatedly builds the same widget, consuming all available stack frames within milliseconds.',
+        '[avoid_recursive_widget_calls] Widget build method creates a new instance of itself, triggering infinite recursion. This crashes the app with a stack overflow as Flutter repeatedly builds the same widget, consuming all available stack frames within milliseconds. {v6}',
     correctionMessage:
         'Extract the repeated content into a separate widget class, or add a depth-limiting condition to terminate the recursion.',
     errorSeverity: DiagnosticSeverity.ERROR,
@@ -2673,6 +2731,8 @@ class _RecursiveWidgetVisitor extends RecursiveAstVisitor<void> {
 
 /// Warns when disposable instances are created but not disposed.
 ///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v7
+///
 /// Example of **bad** code:
 /// ```dart
 /// class MyWidget extends StatefulWidget {
@@ -2684,7 +2744,6 @@ class _RecursiveWidgetVisitor extends RecursiveAstVisitor<void> {
 ///   late final controller = TextEditingController(); // Not disposed
 /// }
 /// ```
-
 class AvoidUndisposedInstancesRule extends SaropaLintRule {
   const AvoidUndisposedInstancesRule() : super(code: _code);
 
@@ -2701,7 +2760,7 @@ class AvoidUndisposedInstancesRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_undisposed_instances',
     problemMessage:
-        '[avoid_undisposed_instances] Disposable object (e.g., TextEditingController, AnimationController, StreamController) created but no matching dispose() call found. Undisposed instances retain listeners, streams, and platform resources, causing memory leaks that grow with each widget rebuild or navigation.',
+        '[avoid_undisposed_instances] Disposable object (e.g., TextEditingController, AnimationController, StreamController) created but no matching dispose() call found. Undisposed instances retain listeners, streams, and platform resources, causing memory leaks that grow with each widget rebuild or navigation. {v7}',
     correctionMessage:
         'Call dispose() on the instance inside the State.dispose() method before calling super.dispose() to release all held resources.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -2880,6 +2939,8 @@ class _DisposeVisitor extends RecursiveAstVisitor<void> {
 
 /// Warns when State class has unnecessary overrides.
 ///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v4
+///
 /// Example of **bad** code:
 /// ```dart
 /// class _MyState extends State<MyWidget> {
@@ -2889,7 +2950,6 @@ class _DisposeVisitor extends RecursiveAstVisitor<void> {
 ///   }
 /// }
 /// ```
-
 class AvoidUnnecessaryOverridesInStateRule extends SaropaLintRule {
   const AvoidUnnecessaryOverridesInStateRule() : super(code: _code);
 
@@ -2906,7 +2966,7 @@ class AvoidUnnecessaryOverridesInStateRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_unnecessary_overrides_in_state',
     problemMessage:
-        '[avoid_unnecessary_overrides_in_state] Override only calls super with no additional logic. State class has unnecessary overrides. This violates the widget lifecycle, risking setState-after-dispose errors or silent state corruption.',
+        '[avoid_unnecessary_overrides_in_state] Override only calls super with no additional logic. State class has unnecessary overrides. This violates the widget lifecycle, risking setState-after-dispose errors or silent state corruption. {v4}',
     correctionMessage:
         'Remove the unnecessary override. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -2965,6 +3025,8 @@ class AvoidUnnecessaryOverridesInStateRule extends SaropaLintRule {
 
 /// Warns when fields that need disposal are not disposed.
 ///
+/// Since: v4.1.3 | Updated: v4.13.0 | Rule version: v2
+///
 /// Example of **bad** code:
 /// ```dart
 /// class _MyState extends State<MyWidget> {
@@ -2972,7 +3034,6 @@ class AvoidUnnecessaryOverridesInStateRule extends SaropaLintRule {
 ///   // Missing dispose() override
 /// }
 /// ```
-
 class DisposeFieldsRule extends SaropaLintRule {
   const DisposeFieldsRule() : super(code: _code);
 
@@ -2989,7 +3050,7 @@ class DisposeFieldsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'dispose_widget_fields',
     problemMessage:
-        '[dispose_widget_fields] Field requires disposal but dispose method is missing or incomplete. Fields that need disposal are not disposed. This violates the widget lifecycle, risking setState-after-dispose errors or silent state corruption.',
+        '[dispose_widget_fields] Field requires disposal but dispose method is missing or incomplete. Fields that need disposal are not disposed. This violates the widget lifecycle, risking setState-after-dispose errors or silent state corruption. {v2}',
     correctionMessage:
         'Add dispose method and call dispose on this field. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -3055,6 +3116,8 @@ class DisposeFieldsRule extends SaropaLintRule {
 
 /// Warns when a new Future is created inside FutureBuilder.
 ///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v8
+///
 /// Creating a new Future inline causes it to restart on every widget rebuild,
 /// leading to flickering UI, wasted network requests, and poor performance.
 ///
@@ -3090,7 +3153,6 @@ class DisposeFieldsRule extends SaropaLintRule {
 ///   builder: (context, snapshot) => ...,
 /// )
 /// ```
-
 class PassExistingFutureToFutureBuilderRule extends SaropaLintRule {
   const PassExistingFutureToFutureBuilderRule() : super(code: _code);
 
@@ -3106,7 +3168,7 @@ class PassExistingFutureToFutureBuilderRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'pass_existing_future_to_future_builder',
     problemMessage:
-        '[pass_existing_future_to_future_builder] Creating new Future in FutureBuilder restarts the async operation on every widget rebuild. This causes duplicate network calls, database queries, and slow UI with visible loading states.',
+        '[pass_existing_future_to_future_builder] Creating new Future in FutureBuilder restarts the async operation on every widget rebuild. This causes duplicate network calls, database queries, and slow UI with visible loading states. {v8}',
     correctionMessage:
         'Cache the Future in initState() or a final field and pass the stored reference to the FutureBuilder to prevent duplicate async operations on each rebuild.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -3150,6 +3212,8 @@ class PassExistingFutureToFutureBuilderRule extends SaropaLintRule {
 
 /// Warns when a new Stream is created inside StreamBuilder.
 ///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v7
+///
 /// Example of **bad** code:
 /// ```dart
 /// StreamBuilder(
@@ -3167,7 +3231,6 @@ class PassExistingFutureToFutureBuilderRule extends SaropaLintRule {
 ///   builder: (context, snapshot) => ...,
 /// )
 /// ```
-
 class PassExistingStreamToStreamBuilderRule extends SaropaLintRule {
   const PassExistingStreamToStreamBuilderRule() : super(code: _code);
 
@@ -3184,7 +3247,7 @@ class PassExistingStreamToStreamBuilderRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'pass_existing_stream_to_stream_builder',
     problemMessage:
-        '[pass_existing_stream_to_stream_builder] New Stream created inline in the StreamBuilder constructor. Every build() call creates a fresh stream, discarding the previous subscription and triggering an infinite rebuild loop as each new stream emits its initial value.',
+        '[pass_existing_stream_to_stream_builder] New Stream created inline in the StreamBuilder constructor. Every build() call creates a fresh stream, discarding the previous subscription and triggering an infinite rebuild loop as each new stream emits its initial value. {v7}',
     correctionMessage:
         'Store the Stream in a field (e.g., a late final or a State variable initialized in initState) and pass the stored reference to StreamBuilder.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -3223,6 +3286,8 @@ class PassExistingStreamToStreamBuilderRule extends SaropaLintRule {
 
 /// Warns when Text widget is created with an empty string.
 ///
+/// Since: v1.4.0 | Updated: v4.13.0 | Rule version: v5
+///
 /// Empty Text widgets consume resources without displaying anything.
 /// Use SizedBox.shrink() or remove the widget entirely.
 ///
@@ -3239,14 +3304,13 @@ class PassExistingStreamToStreamBuilderRule extends SaropaLintRule {
 /// // Or simply remove the widget
 /// if (text.isNotEmpty) Text(text)
 /// ```
-
 class RequireScrollControllerDisposeRule extends SaropaLintRule {
   const RequireScrollControllerDisposeRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
     name: 'require_scroll_controller_dispose',
     problemMessage:
-        '[require_scroll_controller_dispose] ScrollController created but not disposed. Undisposed scroll controllers retain listeners and scroll position state, causing memory leaks that accumulate as users navigate between screens with scrollable content.',
+        '[require_scroll_controller_dispose] ScrollController created but not disposed. Undisposed scroll controllers retain listeners and scroll position state, causing memory leaks that accumulate as users navigate between screens with scrollable content. {v5}',
     correctionMessage:
         'Add _controller.dispose() in the State.dispose() method before calling super.dispose() to release scroll position listeners and resources.',
     errorSeverity: DiagnosticSeverity.ERROR,
@@ -3276,7 +3340,8 @@ class RequireScrollControllerDisposeRule extends SaropaLintRule {
         if (member is FieldDeclaration) {
           for (final VariableDeclaration variable in member.fields.variables) {
             final String? typeName = member.fields.type?.toSource();
-            if (typeName != null && typeName.contains('ScrollController')) {
+            if (typeName == 'ScrollController' ||
+                typeName == 'ScrollController?') {
               controllerNames.add(variable.name.lexeme);
               continue;
             }
@@ -3308,21 +3373,18 @@ class RequireScrollControllerDisposeRule extends SaropaLintRule {
 
       // Check if each controller is disposed
       for (final String name in controllerNames) {
-        // Direct disposal patterns
+        // Direct disposal patterns (whitespace-tolerant)
         final bool isDirectlyDisposed = disposeBody != null &&
-            (disposeBody.contains('$name.dispose(') ||
-                disposeBody.contains('$name?.dispose(') ||
-                disposeBody.contains('$name.disposeSafe(') ||
-                disposeBody.contains('$name?.disposeSafe(') ||
-                disposeBody.contains('$name..dispose('));
+            RegExp(
+              '${RegExp.escape(name)}\\s*[?.]+'
+              '\\s*dispose(Safe)?\\s*\\(',
+            ).hasMatch(disposeBody);
 
-        // Iteration-based disposal for List<ScrollController> or
-        // Map<..., ScrollController>
-        // Patterns like: "for (... in _name) { ...dispose()" or
-        // "for (... in _name.values) { ...dispose()"
+        // Iteration-based disposal
         final bool isIterationDisposed = disposeBody != null &&
-            (disposeBody.contains('in $name)') ||
-                disposeBody.contains('in $name.values)')) &&
+            RegExp(
+              'in\\s+${RegExp.escape(name)}(\\.values)?\\)',
+            ).hasMatch(disposeBody) &&
             disposeBody.contains('.dispose()');
 
         final bool isDisposed = isDirectlyDisposed || isIterationDisposed;
@@ -3431,6 +3493,8 @@ class _AddScrollControllerDisposeFix extends DartFix {
 
 /// Requires FocusNode fields to be disposed in State classes.
 ///
+/// Since: v1.4.3 | Updated: v4.13.0 | Rule version: v6
+///
 /// FocusNode allocates focus tree resources that must be released by calling
 /// dispose(). Failing to do so causes memory leaks and focus management issues.
 ///
@@ -3454,7 +3518,6 @@ class _AddScrollControllerDisposeFix extends DartFix {
 ///   }
 /// }
 /// ```
-
 class RequireFocusNodeDisposeRule extends SaropaLintRule {
   const RequireFocusNodeDisposeRule() : super(code: _code);
 
@@ -3471,7 +3534,7 @@ class RequireFocusNodeDisposeRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_focus_node_dispose',
     problemMessage:
-        '[require_focus_node_dispose] FocusNode created but not disposed. Undisposed focus nodes retain listeners and focus tree references, causing memory leaks and stale focus behavior that accumulates as users navigate between screens with form inputs.',
+        '[require_focus_node_dispose] FocusNode created but not disposed. Undisposed focus nodes retain listeners and focus tree references, causing memory leaks and stale focus behavior that accumulates as users navigate between screens with form inputs. {v6}',
     correctionMessage:
         'Add _focusNode.dispose() in the State.dispose() method before calling super.dispose() to release focus tree references and listeners.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -3501,9 +3564,10 @@ class RequireFocusNodeDisposeRule extends SaropaLintRule {
         if (member is FieldDeclaration) {
           for (final VariableDeclaration variable in member.fields.variables) {
             final String? typeName = member.fields.type?.toSource();
-            if (typeName != null &&
-                (typeName.contains('FocusNode') ||
-                    typeName.contains('FocusScopeNode'))) {
+            if (typeName == 'FocusNode' ||
+                typeName == 'FocusNode?' ||
+                typeName == 'FocusScopeNode' ||
+                typeName == 'FocusScopeNode?') {
               nodeNames.add(variable.name.lexeme);
               continue;
             }
@@ -3535,20 +3599,18 @@ class RequireFocusNodeDisposeRule extends SaropaLintRule {
 
       // Check if each node is disposed
       for (final String name in nodeNames) {
-        // Direct disposal patterns
+        // Direct disposal patterns (whitespace-tolerant)
         final bool isDirectlyDisposed = disposeBody != null &&
-            (disposeBody.contains('$name.dispose(') ||
-                disposeBody.contains('$name?.dispose(') ||
-                disposeBody.contains('$name.disposeSafe(') ||
-                disposeBody.contains('$name?.disposeSafe(') ||
-                disposeBody.contains('$name..dispose('));
+            RegExp(
+              '${RegExp.escape(name)}\\s*[?.]+'
+              '\\s*dispose(Safe)?\\s*\\(',
+            ).hasMatch(disposeBody);
 
-        // Iteration-based disposal for List<FocusNode> or Map<..., FocusNode>
-        // Patterns like: "for (... in _name) { ...dispose()" or
-        // "for (... in _name.values) { ...dispose()"
+        // Iteration-based disposal
         final bool isIterationDisposed = disposeBody != null &&
-            (disposeBody.contains('in $name)') ||
-                disposeBody.contains('in $name.values)')) &&
+            RegExp(
+              'in\\s+${RegExp.escape(name)}(\\.values)?\\)',
+            ).hasMatch(disposeBody) &&
             disposeBody.contains('.dispose()');
 
         final bool isDisposed = isDirectlyDisposed || isIterationDisposed;
@@ -3657,6 +3719,8 @@ class _AddFocusNodeDisposeFix extends DartFix {
 
 /// Warns when InheritedWidget is missing updateShouldNotify.
 ///
+/// Since: v2.1.0 | Updated: v4.13.0 | Rule version: v4
+///
 /// Without updateShouldNotify, dependent widgets rebuild on every
 /// ancestor rebuild, even when the inherited data has not changed.
 ///
@@ -3680,7 +3744,6 @@ class _AddFocusNodeDisposeFix extends DartFix {
 ///       value != oldWidget.value;
 /// }
 /// ```
-
 class RequireShouldRebuildRule extends SaropaLintRule {
   const RequireShouldRebuildRule() : super(code: _code);
 
@@ -3697,7 +3760,7 @@ class RequireShouldRebuildRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_should_rebuild',
     problemMessage:
-        '[require_should_rebuild] InheritedWidget missing updateShouldNotify. Causes unnecessary rebuilds. This violates the widget lifecycle, risking setState-after-dispose errors or silent state corruption.',
+        '[require_should_rebuild] InheritedWidget missing updateShouldNotify. Causes unnecessary rebuilds. This violates the widget lifecycle, risking setState-after-dispose errors or silent state corruption. {v4}',
     correctionMessage:
         'Override updateShouldNotify to control when dependents rebuild. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -3743,6 +3806,8 @@ class RequireShouldRebuildRule extends SaropaLintRule {
 
 /// Warns when app doesn't handle device orientation.
 ///
+/// Since: v4.13.0 | Rule version: v1
+///
 /// Apps should either lock orientation or adapt layout for both
 /// portrait and landscape modes using OrientationBuilder.
 ///
@@ -3772,7 +3837,6 @@ class RequireShouldRebuildRule extends SaropaLintRule {
 ///   },
 /// );
 /// ```
-
 class RequireSuperDisposeCallRule extends SaropaLintRule {
   const RequireSuperDisposeCallRule() : super(code: _code);
 
@@ -3789,7 +3853,7 @@ class RequireSuperDisposeCallRule extends SaropaLintRule {
     name: 'require_super_dispose_call',
     problemMessage:
         '[require_super_dispose_call] Missing super.dispose() prevents parent '
-        'State cleanup, causing memory leaks and broken widget lifecycle.',
+        'State cleanup, causing memory leaks and broken widget lifecycle. {v1}',
     correctionMessage: 'Add super.dispose() at the end of your dispose method.',
     errorSeverity: DiagnosticSeverity.ERROR,
   );
@@ -3822,6 +3886,8 @@ class RequireSuperDisposeCallRule extends SaropaLintRule {
 
 /// Warns when initState() method doesn't call super.initState().
 ///
+/// Since: v2.3.3 | Updated: v4.13.0 | Rule version: v2
+///
 /// Alias: missing_super_init_state, super_init_state_required
 ///
 /// In `State<T>` subclasses, initState() must call super.initState() first
@@ -3848,7 +3914,6 @@ class RequireSuperDisposeCallRule extends SaropaLintRule {
 ///   }
 /// }
 /// ```
-
 class RequireSuperInitStateCallRule extends SaropaLintRule {
   const RequireSuperInitStateCallRule() : super(code: _code);
 
@@ -3865,7 +3930,7 @@ class RequireSuperInitStateCallRule extends SaropaLintRule {
     name: 'require_super_init_state_call',
     problemMessage:
         '[require_super_init_state_call] Missing super.initState() skips parent '
-        'initialization, breaking framework contracts and causing subtle bugs.',
+        'initialization, breaking framework contracts and causing subtle bugs. {v2}',
     correctionMessage:
         'Add super.initState() at the beginning of your initState method.',
     errorSeverity: DiagnosticSeverity.ERROR,
@@ -3899,6 +3964,8 @@ class RequireSuperInitStateCallRule extends SaropaLintRule {
 
 /// Warns when setState is called inside dispose().
 ///
+/// Since: v2.3.3 | Updated: v4.13.0 | Rule version: v2
+///
 /// Alias: set_state_in_dispose, avoid_set_state_after_dispose
 ///
 /// Calling setState in dispose is invalid - the widget is being unmounted.
@@ -3924,7 +3991,6 @@ class RequireSuperInitStateCallRule extends SaropaLintRule {
 ///   }
 /// }
 /// ```
-
 class AvoidSetStateInDisposeRule extends SaropaLintRule {
   const AvoidSetStateInDisposeRule() : super(code: _code);
 
@@ -3941,7 +4007,7 @@ class AvoidSetStateInDisposeRule extends SaropaLintRule {
     name: 'avoid_set_state_in_dispose',
     problemMessage:
         '[avoid_set_state_in_dispose] setState in dispose() throws "setState '
-        'called after dispose" error, crashing the app during navigation.',
+        'called after dispose" error, crashing the app during navigation. {v2}',
     correctionMessage:
         'Remove setState - state changes are invalid during disposal.',
     errorSeverity: DiagnosticSeverity.ERROR,
@@ -3986,6 +4052,8 @@ class AvoidSetStateInDisposeRule extends SaropaLintRule {
 
 /// Warns when Navigator.push/pushNamed is called inside build().
 ///
+/// Since: v4.1.4 | Updated: v4.13.0 | Rule version: v2
+///
 /// Alias: navigation_in_build, avoid_navigator_in_build
 ///
 /// Navigation inside build causes issues because build can be called
@@ -4018,7 +4086,6 @@ class AvoidSetStateInDisposeRule extends SaropaLintRule {
 ///   }
 /// }
 /// ```
-
 class RequireWidgetsBindingCallbackRule extends SaropaLintRule {
   const RequireWidgetsBindingCallbackRule() : super(code: _code);
 
@@ -4032,7 +4099,7 @@ class RequireWidgetsBindingCallbackRule extends SaropaLintRule {
     name: 'require_widgets_binding_callback',
     problemMessage:
         '[require_widgets_binding_callback] showDialog/showModalBottomSheet in '
-        'initState without addPostFrameCallback may fail.',
+        'initState without addPostFrameCallback may fail. {v2}',
     correctionMessage:
         'Wrap in WidgetsBinding.instance.addPostFrameCallback((_) { ... }).',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -4101,6 +4168,8 @@ class _DialogInInitStateVisitor extends RecursiveAstVisitor<void> {
 
 /// GlobalKey fields created in StatefulWidget persist across hot reload.
 ///
+/// Since: v4.1.5 | Updated: v4.13.0 | Rule version: v3
+///
 /// GlobalKeys are expensive and persist state across hot reloads, which can
 /// cause unexpected behavior during development. However, GlobalKey fields
 /// received as constructor parameters (pass-through references) are fine
@@ -4127,7 +4196,6 @@ class _DialogInInitStateVisitor extends RecursiveAstVisitor<void> {
 ///   final GlobalKey<State<StatefulWidget>>? navKey;  // Not owned here
 /// }
 /// ```
-
 class AvoidGlobalKeysInStateRule extends SaropaLintRule {
   const AvoidGlobalKeysInStateRule() : super(code: _code);
 
@@ -4144,7 +4212,7 @@ class AvoidGlobalKeysInStateRule extends SaropaLintRule {
     name: 'avoid_global_keys_in_state',
     problemMessage:
         '[avoid_global_keys_in_state] GlobalKey in StatefulWidget persists '
-        'across hot reload. Move to State class instead.',
+        'across hot reload. Move to State class instead. {v3}',
     correctionMessage:
         'Move this GlobalKey to the State class where it will be properly '
         'managed during hot reload.',

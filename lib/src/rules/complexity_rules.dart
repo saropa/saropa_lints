@@ -12,6 +12,8 @@ import '../saropa_lint_rule.dart';
 
 /// Warns when bitwise operators are used with boolean operands.
 ///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v4
+///
 /// Using & or | with booleans is likely a mistake; use && or || instead.
 /// Bitwise operators don't short-circuit and can cause unexpected behavior.
 ///
@@ -41,7 +43,7 @@ class AvoidBitwiseOperatorsWithBooleansRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_bitwise_operators_with_booleans',
     problemMessage:
-        '[avoid_bitwise_operators_with_booleans] Bitwise operator on boolean. Unlike &&/||, this does not short-circuit. Using & or | with booleans is likely a mistake; use && or || instead. Bitwise operators don\'t short-circuit and can cause unexpected behavior.',
+        '[avoid_bitwise_operators_with_booleans] Bitwise operator on boolean. Unlike &&/||, this does not short-circuit. Using & or | with booleans is likely a mistake; use && or || instead. Bitwise operators don\'t short-circuit and can cause unexpected behavior. {v4}',
     correctionMessage:
         'Use && instead of & and || instead of | for boolean logic. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -78,6 +80,8 @@ class AvoidBitwiseOperatorsWithBooleansRule extends SaropaLintRule {
 
 /// Warns when cascade is used after if-null operator without parentheses.
 ///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v5
+///
 /// Using cascade after `??` without parentheses can lead to unexpected behavior
 /// because `??` has lower precedence than cascade.
 ///
@@ -107,7 +111,7 @@ class AvoidCascadeAfterIfNullRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_cascade_after_if_null',
     problemMessage:
-        '[avoid_cascade_after_if_null] Cascade after ?? may have unexpected precedence. Using cascade after ?? without parentheses can lead to unexpected behavior because ?? has lower precedence than cascade.',
+        '[avoid_cascade_after_if_null] Cascade after ?? may have unexpected precedence. Using cascade after ?? without parentheses can lead to unexpected behavior because ?? has lower precedence than cascade. {v5}',
     correctionMessage:
         'Wrap the ?? expression in parentheses: (a ?? b).cascade. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -134,6 +138,8 @@ class AvoidCascadeAfterIfNullRule extends SaropaLintRule {
 }
 
 /// Warns when arithmetic expressions are too complex.
+///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v4
 ///
 /// Complex arithmetic expressions are hard to understand and maintain.
 /// Consider extracting parts into named variables.
@@ -166,7 +172,7 @@ class AvoidComplexArithmeticExpressionsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_complex_arithmetic_expressions',
     problemMessage:
-        '[avoid_complex_arithmetic_expressions] Arithmetic expression has more than $_maxOperators operators. Complex arithmetic expressions are hard to understand and maintain. Extract parts into named variables.',
+        '[avoid_complex_arithmetic_expressions] Arithmetic expression has more than $_maxOperators operators. Complex arithmetic expressions are hard to understand and maintain. Extract parts into named variables. {v4}',
     correctionMessage:
         'Extract parts into named variables for clarity. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -215,6 +221,8 @@ class AvoidComplexArithmeticExpressionsRule extends SaropaLintRule {
 
 /// Warns when conditions are too complex.
 ///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v3
+///
 /// Complex conditions with many logical operators are hard to understand.
 /// Consider extracting parts into named boolean variables.
 ///
@@ -246,7 +254,7 @@ class AvoidComplexConditionsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_complex_conditions',
     problemMessage:
-        '[avoid_complex_conditions] Condition has more than $_maxOperators logical operators. Complex conditions with many logical operators are hard to understand. Extract parts into named boolean variables.',
+        '[avoid_complex_conditions] Condition has more than $_maxOperators logical operators. Complex conditions with many logical operators are hard to understand. Extract parts into named boolean variables. {v3}',
     correctionMessage:
         'Extract parts into named boolean variables. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -300,6 +308,8 @@ class AvoidComplexConditionsRule extends SaropaLintRule {
 
 /// Warns when the same cascade operation is performed multiple times.
 ///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v4
+///
 /// Duplicate cascades are often a copy-paste error.
 ///
 /// Example of **bad** code:
@@ -332,7 +342,7 @@ class AvoidDuplicateCascadesRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_duplicate_cascades',
     problemMessage:
-        '[avoid_duplicate_cascades] Duplicate cascade operation detected on the same target. Identical cascade members are likely copy-paste errors that produce redundant side effects and increase maintenance risk.',
+        '[avoid_duplicate_cascades] Duplicate cascade operation detected on the same target. Identical cascade members are likely copy-paste errors that produce redundant side effects and increase maintenance risk. {v4}',
     correctionMessage:
         'Remove the duplicate or verify this is intentional. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -365,6 +375,8 @@ class AvoidDuplicateCascadesRule extends SaropaLintRule {
 
 /// Warns when an expression has excessive complexity.
 ///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v4
+///
 /// Complex expressions are hard to read and maintain.
 ///
 /// ### Example
@@ -395,7 +407,7 @@ class AvoidExcessiveExpressionsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_excessive_expressions',
     problemMessage:
-        '[avoid_excessive_expressions] Expression has excessive complexity (>$_maxOperators operators). Complex expressions are hard to read and maintain. This excessive complexity makes the code harder to understand, test, and maintain.',
+        '[avoid_excessive_expressions] Expression has excessive complexity (>$_maxOperators operators). Complex expressions are hard to read and maintain. This excessive complexity makes the code harder to understand, test, and maintain. {v4}',
     correctionMessage:
         'Break into smaller expressions with named variables. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -431,6 +443,8 @@ class AvoidExcessiveExpressionsRule extends SaropaLintRule {
 }
 
 /// Warns when a function is immediately invoked after definition.
+///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v4
 ///
 /// Immediately invoked function expressions (IIFE) can be confusing
 /// and usually indicate the code should be refactored.
@@ -468,7 +482,7 @@ class AvoidImmediatelyInvokedFunctionsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_immediately_invoked_functions',
     problemMessage:
-        '[avoid_immediately_invoked_functions] Function is immediately invoked after definition. Immediately invoked function expressions (IIFE) can be confusing and usually indicate the code must be refactored.',
+        '[avoid_immediately_invoked_functions] Function is immediately invoked after definition. Immediately invoked function expressions (IIFE) can be confusing and usually indicate the code must be refactored. {v4}',
     correctionMessage:
         'Extract the logic inline or to a named function. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -501,6 +515,8 @@ class AvoidImmediatelyInvokedFunctionsRule extends SaropaLintRule {
 }
 
 /// Warns when shorthand syntax is nested too deeply.
+///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v5
 class AvoidNestedShorthandsRule extends SaropaLintRule {
   const AvoidNestedShorthandsRule() : super(code: _code);
 
@@ -514,7 +530,7 @@ class AvoidNestedShorthandsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_nested_shorthands',
     problemMessage:
-        '[avoid_nested_shorthands] Deeply nested shorthand syntax (e.g., cascades inside ternaries inside null-aware operators) reduces readability and makes expressions difficult to understand at a glance. Each nesting level multiplies cognitive load, increasing the risk of logic errors during code review and maintenance.',
+        '[avoid_nested_shorthands] Deeply nested shorthand syntax (e.g., cascades inside ternaries inside null-aware operators) reduces readability and makes expressions difficult to understand at a glance. Each nesting level multiplies cognitive load, increasing the risk of logic errors during code review and maintenance. {v5}',
     correctionMessage:
         'Extract nested expressions into named local variables or helper methods. Each intermediate value should have a descriptive name that communicates its purpose, making the overall logic easier to follow, test, and debug.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -559,6 +575,8 @@ class AvoidNestedShorthandsRule extends SaropaLintRule {
 
 /// Warns when multiple assignments are chained on one line.
 ///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v4
+///
 /// Chained assignments reduce readability and can be confusing.
 ///
 /// Example of **bad** code:
@@ -585,7 +603,7 @@ class AvoidMultiAssignmentRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_multi_assignment',
     problemMessage:
-        '[avoid_multi_assignment] Multiple chained assignments detected. Chained assignments reduce readability and can be confusing. This excessive complexity makes the code harder to understand, test, and maintain.',
+        '[avoid_multi_assignment] Multiple chained assignments detected. Chained assignments reduce readability and can be confusing. This excessive complexity makes the code harder to understand, test, and maintain. {v4}',
     correctionMessage:
         'Split into separate assignment statements. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -608,6 +626,8 @@ class AvoidMultiAssignmentRule extends SaropaLintRule {
 
 /// Warns when binary expression operands could be reordered for clarity.
 ///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v3
+///
 /// **Stylistic rule (opt-in only).** No performance or correctness benefit.
 ///
 /// Prefer having the variable on the left side of comparisons for readability.
@@ -622,7 +642,7 @@ class BinaryExpressionOperandOrderRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'binary_expression_operand_order',
     problemMessage:
-        '[binary_expression_operand_order] Preferring a specific operand order in binary expressions is a stylistic convention. Both orderings produce equivalent compiled code. Enable via the stylistic tier.',
+        '[binary_expression_operand_order] Preferring a specific operand order in binary expressions is a stylistic convention. Both orderings produce equivalent compiled code. Enable via the stylistic tier. {v3}',
     correctionMessage:
         'Place the variable or expression on the left side and the constant on the right (e.g., "status == 200" instead of "200 == status") to match natural language order and improve readability.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -649,6 +669,8 @@ class BinaryExpressionOperandOrderRule extends SaropaLintRule {
 
 /// Warns when an expression is repeated and could be extracted to a variable.
 ///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v4
+///
 /// Repeated expressions can be error-prone and inefficient. Consider
 /// extracting them to a local variable.
 class PreferMovingToVariableRule extends SaropaLintRule {
@@ -664,7 +686,7 @@ class PreferMovingToVariableRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_moving_to_variable',
     problemMessage:
-        '[prefer_moving_to_variable] Expression repeated multiple times within the same scope. Repeated expressions waste CPU recalculating the same value, make code harder to maintain when the logic changes, and increase the chance of typos creating subtle bugs.',
+        '[prefer_moving_to_variable] Expression repeated multiple times within the same scope. Repeated expressions waste CPU recalculating the same value, make code harder to maintain when the logic changes, and increase the chance of typos creating subtle bugs. {v4}',
     correctionMessage:
         'Extract the repeated expression into a descriptive local variable calculated once and reused. This improves performance, makes the code DRY (Don\'t Repeat Yourself), and ensures consistency if the expression value is used multiple times.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -720,6 +742,9 @@ class _ExpressionCollector extends RecursiveAstVisitor<void> {
 }
 
 /// Warns when if-null operator (??) is used without parentheses in
+///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v4
+///
 /// potentially ambiguous expressions.
 ///
 /// ### Example
@@ -748,7 +773,7 @@ class PreferParenthesesWithIfNullRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_parentheses_with_if_null',
     problemMessage:
-        '[prefer_parentheses_with_if_null] Add parentheses to clarify if-null expression precedence. If-null operator (??) is used without parentheses in potentially ambiguous expressions. This excessive complexity makes the code harder to understand, test, and maintain.',
+        '[prefer_parentheses_with_if_null] Add parentheses to clarify if-null expression precedence. If-null operator (??) is used without parentheses in potentially ambiguous expressions. This excessive complexity makes the code harder to understand, test, and maintain. {v4}',
     correctionMessage:
         'Wrap operands in parentheses for clarity. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,

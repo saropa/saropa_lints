@@ -8,6 +8,8 @@ import 'package:saropa_lints/src/saropa_lint_rule.dart';
 
 /// Warns when MediaQuery width is compared to magic numbers.
 ///
+/// Since: v1.8.2 | Updated: v4.13.0 | Rule version: v2
+///
 /// Responsive breakpoints should be extracted to named constants
 /// for clarity and maintainability.
 ///
@@ -34,7 +36,7 @@ class RequireResponsiveBreakpointsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_responsive_breakpoints',
     problemMessage:
-        '[require_responsive_breakpoints] Using magic numbers for breakpoints in MediaQuery makes code unclear and hard to maintain. Readers won’t know what the number means.',
+        '[require_responsive_breakpoints] Using magic numbers for breakpoints in MediaQuery makes code unclear and hard to maintain. Readers won’t know what the number means. {v2}',
     correctionMessage:
         'Extract the number to a named constant (e.g., kTabletBreakpoint) and use that in your MediaQuery comparisons for clarity and maintainability.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -93,6 +95,8 @@ class RequireResponsiveBreakpointsRule extends SaropaLintRule {
 
 /// Warns when Paint() is created inside CustomPainter.paint() method.
 ///
+/// Since: v1.8.2 | Updated: v4.13.0 | Rule version: v2
+///
 /// Paint objects created in paint() are recreated every frame,
 /// causing unnecessary allocations. Move to class fields for better performance.
 ///
@@ -131,7 +135,7 @@ class PreferCachedPaintObjectsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_cached_paint_objects',
     problemMessage:
-        '[prefer_cached_paint_objects] Creating Paint objects inside paint() causes new allocations every frame and hurts performance. Paint objects created in paint() are recreated every frame, causing unnecessary allocations. Move to class fields to improve performance.',
+        '[prefer_cached_paint_objects] Creating Paint objects inside paint() causes new allocations every frame and hurts performance. Paint objects created in paint() are recreated every frame, causing unnecessary allocations. Move to class fields to improve performance. {v2}',
     correctionMessage:
         'Move Paint creation outside paint() and reuse a static or instance field. This reduces allocations and improves performance.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -180,6 +184,8 @@ class PreferCachedPaintObjectsRule extends SaropaLintRule {
 
 /// Warns when CustomPainter.shouldRepaint always returns true.
 ///
+/// Since: v1.8.2 | Updated: v4.13.0 | Rule version: v2
+///
 /// Always returning true from shouldRepaint causes unnecessary repaints.
 /// Compare relevant fields to determine if repaint is actually needed.
 ///
@@ -216,7 +222,7 @@ class RequireCustomPainterShouldRepaintRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_custom_painter_shouldrepaint',
     problemMessage:
-        '[require_custom_painter_shouldrepaint] Always returning true from shouldRepaint causes unnecessary repaints and wastes resources. Always returning true from shouldRepaint causes unnecessary repaints. Compare relevant fields to determine if repaint is actually needed.',
+        '[require_custom_painter_shouldrepaint] Always returning true from shouldRepaint causes unnecessary repaints and wastes resources. Always returning true from shouldRepaint causes unnecessary repaints. Compare relevant fields to determine if repaint is actually needed. {v2}',
     correctionMessage:
         'Compare relevant fields in shouldRepaint and only return true when the painter’s output would change. Avoid always returning true.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -271,6 +277,8 @@ class RequireCustomPainterShouldRepaintRule extends SaropaLintRule {
 
 /// Warns when NumberFormat.currency() lacks locale parameter.
 ///
+/// Since: v1.8.2 | Updated: v4.13.0 | Rule version: v2
+///
 /// Currency formatting depends heavily on locale. Without explicit locale,
 /// the format may not match user expectations.
 ///
@@ -298,7 +306,7 @@ class RequireCurrencyFormattingLocaleRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_currency_formatting_locale',
     problemMessage:
-        '[require_currency_formatting_locale] NumberFormat.currency() without a locale can format currency inconsistently for users. Currency formatting depends heavily on locale. Without explicit locale, the format may not match user expectations.',
+        '[require_currency_formatting_locale] NumberFormat.currency() without a locale can format currency inconsistently for users. Currency formatting depends heavily on locale. Without explicit locale, the format may not match user expectations. {v2}',
     correctionMessage:
         'Always specify a locale for NumberFormat.currency() to ensure consistent formatting for all users.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -347,6 +355,8 @@ class RequireCurrencyFormattingLocaleRule extends SaropaLintRule {
 
 /// Warns when NumberFormat lacks locale parameter.
 ///
+/// Since: v1.8.2 | Updated: v4.13.0 | Rule version: v2
+///
 /// Number formatting varies by locale (decimal separators, grouping, etc.).
 /// Explicit locale ensures consistent formatting across locales.
 ///
@@ -374,7 +384,7 @@ class RequireNumberFormattingLocaleRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_number_formatting_locale',
     problemMessage:
-        '[require_number_formatting_locale] Using NumberFormat or its named constructors without an explicit locale can lead to inconsistent number formatting, such as decimal separators and grouping, depending on the user’s device or system settings. This can cause confusion or misinterpretation of numbers.',
+        '[require_number_formatting_locale] Using NumberFormat or its named constructors without an explicit locale can lead to inconsistent number formatting, such as decimal separators and grouping, depending on the user’s device or system settings. This can cause confusion or misinterpretation of numbers. {v2}',
     correctionMessage:
         'Provide an explicit locale parameter to NumberFormat or its named constructors to ensure numbers are formatted consistently and as intended for all users.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -432,6 +442,8 @@ class RequireNumberFormattingLocaleRule extends SaropaLintRule {
 
 /// Warns when GraphQL query/mutation strings lack operation names.
 ///
+/// Since: v1.8.2 | Updated: v4.13.0 | Rule version: v2
+///
 /// Anonymous GraphQL operations are harder to debug and don't work
 /// with some features like persisted queries.
 ///
@@ -465,7 +477,7 @@ class RequireGraphqlOperationNamesRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_graphql_operation_names',
     problemMessage:
-        '[require_graphql_operation_names] Defining anonymous GraphQL queries, mutations, or subscriptions (without an operation name) makes debugging, error tracking, and persisted queries more difficult. Operation names are essential for identifying and managing GraphQL operations in large codebases and production environments.',
+        '[require_graphql_operation_names] Defining anonymous GraphQL queries, mutations, or subscriptions (without an operation name) makes debugging, error tracking, and persisted queries more difficult. Operation names are essential for identifying and managing GraphQL operations in large codebases and production environments. {v2}',
     correctionMessage:
         'Add a descriptive operation name immediately after the query, mutation, or subscription keyword in your GraphQL document. This improves maintainability, debugging, and compatibility with GraphQL tooling.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -500,6 +512,8 @@ class RequireGraphqlOperationNamesRule extends SaropaLintRule {
 
 /// Warns when Badge shows count of 0 without hiding label.
 ///
+/// Since: v1.8.2 | Updated: v4.13.0 | Rule version: v2
+///
 /// Empty badges confuse users - a badge with "0" usually indicates
 /// there's nothing to see. Hide the badge when count is zero.
 ///
@@ -532,7 +546,7 @@ class AvoidBadgeWithoutMeaningRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_badge_without_meaning',
     problemMessage:
-        '[avoid_badge_without_meaning] Displaying a badge with a count of 0 provides no useful information to users and can create visual noise or confusion. Badges are intended to highlight actionable or noteworthy items, and showing them when empty diminishes their value.',
+        '[avoid_badge_without_meaning] Displaying a badge with a count of 0 provides no useful information to users and can create visual noise or confusion. Badges are intended to highlight actionable or noteworthy items, and showing them when empty diminishes their value. {v2}',
     correctionMessage:
         'Add isLabelVisible: count > 0 (or equivalent logic) to your Badge widget to hide the badge when the count is zero. This ensures badges only appear when there is something to notify the user about.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -580,6 +594,8 @@ class AvoidBadgeWithoutMeaningRule extends SaropaLintRule {
 
 /// Warns when print() is used instead of proper logging.
 ///
+/// Since: v1.8.2 | Updated: v4.13.0 | Rule version: v3
+///
 /// print() statements ship to production and appear in device logs.
 /// Use dart:developer log() or a logging package for better control
 /// over log levels, formatting, and production filtering.
@@ -607,7 +623,7 @@ class PreferLoggerOverPrintRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_logger_over_print',
     problemMessage:
-        '[prefer_logger_over_print] Using print() for logging in production code is discouraged because print statements are not filterable, lack log levels, and may expose sensitive information in release builds. Proper logging allows for better control, filtering, and analysis of application events.',
+        '[prefer_logger_over_print] Using print() for logging in production code is discouraged because print statements are not filterable, lack log levels, and may expose sensitive information in release builds. Proper logging allows for better control, filtering, and analysis of application events. {v3}',
     correctionMessage:
         'Replace print() statements with calls to dart:developer log() or a structured logging package. This provides better log management, filtering, and security in production environments.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -667,6 +683,8 @@ class _PreferLoggerOverPrintFix extends DartFix {
 
 /// Warns when ListView.builder lacks itemExtent for uniform items.
 ///
+/// Since: v1.8.2 | Updated: v4.13.0 | Rule version: v2
+///
 /// When all list items have the same height, setting itemExtent
 /// allows Flutter to optimize layout calculations, improving
 /// scroll performance significantly.
@@ -701,7 +719,7 @@ class PreferItemExtentWhenKnownRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_itemextent_when_known',
     problemMessage:
-        '[prefer_itemextent_when_known] Add itemExtent to improve scroll performance. When all list items have the same height, setting itemExtent allows Flutter to optimize layout calculations, improving scroll performance significantly.',
+        '[prefer_itemextent_when_known] Add itemExtent to improve scroll performance. When all list items have the same height, setting itemExtent allows Flutter to optimize layout calculations, improving scroll performance significantly. {v2}',
     correctionMessage:
         'Set itemExtent when all list items have the same height. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -745,6 +763,8 @@ class PreferItemExtentWhenKnownRule extends SaropaLintRule {
 
 /// Warns when TabBarView children don't preserve state on tab switch.
 ///
+/// Since: v1.8.2 | Updated: v4.13.0 | Rule version: v2
+///
 /// By default, tab content is disposed when switching tabs. Use
 /// AutomaticKeepAliveClientMixin to preserve state across tab switches.
 ///
@@ -780,7 +800,7 @@ class RequireTabStatePreservationRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_tab_state_preservation',
     problemMessage:
-        '[require_tab_state_preservation] TabBarView children may lose state on tab switch. By default, tab content is disposed when switching tabs. Use AutomaticKeepAliveClientMixin to preserve state across tab switches.',
+        '[require_tab_state_preservation] TabBarView children may lose state on tab switch. By default, tab content is disposed when switching tabs. Use AutomaticKeepAliveClientMixin to preserve state across tab switches. {v2}',
     correctionMessage:
         'Use AutomaticKeepAliveClientMixin to preserve state. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -825,6 +845,8 @@ class RequireTabStatePreservationRule extends SaropaLintRule {
 
 /// Warns when CircularProgressIndicator is used for content loading.
 ///
+/// Since: v2.1.0 | Updated: v4.13.0 | Rule version: v2
+///
 /// Skeleton loaders provide better perceived performance than spinners.
 /// They give users a preview of content structure while loading.
 ///
@@ -854,7 +876,7 @@ class PreferSkeletonOverSpinnerRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_skeleton_over_spinner',
     problemMessage:
-        '[prefer_skeleton_over_spinner] CircularProgressIndicator for content loading. Prefer skeleton loaders. This pattern increases maintenance cost and the likelihood of introducing bugs during future changes.',
+        '[prefer_skeleton_over_spinner] CircularProgressIndicator for content loading. Prefer skeleton loaders. This pattern increases maintenance cost and the likelihood of introducing bugs during future changes. {v2}',
     correctionMessage:
         'Use skeleton/shimmer loaders to improve perceived performance. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -896,6 +918,8 @@ class PreferSkeletonOverSpinnerRule extends SaropaLintRule {
 
 /// Warns when search results view has no empty state handling.
 ///
+/// Since: v2.1.0 | Updated: v4.13.0 | Rule version: v2
+///
 /// Search results should show a helpful message when no results are found.
 /// Empty ListView/GridView with no indicator confuses users.
 ///
@@ -929,7 +953,7 @@ class RequireEmptyResultsStateRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_empty_results_state',
     problemMessage:
-        '[require_empty_results_state] List with search-related name missing empty state check. Search results should show a helpful message when no results are found. Empty ListView/GridView with no indicator confuses users.',
+        '[require_empty_results_state] List with search-related name missing empty state check. Search results should show a helpful message when no results are found. Empty ListView/GridView with no indicator confuses users. {v2}',
     correctionMessage:
         'Add isEmpty check with empty state UI to improve UX. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -1006,6 +1030,8 @@ class RequireEmptyResultsStateRule extends SaropaLintRule {
 
 /// Warns when search triggers without loading indicator.
 ///
+/// Since: v2.1.0 | Updated: v4.13.0 | Rule version: v2
+///
 /// When triggering a search (API call), users need feedback that
 /// something is happening. Missing loading state causes confusion.
 ///
@@ -1040,7 +1066,7 @@ class RequireSearchLoadingIndicatorRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_search_loading_indicator',
     problemMessage:
-        '[require_search_loading_indicator] Search callback without loading state management. When triggering a search (API call), users need feedback that something is happening. Missing loading state causes confusion.',
+        '[require_search_loading_indicator] Search callback without loading state management. When triggering a search (API call), users need feedback that something is happening. Missing loading state causes confusion. {v2}',
     correctionMessage:
         'Set loading state before search and clear it on completion. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -1092,6 +1118,8 @@ class RequireSearchLoadingIndicatorRule extends SaropaLintRule {
 
 /// Warns when search TextField triggers API calls without debounce.
 ///
+/// Since: v2.1.0 | Updated: v4.13.0 | Rule version: v2
+///
 /// Typing in search fields should be debounced to avoid excessive
 /// API calls. Each keystroke triggering a request wastes resources.
 ///
@@ -1129,7 +1157,7 @@ class RequireSearchDebounceRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_search_debounce',
     problemMessage:
-        '[require_search_debounce] Calling a search API on every keystroke can overwhelm your backend, degrade performance, and create a poor user experience. Without debouncing, users may see lag, rate limits, or unnecessary network traffic.',
+        '[require_search_debounce] Calling a search API on every keystroke can overwhelm your backend, degrade performance, and create a poor user experience. Without debouncing, users may see lag, rate limits, or unnecessary network traffic. {v2}',
     correctionMessage:
         'Wrap your search trigger in a Debouncer or Timer so the API is only called after the user stops typing for a short period (e.g., 300ms). This reduces load and improves responsiveness.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -1190,6 +1218,8 @@ class RequireSearchDebounceRule extends SaropaLintRule {
 
 /// Warns when paginated list has no loading state for next page.
 ///
+/// Since: v2.1.0 | Updated: v4.13.0 | Rule version: v2
+///
 /// Infinite scroll lists should show a loading indicator when
 /// fetching the next page of results.
 ///
@@ -1228,7 +1258,7 @@ class RequirePaginationLoadingStateRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_pagination_loading_state',
     problemMessage:
-        '[require_pagination_loading_state] Paginated list triggers loadMore but shows no loading indicator. Infinite scroll lists should show a loading indicator when fetching the next page of results.',
+        '[require_pagination_loading_state] Paginated list triggers loadMore but shows no loading indicator. Infinite scroll lists should show a loading indicator when fetching the next page of results. {v2}',
     correctionMessage:
         'Add +1 to itemCount when loading and show indicator at the end. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -1303,6 +1333,8 @@ class RequirePaginationLoadingStateRule extends SaropaLintRule {
 
 /// Warns when WebView lacks a progress indicator for page loading.
 ///
+/// Since: v2.3.7 | Updated: v4.13.0 | Rule version: v2
+///
 /// WebView page loads can take significant time. Without a progress indicator,
 /// users may think the app is frozen or broken. Show loading state while
 /// content loads.
@@ -1355,7 +1387,7 @@ class RequireWebViewProgressIndicatorRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_webview_progress_indicator',
     problemMessage:
-        '[require_webview_progress_indicator] WebView without progress indicator. Users see no loading feedback. WebView page loads can take significant time. Without a progress indicator, users may think the app is frozen or broken. Show loading state while content loads.',
+        '[require_webview_progress_indicator] WebView without progress indicator. Users see no loading feedback. WebView page loads can take significant time. Without a progress indicator, users may think the app is frozen or broken. Show loading state while content loads. {v2}',
     correctionMessage:
         'Add onProgress/onProgressChanged callback to show loading state. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -1436,6 +1468,8 @@ class RequireWebViewProgressIndicatorRule extends SaropaLintRule {
 
 /// Warns when loading states may cause a visible flash.
 ///
+/// Since: v4.2.0 | Updated: v4.13.0 | Rule version: v2
+///
 /// Alias: loading_flash, shimmer_delay
 ///
 /// Immediate loading indicator flash is jarring. Show content immediately for
@@ -1490,7 +1524,7 @@ class AvoidLoadingFlashRule extends SaropaLintRule {
     name: 'avoid_loading_flash',
     problemMessage:
         '[avoid_loading_flash] Loading indicator shown without delay. Fast '
-        'responses will cause jarring visual flash.',
+        'responses will cause jarring visual flash. {v2}',
     correctionMessage:
         'Add a small delay (~200ms) before showing loading indicator, '
         'or use skeleton/shimmer placeholders.',
@@ -1539,6 +1573,128 @@ class AvoidLoadingFlashRule extends SaropaLintRule {
           }
         }
       }
+    });
+  }
+}
+
+// =============================================================================
+// Avatar Loading Placeholder Rules
+// =============================================================================
+
+/// Warns when CircleAvatar uses a NetworkImage for backgroundImage without
+///
+/// Since: v4.12.0 | Updated: v4.13.0 | Rule version: v2
+///
+/// providing an onBackgroundImageError callback or a fallback child widget.
+///
+/// Network images can fail due to connectivity, invalid URLs, or server
+/// errors. Without error handling, CircleAvatar shows an empty or broken
+/// state that confuses users.
+///
+/// **BAD:**
+/// ```dart
+/// CircleAvatar(
+///   backgroundImage: NetworkImage(user.avatarUrl),
+/// )
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// CircleAvatar(
+///   backgroundImage: NetworkImage(user.avatarUrl),
+///   onBackgroundImageError: (_, __) {},
+///   child: Text(user.initials), // Fallback when image fails
+/// )
+/// ```
+class PreferAvatarLoadingPlaceholderRule extends SaropaLintRule {
+  const PreferAvatarLoadingPlaceholderRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  static const LintCode _code = LintCode(
+    name: 'prefer_avatar_loading_placeholder',
+    problemMessage:
+        '[prefer_avatar_loading_placeholder] CircleAvatar uses a network-loaded backgroundImage without providing onBackgroundImageError or a child widget as fallback. When the network image fails to load due to connectivity issues, invalid URLs, server errors, or slow connections, the avatar displays an empty or broken state with no visual feedback to the user. This creates a confusing UI where the user sees a blank circle instead of meaningful placeholder content like initials or a default icon. {v2}',
+    correctionMessage:
+        'Add an onBackgroundImageError callback and/or a child widget (e.g., Text with user initials or an Icon) to serve as a fallback when the network image fails to load.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addInstanceCreationExpression((
+      InstanceCreationExpression node,
+    ) {
+      final String typeName = node.constructorName.type.name.lexeme;
+      if (typeName != 'CircleAvatar') return;
+
+      bool hasNetworkImage = false;
+      bool hasErrorHandler = false;
+      bool hasChild = false;
+
+      for (final Expression arg in node.argumentList.arguments) {
+        if (arg is! NamedExpression) continue;
+        final String paramName = arg.name.label.name;
+
+        if (paramName == 'backgroundImage') {
+          final String imgSource = arg.expression.toSource();
+          if (imgSource.contains('NetworkImage') ||
+              imgSource.contains('CachedNetworkImageProvider')) {
+            hasNetworkImage = true;
+          }
+        } else if (paramName == 'onBackgroundImageError') {
+          hasErrorHandler = true;
+        } else if (paramName == 'child') {
+          hasChild = true;
+        }
+      }
+
+      if (hasNetworkImage && !hasErrorHandler && !hasChild) {
+        reporter.atNode(node, code);
+      }
+    });
+  }
+
+  @override
+  List<Fix> getFixes() => <Fix>[_AddAvatarFallbackFix()];
+}
+
+class _AddAvatarFallbackFix extends DartFix {
+  @override
+  void run(
+    CustomLintResolver resolver,
+    ChangeReporter reporter,
+    CustomLintContext context,
+    AnalysisError analysisError,
+    List<AnalysisError> others,
+  ) {
+    context.registry.addInstanceCreationExpression((
+      InstanceCreationExpression node,
+    ) {
+      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
+      if (node.constructorName.type.name.lexeme != 'CircleAvatar') return;
+
+      final changeBuilder = reporter.createChangeBuilder(
+        message: 'Add onBackgroundImageError and child fallback',
+        priority: 1,
+      );
+
+      changeBuilder.addDartFileEdit((builder) {
+        // Insert before the closing parenthesis
+        final int insertOffset = node.argumentList.rightParenthesis.offset;
+        builder.addSimpleInsertion(
+          insertOffset,
+          "onBackgroundImageError: (_, __) {}, child: const Icon(Icons.person), ",
+        );
+      });
     });
   }
 }

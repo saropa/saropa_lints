@@ -40,6 +40,8 @@ import '../../saropa_lint_rule.dart';
 
 /// Warns when Scaffold body is not wrapped in SafeArea.
 ///
+/// Since: v2.4.0 | Updated: v4.13.0 | Rule version: v2
+///
 /// iOS devices have notches (iPhone X+), Dynamic Islands (iPhone 14 Pro+),
 /// and home indicators that can overlap content. SafeArea ensures content
 /// is visible and interactive on all iOS devices.
@@ -101,7 +103,7 @@ class PreferIosSafeAreaRule extends SaropaLintRule {
     name: 'prefer_ios_safe_area',
     problemMessage:
         '[prefer_ios_safe_area] Scaffold body without SafeArea may have content hidden by iOS notch '
-        'or Dynamic Island.',
+        'or Dynamic Island. {v2}',
     correctionMessage:
         'Wrap body content with SafeArea to avoid UI overlap on iOS devices.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -196,6 +198,8 @@ class _WrapWithSafeAreaFix extends DartFix {
 
 /// Warns when hardcoded iOS status bar height values are used.
 ///
+/// Since: v2.4.0 | Updated: v4.13.0 | Rule version: v2
+///
 /// iOS status bar height varies significantly by device:
 /// - **20pt**: iPhone 8 and earlier (pre-notch)
 /// - **44pt**: iPhone X, XS, 11 Pro (notch)
@@ -248,7 +252,7 @@ class AvoidIosHardcodedStatusBarRule extends SaropaLintRule {
     name: 'avoid_ios_hardcoded_status_bar',
     problemMessage:
         '[avoid_ios_hardcoded_status_bar] Hardcoded status bar height (20, 44, 47, or 59) may cause UI issues '
-        'on different iOS devices.',
+        'on different iOS devices. {v2}',
     correctionMessage:
         'Use MediaQuery.of(context).padding.top for dynamic status bar height.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -380,6 +384,8 @@ class _UseMediaQueryPaddingFix extends DartFix {
 
 /// Suggests adding haptic feedback for important button interactions on iOS.
 ///
+/// Since: v2.4.0 | Updated: v4.13.0 | Rule version: v2
+///
 /// iOS provides rich haptic feedback through the Taptic Engine. Using
 /// `HapticFeedback` improves user experience by providing tactile confirmation
 /// of actions.
@@ -435,7 +441,7 @@ class PreferIosHapticFeedbackRule extends SaropaLintRule {
     name: 'prefer_ios_haptic_feedback',
     problemMessage:
         '[prefer_ios_haptic_feedback] Consider adding haptic feedback for important button interactions '
-        'on iOS.',
+        'on iOS. {v2}',
     correctionMessage:
         'Use HapticFeedback.mediumImpact() or similar for tactile response.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -533,6 +539,8 @@ class _AddHapticFeedbackFix extends DartFix {
 
 /// Warns when iOS-specific MethodChannel calls lack Platform.isIOS guard.
 ///
+/// Since: v2.4.0 | Updated: v4.13.0 | Rule version: v2
+///
 /// Platform-specific MethodChannel calls should be wrapped in platform checks
 /// to prevent runtime errors when running on unsupported platforms.
 ///
@@ -585,7 +593,7 @@ class RequireIosPlatformCheckRule extends SaropaLintRule {
     name: 'require_ios_platform_check',
     problemMessage:
         '[require_ios_platform_check] iOS-specific MethodChannel without Platform.isIOS check may crash '
-        'on other platforms.',
+        'on other platforms. {v2}',
     correctionMessage: 'Wrap iOS-specific code with if (Platform.isIOS) check.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
@@ -726,6 +734,8 @@ class _WrapWithPlatformCheckFix extends DartFix {
 
 /// Warns when Future.delayed exceeds iOS background fetch time limits.
 ///
+/// Since: v2.4.0 | Updated: v4.13.0 | Rule version: v2
+///
 /// iOS terminates background tasks after approximately 30 seconds. Using
 /// [Future.delayed] with durations exceeding this limit in background
 /// contexts will result in incomplete execution.
@@ -772,7 +782,7 @@ class AvoidIosBackgroundFetchAbuseRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_ios_background_fetch_abuse',
     problemMessage:
-        '[avoid_ios_background_fetch_abuse] Future.delayed duration exceeds iOS 30-second background limit.',
+        '[avoid_ios_background_fetch_abuse] Future.delayed duration exceeds iOS 30-second background limit. {v2}',
     correctionMessage:
         'Design background tasks to complete within iOS time limits '
         '(~30 seconds).',
@@ -846,6 +856,8 @@ class AvoidIosBackgroundFetchAbuseRule extends SaropaLintRule {
 
 /// Warns when MethodChannel.invokeMethod is used without error handling.
 ///
+/// Since: v2.4.0 | Updated: v4.13.0 | Rule version: v2
+///
 /// Platform channels can fail on iOS/macOS for various reasons:
 /// - Plugin not implemented on native side
 /// - Permission denied
@@ -895,7 +907,7 @@ class RequireMethodChannelErrorHandlingRule extends SaropaLintRule {
     name: 'require_method_channel_error_handling',
     problemMessage:
         '[require_method_channel_error_handling] MethodChannel.invokeMethod without error handling may crash on '
-        'iOS/macOS.',
+        'iOS/macOS. {v2}',
     correctionMessage: 'Wrap in try-catch and handle PlatformException.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
@@ -1013,6 +1025,8 @@ class _WrapWithTryCatchFix extends DartFix {
 
 /// Reminds to validate iOS Universal Links server configuration.
 ///
+/// Since: v2.4.0 | Updated: v4.13.0 | Rule version: v2
+///
 /// iOS Universal Links (and Android App Links) require proper server-side
 /// configuration:
 /// - **iOS**: apple-app-site-association file at /.well-known/
@@ -1067,7 +1081,7 @@ class RequireUniversalLinkValidationRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_universal_link_validation',
     problemMessage:
-        '[require_universal_link_validation] Deep link route may need iOS Universal Links server configuration. iOS Universal Links (and Android App Links) require proper server-side configuration: - iOS: apple-app-site-association file at /.well-known/ - Android: assetlinks.json at /.well-known/.',
+        '[require_universal_link_validation] Deep link route may need iOS Universal Links server configuration. iOS Universal Links (and Android App Links) require proper server-side configuration: - iOS: apple-app-site-association file at /.well-known/ - Android: assetlinks.json at /.well-known/. {v2}',
     correctionMessage:
         'Ensure apple-app-site-association is configured and test on real. Verify the change works correctly with existing tests and add coverage for the new behavior.'
         'iOS device.',
@@ -1105,6 +1119,8 @@ class RequireUniversalLinkValidationRule extends SaropaLintRule {
 }
 
 /// Suggests using Cupertino widgets in iOS-specific code blocks.
+///
+/// Since: v2.4.0 | Updated: v4.13.0 | Rule version: v2
 ///
 /// When code explicitly checks for Platform.isIOS, using Material widgets
 /// misses the opportunity to provide a native iOS experience. Cupertino
@@ -1158,7 +1174,7 @@ class PreferCupertinoForIosRule extends SaropaLintRule {
     name: 'prefer_cupertino_for_ios',
     problemMessage:
         '[prefer_cupertino_for_ios] Material widget in iOS-specific code block. Consider using '
-        'Cupertino equivalent for native iOS feel.',
+        'Cupertino equivalent for native iOS feel. {v2}',
     correctionMessage:
         'Use CupertinoAlertDialog, CupertinoSwitch, etc. for native iOS feel.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -1219,6 +1235,8 @@ class PreferCupertinoForIosRule extends SaropaLintRule {
 
 /// Warns when HTTP URLs are used that iOS App Transport Security will block.
 ///
+/// Since: v2.4.0 | Updated: v4.13.0 | Rule version: v2
+///
 /// iOS App Transport Security (ATS) blocks non-HTTPS connections by default.
 /// HTTP URLs require explicit exceptions in Info.plist to function.
 ///
@@ -1273,7 +1291,7 @@ class RequireHttpsForIosRule extends SaropaLintRule {
     name: 'require_https_for_ios',
     problemMessage:
         '[require_https_for_ios] HTTP URL will be blocked by iOS App Transport Security unless '
-        'exception is configured.',
+        'exception is configured. {v2}',
     correctionMessage:
         'Use HTTPS or add NSAppTransportSecurity exception in Info.plist.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -1373,6 +1391,8 @@ class _ReplaceHttpWithHttpsFix extends DartFix {
 
 /// Warns when permission-requiring APIs are used without Info.plist entries.
 ///
+/// Since: v2.4.0 | Updated: v4.13.0 | Rule version: v5
+///
 /// iOS requires Info.plist usage description entries for any app that accesses
 /// protected resources (camera, location, microphone, etc.). Apps without
 /// these entries are **rejected by App Store review**.
@@ -1432,7 +1452,7 @@ class RequireIosPermissionDescriptionRule extends SaropaLintRule {
     name: 'require_ios_permission_description',
     problemMessage:
         '[require_ios_permission_description] Missing Info.plist keys cause App '
-        'Store rejection or instant crash when the permission is requested.',
+        'Store rejection or instant crash when the permission is requested. {v5}',
     correctionMessage: 'Add the missing key(s) to ios/Runner/Info.plist.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
@@ -1586,6 +1606,8 @@ enum _ImageSource { gallery, camera, unknown }
 
 /// Warns when APIs requiring iOS 17+ Privacy Manifest are used.
 ///
+/// Since: v2.4.0 | Updated: v4.13.0 | Rule version: v3
+///
 /// Starting with iOS 17, Apple requires apps to declare usage of certain
 /// "required reason APIs" in a PrivacyInfo.xcprivacy file. Apps using these
 /// APIs without declaration may be rejected from the App Store.
@@ -1625,7 +1647,7 @@ class RequireIosPrivacyManifestRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_ios_privacy_manifest',
     problemMessage:
-        '[require_ios_privacy_manifest] API requires an iOS Privacy Manifest entry (iOS 17+). Missing PrivacyInfo.xcprivacy declarations for required-reason APIs will cause automatic App Store rejection during review, block new releases, and may trigger runtime permission failures on user devices.',
+        '[require_ios_privacy_manifest] API requires an iOS Privacy Manifest entry (iOS 17+). Missing PrivacyInfo.xcprivacy declarations for required-reason APIs will cause automatic App Store rejection during review, block new releases, and may trigger runtime permission failures on user devices. {v3}',
     correctionMessage:
         'Add a PrivacyInfo.xcprivacy file with the required reason API declarations. This is mandatory for App Store approval and correct runtime behavior on iOS 17+.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -1678,6 +1700,8 @@ class RequireIosPrivacyManifestRule extends SaropaLintRule {
 // =============================================================================
 
 /// Warns when apps use third-party login without Sign in with Apple.
+///
+/// Since: v2.4.0 | Updated: v4.13.0 | Rule version: v2
 ///
 /// Apple's App Store Review Guidelines (Section 4.8) require that apps offering
 /// third-party login options (Google, Facebook, Twitter, etc.) must also offer
@@ -1737,7 +1761,7 @@ class RequireAppleSignInRule extends SaropaLintRule {
     name: 'require_apple_sign_in',
     problemMessage:
         '[require_apple_sign_in] Third-party login detected without Sign in with Apple. '
-        'iOS apps with social login must offer Sign in with Apple.',
+        'iOS apps with social login must offer Sign in with Apple. {v2}',
     correctionMessage:
         'Add Sign in with Apple using the sign_in_with_apple package '
         'per App Store Guidelines 4.8.',
@@ -1824,6 +1848,8 @@ class RequireAppleSignInRule extends SaropaLintRule {
 
 /// Warns when iOS-specific background task patterns exceed time limits.
 ///
+/// Since: v2.4.0 | Updated: v4.13.0 | Rule version: v2
+///
 /// iOS strictly limits background execution time:
 /// - **Background fetch**: ~30 seconds maximum
 /// - **Background processing**: 1-10 minutes (requires BGProcessingTask)
@@ -1884,7 +1910,7 @@ class RequireIosBackgroundModeRule extends SaropaLintRule {
     name: 'require_ios_background_mode',
     problemMessage:
         '[require_ios_background_mode] Background task pattern detected. iOS requires specific capabilities '
-        'for background execution.',
+        'for background execution. {v2}',
     correctionMessage:
         'Add background capabilities in Xcode (Background fetch, '
         'Background processing, etc.) and use workmanager package.',
@@ -1927,6 +1953,8 @@ class RequireIosBackgroundModeRule extends SaropaLintRule {
 }
 
 /// Warns when deprecated iOS 13+ APIs are used via platform channels.
+///
+/// Since: v2.4.0 | Updated: v4.13.0 | Rule version: v2
 ///
 /// iOS 13 deprecated several UIKit APIs that were commonly used. Apps using
 /// these deprecated APIs receive App Store warnings and may eventually be
@@ -1980,7 +2008,7 @@ class AvoidIos13DeprecationsRule extends SaropaLintRule {
     name: 'avoid_ios_13_deprecations',
     problemMessage:
         '[avoid_ios_13_deprecations] Deprecated iOS API detected. This API is deprecated since iOS 13 '
-        'and may cause App Store rejection.',
+        'and may cause App Store rejection. {v2}',
     correctionMessage:
         'Use the modern replacement API. See Apple documentation for '
         'migration guidance.',
@@ -2030,6 +2058,8 @@ class AvoidIos13DeprecationsRule extends SaropaLintRule {
 
 /// Warns when iOS Simulator-only code patterns are detected.
 ///
+/// Since: v2.4.0 | Updated: v4.13.0 | Rule version: v2
+///
 /// Code that only works on iOS Simulator (not real devices) should be properly
 /// guarded to prevent runtime failures in production.
 ///
@@ -2078,7 +2108,7 @@ class AvoidIosSimulatorOnlyCodeRule extends SaropaLintRule {
     name: 'avoid_ios_simulator_only_code',
     problemMessage:
         '[avoid_ios_simulator_only_code] iOS Simulator-only code pattern detected. This code may not work '
-        'on real iOS devices.',
+        'on real iOS devices. {v2}',
     correctionMessage:
         'Use platform-agnostic paths (path_provider) and proper environment '
         'detection.',
@@ -2121,6 +2151,8 @@ class AvoidIosSimulatorOnlyCodeRule extends SaropaLintRule {
 }
 
 /// Warns when iOS version-specific APIs are used without version checks.
+///
+/// Since: v2.4.0 | Updated: v4.13.0 | Rule version: v2
 ///
 /// iOS APIs have minimum version requirements. Using newer APIs without
 /// version guards causes crashes on older iOS versions that users may still
@@ -2175,7 +2207,7 @@ class RequireIosMinimumVersionCheckRule extends SaropaLintRule {
     name: 'require_ios_minimum_version_check',
     problemMessage:
         '[require_ios_minimum_version_check] iOS version-specific API detected. Ensure iOS version is checked '
-        'before using this API.',
+        'before using this API. {v2}',
     correctionMessage:
         'Add iOS version check before calling version-specific APIs.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -2231,6 +2263,8 @@ class RequireIosMinimumVersionCheckRule extends SaropaLintRule {
 
 /// Warns when deprecated UIKit APIs are used in platform channel code.
 ///
+/// Since: v2.4.0 | Updated: v4.13.0 | Rule version: v2
+///
 /// Platform channel code (Swift/Objective-C) that uses deprecated UIKit APIs
 /// will generate warnings during Xcode builds and may be rejected by App Store
 /// in future iOS versions.
@@ -2282,7 +2316,7 @@ class AvoidIosDeprecatedUikitRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_ios_deprecated_uikit',
     problemMessage:
-        '[avoid_ios_deprecated_uikit] Deprecated UIKit API pattern detected in platform channel code. Platform channel code (Swift/Objective-C) that uses deprecated UIKit APIs will generate warnings during Xcode builds and may be rejected by App Store in future iOS versions.',
+        '[avoid_ios_deprecated_uikit] Deprecated UIKit API pattern detected in platform channel code. Platform channel code (Swift/Objective-C) that uses deprecated UIKit APIs will generate warnings during Xcode builds and may be rejected by App Store in future iOS versions. {v2}',
     correctionMessage:
         'Update platform channel code to use modern iOS APIs. Verify the change works correctly with existing tests and add coverage for the new behavior.'
         'See Xcode warnings for specific replacements.',
@@ -2326,6 +2360,8 @@ class AvoidIosDeprecatedUikitRule extends SaropaLintRule {
 // =============================================================================
 
 /// Warns when apps use advertising/tracking without App Tracking Transparency.
+///
+/// Since: v2.4.0 | Updated: v4.13.0 | Rule version: v2
 ///
 /// iOS 14.5+ requires apps to request user permission before tracking via
 /// App Tracking Transparency (ATT). Apps that track without permission are
@@ -2379,7 +2415,7 @@ class RequireIosAppTrackingTransparencyRule extends SaropaLintRule {
     name: 'require_ios_app_tracking_transparency',
     problemMessage:
         '[require_ios_app_tracking_transparency] Advertising/tracking SDK detected. iOS 14.5+ requires App Tracking '
-        'Transparency permission before tracking users.',
+        'Transparency permission before tracking users. {v2}',
     correctionMessage:
         'Use AppTrackingTransparency.requestTrackingAuthorization() before '
         'initializing ad SDKs. Add NSUserTrackingUsageDescription to Info.plist.',
@@ -2461,6 +2497,8 @@ class RequireIosAppTrackingTransparencyRule extends SaropaLintRule {
 
 /// Warns when Face ID is used without NSFaceIDUsageDescription.
 ///
+/// Since: v2.4.0 | Updated: v4.13.0 | Rule version: v4
+///
 /// iOS requires NSFaceIDUsageDescription in Info.plist for any app that uses
 /// Face ID authentication. Apps without this entry crash when attempting
 /// Face ID authentication.
@@ -2504,7 +2542,7 @@ class RequireIosFaceIdUsageDescriptionRule extends SaropaLintRule {
     name: 'require_ios_face_id_usage_description',
     problemMessage:
         '[require_ios_face_id_usage_description] Biometric authentication detected. iOS requires '
-        'NSFaceIDUsageDescription in Info.plist for Face ID.',
+        'NSFaceIDUsageDescription in Info.plist for Face ID. {v4}',
     correctionMessage:
         'Add NSFaceIDUsageDescription to ios/Runner/Info.plist explaining '
         'why your app uses Face ID.',
@@ -2575,6 +2613,8 @@ class RequireIosFaceIdUsageDescriptionRule extends SaropaLintRule {
 
 /// Warns when saving photos without NSPhotoLibraryAddUsageDescription.
 ///
+/// Since: v2.4.0 | Updated: v4.13.0 | Rule version: v2
+///
 /// iOS separates permissions for reading vs writing to the photo library:
 /// - **NSPhotoLibraryUsageDescription**: Reading photos (picker)
 /// - **NSPhotoLibraryAddUsageDescription**: Saving photos (write-only)
@@ -2617,7 +2657,7 @@ class RequireIosPhotoLibraryAddUsageRule extends SaropaLintRule {
     name: 'require_ios_photo_library_add_usage',
     problemMessage:
         '[require_ios_photo_library_add_usage] Photo saving detected. iOS requires NSPhotoLibraryAddUsageDescription '
-        'for saving photos (separate from read permission).',
+        'for saving photos (separate from read permission). {v2}',
     correctionMessage:
         'Add NSPhotoLibraryAddUsageDescription to ios/Runner/Info.plist.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -2666,6 +2706,8 @@ class RequireIosPhotoLibraryAddUsageRule extends SaropaLintRule {
 
 /// Warns when OAuth is performed via in-app WebView instead of system browser.
 ///
+/// Since: v2.4.0 | Updated: v4.13.0 | Rule version: v2
+///
 /// Google and Apple block OAuth via in-app WebView for security reasons.
 /// OAuth must use ASWebAuthenticationSession (iOS) or Custom Tabs (Android).
 ///
@@ -2711,7 +2753,7 @@ class AvoidIosInAppBrowserForAuthRule extends SaropaLintRule {
     name: 'avoid_ios_in_app_browser_for_auth',
     problemMessage:
         '[avoid_ios_in_app_browser_for_auth] OAuth URL detected in WebView. Google and Apple block OAuth via '
-        'in-app WebView for security reasons.',
+        'in-app WebView for security reasons. {v2}',
     correctionMessage: 'Use flutter_appauth or url_launcher for OAuth. '
         'ASWebAuthenticationSession is required on iOS.',
     errorSeverity: DiagnosticSeverity.ERROR,
@@ -2784,6 +2826,8 @@ class AvoidIosInAppBrowserForAuthRule extends SaropaLintRule {
 
 /// Warns when app review is requested too early or too frequently.
 ///
+/// Since: v2.4.0 | Updated: v4.13.0 | Rule version: v2
+///
 /// Apple's App Store Review Guidelines require that apps not prompt for
 /// reviews on first launch or too frequently. Apps that violate this are
 /// **rejected during App Store review**.
@@ -2840,7 +2884,7 @@ class RequireIosAppReviewPromptTimingRule extends SaropaLintRule {
     name: 'require_ios_app_review_prompt_timing',
     problemMessage:
         '[require_ios_app_review_prompt_timing] App review request detected in initialization context. '
-        'Do not request reviews on first launch or during startup.',
+        'Do not request reviews on first launch or during startup. {v2}',
     correctionMessage: 'Move review request after meaningful user engagement. '
         'Apple rejects apps that prompt too early.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -2907,6 +2951,8 @@ class RequireIosAppReviewPromptTimingRule extends SaropaLintRule {
 
 /// Warns when Keychain is used without specifying accessibility level.
 ///
+/// Since: v2.4.0 | Updated: v4.13.0 | Rule version: v2
+///
 /// iOS Keychain items should specify when they're accessible for security.
 /// Default accessibility may not be appropriate for sensitive data.
 ///
@@ -2960,7 +3006,7 @@ class RequireIosKeychainAccessibilityRule extends SaropaLintRule {
     name: 'require_ios_keychain_accessibility',
     problemMessage:
         '[require_ios_keychain_accessibility] Keychain write detected. Consider specifying iOS accessibility level '
-        'for security.',
+        'for security. {v2}',
     correctionMessage:
         'Use IOSOptions with KeychainAccessibility to control when data '
         'is accessible.',
@@ -3005,6 +3051,8 @@ class RequireIosKeychainAccessibilityRule extends SaropaLintRule {
 }
 
 /// Warns when bundle ID is hardcoded instead of from configuration.
+///
+/// Since: v2.4.0 | Updated: v4.13.0 | Rule version: v2
 ///
 /// Bundle IDs should come from build configuration, not hardcoded strings.
 /// Hardcoded bundle IDs cause issues when:
@@ -3051,7 +3099,7 @@ class AvoidIosHardcodedBundleIdRule extends SaropaLintRule {
     name: 'avoid_ios_hardcoded_bundle_id',
     problemMessage:
         '[avoid_ios_hardcoded_bundle_id] Hardcoded bundle ID detected. Bundle IDs should come from '
-        'configuration, not hardcoded strings.',
+        'configuration, not hardcoded strings. {v2}',
     correctionMessage:
         'Use PackageInfo.fromPlatform().packageName or build-time configuration.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -3110,6 +3158,8 @@ class AvoidIosHardcodedBundleIdRule extends SaropaLintRule {
 
 /// Warns when push notifications are used without capability reminder.
 ///
+/// Since: v2.4.0 | Updated: v4.13.0 | Rule version: v3
+///
 /// iOS push notifications require:
 /// 1. Push Notifications capability in Xcode
 /// 2. APNs certificate or key configured in Apple Developer Console
@@ -3149,7 +3199,7 @@ class RequireIosPushNotificationCapabilityRule extends SaropaLintRule {
     name: 'require_ios_push_notification_capability',
     problemMessage:
         '[require_ios_push_notification_capability] Push notification usage detected. Ensure Push Notifications '
-        'capability is enabled in Xcode and APNs is configured.',
+        'capability is enabled in Xcode and APNs is configured. {v3}',
     correctionMessage:
         'Enable Push Notifications in Xcode Signing & Capabilities. '
         'Configure APNs key/certificate in Apple Developer Console.',
@@ -3220,6 +3270,8 @@ class RequireIosPushNotificationCapabilityRule extends SaropaLintRule {
 
 /// Warns when HTTP connections are used without ATS exception documentation.
 ///
+/// Since: v2.4.0 | Updated: v4.13.0 | Rule version: v2
+///
 /// iOS App Transport Security (ATS) blocks HTTP connections by default.
 /// If your app must use HTTP (e.g., connecting to IoT devices, local servers),
 /// you need both Info.plist exceptions AND code comments explaining why.
@@ -3263,7 +3315,7 @@ class RequireIosAtsExceptionDocumentationRule extends SaropaLintRule {
     name: 'require_ios_ats_exception_documentation',
     problemMessage:
         '[require_ios_ats_exception_documentation] HTTP URL detected. If intentional, document the ATS exception '
-        'required in Info.plist with a comment.',
+        'required in Info.plist with a comment. {v2}',
     correctionMessage:
         'Add a comment explaining why HTTP is needed and which ATS exception '
         'is configured in Info.plist.',
@@ -3312,6 +3364,8 @@ class RequireIosAtsExceptionDocumentationRule extends SaropaLintRule {
 
 /// Warns when local notifications are scheduled without permission request.
 ///
+/// Since: v2.4.0 | Updated: v4.13.0 | Rule version: v2
+///
 /// iOS requires explicit permission for local notifications since iOS 10.
 /// Notifications scheduled without permission are silently dropped.
 ///
@@ -3358,7 +3412,7 @@ class RequireIosLocalNotificationPermissionRule extends SaropaLintRule {
     name: 'require_ios_local_notification_permission',
     problemMessage:
         '[require_ios_local_notification_permission] Local notification scheduling detected. Ensure iOS notification '
-        'permission is requested before scheduling.',
+        'permission is requested before scheduling. {v2}',
     correctionMessage:
         'Call requestPermissions() on IOSFlutterLocalNotificationsPlugin '
         'before scheduling notifications.',
@@ -3409,6 +3463,8 @@ class RequireIosLocalNotificationPermissionRule extends SaropaLintRule {
 
 /// Warns when device model names are hardcoded instead of detected.
 ///
+/// Since: v2.4.0 | Updated: v4.13.0 | Rule version: v2
+///
 /// Hardcoding device model names (iPhone, iPad, etc.) causes maintenance
 /// issues when Apple releases new devices with different characteristics.
 ///
@@ -3450,7 +3506,7 @@ class AvoidIosHardcodedDeviceModelRule extends SaropaLintRule {
     name: 'avoid_ios_hardcoded_device_model',
     problemMessage:
         '[avoid_ios_hardcoded_device_model] Hardcoded iOS device model detected. Device-specific code breaks '
-        'when new devices are released.',
+        'when new devices are released. {v2}',
     correctionMessage:
         'Use platform APIs to detect capabilities instead of device names.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -3485,6 +3541,8 @@ class AvoidIosHardcodedDeviceModelRule extends SaropaLintRule {
 }
 
 /// Warns when App Groups capability may be needed but not mentioned.
+///
+/// Since: v2.4.0 | Updated: v4.13.0 | Rule version: v2
 ///
 /// iOS App Groups are required for sharing data between:
 /// - Main app and app extensions (widgets, share extensions, etc.)
@@ -3523,7 +3581,7 @@ class RequireIosAppGroupCapabilityRule extends SaropaLintRule {
     name: 'require_ios_app_group_capability',
     problemMessage:
         '[require_ios_app_group_capability] App extension data sharing detected. Ensure App Groups capability '
-        'is enabled in Xcode for both main app and extensions.',
+        'is enabled in Xcode for both main app and extensions. {v2}',
     correctionMessage:
         'Add App Groups capability in Xcode Signing & Capabilities. '
         'Use same group ID in both main app and extensions.',
@@ -3577,6 +3635,8 @@ class RequireIosAppGroupCapabilityRule extends SaropaLintRule {
 
 /// Warns when HealthKit APIs are used without authorization check.
 ///
+/// Since: v2.4.0 | Updated: v4.13.0 | Rule version: v2
+///
 /// iOS HealthKit requires explicit user authorization for each data type.
 /// Apps must request authorization before reading or writing health data.
 ///
@@ -3626,7 +3686,7 @@ class RequireIosHealthKitAuthorizationRule extends SaropaLintRule {
     name: 'require_ios_healthkit_authorization',
     problemMessage:
         '[require_ios_healthkit_authorization] HealthKit data access detected. Ensure authorization is requested '
-        'before reading or writing health data.',
+        'before reading or writing health data. {v2}',
     correctionMessage:
         'Call requestAuthorization() before accessing health data. '
         'Add NSHealthShareUsageDescription and NSHealthUpdateUsageDescription '
@@ -3674,6 +3734,8 @@ class RequireIosHealthKitAuthorizationRule extends SaropaLintRule {
 
 /// Warns when Siri Shortcuts are implemented without intent definition.
 ///
+/// Since: v2.4.0 | Updated: v4.13.0 | Rule version: v2
+///
 /// iOS Siri Shortcuts require an Intent Definition file (.intentdefinition)
 /// in Xcode for custom intents. Without it, Siri integration won't work.
 ///
@@ -3714,7 +3776,7 @@ class RequireIosSiriIntentDefinitionRule extends SaropaLintRule {
     name: 'require_ios_siri_intent_definition',
     problemMessage:
         '[require_ios_siri_intent_definition] Siri Shortcuts usage detected. Ensure Intent Definition file '
-        'exists in Xcode and SiriKit capability is enabled.',
+        'exists in Xcode and SiriKit capability is enabled. {v2}',
     correctionMessage:
         'Add Intent Definition file in Xcode: File > New > File > Intent Definition. '
         'Enable SiriKit capability in Signing & Capabilities.',
@@ -3775,6 +3837,8 @@ class RequireIosSiriIntentDefinitionRule extends SaropaLintRule {
 
 /// Warns when iOS Home Screen widgets are implemented without WidgetKit setup.
 ///
+/// Since: v2.4.0 | Updated: v4.13.0 | Rule version: v2
+///
 /// iOS Home Screen widgets (WidgetKit) require specific Xcode setup:
 /// - Widget Extension target
 /// - App Groups for data sharing
@@ -3815,7 +3879,7 @@ class RequireIosWidgetExtensionCapabilityRule extends SaropaLintRule {
     name: 'require_ios_widget_extension_capability',
     problemMessage:
         '[require_ios_widget_extension_capability] Home Screen widget usage detected. Ensure Widget Extension target '
-        'and App Groups are configured in Xcode.',
+        'and App Groups are configured in Xcode. {v2}',
     correctionMessage:
         'Create Widget Extension target in Xcode. Enable App Groups in both '
         'main app and extension. Use shared UserDefaults for data.',
@@ -3869,6 +3933,8 @@ class RequireIosWidgetExtensionCapabilityRule extends SaropaLintRule {
 
 /// Warns when in-app purchases are used without receipt validation.
 ///
+/// Since: v2.4.0 | Updated: v4.13.0 | Rule version: v2
+///
 /// iOS in-app purchases must be validated to prevent fraud. Local receipt
 /// validation is insufficient; server-side validation is required.
 ///
@@ -3920,7 +3986,7 @@ class RequireIosReceiptValidationRule extends SaropaLintRule {
     name: 'require_ios_receipt_validation',
     problemMessage:
         '[require_ios_receipt_validation] In-app purchase detected. Ensure receipt is validated with server, '
-        'not just locally.',
+        'not just locally. {v2}',
     correctionMessage:
         'Send receipt data to your server for validation with Apple. '
         'Local-only validation can be bypassed.',
@@ -3969,6 +4035,8 @@ class RequireIosReceiptValidationRule extends SaropaLintRule {
 
 /// Warns when Core Data or Realm sync is used without conflict resolution.
 ///
+/// Since: v2.4.0 | Updated: v4.13.0 | Rule version: v2
+///
 /// Cloud-synced databases can have conflicts when the same record is
 /// modified on multiple devices. Without conflict resolution, data loss occurs.
 ///
@@ -4002,7 +4070,7 @@ class RequireIosDatabaseConflictResolutionRule extends SaropaLintRule {
     name: 'require_ios_database_conflict_resolution',
     problemMessage:
         '[require_ios_database_conflict_resolution] Database sync detected. Ensure conflict resolution is implemented '
-        'for multi-device sync scenarios.',
+        'for multi-device sync scenarios. {v2}',
     correctionMessage:
         'Implement conflict resolution handlers for sync errors.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -4043,6 +4111,8 @@ class RequireIosDatabaseConflictResolutionRule extends SaropaLintRule {
 }
 
 /// Warns when Core Location continuous tracking may drain battery.
+///
+/// Since: v2.4.0 | Updated: v4.13.0 | Rule version: v2
 ///
 /// iOS location services have significant battery impact. Apps should use
 /// appropriate accuracy levels and stop tracking when not needed.
@@ -4091,7 +4161,7 @@ class AvoidIosContinuousLocationTrackingRule extends SaropaLintRule {
     name: 'avoid_ios_continuous_location_tracking',
     problemMessage:
         '[avoid_ios_continuous_location_tracking] Continuous location tracking detected with high accuracy. '
-        'Consider using lower accuracy or distance filters to save battery.',
+        'Consider using lower accuracy or distance filters to save battery. {v2}',
     correctionMessage:
         'Use LocationAccuracy.medium or lower, and set distanceFilter.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -4123,6 +4193,8 @@ class AvoidIosContinuousLocationTrackingRule extends SaropaLintRule {
 
 /// Warns when background audio capability may be needed.
 ///
+/// Since: v2.4.0 | Updated: v4.13.0 | Rule version: v2
+///
 /// iOS requires Background Modes capability with "Audio, AirPlay, and Picture in Picture"
 /// enabled for apps that play audio in the background.
 ///
@@ -4147,7 +4219,7 @@ class RequireIosBackgroundAudioCapabilityRule extends SaropaLintRule {
     name: 'require_ios_background_audio_capability',
     problemMessage:
         '[require_ios_background_audio_capability] Audio playback detected. If audio should play in background, '
-        'enable Background Modes > Audio capability in Xcode.',
+        'enable Background Modes > Audio capability in Xcode. {v2}',
     correctionMessage:
         'Add Background Modes capability and enable Audio, AirPlay, '
         'and Picture in Picture.',
@@ -4188,6 +4260,8 @@ class RequireIosBackgroundAudioCapabilityRule extends SaropaLintRule {
 
 /// Warns when StoreKit 2 APIs should be preferred over original StoreKit.
 ///
+/// Since: v2.4.0 | Updated: v4.13.0 | Rule version: v3
+///
 /// Apple recommends StoreKit 2 for new apps. It has better Swift concurrency
 /// support, simpler API, and server-side receipt verification.
 ///
@@ -4219,7 +4293,7 @@ class PreferIosStoreKit2Rule extends SaropaLintRule {
     name: 'prefer_ios_storekit2',
     problemMessage:
         '[prefer_ios_storekit2] Consider using StoreKit 2 APIs for new in-app purchase implementations. '
-        'StoreKit 2 offers better async support and automatic receipt verification.',
+        'StoreKit 2 offers better async support and automatic receipt verification. {v3}',
     correctionMessage:
         'Evaluate migrating to StoreKit 2 for simpler IAP implementation.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -4246,6 +4320,8 @@ class PreferIosStoreKit2Rule extends SaropaLintRule {
 }
 
 /// Warns when App Clip usage is detected without size considerations.
+///
+/// Since: v2.4.0 | Updated: v4.13.0 | Rule version: v2
 ///
 /// App Clips have a 10 MB size limit. Including large dependencies
 /// can cause the App Clip to exceed this limit.
@@ -4277,7 +4353,7 @@ class RequireIosAppClipSizeLimitRule extends SaropaLintRule {
     name: 'require_ios_app_clip_size_limit',
     problemMessage:
         '[require_ios_app_clip_size_limit] App Clip detected. Ensure App Clip bundle stays under 10 MB. '
-        'Large dependencies can exceed this limit.',
+        'Large dependencies can exceed this limit. {v2}',
     correctionMessage: 'Minimize dependencies and assets in App Clip target. '
         'Consider lazy loading heavy features.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -4316,6 +4392,8 @@ class RequireIosAppClipSizeLimitRule extends SaropaLintRule {
 }
 
 /// Warns when iOS Keychain is accessed without considering iCloud sync.
+///
+/// Since: v2.4.0 | Updated: v4.13.0 | Rule version: v2
 ///
 /// Keychain items sync across devices via iCloud by default. For sensitive
 /// data that should stay on one device, use kSecAttrSynchronizable = false.
@@ -4362,7 +4440,7 @@ class RequireIosKeychainSyncAwarenessRule extends SaropaLintRule {
     name: 'require_ios_keychain_sync_awareness',
     problemMessage:
         '[require_ios_keychain_sync_awareness] Keychain write of sensitive key detected. Consider if this should '
-        'sync across devices via iCloud Keychain.',
+        'sync across devices via iCloud Keychain. {v2}',
     correctionMessage:
         'For device-only secrets, use accessibility ending in ThisDeviceOnly.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -4419,6 +4497,8 @@ class RequireIosKeychainSyncAwarenessRule extends SaropaLintRule {
 
 /// Warns when iOS Share Sheet is used without proper UTI declarations.
 ///
+/// Since: v2.4.0 | Updated: v4.13.0 | Rule version: v2
+///
 /// For sharing custom file types, your app needs UTI declarations in Info.plist.
 /// Without them, files may not appear in the share sheet or may fail to open.
 ///
@@ -4441,7 +4521,7 @@ class RequireIosShareSheetUtiDeclarationRule extends SaropaLintRule {
     name: 'require_ios_share_sheet_uti_declaration',
     problemMessage:
         '[require_ios_share_sheet_uti_declaration] File sharing with custom type detected. Ensure UTI is declared '
-        'in Info.plist for custom file types.',
+        'in Info.plist for custom file types. {v2}',
     correctionMessage:
         'Add UTExportedTypeDeclarations or UTImportedTypeDeclarations '
         'to Info.plist for custom file types.',
@@ -4472,6 +4552,8 @@ class RequireIosShareSheetUtiDeclarationRule extends SaropaLintRule {
 
 /// Warns when NSUbiquitousKeyValueStore (iCloud Key-Value Storage) is used.
 ///
+/// Since: v2.4.0 | Updated: v4.13.0 | Rule version: v2
+///
 /// iCloud Key-Value Storage has limitations:
 /// - 1 MB total storage limit
 /// - 1024 keys maximum
@@ -4496,7 +4578,7 @@ class RequireIosIcloudKvstoreLimitationsRule extends SaropaLintRule {
     name: 'require_ios_icloud_kvstore_limitations',
     problemMessage:
         '[require_ios_icloud_kvstore_limitations] iCloud Key-Value Storage has 1 MB limit and 1024 keys max. '
-        'Use only for small preferences.',
+        'Use only for small preferences. {v2}',
     correctionMessage:
         'For larger data, use CloudKit or iCloud Documents instead.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -4521,6 +4603,8 @@ class RequireIosIcloudKvstoreLimitationsRule extends SaropaLintRule {
 
 /// Warns when critical accessibility features may be missing.
 ///
+/// Since: v2.4.0 | Updated: v4.13.0 | Rule version: v2
+///
 /// iOS apps should support VoiceOver and other accessibility features.
 /// Common issues include missing labels, poor contrast, and touch targets.
 ///
@@ -4543,7 +4627,7 @@ class RequireIosAccessibilityLabelsRule extends SaropaLintRule {
     name: 'require_ios_accessibility_labels',
     problemMessage:
         '[require_ios_accessibility_labels] Interactive widget without Semantics wrapper. VoiceOver users '
-        'cannot identify this element.',
+        'cannot identify this element. {v2}',
     correctionMessage:
         'Wrap with Semantics widget and provide label for VoiceOver.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -4585,6 +4669,8 @@ class RequireIosAccessibilityLabelsRule extends SaropaLintRule {
 
 /// Warns when iOS app may not handle all device orientations.
 ///
+/// Since: v2.4.0 | Updated: v4.13.0 | Rule version: v2
+///
 /// Apps should explicitly declare supported orientations in Info.plist
 /// and handle orientation changes gracefully.
 ///
@@ -4606,7 +4692,7 @@ class RequireIosOrientationHandlingRule extends SaropaLintRule {
     name: 'require_ios_orientation_handling',
     problemMessage:
         '[require_ios_orientation_handling] Orientation lock detected. Ensure Info.plist declares supported '
-        'orientations and UI handles all locked orientations.',
+        'orientations and UI handles all locked orientations. {v2}',
     correctionMessage:
         'Set UISupportedInterfaceOrientations in Info.plist to match '
         'SystemChrome.setPreferredOrientations calls.',
@@ -4631,6 +4717,8 @@ class RequireIosOrientationHandlingRule extends SaropaLintRule {
 
 /// Warns when deep linking may conflict with iOS Universal Links.
 ///
+/// Since: v2.4.0 | Updated: v4.13.0 | Rule version: v2
+///
 /// iOS Universal Links require exact domain matching. Subdomains and
 /// path variations can cause routing issues.
 class RequireIosUniversalLinksDomainMatchingRule extends SaropaLintRule {
@@ -4647,7 +4735,7 @@ class RequireIosUniversalLinksDomainMatchingRule extends SaropaLintRule {
     name: 'require_ios_universal_links_domain_matching',
     problemMessage:
         '[require_ios_universal_links_domain_matching] Deep link pattern detected. Ensure apple-app-site-association '
-        'paths match exactly for Universal Links to work.',
+        'paths match exactly for Universal Links to work. {v2}',
     correctionMessage:
         'Verify apple-app-site-association on server matches app paths exactly.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -4676,6 +4764,8 @@ class RequireIosUniversalLinksDomainMatchingRule extends SaropaLintRule {
 
 /// Warns when NFC usage is detected without capability check.
 ///
+/// Since: v2.4.0 | Updated: v4.13.0 | Rule version: v2
+///
 /// NFC is not available on all iOS devices. Apps should check capability
 /// before attempting NFC operations.
 ///
@@ -4698,7 +4788,7 @@ class RequireIosNfcCapabilityCheckRule extends SaropaLintRule {
     name: 'require_ios_nfc_capability_check',
     problemMessage:
         '[require_ios_nfc_capability_check] NFC usage detected. Not all iOS devices support NFC. '
-        'Check capability before use.',
+        'Check capability before use. {v2}',
     correctionMessage:
         'Use NFCNDEFReaderSession.readingAvailable before scanning.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -4738,6 +4828,8 @@ class RequireIosNfcCapabilityCheckRule extends SaropaLintRule {
 
 /// Warns when CallKit integration may be missing for VoIP apps.
 ///
+/// Since: v2.4.0 | Updated: v4.13.0 | Rule version: v3
+///
 /// iOS VoIP apps must use CallKit to display the native call UI.
 /// Apps that don't use CallKit have limited functionality.
 ///
@@ -4759,7 +4851,7 @@ class RequireIosCallkitIntegrationRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_ios_callkit_integration',
     problemMessage:
-        '[require_ios_callkit_integration] VoIP call handling detected. iOS requires CallKit integration for native call UI. Without CallKit, incoming calls will not appear on the lock screen, call audio routing will fail, and Apple will reject your app from the App Store during review.',
+        '[require_ios_callkit_integration] VoIP call handling detected. iOS requires CallKit integration for native call UI. Without CallKit, incoming calls will not appear on the lock screen, call audio routing will fail, and Apple will reject your app from the App Store during review. {v3}',
     correctionMessage:
         'Integrate CallKit using flutter_callkit_incoming or a similar package to ensure App Store compliance and a native call experience on iOS.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -4810,6 +4902,8 @@ class RequireIosCallkitIntegrationRule extends SaropaLintRule {
 
 /// Warns when CarPlay integration may need additional setup.
 ///
+/// Since: v2.4.0 | Updated: v4.13.0 | Rule version: v2
+///
 /// CarPlay apps require specific entitlements and must follow
 /// Apple's CarPlay App Programming Guide.
 ///
@@ -4832,7 +4926,7 @@ class RequireIosCarplaySetupRule extends SaropaLintRule {
     name: 'require_ios_carplay_setup',
     problemMessage:
         '[require_ios_carplay_setup] CarPlay-related code detected. CarPlay requires Apple approval '
-        'and specific entitlements.',
+        'and specific entitlements. {v2}',
     correctionMessage: 'Apply for CarPlay entitlement at developer.apple.com. '
         'Implement CPTemplateApplicationSceneDelegate.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -4872,6 +4966,8 @@ class RequireIosCarplaySetupRule extends SaropaLintRule {
 
 /// Warns when Live Activities may need proper configuration.
 ///
+/// Since: v2.4.0 | Updated: v4.13.0 | Rule version: v2
+///
 /// iOS 16.1+ Live Activities require:
 /// - ActivityKit capability
 /// - Widget Extension with ActivityConfiguration
@@ -4890,7 +4986,7 @@ class RequireIosLiveActivitiesSetupRule extends SaropaLintRule {
     name: 'require_ios_live_activities_setup',
     problemMessage:
         '[require_ios_live_activities_setup] Live Activity usage detected. Ensure ActivityKit capability '
-        'and Widget Extension are configured.',
+        'and Widget Extension are configured. {v2}',
     correctionMessage: 'Add Widget Extension with ActivityConfiguration. '
         'Enable Push Notifications for remote updates.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -4943,6 +5039,8 @@ class RequireIosLiveActivitiesSetupRule extends SaropaLintRule {
 
 /// Warns when ProMotion display support may be needed.
 ///
+/// Since: v2.4.0 | Updated: v4.13.0 | Rule version: v2
+///
 /// iPhone 13 Pro and later have ProMotion displays (120Hz).
 /// Apps should use CADisplayLink for smooth animations on these devices.
 class RequireIosPromotionDisplaySupportRule extends SaropaLintRule {
@@ -4959,7 +5057,7 @@ class RequireIosPromotionDisplaySupportRule extends SaropaLintRule {
     name: 'require_ios_promotion_display_support',
     problemMessage:
         '[require_ios_promotion_display_support] Manual frame timing detected. ProMotion displays run at 120Hz. '
-        'Use Flutter animations for automatic frame rate adaptation.',
+        'Use Flutter animations for automatic frame rate adaptation. {v2}',
     correctionMessage:
         'Use AnimationController instead of manual timing for smooth animations.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -4989,6 +5087,8 @@ class RequireIosPromotionDisplaySupportRule extends SaropaLintRule {
 
 /// Warns when Photo Library limited access may not be handled.
 ///
+/// Since: v2.4.0 | Updated: v4.13.0 | Rule version: v2
+///
 /// iOS 14+ supports limited photo library access. Apps should handle
 /// the case where user only grants access to selected photos.
 class RequireIosPhotoLibraryLimitedAccessRule extends SaropaLintRule {
@@ -5005,7 +5105,7 @@ class RequireIosPhotoLibraryLimitedAccessRule extends SaropaLintRule {
     name: 'require_ios_photo_library_limited_access',
     problemMessage:
         '[require_ios_photo_library_limited_access] Photo library access detected. Handle iOS 14+ limited access mode '
-        'where user may only grant access to selected photos.',
+        'where user may only grant access to selected photos. {v2}',
     correctionMessage:
         'Check for PHAuthorizationStatus.limited and provide UI to '
         'modify selection.',
@@ -5045,6 +5145,8 @@ class RequireIosPhotoLibraryLimitedAccessRule extends SaropaLintRule {
 
 /// Warns when iOS pasteboard access may trigger iOS 16+ notification.
 ///
+/// Since: v2.4.0 | Updated: v4.13.0 | Rule version: v2
+///
 /// iOS 16+ shows a notification when apps access the pasteboard. Apps should
 /// provide clear UX indication before reading clipboard content.
 ///
@@ -5083,7 +5185,7 @@ class RequireIosPasteboardPrivacyHandlingRule extends SaropaLintRule {
     name: 'require_ios_pasteboard_privacy_handling',
     problemMessage:
         '[require_ios_pasteboard_privacy_handling] Clipboard access detected. On iOS 16+, users see a notification '
-        'when apps read the clipboard. Only access after explicit user action.',
+        'when apps read the clipboard. Only access after explicit user action. {v2}',
     correctionMessage:
         'Access clipboard only in response to user paste action.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -5110,6 +5212,8 @@ class RequireIosPasteboardPrivacyHandlingRule extends SaropaLintRule {
 
 /// Warns when background refresh may need capability declaration.
 ///
+/// Since: v2.4.0 | Updated: v4.13.0 | Rule version: v2
+///
 /// iOS apps that fetch data in the background must declare the capability
 /// in Info.plist and handle the background fetch appropriately.
 ///
@@ -5132,7 +5236,7 @@ class RequireIosBackgroundRefreshDeclarationRule extends SaropaLintRule {
     name: 'require_ios_background_refresh_declaration',
     problemMessage:
         '[require_ios_background_refresh_declaration] Background task scheduling detected. Ensure UIBackgroundModes '
-        'includes "fetch" in Info.plist for background refresh.',
+        'includes "fetch" in Info.plist for background refresh. {v2}',
     correctionMessage: 'Add UIBackgroundModes with "fetch" to Info.plist.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -5174,6 +5278,8 @@ class RequireIosBackgroundRefreshDeclarationRule extends SaropaLintRule {
 
 /// Warns when iOS 13+ Scene Delegate lifecycle may not be handled.
 ///
+/// Since: v2.4.0 | Updated: v4.13.0 | Rule version: v2
+///
 /// iOS 13+ apps can support multiple windows using Scene Delegate.
 /// Apps should handle scene lifecycle events, not just app lifecycle.
 ///
@@ -5197,7 +5303,7 @@ class RequireIosSceneDelegateAwarenessRule extends SaropaLintRule {
     name: 'require_ios_scene_delegate_awareness',
     problemMessage:
         '[require_ios_scene_delegate_awareness] App lifecycle handling detected. On iOS 13+, consider using '
-        'scene-based lifecycle for multi-window support.',
+        'scene-based lifecycle for multi-window support. {v2}',
     correctionMessage: 'Use WidgetsBindingObserver.didChangeAppLifecycleState '
         'which handles both app and scene lifecycle.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -5230,6 +5336,8 @@ class RequireIosSceneDelegateAwarenessRule extends SaropaLintRule {
 }
 
 /// Warns when MethodChannel observer cleanup may be missing.
+///
+/// Since: v2.4.0 | Updated: v4.13.0 | Rule version: v2
 ///
 /// MethodChannel listeners must be removed when no longer needed to
 /// prevent memory leaks and crashes from callbacks on disposed objects.
@@ -5268,7 +5376,7 @@ class RequireIosMethodChannelCleanupRule extends SaropaLintRule {
     name: 'require_ios_method_channel_cleanup',
     problemMessage:
         '[require_ios_method_channel_cleanup] MethodChannel handler set without cleanup. Set handler to null '
-        'in dispose() to prevent memory leaks.',
+        'in dispose() to prevent memory leaks. {v2}',
     correctionMessage:
         'Add channel.setMethodCallHandler(null) in dispose() method.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -5301,6 +5409,8 @@ class RequireIosMethodChannelCleanupRule extends SaropaLintRule {
 
 /// Warns when force unwrapping in MethodChannel callbacks may cause crashes.
 ///
+/// Since: v2.4.0 | Updated: v4.13.0 | Rule version: v2
+///
 /// Native code may return unexpected null values. Using force unwrap (!)
 /// on MethodChannel results can cause crashes on iOS/macOS.
 ///
@@ -5331,7 +5441,7 @@ class AvoidIosForceUnwrapInCallbacksRule extends SaropaLintRule {
     name: 'avoid_ios_force_unwrap_in_callbacks',
     problemMessage:
         '[avoid_ios_force_unwrap_in_callbacks] Force unwrap on MethodChannel result detected. Native code may '
-        'return null unexpectedly, causing crashes.',
+        'return null unexpectedly, causing crashes. {v2}',
     correctionMessage: 'Use null-safe access (?.) and provide default values.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
@@ -5364,6 +5474,8 @@ class AvoidIosForceUnwrapInCallbacksRule extends SaropaLintRule {
 
 /// Warns when in-app review may be requested too frequently.
 ///
+/// Since: v2.4.0 | Updated: v4.13.0 | Rule version: v2
+///
 /// Apple limits StoreKit review requests to 3 times per year per user.
 /// Requesting more frequently results in no prompt being shown.
 ///
@@ -5387,7 +5499,7 @@ class RequireIosReviewPromptFrequencyRule extends SaropaLintRule {
     name: 'require_ios_review_prompt_frequency',
     problemMessage:
         '[require_ios_review_prompt_frequency] In-app review detected. Apple limits StoreKit prompts to 3x per year. '
-        'Track and limit prompt frequency.',
+        'Track and limit prompt frequency. {v2}',
     correctionMessage:
         'Implement review prompt tracking to respect Apple\'s limits.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -5419,6 +5531,8 @@ class RequireIosReviewPromptFrequencyRule extends SaropaLintRule {
 
 /// Warns when iOS deployment target may not match API usage.
 ///
+/// Since: v2.4.0 | Updated: v4.13.0 | Rule version: v2
+///
 /// Using APIs from newer iOS versions without version guards causes
 /// crashes on older devices.
 ///
@@ -5442,7 +5556,7 @@ class RequireIosDeploymentTargetConsistencyRule extends SaropaLintRule {
     name: 'require_ios_deployment_target_consistency',
     problemMessage:
         '[require_ios_deployment_target_consistency] API requiring iOS 15+ detected. Ensure minimum deployment target '
-        'matches or add version guards.',
+        'matches or add version guards. {v2}',
     correctionMessage: 'Check iOS version before using newer APIs or increase '
         'minimum deployment target.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -5484,6 +5598,8 @@ class RequireIosDeploymentTargetConsistencyRule extends SaropaLintRule {
 
 /// Warns when iOS Dynamic Island area may not be accounted for.
 ///
+/// Since: v2.4.0 | Updated: v4.13.0 | Rule version: v2
+///
 /// iPhone 14 Pro/15 Pro have Dynamic Island which takes up more
 /// screen space than the notch. Fixed padding values don't adapt.
 ///
@@ -5508,7 +5624,7 @@ class RequireIosDynamicIslandSafeZonesRule extends SaropaLintRule {
     name: 'require_ios_dynamic_island_safe_zones',
     problemMessage:
         '[require_ios_dynamic_island_safe_zones] Fixed top padding (44pt or 59pt) detected. Dynamic Island height '
-        'varies by device. Use MediaQuery.padding.top instead.',
+        'varies by device. Use MediaQuery.padding.top instead. {v2}',
     correctionMessage:
         'Replace hardcoded value with MediaQuery.of(context).padding.top.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -5539,6 +5655,8 @@ class RequireIosDynamicIslandSafeZonesRule extends SaropaLintRule {
 
 /// Warns when iOS App Intents framework should be considered.
 ///
+/// Since: v2.4.0 | Updated: v4.13.0 | Rule version: v2
+///
 /// iOS 16+ introduces App Intents as the modern way to integrate with
 /// Siri, Shortcuts, and Spotlight. Replaces older SiriKit Intents.
 ///
@@ -5561,7 +5679,7 @@ class PreferIosAppIntentsFrameworkRule extends SaropaLintRule {
     name: 'prefer_ios_app_intents_framework',
     problemMessage:
         '[prefer_ios_app_intents_framework] Legacy SiriKit Intent detected. Consider migrating to App Intents '
-        'framework (iOS 16+) for better Siri and Shortcuts integration.',
+        'framework (iOS 16+) for better Siri and Shortcuts integration. {v2}',
     correctionMessage:
         'Migrate from INIntent to AppIntent for modern Siri integration.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -5600,6 +5718,8 @@ class PreferIosAppIntentsFrameworkRule extends SaropaLintRule {
 
 /// Warns when iOS app may need age rating consideration.
 ///
+/// Since: v2.4.0 | Updated: v4.13.0 | Rule version: v2
+///
 /// Apps with user-generated content, web browsing, or mature themes
 /// need appropriate age ratings in App Store Connect.
 class RequireIosAgeRatingConsiderationRule extends SaropaLintRule {
@@ -5616,7 +5736,7 @@ class RequireIosAgeRatingConsiderationRule extends SaropaLintRule {
     name: 'require_ios_age_rating_consideration',
     problemMessage:
         '[require_ios_age_rating_consideration] Feature requiring age rating consideration detected. '
-        'Verify App Store Connect age rating matches app content.',
+        'Verify App Store Connect age rating matches app content. {v2}',
     correctionMessage:
         'Review App Store Connect age rating for user-generated content, '
         'web access, or mature themes.',
@@ -5660,6 +5780,8 @@ class RequireIosAgeRatingConsiderationRule extends SaropaLintRule {
 
 /// Warns when iOS certificate pinning may be needed for security.
 ///
+/// Since: v2.4.0 | Updated: v4.13.0 | Rule version: v2
+///
 /// High-security apps (banking, healthcare) should use certificate
 /// pinning to prevent man-in-the-middle attacks.
 class RequireIosCertificatePinningRule extends SaropaLintRule {
@@ -5676,7 +5798,7 @@ class RequireIosCertificatePinningRule extends SaropaLintRule {
     name: 'require_ios_certificate_pinning',
     problemMessage:
         '[require_ios_certificate_pinning] Sensitive API endpoint detected. Consider implementing SSL '
-        'certificate pinning for additional security.',
+        'certificate pinning for additional security. {v2}',
     correctionMessage:
         'Use Dio with certificate pinning or platform-specific SSL pinning.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -5722,6 +5844,8 @@ class RequireIosCertificatePinningRule extends SaropaLintRule {
 
 /// Warns when iOS Keychain credential storage isn't using Keychain.
 ///
+/// Since: v2.4.0 | Updated: v4.13.0 | Rule version: v2
+///
 /// Credentials should be stored in iOS Keychain, not UserDefaults
 /// or SharedPreferences which are not encrypted.
 class RequireIosKeychainForCredentialsRule extends SaropaLintRule {
@@ -5738,7 +5862,7 @@ class RequireIosKeychainForCredentialsRule extends SaropaLintRule {
     name: 'require_ios_keychain_for_credentials',
     problemMessage:
         '[require_ios_keychain_for_credentials] Credential storage in SharedPreferences detected. Use iOS Keychain '
-        '(flutter_secure_storage) for sensitive data.',
+        '(flutter_secure_storage) for sensitive data. {v2}',
     correctionMessage:
         'Replace SharedPreferences with FlutterSecureStorage for credentials.',
     errorSeverity: DiagnosticSeverity.ERROR,
@@ -5786,6 +5910,8 @@ class RequireIosKeychainForCredentialsRule extends SaropaLintRule {
 
 /// Warns when iOS debug code may be included in release builds.
 ///
+/// Since: v2.4.0 | Updated: v4.13.0 | Rule version: v2
+///
 /// Debug logging, assertions, and test code should be removed or
 /// conditionally compiled out of release builds.
 class AvoidIosDebugCodeInReleaseRule extends SaropaLintRule {
@@ -5802,7 +5928,7 @@ class AvoidIosDebugCodeInReleaseRule extends SaropaLintRule {
     name: 'avoid_ios_debug_code_in_release',
     problemMessage:
         '[avoid_ios_debug_code_in_release] Debug code detected. Ensure this is conditionally compiled out '
-        'for release builds.',
+        'for release builds. {v2}',
     correctionMessage:
         'Wrap debug code in kDebugMode or assert() for automatic removal.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -5839,6 +5965,8 @@ class AvoidIosDebugCodeInReleaseRule extends SaropaLintRule {
 
 /// Warns when iOS biometric authentication may need fallback.
 ///
+/// Since: v2.4.0 | Updated: v4.13.0 | Rule version: v2
+///
 /// Not all iOS devices support Face ID or Touch ID. Apps should
 /// provide alternative authentication methods.
 class RequireIosBiometricFallbackRule extends SaropaLintRule {
@@ -5855,7 +5983,7 @@ class RequireIosBiometricFallbackRule extends SaropaLintRule {
     name: 'require_ios_biometric_fallback',
     problemMessage:
         '[require_ios_biometric_fallback] Biometric authentication detected. Ensure fallback authentication '
-        '(passcode) is available for devices without biometrics.',
+        '(passcode) is available for devices without biometrics. {v2}',
     correctionMessage:
         'Handle BiometricType.none and provide alternative login method.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -5888,6 +6016,8 @@ class RequireIosBiometricFallbackRule extends SaropaLintRule {
 
 /// Warns when iOS app may send misleading push notifications.
 ///
+/// Since: v2.4.0 | Updated: v4.13.0 | Rule version: v2
+///
 /// Apple rejects apps that send push notifications unrelated to
 /// the user's interests or that spam users.
 class AvoidIosMisleadingPushNotificationsRule extends SaropaLintRule {
@@ -5904,7 +6034,7 @@ class AvoidIosMisleadingPushNotificationsRule extends SaropaLintRule {
     name: 'avoid_ios_misleading_push_notifications',
     problemMessage:
         '[avoid_ios_misleading_push_notifications] Marketing notification pattern detected. Push notifications must '
-        'be relevant to user interests to comply with Apple guidelines.',
+        'be relevant to user interests to comply with Apple guidelines. {v2}',
     correctionMessage: 'Ensure notifications are personalized and relevant. '
         'Avoid generic marketing messages.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -5953,6 +6083,8 @@ class AvoidIosMisleadingPushNotificationsRule extends SaropaLintRule {
 // =============================================================================
 
 /// Warns when background tasks may exceed iOS 30-second limit.
+///
+/// Since: v2.4.0 | Updated: v4.13.0 | Rule version: v3
 ///
 /// iOS kills background tasks after approximately 30 seconds. Long-running
 /// operations must be designed to complete quickly or use appropriate
@@ -6017,7 +6149,7 @@ class AvoidLongRunningIsolatesRule extends SaropaLintRule {
     name: 'avoid_long_running_isolates',
     problemMessage:
         '[avoid_long_running_isolates] Long-running isolate detected. iOS kills background tasks after '
-        '~30 seconds. Design tasks to complete quickly.',
+        '~30 seconds. Design tasks to complete quickly. {v3}',
     correctionMessage:
         'Use workmanager package for reliable background tasks, or break '
         'work into smaller chunks.',
@@ -6092,6 +6224,8 @@ class AvoidLongRunningIsolatesRule extends SaropaLintRule {
 
 /// Suggests showing notification for long-running tasks.
 ///
+/// Since: v2.4.0 | Updated: v4.13.0 | Rule version: v2
+///
 /// Long operations (uploads, processing, downloads) should show progress
 /// notifications. Silent background work gets killed by the OS and users
 /// have no visibility into progress.
@@ -6134,7 +6268,7 @@ class RequireNotificationForLongTasksRule extends SaropaLintRule {
     name: 'require_notification_for_long_tasks',
     problemMessage:
         '[require_notification_for_long_tasks] Long-running operation detected without progress notification. '
-        'Silent background work may be killed by OS.',
+        'Silent background work may be killed by OS. {v2}',
     correctionMessage:
         'Show a progress notification for operations that take more than '
         'a few seconds. This keeps users informed and prevents OS termination.',
@@ -6185,6 +6319,8 @@ class RequireNotificationForLongTasksRule extends SaropaLintRule {
 }
 
 /// Suggests delaying permission prompt until user sees value.
+///
+/// Since: v2.4.0 | Updated: v4.13.0 | Rule version: v2
 ///
 /// Don't ask for notification permission on first launch. Wait until
 /// the user understands the app's value, then explain why notifications
@@ -6246,7 +6382,7 @@ class PreferDelayedPermissionPromptRule extends SaropaLintRule {
     name: 'prefer_delayed_permission_prompt',
     problemMessage:
         '[prefer_delayed_permission_prompt] Permission request detected in main() or initState(). '
-        'Asking too early reduces acceptance rates.',
+        'Asking too early reduces acceptance rates. {v2}',
     correctionMessage:
         'Wait until user interaction shows they need the feature, '
         'then explain the value before requesting permission.',
@@ -6295,6 +6431,8 @@ class PreferDelayedPermissionPromptRule extends SaropaLintRule {
 
 /// Warns when notification frequency may be too high.
 ///
+/// Since: v2.4.0 | Updated: v4.13.0 | Rule version: v2
+///
 /// Too many notifications cause users to disable all notifications or
 /// uninstall the app. Batch, deduplicate, and respect user preferences.
 ///
@@ -6337,7 +6475,7 @@ class AvoidNotificationSpamRule extends SaropaLintRule {
     name: 'avoid_notification_spam',
     problemMessage:
         '[avoid_notification_spam] Notification inside loop detected. Sending too many notifications '
-        'causes users to disable notifications or uninstall.',
+        'causes users to disable notifications or uninstall. {v2}',
     correctionMessage:
         'Batch notifications or use a summary notification when there are '
         'multiple items.',
@@ -6383,6 +6521,8 @@ class AvoidNotificationSpamRule extends SaropaLintRule {
 }
 
 /// Warns when in-app purchases lack server-side verification.
+///
+/// Since: v2.4.0 | Updated: v4.13.0 | Rule version: v2
 ///
 /// Client-side purchase verification can be bypassed by attackers.
 /// Always verify receipts server-side with Apple/Google.
@@ -6431,7 +6571,7 @@ class RequirePurchaseVerificationRule extends SaropaLintRule {
     name: 'require_purchase_verification',
     problemMessage:
         '[require_purchase_verification] In-app purchase without server verification detected. '
-        'Client-side verification can be bypassed by attackers.',
+        'Client-side verification can be bypassed by attackers. {v2}',
     correctionMessage:
         'Verify purchase receipts server-side with Apple/Google. '
         'Consider using an IAP SDK for cross-platform verification.',
@@ -6473,6 +6613,8 @@ class RequirePurchaseVerificationRule extends SaropaLintRule {
 }
 
 /// Warns when "Restore Purchases" functionality is missing.
+///
+/// Since: v2.4.0 | Updated: v4.13.0 | Rule version: v2
 ///
 /// App Store requires a "Restore Purchases" button for non-consumable
 /// purchases and subscriptions. Users switching devices need this.
@@ -6534,7 +6676,7 @@ class RequirePurchaseRestorationRule extends SaropaLintRule {
     name: 'require_purchase_restoration',
     problemMessage:
         '[require_purchase_restoration] In-app purchase detected without restore functionality. '
-        'App Store requires "Restore Purchases" for non-consumables.',
+        'App Store requires "Restore Purchases" for non-consumables. {v2}',
     correctionMessage: 'Add a "Restore Purchases" button that calls '
         'InAppPurchase.instance.restorePurchases().',
     errorSeverity: DiagnosticSeverity.ERROR,
@@ -6571,6 +6713,8 @@ class RequirePurchaseRestorationRule extends SaropaLintRule {
 }
 
 /// Suggests using BGTaskScheduler for background sync on iOS.
+///
+/// Since: v2.4.0 | Updated: v4.13.0 | Rule version: v2
 ///
 /// Use WorkManager (Android) or BGTaskScheduler (iOS) to sync data when
 /// the app is backgrounded, not just when open.
@@ -6621,7 +6765,7 @@ class PreferBackgroundSyncRule extends SaropaLintRule {
     name: 'prefer_background_sync',
     problemMessage:
         '[prefer_background_sync] Data sync in initState() only runs when app is open. '
-        'Consider background sync for better user experience.',
+        'Consider background sync for better user experience. {v2}',
     correctionMessage:
         'Use Workmanager for background sync. Data stays fresh even when '
         'the app is not actively used.',
@@ -6667,6 +6811,8 @@ class PreferBackgroundSyncRule extends SaropaLintRule {
 }
 
 /// Warns when sync error recovery is missing.
+///
+/// Since: v2.4.0 | Updated: v4.13.0 | Rule version: v2
 ///
 /// Failed syncs must retry with exponential backoff. Unrecoverable errors
 /// should notify the user, not silently lose data.
@@ -6717,7 +6863,7 @@ class RequireSyncErrorRecoveryRule extends SaropaLintRule {
     name: 'require_sync_error_recovery',
     problemMessage:
         '[require_sync_error_recovery] Sync operation without error recovery detected. '
-        'Failed syncs should retry and notify user of unrecoverable errors.',
+        'Failed syncs should retry and notify user of unrecoverable errors. {v2}',
     correctionMessage: 'Implement exponential backoff retry and notify user of '
         'persistent failures.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -6785,6 +6931,8 @@ class RequireSyncErrorRecoveryRule extends SaropaLintRule {
 
 /// Warns when code assumes WiFi-only connectivity.
 ///
+/// Since: v2.4.0 | Updated: v4.13.0 | Rule version: v2
+///
 /// iOS devices frequently switch between WiFi and cellular. Code that
 /// assumes WiFi-only connectivity may fail or waste cellular data.
 ///
@@ -6837,7 +6985,7 @@ class AvoidIosWifiOnlyAssumptionRule extends SaropaLintRule {
     name: 'avoid_ios_wifi_only_assumption',
     problemMessage:
         '[avoid_ios_wifi_only_assumption] Large download without connectivity check. Users may have '
-        'expensive cellular plans.',
+        'expensive cellular plans. {v2}',
     correctionMessage:
         'Check connectivity type and warn user before large downloads '
         'on cellular.',
@@ -6871,6 +7019,8 @@ class AvoidIosWifiOnlyAssumptionRule extends SaropaLintRule {
 }
 
 /// Warns when app doesn't handle iOS Low Power Mode.
+///
+/// Since: v2.4.0 | Updated: v4.13.0 | Rule version: v2
 ///
 /// iOS Low Power Mode throttles background activity, network requests,
 /// and animations. Apps should adapt their behavior accordingly.
@@ -6914,7 +7064,7 @@ class RequireIosLowPowerModeHandlingRule extends SaropaLintRule {
     name: 'require_ios_low_power_mode_handling',
     problemMessage:
         '[require_ios_low_power_mode_handling] Heavy animation or background activity detected. Consider '
-        'checking iOS Low Power Mode and adapting behavior.',
+        'checking iOS Low Power Mode and adapting behavior. {v2}',
     correctionMessage:
         'Check ProcessInfo.isLowPowerModeEnabled and reduce animations '
         'or defer background work when enabled.',
@@ -6959,6 +7109,8 @@ class RequireIosLowPowerModeHandlingRule extends SaropaLintRule {
 
 /// Suggests supporting Dynamic Type (large text) on iOS.
 ///
+/// Since: v2.4.0 | Updated: v4.13.0 | Rule version: v2
+///
 /// iOS users can increase text size in Settings > Accessibility.
 /// Apps should respect this preference for accessibility.
 ///
@@ -7000,7 +7152,7 @@ class RequireIosAccessibilityLargeTextRule extends SaropaLintRule {
     name: 'require_ios_accessibility_large_text',
     problemMessage:
         '[require_ios_accessibility_large_text] Hardcoded font size may not respect iOS Dynamic Type. '
-        'Use theme text styles for accessibility.',
+        'Use theme text styles for accessibility. {v2}',
     correctionMessage: 'Use Theme.of(context).textTheme styles or apply '
         'MediaQuery.textScaleFactorOf(context).',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -7046,6 +7198,8 @@ class RequireIosAccessibilityLargeTextRule extends SaropaLintRule {
 }
 
 /// Suggests using iOS context menus for touch-and-hold interactions.
+///
+/// Since: v2.4.0 | Updated: v4.13.0 | Rule version: v2
 ///
 /// iOS users expect context menus (long press) on actionable items.
 /// This provides quick access to secondary actions.
@@ -7102,7 +7256,7 @@ class PreferIosContextMenuRule extends SaropaLintRule {
     name: 'prefer_ios_context_menu',
     problemMessage:
         '[prefer_ios_context_menu] ListTile with multiple actions could benefit from a context menu. '
-        'iOS users expect long-press for secondary actions.',
+        'iOS users expect long-press for secondary actions. {v2}',
     correctionMessage:
         'Wrap actionable items with CupertinoContextMenu for better iOS UX.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -7147,6 +7301,8 @@ class PreferIosContextMenuRule extends SaropaLintRule {
 
 /// Reminds about iOS Quick Note feature compatibility.
 ///
+/// Since: v2.4.0 | Updated: v4.13.0 | Rule version: v2
+///
 /// iOS 15+ has Quick Note that allows users to link notes to app content.
 /// Apps can provide better context for Quick Note by implementing
 /// NSUserActivity.
@@ -7185,7 +7341,7 @@ class RequireIosQuickNoteAwarenessRule extends SaropaLintRule {
     name: 'require_ios_quick_note_awareness',
     problemMessage:
         '[require_ios_quick_note_awareness] Document viewing detected. Consider implementing NSUserActivity '
-        'for iOS Quick Note compatibility.',
+        'for iOS Quick Note compatibility. {v2}',
     correctionMessage:
         'Set NSUserActivity with document context so users can link '
         'Quick Notes to your app content.',
@@ -7221,6 +7377,8 @@ class RequireIosQuickNoteAwarenessRule extends SaropaLintRule {
 }
 
 /// Warns when keyboard height is hardcoded instead of using ViewInsets.
+///
+/// Since: v2.4.0 | Updated: v4.13.0 | Rule version: v2
 ///
 /// iOS keyboard height varies by device, orientation, and input type.
 /// Hardcoding heights causes UI issues on different devices.
@@ -7267,7 +7425,7 @@ class AvoidIosHardcodedKeyboardHeightRule extends SaropaLintRule {
     name: 'avoid_ios_hardcoded_keyboard_height',
     problemMessage:
         '[avoid_ios_hardcoded_keyboard_height] Hardcoded bottom padding may be for keyboard. iOS keyboard height '
-        'varies by device and input type.',
+        'varies by device and input type. {v2}',
     correctionMessage:
         'Use MediaQuery.of(context).viewInsets.bottom for keyboard height.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -7313,6 +7471,8 @@ class AvoidIosHardcodedKeyboardHeightRule extends SaropaLintRule {
 }
 
 /// Warns when iPad multitasking modes aren't handled.
+///
+/// Since: v2.4.0 | Updated: v4.13.0 | Rule version: v2
 ///
 /// iPads support Split View, Slide Over, and Stage Manager. Apps must
 /// handle window size changes gracefully.
@@ -7363,7 +7523,7 @@ class RequireIosMultitaskingSupportRule extends SaropaLintRule {
     name: 'require_ios_multitasking_support',
     problemMessage:
         '[require_ios_multitasking_support] Fixed layout detected. iPads support Split View and Slide Over. '
-        'Layouts should adapt to window size changes.',
+        'Layouts should adapt to window size changes. {v2}',
     correctionMessage:
         'Use LayoutBuilder or MediaQuery breakpoints to create responsive '
         'layouts that work in multitasking modes.',
@@ -7408,6 +7568,8 @@ class RequireIosMultitaskingSupportRule extends SaropaLintRule {
 
 /// Suggests implementing Spotlight search indexing.
 ///
+/// Since: v2.4.0 | Updated: v4.13.0 | Rule version: v2
+///
 /// iOS Spotlight allows users to search app content from the home screen.
 /// Apps can index their content to appear in Spotlight results.
 ///
@@ -7448,7 +7610,7 @@ class PreferIosSpotlightIndexingRule extends SaropaLintRule {
     name: 'prefer_ios_spotlight_indexing',
     problemMessage:
         '[prefer_ios_spotlight_indexing] Searchable content detected. Consider indexing with Core Spotlight '
-        'so users can find content from iOS home screen.',
+        'so users can find content from iOS home screen. {v2}',
     correctionMessage:
         'Use CSSearchableItem to index content for Spotlight search.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -7488,6 +7650,8 @@ class PreferIosSpotlightIndexingRule extends SaropaLintRule {
 }
 
 /// Suggests using iOS Data Protection for sensitive files.
+///
+/// Since: v2.4.0 | Updated: v4.13.0 | Rule version: v2
 ///
 /// iOS Data Protection encrypts files based on device passcode.
 /// Sensitive data should use appropriate protection classes.
@@ -7531,7 +7695,7 @@ class RequireIosDataProtectionRule extends SaropaLintRule {
     name: 'require_ios_data_protection',
     problemMessage:
         '[require_ios_data_protection] Sensitive file storage detected. Consider using iOS Data Protection '
-        'to encrypt files when device is locked.',
+        'to encrypt files when device is locked. {v2}',
     correctionMessage: 'Set appropriate FileProtectionType for sensitive data. '
         'Use "complete" protection for highly sensitive files.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -7585,6 +7749,8 @@ class RequireIosDataProtectionRule extends SaropaLintRule {
 
 /// Warns when code patterns may cause excessive battery drain.
 ///
+/// Since: v2.4.0 | Updated: v4.13.0 | Rule version: v2
+///
 /// iOS aggressively manages battery. Apps with poor battery performance
 /// may be throttled or flagged in Settings.
 ///
@@ -7632,7 +7798,7 @@ class AvoidIosBatteryDrainPatternsRule extends SaropaLintRule {
     name: 'avoid_ios_battery_drain_patterns',
     problemMessage:
         '[avoid_ios_battery_drain_patterns] Pattern detected that may cause excessive battery drain. '
-        'iOS shows high battery usage in Settings.',
+        'iOS shows high battery usage in Settings. {v2}',
     correctionMessage: 'Use push notifications instead of polling. '
         'Reduce location accuracy and frequency.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -7683,6 +7849,8 @@ class AvoidIosBatteryDrainPatternsRule extends SaropaLintRule {
 
 /// Warns when iOS entitlements may be needed for features.
 ///
+/// Since: v2.4.0 | Updated: v4.13.0 | Rule version: v2
+///
 /// iOS features like Push Notifications, HealthKit, and Sign in with Apple
 /// require corresponding entitlements in Xcode.
 ///
@@ -7717,7 +7885,7 @@ class RequireIosEntitlementsRule extends SaropaLintRule {
     name: 'require_ios_entitlements',
     problemMessage:
         '[require_ios_entitlements] Feature detected that requires iOS entitlement/capability. '
-        'Enable in Xcode Signing & Capabilities.',
+        'Enable in Xcode Signing & Capabilities. {v2}',
     correctionMessage:
         'Open Xcode, select Runner target, go to Signing & Capabilities, '
         'and add the required capability.',
@@ -7755,6 +7923,8 @@ class RequireIosEntitlementsRule extends SaropaLintRule {
 
 /// Warns when iOS launch screen configuration may be missing.
 ///
+/// Since: v2.4.0 | Updated: v4.13.0 | Rule version: v2
+///
 /// iOS apps without LaunchScreen.storyboard are rejected from the App Store.
 /// Flutter apps must have proper launch screen configuration.
 ///
@@ -7785,7 +7955,7 @@ class RequireIosLaunchStoryboardRule extends SaropaLintRule {
     name: 'require_ios_launch_storyboard',
     problemMessage:
         '[require_ios_launch_storyboard] iOS app detected. Ensure LaunchScreen.storyboard is properly '
-        'configured. Apps without launch screen are rejected.',
+        'configured. Apps without launch screen are rejected. {v2}',
     correctionMessage:
         'Verify ios/Runner/Base.lproj/LaunchScreen.storyboard exists '
         'and is configured in Xcode.',
@@ -7830,6 +8000,8 @@ class RequireIosLaunchStoryboardRule extends SaropaLintRule {
 
 /// Warns when iOS version-specific features lack platform checks.
 ///
+/// Since: v2.4.0 | Updated: v4.13.0 | Rule version: v2
+///
 /// New iOS features require version checks to avoid crashes on older devices.
 /// Always check iOS version before using newer APIs.
 ///
@@ -7872,7 +8044,7 @@ class RequireIosVersionCheckRule extends SaropaLintRule {
     name: 'require_ios_version_check',
     problemMessage:
         '[require_ios_version_check] iOS version-specific feature detected without version check. '
-        'Crashes may occur on older iOS versions.',
+        'Crashes may occur on older iOS versions. {v2}',
     correctionMessage: 'Check iOS version before using newer APIs. '
         'Use device_info_plus to get iOS version.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -7917,6 +8089,8 @@ class RequireIosVersionCheckRule extends SaropaLintRule {
 
 /// Warns when iOS Focus mode integration is not handled.
 ///
+/// Since: v2.4.0 | Updated: v4.13.0 | Rule version: v2
+///
 /// iOS 15+ Focus modes can affect app behavior. Apps should respect
 /// Focus settings and adapt notifications accordingly.
 ///
@@ -7953,7 +8127,7 @@ class RequireIosFocusModeAwarenessRule extends SaropaLintRule {
     name: 'require_ios_focus_mode_awareness',
     problemMessage:
         '[require_ios_focus_mode_awareness] Notification without interruption level detected. iOS Focus mode '
-        'may silence notifications. Set appropriate interruption level.',
+        'may silence notifications. Set appropriate interruption level. {v2}',
     correctionMessage:
         'Use interruptionLevel parameter to indicate notification importance. '
         'Time-sensitive notifications can break through Focus.',
@@ -7989,6 +8163,8 @@ class RequireIosFocusModeAwarenessRule extends SaropaLintRule {
 }
 
 /// Suggests implementing iOS Handoff for continuity between devices.
+///
+/// Since: v2.4.0 | Updated: v4.13.0 | Rule version: v2
 ///
 /// iOS Handoff allows users to continue activities across devices.
 /// Apps can implement NSUserActivity for seamless transitions.
@@ -8027,7 +8203,7 @@ class PreferIosHandoffSupportRule extends SaropaLintRule {
     name: 'prefer_ios_handoff_support',
     problemMessage:
         '[prefer_ios_handoff_support] Document or content editing detected. Consider implementing '
-        'iOS Handoff for continuity across devices.',
+        'iOS Handoff for continuity across devices. {v2}',
     correctionMessage:
         'Use NSUserActivity to enable Handoff. Users can continue work '
         'on other Apple devices.',
@@ -8062,6 +8238,8 @@ class PreferIosHandoffSupportRule extends SaropaLintRule {
 }
 
 /// Warns when iOS voiceover gestures may conflict with app gestures.
+///
+/// Since: v2.4.0 | Updated: v4.13.0 | Rule version: v2
 ///
 /// VoiceOver uses different gestures than standard touch interactions.
 /// Apps should ensure all functionality is accessible with VoiceOver.
@@ -8108,7 +8286,7 @@ class RequireIosVoiceoverGestureCompatibilityRule extends SaropaLintRule {
     name: 'require_ios_voiceover_gesture_compatibility',
     problemMessage:
         '[require_ios_voiceover_gesture_compatibility] Custom gesture without accessibility action. VoiceOver users may '
-        'not be able to perform this action.',
+        'not be able to perform this action. {v2}',
     correctionMessage:
         'Wrap with Semantics and provide onDismiss, onScrollLeft, '
         'or other accessibility actions.',

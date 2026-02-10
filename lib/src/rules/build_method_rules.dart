@@ -16,6 +16,8 @@ import '../saropa_lint_rule.dart';
 
 /// Warns when Gradient objects are created inside build().
 ///
+/// Since: v1.7.9 | Updated: v4.13.0 | Rule version: v3
+///
 /// Alias: gradient_in_build, no_gradient_in_build, cache_gradient
 ///
 /// Creating Gradient objects in build() prevents Flutter from reusing them,
@@ -56,7 +58,7 @@ class AvoidGradientInBuildRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_gradient_in_build',
     problemMessage:
-        '[avoid_gradient_in_build] Creating Gradient in build() prevents reuse and causes allocations. This leads to unnecessary memory usage, slower UI performance, and increased battery drain.',
+        '[avoid_gradient_in_build] Creating Gradient in build() prevents reuse and causes allocations. This leads to unnecessary memory usage, slower UI performance, and increased battery drain. {v3}',
     correctionMessage:
         'Store gradient as a static const field or create outside build(). Use DevTools widget inspector to verify that rebuild counts decrease.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -118,6 +120,8 @@ class _GradientVisitor extends GeneralizingAstVisitor<void> {
 
 /// Warns when showDialog is called inside build().
 ///
+/// Since: v1.7.9 | Updated: v4.13.0 | Rule version: v2
+///
 /// Alias: dialog_in_build, no_show_dialog_in_build, infinite_dialog_loop
 ///
 /// Calling showDialog in build() causes infinite dialog loops because
@@ -160,7 +164,7 @@ class AvoidDialogInBuildRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_dialog_in_build',
     problemMessage:
-        '[avoid_dialog_in_build] Calling showDialog (or similar) inside build() will cause your app to enter an infinite loop, repeatedly showing dialogs and freezing the UI. This results in a poor user experience and may crash the app.',
+        '[avoid_dialog_in_build] Calling showDialog (or similar) inside build() will cause your app to enter an infinite loop, repeatedly showing dialogs and freezing the UI. This results in a poor user experience and may crash the app. {v2}',
     correctionMessage:
         'Move all dialog calls out of build() and into event handlers (e.g., onPressed) or lifecycle methods (e.g., initState) to prevent infinite loops and keep your app responsive.',
     errorSeverity: DiagnosticSeverity.ERROR,
@@ -257,6 +261,8 @@ class _DialogVisitor extends RecursiveAstVisitor<void> {
 
 /// Warns when showSnackBar is called inside build().
 ///
+/// Since: v1.7.9 | Updated: v4.13.0 | Rule version: v3
+///
 /// Alias: snackbar_in_build, no_snackbar_in_build, repeated_snackbar
 ///
 /// Calling showSnackBar in build() causes repeated snackbars on every
@@ -299,7 +305,7 @@ class AvoidSnackbarInBuildRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_snackbar_in_build',
     problemMessage:
-        '[avoid_snackbar_in_build] Calling showSnackBar inside build() causes a snackbar to be shown on every rebuild, flooding the user with duplicate messages and overwhelming the snackbar queue. This leads to poor user experience, lost context, and can make the app feel buggy or unresponsive. It may also result in app store rejection for UX violations and negative user reviews due to notification spam.',
+        '[avoid_snackbar_in_build] Calling showSnackBar inside build() causes a snackbar to be shown on every rebuild, flooding the user with duplicate messages and overwhelming the snackbar queue. This leads to poor user experience, lost context, and can make the app feel buggy or unresponsive. It may also result in app store rejection for UX violations and negative user reviews due to notification spam. {v3}',
     correctionMessage:
         'Move all snackbar calls out of build() and into event handlers (e.g., onPressed) or lifecycle methods (e.g., initState). Ensure snackbars are only shown in response to user actions or specific events. Audit your codebase for accidental snackbar triggers in build() and add tests to verify correct notification behavior.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -356,6 +362,8 @@ class _SnackbarVisitor extends RecursiveAstVisitor<void> {
 
 /// Warns when analytics calls are made inside build().
 ///
+/// Since: v1.7.9 | Updated: v4.13.0 | Rule version: v3
+///
 /// Alias: analytics_in_build, no_tracking_in_build, duplicate_analytics_events
 ///
 /// Analytics calls in build() fire on every rebuild, causing duplicate
@@ -390,7 +398,7 @@ class AvoidAnalyticsInBuildRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_analytics_in_build',
     problemMessage:
-        '[avoid_analytics_in_build] Analytics calls inside build() are triggered on every rebuild, resulting in duplicate events, inaccurate tracking data, degraded app performance, and inflated backend costs. This can skew business metrics, produce misleading dashboards, and make it difficult to analyze real user behavior. Persistent analytics spam may also trigger rate limits or data quality flags in analytics platforms.',
+        '[avoid_analytics_in_build] Analytics calls inside build() are triggered on every rebuild, resulting in duplicate events, inaccurate tracking data, degraded app performance, and inflated backend costs. This can skew business metrics, produce misleading dashboards, and make it difficult to analyze real user behavior. Persistent analytics spam may also trigger rate limits or data quality flags in analytics platforms. {v3}',
     correctionMessage:
         'Move analytics calls to initState(), event handlers, or lifecycle methods triggered once per user action or screen view. Audit analytics logic for duplicate events and add tests to verify correct event tracking. Document analytics integration for maintainability.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -468,6 +476,8 @@ class _AnalyticsVisitor extends RecursiveAstVisitor<void> {
 
 /// Warns when jsonEncode is called inside build().
 ///
+/// Since: v1.7.9 | Updated: v4.13.0 | Rule version: v2
+///
 /// Alias: json_in_build, no_json_encode_in_build, expensive_build_operation
 ///
 /// JSON encoding is expensive. Doing it in build() causes performance issues
@@ -509,7 +519,7 @@ class AvoidJsonEncodeInBuildRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_json_encode_in_build',
     problemMessage:
-        '[avoid_json_encode_in_build] jsonEncode in build() is expensive and causes jank. JSON encoding is expensive. Doing it in build() causes performance issues because build() is called frequently (60fps during animations).',
+        '[avoid_json_encode_in_build] jsonEncode in build() is expensive and causes jank. JSON encoding is expensive. Doing it in build() causes performance issues because build() is called frequently (60fps during animations). {v2}',
     correctionMessage:
         'Cache JSON encoding result outside of build(). Use DevTools widget inspector to verify that rebuild counts decrease.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -559,6 +569,8 @@ class _JsonEncodeVisitor extends RecursiveAstVisitor<void> {
 
 /// Warns when Canvas operations are used outside of CustomPainter.
 ///
+/// Since: v1.7.9 | Updated: v4.13.0 | Rule version: v3
+///
 /// Alias: canvas_in_build, no_canvas_in_build, use_custom_painter
 ///
 /// Canvas operations should only be in CustomPainter.paint(), not in
@@ -594,7 +606,7 @@ class AvoidCanvasInBuildRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_canvas_operations_in_build',
     problemMessage:
-        '[avoid_canvas_operations_in_build] Canvas operations (drawing, painting) should only be performed in CustomPainter.paint(), not in build() or other widget methods. Doing this in build() can cause severe performance issues, unpredictable rendering, visual glitches, and broken platform optimizations. This may result in app store rejection for poor graphics handling and negative user feedback due to laggy or broken UI.',
+        '[avoid_canvas_operations_in_build] Canvas operations (drawing, painting) should only be performed in CustomPainter.paint(), not in build() or other widget methods. Doing this in build() can cause severe performance issues, unpredictable rendering, visual glitches, and broken platform optimizations. This may result in app store rejection for poor graphics handling and negative user feedback due to laggy or broken UI. {v3}',
     correctionMessage:
         'Move all canvas operations to a CustomPainter subclass and override the paint() method. Trigger repaints using setState or notifier patterns, not by calling canvas methods in build(). Audit your codebase for accidental canvas calls in build() and add tests for rendering correctness.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -625,6 +637,8 @@ class AvoidCanvasInBuildRule extends SaropaLintRule {
 }
 
 /// Warns when hardcoded feature flags (if true/false) are used.
+///
+/// Since: v1.7.9 | Updated: v4.13.0 | Rule version: v2
 ///
 /// Alias: literal_boolean_condition, if_true_if_false, dead_code_condition
 ///
@@ -662,7 +676,7 @@ class AvoidHardcodedFeatureFlagsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_hardcoded_feature_flags',
     problemMessage:
-        '[avoid_hardcoded_feature_flags] Hardcoded if(true)/if(false) suggests incomplete feature flag. Hardcoded conditions like if (true) or if (false) suggest incomplete feature flag implementation or dead code.',
+        '[avoid_hardcoded_feature_flags] Hardcoded if(true)/if(false) suggests incomplete feature flag. Hardcoded conditions like if (true) or if (false) suggest incomplete feature flag implementation or dead code. {v2}',
     correctionMessage:
         'Use a proper feature flag system or remove dead code. Use DevTools widget inspector to verify that rebuild counts decrease.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -718,6 +732,8 @@ class _AddFeatureFlagTodoFix extends DartFix {
 
 /// Warns when multiple setState calls are made in the same method.
 ///
+/// Since: v2.0.0 | Updated: v4.13.0 | Rule version: v2
+///
 /// Alias: combine_setstate, multiple_setstate, batch_setstate
 ///
 /// Multiple setState calls cause multiple rebuilds. Combine them for
@@ -757,7 +773,7 @@ class PreferSingleSetStateRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_single_setstate',
     problemMessage:
-        '[prefer_single_setstate] Multiple setState calls cause unnecessary rebuilds. Multiple setState calls are made in the same method. This increases build() cost, causing unnecessary widget rebuilds that degrade scroll performance.',
+        '[prefer_single_setstate] Multiple setState calls cause unnecessary rebuilds. Multiple setState calls are made in the same method. This increases build() cost, causing unnecessary widget rebuilds that degrade scroll performance. {v2}',
     correctionMessage:
         'Combine setState calls into a single call. Use DevTools widget inspector to verify that rebuild counts decrease.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -806,6 +822,8 @@ class _SetStateCountVisitor extends RecursiveAstVisitor<void> {
 
 /// Warns when Isolate.run is used for simple computations.
 ///
+/// Since: v2.0.0 | Updated: v4.13.0 | Rule version: v2
+///
 /// Alias: use_compute, isolate_run_overhead, prefer_compute_function
 ///
 /// For simple, quick operations, the overhead of spawning an isolate
@@ -835,7 +853,7 @@ class PreferComputeOverIsolateRunRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_compute_over_isolate_run',
     problemMessage:
-        '[prefer_compute_over_isolate_run] Use compute() instead of Isolate.run(). For simple, quick operations, the overhead of spawning an isolate is greater than running inline. Use compute() for heavy work.',
+        '[prefer_compute_over_isolate_run] Use compute() instead of Isolate.run(). For simple, quick operations, the overhead of spawning an isolate is greater than running inline. Use compute() for heavy work. {v2}',
     correctionMessage:
         'compute() provides better error handling and typing. Use DevTools widget inspector to verify that rebuild counts decrease.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -860,6 +878,8 @@ class PreferComputeOverIsolateRunRule extends SaropaLintRule {
 }
 
 /// Warns when List.generate is used in widget children.
+///
+/// Since: v2.0.0 | Updated: v4.13.0 | Rule version: v2
 ///
 /// Alias: no_list_generate_in_children, collection_for_children, prefer_collection_for
 ///
@@ -895,7 +915,7 @@ class PreferForLoopInChildrenRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_for_loop_in_children',
     problemMessage:
-        '[prefer_for_loop_in_children] Prefer collection-for over List.generate in children. For building widget lists, prefer for-in collection or spread to improve readability and performance.',
+        '[prefer_for_loop_in_children] Prefer collection-for over List.generate in children. For building widget lists, prefer for-in collection or spread to improve readability and performance. {v2}',
     correctionMessage:
         'Use [for (final item in items) Widget(item)]. Use DevTools widget inspector to verify that rebuild counts decrease.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -929,6 +949,8 @@ class PreferForLoopInChildrenRule extends SaropaLintRule {
 }
 
 /// Warns when multiple decoration widgets could be a Container.
+///
+/// Since: v4.1.3 | Updated: v4.13.0 | Rule version: v2
 ///
 /// Alias: combine_decoration_widgets, nested_padding_decoratedbox, use_container
 ///
@@ -971,7 +993,7 @@ class PreferContainerRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_single_container',
     problemMessage:
-        '[prefer_single_container] Nested decoration widgets could be a single Container. Using nested Padding, DecoratedBox, etc. is verbose when Container provides all these features in one widget.',
+        '[prefer_single_container] Nested decoration widgets could be a single Container. Using nested Padding, DecoratedBox, etc. is verbose when Container provides all these features in one widget. {v2}',
     correctionMessage:
         'Use Container with padding, decoration, and size. Use DevTools widget inspector to verify that rebuild counts decrease.',
     errorSeverity: DiagnosticSeverity.INFO,

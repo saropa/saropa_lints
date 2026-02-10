@@ -15,6 +15,7 @@ Provider is Flutter's recommended state management for simple apps. But it has p
 | Provider.of for reactivity | Use Consumer instead | `prefer_consumer_over_provider_of` |
 | context.watch in async | Subscription leaks | `avoid_listen_in_async` |
 | Provider.value inline | Rebuilds create new instances | `avoid_provider_value_rebuild` |
+| listen:false in build | Widget won't rebuild on changes | `avoid_provider_listen_false_in_build` |
 
 ## What saropa_lints Catches
 
@@ -301,6 +302,7 @@ dart run custom_lint
 | `avoid_build_context_in_providers` | recommended | BuildContext stored in ChangeNotifier |
 | `require_provider_dispose` | recommended | Missing dispose in ChangeNotifier |
 | `prefer_consumer_over_provider_of` | recommended | Provider.of instead of Consumer |
+| `avoid_provider_listen_false_in_build` | recommended | listen:false in build() suppresses rebuilds (v4.12.0) |
 
 ## Common Patterns
 

@@ -15,6 +15,8 @@ import '../../saropa_lint_rule.dart';
 
 /// Warns when Vector2/Vector3 objects are created inside update().
 ///
+/// Since: v2.0.0 | Updated: v4.13.0 | Rule version: v2
+///
 /// Creating vectors in update() causes garbage collection churn since
 /// update() is called every frame. Cache vectors as fields instead.
 ///
@@ -47,7 +49,7 @@ class AvoidCreatingVectorInUpdateRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_creating_vector_in_update',
     problemMessage:
-        '[avoid_creating_vector_in_update] Creating new Vector objects (Vector2, Vector3, etc.) inside update() causes frequent garbage collection (GC) churn every frame, leading to performance degradation, frame drops, and increased CPU usage. In real-time games, this can cause stuttering, input lag, and poor user experience, especially on lower-end devices.',
+        '[avoid_creating_vector_in_update] Creating new Vector objects (Vector2, Vector3, etc.) inside update() causes frequent garbage collection (GC) churn every frame, leading to performance degradation, frame drops, and increased CPU usage. In real-time games, this can cause stuttering, input lag, and poor user experience, especially on lower-end devices. {v2}',
     correctionMessage:
         'Cache reusable vectors as static final or instance fields, and reuse them in update() instead of creating new objects each frame. Profile memory usage and GC activity to ensure smooth performance. Document vector reuse strategy for maintainability.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -102,6 +104,8 @@ class _VectorVisitor extends RecursiveAstVisitor<void> {
 
 /// Warns when onLoad() is async but doesn't contain any await.
 ///
+/// Since: v2.0.0 | Updated: v4.13.0 | Rule version: v2
+///
 /// Making onLoad() async without await adds unnecessary overhead.
 /// Remove the async keyword if no awaiting is needed.
 ///
@@ -140,7 +144,7 @@ class AvoidRedundantAsyncOnLoadRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_redundant_async_on_load',
     problemMessage:
-        '[avoid_redundant_async_on_load] async onLoad() without await adds unnecessary overhead. OnLoad() is async but doesn\'t contain any await.',
+        '[avoid_redundant_async_on_load] async onLoad() without await adds unnecessary overhead. OnLoad() is async but doesn\'t contain any await. {v2}',
     correctionMessage:
         'Remove async keyword or add await statements. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,

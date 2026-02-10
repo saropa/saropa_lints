@@ -18,6 +18,8 @@ import '../../saropa_lint_rule.dart';
 
 /// Warns when SQLite column types may not match Dart types correctly.
 ///
+/// Since: v4.2.0 | Updated: v4.13.0 | Rule version: v2
+///
 /// Alias: sqflite_type, sqlite_type_mismatch
 ///
 /// SQLite types must match Dart types. SQLite is dynamically typed but
@@ -60,7 +62,7 @@ class AvoidSqfliteTypeMismatchRule extends SaropaLintRule {
     name: 'avoid_sqflite_type_mismatch',
     problemMessage:
         '[avoid_sqflite_type_mismatch] SQLite type may not match Dart type. '
-        'Booleans are stored as INTEGER (0/1), DateTime as TEXT/INTEGER.',
+        'Booleans are stored as INTEGER (0/1), DateTime as TEXT/INTEGER. {v2}',
     correctionMessage:
         'Convert types explicitly: bool = row["col"] == 1; DateTime = DateTime.parse(row["col"]).',
     errorSeverity: DiagnosticSeverity.ERROR,

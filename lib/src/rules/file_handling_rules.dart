@@ -7,6 +7,8 @@ import 'package:saropa_lints/src/saropa_lint_rule.dart';
 
 /// Warns when file read operations are used without exists() check or try-catch.
 ///
+/// Since: v1.8.2 | Updated: v4.13.0 | Rule version: v2
+///
 /// File operations on non-existent files throw exceptions. Always verify
 /// the file exists or wrap in try-catch to handle missing files gracefully.
 ///
@@ -40,7 +42,7 @@ class RequireFileExistsCheckRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_file_exists_check',
     problemMessage:
-        '[require_file_exists_check] File read operation should check exists() or use try-catch. File operations on non-existent files throw exceptions. Always verify the file exists or wrap in try-catch to handle missing files gracefully.',
+        '[require_file_exists_check] File read operation should check exists() or use try-catch. File operations on non-existent files throw exceptions. Always verify the file exists or wrap in try-catch to handle missing files gracefully. {v2}',
     correctionMessage:
         'Wrap in if (await file.exists()) or try-catch block. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -117,6 +119,8 @@ class RequireFileExistsCheckRule extends SaropaLintRule {
 
 /// Warns when PDF loading lacks error handling.
 ///
+/// Since: v1.8.2 | Updated: v4.13.0 | Rule version: v3
+///
 /// PDF files can be corrupted, password-protected, or use unsupported features.
 /// Without error handling, these failures crash the app instead of showing
 /// a helpful error message.
@@ -147,7 +151,7 @@ class RequirePdfErrorHandlingRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_pdf_error_handling',
     problemMessage:
-        '[require_pdf_error_handling] PDF loading operation lacks try-catch error handling. PDF files can be corrupted, missing, or have invalid format. Without error handling, failures crash the application instead of showing user-friendly error messages.',
+        '[require_pdf_error_handling] PDF loading operation lacks try-catch error handling. PDF files can be corrupted, missing, or have invalid format. Without error handling, failures crash the application instead of showing user-friendly error messages. {v3}',
     correctionMessage:
         'Wrap the PDF loading call in a try-catch block to handle FormatException, FileSystemException, and other errors gracefully. Display appropriate user feedback and prevent app crashes when PDF loading fails.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -219,6 +223,8 @@ class RequirePdfErrorHandlingRule extends SaropaLintRule {
 
 /// Warns when GraphQL response is used without checking for errors.
 ///
+/// Since: v1.8.2 | Updated: v4.13.0 | Rule version: v3
+///
 /// GraphQL returns errors in the response body, not via HTTP status codes.
 /// Accessing `result.data` without checking `result.hasException` may
 /// process null data or miss important error information.
@@ -251,7 +257,7 @@ class RequireGraphqlErrorHandlingRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_graphql_error_handling',
     problemMessage:
-        '[require_graphql_error_handling] GraphQL query and mutation results must check hasException before accessing data. Failing to check for errors can cause runtime crashes, display incomplete or misleading data, and make debugging difficult. This is a common source of silent failures and poor user experience in apps using GraphQL.',
+        '[require_graphql_error_handling] GraphQL query and mutation results must check hasException before accessing data. Failing to check for errors can cause runtime crashes, display incomplete or misleading data, and make debugging difficult. This is a common source of silent failures and poor user experience in apps using GraphQL. {v3}',
     correctionMessage:
         'Always check result.hasException before accessing result.data. Handle errors gracefully, provide user feedback, and log exceptions for troubleshooting.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -320,6 +326,8 @@ class RequireGraphqlErrorHandlingRule extends SaropaLintRule {
 
 /// Warns when SQL queries use string interpolation instead of whereArgs.
 ///
+/// Since: v2.1.0 | Updated: v4.13.0 | Rule version: v3
+///
 /// String interpolation in SQL queries is vulnerable to SQL injection attacks.
 /// Always use parameterized queries with whereArgs.
 ///
@@ -346,7 +354,7 @@ class RequireSqfliteWhereArgsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_sqflite_whereargs',
     problemMessage:
-        '[require_sqflite_whereargs] SQL queries using string interpolation are vulnerable to SQL injection attacks. User input can modify queries, leak data, or corrupt the database. Always use whereArgs to safely pass parameters.',
+        '[require_sqflite_whereargs] SQL queries using string interpolation are vulnerable to SQL injection attacks. User input can modify queries, leak data, or corrupt the database. Always use whereArgs to safely pass parameters. {v3}',
     correctionMessage:
         'Replace string interpolation in SQL queries with whereArgs to prevent injection and ensure query safety.',
     errorSeverity: DiagnosticSeverity.ERROR,
@@ -426,6 +434,8 @@ class RequireSqfliteWhereArgsRule extends SaropaLintRule {
 
 /// Warns when sqflite database operations are not in a transaction.
 ///
+/// Since: v2.1.0 | Updated: v4.13.0 | Rule version: v2
+///
 /// Multiple sequential writes should use transactions for atomicity
 /// and better performance.
 ///
@@ -456,7 +466,7 @@ class RequireSqfliteTransactionRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_sqflite_transaction',
     problemMessage:
-        '[require_sqflite_transaction] Multiple sequential writes should use transaction for atomicity. Multiple sequential writes should use transactions for atomicity and better performance.',
+        '[require_sqflite_transaction] Multiple sequential writes should use transaction for atomicity. Multiple sequential writes should use transactions for atomicity and better performance. {v2}',
     correctionMessage:
         'Wrap writes in db.transaction() to improve performance. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -535,6 +545,8 @@ class RequireSqfliteTransactionRule extends SaropaLintRule {
 
 /// Warns when sqflite database operations are not wrapped in try-catch.
 ///
+/// Since: v4.9.7 | Updated: v4.13.0 | Rule version: v5
+///
 /// Database operations can fail due to schema issues, disk full, or
 /// constraint violations.
 ///
@@ -563,7 +575,7 @@ class RequireSqfliteErrorHandlingRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_sqflite_error_handling',
     problemMessage:
-        '[require_sqflite_error_handling] All database operations (insert, update, query, etc.) must handle errors such as disk full, corruption, or constraint violations. Unhandled database errors will crash the app, cause data loss, and make recovery difficult. This is a critical reliability and data integrity issue.',
+        '[require_sqflite_error_handling] All database operations (insert, update, query, etc.) must handle errors such as disk full, corruption, or constraint violations. Unhandled database errors will crash the app, cause data loss, and make recovery difficult. This is a critical reliability and data integrity issue. {v5}',
     correctionMessage:
         'Wrap all database operations in try-catch blocks to handle DatabaseException and related errors. Provide user feedback and fallback logic to maintain app stability.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -621,6 +633,8 @@ class RequireSqfliteErrorHandlingRule extends SaropaLintRule {
 
 /// Warns when sqflite uses individual inserts in a loop instead of batch.
 ///
+/// Since: v2.1.0 | Updated: v4.13.0 | Rule version: v3
+///
 /// Inserting rows one at a time is slow. Use batch operations for bulk inserts.
 ///
 /// **BAD:**
@@ -650,7 +664,7 @@ class PreferSqfliteBatchRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_sqflite_batch',
     problemMessage:
-        '[prefer_sqflite_batch] Database insert in loop reduces throughput by 10-100x. Inserting rows one at a time is slow. Use batch operations for bulk inserts. Sqflite uses individual inserts in a loop instead of batch.',
+        '[prefer_sqflite_batch] Database insert in loop reduces throughput by 10-100x. Inserting rows one at a time is slow. Use batch operations for bulk inserts. Sqflite uses individual inserts in a loop instead of batch. {v3}',
     correctionMessage:
         'Use db.batch() with batch.insert() and batch.commit(). Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -707,6 +721,8 @@ class PreferSqfliteBatchRule extends SaropaLintRule {
 
 /// Warns when sqflite database is opened but not closed.
 ///
+/// Since: v2.1.0 | Updated: v4.13.0 | Rule version: v3
+///
 /// Database connections should be closed when no longer needed to free resources.
 ///
 /// **BAD:**
@@ -737,7 +753,7 @@ class RequireSqfliteCloseRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_sqflite_close',
     problemMessage:
-        '[require_sqflite_close] Database connections must be closed when no longer needed. Leaving databases open causes resource leaks, file locks, and can prevent other apps or processes from accessing the database. This may lead to app crashes, data corruption, and degraded device performance.',
+        '[require_sqflite_close] Database connections must be closed when no longer needed. Leaving databases open causes resource leaks, file locks, and can prevent other apps or processes from accessing the database. This may lead to app crashes, data corruption, and degraded device performance. {v3}',
     correctionMessage:
         'Always call db.close() in dispose() or a finally block. Document database cleanup to prevent resource leaks and ensure reliable data access.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -799,6 +815,8 @@ class RequireSqfliteCloseRule extends SaropaLintRule {
 
 /// Warns when SQLite reserved words are used as column names.
 ///
+/// Since: v2.3.9 | Updated: v4.13.0 | Rule version: v3
+///
 /// Alias: sqflite_reserved_word, sql_reserved_column
 ///
 /// SQLite reserved words like ORDER, GROUP, SELECT, etc. cannot be used
@@ -842,7 +860,7 @@ class AvoidSqfliteReservedWordsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_sqflite_reserved_words',
     problemMessage:
-        '[avoid_sqflite_reserved_words] Using SQLite reserved words as column names in SQL statements can cause syntax errors, failed migrations, and data loss. This is a common source of hard-to-diagnose database bugs and can break schema upgrades or queries.',
+        '[avoid_sqflite_reserved_words] Using SQLite reserved words as column names in SQL statements can cause syntax errors, failed migrations, and data loss. This is a common source of hard-to-diagnose database bugs and can break schema upgrades or queries. {v3}',
     correctionMessage:
         'Escape reserved words with double quotes ("column") or rename the column to avoid conflicts. Document schema changes and test migrations to ensure compatibility.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -1043,6 +1061,8 @@ class AvoidSqfliteReservedWordsRule extends SaropaLintRule {
 
 /// Warns when SELECT * is used in sqflite rawQuery() calls.
 ///
+/// Since: v2.3.2 | Updated: v4.13.0 | Rule version: v2
+///
 /// Alias: sqflite_select_columns, avoid_select_star
 ///
 /// ## Why This Matters
@@ -1089,7 +1109,7 @@ class AvoidSqfliteReadAllColumnsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_sqflite_read_all_columns',
     problemMessage:
-        '[avoid_sqflite_read_all_columns] SELECT * fetches unnecessary columns, wasting memory and bandwidth. Using SELECT * fetches all columns from the database, which: - Wastes memory by loading unused data - Increases network/disk bandwidth - Breaks when table schema changes (new columns appear unexpectedly) - Prevents SQLite query optimization.',
+        '[avoid_sqflite_read_all_columns] SELECT * fetches unnecessary columns, wasting memory and bandwidth. Using SELECT * fetches all columns from the database, which: - Wastes memory by loading unused data - Increases network/disk bandwidth - Breaks when table schema changes (new columns appear unexpectedly) - Prevents SQLite query optimization. {v2}',
     correctionMessage:
         'Specify only the columns you need: SELECT id, name, email FROM .. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -1151,6 +1171,8 @@ class AvoidSqfliteReadAllColumnsRule extends SaropaLintRule {
 
 /// Warns when PDF files are loaded entirely into memory without streaming.
 ///
+/// Since: v2.3.7 | Updated: v4.13.0 | Rule version: v3
+///
 /// Loading entire PDF documents into memory can cause out-of-memory errors
 /// for large files, especially on mobile devices with limited RAM. Use
 /// streaming or page-by-page loading for better memory efficiency.
@@ -1191,7 +1213,7 @@ class AvoidLoadingFullPdfInMemoryRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_loading_full_pdf_in_memory',
     problemMessage:
-        '[avoid_loading_full_pdf_in_memory] Loading an entire PDF file into memory can cause out-of-memory errors, especially on mobile devices with limited RAM. This can crash the app, degrade performance, and prevent users from viewing large documents.',
+        '[avoid_loading_full_pdf_in_memory] Loading an entire PDF file into memory can cause out-of-memory errors, especially on mobile devices with limited RAM. This can crash the app, degrade performance, and prevent users from viewing large documents. {v3}',
     correctionMessage:
         'Use file path-based loading or streaming APIs to process PDFs incrementally. Avoid loading all bytes into memory; instead, read only the required pages or sections.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -1280,6 +1302,8 @@ class AvoidLoadingFullPdfInMemoryRule extends SaropaLintRule {
 
 /// Use singleton database instance instead of multiple openDatabase calls.
 ///
+/// Since: v2.6.0 | Updated: v4.13.0 | Rule version: v2
+///
 /// Calling openDatabase repeatedly creates connection overhead and may
 /// cause locking issues. Use a singleton pattern.
 ///
@@ -1313,7 +1337,7 @@ class PreferSqfliteSingletonRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_sqflite_singleton',
     problemMessage:
-        '[prefer_sqflite_singleton] openDatabase called directly. May create multiple connections. Calling openDatabase repeatedly creates connection overhead and may cause locking issues. Use a singleton pattern.',
+        '[prefer_sqflite_singleton] openDatabase called directly. May create multiple connections. Calling openDatabase repeatedly creates connection overhead and may cause locking issues. Use a singleton pattern. {v2}',
     correctionMessage:
         'Use a singleton pattern for database instance. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -1361,6 +1385,8 @@ class PreferSqfliteSingletonRule extends SaropaLintRule {
 
 /// Use constants for column names to avoid typos.
 ///
+/// Since: v2.6.0 | Updated: v4.13.0 | Rule version: v2
+///
 /// String literals for column names are error-prone. Use constants
 /// for compile-time checking.
 ///
@@ -1392,7 +1418,7 @@ class PreferSqfliteColumnConstantsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_sqflite_column_constants',
     problemMessage:
-        '[prefer_sqflite_column_constants] String literal column name may contain typos. String literals for column names are error-prone. Use constants for compile-time checking. This file handling can cause data corruption, resource leaks, or permission errors.',
+        '[prefer_sqflite_column_constants] String literal column name may contain typos. String literals for column names are error-prone. Use constants for compile-time checking. This file handling can cause data corruption, resource leaks, or permission errors. {v2}',
     correctionMessage:
         'Define column names as constants in a table class. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -1456,6 +1482,8 @@ class PreferSqfliteColumnConstantsRule extends SaropaLintRule {
 
 /// Warns when reading entire large files into memory instead of streaming.
 ///
+/// Since: v4.2.0 | Updated: v4.13.0 | Rule version: v2
+///
 /// Alias: stream_large_files, chunked_file_read
 ///
 /// readAsBytes/readAsString loads entire file into memory. For large files
@@ -1492,7 +1520,7 @@ class PreferStreamingForLargeFilesRule extends SaropaLintRule {
     name: 'prefer_streaming_for_large_files',
     problemMessage:
         '[prefer_streaming_for_large_files] Reading potentially large file '
-        'into memory. Consider streaming for logs, media, or data exports.',
+        'into memory. Consider streaming for logs, media, or data exports. {v2}',
     correctionMessage:
         'Use file.openRead() with stream transformers for memory-efficient processing.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -1567,6 +1595,8 @@ class PreferStreamingForLargeFilesRule extends SaropaLintRule {
 
 /// Warns when file paths are constructed from user input without sanitization.
 ///
+/// Since: v4.2.0 | Updated: v4.13.0 | Rule version: v2
+///
 /// Alias: sanitize_file_path, path_traversal
 ///
 /// User-provided paths can contain ../ to access files outside intended
@@ -1616,7 +1646,7 @@ class RequireFilePathSanitizationRule extends SaropaLintRule {
     name: 'require_file_path_sanitization',
     problemMessage:
         '[require_file_path_sanitization] File path constructed from parameter '
-        'without sanitization. Path traversal attack possible with ../',
+        'without sanitization. Path traversal attack possible with ../ {v2}',
     correctionMessage:
         'Use path.basename() to extract filename and path.isWithin() to verify.',
     errorSeverity: DiagnosticSeverity.WARNING,

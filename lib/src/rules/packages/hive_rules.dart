@@ -55,6 +55,8 @@ bool _isHiveBoxField(String typeSource, String variableName) {
 
 /// Warns when Hive.openBox is called without verifying Hive.init was called.
 ///
+/// Since: v2.1.0 | Updated: v4.13.0 | Rule version: v4
+///
 /// Alias: hive_init_check, ensure_hive_initialized
 ///
 /// Hive must be initialized before opening boxes. Forgetting to call
@@ -89,7 +91,7 @@ class RequireHiveInitializationRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_hive_initialization',
     problemMessage:
-        '[require_hive_initialization] Hive.openBox() or Hive.openLazyBox() was called without a visible Hive.init() or Hive.initFlutter() call in this file. Opening a box before initialization throws a HiveError at runtime.',
+        '[require_hive_initialization] Hive.openBox() or Hive.openLazyBox() was called without a visible Hive.init() or Hive.initFlutter() call in this file. Opening a box before initialization throws a HiveError at runtime. {v4}',
     correctionMessage:
         'Call Hive.initFlutter() in main() before any openBox() calls. This rule cannot verify cross-file initialization, so suppress the warning if Hive.init() is called in a separate startup file.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -123,6 +125,8 @@ class RequireHiveInitializationRule extends SaropaLintRule {
 }
 
 /// Warns when custom types are stored in Hive without @HiveType annotation.
+///
+/// Since: v2.1.0 | Updated: v4.13.0 | Rule version: v2
 ///
 /// Alias: hive_type_adapter, hive_custom_type
 ///
@@ -158,7 +162,7 @@ class RequireHiveTypeAdapterRule extends SaropaLintRule {
     name: 'require_hive_type_adapter',
     problemMessage:
         '[require_hive_type_adapter] Hive cannot serialize this object without '
-        '@HiveType annotation. Storing will throw a HiveError at runtime.',
+        '@HiveType annotation. Storing will throw a HiveError at runtime. {v2}',
     correctionMessage:
         'Add @HiveType(typeId: X) annotation and generate adapter with build_runner.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -219,6 +223,8 @@ class RequireHiveTypeAdapterRule extends SaropaLintRule {
 
 /// Warns when Hive box is opened but not closed in dispose.
 ///
+/// Since: v2.1.0 | Updated: v4.13.0 | Rule version: v3
+///
 /// Alias: close_hive_box, hive_box_leak
 ///
 /// Boxes should be closed when no longer needed, especially in widgets.
@@ -252,7 +258,7 @@ class RequireHiveBoxCloseRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_hive_box_close',
     problemMessage:
-        '[require_hive_box_close] Hive database box opened but not closed in dispose. This leaves file handles open, prevents database compaction, causes memory leaks, and can lead to data corruption or app crashes over time. Unclosed boxes may also block updates and degrade device performance.',
+        '[require_hive_box_close] Hive database box opened but not closed in dispose. This leaves file handles open, prevents database compaction, causes memory leaks, and can lead to data corruption or app crashes over time. Unclosed boxes may also block updates and degrade device performance. {v3}',
     correctionMessage:
         'Always call box.close() in dispose() or when the box is no longer needed. Audit all Hive usage for proper cleanup and add tests for resource management. Document cleanup logic for maintainability.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -307,6 +313,8 @@ class RequireHiveBoxCloseRule extends SaropaLintRule {
 
 /// Warns when Hive stores sensitive data without encryption.
 ///
+/// Since: v2.1.0 | Updated: v4.13.0 | Rule version: v2
+///
 /// Alias: encrypt_hive_sensitive, hive_security
 ///
 /// Sensitive data like passwords, tokens, and personal information
@@ -339,7 +347,7 @@ class PreferHiveEncryptionRule extends SaropaLintRule {
     name: 'prefer_hive_encryption',
     problemMessage:
         '[prefer_hive_encryption] Unencrypted Hive box stores data in plaintext. '
-        'Anyone with device access can read sensitive user data.',
+        'Anyone with device access can read sensitive user data. {v2}',
     correctionMessage:
         'Use encryptionCipher parameter with HiveAesCipher for sensitive data.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -390,6 +398,8 @@ class PreferHiveEncryptionRule extends SaropaLintRule {
 
 /// Warns when HiveAesCipher uses a hardcoded encryption key.
 ///
+/// Since: v2.1.0 | Updated: v4.13.0 | Rule version: v2
+///
 /// Alias: hive_hardcoded_key, secure_hive_key
 ///
 /// Hardcoded keys can be extracted from the app binary. Store keys
@@ -419,7 +429,7 @@ class RequireHiveEncryptionKeySecureRule extends SaropaLintRule {
     name: 'require_hive_encryption_key_secure',
     problemMessage:
         '[require_hive_encryption_key_secure] Hardcoded key defeats encryption. '
-        'Anyone decompiling the app can decrypt all stored user data.',
+        'Anyone decompiling the app can decrypt all stored user data. {v2}',
     correctionMessage:
         'Store encryption key in flutter_secure_storage, not in code.',
     errorSeverity: DiagnosticSeverity.ERROR,
@@ -464,6 +474,8 @@ class RequireHiveEncryptionKeySecureRule extends SaropaLintRule {
 
 /// Warns when database is opened but no close() method found.
 ///
+/// Since: v1.7.8 | Updated: v4.13.0 | Rule version: v4
+///
 /// Alias: database_close, hive_database_leak
 ///
 /// Database connections should be closed when no longer needed to
@@ -504,7 +516,7 @@ class RequireHiveDatabaseCloseRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_hive_database_close',
     problemMessage:
-        '[require_hive_database_close] Database opened but no close() method found. This creates a resource leak risk, leading to memory exhaustion, file locks, and possible data loss. Unclosed databases can prevent compaction and degrade app reliability.',
+        '[require_hive_database_close] Database opened but no close() method found. This creates a resource leak risk, leading to memory exhaustion, file locks, and possible data loss. Unclosed databases can prevent compaction and degrade app reliability. {v4}',
     correctionMessage:
         'Add a dispose() method that calls database.close(). Audit all database usage for proper closure and add tests for resource cleanup. Document disposal logic for maintainability.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -543,6 +555,8 @@ class RequireHiveDatabaseCloseRule extends SaropaLintRule {
 
 /// Warns when Hive type adapters are used without registration.
 ///
+/// Since: v1.7.8 | Updated: v4.13.0 | Rule version: v3
+///
 /// Alias: register_hive_adapter, hive_adapter_missing
 ///
 /// Custom Hive types require adapters to be registered before use.
@@ -576,7 +590,7 @@ class RequireTypeAdapterRegistrationRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_type_adapter_registration',
     problemMessage:
-        '[require_type_adapter_registration] Hive box opened with a custom type but the corresponding TypeAdapter may not be registered. Unregistered adapters cause HiveError at runtime, preventing all read and write operations on the box, which leads to app crashes and complete data inaccessibility.',
+        '[require_type_adapter_registration] Hive box opened with a custom type but the corresponding TypeAdapter may not be registered. Unregistered adapters cause HiveError at runtime, preventing all read and write operations on the box, which leads to app crashes and complete data inaccessibility. {v3}',
     correctionMessage:
         'Call Hive.registerAdapter() for every custom type before opening boxes that use it. Without registration, your app will crash or lose data when reading or writing.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -639,6 +653,8 @@ class RequireTypeAdapterRegistrationRule extends SaropaLintRule {
 
 /// Warns when large data is loaded into regular Hive boxes instead of lazy.
 ///
+/// Since: v1.7.8 | Updated: v4.13.0 | Rule version: v4
+///
 /// Alias: use_lazy_box, hive_lazy_loading
 ///
 /// Regular boxes load all data into memory at open time. For large
@@ -669,7 +685,7 @@ class PreferLazyBoxForLargeRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_lazy_box_for_large',
     problemMessage:
-        '[prefer_lazy_box_for_large] Regular box loads all entries into memory at once. Regular boxes load all data into memory at open time. For large datasets, use lazy boxes that load values on demand.',
+        '[prefer_lazy_box_for_large] Regular box loads all entries into memory at once. Regular boxes load all data into memory at open time. For large datasets, use lazy boxes that load values on demand. {v4}',
     correctionMessage:
         'Use Hive.openLazyBox() for collections that may grow large. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -745,6 +761,8 @@ class PreferLazyBoxForLargeRule extends SaropaLintRule {
 
 /// Warns when @HiveType typeIds may conflict or change.
 ///
+/// Since: v2.3.0 | Updated: v4.13.0 | Rule version: v2
+///
 /// Alias: hive_type_id, manage_hive_type_ids
 ///
 /// Hive typeIds must be unique and stable. Changing or duplicating typeIds
@@ -785,7 +803,7 @@ class RequireHiveTypeIdManagementRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_hive_type_id_management',
     problemMessage:
-        '[require_hive_type_id_management] @HiveType found. Ensure typeId is unique and documented in a central registry. Hive typeIds must be unique and stable. Changing or duplicating typeIds corrupts stored data. Track typeIds in a central registry.',
+        '[require_hive_type_id_management] @HiveType found. Ensure typeId is unique and documented in a central registry. Hive typeIds must be unique and stable. Changing or duplicating typeIds corrupts stored data. Track typeIds in a central registry. {v2}',
     correctionMessage:
         'Create a hive_type_ids.dart file to track all typeIds and prevent conflicts. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -828,6 +846,8 @@ class RequireHiveTypeIdManagementRule extends SaropaLintRule {
 
 /// Warns when @HiveField indices are reused within the same class.
 ///
+/// Since: v2.3.9 | Updated: v4.13.0 | Rule version: v3
+///
 /// Alias: hive_field_duplicate, hive_field_conflict
 ///
 /// @HiveField indices must be unique within a class. Reusing an index
@@ -868,7 +888,7 @@ class AvoidHiveFieldIndexReuseRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_hive_field_index_reuse',
     problemMessage:
-        'Reusing Hive field indexes across different fields or types can corrupt your database, cause data loss, and make migrations impossible. This can result in users losing critical data or experiencing app crashes after updates. Always assign unique field indexes and never change them after release. See https://docs.hivedb.dev/#/adapters/fields.',
+        '[avoid_hive_field_index_reuse] Reusing Hive field indexes across different fields or types can corrupt your database, cause data loss, and make migrations impossible. This can result in users losing critical data or experiencing app crashes after updates. Always assign unique field indexes and never change them after release. See https://docs.hivedb.dev/#/adapters/fields. {v3}',
     correctionMessage:
         'Ensure each Hive field has a unique, immutable index and avoid reusing or changing indexes after deployment. See https://docs.hivedb.dev/#/adapters/fields for guidance.',
     errorSeverity: DiagnosticSeverity.ERROR,
@@ -941,6 +961,8 @@ class AvoidHiveFieldIndexReuseRule extends SaropaLintRule {
 
 /// Warns when @HiveField on nullable fields lacks defaultValue.
 ///
+/// Since: v2.3.11 | Updated: v4.13.0 | Rule version: v2
+///
 /// Alias: hive_field_default, hive_migration_safe, hive_nullable_field
 ///
 /// When adding new nullable fields to existing Hive types, they need
@@ -976,7 +998,7 @@ class RequireHiveFieldDefaultValueRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_hive_field_default_value',
     problemMessage:
-        '[require_hive_field_default_value] @HiveField on nullable field without defaultValue. This can cause existing data to fail to load, trigger runtime exceptions, and break migrations. Missing defaults may result in silent data loss or corrupted records after schema changes.',
+        '[require_hive_field_default_value] @HiveField on nullable field without defaultValue. This can cause existing data to fail to load, trigger runtime exceptions, and break migrations. Missing defaults may result in silent data loss or corrupted records after schema changes. {v2}',
     correctionMessage:
         'Add defaultValue parameter: @HiveField(0, defaultValue: ...) for all nullable fields. Audit schema migrations for missing defaults and add tests for data integrity. Document migration logic for maintainability.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -1028,6 +1050,8 @@ class RequireHiveFieldDefaultValueRule extends SaropaLintRule {
 
 /// Warns when Hive.openBox is called before registering all adapters.
 ///
+/// Since: v2.3.11 | Updated: v4.13.0 | Rule version: v2
+///
 /// Alias: hive_adapter_order, hive_register_before_open
 ///
 /// TypeAdapters must be registered before opening boxes that use them.
@@ -1064,7 +1088,7 @@ class RequireHiveAdapterRegistrationOrderRule extends SaropaLintRule {
     name: 'require_hive_adapter_registration_order',
     problemMessage:
         '[require_hive_adapter_registration_order] Opening box before registering '
-        'adapters throws HiveError. Adapters must be registered first.',
+        'adapters throws HiveError. Adapters must be registered first. {v2}',
     correctionMessage:
         'Ensure all Hive.registerAdapter() calls appear before Hive.openBox().',
     errorSeverity: DiagnosticSeverity.ERROR,
@@ -1141,6 +1165,8 @@ class _HiveOrderVisitor extends RecursiveAstVisitor<void> {
 
 /// Warns when nested objects in @HiveType don't have their own adapters.
 ///
+/// Since: v2.3.11 | Updated: v4.13.0 | Rule version: v2
+///
 /// Alias: hive_nested_adapter, hive_custom_field_type
 ///
 /// Hive can't serialize nested objects unless they have TypeAdapters too.
@@ -1180,7 +1206,7 @@ class RequireHiveNestedObjectAdapterRule extends SaropaLintRule {
     name: 'require_hive_nested_object_adapter',
     problemMessage:
         '[require_hive_nested_object_adapter] Nested custom type without adapter '
-        'causes runtime crash when Hive tries to serialize the object.',
+        'causes runtime crash when Hive tries to serialize the object. {v2}',
     correctionMessage:
         'Add @HiveType annotation to the nested class or use a primitive type.',
     errorSeverity: DiagnosticSeverity.ERROR,
@@ -1232,6 +1258,8 @@ class RequireHiveNestedObjectAdapterRule extends SaropaLintRule {
 
 /// Warns when duplicate Hive box names are used.
 ///
+/// Since: v2.3.11 | Updated: v4.13.0 | Rule version: v2
+///
 /// Alias: hive_box_name_unique, hive_duplicate_box
 ///
 /// Box names must be unique across the application. Using the same name
@@ -1265,7 +1293,7 @@ class AvoidHiveBoxNameCollisionRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_hive_box_name_collision',
     problemMessage:
-        '[avoid_hive_box_name_collision] Generic Hive box name may cause collision. Use a specific name. Box names must be unique across the application. Using the same name for different types causes data corruption or type errors.',
+        '[avoid_hive_box_name_collision] Generic Hive box name may cause collision. Use a specific name. Box names must be unique across the application. Using the same name for different types causes data corruption or type errors. {v2}',
     correctionMessage:
         'Use a unique, descriptive box name like "users" or "settings". Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -1323,6 +1351,8 @@ class AvoidHiveBoxNameCollisionRule extends SaropaLintRule {
 
 /// Use box.listenable() with ValueListenableBuilder for reactive UI.
 ///
+/// Since: v2.6.0 | Updated: v4.13.0 | Rule version: v3
+///
 /// Manually calling setState after Hive updates is error-prone.
 /// Use ValueListenableBuilder with box.listenable() for reactive updates.
 ///
@@ -1356,7 +1386,7 @@ class PreferHiveValueListenableRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_hive_value_listenable',
     problemMessage:
-        '[prefer_hive_value_listenable] Manual setState after Hive changes is error-prone. Manually calling setState after Hive updates is error-prone. Use ValueListenableBuilder with box.listenable() for reactive updates.',
+        '[prefer_hive_value_listenable] Manual setState after Hive changes is error-prone. Manually calling setState after Hive updates is error-prone. Use ValueListenableBuilder with box.listenable() for reactive updates. {v3}',
     correctionMessage:
         'Use ValueListenableBuilder with box.listenable() for reactive UI. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -1396,6 +1426,8 @@ class PreferHiveValueListenableRule extends SaropaLintRule {
 
 /// Warns when Box is used instead of LazyBox for potentially large collections.
 ///
+/// Since: v4.1.4 | Updated: v4.13.0 | Rule version: v3
+///
 /// LazyBox loads entries on-demand, avoiding memory issues with large datasets.
 /// Regular Box loads all entries into memory at once.
 ///
@@ -1423,7 +1455,7 @@ class PreferHiveLazyBoxRule extends SaropaLintRule {
     name: 'prefer_hive_lazy_box',
     problemMessage:
         '[prefer_hive_lazy_box] Consider using LazyBox for potentially large '
-        'collections. Regular Box loads all entries into memory.',
+        'collections. Regular Box loads all entries into memory. {v3}',
     correctionMessage:
         'Use Hive.openLazyBox() instead of Hive.openBox() for large datasets.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -1534,6 +1566,8 @@ class _PreferHiveLazyBoxFix extends DartFix {
 
 /// Warns when Uint8List or binary data is stored in Hive.
 ///
+/// Since: v4.1.4 | Updated: v4.13.0 | Rule version: v2
+///
 /// Hive is not optimized for large binary data. Store file paths instead
 /// and keep binary data in the file system.
 ///
@@ -1567,7 +1601,7 @@ class AvoidHiveBinaryStorageRule extends SaropaLintRule {
     name: 'avoid_hive_binary_storage',
     problemMessage:
         '[avoid_hive_binary_storage] Storing Uint8List/binary data in Hive. '
-        'This degrades performance for large files.',
+        'This degrades performance for large files. {v2}',
     correctionMessage:
         'Store file paths instead and keep binary data in the file system.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -1620,6 +1654,8 @@ class AvoidHiveBinaryStorageRule extends SaropaLintRule {
 
 /// Warns when @HiveType class is modified without migration strategy.
 ///
+/// Since: v4.2.0 | Updated: v4.13.0 | Rule version: v2
+///
 /// Alias: hive_migration, hive_schema_change
 ///
 /// Adding/removing/reordering @HiveField annotations breaks existing data.
@@ -1669,7 +1705,7 @@ class RequireHiveMigrationStrategyRule extends SaropaLintRule {
     name: 'require_hive_migration_strategy',
     problemMessage:
         '[require_hive_migration_strategy] @HiveType with gaps in @HiveField '
-        'indices. This suggests fields were removed without migration.',
+        'indices. This suggests fields were removed without migration. {v2}',
     correctionMessage:
         'Keep all @HiveField indices even for removed fields, or create new typeId for breaking changes.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -1740,5 +1776,256 @@ class RequireHiveMigrationStrategyRule extends SaropaLintRule {
     }
 
     return null;
+  }
+}
+
+// =============================================================================
+// Hive Synchronous in UI Rules
+// =============================================================================
+
+/// Warns when synchronous Hive box operations (get, put, delete, add) are
+///
+/// Since: v4.12.0 | Updated: v4.13.0 | Rule version: v2
+///
+/// called inside build() or initState() methods.
+///
+/// Hive synchronous operations perform disk I/O on the main thread. In
+/// build() this blocks frame rendering; in initState() it delays widget
+/// display. Both cause UI jank and ANR (Application Not Responding) dialogs.
+///
+/// **BAD:**
+/// ```dart
+/// @override
+/// Widget build(BuildContext context) {
+///   final name = box.get('name'); // Blocks UI rendering!
+///   return Text(name ?? 'Unknown');
+/// }
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// String? _name;
+///
+/// @override
+/// void initState() {
+///   super.initState();
+///   _loadName();
+/// }
+///
+/// Future<void> _loadName() async {
+///   final name = await compute((_) => box.get('name'), null);
+///   setState(() => _name = name);
+/// }
+/// ```
+class AvoidHiveSynchronousInUiRule extends SaropaLintRule {
+  const AvoidHiveSynchronousInUiRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  static const LintCode _code = LintCode(
+    name: 'avoid_hive_synchronous_in_ui',
+    problemMessage:
+        '[avoid_hive_synchronous_in_ui] Synchronous Hive box operation (get, put, delete, add) is called inside a build() or initState() method. These operations perform disk I/O on the main isolate, blocking frame rendering and causing visible UI jank. On slower devices or with large boxes, this can trigger ANR (Application Not Responding) dialogs, force-close the app, and create a poor user experience that leads to negative app store reviews. {v2}',
+    correctionMessage:
+        'Move the Hive operation to an async method and use setState() or a state management solution to update the UI when the data is ready. For large operations, use compute() or Isolate.run() to offload to a background isolate.',
+    errorSeverity: DiagnosticSeverity.WARNING,
+  );
+
+  /// Hive box methods that perform synchronous I/O.
+  static const Set<String> _syncHiveMethods = <String>{
+    'get',
+    'getAt',
+    'put',
+    'putAt',
+    'putAll',
+    'add',
+    'addAll',
+    'delete',
+    'deleteAt',
+    'deleteAll',
+    'clear',
+    'compact',
+  };
+
+  /// UI lifecycle methods where sync I/O should be avoided.
+  static const Set<String> _uiMethods = <String>{
+    'build',
+    'initState',
+  };
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      if (!_syncHiveMethods.contains(node.methodName.name)) return;
+
+      // Check if target looks like a Hive box
+      if (!_isHiveBoxTarget(node.target)) return;
+
+      // Check if inside build() or initState()
+      AstNode? current = node.parent;
+      while (current != null) {
+        if (current is MethodDeclaration &&
+            _uiMethods.contains(current.name.lexeme)) {
+          reporter.atNode(node, code);
+          return;
+        }
+        current = current.parent;
+      }
+    });
+  }
+
+  @override
+  List<Fix> getFixes() => <Fix>[_WrapHiveInAsyncCommentFix()];
+}
+
+class _WrapHiveInAsyncCommentFix extends DartFix {
+  @override
+  void run(
+    CustomLintResolver resolver,
+    ChangeReporter reporter,
+    CustomLintContext context,
+    AnalysisError analysisError,
+    List<AnalysisError> others,
+  ) {
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
+
+      final changeBuilder = reporter.createChangeBuilder(
+        message: 'Add TODO: move Hive operation to async method',
+        priority: 1,
+      );
+
+      changeBuilder.addDartFileEdit((builder) {
+        builder.addSimpleInsertion(
+          node.offset,
+          '/* TODO: move to async method or use compute() */ ',
+        );
+      });
+    });
+  }
+}
+
+// =============================================================================
+// require_hive_web_subdirectory
+// =============================================================================
+
+/// Warns when Hive.initFlutter() is called without a subDir parameter on
+///
+/// Since: v4.14.0 | Rule version: v2
+///
+/// web platform.
+///
+/// Alias: hive_web_subdir, hive_web_init
+///
+/// On web, Hive stores data in IndexedDB. Without an explicit subDir,
+/// multiple apps on the same domain share the same Hive storage, causing
+/// data conflicts and overwrites. Always specify a subDir unique to your app.
+///
+/// **BAD:**
+/// ```dart
+/// await Hive.initFlutter(); // No subDir - shared storage on web!
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// await Hive.initFlutter('my_app_data');
+/// ```
+class RequireHiveWebSubdirectoryRule extends SaropaLintRule {
+  const RequireHiveWebSubdirectoryRule() : super(code: _code);
+
+  /// Missing subDir causes data conflicts between web apps on same domain.
+  @override
+  LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  static const LintCode _code = LintCode(
+    name: 'require_hive_web_subdirectory',
+    problemMessage:
+        '[require_hive_web_subdirectory] Hive.initFlutter() called without a '
+        'subDir parameter. On web platforms, Hive stores data in IndexedDB. '
+        'Without an explicit subdirectory, multiple apps deployed on the same '
+        'domain will share the same Hive storage namespace, causing data '
+        'conflicts, overwrites, and potential data loss between applications. '
+        'This is especially critical for web deployments. {v2}',
+    correctionMessage:
+        'Pass a unique subdirectory name to Hive.initFlutter(), e.g., '
+        "Hive.initFlutter('my_app_data'). Use your app's package name or a "
+        'unique identifier to avoid storage conflicts.',
+    errorSeverity: DiagnosticSeverity.ERROR,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      // Check for initFlutter method
+      if (node.methodName.name != 'initFlutter') return;
+
+      // Check if target is Hive
+      final Expression? target = node.target;
+      if (target == null) return;
+      if (target is! SimpleIdentifier || target.name != 'Hive') return;
+
+      // Check if subDir argument is provided
+      final NodeList<Expression> args = node.argumentList.arguments;
+      if (args.isEmpty) {
+        // No arguments at all - missing subDir
+        reporter.atNode(node, code);
+        return;
+      }
+
+      // Check if first positional arg is a non-empty string
+      final Expression firstArg = args.first;
+      if (firstArg is StringLiteral) {
+        final String? value = firstArg.stringValue;
+        if (value == null || value.isEmpty) {
+          reporter.atNode(node, code);
+        }
+      }
+    });
+  }
+
+  @override
+  List<Fix> getFixes() => <Fix>[_AddHiveSubDirFix()];
+}
+
+class _AddHiveSubDirFix extends DartFix {
+  @override
+  void run(
+    CustomLintResolver resolver,
+    ChangeReporter reporter,
+    CustomLintContext context,
+    AnalysisError analysisError,
+    List<AnalysisError> others,
+  ) {
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
+      if (node.methodName.name != 'initFlutter') return;
+
+      final changeBuilder = reporter.createChangeBuilder(
+        message: 'Add subdirectory parameter',
+        priority: 1,
+      );
+
+      changeBuilder.addDartFileEdit((builder) {
+        builder.addSimpleReplacement(
+          node.sourceRange,
+          "Hive.initFlutter('my_app_data')",
+        );
+      });
+    });
   }
 }

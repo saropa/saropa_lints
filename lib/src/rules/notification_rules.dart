@@ -15,6 +15,8 @@ import '../saropa_lint_rule.dart';
 
 /// Warns when Android notifications don't specify a channel ID.
 ///
+/// Since: v1.7.2 | Updated: v4.13.0 | Rule version: v2
+///
 /// Starting with Android 8.0 (API 26), notifications must use notification
 /// channels. Without a channel ID, notifications won't display on newer
 /// Android versions.
@@ -53,7 +55,7 @@ class RequireNotificationChannelAndroidRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_notification_channel_android',
     problemMessage:
-        '[require_notification_channel_android] Android notification is missing a channel ID or description. Without these, notifications may not appear or may be grouped incorrectly on Android 8.0+ devices, reducing reliability and user engagement.',
+        '[require_notification_channel_android] Android notification is missing a channel ID or description. Without these, notifications may not appear or may be grouped incorrectly on Android 8.0+ devices, reducing reliability and user engagement. {v2}',
     correctionMessage:
         'Add a channelId and channelDescription to your AndroidNotificationDetails to ensure notifications are delivered and categorized correctly on Android 8.0+ devices. This improves reliability and user experience.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -137,6 +139,8 @@ class _AddNotificationChannelFix extends DartFix {
 
 /// Warns when notification payloads contain sensitive data.
 ///
+/// Since: v1.7.2 | Updated: v4.13.0 | Rule version: v4
+///
 /// Notification content appears on lock screens and can be visible to others.
 /// Never include passwords, tokens, PII, or financial data in notifications.
 ///
@@ -179,7 +183,7 @@ class AvoidNotificationPayloadSensitiveRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_notification_payload_sensitive',
     problemMessage:
-        '[avoid_notification_payload_sensitive] Sensitive data in notifications exposes passwords, tokens, or PII on the lock screen. Anyone nearby can read this information without unlocking the device, creating a security vulnerability.',
+        '[avoid_notification_payload_sensitive] Sensitive data in notifications exposes passwords, tokens, or PII on the lock screen. Anyone nearby can read this information without unlocking the device, creating a security vulnerability. {v4}',
     correctionMessage:
         'Use generic messages like "New message received" instead of actual content, and require user authentication before displaying sensitive details inside the app.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -342,6 +346,9 @@ class _AddSensitiveNotificationTodoFix extends DartFix {
 }
 
 /// Warns when FlutterLocalNotificationsPlugin.initialize is called without
+///
+/// Since: v2.3.2 | Updated: v4.13.0 | Rule version: v4
+///
 /// both iOS and Android settings.
 ///
 /// Alias: notification_platform_settings, require_notification_settings
@@ -394,7 +401,7 @@ class RequireNotificationInitializePerPlatformRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_notification_initialize_per_platform',
     problemMessage:
-        '[require_notification_initialize_per_platform] Missing platform-specific initialization settings (android: or iOS: parameters) causes notifications to fail silently, breaking critical app functionality. Users on the unconfigured platform will never receive time-sensitive alerts, security notifications, or important updates.',
+        '[require_notification_initialize_per_platform] Missing platform-specific initialization settings (android: or iOS: parameters) causes notifications to fail silently, breaking critical app functionality. Users on the unconfigured platform will never receive time-sensitive alerts, security notifications, or important updates. {v4}',
     correctionMessage:
         'Add both android: and iOS: parameters to ensure notifications work on all platforms.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -496,6 +503,8 @@ class _AddPlatformSettingsTodoFix extends DartFix {
 
 /// Warns when scheduled notifications use DateTime instead of TZDateTime.
 ///
+/// Since: v2.3.7 | Updated: v4.13.0 | Rule version: v3
+///
 /// Scheduled notifications require timezone-aware datetime handling to ensure
 /// notifications fire at the correct time across timezone changes, daylight
 /// saving time transitions, and for users in different time zones.
@@ -542,7 +551,7 @@ class RequireNotificationTimezoneAwarenessRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_notification_timezone_awareness',
     problemMessage:
-        '[require_notification_timezone_awareness] Scheduled notification should use TZDateTime instead of DateTime. Scheduled notifications require timezone-aware datetime handling to ensure notifications fire at the correct time across timezone changes, daylight saving time transitions, and for users in different time zones.',
+        '[require_notification_timezone_awareness] Scheduled notification should use TZDateTime instead of DateTime. Scheduled notifications require timezone-aware datetime handling to ensure notifications fire at the correct time across timezone changes, daylight saving time transitions, and for users in different time zones. {v3}',
     correctionMessage:
         'Use tz.TZDateTime.now(tz.local) or tz.TZDateTime.from() for timezone-aware scheduling.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -702,6 +711,8 @@ class _AddTimezoneAwarenessFix extends DartFix {
 
 /// Warns when notifications use the same ID for different notifications.
 ///
+/// Since: v2.3.10 | Updated: v4.13.0 | Rule version: v3
+///
 /// Alias: notification_id, duplicate_notification_id
 ///
 /// Using the same notification ID for different notifications causes
@@ -735,7 +746,7 @@ class AvoidNotificationSameIdRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_notification_same_id',
     problemMessage:
-        '[avoid_notification_same_id] Static or hardcoded notification ID causes newer notifications to silently replace older ones using the same identifier. Users will miss important alerts, messages, and time-sensitive updates without any indication that previous notifications were overwritten, leading to lost information and degraded communication reliability.',
+        '[avoid_notification_same_id] Static or hardcoded notification ID causes newer notifications to silently replace older ones using the same identifier. Users will miss important alerts, messages, and time-sensitive updates without any indication that previous notifications were overwritten, leading to lost information and degraded communication reliability. {v3}',
     correctionMessage:
         'Generate a unique ID per notification using DateTime.now().millisecondsSinceEpoch or an incrementing counter to prevent silent notification replacement.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -784,6 +795,8 @@ class AvoidNotificationSameIdRule extends SaropaLintRule {
 // =============================================================================
 
 /// Warns when multiple notifications are shown without grouping.
+///
+/// Since: v4.2.0 | Updated: v4.13.0 | Rule version: v2
 ///
 /// Alias: notification_grouping, group_notifications
 ///
@@ -851,7 +864,7 @@ class PreferNotificationGroupingRule extends SaropaLintRule {
     name: 'prefer_notification_grouping',
     problemMessage:
         '[prefer_notification_grouping] Multiple notifications shown in loop '
-        'without groupKey. Notifications will clutter the notification shade.',
+        'without groupKey. Notifications will clutter the notification shade. {v2}',
     correctionMessage:
         'Add groupKey to AndroidNotificationDetails to group related notifications.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -914,6 +927,8 @@ class PreferNotificationGroupingRule extends SaropaLintRule {
 
 /// Warns when notification show/schedule is called without error handling.
 ///
+/// Since: v4.2.0 | Updated: v4.13.0 | Rule version: v2
+///
 /// Alias: notification_error_handling, handle_notification_failure
 ///
 /// Notification operations can fail silently (permission denied, channel
@@ -948,7 +963,7 @@ class AvoidNotificationSilentFailureRule extends SaropaLintRule {
     name: 'avoid_notification_silent_failure',
     problemMessage:
         '[avoid_notification_silent_failure] Notification operation without '
-        'error handling. Failures will be silent and hard to debug.',
+        'error handling. Failures will be silent and hard to debug. {v2}',
     correctionMessage:
         'Wrap notification calls in try-catch to handle permission or platform errors.',
     errorSeverity: DiagnosticSeverity.WARNING,

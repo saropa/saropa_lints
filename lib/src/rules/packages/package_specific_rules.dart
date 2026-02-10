@@ -20,6 +20,8 @@ import '../../saropa_lint_rule.dart';
 
 /// Warns when Google Sign-In calls lack try-catch error handling.
 ///
+/// Since: v2.2.0 | Updated: v4.13.0 | Rule version: v3
+///
 /// Alias: google_signin_try_catch, handle_google_signin_errors
 ///
 /// Google Sign-In can fail for various reasons (network, user cancellation,
@@ -55,7 +57,7 @@ class RequireGoogleSigninErrorHandlingRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_google_signin_error_handling',
     problemMessage:
-        '[require_google_signin_error_handling] Google Sign-In call without error handling crashes when the user cancels the sign-in flow, the network is unavailable, or Google Play Services are outdated. Users see an unhandled exception crash screen instead of a friendly error message, causing frustration and potential data loss in unsaved work.',
+        '[require_google_signin_error_handling] Google Sign-In call without error handling crashes when the user cancels the sign-in flow, the network is unavailable, or Google Play Services are outdated. Users see an unhandled exception crash screen instead of a friendly error message, causing frustration and potential data loss in unsaved work. {v3}',
     correctionMessage:
         'Wrap the signIn() call in a try-catch block that handles PlatformException and network errors, and display a user-friendly error message with a retry option.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -217,6 +219,8 @@ class _AddDisposeTodoFix extends DartFix {
 
 /// Warns when Apple Sign-In is used without nonce parameter.
 ///
+/// Since: v2.2.0 | Updated: v4.13.0 | Rule version: v4
+///
 /// Alias: apple_signin_nonce, require_apple_nonce
 ///
 /// ## Why This Matters
@@ -276,7 +280,7 @@ class RequireAppleSigninNonceRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_apple_signin_nonce',
     problemMessage:
-        '[require_apple_signin_nonce] Omitting a cryptographic nonce when using Apple Sign-In exposes your app to replay attacks. Attackers can intercept a valid authorization token and reuse it to impersonate the user, gaining unauthorized access to their account and sensitive data. Apple’s security documentation strongly recommends using a unique, random nonce for every authentication request to prevent these attacks and ensure user safety.',
+        '[require_apple_signin_nonce] Omitting a cryptographic nonce when using Apple Sign-In exposes your app to replay attacks. Attackers can intercept a valid authorization token and reuse it to impersonate the user, gaining unauthorized access to their account and sensitive data. Apple’s security documentation strongly recommends using a unique, random nonce for every authentication request to prevent these attacks and ensure user safety. {v4}',
     correctionMessage:
         'Always provide a unique, random nonce parameter to getAppleIDCredential() when implementing Apple Sign-In. This binds the authentication request to a single session and prevents replay attacks. Review your authentication flows, update your code to generate and pass a secure nonce, and test thoroughly to ensure the nonce is included in every request.',
     errorSeverity: DiagnosticSeverity.ERROR,
@@ -343,6 +347,8 @@ class _AddNonceParameterFix extends DartFix {
 
 /// Warns when WebView lacks SSL error handling callback.
 ///
+/// Since: v2.2.0 | Updated: v4.13.0 | Rule version: v4
+///
 /// Alias: webview_ssl_handler, require_ssl_error_callback
 ///
 /// Without SSL error handling, WebView may silently fail on certificate issues
@@ -394,7 +400,7 @@ class RequireWebviewSslErrorHandlingRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_webview_ssl_error_handling',
     problemMessage:
-        '[require_webview_ssl_error_handling] If your WebView does not handle SSL certificate errors, it may silently accept invalid or malicious certificates, exposing users to man-in-the-middle attacks. Users may unknowingly submit sensitive information (such as passwords or payment details) to attackers, resulting in account compromise, data theft, or financial loss. Proper SSL error handling is essential for secure in-app browsing.',
+        '[require_webview_ssl_error_handling] If your WebView does not handle SSL certificate errors, it may silently accept invalid or malicious certificates, exposing users to man-in-the-middle attacks. Users may unknowingly submit sensitive information (such as passwords or payment details) to attackers, resulting in account compromise, data theft, or financial loss. Proper SSL error handling is essential for secure in-app browsing. {v4}',
     correctionMessage:
         'Implement an onSslAuthError callback in your WebView’s NavigationDelegate to detect and handle certificate errors. Warn users about invalid certificates, block navigation to untrusted sites, and log incidents for further review. Test your WebView implementation with both valid and invalid certificates to ensure robust SSL error handling.',
     errorSeverity: DiagnosticSeverity.ERROR,
@@ -481,6 +487,8 @@ class _AddSslHandlerTodoFix extends DartFix {
 
 /// Warns when WebView has file access enabled.
 ///
+/// Since: v2.2.0 | Updated: v4.13.0 | Rule version: v3
+///
 /// Alias: webview_no_file_access, disable_webview_file_access
 ///
 /// Enabling file access in WebView is a security risk as malicious web content
@@ -512,7 +520,7 @@ class AvoidWebviewFileAccessRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_webview_file_access',
     problemMessage:
-        '[avoid_webview_file_access] WebView file access enabled (allowFileAccess: true) creates a critical security vulnerability. Malicious web content loaded in the WebView can read local files including user data, cached credentials, and app configuration, then exfiltrate them to attacker-controlled servers without user consent or visible indication.',
+        '[avoid_webview_file_access] WebView file access enabled (allowFileAccess: true) creates a critical security vulnerability. Malicious web content loaded in the WebView can read local files including user data, cached credentials, and app configuration, then exfiltrate them to attacker-controlled servers without user consent or visible indication. {v3}',
     correctionMessage:
         'Remove allowFileAccess: true or explicitly set it to false. If file access is required, restrict it to specific directories and validate all file paths.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -616,6 +624,8 @@ class _RemoveFileAccessFix extends DartFix {
 
 /// Warns when device_calendar Event doesn't specify time zone handling.
 ///
+/// Since: v2.2.0 | Updated: v4.13.0 | Rule version: v2
+///
 /// Alias: calendar_timezone, device_calendar_timezone
 ///
 /// Calendar events without explicit time zone handling may display at wrong
@@ -657,7 +667,7 @@ class RequireCalendarTimezoneHandlingRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_calendar_timezone_handling',
     problemMessage:
-        '[require_calendar_timezone_handling] device_calendar Event is missing an explicit timeZone. This can cause events to appear at the wrong time for users in different time zones, leading to missed or misaligned appointments.',
+        '[require_calendar_timezone_handling] device_calendar Event is missing an explicit timeZone. This can cause events to appear at the wrong time for users in different time zones, leading to missed or misaligned appointments. {v2}',
     correctionMessage:
         'Add the timeZone parameter to device_calendar Event to ensure events are scheduled and displayed correctly across different time zones. This prevents confusion and missed appointments for users in other regions.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -743,6 +753,8 @@ class _AddTimezoneParameterFix extends DartFix {
 
 /// Warns when KeyboardVisibilityController is not disposed.
 ///
+/// Since: v2.2.0 | Updated: v4.13.0 | Rule version: v2
+///
 /// Alias: dispose_keyboard_visibility, keyboard_visibility_leak
 ///
 /// KeyboardVisibilityController listeners must be cancelled to prevent
@@ -799,7 +811,7 @@ class RequireKeyboardVisibilityDisposeRule extends SaropaLintRule {
     name: 'require_keyboard_visibility_dispose',
     problemMessage:
         '[require_keyboard_visibility_dispose] Uncancelled subscription keeps '
-        'firing callbacks after dispose, causing setState errors.',
+        'firing callbacks after dispose, causing setState errors. {v2}',
     correctionMessage: 'Store and cancel the stream subscription in dispose().',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
@@ -857,6 +869,8 @@ class RequireKeyboardVisibilityDisposeRule extends SaropaLintRule {
 
 /// Warns when SpeechToText is not stopped in dispose.
 ///
+/// Since: v2.2.0 | Updated: v4.13.0 | Rule version: v2
+///
 /// Alias: dispose_speech_to_text, speech_to_text_leak
 ///
 /// SpeechToText must be stopped when the widget is disposed to release
@@ -906,7 +920,7 @@ class RequireSpeechStopOnDisposeRule extends SaropaLintRule {
     name: 'require_speech_stop_on_dispose',
     problemMessage:
         '[require_speech_stop_on_dispose] Unreleased SpeechToText keeps '
-        'microphone active, draining battery and blocking other apps.',
+        'microphone active, draining battery and blocking other apps. {v2}',
     correctionMessage:
         'Add _speech.stop() in dispose() to release microphone resources.',
     errorSeverity: DiagnosticSeverity.ERROR,
@@ -984,6 +998,8 @@ class RequireSpeechStopOnDisposeRule extends SaropaLintRule {
 // cspell:ignore myapp
 /// Warns when deep links contain sensitive parameters in URL.
 ///
+/// Since: v2.2.0 | Updated: v4.13.0 | Rule version: v2
+///
 /// Alias: no_tokens_in_deep_links, secure_app_links
 ///
 /// Sensitive data like tokens, passwords, or API keys should never appear
@@ -1013,7 +1029,7 @@ class AvoidAppLinksSensitiveParamsRule extends SaropaLintRule {
     name: 'avoid_app_links_sensitive_params',
     problemMessage:
         '[avoid_app_links_sensitive_params] Deep link params are logged by '
-        'OS and analytics, exposing tokens in crash reports and logs.',
+        'OS and analytics, exposing tokens in crash reports and logs. {v2}',
     correctionMessage:
         'Use one-time codes instead of tokens or passwords in URLs.',
     errorSeverity: DiagnosticSeverity.ERROR,
@@ -1126,6 +1142,8 @@ class _AddSensitiveUrlTodoFix extends DartFix {
 
 /// Warns when Envied annotation lacks obfuscate parameter.
 ///
+/// Since: v2.2.0 | Updated: v4.13.0 | Rule version: v2
+///
 /// Alias: envied_obfuscate, require_env_obfuscation
 ///
 /// Environment variables generated by Envied should be obfuscated to prevent
@@ -1160,7 +1178,7 @@ class RequireEnviedObfuscationRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_envied_obfuscation',
     problemMessage:
-        '[require_envied_obfuscation] Envied environment variable generated without obfuscation stores secrets as plaintext string constants in the compiled binary. Attackers can extract API keys, database URLs, and authentication tokens using basic reverse engineering tools, enabling unauthorized access to your backend services and third-party APIs.',
+        '[require_envied_obfuscation] Envied environment variable generated without obfuscation stores secrets as plaintext string constants in the compiled binary. Attackers can extract API keys, database URLs, and authentication tokens using basic reverse engineering tools, enabling unauthorized access to your backend services and third-party APIs. {v2}',
     correctionMessage:
         'Add obfuscate: true to the @Envied annotation or individual @EnviedField annotations to encode secrets at compile time and prevent plaintext extraction.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -1231,6 +1249,8 @@ class _AddObfuscateTodoFix extends DartFix {
 
 /// Warns when OpenAI API key pattern is found in source code.
 ///
+/// Since: v2.2.0 | Updated: v4.13.0 | Rule version: v2
+///
 /// Alias: no_openai_key_in_code, openai_key_security
 ///
 /// OpenAI API keys (sk-...) should never be hardcoded in source files.
@@ -1262,7 +1282,7 @@ class AvoidOpenaiKeyInCodeRule extends SaropaLintRule {
     name: 'avoid_openai_key_in_code',
     problemMessage:
         '[avoid_openai_key_in_code] Hardcoded OpenAI keys are extractable '
-        'from binaries, enabling API abuse charged to your account.',
+        'from binaries, enabling API abuse charged to your account. {v2}',
     correctionMessage:
         'Use environment variables or secure configuration for API keys.',
     errorSeverity: DiagnosticSeverity.ERROR,
@@ -1290,6 +1310,8 @@ class AvoidOpenaiKeyInCodeRule extends SaropaLintRule {
 }
 
 /// Warns when OpenAI API calls (chat_gpt_sdk) lack try-catch error handling.
+///
+/// Since: v2.2.0 | Updated: v4.13.0 | Rule version: v3
 ///
 /// Alias: openai_try_catch, handle_openai_errors
 ///
@@ -1330,7 +1352,7 @@ class RequireOpenaiErrorHandlingRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_openai_error_handling',
     problemMessage:
-        '[require_openai_error_handling] OpenAI API call without error handling crashes when the service returns rate limit errors (429), the API is temporarily unavailable (503), or the request exceeds token limits. Users see an unhandled exception crash screen instead of graceful fallback behavior, causing lost context and a broken experience.',
+        '[require_openai_error_handling] OpenAI API call without error handling crashes when the service returns rate limit errors (429), the API is temporarily unavailable (503), or the request exceeds token limits. Users see an unhandled exception crash screen instead of graceful fallback behavior, causing lost context and a broken experience. {v3}',
     correctionMessage:
         'Wrap OpenAI API calls in a try-catch block that handles rate limits with exponential backoff and service errors with user-friendly fallback messages.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -1391,6 +1413,8 @@ class RequireOpenaiErrorHandlingRule extends SaropaLintRule {
 
 /// Warns when SvgPicture lacks errorBuilder callback.
 ///
+/// Since: v2.2.0 | Updated: v4.13.0 | Rule version: v3
+///
 /// Alias: svg_error_handler, require_svg_error_builder
 ///
 /// SVG loading can fail for various reasons. Without an error builder,
@@ -1423,7 +1447,7 @@ class RequireSvgErrorHandlerRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_svg_error_handler',
     problemMessage:
-        '[require_svg_error_handler] SvgPicture without errorBuilder shows blank on invalid SVG. SVG loading can fail for various reasons. Without an error builder, the UI may break or show nothing when an SVG fails to load.',
+        '[require_svg_error_handler] SvgPicture without errorBuilder shows blank on invalid SVG. SVG loading can fail for various reasons. Without an error builder, the UI may break or show nothing when an SVG fails to load. {v3}',
     correctionMessage:
         'Add errorBuilder to handle SVG loading failures. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -1497,6 +1521,8 @@ class _AddErrorBuilderTodoFix extends DartFix {
 // cspell:ignore roboto
 /// Warns when GoogleFonts usage lacks fontFamilyFallback.
 ///
+/// Since: v2.2.0 | Updated: v4.13.0 | Rule version: v2
+///
 /// Alias: google_fonts_fallback, require_font_fallback
 ///
 /// Google Fonts may fail to load on slow connections or offline. Without a
@@ -1532,7 +1558,7 @@ class RequireGoogleFontsFallbackRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_google_fonts_fallback',
     problemMessage:
-        '[require_google_fonts_fallback] GoogleFonts should specify fontFamilyFallback. Google Fonts may fail to load on slow connections or offline. Without a fallback, text may be invisible or use system default unexpectedly.',
+        '[require_google_fonts_fallback] GoogleFonts should specify fontFamilyFallback. Google Fonts may fail to load on slow connections or offline. Without a fallback, text may be invisible or use system default unexpectedly. {v2}',
     correctionMessage:
         'Add fontFamilyFallback to handle font loading failures. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -1601,6 +1627,8 @@ class _AddFontFallbackTodoFix extends DartFix {
 
 /// Suggests using UUID v4 instead of v1 for better randomness.
 ///
+/// Since: v2.2.0 | Updated: v4.13.0 | Rule version: v3
+///
 /// Alias: prefer_uuid_v4_over_v1, use_uuid_v4
 ///
 /// UUID v1 is time-based and includes MAC address, which may leak information.
@@ -1627,7 +1655,7 @@ class PreferUuidV4Rule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_uuid_v4',
     problemMessage:
-        '[prefer_uuid_v4] Prefer UUID v4 over v1 to improve randomness and privacy. UUID v1 is time-based and includes MAC address, which may leak information. UUID v4 is random and more suitable for most use cases.',
+        '[prefer_uuid_v4] Prefer UUID v4 over v1 to improve randomness and privacy. UUID v1 is time-based and includes MAC address, which may leak information. UUID v4 is random and more suitable for most use cases. {v3}',
     correctionMessage:
         'Use Uuid().v4() instead of Uuid().v1(). Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -1688,6 +1716,8 @@ class _ReplaceV1WithV4Fix extends DartFix {
 
 /// Warns when ImagePicker.pickImage() is called without maxWidth/maxHeight.
 ///
+/// Since: v2.3.2 | Updated: v4.13.0 | Rule version: v2
+///
 /// Alias: image_picker_dimensions, limit_image_size, picker_size_limit
 ///
 /// **Quick fix available:** Adds a reminder comment for manual size limit addition.
@@ -1745,7 +1775,7 @@ class PreferImagePickerMaxDimensionsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_image_picker_max_dimensions',
     problemMessage:
-        '[prefer_image_picker_max_dimensions] pickImage() called without maxWidth or maxHeight parameters loads full-resolution camera images (12+ megapixels on modern devices). Decoding these large images into memory causes OutOfMemoryError crashes on lower-end devices, excessive memory consumption that triggers OS app kills, and slow image processing.',
+        '[prefer_image_picker_max_dimensions] pickImage() called without maxWidth or maxHeight parameters loads full-resolution camera images (12+ megapixels on modern devices). Decoding these large images into memory causes OutOfMemoryError crashes on lower-end devices, excessive memory consumption that triggers OS app kills, and slow image processing. {v2}',
     correctionMessage:
         'Add maxWidth and maxHeight parameters (e.g., maxWidth: 1920, maxHeight: 1080) to limit image resolution and prevent out-of-memory crashes on constrained devices.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -1824,6 +1854,8 @@ class _AddImagePickerSizeTodoFix extends DartFix {
 
 /// Warns when launchUrl() is called without specifying LaunchMode.
 ///
+/// Since: v2.3.2 | Updated: v4.13.0 | Rule version: v2
+///
 /// Alias: url_launcher_mode, specify_launch_mode, launch_mode_explicit
 ///
 /// ## Why This Matters
@@ -1873,7 +1905,7 @@ class RequireUrlLauncherModeRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_url_launcher_mode',
     problemMessage:
-        '[require_url_launcher_mode] launchUrl() without mode parameter has inconsistent behavior across platforms. Without explicit LaunchMode, URL launching behavior varies by platform: - iOS: Opens in-app Safari View Controller by default - Android: Opens external browser by default - Web: Opens in same tab by default.',
+        '[require_url_launcher_mode] launchUrl() without mode parameter has inconsistent behavior across platforms. Without explicit LaunchMode, URL launching behavior varies by platform: - iOS: Opens in-app Safari View Controller by default - Android: Opens external browser by default - Web: Opens in same tab by default. {v2}',
     correctionMessage:
         'Add mode parameter (e.g., LaunchMode.externalApplication) for consistent behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -1909,6 +1941,8 @@ class RequireUrlLauncherModeRule extends SaropaLintRule {
 }
 
 /// Warns when Geolocator location stream doesn't specify distanceFilter.
+///
+/// Since: v2.3.7 | Updated: v4.13.0 | Rule version: v2
 ///
 /// Without distanceFilter, the location stream fires on every tiny GPS update,
 /// which drains battery and may cause performance issues. Setting a reasonable
@@ -1951,7 +1985,7 @@ class PreferGeolocatorDistanceFilterRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_geolocator_distance_filter',
     problemMessage:
-        '[prefer_geolocator_distance_filter] Location stream subscription without a distanceFilter fires continuous GPS updates at the maximum sensor rate regardless of actual movement. This causes excessive battery drain, unnecessary network requests to location services, and high CPU usage from processing redundant position updates that provide no new information.',
+        '[prefer_geolocator_distance_filter] Location stream subscription without a distanceFilter fires continuous GPS updates at the maximum sensor rate regardless of actual movement. This causes excessive battery drain, unnecessary network requests to location services, and high CPU usage from processing redundant position updates that provide no new information. {v2}',
     correctionMessage:
         'Add distanceFilter to LocationSettings (e.g., distanceFilter: 10) to receive updates only when the user moves a meaningful distance, reducing battery and CPU usage.',
     errorSeverity: DiagnosticSeverity.INFO,
