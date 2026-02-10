@@ -21,6 +21,8 @@ Dates are not included in version headers — [pub.dev](https://pub.dev/packages
 
 ### Added
 
+- **Unit test coverage for 5 rule categories** (525 tests): Behaviour documentation tests for `ios` (89 rules), `bloc` (52 rules), `riverpod` (37 rules), `provider` (27 rules), and `firebase` (25 rules) — covering fixture verification and expected trigger/no-trigger patterns
+- **Unit test coverage metric** in publish workflow: New `display_unit_test_coverage` report shows per-category test file status alongside the existing fixture coverage metric
 - **Structured JSON violation export** (`reports/.saropa_lints/violations.json`): Machine-readable export of all lint violations written alongside the markdown report after each analysis run. Enables Saropa Log Capture to cross-reference runtime errors with static analysis findings. Schema v1.0 includes per-violation OWASP mappings, correction messages, impact levels, severity, plus aggregate `issuesByFile`, `issuesByRule`, `ruleSeverities`, `enabledRuleNames`, `disabledPackages`, `userExclusions`, and `batchCount`
 - **`VIOLATION_EXPORT_API.md`**: Exhaustive API reference for the structured JSON export schema — field types, sort order, OWASP ID tables, consumer notes, and full examples
 - **`correction` field on `ViolationRecord`**: Carries `LintCode.correctionMessage` through the batch pipeline into both the markdown report and JSON export
