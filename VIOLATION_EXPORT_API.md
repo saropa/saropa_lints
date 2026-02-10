@@ -4,6 +4,7 @@
 > **File:** `reports/.saropa_lints/violations.json`
 > **Producer:** `saropa_lints` analysis plugin
 > **Consumer:** Saropa Log Capture (and any tool reading structured lint data)
+> **Authority:** This document is the canonical schema reference. The design spec in `bugs/discussion/log_capture_integration.md` covers requirements and rationale; in case of conflict, this document wins.
 
 ## Overview
 
@@ -33,7 +34,7 @@ The `.saropa_lints` directory is created automatically under the project's `repo
 |-------|------|----------|-------------|
 | `schema` | `string` | Yes | Schema version. Always `"1.0"` for this version |
 | `version` | `string` | No | saropa_lints package version (e.g. `"4.14.0"`). Absent if config was not captured |
-| `timestamp` | `string` | Yes | ISO 8601 UTC timestamp of export generation (e.g. `"2026-02-09T14:30:22.123Z"`) |
+| `timestamp` | `string` | Yes | ISO 8601 UTC timestamp of export generation (e.g. `"2026-02-09T14:30:22.123456Z"`) |
 | `sessionId` | `string` | Yes | Analysis session identifier (format: `YYYYMMDD_HHMMSS`) |
 | `config` | `object` | Yes | [Config object](#config-object) |
 | `summary` | `object` | Yes | [Summary object](#summary-object) |
@@ -57,22 +58,24 @@ The `.saropa_lints` directory is created automatically under the project's `repo
 
 ## Config Object
 
-Analysis configuration snapshot captured at rule-loading time. If the plugin failed to capture configuration, this object contains only `{ "tier": "unknown" }`.
+Analysis configuration snapshot captured at rule-loading time. If the plugin failed to capture configuration, this object contains only `{ "tier": "unknown" }` — all other fields in the table below will be absent. Consumers MUST check for `tier: "unknown"` before accessing other config fields.
 
 | Field | Type | Required | Description |
 |-------|------|----------|-------------|
 | `tier` | `string` | Yes | Effective analysis tier. One of: `"essential"`, `"recommended"`, `"professional"`, `"comprehensive"`, `"pedantic"`, or `"unknown"` |
-| `enabledRuleCount` | `integer` | Yes | Number of rules enabled after tier selection and user overrides |
-| `enabledRuleCountNote` | `string` | Yes | Human-readable explanation: `"After tier selection and user overrides"` |
-| `enabledRuleNames` | `string[]` | Yes | Full list of enabled rule names (e.g. `["avoid_print", "prefer_const", ...]`). May be empty if not captured |
-| `enabledPlatforms` | `string[]` | Yes | Platforms with rules active (e.g. `["ios", "android"]`) |
-| `disabledPlatforms` | `string[]` | Yes | Platforms with rules inactive (e.g. `["macos", "web"]`) |
-| `enabledPackages` | `string[]` | Yes | Package-specific rule sets active (e.g. `["firebase", "riverpod"]`) |
-| `disabledPackages` | `string[]` | Yes | Package-specific rule sets inactive (e.g. `["isar", "hive"]`) |
-| `userExclusions` | `string[]` | Yes | Rules explicitly disabled by the user in `analysis_options_custom.yaml` |
-| `maxIssues` | `integer` | Yes | IDE Problems tab cap. `0` means unlimited |
-| `maxIssuesNote` | `string` | Yes | Explanation: `"IDE Problems tab cap only; this export contains all violations"` |
-| `outputMode` | `string` | Yes | Report output mode. One of: `"both"`, `"report"`, `"json"`, `"none"` |
+| `enabledRuleCount` | `integer` | * | Number of rules enabled after tier selection and user overrides |
+| `enabledRuleCountNote` | `string` | * | Human-readable explanation: `"After tier selection and user overrides"` |
+| `enabledRuleNames` | `string[]` | * | Full list of enabled rule names (e.g. `["avoid_print", "prefer_const", ...]`). May be empty if not captured |
+| `enabledPlatforms` | `string[]` | * | Platforms with rules active (e.g. `["ios", "android"]`) |
+| `disabledPlatforms` | `string[]` | * | Platforms with rules inactive (e.g. `["macos", "web"]`) |
+| `enabledPackages` | `string[]` | * | Package-specific rule sets active (e.g. `["firebase", "riverpod"]`) |
+| `disabledPackages` | `string[]` | * | Package-specific rule sets inactive (e.g. `["isar", "hive"]`) |
+| `userExclusions` | `string[]` | * | Rules explicitly disabled by the user in `analysis_options_custom.yaml` |
+| `maxIssues` | `integer` | * | IDE Problems tab cap. `0` means unlimited |
+| `maxIssuesNote` | `string` | * | Explanation: `"IDE Problems tab cap only; this export contains all violations"` |
+| `outputMode` | `string` | * | Report output mode. One of: `"both"`, `"report"`, `"json"`, `"none"` |
+
+\* Present when `tier` is not `"unknown"`. Absent when config was not captured.
 
 ### Example
 
@@ -129,7 +132,7 @@ Aggregate statistics for the analysis session. All counts are computed from the 
 
 ### Severity Counts
 
-Violation counts grouped by Dart analyzer severity level.
+Violation counts grouped by Dart analyzer severity level. All three keys are always present (value `0` if no violations at that level).
 
 | Field | Type | Description |
 |-------|------|-------------|
@@ -190,7 +193,7 @@ Each element in the `violations` array represents a single lint violation.
 | `file` | `string` | Yes | Relative file path from project root, forward-slash normalized (e.g. `"lib/auth/login.dart"`) |
 | `line` | `integer` | Yes | 1-based line number where the violation occurs |
 | `rule` | `string` | Yes | Rule name (e.g. `"avoid_hardcoded_credentials"`) |
-| `message` | `string` | Yes | Problem message describing the violation |
+| `message` | `string` | Yes | Problem message, conventionally prefixed with `[rule_name]` (e.g. `"[avoid_print] print() statement found..."`) |
 | `correction` | `string` | No | Suggested fix. Absent (not `null`) when the rule has no correction message |
 | `severity` | `string` | Yes | Dart analyzer severity: `"error"`, `"warning"`, or `"info"` (always lowercase) |
 | `impact` | `string` | Yes | saropa_lints impact level: `"critical"`, `"high"`, `"medium"`, `"low"`, or `"opinionated"` (always lowercase) |
