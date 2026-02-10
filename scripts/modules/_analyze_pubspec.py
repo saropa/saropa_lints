@@ -51,7 +51,7 @@ class ExitCode(Enum):
     FILE_NOT_FOUND = 1
     PARSE_ERROR = 2
     NO_DEPENDENCIES = 3
-    USER_CANCELLED = 4
+    USER_CANCELED = 4
 
 
 # =============================================================================
@@ -196,10 +196,10 @@ def prompt_for_file() -> str:
         user_input = input("  > ").strip()
     except (KeyboardInterrupt, EOFError):
         print()
-        exit_with_error("Cancelled by user", ExitCode.USER_CANCELLED)
+        exit_with_error("canceled by user", ExitCode.USER_CANCELED)
 
     if not user_input:
-        exit_with_error("No file path provided", ExitCode.USER_CANCELLED)
+        exit_with_error("No file path provided", ExitCode.USER_CANCELED)
 
     # Remove quotes if present
     user_input = user_input.strip('"').strip("'")

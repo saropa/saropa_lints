@@ -3103,12 +3103,12 @@ class RequireCompleterErrorHandlingRule extends SaropaLintRule {
 ///
 /// Stream subscriptions in field initializers are particularly dangerous
 /// because they execute before initState() where cleanup setup typically
-/// happens. The subscription must be stored to be cancelled in dispose().
+/// happens. The subscription must be stored to be canceled in dispose().
 ///
 /// **BAD:**
 /// ```dart
 /// class _MyWidgetState extends State<MyWidget> {
-///   // Subscription created but never stored - cannot be cancelled!
+///   // Subscription created but never stored - cannot be canceled!
 ///   final _ = someStream.listen((data) => print(data));
 ///
 ///   // Or assigned to void
@@ -3152,7 +3152,7 @@ class AvoidStreamSubscriptionInFieldRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_stream_subscription_in_field',
     problemMessage:
-        '[avoid_stream_subscription_in_field] If a StreamSubscription is stored as a field in a State class but not properly cancelled in dispose(), the subscription will continue to receive events even after the widget is removed from the widget tree. This can cause memory leaks, unexpected UI updates, and subtle bugs, especially in dynamic lists or navigation flows where widgets are frequently created and destroyed. Always cancel subscriptions in the correct State object’s dispose() method. See https://docs.flutter.dev/perf/memory#dispose-resources. {v4}',
+        '[avoid_stream_subscription_in_field] If a StreamSubscription is stored as a field in a State class but not properly canceled in dispose(), the subscription will continue to receive events even after the widget is removed from the widget tree. This can cause memory leaks, unexpected UI updates, and subtle bugs, especially in dynamic lists or navigation flows where widgets are frequently created and destroyed. Always cancel subscriptions in the correct State object’s dispose() method. See https://docs.flutter.dev/perf/memory#dispose-resources. {v4}',
     correctionMessage:
         'In every State class that owns a StreamSubscription field, call subscription.cancel() in the dispose() method before calling super.dispose(). This ensures the subscription is cleaned up when the widget is removed, preventing leaks and unwanted callbacks. See https://docs.flutter.dev/perf/memory#dispose-resources for more information.',
     errorSeverity: DiagnosticSeverity.WARNING,

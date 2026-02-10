@@ -170,7 +170,7 @@ class FormatCommentRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_capitalized_comment_start',
     problemMessage:
-        '[prefer_capitalized_comment_start] Comment should start with capital letter. Prose comments should start with a capital letter for readability. Commented-out code is automatically detected and skipped to avoid false positives on patterns like // foo.bar() or // return x;. {v3}',
+        '[prefer_capitalized_comment_start] Comment should start with capital letter. Prose comments should start with a capital letter for readability. Commented-out code and continuation comments are automatically detected and skipped. {v4}',
     correctionMessage:
         'Capitalize the first letter of the comment text. Prose comments that start with lowercase letters reduce readability.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -183,13 +183,17 @@ class FormatCommentRule extends SaropaLintRule {
     CustomLintContext context,
   ) {
     context.registry.addCompilationUnit((CompilationUnit unit) {
+      final lineInfo = unit.lineInfo;
       Token? token = unit.beginToken;
 
       while (token != null && !token.isEof) {
         Token? commentToken = token.precedingComments;
+        int prevCommentLine = -2;
 
         while (commentToken != null) {
           final String lexeme = commentToken.lexeme;
+          final int currentLine =
+              lineInfo.getLocation(commentToken.offset).lineNumber;
 
           // Only check single-line comments (not doc comments)
           if (lexeme.startsWith('//') && !lexeme.startsWith('///')) {
@@ -197,12 +201,14 @@ class FormatCommentRule extends SaropaLintRule {
 
             // Skip empty comments
             if (content.isEmpty) {
+              prevCommentLine = currentLine;
               commentToken = commentToken.next;
               continue;
             }
 
             // Skip special task markers and ignore directives
             if (CommentPatterns.isSpecialMarker(content)) {
+              prevCommentLine = currentLine;
               commentToken = commentToken.next;
               continue;
             }
@@ -211,6 +217,13 @@ class FormatCommentRule extends SaropaLintRule {
             if (CommentPatterns.startsWithLowercase(content)) {
               // Skip if this looks like commented-out code
               if (CommentPatterns.isLikelyCode(content)) {
+                prevCommentLine = currentLine;
+                commentToken = commentToken.next;
+                continue;
+              }
+              // Skip continuation comments (immediately after another comment)
+              if (currentLine == prevCommentLine + 1) {
+                prevCommentLine = currentLine;
                 commentToken = commentToken.next;
                 continue;
               }
@@ -218,6 +231,7 @@ class FormatCommentRule extends SaropaLintRule {
             }
           }
 
+          prevCommentLine = currentLine;
           commentToken = commentToken.next;
         }
 

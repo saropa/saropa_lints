@@ -169,7 +169,7 @@ enum OrderStatus {
   processing(1),
   shipped(2),
   delivered(3),
-  cancelled(100);  // Use large gaps for future additions
+  canceled(100);  // Use large gaps for future additions
 
   const OrderStatus(this.code);
   final int code;

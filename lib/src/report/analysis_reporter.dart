@@ -160,7 +160,7 @@ class AnalysisReporter {
   /// The project root directory, or null if not initialized.
   static String? get projectRoot => _projectRoot;
 
-  /// Write the report immediately, cancelling any pending debounce.
+  /// Write the report immediately, canceling any pending debounce.
   ///
   /// Used by the abort mechanism to flush partial results before rules
   /// stop running.

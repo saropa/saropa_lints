@@ -1,0 +1,29 @@
+analyzer:
+  plugins:
+    - custom_lint
+  errors:
+    unused_local_variable: ignore
+    unused_field: ignore
+    unused_element: ignore
+    todo: ignore
+    fixme: ignore
+    hack: ignore
+
+# Configure saropa_lints tier
+custom_lint:
+  saropa_lints:
+    tier: recommended
+  rules:
+    - prefer_async_callback: true
+    - avoid_debug_print: true
+    - avoid_print_in_production: true
+    - avoid_hardcoded_feature_flags: true
+    - prefer_secure_random_for_crypto: true
+    - require_json_decode_try_catch: true
+    - avoid_datetime_parse_unvalidated: true
+    - require_media_player_dispose: true
+    - require_tab_controller_dispose: true
+    - require_dispose: false
+    - avoid_undisposed_instances: false
+    - prefer_uuid_v4: true
+    - avoid_redirect_injection: true

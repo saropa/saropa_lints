@@ -247,7 +247,7 @@ class RequireDioInterceptorErrorHandlerRule extends SaropaLintRule {
 ///
 /// **BAD:**
 /// ```dart
-/// await dio.download(url, path); // Can't be cancelled!
+/// await dio.download(url, path); // Can't be canceled!
 /// ```
 ///
 /// **GOOD:**
@@ -268,7 +268,7 @@ class PreferDioCancelTokenRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_dio_cancel_token',
     problemMessage:
-        '[prefer_dio_cancel_token] Long-running Dio request without CancelToken. Cannot be cancelled. Requests must be cancellable to avoid wasting resources when the user navigates away. {v3}',
+        '[prefer_dio_cancel_token] Long-running Dio request without CancelToken. Cannot be canceled. Requests must be cancellable to avoid wasting resources when the user navigates away. {v3}',
     correctionMessage:
         'Add cancelToken parameter for cancellable requests. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,

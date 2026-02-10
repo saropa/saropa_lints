@@ -634,7 +634,7 @@ class PreferExplicitTypeArgumentsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_explicit_type_arguments',
     problemMessage:
-        '[prefer_explicit_type_arguments] Generic type without explicit type arguments. Explicit type arguments improve code clarity and prevent accidental type inference issues. {v5}',
+        '[prefer_explicit_type_arguments] Generic type without explicit type arguments. Explicit type arguments improve code clarity and prevent accidental type inference issues. Collections with types inferred from context are skipped. {v6}',
     correctionMessage:
         'Add explicit type arguments to the generic type so that the intended types are visible without relying on inference.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -647,15 +647,17 @@ class PreferExplicitTypeArgumentsRule extends SaropaLintRule {
     CustomLintContext context,
   ) {
     context.registry.addListLiteral((ListLiteral node) {
-      // Check for empty list without type args
-      if (node.typeArguments == null && node.elements.isEmpty) {
+      if (node.typeArguments == null &&
+          node.elements.isEmpty &&
+          !_hasInferredTypeArgs(node.staticType)) {
         reporter.atNode(node, code);
       }
     });
 
     context.registry.addSetOrMapLiteral((SetOrMapLiteral node) {
-      // Check for empty map/set without type args
-      if (node.typeArguments == null && node.elements.isEmpty) {
+      if (node.typeArguments == null &&
+          node.elements.isEmpty &&
+          !_hasInferredTypeArgs(node.staticType)) {
         reporter.atNode(node, code);
       }
     });
@@ -685,6 +687,15 @@ class PreferExplicitTypeArgumentsRule extends SaropaLintRule {
         reporter.atNode(node.constructorName, code);
       }
     });
+  }
+
+  /// Returns true if [staticType] has non-dynamic type arguments inferred
+  /// from context (return type, variable type, parameter type).
+  static bool _hasInferredTypeArgs(DartType? staticType) {
+    if (staticType is! InterfaceType) return false;
+    final typeArgs = staticType.typeArguments;
+    return typeArgs.isNotEmpty &&
+        !typeArgs.every((DartType t) => t is DynamicType);
   }
 
   @override
