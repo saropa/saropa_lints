@@ -103,7 +103,7 @@
 // Test fixture for: require_physics_for_nested_scroll
 // Source: lib\src\rules\widget_layout_rules.dart
 
-import '../flutter_mocks.dart';
+import 'package:saropa_lints_example/flutter_mocks.dart';
 
 // BAD: Should trigger require_physics_for_nested_scroll
 // expect_lint: require_physics_for_nested_scroll

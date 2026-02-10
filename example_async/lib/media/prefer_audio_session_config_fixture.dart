@@ -103,7 +103,7 @@
 // Test fixture for: prefer_audio_session_config
 // Source: lib\src\rules\media_rules.dart
 
-import '../flutter_mocks.dart';
+import 'package:saropa_lints_example/flutter_mocks.dart';
 
 final url = 'https://example.com';
 

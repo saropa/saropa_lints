@@ -103,7 +103,7 @@
 // Test fixture for: prefer_overriding_parent_equality
 // Source: lib\src\rules\code_quality_rules.dart
 
-import '../flutter_mocks.dart';
+import 'package:saropa_lints_example/flutter_mocks.dart';
 
 // BAD: Should trigger prefer_overriding_parent_equality
 // expect_lint: prefer_overriding_parent_equality

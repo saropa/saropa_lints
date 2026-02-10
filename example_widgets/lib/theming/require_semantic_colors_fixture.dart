@@ -103,7 +103,7 @@
 // Test fixture for: require_semantic_colors
 // Source: lib\src\rules\theming_rules.dart
 
-import '../flutter_mocks.dart';
+import 'package:saropa_lints_example/flutter_mocks.dart';
 
 // BAD: Should trigger require_semantic_colors
 // expect_lint: require_semantic_colors

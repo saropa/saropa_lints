@@ -103,7 +103,7 @@
 // Test fixture for: avoid_vague_test_descriptions
 // Source: lib\src\rules\testing_best_practices_rules.dart
 
-import '../flutter_mocks.dart';
+import 'package:saropa_lints_example/flutter_mocks.dart';
 
 final email = 'test@example.com';
 dynamic user;

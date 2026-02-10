@@ -103,7 +103,7 @@
 // Test fixture for: prefer_secure_random
 // Source: lib\src\rules\security_rules.dart
 
-import '../flutter_mocks.dart';
+import 'package:saropa_lints_example/flutter_mocks.dart';
 
 final token = 'token';
 

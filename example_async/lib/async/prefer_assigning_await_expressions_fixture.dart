@@ -103,7 +103,7 @@
 // Test fixture for: prefer_assigning_await_expressions
 // Source: lib\src\rules\async_rules.dart
 
-import '../flutter_mocks.dart';
+import 'package:saropa_lints_example/flutter_mocks.dart';
 
 // BAD: Should trigger prefer_assigning_await_expressions
 // expect_lint: prefer_assigning_await_expressions

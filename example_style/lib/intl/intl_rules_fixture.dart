@@ -58,7 +58,7 @@
 // ignore_for_file: abstract_super_member_reference, equal_keys_in_map
 // ignore_for_file: unused_catch_stack, non_constant_default_value
 // ignore_for_file: not_a_type
-// Test fixture for internationalization rules (v2.3.9)
+// Test fixture for internationalization rules
 
 // Mock DateFormat class
 class DateFormat {
@@ -396,7 +396,7 @@ Widget testKeyForCollection(List<String> items) {
 }
 
 // =========================================================================
-// Internationalization Rules (from v4.1.4)
+// Internationalization Rules
 // =========================================================================
 
 class NumberFormatWidget extends StatelessWidget {

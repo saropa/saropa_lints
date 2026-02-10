@@ -103,7 +103,7 @@
 // Test fixture for: prefer_geolocator_distance_filter
 // Source: lib\src\rules\packages\package_specific_rules.dart
 
-import '../flutter_mocks.dart';
+import 'package:saropa_lints_example/flutter_mocks.dart';
 
 dynamic user;
 

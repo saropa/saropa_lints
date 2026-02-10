@@ -103,7 +103,7 @@
 // Test fixture for: use_ref_and_state_synchronously
 // Source: lib\src\rules\packages\riverpod_rules.dart
 
-import '../flutter_mocks.dart';
+import 'package:saropa_lints_example/flutter_mocks.dart';
 
 // BAD: Should trigger use_ref_and_state_synchronously
 // expect_lint: use_ref_and_state_synchronously

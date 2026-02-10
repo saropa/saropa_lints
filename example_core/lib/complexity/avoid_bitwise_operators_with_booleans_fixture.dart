@@ -103,7 +103,7 @@
 // Test fixture for: avoid_bitwise_operators_with_booleans
 // Source: lib\src\rules\complexity_rules.dart
 
-import '../flutter_mocks.dart';
+import 'package:saropa_lints_example/flutter_mocks.dart';
 
 dynamic a;
 dynamic b;

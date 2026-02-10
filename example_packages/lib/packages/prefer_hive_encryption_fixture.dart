@@ -103,7 +103,7 @@
 // Test fixture for: prefer_hive_encryption
 // Source: lib\src\rules\packages\hive_rules.dart
 
-import '../flutter_mocks.dart';
+import 'package:saropa_lints_example/flutter_mocks.dart';
 
 dynamic box;
 final key = 'key';

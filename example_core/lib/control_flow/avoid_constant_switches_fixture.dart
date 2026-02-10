@@ -103,7 +103,7 @@
 // Test fixture for: avoid_constant_switches
 // Source: lib\src\rules\control_flow_rules.dart
 
-import '../flutter_mocks.dart';
+import 'package:saropa_lints_example/flutter_mocks.dart';
 
 // BAD: Should trigger avoid_constant_switches
 // expect_lint: avoid_constant_switches

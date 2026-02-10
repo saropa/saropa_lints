@@ -59,7 +59,7 @@
 // ignore_for_file: abstract_super_member_reference, equal_keys_in_map
 // ignore_for_file: unused_catch_stack, non_constant_default_value
 // ignore_for_file: not_a_type
-// Test fixture for async rules added in v2.3.10
+// Test fixture for async rules
 
 import 'dart:async';
 
@@ -169,7 +169,7 @@ void badCancelOutsideDispose() {
 }
 
 // =========================================================================
-// Stream Rules (from v4.1.4)
+// Stream Rules
 // =========================================================================
 
 class StreamTestWidget extends StatefulWidget {
@@ -247,7 +247,7 @@ void testBroadcastStream() {
 }
 
 // =========================================================================
-// Async/Build Rules (from v4.1.4)
+// Async/Build Rules
 // =========================================================================
 
 class BadAsyncWidget extends StatelessWidget {
@@ -376,7 +376,7 @@ class FutureBuilder<T> extends Widget {
 }
 
 // =========================================================================
-// Async Rules (from v4.1.7)
+// Async Rules (continued)
 // =========================================================================
 
 // BAD: WebSocket without reconnection handling

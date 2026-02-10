@@ -2,7 +2,7 @@
 // ignore_for_file: unused_field
 // Test fixture for use_setstate_synchronously rule
 
-import '../flutter_mocks.dart';
+import 'package:saropa_lints_example/flutter_mocks.dart';
 
 // =========================================================================
 // use_setstate_synchronously
@@ -268,7 +268,7 @@ class _GoodMultipleAwaitsWithGuardsState
 }
 
 // =========================================================================
-// Compound && mounted checks (v3.0.2 fix)
+// Compound && mounted checks
 // =========================================================================
 // Short-circuit evaluation guarantees mounted is true in the then-branch.
 

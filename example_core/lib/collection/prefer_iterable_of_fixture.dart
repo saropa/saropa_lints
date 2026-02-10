@@ -103,7 +103,7 @@
 // Test fixture for: prefer_iterable_of
 // Source: lib\src\rules\collection_rules.dart
 
-import '../flutter_mocks.dart';
+import 'package:saropa_lints_example/flutter_mocks.dart';
 
 final items = <dynamic>[];
 dynamic list;

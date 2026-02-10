@@ -59,7 +59,7 @@
 // ignore_for_file: non_constant_default_value, not_a_type
 // Test fixture for scroll and list rules
 
-import '../flutter_mocks.dart';
+import 'package:saropa_lints_example/flutter_mocks.dart';
 
 // =========================================================================
 // avoid_shrinkwrap_in_scrollview

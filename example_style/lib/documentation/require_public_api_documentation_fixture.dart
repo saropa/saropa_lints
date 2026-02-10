@@ -103,7 +103,7 @@
 // Test fixture for: require_public_api_documentation
 // Source: lib\src\rules\documentation_rules.dart
 
-import '../flutter_mocks.dart';
+import 'package:saropa_lints_example/flutter_mocks.dart';
 
 dynamic a;
 final id = '1';

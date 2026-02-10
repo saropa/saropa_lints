@@ -103,7 +103,7 @@
 // Test fixture for: avoid_unguarded_debug
 // Source: lib\src\rules\debug_rules.dart
 
-import '../flutter_mocks.dart';
+import 'package:saropa_lints_example/flutter_mocks.dart';
 
 dynamic data;
 dynamic x;

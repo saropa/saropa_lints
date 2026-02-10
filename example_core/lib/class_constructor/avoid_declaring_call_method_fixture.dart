@@ -103,7 +103,7 @@
 // Test fixture for: avoid_declaring_call_method
 // Source: lib\src\rules\class_constructor_rules.dart
 
-import '../flutter_mocks.dart';
+import 'package:saropa_lints_example/flutter_mocks.dart';
 
 // BAD: Should trigger avoid_declaring_call_method
 // expect_lint: avoid_declaring_call_method

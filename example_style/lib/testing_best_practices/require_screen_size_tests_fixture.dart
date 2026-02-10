@@ -103,7 +103,7 @@
 // Test fixture for: require_screen_size_tests
 // Source: lib\src\rules\testing_best_practices_rules.dart
 
-import '../flutter_mocks.dart';
+import 'package:saropa_lints_example/flutter_mocks.dart';
 
 // BAD: Should trigger require_screen_size_tests
 // expect_lint: require_screen_size_tests

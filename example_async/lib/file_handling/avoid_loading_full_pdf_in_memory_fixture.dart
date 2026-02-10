@@ -103,7 +103,7 @@
 // Test fixture for: avoid_loading_full_pdf_in_memory
 // Source: lib\src\rules\file_handling_rules.dart
 
-import '../flutter_mocks.dart';
+import 'package:saropa_lints_example/flutter_mocks.dart';
 
 dynamic a;
 dynamic file;

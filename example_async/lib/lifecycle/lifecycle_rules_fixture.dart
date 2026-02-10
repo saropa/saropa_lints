@@ -1,7 +1,7 @@
 // ignore_for_file: unused_local_variable, unused_element, unused_field
-// Test fixture for lifecycle rules added in v2.3.10
+// Test fixture for lifecycle rules
 
-import '../flutter_mocks.dart';
+import 'package:saropa_lints_example/flutter_mocks.dart';
 
 // =========================================================================
 // require_did_update_widget_check
@@ -275,7 +275,7 @@ class _GoodDidUpdateWidgetIdenticalState
 }
 
 // =========================================================================
-// Widget Lifecycle Rules (from v4.1.4)
+// Widget Lifecycle Rules
 // =========================================================================
 
 class BadDialogWidget extends StatefulWidget {

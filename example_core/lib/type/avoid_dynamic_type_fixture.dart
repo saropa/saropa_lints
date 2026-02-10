@@ -103,7 +103,7 @@
 // Test fixture for: avoid_dynamic_type
 // Source: lib\src\rules\type_rules.dart
 
-import '../flutter_mocks.dart';
+import 'package:saropa_lints_example/flutter_mocks.dart';
 
 // BAD: Should trigger avoid_dynamic_type
 // expect_lint: avoid_dynamic_type

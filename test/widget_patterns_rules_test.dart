@@ -7,7 +7,7 @@ import 'package:test/test.dart';
 /// These rules cover widget structure, accessibility, theming, navigation,
 /// form handling, image patterns, gesture handling, and platform integration.
 ///
-/// Test fixtures: example/lib/widget_patterns/*
+/// Test fixtures: example_widgets/lib/widget_patterns/*
 void main() {
   group('Widget Patterns Rules - Fixture Verification', () {
     final fixtures = [
@@ -113,7 +113,7 @@ void main() {
     for (final fixture in fixtures) {
       test('$fixture fixture exists', () {
         final file = File(
-          'example/lib/widget_patterns/${fixture}_fixture.dart',
+          'example_widgets/lib/widget_patterns/${fixture}_fixture.dart',
         );
         expect(file.existsSync(), isTrue);
       });

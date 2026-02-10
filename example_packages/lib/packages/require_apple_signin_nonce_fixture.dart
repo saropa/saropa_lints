@@ -103,7 +103,7 @@
 // Test fixture for: require_apple_signin_nonce
 // Source: lib\src\rules\packages\package_specific_rules.dart
 
-import '../flutter_mocks.dart';
+import 'package:saropa_lints_example/flutter_mocks.dart';
 
 dynamic client;
 final email = 'test@example.com';

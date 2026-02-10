@@ -103,7 +103,7 @@
 // Test fixture for: prefer_commenting_future_delayed
 // Source: lib\src\rules\async_rules.dart
 
-import '../flutter_mocks.dart';
+import 'package:saropa_lints_example/flutter_mocks.dart';
 
 // BAD: Should trigger prefer_commenting_future_delayed
 // expect_lint: prefer_commenting_future_delayed

@@ -103,7 +103,7 @@
 // Test fixture for: prefer_for_loop_in_children
 // Source: lib\src\rules\build_method_rules.dart
 
-import '../flutter_mocks.dart';
+import 'package:saropa_lints_example/flutter_mocks.dart';
 
 final children = <Widget>[];
 dynamic item;

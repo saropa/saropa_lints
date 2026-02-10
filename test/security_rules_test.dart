@@ -7,7 +7,7 @@ import 'package:test/test.dart';
 /// These rules cover credential security, injection prevention, secure storage,
 /// WebView security, authentication, data protection, and OWASP compliance.
 ///
-/// Test fixtures: example/lib/security/*
+/// Test fixtures: example_async/lib/security/*
 void main() {
   group('Security Rules - Fixture Verification', () {
     final fixtures = [
@@ -59,7 +59,7 @@ void main() {
 
     for (final fixture in fixtures) {
       test('$fixture fixture exists', () {
-        final file = File('example/lib/security/${fixture}_fixture.dart');
+        final file = File('example_async/lib/security/${fixture}_fixture.dart');
         expect(file.existsSync(), isTrue);
       });
     }

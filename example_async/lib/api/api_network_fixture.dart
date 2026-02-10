@@ -57,7 +57,7 @@
 // ignore_for_file: const_with_undefined_constructor, abstract_super_member_reference
 // ignore_for_file: equal_keys_in_map, unused_catch_stack
 // ignore_for_file: non_constant_default_value, not_a_type
-// Test fixture for API/network rules added in v2.3.10
+// Test fixture for API/network rules
 
 // =========================================================================
 // prefer_timeout_on_requests

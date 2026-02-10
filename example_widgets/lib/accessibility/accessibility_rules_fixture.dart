@@ -59,7 +59,7 @@
 // ignore_for_file: non_constant_default_value, not_a_type
 // Test fixture for accessibility rules (Plan Group C)
 
-import '../flutter_mocks.dart';
+import 'package:saropa_lints_example/flutter_mocks.dart';
 
 // =========================================================================
 // require_avatar_alt_text (C1)
@@ -161,7 +161,7 @@ class GoodBadgeCountWidget extends StatelessWidget {
 }
 
 // =========================================================================
-// Accessibility Rules (from v4.1.5)
+// Accessibility Rules
 // =========================================================================
 
 // BAD: Small touch target

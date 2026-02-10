@@ -103,7 +103,7 @@
 // Test fixture for: prefer_async_init_state
 // Source: lib\src\rules\async_rules.dart
 
-import '../flutter_mocks.dart';
+import 'package:saropa_lints_example/flutter_mocks.dart';
 
 dynamic builder;
 final context = BuildContext();

@@ -103,7 +103,7 @@
 // Test fixture for: prefer_constructor_body_assignment
 // Source: lib\src\rules\stylistic_whitespace_constructor_rules.dart
 
-import '../flutter_mocks.dart';
+import 'package:saropa_lints_example/flutter_mocks.dart';
 
 // BAD: Should trigger prefer_constructor_body_assignment
 // expect_lint: prefer_constructor_body_assignment

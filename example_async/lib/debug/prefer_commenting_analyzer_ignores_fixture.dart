@@ -103,7 +103,7 @@
 // Test fixture for: prefer_commenting_analyzer_ignores
 // Source: lib\src\rules\debug_rules.dart
 
-import '../flutter_mocks.dart';
+import 'package:saropa_lints_example/flutter_mocks.dart';
 
 // BAD: Should trigger prefer_commenting_analyzer_ignores
 // expect_lint: prefer_commenting_analyzer_ignores

@@ -2,7 +2,7 @@
 // ignore_for_file: unused_element, avoid_print
 // Test fixture for BlocProvider rules
 
-import '../flutter_mocks.dart';
+import 'package:saropa_lints_example/flutter_mocks.dart';
 
 // Mock Bloc classes for testing
 class AuthBloc extends Bloc<Object, Object> {
@@ -108,7 +108,7 @@ class GoodTestWidget extends StatelessWidget {
 }
 
 // =============================================================================
-// Bloc/Cubit Rules (from v4.1.4)
+// Bloc/Cubit Rules
 // =============================================================================
 
 // BAD: Bloc depending on another Bloc

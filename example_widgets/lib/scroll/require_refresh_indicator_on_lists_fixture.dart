@@ -103,7 +103,7 @@
 // Test fixture for: require_refresh_indicator_on_lists
 // Source: lib\src\rules\scroll_rules.dart
 
-import '../flutter_mocks.dart';
+import 'package:saropa_lints_example/flutter_mocks.dart';
 
 dynamic builder;
 dynamic child;

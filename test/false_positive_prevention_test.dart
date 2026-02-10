@@ -2,7 +2,7 @@ import 'dart:io';
 
 import 'package:test/test.dart';
 
-/// Tests for 6 new rules added in v4.14.0:
+/// Tests for 6 rules for false positive prevention:
 ///
 /// 1. prefer_correct_package_name - library directive naming
 /// 2. avoid_getx_build_context_bypass - Get.context usage
@@ -11,11 +11,11 @@ import 'package:test/test.dart';
 /// 5. require_secure_key_generation - predictable key patterns
 /// 6. require_hive_web_subdirectory - missing subDir in initFlutter
 ///
-/// Test fixtures: example/lib/new_rules_v4_14_fixture.dart
+/// Test fixtures: example/lib/false_positive_prevention_fixture.dart
 void main() {
-  group('v4.14.0 Rules - False Positive Prevention', () {
+  group('Rules - False Positive Prevention', () {
     test('fixture file exists', () {
-      final file = File('example/lib/new_rules_v4_14_fixture.dart');
+      final file = File('example/lib/false_positive_prevention_fixture.dart');
       expect(file.existsSync(), isTrue);
     });
 

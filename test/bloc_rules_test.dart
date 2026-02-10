@@ -7,7 +7,7 @@ import 'package:test/test.dart';
 /// These rules cover BLoC event handling, state management, provider patterns,
 /// architectural best practices, naming conventions, and common anti-patterns.
 ///
-/// Test fixtures: example/lib/packages/*bloc*
+/// Test fixtures: example_packages/lib/packages/*bloc*
 void main() {
   group('Bloc Rules - Fixture Verification', () {
     final fixtures = [
@@ -46,7 +46,7 @@ void main() {
     for (final fixture in fixtures) {
       test('$fixture fixture exists', () {
         final file = File(
-          'example/lib/packages/${fixture}_fixture.dart',
+          'example_packages/lib/packages/${fixture}_fixture.dart',
         );
         expect(file.existsSync(), isTrue);
       });

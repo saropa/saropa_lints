@@ -103,7 +103,7 @@
 // Test fixture for: avoid_android_cleartext_traffic
 // Source: lib\src\rules\platforms\android_rules.dart
 
-import '../flutter_mocks.dart';
+import 'package:saropa_lints_example/flutter_mocks.dart';
 
 dynamic api;
 dynamic data;

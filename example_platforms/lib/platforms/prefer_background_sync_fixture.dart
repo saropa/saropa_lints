@@ -103,7 +103,7 @@
 // Test fixture for: prefer_background_sync
 // Source: lib\src\rules\platforms\ios_rules.dart
 
-import '../flutter_mocks.dart';
+import 'package:saropa_lints_example/flutter_mocks.dart';
 
 // BAD: Should trigger prefer_background_sync
 // expect_lint: prefer_background_sync

@@ -57,7 +57,7 @@
 // ignore_for_file: const_with_undefined_constructor, abstract_super_member_reference
 // ignore_for_file: equal_keys_in_map, unused_catch_stack
 // ignore_for_file: non_constant_default_value, not_a_type
-// Test fixture for code quality rules added in v2.5.0
+// Test fixture for code quality rules
 
 // =========================================================================
 // no_boolean_literal_compare

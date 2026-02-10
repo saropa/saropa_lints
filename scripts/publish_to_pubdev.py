@@ -195,6 +195,7 @@ from scripts.modules._rule_metrics import (
     count_rules,
     display_roadmap_summary,
     display_test_coverage,
+    display_todo_audit,
     display_unit_test_coverage,
     sync_readme_badges,
 )
@@ -348,6 +349,7 @@ def main() -> int:
     display_changelog(project_dir)
     display_test_coverage(project_dir)
     display_unit_test_coverage(project_dir)
+    display_todo_audit(project_dir)
     display_roadmap_summary(project_dir)
 
     # --- Step 1: Pre-publish audits (unless --skip-audit) ---

@@ -103,7 +103,7 @@
 // Test fixture for: prefer_interface_class
 // Source: lib\src\rules\class_constructor_rules.dart
 
-import '../flutter_mocks.dart';
+import 'package:saropa_lints_example/flutter_mocks.dart';
 
 final id = '1';
 dynamic user;

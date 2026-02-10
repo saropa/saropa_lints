@@ -103,7 +103,7 @@
 // Test fixture for: prefer_specific_numeric_types
 // Source: lib\src\rules\type_safety_rules.dart
 
-import '../flutter_mocks.dart';
+import 'package:saropa_lints_example/flutter_mocks.dart';
 
 dynamic a;
 dynamic b;

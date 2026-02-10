@@ -103,7 +103,7 @@
 // Test fixture for: require_intl_plural_rules
 // Source: lib\src\rules\internationalization_rules.dart
 
-import '../flutter_mocks.dart';
+import 'package:saropa_lints_example/flutter_mocks.dart';
 
 var count = 0;
 dynamic item;

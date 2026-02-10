@@ -103,7 +103,7 @@
 // Test fixture for: avoid_context_in_initstate_dispose
 // Source: lib\src\rules\widget_lifecycle_rules.dart
 
-import '../flutter_mocks.dart';
+import 'package:saropa_lints_example/flutter_mocks.dart';
 
 // BAD: Should trigger avoid_context_in_initstate_dispose
 // expect_lint: avoid_context_in_initstate_dispose

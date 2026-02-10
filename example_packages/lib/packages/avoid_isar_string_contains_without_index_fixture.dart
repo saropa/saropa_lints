@@ -103,7 +103,7 @@
 // Test fixture for: avoid_isar_string_contains_without_index
 // Source: lib\src\rules\packages\isar_rules.dart
 
-import '../flutter_mocks.dart';
+import 'package:saropa_lints_example/flutter_mocks.dart';
 
 dynamic collection;
 dynamic isar;

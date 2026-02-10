@@ -103,7 +103,7 @@
 // Test fixture for: prefer_feature_folder_structure
 // Source: lib\src\rules\widget_patterns_rules.dart
 
-import '../flutter_mocks.dart';
+import 'package:saropa_lints_example/flutter_mocks.dart';
 
 // BAD: Should trigger prefer_feature_folder_structure
 // expect_lint: prefer_feature_folder_structure

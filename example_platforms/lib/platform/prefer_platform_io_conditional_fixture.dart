@@ -103,7 +103,7 @@
 // Test fixture for: prefer_platform_io_conditional
 // Source: lib\src\rules\platform_rules.dart
 
-import '../flutter_mocks.dart';
+import 'package:saropa_lints_example/flutter_mocks.dart';
 
 // BAD: Should trigger prefer_platform_io_conditional
 // expect_lint: prefer_platform_io_conditional

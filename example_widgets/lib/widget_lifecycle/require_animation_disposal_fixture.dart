@@ -103,7 +103,7 @@
 // Test fixture for: require_animation_disposal
 // Source: lib\src\rules\widget_lifecycle_rules.dart
 
-import '../flutter_mocks.dart';
+import 'package:saropa_lints_example/flutter_mocks.dart';
 
 // BAD: Should trigger require_animation_disposal
 // expect_lint: require_animation_disposal

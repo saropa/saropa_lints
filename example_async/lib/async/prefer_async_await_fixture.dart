@@ -103,7 +103,7 @@
 // Test fixture for: prefer_async_await
 // Source: lib\src\rules\async_rules.dart
 
-import '../flutter_mocks.dart';
+import 'package:saropa_lints_example/flutter_mocks.dart';
 
 // BAD: Should trigger prefer_async_await
 // expect_lint: prefer_async_await

@@ -103,7 +103,7 @@
 // Test fixture for: require_null_safe_extensions
 // Source: lib\src\rules\type_safety_rules.dart
 
-import '../flutter_mocks.dart';
+import 'package:saropa_lints_example/flutter_mocks.dart';
 
 // BAD: Should trigger require_null_safe_extensions
 // expect_lint: require_null_safe_extensions

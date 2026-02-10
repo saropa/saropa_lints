@@ -103,7 +103,7 @@
 // Test fixture for: prefer_no_blank_line_before_return
 // Source: lib\src\rules\stylistic_whitespace_constructor_rules.dart
 
-import '../flutter_mocks.dart';
+import 'package:saropa_lints_example/flutter_mocks.dart';
 
 // BAD: Should trigger prefer_no_blank_line_before_return
 // expect_lint: prefer_no_blank_line_before_return

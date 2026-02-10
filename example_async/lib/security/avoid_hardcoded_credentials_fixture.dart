@@ -21,7 +21,7 @@ void testHardcodedCredentials() {
 }
 
 // =============================================================================
-// Security Rules (from v4.1.5)
+// Security Rules
 // =============================================================================
 
 Future<void> testSecureStorageWithoutErrorHandling() async {
@@ -56,7 +56,7 @@ String jsonEncode(Object obj) => '{}';
 final Object largeObject = Object();
 
 // =============================================================================
-// Security Rules (from v4.1.7)
+// Security Rules (continued)
 // =============================================================================
 
 // BAD: Sensitive data copied to clipboard
