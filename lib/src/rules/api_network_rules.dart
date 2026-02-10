@@ -1407,7 +1407,7 @@ class RequireCancelTokenRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_cancel_token',
     problemMessage:
-        '[require_cancel_token] Async request without cancellation continues after a StatefulWidget disposes its State, wasting bandwidth and causing setState errors. Not cancelling can lead to memory leaks, wasted network connections, and crashes from calling setState on a disposed State object after the parent removes the child from the widget tree. {v4}',
+        '[require_cancel_token] Async request without cancellation continues after a StatefulWidget disposes its State, wasting bandwidth and causing setState errors. Not canceling can lead to memory leaks, wasted network connections, and crashes from calling setState on a disposed State object after the parent removes the child from the widget tree. {v4}',
     correctionMessage:
         'Use CancelToken (Dio) or implement request cancellation in the State dispose() method to stop in-flight requests when the widget is removed.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -1441,8 +1441,10 @@ class RequireCancelTokenRule extends SaropaLintRule {
       // Check for cancellation patterns
       final bool hasCancellation = classSource.contains('CancelToken') ||
           classSource.contains('cancelToken') ||
-          classSource.contains('_cancelled') ||
-          classSource.contains('isCancelled') ||
+          classSource.contains('_cancelled') || // US spelling
+          classSource.contains('isCancelled') || // US spelling
+          classSource.contains('_canceled') || // UK spelling
+          classSource.contains('isCanceled') || // UK spelling
           classSource.contains('cancel()');
 
       // Check for mounted check (partial mitigation)
@@ -1607,7 +1609,7 @@ class RequireContentTypeCheckRule extends SaropaLintRule {
     problemMessage:
         '[require_content_type_check] Parsing response without Content-Type check. May fail on error responses. APIs may return different content types on error. Parsing JSON without checking Content-Type may fail unexpectedly. {v4}',
     correctionMessage:
-        'Check the Content-Type header before parsing the response body. APIs may return HTML error pages or plaintext instead of JSON on failure, causing parse exceptions.',
+        'Check the Content-Type header before parsing the response body. APIs may return HTML error pages or plain text instead of JSON on failure, causing parse exceptions.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -1859,14 +1861,14 @@ class RequireUrlLauncherErrorHandlingRule extends SaropaLintRule {
 /// **BAD:**
 /// ```dart
 /// final image = await picker.pickImage(source: ImageSource.camera);
-/// File file = File(image!.path);  // Crash if cancelled!
+/// File file = File(image!.path);  // Crash if canceled!
 /// ```
 ///
 /// **GOOD:**
 /// ```dart
 /// try {
 ///   final image = await picker.pickImage(source: ImageSource.camera);
-///   if (image == null) return;  // User cancelled
+///   if (image == null) return;  // User canceled
 ///   File file = File(image.path);
 /// } catch (e) {
 ///   // Handle permission error
@@ -2082,13 +2084,13 @@ class RequireGeolocatorTimeoutRule extends SaropaLintRule {
 // Part 7: Connectivity Rules
 // =============================================================================
 
-/// Warns when connectivity subscription isn't cancelled.
+/// Warns when connectivity subscription isn't canceled.
 ///
 /// Since: v2.3.0 | Updated: v4.13.0 | Rule version: v3
 ///
 /// Alias: connectivity_leak, connectivity_no_cancel
 ///
-/// Connectivity subscriptions must be cancelled to prevent memory leaks.
+/// Connectivity subscriptions must be canceled to prevent memory leaks.
 ///
 /// **BAD:**
 /// ```dart
@@ -3320,7 +3322,7 @@ class _AddTimeout60SecondsFix extends DartFix {
 
 /// Warns when WebSocket connections lack reconnection logic.
 ///
-/// Since: v4.1.8 | Updated: v4.13.0 | Rule version: v3
+/// Since: v4.1.8 | Updated: v4.14.2 | Rule version: v4
 ///
 /// `[HEURISTIC]` - Detects WebSocketChannel without reconnection handling.
 ///
@@ -3372,7 +3374,7 @@ class RequireWebsocketReconnectionRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_websocket_reconnection',
     problemMessage:
-        '[require_websocket_reconnection] WebSocket connection without reconnection logic will stay permanently disconnected after network interruptions, server restarts, or mobile network handoffs. Users will see stale data, miss real-time updates, and have no indication that the live connection has dropped until they manually refresh or restart the app. {v3}',
+        '[require_websocket_reconnection] WebSocket connection without reconnection logic will stay permanently disconnected after network interruptions, server restarts, or mobile network handoffs. Users will see stale data, miss real-time updates, and have no indication that the live connection has dropped until they manually refresh or restart the app. {v4}',
     correctionMessage:
         'Implement automatic reconnection with exponential backoff for WebSocket connections.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -3385,6 +3387,12 @@ class RequireWebsocketReconnectionRule extends SaropaLintRule {
     CustomLintContext context,
   ) {
     context.registry.addClassDeclaration((ClassDeclaration node) {
+      final String className = node.name.lexeme;
+
+      // Skip WebSocket class definitions — only check classes that USE
+      // WebSocket, not classes that ARE WebSocket stubs/mocks.
+      if (className == 'WebSocketChannel' || className == 'WebSocket') return;
+
       final String classSource = node.toSource();
 
       // Check if class uses WebSocket

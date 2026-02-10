@@ -686,11 +686,11 @@ class RequireGeolocatorServiceEnabledRule extends SaropaLintRule {
   }
 }
 
-/// Warns when getPositionStream subscription is not cancelled.
+/// Warns when getPositionStream subscription is not canceled.
 ///
 /// Since: v2.1.0 | Updated: v4.13.0 | Rule version: v3
 ///
-/// Stream subscriptions must be cancelled to stop location updates.
+/// Stream subscriptions must be canceled to stop location updates.
 ///
 /// **BAD:**
 /// ```dart
@@ -722,7 +722,7 @@ class RequireGeolocatorStreamCancelRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_geolocator_stream_cancel',
     problemMessage:
-        '[require_geolocator_stream_cancel] Position stream subscriptions must be cancelled when no longer needed. Failing to cancel subscriptions leads to battery drain, memory leaks, and background location updates that persist after the UI is disposed. This can degrade device performance and violate privacy expectations. {v3}',
+        '[require_geolocator_stream_cancel] Position stream subscriptions must be canceled when no longer needed. Failing to cancel subscriptions leads to battery drain, memory leaks, and background location updates that persist after the UI is disposed. This can degrade device performance and violate privacy expectations. {v3}',
     correctionMessage:
         'Store the stream subscription and always call cancel() in dispose() or when the subscription is no longer needed. Document this cleanup to prevent resource leaks and ensure responsible location usage.',
     errorSeverity: DiagnosticSeverity.WARNING,

@@ -1266,7 +1266,7 @@ class _SuperCallVisitor extends RecursiveAstVisitor<void> {
 /// Since: v2.0.0 | Updated: v4.13.0 | Rule version: v2
 ///
 /// Workers like `ever()`, `once()`, `debounce()`, and `interval()` create
-/// subscriptions that must be cancelled in `onClose()` to prevent memory leaks.
+/// subscriptions that must be canceled in `onClose()` to prevent memory leaks.
 ///
 /// **BAD:**
 /// ```dart

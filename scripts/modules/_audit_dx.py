@@ -471,7 +471,7 @@ def print_dx_audit_report(
             else Color.RED
         )
         print(
-            f"    {color.value}{impact.capitalize():<10}{Color.RESET.value} "
+            f"    {color.value}{impact.capitalize():<12}{Color.RESET.value}"
             f"{passing:>3}/{total:<3} passing  "
             f"{pct_color.value}({pct:>5.1f}%){Color.RESET.value}"
         )

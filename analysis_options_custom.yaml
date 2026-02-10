@@ -161,7 +161,7 @@ prefer_single_quotes: false  # Use single quotes instead of double quotes for st
 
 # --- Apostrophe style (conflicting - choose one) ---
 prefer_doc_curly_apostrophe: false  # Use Right Single Quotation Mark (') instead of straight apostrophe (') in documentation. Replace the straight apostrophe with a Right Single Quotation Mark (U+2019) for typographic correctness.
-prefer_doc_straight_apostrophe: false  # Use straight apostrophe (') instead of Right Single Quotation Mark (') in documentation. Replace the Right Single Quotation Mark (U+2019) with a straight apostrophe (U+0027) for plain-text docs.
+prefer_doc_straight_apostrophe: false  # Use straight apostrophe (') instead of Right Single Quotation Mark (') in documentation. Replace the Right Single Quotation Mark (U+2019) with a straight apostrophe (U+0027) for plain text docs.
 prefer_straight_apostrophe: false  # Use straight apostrophe (') instead of Right Single Quotation Mark ('). Replace the Right Single Quotation Mark (U+2019) with a straight apostrophe (U+0027) for code consistency.
 
 # --- Member ordering (conflicting - choose one) ---
@@ -204,7 +204,7 @@ prefer_explicit_null_assignment: false  # Use explicit if-null-then-assign inste
 prefer_explicit_types: false  # Use explicit type annotation instead of var. Replace var with the explicit type annotation so the declared type is visible without hovering or reading the initializer.
 prefer_factory_for_validation: false  # Use a factory constructor for validation logic instead of constructor assertions. A factory constructor can return null, a cached instance, or a subtype when validation fails, unlike assert.
 prefer_fake_over_mock: false  # Test uses mock with verify(). A hand-written fake keeps the test simpler and avoids mock-framework coupling. Create a hand-written Fake subclass instead of a Mock — fakes are easier to maintain and do not require verify() calls.
-prefer_fields_before_methods: false  # Declare fields before methods in class declarations. Move field declarations above method declarations so readers see the data model before the behaviour.
+prefer_fields_before_methods: false  # Declare fields before methods in class declarations. Move field declarations above method declarations so readers see the data model before the behavior.
 prefer_flexible_over_expanded: false  # Use Flexible instead of Expanded for consistency. Replace Expanded with Flexible(fit: FlexFit.tight) so the fit parameter is always visible and easy to change later.
 prefer_future_void_function_over_async_callback: false  # Prefer explicit Future<void> Function() instead of AsyncCallback. Use Future<void> Function() instead of AsyncCallback to keep the signature framework-agnostic and self-documenting.
 prefer_generic_exception: false  # Custom exception classes add boilerplate without proportional benefit. Use generic Exception to keep error handling simple. Replace the custom exception with Exception to reduce class boilerplate while still conveying the error message.
