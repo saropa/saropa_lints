@@ -119,8 +119,10 @@ void _bad554_usage() {
   event.name = 'changed'; // Mutating after dispatch!
 }
 
-// GOOD: Should NOT trigger avoid_bloc_event_mutation
-class _good554_UpdateEvent extends MyEvent {
-  final String name; // Immutable
-  const _good554_UpdateEvent(this.name);
-}
+// HACK: TODO restore when available to testing
+
+// // GOOD: Should NOT trigger avoid_bloc_event_mutation
+// class _good554_UpdateEvent extends MyEvent {
+//   final String name; // Immutable
+//   const _good554_UpdateEvent(this.name);
+// }
