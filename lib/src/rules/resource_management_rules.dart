@@ -15,6 +15,8 @@ import '../saropa_lint_rule.dart';
 
 /// Warns when file handle is not closed in finally block.
 ///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v4
+///
 /// File handles should be closed in finally blocks or use try-with-resources
 /// pattern to ensure cleanup even when exceptions occur.
 ///
@@ -57,7 +59,7 @@ class RequireFileCloseInFinallyRule extends SaropaLintRule {
     name: 'require_file_close_in_finally',
     problemMessage:
         '[require_file_close_in_finally] Unclosed file handle on exception '
-        'leaks file descriptor, exhausting system limits.',
+        'leaks file descriptor, exhausting system limits. {v4}',
     correctionMessage:
         'Use try-finally or convenience methods like readAsString().',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -131,6 +133,8 @@ class RequireFileCloseInFinallyRule extends SaropaLintRule {
 
 /// Warns when database connection is not properly closed.
 ///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v6
+///
 /// Database connections are expensive resources that must be closed
 /// to prevent connection pool exhaustion.
 ///
@@ -171,7 +175,7 @@ class RequireDatabaseCloseRule extends SaropaLintRule {
     name: 'require_database_close',
     problemMessage:
         '[require_database_close] Unclosed database connection leaks resources '
-        'and may exhaust connection pool, causing app failures.',
+        'and may exhaust connection pool, causing app failures. {v6}',
     correctionMessage:
         'Close database in finally block or use connection pool.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -211,6 +215,8 @@ class RequireDatabaseCloseRule extends SaropaLintRule {
 }
 
 /// Warns when HttpClient is not closed.
+///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v5
 ///
 /// HttpClient maintains connection pools and should be closed
 /// when no longer needed to free resources.
@@ -253,7 +259,7 @@ class RequireHttpClientCloseRule extends SaropaLintRule {
     name: 'require_http_client_close',
     problemMessage:
         '[require_http_client_close] Unclosed HttpClient leaks socket '
-        'connections and memory, eventually exhausting system resources.',
+        'connections and memory, eventually exhausting system resources. {v5}',
     correctionMessage: 'Call client.close() in finally block.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
@@ -282,6 +288,8 @@ class RequireHttpClientCloseRule extends SaropaLintRule {
 }
 
 /// Warns when native resources are allocated without cleanup.
+///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v3
 ///
 /// Native resources (FFI, platform channels) must be explicitly freed
 /// to prevent memory leaks outside Dart's garbage collector.
@@ -320,7 +328,7 @@ class RequireNativeResourceCleanupRule extends SaropaLintRule {
     name: 'require_native_resource_cleanup',
     problemMessage:
         '[require_native_resource_cleanup] Unfreed native memory leaks '
-        'outside Dart GC, causing permanent memory loss until app restart.',
+        'outside Dart GC, causing permanent memory loss until app restart. {v3}',
     correctionMessage: 'Call free() in finally block for native allocations.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
@@ -364,6 +372,8 @@ class RequireNativeResourceCleanupRule extends SaropaLintRule {
 }
 
 /// Warns when WebSocket is not closed on dispose.
+///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v5
 ///
 /// Alias: require_web_socket_close
 ///
@@ -414,7 +424,7 @@ class RequireWebSocketCloseRule extends SaropaLintRule {
     name: 'require_websocket_close',
     problemMessage:
         '[require_websocket_close] Unclosed WebSocket leaks connections and '
-        'continues receiving data after widget disposal, causing errors.',
+        'continues receiving data after widget disposal, causing errors. {v5}',
     correctionMessage: 'Add _socket.close() in dispose method.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
@@ -466,6 +476,8 @@ class RequireWebSocketCloseRule extends SaropaLintRule {
 
 /// Warns when Platform Channel is used without cleanup.
 ///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v5
+///
 /// MethodChannel and EventChannel handlers should be removed
 /// when no longer needed to prevent memory leaks.
 ///
@@ -513,7 +525,7 @@ class RequirePlatformChannelCleanupRule extends SaropaLintRule {
     name: 'require_platform_channel_cleanup',
     problemMessage:
         '[require_platform_channel_cleanup] Active platform channel handler '
-        'receives callbacks after dispose, causing setState on unmounted widget.',
+        'receives callbacks after dispose, causing setState on unmounted widget. {v5}',
     correctionMessage: 'Set handler to null in dispose method.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
@@ -565,6 +577,8 @@ class RequirePlatformChannelCleanupRule extends SaropaLintRule {
 
 /// Warns when Isolate is spawned without being killed.
 ///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v3
+///
 /// Spawned isolates should be killed when no longer needed
 /// to free system resources.
 ///
@@ -610,7 +624,7 @@ class RequireIsolateKillRule extends SaropaLintRule {
     name: 'require_isolate_kill',
     problemMessage:
         '[require_isolate_kill] Unkilled Isolate continues consuming CPU and '
-        'memory, and may send messages to disposed handlers causing crashes.',
+        'memory, and may send messages to disposed handlers causing crashes. {v3}',
     correctionMessage: 'Call isolate.kill() in cleanup/dispose method.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
@@ -639,6 +653,8 @@ class RequireIsolateKillRule extends SaropaLintRule {
 }
 
 /// Warns when CameraController is not disposed.
+///
+/// Since: v1.6.0 | Updated: v4.13.0 | Rule version: v2
 ///
 /// CameraController holds native camera resources that must be released.
 /// Failing to dispose keeps the camera locked and causes memory leaks.
@@ -695,7 +711,7 @@ class RequireCameraDisposeRule extends SaropaLintRule {
     name: 'require_camera_dispose',
     problemMessage:
         '[require_camera_dispose] Undisposed camera holds hardware exclusively, '
-        'blocking other apps from accessing camera until app restart.',
+        'blocking other apps from accessing camera until app restart. {v2}',
     correctionMessage:
         'Add _controller.dispose() in the dispose() method before super.dispose().',
     errorSeverity: DiagnosticSeverity.ERROR,
@@ -847,6 +863,8 @@ class _AddCameraDisposeFix extends DartFix {
 
 /// Warns when images from camera are uploaded without compression.
 ///
+/// Since: v1.6.0 | Updated: v4.13.0 | Rule version: v2
+///
 /// Phone cameras produce large images (5-20MB). Uploading uncompressed
 /// images wastes bandwidth and storage. Compress before upload.
 ///
@@ -880,7 +898,7 @@ class RequireImageCompressionRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_image_compression',
     problemMessage:
-        '[require_image_compression] Camera image captured without compression. Large files waste bandwidth. Phone cameras produce large images (5-20MB). Uploading uncompressed images wastes bandwidth and storage. Compress before upload.',
+        '[require_image_compression] Camera image captured without compression. Large files waste bandwidth. Phone cameras produce large images (5-20MB). Uploading uncompressed images wastes bandwidth and storage. Compress before upload. {v2}',
     correctionMessage:
         'Add maxWidth, maxHeight, or imageQuality parameters to limit file size. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -959,6 +977,8 @@ class _AddImageCompressionFix extends DartFix {
 
 /// Warns when precise location is requested when coarse would suffice.
 ///
+/// Since: v1.6.0 | Updated: v4.13.0 | Rule version: v2
+///
 /// Precise GPS location uses more battery and feels more invasive
 /// to users. For city-level features (weather, local stores), use
 /// coarse location instead.
@@ -996,7 +1016,7 @@ class PreferCoarseLocationRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_coarse_location_when_sufficient',
     problemMessage:
-        '[prefer_coarse_location_when_sufficient] High accuracy location uses more battery. Prefer coarse location. Precise GPS location uses more battery and feels more invasive to users. For city-level features (weather, local stores), use coarse location instead.',
+        '[prefer_coarse_location_when_sufficient] High accuracy location uses more battery. Prefer coarse location. Precise GPS location uses more battery and feels more invasive to users. For city-level features (weather, local stores), use coarse location instead. {v2}',
     correctionMessage:
         'Use LocationAccuracy.low or .medium if you only need city-level location. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -1037,6 +1057,8 @@ class PreferCoarseLocationRule extends SaropaLintRule {
 
 /// Warns when ImagePicker is used without specifying source.
 ///
+/// Since: v4.2.0 | Updated: v4.13.0 | Rule version: v2
+///
 /// ImagePicker without specifying source shows confusing blank picker
 /// on some devices. Always specify ImageSource.camera or ImageSource.gallery.
 ///
@@ -1065,7 +1087,7 @@ class AvoidImagePickerWithoutSourceRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_image_picker_without_source',
     problemMessage:
-        '[avoid_image_picker_without_source] ImagePicker called without specifying an ImageSource shows a blank or empty picker dialog on some Android devices and older iOS versions. Users see a non-functional dialog and cannot select or capture images, resulting in a broken feature that provides no error feedback or alternative selection path.',
+        '[avoid_image_picker_without_source] ImagePicker called without specifying an ImageSource shows a blank or empty picker dialog on some Android devices and older iOS versions. Users see a non-functional dialog and cannot select or capture images, resulting in a broken feature that provides no error feedback or alternative selection path. {v2}',
     correctionMessage:
         'Explicitly specify source: ImageSource.camera or ImageSource.gallery, or present a chooser dialog that lets the user pick their preferred image source.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -1154,6 +1176,8 @@ class _AddImageSourceFix extends DartFix {
 
 /// Use appropriate location accuracy level - high accuracy drains battery.
 ///
+/// Since: v2.6.0 | Updated: v4.13.0 | Rule version: v2
+///
 /// LocationAccuracy.high uses GPS and significantly drains battery.
 /// For features that don't need precise location, use lower accuracy.
 ///
@@ -1183,7 +1207,7 @@ class PreferGeolocatorAccuracyAppropriateRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_geolocator_accuracy_appropriate',
     problemMessage:
-        '[prefer_geolocator_accuracy_appropriate] LocationAccuracy.high uses GPS and drains battery significantly. LocationAccuracy.high uses GPS and significantly drains battery. For features that don\'t need precise location, use lower accuracy.',
+        '[prefer_geolocator_accuracy_appropriate] LocationAccuracy.high uses GPS and drains battery significantly. LocationAccuracy.high uses GPS and significantly drains battery. For features that don\'t need precise location, use lower accuracy. {v2}',
     correctionMessage:
         'Prefer LocationAccuracy.low or .medium if precise location not needed. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -1230,6 +1254,8 @@ class PreferGeolocatorAccuracyAppropriateRule extends SaropaLintRule {
 
 /// Use lastKnownPosition for non-critical needs to save battery.
 ///
+/// Since: v2.6.0 | Updated: v4.13.0 | Rule version: v2
+///
 /// getLastKnownPosition returns cached location without GPS poll.
 /// Use it when fresh location isn't critical.
 ///
@@ -1253,7 +1279,7 @@ class PreferGeolocatorLastKnownRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_geolocator_last_known',
     problemMessage:
-        '[prefer_geolocator_last_known] getCurrentPosition polls GPS. Prefer getLastKnownPosition for cached location. getLastKnownPosition returns cached location without GPS poll. Use it when fresh location isn\'t critical.',
+        '[prefer_geolocator_last_known] getCurrentPosition polls GPS. Prefer getLastKnownPosition for cached location. getLastKnownPosition returns cached location without GPS poll. Use it when fresh location isn\'t critical. {v2}',
     correctionMessage:
         'Use Geolocator.getLastKnownPosition() when fresh location not critical. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -1304,6 +1330,8 @@ class PreferGeolocatorLastKnownRule extends SaropaLintRule {
 
 /// Use pickMultiImage instead of loop calling pickImage.
 ///
+/// Since: v2.6.0 | Updated: v4.13.0 | Rule version: v2
+///
 /// Calling pickImage in a loop is inefficient. Use pickMultiImage for
 /// batch image selection.
 ///
@@ -1331,7 +1359,7 @@ class PreferImagePickerMultiSelectionRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_image_picker_multi_selection',
     problemMessage:
-        '[prefer_image_picker_multi_selection] pickImage in loop. Use pickMultiImage for batch selection. Use pickMultiImage instead of loop calling pickImage. This can cause resource exhaustion, performance degradation, or application instability.',
+        '[prefer_image_picker_multi_selection] pickImage in loop. Use pickMultiImage for batch selection. Use pickMultiImage instead of loop calling pickImage. This can cause resource exhaustion, performance degradation, or application instability. {v2}',
     correctionMessage:
         'Replace with ImagePicker().pickMultiImage(). Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,

@@ -26,7 +26,7 @@ class AvoidIncorrectImageOpacityRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_incorrect_image_opacity',
     problemMessage:
-        '[avoid_incorrect_image_opacity] Wrapping an Image widget in an Opacity widget is inefficient because it forces the framework to allocate an offscreen buffer, render the image into it, and then composite the buffer with reduced alpha. This extra compositing pass increases GPU memory usage and slows frame rendering, especially on lower-end devices. The Image widget natively supports opacity through its color and colorBlendMode properties, which apply the alpha during the image decode stage without an extra compositing layer.',
+        '[avoid_incorrect_image_opacity] Wrapping an Image widget in an Opacity widget is inefficient because it forces the framework to allocate an offscreen buffer, render the image into it, and then composite the buffer with reduced alpha. This extra compositing pass increases GPU memory usage and slows frame rendering, especially on lower-end devices. The Image widget natively supports opacity through its color and colorBlendMode properties, which apply the alpha during the image decode stage without an extra compositing layer. {v6}',
     correctionMessage:
         'Replace Opacity(child: Image(...)) with Image(..., color: color.withOpacity(x), colorBlendMode: BlendMode.modulate) to apply opacity efficiently. This avoids unnecessary compositing and improves rendering performance. See Flutter documentation for details on image opacity handling.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -73,6 +73,8 @@ class AvoidIncorrectImageOpacityRule extends SaropaLintRule {
 
 /// Warns when BuildContext is used in a late field initializer.
 ///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v4
+///
 /// Late field initializers run at first access, not during construction,
 /// so the context may be invalid or from a different widget lifecycle.
 ///
@@ -98,7 +100,6 @@ class AvoidIncorrectImageOpacityRule extends SaropaLintRule {
 ///   }
 /// }
 /// ```
-
 class AvoidMissingImageAltRule extends SaropaLintRule {
   const AvoidMissingImageAltRule() : super(code: _code);
 
@@ -115,7 +116,7 @@ class AvoidMissingImageAltRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_missing_image_alt',
     problemMessage:
-        '[avoid_missing_image_alt] This Image widget is missing a semanticLabel, which is essential for accessibility. Without a semanticLabel, screen readers cannot describe the image to visually impaired users, making your app less inclusive and potentially non-compliant with accessibility standards.',
+        '[avoid_missing_image_alt] This Image widget is missing a semanticLabel, which is essential for accessibility. Without a semanticLabel, screen readers cannot describe the image to visually impaired users, making your app less inclusive and potentially non-compliant with accessibility standards. {v4}',
     correctionMessage:
         'Add a descriptive semanticLabel to every Image widget to ensure it is accessible to screen readers. This improves accessibility for users with visual impairments and helps meet accessibility guidelines. Refer to Flutter’s accessibility documentation for best practices on semantic labels.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -175,6 +176,8 @@ class AvoidMissingImageAltRule extends SaropaLintRule {
 
 /// Warns when `mounted` is referenced inside setState callback.
 ///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v5
+///
 /// Checking `mounted` inside setState is an anti-pattern because
 /// setState should not be called if not mounted.
 ///
@@ -194,7 +197,6 @@ class AvoidMissingImageAltRule extends SaropaLintRule {
 ///   _value = newValue;
 /// });
 /// ```
-
 class AvoidReturningWidgetsRule extends SaropaLintRule {
   const AvoidReturningWidgetsRule() : super(code: _code);
 
@@ -211,7 +213,7 @@ class AvoidReturningWidgetsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_returning_widgets',
     problemMessage:
-        '[avoid_returning_widgets] Defining methods that return widgets (other than the build method) can make your widget tree harder to read, test, and maintain. This practice hides widget structure in private methods, reducing code clarity and making it more difficult to leverage Flutter’s hot reload and widget inspector tools.',
+        '[avoid_returning_widgets] Defining methods that return widgets (other than the build method) can make your widget tree harder to read, test, and maintain. This practice hides widget structure in private methods, reducing code clarity and making it more difficult to leverage Flutter’s hot reload and widget inspector tools. {v5}',
     correctionMessage:
         'Refactor methods that return widgets into separate StatelessWidget or StatefulWidget classes. This improves code organization, enables better tooling support, and makes your UI easier to test and maintain. See Flutter documentation for best practices on widget composition.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -241,9 +243,10 @@ class AvoidReturningWidgetsRule extends SaropaLintRule {
 
 /// Warns when shrinkWrap is used in nested scrollable lists.
 ///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v6
+///
 /// Using shrinkWrap: true in nested scrollables can cause performance issues
 /// as it forces the list to calculate the size of all children.
-
 class AvoidUnnecessaryGestureDetectorRule extends SaropaLintRule {
   const AvoidUnnecessaryGestureDetectorRule() : super(code: _code);
 
@@ -260,7 +263,7 @@ class AvoidUnnecessaryGestureDetectorRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_unnecessary_gesture_detector',
     problemMessage:
-        '[avoid_unnecessary_gesture_detector] GestureDetector wraps a child widget but has no gesture callbacks (onTap, onDoubleTap, onLongPress, etc.) defined, making it a redundant wrapper that adds an unnecessary layer to the widget tree and confuses maintainers reading the code.',
+        '[avoid_unnecessary_gesture_detector] GestureDetector wraps a child widget but has no gesture callbacks (onTap, onDoubleTap, onLongPress, etc.) defined, making it a redundant wrapper that adds an unnecessary layer to the widget tree and confuses maintainers reading the code. {v6}',
     correctionMessage:
         'Add at least one gesture callback (e.g. onTap, onLongPress) or remove the GestureDetector wrapper entirely to simplify the widget tree.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -356,6 +359,8 @@ class AvoidUnnecessaryGestureDetectorRule extends SaropaLintRule {
 
 /// Warns when setState is called in initState, dispose, or build.
 ///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v4
+///
 /// Calling setState during widget lifecycle methods can cause issues.
 ///
 /// Example of **bad** code:
@@ -375,7 +380,6 @@ class AvoidUnnecessaryGestureDetectorRule extends SaropaLintRule {
 ///   // Update state directly in initState, no setState needed
 /// }
 /// ```
-
 class PreferDefineHeroTagRule extends SaropaLintRule {
   const PreferDefineHeroTagRule() : super(code: _code);
 
@@ -392,7 +396,7 @@ class PreferDefineHeroTagRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_define_hero_tag',
     problemMessage:
-        '[prefer_define_hero_tag] Hero widget without an explicit tag defaults to the widget itself, causing conflicts when multiple Hero widgets exist on the same screen. Duplicate tags trigger runtime assertion errors that crash the app during navigation transitions.',
+        '[prefer_define_hero_tag] Hero widget without an explicit tag defaults to the widget itself, causing conflicts when multiple Hero widgets exist on the same screen. Duplicate tags trigger runtime assertion errors that crash the app during navigation transitions. {v4}',
     correctionMessage:
         'Add a unique tag parameter to the Hero widget, such as a String constant or identifier that distinguishes it from other Hero widgets on the same route.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -424,16 +428,17 @@ class PreferDefineHeroTagRule extends SaropaLintRule {
 
 /// Warns when inline callbacks could be extracted to methods.
 ///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v3
+///
 /// Long inline callbacks can make code harder to read. Consider extracting
 /// them to named methods for better readability and testability.
-
 class PreferExtractingCallbacksRule extends SaropaLintRule {
   const PreferExtractingCallbacksRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
     name: 'prefer_extracting_callbacks',
     problemMessage:
-        '[prefer_extracting_callbacks] Inline callback exceeds a reasonable length, reducing readability and making the build method harder to maintain. Long inline closures obscure widget structure, complicate debugging, and prevent reuse of the callback logic across widgets.',
+        '[prefer_extracting_callbacks] Inline callback exceeds a reasonable length, reducing readability and making the build method harder to maintain. Long inline closures obscure widget structure, complicate debugging, and prevent reuse of the callback logic across widgets. {v3}',
     correctionMessage:
         'Extract the callback body into a named method on the widget or state class. This improves readability, enables reuse, and simplifies testing.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -464,9 +469,10 @@ class PreferExtractingCallbacksRule extends SaropaLintRule {
 
 /// Warns when a file contains multiple public widget classes.
 ///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v4
+///
 /// Each public widget should generally be in its own file for better
 /// organization and maintainability.
-
 class PreferSingleWidgetPerFileRule extends SaropaLintRule {
   const PreferSingleWidgetPerFileRule() : super(code: _code);
 
@@ -483,7 +489,7 @@ class PreferSingleWidgetPerFileRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_single_widget_per_file',
     problemMessage:
-        '[prefer_single_widget_per_file] File contains multiple public widget classes, making it harder to locate widgets by filename, increasing merge conflicts in team environments, and complicating code navigation. Each public widget deserves its own file for discoverability and maintainability.',
+        '[prefer_single_widget_per_file] File contains multiple public widget classes, making it harder to locate widgets by filename, increasing merge conflicts in team environments, and complicating code navigation. Each public widget deserves its own file for discoverability and maintainability. {v4}',
     correctionMessage:
         'Move each public widget class to its own file named after the widget (e.g. my_widget.dart). Keep private helper widgets in the same file as the public widget they support.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -528,6 +534,8 @@ class PreferSingleWidgetPerFileRule extends SaropaLintRule {
 
 /// Warns when a Sliver widget class doesn't have 'Sliver' prefix.
 ///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v6
+///
 /// Sliver widgets should be named with 'Sliver' prefix for clarity.
 ///
 /// Example of **bad** code:
@@ -541,7 +549,6 @@ class PreferSingleWidgetPerFileRule extends SaropaLintRule {
 /// class SliverMyList extends SliverChildDelegate {}
 /// class SliverCustomGrid extends SliverGridDelegate {}
 /// ```
-
 class PreferTextRichRule extends SaropaLintRule {
   const PreferTextRichRule() : super(code: _code);
 
@@ -558,7 +565,7 @@ class PreferTextRichRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_text_rich',
     problemMessage:
-        '[prefer_text_rich] RichText widget does not inherit DefaultTextStyle or respect textScaler from the widget tree, causing inconsistent text rendering across the app. Text.rich provides the same TextSpan capabilities while automatically inheriting the ambient text style and scaling settings.',
+        '[prefer_text_rich] RichText widget does not inherit DefaultTextStyle or respect textScaler from the widget tree, causing inconsistent text rendering across the app. Text.rich provides the same TextSpan capabilities while automatically inheriting the ambient text style and scaling settings. {v6}',
     correctionMessage:
         'Replace RichText(text: TextSpan(...)) with Text.rich(TextSpan(...)) to inherit DefaultTextStyle and textScaler from the widget tree automatically.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -582,6 +589,8 @@ class PreferTextRichRule extends SaropaLintRule {
 
 /// Warns when using Column inside SingleChildScrollView instead of ListView.
 ///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v6
+///
 /// Example of **bad** code:
 /// ```dart
 /// SingleChildScrollView(
@@ -597,14 +606,13 @@ class PreferTextRichRule extends SaropaLintRule {
 ///   children: widgets,
 /// )
 /// ```
-
 class PreferWidgetPrivateMembersRule extends SaropaLintRule {
   const PreferWidgetPrivateMembersRule() : super(code: _codeField);
 
   static const LintCode _codeField = LintCode(
     name: 'prefer_widget_private_members',
     problemMessage:
-        '[prefer_widget_private_members] Non-final public field in a widget class breaks the immutability contract of Flutter widgets. Mutable widget fields can cause unpredictable rebuilds, stale state, and hard-to-trace rendering bugs because the framework assumes widgets are immutable after construction.',
+        '[prefer_widget_private_members] Non-final public field in a widget class breaks the immutability contract of Flutter widgets. Mutable widget fields can cause unpredictable rebuilds, stale state, and hard-to-trace rendering bugs because the framework assumes widgets are immutable after construction. {v6}',
     correctionMessage:
         'Make the field final (preferred) or private with an underscore prefix. Widget fields should be set only via the constructor.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -613,7 +621,7 @@ class PreferWidgetPrivateMembersRule extends SaropaLintRule {
   static const LintCode _codeMethod = LintCode(
     name: 'prefer_widget_private_members',
     problemMessage:
-        '[prefer_widget_private_members] Public helper method in a widget class exposes internal implementation details to consumers. This increases the public API surface, invites unintended coupling, and makes refactoring harder because external code may depend on methods that are not part of the widget contract.',
+        '[prefer_widget_private_members] Public helper method in a widget class exposes internal implementation details to consumers. This increases the public API surface, invites unintended coupling, and makes refactoring harder because external code may depend on methods that are not part of the widget contract. {v6}',
     correctionMessage:
         'Prefix the method name with an underscore to make it private (e.g. _buildHeader), keeping the widget API limited to its constructor parameters.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -691,6 +699,8 @@ class PreferWidgetPrivateMembersRule extends SaropaLintRule {
 
 /// Warns when a State class has disposable fields that are not properly disposed.
 ///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v6
+///
 /// StatefulWidget State classes should dispose of controllers, subscriptions,
 /// and other disposable resources in their dispose() method to prevent memory leaks.
 ///
@@ -732,7 +742,6 @@ class PreferWidgetPrivateMembersRule extends SaropaLintRule {
 ///   }
 /// }
 /// ```
-
 class AvoidUncontrolledTextFieldRule extends SaropaLintRule {
   const AvoidUncontrolledTextFieldRule() : super(code: _code);
 
@@ -749,7 +758,7 @@ class AvoidUncontrolledTextFieldRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_uncontrolled_text_field',
     problemMessage:
-        '[avoid_uncontrolled_text_field] TextField without a TextEditingController loses programmatic access to the input value, making it impossible to pre-fill, clear, validate on demand, or read the text outside of onChanged. This leads to fragile state management and unexpected behavior during form submissions.',
+        '[avoid_uncontrolled_text_field] TextField without a TextEditingController loses programmatic access to the input value, making it impossible to pre-fill, clear, validate on demand, or read the text outside of onChanged. This leads to fragile state management and unexpected behavior during form submissions. {v6}',
     correctionMessage:
         'Create a TextEditingController in initState (and dispose it in dispose), then pass it to the TextField via the controller parameter.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -785,6 +794,9 @@ class AvoidUncontrolledTextFieldRule extends SaropaLintRule {
 }
 
 /// Future rule: avoid-hardcoded-asset-paths
+///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v5
+///
 /// Warns when asset paths are hardcoded as string literals.
 ///
 /// Example of **bad** code:
@@ -796,14 +808,13 @@ class AvoidUncontrolledTextFieldRule extends SaropaLintRule {
 /// ```dart
 /// Image.asset(Assets.images.logo)  // Using generated assets class
 /// ```
-
 class AvoidHardcodedAssetPathsRule extends SaropaLintRule {
   const AvoidHardcodedAssetPathsRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
     name: 'avoid_hardcoded_asset_paths',
     problemMessage:
-        '[avoid_hardcoded_asset_paths] Hardcoded asset path string is error-prone: typos produce silent runtime failures, path changes require find-and-replace across the codebase, and the compiler cannot verify the asset exists. Centralized asset references enable compile-time safety and single-source-of-truth for all asset paths.',
+        '[avoid_hardcoded_asset_paths] Hardcoded asset path string is error-prone: typos produce silent runtime failures, path changes require find-and-replace across the codebase, and the compiler cannot verify the asset exists. Centralized asset references enable compile-time safety and single-source-of-truth for all asset paths. {v5}',
     correctionMessage:
         'Define asset paths in a constants class or use a code generator like flutter_gen to produce type-safe asset references (e.g. Assets.images.logo).',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -859,6 +870,9 @@ class AvoidHardcodedAssetPathsRule extends SaropaLintRule {
 }
 
 /// Future rule: avoid-print-in-production
+///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v5
+///
 /// Warns when print() is used outside of debug/test code.
 ///
 /// Example of **bad** code:
@@ -876,7 +890,6 @@ class AvoidHardcodedAssetPathsRule extends SaropaLintRule {
 /// ```
 ///
 /// **Quick fix available:** Comments out the print statement.
-
 class AvoidPrintInProductionRule extends SaropaLintRule {
   const AvoidPrintInProductionRule() : super(code: _code);
 
@@ -893,7 +906,7 @@ class AvoidPrintInProductionRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_print_in_production',
     problemMessage:
-        '[avoid_print_in_production] print() call found in production widget code. Print statements bypass structured logging, cannot be filtered by severity, pollute the console in release builds, and may inadvertently leak sensitive data. They also add unnecessary I/O overhead in production.',
+        '[avoid_print_in_production] print() call found in production widget code. Print statements bypass structured logging, cannot be filtered by severity, pollute the console in release builds, and may inadvertently leak sensitive data. They also add unnecessary I/O overhead in production. {v5}',
     correctionMessage:
         'Replace with a logging framework (e.g. package:logging, or debugPrint for debug-only output) that supports log levels and can be silenced in release builds.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -970,6 +983,9 @@ class _CommentOutPrintFix extends DartFix {
 }
 
 /// Future rule: avoid-catching-generic-exception
+///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v4
+///
 /// Warns when catching Exception or Object too broadly.
 ///
 /// Example of **bad** code:
@@ -989,7 +1005,6 @@ class _CommentOutPrintFix extends DartFix {
 ///   // Handle specific exception
 /// }
 /// ```
-
 class AvoidCatchingGenericExceptionRule extends SaropaLintRule {
   const AvoidCatchingGenericExceptionRule() : super(code: _code);
 
@@ -1006,7 +1021,7 @@ class AvoidCatchingGenericExceptionRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_catching_generic_exception',
     problemMessage:
-        '[avoid_catching_generic_exception] Catching Exception or Object swallows all errors including programming bugs, assertion failures, and unexpected states that should crash visibly. This masks root causes, making bugs harder to diagnose and allowing the app to continue in a corrupted state.',
+        '[avoid_catching_generic_exception] Catching Exception or Object swallows all errors including programming bugs, assertion failures, and unexpected states that should crash visibly. This masks root causes, making bugs harder to diagnose and allowing the app to continue in a corrupted state. {v4}',
     correctionMessage:
         'Catch specific exception types (e.g. FormatException, HttpException, SocketException) so that unexpected errors propagate and are caught by error reporting.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -1041,6 +1056,9 @@ class AvoidCatchingGenericExceptionRule extends SaropaLintRule {
 }
 
 /// Future rule: avoid-service-locator-overuse
+///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v6
+///
 /// Warns when GetIt.I or similar service locator calls are scattered throughout.
 ///
 /// Example of **bad** code:
@@ -1062,7 +1080,6 @@ class AvoidCatchingGenericExceptionRule extends SaropaLintRule {
 ///   // Constructor injection
 /// }
 /// ```
-
 class AvoidServiceLocatorOveruseRule extends SaropaLintRule {
   const AvoidServiceLocatorOveruseRule() : super(code: _code);
 
@@ -1079,7 +1096,7 @@ class AvoidServiceLocatorOveruseRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_service_locator_overuse',
     problemMessage:
-        '[avoid_service_locator_overuse] Service locator (e.g. GetIt.instance) called directly in a widget hides dependencies, makes the widget untestable without the full service container, and couples the UI layer to a specific DI framework. Constructor injection makes dependencies explicit and enables easy mocking in tests.',
+        '[avoid_service_locator_overuse] Service locator (e.g. GetIt.instance) called directly in a widget hides dependencies, makes the widget untestable without the full service container, and couples the UI layer to a specific DI framework. Constructor injection makes dependencies explicit and enables easy mocking in tests. {v6}',
     correctionMessage:
         'Pass the dependency through the widget constructor or use a DI-aware wrapper (e.g. Provider, Riverpod) so that tests can supply mock implementations without configuring a global container.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -1134,13 +1151,15 @@ class _ServiceLocatorFinder extends RecursiveAstVisitor<void> {
 }
 
 /// Future rule: prefer-utc-datetimes
+///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v6
+///
 /// Warns when DateTime.now() is used where UTC might be more appropriate.
 ///
 /// Example of code that might need UTC:
 /// ```dart
 /// final timestamp = DateTime.now();  // Consider DateTime.now().toUtc()
 /// ```
-
 class PreferUtcDateTimesRule extends SaropaLintRule {
   const PreferUtcDateTimesRule() : super(code: _code);
 
@@ -1157,7 +1176,7 @@ class PreferUtcDateTimesRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_utc_datetimes',
     problemMessage:
-        '[prefer_utc_datetimes] Local DateTime values shift meaning when serialized and deserialized across time zones, causing off-by-hours bugs in timestamps, scheduling, and data synchronization. Storing and transmitting dates in UTC eliminates timezone ambiguity and ensures consistent behavior across devices and servers.',
+        '[prefer_utc_datetimes] Local DateTime values shift meaning when serialized and deserialized across time zones, causing off-by-hours bugs in timestamps, scheduling, and data synchronization. Storing and transmitting dates in UTC eliminates timezone ambiguity and ensures consistent behavior across devices and servers. {v6}',
     correctionMessage:
         'Use DateTime.now().toUtc() or DateTime.utc() for timestamps intended for storage, API transmission, or cross-device synchronization. Convert to local time only for display.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -1193,6 +1212,9 @@ class PreferUtcDateTimesRule extends SaropaLintRule {
 }
 
 /// Future rule: avoid-regex-in-loop
+///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v6
+///
 /// Warns when RegExp is created inside a loop.
 ///
 /// Example of **bad** code:
@@ -1210,7 +1232,6 @@ class PreferUtcDateTimesRule extends SaropaLintRule {
 ///   if (regex.hasMatch(item)) { }
 /// }
 /// ```
-
 class AvoidRegexInLoopRule extends SaropaLintRule {
   const AvoidRegexInLoopRule() : super(code: _code);
 
@@ -1227,7 +1248,7 @@ class AvoidRegexInLoopRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_regex_in_loop',
     problemMessage:
-        '[avoid_regex_in_loop] RegExp object constructed inside a loop body is re-compiled on every iteration, wasting CPU cycles on repeated pattern parsing. Regex compilation is expensive relative to matching, and this overhead multiplies with large data sets, causing noticeable jank in UI-driven code.',
+        '[avoid_regex_in_loop] RegExp object constructed inside a loop body is re-compiled on every iteration, wasting CPU cycles on repeated pattern parsing. Regex compilation is expensive relative to matching, and this overhead multiplies with large data sets, causing noticeable jank in UI-driven code. {v6}',
     correctionMessage:
         'Declare the RegExp as a static final field or a local variable above the loop so it is compiled once and reused on each iteration.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -1280,6 +1301,9 @@ class _RegExpCreationFinder extends RecursiveAstVisitor<void> {
 }
 
 /// Future rule: prefer-getter-over-method
+///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v4
+///
 /// Warns when a method with no parameters just returns a value.
 ///
 /// **Stylistic rule (opt-in only).** No performance or correctness benefit.
@@ -1295,7 +1319,6 @@ class _RegExpCreationFinder extends RecursiveAstVisitor<void> {
 /// String get name => _name;
 /// int get count => _count;
 /// ```
-
 class PreferGetterOverMethodRule extends SaropaLintRule {
   const PreferGetterOverMethodRule() : super(code: _code);
 
@@ -1312,7 +1335,7 @@ class PreferGetterOverMethodRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_getter_over_method',
     problemMessage:
-        '[prefer_getter_over_method] Using a getter instead of a zero-parameter method is a Dart API style preference. Both produce identical compiled code with no performance difference. Enable via the stylistic tier.',
+        '[prefer_getter_over_method] Using a getter instead of a zero-parameter method is a Dart API style preference. Both produce identical compiled code with no performance difference. Enable via the stylistic tier. {v4}',
     correctionMessage:
         'Convert to a getter (e.g. String get name => _name;). Reserve methods for operations that have side effects or accept parameters.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -1374,6 +1397,9 @@ class PreferGetterOverMethodRule extends SaropaLintRule {
 }
 
 /// Future rule: avoid-unused-parameters-in-callbacks
+///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v4
+///
 /// Warns when callback parameters are declared but not used.
 ///
 /// Example of **bad** code:
@@ -1389,7 +1415,6 @@ class PreferGetterOverMethodRule extends SaropaLintRule {
 ///   print('tapped');
 /// }
 /// ```
-
 class AvoidUnusedCallbackParametersRule extends SaropaLintRule {
   const AvoidUnusedCallbackParametersRule() : super(code: _code);
 
@@ -1406,7 +1431,7 @@ class AvoidUnusedCallbackParametersRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_unused_callback_parameters',
     problemMessage:
-        '[avoid_unused_callback_parameters] Callback parameter is declared but never referenced in the closure body, adding visual noise and misleading readers into thinking the value is needed. Unused parameters also trigger analyzer warnings and obscure the actual data flow of the callback.',
+        '[avoid_unused_callback_parameters] Callback parameter is declared but never referenced in the closure body, adding visual noise and misleading readers into thinking the value is needed. Unused parameters also trigger analyzer warnings and obscure the actual data flow of the callback. {v4}',
     correctionMessage:
         'Replace the unused parameter name with an underscore (_) or double underscore (__) to signal that the value is intentionally ignored.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -1450,6 +1475,9 @@ class _IdentifierCollector extends RecursiveAstVisitor<void> {
 }
 
 /// Future rule: prefer-const-widgets-in-lists
+///
+/// Since: v1.7.2 | Updated: v4.13.0 | Rule version: v2
+///
 /// Warns when widget literals in lists could be const.
 ///
 /// Example of **bad** code:
@@ -1467,7 +1495,6 @@ class _IdentifierCollector extends RecursiveAstVisitor<void> {
 ///   Divider(),
 /// ]
 /// ```
-
 class PreferSemanticWidgetNamesRule extends SaropaLintRule {
   const PreferSemanticWidgetNamesRule() : super(code: _code);
 
@@ -1484,7 +1511,7 @@ class PreferSemanticWidgetNamesRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_semantic_widget_names',
     problemMessage:
-        '[prefer_semantic_widget_names] Generic Container widget used where a more specific widget communicates intent. Container combines padding, decoration, alignment, and sizing in one opaque widget, making it unclear which feature is actually needed. Specific widgets like SizedBox, DecoratedBox, Padding, or Align are more readable and more efficient.',
+        '[prefer_semantic_widget_names] Generic Container widget used where a more specific widget communicates intent. Container combines padding, decoration, alignment, and sizing in one opaque widget, making it unclear which feature is actually needed. Specific widgets like SizedBox, DecoratedBox, Padding, or Align are more readable and more efficient. {v2}',
     correctionMessage:
         'Replace Container with the specific widget that matches the intended use: SizedBox for sizing, Padding for padding, DecoratedBox for decoration, or Align for alignment.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -1532,6 +1559,9 @@ class PreferSemanticWidgetNamesRule extends SaropaLintRule {
 }
 
 /// Future rule: avoid-text-scale-factor
+///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v4
+///
 /// Warns when using deprecated textScaleFactor instead of textScaler.
 ///
 /// Example of **bad** code:
@@ -1545,7 +1575,6 @@ class PreferSemanticWidgetNamesRule extends SaropaLintRule {
 /// MediaQuery.textScalerOf(context);
 /// MediaQuery.of(context).textScaler;
 /// ```
-
 class AvoidTextScaleFactorRule extends SaropaLintRule {
   const AvoidTextScaleFactorRule() : super(code: _code);
 
@@ -1562,7 +1591,7 @@ class AvoidTextScaleFactorRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_text_scale_factor',
     problemMessage:
-        '[avoid_text_scale_factor] textScaleFactor is deprecated since Flutter 3.16. It applies a linear multiplier that cannot express non-linear text scaling used by accessibility settings on modern platforms. The replacement textScaler API supports both linear and non-linear scaling, ensuring correct rendering for users with accessibility needs.',
+        '[avoid_text_scale_factor] textScaleFactor is deprecated since Flutter 3.16. It applies a linear multiplier that cannot express non-linear text scaling used by accessibility settings on modern platforms. The replacement textScaler API supports both linear and non-linear scaling, ensuring correct rendering for users with accessibility needs. {v4}',
     correctionMessage:
         'Replace textScaleFactor with textScaler: TextScaler.linear(factor), or use MediaQuery.textScalerOf(context) to read the ambient scaler.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -1591,6 +1620,9 @@ class AvoidTextScaleFactorRule extends SaropaLintRule {
 }
 
 /// Future rule: prefer-widget-state-mixin
+///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v6
+///
 /// Warns when State class doesn't use WidgetStateMixin for better state management.
 ///
 /// Example of **bad** code:
@@ -1607,7 +1639,6 @@ class AvoidTextScaleFactorRule extends SaropaLintRule {
 ///   // Use WidgetState for hover, pressed, etc.
 /// }
 /// ```
-
 class AvoidImageWithoutCacheRule extends SaropaLintRule {
   const AvoidImageWithoutCacheRule() : super(code: _code);
 
@@ -1624,7 +1655,7 @@ class AvoidImageWithoutCacheRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_image_without_cache',
     problemMessage:
-        '[avoid_image_without_cache] Image.network without cacheWidth or cacheHeight decodes the full-resolution image into memory, even when displayed at a smaller size. A 4000x3000 photo decoded at full resolution consumes ~48 MB of GPU memory, causing excessive memory usage and potential out-of-memory crashes on low-end devices.',
+        '[avoid_image_without_cache] Image.network without cacheWidth or cacheHeight decodes the full-resolution image into memory, even when displayed at a smaller size. A 4000x3000 photo decoded at full resolution consumes ~48 MB of GPU memory, causing excessive memory usage and potential out-of-memory crashes on low-end devices. {v6}',
     correctionMessage:
         'Add cacheWidth and/or cacheHeight matching the display size (in logical pixels multiplied by devicePixelRatio) so Flutter decodes a smaller image into memory.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -1663,6 +1694,9 @@ class AvoidImageWithoutCacheRule extends SaropaLintRule {
 }
 
 /// Future rule: prefer-split-widget-const
+///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v6
+///
 /// Warns when large widget trees should be split into const widgets.
 ///
 /// Example of **bad** code:
@@ -1681,7 +1715,6 @@ class AvoidImageWithoutCacheRule extends SaropaLintRule {
 /// const _TitleSection();
 /// // or extract to const widget
 /// ```
-
 class PreferSplitWidgetConstRule extends SaropaLintRule {
   const PreferSplitWidgetConstRule() : super(code: _code);
 
@@ -1698,7 +1731,7 @@ class PreferSplitWidgetConstRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_split_widget_const',
     problemMessage:
-        '[prefer_split_widget_const] Large widget subtree with all-const children is rebuilt on every parent setState, even though its output never changes. Extracting it into a separate const widget class allows Flutter to skip rebuilding the entire subtree, reducing frame build times and improving scroll performance.',
+        '[prefer_split_widget_const] Large widget subtree with all-const children is rebuilt on every parent setState, even though its output never changes. Extracting it into a separate const widget class allows Flutter to skip rebuilding the entire subtree, reducing frame build times and improving scroll performance. {v6}',
     correctionMessage:
         'Extract the static subtree into its own StatelessWidget class with a const constructor, then instantiate it with const in the parent build method.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -1743,6 +1776,9 @@ class _WidgetCounter extends RecursiveAstVisitor<void> {
 }
 
 /// Future rule: avoid-navigator-push-without-route-name
+///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v4
+///
 /// Warns when Navigator.push is used without a route name.
 ///
 /// Example of **bad** code:
@@ -1758,7 +1794,6 @@ class _WidgetCounter extends RecursiveAstVisitor<void> {
 /// Navigator.pushNamed(context, '/next');
 /// // or use go_router/auto_route
 /// ```
-
 class AvoidNavigatorPushWithoutRouteNameRule extends SaropaLintRule {
   const AvoidNavigatorPushWithoutRouteNameRule() : super(code: _code);
 
@@ -1775,7 +1810,7 @@ class AvoidNavigatorPushWithoutRouteNameRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_navigator_push_without_route_name',
     problemMessage:
-        '[avoid_navigator_push_without_route_name] Anonymous Navigator.push with inline MaterialPageRoute scatters route definitions throughout the codebase, making it impossible to see all routes in one place, complicating deep linking, and preventing analytics from tracking navigation paths by name.',
+        '[avoid_navigator_push_without_route_name] Anonymous Navigator.push with inline MaterialPageRoute scatters route definitions throughout the codebase, making it impossible to see all routes in one place, complicating deep linking, and preventing analytics from tracking navigation paths by name. {v4}',
     correctionMessage:
         'Use Navigator.pushNamed with routes defined in a central route table, or adopt a declarative routing package (e.g. go_router) for type-safe navigation.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -1802,6 +1837,9 @@ class AvoidNavigatorPushWithoutRouteNameRule extends SaropaLintRule {
 }
 
 /// Future rule: avoid-duplicate-keys-in-widget-list
+///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v4
+///
 /// Warns when widgets in a list have duplicate keys.
 ///
 /// Example of **bad** code:
@@ -1819,7 +1857,6 @@ class AvoidNavigatorPushWithoutRouteNameRule extends SaropaLintRule {
 ///   Container(key: Key('item2')),
 /// ]
 /// ```
-
 class AvoidDuplicateWidgetKeysRule extends SaropaLintRule {
   const AvoidDuplicateWidgetKeysRule() : super(code: _code);
 
@@ -1836,7 +1873,7 @@ class AvoidDuplicateWidgetKeysRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_duplicate_widget_keys',
     problemMessage:
-        '[avoid_duplicate_widget_keys] Multiple widgets in a list share the same Key value. Flutter uses keys to match old widgets with new widgets during reconciliation. Duplicate keys cause the framework to reuse the wrong element, leading to stale state, broken animations, and incorrect widget ordering after list mutations.',
+        '[avoid_duplicate_widget_keys] Multiple widgets in a list share the same Key value. Flutter uses keys to match old widgets with new widgets during reconciliation. Duplicate keys cause the framework to reuse the wrong element, leading to stale state, broken animations, and incorrect widget ordering after list mutations. {v4}',
     correctionMessage:
         'Assign a unique key to each widget in the list, using ValueKey with a stable identifier (e.g. item.id) rather than the list index.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -1893,6 +1930,9 @@ class AvoidDuplicateWidgetKeysRule extends SaropaLintRule {
 }
 
 /// Future rule: prefer-safe-area-consumer
+///
+/// Since: v1.1.19 | Updated: v4.13.0 | Rule version: v4
+///
 /// Warns when SafeArea is used without considering when it's unnecessary.
 ///
 /// Example of **bad** code:
@@ -1910,7 +1950,6 @@ class AvoidDuplicateWidgetKeysRule extends SaropaLintRule {
 ///   body: ListView(...),  // Scaffold handles safe area via appBar, bottomNavigationBar
 /// )
 /// ```
-
 class PreferSafeAreaConsumerRule extends SaropaLintRule {
   const PreferSafeAreaConsumerRule() : super(code: _code);
 
@@ -1927,7 +1966,7 @@ class PreferSafeAreaConsumerRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_safe_area_consumer',
     problemMessage:
-        '[prefer_safe_area_consumer] SafeArea placed directly inside a Scaffold body is often redundant because Scaffold already insets its body below the AppBar and above the BottomNavigationBar. Doubling up on safe area handling wastes vertical space and can push content further from the edges than intended.',
+        '[prefer_safe_area_consumer] SafeArea placed directly inside a Scaffold body is often redundant because Scaffold already insets its body below the AppBar and above the BottomNavigationBar. Doubling up on safe area handling wastes vertical space and can push content further from the edges than intended. {v4}',
     correctionMessage:
         'Remove SafeArea if the Scaffold has appBar or bottomNavigationBar that already consume safe area insets. Use SafeArea only when the Scaffold body extends behind system UI.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -1962,6 +2001,9 @@ class PreferSafeAreaConsumerRule extends SaropaLintRule {
 }
 
 /// Future rule: avoid-unrestricted-text-field-length
+///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v6
+///
 /// Warns when TextField doesn't have maxLength set.
 ///
 /// Example of **bad** code:
@@ -1976,7 +2018,6 @@ class PreferSafeAreaConsumerRule extends SaropaLintRule {
 ///   maxLength: 500,
 /// )
 /// ```
-
 class AvoidUnrestrictedTextFieldLengthRule extends SaropaLintRule {
   const AvoidUnrestrictedTextFieldLengthRule() : super(code: _code);
 
@@ -1993,7 +2034,7 @@ class AvoidUnrestrictedTextFieldLengthRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_unrestricted_text_field_length',
     problemMessage:
-        '[avoid_unrestricted_text_field_length] TextField without maxLength allows unbounded input, enabling users to paste megabytes of text that can freeze the UI, exhaust memory, and create oversized payloads for backend APIs. Setting maxLength protects against denial-of-service scenarios and enforces data integrity constraints.',
+        '[avoid_unrestricted_text_field_length] TextField without maxLength allows unbounded input, enabling users to paste megabytes of text that can freeze the UI, exhaust memory, and create oversized payloads for backend APIs. Setting maxLength protects against denial-of-service scenarios and enforces data integrity constraints. {v6}',
     correctionMessage:
         'Add the maxLength parameter with a reasonable limit (e.g. maxLength: 500) and optionally set maxLengthEnforcement to control truncation behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -2028,6 +2069,9 @@ class AvoidUnrestrictedTextFieldLengthRule extends SaropaLintRule {
 }
 
 /// Future rule: prefer-scaffold-messenger-maybeof
+///
+/// Since: v1.1.19 | Updated: v4.13.0 | Rule version: v4
+///
 /// Warns when ScaffoldMessenger.of is used instead of maybeOf.
 ///
 /// Example of **bad** code:
@@ -2039,7 +2083,6 @@ class AvoidUnrestrictedTextFieldLengthRule extends SaropaLintRule {
 /// ```dart
 /// ScaffoldMessenger.maybeOf(context)?.showSnackBar(...);
 /// ```
-
 class PreferScaffoldMessengerMaybeOfRule extends SaropaLintRule {
   const PreferScaffoldMessengerMaybeOfRule() : super(code: _code);
 
@@ -2056,7 +2099,7 @@ class PreferScaffoldMessengerMaybeOfRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_scaffold_messenger_maybeof',
     problemMessage:
-        '[prefer_scaffold_messenger_maybeof] ScaffoldMessenger.of throws a FlutterError if no ScaffoldMessenger ancestor exists, crashing the app in contexts like dialogs, overlays, or tests without a Scaffold. Using maybeOf returns null instead, allowing graceful fallback when the messenger is unavailable.',
+        '[prefer_scaffold_messenger_maybeof] ScaffoldMessenger.of throws a FlutterError if no ScaffoldMessenger ancestor exists, crashing the app in contexts like dialogs, overlays, or tests without a Scaffold. Using maybeOf returns null instead, allowing graceful fallback when the messenger is unavailable. {v4}',
     correctionMessage:
         'Replace ScaffoldMessenger.of(context) with ScaffoldMessenger.maybeOf(context) and handle the null case, or verify the context has a Scaffold ancestor before calling .of.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -2080,6 +2123,9 @@ class PreferScaffoldMessengerMaybeOfRule extends SaropaLintRule {
 }
 
 /// Future rule: avoid-form-without-key
+///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v4
+///
 /// Warns when Form widget doesn't have a GlobalKey.
 ///
 /// Example of **bad** code:
@@ -2096,7 +2142,6 @@ class PreferScaffoldMessengerMaybeOfRule extends SaropaLintRule {
 ///   child: Column(...),
 /// )
 /// ```
-
 class AvoidFormWithoutKeyRule extends SaropaLintRule {
   const AvoidFormWithoutKeyRule() : super(code: _code);
 
@@ -2113,7 +2158,7 @@ class AvoidFormWithoutKeyRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_form_without_key',
     problemMessage:
-        '[avoid_form_without_key] Form widget without a GlobalKey<FormState> makes it impossible to call validate(), save(), or reset() on the form state programmatically. Without a key, you cannot trigger field validation on submit, retrieve form values, or reset the form to its initial state.',
+        '[avoid_form_without_key] Form widget without a GlobalKey<FormState> makes it impossible to call validate(), save(), or reset() on the form state programmatically. Without a key, you cannot trigger field validation on submit, retrieve form values, or reset the form to its initial state. {v4}',
     correctionMessage:
         'Create a GlobalKey<FormState> field (e.g. final _formKey = GlobalKey<FormState>()) and pass it to the Form widget via the key parameter.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -2148,6 +2193,9 @@ class AvoidFormWithoutKeyRule extends SaropaLintRule {
 }
 
 /// Future rule: avoid-listview-without-item-extent
+///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v6
+///
 /// Warns when ListView doesn't specify itemExtent for better performance.
 ///
 /// Example of **bad** code:
@@ -2164,7 +2212,6 @@ class AvoidFormWithoutKeyRule extends SaropaLintRule {
 ///   itemBuilder: (context, index) => ListTile(...),
 /// )
 /// ```
-
 class AvoidMediaQueryInBuildRule extends SaropaLintRule {
   const AvoidMediaQueryInBuildRule() : super(code: _code);
 
@@ -2181,7 +2228,7 @@ class AvoidMediaQueryInBuildRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_mediaquery_in_build',
     problemMessage:
-        '[avoid_mediaquery_in_build] MediaQuery.of(context) subscribes to all MediaQueryData changes (size, padding, orientation, brightness, text scaling), causing unnecessary rebuilds when only one property is needed. Specific accessors like sizeOf or paddingOf subscribe to only the relevant property, significantly reducing rebuild frequency.',
+        '[avoid_mediaquery_in_build] MediaQuery.of(context) subscribes to all MediaQueryData changes (size, padding, orientation, brightness, text scaling), causing unnecessary rebuilds when only one property is needed. Specific accessors like sizeOf or paddingOf subscribe to only the relevant property, significantly reducing rebuild frequency. {v6}',
     correctionMessage:
         'Replace MediaQuery.of(context).size with MediaQuery.sizeOf(context), .padding with MediaQuery.paddingOf(context), etc. These targeted methods were added in Flutter 3.10.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -2205,6 +2252,9 @@ class AvoidMediaQueryInBuildRule extends SaropaLintRule {
 }
 
 /// Future rule: prefer-sliver-list-delegate
+///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v4
+///
 /// Warns when SliverList uses children instead of delegate for large lists.
 ///
 /// Example of **bad** code:
@@ -2223,7 +2273,6 @@ class AvoidMediaQueryInBuildRule extends SaropaLintRule {
 ///   ),
 /// )
 /// ```
-
 class PreferCachedNetworkImageRule extends SaropaLintRule {
   const PreferCachedNetworkImageRule() : super(code: _code);
 
@@ -2240,7 +2289,7 @@ class PreferCachedNetworkImageRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_cached_network_image',
     problemMessage:
-        '[prefer_cached_network_image] Image.network re-downloads images every time the widget rebuilds or the user navigates back to the screen, wasting bandwidth and causing visible loading flicker. CachedNetworkImage persists images to disk, loads them instantly on subsequent visits, and supports placeholder and error widgets out of the box.',
+        '[prefer_cached_network_image] Image.network re-downloads images every time the widget rebuilds or the user navigates back to the screen, wasting bandwidth and causing visible loading flicker. CachedNetworkImage persists images to disk, loads them instantly on subsequent visits, and supports placeholder and error widgets out of the box. {v4}',
     correctionMessage:
         'Replace Image.network(url) with CachedNetworkImage(imageUrl: url) from the cached_network_image package, and add placeholder/errorWidget parameters for loading feedback.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -2265,6 +2314,9 @@ class PreferCachedNetworkImageRule extends SaropaLintRule {
 }
 
 /// Future rule: avoid-gesture-detector-in-scrollview
+///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v6
+///
 /// Warns when GestureDetector is used around a scrollable widget.
 ///
 /// Example of **bad** code:
@@ -2283,7 +2335,6 @@ class PreferCachedNetworkImageRule extends SaropaLintRule {
 ///   ],
 /// )
 /// ```
-
 class AvoidStatefulWidgetInListRule extends SaropaLintRule {
   const AvoidStatefulWidgetInListRule() : super(code: _code);
 
@@ -2300,7 +2351,7 @@ class AvoidStatefulWidgetInListRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_stateful_widget_in_list',
     problemMessage:
-        '[avoid_stateful_widget_in_list] StatefulWidget created inside a ListView.builder callback loses its State when scrolled off-screen and recreated, causing input fields to reset, animations to restart, and expanded/collapsed states to revert. The framework cannot preserve State for widgets without stable keys in a lazily-built list.',
+        '[avoid_stateful_widget_in_list] StatefulWidget created inside a ListView.builder callback loses its State when scrolled off-screen and recreated, causing input fields to reset, animations to restart, and expanded/collapsed states to revert. The framework cannot preserve State for widgets without stable keys in a lazily-built list. {v6}',
     correctionMessage:
         'Add a ValueKey with a stable identifier (e.g. item.id) to the StatefulWidget, or lift mutable state out of the list item into a parent state manager.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -2354,6 +2405,9 @@ class AvoidStatefulWidgetInListRule extends SaropaLintRule {
 }
 
 /// Future rule: prefer-opacity-over-color-alpha
+///
+/// Since: v2.3.3 | Updated: v4.13.0 | Rule version: v2
+///
 /// Warns when Color.withAlpha/withOpacity is used instead of Opacity widget.
 ///
 /// Example of **bad** code:
@@ -2375,14 +2429,13 @@ class AvoidStatefulWidgetInListRule extends SaropaLintRule {
 /// )
 /// // Or better, use AnimatedOpacity for animations
 /// ```
-
 class AvoidEmptyTextWidgetsRule extends SaropaLintRule {
   const AvoidEmptyTextWidgetsRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
     name: 'avoid_empty_text_widgets',
     problemMessage:
-        "[avoid_empty_text_widgets] Text widget with an empty string ('') still occupies space based on the inherited text style's line height, creating invisible layout artifacts. It also participates in accessibility announcements, confusing screen readers with blank text nodes that convey no information.",
+        "[avoid_empty_text_widgets] Text widget with an empty string ('') still occupies space based on the inherited text style's line height, creating invisible layout artifacts. It also participates in accessibility announcements, confusing screen readers with blank text nodes that convey no information. {v2}",
     correctionMessage:
         'Replace Text(\'\') with SizedBox.shrink() for a zero-size placeholder, or remove the widget entirely if conditional display is intended.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -2458,6 +2511,8 @@ class _ReplaceEmptyTextWithSizedBoxFix extends DartFix {
 
 /// Warns when FontWeight is specified using numeric w-values instead of named constants.
 ///
+/// Since: v1.7.2 | Updated: v4.13.0 | Rule version: v2
+///
 /// While FontWeight supports w100-w900 numeric values, using named constants
 /// like FontWeight.normal or FontWeight.bold is more readable.
 ///
@@ -2472,7 +2527,6 @@ class _ReplaceEmptyTextWithSizedBoxFix extends DartFix {
 /// TextStyle(fontWeight: FontWeight.normal)  // w400
 /// TextStyle(fontWeight: FontWeight.bold)    // w700
 /// ```
-
 class AvoidFontWeightAsNumberRule extends SaropaLintRule {
   const AvoidFontWeightAsNumberRule() : super(code: _code);
 
@@ -2489,7 +2543,7 @@ class AvoidFontWeightAsNumberRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_font_weight_as_number',
     problemMessage:
-        '[avoid_font_weight_as_number] Numeric FontWeight values like w400 or w700 are less readable and harder to maintain than their named equivalents. Named constants (normal, bold) convey semantic intent, reduce lookup effort during code review, and align with design system terminology used by designers.',
+        '[avoid_font_weight_as_number] Numeric FontWeight values like w400 or w700 are less readable and harder to maintain than their named equivalents. Named constants (normal, bold) convey semantic intent, reduce lookup effort during code review, and align with design system terminology used by designers. {v2}',
     correctionMessage:
         'Replace numeric FontWeight values with named constants: w100=thin, w200=extraLight, w300=light, w400=normal, w500=medium, w600=semiBold, w700=bold, w800=extraBold, w900=black.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -2560,6 +2614,8 @@ class _ReplaceFontWeightNumberFix extends DartFix {
 
 /// Warns when Container is used only for whitespace/spacing.
 ///
+/// Since: v2.3.3 | Updated: v4.13.0 | Rule version: v2
+///
 /// SizedBox is more efficient than Container when you only need to add
 /// spacing. Container has additional overhead from decoration handling.
 ///
@@ -2576,14 +2632,13 @@ class _ReplaceFontWeightNumberFix extends DartFix {
 /// SizedBox(height: 8)
 /// SizedBox.square(dimension: 10)
 /// ```
-
 class AvoidMultipleMaterialAppsRule extends SaropaLintRule {
   const AvoidMultipleMaterialAppsRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
     name: 'avoid_multiple_material_apps',
     problemMessage:
-        '[avoid_multiple_material_apps] Multiple MaterialApp (or CupertinoApp) widgets in the tree create separate Navigator stacks, separate Theme contexts, and independent Locale/MediaQuery scopes. This breaks navigation (pushNamed cannot reach routes in the other app), causes theme inconsistencies, and doubles memory usage for shared resources.',
+        '[avoid_multiple_material_apps] Multiple MaterialApp (or CupertinoApp) widgets in the tree create separate Navigator stacks, separate Theme contexts, and independent Locale/MediaQuery scopes. This breaks navigation (pushNamed cannot reach routes in the other app), causes theme inconsistencies, and doubles memory usage for shared resources. {v2}',
     correctionMessage:
         'Keep a single MaterialApp at the root. For sub-navigators, use Navigator widgets or a nested Router instead of adding another MaterialApp.',
     errorSeverity: DiagnosticSeverity.ERROR,
@@ -2630,6 +2685,8 @@ class AvoidMultipleMaterialAppsRule extends SaropaLintRule {
 
 /// Warns when deprecated RawKeyboardListener is used.
 ///
+/// Since: v1.3.0 | Updated: v4.13.0 | Rule version: v4
+///
 /// RawKeyboardListener is deprecated. Use KeyboardListener or Focus widget
 /// with onKeyEvent instead.
 ///
@@ -2650,7 +2707,6 @@ class AvoidMultipleMaterialAppsRule extends SaropaLintRule {
 ///   child: child,
 /// )
 /// ```
-
 class AvoidRawKeyboardListenerRule extends SaropaLintRule {
   const AvoidRawKeyboardListenerRule() : super(code: _code);
 
@@ -2667,7 +2723,7 @@ class AvoidRawKeyboardListenerRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_raw_keyboard_listener',
     problemMessage:
-        '[avoid_raw_keyboard_listener] RawKeyboardListener is deprecated since Flutter 3.18. It uses the legacy RawKeyEvent system that does not correctly handle key mapping across platforms, missing modifier keys and producing inconsistent key codes. The replacement KeyboardListener uses the modern KeyEvent system with proper platform key mapping.',
+        '[avoid_raw_keyboard_listener] RawKeyboardListener is deprecated since Flutter 3.18. It uses the legacy RawKeyEvent system that does not correctly handle key mapping across platforms, missing modifier keys and producing inconsistent key codes. The replacement KeyboardListener uses the modern KeyEvent system with proper platform key mapping. {v4}',
     correctionMessage:
         'Replace RawKeyboardListener with KeyboardListener (or Focus with onKeyEvent) which uses the modern HardwareKeyboard / KeyEvent API for correct cross-platform input handling.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -2725,6 +2781,8 @@ class _ReplaceRawKeyboardListenerFix extends DartFix {
 
 /// Warns when ImageRepeat is used on Image widgets.
 ///
+/// Since: v1.3.0 | Updated: v4.13.0 | Rule version: v4
+///
 /// ImageRepeat is rarely needed and often indicates a design issue.
 /// Consider using a pattern image or tiled background instead.
 ///
@@ -2740,7 +2798,6 @@ class _ReplaceRawKeyboardListenerFix extends DartFix {
 /// ```dart
 /// Image.asset('image.png')
 /// ```
-
 class AvoidImageRepeatRule extends SaropaLintRule {
   const AvoidImageRepeatRule() : super(code: _code);
 
@@ -2757,7 +2814,7 @@ class AvoidImageRepeatRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_image_repeat',
     problemMessage:
-        '[avoid_image_repeat] ImageRepeat tiles the image across the available space, which is rarely the intended behavior for photos or icons and usually signals a misconfigured decoration. Tiled images consume additional GPU memory for the repeated texture and can produce visual artifacts at tile boundaries on different screen densities.',
+        '[avoid_image_repeat] ImageRepeat tiles the image across the available space, which is rarely the intended behavior for photos or icons and usually signals a misconfigured decoration. Tiled images consume additional GPU memory for the repeated texture and can produce visual artifacts at tile boundaries on different screen densities. {v4}',
     correctionMessage:
         'Remove the repeat parameter (defaults to ImageRepeat.noRepeat), or if tiling is intentional, use a dedicated pattern asset designed for seamless repetition.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -2780,6 +2837,8 @@ class AvoidImageRepeatRule extends SaropaLintRule {
 
 /// Warns when Icon widget has explicit size override.
 ///
+/// Since: v1.3.0 | Updated: v4.13.0 | Rule version: v2
+///
 /// Instead of overriding icon size on individual Icon widgets,
 /// use IconTheme to set consistent sizing.
 ///
@@ -2795,14 +2854,13 @@ class AvoidImageRepeatRule extends SaropaLintRule {
 ///   child: Icon(Icons.home),
 /// )
 /// ```
-
 class AvoidIconSizeOverrideRule extends SaropaLintRule {
   const AvoidIconSizeOverrideRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
     name: 'avoid_icon_size_override',
     problemMessage:
-        '[avoid_icon_size_override] Setting icon size directly on individual Icon widgets scatters sizing values throughout the codebase, causing inconsistencies when the design system changes. IconTheme provides a single point of control for icon sizing within a subtree, keeping all icons consistent and easier to update.',
+        '[avoid_icon_size_override] Setting icon size directly on individual Icon widgets scatters sizing values throughout the codebase, causing inconsistencies when the design system changes. IconTheme provides a single point of control for icon sizing within a subtree, keeping all icons consistent and easier to update. {v2}',
     correctionMessage:
         'Remove the size parameter from the Icon widget and wrap the relevant subtree with IconTheme(data: IconThemeData(size: 24), child: ...) for centralized sizing.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -2831,6 +2889,8 @@ class AvoidIconSizeOverrideRule extends SaropaLintRule {
 
 /// Warns when GestureDetector is used with only onTap.
 ///
+/// Since: v1.3.0 | Updated: v4.13.0 | Rule version: v4
+///
 /// For simple tap interactions with Material design feedback,
 /// InkWell provides better UX with ripple effects.
 ///
@@ -2849,7 +2909,6 @@ class AvoidIconSizeOverrideRule extends SaropaLintRule {
 ///   child: MyWidget(),
 /// )
 /// ```
-
 class PreferInkwellOverGestureRule extends SaropaLintRule {
   const PreferInkwellOverGestureRule() : super(code: _code);
 
@@ -2866,7 +2925,7 @@ class PreferInkwellOverGestureRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_inkwell_over_gesture',
     problemMessage:
-        '[prefer_inkwell_over_gesture] GestureDetector with onTap provides no visual feedback when tapped, leaving users unsure whether their tap registered. InkWell produces the Material Design ripple effect that confirms interaction, improving perceived responsiveness and matching platform conventions users expect.',
+        '[prefer_inkwell_over_gesture] GestureDetector with onTap provides no visual feedback when tapped, leaving users unsure whether their tap registered. InkWell produces the Material Design ripple effect that confirms interaction, improving perceived responsiveness and matching platform conventions users expect. {v4}',
     correctionMessage:
         'Replace GestureDetector(onTap: ...) with InkWell(onTap: ...) to get built-in ripple feedback. Ensure a Material ancestor exists in the tree for the ripple to render.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -2959,6 +3018,8 @@ class _ReplaceGestureWithInkWellFix extends DartFix {
 
 /// Warns when FittedBox contains a Text widget.
 ///
+/// Since: v1.3.0 | Updated: v4.13.0 | Rule version: v3
+///
 /// FittedBox scales its child to fit, which can cause text to become
 /// unreadable or distorted. Use maxLines and overflow instead.
 ///
@@ -2971,7 +3032,6 @@ class _ReplaceGestureWithInkWellFix extends DartFix {
 /// ```dart
 /// Text('Long text', maxLines: 2, overflow: TextOverflow.ellipsis)
 /// ```
-
 class AvoidFittedBoxForTextRule extends SaropaLintRule {
   const AvoidFittedBoxForTextRule() : super(code: _code);
 
@@ -2988,7 +3048,7 @@ class AvoidFittedBoxForTextRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_fitted_box_for_text',
     problemMessage:
-        '[avoid_fitted_box_for_text] FittedBox scales Text widgets uniformly, shrinking the entire text to fit the container. This ignores the user accessibility text scaling preference, can render text unreadably small on narrow screens, and defeats the purpose of responsive text layout. Use text-specific overflow handling instead.',
+        '[avoid_fitted_box_for_text] FittedBox scales Text widgets uniformly, shrinking the entire text to fit the container. This ignores the user accessibility text scaling preference, can render text unreadably small on narrow screens, and defeats the purpose of responsive text layout. Use text-specific overflow handling instead. {v3}',
     correctionMessage:
         'Remove FittedBox and use maxLines with TextOverflow.ellipsis to handle long text, or use AutoSizeText for controlled text scaling that respects minimum font sizes.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -3027,6 +3087,8 @@ class AvoidFittedBoxForTextRule extends SaropaLintRule {
 
 /// Warns when ListView is used with many children instead of ListView.builder.
 ///
+/// Since: v1.3.0 | Updated: v4.13.0 | Rule version: v3
+///
 /// Alias: require_list_view_builder
 ///
 /// ListView with children list builds all items at once.
@@ -3041,7 +3103,6 @@ class AvoidFittedBoxForTextRule extends SaropaLintRule {
 /// ```dart
 /// ListView.builder(itemCount: 100, itemBuilder: (ctx, i) => ListTile())
 /// ```
-
 class AvoidOpacityAnimationRule extends SaropaLintRule {
   const AvoidOpacityAnimationRule() : super(code: _code);
 
@@ -3058,7 +3119,7 @@ class AvoidOpacityAnimationRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_opacity_animation',
     problemMessage:
-        '[avoid_opacity_animation] Animating the Opacity widget via setState triggers a full rebuild of the child subtree on every frame, which is expensive for complex children. FadeTransition applies opacity changes directly on the compositing layer without rebuilding, achieving the same visual effect with significantly less CPU and GPU overhead.',
+        '[avoid_opacity_animation] Animating the Opacity widget via setState triggers a full rebuild of the child subtree on every frame, which is expensive for complex children. FadeTransition applies opacity changes directly on the compositing layer without rebuilding, achieving the same visual effect with significantly less CPU and GPU overhead. {v3}',
     correctionMessage:
         'Replace the Opacity widget with FadeTransition(opacity: animation, child: ...) driven by an AnimationController, so opacity changes happen at the compositing layer.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -3132,6 +3193,8 @@ class _ReplaceOpacityWithFadeTransitionFix extends DartFix {
 
 /// Warns when SizedBox.expand() is used.
 ///
+/// Since: v1.3.0 | Updated: v4.13.0 | Rule version: v3
+///
 /// SizedBox.expand() fills all available space which can cause layout issues.
 ///
 /// Example of **bad** code:
@@ -3143,7 +3206,6 @@ class _ReplaceOpacityWithFadeTransitionFix extends DartFix {
 /// ```dart
 /// SizedBox(width: double.infinity, height: 200, child: MyWidget())
 /// ```
-
 class PreferSelectableTextRule extends SaropaLintRule {
   const PreferSelectableTextRule() : super(code: _code);
 
@@ -3160,7 +3222,7 @@ class PreferSelectableTextRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_selectable_text',
     problemMessage:
-        '[prefer_selectable_text] Long-form text displayed with the Text widget cannot be selected or copied by users, frustrating those who need to copy error messages, addresses, phone numbers, or reference codes. SelectableText enables native text selection with copy support at no additional performance cost.',
+        '[prefer_selectable_text] Long-form text displayed with the Text widget cannot be selected or copied by users, frustrating those who need to copy error messages, addresses, phone numbers, or reference codes. SelectableText enables native text selection with copy support at no additional performance cost. {v3}',
     correctionMessage:
         'Replace Text with SelectableText for content users may want to copy (errors, IDs, addresses, etc.). Use SelectableText.rich for styled spans.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -3226,6 +3288,8 @@ class _ReplaceTextWithSelectableFix extends DartFix {
 
 /// Warns when Row/Column uses SizedBox for spacing instead of spacing param.
 ///
+/// Since: v1.3.0 | Updated: v4.13.0 | Rule version: v3
+///
 /// Flutter 3.10+ introduced spacing parameter for Row, Column, Wrap, and Flex.
 ///
 /// Example of **bad** code:
@@ -3237,7 +3301,6 @@ class _ReplaceTextWithSelectableFix extends DartFix {
 /// ```dart
 /// Column(spacing: 8, children: [Text('A'), Text('B')])
 /// ```
-
 class AvoidMaterial2FallbackRule extends SaropaLintRule {
   const AvoidMaterial2FallbackRule() : super(code: _code);
 
@@ -3254,7 +3317,7 @@ class AvoidMaterial2FallbackRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_material2_fallback',
     problemMessage:
-        '[avoid_material2_fallback] Explicitly setting useMaterial3: false forces the app back to the deprecated Material 2 design system, which will receive no new component updates or accessibility improvements. Material 2 components may also be removed in future Flutter releases, creating a migration burden.',
+        '[avoid_material2_fallback] Explicitly setting useMaterial3: false forces the app back to the deprecated Material 2 design system, which will receive no new component updates or accessibility improvements. Material 2 components may also be removed in future Flutter releases, creating a migration burden. {v3}',
     correctionMessage:
         'Remove useMaterial3: false (M3 is the default since Flutter 3.16) or set it to true. Migrate M2-specific theming to M3 ColorScheme and typography.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -3334,6 +3397,8 @@ class _RemoveMaterial2FallbackFix extends DartFix {
 
 /// Warns when using OverlayEntry instead of the declarative OverlayPortal.
 ///
+/// Since: v1.3.0 | Updated: v4.13.0 | Rule version: v4
+///
 /// OverlayPortal (Flutter 3.10+) provides a declarative API for overlays
 /// that integrates better with the widget tree and InheritedWidgets.
 ///
@@ -3361,7 +3426,6 @@ class _RemoveMaterial2FallbackFix extends DartFix {
 ///   child: MyWidget(),
 /// )
 /// ```
-
 class PreferOverlayPortalRule extends SaropaLintRule {
   const PreferOverlayPortalRule() : super(code: _code);
 
@@ -3378,7 +3442,7 @@ class PreferOverlayPortalRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_overlay_portal',
     problemMessage:
-        '[prefer_overlay_portal] Consider using OverlayPortal instead of OverlayEntry.',
+        '[prefer_overlay_portal] Consider using OverlayPortal instead of OverlayEntry. {v4}',
     correctionMessage:
         'OverlayPortal provides a declarative API that integrates '
         'with InheritedWidgets (Flutter 3.10+).',
@@ -3403,6 +3467,8 @@ class PreferOverlayPortalRule extends SaropaLintRule {
 
 /// Warns when using third-party carousel packages instead of CarouselView.
 ///
+/// Since: v1.3.0 | Updated: v4.13.0 | Rule version: v3
+///
 /// CarouselView (Flutter 3.24+) is a built-in Material 3 carousel widget
 /// that provides standard carousel behavior without external dependencies.
 ///
@@ -3425,14 +3491,13 @@ class PreferOverlayPortalRule extends SaropaLintRule {
 ///   children: items,
 /// )
 /// ```
-
 class PreferCarouselViewRule extends SaropaLintRule {
   const PreferCarouselViewRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
     name: 'prefer_carousel_view',
     problemMessage:
-        '[prefer_carousel_view] Third-party carousel package adds dependency maintenance overhead, increases app size, and may not follow Material 3 design guidelines. The built-in CarouselView widget (Flutter 3.24+) provides standard M3 carousel behavior with accessibility support, animation curves, and theme integration out of the box.',
+        '[prefer_carousel_view] Third-party carousel package adds dependency maintenance overhead, increases app size, and may not follow Material 3 design guidelines. The built-in CarouselView widget (Flutter 3.24+) provides standard M3 carousel behavior with accessibility support, animation curves, and theme integration out of the box. {v3}',
     correctionMessage:
         'Replace the third-party carousel with CarouselView(children: items) from the Flutter framework. It supports item extent, shrink extent, and standard scroll physics.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -3485,6 +3550,8 @@ class PreferCarouselViewRule extends SaropaLintRule {
 
 /// Warns when using showSearch/SearchDelegate instead of SearchAnchor.
 ///
+/// Since: v1.3.0 | Updated: v4.13.0 | Rule version: v4
+///
 /// SearchAnchor (Flutter 3.10+) is the Material 3 search component that
 /// provides a modern, declarative search UI pattern.
 ///
@@ -3517,7 +3584,6 @@ class PreferCarouselViewRule extends SaropaLintRule {
 ///   },
 /// )
 /// ```
-
 class PreferSearchAnchorRule extends SaropaLintRule {
   const PreferSearchAnchorRule() : super(code: _code);
 
@@ -3534,7 +3600,7 @@ class PreferSearchAnchorRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_search_anchor',
     problemMessage:
-        '[prefer_search_anchor] showSearch with SearchDelegate uses an imperative API that bypasses the widget tree, cannot access InheritedWidgets from the parent context, and follows Material 2 patterns. SearchAnchor (Flutter 3.10+) provides a declarative, widget-based search with full M3 styling and theme integration.',
+        '[prefer_search_anchor] showSearch with SearchDelegate uses an imperative API that bypasses the widget tree, cannot access InheritedWidgets from the parent context, and follows Material 2 patterns. SearchAnchor (Flutter 3.10+) provides a declarative, widget-based search with full M3 styling and theme integration. {v4}',
     correctionMessage:
         'Replace showSearch/SearchDelegate with SearchAnchor and SearchAnchor.bar, which integrate into the widget tree and support suggestionsBuilder for async search results.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -3568,6 +3634,8 @@ class PreferSearchAnchorRule extends SaropaLintRule {
 
 /// Warns when using GestureDetector for tap-outside-to-dismiss patterns.
 ///
+/// Since: v1.3.0 | Updated: v4.13.0 | Rule version: v4
+///
 /// TapRegion (Flutter 3.10+) provides a cleaner API for detecting taps
 /// outside a widget, commonly used for dismissing popups, dropdowns, etc.
 ///
@@ -3593,7 +3661,6 @@ class PreferSearchAnchorRule extends SaropaLintRule {
 ///   child: MyPopup(),
 /// )
 /// ```
-
 class PreferTapRegionForDismissRule extends SaropaLintRule {
   const PreferTapRegionForDismissRule() : super(code: _code);
 
@@ -3610,7 +3677,7 @@ class PreferTapRegionForDismissRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_tap_region_for_dismiss',
     problemMessage:
-        '[prefer_tap_region_for_dismiss] Manual tap-outside detection using GestureDetector or Focus requires tracking tap locations and comparing against widget bounds, which is error-prone and breaks with nested interactive elements. TapRegion (Flutter 3.10+) handles this pattern correctly out of the box, including group regions for linked elements.',
+        '[prefer_tap_region_for_dismiss] Manual tap-outside detection using GestureDetector or Focus requires tracking tap locations and comparing against widget bounds, which is error-prone and breaks with nested interactive elements. TapRegion (Flutter 3.10+) handles this pattern correctly out of the box, including group regions for linked elements. {v4}',
     correctionMessage:
         'Wrap the dismissible content with TapRegion(onTapOutside: (_) => dismiss()) for reliable tap-outside detection. Use TapRegion.groupId to link multiple regions.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -3684,6 +3751,8 @@ class PreferTapRegionForDismissRule extends SaropaLintRule {
 
 /// Warns when Text widgets with dynamic content lack overflow handling.
 ///
+/// Since: v1.7.2 | Updated: v4.13.0 | Rule version: v3
+///
 /// Text displaying dynamic content (variables, user input) can overflow
 /// unexpectedly. Adding `overflow` or `maxLines` ensures graceful handling.
 ///
@@ -3704,7 +3773,6 @@ class PreferTapRegionForDismissRule extends SaropaLintRule {
 /// Text('OK') // Static short text is fine
 /// Text('Submit', maxLines: 1) // Has maxLines
 /// ```
-
 class RequireTextOverflowHandlingRule extends SaropaLintRule {
   const RequireTextOverflowHandlingRule() : super(code: _code);
 
@@ -3721,7 +3789,7 @@ class RequireTextOverflowHandlingRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_text_overflow_handling',
     problemMessage:
-        '[require_text_overflow_handling] Text displaying dynamic content (user input, API data, translations) without overflow handling can break layouts when the text is longer than expected. Unbounded text pushes sibling widgets off-screen, triggers RenderFlex overflow errors in Row/Column contexts, and creates inconsistent UI across locales with varying text lengths.',
+        '[require_text_overflow_handling] Text displaying dynamic content (user input, API data, translations) without overflow handling can break layouts when the text is longer than expected. Unbounded text pushes sibling widgets off-screen, triggers RenderFlex overflow errors in Row/Column contexts, and creates inconsistent UI across locales with varying text lengths. {v3}',
     correctionMessage:
         'Add overflow: TextOverflow.ellipsis and maxLines to limit visible lines, or wrap in Expanded/Flexible within Row/Column to constrain the available width.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -3825,6 +3893,8 @@ class _AddTextOverflowFix extends DartFix {
 
 /// Requires Image.network to have an errorBuilder for handling load failures.
 ///
+/// Since: v1.7.2 | Updated: v4.13.0 | Rule version: v3
+///
 /// Alias: require_image_error_fallback
 ///
 /// Network images can fail to load due to connectivity issues, invalid URLs, or server errors. Without an errorBuilder, users see broken image icons, blank spaces, or cryptic UI. This leads to poor user experience, missed content, and increased support burden. It can also mask backend or CDN issues during development and testing.
@@ -3849,7 +3919,6 @@ class _AddTextOverflowFix extends DartFix {
 ///   errorBuilder: (context, error, stackTrace) => Icon(Icons.error),
 /// )
 /// ```
-
 class RequireImageErrorBuilderRule extends SaropaLintRule {
   const RequireImageErrorBuilderRule() : super(code: _code);
 
@@ -3866,7 +3935,7 @@ class RequireImageErrorBuilderRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_image_error_builder',
     problemMessage:
-        '[require_image_error_builder] Network image without errorBuilder shows a broken image icon or blank space when the URL is invalid, the server is down, or the network is unavailable. This creates a poor user experience with no indication of what went wrong and no way to retry loading the image.',
+        '[require_image_error_builder] Network image without errorBuilder shows a broken image icon or blank space when the URL is invalid, the server is down, or the network is unavailable. This creates a poor user experience with no indication of what went wrong and no way to retry loading the image. {v3}',
     correctionMessage:
         'Add errorBuilder: (context, error, stackTrace) => FallbackWidget() to display a placeholder icon, error message, or retry button when image loading fails.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -3906,6 +3975,8 @@ class RequireImageErrorBuilderRule extends SaropaLintRule {
 
 /// Requires network images to specify width and height for layout stability.
 ///
+/// Since: v2.3.3 | Updated: v4.13.0 | Rule version: v2
+///
 /// Network images without dimensions cause layout shifts (CLS) when they load,
 /// leading to poor user experience. Specifying dimensions reserves space
 /// before the image loads.
@@ -3938,14 +4009,13 @@ class RequireImageErrorBuilderRule extends SaropaLintRule {
 ///   child: Image.network(url, fit: BoxFit.cover),
 /// )
 /// ```
-
 class RequireImageDimensionsRule extends SaropaLintRule {
   const RequireImageDimensionsRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
     name: 'require_image_dimensions',
     problemMessage:
-        '[require_image_dimensions] Network image without explicit dimensions causes layout shifts (CLS) when the image loads, as the widget expands from zero to the image size. This pushes surrounding content around, creates a jarring user experience, and negatively impacts web Core Web Vitals scores.',
+        '[require_image_dimensions] Network image without explicit dimensions causes layout shifts (CLS) when the image loads, as the widget expands from zero to the image size. This pushes surrounding content around, creates a jarring user experience, and negatively impacts web Core Web Vitals scores. {v2}',
     correctionMessage:
         'Set width and height on the Image widget matching the expected aspect ratio, or wrap it in a SizedBox/AspectRatio with fixed dimensions to reserve space before the image loads.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -4043,6 +4113,8 @@ class RequireImageDimensionsRule extends SaropaLintRule {
 
 /// Requires network images to have a placeholder or loadingBuilder.
 ///
+/// Since: v1.3.0 | Updated: v4.13.0 | Rule version: v4
+///
 /// Without a placeholder, users see nothing while images load,
 /// leading to poor perceived performance.
 ///
@@ -4064,7 +4136,6 @@ class RequireImageDimensionsRule extends SaropaLintRule {
 ///   placeholder: (context, url) => CircularProgressIndicator(),
 /// )
 /// ```
-
 class RequirePlaceholderForNetworkRule extends SaropaLintRule {
   const RequirePlaceholderForNetworkRule() : super(code: _code);
 
@@ -4081,7 +4152,7 @@ class RequirePlaceholderForNetworkRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_placeholder_for_network',
     problemMessage:
-        '[require_placeholder_for_network] Network image without a placeholder or loadingBuilder shows blank space while the image downloads, giving users no indication that content is loading. On slow connections this blank period can last several seconds, making the UI appear broken or unresponsive.',
+        '[require_placeholder_for_network] Network image without a placeholder or loadingBuilder shows blank space while the image downloads, giving users no indication that content is loading. On slow connections this blank period can last several seconds, making the UI appear broken or unresponsive. {v4}',
     correctionMessage:
         'Add loadingBuilder to show a progress indicator during download, or use a placeholder image (e.g. a low-res thumbnail or shimmer effect) to indicate loading state.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -4133,6 +4204,8 @@ class RequirePlaceholderForNetworkRule extends SaropaLintRule {
 
 /// Requires ScrollController fields to be disposed in State classes.
 ///
+/// Since: v1.3.0 | Updated: v4.13.0 | Rule version: v4
+///
 /// ScrollController allocates native resources and listeners that must be
 /// released by calling dispose(). Failing to do so causes memory leaks.
 ///
@@ -4156,7 +4229,6 @@ class RequirePlaceholderForNetworkRule extends SaropaLintRule {
 ///   }
 /// }
 /// ```
-
 class PreferTextThemeRule extends SaropaLintRule {
   const PreferTextThemeRule() : super(code: _code);
 
@@ -4173,7 +4245,7 @@ class PreferTextThemeRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_text_theme',
     problemMessage:
-        '[prefer_text_theme] Hardcoded TextStyle with inline fontSize, fontWeight, and color values scatters typography decisions throughout the codebase. When the design system changes, every hardcoded style must be found and updated manually. Theme.textTheme centralizes typography so that a single theme change propagates consistently to all text widgets.',
+        '[prefer_text_theme] Hardcoded TextStyle with inline fontSize, fontWeight, and color values scatters typography decisions throughout the codebase. When the design system changes, every hardcoded style must be found and updated manually. Theme.textTheme centralizes typography so that a single theme change propagates consistently to all text widgets. {v4}',
     correctionMessage:
         'Replace the inline TextStyle with Theme.of(context).textTheme.bodyMedium (or the appropriate text style) and use copyWith for minor overrides.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -4217,6 +4289,8 @@ class PreferTextThemeRule extends SaropaLintRule {
 
 /// Warns when scrollable widgets are nested without NestedScrollView.
 ///
+/// Since: v1.4.2 | Updated: v4.13.0 | Rule version: v5
+///
 /// Nested scrollables (ListView inside ListView) cause gestures to be
 /// ambiguous and can lead to poor scroll performance and UX issues.
 ///
@@ -4239,7 +4313,6 @@ class PreferTextThemeRule extends SaropaLintRule {
 /// )
 /// // Or use shrinkWrap + NeverScrollableScrollPhysics for inner list
 /// ```
-
 class AvoidGestureWithoutBehaviorRule extends SaropaLintRule {
   const AvoidGestureWithoutBehaviorRule() : super(code: _code);
 
@@ -4256,7 +4329,7 @@ class AvoidGestureWithoutBehaviorRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_gesture_without_behavior',
     problemMessage:
-        '[avoid_gesture_without_behavior] GestureDetector without explicit HitTestBehavior defaults to deferToChild, which only detects taps on painted pixels of the child. Empty areas within the GestureDetector bounds are ignored, causing missed taps that confuse users. Specifying the behavior makes the tap target boundaries explicit and predictable.',
+        '[avoid_gesture_without_behavior] GestureDetector without explicit HitTestBehavior defaults to deferToChild, which only detects taps on painted pixels of the child. Empty areas within the GestureDetector bounds are ignored, causing missed taps that confuse users. Specifying the behavior makes the tap target boundaries explicit and predictable. {v5}',
     correctionMessage:
         'Add behavior: HitTestBehavior.opaque to detect taps on the full bounding box, or .translucent to detect taps while allowing pass-through to widgets behind.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -4292,6 +4365,8 @@ class AvoidGestureWithoutBehaviorRule extends SaropaLintRule {
 
 /// Warns when buttons don't prevent double-tap submissions.
 ///
+/// Since: v1.4.2 | Updated: v4.13.0 | Rule version: v4
+///
 /// Double-tapping a submit button can cause duplicate API calls,
 /// payments, or other unintended side effects.
 ///
@@ -4310,14 +4385,13 @@ class AvoidGestureWithoutBehaviorRule extends SaropaLintRule {
 ///   child: isSubmitting ? CircularProgressIndicator() : Text('Submit'),
 /// )
 /// ```
-
 class AvoidDoubleTapSubmitRule extends SaropaLintRule {
   const AvoidDoubleTapSubmitRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
     name: 'avoid_double_tap_submit',
     problemMessage:
-        '[avoid_double_tap_submit] Submit button without double-tap protection can fire the onPressed callback multiple times before the first submission completes. This causes duplicate API requests, duplicate database entries, double charges in payment flows, and race conditions that corrupt application state.',
+        '[avoid_double_tap_submit] Submit button without double-tap protection can fire the onPressed callback multiple times before the first submission completes. This causes duplicate API requests, duplicate database entries, double charges in payment flows, and race conditions that corrupt application state. {v4}',
     correctionMessage:
         'Set onPressed to null (disabling the button) while the async operation is in progress, or use a debounce/throttle mechanism to ignore rapid successive taps.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -4396,6 +4470,8 @@ class AvoidDoubleTapSubmitRule extends SaropaLintRule {
 
 /// Warns when buttons on web don't have mouse cursor configured.
 ///
+/// Since: v1.4.2 | Updated: v4.13.0 | Rule version: v6
+///
 /// On web platforms, buttons should show appropriate cursors to
 /// indicate interactivity.
 ///
@@ -4415,7 +4491,6 @@ class AvoidDoubleTapSubmitRule extends SaropaLintRule {
 ///   child: Text('Click me'),
 /// )
 /// ```
-
 class PreferCursorForButtonsRule extends SaropaLintRule {
   const PreferCursorForButtonsRule() : super(code: _code);
 
@@ -4432,7 +4507,7 @@ class PreferCursorForButtonsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_cursor_for_buttons',
     problemMessage:
-        '[prefer_cursor_for_buttons] Interactive widget on web/desktop without a pointer cursor leaves the default arrow cursor, giving users no visual indication that the element is clickable. This violates web platform conventions and reduces discoverability of interactive elements, especially for GestureDetector-based custom buttons.',
+        '[prefer_cursor_for_buttons] Interactive widget on web/desktop without a pointer cursor leaves the default arrow cursor, giving users no visual indication that the element is clickable. This violates web platform conventions and reduces discoverability of interactive elements, especially for GestureDetector-based custom buttons. {v6}',
     correctionMessage:
         'Add mouseCursor: SystemMouseCursors.click to GestureDetector or InkWell widgets that act as buttons. Built-in Material buttons handle this automatically.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -4480,6 +4555,8 @@ class PreferCursorForButtonsRule extends SaropaLintRule {
 
 /// Warns when interactive widgets don't handle hover state.
 ///
+/// Since: v1.4.2 | Updated: v4.13.0 | Rule version: v6
+///
 /// On web and desktop, hover states provide important visual feedback.
 ///
 /// **BAD:**
@@ -4498,7 +4575,6 @@ class PreferCursorForButtonsRule extends SaropaLintRule {
 ///   child: MyButton(isHovered: _isHovered),
 /// )
 /// ```
-
 class RequireHoverStatesRule extends SaropaLintRule {
   const RequireHoverStatesRule() : super(code: _code);
 
@@ -4515,7 +4591,7 @@ class RequireHoverStatesRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_hover_states',
     problemMessage:
-        '[require_hover_states] Interactive widget on web/desktop without hover feedback feels unresponsive to mouse users. Hover states are a fundamental interaction pattern on these platforms, signaling clickability and providing visual confirmation that the cursor is over the target. Missing hover states make the app feel like a mobile port rather than a native desktop experience.',
+        '[require_hover_states] Interactive widget on web/desktop without hover feedback feels unresponsive to mouse users. Hover states are a fundamental interaction pattern on these platforms, signaling clickability and providing visual confirmation that the cursor is over the target. Missing hover states make the app feel like a mobile port rather than a native desktop experience. {v6}',
     correctionMessage:
         'Add onHover callback to change visual state (e.g. elevation, background color, or border) when the mouse enters the widget. Material widgets like ElevatedButton handle this automatically.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -4560,6 +4636,8 @@ class RequireHoverStatesRule extends SaropaLintRule {
 
 /// Warns when buttons don't have a loading state for async operations.
 ///
+/// Since: v1.4.2 | Updated: v4.13.0 | Rule version: v5
+///
 /// Users should see visual feedback when an async operation is in progress.
 ///
 /// **BAD:**
@@ -4583,7 +4661,6 @@ class RequireHoverStatesRule extends SaropaLintRule {
 ///   child: isLoading ? CircularProgressIndicator() : Text('Submit'),
 /// )
 /// ```
-
 class RequireButtonLoadingStateRule extends SaropaLintRule {
   const RequireButtonLoadingStateRule() : super(code: _code);
 
@@ -4600,7 +4677,7 @@ class RequireButtonLoadingStateRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_button_loading_state',
     problemMessage:
-        '[require_button_loading_state] Button triggering an async operation without a loading state indicator leaves users unsure whether their tap was registered. They may tap again (causing duplicate requests), navigate away (abandoning the operation), or assume the app is frozen. A loading state provides essential feedback for async interactions.',
+        '[require_button_loading_state] Button triggering an async operation without a loading state indicator leaves users unsure whether their tap was registered. They may tap again (causing duplicate requests), navigate away (abandoning the operation), or assume the app is frozen. A loading state provides essential feedback for async interactions. {v5}',
     correctionMessage:
         'Show a CircularProgressIndicator and set onPressed to null while the async operation runs. Restore the button when the operation completes or fails.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -4673,6 +4750,8 @@ class RequireButtonLoadingStateRule extends SaropaLintRule {
 
 /// Warns when hardcoded TextStyle values are used instead of theme.
 ///
+/// Since: v1.4.2 | Updated: v4.13.0 | Rule version: v5
+///
 /// Hardcoded text styles make it difficult to maintain consistent
 /// typography across the app.
 ///
@@ -4691,7 +4770,6 @@ class RequireButtonLoadingStateRule extends SaropaLintRule {
 ///   style: Theme.of(context).textTheme.bodyLarge,
 /// )
 /// ```
-
 class AvoidHardcodedTextStylesRule extends SaropaLintRule {
   const AvoidHardcodedTextStylesRule() : super(code: _code);
 
@@ -4708,7 +4786,7 @@ class AvoidHardcodedTextStylesRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_hardcoded_text_styles',
     problemMessage:
-        '[avoid_hardcoded_text_styles] Inline TextStyle with hardcoded fontSize, fontWeight, and color values creates scattered styling that drifts from the design system over time. Every hardcoded style must be updated individually when the design changes, and inconsistencies between screens become difficult to detect during code review.',
+        '[avoid_hardcoded_text_styles] Inline TextStyle with hardcoded fontSize, fontWeight, and color values creates scattered styling that drifts from the design system over time. Every hardcoded style must be updated individually when the design changes, and inconsistencies between screens become difficult to detect during code review. {v5}',
     correctionMessage:
         'Use Theme.of(context).textTheme (e.g. bodyMedium, titleLarge) for standard styles and .copyWith() for minor overrides. Define custom styles in a centralized theme extension.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -4764,6 +4842,8 @@ class AvoidHardcodedTextStylesRule extends SaropaLintRule {
 
 /// Warns when PageStorageKey is not used for scroll position preservation.
 ///
+/// Since: v1.4.2 | Updated: v4.13.0 | Rule version: v5
+///
 /// Without PageStorageKey, scroll positions are lost when navigating
 /// between screens.
 ///
@@ -4783,7 +4863,6 @@ class AvoidHardcodedTextStylesRule extends SaropaLintRule {
 ///   itemCount: 100,
 /// )
 /// ```
-
 class RequireRefreshIndicatorRule extends SaropaLintRule {
   const RequireRefreshIndicatorRule() : super(code: _code);
 
@@ -4800,7 +4879,7 @@ class RequireRefreshIndicatorRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_refresh_indicator',
     problemMessage:
-        '[require_refresh_indicator] List displaying remote data without pull-to-refresh forces users to navigate away and back to see updated content. This common UX pattern is expected on both platforms, and its absence makes the app feel unresponsive when data becomes stale. Users have no self-service way to recover from a failed initial load.',
+        '[require_refresh_indicator] List displaying remote data without pull-to-refresh forces users to navigate away and back to see updated content. This common UX pattern is expected on both platforms, and its absence makes the app feel unresponsive when data becomes stale. Users have no self-service way to recover from a failed initial load. {v5}',
     correctionMessage:
         'Wrap the scrollable list with RefreshIndicator(onRefresh: () async => fetchData(), child: listView) to enable pull-to-refresh for data refresh.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -4863,6 +4942,8 @@ class RequireRefreshIndicatorRule extends SaropaLintRule {
 
 /// Warns when scrollable widgets don't specify scroll physics.
 ///
+/// Since: v1.4.2 | Updated: v4.13.0 | Rule version: v5
+///
 /// Explicit scroll physics ensures consistent behavior across platforms.
 ///
 /// **BAD:**
@@ -4879,7 +4960,6 @@ class RequireRefreshIndicatorRule extends SaropaLintRule {
 ///   itemBuilder: (context, index) => ListTile(),
 /// )
 /// ```
-
 class RequireDefaultTextStyleRule extends SaropaLintRule {
   const RequireDefaultTextStyleRule() : super(code: _code);
 
@@ -4896,7 +4976,7 @@ class RequireDefaultTextStyleRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_default_text_style',
     problemMessage:
-        '[require_default_text_style] Multiple sibling Text widgets repeat the same TextStyle, creating redundant style objects and making future style changes error-prone since each instance must be updated independently. DefaultTextStyle applies a shared style to all descendant Text widgets automatically, keeping the code DRY and consistent.',
+        '[require_default_text_style] Multiple sibling Text widgets repeat the same TextStyle, creating redundant style objects and making future style changes error-prone since each instance must be updated independently. DefaultTextStyle applies a shared style to all descendant Text widgets automatically, keeping the code DRY and consistent. {v5}',
     correctionMessage:
         'Wrap the parent widget with DefaultTextStyle(style: sharedStyle, child: ...) and remove individual style parameters from child Text widgets that use the common style.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -4942,6 +5022,8 @@ class RequireDefaultTextStyleRule extends SaropaLintRule {
 
 /// Warns when Row/Column with overflow could use Wrap instead.
 ///
+/// Since: v1.4.2 | Updated: v4.13.0 | Rule version: v3
+///
 /// Wrap automatically moves overflowing children to the next line.
 ///
 /// **BAD:**
@@ -4958,7 +5040,6 @@ class RequireDefaultTextStyleRule extends SaropaLintRule {
 ///   children: [Chip(...), Chip(...), Chip(...), Chip(...)],
 /// )
 /// ```
-
 class PreferAssetImageForLocalRule extends SaropaLintRule {
   const PreferAssetImageForLocalRule() : super(code: _code);
 
@@ -4975,7 +5056,7 @@ class PreferAssetImageForLocalRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_asset_image_for_local',
     problemMessage:
-        '[prefer_asset_image_for_local] FileImage reads from the device filesystem at runtime and is intended for user-generated content, not bundled assets. Using FileImage for assets bypasses Flutter asset resolution (density variants, locale fallbacks), is not supported on web, and fails if the file path does not exist on the target device.',
+        '[prefer_asset_image_for_local] FileImage reads from the device filesystem at runtime and is intended for user-generated content, not bundled assets. Using FileImage for assets bypasses Flutter asset resolution (density variants, locale fallbacks), is not supported on web, and fails if the file path does not exist on the target device. {v3}',
     correctionMessage:
         'Replace FileImage with AssetImage or use Image.asset() to load bundled assets through the Flutter asset pipeline with proper resolution-aware variant selection.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -5006,6 +5087,8 @@ class PreferAssetImageForLocalRule extends SaropaLintRule {
 
 /// Warns when background images don't use BoxFit.cover.
 ///
+/// Since: v1.4.2 | Updated: v4.13.0 | Rule version: v3
+///
 /// BoxFit.cover ensures the image fills the container without distortion.
 ///
 /// **BAD:**
@@ -5028,7 +5111,6 @@ class PreferAssetImageForLocalRule extends SaropaLintRule {
 ///   ),
 /// )
 /// ```
-
 class PreferFitCoverForBackgroundRule extends SaropaLintRule {
   const PreferFitCoverForBackgroundRule() : super(code: _code);
 
@@ -5045,7 +5127,7 @@ class PreferFitCoverForBackgroundRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_fit_cover_for_background',
     problemMessage:
-        '[prefer_fit_cover_for_background] Background DecorationImage without BoxFit.cover may show letterboxing, stretching, or empty space around the image on different screen aspect ratios. BoxFit.cover ensures the image fills the entire container while maintaining its aspect ratio, which is the standard behavior for background images.',
+        '[prefer_fit_cover_for_background] Background DecorationImage without BoxFit.cover may show letterboxing, stretching, or empty space around the image on different screen aspect ratios. BoxFit.cover ensures the image fills the entire container while maintaining its aspect ratio, which is the standard behavior for background images. {v3}',
     correctionMessage:
         'Add fit: BoxFit.cover to DecorationImage so the image fills the container on all screen sizes without distortion. Crop alignment defaults to center.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -5080,6 +5162,8 @@ class PreferFitCoverForBackgroundRule extends SaropaLintRule {
 
 /// Warns when buttons with conditional onPressed don't customize disabled style.
 ///
+/// Since: v1.4.2 | Updated: v4.13.0 | Rule version: v5
+///
 /// While Flutter buttons have default disabled styling, custom styles
 /// provide better UX consistency across your app's design system.
 ///
@@ -5104,7 +5188,6 @@ class PreferFitCoverForBackgroundRule extends SaropaLintRule {
 ///   child: Text('Submit'),
 /// )
 /// ```
-
 class RequireDisabledStateRule extends SaropaLintRule {
   const RequireDisabledStateRule() : super(code: _code);
 
@@ -5121,7 +5204,7 @@ class RequireDisabledStateRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_disabled_state',
     problemMessage:
-        '[require_disabled_state] Button without custom disabled styling uses the framework default gray appearance, which may not match your app design system or provide sufficient contrast. Customizing the disabled state ensures visual consistency, communicates the disabled status clearly, and maintains your brand identity across all button states.',
+        '[require_disabled_state] Button without custom disabled styling uses the framework default gray appearance, which may not match your app design system or provide sufficient contrast. Customizing the disabled state ensures visual consistency, communicates the disabled status clearly, and maintains your brand identity across all button states. {v5}',
     correctionMessage:
         'Add a ButtonStyle with disabledBackgroundColor and disabledForegroundColor via styleFrom or the theme, ensuring disabled buttons match your design system.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -5176,6 +5259,8 @@ class RequireDisabledStateRule extends SaropaLintRule {
 
 /// Warns when Draggable doesn't have feedback widget.
 ///
+/// Since: v1.4.2 | Updated: v4.13.0 | Rule version: v4
+///
 /// Feedback provides visual indication during drag operations.
 ///
 /// **BAD:**
@@ -5194,7 +5279,6 @@ class RequireDisabledStateRule extends SaropaLintRule {
 ///   child: ItemWidget(item),
 /// )
 /// ```
-
 class RequireDragFeedbackRule extends SaropaLintRule {
   const RequireDragFeedbackRule() : super(code: _code);
 
@@ -5211,7 +5295,7 @@ class RequireDragFeedbackRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_drag_feedback',
     problemMessage:
-        '[require_drag_feedback] Draggable without a feedback widget shows no visual representation of the dragged item under the user finger/cursor. The original child disappears (replaced by childWhenDragging or nothing) while the drag area appears empty, making it impossible for the user to see what they are dragging or where to drop it.',
+        '[require_drag_feedback] Draggable without a feedback widget shows no visual representation of the dragged item under the user finger/cursor. The original child disappears (replaced by childWhenDragging or nothing) while the drag area appears empty, making it impossible for the user to see what they are dragging or where to drop it. {v4}',
     correctionMessage:
         'Add a feedback parameter with a widget representing the dragged item (e.g. a semi-transparent copy of the child or a Material-elevated card).',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -5246,6 +5330,8 @@ class RequireDragFeedbackRule extends SaropaLintRule {
 
 /// Warns when GestureDetector widgets are nested, causing gesture conflicts.
 ///
+/// Since: v1.4.2 | Updated: v4.13.0 | Rule version: v6
+///
 /// Nested GestureDetectors can cause unexpected behavior as gestures
 /// compete with each other.
 ///
@@ -5267,7 +5353,6 @@ class RequireDragFeedbackRule extends SaropaLintRule {
 ///   child: Content(),
 /// )
 /// ```
-
 class AvoidGestureConflictRule extends SaropaLintRule {
   const AvoidGestureConflictRule() : super(code: _code);
 
@@ -5284,7 +5369,7 @@ class AvoidGestureConflictRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_gesture_conflict',
     problemMessage:
-        '[avoid_gesture_conflict] Nested GestureDetector widgets compete in the gesture arena, causing unpredictable behavior where the inner detector wins some gestures and the outer wins others depending on timing. This leads to missed taps, swallowed swipes, and inconsistent interaction behavior that is difficult to debug.',
+        '[avoid_gesture_conflict] Nested GestureDetector widgets compete in the gesture arena, causing unpredictable behavior where the inner detector wins some gestures and the outer wins others depending on timing. This leads to missed taps, swallowed swipes, and inconsistent interaction behavior that is difficult to debug. {v6}',
     correctionMessage:
         'Consolidate gesture handling into a single GestureDetector, or use RawGestureDetector with a custom gesture factory to coordinate nested gesture recognition explicitly.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -5322,6 +5407,8 @@ class AvoidGestureConflictRule extends SaropaLintRule {
 
 /// Warns when large images are loaded without size constraints.
 ///
+/// Since: v1.4.2 | Updated: v4.13.0 | Rule version: v5
+///
 /// Loading large images without constraints wastes memory.
 ///
 /// **BAD:**
@@ -5338,14 +5425,13 @@ class AvoidGestureConflictRule extends SaropaLintRule {
 ///   cacheWidth: 300,
 /// )
 /// ```
-
 class AvoidLargeImagesInMemoryRule extends SaropaLintRule {
   const AvoidLargeImagesInMemoryRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
     name: 'avoid_large_images_in_memory',
     problemMessage:
-        '[avoid_large_images_in_memory] Image loaded without size constraints decodes at full resolution into GPU memory regardless of display size. A single uncompressed 4K image can consume 30-50 MB of memory, and lists of such images quickly exhaust available memory, causing OOM crashes on mobile devices.',
+        '[avoid_large_images_in_memory] Image loaded without size constraints decodes at full resolution into GPU memory regardless of display size. A single uncompressed 4K image can consume 30-50 MB of memory, and lists of such images quickly exhaust available memory, causing OOM crashes on mobile devices. {v5}',
     correctionMessage:
         'Add width/height to constrain display size and cacheWidth/cacheHeight to limit decode resolution. Set cacheWidth to displayWidth * devicePixelRatio.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -5392,6 +5478,8 @@ class AvoidLargeImagesInMemoryRule extends SaropaLintRule {
 
 /// Warns when LayoutBuilder is used inside a scrollable widget.
 ///
+/// Since: v1.4.2 | Updated: v4.13.0 | Rule version: v6
+///
 /// LayoutBuilder in a scrollable can cause performance issues as
 /// it rebuilds on every scroll.
 ///
@@ -5412,7 +5500,6 @@ class AvoidLargeImagesInMemoryRule extends SaropaLintRule {
 ///   ),
 /// )
 /// ```
-
 class PreferActionsAndShortcutsRule extends SaropaLintRule {
   const PreferActionsAndShortcutsRule() : super(code: _code);
 
@@ -5429,7 +5516,7 @@ class PreferActionsAndShortcutsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_actions_and_shortcuts',
     problemMessage:
-        '[prefer_actions_and_shortcuts] RawKeyboardListener requires manual key code matching and does not integrate with the Flutter intent system, making keyboard shortcuts invisible to accessibility tools and impossible to discover via keyboard shortcut overlays. The Actions/Shortcuts system provides composable, discoverable, and testable keyboard handling.',
+        '[prefer_actions_and_shortcuts] RawKeyboardListener requires manual key code matching and does not integrate with the Flutter intent system, making keyboard shortcuts invisible to accessibility tools and impossible to discover via keyboard shortcut overlays. The Actions/Shortcuts system provides composable, discoverable, and testable keyboard handling. {v6}',
     correctionMessage:
         'Replace with Shortcuts(shortcuts: {key: intent}, child: Actions(actions: {Intent: CallbackAction(...)}, child: ...)) for declarative keyboard handling.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -5454,6 +5541,8 @@ class PreferActionsAndShortcutsRule extends SaropaLintRule {
 
 /// Warns when GestureDetector doesn't handle long press for context menus.
 ///
+/// Since: v1.4.2 | Updated: v4.13.0 | Rule version: v3
+///
 /// Long press is a common pattern for showing context menus on mobile.
 ///
 /// **BAD:**
@@ -5472,14 +5561,13 @@ class PreferActionsAndShortcutsRule extends SaropaLintRule {
 ///   child: ListTile(...),
 /// )
 /// ```
-
 class RequireLongPressCallbackRule extends SaropaLintRule {
   const RequireLongPressCallbackRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
     name: 'require_long_press_callback',
     problemMessage:
-        '[require_long_press_callback] Interactive list item without onLongPress misses a standard mobile interaction pattern for secondary actions. Users expect long-press to reveal context menus, selection mode, or additional options. Omitting this leaves no discoverable path to bulk actions like delete, share, or move.',
+        '[require_long_press_callback] Interactive list item without onLongPress misses a standard mobile interaction pattern for secondary actions. Users expect long-press to reveal context menus, selection mode, or additional options. Omitting this leaves no discoverable path to bulk actions like delete, share, or move. {v3}',
     correctionMessage:
         'Add onLongPress callback to show a context menu (showMenu), enter selection mode, or trigger a bottom sheet with secondary actions for the item.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -5528,6 +5616,8 @@ class RequireLongPressCallbackRule extends SaropaLintRule {
 
 /// Warns when findChildIndexCallback is called in build method.
 ///
+/// Since: v1.4.2 | Updated: v4.13.0 | Rule version: v4
+///
 /// Creating a new callback in build causes unnecessary rebuilds.
 ///
 /// **BAD:**
@@ -5548,7 +5638,6 @@ class RequireLongPressCallbackRule extends SaropaLintRule {
 ///   itemBuilder: ...,
 /// )
 /// ```
-
 class AvoidFindChildInBuildRule extends SaropaLintRule {
   const AvoidFindChildInBuildRule() : super(code: _code);
 
@@ -5565,7 +5654,7 @@ class AvoidFindChildInBuildRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_find_child_in_build',
     problemMessage:
-        '[avoid_find_child_in_build] Creating findChildIndexCallback as a new closure inside the build method allocates a new function object on every rebuild. Since SliverChildBuilderDelegate uses this callback to optimize child reordering, a new instance defeats the identity check and forces unnecessary child lookups on every frame.',
+        '[avoid_find_child_in_build] Creating findChildIndexCallback as a new closure inside the build method allocates a new function object on every rebuild. Since SliverChildBuilderDelegate uses this callback to optimize child reordering, a new instance defeats the identity check and forces unnecessary child lookups on every frame. {v4}',
     correctionMessage:
         'Extract findChildIndexCallback to a final field, a static method, or a top-level function so the same instance is reused across rebuilds.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -5607,6 +5696,8 @@ class AvoidFindChildInBuildRule extends SaropaLintRule {
 
 /// Warns when Column/Row is used inside SingleChildScrollView without constraints.
 ///
+/// Since: v1.4.2 | Updated: v4.13.0 | Rule version: v4
+///
 /// Without proper constraints, Column/Row may have unbounded height/width.
 ///
 /// **BAD:**
@@ -5627,7 +5718,6 @@ class AvoidFindChildInBuildRule extends SaropaLintRule {
 ///   ),
 /// )
 /// ```
-
 class RequireErrorWidgetRule extends SaropaLintRule {
   const RequireErrorWidgetRule() : super(code: _code);
 
@@ -5644,7 +5734,7 @@ class RequireErrorWidgetRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_error_widget',
     problemMessage:
-        '[require_error_widget] FutureBuilder/StreamBuilder must handle error state to prevent silent failures, blank screens, or cryptic UI. Without error handling, users may see no feedback when data fails to load, leading to confusion, poor UX, and support burden. This can also mask backend or network issues during development.',
+        '[require_error_widget] FutureBuilder/StreamBuilder must handle error state to prevent silent failures, blank screens, or cryptic UI. Without error handling, users may see no feedback when data fails to load, leading to confusion, poor UX, and support burden. This can also mask backend or network issues during development. {v4}',
     correctionMessage:
         'Add error handling: if (snapshot.hasError) show a user-friendly error message or fallback UI. Log errors for diagnostics and provide actionable feedback to users. Audit all async builders for error handling coverage.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -5681,6 +5771,8 @@ class RequireErrorWidgetRule extends SaropaLintRule {
 
 /// Warns when AppBar is used inside CustomScrollView instead of SliverAppBar.
 ///
+/// Since: v1.4.2 | Updated: v4.13.0 | Rule version: v3
+///
 /// SliverAppBar enables collapsing/expanding behavior in scroll views.
 ///
 /// **BAD:**
@@ -5702,14 +5794,13 @@ class RequireErrorWidgetRule extends SaropaLintRule {
 ///   ],
 /// )
 /// ```
-
 class RequireFormValidationRule extends SaropaLintRule {
   const RequireFormValidationRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
     name: 'require_form_validation',
     problemMessage:
-        '[require_form_validation] TextFormField inside a Form without a validator function bypasses the form validation pipeline entirely. Calling formKey.currentState.validate() will always return true for this field, allowing invalid or empty input to reach the backend, causing data integrity issues and poor user feedback.',
+        '[require_form_validation] TextFormField inside a Form without a validator function bypasses the form validation pipeline entirely. Calling formKey.currentState.validate() will always return true for this field, allowing invalid or empty input to reach the backend, causing data integrity issues and poor user feedback. {v3}',
     correctionMessage:
         'Add a validator parameter (e.g. validator: (value) => value?.isEmpty ?? true ? \"Required field\" : null) to participate in Form.validate() calls.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -5761,6 +5852,8 @@ class RequireFormValidationRule extends SaropaLintRule {
 
 /// Warns when ListView/GridView uses `shrinkWrap: true` inside a scrollable.
 ///
+/// Since: v1.6.0 | Updated: v4.13.0 | Rule version: v4
+///
 /// Using `shrinkWrap: true` forces the list to calculate the size of all
 /// children at once, which defeats lazy loading and causes O(n) layout cost.
 /// This is particularly problematic for large lists.
@@ -5790,7 +5883,6 @@ class RequireFormValidationRule extends SaropaLintRule {
 ///   ],
 /// )
 /// ```
-
 class RequireThemeColorFromSchemeRule extends SaropaLintRule {
   const RequireThemeColorFromSchemeRule() : super(code: _code);
 
@@ -5807,7 +5899,7 @@ class RequireThemeColorFromSchemeRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_theme_color_from_scheme',
     problemMessage:
-        '[require_theme_color_from_scheme] Hardcoded Color value (e.g. Colors.blue, Color(0xFF...)) does not adapt to light/dark theme, high-contrast mode, or dynamic color (Material You). This breaks theming consistency and accessibility, as the color may become unreadable against the themed background in alternate modes.',
+        '[require_theme_color_from_scheme] Hardcoded Color value (e.g. Colors.blue, Color(0xFF...)) does not adapt to light/dark theme, high-contrast mode, or dynamic color (Material You). This breaks theming consistency and accessibility, as the color may become unreadable against the themed background in alternate modes. {v4}',
     correctionMessage:
         'Replace with Theme.of(context).colorScheme.primary, .secondary, .surface, .onSurface, etc. to use theme-aware colors that adapt to light/dark mode automatically.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -5872,6 +5964,8 @@ class RequireThemeColorFromSchemeRule extends SaropaLintRule {
 
 /// Warns when ColorScheme is created manually instead of using fromSeed.
 ///
+/// Since: v1.6.0 | Updated: v4.13.0 | Rule version: v4
+///
 /// ColorScheme.fromSeed generates a harmonious, accessible color palette
 /// from a single seed color. Manual ColorScheme is error-prone and often
 /// has accessibility issues.
@@ -5893,7 +5987,6 @@ class RequireThemeColorFromSchemeRule extends SaropaLintRule {
 ///   brightness: Brightness.light,
 /// )
 /// ```
-
 class PreferColorSchemeFromSeedRule extends SaropaLintRule {
   const PreferColorSchemeFromSeedRule() : super(code: _code);
 
@@ -5910,7 +6003,7 @@ class PreferColorSchemeFromSeedRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_color_scheme_from_seed',
     problemMessage:
-        '[prefer_color_scheme_from_seed] Manually constructing a ColorScheme requires specifying 20+ color roles with correct contrast ratios. Missing or mismatched colors cause poor contrast, invisible text, or WCAG accessibility failures. ColorScheme.fromSeed algorithmically generates all roles from a single seed color with guaranteed accessibility compliance.',
+        '[prefer_color_scheme_from_seed] Manually constructing a ColorScheme requires specifying 20+ color roles with correct contrast ratios. Missing or mismatched colors cause poor contrast, invisible text, or WCAG accessibility failures. ColorScheme.fromSeed algorithmically generates all roles from a single seed color with guaranteed accessibility compliance. {v4}',
     correctionMessage:
         'Replace the manual ColorScheme constructor with ColorScheme.fromSeed(seedColor: primaryColor) to generate a complete, accessible palette automatically.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -5960,6 +6053,8 @@ class PreferColorSchemeFromSeedRule extends SaropaLintRule {
 
 /// Warns when multiple adjacent Text widgets could use Text.rich or RichText.
 ///
+/// Since: v1.6.0 | Updated: v4.13.0 | Rule version: v4
+///
 /// Multiple Text widgets in a Row or Wrap for styled text is inefficient.
 /// Use Text.rich with TextSpan children for mixed styling.
 ///
@@ -5986,7 +6081,6 @@ class PreferColorSchemeFromSeedRule extends SaropaLintRule {
 ///   ),
 /// )
 /// ```
-
 class PreferRichTextForComplexRule extends SaropaLintRule {
   const PreferRichTextForComplexRule() : super(code: _code);
 
@@ -6003,7 +6097,7 @@ class PreferRichTextForComplexRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_rich_text_for_complex',
     problemMessage:
-        '[prefer_rich_text_for_complex] Multiple Text widgets in a Row create separate text layout blocks that cannot wrap as a single paragraph. If the combined text exceeds the available width, each Text clips or overflows independently instead of wrapping naturally. Text.rich with multiple TextSpan children lays out as a single text block with proper line wrapping.',
+        '[prefer_rich_text_for_complex] Multiple Text widgets in a Row create separate text layout blocks that cannot wrap as a single paragraph. If the combined text exceeds the available width, each Text clips or overflows independently instead of wrapping naturally. Text.rich with multiple TextSpan children lays out as a single text block with proper line wrapping. {v4}',
     correctionMessage:
         'Replace the Row of Text widgets with a single Text.rich(TextSpan(children: [TextSpan(...), TextSpan(...)])) for unified text layout and natural line wrapping.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -6053,6 +6147,8 @@ class PreferRichTextForComplexRule extends SaropaLintRule {
 
 /// Warns when ThemeMode is hardcoded instead of using system default.
 ///
+/// Since: v1.7.2 | Updated: v4.13.0 | Rule version: v3
+///
 /// Using ThemeMode.light or ThemeMode.dark ignores user's OS preference.
 /// Default to ThemeMode.system to respect user settings, with option to override.
 ///
@@ -6073,7 +6169,6 @@ class PreferRichTextForComplexRule extends SaropaLintRule {
 ///   themeMode: userThemePreference ?? ThemeMode.system,
 /// )
 /// ```
-
 class PreferSystemThemeDefaultRule extends SaropaLintRule {
   const PreferSystemThemeDefaultRule() : super(code: _code);
 
@@ -6090,7 +6185,7 @@ class PreferSystemThemeDefaultRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_system_theme_default',
     problemMessage:
-        '[prefer_system_theme_default] Hardcoded ThemeMode ignores user\'s OS dark mode preference. Using ThemeMode.light or ThemeMode.dark ignores user\'s OS preference. Default to ThemeMode.system to respect user settings, with option to override.',
+        '[prefer_system_theme_default] Hardcoded ThemeMode ignores user\'s OS dark mode preference. Using ThemeMode.light or ThemeMode.dark ignores user\'s OS preference. Default to ThemeMode.system to respect user settings, with option to override. {v3}',
     correctionMessage:
         'Use ThemeMode.system as default to respect user settings. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -6144,6 +6239,8 @@ class PreferSystemThemeDefaultRule extends SaropaLintRule {
 
 /// Warns when AbsorbPointer is used (often IgnorePointer is more appropriate).
 ///
+/// Since: v2.3.3 | Updated: v4.13.0 | Rule version: v2
+///
 /// AbsorbPointer blocks ALL touch events including scrolling. IgnorePointer
 /// allows events to pass through to widgets behind. AbsorbPointer is rarely
 /// the correct choice.
@@ -6169,14 +6266,13 @@ class PreferSystemThemeDefaultRule extends SaropaLintRule {
 ///   child: OverlayBlocker(),
 /// )
 /// ```
-
 class AvoidBrightnessCheckForThemeRule extends SaropaLintRule {
   const AvoidBrightnessCheckForThemeRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
     name: 'avoid_brightness_check_for_theme',
     problemMessage:
-        '[avoid_brightness_check_for_theme] Manually checking Theme.of(context).brightness to pick light/dark colors bypasses the colorScheme system, which already provides semantically correct colors for each theme mode. Brightness checks are fragile, miss high-contrast mode, and scatter color logic throughout the codebase instead of centralizing it in the theme.',
+        '[avoid_brightness_check_for_theme] Manually checking Theme.of(context).brightness to pick light/dark colors bypasses the colorScheme system, which already provides semantically correct colors for each theme mode. Brightness checks are fragile, miss high-contrast mode, and scatter color logic throughout the codebase instead of centralizing it in the theme. {v2}',
     correctionMessage:
         'Replace brightness-conditional colors with colorScheme properties (e.g. colorScheme.onSurface, colorScheme.surface) that automatically adapt to light, dark, and high-contrast modes.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -6205,6 +6301,8 @@ class AvoidBrightnessCheckForThemeRule extends SaropaLintRule {
 }
 
 /// Warns when Scaffold body doesn't handle safe areas.
+///
+/// Since: v2.3.3 | Updated: v4.13.0 | Rule version: v2
 ///
 /// Notches, home indicators, and rounded corners clip content. Scaffold
 /// body should use SafeArea or handle MediaQuery.padding appropriately.
@@ -6235,14 +6333,13 @@ class AvoidBrightnessCheckForThemeRule extends SaropaLintRule {
 ///   ),
 /// )
 /// ```
-
 class RequireSafeAreaHandlingRule extends SaropaLintRule {
   const RequireSafeAreaHandlingRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
     name: 'require_safe_area_handling',
     problemMessage:
-        '[require_safe_area_handling] Scaffold body without safe area handling allows content to render behind device notches, camera cutouts, rounded corners, and home indicators. On modern devices with non-rectangular displays, this causes text and interactive elements to be obscured or unreachable.',
+        '[require_safe_area_handling] Scaffold body without safe area handling allows content to render behind device notches, camera cutouts, rounded corners, and home indicators. On modern devices with non-rectangular displays, this causes text and interactive elements to be obscured or unreachable. {v2}',
     correctionMessage:
         'Wrap the Scaffold body with SafeArea, or use MediaQuery.paddingOf(context) to manually inset content away from system UI intrusions.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -6316,6 +6413,8 @@ class RequireSafeAreaHandlingRule extends SaropaLintRule {
 
 /// Warns when Material widgets are used that have Cupertino equivalents.
 ///
+/// Since: v2.3.3 | Updated: v4.13.0 | Rule version: v2
+///
 /// Material widgets look foreign on iOS. Use Cupertino equivalents or
 /// adaptive widgets for native iOS feel.
 ///
@@ -6343,7 +6442,6 @@ class RequireSafeAreaHandlingRule extends SaropaLintRule {
 /// // Or use adaptive widgets
 /// showAdaptiveDialog(...);
 /// ```
-
 class PreferCupertinoForIosFeelRule extends SaropaLintRule {
   const PreferCupertinoForIosFeelRule() : super(code: _code);
 
@@ -6361,7 +6459,7 @@ class PreferCupertinoForIosFeelRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_cupertino_for_ios_feel',
     problemMessage:
-        '[prefer_cupertino_for_ios_feel] Material widget has Cupertino equivalent for native iOS feel. Material widgets look foreign on iOS. Use Cupertino equivalents or adaptive widgets for native iOS feel.',
+        '[prefer_cupertino_for_ios_feel] Material widget has Cupertino equivalent for native iOS feel. Material widgets look foreign on iOS. Use Cupertino equivalents or adaptive widgets for native iOS feel. {v2}',
     correctionMessage:
         'Use the Cupertino equivalent (e.g. CupertinoAlertDialog, CupertinoButton) or an adaptive widget (.adaptive constructor) to provide native iOS look and feel.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -6399,6 +6497,8 @@ class PreferCupertinoForIosFeelRule extends SaropaLintRule {
 
 /// Warns when desktop apps don't set window size constraints.
 ///
+/// Since: v1.7.2 | Updated: v4.13.0 | Rule version: v2
+///
 /// Desktop apps need minimum window size to prevent unusable layouts.
 /// Set constraints in main() or platform runner.
 ///
@@ -6418,7 +6518,6 @@ class PreferCupertinoForIosFeelRule extends SaropaLintRule {
 ///   runApp(MyDesktopApp());
 /// }
 /// ```
-
 class RequireWindowSizeConstraintsRule extends SaropaLintRule {
   const RequireWindowSizeConstraintsRule() : super(code: _code);
 
@@ -6436,7 +6535,7 @@ class RequireWindowSizeConstraintsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_window_size_constraints',
     problemMessage:
-        '[require_window_size_constraints] Desktop app without minimum window size allows users to resize the window below the minimum layout dimensions, causing text overflow, clipped buttons, and broken layouts. Setting a minimum size prevents the window from reaching dimensions where the UI cannot function properly.',
+        '[require_window_size_constraints] Desktop app without minimum window size allows users to resize the window below the minimum layout dimensions, causing text overflow, clipped buttons, and broken layouts. Setting a minimum size prevents the window from reaching dimensions where the UI cannot function properly. {v2}',
     correctionMessage:
         'Use the window_manager package to call setMinimumSize(Size(minWidth, minHeight)) during app initialization, based on your minimum supported layout dimensions.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -6483,6 +6582,8 @@ class RequireWindowSizeConstraintsRule extends SaropaLintRule {
 
 /// Warns when desktop apps lack keyboard shortcuts.
 ///
+/// Since: v2.3.3 | Updated: v4.13.0 | Rule version: v2
+///
 /// Desktop users expect Ctrl+S, Ctrl+Z, etc. Implement Shortcuts and
 /// Actions for standard keyboard interactions.
 ///
@@ -6514,7 +6615,6 @@ class RequireWindowSizeConstraintsRule extends SaropaLintRule {
 ///   }
 /// }
 /// ```
-
 class PreferKeyboardShortcutsRule extends SaropaLintRule {
   const PreferKeyboardShortcutsRule() : super(code: _code);
 
@@ -6532,7 +6632,7 @@ class PreferKeyboardShortcutsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_keyboard_shortcuts',
     problemMessage:
-        '[prefer_keyboard_shortcuts] Desktop app should implement keyboard shortcuts for common actions. Desktop users expect Ctrl+S, Ctrl+Z, etc. Implement Shortcuts and Actions for standard keyboard interactions.',
+        '[prefer_keyboard_shortcuts] Desktop app should implement keyboard shortcuts for common actions. Desktop users expect Ctrl+S, Ctrl+Z, etc. Implement Shortcuts and Actions for standard keyboard interactions. {v2}',
     correctionMessage:
         'Add Shortcuts and Actions widgets for standard keyboard shortcuts (Ctrl+S save, Ctrl+Z undo, Ctrl+C copy, etc.) to match desktop user expectations.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -6578,6 +6678,8 @@ class PreferKeyboardShortcutsRule extends SaropaLintRule {
 
 /// Warns when methods return nullable Widget? types.
 ///
+/// Since: v2.3.3 | Updated: v4.13.0 | Rule version: v2
+///
 /// Methods returning `Widget?` are often better implemented as:
 /// - Returning an empty SizedBox or Container when nothing should render
 /// - Using conditional rendering in the parent widget
@@ -6622,7 +6724,6 @@ class PreferKeyboardShortcutsRule extends SaropaLintRule {
 ///   );
 /// }
 /// ```
-
 class AvoidNullableWidgetMethodsRule extends SaropaLintRule {
   const AvoidNullableWidgetMethodsRule() : super(code: _code);
 
@@ -6639,7 +6740,7 @@ class AvoidNullableWidgetMethodsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_nullable_widget_methods',
     problemMessage:
-        '[avoid_nullable_widget_methods] A method returning Widget? forces every call site to handle the null case, which clutters the widget tree with null checks and ternary expressions. Nullable widget returns also break composability because parent widgets expecting a non-null child cannot directly use the result. Returning a placeholder widget such as SizedBox.shrink() for empty states keeps the return type non-nullable and makes the widget tree consistent and predictable.',
+        '[avoid_nullable_widget_methods] A method returning Widget? forces every call site to handle the null case, which clutters the widget tree with null checks and ternary expressions. Nullable widget returns also break composability because parent widgets expecting a non-null child cannot directly use the result. Returning a placeholder widget such as SizedBox.shrink() for empty states keeps the return type non-nullable and makes the widget tree consistent and predictable. {v2}',
     correctionMessage:
         'Return SizedBox.shrink() instead of null for empty states, or move the null check to the call site using conditional rendering (e.g. if (show) widget else SizedBox.shrink()).',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -6688,6 +6789,8 @@ class AvoidNullableWidgetMethodsRule extends SaropaLintRule {
 
 /// Warns when OverflowBox is used without a comment explaining why.
 ///
+/// Since: v2.0.0 | Updated: v4.13.0 | Rule version: v2
+///
 /// OverflowBox allows children to overflow parent bounds, which can cause
 /// visual glitches. Require a comment explaining why overflow is intentional.
 ///
@@ -6707,7 +6810,6 @@ class AvoidNullableWidgetMethodsRule extends SaropaLintRule {
 ///   child: MyWidget(),
 /// )
 /// ```
-
 class PreferActionButtonTooltipRule extends SaropaLintRule {
   const PreferActionButtonTooltipRule() : super(code: _code);
 
@@ -6724,7 +6826,7 @@ class PreferActionButtonTooltipRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_action_button_tooltip',
     problemMessage:
-        '[prefer_action_button_tooltip] IconButton without a tooltip is inaccessible to screen reader users who cannot see the icon and have no text description of the button action. Tooltips also appear on long-press (mobile) and hover (desktop), providing discoverability for all users, not just those using assistive technology.',
+        '[prefer_action_button_tooltip] IconButton without a tooltip is inaccessible to screen reader users who cannot see the icon and have no text description of the button action. Tooltips also appear on long-press (mobile) and hover (desktop), providing discoverability for all users, not just those using assistive technology. {v2}',
     correctionMessage:
         'Add tooltip: \"Description of action\" to the IconButton so screen readers can announce the button purpose and hover/long-press shows a label.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -6766,6 +6868,8 @@ class PreferActionButtonTooltipRule extends SaropaLintRule {
 
 /// Warns when void Function() is used instead of VoidCallback typedef.
 ///
+/// Since: v2.0.0 | Updated: v4.13.0 | Rule version: v2
+///
 /// Using VoidCallback typedef is cleaner and more conventional in Flutter.
 ///
 /// ### Example
@@ -6781,7 +6885,6 @@ class PreferActionButtonTooltipRule extends SaropaLintRule {
 /// final VoidCallback onPressed;
 /// void doSomething(VoidCallback callback) {}
 /// ```
-
 class PreferVoidCallbackRule extends SaropaLintRule {
   const PreferVoidCallbackRule() : super(code: _code);
 
@@ -6799,7 +6902,7 @@ class PreferVoidCallbackRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_void_callback',
     problemMessage:
-        '[prefer_void_callback] Use VoidCallback instead of void Function(). Using VoidCallback typedef is cleaner and more conventional in Flutter.',
+        '[prefer_void_callback] Use VoidCallback instead of void Function(). Using VoidCallback typedef is cleaner and more conventional in Flutter. {v2}',
     correctionMessage:
         'Replace void Function() with VoidCallback for consistency. Use ValueChanged<T> for void Function(T) and ValueGetter<T> for T Function().',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -6864,6 +6967,8 @@ class _ReplaceWithVoidCallbackFix extends DartFix {
 
 /// Warns when InheritedWidget doesn't override updateShouldNotify.
 ///
+/// Since: v2.1.0 | Updated: v4.13.0 | Rule version: v3
+///
 /// Without updateShouldNotify, dependent widgets rebuild on every
 /// ancestor rebuild, even when the inherited data hasn't changed.
 ///
@@ -6890,7 +6995,6 @@ class _ReplaceWithVoidCallbackFix extends DartFix {
 ///   }
 /// }
 /// ```
-
 class RequireOrientationHandlingRule extends SaropaLintRule {
   const RequireOrientationHandlingRule() : super(code: _code);
 
@@ -6907,7 +7011,7 @@ class RequireOrientationHandlingRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_orientation_handling',
     problemMessage:
-        '[require_orientation_handling] MaterialApp without orientation handling. May break in landscape. This widget pattern increases complexity and makes the widget tree harder to maintain and debug.',
+        '[require_orientation_handling] MaterialApp without orientation handling. May break in landscape. This widget pattern increases complexity and makes the widget tree harder to maintain and debug. {v3}',
     correctionMessage:
         'Call SystemChrome.setPreferredOrientations in main() to lock orientation, or use OrientationBuilder/LayoutBuilder to provide responsive layouts for both portrait and landscape.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -6953,6 +7057,8 @@ class RequireOrientationHandlingRule extends SaropaLintRule {
 
 /// Warns when dispose() method doesn't call super.dispose().
 ///
+/// Since: v2.3.3 | Updated: v4.13.0 | Rule version: v2
+///
 /// Alias: missing_super_dispose, super_dispose_required
 ///
 /// In `State<T>` subclasses, dispose() must call super.dispose() to ensure
@@ -6978,7 +7084,6 @@ class RequireOrientationHandlingRule extends SaropaLintRule {
 ///   }
 /// }
 /// ```
-
 class AvoidNavigationInBuildRule extends SaropaLintRule {
   const AvoidNavigationInBuildRule() : super(code: _code);
 
@@ -6995,7 +7100,7 @@ class AvoidNavigationInBuildRule extends SaropaLintRule {
     name: 'avoid_navigation_in_build',
     problemMessage:
         '[avoid_navigation_in_build] Navigation in build() triggers during '
-        'rebuild, causing infinite navigation loops or flickering screens.',
+        'rebuild, causing infinite navigation loops or flickering screens. {v2}',
     correctionMessage:
         'Use WidgetsBinding.instance.addPostFrameCallback or move to callback.',
     errorSeverity: DiagnosticSeverity.ERROR,
@@ -7067,6 +7172,8 @@ class AvoidNavigationInBuildRule extends SaropaLintRule {
 
 /// Warns when TextFormField is used without a Form ancestor.
 ///
+/// Since: v2.3.3 | Updated: v4.13.0 | Rule version: v2
+///
 /// Alias: text_form_field_without_form, orphan_text_form_field
 ///
 /// TextFormField features like validation only work inside a Form widget.
@@ -7095,7 +7202,6 @@ class AvoidNavigationInBuildRule extends SaropaLintRule {
 ///
 /// **Note:** This rule uses heuristic detection since Form widgets may be
 /// defined in parent files.
-
 class RequireTextFormFieldInFormRule extends SaropaLintRule {
   const RequireTextFormFieldInFormRule() : super(code: _code);
 
@@ -7111,7 +7217,7 @@ class RequireTextFormFieldInFormRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_text_form_field_in_form',
     problemMessage:
-        '[require_text_form_field_in_form] TextFormField outside a Form ancestor cannot participate in form-level validation. Calling formKey.currentState.validate() will not reach this field, and its validator callback will never execute. The field behaves identically to a plain TextField but misleads readers into thinking validation is wired up.',
+        '[require_text_form_field_in_form] TextFormField outside a Form ancestor cannot participate in form-level validation. Calling formKey.currentState.validate() will not reach this field, and its validator callback will never execute. The field behaves identically to a plain TextField but misleads readers into thinking validation is wired up. {v2}',
     correctionMessage:
         'Wrap the TextFormField and its siblings in a Form widget with a GlobalKey<FormState>, or replace it with TextField if form-level validation is not needed.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -7166,6 +7272,8 @@ class RequireTextFormFieldInFormRule extends SaropaLintRule {
 
 /// Warns when WebView is used without navigationDelegate.
 ///
+/// Since: v2.3.3 | Updated: v4.13.0 | Rule version: v3
+///
 /// Alias: webview_missing_navigation_delegate, insecure_webview
 ///
 /// WebView without navigationDelegate can navigate to any URL, which is
@@ -7191,7 +7299,6 @@ class RequireTextFormFieldInFormRule extends SaropaLintRule {
 ///   },
 /// )
 /// ```
-
 class RequireWebViewNavigationDelegateRule extends SaropaLintRule {
   const RequireWebViewNavigationDelegateRule() : super(code: _code);
 
@@ -7208,7 +7315,7 @@ class RequireWebViewNavigationDelegateRule extends SaropaLintRule {
     name: 'require_webview_navigation_delegate',
     problemMessage:
         '[require_webview_navigation_delegate] Without navigation delegate, '
-        'WebView can navigate to malicious or phishing sites.',
+        'WebView can navigate to malicious or phishing sites. {v3}',
     correctionMessage:
         'Add navigationDelegate to validate URLs before navigation.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -7258,6 +7365,8 @@ class RequireWebViewNavigationDelegateRule extends SaropaLintRule {
 
 /// Warns when nested scrollables don't have NeverScrollableScrollPhysics.
 ///
+/// Since: v2.3.3 | Updated: v4.13.0 | Rule version: v2
+///
 /// Alias: nested_scroll_physics, scroll_conflict
 ///
 /// When one scrollable is inside another, the inner one should usually
@@ -7287,7 +7396,6 @@ class RequireWebViewNavigationDelegateRule extends SaropaLintRule {
 ///   ],
 /// )
 /// ```
-
 class RequireAnimatedBuilderChildRule extends SaropaLintRule {
   const RequireAnimatedBuilderChildRule() : super(code: _code);
 
@@ -7303,7 +7411,7 @@ class RequireAnimatedBuilderChildRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_animated_builder_child',
     problemMessage:
-        '[require_animated_builder_child] AnimatedBuilder without a child parameter rebuilds the entire subtree on every animation frame. Static widgets that do not depend on the animation value are needlessly reconstructed 60 times per second, wasting CPU cycles and causing jank in complex widget trees.',
+        '[require_animated_builder_child] AnimatedBuilder without a child parameter rebuilds the entire subtree on every animation frame. Static widgets that do not depend on the animation value are needlessly reconstructed 60 times per second, wasting CPU cycles and causing jank in complex widget trees. {v2}',
     correctionMessage:
         'Move static widgets to the child parameter of AnimatedBuilder. The child is built once and passed to the builder callback, avoiding reconstruction on each frame.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -7338,6 +7446,8 @@ class RequireAnimatedBuilderChildRule extends SaropaLintRule {
 
 /// Warns when `throw e` is used instead of `rethrow`.
 ///
+/// Since: v2.4.0 | Updated: v4.13.0 | Rule version: v2
+///
 /// Alias: use_rethrow
 ///
 /// `throw e` loses the original stack trace. Use `rethrow` to preserve it.
@@ -7361,7 +7471,6 @@ class RequireAnimatedBuilderChildRule extends SaropaLintRule {
 ///   rethrow;  // Preserves stack trace
 /// }
 /// ```
-
 class RequireRethrowPreserveStackRule extends SaropaLintRule {
   const RequireRethrowPreserveStackRule() : super(code: _code);
 
@@ -7377,7 +7486,7 @@ class RequireRethrowPreserveStackRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_rethrow_preserve_stack',
     problemMessage:
-        '[require_rethrow_preserve_stack] Using \"throw e\" in a catch block creates a new stack trace starting from the throw site, discarding the original stack trace that shows where the error actually occurred. This makes debugging significantly harder because the error origin is lost. The rethrow keyword preserves the original stack trace.',
+        '[require_rethrow_preserve_stack] Using \"throw e\" in a catch block creates a new stack trace starting from the throw site, discarding the original stack trace that shows where the error actually occurred. This makes debugging significantly harder because the error origin is lost. The rethrow keyword preserves the original stack trace. {v2}',
     correctionMessage:
         'Replace \"throw e\" with \"rethrow\" to preserve the original stack trace. If you need to wrap the error, throw a new exception with the original as the cause.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -7420,6 +7529,8 @@ class RequireRethrowPreserveStackRule extends SaropaLintRule {
 
 /// Warns when http:// URLs are used in network calls.
 ///
+/// Since: v4.13.0 | Rule version: v1
+///
 /// Alias: insecure_http, require_https
 ///
 /// HTTP is insecure. Always use HTTPS for network requests.
@@ -7433,7 +7544,6 @@ class RequireRethrowPreserveStackRule extends SaropaLintRule {
 /// ```dart
 /// final response = await http.get(Uri.parse('https://api.example.com/data'));
 /// ```
-
 class RequireHttpsOverHttpRule extends SaropaLintRule {
   const RequireHttpsOverHttpRule() : super(code: _code);
 
@@ -7450,7 +7560,7 @@ class RequireHttpsOverHttpRule extends SaropaLintRule {
     name: 'require_https_over_http',
     problemMessage:
         '[require_https_over_http] HTTP transmits data in plain text. '
-        'Attackers can intercept credentials, tokens, and user data.',
+        'Attackers can intercept credentials, tokens, and user data. {v1}',
     correctionMessage: 'Replace http:// with https://.',
     errorSeverity: DiagnosticSeverity.ERROR,
   );
@@ -7476,6 +7586,8 @@ class RequireHttpsOverHttpRule extends SaropaLintRule {
 
 /// Warns when ws:// URLs are used for WebSocket connections.
 ///
+/// Since: v4.13.0 | Rule version: v1
+///
 /// Alias: insecure_websocket, require_wss
 ///
 /// ws:// is insecure. Always use wss:// for WebSocket connections.
@@ -7489,7 +7601,6 @@ class RequireHttpsOverHttpRule extends SaropaLintRule {
 /// ```dart
 /// final channel = WebSocketChannel.connect(Uri.parse('wss://api.example.com'));
 /// ```
-
 class RequireWssOverWsRule extends SaropaLintRule {
   const RequireWssOverWsRule() : super(code: _code);
 
@@ -7506,7 +7617,7 @@ class RequireWssOverWsRule extends SaropaLintRule {
     name: 'require_wss_over_ws',
     problemMessage:
         '[require_wss_over_ws] ws:// transmits data unencrypted. Attackers '
-        'can intercept, read, and modify WebSocket messages in transit.',
+        'can intercept, read, and modify WebSocket messages in transit. {v1}',
     correctionMessage: 'Replace ws:// with wss://.',
     errorSeverity: DiagnosticSeverity.ERROR,
   );
@@ -7531,6 +7642,8 @@ class RequireWssOverWsRule extends SaropaLintRule {
 }
 
 /// Warns when `late` is used without guaranteed initialization.
+///
+/// Since: v2.3.3 | Updated: v4.13.0 | Rule version: v2
 ///
 /// Alias: unsafe_late, late_init_risk
 ///
@@ -7563,7 +7676,6 @@ class RequireWssOverWsRule extends SaropaLintRule {
 ///   }
 /// }
 /// ```
-
 class AvoidLateWithoutGuaranteeRule extends SaropaLintRule {
   const AvoidLateWithoutGuaranteeRule() : super(code: _code);
 
@@ -7579,7 +7691,7 @@ class AvoidLateWithoutGuaranteeRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_late_without_guarantee',
     problemMessage:
-        '[avoid_late_without_guarantee] late field throws a LateInitializationError at runtime if accessed before assignment, and Dart provides no compile-time guarantee that initialization has occurred. This creates a hidden crash risk that is difficult to catch in testing and may only surface in specific user flows or edge cases.',
+        '[avoid_late_without_guarantee] late field throws a LateInitializationError at runtime if accessed before assignment, and Dart provides no compile-time guarantee that initialization has occurred. This creates a hidden crash risk that is difficult to catch in testing and may only surface in specific user flows or edge cases. {v2}',
     correctionMessage:
         'Use a nullable type with null checks for fields that may not be initialized, or ensure initialization in the constructor or initState where the framework guarantees execution order.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -7642,6 +7754,8 @@ class AvoidLateWithoutGuaranteeRule extends SaropaLintRule {
 
 /// Reminder to add NSPhotoLibraryUsageDescription for image_picker on iOS.
 ///
+/// Since: v2.3.3 | Updated: v4.13.0 | Rule version: v3
+///
 /// Alias: ios_photo_permission, image_picker_plist
 ///
 /// image_picker requires Info.plist entries on iOS.
@@ -7653,7 +7767,6 @@ class AvoidLateWithoutGuaranteeRule extends SaropaLintRule {
 /// <key>NSCameraUsageDescription</key>
 /// <string>App needs camera access</string>
 /// ```
-
 class RequireImagePickerPermissionIosRule extends SaropaLintRule {
   const RequireImagePickerPermissionIosRule() : super(code: _code);
 
@@ -7670,7 +7783,7 @@ class RequireImagePickerPermissionIosRule extends SaropaLintRule {
     name: 'require_image_picker_permission_ios',
     problemMessage:
         '[require_image_picker_permission_ios] Missing Info.plist entries cause '
-        'app rejection by App Store or instant crash when accessing photos.',
+        'app rejection by App Store or instant crash when accessing photos. {v3}',
     correctionMessage:
         'Add NSPhotoLibraryUsageDescription and NSCameraUsageDescription to Info.plist.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -7699,6 +7812,8 @@ class RequireImagePickerPermissionIosRule extends SaropaLintRule {
 
 /// Reminder to add camera permission for image_picker on Android.
 ///
+/// Since: v2.3.3 | Updated: v4.13.0 | Rule version: v3
+///
 /// Alias: android_camera_permission, image_picker_manifest
 ///
 /// Camera access requires AndroidManifest.xml entry.
@@ -7707,7 +7822,6 @@ class RequireImagePickerPermissionIosRule extends SaropaLintRule {
 /// ```xml
 /// <uses-permission android:name="android.permission.CAMERA"/>
 /// ```
-
 class RequireImagePickerPermissionAndroidRule extends SaropaLintRule {
   const RequireImagePickerPermissionAndroidRule() : super(code: _code);
 
@@ -7724,7 +7838,7 @@ class RequireImagePickerPermissionAndroidRule extends SaropaLintRule {
     name: 'require_image_picker_permission_android',
     problemMessage:
         '[require_image_picker_permission_android] Missing CAMERA permission '
-        'causes SecurityException crash when user tries to take a photo.',
+        'causes SecurityException crash when user tries to take a photo. {v3}',
     correctionMessage:
         'Add <uses-permission android:name="android.permission.CAMERA"/> to manifest.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -7753,6 +7867,8 @@ class RequireImagePickerPermissionAndroidRule extends SaropaLintRule {
 
 /// Reminder to add manifest entry for runtime permissions.
 ///
+/// Since: v2.3.3 | Updated: v4.13.0 | Rule version: v3
+///
 /// Alias: android_manifest_permission, permission_handler_manifest
 ///
 /// Runtime permissions require manifest declaration on Android.
@@ -7762,7 +7878,6 @@ class RequireImagePickerPermissionAndroidRule extends SaropaLintRule {
 /// <uses-permission android:name="android.permission.CAMERA"/>
 /// <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
 /// ```
-
 class RequirePermissionManifestAndroidRule extends SaropaLintRule {
   const RequirePermissionManifestAndroidRule() : super(code: _code);
 
@@ -7779,7 +7894,7 @@ class RequirePermissionManifestAndroidRule extends SaropaLintRule {
     name: 'require_permission_manifest_android',
     problemMessage:
         '[require_permission_manifest_android] Runtime permission request without '
-        'manifest entry always fails. Feature silently stops working.',
+        'manifest entry always fails. Feature silently stops working. {v3}',
     correctionMessage:
         'Add <uses-permission android:name="android.permission.XXX"/> to manifest.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -7807,6 +7922,8 @@ class RequirePermissionManifestAndroidRule extends SaropaLintRule {
 
 /// Reminder to add Info.plist entries for iOS permissions.
 ///
+/// Since: v2.3.3 | Updated: v4.13.0 | Rule version: v3
+///
 /// Alias: ios_plist_permission, permission_handler_plist
 ///
 /// iOS permissions require Info.plist usage description strings.
@@ -7816,7 +7933,6 @@ class RequirePermissionManifestAndroidRule extends SaropaLintRule {
 /// <key>NSCameraUsageDescription</key>
 /// <string>Camera access for photo capture</string>
 /// ```
-
 class RequirePermissionPlistIosRule extends SaropaLintRule {
   const RequirePermissionPlistIosRule() : super(code: _code);
 
@@ -7833,7 +7949,7 @@ class RequirePermissionPlistIosRule extends SaropaLintRule {
     name: 'require_permission_plist_ios',
     problemMessage:
         '[require_permission_plist_ios] iOS requires usage descriptions in '
-        'Info.plist. App crashes or gets rejected from App Store without them.',
+        'Info.plist. App crashes or gets rejected from App Store without them. {v3}',
     correctionMessage:
         'Add NSxxxUsageDescription key to Info.plist for each permission.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -7861,6 +7977,8 @@ class RequirePermissionPlistIosRule extends SaropaLintRule {
 
 /// Reminder to add queries element for url_launcher on Android 11+.
 ///
+/// Since: v2.3.3 | Updated: v4.13.0 | Rule version: v3
+///
 /// Alias: android_queries_element, url_launcher_manifest
 ///
 /// Android 11+ requires queries element in manifest for URL handling.
@@ -7874,7 +7992,6 @@ class RequirePermissionPlistIosRule extends SaropaLintRule {
 ///   </intent>
 /// </queries>
 /// ```
-
 class RequireUrlLauncherQueriesAndroidRule extends SaropaLintRule {
   const RequireUrlLauncherQueriesAndroidRule() : super(code: _code);
 
@@ -7891,7 +8008,7 @@ class RequireUrlLauncherQueriesAndroidRule extends SaropaLintRule {
     name: 'require_url_launcher_queries_android',
     problemMessage:
         '[require_url_launcher_queries_android] Without <queries> in manifest, '
-        'canLaunchUrl returns false on Android 11+ even for installed apps.',
+        'canLaunchUrl returns false on Android 11+ even for installed apps. {v3}',
     correctionMessage:
         'Add <queries> element with intent filters to AndroidManifest.xml.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -7919,6 +8036,8 @@ class RequireUrlLauncherQueriesAndroidRule extends SaropaLintRule {
 
 /// Reminder to add LSApplicationQueriesSchemes for iOS url_launcher.
 ///
+/// Since: v2.3.3 | Updated: v4.13.0 | Rule version: v3
+///
 /// Alias: ios_url_schemes, url_launcher_plist
 ///
 /// iOS requires declared URL schemes in Info.plist for canLaunchUrl.
@@ -7932,7 +8051,6 @@ class RequireUrlLauncherQueriesAndroidRule extends SaropaLintRule {
 ///   <string>mailto</string>
 /// </array>
 /// ```
-
 class RequireUrlLauncherSchemesIosRule extends SaropaLintRule {
   const RequireUrlLauncherSchemesIosRule() : super(code: _code);
 
@@ -7949,7 +8067,7 @@ class RequireUrlLauncherSchemesIosRule extends SaropaLintRule {
     name: 'require_url_launcher_schemes_ios',
     problemMessage:
         '[require_url_launcher_schemes_ios] Without LSApplicationQueriesSchemes, '
-        'canLaunchUrl returns false on iOS even for available URL schemes.',
+        'canLaunchUrl returns false on iOS even for available URL schemes. {v3}',
     correctionMessage:
         'Add URL schemes to LSApplicationQueriesSchemes array in Info.plist.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -7973,6 +8091,8 @@ class RequireUrlLauncherSchemesIosRule extends SaropaLintRule {
 }
 
 /// Warns when Stack children are not Positioned widgets.
+///
+/// Since: v4.1.5 | Updated: v4.13.0 | Rule version: v2
 ///
 /// Alias: stack_positioned, positioned_in_stack
 ///
@@ -8002,7 +8122,6 @@ class RequireUrlLauncherSchemesIosRule extends SaropaLintRule {
 ///   ],
 /// )
 /// ```
-
 class AvoidStaticRouteConfigRule extends SaropaLintRule {
   const AvoidStaticRouteConfigRule() : super(code: _code);
 
@@ -8016,7 +8135,7 @@ class AvoidStaticRouteConfigRule extends SaropaLintRule {
     name: 'avoid_static_route_config',
     problemMessage:
         '[avoid_static_route_config] Static router configuration prevents '
-        'hot reload. Route changes require full restart.',
+        'hot reload. Route changes require full restart. {v2}',
     correctionMessage:
         'Use a top-level final variable or a getter for the router instead.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -8076,6 +8195,8 @@ class AvoidStaticRouteConfigRule extends SaropaLintRule {
 
 /// Warns when complex positioning uses nested widgets instead of CustomSingleChildLayout.
 ///
+/// Since: v4.1.8 | Updated: v4.13.0 | Rule version: v2
+///
 /// For complex single-child positioning logic, CustomSingleChildLayout is more
 /// efficient than nested Positioned/Align/Transform widgets.
 ///
@@ -8107,7 +8228,6 @@ class AvoidStaticRouteConfigRule extends SaropaLintRule {
 ///   );
 /// }
 /// ```
-
 class RequireLocaleForTextRule extends SaropaLintRule {
   const RequireLocaleForTextRule() : super(code: _code);
 
@@ -8120,7 +8240,7 @@ class RequireLocaleForTextRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_locale_for_text',
     problemMessage:
-        '[require_locale_for_text] Text formatting methods (toUpperCase, toLowerCase, number formatting) without an explicit locale use the device default, producing different results across regions. For example, Turkish locale uppercases \"i\" to \"I\" (with a dot), breaking string comparisons and identifiers unexpectedly.',
+        '[require_locale_for_text] Text formatting methods (toUpperCase, toLowerCase, number formatting) without an explicit locale use the device default, producing different results across regions. For example, Turkish locale uppercases \"i\" to \"I\" (with a dot), breaking string comparisons and identifiers unexpectedly. {v2}',
     correctionMessage:
         'Pass an explicit locale parameter to text formatting calls, or use toUpperCase() only on ASCII-known strings. Use intl package for locale-aware number and date formatting.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -8172,6 +8292,8 @@ class RequireLocaleForTextRule extends SaropaLintRule {
 
 /// Warns when destructive dialogs can be dismissed by tapping barrier.
 ///
+/// Since: v4.1.8 | Updated: v4.13.0 | Rule version: v2
+///
 /// `[HEURISTIC]` - Detects showDialog without explicit barrierDismissible for destructive actions.
 ///
 /// Destructive confirmations shouldn't dismiss on barrier tap.
@@ -8202,7 +8324,6 @@ class RequireLocaleForTextRule extends SaropaLintRule {
 ///   ),
 /// );
 /// ```
-
 class RequireDialogBarrierConsiderationRule extends SaropaLintRule {
   const RequireDialogBarrierConsiderationRule() : super(code: _code);
 
@@ -8218,7 +8339,7 @@ class RequireDialogBarrierConsiderationRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_dialog_barrier_consideration',
     problemMessage:
-        '[require_dialog_barrier_consideration] Destructive confirmation dialog (delete, remove, logout) defaults to barrierDismissible: true, allowing users to accidentally dismiss the dialog by tapping outside. This can silently skip the confirmation step, or worse, leave the user unsure whether the action was confirmed or cancelled.',
+        '[require_dialog_barrier_consideration] Destructive confirmation dialog (delete, remove, logout) defaults to barrierDismissible: true, allowing users to accidentally dismiss the dialog by tapping outside. This can silently skip the confirmation step, or worse, leave the user unsure whether the action was confirmed or cancelled. {v2}',
     correctionMessage:
         'Set barrierDismissible: false on destructive confirmation dialogs so users must explicitly tap a button to confirm or cancel the action.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -8253,6 +8374,8 @@ class RequireDialogBarrierConsiderationRule extends SaropaLintRule {
 
 /// Warns when folder structure doesn't follow feature-based organization.
 ///
+/// Since: v4.1.8 | Updated: v4.13.0 | Rule version: v3
+///
 /// `[HEURISTIC]` - Checks file path patterns.
 ///
 /// Group files by feature (/auth, /profile) instead of type (/bloc, /ui)
@@ -8285,7 +8408,6 @@ class RequireDialogBarrierConsiderationRule extends SaropaLintRule {
 ///       order_screen.dart
 ///       order_model.dart
 /// ```
-
 class PreferFeatureFolderStructureRule extends SaropaLintRule {
   const PreferFeatureFolderStructureRule() : super(code: _code);
 
@@ -8298,7 +8420,7 @@ class PreferFeatureFolderStructureRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_feature_folder_structure',
     problemMessage:
-        '[prefer_feature_folder_structure] File in type-based folder. Prefer feature-based organization. Group files by feature (/auth, /profile) instead of type (/bloc, /ui) to improve scalability.',
+        '[prefer_feature_folder_structure] File in type-based folder. Prefer feature-based organization. Group files by feature (/auth, /profile) instead of type (/bloc, /ui) to improve scalability. {v3}',
     correctionMessage:
         'Group related files by feature (e.g. features/auth/login_bloc.dart, features/auth/login_screen.dart) so all code for a feature is co-located and can be modified, tested, and deleted as a unit.',
     errorSeverity: DiagnosticSeverity.INFO,

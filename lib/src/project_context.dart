@@ -310,6 +310,17 @@ class ProjectContext {
     });
   }
 
+  /// Get the package name for the project at [projectRoot].
+  ///
+  /// Returns the `name:` field from `pubspec.yaml`, or an empty string
+  /// if not found. Result is cached.
+  static String getPackageName(String projectRoot) {
+    final info = _projectCache.putIfAbsent(projectRoot, () {
+      return _ProjectInfo._fromProjectRoot(projectRoot);
+    });
+    return info.packageName;
+  }
+
   /// Find the project root directory (contains pubspec.yaml).
   ///
   /// Walks up the directory tree from [filePath] looking for pubspec.yaml.
@@ -342,12 +353,17 @@ class _ProjectInfo {
   _ProjectInfo._({
     required this.isFlutterProject,
     required this.dependencies,
+    required this.packageName,
   });
 
   factory _ProjectInfo._fromProjectRoot(String projectRoot) {
     final pubspecFile = File('$projectRoot/pubspec.yaml');
     if (!pubspecFile.existsSync()) {
-      return _ProjectInfo._(isFlutterProject: false, dependencies: {});
+      return _ProjectInfo._(
+        isFlutterProject: false,
+        dependencies: {},
+        packageName: '',
+      );
     }
 
     try {
@@ -355,6 +371,11 @@ class _ProjectInfo {
       final isFlutter = content.contains('flutter:') ||
           content.contains('flutter_test:') ||
           content.contains('sdk: flutter');
+
+      // Parse package name from top-level `name:` field (valid Dart pkg names)
+      final nameMatch = RegExp(r'^name:\s+([a-z][a-z0-9_]*)', multiLine: true)
+          .firstMatch(content);
+      final packageName = nameMatch?.group(1) ?? '';
 
       // Parse dependencies (simple regex-based parsing)
       final deps = <String>{};
@@ -367,14 +388,22 @@ class _ProjectInfo {
       return _ProjectInfo._(
         isFlutterProject: isFlutter,
         dependencies: deps,
+        packageName: packageName,
       );
     } catch (_) {
-      return _ProjectInfo._(isFlutterProject: false, dependencies: {});
+      return _ProjectInfo._(
+        isFlutterProject: false,
+        dependencies: {},
+        packageName: '',
+      );
     }
   }
 
   /// Whether this is a Flutter project (has flutter SDK dependency).
   final bool isFlutterProject;
+
+  /// The package name from `pubspec.yaml` (`name:` field).
+  final String packageName;
 
   /// Set of dependency names in the project.
   final Set<String> dependencies;

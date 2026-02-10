@@ -19,6 +19,8 @@ import '../saropa_lint_rule.dart';
 
 /// Warns when both @freezed and @JsonSerializable are used on same class.
 ///
+/// Since: v4.10.0 | Updated: v4.13.0 | Rule version: v2
+///
 /// Alias: freezed_json_conflict, duplicate_json_annotation
 ///
 /// @freezed already generates JSON serialization. Adding @JsonSerializable
@@ -53,7 +55,7 @@ class AvoidFreezedJsonSerializableConflictRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_freezed_json_serializable_conflict',
     problemMessage:
-        'Combining Freezed and json_serializable annotations incorrectly can result in code generation conflicts, leading to broken serialization, runtime errors, or data loss. This can cause your app to fail when parsing or serializing JSON, especially in production environments. Always follow the recommended integration patterns to ensure reliable code generation. See https://pub.dev/packages/freezed#json_serializable.',
+        '[avoid_freezed_json_serializable_conflict] Combining Freezed and json_serializable annotations incorrectly can result in code generation conflicts, leading to broken serialization, runtime errors, or data loss. This can cause your app to fail when parsing or serializing JSON, especially in production environments. Always follow the recommended integration patterns to ensure reliable code generation. See https://pub.dev/packages/freezed#json_serializable. {v2}',
     correctionMessage:
         'Review and adjust your Freezed and json_serializable usage to avoid annotation conflicts, following the official documentation for correct integration. This ensures consistent and reliable serialization behavior. See https://pub.dev/packages/freezed#json_serializable for best practices.',
     errorSeverity: DiagnosticSeverity.ERROR,
@@ -123,6 +125,8 @@ class _RemoveJsonSerializableFix extends DartFix {
 // cspell:ignore freezed_fromjson_syntax
 /// Warns when Freezed fromJson has block body instead of arrow syntax.
 ///
+/// Since: v4.10.0 | Updated: v4.13.0 | Rule version: v2
+///
 /// Alias: freezed_fromjson_syntax, freezed_arrow_required
 ///
 /// Freezed fromJson factory must use arrow syntax for code generation.
@@ -156,7 +160,7 @@ class RequireFreezedArrowSyntaxRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_freezed_arrow_syntax',
     problemMessage:
-        '[require_freezed_arrow_syntax] The fromJson factory in a @freezed class must use arrow syntax (=>) to ensure correct code generation. Using block syntax ({}) breaks the generated code, causing runtime errors, missing serialization, and build_runner failures. This leads to broken deserialization and hard-to-debug bugs in your models.',
+        '[require_freezed_arrow_syntax] The fromJson factory in a @freezed class must use arrow syntax (=>) to ensure correct code generation. Using block syntax ({}) breaks the generated code, causing runtime errors, missing serialization, and build_runner failures. This leads to broken deserialization and hard-to-debug bugs in your models. {v2}',
     correctionMessage:
         'Change the fromJson factory to use arrow syntax. Example: factory User.fromJson(Map<String, dynamic> json) => _\$UserFromJson(json);',
     errorSeverity: DiagnosticSeverity.ERROR,
@@ -248,6 +252,8 @@ class _ConvertToArrowSyntaxFix extends DartFix {
 
 /// Warns when Freezed class is missing the private constructor.
 ///
+/// Since: v4.10.0 | Updated: v4.13.0 | Rule version: v2
+///
 /// Alias: freezed_private_ctor, freezed_underscore_ctor
 ///
 /// Freezed classes need a private constructor for methods like copyWith.
@@ -282,7 +288,7 @@ class RequireFreezedPrivateConstructorRule extends SaropaLintRule {
     name: 'require_freezed_private_constructor',
     problemMessage:
         '[require_freezed_private_constructor] Missing private constructor '
-        'breaks code generation, causing build_runner to fail.',
+        'breaks code generation, causing build_runner to fail. {v2}',
     correctionMessage: 'Add: const ClassName._();',
     errorSeverity: DiagnosticSeverity.ERROR,
   );
@@ -369,6 +375,8 @@ class _AddPrivateConstructorFix extends DartFix {
 
 /// Warns when Freezed is used without explicit_to_json in build.yaml for nested objects.
 ///
+/// Since: v2.3.7 | Updated: v4.13.0 | Rule version: v3
+///
 /// Alias: freezed_explicit_json, require_explicit_to_json
 ///
 /// When using Freezed with nested objects, explicit_to_json: true is required
@@ -411,7 +419,7 @@ class RequireFreezedExplicitJsonRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_freezed_explicit_json',
     problemMessage:
-        '[require_freezed_explicit_json] Freezed class with nested objects may need explicit_to_json in build.yaml. Freezed requires explicit_to_json: true in build.yaml to correctly serialize nested objects into JSON. Without this setting, nested toJson() calls produce Instance-of strings instead of actual JSON data.',
+        '[require_freezed_explicit_json] Freezed class with nested objects may need explicit_to_json in build.yaml. Freezed requires explicit_to_json: true in build.yaml to correctly serialize nested objects into JSON. Without this setting, nested toJson() calls produce Instance-of strings instead of actual JSON data. {v3}',
     correctionMessage:
         'Add explicit_to_json: true to build.yaml under json_serializable options. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -529,6 +537,8 @@ class RequireFreezedExplicitJsonRule extends SaropaLintRule {
 
 /// Warns when Freezed nullable fields could use @Default annotation instead.
 ///
+/// Since: v2.3.7 | Updated: v4.13.0 | Rule version: v2
+///
 /// Alias: freezed_default_annotation, prefer_freezed_defaults
 ///
 /// Using @Default annotation instead of nullable types provides clearer
@@ -573,7 +583,7 @@ class PreferFreezedDefaultValuesRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_freezed_default_values',
     problemMessage:
-        '[prefer_freezed_default_values] Freezed nullable field could use @Default annotation instead. Using @Default annotation instead of nullable types provides clearer intent and better code when the field must have a default value rather than being truly optional.',
+        '[prefer_freezed_default_values] Freezed nullable field could use @Default annotation instead. Using @Default annotation instead of nullable types provides clearer intent and better code when the field must have a default value rather than being truly optional. {v2}',
     correctionMessage:
         'Use @Default(value) instead of nullable type if field has a sensible default. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -647,6 +657,8 @@ class PreferFreezedDefaultValuesRule extends SaropaLintRule {
 
 /// Custom types in Freezed classes need JsonConverter.
 ///
+/// Since: v2.6.0 | Updated: v4.13.0 | Rule version: v2
+///
 /// Types like DateTime, Color, or custom classes need explicit converters
 /// for proper JSON serialization in Freezed.
 ///
@@ -683,7 +695,7 @@ class RequireFreezedJsonConverterRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_freezed_json_converter',
     problemMessage:
-        '[require_freezed_json_converter] Freezed class with DateTime/Color field may need a JsonConverter for correct serialization. Missing converters can cause runtime errors, silent data loss, and broken API contracts. This is a common source of serialization bugs in complex models.',
+        '[require_freezed_json_converter] Freezed class with DateTime/Color field may need a JsonConverter for correct serialization. Missing converters can cause runtime errors, silent data loss, and broken API contracts. This is a common source of serialization bugs in complex models. {v2}',
     correctionMessage:
         'Add @JsonSerializable(converters: [...]) for custom types. Audit all Freezed models for converter coverage and add tests for serialization/deserialization. Document converter logic for maintainability.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -784,6 +796,8 @@ class RequireFreezedJsonConverterRule extends SaropaLintRule {
 
 /// Install freezed_lint for official linting of Freezed classes.
 ///
+/// Since: v2.6.0 | Updated: v4.13.0 | Rule version: v2
+///
 /// **Heuristic warning:** This rule cannot verify if freezed_lint is in your
 /// pubspec.yaml. It simply reminds developers using Freezed to consider
 /// adding freezed_lint to their dev_dependencies. Disable this rule if you
@@ -805,7 +819,7 @@ class RequireFreezedLintPackageRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_freezed_lint_package',
     problemMessage:
-        '[require_freezed_lint_package] File uses Freezed. Add freezed_lint package for specialized linting. Heuristic warning: This rule cannot verify if freezed_lint is in your pubspec.yaml. It simply reminds developers using Freezed to Add freezed_lint to their dev_dependencies. Disable this rule if you have already installed freezed_lint.',
+        '[require_freezed_lint_package] File uses Freezed. Add freezed_lint package for specialized linting. Heuristic warning: This rule cannot verify if freezed_lint is in your pubspec.yaml. It simply reminds developers using Freezed to Add freezed_lint to their dev_dependencies. Disable this rule if you have already installed freezed_lint. {v2}',
     correctionMessage:
         'Add freezed_lint to dev_dependencies. Disable this rule if already installed. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -833,6 +847,8 @@ class RequireFreezedLintPackageRule extends SaropaLintRule {
 }
 
 /// Warns when Freezed is used for logic classes like Blocs or Services.
+///
+/// Since: v4.1.4 | Updated: v4.13.0 | Rule version: v2
 ///
 /// Freezed is designed for immutable data classes. Using it for Blocs,
 /// Cubits, or Services adds unnecessary complexity.
@@ -869,7 +885,7 @@ class AvoidFreezedForLogicClassesRule extends SaropaLintRule {
     name: 'avoid_freezed_for_logic_classes',
     problemMessage:
         '[avoid_freezed_for_logic_classes] Freezed annotation on logic class. '
-        'Freezed is meant for data classes, not Blocs/Services.',
+        'Freezed is meant for data classes, not Blocs/Services. {v2}',
     correctionMessage:
         'Remove @freezed from logic classes. Use regular classes for Blocs/Services.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -920,6 +936,8 @@ class AvoidFreezedForLogicClassesRule extends SaropaLintRule {
 }
 
 /// Warns when data classes could benefit from using freezed.
+///
+/// Since: v4.2.0 | Updated: v4.13.0 | Rule version: v2
 ///
 /// Alias: use_freezed, immutable_data_class
 ///
@@ -983,7 +1001,7 @@ class PreferFreezedForDataClassesRule extends SaropaLintRule {
     name: 'prefer_freezed_for_data_classes',
     problemMessage:
         '[prefer_freezed_for_data_classes] Data class with manual copyWith/equals. '
-        'Consider using @freezed to eliminate boilerplate.',
+        'Consider using @freezed to eliminate boilerplate. {v2}',
     correctionMessage:
         'Add @freezed annotation and let code generation handle copyWith, ==, hashCode.',
     errorSeverity: DiagnosticSeverity.INFO,

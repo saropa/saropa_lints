@@ -24,6 +24,8 @@ import '../type_annotation_utils.dart';
 
 /// Warns when `if (x == null) x = value` is used instead of `x ??= value`.
 ///
+/// Since: v2.7.0 | Updated: v4.13.0 | Rule version: v3
+///
 /// This is an **opinionated rule** - not included in any tier by default.
 ///
 /// **Pros of ??= operator:**
@@ -59,7 +61,7 @@ class PreferNullAwareAssignmentRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_null_aware_assignment',
     problemMessage:
-        '[prefer_null_aware_assignment] An if-null-then-assign pattern was detected that can be simplified. Replace the verbose null check and assignment block with the ??= operator for a concise, idiomatic single-expression assignment.',
+        '[prefer_null_aware_assignment] An if-null-then-assign pattern was detected that can be simplified. Replace the verbose null check and assignment block with the ??= operator for a concise, idiomatic single-expression assignment. {v3}',
     correctionMessage:
         'Replace the if-null-then-assign block with the ??= operator for a single-expression null-coalescing assignment.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -110,6 +112,8 @@ class PreferNullAwareAssignmentRule extends SaropaLintRule {
 
 /// Warns when explicit if-null-then-assign is preferred over ??= (opposite).
 ///
+/// Since: v2.7.0 | Updated: v4.13.0 | Rule version: v3
+///
 /// This is an **opinionated rule** - not included in any tier by default.
 ///
 /// **Pros of explicit null check:**
@@ -144,7 +148,7 @@ class PreferExplicitNullAssignmentRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_explicit_null_assignment',
     problemMessage:
-        '[prefer_explicit_null_assignment] The ??= operator hides the null-check control flow, making it harder to debug and log. Use an explicit if-null-then-assign block for step-by-step clarity.',
+        '[prefer_explicit_null_assignment] The ??= operator hides the null-check control flow, making it harder to debug and log. Use an explicit if-null-then-assign block for step-by-step clarity. {v3}',
     correctionMessage:
         'Replace ??= with an explicit if (variable == null) variable = value; block for step-by-step clarity.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -165,6 +169,8 @@ class PreferExplicitNullAssignmentRule extends SaropaLintRule {
 }
 
 /// Warns when `x != null ? x : default` is used instead of `x ?? default`.
+///
+/// Since: v4.9.0 | Updated: v4.13.0 | Rule version: v4
 ///
 /// This is an **opinionated rule** - not included in any tier by default.
 ///
@@ -201,7 +207,7 @@ class PreferIfNullOverTernaryRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_if_null_over_ternary',
     problemMessage:
-        '[prefer_if_null_over_ternary] Null-checking ternary detected where the ?? operator expresses the same intent more concisely. Replace with ?? to reduce verbosity and follow idiomatic Dart conventions.',
+        '[prefer_if_null_over_ternary] Null-checking ternary detected where the ?? operator expresses the same intent more concisely. Replace with ?? to reduce verbosity and follow idiomatic Dart conventions. {v4}',
     correctionMessage:
         'Replace the ternary null check with the ?? operator, which expresses the same intent in fewer tokens.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -316,6 +322,8 @@ class _PreferIfNullOverTernaryFix extends DartFix {
 
 /// Warns when ?? is used instead of explicit ternary (opposite rule).
 ///
+/// Since: v2.7.0 | Updated: v4.13.0 | Rule version: v5
+///
 /// This is an **opinionated rule** - not included in any tier by default.
 ///
 /// **Pros of ternary:**
@@ -350,7 +358,7 @@ class PreferTernaryOverIfNullRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_ternary_over_if_null',
     problemMessage:
-        '[prefer_ternary_over_if_null] The ?? operator hides the null-check branching logic, reducing visibility into both code paths. Use an explicit ternary (value != null ? value : fallback) for full control over each branch.',
+        '[prefer_ternary_over_if_null] The ?? operator hides the null-check branching logic, reducing visibility into both code paths. Use an explicit ternary (value != null ? value : fallback) for full control over each branch. {v5}',
     correctionMessage:
         'Replace ?? with an explicit ternary (value != null ? value : fallback) for full control over both branches.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -406,6 +414,8 @@ class _PreferTernaryOverIfNullFix extends DartFix {
 
 /// Warns when `late` could be used instead of nullable type for lazy init.
 ///
+/// Since: v4.9.11 | Updated: v4.13.0 | Rule version: v2
+///
 /// This is an **opinionated rule** - not included in any tier by default.
 ///
 /// **Pros of late:**
@@ -445,7 +455,7 @@ class PreferLateOverNullableRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_late_over_nullable',
     problemMessage:
-        '[prefer_late_over_nullable] Use late instead of nullable for lazily initialized fields that are always set before first access. This is an opinionated rule - not included in any tier by default.',
+        '[prefer_late_over_nullable] Use late instead of nullable for lazily initialized fields that are always set before first access. This is an opinionated rule - not included in any tier by default. {v2}',
     correctionMessage:
         'Declare the field as late to remove null checks — the runtime guarantees a LateInitializationError if read too early.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -483,6 +493,8 @@ class PreferLateOverNullableRule extends SaropaLintRule {
 }
 
 /// Warns when late is used instead of nullable (opposite rule).
+///
+/// Since: v4.9.0 | Updated: v4.13.0 | Rule version: v4
 ///
 /// This is an **opinionated rule** - not included in any tier by default.
 ///
@@ -526,7 +538,7 @@ class PreferNullableOverLateRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_nullable_over_late',
     problemMessage:
-        '[prefer_nullable_over_late] Field uses late initialization, which risks a LateInitializationError at runtime if read before assignment. Use a nullable type instead so the compiler enforces null checks at every access point.',
+        '[prefer_nullable_over_late] Field uses late initialization, which risks a LateInitializationError at runtime if read before assignment. Use a nullable type instead so the compiler enforces null checks at every access point. {v4}',
     correctionMessage:
         'Use a nullable type instead of late so the compiler enforces a null check at every access, preventing runtime errors.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -617,6 +629,8 @@ class _PreferNullableOverLateFix extends DartFix {
 
 /// Warns when .addAll() is used instead of spread operator.
 ///
+/// Since: v4.9.11 | Updated: v4.13.0 | Rule version: v2
+///
 /// This is an **opinionated rule** - not included in any tier by default.
 ///
 /// **Pros of spread:**
@@ -655,7 +669,7 @@ class PreferSpreadOverAddAllRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_spread_over_addall',
     problemMessage:
-        '[prefer_spread_over_addall] Collection uses addAll() instead of the spread operator. The spread syntax [...list1, ...list2] is a declarative, expression-level merge that avoids mutation.',
+        '[prefer_spread_over_addall] Collection uses addAll() instead of the spread operator. The spread syntax [...list1, ...list2] is a declarative, expression-level merge that avoids mutation. {v2}',
     correctionMessage:
         'Replace addAll() with the spread operator [...list1, ...list2] for a declarative, expression-level merge.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -676,6 +690,8 @@ class PreferSpreadOverAddAllRule extends SaropaLintRule {
 }
 
 /// Warns when spread is used instead of addAll() (opposite rule).
+///
+/// Since: v4.9.11 | Updated: v4.13.0 | Rule version: v2
 ///
 /// This is an **opinionated rule** - not included in any tier by default.
 ///
@@ -711,7 +727,7 @@ class PreferAddAllOverSpreadRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_addall_over_spread',
     problemMessage:
-        '[prefer_addall_over_spread] The spread operator creates a new list allocation on every use, which can be wasteful for in-place mutations. Use addAll() for an explicit imperative merge that avoids unnecessary copies.',
+        '[prefer_addall_over_spread] The spread operator creates a new list allocation on every use, which can be wasteful for in-place mutations. Use addAll() for an explicit imperative merge that avoids unnecessary copies. {v2}',
     correctionMessage:
         'Replace the spread operator with addAll() for an explicit imperative mutation that reads naturally in method chains.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -730,6 +746,8 @@ class PreferAddAllOverSpreadRule extends SaropaLintRule {
 }
 
 /// Warns when `cond ? [item] : []` is used instead of `[if (cond) item]`.
+///
+/// Since: v4.9.11 | Updated: v4.13.0 | Rule version: v2
 ///
 /// This is an **opinionated rule** - not included in any tier by default.
 ///
@@ -773,7 +791,7 @@ class PreferCollectionIfOverTernaryRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_collection_if_over_ternary',
     problemMessage:
-        '[prefer_collection_if_over_ternary] Ternary operator with spread is used to conditionally include collection elements. This pattern is harder to read; use collection-if syntax instead for clearer, more idiomatic Dart.',
+        '[prefer_collection_if_over_ternary] Ternary operator with spread is used to conditionally include collection elements. This pattern is harder to read; use collection-if syntax instead for clearer, more idiomatic Dart. {v2}',
     correctionMessage:
         'Replace the ternary-spread pattern with a collection-if expression: [if (condition) element] for cleaner syntax.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -809,6 +827,8 @@ class PreferCollectionIfOverTernaryRule extends SaropaLintRule {
 }
 
 /// Warns when ternary is preferred over collection-if (opposite rule).
+///
+/// Since: v4.9.11 | Updated: v4.13.0 | Rule version: v2
 ///
 /// This is an **opinionated rule** - not included in any tier by default.
 ///
@@ -848,7 +868,7 @@ class PreferTernaryOverCollectionIfRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_ternary_over_collection_if',
     problemMessage:
-        '[prefer_ternary_over_collection_if] Collection-if expression could be replaced with a ternary-spread pattern for explicit control over the empty-case branch and consistent syntax.',
+        '[prefer_ternary_over_collection_if] Collection-if expression could be replaced with a ternary-spread pattern for explicit control over the empty-case branch and consistent syntax. {v2}',
     correctionMessage:
         'Replace the collection-if with a ternary-spread expression: ...(condition ? [element] : []) for explicit control.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -867,6 +887,8 @@ class PreferTernaryOverCollectionIfRule extends SaropaLintRule {
 }
 
 /// Warns when `.where((e) => e is T)` is used instead of `.whereType<T>()`.
+///
+/// Since: v4.9.11 | Updated: v4.13.0 | Rule version: v2
 ///
 /// This is an **opinionated rule** - not included in any tier by default.
 ///
@@ -904,7 +926,7 @@ class PreferWhereTypeOverWhereIsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_wheretype_over_where_is',
     problemMessage:
-        '[prefer_wheretype_over_where_is] Collection uses where((e) => e is T) for type filtering, which requires a manual cast afterward. Use whereType<T>() instead to filter and cast in one step for cleaner, type-safe code.',
+        '[prefer_wheretype_over_where_is] Collection uses where((e) => e is T) for type filtering, which requires a manual cast afterward. Use whereType<T>() instead to filter and cast in one step for cleaner, type-safe code. {v2}',
     correctionMessage:
         'Replace where((e) => e is T) with whereType<T>() for concise, type-safe filtering without a manual cast.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -986,6 +1008,8 @@ class _PreferWhereTypeOverWhereIsFix extends DartFix {
 
 /// Warns when iterating map with .keys and lookup vs .entries.
 ///
+/// Since: v4.9.11 | Updated: v4.13.0 | Rule version: v2
+///
 /// This is an **opinionated rule** - not included in any tier by default.
 ///
 /// **Pros of .entries:**
@@ -1025,7 +1049,7 @@ class PreferMapEntriesIterationRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_map_entries_iteration',
     problemMessage:
-        '[prefer_map_entries_iteration] Iterating a map via .keys and then performing a separate map[key] lookup on each iteration duplicates work. Use map.entries to access both key and value in a single pass.',
+        '[prefer_map_entries_iteration] Iterating a map via .keys and then performing a separate map[key] lookup on each iteration duplicates work. Use map.entries to access both key and value in a single pass. {v2}',
     correctionMessage:
         'Iterate with map.entries to access key and value in a single lookup instead of re-indexing via map[key].',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -1079,6 +1103,8 @@ class PreferMapEntriesIterationRule extends SaropaLintRule {
 
 /// Warns when .keys iteration is preferred over .entries (opposite rule).
 ///
+/// Since: v4.9.11 | Updated: v4.13.0 | Rule version: v2
+///
 /// This is an **opinionated rule** - not included in any tier by default.
 ///
 /// **Pros of .keys:**
@@ -1112,7 +1138,7 @@ class PreferKeysIterationRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_keys_with_lookup',
     problemMessage:
-        '[prefer_keys_with_lookup] Map iteration uses .entries instead of .keys with explicit lookup. Iterating with .keys and map[key] is a familiar loop pattern that matches common imperative styles.',
+        '[prefer_keys_with_lookup] Map iteration uses .entries instead of .keys with explicit lookup. Iterating with .keys and map[key] is a familiar loop pattern that matches common imperative styles. {v2}',
     correctionMessage:
         'Iterate with map.keys and look up each value explicitly for a familiar loop style that matches common patterns.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -1138,6 +1164,8 @@ class PreferKeysIterationRule extends SaropaLintRule {
 }
 
 /// Warns when UnmodifiableListView is preferred over mutable (opposite rule).
+///
+/// Since: v4.8.3 | Updated: v4.13.0 | Rule version: v3
 ///
 /// This is an **opinionated rule** - not included in any tier by default.
 ///
@@ -1173,7 +1201,7 @@ class PreferMutableCollectionsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_mutable_collections',
     problemMessage:
-        '[prefer_mutable_collections] Function returns an unmodifiable collection. Immutable return types force callers to copy the collection before modification, adding allocation overhead and boilerplate.',
+        '[prefer_mutable_collections] Function returns an unmodifiable collection. Immutable return types force callers to copy the collection before modification, adding allocation overhead and boilerplate. {v3}',
     correctionMessage:
         'Return a plain List, Set, or Map so callers can modify the collection without needing to copy or unwrap it first.',
     errorSeverity: DiagnosticSeverity.INFO,

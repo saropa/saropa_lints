@@ -14,6 +14,8 @@ import '../saropa_lint_rule.dart';
 
 /// Warns when Timer or periodic work runs without AppLifecycleState check.
 ///
+/// Since: v2.1.0 | Updated: v4.13.0 | Rule version: v2
+///
 /// Timers and periodic callbacks should pause when the app is backgrounded
 /// to save battery and avoid unexpected behavior.
 ///
@@ -58,7 +60,7 @@ class AvoidWorkInPausedStateRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_work_in_paused_state',
     problemMessage:
-        '[avoid_work_in_paused_state] Timer.periodic without lifecycle handling. Will run when app is backgrounded. Timers and periodic callbacks should pause when the app is backgrounded to save battery and avoid unexpected behavior.',
+        '[avoid_work_in_paused_state] Timer.periodic without lifecycle handling. Will run when app is backgrounded. Timers and periodic callbacks should pause when the app is backgrounded to save battery and avoid unexpected behavior. {v2}',
     correctionMessage:
         'Add WidgetsBindingObserver and pause timer in didChangeAppLifecycleState. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -146,6 +148,8 @@ class AvoidWorkInPausedStateRule extends SaropaLintRule {
 
 /// Warns when WidgetsBindingObserver doesn't handle resumed state.
 ///
+/// Since: v2.1.0 | Updated: v4.13.0 | Rule version: v2
+///
 /// When app returns from background, data may be stale and should be
 /// refreshed. Missing resumed handling leads to outdated UI.
 ///
@@ -188,7 +192,7 @@ class RequireResumeStateRefreshRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_resume_state_refresh',
     problemMessage:
-        '[require_resume_state_refresh] App handles paused state but not resumed, leaving UI stale after returning from background. When app returns from background, data may be stale and must be refreshed. Missing resumed handling leads to outdated UI.',
+        '[require_resume_state_refresh] App handles paused state but not resumed, leaving UI stale after returning from background. When app returns from background, data may be stale and must be refreshed. Missing resumed handling leads to outdated UI. {v2}',
     correctionMessage:
         'Handle AppLifecycleState.resumed to refresh data when app returns to foreground.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -228,6 +232,8 @@ class RequireResumeStateRefreshRule extends SaropaLintRule {
 }
 
 /// Warns when didUpdateWidget doesn't compare oldWidget.
+///
+/// Since: v2.3.10 | Updated: v4.13.0 | Rule version: v3
 ///
 /// Alias: did_update_widget_compare, compare_old_widget
 ///
@@ -269,7 +275,7 @@ class RequireDidUpdateWidgetCheckRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_did_update_widget_check',
     problemMessage:
-        '[require_did_update_widget_check] didUpdateWidget triggers updates without checking if properties changed, causing unnecessary rebuilds. didUpdateWidget receives the old widget for comparison. Without comparing oldWidget to widget, you might trigger unnecessary updates.',
+        '[require_did_update_widget_check] didUpdateWidget triggers updates without checking if properties changed, causing unnecessary rebuilds. didUpdateWidget receives the old widget for comparison. Without comparing oldWidget to widget, you might trigger unnecessary updates. {v3}',
     correctionMessage:
         'Compare properties using operators (oldWidget.x != widget.x) or functions (listEquals, setEquals, mapEquals) before updating state.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -329,6 +335,8 @@ class RequireDidUpdateWidgetCheckRule extends SaropaLintRule {
 
 /// Warns when late widget fields are initialized in build() instead of initState().
 ///
+/// Since: v4.1.6 | Updated: v4.13.0 | Rule version: v3
+///
 /// Late fields in StatefulWidget State classes should be initialized in
 /// initState(), not build(). build() can be called multiple times, causing
 /// redundant initialization or state loss.
@@ -378,7 +386,7 @@ class RequireLateInitializationInInitStateRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_late_initialization_in_init_state',
     problemMessage:
-        '[require_late_initialization_in_init_state] Late field initialized in build() recreates the object on every setState() call. AnimationController instances restart their animations, StreamSubscription objects create duplicate listeners, and the resulting UI jank becomes visible to users. This also wastes memory by allocating new objects on every widget rebuild cycle.',
+        '[require_late_initialization_in_init_state] Late field initialized in build() recreates the object on every setState() call. AnimationController instances restart their animations, StreamSubscription objects create duplicate listeners, and the resulting UI jank becomes visible to users. This also wastes memory by allocating new objects on every widget rebuild cycle. {v3}',
     correctionMessage:
         'Move late field initialization into initState(), which executes only once when the State object is first created, ensuring stable object lifecycle and preventing duplicate allocations.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -450,6 +458,9 @@ class RequireLateInitializationInInitStateRule extends SaropaLintRule {
 }
 
 /// Warns when State subclasses use Timer or stream subscriptions without
+///
+/// Since: v2.4.0 | Updated: v4.13.0 | Rule version: v4
+///
 /// lifecycle handling.
 ///
 /// Timer.periodic, Timer() constructor, and .listen() calls in State
@@ -508,7 +519,7 @@ class RequireAppLifecycleHandlingRule extends SaropaLintRule {
     problemMessage:
         '[require_app_lifecycle_handling] Timer or subscription detected '
         'without lifecycle handling. '
-        'Stop background work when app is inactive to save battery.',
+        'Stop background work when app is inactive to save battery. {v4}',
     correctionMessage: 'Implement WidgetsBindingObserver and pause/resume in '
         'didChangeAppLifecycleState, or use AppLifecycleListener.',
     errorSeverity: DiagnosticSeverity.INFO,

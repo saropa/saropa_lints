@@ -266,6 +266,9 @@ bool _isFollowedBySafe(List<Statement> stmts, int i) {
 // ---------------------------------------------------------------------------
 
 /// Warns when a database or I/O **write** `await` is not immediately followed
+///
+/// Since: v4.13.0 | Rule version: v1
+///
 /// by `yieldToUI()`.
 ///
 /// Write operations (`writeTxn`, `putAll`, `deleteAll`, `rawInsert`, etc.)
@@ -298,7 +301,7 @@ class RequireYieldAfterDbWriteRule extends SaropaLintRule {
         '[require_yield_after_db_write] Database or I/O write without a '
         'following yieldToUI() call may block the UI thread and cause visible '
         'frame drops. Write operations acquire exclusive locks that starve '
-        'the framework of time to paint.',
+        'the framework of time to paint. {v1}',
     correctionMessage:
         'Insert `await DelayUtils.yieldToUI();` after this write operation '
         'to give the framework a chance to process pending frames.',
@@ -323,6 +326,8 @@ class RequireYieldAfterDbWriteRule extends SaropaLintRule {
 // ---------------------------------------------------------------------------
 
 /// Suggests inserting `yieldToUI()` after a database or I/O **bulk read**.
+///
+/// Since: v4.13.0 | Rule version: v1
 ///
 /// Bulk reads (`findAll`, `rawQuery`, `readAsString`, etc.) can block the
 /// UI during deserialization of large payloads. A yield is helpful but
@@ -354,7 +359,7 @@ class SuggestYieldAfterDbReadRule extends SaropaLintRule {
     problemMessage:
         '[suggest_yield_after_db_read] Bulk database or I/O read without a '
         'following yieldToUI() call. Deserializing large payloads on the '
-        'main isolate can cause frame drops during data-heavy workflows.',
+        'main isolate can cause frame drops during data-heavy workflows. {v1}',
     correctionMessage:
         'Consider inserting `await DelayUtils.yieldToUI();` after this read '
         'if the result set may be large.',
@@ -406,6 +411,8 @@ void _registerYieldCheck(
 
 /// Warns on `return await dbWriteCall()` — the caller has no chance to yield.
 ///
+/// Since: v4.9.16 | Updated: v4.13.0 | Rule version: v3
+///
 /// Only write operations are flagged. Reads (`findFirst`, `findAll`, etc.)
 /// do not need a yield before returning.
 ///
@@ -434,7 +441,7 @@ class AvoidReturnAwaitDbRule extends SaropaLintRule {
     name: 'avoid_return_await_db',
     problemMessage:
         '[avoid_return_await_db] Returning directly from a database/IO '
-        'write skips yieldToUI().',
+        'write skips yieldToUI(). {v3}',
     correctionMessage: 'Save the result to a variable, call '
         '`await DelayUtils.yieldToUI();`, then return the variable.',
     errorSeverity: DiagnosticSeverity.WARNING,

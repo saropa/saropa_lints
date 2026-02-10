@@ -11,6 +11,8 @@ import '../saropa_lint_rule.dart';
 
 /// Warns when a class declares a call() method.
 ///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v5
+///
 /// Example of **bad** code:
 /// ```dart
 /// class MyClass {
@@ -37,7 +39,7 @@ class AvoidDeclaringCallMethodRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_declaring_call_method',
     problemMessage:
-        '[avoid_declaring_call_method] call() method makes class callable but hides intent. Code reads ambiguously. A class declares a call() method.',
+        '[avoid_declaring_call_method] call() method makes class callable but hides intent. Code reads ambiguously. A class declares a call() method. {v5}',
     correctionMessage:
         'Use descriptive method name: execute(), invoke(), or run() instead. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -58,6 +60,8 @@ class AvoidDeclaringCallMethodRule extends SaropaLintRule {
 }
 
 /// Warns when a generic type parameter shadows a top-level declaration.
+///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v4
 ///
 /// This can cause confusion when the generic type parameter has the same name
 /// as a class, typedef, or other top-level declaration.
@@ -85,7 +89,7 @@ class AvoidGenericsShadowingRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_generics_shadowing',
     problemMessage:
-        '[avoid_generics_shadowing] Generic type parameter shadows a top-level declaration. This class design reduces clarity and can lead to incorrect object initialization.',
+        '[avoid_generics_shadowing] Generic type parameter shadows a top-level declaration. This class design reduces clarity and can lead to incorrect object initialization. {v4}',
     correctionMessage:
         'Rename the generic parameter to avoid shadowing. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -145,6 +149,8 @@ class AvoidGenericsShadowingRule extends SaropaLintRule {
 
 /// Warns when a copyWith method is missing fields.
 ///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v4
+///
 /// All non-final fields should be included in copyWith for complete copying.
 ///
 /// Example of **bad** code:
@@ -178,7 +184,7 @@ class AvoidIncompleteCopyWithRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_incomplete_copy_with',
     problemMessage:
-        '[avoid_incomplete_copy_with] copyWith() is missing fields. Copied objects will lose data for those fields. All non-final fields must be included in copyWith for complete copying.',
+        '[avoid_incomplete_copy_with] copyWith() is missing fields. Copied objects will lose data for those fields. All non-final fields must be included in copyWith for complete copying. {v4}',
     correctionMessage:
         'Add missing fields as nullable parameters: copyWith({String? name, int? age}). Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -231,6 +237,8 @@ class AvoidIncompleteCopyWithRule extends SaropaLintRule {
 
 /// Warns when constructor body contains logic.
 ///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v4
+///
 /// Constructor bodies with logic can be harder to understand.
 /// Prefer using initializer lists or factory constructors.
 ///
@@ -266,7 +274,7 @@ class AvoidNonEmptyConstructorBodiesRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_non_empty_constructor_bodies',
     problemMessage:
-        '[avoid_non_empty_constructor_bodies] Constructor body has logic. Final fields cannot be set in body, only initializers. Constructor bodies with logic can be harder to understand. Prefer using initializer lists or factory constructors.',
+        '[avoid_non_empty_constructor_bodies] Constructor body has logic. Final fields cannot be set in body, only initializers. Constructor bodies with logic can be harder to understand. Prefer using initializer lists or factory constructors. {v4}',
     correctionMessage:
         'Move logic to initializer list: MyClass(input) : name = input.trim();. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -315,6 +323,9 @@ class AvoidNonEmptyConstructorBodiesRule extends SaropaLintRule {
 }
 
 /// Warns when a variable or parameter shadows another declaration from an
+///
+/// Since: v4.1.3 | Updated: v4.13.0 | Rule version: v3
+///
 /// outer scope.
 ///
 /// Shadowing occurs when a nested scope declares a variable with the same name
@@ -367,7 +378,7 @@ class AvoidShadowingRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_variable_shadowing',
     problemMessage:
-        '[avoid_variable_shadowing] Declaration shadows a declaration from an outer scope. Shadowing occurs when a nested scope declares a variable with the same name as one in an enclosing scope. This can lead to confusion about which variable is being referenced and is a common source of subtle bugs.',
+        '[avoid_variable_shadowing] Declaration shadows a declaration from an outer scope. Shadowing occurs when a nested scope declares a variable with the same name as one in an enclosing scope. This can lead to confusion about which variable is being referenced and is a common source of subtle bugs. {v3}',
     correctionMessage:
         'Rename the variable to avoid confusion. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -487,6 +498,9 @@ class _ShadowingChecker extends RecursiveAstVisitor<void> {
 }
 
 /// Warns when a `<String>[...]` list literal with only string literals
+///
+/// Since: v4.9.0 | Updated: v4.13.0 | Rule version: v3
+///
 /// is not marked as `const`.
 ///
 /// Using `const` for immutable string lists improves performance by
@@ -517,7 +531,7 @@ class PreferConstStringListRule extends SaropaLintRule {
     name: 'prefer_const_string_list',
     problemMessage:
         '[prefer_const_string_list] This <String>[...] list contains only string literals '
-        'and could be const.',
+        'and could be const. {v3}',
     correctionMessage: 'Add const before the list literal or use a const '
         'variable declaration.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -621,6 +635,8 @@ class PreferConstStringListRule extends SaropaLintRule {
 }
 
 /// Warns when a class could have a const constructor but doesn't.
+///
+/// Since: v4.9.0 | Updated: v4.13.0 | Rule version: v5
 class PreferDeclaringConstConstructorRule extends SaropaLintRule {
   const PreferDeclaringConstConstructorRule() : super(code: _code);
 
@@ -634,7 +650,7 @@ class PreferDeclaringConstConstructorRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_declaring_const_constructor',
     problemMessage:
-        '[prefer_declaring_const_constructor] Class could have a const constructor. A class could have a const constructor but doesn\'t. This class design reduces clarity and can lead to incorrect object initialization.',
+        '[prefer_declaring_const_constructor] Class could have a const constructor. A class could have a const constructor but doesn\'t. This class design reduces clarity and can lead to incorrect object initialization. {v5}',
     correctionMessage:
         'Add const keyword to constructor. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -700,6 +716,8 @@ class PreferDeclaringConstConstructorRule extends SaropaLintRule {
 
 /// Warns when extension type representation fields are public.
 ///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v4
+///
 /// Extension type fields should be private for encapsulation.
 ///
 /// ### Example
@@ -728,7 +746,7 @@ class PreferPrivateExtensionTypeFieldRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_private_extension_type_field',
     problemMessage:
-        '[prefer_private_extension_type_field] Extension type representation field must be private. Extension type fields must be private for encapsulation.',
+        '[prefer_private_extension_type_field] Extension type representation field must be private. Extension type fields must be private for encapsulation. {v4}',
     correctionMessage:
         'Use a private field with underscore prefix. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -753,6 +771,8 @@ class PreferPrivateExtensionTypeFieldRule extends SaropaLintRule {
 }
 
 /// Warns when super lifecycle methods are called in wrong order.
+///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v5
 ///
 /// In State classes, super.initState() should be called first,
 /// and super.dispose() should be called last.
@@ -799,7 +819,7 @@ class ProperSuperCallsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'proper_super_calls',
     problemMessage:
-        '[proper_super_calls] Super lifecycle method called in wrong order. In State classes, super.initState() must be called first, and super.dispose() must be called last.',
+        '[proper_super_calls] Super lifecycle method called in wrong order. In State classes, super.initState() must be called first, and super.dispose() must be called last. {v5}',
     correctionMessage:
         'super.initState() must be first; super.dispose() must be last. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -865,6 +885,8 @@ class ProperSuperCallsRule extends SaropaLintRule {
 
 /// Warns when a public class lacks an explicit class modifier.
 ///
+/// Since: v1.3.0 | Updated: v4.13.0 | Rule version: v3
+///
 /// Dart 3.0 introduced class modifiers (base, final, interface, sealed).
 /// For API stability, public classes should declare their inheritance intent.
 ///
@@ -893,7 +915,7 @@ class AvoidUnmarkedPublicClassRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_unmarked_public_class',
     problemMessage:
-        '[avoid_unmarked_public_class] Public class lacks an explicit class modifier. Dart 3.0 introduced class modifiers (base, final, interface, sealed). For API stability, public classes should declare their inheritance intent.',
+        '[avoid_unmarked_public_class] Public class lacks an explicit class modifier. Dart 3.0 introduced class modifiers (base, final, interface, sealed). For API stability, public classes should declare their inheritance intent. {v3}',
     correctionMessage:
         'Add base, final, interface, or sealed modifier (Dart 3.0+). Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -935,6 +957,8 @@ class AvoidUnmarkedPublicClassRule extends SaropaLintRule {
 
 /// Warns when a concrete class could be marked `final`.
 ///
+/// Since: v1.3.0 | Updated: v4.13.0 | Rule version: v4
+///
 /// Dart 3.0 introduced the `final` modifier to prevent subclassing.
 /// Classes that are not designed for extension should be marked `final`.
 ///
@@ -960,7 +984,7 @@ class PreferFinalClassRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_final_class',
     problemMessage:
-        '[prefer_final_class] Prefer marking this class as final. Dart 3.0 introduced the final modifier to prevent subclassing. Classes that are not designed for extension must be marked final.',
+        '[prefer_final_class] Prefer marking this class as final. Dart 3.0 introduced the final modifier to prevent subclassing. Classes that are not designed for extension must be marked final. {v4}',
     correctionMessage:
         'Add final modifier if this class is not designed for extension (Dart 3.0+). Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -1025,6 +1049,8 @@ class PreferFinalClassRule extends SaropaLintRule {
 
 /// Warns when an abstract class with only abstract members could be `interface`.
 ///
+/// Since: v1.3.0 | Updated: v4.13.0 | Rule version: v4
+///
 /// Dart 3.0 introduced the `interface` modifier for pure contracts.
 /// Abstract classes with no implementation should use `interface class`.
 ///
@@ -1056,7 +1082,7 @@ class PreferInterfaceClassRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_interface_class',
     problemMessage:
-        '[prefer_interface_class] Abstract class with only abstract members could be interface. Dart 3.0 introduced the interface modifier for pure contracts. Abstract classes with no implementation should use interface class.',
+        '[prefer_interface_class] Abstract class with only abstract members could be interface. Dart 3.0 introduced the interface modifier for pure contracts. Abstract classes with no implementation should use interface class. {v4}',
     correctionMessage:
         'Use interface class for pure contracts (Dart 3.0+). Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -1125,6 +1151,8 @@ class PreferInterfaceClassRule extends SaropaLintRule {
 
 /// Warns when an abstract class with implementation could be `base`.
 ///
+/// Since: v1.3.0 | Updated: v4.13.0 | Rule version: v4
+///
 /// Dart 3.0 introduced the `base` modifier for classes meant to be
 /// extended but not implemented directly.
 ///
@@ -1162,7 +1190,7 @@ class PreferBaseClassRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_base_class',
     problemMessage:
-        '[prefer_base_class] Abstract class with shared implementation could be base. Dart 3.0 introduced the base modifier for classes meant to be extended but not implemented directly.',
+        '[prefer_base_class] Abstract class with shared implementation could be base. Dart 3.0 introduced the base modifier for classes meant to be extended but not implemented directly. {v4}',
     correctionMessage:
         'Use abstract base class to prevent direct implementation (Dart 3.0+). Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,

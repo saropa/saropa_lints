@@ -8,6 +8,7 @@ GetX is powerful but has patterns that fail silently. Standard linters see valid
 
 | Issue Type | What Happens | Rule |
 |------------|--------------|------|
+| Static Get.find() calls | Hidden dependencies, untestable | `avoid_getx_static_get` |
 | Undisposed controllers | Memory leaks, stale state | `require_getx_controller_dispose` |
 | .obs outside controllers | Lifecycle issues, memory leaks | `avoid_obs_outside_controller` |
 | Missing super calls | Broken lifecycle | `proper_getx_super_calls` |
@@ -17,6 +18,7 @@ GetX is powerful but has patterns that fail silently. Standard linters see valid
 | Undisposed Worker fields | Memory leaks | `dispose_getx_fields` |
 | .obs without Obx wrapper | UI doesn't react to changes | `prefer_getx_builder` |
 | Get.put in build | Poor lifecycle management | `require_getx_binding` |
+| Get.context bypass | Hidden dependencies, untestable | `avoid_getx_build_context_bypass` |
 
 ## What saropa_lints Catches
 
@@ -233,6 +235,7 @@ dart run custom_lint
 | `require_getx_binding` | professional | Get.put() in widget build method |
 | `avoid_getx_global_navigation` | professional | Get.to/Get.off global navigation (v2.6.0) |
 | `require_getx_binding_routes` | professional | GetPage without binding parameter (v2.6.0) |
+| `avoid_getx_static_get` | professional | Get.find() creating hidden dependencies (v4.12.0) |
 
 ## Common Patterns
 

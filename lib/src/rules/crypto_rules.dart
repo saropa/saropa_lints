@@ -15,6 +15,8 @@ import '../saropa_lint_rule.dart';
 
 /// Warns when encryption keys appear to be hardcoded.
 ///
+/// Since: v1.7.9 | Updated: v4.13.0 | Rule version: v5
+///
 /// Alias: no_hardcoded_key, hardcoded_secret_key, embedded_encryption_key
 ///
 /// Hardcoded encryption keys in source code can be extracted from
@@ -74,7 +76,7 @@ class AvoidHardcodedEncryptionKeysRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_hardcoded_encryption_keys',
     problemMessage:
-        '[avoid_hardcoded_encryption_keys] Hardcoded encryption keys present in source code or binaries can be easily extracted by attackers using reverse engineering tools. Once exposed, these keys allow adversaries to decrypt all user data protected by the key, resulting in a complete compromise of confidentiality for every user of your application. This vulnerability is especially critical in mobile and web apps, where binaries are distributed to end users. Hardcoded keys are often found in test code, examples, or as quick fixes, but they must never be used in production or shipped code. Attackers routinely scan for such patterns, and automated tools can detect and extract these secrets within minutes of release.',
+        '[avoid_hardcoded_encryption_keys] Hardcoded encryption keys present in source code or binaries can be easily extracted by attackers using reverse engineering tools. Once exposed, these keys allow adversaries to decrypt all user data protected by the key, resulting in a complete compromise of confidentiality for every user of your application. This vulnerability is especially critical in mobile and web apps, where binaries are distributed to end users. Hardcoded keys are often found in test code, examples, or as quick fixes, but they must never be used in production or shipped code. Attackers routinely scan for such patterns, and automated tools can detect and extract these secrets within minutes of release. {v5}',
     correctionMessage:
         'Never store encryption keys directly in your source code, configuration files, or application binaries. Instead, load keys securely at runtime from protected sources such as secure storage (e.g., Android Keystore, iOS Keychain, server APIs, or environment variables), or derive them from user input (such as passwords) using a secure key derivation function (KDF) with a unique salt. Review your codebase for any hardcoded secrets, and refactor to ensure that all cryptographic keys are dynamically loaded or derived at runtime. Document your key management strategy and ensure that secrets are never committed to version control or distributed with your app.',
     errorSeverity: DiagnosticSeverity.ERROR,
@@ -200,6 +202,8 @@ class _AddSecureKeyLoadingCommentFix extends DartFix {
 
 /// Warns when Random() is used for cryptographic purposes.
 ///
+/// Since: v1.7.9 | Updated: v4.13.0 | Rule version: v3
+///
 /// Alias: use_secure_random, random_vs_secure_random, insecure_random
 ///
 /// Random() uses a predictable PRNG that can be reverse-engineered.
@@ -235,7 +239,7 @@ class PreferSecureRandomForCryptoRule extends SaropaLintRule {
     name: 'prefer_secure_random_for_crypto',
     // cspell:ignore PRNG CSPRNG
     problemMessage:
-        '[prefer_secure_random_for_crypto] The default Random() constructor in Dart uses a seed based on the current system time, making its output predictable and vulnerable to attack. If Random() is used to generate cryptographic keys, initialization vectors (IVs), nonces, tokens, or any value intended to protect sensitive data, attackers can reproduce the same sequence of random numbers and break your security. This flaw has led to real-world breaches where cryptographic protections were bypassed due to weak randomness. Only a cryptographically secure random number generator (CSPRNG) can provide the unpredictability required for security-critical operations.',
+        '[prefer_secure_random_for_crypto] The default Random() constructor in Dart uses a seed based on the current system time, making its output predictable and vulnerable to attack. If Random() is used to generate cryptographic keys, initialization vectors (IVs), nonces, tokens, or any value intended to protect sensitive data, attackers can reproduce the same sequence of random numbers and break your security. This flaw has led to real-world breaches where cryptographic protections were bypassed due to weak randomness. Only a cryptographically secure random number generator (CSPRNG) can provide the unpredictability required for security-critical operations. {v3}',
     correctionMessage:
         'Replace every use of Random() in cryptographic or security-sensitive contexts with Random.secure(), which leverages the operating system’s cryptographically secure random number generator. This ensures that generated values are truly unpredictable and cannot be reproduced by attackers. Audit your codebase for any use of Random() related to encryption, authentication, token generation, or any feature that relies on secrecy. Update all such instances to use Random.secure(), and add tests or code reviews to prevent future regressions. Document the importance of using CSPRNGs for all cryptographic operations in your project guidelines.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -338,6 +342,8 @@ class _UseSecureRandomFix extends DartFix {
 
 /// Warns when deprecated cryptographic algorithms are used.
 ///
+/// Since: v1.7.9 | Updated: v4.13.0 | Rule version: v2
+///
 /// Alias: no_md5, no_sha1, weak_hash_algorithm, insecure_hash
 ///
 /// MD5 and SHA1 are broken for security purposes. DES and 3DES
@@ -373,7 +379,7 @@ class AvoidDeprecatedCryptoAlgorithmsRule extends SaropaLintRule {
     name: 'avoid_deprecated_crypto_algorithms',
     // cspell:ignore preimage
     problemMessage:
-        '[avoid_deprecated_crypto_algorithms] The use of outdated cryptographic algorithms such as MD5, SHA1, DES, 3DES, and RC4 exposes your application to well-known attacks. These algorithms have been broken by the security community: MD5 and SHA1 are vulnerable to collision and preimage attacks, allowing attackers to forge digital signatures or tamper with data. DES and 3DES have insufficient key lengths and are susceptible to brute-force attacks, while RC4 is vulnerable to several biases and key recovery attacks. Continuing to use these algorithms puts all encrypted or hashed data at risk of compromise, regardless of other security measures.',
+        '[avoid_deprecated_crypto_algorithms] The use of outdated cryptographic algorithms such as MD5, SHA1, DES, 3DES, and RC4 exposes your application to well-known attacks. These algorithms have been broken by the security community: MD5 and SHA1 are vulnerable to collision and preimage attacks, allowing attackers to forge digital signatures or tamper with data. DES and 3DES have insufficient key lengths and are susceptible to brute-force attacks, while RC4 is vulnerable to several biases and key recovery attacks. Continuing to use these algorithms puts all encrypted or hashed data at risk of compromise, regardless of other security measures. {v2}',
     correctionMessage:
         'Replace all uses of deprecated algorithms with modern, secure alternatives. For hashing, use SHA-256 or stronger (SHA-384, SHA-512) for integrity, and HMAC with a strong hash for authentication. For encryption, use AES-256 in a secure mode (e.g., GCM or CBC with random IVs). For password storage, use dedicated password hashing algorithms like bcrypt, scrypt, or Argon2. Review your codebase, dependencies, and third-party libraries for any references to MD5, SHA1, DES, 3DES, or RC4, and refactor to use only cryptographically secure primitives. Document your cryptographic choices and ensure all team members are aware of the risks of deprecated algorithms.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -431,6 +437,8 @@ class AvoidDeprecatedCryptoAlgorithmsRule extends SaropaLintRule {
 // cspell:ignore ciphertext
 /// Warns when static or reused IVs are detected in encryption.
 ///
+/// Since: v1.7.9 | Updated: v4.13.0 | Rule version: v4
+///
 /// Alias: static_iv, reused_iv, iv_reuse, nonce_reuse
 ///
 /// Reusing an IV (Initialization Vector) with the same key breaks
@@ -473,7 +481,7 @@ class RequireUniqueIvPerEncryptionRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_unique_iv_per_encryption',
     problemMessage:
-        '[require_unique_iv_per_encryption] Using a static or reused initialization vector (IV) with the same encryption key enables attackers to detect patterns in your encrypted data. When the same IV is used for multiple encryption operations, identical plaintexts will always produce identical ciphertexts, making it possible for adversaries to infer relationships between messages, perform replay attacks, or even recover plaintexts in some encryption modes. This breaks the fundamental guarantee of confidentiality provided by encryption and has led to serious vulnerabilities in real-world systems.',
+        '[require_unique_iv_per_encryption] Using a static or reused initialization vector (IV) with the same encryption key enables attackers to detect patterns in your encrypted data. When the same IV is used for multiple encryption operations, identical plaintexts will always produce identical ciphertexts, making it possible for adversaries to infer relationships between messages, perform replay attacks, or even recover plaintexts in some encryption modes. This breaks the fundamental guarantee of confidentiality provided by encryption and has led to serious vulnerabilities in real-world systems. {v4}',
     correctionMessage:
         'Always generate a new, random IV for every encryption operation, especially when using block cipher modes like CBC or GCM. Use secure random number generators (such as IV.fromSecureRandom(16)) to ensure IVs are unpredictable and unique for each message. Never use a constant, hardcoded, or reused IV, even for testing or non-production code. If you need to decrypt data later, store the IV alongside the ciphertext (it does not need to be secret, only unique per key). Review your codebase for static or reused IVs and refactor to generate fresh IVs for every encryption. Educate your team about the risks of IV reuse and document best practices in your project.',
     errorSeverity: DiagnosticSeverity.ERROR,
@@ -597,6 +605,134 @@ class _UseSecureRandomIvFix extends DartFix {
           'IV.fromSecureRandom(16)',
         );
       });
+    });
+  }
+}
+
+// =============================================================================
+// require_secure_key_generation
+// =============================================================================
+
+/// Warns when encryption keys are generated from predictable byte patterns.
+///
+/// Since: v4.14.0 | Rule version: v2
+///
+/// Alias: secure_key_generation, predictable_key
+///
+/// Complementary to `avoid_hardcoded_encryption_keys` which catches string
+/// literal keys. This rule detects **non-string** predictable patterns:
+/// - `Key(Uint8List.fromList([1, 2, 3, ...]))` — hardcoded byte arrays
+/// - `Key(List.filled(16, 0))` — predictable fill patterns
+/// - `Key.fromLength(N)` — uses `dart:math` Random (NOT SecureRandom)
+///
+/// These patterns produce deterministic or guessable keys that compromise
+/// all encrypted data.
+///
+/// **BAD:**
+/// ```dart
+/// final key = Key(Uint8List.fromList([1, 2, 3, 4, 5, 6, 7, 8,
+///   9, 10, 11, 12, 13, 14, 15, 16]));
+/// final key = Key.fromLength(16); // uses dart:math Random, not secure
+/// final key = Key(List.filled(32, 0));
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// final key = Key.fromSecureRandom(32);
+/// final key = Key(SecureRandom(32).bytes);
+/// final keyStr = await secureStorage.read(key: 'enc_key');
+/// final key = Key.fromUtf8(keyStr!);
+/// ```
+///
+/// **OWASP:** `M5:Insecure-Communication` `M9:Reverse-Engineering`
+class RequireSecureKeyGenerationRule extends SaropaLintRule {
+  const RequireSecureKeyGenerationRule() : super(code: _code);
+
+  /// Predictable keys are extractable from binaries — critical security flaw.
+  @override
+  LintImpact get impact => LintImpact.critical;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  @override
+  OwaspMapping get owasp => const OwaspMapping(
+        mobile: <OwaspMobile>{OwaspMobile.m5, OwaspMobile.m10},
+        web: <OwaspWeb>{OwaspWeb.a02},
+      );
+
+  static const LintCode _code = LintCode(
+    name: 'require_secure_key_generation',
+    problemMessage:
+        '[require_secure_key_generation] Encryption key generated from a '
+        'predictable source. Key.fromLength() uses dart:math Random which is '
+        'NOT cryptographically secure. Hardcoded byte arrays in '
+        'Uint8List.fromList() or List.filled() produce deterministic keys '
+        'extractable from compiled binaries. Predictable keys compromise all '
+        'data encrypted with them and cannot be rotated without data loss. {v2}',
+    correctionMessage:
+        'Use Key.fromSecureRandom(32) for AES-256 or Key.fromSecureRandom(16) '
+        'for AES-128. For runtime keys, load from secure storage or derive '
+        'from user credentials with a proper KDF.',
+    errorSeverity: DiagnosticSeverity.ERROR,
+  );
+
+  /// Known encryption Key class names from popular Dart crypto libraries
+  static const Set<String> _keyClasses = <String>{
+    'Key',
+    'SecretKey',
+    'EncryptionKey',
+    'AesKey',
+    'CipherKey',
+  };
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    // Detect Key.fromLength(N) — uses dart:math Random, not SecureRandom
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      if (node.methodName.name != 'fromLength') return;
+
+      final Expression? target = node.target;
+      if (target is SimpleIdentifier && _keyClasses.contains(target.name)) {
+        reporter.atNode(node, code);
+      }
+    });
+
+    // Detect Key(literal_list) or Key(Uint8List.fromList([...]))
+    context.registry
+        .addInstanceCreationExpression((InstanceCreationExpression node) {
+      final String typeName = node.constructorName.type.name2.lexeme;
+      if (!_keyClasses.contains(typeName)) return;
+
+      final NodeList<Expression> args = node.argumentList.arguments;
+      if (args.isEmpty) return;
+
+      final Expression firstArg = args.first;
+
+      // Key([1, 2, 3, ...]) — direct list literal
+      if (firstArg is ListLiteral) {
+        reporter.atNode(node, code);
+        return;
+      }
+
+      // Key(Uint8List.fromList([...])) or Key(List.filled(N, M))
+      if (firstArg is MethodInvocation) {
+        final String method = firstArg.methodName.name;
+        if (method == 'fromList' || method == 'filled') {
+          final NodeList<Expression> innerArgs =
+              firstArg.argumentList.arguments;
+          if (innerArgs.isNotEmpty && innerArgs.first is ListLiteral) {
+            reporter.atNode(node, code);
+          } else if (method == 'filled') {
+            // List.filled always produces predictable output
+            reporter.atNode(node, code);
+          }
+        }
+      }
     });
   }
 }

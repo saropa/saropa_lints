@@ -11,6 +11,146 @@ Dates are not included in version headers — [pub.dev](https://pub.dev/packages
 ** See the current published changelog: [saropa_lints/changelog](https://pub.dev/packages/saropa_lints/changelog)
 
 ---
+## [Unreleased]
+
+### Added
+
+- **Structured JSON violation export** (`reports/.saropa_lints/violations.json`): Machine-readable export of all lint violations written alongside the markdown report after each analysis run. Enables Saropa Log Capture to cross-reference runtime errors with static analysis findings. Schema v1.0 includes per-violation OWASP mappings, correction messages, impact levels, severity, plus aggregate `issuesByFile`, `issuesByRule`, `ruleSeverities`, `enabledRuleNames`, `disabledPackages`, `userExclusions`, and `batchCount`
+- **`VIOLATION_EXPORT_API.md`**: Exhaustive API reference for the structured JSON export schema — field types, sort order, OWASP ID tables, consumer notes, and full examples
+- **`correction` field on `ViolationRecord`**: Carries `LintCode.correctionMessage` through the batch pipeline into both the markdown report and JSON export
+- **`toRelativePath` shared utility**: Extracted from duplicated path normalization logic in the report pipeline
+- **New Essential rule**: `require_firebase_composite_index` (ERROR) — detects Firebase Realtime Database queries using `orderByChild` with filter methods that need a `.indexOn` rule in database security rules
+
+---
+## [4.14.0]
+
+### Added
+
+- **6 new Essential rules (ERROR severity)**:
+  - `prefer_correct_package_name`: Library directive names must use lowercase_with_underscores format per Dart naming conventions
+  - `avoid_getx_build_context_bypass`: Detects Get.context and Get.overlayContext usage that bypasses Flutter's BuildContext propagation
+  - `avoid_permission_handler_null_safety`: Detects deprecated pre-null-safety permission_handler APIs (PermissionHandler(), PermissionGroup)
+  - `avoid_retaining_disposed_widgets`: Detects Widget/State/BuildContext references stored in non-widget classes causing memory leaks
+  - `require_secure_key_generation`: Detects predictable encryption key generation (Key.fromLength, hardcoded byte arrays, List.filled)
+  - `require_hive_web_subdirectory`: Detects Hive.initFlutter() without subDir parameter causing web storage conflicts
+
+- **Quick fix for `require_hive_web_subdirectory`**: Adds subdirectory parameter to Hive.initFlutter() calls
+
+- **5 new rules**:
+  - `avoid_blocking_main_thread` (Essential/WARNING): Detects synchronous I/O methods (readAsStringSync, etc.) on the main isolate ([#17](https://github.com/saropa/saropa_lints/issues/17))
+  - `require_log_level_for_production` (Professional/INFO): Detects verbose logging without kDebugMode/assert guards
+  - `require_analytics_event_naming` (Professional/INFO): Detects non-snake_case analytics event names ([#19](https://github.com/saropa/saropa_lints/issues/19))
+  - `require_feature_flag_type_safety` (Recommended/INFO): Detects string-based feature flag access without type-safe wrappers
+  - `require_timezone_display` (Recommended/INFO): Detects DateFormat with time components but no timezone indicator; covers named constructors (Hm, jm, Hms)
+
+### Fixed
+
+- **False positive prevention**: Added receiver/target filtering to 3 heuristic rules to prevent false positives on unrelated APIs:
+  - `require_log_level_for_production`: Now requires logger-like receiver; `math.log()`, `myObject.trace()` no longer trigger
+  - `require_analytics_event_naming`: `track()` and `sendEvent()` now require analytics-like receiver; `shipment.track()` no longer triggers
+  - `require_feature_flag_type_safety`: `isEnabled()` moved to target-filtered set; `notification.isEnabled()` no longer triggers
+- **Double-fire note**: `avoid_synchronous_file_io` (Professional) is now also covered by `avoid_blocking_main_thread` (Essential) which adds isolate detection
+
+- **Rule versioning**: Added `{vN}` version suffixes and `Since: vX.Y.Z` DartDoc provenance to all rules
+
+- **Publish script enhancements**: Auto-sync README/ROADMAP rule counts, roadmap header sync, GitHub issue tracking
+
+---
+## [4.13.0]
+
+### Changed
+
+- **`avoid_empty_setstate` no longer flags mounted-guarded calls**: Empty `setState(() {})` inside a `mounted` guard (`if (mounted)`, ternary, or early-return pattern) is now suppressed. This is an intentional Flutter idiom for triggering rebuilds after async gaps or external state mutations. This rule flags a valid Flutter idiom (`if (mounted) setState(() {})` after async gaps). It is a style preference, not a bug or correctness issue, so it belongs in the comprehensive tier for quality-focused teams. Impact reduced from medium to low.
+
+### Fixed
+
+- **False positives: replaced substring matching with exact detection across 30+ rules**: Rules in animation, async, navigation, API/network, disposal, permission, provider, and widget lifecycle categories now use exact-match sets, `endsWith`/`startsWith`, and AST patterns instead of `String.contains()` substring matching. Eliminates false positives on permission utilities, custom wrappers, and identifiers that happen to contain framework terms like "Location", "Navigator", or "Controller".
+
+- **`require_location_timeout` no longer fires on permission checks**: GPS timeout rule now uses an exact allowlist of GPS methods (`getCurrentPosition`, `getLastKnownPosition`, etc.) and detects chained `.timeout()` calls. Previously matched any method with "location" in the name.
+
+- **Report: duplicate violations on file re-analysis**: `_currentFile` was not updated when a file was re-analyzed, causing `_trackByFileAndRule` to attribute violations to the wrong file and `_clearFileData` to skip ImpactTracker cleanup. Violations appeared 10-15x in reports.
+
+- **Report: session detection uses re-analysis instead of timeout**: The 3-second debounce could fire mid-analysis (observed 83-second gap between file batches), splitting one run into multiple reports. Session boundaries now use file re-analysis detection — straggler files are new and never trigger false boundaries.
+
+### Added
+
+- **Report: analysis configuration header**: Reports now include tier, enabled rules, platforms, packages, user exclusions, and verbatim `analysis_options_custom.yaml` content.
+
+- **Publish gate: `[rule_name]` prefix required in all problemMessage strings**: The publish script now blocks release if any rule's `problemMessage` does not start with `[rule_name]`. All 15 previously non-compliant rules have been updated.
+
+- **CI guard: `.contains()` anti-pattern detection test**: New test scans all rule files for 9 dangerous `String.contains()` patterns (e.g. `methodName.contains(`, `toSource().contains(`) and fails CI if new violations are introduced. Per-file baseline counts track the 1,100+ existing instances; baselines tighten as violations are removed.
+
+- **Shared utility: `target_matcher_utils.dart`**: Four functions (`extractTargetName`, `isExactTarget`, `isFieldCleanedUp`, `hasChainedMethod`) that replace the most common `.contains()` anti-patterns with exact-match and AST-based detection.
+
+- **False-positive regression tests**: 7 new test cases in `false_positive_fixes_test.dart` covering the patterns that caused the most real-world false positives (location timeout, navigator match, context access, HTTP status, scroll controller dispose).
+
+- **Report: import graph priority scoring**: New FILE IMPORTANCE section ranks every analyzed file by a combined score of fan-in (how many files import it) and architectural layer weight. New FIX PRIORITY section sorts all violations by `impact * (importance + 1) * layer_weight` so the developer sees what to fix first. New PROJECT STRUCTURE section renders the full import dependency tree from entry points.
+
+- **Report: multi-isolate batch consolidation**: Reports now merge data from all isolate restarts within a session instead of losing earlier analysis data. Each isolate writes a batch file; the final report consolidates all batches into one combined report.
+
+---
+## [4.12.3]
+
+### Fixed
+
+- **Init migrates existing configs**: Running `dart run saropa_lints:init` on projects that already have `max_issues` now adds the missing `output` setting instead of skipping the file.
+
+---
+## [4.12.2]
+
+### Changed
+
+- **Problems tab capped at 500**: After 500 non-ERROR issues in the Problems tab, rules keep running and all remaining issues are written to the report log only. Configurable via `SAROPA_LINTS_MAX` env var or `max_issues` in `analysis_options_custom.yaml`.
+
+- **Single report file**: Merged full violation log and summary into one combined report file (`_saropa_lint_report.log`).
+
+- **Progress shows total after limit**: After 500 issues, the progress line shows "500 shown, 847 total" so you can see the report growing in real time.
+
+### Added
+
+- **Graceful abort**: Create a `.saropa_stop` file in the project root to stop analysis mid-flight and get a partial report. Hint shown when the 500-issue limit is reached.
+
+- **File-only output mode**: Set `output: file` in `analysis_options_custom.yaml` (or `SAROPA_LINTS_OUTPUT=file` env var for a one-off run) to skip the Problems tab and send all violations to the report log only.
+
+### Fixed
+
+- **Report debounce resets on every file**: The debounce timer now resets when any file is processed, not just when a violation is found. Prevents premature report writes during long stretches of clean files.
+
+- **Session reset between analysis runs**: Trackers now reset automatically when a new analysis session starts, preventing double-counted violations and stale `_limitReached` state from previous runs.
+
+- **File re-analysis no longer double-counts**: When a file is re-analyzed within the same session (e.g. user saves during active analysis), stale violation data is cleared before recording new violations.
+
+---
+## [4.12.1]
+
+### Fixed
+
+- **Analysis report captures all violations**: The debounce timer's write-once guard caused reports to contain only the first batch of violations when analysis gaps exceeded 3 seconds. Reports now overwrite on each debounce cycle so the final output reflects the complete analysis.
+
+### Added
+
+- **Regression tests for violation parser**: Added 16 tests covering `parseViolations()` and the `Violation` model to guard against future `custom_lint` output format changes (see PR #84 / PR #90).
+
+- **Updated PR #84 review document**: Corrected merge status (PR #84 was closed in favor of PR #90), added timeline, risk table, and regression test reference.
+
+---
+## [4.12.0]
+
+### Added
+
+- **10 new lint rules** across multiple categories:
+  - `avoid_context_dependency_in_callback` (Essential, WARNING): Detects `Theme.of(context)`, `MediaQuery.of(context)`, etc. inside async callbacks (`.then()`, `Future.delayed`, `Timer`). These calls can use a disposed context. Includes quick fix.
+  - `avoid_datetime_comparison_without_precision` (Professional, INFO): Flags `==`/`!=` on DateTime values which fails due to microsecond differences. Suggests `difference().abs()` comparison. Includes quick fix.
+  - `avoid_getx_static_get` (Professional, WARNING): Detects `Get.find()` calls which create hidden global dependencies. Suggests constructor injection. Includes quick fix.
+  - `avoid_missing_interpolation` (Recommended, WARNING): Detects string concatenation with `+` where interpolation is clearer. Includes quick fix.
+  - `avoid_provider_listen_false_in_build` (Recommended, INFO): Flags `Provider.of(context, listen: false)` inside `build()` methods which suppresses reactive rebuilds. Includes quick fix to remove `listen: false`.
+  - `avoid_hive_synchronous_in_ui` (Essential, WARNING): Detects synchronous Hive operations (`get`, `put`, `delete`, etc.) inside `build()` or `initState()` which block the UI thread. Includes quick fix.
+  - `prefer_spring_animation` (Recommended, INFO): Suggests replacing `CurvedAnimation` with physics-like bounce/elastic curves with `SpringSimulation` for more natural motion. Includes quick fix.
+  - `prefer_avatar_loading_placeholder` (Recommended, INFO): Flags `CircleAvatar` with `NetworkImage` but no error handler or fallback child. Includes quick fix adding `onBackgroundImageError` and fallback `Icon`.
+  - `require_navigation_result_handling` (Professional, INFO): Detects `Navigator.push*()` calls where the result is not awaited or assigned. Includes quick fix adding `await`.
+  - `require_semantic_colors` (Professional, INFO): Flags Color variables named by appearance (e.g., `redColor`) instead of semantic purpose (e.g., `errorColor`). Includes quick fix.
+
+---
 ## [4.11.1]
 
 - **Improved `prefer_using_list_view` Rule:**

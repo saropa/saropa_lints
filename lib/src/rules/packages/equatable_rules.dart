@@ -39,6 +39,8 @@ bool isEquatable(ClassDeclaration node) {
 
 /// Warns when a class overrides operator == but doesn't extend Equatable.
 ///
+/// Since: v4.1.3 | Updated: v4.13.0 | Rule version: v2
+///
 /// Alias: prefer_equatable, use_equatable_for_equality
 ///
 /// Equatable provides consistent hashCode and equality implementations
@@ -85,7 +87,7 @@ class ExtendEquatableRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_extend_equatable',
     problemMessage:
-        '[require_extend_equatable] Class overrides operator == but does not extend Equatable. Equatable provides consistent hashCode and equality implementations with less boilerplate and fewer opportunities for bugs.',
+        '[require_extend_equatable] Class overrides operator == but does not extend Equatable. Equatable provides consistent hashCode and equality implementations with less boilerplate and fewer opportunities for bugs. {v2}',
     correctionMessage:
         'Prefer extending Equatable for cleaner equality implementation. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -144,6 +146,8 @@ class ExtendEquatableRule extends SaropaLintRule {
 
 /// Warns when an Equatable subclass has fields not listed in props.
 ///
+/// Since: v2.0.0 | Updated: v4.13.0 | Rule version: v3
+///
 /// Alias: require_equatable_all_fields_in_props, missing_props_field, equatable_props_incomplete
 ///
 /// All fields should be included in props for correct equality comparison.
@@ -189,7 +193,7 @@ class ListAllEquatableFieldsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'list_all_equatable_fields',
     problemMessage:
-        '[list_all_equatable_fields] Equatable class has fields not included in props. Equality checks fail silently when these fields differ, causing inconsistent behavior in collections, comparisons, and UI updates. Two objects with different field values will be treated as equal, leading to missed rebuilds, incorrect deduplication, and subtle bugs that are extremely hard to trace.',
+        '[list_all_equatable_fields] Equatable class has fields not included in props. Equality checks fail silently when these fields differ, causing inconsistent behavior in collections, comparisons, and UI updates. Two objects with different field values will be treated as equal, leading to missed rebuilds, incorrect deduplication, and subtle bugs that are extremely hard to trace. {v3}',
     correctionMessage:
         'Add all instance fields to the props getter for correct equality. Otherwise, objects may not compare as equal when expected, leading to subtle bugs.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -310,6 +314,8 @@ class _AddMissingFieldsToPropsHint extends DartFix {
 
 /// Warns when a class extends Equatable but could use EquatableMixin instead.
 ///
+/// Since: v2.0.0 | Updated: v4.13.0 | Rule version: v2
+///
 /// Alias: use_equatable_mixin, equatable_mixin_over_extends
 ///
 /// Using EquatableMixin is preferred when:
@@ -353,7 +359,7 @@ class PreferEquatableMixinRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_equatable_mixin',
     problemMessage:
-        '[prefer_equatable_mixin] Use EquatableMixin instead of extending Equatable. Using EquatableMixin is preferred when: - The class already extends another class - You want to preserve the class hierarchy.',
+        '[prefer_equatable_mixin] Use EquatableMixin instead of extending Equatable. Using EquatableMixin is preferred when: - The class already extends another class - You want to preserve the class hierarchy. {v2}',
     correctionMessage:
         'EquatableMixin allows you to extend other classes while keeping. Verify the change works correctly with existing tests and add coverage for the new behavior.'
         'Equatable functionality. Change to: class X with EquatableMixin',
@@ -446,6 +452,8 @@ class _ConvertToEquatableMixinFix extends DartFix {
 
 /// Warns when an Equatable class doesn't override stringify to true.
 ///
+/// Since: v2.3.7 | Updated: v4.13.0 | Rule version: v2
+///
 /// Alias: equatable_stringify, require_stringify_override
 ///
 /// Overriding stringify to true provides better debugging output by including
@@ -492,7 +500,7 @@ class PreferEquatableStringifyRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_equatable_stringify',
     problemMessage:
-        '[prefer_equatable_stringify] Equatable class does not override stringify to true. Overriding stringify to true provides better debugging output by including field values in toString() instead of just the class name.',
+        '[prefer_equatable_stringify] Equatable class does not override stringify to true. Overriding stringify to true provides better debugging output by including field values in toString() instead of just the class name. {v2}',
     correctionMessage:
         'Add: @override bool get stringify => true; to improve debugging. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -570,6 +578,8 @@ class _AddStringifyOverrideFix extends DartFix {
 
 /// Warns when an Equatable class is not annotated with @immutable.
 ///
+/// Since: v2.3.7 | Updated: v4.13.0 | Rule version: v2
+///
 /// Alias: require_immutable_annotation, immutable_equatable
 ///
 /// Equatable classes should be immutable to ensure correct equality
@@ -613,7 +623,7 @@ class PreferImmutableAnnotationRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_immutable_annotation',
     problemMessage:
-        '[prefer_immutable_annotation] Equatable class is not annotated with @immutable. Equatable classes must be immutable to ensure correct equality behavior. The @immutable annotation documents this intent and enables additional static analysis.',
+        '[prefer_immutable_annotation] Equatable class is not annotated with @immutable. Equatable classes must be immutable to ensure correct equality behavior. The @immutable annotation documents this intent and enables additional static analysis. {v2}',
     correctionMessage:
         'Add @immutable annotation to document immutability intent. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -678,6 +688,8 @@ class _AddImmutableAnnotationFix extends DartFix {
 
 /// Warns when a simple Equatable class could be replaced with a Dart 3 record.
 ///
+/// Since: v2.3.7 | Updated: v4.13.0 | Rule version: v5
+///
 /// Alias: use_record_instead_of_equatable, equatable_to_record
 ///
 /// Simple data classes that only hold values and use Equatable for
@@ -717,7 +729,7 @@ class PreferRecordOverEquatableRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_record_over_equatable',
     problemMessage:
-        '[prefer_record_over_equatable] Simple Equatable class with only final fields and no custom methods detected. Dart 3 records provide built-in equality and immutability with far less boilerplate. Replace with a typedef record.',
+        '[prefer_record_over_equatable] Simple Equatable class with only final fields and no custom methods detected. Dart 3 records provide built-in equality and immutability with far less boilerplate. Replace with a typedef record. {v5}',
     correctionMessage:
         'Replace the Equatable subclass with a Dart 3 record: typedef ClassName = ({Type field, ...}); for less boilerplate.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -798,6 +810,8 @@ class PreferRecordOverEquatableRule extends SaropaLintRule {
 
 /// Warns when Equatable class has non-final (mutable) fields.
 ///
+/// Since: v2.3.9 | Updated: v4.13.0 | Rule version: v4
+///
 /// Alias: no_mutable_equatable_field, equatable_final_fields
 ///
 /// All fields in Equatable classes should be final to ensure correct
@@ -837,7 +851,7 @@ class AvoidMutableFieldInEquatableRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_mutable_field_in_equatable',
     problemMessage:
-        '[avoid_mutable_field_in_equatable] Equatable classes should only have final fields. Mutable fields break value equality, causing bugs in collections, state management, and UI updates. Changing a field after object creation makes == and hashCode unreliable.',
+        '[avoid_mutable_field_in_equatable] Equatable classes should only have final fields. Mutable fields break value equality, causing bugs in collections, state management, and UI updates. Changing a field after object creation makes == and hashCode unreliable. {v4}',
     correctionMessage:
         'Make all fields in Equatable classes final to ensure correct value equality and predictable behavior.',
     errorSeverity: DiagnosticSeverity.ERROR,
@@ -871,6 +885,8 @@ class AvoidMutableFieldInEquatableRule extends SaropaLintRule {
 }
 
 /// Warns when Equatable class doesn't have a copyWith method.
+///
+/// Since: v2.3.10 | Updated: v4.13.0 | Rule version: v2
 ///
 /// Alias: copy_with_for_equatable, add_copy_with
 ///
@@ -915,7 +931,7 @@ class RequireEquatableCopyWithRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_equatable_copy_with',
     problemMessage:
-        '[require_equatable_copy_with] Equatable class lacks copyWith method. Without copyWith, creating modified copies requires manually constructing new instances with all fields, leading to verbose code and errors when fields are added or removed from the class.',
+        '[require_equatable_copy_with] Equatable class lacks copyWith method. Without copyWith, creating modified copies requires manually constructing new instances with all fields, leading to verbose code and errors when fields are added or removed from the class. {v2}',
     correctionMessage:
         'Add a copyWith method that accepts optional named parameters for each field and returns a new instance. This enables concise immutable updates and maintains compatibility when the class structure evolves.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -953,6 +969,8 @@ class RequireEquatableCopyWithRule extends SaropaLintRule {
 
 /// Warns when copyWith methods can't set nullable fields to null.
 ///
+/// Since: v2.3.11 | Updated: v4.13.0 | Rule version: v2
+///
 /// Alias: copy_with_nullable, nullable_copy_with
 ///
 /// Standard copyWith pattern can't distinguish between "not provided" and
@@ -986,7 +1004,7 @@ class RequireCopyWithNullHandlingRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_copy_with_null_handling',
     problemMessage:
-        '[require_copy_with_null_handling] copyWith with ?? operator cannot set nullable fields to null. Standard copyWith pattern can\'t distinguish between "not provided" and "explicitly null". Use a sentinel value or wrapper class to support setting nullable fields back to null.',
+        '[require_copy_with_null_handling] copyWith with ?? operator cannot set nullable fields to null. Standard copyWith pattern can\'t distinguish between "not provided" and "explicitly null". Use a sentinel value or wrapper class to support setting nullable fields back to null. {v2}',
     correctionMessage:
         'Use a wrapper type like Optional<T> or generated copyWith from freezed. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -1057,6 +1075,8 @@ class RequireCopyWithNullHandlingRule extends SaropaLintRule {
 
 /// Collection fields in Equatable need DeepCollectionEquality.
 ///
+/// Since: v2.6.0 | Updated: v4.13.0 | Rule version: v3
+///
 /// List/Map/Set fields compared by reference, not contents.
 /// Use DeepCollectionEquality for proper comparison.
 ///
@@ -1090,7 +1110,7 @@ class RequireDeepEqualityCollectionsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_deep_equality_collections',
     problemMessage:
-        '[require_deep_equality_collections] Collections (List, Map, Set) in Equatable props are compared by reference, not by contents. This causes false negatives in equality checks, leading to subtle bugs, missed UI updates, broken state management, and wasted rebuilds. In production, this can result in persistent UI glitches, incorrect state restoration, and hard-to-diagnose logic errors. Collections with identical contents but different references will not compare as equal, undermining the reliability of Equatable-based state classes.',
+        '[require_deep_equality_collections] Collections (List, Map, Set) in Equatable props are compared by reference, not by contents. This causes false negatives in equality checks, leading to subtle bugs, missed UI updates, broken state management, and wasted rebuilds. In production, this can result in persistent UI glitches, incorrect state restoration, and hard-to-diagnose logic errors. Collections with identical contents but different references will not compare as equal, undermining the reliability of Equatable-based state classes. {v3}',
     correctionMessage:
         'Use DeepCollectionEquality().equals() and .hash() for collections, or wrap collections in unmodifiable views. Always document equality logic for collection fields, and add tests to verify correct behavior. This ensures reliable state comparison and prevents UI bugs and wasted rebuilds.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -1162,6 +1182,8 @@ class RequireDeepEqualityCollectionsRule extends SaropaLintRule {
 
 /// DateTime equality is problematic due to microsecond precision.
 ///
+/// Since: v2.6.0 | Updated: v4.13.0 | Rule version: v2
+///
 /// DateTime comparisons can fail due to microsecond differences.
 /// Compare truncated or formatted values instead.
 ///
@@ -1192,7 +1214,7 @@ class AvoidEquatableDatetimeRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_equatable_datetime',
     problemMessage:
-        '[avoid_equatable_datetime] DateTime in Equatable props may cause flaky equality checks. DateTime comparisons can fail due to microsecond differences. Compare truncated or formatted values instead.',
+        '[avoid_equatable_datetime] DateTime in Equatable props may cause flaky equality checks. DateTime comparisons can fail due to microsecond differences. Compare truncated or formatted values instead. {v2}',
     correctionMessage:
         'Use timestamp.millisecondsSinceEpoch or toIso8601String() instead. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -1261,6 +1283,8 @@ class AvoidEquatableDatetimeRule extends SaropaLintRule {
 
 /// Make collection fields unmodifiable to prevent mutation.
 ///
+/// Since: v2.6.0 | Updated: v4.13.0 | Rule version: v3
+///
 /// Mutable collections in state classes can be modified externally,
 /// breaking immutability expectations.
 ///
@@ -1292,7 +1316,7 @@ class PreferUnmodifiableCollectionsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_unmodifiable_collections',
     problemMessage:
-        '[prefer_unmodifiable_collections] Equatable class exposes mutable collection field. External code can modify the collection contents without creating a new instance, breaking Equatable\'s equality contract and causing inconsistent state where equal objects have different contents.',
+        '[prefer_unmodifiable_collections] Equatable class exposes mutable collection field. External code can modify the collection contents without creating a new instance, breaking Equatable\'s equality contract and causing inconsistent state where equal objects have different contents. {v3}',
     correctionMessage:
         'Wrap the collection in List.unmodifiable(), Map.unmodifiable(), or UnmodifiableSetView() to prevent external modifications. This enforces immutability and preserves Equatable semantics while still allowing read access.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -1373,6 +1397,8 @@ class PreferUnmodifiableCollectionsRule extends SaropaLintRule {
 
 /// Warns when Equatable class doesn't override props.
 ///
+/// Since: v4.13.0 | Rule version: v1
+///
 /// Alias: equatable_missing_props, props_override_required
 ///
 /// Equatable requires props getter to define which fields affect equality.
@@ -1406,7 +1432,7 @@ class RequireEquatablePropsOverrideRule extends SaropaLintRule {
     name: 'require_equatable_props_override',
     problemMessage:
         '[require_equatable_props_override] Without props override, equality '
-        'defaults to identity comparison, breaking state deduplication.',
+        'defaults to identity comparison, breaking state deduplication. {v1}',
     correctionMessage: 'Add: List<Object?> get props => [field1, field2];',
     errorSeverity: DiagnosticSeverity.ERROR,
   );

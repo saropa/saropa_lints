@@ -18,6 +18,8 @@ import '../saropa_lint_rule.dart';
 
 /// Warns when IconButton is used without a tooltip for accessibility.
 ///
+/// Since: v4.10.0 | Updated: v4.13.0 | Rule version: v5
+///
 /// Alias: prefer_action_button_tooltip
 ///
 /// IconButtons without tooltips are not accessible to screen readers.
@@ -52,7 +54,7 @@ class AvoidIconButtonsWithoutTooltipRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_icon_buttons_without_tooltip',
     problemMessage:
-        '[avoid_icon_buttons_without_tooltip] This IconButton does not provide a tooltip, making it inaccessible to screen readers and users with visual impairments. Without a tooltip, users cannot understand the button’s purpose, which reduces usability and fails accessibility standards. Tooltips are essential for describing the action of icon-only buttons.',
+        '[avoid_icon_buttons_without_tooltip] This IconButton does not provide a tooltip, making it inaccessible to screen readers and users with visual impairments. Without a tooltip, users cannot understand the button’s purpose, which reduces usability and fails accessibility standards. Tooltips are essential for describing the action of icon-only buttons. {v5}',
     correctionMessage:
         "Always provide a tooltip for every IconButton, describing its action clearly (e.g., tooltip: 'Open settings'). Audit your codebase for IconButton usage and add tooltips where missing. Refer to Flutter accessibility documentation for best practices on labeling interactive elements.",
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -126,6 +128,8 @@ class _AddIconButtonTooltipFix extends DartFix {
 
 /// Warns when touch targets are potentially too small for accessibility.
 ///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v5
+///
 /// WCAG 2.1 recommends touch targets be at least 44x44 CSS pixels.
 /// Material Design recommends 48x48 dp minimum.
 ///
@@ -161,7 +165,7 @@ class AvoidSmallTouchTargetsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_small_touch_targets',
     problemMessage:
-        '[avoid_small_touch_targets] Touch target under 44px violates WCAG 2.5.5 (Target Size). Users with motor impairments, tremors, or limited dexterity will struggle to tap accurately, causing frustration and excluding them from core functionality. The minimum recommended touch target size is 48x48 logical pixels to ensure reliable interaction across all ability levels.',
+        '[avoid_small_touch_targets] Touch target under 44px violates WCAG 2.5.5 (Target Size). Users with motor impairments, tremors, or limited dexterity will struggle to tap accurately, causing frustration and excluding them from core functionality. The minimum recommended touch target size is 48x48 logical pixels to ensure reliable interaction across all ability levels. {v5}',
     correctionMessage:
         'Wrap the interactive element in a SizedBox(width: 48, height: 48) or set MaterialTapTargetSize.padded to ensure the touch area meets the 48px minimum.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -264,6 +268,8 @@ class _InteractiveWidgetVisitor extends RecursiveAstVisitor<void> {
 
 /// Warns when ExcludeSemantics is used without a comment explaining why.
 ///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v5
+///
 /// ExcludeSemantics removes content from the accessibility tree.
 /// This should be intentional and documented.
 ///
@@ -295,7 +301,7 @@ class RequireExcludeSemanticsJustificationRule extends SaropaLintRule {
     name: 'require_exclude_semantics_justification',
     problemMessage:
         '[require_exclude_semantics_justification] ExcludeSemantics without '
-        'justification makes accessibility audits harder to pass.',
+        'justification makes accessibility audits harder to pass. {v5}',
     correctionMessage:
         'Add a comment above ExcludeSemantics explaining the rationale.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -364,6 +370,8 @@ class RequireExcludeSemanticsJustificationRule extends SaropaLintRule {
 
 /// Warns when using color alone to convey information.
 ///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v6
+///
 /// Users with color blindness may not be able to distinguish colors.
 /// Always provide an additional indicator (icon, text, pattern).
 ///
@@ -398,7 +406,7 @@ class AvoidColorOnlyIndicatorsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_color_only_indicators',
     problemMessage:
-        '[avoid_color_only_indicators] Color-only status indicator fails for approximately 8% of men and 0.5% of women who have color vision deficiency and cannot distinguish red from green, making the UI completely inaccessible to colorblind users. Relying solely on color to convey meaning violates WCAG 1.4.1 (Use of Color), which requires a secondary visual cue such as an icon, text label, or pattern to communicate status information.',
+        '[avoid_color_only_indicators] Color-only status indicator fails for approximately 8% of men and 0.5% of women who have color vision deficiency and cannot distinguish red from green, making the UI completely inaccessible to colorblind users. Relying solely on color to convey meaning violates WCAG 1.4.1 (Use of Color), which requires a secondary visual cue such as an icon, text label, or pattern to communicate status information. {v6}',
     correctionMessage:
         'Add a secondary visual cue alongside the color, such as Icon(isError ? Icons.error : Icons.check), a text label, or a distinct shape to convey status.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -443,6 +451,8 @@ class AvoidColorOnlyIndicatorsRule extends SaropaLintRule {
 
 /// Warns when GestureDetector is used without keyboard accessibility.
 ///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v6
+///
 /// Touch gestures like tap, long press, etc. need keyboard equivalents
 /// for users who cannot use touch input.
 ///
@@ -483,7 +493,7 @@ class AvoidGestureOnlyInteractionsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_gesture_only_interactions',
     problemMessage:
-        '[avoid_gesture_only_interactions] GestureDetector is used without providing keyboard or accessibility support, making the interaction inaccessible to users with motor disabilities or those relying on switch control. This excludes users who cannot use touch input and fails to meet accessibility standards for interactive elements.',
+        '[avoid_gesture_only_interactions] GestureDetector is used without providing keyboard or accessibility support, making the interaction inaccessible to users with motor disabilities or those relying on switch control. This excludes users who cannot use touch input and fails to meet accessibility standards for interactive elements. {v6}',
     correctionMessage:
         'Wrap GestureDetector with Focus and provide onKeyEvent handlers, or use InkWell, ElevatedButton, or other accessible widgets that support keyboard and assistive technologies. Audit your codebase for GestureDetector usage and refactor to ensure all interactions are accessible. See Flutter accessibility documentation for guidance.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -542,6 +552,8 @@ class AvoidGestureOnlyInteractionsRule extends SaropaLintRule {
 
 /// Warns when Semantics widget is missing the label property.
 ///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v5
+///
 /// Interactive elements need semantic labels for screen readers.
 ///
 /// **BAD:**
@@ -573,7 +585,7 @@ class RequireSemanticsLabelRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_semantics_label',
     problemMessage:
-        '[require_semantics_label] This Semantics child element with a button, link, or other interactive role is missing a label, making it inaccessible to screen readers. Without a label, users cannot understand the purpose of the interactive element, which reduces usability and fails accessibility standards. Labels are essential for describing the action or purpose of interactive elements in the widget tree.',
+        '[require_semantics_label] This Semantics child element with a button, link, or other interactive role is missing a label, making it inaccessible to screen readers. Without a label, users cannot understand the purpose of the interactive element, which reduces usability and fails accessibility standards. Labels are essential for describing the action or purpose of interactive elements in the widget tree. {v5}',
     correctionMessage:
         "Always provide a descriptive label for Semantics child elements with interactive roles (e.g., label: 'Submit form'). Audit your build methods for Semantics usage and add labels where missing. Refer to Flutter accessibility documentation for labeling interactive elements.",
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -629,6 +641,8 @@ class RequireSemanticsLabelRule extends SaropaLintRule {
 
 /// Warns when MergeSemantics might hide important information.
 ///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v5
+///
 /// MergeSemantics combines all descendant semantics into one node.
 /// This can hide important information from screen reader users.
 ///
@@ -670,7 +684,7 @@ class AvoidMergedSemanticsHidingInfoRule extends SaropaLintRule {
     name: 'avoid_merged_semantics_hiding_info',
     problemMessage:
         '[avoid_merged_semantics_hiding_info] MergeSemantics hides interactive '
-        'elements from screen readers, making buttons/inputs unusable.',
+        'elements from screen readers, making buttons/inputs unusable. {v5}',
     correctionMessage:
         'Move interactive widgets outside MergeSemantics, or wrap only related text content.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -738,6 +752,8 @@ class _InteractiveCountVisitor extends RecursiveAstVisitor<void> {
 
 /// Warns when dynamic content doesn't use live region semantics.
 ///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v5
+///
 /// Screen readers need to be notified when content changes dynamically.
 /// Use Semantics with liveRegion: true for important updates.
 ///
@@ -766,7 +782,7 @@ class RequireLiveRegionRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_live_region',
     problemMessage:
-        '[require_live_region] Dynamic content that changes (such as error messages, notifications, or status updates) should use Semantics with liveRegion enabled. Without liveRegion, screen readers will not announce updates, leaving users unaware of important changes. This is critical for accessibility in apps with real-time or changing content.',
+        '[require_live_region] Dynamic content that changes (such as error messages, notifications, or status updates) should use Semantics with liveRegion enabled. Without liveRegion, screen readers will not announce updates, leaving users unaware of important changes. This is critical for accessibility in apps with real-time or changing content. {v5}',
     correctionMessage:
         'Wrap dynamic content with Semantics(liveRegion: true) to ensure screen readers announce changes. Audit your codebase for dynamic UI updates and add liveRegion where appropriate. Refer to Flutter accessibility documentation for best practices on live regions and dynamic content.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -847,6 +863,8 @@ class RequireLiveRegionRule extends SaropaLintRule {
 
 /// Warns when section headers don't have heading semantics.
 ///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v5
+///
 /// Screen reader users rely on heading semantics to navigate content.
 /// Use Semantics with header: true for section titles.
 ///
@@ -882,7 +900,7 @@ class RequireHeadingSemanticsRule extends SaropaLintRule {
     name: 'require_heading_semantics',
     problemMessage:
         '[require_heading_semantics] Missing header semantics prevents screen '
-        'reader users from navigating by headings.',
+        'reader users from navigating by headings. {v5}',
     correctionMessage:
         'Wrap with Semantics(header: true) for screen reader navigation.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -959,6 +977,8 @@ class RequireHeadingSemanticsRule extends SaropaLintRule {
 
 /// Warns when image-based buttons lack tooltips.
 ///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v5
+///
 /// Buttons that only show an image or icon need text descriptions
 /// for screen reader users.
 ///
@@ -993,7 +1013,7 @@ class AvoidImageButtonsWithoutTooltipRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_image_buttons_without_tooltip',
     problemMessage:
-        '[avoid_image_buttons_without_tooltip] This image-only button does not provide an accessible label, making it invisible to screen readers and users with visual impairments. Without a tooltip or semantic label, users cannot understand or interact with the button, which fails accessibility standards and excludes blind users from key actions.',
+        '[avoid_image_buttons_without_tooltip] This image-only button does not provide an accessible label, making it invisible to screen readers and users with visual impairments. Without a tooltip or semantic label, users cannot understand or interact with the button, which fails accessibility standards and excludes blind users from key actions. {v5}',
     correctionMessage:
         'Always wrap image-only buttons with Tooltip or add a Semantics widget with a descriptive label to ensure accessibility. Audit your codebase for image buttons and add labels where missing. Refer to Flutter accessibility documentation for best practices on labeling interactive elements.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -1070,6 +1090,8 @@ class AvoidImageButtonsWithoutTooltipRule extends SaropaLintRule {
 
 /// Warns when textScaleFactor is set to 1.0, ignoring user accessibility settings.
 ///
+/// Since: v1.5.0 | Updated: v4.13.0 | Rule version: v3
+///
 /// Users with visual impairments rely on system text scaling to make text
 /// readable. Hardcoding textScaleFactor: 1.0 overrides their preferences.
 ///
@@ -1107,7 +1129,7 @@ class AvoidTextScaleFactorIgnoreRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_text_scale_factor_ignore',
     problemMessage:
-        '[avoid_text_scale_factor_ignore] Setting textScaleFactor to 1.0 on a text child element overrides user accessibility settings, preventing users from increasing text size for readability. This excludes users with low vision and fails accessibility standards. Respecting user-configured text scaling in the widget tree is essential for inclusive design.',
+        '[avoid_text_scale_factor_ignore] Setting textScaleFactor to 1.0 on a text child element overrides user accessibility settings, preventing users from increasing text size for readability. This excludes users with low vision and fails accessibility standards. Respecting user-configured text scaling in the widget tree is essential for inclusive design. {v3}',
     correctionMessage:
         'Remove hardcoded textScaleFactor values or use clamp() to limit scaling range while still allowing user adjustments. Audit your build methods for textScaleFactor usage and refactor to respect accessibility settings. See Flutter documentation on text scaling and accessibility.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -1161,6 +1183,8 @@ class AvoidTextScaleFactorIgnoreRule extends SaropaLintRule {
 
 /// Warns when Image widget lacks a semanticLabel for screen readers.
 ///
+/// Since: v1.5.0 | Updated: v4.13.0 | Rule version: v6
+///
 /// Alias: require_image_description
 ///
 /// Images without semanticLabel are invisible to screen readers, making
@@ -1198,7 +1222,7 @@ class RequireImageSemanticsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_image_semantics',
     problemMessage:
-        '[require_image_semantics] Image constructor lacks a semanticLabel parameter. Screen readers cannot describe this image to users with visual impairments, making the content inaccessible. This violates WCAG 1.1.1 (Non-text Content) and may exclude your app from accessibility-mandated markets.',
+        '[require_image_semantics] Image constructor lacks a semanticLabel parameter. Screen readers cannot describe this image to users with visual impairments, making the content inaccessible. This violates WCAG 1.1.1 (Non-text Content) and may exclude your app from accessibility-mandated markets. {v6}',
     correctionMessage:
         "Add semanticLabel: 'description' or excludeFromSemantics: true for decorative images.",
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -1277,6 +1301,8 @@ class RequireImageSemanticsRule extends SaropaLintRule {
 
 /// Warns when interactive elements have excludeFromSemantics but also have tap handlers.
 ///
+/// Since: v1.5.0 | Updated: v4.13.0 | Rule version: v3
+///
 /// Elements with tap handlers that are excluded from semantics are completely
 /// inaccessible to screen reader users. This is a critical accessibility bug.
 ///
@@ -1315,7 +1341,7 @@ class AvoidHiddenInteractiveRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_hidden_interactive',
     problemMessage:
-        '[avoid_hidden_interactive] This interactive element uses excludeFromSemantics, making it completely inaccessible to screen readers and users with assistive technologies. Excluding interactive child elements from the semantics tree prevents users with disabilities from discovering or activating key actions, which fails accessibility standards and can break critical workflows.',
+        '[avoid_hidden_interactive] This interactive element uses excludeFromSemantics, making it completely inaccessible to screen readers and users with assistive technologies. Excluding interactive child elements from the semantics tree prevents users with disabilities from discovering or activating key actions, which fails accessibility standards and can break critical workflows. {v3}',
     correctionMessage:
         'Remove excludeFromSemantics from interactive elements, or wrap them in a Semantics parent with a descriptive label to ensure accessibility. Audit your build methods for excludeFromSemantics usage and refactor to provide proper semantic information. Refer to Flutter accessibility documentation for guidance.',
     errorSeverity: DiagnosticSeverity.ERROR,
@@ -1408,6 +1434,8 @@ class _InteractiveChildVisitor extends RecursiveAstVisitor<void> {
 
 /// Warns when text uses fixed pixel sizes that don't scale with system settings.
 ///
+/// Since: v1.7.2 | Updated: v4.13.0 | Rule version: v2
+///
 /// Text should scale with system font size settings for users with visual
 /// impairments. Avoid fixed pixel sizes and let text scale naturally.
 ///
@@ -1448,7 +1476,7 @@ class PreferScalableTextRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_scalable_text',
     problemMessage:
-        '[prefer_scalable_text] Text uses a fixed font size and does not respect user accessibility settings. This prevents users who rely on larger text for readability from accessing your content. All text should scale with the system text scale factor for accessibility compliance.',
+        '[prefer_scalable_text] Text uses a fixed font size and does not respect user accessibility settings. This prevents users who rely on larger text for readability from accessing your content. All text should scale with the system text scale factor for accessibility compliance. {v2}',
     correctionMessage:
         'Use Theme.of(context).textTheme for text styles, or apply MediaQuery.textScaleFactorOf(context) to scale text. Avoid hardcoded font sizes. Ensure your text widgets respond to user accessibility settings.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -1483,6 +1511,8 @@ class PreferScalableTextRule extends SaropaLintRule {
 }
 
 /// Warns when custom tap targets lack Semantics with button: true.
+///
+/// Since: v1.7.2 | Updated: v4.13.0 | Rule version: v2
 ///
 /// GestureDetector and InkWell on non-button widgets are invisible to
 /// screen readers unless wrapped with Semantics indicating they're buttons.
@@ -1529,7 +1559,7 @@ class RequireButtonSemanticsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_button_semantics',
     problemMessage:
-        '[require_button_semantics] Custom interactive elements (e.g., GestureDetector, InkWell) are missing Semantics with button: true. Without proper semantics, assistive technologies cannot identify these child elements as buttons, making them inaccessible to screen reader users who rely on the widget tree for navigation.',
+        '[require_button_semantics] Custom interactive elements (e.g., GestureDetector, InkWell) are missing Semantics with button: true. Without proper semantics, assistive technologies cannot identify these child elements as buttons, making them inaccessible to screen reader users who rely on the widget tree for navigation. {v2}',
     correctionMessage:
         'Wrap custom tap targets in a Semantics parent (button: true, label: "...") or use built-in child elements like IconButton, TextButton, or ElevatedButton that provide correct accessibility roles and labels.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -1589,6 +1619,8 @@ class RequireButtonSemanticsRule extends SaropaLintRule {
 
 /// Warns when custom widgets lack explicit Semantics wrapper.
 ///
+/// Since: v1.7.2 | Updated: v4.13.0 | Rule version: v2
+///
 /// Custom widgets that display meaningful content need Semantics to be
 /// accessible. Screen readers can't understand custom-painted or composed
 /// widgets without explicit semantic information.
@@ -1634,7 +1666,7 @@ class PreferExplicitSemanticsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_explicit_semantics',
     problemMessage:
-        '[prefer_explicit_semantics] Custom build methods lack explicit Semantics, making their child elements invisible or meaningless to screen readers and assistive technologies. All non-trivial elements in the widget tree must provide a semantic label or description for accessibility.',
+        '[prefer_explicit_semantics] Custom build methods lack explicit Semantics, making their child elements invisible or meaningless to screen readers and assistive technologies. All non-trivial elements in the widget tree must provide a semantic label or description for accessibility. {v2}',
     correctionMessage:
         'Add a Semantics parent with a descriptive label to your custom build output, or ensure that all important child content is accessible via semantics. Example: Semantics(label: "Rating: 4 out of 5 stars").',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -1693,6 +1725,8 @@ class PreferExplicitSemanticsRule extends SaropaLintRule {
 
 /// Warns when MouseRegion or Listener is used without tap alternative.
 ///
+/// Since: v1.7.2 | Updated: v4.13.0 | Rule version: v3
+///
 /// Hover-only interactions are inaccessible on touch devices and for
 /// screen reader users. Always provide tap or button alternatives.
 ///
@@ -1734,7 +1768,7 @@ class AvoidHoverOnlyRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_hover_only',
     problemMessage:
-        '[avoid_hover_only] Interactive elements respond only to hover events, excluding mobile and touch users as well as people with motor disabilities. All actionable child elements in the widget tree must support both pointer and touch interactions for universal accessibility.',
+        '[avoid_hover_only] Interactive elements respond only to hover events, excluding mobile and touch users as well as people with motor disabilities. All actionable child elements in the widget tree must support both pointer and touch interactions for universal accessibility. {v3}',
     correctionMessage:
         'Add onTap or onPressed handlers using GestureDetector, InkWell, or use built-in components like Tooltip that support both mouse and touch input. Never rely solely on hover for interactivity.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -1801,6 +1835,8 @@ class AvoidHoverOnlyRule extends SaropaLintRule {
 
 /// Warns when error states don't have non-color indicators.
 ///
+/// Since: v2.3.0 | Updated: v4.13.0 | Rule version: v2
+///
 /// Errors must be identifiable without color. Users with color blindness
 /// cannot distinguish red from other colors. Add icons, text labels,
 /// and positional cues alongside color changes.
@@ -1839,7 +1875,7 @@ class RequireErrorIdentificationRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_error_identification',
     problemMessage:
-        '[require_error_identification] Error or alert states are indicated only by color, which is not accessible to users with color vision deficiencies. All error indicators must include a non-color cue such as an icon, text label, or pattern for full accessibility.',
+        '[require_error_identification] Error or alert states are indicated only by color, which is not accessible to users with color vision deficiencies. All error indicators must include a non-color cue such as an icon, text label, or pattern for full accessibility. {v2}',
     correctionMessage:
         'Add a visible error icon (e.g., Icons.error), descriptive text, or another non-color indicator in addition to color changes. Never rely on color alone to convey critical information.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -1911,6 +1947,8 @@ class RequireErrorIdentificationRule extends SaropaLintRule {
 
 /// Warns when text may have insufficient contrast ratio.
 ///
+/// Since: v4.13.0 | Rule version: v1
+///
 /// Text must have 4.5:1 contrast ratio against background (3:1 for large text).
 /// This rule flags potential issues when light colors are used on light
 /// backgrounds or dark colors on dark backgrounds.
@@ -1951,7 +1989,7 @@ class RequireMinimumContrastRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_minimum_contrast',
     problemMessage:
-        '[require_minimum_contrast] Low contrast text excludes users with low vision, cataracts, or age-related sight loss who cannot distinguish foreground from background. WCAG 2.1 Success Criterion 1.4.3 requires a minimum contrast ratio of 4.5:1 for normal text and 3:1 for large text. Failing to meet this threshold makes content unreadable for millions of users worldwide.',
+        '[require_minimum_contrast] Low contrast text excludes users with low vision, cataracts, or age-related sight loss who cannot distinguish foreground from background. WCAG 2.1 Success Criterion 1.4.3 requires a minimum contrast ratio of 4.5:1 for normal text and 3:1 for large text. Failing to meet this threshold makes content unreadable for millions of users worldwide. {v1}',
     correctionMessage:
         'Increase the contrast ratio by using darker text on light backgrounds or lighter text on dark backgrounds, aiming for at least 4.5:1 for normal text.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -2047,6 +2085,8 @@ class RequireMinimumContrastRule extends SaropaLintRule {
 
 /// Warns when CircleAvatar lacks a semanticLabel for accessibility.
 ///
+/// Since: v1.8.2 | Updated: v4.13.0 | Rule version: v2
+///
 /// Screen readers need a description to announce what the avatar represents.
 /// Without semanticLabel, the avatar is invisible to blind users.
 ///
@@ -2076,7 +2116,7 @@ class RequireAvatarAltTextRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_avatar_alt_text',
     problemMessage:
-        '[require_avatar_alt_text] Avatar or profile image is missing a semanticLabel or alt text. Screen readers cannot describe the image, making it inaccessible to users who rely on assistive technology. All meaningful images must have a descriptive label.',
+        '[require_avatar_alt_text] Avatar or profile image is missing a semanticLabel or alt text. Screen readers cannot describe the image, making it inaccessible to users who rely on assistive technology. All meaningful images must have a descriptive label. {v2}',
     correctionMessage:
         'Add a semanticLabel property to CircleAvatar or provide alt text describing the avatar (e.g., "Profile photo of John Doe") so screen readers can announce its purpose.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -2112,6 +2152,8 @@ class RequireAvatarAltTextRule extends SaropaLintRule {
 
 /// Warns when Badge widget lacks accessibility semantics.
 ///
+/// Since: v1.8.2 | Updated: v4.13.0 | Rule version: v4
+///
 /// Badges convey important information (like notification counts) that
 /// screen reader users need to hear. Without proper semantics, this
 /// information is hidden from blind users.
@@ -2146,7 +2188,7 @@ class RequireBadgeSemanticsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_badge_semantics',
     problemMessage:
-        '[require_badge_semantics] Badge or status indicator is missing accessibility semantics. Without a semantic label, screen readers cannot announce the badge count or its meaning to users with visual impairments, hiding important notification or status information from a significant portion of your users.',
+        '[require_badge_semantics] Badge or status indicator is missing accessibility semantics. Without a semantic label, screen readers cannot announce the badge count or its meaning to users with visual impairments, hiding important notification or status information from a significant portion of your users. {v4}',
     correctionMessage:
         'Wrap the Badge widget in a Semantics widget with a descriptive label (e.g., "3 unread messages") so assistive technologies can announce its content and purpose.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -2191,6 +2233,8 @@ class RequireBadgeSemanticsRule extends SaropaLintRule {
 
 /// Warns when Badge displays count greater than 99 without truncation.
 ///
+/// Since: v1.8.2 | Updated: v4.13.0 | Rule version: v2
+///
 /// Large numbers in badges are hard to read and look unprofessional.
 /// The convention is to show "99+" for counts above 99.
 ///
@@ -2221,7 +2265,7 @@ class RequireBadgeCountLimitRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_badge_count_limit',
     problemMessage:
-        '[require_badge_count_limit] Badge count exceeds 99. Use "99+" pattern for large numbers. Large numbers in badges are hard to read and look unprofessional. The convention is to show "99+" for counts above 99.',
+        '[require_badge_count_limit] Badge count exceeds 99. Use "99+" pattern for large numbers. Large numbers in badges are hard to read and look unprofessional. The convention is to show "99+" for counts above 99. {v2}',
     correctionMessage:
         'Replace with: Text(count > 99 ? "99+" : "\$count"). Test with VoiceOver (iOS) and TalkBack (Android) to verify the change improves accessibility.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -2267,6 +2311,8 @@ class RequireBadgeCountLimitRule extends SaropaLintRule {
 
 /// Warns when Image widget lacks semanticLabel or excludeFromSemantics.
 ///
+/// Since: v2.0.0 | Updated: v4.13.0 | Rule version: v2
+///
 /// Images need descriptions for screen reader users. Either provide a
 /// semanticLabel describing the image or explicitly exclude decorative
 /// images from semantics.
@@ -2302,7 +2348,7 @@ class RequireImageDescriptionRule extends SaropaLintRule {
     name: 'require_image_description',
     problemMessage:
         '[require_image_description] Image without semanticLabel is announced '
-        'as "image" by screen readers, providing no useful information.',
+        'as "image" by screen readers, providing no useful information. {v2}',
     correctionMessage:
         'Add semanticLabel for content images or excludeFromSemantics: true '
         'for decorative images.',
@@ -2341,6 +2387,8 @@ class RequireImageDescriptionRule extends SaropaLintRule {
 
 /// Warns when excludeFromSemantics is used without a comment explaining why.
 ///
+/// Since: v2.0.0 | Updated: v4.13.0 | Rule version: v3
+///
 /// Excluding content from semantics should be a conscious decision.
 /// Add a comment explaining why the content is decorative.
 ///
@@ -2372,7 +2420,7 @@ class AvoidSemanticsExclusionRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_semantics_exclusion',
     problemMessage:
-        '[avoid_semantics_exclusion] excludeFromSemantics: true detected without accompanying documentation. Screen reader users will encounter hidden content without understanding why it was excluded, making it difficult to debug accessibility issues or verify the exclusion was intentional.',
+        '[avoid_semantics_exclusion] excludeFromSemantics: true detected without accompanying documentation. Screen reader users will encounter hidden content without understanding why it was excluded, making it difficult to debug accessibility issues or verify the exclusion was intentional. {v3}',
     correctionMessage:
         'Add a comment above this widget explaining why it is decorative or redundant content that screen readers should skip. Include the semantic information provided by surrounding context.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -2412,6 +2460,8 @@ class AvoidSemanticsExclusionRule extends SaropaLintRule {
 
 /// Warns when Icon and Text are adjacent without MergeSemantics.
 ///
+/// Since: v2.0.0 | Updated: v4.13.0 | Rule version: v3
+///
 /// Icon + Text combinations should be wrapped in MergeSemantics so
 /// screen readers announce them as a single unit.
 ///
@@ -2444,7 +2494,7 @@ class PreferMergeSemanticsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_merge_semantics',
     problemMessage:
-        '[prefer_merge_semantics] Row or Column containing Icon and Text detected without MergeSemantics wrapper. Screen readers will announce each element separately instead of as a single cohesive label, forcing users to piece together fragmented information.',
+        '[prefer_merge_semantics] Row or Column containing Icon and Text detected without MergeSemantics wrapper. Screen readers will announce each element separately instead of as a single cohesive label, forcing users to piece together fragmented information. {v3}',
     correctionMessage:
         'Wrap the Row or Column with MergeSemantics to combine the icon and text into a single unified announcement for screen readers, improving comprehension and navigation efficiency.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -2511,6 +2561,8 @@ class PreferMergeSemanticsRule extends SaropaLintRule {
 
 /// Warns when interactive widget lacks visible focus styling.
 ///
+/// Since: v2.0.0 | Updated: v4.13.0 | Rule version: v4
+///
 /// Keyboard users need visible focus indicators to know which element
 /// is currently focused. Use Focus widget with visual feedback.
 ///
@@ -2551,7 +2603,7 @@ class RequireFocusIndicatorRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_focus_indicator',
     problemMessage:
-        '[require_focus_indicator] GestureDetector or InkWell lacks visible focus indicator. Keyboard and assistive technology users cannot determine which element currently has focus, preventing effective navigation and interaction with your application.',
+        '[require_focus_indicator] GestureDetector or InkWell lacks visible focus indicator. Keyboard and assistive technology users cannot determine which element currently has focus, preventing effective navigation and interaction with your application. {v4}',
     correctionMessage:
         'Wrap the interactive widget in a Focus widget with a FocusNode, then show visual feedback (border, background color, or outline) when hasFocus is true to indicate keyboard focus state.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -2612,6 +2664,8 @@ class RequireFocusIndicatorRule extends SaropaLintRule {
 
 /// Warns when repeating animation may flash more than 3 times per second.
 ///
+/// Since: v2.0.0 | Updated: v4.13.0 | Rule version: v4
+///
 /// Rapidly flashing content can trigger seizures in photosensitive users.
 /// WCAG 2.3.1 requires no more than 3 flashes per second. A "flash" requires
 /// alternating between states, so only repeating animations can cause flashing.
@@ -2651,7 +2705,7 @@ class AvoidFlashingContentRule extends SaropaLintRule {
     name: 'avoid_flashing_content',
     problemMessage:
         '[avoid_flashing_content] Flashing >3Hz can trigger seizures in users '
-        'with photosensitive epilepsy. WCAG 2.3.1 compliance required.',
+        'with photosensitive epilepsy. WCAG 2.3.1 compliance required. {v4}',
     correctionMessage:
         'Increase duration to at least 333ms to stay under 3 flashes/second.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -2769,6 +2823,8 @@ class _IncreaseAnimationDurationFix extends DartFix {
 
 /// Warns when touch targets have insufficient spacing.
 ///
+/// Since: v2.0.0 | Updated: v4.13.0 | Rule version: v2
+///
 /// Touch targets that are too close together make it difficult for
 /// users with motor impairments to tap the correct target.
 /// Recommended minimum spacing is 8dp.
@@ -2801,7 +2857,7 @@ class PreferAdequateSpacingRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_adequate_spacing',
     problemMessage:
-        '[prefer_adequate_spacing] Adjacent interactive buttons detected without spacing. Users may accidentally tap the wrong button, especially those with motor impairments or using touch interfaces where precision is limited.',
+        '[prefer_adequate_spacing] Adjacent interactive buttons detected without spacing. Users may accidentally tap the wrong button, especially those with motor impairments or using touch interfaces where precision is limited. {v2}',
     correctionMessage:
         'Add SizedBox(width: 8) or SizedBox(height: 8) between adjacent touch targets to provide adequate spacing and reduce accidental taps. Consider 16px spacing for better accessibility compliance.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -2856,6 +2912,8 @@ class PreferAdequateSpacingRule extends SaropaLintRule {
 
 /// Warns when animation plays without respecting user's reduce motion preference.
 ///
+/// Since: v2.0.0 | Updated: v4.13.0 | Rule version: v2
+///
 /// Users with vestibular disorders may have enabled "Reduce Motion" in their
 /// accessibility settings. Respect this preference for non-essential animations.
 ///
@@ -2888,7 +2946,7 @@ class AvoidMotionWithoutReduceRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_motion_without_reduce',
     problemMessage:
-        '[avoid_motion_without_reduce] Animation should respect disableAnimations preference. Users with vestibular disorders may have enabled "Reduce Motion" in their accessibility settings. Respect this preference for non-essential animations.',
+        '[avoid_motion_without_reduce] Animation should respect disableAnimations preference. Users with vestibular disorders may have enabled "Reduce Motion" in their accessibility settings. Respect this preference for non-essential animations. {v2}',
     correctionMessage:
         'Check MediaQuery.disableAnimations and reduce/skip animation if true. Test with VoiceOver (iOS) and TalkBack (Android) to verify the change improves accessibility.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -2939,6 +2997,8 @@ class AvoidMotionWithoutReduceRule extends SaropaLintRule {
 
 /// Warns when Icon widget is used without a semanticLabel for accessibility.
 ///
+/// Since: v2.3.7 | Updated: v4.13.0 | Rule version: v2
+///
 /// Icons without semanticLabel are invisible to screen readers. Provide a
 /// semanticLabel to describe the icon's meaning or purpose.
 ///
@@ -2971,7 +3031,7 @@ class RequireSemanticLabelIconsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_semantic_label_icons',
     problemMessage:
-        '[require_semantic_label_icons] Icon child element is missing a semanticLabel, making it invisible or meaningless to screen readers and assistive technologies. All icons that convey information or actions in the widget tree must have a descriptive semanticLabel for accessibility compliance.',
+        '[require_semantic_label_icons] Icon child element is missing a semanticLabel, making it invisible or meaningless to screen readers and assistive technologies. All icons that convey information or actions in the widget tree must have a descriptive semanticLabel for accessibility compliance. {v2}',
     correctionMessage:
         "Add a semanticLabel property to your Icon child element describing its meaning or purpose (e.g., semanticLabel: 'Add item'). This ensures screen readers can announce the icon to users with visual impairments.",
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -3046,6 +3106,8 @@ class RequireSemanticLabelIconsRule extends SaropaLintRule {
 
 /// Warns when Image widget lacks semanticLabel or excludeFromSemantics.
 ///
+/// Since: v2.3.7 | Updated: v4.13.0 | Rule version: v2
+///
 /// Images need descriptions for screen reader users. Either provide a
 /// semanticLabel describing the image content, or explicitly mark decorative
 /// images with excludeFromSemantics: true.
@@ -3082,7 +3144,7 @@ class RequireAccessibleImagesRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_accessible_images',
     problemMessage:
-        '[require_accessible_images] Image element lacks accessibility handling, making it invisible to screen readers and users with visual impairments. Without a semanticLabel describing the image content, assistive technologies skip over it entirely, leaving users unable to understand the visual context. This violates WCAG 1.1.1 (Non-text Content), which requires all meaningful images to have a text alternative.',
+        '[require_accessible_images] Image element lacks accessibility handling, making it invisible to screen readers and users with visual impairments. Without a semanticLabel describing the image content, assistive technologies skip over it entirely, leaving users unable to understand the visual context. This violates WCAG 1.1.1 (Non-text Content), which requires all meaningful images to have a text alternative. {v2}',
     correctionMessage:
         "Add semanticLabel: 'description' or excludeFromSemantics: true for decorative images.",
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -3147,6 +3209,8 @@ class RequireAccessibleImagesRule extends SaropaLintRule {
 
 /// Warns when video or audio widgets have autoPlay: true enabled.
 ///
+/// Since: v2.3.7 | Updated: v4.13.0 | Rule version: v2
+///
 /// Auto-playing media can be disorienting and problematic for users with
 /// vestibular disorders, cognitive disabilities, or those using screen readers.
 /// Users should have control over when media plays.
@@ -3185,7 +3249,7 @@ class AvoidAutoPlayMediaRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_auto_play_media',
     problemMessage:
-        '[avoid_auto_play_media] Media that auto-plays on page load can be disorienting, distracting, or even harmful for users with disabilities, especially those with cognitive or sensory sensitivities. Auto-play also reduces user control and can violate accessibility guidelines.',
+        '[avoid_auto_play_media] Media that auto-plays on page load can be disorienting, distracting, or even harmful for users with disabilities, especially those with cognitive or sensory sensitivities. Auto-play also reduces user control and can violate accessibility guidelines. {v2}',
     correctionMessage:
         'Set autoPlay: false for all video and audio widgets. Allow users to start media playback manually, and provide clear controls for play, pause, and stop. Audit your codebase for autoPlay usage and document this requirement in your team’s accessibility checklist.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -3288,6 +3352,8 @@ class AvoidAutoPlayMediaRule extends SaropaLintRule {
 
 /// Touch targets should be at least 48x48 logical pixels for accessibility.
 ///
+/// Since: v4.1.5 | Updated: v4.13.0 | Rule version: v2
+///
 /// Small touch targets are difficult for users with motor impairments
 /// or when using the app in challenging conditions.
 ///
@@ -3328,7 +3394,7 @@ class PreferLargeTouchTargetsRule extends SaropaLintRule {
     name: 'prefer_large_touch_targets',
     problemMessage:
         '[prefer_large_touch_targets] Touch target is smaller than 48px. '
-        'This makes it difficult for users with motor impairments.',
+        'This makes it difficult for users with motor impairments. {v2}',
     correctionMessage: 'Increase the touch target size to at least 48x48 '
         'logical pixels, or wrap in a larger touchable area.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -3454,6 +3520,8 @@ class PreferLargeTouchTargetsRule extends SaropaLintRule {
 
 /// Warns when timed interactions disadvantage users who need more time.
 ///
+/// Since: v4.1.5 | Updated: v4.13.0 | Rule version: v2
+///
 /// Auto-logout, disappearing toasts, and timed actions can be problematic
 /// for users with cognitive or motor disabilities who need more time.
 ///
@@ -3498,7 +3566,7 @@ class AvoidTimeLimitsRule extends SaropaLintRule {
     name: 'avoid_time_limits',
     problemMessage:
         '[avoid_time_limits] Short duration may disadvantage users who need '
-        'more time. Consider longer durations or manual dismissal.',
+        'more time. Consider longer durations or manual dismissal. {v2}',
     correctionMessage:
         'Use duration >= 10 seconds or provide manual dismiss option.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -3600,6 +3668,8 @@ class AvoidTimeLimitsRule extends SaropaLintRule {
 
 /// Warns when drag gestures lack button alternatives.
 ///
+/// Since: v4.1.5 | Updated: v4.13.0 | Rule version: v2
+///
 /// Drag gestures are difficult for users with motor disabilities.
 /// Provide button alternatives for drag-to-reorder, swipe-to-delete, etc.
 ///
@@ -3643,7 +3713,7 @@ class RequireDragAlternativesRule extends SaropaLintRule {
     name: 'require_drag_alternatives',
     problemMessage:
         '[require_drag_alternatives] `[HEURISTIC]` Drag-based widget without '
-        'obvious button alternative. Some users cannot perform drag gestures.',
+        'obvious button alternative. Some users cannot perform drag gestures. {v2}',
     correctionMessage: 'Provide button-based alternatives for drag operations.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -3690,6 +3760,8 @@ class RequireDragAlternativesRule extends SaropaLintRule {
 // =============================================================================
 
 /// Warns when complex forms don't specify focus traversal order.
+///
+/// Since: v4.2.0 | Updated: v4.13.0 | Rule version: v2
 ///
 /// Alias: focus_order, keyboard_navigation
 ///
@@ -3746,7 +3818,7 @@ class PreferFocusTraversalOrderRule extends SaropaLintRule {
     name: 'prefer_focus_traversal_order',
     problemMessage:
         '[prefer_focus_traversal_order] Form with multiple inputs in Row/Wrap '
-        'layout without FocusTraversalOrder. Keyboard navigation may be confusing.',
+        'layout without FocusTraversalOrder. Keyboard navigation may be confusing. {v2}',
     correctionMessage:
         'Wrap in FocusTraversalGroup and use FocusTraversalOrder for each input.',
     errorSeverity: DiagnosticSeverity.INFO,

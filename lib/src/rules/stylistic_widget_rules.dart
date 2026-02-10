@@ -18,6 +18,8 @@ import '../saropa_lint_rule.dart';
 
 /// Warns when Container is used for simple width/height spacing.
 ///
+/// Since: v4.9.5 | Updated: v4.13.0 | Rule version: v3
+///
 /// This is an **opinionated rule** - not included in any tier by default.
 ///
 /// **Pros of SizedBox:**
@@ -58,7 +60,7 @@ class PreferSizedBoxOverContainerRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_sizedbox_over_container',
     problemMessage:
-        '[prefer_sizedbox_over_container] A Container is used only for width/height sizing, which adds unnecessary decoration and padding layers. Use SizedBox instead for a lighter widget with clearer intent.',
+        '[prefer_sizedbox_over_container] A Container is used only for width/height sizing, which adds unnecessary decoration and padding layers. Use SizedBox instead for a lighter widget with clearer intent. {v3}',
     correctionMessage:
         'Replace Container with SizedBox when you only need width and height \u2014 SizedBox skips the decoration/padding layers.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -137,6 +139,8 @@ class _PreferSizedBoxOverContainerFix extends DartFix {
 
 /// Warns when SizedBox is used instead of Container (opposite rule).
 ///
+/// Since: v4.9.5 | Updated: v4.13.0 | Rule version: v3
+///
 /// This is an **opinionated rule** - not included in any tier by default.
 ///
 /// **Pros of Container:**
@@ -174,7 +178,7 @@ class PreferContainerOverSizedBoxRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_container_over_sizedbox',
     problemMessage:
-        '[prefer_container_over_sizedbox] A SizedBox was used where a Container would provide better consistency and easier future extension. Replace it with a Container to allow adding decoration, padding, or alignment without a widget swap.',
+        '[prefer_container_over_sizedbox] A SizedBox was used where a Container would provide better consistency and easier future extension. Replace it with a Container to allow adding decoration, padding, or alignment without a widget swap. {v3}',
     correctionMessage:
         'Replace SizedBox with Container so decoration, padding, or alignment can be added later without a widget swap.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -241,6 +245,8 @@ class _PreferContainerOverSizedBoxFix extends DartFix {
 
 /// Warns when RichText is used instead of Text.rich().
 ///
+/// Since: v2.7.0 | Updated: v4.13.0 | Rule version: v3
+///
 /// This is an **opinionated rule** - not included in any tier by default.
 ///
 /// **Pros of Text.rich():**
@@ -283,7 +289,7 @@ class PreferTextRichOverRichTextRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_text_rich_over_richtext',
     problemMessage:
-        '[prefer_text_rich_over_richtext] RichText widget does not inherit DefaultTextStyle, requiring manual base style setup. Text.rich() inherits the theme automatically and produces less boilerplate.',
+        '[prefer_text_rich_over_richtext] RichText widget does not inherit DefaultTextStyle, requiring manual base style setup. Text.rich() inherits the theme automatically and produces less boilerplate. {v3}',
     correctionMessage:
         'Replace RichText with Text.rich() to inherit the DefaultTextStyle and avoid manually setting the base style.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -305,6 +311,8 @@ class PreferTextRichOverRichTextRule extends SaropaLintRule {
 }
 
 /// Warns when Text.rich() is used instead of RichText (opposite rule).
+///
+/// Since: v2.7.0 | Updated: v4.13.0 | Rule version: v3
 ///
 /// This is an **opinionated rule** - not included in any tier by default.
 ///
@@ -343,7 +351,7 @@ class PreferRichTextOverTextRichRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_richtext_over_text_rich',
     problemMessage:
-        '[prefer_richtext_over_text_rich] Text.rich() inherits DefaultTextStyle implicitly, which can cause unexpected styling. Use RichText instead for explicit control over the base text style without hidden theme inheritance.',
+        '[prefer_richtext_over_text_rich] Text.rich() inherits DefaultTextStyle implicitly, which can cause unexpected styling. Use RichText instead for explicit control over the base text style without hidden theme inheritance. {v3}',
     correctionMessage:
         'Replace Text.rich() with RichText for full control over the base text style without implicit DefaultTextStyle inheritance.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -367,6 +375,8 @@ class PreferRichTextOverTextRichRule extends SaropaLintRule {
 }
 
 /// Warns when EdgeInsets.only() could be simplified to EdgeInsets.symmetric().
+///
+/// Since: v4.9.5 | Updated: v4.13.0 | Rule version: v4
 ///
 /// This is an **opinionated rule** - not included in any tier by default.
 ///
@@ -407,7 +417,7 @@ class PreferEdgeInsetsSymmetricRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_edgeinsets_symmetric',
     problemMessage:
-        '[prefer_edgeinsets_symmetric] EdgeInsets.only() was used with equal left/right or top/bottom values, which adds unnecessary repetition. Use EdgeInsets.symmetric() to express mirrored padding concisely.',
+        '[prefer_edgeinsets_symmetric] EdgeInsets.only() was used with equal left/right or top/bottom values, which adds unnecessary repetition. Use EdgeInsets.symmetric() to express mirrored padding concisely. {v4}',
     correctionMessage:
         'Replace EdgeInsets.only() with EdgeInsets.symmetric() when horizontal or vertical values are equal, for brevity.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -516,6 +526,8 @@ class _PreferEdgeInsetsSymmetricFix extends DartFix {
 
 /// Warns when EdgeInsets.symmetric() is used instead of .only() (opposite rule).
 ///
+/// Since: v4.9.5 | Updated: v4.13.0 | Rule version: v3
+///
 /// This is an **opinionated rule** - not included in any tier by default.
 ///
 /// **Pros of EdgeInsets.only():**
@@ -553,7 +565,7 @@ class PreferEdgeInsetsOnlyRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_edgeinsets_only',
     problemMessage:
-        '[prefer_edgeinsets_only] EdgeInsets.symmetric() hides which sides receive padding, making future per-side adjustments harder. Use EdgeInsets.only() to declare each side explicitly so values can be changed independently.',
+        '[prefer_edgeinsets_only] EdgeInsets.symmetric() hides which sides receive padding, making future per-side adjustments harder. Use EdgeInsets.only() to declare each side explicitly so values can be changed independently. {v3}',
     correctionMessage:
         'Replace EdgeInsets.symmetric() with EdgeInsets.only() for explicit per-side values that are easier to adjust independently.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -624,6 +636,9 @@ class _PreferEdgeInsetsOnlyFix extends DartFix {
 }
 
 /// Warns when BorderRadius.all(Radius.circular()) is used instead of
+///
+/// Since: v4.9.5 | Updated: v4.13.0 | Rule version: v3
+///
 /// BorderRadius.circular().
 ///
 /// This is an **opinionated rule** - not included in any tier by default.
@@ -664,7 +679,7 @@ class PreferBorderRadiusCircularRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_borderradius_circular',
     problemMessage:
-        '[prefer_borderradius_circular] Use BorderRadius.circular() instead of BorderRadius.all(Radius.circular()). This is an opinionated rule - not included in any tier by default.',
+        '[prefer_borderradius_circular] Use BorderRadius.circular() instead of BorderRadius.all(Radius.circular()). This is an opinionated rule - not included in any tier by default. {v3}',
     correctionMessage:
         'Replace BorderRadius.all(Radius.circular(r)) with BorderRadius.circular(r) for a shorter single-call equivalent.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -746,6 +761,8 @@ class _PreferBorderRadiusCircularFix extends DartFix {
 
 /// Warns when Flexible(fit: FlexFit.tight) is used instead of Expanded.
 ///
+/// Since: v4.9.5 | Updated: v4.13.0 | Rule version: v3
+///
 /// This is an **opinionated rule** - not included in any tier by default.
 ///
 /// **Pros of Expanded:**
@@ -784,7 +801,7 @@ class PreferExpandedOverFlexibleRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_expanded_over_flexible',
     problemMessage:
-        '[prefer_expanded_over_flexible] Flexible with fit: FlexFit.tight is equivalent to Expanded, adding unnecessary verbosity. Use Expanded directly for clearer intent and less boilerplate.',
+        '[prefer_expanded_over_flexible] Flexible with fit: FlexFit.tight is equivalent to Expanded, adding unnecessary verbosity. Use Expanded directly for clearer intent and less boilerplate. {v3}',
     correctionMessage:
         'Replace Flexible(fit: FlexFit.tight) with Expanded, which is the idiomatic shorthand for tight-fit flex children.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -858,6 +875,8 @@ class _PreferExpandedOverFlexibleFix extends DartFix {
 
 /// Warns when Expanded is used instead of Flexible (opposite rule).
 ///
+/// Since: v4.9.5 | Updated: v4.13.0 | Rule version: v3
+///
 /// This is an **opinionated rule** - not included in any tier by default.
 ///
 /// **Pros of Flexible:**
@@ -895,7 +914,7 @@ class PreferFlexibleOverExpandedRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_flexible_over_expanded',
     problemMessage:
-        '[prefer_flexible_over_expanded] Expanded widget detected, which hides its fit parameter. Use Flexible with an explicit fit argument instead for greater clarity and easier adjustments to flex behavior.',
+        '[prefer_flexible_over_expanded] Expanded widget detected, which hides its fit parameter. Use Flexible with an explicit fit argument instead for greater clarity and easier adjustments to flex behavior. {v3}',
     correctionMessage:
         'Replace Expanded with Flexible(fit: FlexFit.tight) so the fit parameter is always visible and easy to change later.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -957,6 +976,8 @@ class _PreferFlexibleOverExpandedFix extends DartFix {
 
 /// Warns when hardcoded colors are used instead of Theme.of(context).colorScheme.
 ///
+/// Since: v4.9.11 | Updated: v4.13.0 | Rule version: v2
+///
 /// This is an **opinionated rule** - not included in any tier by default.
 ///
 /// **Pros of theme colors:**
@@ -997,7 +1018,7 @@ class PreferMaterialThemeColorsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_material_theme_colors',
     problemMessage:
-        '[prefer_material_theme_colors] Hardcoded Colors.* constant detected in a widget color parameter. Hardcoded colors ignore the active theme and break dark mode support. Use Theme.of(context).colorScheme for consistent theming.',
+        '[prefer_material_theme_colors] Hardcoded Colors.* constant detected in a widget color parameter. Hardcoded colors ignore the active theme and break dark mode support. Use Theme.of(context).colorScheme for consistent theming. {v2}',
     correctionMessage:
         'Replace hardcoded Colors.* with Theme.of(context).colorScheme values to support dark mode and keep colors consistent.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -1042,6 +1063,9 @@ class PreferMaterialThemeColorsRule extends SaropaLintRule {
 }
 
 /// Warns when Theme.of(context).colorScheme is used instead of explicit Colors
+///
+/// Since: v4.9.11 | Updated: v4.13.0 | Rule version: v2
+///
 /// (opposite rule).
 ///
 /// This is an **opinionated rule** - not included in any tier by default.
@@ -1081,7 +1105,7 @@ class PreferExplicitColorsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_explicit_colors',
     problemMessage:
-        '[prefer_explicit_colors] Theme.of(context).colorScheme requires a BuildContext lookup at runtime, adding indirection. Use explicit Colors constants for predictable output without runtime context dependency.',
+        '[prefer_explicit_colors] Theme.of(context).colorScheme requires a BuildContext lookup at runtime, adding indirection. Use explicit Colors constants for predictable output without runtime context dependency. {v2}',
     correctionMessage:
         'Replace Theme.of(context).colorScheme with explicit Colors.* values for predictable output without runtime context.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -1115,6 +1139,8 @@ class PreferExplicitColorsRule extends SaropaLintRule {
 // =============================================================================
 
 /// Suggests using ClipRSuperellipse instead of ClipRRect for rounded corners.
+///
+/// Since: v4.9.11 | Updated: v4.13.0 | Rule version: v2
 ///
 /// This is an **opinionated rule** — not included in any tier by default.
 ///
@@ -1165,7 +1191,7 @@ class PreferClipRSuperellipseRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_clip_r_superellipse',
     problemMessage:
-        '[prefer_clip_r_superellipse] ClipRRect uses circular arcs for rounded corners, which produce a visible transition between straight edges and curves. Use ClipRSuperellipse for smoother continuous corners matching iOS design language.',
+        '[prefer_clip_r_superellipse] ClipRRect uses circular arcs for rounded corners, which produce a visible transition between straight edges and curves. Use ClipRSuperellipse for smoother continuous corners matching iOS design language. {v2}',
     correctionMessage:
         'ClipRSuperellipse provides smoother corner transitions matching iOS design language. Requires Flutter 3.32+.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -1240,6 +1266,9 @@ class _PreferClipRSuperellipseFix extends DartFix {
 }
 
 /// Suggests using ClipRSuperellipse instead of ClipRRect when a custom
+///
+/// Since: v4.9.11 | Updated: v4.13.0 | Rule version: v2
+///
 /// clipper is used.
 ///
 /// This is an **opinionated rule** — not included in any tier by default.
@@ -1285,7 +1314,7 @@ class PreferClipRSuperellipseClipperRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_clip_r_superellipse_clipper',
     problemMessage:
-        '[prefer_clip_r_superellipse_clipper] Use ClipRSuperellipse instead of ClipRRect for smoother continuous corners. This is an opinionated rule — not included in any tier by default.',
+        '[prefer_clip_r_superellipse_clipper] Use ClipRSuperellipse instead of ClipRRect for smoother continuous corners. This is an opinionated rule — not included in any tier by default. {v2}',
     correctionMessage:
         'The custom clipper must be rewritten as CustomClipper<RSuperellipse>. Requires Flutter 3.32+.',
     errorSeverity: DiagnosticSeverity.INFO,

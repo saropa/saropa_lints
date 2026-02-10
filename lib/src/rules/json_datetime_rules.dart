@@ -15,6 +15,8 @@ import '../saropa_lint_rule.dart';
 
 /// Warns when jsonDecode is used without try-catch.
 ///
+/// Since: v1.7.9 | Updated: v4.13.0 | Rule version: v2
+///
 /// jsonDecode throws FormatException on malformed JSON. Without
 /// error handling, this crashes the app.
 ///
@@ -43,7 +45,7 @@ class RequireJsonDecodeTryCatchRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_json_decode_try_catch',
     problemMessage:
-        '[require_json_decode_try_catch] jsonDecode throws on malformed JSON. Unhandled exceptions can crash the app, cause silent data loss, and make debugging difficult. This is a common source of runtime errors in networked and user-input scenarios.',
+        '[require_json_decode_try_catch] jsonDecode throws on malformed JSON. Unhandled exceptions can crash the app, cause silent data loss, and make debugging difficult. This is a common source of runtime errors in networked and user-input scenarios. {v2}',
     correctionMessage:
         'Wrap jsonDecode in try-catch for FormatException. Provide user feedback and log errors for diagnostics. Audit all JSON parsing for error handling and add tests for malformed input.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -89,6 +91,8 @@ class RequireJsonDecodeTryCatchRule extends SaropaLintRule {
 
 /// Warns when DateTime.parse is used without try-catch or tryParse.
 ///
+/// Since: v1.7.9 | Updated: v4.13.0 | Rule version: v3
+///
 /// DateTime.parse throws FormatException on invalid date strings.
 /// Use tryParse or wrap in try-catch for user-provided dates.
 ///
@@ -123,7 +127,7 @@ class AvoidDateTimeParseUnvalidatedRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_datetime_parse_unvalidated',
     problemMessage:
-        '[avoid_datetime_parse_unvalidated] DateTime.parse throws on invalid input. Unvalidated parsing can crash the app, cause silent failures, and break data flows. This is a common source of bugs in date handling and can lead to missed events or corrupted records.',
+        '[avoid_datetime_parse_unvalidated] DateTime.parse throws on invalid input. Unvalidated parsing can crash the app, cause silent failures, and break data flows. This is a common source of bugs in date handling and can lead to missed events or corrupted records. {v3}',
     correctionMessage:
         'Replace with DateTime.tryParse() or wrap in try-catch. Always validate input before parsing and add tests for edge cases. Document date parsing logic for maintainability.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -197,6 +201,8 @@ class _UseTryParseFix extends DartFix {
 
 /// Warns when int/double/num/BigInt/Uri.parse is used without try-catch.
 ///
+/// Since: v1.7.9 | Updated: v4.13.0 | Rule version: v4
+///
 /// These parse methods throw FormatException on invalid input. Dynamic data
 /// (user input, API responses, file contents) should use tryParse instead
 /// to return null on failure, preventing runtime crashes.
@@ -226,7 +232,7 @@ class PreferTryParseForDynamicDataRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_try_parse_for_dynamic_data',
     problemMessage:
-        'Using parse methods (like int.parse or double.parse) on dynamic or user-provided data can throw exceptions and crash your app if the input is invalid. This exposes your app to stability and security risks, especially when handling external or untrusted data. Always use tryParse to safely handle potentially malformed input and provide a fallback for invalid values. See https://dart.dev/guides/libraries/library-tour#numbers.',
+        '[prefer_try_parse_for_dynamic_data] Using parse methods (like int.parse or double.parse) on dynamic or user-provided data can throw exceptions and crash your app if the input is invalid. This exposes your app to stability and security risks, especially when handling external or untrusted data. Always use tryParse to safely handle potentially malformed input and provide a fallback for invalid values. See https://dart.dev/guides/libraries/library-tour#numbers. {v4}',
     correctionMessage:
         'Replace parse with tryParse when converting dynamic or user-controlled data to prevent runtime exceptions and improve app robustness. This practice aligns with Dart’s recommendations for safe type conversion. See https://dart.dev/guides/libraries/library-tour#numbers for guidance.',
     errorSeverity: DiagnosticSeverity.ERROR,
@@ -308,6 +314,8 @@ class _UseNumTryParseFix extends DartFix {
 
 /// Warns when Duration constructor can use cleaner units.
 ///
+/// Since: v1.8.2 | Updated: v4.13.0 | Rule version: v2
+///
 /// **Stylistic rule (opt-in only).** No performance or correctness benefit.
 ///
 /// Duration(seconds: 60) is clearer as Duration(minutes: 1).
@@ -339,7 +347,7 @@ class PreferDurationConstantsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_duration_constants',
     problemMessage:
-        '[prefer_duration_constants] Using named Duration constants instead of inline constructors is a naming convention. Both create identical Duration objects with no performance difference. Enable via the stylistic tier.',
+        '[prefer_duration_constants] Using named Duration constants instead of inline constructors is a naming convention. Both create identical Duration objects with no performance difference. Enable via the stylistic tier. {v2}',
     correctionMessage:
         'Replace with the equivalent larger time unit (e.g., Duration(seconds: 60) becomes Duration(minutes: 1)) for clarity.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -385,6 +393,8 @@ class PreferDurationConstantsRule extends SaropaLintRule {
 
 /// Warns when DateTime.now() is used in test files.
 ///
+/// Since: v1.8.2 | Updated: v4.13.0 | Rule version: v2
+///
 /// Tests using DateTime.now() can be flaky and hard to debug.
 /// Use a clock abstraction or fixed datetime values for predictable tests.
 ///
@@ -418,7 +428,7 @@ class AvoidDatetimeNowInTestsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_datetime_now_in_tests',
     problemMessage:
-        '[avoid_datetime_now_in_tests] DateTime.now() in tests produces non-deterministic values that vary between runs, causing flaky assertions that pass locally but fail in CI, making test failures impossible to reproduce reliably.',
+        '[avoid_datetime_now_in_tests] DateTime.now() in tests produces non-deterministic values that vary between runs, causing flaky assertions that pass locally but fail in CI, making test failures impossible to reproduce reliably. {v2}',
     correctionMessage:
         'Use fixed DateTime values (e.g., DateTime(2024, 1, 15)) or inject a clock abstraction for deterministic, reproducible tests.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -452,6 +462,8 @@ class AvoidDatetimeNowInTestsRule extends SaropaLintRule {
 // =============================================================================
 
 /// Warns when toJson methods return non-JSON-encodable types.
+///
+/// Since: v2.5.0 | Updated: v4.13.0 | Rule version: v2
 ///
 /// Alias: not_encodable_in_json, toJson_non_encodable, json_serialization_error
 ///
@@ -496,7 +508,7 @@ class AvoidNotEncodableInToJsonRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_not_encodable_in_to_json',
     problemMessage:
-        '[avoid_not_encodable_in_to_json] Value is not JSON-encodable and will cause runtime error.',
+        '[avoid_not_encodable_in_to_json] Value is not JSON-encodable and will cause runtime error. {v2}',
     correctionMessage:
         'Convert to JSON-safe type: use .toIso8601String() for DateTime, '
         '.toJson() for objects, or remove non-serializable values.',
@@ -729,6 +741,8 @@ class _ConvertDateTimeToIso8601Fix extends DartFix {
 
 /// Warns when DateTime.parse is used with server dates without format spec.
 ///
+/// Since: v4.1.6 | Updated: v4.13.0 | Rule version: v2
+///
 /// DateTime.parse assumes ISO 8601 format but servers often return custom
 /// formats. Using parse() without understanding the format causes crashes.
 ///
@@ -755,7 +769,7 @@ class RequireDateFormatSpecificationRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_date_format_specification',
     problemMessage:
-        '[require_date_format_specification] DateTime.parse may fail on server dates due to format mismatches. Unspecified formats can cause runtime errors, silent failures, and broken data flows. This is a common source of bugs in internationalized and backend-driven apps.',
+        '[require_date_format_specification] DateTime.parse may fail on server dates due to format mismatches. Unspecified formats can cause runtime errors, silent failures, and broken data flows. This is a common source of bugs in internationalized and backend-driven apps. {v2}',
     correctionMessage:
         'Use DateTime.tryParse() for safety or DateFormat for specific formats. Always specify expected formats and add tests for edge cases. Document date format logic for maintainability.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -820,6 +834,8 @@ class _UseDateTimeTryParseFix extends DartFix {
 
 /// Warns when non-ISO 8601 date formats are used for serialization.
 ///
+/// Since: v4.1.6 | Updated: v4.13.0 | Rule version: v2
+///
 /// ISO 8601 is the standard for date interchange. Custom formats cause
 /// parsing issues across different locales and systems.
 ///
@@ -846,7 +862,7 @@ class PreferIso8601DatesRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_iso8601_dates',
     problemMessage:
-        '[prefer_iso8601_dates] Locale-specific date format detected instead of ISO 8601. Non-standard date formats break cross-system interoperability and can cause parsing failures or timezone-related data corruption.',
+        '[prefer_iso8601_dates] Locale-specific date format detected instead of ISO 8601. Non-standard date formats break cross-system interoperability and can cause parsing failures or timezone-related data corruption. {v2}',
     correctionMessage:
         'Use toIso8601String() or yyyy-MM-dd format for interoperability. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -886,6 +902,8 @@ class PreferIso8601DatesRule extends SaropaLintRule {
 
 /// Warns when JSON fields are accessed without null checks.
 ///
+/// Since: v4.1.6 | Updated: v4.13.0 | Rule version: v2
+///
 /// Optional JSON fields may be missing. Accessing them directly
 /// causes null pointer exceptions.
 ///
@@ -913,7 +931,7 @@ class AvoidOptionalFieldCrashRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_optional_field_crash',
     problemMessage:
-        '[avoid_optional_field_crash] JSON field accessed with direct bracket notation on a Map that may contain null values. When the API response omits an optional field, this direct access throws a runtime exception that crashes the app. Defensive null-aware access with ?[] prevents unexpected null pointer errors and provides graceful handling of incomplete or malformed JSON responses.',
+        '[avoid_optional_field_crash] JSON field accessed with direct bracket notation on a Map that may contain null values. When the API response omits an optional field, this direct access throws a runtime exception that crashes the app. Defensive null-aware access with ?[] prevents unexpected null pointer errors and provides graceful handling of incomplete or malformed JSON responses. {v2}',
     correctionMessage:
         'Use the null-aware bracket operator ?[] for optional field access, and provide a fallback default value with the ?? operator to handle missing JSON fields safely.',
     errorSeverity: DiagnosticSeverity.ERROR,
@@ -991,6 +1009,8 @@ class _AddNullAwareAccessFix extends DartFix {
 
 /// Warns when manual JSON key mapping is used instead of @JsonKey.
 ///
+/// Since: v4.1.6 | Updated: v4.13.0 | Rule version: v2
+///
 /// Manual key mapping in fromJson is error-prone and verbose.
 /// Use @JsonKey annotation with json_serializable for clarity.
 ///
@@ -1025,7 +1045,7 @@ class PreferExplicitJsonKeysRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_explicit_json_keys',
     problemMessage:
-        '[prefer_explicit_json_keys] Use @JsonKey for field name mapping. Manual key mapping in fromJson is error-prone and verbose. Use @JsonKey annotation with json_serializable for clarity.',
+        '[prefer_explicit_json_keys] Use @JsonKey for field name mapping. Manual key mapping in fromJson is error-prone and verbose. Use @JsonKey annotation with json_serializable for clarity. {v2}',
     correctionMessage:
         'Use json_serializable with @JsonKey annotation for cleaner mapping. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -1084,6 +1104,8 @@ class PreferExplicitJsonKeysRule extends SaropaLintRule {
 
 /// Warns when JSON API responses are used without schema validation.
 ///
+/// Since: v4.2.0 | Updated: v4.13.0 | Rule version: v2
+///
 /// Alias: validate_json_schema, api_response_validation
 ///
 /// API responses should be validated against a schema before use. Malformed
@@ -1131,7 +1153,7 @@ class RequireJsonSchemaValidationRule extends SaropaLintRule {
     name: 'require_json_schema_validation',
     problemMessage:
         '[require_json_schema_validation] JSON API response used without '
-        'validation. Malformed data may crash the app or cause unexpected behavior.',
+        'validation. Malformed data may crash the app or cause unexpected behavior. {v2}',
     correctionMessage:
         'Validate JSON structure with fromJson in try-catch, or check required fields.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -1188,6 +1210,8 @@ class RequireJsonSchemaValidationRule extends SaropaLintRule {
 // =============================================================================
 
 /// Warns when data classes have manual JSON serialization.
+///
+/// Since: v4.2.0 | Updated: v4.13.0 | Rule version: v2
 ///
 /// Alias: use_json_serializable, json_codegen
 ///
@@ -1249,7 +1273,7 @@ class PreferJsonSerializableRule extends SaropaLintRule {
     name: 'prefer_json_serializable',
     problemMessage:
         '[prefer_json_serializable] Data class with manual JSON serialization. '
-        'Manual parsing is error-prone and hard to maintain.',
+        'Manual parsing is error-prone and hard to maintain. {v2}',
     correctionMessage:
         'Use @JsonSerializable() or @freezed for type-safe serialization.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -1305,6 +1329,126 @@ class PreferJsonSerializableRule extends SaropaLintRule {
       // Warn if has manual serialization
       if (hasManualFromJson && hasManualToJson) {
         reporter.atToken(node.name, code);
+      }
+    });
+  }
+}
+
+// =============================================================================
+// require_timezone_display
+// =============================================================================
+
+/// Warns when DateFormat is used without timezone patterns for display.
+///
+/// Since: v4.14.0 | Rule version: v1
+///
+/// `[HEURISTIC]` - Detects DateFormat constructors that include time patterns
+/// (H, h, m, s) but lack timezone indicators (z, Z, v, O, x, X).
+///
+/// Displaying times without timezone context causes user confusion when times
+/// are interpreted in the wrong timezone.
+///
+/// **BAD:**
+/// ```dart
+/// final fmt = DateFormat('yyyy-MM-dd HH:mm'); // No timezone!
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// final fmt = DateFormat('yyyy-MM-dd HH:mm z');
+/// ```
+///
+/// GitHub: https://github.com/saropa/saropa_lints/issues/22
+class RequireTimezoneDisplayRule extends SaropaLintRule {
+  const RequireTimezoneDisplayRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  static const LintCode _code = LintCode(
+    name: 'require_timezone_display',
+    problemMessage:
+        '[require_timezone_display] DateFormat includes time components but no '
+        'timezone indicator. Users may misinterpret displayed times when the '
+        'timezone is ambiguous, leading to missed appointments, incorrect '
+        'scheduling, and poor user experience across time zones. {v1}',
+    correctionMessage:
+        'Add a timezone pattern (z, Z, v, O, x, or X) to the format string, '
+        'or append the timezone abbreviation separately.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  /// Time patterns that indicate time is being formatted.
+  static final RegExp _timePattern = RegExp(r'[Hhms]');
+
+  /// Timezone patterns that indicate timezone is included.
+  static final RegExp _timezonePattern = RegExp(r'[zZvOxX]');
+
+  /// Named constructors that produce time-only formats without timezone.
+  /// These are ICU DateFormat factory constructors from the intl package.
+  static const Set<String> _timeOnlyConstructors = <String>{
+    'Hm',
+    'Hms',
+    'j',
+    'jm',
+    'jms',
+    'jmv',
+    'jmz',
+    'jv',
+    'jz',
+  };
+
+  /// Named constructors that include timezone (safe to skip).
+  static const Set<String> _timeWithTzConstructors = <String>{
+    'jmv',
+    'jmz',
+    'jv',
+    'jz',
+  };
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry
+        .addInstanceCreationExpression((InstanceCreationExpression node) {
+      final String typeName = node.constructorName.type.name2.lexeme;
+      if (typeName != 'DateFormat') return;
+
+      final String? namedCtor = node.constructorName.name?.name;
+
+      // Check named constructors (e.g., DateFormat.Hm())
+      if (namedCtor != null) {
+        if (_timeOnlyConstructors.contains(namedCtor) &&
+            !_timeWithTzConstructors.contains(namedCtor)) {
+          reporter.atNode(node, code);
+        }
+        return;
+      }
+
+      // Check format string in default constructor
+      final NodeList<Expression> args = node.argumentList.arguments;
+      if (args.isEmpty) return;
+
+      final Expression firstArg = args.first;
+      String? formatString;
+      if (firstArg is SimpleStringLiteral) {
+        formatString = firstArg.value;
+      } else if (firstArg is NamedExpression &&
+          firstArg.expression is SimpleStringLiteral) {
+        formatString = (firstArg.expression as SimpleStringLiteral).value;
+      }
+
+      if (formatString == null) return;
+
+      if (_timePattern.hasMatch(formatString) &&
+          !_timezonePattern.hasMatch(formatString)) {
+        reporter.atNode(node, code);
       }
     });
   }

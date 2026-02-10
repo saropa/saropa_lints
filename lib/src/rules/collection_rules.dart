@@ -13,6 +13,8 @@ import '../saropa_lint_rule.dart';
 
 /// Warns when comparing collections using == operator.
 ///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v5
+///
 /// Alias: no_collection_equality, use_deep_equals
 ///
 /// Collections (List, Set, Map) use reference equality by default,
@@ -45,7 +47,7 @@ class AvoidCollectionEqualityChecksRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_collection_equality_checks',
     problemMessage:
-        '[avoid_collection_equality_checks] Comparing collections with == uses reference equality. This can cause false positives/negatives, leading to logic errors and unexpected app behavior. Collections (List, Set, Map) use reference equality by default, not value equality. Use listEquals, setEquals, or mapEquals instead.',
+        '[avoid_collection_equality_checks] Comparing collections with == uses reference equality. This can cause false positives/negatives, leading to logic errors and unexpected app behavior. Collections (List, Set, Map) use reference equality by default, not value equality. Use listEquals, setEquals, or mapEquals instead. {v5}',
     correctionMessage:
         'Use listEquals, setEquals, mapEquals, or DeepCollectionEquality. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -128,6 +130,8 @@ class _AddHackCommentForCollectionEqualityFix extends DartFix {
 
 /// Warns when duplicate keys are used in a map literal.
 ///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v4
+///
 /// Alias: no_duplicate_keys, map_duplicate_key
 ///
 /// Example of **bad** code:
@@ -152,7 +156,7 @@ class AvoidDuplicateMapKeysRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_duplicate_map_keys',
     problemMessage:
-        '[avoid_duplicate_map_keys] Duplicate key in map literal silently overwrites the earlier value, causing data loss and unpredictable behavior. Only the last value assigned to the key will persist in the resulting map.',
+        '[avoid_duplicate_map_keys] Duplicate key in map literal silently overwrites the earlier value, causing data loss and unpredictable behavior. Only the last value assigned to the key will persist in the resulting map. {v4}',
     correctionMessage:
         'Remove the duplicate key entry or rename it to a unique key to preserve all intended values.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -184,6 +188,8 @@ class AvoidDuplicateMapKeysRule extends SaropaLintRule {
 
 /// Warns when .keys.contains() is used instead of .containsKey().
 ///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v5
+///
 /// Alias: use_contains_key, no_keys_contains
 ///
 /// Example of **bad** code:
@@ -210,7 +216,7 @@ class AvoidMapKeysContainsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_map_keys_contains',
     problemMessage:
-        '[avoid_map_keys_contains] Calling .keys.contains() allocates an iterable of all keys and performs a linear search, while .containsKey() uses the map hash table for O(1) lookup. This wastes memory and CPU cycles on every call.',
+        '[avoid_map_keys_contains] Calling .keys.contains() allocates an iterable of all keys and performs a linear search, while .containsKey() uses the map hash table for O(1) lookup. This wastes memory and CPU cycles on every call. {v5}',
     correctionMessage:
         'Replace map.keys.contains(key) with map.containsKey(key) to use the efficient hash-based lookup.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -278,6 +284,8 @@ class _UseContainsKeyFix extends DartFix {
 
 /// Warns when unnecessary collection wrappers are used.
 ///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v4
+///
 /// Alias: prefer_collection_literals, no_list_of_literal
 ///
 /// Using collection literals is preferred over constructors.
@@ -308,7 +316,7 @@ class AvoidUnnecessaryCollectionsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_unnecessary_collections',
     problemMessage:
-        '[avoid_unnecessary_collections] Wrapping an existing collection literal with List.of() or Set.of() creates a redundant copy, wasting memory and adding unnecessary overhead. The literal itself already produces the correct collection type.',
+        '[avoid_unnecessary_collections] Wrapping an existing collection literal with List.of() or Set.of() creates a redundant copy, wasting memory and adding unnecessary overhead. The literal itself already produces the correct collection type. {v4}',
     correctionMessage:
         'Remove the List.of() or Set.of() wrapper and use the collection literal directly to eliminate the extra allocation.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -355,6 +363,8 @@ class AvoidUnnecessaryCollectionsRule extends SaropaLintRule {
 
 /// Warns when using .first or .last on potentially empty collections.
 ///
+/// Since: v0.1.8 | Updated: v4.13.0 | Rule version: v9
+///
 /// Alias: no_unsafe_first_last, prefer_first_or_null
 ///
 /// Calling .first or .last on an empty collection throws a StateError.
@@ -388,7 +398,7 @@ class AvoidUnsafeCollectionMethodsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_unsafe_collection_methods',
     problemMessage:
-        '[avoid_unsafe_collection_methods] Calling .first, .last, or .single on an empty collection throws a StateError at runtime, crashing the app. This is especially dangerous when the collection comes from an API response, database query, or user input where emptiness cannot be guaranteed at compile time.',
+        '[avoid_unsafe_collection_methods] Calling .first, .last, or .single on an empty collection throws a StateError at runtime, crashing the app. This is especially dangerous when the collection comes from an API response, database query, or user input where emptiness cannot be guaranteed at compile time. {v9}',
     correctionMessage:
         'Use .firstOrNull, .lastOrNull, or .singleOrNull from package:collection, or guard with an isEmpty check before accessing.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -871,6 +881,8 @@ class _UseNullSafeCollectionMethodFix extends DartFix {
 
 /// Warns when reduce() is called on a potentially empty collection.
 ///
+/// Since: v0.1.8 | Updated: v4.13.0 | Rule version: v6
+///
 /// Alias: no_unsafe_reduce, prefer_fold
 ///
 /// Calling reduce() on an empty collection throws a StateError.
@@ -900,7 +912,7 @@ class AvoidUnsafeReduceRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_unsafe_reduce',
     problemMessage:
-        '[avoid_unsafe_reduce] Calling reduce() on an empty collection throws a StateError at runtime, crashing the app. Unlike fold(), reduce() has no initial value and requires at least one element to operate.',
+        '[avoid_unsafe_reduce] Calling reduce() on an empty collection throws a StateError at runtime, crashing the app. Unlike fold(), reduce() has no initial value and requires at least one element to operate. {v6}',
     correctionMessage:
         'Replace reduce() with fold() and provide an initial value, or guard the call with an isEmpty check first.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -966,6 +978,8 @@ class _AddHackCommentForReduceFix extends DartFix {
 
 /// Warns when firstWhere/lastWhere/singleWhere is used without orElse.
 ///
+/// Since: v1.4.0 | Updated: v4.13.0 | Rule version: v4
+///
 /// Alias: no_unsafe_where, require_or_else
 ///
 /// These methods throw StateError if no element matches the predicate.
@@ -999,7 +1013,7 @@ class AvoidUnsafeWhereMethodsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_unsafe_where_methods',
     problemMessage:
-        '[avoid_unsafe_where_methods] Calling firstWhere, lastWhere, or singleWhere without an orElse callback throws a StateError when no element matches the predicate. This crashes the app at runtime, especially when filtering data from external sources where matches are not guaranteed.',
+        '[avoid_unsafe_where_methods] Calling firstWhere, lastWhere, or singleWhere without an orElse callback throws a StateError when no element matches the predicate. This crashes the app at runtime, especially when filtering data from external sources where matches are not guaranteed. {v4}',
     correctionMessage:
         'Use firstWhereOrNull, lastWhereOrNull, or singleWhereOrNull from package:collection, or provide an orElse callback to handle the no-match case.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -1092,6 +1106,8 @@ class _UseWhereOrNullFix extends DartFix {
 
 /// Suggests using *OrNull methods instead of *Where with orElse callback.
 ///
+/// Since: v4.1.1 | Updated: v4.13.0 | Rule version: v4
+///
 /// Alias: use_where_or_null, prefer_or_null_methods
 ///
 /// While using orElse is safe, the *OrNull pattern from package:collection
@@ -1120,7 +1136,7 @@ class PreferWhereOrNullRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_where_or_null',
     problemMessage:
-        '[prefer_where_or_null] Using firstWhere/lastWhere/singleWhere with an orElse callback is verbose and harder to read. The *OrNull variant from package:collection combined with ?? produces cleaner, more idiomatic Dart code.',
+        '[prefer_where_or_null] Using firstWhere/lastWhere/singleWhere with an orElse callback is verbose and harder to read. The *OrNull variant from package:collection combined with ?? produces cleaner, more idiomatic Dart code. {v4}',
     correctionMessage:
         'Replace .firstWhere(..., orElse: () => x) with .firstWhereOrNull(...) ?? x to reduce boilerplate and improve readability.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -1253,6 +1269,8 @@ class _ReplaceWithWhereOrNullFix extends DartFix {
 
 /// Warns when map literal keys are not in alphabetical order.
 ///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v4
+///
 /// Alias: sort_map_keys, alphabetical_map_keys
 ///
 /// **Stylistic rule (opt-in only).** Key ordering does not affect runtime
@@ -1281,7 +1299,7 @@ class MapKeysOrderingRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'map_keys_ordering',
     problemMessage:
-        '[map_keys_ordering] Ordering map keys alphabetically is a stylistic preference for readability. Key order does not affect map behavior or performance at runtime. Enable via the stylistic tier.',
+        '[map_keys_ordering] Ordering map keys alphabetically is a stylistic preference for readability. Key order does not affect map behavior or performance at runtime. Enable via the stylistic tier. {v4}',
     correctionMessage:
         'Reorder the map entries alphabetically by key to improve readability and make diffs easier to review.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -1323,6 +1341,8 @@ class MapKeysOrderingRule extends SaropaLintRule {
 
 /// Warns when indexOf is used to check for element presence.
 ///
+/// Since: v4.1.3 | Updated: v4.13.0 | Rule version: v2
+///
 /// Alias: no_index_of_for_contains, use_contains
 ///
 /// Example of **bad** code:
@@ -1347,7 +1367,7 @@ class PreferContainsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_list_contains',
     problemMessage:
-        '[prefer_list_contains] Using indexOf() with a comparison to -1 or 0 to check element presence is verbose and error-prone. The contains() method expresses intent directly, improving readability and reducing off-by-one mistakes.',
+        '[prefer_list_contains] Using indexOf() with a comparison to -1 or 0 to check element presence is verbose and error-prone. The contains() method expresses intent directly, improving readability and reducing off-by-one mistakes. {v2}',
     correctionMessage:
         'Replace the indexOf() comparison with contains() to express the presence check directly and clearly.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -1431,6 +1451,8 @@ class _UseContainsFix extends DartFix {
 
 /// Warns when `list[0]` is used instead of `list.first`.
 ///
+/// Since: v4.1.3 | Updated: v4.13.0 | Rule version: v3
+///
 /// Alias: use_first_not_index, no_list_zero
 ///
 /// **Stylistic rule (opt-in only).** The `.first` getter calls `operator[]`
@@ -1460,7 +1482,7 @@ class PreferFirstRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_list_first',
     problemMessage:
-        '[prefer_list_first] Using [0] instead of .first is a stylistic choice. The .first getter calls [0] internally — there is no performance benefit. Enable via the stylistic tier.',
+        '[prefer_list_first] Using [0] instead of .first is a stylistic choice. The .first getter calls [0] internally — there is no performance benefit. Enable via the stylistic tier. {v3}',
     correctionMessage:
         'Replace [0] with .first or .firstOrNull to clearly communicate the intent of accessing the first element.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -1519,6 +1541,8 @@ class _UseFirstFix extends DartFix {
 
 /// Warns when List.from/Set.from/Map.from is used instead of .of constructors.
 ///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v4
+///
 /// Alias: prefer_of_over_from, no_collection_from
 ///
 /// The `.of` constructors are more efficient for creating collections from iterables
@@ -1548,7 +1572,7 @@ class PreferIterableOfRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_iterable_of',
     problemMessage:
-        '[prefer_iterable_of] Using .from() performs a runtime cast on each element, which can silently succeed with wrong types and throw later. The .of() constructor enforces type safety at the call site, catching type mismatches immediately.',
+        '[prefer_iterable_of] Using .from() performs a runtime cast on each element, which can silently succeed with wrong types and throw later. The .of() constructor enforces type safety at the call site, catching type mismatches immediately. {v4}',
     correctionMessage:
         'Replace .from() with .of() to enforce compile-time type checking and prevent silent runtime cast failures.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -1584,6 +1608,8 @@ class PreferIterableOfRule extends SaropaLintRule {
 
 /// Warns when `list[length-1]` is used instead of `list.last`.
 ///
+/// Since: v4.1.3 | Updated: v4.13.0 | Rule version: v2
+///
 /// Alias: use_last_not_index, no_length_minus_one
 ///
 /// **Stylistic rule (opt-in only).** The `.last` getter performs the same
@@ -1605,7 +1631,7 @@ class PreferLastRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_list_last',
     problemMessage:
-        '[prefer_list_last] Using [length-1] instead of .last is a stylistic choice. The .last getter does the same indexing internally — no performance benefit. Enable via the stylistic tier.',
+        '[prefer_list_last] Using [length-1] instead of .last is a stylistic choice. The .last getter does the same indexing internally — no performance benefit. Enable via the stylistic tier. {v2}',
     correctionMessage:
         'Replace list[list.length - 1] with list.last to improve readability and reduce off-by-one error risk.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -1684,6 +1710,8 @@ class _UseLastFix extends DartFix {
 
 /// Warns when forEach with add is used instead of addAll.
 ///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v4
+///
 /// Alias: use_add_all, no_foreach_add
 ///
 /// Example of **bad** code:
@@ -1709,7 +1737,7 @@ class PreferAddAllRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_add_all',
     problemMessage:
-        '[prefer_add_all] Looping with forEach or for-in to call add() one element at a time is verbose and slower than addAll(), which can pre-allocate capacity and copy elements in bulk. This pattern also obscures the intent of batch insertion.',
+        '[prefer_add_all] Looping with forEach or for-in to call add() one element at a time is verbose and slower than addAll(), which can pre-allocate capacity and copy elements in bulk. This pattern also obscures the intent of batch insertion. {v4}',
     correctionMessage:
         'Replace the forEach/for loop with list.addAll(items) to reduce boilerplate and enable bulk insertion optimization.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -1782,6 +1810,8 @@ class PreferAddAllRule extends SaropaLintRule {
 
 /// Warns when duplicate numeric elements appear in collection literals.
 ///
+/// Since: v4.4.0 | Updated: v4.13.0 | Rule version: v2
+///
 /// Alias: no_duplicate_numbers, unique_number_elements
 ///
 /// Duplicate numeric values in lists or sets are usually unintentional and
@@ -1826,7 +1856,7 @@ class AvoidDuplicateNumberElementsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_duplicate_number_elements',
     problemMessage:
-        '[avoid_duplicate_number_elements] Duplicate numeric element in collection literal typically indicates a copy-paste error or logic mistake. In Sets, the duplicate is silently ignored, producing a smaller collection than expected.',
+        '[avoid_duplicate_number_elements] Duplicate numeric element in collection literal typically indicates a copy-paste error or logic mistake. In Sets, the duplicate is silently ignored, producing a smaller collection than expected. {v2}',
     correctionMessage:
         'Remove the duplicate numeric element. If intentional (e.g., days-in-month arrays), suppress with // ignore.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -1854,6 +1884,8 @@ class AvoidDuplicateNumberElementsRule extends SaropaLintRule {
 }
 
 /// Warns when duplicate string elements appear in collection literals.
+///
+/// Since: v4.4.0 | Updated: v4.13.0 | Rule version: v2
 ///
 /// Alias: no_duplicate_strings, unique_string_elements
 ///
@@ -1897,7 +1929,7 @@ class AvoidDuplicateStringElementsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_duplicate_string_elements',
     problemMessage:
-        '[avoid_duplicate_string_elements] Duplicate string element in collection literal typically indicates a copy-paste error or incomplete refactoring. In Sets, the duplicate is silently ignored, producing a smaller collection than expected.',
+        '[avoid_duplicate_string_elements] Duplicate string element in collection literal typically indicates a copy-paste error or incomplete refactoring. In Sets, the duplicate is silently ignored, producing a smaller collection than expected. {v2}',
     correctionMessage:
         'Remove the duplicate string element or verify the values are intentionally repeated. In Sets, duplicates are silently discarded.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -1925,6 +1957,8 @@ class AvoidDuplicateStringElementsRule extends SaropaLintRule {
 }
 
 /// Warns when duplicate object elements appear in collection literals.
+///
+/// Since: v4.4.0 | Updated: v4.13.0 | Rule version: v2
 ///
 /// Alias: no_duplicate_objects, unique_object_elements
 ///
@@ -1968,7 +2002,7 @@ class AvoidDuplicateObjectElementsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_duplicate_object_elements',
     problemMessage:
-        '[avoid_duplicate_object_elements] Duplicate object reference or literal (bool, null, identifier) in collection typically indicates a copy-paste error. In Sets, the duplicate is silently ignored, producing a smaller collection than expected.',
+        '[avoid_duplicate_object_elements] Duplicate object reference or literal (bool, null, identifier) in collection typically indicates a copy-paste error. In Sets, the duplicate is silently ignored, producing a smaller collection than expected. {v2}',
     correctionMessage:
         'Remove the duplicate object element or verify the references are intentionally repeated. In Sets, duplicates are silently discarded.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -2133,6 +2167,8 @@ class _RemoveDuplicateElementFix extends DartFix {
 
 /// Warns when a List is used for frequent contains() checks.
 ///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v5
+///
 /// Alias: use_set_for_contains, set_over_list_lookup
 ///
 /// Using Set for lookups is O(1) vs O(n) for List.
@@ -2161,7 +2197,7 @@ class PreferSetForLookupRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_set_for_lookup',
     problemMessage:
-        '[prefer_set_for_lookup] Calling contains() on a List performs a linear O(n) scan through every element, while a Set uses hash-based O(1) lookup. For collections used primarily for membership testing, this causes unnecessary performance degradation.',
+        '[prefer_set_for_lookup] Calling contains() on a List performs a linear O(n) scan through every element, while a Set uses hash-based O(1) lookup. For collections used primarily for membership testing, this causes unnecessary performance degradation. {v5}',
     correctionMessage:
         'Change the collection type from List to Set to use hash-based O(1) lookup instead of linear O(n) scanning.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -2193,6 +2229,8 @@ class PreferSetForLookupRule extends SaropaLintRule {
 
 /// Warns when for loop uses non-standard increment patterns.
 ///
+/// Since: v2.0.0 | Updated: v4.13.0 | Rule version: v2
+///
 /// Alias: standard_for_increment, no_non_standard_increment
 ///
 /// Standard for loop increments make code more readable and predictable.
@@ -2220,7 +2258,7 @@ class PreferCorrectForLoopIncrementRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_correct_for_loop_increment',
     problemMessage:
-        '[prefer_correct_for_loop_increment] Non-standard for loop increment (e.g., i += 2, i = i + 3) reduces readability and can hide off-by-one errors. Standard i++ makes the iteration pattern immediately recognizable to all developers.',
+        '[prefer_correct_for_loop_increment] Non-standard for loop increment (e.g., i += 2, i = i + 3) reduces readability and can hide off-by-one errors. Standard i++ makes the iteration pattern immediately recognizable to all developers. {v2}',
     correctionMessage:
         'Use i++ for standard iteration, or add a comment explaining why a non-standard increment step is necessary.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -2273,6 +2311,8 @@ class PreferCorrectForLoopIncrementRule extends SaropaLintRule {
 
 /// Warns when a for loop has impossible or unreachable bounds.
 ///
+/// Since: v2.0.0 | Updated: v4.13.0 | Rule version: v3
+///
 /// Alias: no_impossible_for_loop, unreachable_loop_body
 ///
 /// For loops with impossible conditions never execute or run infinitely.
@@ -2301,7 +2341,7 @@ class AvoidUnreachableForLoopRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_unreachable_for_loop',
     problemMessage:
-        '[avoid_unreachable_for_loop] For loop with impossible bounds will never execute, resulting in dead code. This often indicates a logic error, typo, or incorrect increment direction. Unreachable loops can hide bugs, confuse maintainers, and lead to missed updates or calculations.',
+        '[avoid_unreachable_for_loop] For loop with impossible bounds will never execute, resulting in dead code. This often indicates a logic error, typo, or incorrect increment direction. Unreachable loops can hide bugs, confuse maintainers, and lead to missed updates or calculations. {v3}',
     correctionMessage:
         'Review the loop condition and increment direction. Ensure the bounds allow the loop to execute at least once, and correct any off-by-one errors or typos. Add tests to verify loop behavior.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -2405,6 +2445,8 @@ class AvoidUnreachableForLoopRule extends SaropaLintRule {
 
 /// Warns when collections handle nullable items without null-aware spread.
 ///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v5
+///
 /// Dart 3 supports null-aware elements (?element) in collections.
 /// This avoids explicit null checks when adding nullable items.
 ///
@@ -2436,7 +2478,7 @@ class PreferNullAwareElementsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_null_aware_elements',
     problemMessage:
-        '[prefer_null_aware_elements] Explicit null check with if (x != null) x in collection literals is verbose. Dart 3 supports the ?element syntax, which eliminates the boilerplate and expresses nullable inclusion more concisely.',
+        '[prefer_null_aware_elements] Explicit null check with if (x != null) x in collection literals is verbose. Dart 3 supports the ?element syntax, which eliminates the boilerplate and expresses nullable inclusion more concisely. {v5}',
     correctionMessage:
         'Replace `if (x != null) x` with `?x` to use the Dart 3 null-aware element syntax and reduce collection boilerplate.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -2488,6 +2530,8 @@ class PreferNullAwareElementsRule extends SaropaLintRule {
 
 /// Warns when iterable operations chain to List when lazy iteration suffices.
 ///
+/// Since: v2.1.0 | Updated: v4.13.0 | Rule version: v2
+///
 /// Chaining .map().where().toList() creates intermediate lists.
 /// If only iterating once, keep it lazy for better memory usage.
 ///
@@ -2524,7 +2568,7 @@ class PreferIterableOperationsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_iterable_operations',
     problemMessage:
-        '[prefer_iterable_operations] Calling .toList() at the end of an iterable chain inside a for-in loop forces eager evaluation and allocates an intermediate list that is iterated once and then discarded. This wastes memory and CPU cycles.',
+        '[prefer_iterable_operations] Calling .toList() at the end of an iterable chain inside a for-in loop forces eager evaluation and allocates an intermediate list that is iterated once and then discarded. This wastes memory and CPU cycles. {v2}',
     correctionMessage:
         'Remove .toList() to keep the iteration lazy and eliminate the unnecessary intermediate list allocation.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -2570,6 +2614,8 @@ class PreferIterableOperationsRule extends SaropaLintRule {
 
 /// Warns when widgets in lists lack a Key for efficient updates.
 ///
+/// Since: v2.3.9 | Updated: v4.13.0 | Rule version: v4
+///
 /// Alias: list_item_key, require_widget_key, no_keyless_list_items
 ///
 /// Flutter uses keys to identify widgets in lists. Without keys, Flutter
@@ -2603,7 +2649,7 @@ class RequireKeyForCollectionRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_key_for_collection',
     problemMessage:
-        '[require_key_for_collection] List items in dynamic collections (ListView, GridView, etc.) must have a Key to preserve child widget state (e.g., TextField input, animations) when the list reorders or updates. Missing keys can cause UI bugs, loss of user input, broken animations, and confusing user experiences. This is a common source of hard-to-debug Flutter widget tree issues.',
+        '[require_key_for_collection] List items in dynamic collections (ListView, GridView, etc.) must have a Key to preserve child widget state (e.g., TextField input, animations) when the list reorders or updates. Missing keys can cause UI bugs, loss of user input, broken animations, and confusing user experiences. This is a common source of hard-to-debug Flutter widget tree issues. {v4}',
     correctionMessage:
         'Add a Key (such as ValueKey, ObjectKey, or UniqueKey) to each list item. Ensure the key is unique and stable for each item, especially when items are reordered or updated. Document key usage in your builder methods to prevent state loss.',
     errorSeverity: DiagnosticSeverity.WARNING,

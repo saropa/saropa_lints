@@ -21,6 +21,8 @@ import '../../saropa_lint_rule.dart';
 
 /// Warns when GetIt.I or GetIt.instance is used inside build().
 ///
+/// Since: v1.7.9 | Updated: v4.13.0 | Rule version: v2
+///
 /// Alias: getit_in_build, service_locator_in_build, inject_dependencies
 ///
 /// Service locator calls in build() hide dependencies and make
@@ -59,7 +61,7 @@ class AvoidGetItInBuildRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_getit_in_build',
     problemMessage:
-        '[avoid_getit_in_build] GetIt service locator in build() hides dependencies. Service locator calls in build() hide dependencies and make testing difficult. Inject dependencies via constructor instead.',
+        '[avoid_getit_in_build] GetIt service locator in build() hides dependencies. Service locator calls in build() hide dependencies and make testing difficult. Inject dependencies via constructor instead. {v2}',
     correctionMessage:
         'Inject dependencies via constructor or access in initState(). Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -118,6 +120,8 @@ class _GetItBuildVisitor extends RecursiveAstVisitor<void> {
 
 /// Warns when GetIt registration order may cause unresolved dependencies.
 ///
+/// Since: v2.3.11 | Updated: v4.13.0 | Rule version: v3
+///
 /// Alias: getit_order, getit_registration_sequence, di_order
 ///
 /// When registering services with GetIt, dependent services must be
@@ -147,7 +151,7 @@ class RequireGetItRegistrationOrderRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_getit_registration_order',
     problemMessage:
-        '[require_getit_registration_order] GetIt registration uses a dependency not yet registered at this point in the setup sequence. This causes runtime errors when the service locator attempts to resolve an unregistered type, resulting in app crashes during startup or lazy initialization that are difficult to reproduce and debug in production.',
+        '[require_getit_registration_order] GetIt registration uses a dependency not yet registered at this point in the setup sequence. This causes runtime errors when the service locator attempts to resolve an unregistered type, resulting in app crashes during startup or lazy initialization that are difficult to reproduce and debug in production. {v3}',
     correctionMessage:
         'Register dependencies before services that depend on them, or use registerLazySingleton.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -293,6 +297,8 @@ class _DependencyFinder extends RecursiveAstVisitor<void> {
 
 /// Warns when GetIt is used in tests without reset in setUp.
 ///
+/// Since: v1.7.9 | Updated: v4.13.0 | Rule version: v3
+///
 /// GetIt singletons persist across tests, causing test pollution.
 /// Reset the container in setUp to ensure test isolation.
 ///
@@ -337,7 +343,7 @@ class RequireGetItResetInTestsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_getit_reset_in_tests',
     problemMessage:
-        '[require_getit_reset_in_tests] GetIt singletons are not automatically reset between tests. If you do not call GetIt.I.reset(), state from one test can leak into others, causing unpredictable, flaky, or misleading results. This can hide real bugs and make tests unreliable.',
+        '[require_getit_reset_in_tests] GetIt singletons are not automatically reset between tests. If you do not call GetIt.I.reset(), state from one test can leak into others, causing unpredictable, flaky, or misleading results. This can hide real bugs and make tests unreliable. {v3}',
     correctionMessage:
         'To ensure each test runs in isolation, add GetIt.I.reset() in setUp() or setUpAll() of your test suite.',
     errorSeverity: DiagnosticSeverity.WARNING,

@@ -20,6 +20,8 @@ import '../saropa_lint_rule.dart';
 
 /// Warns when HTTP response status is not checked.
 ///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v5
+///
 /// API responses should always check status codes before processing.
 ///
 /// **BAD:**
@@ -50,7 +52,7 @@ class RequireHttpStatusCheckRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_http_status_check',
     problemMessage:
-        '[require_http_status_check] HTTP response body is used without first checking the status code. This can result in undetected failures, silent data corruption, or security issues if error responses are parsed as valid data. Always check if (response.statusCode == 200) before parsing response.body to ensure only successful responses are processed and errors are handled appropriately.',
+        '[require_http_status_check] HTTP response body is used without first checking the status code. This can result in undetected failures, silent data corruption, or security issues if error responses are parsed as valid data. Always check if (response.statusCode == 200) before parsing response.body to ensure only successful responses are processed and errors are handled appropriately. {v5}',
     correctionMessage:
         'Check if (response.statusCode == 200) before parsing response.body to ensure only successful responses are processed and error payloads are handled separately.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -66,13 +68,15 @@ class RequireHttpStatusCheckRule extends SaropaLintRule {
       final FunctionBody body = node.body;
       final String bodySource = body.toSource();
 
-      // Check for HTTP calls
+      // Check for HTTP calls (specific client patterns only)
       if (!bodySource.contains('http.get') &&
           !bodySource.contains('http.post') &&
           !bodySource.contains('http.put') &&
           !bodySource.contains('http.delete') &&
-          !bodySource.contains('.get(') &&
-          !bodySource.contains('.post(')) {
+          !bodySource.contains('dio.get') &&
+          !bodySource.contains('dio.post') &&
+          !bodySource.contains('client.get') &&
+          !bodySource.contains('client.post')) {
         return;
       }
 
@@ -86,6 +90,8 @@ class RequireHttpStatusCheckRule extends SaropaLintRule {
 }
 
 /// Warns when API endpoint URLs are hardcoded.
+///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v5
 ///
 /// API URLs should come from configuration for different environments.
 ///
@@ -113,7 +119,7 @@ class AvoidHardcodedApiUrlsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_hardcoded_api_urls',
     problemMessage:
-        '[avoid_hardcoded_api_urls] Hardcoded API URLs prevent switching between development, staging, and production environments, making code inflexible and error-prone. This practice also risks leaking sensitive endpoints and complicates maintenance. Always extract API URLs to configuration constants (e.g., ApiConfig.baseUrl) to enable environment switching and improve security.',
+        '[avoid_hardcoded_api_urls] Hardcoded API URLs prevent switching between development, staging, and production environments, making code inflexible and error-prone. This practice also risks leaking sensitive endpoints and complicates maintenance. Always extract API URLs to configuration constants (e.g., ApiConfig.baseUrl) to enable environment switching and improve security. {v5}',
     correctionMessage:
         "Extract the URL to a configuration constant (e.g., ApiConfig.baseUrl) so endpoints can be switched per environment without code changes.",
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -145,6 +151,8 @@ class AvoidHardcodedApiUrlsRule extends SaropaLintRule {
 }
 
 /// Warns when retry logic is missing for network calls.
+///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v6
 ///
 /// Network operations should handle transient failures with retries.
 ///
@@ -181,7 +189,7 @@ class RequireRetryLogicRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_retry_logic',
     problemMessage:
-        '[require_retry_logic] Network call does not implement retry logic, so transient failures (e.g., temporary network loss, server hiccups) will not recover automatically. This can lead to poor reliability and frustrated users. Always wrap network calls with retry() or implement exponential backoff for SocketException/TimeoutException to improve robustness.',
+        '[require_retry_logic] Network call does not implement retry logic, so transient failures (e.g., temporary network loss, server hiccups) will not recover automatically. This can lead to poor reliability and frustrated users. Always wrap network calls with retry() or implement exponential backoff for SocketException/TimeoutException to improve robustness. {v6}',
     correctionMessage:
         'Wrap with retry() or implement exponential backoff for SocketException/TimeoutException.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -206,18 +214,17 @@ class RequireRetryLogicRule extends SaropaLintRule {
       final FunctionBody body = node.body;
       final String bodySource = body.toSource();
 
-      // Check for HTTP calls
+      // Check for HTTP calls (specific client patterns only)
       if (!bodySource.contains('http.') &&
           !bodySource.contains('dio.') &&
-          !bodySource.contains('.get(') &&
-          !bodySource.contains('.post(')) {
+          !bodySource.contains('client.get') &&
+          !bodySource.contains('client.post')) {
         return;
       }
 
       // Check for retry logic
       if (!bodySource.contains('retry') &&
           !bodySource.contains('Retry') &&
-          !bodySource.contains('attempts') &&
           !bodySource.contains('maxRetries')) {
         reporter.atNode(node, code);
       }
@@ -226,6 +233,8 @@ class RequireRetryLogicRule extends SaropaLintRule {
 }
 
 /// Warns when API response is not properly typed.
+///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v4
 ///
 /// API responses should be parsed into strongly-typed models.
 ///
@@ -254,7 +263,7 @@ class RequireTypedApiResponseRule extends SaropaLintRule {
     name: 'require_typed_api_response',
     problemMessage:
         '[require_typed_api_response] Untyped API access via dynamic keys '
-        'loses type safety. Typos cause runtime errors, not compile errors.',
+        'loses type safety. Typos cause runtime errors, not compile errors. {v4}',
     correctionMessage: 'Create a model class and use fromJson/fromMap.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -277,9 +286,10 @@ class RequireTypedApiResponseRule extends SaropaLintRule {
       while (parent != null) {
         if (parent is MethodInvocation) {
           final String parentMethod = parent.methodName.name;
-          if (parentMethod.contains('fromJson') ||
-              parentMethod.contains('fromMap') ||
-              parentMethod.contains('parse')) {
+          if (parentMethod == 'fromJson' ||
+              parentMethod == 'fromMap' ||
+              parentMethod == 'parse' ||
+              parentMethod == 'tryParse') {
             return; // Good - being parsed into model
           }
         }
@@ -319,6 +329,8 @@ class RequireTypedApiResponseRule extends SaropaLintRule {
 
 /// Warns when connectivity is not checked before network operations.
 ///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v4
+///
 /// Apps should check connectivity to provide better UX for offline users.
 ///
 /// **BAD:**
@@ -352,7 +364,7 @@ class RequireConnectivityCheckRule extends SaropaLintRule {
     name: 'require_connectivity_check',
     problemMessage:
         '[require_connectivity_check] Network calls without connectivity check '
-        'cause poor UX with long timeouts and unhelpful error messages.',
+        'cause poor UX with long timeouts and unhelpful error messages. {v4}',
     correctionMessage: 'Use Connectivity package to check network status.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -366,28 +378,32 @@ class RequireConnectivityCheckRule extends SaropaLintRule {
     context.registry.addMethodDeclaration((MethodDeclaration node) {
       // Check methods that do network operations
       final String methodName = node.name.lexeme.toLowerCase();
-      if (!methodName.contains('sync') &&
-          !methodName.contains('upload') &&
-          !methodName.contains('download') &&
-          !methodName.contains('fetch') &&
-          !methodName.contains('submit')) {
+      // Use word-boundary-aware checks to avoid matching 'resync', 'async', etc.
+      if (!methodName.startsWith('sync') &&
+          !methodName.startsWith('upload') &&
+          !methodName.startsWith('download') &&
+          !methodName.startsWith('fetch') &&
+          !methodName.startsWith('submit') &&
+          !methodName.endsWith('sync') &&
+          !methodName.endsWith('upload') &&
+          !methodName.endsWith('download')) {
         return;
       }
 
       final FunctionBody body = node.body;
       final String bodySource = body.toSource();
 
-      // Check for HTTP calls
+      // Check for HTTP calls (specific client patterns only)
       if (!bodySource.contains('http.') &&
           !bodySource.contains('dio.') &&
-          !bodySource.contains('.post(') &&
-          !bodySource.contains('.get(')) {
+          !bodySource.contains('client.post') &&
+          !bodySource.contains('client.get')) {
         return;
       }
 
       // Check for connectivity check
-      if (!bodySource.contains('connectivity') &&
-          !bodySource.contains('Connectivity') &&
+      if (!bodySource.contains('Connectivity') &&
+          !bodySource.contains('checkConnectivity') &&
           !bodySource.contains('isConnected') &&
           !bodySource.contains('hasConnection')) {
         reporter.atNode(node, code);
@@ -397,6 +413,8 @@ class RequireConnectivityCheckRule extends SaropaLintRule {
 }
 
 /// Warns when API errors are not mapped to domain errors.
+///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v4
 ///
 /// Network errors should be translated to meaningful domain exceptions.
 ///
@@ -432,7 +450,7 @@ class RequireApiErrorMappingRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_api_error_mapping',
     problemMessage:
-        '[require_api_error_mapping] Raw API exceptions are exposed to users, leaking implementation details and providing unhelpful error messages. This can confuse users and expose sensitive information such as server paths, stack traces, or internal status codes. Always catch specific exceptions and map them to domain errors with clear, actionable messages to protect against information disclosure and improve error recovery.',
+        '[require_api_error_mapping] Raw API exceptions are exposed to users, leaking implementation details and providing unhelpful error messages. This can confuse users and expose sensitive information such as server paths, stack traces, or internal status codes. Always catch specific exceptions and map them to domain errors with clear, actionable messages to protect against information disclosure and improve error recovery. {v4}',
     correctionMessage:
         'Catch specific exceptions (SocketException, TimeoutException, HttpException) and map each to a typed domain error with a user-facing message.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -447,12 +465,11 @@ class RequireApiErrorMappingRule extends SaropaLintRule {
     context.registry.addTryStatement((TryStatement node) {
       final String trySource = node.body.toSource();
 
-      // Check if try block contains API calls
+      // Check if try block contains API calls (specific client patterns only)
       if (!trySource.contains('http.') &&
           !trySource.contains('dio.') &&
-          !trySource.contains('.get(') &&
-          !trySource.contains('.post(') &&
-          !trySource.contains('fetch')) {
+          !trySource.contains('client.get') &&
+          !trySource.contains('client.post')) {
         return;
       }
 
@@ -477,6 +494,8 @@ class RequireApiErrorMappingRule extends SaropaLintRule {
 }
 
 /// Warns when HTTP requests don't specify a timeout.
+///
+/// Since: v1.4.3 | Updated: v4.13.0 | Rule version: v4
 ///
 /// Alias: require_api_timeout
 ///
@@ -516,7 +535,7 @@ class RequireRequestTimeoutRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_request_timeout',
     problemMessage:
-        '[require_request_timeout] HTTP request is missing a timeout configuration, which means it may hang indefinitely if the server does not respond. This can cause the app to freeze, degrade user experience, and waste socket connections and memory. Always add .timeout(Duration(seconds: 30)) or configure timeout in client options to ensure requests fail gracefully and users are informed of network issues.',
+        '[require_request_timeout] HTTP request is missing a timeout configuration, which means it may hang indefinitely if the server does not respond. This can cause the app to freeze, degrade user experience, and waste socket connections and memory. Always add .timeout(Duration(seconds: 30)) or configure timeout in client options to ensure requests fail gracefully and users are informed of network issues. {v4}',
     correctionMessage:
         'Add .timeout(Duration(seconds: 30)) to the request or configure connectTimeout and receiveTimeout in your HTTP client options.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -554,16 +573,15 @@ class RequireRequestTimeoutRule extends SaropaLintRule {
       final String targetSource = target.toSource().toLowerCase();
 
       // cspell:ignore httpclient
-      // Check if this is an HTTP-related call
-      // Be specific to avoid false positives (e.g., apiResponse.get() is not HTTP)
-      // Look for actual HTTP client patterns, not just 'api' which matches too broadly
-      final bool isHttpCall = targetSource.contains('http') ||
+      // Check if this is an HTTP-related call using exact target patterns
+      final bool isHttpCall = targetSource == 'http' ||
           targetSource == 'dio' ||
+          targetSource == 'client' ||
+          targetSource.endsWith('.http') ||
           targetSource.endsWith('.dio') ||
-          targetSource.contains('httpclient') ||
-          targetSource.contains('http.client') ||
-          // Client without 'api' prefix to avoid matching apiClient, apiResponse, etc.
-          (targetSource == 'client' || targetSource.endsWith('.client'));
+          targetSource.endsWith('.client') ||
+          targetSource == 'httpclient' ||
+          targetSource.endsWith('.httpclient');
 
       if (!isHttpCall) return;
 
@@ -609,6 +627,8 @@ class RequireRequestTimeoutRule extends SaropaLintRule {
 
 /// Warns when connectivity monitoring is used without an offline indicator.
 ///
+/// Since: v1.6.0 | Updated: v4.13.0 | Rule version: v4
+///
 /// Users should know when they're offline. Using connectivity monitoring
 /// without providing visual feedback creates a confusing experience where
 /// actions fail silently.
@@ -653,7 +673,7 @@ class RequireOfflineIndicatorRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_offline_indicator',
     problemMessage:
-        '[require_offline_indicator] Connectivity is checked, but there is no offline indicator shown to users. Without a clear indicator, users may not understand why features are unavailable or why requests fail. Always show a banner, snackbar, or icon when connectivity is lost to improve transparency and user experience.',
+        '[require_offline_indicator] Connectivity is checked, but there is no offline indicator shown to users. Without a clear indicator, users may not understand why features are unavailable or why requests fail. Always show a banner, snackbar, or icon when connectivity is lost to improve transparency and user experience. {v4}',
     correctionMessage:
         'Show a visible offline indicator (banner, snackbar, or status icon) when connectivity is lost so users understand why features are unavailable.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -706,6 +726,8 @@ class RequireOfflineIndicatorRule extends SaropaLintRule {
 
 /// Warns when large file downloads don't use streaming.
 ///
+/// Since: v2.3.9 | Updated: v4.13.0 | Rule version: v2
+///
 /// Large downloads should stream to disk instead of buffering in memory.
 /// Loading large files entirely into memory can cause out-of-memory crashes.
 ///
@@ -737,7 +759,7 @@ class PreferStreamingResponseRule extends SaropaLintRule {
     name: 'prefer_streaming_response',
     problemMessage:
         '[prefer_streaming_response] bodyBytes loads entire file into memory, '
-        'causing OutOfMemoryError for large downloads. Stream to disk instead.',
+        'causing OutOfMemoryError for large downloads. Stream to disk instead. {v2}',
     correctionMessage:
         'Use client.send() with StreamedResponse and pipe to file.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -852,6 +874,8 @@ class PreferStreamingResponseRule extends SaropaLintRule {
 
 /// Warns when HTTP clients are created without connection reuse.
 ///
+/// Since: v1.7.8 | Updated: v4.13.0 | Rule version: v4
+///
 /// Each new HTTP client requires DNS lookup, TCP handshake, and TLS
 /// negotiation. Reusing connections is much more efficient.
 ///
@@ -891,7 +915,7 @@ class PreferHttpConnectionReuseRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_http_connection_reuse',
     problemMessage:
-        '[prefer_http_connection_reuse] HTTP client created inside method. Connection overhead on every call. Each new HTTP client requires DNS lookup, TCP handshake, and TLS negotiation. Reusing connections is much more efficient.',
+        '[prefer_http_connection_reuse] HTTP client created inside method. Connection overhead on every call. Each new HTTP client requires DNS lookup, TCP handshake, and TLS negotiation. Reusing connections is much more efficient. {v4}',
     correctionMessage:
         'Create HTTP client as a class field and reuse across requests. Test with slow and interrupted connections to verify network resilience.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -962,6 +986,8 @@ class PreferHttpConnectionReuseRule extends SaropaLintRule {
 
 /// Warns when the same API endpoint might be called redundantly.
 ///
+/// Since: v1.7.8 | Updated: v4.13.0 | Rule version: v5
+///
 /// Multiple widgets or methods requesting the same data simultaneously
 /// wastes bandwidth and server resources. Deduplicate concurrent requests.
 ///
@@ -1001,7 +1027,7 @@ class AvoidRedundantRequestsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_redundant_requests',
     problemMessage:
-        '[avoid_redundant_requests] API call in build() or similar may cause redundant requests. Multiple widgets or methods requesting the same data simultaneously wastes bandwidth and server resources. Deduplicate concurrent requests.',
+        '[avoid_redundant_requests] API call in build() or similar may cause redundant requests. Multiple widgets or methods requesting the same data simultaneously wastes bandwidth and server resources. Deduplicate concurrent requests. {v5}',
     correctionMessage:
         'Cache results or use request deduplication pattern. Test with slow and interrupted connections to verify network resilience.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -1055,6 +1081,8 @@ class AvoidRedundantRequestsRule extends SaropaLintRule {
 
 /// Warns when GET responses are not cached.
 ///
+/// Since: v1.7.8 | Updated: v4.13.0 | Rule version: v5
+///
 /// GET responses for static or slowly-changing data should be cached
 /// to reduce bandwidth usage and improve responsiveness.
 ///
@@ -1093,7 +1121,7 @@ class RequireResponseCachingRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_response_caching',
     problemMessage:
-        '[require_response_caching] GET request without caching. Static or rarely-changing data wastes bandwidth on every call. GET responses for static or slowly-changing data must be cached to reduce bandwidth usage and improve responsiveness.',
+        '[require_response_caching] GET request without caching. Static or rarely-changing data wastes bandwidth on every call. GET responses for static or slowly-changing data must be cached to reduce bandwidth usage and improve responsiveness. {v5}',
     correctionMessage:
         'Add response caching with a TTL header or local cache layer for data that changes infrequently to reduce network load.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -1154,6 +1182,8 @@ class RequireResponseCachingRule extends SaropaLintRule {
 
 /// Warns when APIs return large collections without pagination.
 ///
+/// Since: v4.1.3 | Updated: v4.13.0 | Rule version: v2
+///
 /// Loading thousands of items at once is slow and memory-intensive.
 /// Use pagination with limit/offset or cursor-based pagination.
 ///
@@ -1185,7 +1215,7 @@ class PreferPaginationRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_api_pagination',
     problemMessage:
-        '[prefer_api_pagination] API fetches all items without pagination. May cause memory issues. Loading thousands of items at once is slow and memory-intensive. Use pagination with limit/offset or cursor-based pagination.',
+        '[prefer_api_pagination] API fetches all items without pagination. May cause memory issues. Loading thousands of items at once is slow and memory-intensive. Use pagination with limit/offset or cursor-based pagination. {v2}',
     correctionMessage:
         'Add pagination parameters: limit, offset, page, or cursor. Test with slow and interrupted connections to verify network resilience.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -1247,6 +1277,8 @@ class PreferPaginationRule extends SaropaLintRule {
 
 /// Warns when API responses fetch more data than needed.
 ///
+/// Since: v1.7.8 | Updated: v4.13.0 | Rule version: v5
+///
 /// Fetching entire objects when only a few fields are needed wastes
 /// bandwidth. Use field selection or create dedicated endpoints.
 ///
@@ -1277,7 +1309,7 @@ class AvoidOverFetchingRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_over_fetching',
     problemMessage:
-        '[avoid_over_fetching] Fetching the full object but only using a few fields, wasting bandwidth and serialization time. This network pattern wastes bandwidth and server resources, increasing latency and data costs for users.',
+        '[avoid_over_fetching] Fetching the full object but only using a few fields, wasting bandwidth and serialization time. This network pattern wastes bandwidth and server resources, increasing latency and data costs for users. {v5}',
     correctionMessage:
         'Use field selection, sparse fieldsets, or a dedicated endpoint to fetch only the fields this call-site actually uses.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -1330,6 +1362,8 @@ class AvoidOverFetchingRule extends SaropaLintRule {
 
 /// Warns when async requests lack cancellation support.
 ///
+/// Since: v1.7.8 | Updated: v4.13.0 | Rule version: v4
+///
 /// Requests for disposed screens waste resources and can cause errors.
 /// Use CancelToken or cancel HTTP requests when the widget is disposed.
 ///
@@ -1373,7 +1407,7 @@ class RequireCancelTokenRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_cancel_token',
     problemMessage:
-        '[require_cancel_token] Async request without cancellation continues after a StatefulWidget disposes its State, wasting bandwidth and causing setState errors. Not cancelling can lead to memory leaks, wasted network connections, and crashes from calling setState on a disposed State object after the parent removes the child from the widget tree.',
+        '[require_cancel_token] Async request without cancellation continues after a StatefulWidget disposes its State, wasting bandwidth and causing setState errors. Not cancelling can lead to memory leaks, wasted network connections, and crashes from calling setState on a disposed State object after the parent removes the child from the widget tree. {v4}',
     correctionMessage:
         'Use CancelToken (Dio) or implement request cancellation in the State dispose() method to stop in-flight requests when the widget is removed.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -1424,6 +1458,8 @@ class RequireCancelTokenRule extends SaropaLintRule {
 
 /// Warns when WebSocket listeners don't have error handlers.
 ///
+/// Since: v1.7.9 | Updated: v4.13.0 | Rule version: v3
+///
 /// WebSocket streams can emit errors. Without error handling,
 /// the app may crash or behave unexpectedly.
 ///
@@ -1456,7 +1492,7 @@ class RequireWebSocketErrorHandlingRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_websocket_error_handling',
     problemMessage:
-        '[require_websocket_error_handling] WebSocket stream.listen() is missing an onError handler. Unhandled errors can crash your app, disconnect users, and make debugging network issues difficult. All WebSocket listeners must handle errors to ensure robust, production-quality networking.',
+        '[require_websocket_error_handling] WebSocket stream.listen() is missing an onError handler. Unhandled errors can crash your app, disconnect users, and make debugging network issues difficult. All WebSocket listeners must handle errors to ensure robust, production-quality networking. {v3}',
     correctionMessage:
         'Always provide an onError handler to WebSocket stream.listen(). Log errors, show user feedback, and attempt reconnection if appropriate. Audit your codebase for missing error handlers and add tests for network failure scenarios.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -1536,6 +1572,8 @@ class _AddOnErrorHandlerFix extends DartFix {
 
 /// Warns when HTTP response is parsed without Content-Type check.
 ///
+/// Since: v2.1.0 | Updated: v4.13.0 | Rule version: v4
+///
 /// APIs may return different content types on error. Parsing JSON
 /// without checking Content-Type may fail unexpectedly.
 ///
@@ -1567,7 +1605,7 @@ class RequireContentTypeCheckRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_content_type_check',
     problemMessage:
-        '[require_content_type_check] Parsing response without Content-Type check. May fail on error responses. APIs may return different content types on error. Parsing JSON without checking Content-Type may fail unexpectedly.',
+        '[require_content_type_check] Parsing response without Content-Type check. May fail on error responses. APIs may return different content types on error. Parsing JSON without checking Content-Type may fail unexpectedly. {v4}',
     correctionMessage:
         'Check the Content-Type header before parsing the response body. APIs may return HTML error pages or plaintext instead of JSON on failure, causing parse exceptions.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -1630,6 +1668,8 @@ class RequireContentTypeCheckRule extends SaropaLintRule {
 
 /// Warns when WebSocket is used without heartbeat/ping mechanism.
 ///
+/// Since: v2.1.0 | Updated: v4.13.0 | Rule version: v3
+///
 /// WebSocket connections can silently fail. Periodic pings help
 /// detect dead connections and keep firewalls from closing idle sockets.
 ///
@@ -1660,7 +1700,7 @@ class AvoidWebsocketWithoutHeartbeatRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_websocket_without_heartbeat',
     problemMessage:
-        '[avoid_websocket_without_heartbeat] WebSocket without heartbeat/ping. Dead connections won\'t be detected. WebSocket connections can silently fail. Periodic pings help detect dead connections and keep firewalls from closing idle sockets.',
+        '[avoid_websocket_without_heartbeat] WebSocket without heartbeat/ping. Dead connections won\'t be detected. WebSocket connections can silently fail. Periodic pings help detect dead connections and keep firewalls from closing idle sockets. {v3}',
     correctionMessage:
         'Add periodic ping messages to detect connection failures. Test with slow and interrupted connections to verify network resilience.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -1725,6 +1765,8 @@ class AvoidWebsocketWithoutHeartbeatRule extends SaropaLintRule {
 
 /// Warns when launchUrl is called without try-catch error handling.
 ///
+/// Since: v4.5.5 | Updated: v4.13.0 | Rule version: v2
+///
 /// Alias: url_launch_unhandled, launch_url_try_catch
 ///
 /// launchUrl can throw PlatformException if no app can handle the URL.
@@ -1756,7 +1798,7 @@ class RequireUrlLauncherErrorHandlingRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_url_launcher_error_handling',
     problemMessage:
-        '[require_url_launcher_error_handling] Calling launchUrl without error handling can cause your app to crash or leave users stranded if the URL cannot be opened (e.g., missing browser, invalid URL, or platform restrictions). This results in a poor user experience and can break critical app flows.',
+        '[require_url_launcher_error_handling] Calling launchUrl without error handling can cause your app to crash or leave users stranded if the URL cannot be opened (e.g., missing browser, invalid URL, or platform restrictions). This results in a poor user experience and can break critical app flows. {v2}',
     correctionMessage:
         'Always check canLaunchUrl before calling launchUrl, and wrap the call in a try-catch block to handle errors gracefully. Provide user feedback if the URL cannot be opened.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -1808,6 +1850,8 @@ class RequireUrlLauncherErrorHandlingRule extends SaropaLintRule {
 
 /// Warns when pickImage is called without null check or try-catch.
 ///
+/// Since: v4.5.5 | Updated: v4.13.0 | Rule version: v2
+///
 /// Alias: image_picker_no_error_handling, pick_image_crash
 ///
 /// pickImage returns null if user cancels and can throw on permission denied.
@@ -1840,7 +1884,7 @@ class RequireImagePickerErrorHandlingRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_image_picker_error_handling',
     problemMessage:
-        '[require_image_picker_error_handling] Using pickImage, pickVideo, or pickMultiImage without null checks or error handling can result in null dereference errors or unhandled exceptions if the user cancels the picker or a platform error occurs. This can crash your app or cause unpredictable UI states.',
+        '[require_image_picker_error_handling] Using pickImage, pickVideo, or pickMultiImage without null checks or error handling can result in null dereference errors or unhandled exceptions if the user cancels the picker or a platform error occurs. This can crash your app or cause unpredictable UI states. {v2}',
     correctionMessage:
         'Always check for null results and wrap picker calls in try-catch blocks. Provide user feedback for cancellations and handle errors to prevent crashes.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -1880,6 +1924,8 @@ class RequireImagePickerErrorHandlingRule extends SaropaLintRule {
 
 /// Warns when ImageSource is hardcoded without giving user choice.
 ///
+/// Since: v4.13.0 | Rule version: v1
+///
 /// Alias: image_picker_source_fixed, no_source_choice
 ///
 /// Users should be able to choose between camera and gallery.
@@ -1910,7 +1956,7 @@ class RequireImagePickerSourceChoiceRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_image_picker_source_choice',
     problemMessage:
-        '[require_image_picker_source_choice] Hardcoded ImageSource. Prefer offering user a choice. Users must be able to choose between camera and gallery.',
+        '[require_image_picker_source_choice] Hardcoded ImageSource. Prefer offering user a choice. Users must be able to choose between camera and gallery. {v1}',
     correctionMessage:
         'Show dialog letting user choose camera or gallery. Test with slow and interrupted connections to verify network resilience.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -1963,6 +2009,8 @@ class RequireImagePickerSourceChoiceRule extends SaropaLintRule {
 
 /// Warns when getCurrentPosition is called without timeLimit.
 ///
+/// Since: v2.3.0 | Updated: v4.13.0 | Rule version: v3
+///
 /// Alias: geolocator_no_timeout, position_timeout_missing
 ///
 /// Without timeout, getCurrentPosition can hang indefinitely.
@@ -1990,7 +2038,7 @@ class RequireGeolocatorTimeoutRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_geolocator_timeout',
     problemMessage:
-        '[require_geolocator_timeout] Calling getCurrentPosition without a timeLimit can cause the request to hang indefinitely if the device cannot acquire a location fix (e.g., poor GPS signal, airplane mode). This can freeze your UI and frustrate users.',
+        '[require_geolocator_timeout] Calling getCurrentPosition without a timeLimit can cause the request to hang indefinitely if the device cannot acquire a location fix (e.g., poor GPS signal, airplane mode). This can freeze your UI and frustrate users. {v3}',
     correctionMessage:
         'Always set the timeLimit parameter (e.g., Duration(seconds: 10)) to ensure location requests fail gracefully and your app remains responsive.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -2035,6 +2083,8 @@ class RequireGeolocatorTimeoutRule extends SaropaLintRule {
 // =============================================================================
 
 /// Warns when connectivity subscription isn't cancelled.
+///
+/// Since: v2.3.0 | Updated: v4.13.0 | Rule version: v3
 ///
 /// Alias: connectivity_leak, connectivity_no_cancel
 ///
@@ -2081,7 +2131,7 @@ class RequireConnectivitySubscriptionCancelRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_connectivity_subscription_cancel',
     problemMessage:
-        '[require_connectivity_subscription_cancel] If you do not cancel your connectivity subscription, your app will leak memory and system resources. This can cause crashes, slowdowns, and unpredictable behavior, especially after repeated hot reloads or navigation.',
+        '[require_connectivity_subscription_cancel] If you do not cancel your connectivity subscription, your app will leak memory and system resources. This can cause crashes, slowdowns, and unpredictable behavior, especially after repeated hot reloads or navigation. {v3}',
     correctionMessage:
         'Always store your connectivity subscription and call cancel() in dispose() to prevent memory leaks and keep your app stable.',
     errorSeverity: DiagnosticSeverity.ERROR,
@@ -2138,6 +2188,8 @@ class RequireConnectivitySubscriptionCancelRule extends SaropaLintRule {
 
 /// Warns when background notification handler is an instance method.
 ///
+/// Since: v2.3.0 | Updated: v4.13.0 | Rule version: v3
+///
 /// Alias: notification_handler_instance, fcm_handler_top_level
 ///
 /// Firebase messaging background handler must be a top-level function.
@@ -2169,7 +2221,7 @@ class RequireNotificationHandlerTopLevelRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_notification_handler_top_level',
     problemMessage:
-        '[require_notification_handler_top_level] If your notification handler is not a top-level function, background messages will be silently dropped when the app is terminated or in the background. Users will miss important notifications and your app may fail compliance checks.',
+        '[require_notification_handler_top_level] If your notification handler is not a top-level function, background messages will be silently dropped when the app is terminated or in the background. Users will miss important notifications and your app may fail compliance checks. {v3}',
     correctionMessage:
         'Move your notification handler to a top-level function and annotate it with @pragma("vm:entry-point") to ensure background messages are always delivered.',
     errorSeverity: DiagnosticSeverity.ERROR,
@@ -2226,6 +2278,8 @@ class RequireNotificationHandlerTopLevelRule extends SaropaLintRule {
 
 /// Warns when permission denied state is not handled.
 ///
+/// Since: v2.3.0 | Updated: v4.13.0 | Rule version: v4
+///
 /// Alias: permission_denied_unhandled, missing_denied_handler
 ///
 /// Users may deny permissions. Apps must handle denied state gracefully.
@@ -2256,7 +2310,7 @@ class RequirePermissionDeniedHandlingRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_permission_denied_handling',
     problemMessage:
-        '[require_permission_denied_handling] Requesting permissions without handling denied or permanently denied states leaves users unable to proceed, with no explanation or way to enable permissions. This can block critical app features and frustrate users.',
+        '[require_permission_denied_handling] Requesting permissions without handling denied or permanently denied states leaves users unable to proceed, with no explanation or way to enable permissions. This can block critical app features and frustrate users. {v4}',
     correctionMessage:
         'Check for isDenied and isPermanentlyDenied states after requesting permissions. Show clear explanations and provide a link to app settings if needed.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -2356,6 +2410,8 @@ class RequirePermissionDeniedHandlingRule extends SaropaLintRule {
 
 /// Warns when pickImage result is not checked for null.
 ///
+/// Since: v2.3.0 | Updated: v4.13.0 | Rule version: v2
+///
 /// Alias: image_picker_result, handle_picker_null
 ///
 /// ImagePicker.pickImage returns null when the user cancels. Ignoring the
@@ -2386,7 +2442,7 @@ class RequireImagePickerResultHandlingRule extends SaropaLintRule {
     name: 'require_image_picker_result_handling',
     problemMessage:
         '[require_image_picker_result_handling] pickImage returns null when '
-        'user cancels. Missing null check causes NoSuchMethodError crash.',
+        'user cancels. Missing null check causes NoSuchMethodError crash. {v2}',
     correctionMessage: 'Add null check: if (image == null) return;',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
@@ -2449,6 +2505,8 @@ class RequireImagePickerResultHandlingRule extends SaropaLintRule {
 
 /// Warns when CachedNetworkImage uses a variable cacheKey in build.
 ///
+/// Since: v2.3.0 | Updated: v4.13.0 | Rule version: v2
+///
 /// Alias: cached_image_key, stable_cache_key
 ///
 /// Using a changing cacheKey in build causes the image to reload on every
@@ -2485,7 +2543,7 @@ class AvoidCachedImageInBuildRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_cached_image_in_build',
     problemMessage:
-        '[avoid_cached_image_in_build] Variable cacheKey in build method defeats caching. Using a changing cacheKey in build causes the image to reload on every rebuild, defeating the purpose of caching.',
+        '[avoid_cached_image_in_build] Variable cacheKey in build method defeats caching. Using a changing cacheKey in build causes the image to reload on every rebuild, defeating the purpose of caching. {v2}',
     correctionMessage:
         'Use a stable cacheKey that does not change on rebuild. Test with slow and interrupted connections to verify network resilience.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -2535,6 +2593,8 @@ class AvoidCachedImageInBuildRule extends SaropaLintRule {
 
 /// Warns when SQLite onUpgrade doesn't check oldVersion properly.
 ///
+/// Since: v2.3.0 | Updated: v4.13.0 | Rule version: v4
+///
 /// Alias: sqflite_version_check, database_migration
 ///
 /// Database migrations must check oldVersion to apply only necessary changes.
@@ -2570,7 +2630,7 @@ class RequireSqfliteMigrationRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_sqflite_migration',
     problemMessage:
-        '[require_sqflite_migration] Implementing onUpgrade without checking oldVersion can cause all migrations to run for every upgrade, corrupting user data and breaking app updates. This is especially dangerous for users upgrading from recent versions.',
+        '[require_sqflite_migration] Implementing onUpgrade without checking oldVersion can cause all migrations to run for every upgrade, corrupting user data and breaking app updates. This is especially dangerous for users upgrading from recent versions. {v4}',
     correctionMessage:
         'Always check oldVersion and newVersion in onUpgrade, and only run migrations needed for the user’s upgrade path. Test migrations thoroughly before release.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -2636,6 +2696,8 @@ class RequireSqfliteMigrationRule extends SaropaLintRule {
 
 /// Warns when requesting permissions without showing a rationale first.
 ///
+/// Since: v2.3.0 | Updated: v4.13.0 | Rule version: v3
+///
 /// Alias: permission_rationale, show_rationale
 ///
 /// Android best practice is to explain why the app needs a permission before
@@ -2665,7 +2727,7 @@ class RequirePermissionRationaleRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_permission_rationale',
     problemMessage:
-        '[require_permission_rationale] Permission request without checking shouldShowRequestRationale. Android established convention is to explain why the app needs a permission before requesting it using shouldShowRequestRationale.',
+        '[require_permission_rationale] Permission request without checking shouldShowRequestRationale. Android established convention is to explain why the app needs a permission before requesting it using shouldShowRequestRationale. {v3}',
     correctionMessage:
         'Check shouldShowRequestRationale() before requesting permission. Test with slow and interrupted connections to verify network resilience.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -2715,6 +2777,8 @@ class RequirePermissionRationaleRule extends SaropaLintRule {
 
 /// Warns when using permission-gated features without checking status.
 ///
+/// Since: v2.3.0 | Updated: v4.13.0 | Rule version: v4
+///
 /// Alias: check_permission_status, permission_before_use
 ///
 /// Using features like camera, location, or microphone without checking if
@@ -2743,7 +2807,7 @@ class RequirePermissionStatusCheckRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_permission_status_check',
     problemMessage:
-        '[require_permission_status_check] Accessing camera, location, or other gated features without checking permission status can cause runtime exceptions or crashes if the user has denied permission. This can break critical app flows and frustrate users.',
+        '[require_permission_status_check] Accessing camera, location, or other gated features without checking permission status can cause runtime exceptions or crashes if the user has denied permission. This can break critical app flows and frustrate users. {v4}',
     correctionMessage:
         'Always check permission.status.isGranted before accessing gated features. Handle denied permissions gracefully and inform the user.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -2803,6 +2867,8 @@ class RequirePermissionStatusCheckRule extends SaropaLintRule {
 
 /// Warns when showing notifications without Android 13+ permission check.
 ///
+/// Since: v2.3.0 | Updated: v4.13.0 | Rule version: v3
+///
 /// Alias: android13_notification, post_notifications
 ///
 /// Android 13 (API 33) requires explicit POST_NOTIFICATIONS permission.
@@ -2831,7 +2897,7 @@ class RequireNotificationPermissionAndroid13Rule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_notification_permission_android13',
     problemMessage:
-        '[require_notification_permission_android13] Notification displayed without checking POST_NOTIFICATIONS permission on Android 13+. On API level 33 and above, notifications fail silently without this runtime permission, causing users to miss critical alerts, messages, and updates with no error feedback to the developer or the user.',
+        '[require_notification_permission_android13] Notification displayed without checking POST_NOTIFICATIONS permission on Android 13+. On API level 33 and above, notifications fail silently without this runtime permission, causing users to miss critical alerts, messages, and updates with no error feedback to the developer or the user. {v3}',
     correctionMessage:
         'Check and request Permission.notification at runtime before calling any notification display method on Android 13+ (API 33+) devices.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -2911,6 +2977,8 @@ class RequireNotificationPermissionAndroid13Rule extends SaropaLintRule {
 
 /// Warns when EventSource/SSE connection is created without close() cleanup.
 ///
+/// Since: v2.3.7 | Updated: v4.13.0 | Rule version: v4
+///
 /// Alias: sse_subscription_cancel, event_source_close, sse_close
 ///
 /// Server-Sent Events (SSE) connections via EventSource or similar packages
@@ -2974,7 +3042,7 @@ class RequireSseSubscriptionCancelRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_sse_subscription_cancel',
     problemMessage:
-        'If a widget (such as a StatefulWidget managing a live data feed) opens a Server-Sent Events (SSE) or EventSource connection but does not cancel it in dispose(), the connection remains open after the widget is removed. This can result in orphaned network connections, wasted bandwidth, and memory leaks, especially in dashboards, chat clients, or any UI with dynamic SSE usage. Always close SSE/EventSource connections in the correct State object’s dispose() method. See https://docs.flutter.dev/perf/memory#dispose-resources.',
+        '[require_sse_subscription_cancel] If a widget (such as a StatefulWidget managing a live data feed) opens a Server-Sent Events (SSE) or EventSource connection but does not cancel it in dispose(), the connection remains open after the widget is removed. This can result in orphaned network connections, wasted bandwidth, and memory leaks, especially in dashboards, chat clients, or any UI with dynamic SSE usage. Always close SSE/EventSource connections in the correct State object’s dispose() method. See https://docs.flutter.dev/perf/memory#dispose-resources. {v4}',
     correctionMessage:
         'In every State class that owns an SSE or EventSource connection, call connection.close() in the dispose() method before calling super.dispose(). This ensures the connection is properly terminated when the widget is removed, preventing leaks and network resource exhaustion. See https://docs.flutter.dev/perf/memory#dispose-resources for more details.',
     errorSeverity: DiagnosticSeverity.ERROR,
@@ -3092,6 +3160,8 @@ class RequireSseSubscriptionCancelRule extends SaropaLintRule {
 
 /// Warns when HTTP requests don't have a timeout specified.
 ///
+/// Since: v2.3.10 | Updated: v4.13.0 | Rule version: v3
+///
 /// Alias: http_timeout, network_timeout, request_timeout
 ///
 /// HTTP requests without timeouts can hang indefinitely, freezing the UI
@@ -3120,7 +3190,7 @@ class PreferTimeoutOnRequestsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_timeout_on_requests',
     problemMessage:
-        '[prefer_timeout_on_requests] Making HTTP requests without a timeout can cause your app to hang indefinitely if the server is slow or unresponsive. This degrades user experience and can block critical app flows.',
+        '[prefer_timeout_on_requests] Making HTTP requests without a timeout can cause your app to hang indefinitely if the server is slow or unresponsive. This degrades user experience and can block critical app flows. {v3}',
     correctionMessage:
         'Always set a timeout on HTTP requests (e.g., .timeout(Duration(seconds: 30))) or configure a client-wide timeout to ensure your app remains responsive.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -3250,6 +3320,8 @@ class _AddTimeout60SecondsFix extends DartFix {
 
 /// Warns when WebSocket connections lack reconnection logic.
 ///
+/// Since: v4.1.8 | Updated: v4.13.0 | Rule version: v3
+///
 /// `[HEURISTIC]` - Detects WebSocketChannel without reconnection handling.
 ///
 /// WebSocket connections drop unexpectedly. Implement automatic reconnection
@@ -3300,7 +3372,7 @@ class RequireWebsocketReconnectionRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_websocket_reconnection',
     problemMessage:
-        '[require_websocket_reconnection] WebSocket connection without reconnection logic will stay permanently disconnected after network interruptions, server restarts, or mobile network handoffs. Users will see stale data, miss real-time updates, and have no indication that the live connection has dropped until they manually refresh or restart the app.',
+        '[require_websocket_reconnection] WebSocket connection without reconnection logic will stay permanently disconnected after network interruptions, server restarts, or mobile network handoffs. Users will see stale data, miss real-time updates, and have no indication that the live connection has dropped until they manually refresh or restart the app. {v3}',
     correctionMessage:
         'Implement automatic reconnection with exponential backoff for WebSocket connections.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -3332,5 +3404,114 @@ class RequireWebsocketReconnectionRule extends SaropaLintRule {
         reporter.atNode(node, code);
       }
     });
+  }
+}
+
+/// Warns when analytics event names do not follow snake_case convention.
+///
+/// Since: v4.14.0 | Rule version: v1
+///
+/// GitHub: https://github.com/saropa/saropa_lints/issues/19
+///
+/// `[HEURISTIC]` - Detects calls to known analytics methods and checks
+/// the first string literal argument against a strict snake_case pattern.
+///
+/// **BAD:**
+/// ```dart
+/// analytics.logEvent(name: 'UserSignedUp');
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// analytics.logEvent(name: 'user_signed_up');
+/// ```
+class RequireAnalyticsEventNamingRule extends SaropaLintRule {
+  const RequireAnalyticsEventNamingRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  static const LintCode _code = LintCode(
+    name: 'require_analytics_event_naming',
+    problemMessage:
+        '[require_analytics_event_naming] Analytics event name does not '
+        'follow snake_case convention. Inconsistent naming fragments '
+        'dashboards, breaks funnel queries, and makes cross-platform '
+        'analysis unreliable. Most analytics platforms recommend or '
+        'require snake_case for event names. {v1}',
+    correctionMessage: 'Rename the event to snake_case (e.g., "user_signed_up" '
+        'instead of "UserSignedUp" or "user-signed-up").',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  /// Unambiguous analytics method names - always trigger without
+  /// receiver filtering since they are specific to analytics APIs.
+  static const Set<String> _unambiguousMethods = <String>{
+    'logEvent',
+    'trackEvent',
+    'logCustomEvent',
+  };
+
+  /// Ambiguous method names that appear in non-analytics contexts.
+  /// Require an analytics-like receiver to avoid false positives
+  /// (e.g., shipment.track(), stateMachine.sendEvent()).
+  static const Set<String> _ambiguousMethods = <String>{
+    'track',
+    'sendEvent',
+  };
+
+  /// Receivers that indicate an analytics context.
+  static final RegExp _analyticsTargetPattern = RegExp(
+    r'(analytics|tracker|segment|mixpanel|amplitude|firebase|appFlyer|braze|clevertap|appsFlyer|posthog)',
+    caseSensitive: false,
+  );
+
+  static final RegExp _snakeCasePattern = RegExp(
+    r'^[a-z][a-z0-9]*(_[a-z0-9]+)*$',
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      final String methodName = node.methodName.name;
+
+      if (_ambiguousMethods.contains(methodName)) {
+        // Require an analytics-like receiver
+        final Expression? target = node.target;
+        if (target == null) return;
+        if (!_analyticsTargetPattern.hasMatch(target.toSource())) return;
+      } else if (!_unambiguousMethods.contains(methodName)) {
+        return;
+      }
+
+      final String? eventName = _extractEventName(node);
+      if (eventName == null || eventName.isEmpty) return;
+      if (!_snakeCasePattern.hasMatch(eventName)) {
+        reporter.atNode(node.methodName, code);
+      }
+    });
+  }
+
+  static String? _extractEventName(MethodInvocation node) {
+    for (final Expression arg in node.argumentList.arguments) {
+      if (arg is NamedExpression && arg.name.label.name == 'name') {
+        final Expression value = arg.expression;
+        if (value is StringLiteral) return value.stringValue;
+        return null;
+      }
+    }
+    for (final Expression arg in node.argumentList.arguments) {
+      if (arg is! NamedExpression && arg is StringLiteral) {
+        return arg.stringValue;
+      }
+    }
+    return null;
   }
 }

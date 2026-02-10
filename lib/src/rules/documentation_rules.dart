@@ -16,6 +16,8 @@ import '../saropa_lint_rule.dart';
 
 /// Warns when public API lacks documentation.
 ///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v4
+///
 /// Public classes, methods, and properties should have doc comments
 /// to help other developers understand their purpose.
 ///
@@ -49,7 +51,7 @@ class RequirePublicApiDocumentationRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_public_api_documentation',
     problemMessage:
-        '[require_public_api_documentation] Public API must be documented. Public classes, methods, and properties must have doc comments to help other developers understand their purpose.',
+        '[require_public_api_documentation] Public API must be documented. Public classes, methods, and properties must have doc comments to help other developers understand their purpose. {v4}',
     correctionMessage:
         'Add a doc comment explaining the purpose and usage. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -94,6 +96,8 @@ class RequirePublicApiDocumentationRule extends SaropaLintRule {
 
 /// Warns when documentation is outdated or misleading.
 ///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v4
+///
 /// Doc comments should accurately describe the code behavior.
 ///
 /// **BAD:**
@@ -120,7 +124,7 @@ class AvoidMisleadingDocumentationRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_misleading_documentation',
     problemMessage:
-        '[avoid_misleading_documentation] Documentation does not match the method name or code behavior. Mismatched docs confuse maintainers and lead to incorrect usage.',
+        '[avoid_misleading_documentation] Documentation does not match the method name or code behavior. Mismatched docs confuse maintainers and lead to incorrect usage. {v4}',
     correctionMessage:
         'Update documentation to match the method name and actual code behavior. Example: If the method is getUserEmail(), the doc should describe returning the user email, not something else.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -161,6 +165,8 @@ class AvoidMisleadingDocumentationRule extends SaropaLintRule {
 
 /// Warns when deprecated API lacks migration guidance.
 ///
+/// Since: v4.9.7 | Updated: v4.13.0 | Rule version: v6
+///
 /// Deprecated APIs should explain what to use instead.
 ///
 /// **BAD:**
@@ -187,7 +193,7 @@ class RequireDeprecationMessageRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_deprecation_message',
     problemMessage:
-        '[require_deprecation_message] Deprecated annotation should include migration guidance. Missing documentation makes the API harder to use correctly and increases onboarding time.',
+        '[require_deprecation_message] Deprecated annotation should include migration guidance. Missing documentation makes the API harder to use correctly and increases onboarding time. {v6}',
     correctionMessage:
         'Use @Deprecated("message") with explanation of what to use instead. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -261,6 +267,8 @@ class _UseDeprecatedWithMessageFix extends DartFix {
 
 /// Warns when complex methods lack explanatory comments.
 ///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v5
+///
 /// Complex logic should have comments explaining the reasoning.
 ///
 /// **BAD:**
@@ -296,7 +304,7 @@ class RequireComplexLogicCommentsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_complex_logic_comments',
     problemMessage:
-        '[require_complex_logic_comments] Complex method lacks explanatory comments. Complex logic must have comments explaining the reasoning.',
+        '[require_complex_logic_comments] Complex method lacks explanatory comments. Complex logic must have comments explaining the reasoning. {v5}',
     correctionMessage:
         'Add comments explaining the logic, especially for chained operations. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -341,6 +349,8 @@ class RequireComplexLogicCommentsRule extends SaropaLintRule {
 
 /// Warns when parameter documentation is missing for public methods.
 ///
+/// Since: v4.10.1 | Updated: v4.13.0 | Rule version: v5
+///
 /// Parameters should be documented to explain their purpose.
 ///
 /// **BAD:**
@@ -371,7 +381,7 @@ class RequireParameterDocumentationRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_parameter_documentation',
     problemMessage:
-        '[require_parameter_documentation] Parameters must be documented. Parameters must be documented to explain their purpose. Parameter documentation is missing for public methods.',
+        '[require_parameter_documentation] Parameters must be documented. Parameters must be documented to explain their purpose. Parameter documentation is missing for public methods. {v5}',
     correctionMessage:
         'Add [paramName] documentation for each parameter. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -427,6 +437,8 @@ class RequireParameterDocumentationRule extends SaropaLintRule {
 
 /// Warns when return value documentation is missing.
 ///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v4
+///
 /// Non-void methods should document what they return.
 ///
 /// **BAD:**
@@ -456,7 +468,7 @@ class RequireReturnDocumentationRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_return_documentation',
     problemMessage:
-        '[require_return_documentation] Return value must be documented. Non-void methods should document what they return. Return value documentation is missing.',
+        '[require_return_documentation] Return value must be documented. Non-void methods should document what they return. Return value documentation is missing. {v4}',
     correctionMessage:
         'Add documentation explaining what the method returns. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -498,6 +510,8 @@ class RequireReturnDocumentationRule extends SaropaLintRule {
 
 /// Warns when exception documentation is missing.
 ///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v4
+///
 /// Methods that throw should document the exceptions.
 ///
 /// **BAD:**
@@ -530,7 +544,7 @@ class RequireExceptionDocumentationRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_exception_documentation',
     problemMessage:
-        '[require_exception_documentation] Thrown exceptions must be documented. Methods that throw should document the exceptions. Exception documentation is missing.',
+        '[require_exception_documentation] Thrown exceptions must be documented. Methods that throw should document the exceptions. Exception documentation is missing. {v4}',
     correctionMessage:
         'Add "Throws [ExceptionType]" to documentation. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -571,6 +585,8 @@ class RequireExceptionDocumentationRule extends SaropaLintRule {
 
 /// Warns when public class lacks example usage in documentation.
 ///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v4
+///
 /// Complex classes benefit from example usage in their docs.
 ///
 /// **BAD:**
@@ -603,7 +619,7 @@ class RequireExampleInDocumentationRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_example_in_documentation',
     problemMessage:
-        '[require_example_in_documentation] Public class documentation should include an example. Complex classes benefit from example usage in their docs.',
+        '[require_example_in_documentation] Public class documentation should include an example. Complex classes benefit from example usage in their docs. {v4}',
     correctionMessage:
         'Add an example code block showing typical usage. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -656,6 +672,9 @@ class RequireExampleInDocumentationRule extends SaropaLintRule {
 }
 
 /// Warns when a dartdoc `[name]` references a parameter that does not exist
+///
+/// Since: v4.10.1 | Updated: v4.13.0 | Rule version: v2
+///
 /// in the function, method, or constructor signature.
 ///
 /// The existing `require_parameter_documentation` rule checks that real
@@ -688,7 +707,7 @@ class VerifyDocumentedParametersExistRule extends SaropaLintRule {
     name: 'verify_documented_parameters_exist',
     problemMessage:
         '[verify_documented_parameters_exist] Documentation references '
-        'a parameter that does not exist in the signature.',
+        'a parameter that does not exist in the signature. {v2}',
     correctionMessage:
         'Remove the stale parameter reference or update it to match '
         'an actual parameter name.',
@@ -700,7 +719,7 @@ class VerifyDocumentedParametersExistRule extends SaropaLintRule {
         name: 'verify_documented_parameters_exist',
         problemMessage:
             '[verify_documented_parameters_exist] Documentation references '
-            "'[$name]' which does not exist in the signature.",
+            "'[$name]' which does not exist in the signature. {v2}",
         correctionMessage:
             'Remove the stale parameter reference or update it to match '
             'an actual parameter name.',

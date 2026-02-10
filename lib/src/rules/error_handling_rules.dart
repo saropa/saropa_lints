@@ -17,6 +17,8 @@ import '../saropa_lint_rule.dart';
 
 /// Warns when catch block swallows exception without logging.
 ///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v5
+///
 /// Alias: avoid_empty_catch, empty_catch, no_empty_catch_block
 ///
 /// Empty catch blocks hide errors and make debugging difficult.
@@ -54,7 +56,7 @@ class AvoidSwallowingExceptionsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_swallowing_exceptions',
     problemMessage:
-        '[avoid_swallowing_exceptions] Catch block swallows exception without logging, rethrowing, or handling it. Silent failures hide production bugs, break monitoring and alerting systems, and make it impossible to diagnose issues reported by users. Every caught exception must be acknowledged.',
+        '[avoid_swallowing_exceptions] Catch block swallows exception without logging, rethrowing, or handling it. Silent failures hide production bugs, break monitoring and alerting systems, and make it impossible to diagnose issues reported by users. Every caught exception must be acknowledged. {v5}',
     correctionMessage:
         'Log the error, rethrow, or handle it with a user-visible message or recovery action. Example: catch (e, st) { logger.error("Operation failed", e, st); rethrow; }',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -142,6 +144,8 @@ class _IdentifierUsageVisitor extends RecursiveAstVisitor<void> {
 
 /// Warns when stack trace is lost in catch block.
 ///
+/// Since: v1.7.2 | Updated: v4.13.0 | Rule version: v2
+///
 /// Alias: preserve_stack_trace, lost_stack_trace, capture_stack_trace
 ///
 /// Losing stack trace makes debugging production issues nearly impossible.
@@ -178,7 +182,7 @@ class AvoidLosingStackTraceRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_losing_stack_trace',
     problemMessage:
-        '[avoid_losing_stack_trace] Rethrowing without preserving the stack trace loses the original error location and call chain. Production debugging becomes impossible because crash reports show only the rethrow site, not where the error actually originated. Always capture and forward the full stack trace.',
+        '[avoid_losing_stack_trace] Rethrowing without preserving the stack trace loses the original error location and call chain. Production debugging becomes impossible because crash reports show only the rethrow site, not where the error actually originated. Always capture and forward the full stack trace. {v2}',
     correctionMessage:
         'Capture the stack trace parameter and use Error.throwWithStackTrace or include it in the new exception. Example: catch (e, st) { Error.throwWithStackTrace(CustomError(e), st); }',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -269,6 +273,8 @@ class _ThrowVisitor extends RecursiveAstVisitor<void> {
 
 /// Warns when using generic Exception instead of specific types.
 ///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v4
+///
 /// Alias: specific_exception, no_generic_exception, typed_exception
 ///
 /// Generic exceptions provide less context for error handling.
@@ -295,7 +301,7 @@ class AvoidGenericExceptionsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_generic_exceptions',
     problemMessage:
-        '[avoid_generic_exceptions] Generic Exception thrown instead of a specific error type. This prevents callers from distinguishing between different failure modes, forces broad catch-all blocks, and makes error traceability across services impossible. Specific exception types enable targeted recovery and clearer crash reports.',
+        '[avoid_generic_exceptions] Generic Exception thrown instead of a specific error type. This prevents callers from distinguishing between different failure modes, forces broad catch-all blocks, and makes error traceability across services impossible. Specific exception types enable targeted recovery and clearer crash reports. {v4}',
     correctionMessage:
         'Create and throw a specific exception type for each error case. Example: throw UserNotFoundException(userId) instead of throw Exception("not found").',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -321,6 +327,8 @@ class AvoidGenericExceptionsRule extends SaropaLintRule {
 }
 
 /// Warns when error messages don't include context.
+///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v5
 ///
 /// Alias: descriptive_error, error_message_context, detailed_exception
 ///
@@ -348,7 +356,7 @@ class RequireErrorContextRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_error_context',
     problemMessage:
-        '[require_error_context] Error message is missing contextual details such as entity IDs, operation names, or relevant state. Without this context, production crash reports and logs become impossible to correlate with specific user actions, and debugging requires reproducing the exact conditions that caused the failure.',
+        '[require_error_context] Error message is missing contextual details such as entity IDs, operation names, or relevant state. Without this context, production crash reports and logs become impossible to correlate with specific user actions, and debugging requires reproducing the exact conditions that caused the failure. {v5}',
     correctionMessage:
         'Include relevant context in error messages such as IDs, state, or operation details. Example: throw Exception("Failed to load user \$userId: \$reason").',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -385,6 +393,8 @@ class RequireErrorContextRule extends SaropaLintRule {
 }
 
 /// Warns when Result pattern is not used for expected failures.
+///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v5
 ///
 /// Alias: use_result_type, either_pattern, result_vs_exception
 ///
@@ -424,7 +434,7 @@ class PreferResultPatternRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_result_pattern',
     problemMessage:
-        '[prefer_result_pattern] Throwing exceptions for recoverable errors like validation failures forces try-catch blocks at every call site and obscures control flow. This makes error handling inconsistent, increases boilerplate, and causes callers to miss failure cases entirely when they forget to add try-catch.',
+        '[prefer_result_pattern] Throwing exceptions for recoverable errors like validation failures forces try-catch blocks at every call site and obscures control flow. This makes error handling inconsistent, increases boilerplate, and causes callers to miss failure cases entirely when they forget to add try-catch. {v5}',
     correctionMessage:
         'Return Result<T, E> or a sealed class for recoverable errors instead of throwing exceptions. Example: return Result.error(ValidationError("invalid email")).',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -475,6 +485,8 @@ class _ThrowCountVisitor extends RecursiveAstVisitor<void> {
 
 /// Warns when async function doesn't handle errors internally.
 ///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v5
+///
 /// Alias: document_throws, async_error_handling, throws_annotation
 ///
 /// Async functions should either handle errors or document that they throw.
@@ -510,7 +522,7 @@ class RequireAsyncErrorDocumentationRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_async_error_documentation',
     problemMessage:
-        '[require_async_error_documentation] Async function with await expressions does not document thrown exceptions or handle errors internally. Unhandled async errors propagate as uncaught Future failures that can crash the app, produce silent data loss, or leave the UI in an inconsistent state with no recovery path.',
+        '[require_async_error_documentation] Async function with await expressions does not document thrown exceptions or handle errors internally. Unhandled async errors propagate as uncaught Future failures that can crash the app, produce silent data loss, or leave the UI in an inconsistent state with no recovery path. {v5}',
     correctionMessage:
         'Add try-catch to handle errors, or document thrown exceptions with /// Throws [ExceptionType]. Example: /// Throws [NetworkException] if the request fails.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -574,6 +586,8 @@ class _AsyncAnalysisVisitor extends RecursiveAstVisitor<void> {
 
 /// Warns when try statements are nested.
 ///
+/// Since: v4.1.0 | Updated: v4.13.0 | Rule version: v2
+///
 /// Alias: nested_try_catch, flatten_try_catch, extract_try_block
 ///
 /// Nested try-catch blocks make code harder to read and maintain.
@@ -621,7 +635,7 @@ class AvoidNestedTryStatementsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_nested_try_statements',
     problemMessage:
-        '[avoid_nested_try_statements] Nested try statements found. Deeply nested error handling is hard to read and maintain. Nested try-catch blocks make code harder to read and maintain. Extract nested logic into separate functions.',
+        '[avoid_nested_try_statements] Nested try statements found. Deeply nested error handling is hard to read and maintain. Nested try-catch blocks make code harder to read and maintain. Extract nested logic into separate functions. {v2}',
     correctionMessage:
         'Extract inner try-catch into a separate function or refactor to flatten error handling. Example: move inner try to a helper method.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -652,6 +666,8 @@ class AvoidNestedTryStatementsRule extends SaropaLintRule {
 }
 
 /// Warns when error boundary widget is missing.
+///
+/// Since: v1.7.2 | Updated: v4.13.0 | Rule version: v2
 ///
 /// Alias: app_error_boundary, error_widget, crash_handler
 ///
@@ -684,7 +700,7 @@ class RequireErrorBoundaryRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_error_boundary',
     problemMessage:
-        '[require_error_boundary] Top-level MaterialApp or CupertinoApp is missing an error boundary in its build tree. Without a dedicated error handler, uncaught exceptions will crash the entire application, leaving users with a blank or frozen screen and no recovery path. All production apps must provide a visible fallback UI for unexpected errors.',
+        '[require_error_boundary] Top-level MaterialApp or CupertinoApp is missing an error boundary in its build tree. Without a dedicated error handler, uncaught exceptions will crash the entire application, leaving users with a blank or frozen screen and no recovery path. All production apps must provide a visible fallback UI for unexpected errors. {v2}',
     correctionMessage:
         'Add a builder parameter to your MaterialApp or CupertinoApp that wraps the child tree in an ErrorBoundary. Example: builder: (context, child) => ErrorBoundary(child: child!).',
     errorSeverity: DiagnosticSeverity.ERROR,
@@ -722,6 +738,8 @@ class RequireErrorBoundaryRule extends SaropaLintRule {
 }
 
 /// Warns when fire-and-forget Future lacks error handling.
+///
+/// Since: v2.0.0 | Updated: v4.13.0 | Rule version: v5
 ///
 /// Alias: require_future_error_handling, catch_future_errors, future_error_handler,
 /// handle_future_exception, unhandled_future, fire_and_forget_future, add_catch_error
@@ -813,7 +831,7 @@ class AvoidUncaughtFutureErrorsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_uncaught_future_errors',
     problemMessage:
-        '[avoid_uncaught_future_errors] Fire-and-forget Future called without error handling. Any exception thrown by this Future is silently lost or crashes the app via the global error handler. Without .catchError(), try-catch, or .ignore(), async failures become invisible in production and extremely difficult to diagnose from crash logs.',
+        '[avoid_uncaught_future_errors] Fire-and-forget Future called without error handling. Any exception thrown by this Future is silently lost or crashes the app via the global error handler. Without .catchError(), try-catch, or .ignore(), async failures become invisible in production and extremely difficult to diagnose from crash logs. {v5}',
     correctionMessage:
         'Add try-catch inside the async function, chain .catchError() at the call site, or use .ignore() to explicitly acknowledge fire-and-forget. Example: loadData().catchError((e) => log(e));',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -1105,6 +1123,8 @@ class _AddIgnoreCommentForUncaughtFutureFix extends DartFix {
 
 /// Warns when print() is used for error logging in catch blocks.
 ///
+/// Since: v2.3.9 | Updated: v4.13.0 | Rule version: v2
+///
 /// Alias: no_print_error, print_error, use_logger
 ///
 /// Using print() for error logging is not appropriate for production apps.
@@ -1141,7 +1161,7 @@ class AvoidPrintErrorRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_print_error',
     problemMessage:
-        '[avoid_print_error] Using print() for error logging in a catch block. In production, print() output is not captured by crash reporting services like Crashlytics or Sentry, making errors invisible to monitoring dashboards. Errors logged only via print() are effectively lost and cannot trigger alerts or be tracked over time.',
+        '[avoid_print_error] Using print() for error logging in a catch block. In production, print() output is not captured by crash reporting services like Crashlytics or Sentry, making errors invisible to monitoring dashboards. Errors logged only via print() are effectively lost and cannot trigger alerts or be tracked over time. {v2}',
     correctionMessage:
         'Use a structured logging framework like logger, Crashlytics, or Sentry to capture errors with full stack traces. Example: logger.e("Fetch failed", error: e, stackTrace: st);',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -1227,6 +1247,8 @@ class _PrintErrorVisitor extends RecursiveAstVisitor<void> {
 
 /// Warns when using bare catch without an on clause.
 ///
+/// Since: v2.3.10 | Updated: v4.13.0 | Rule version: v3
+///
 /// Alias: catch_all, generic_catch, broad_exception_catch, no_bare_catch
 ///
 /// Bare catch blocks (`catch (e)` without `on` clause) catch everything
@@ -1290,7 +1312,7 @@ class AvoidCatchAllRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_catch_all',
     problemMessage:
-        '[avoid_catch_all] Bare catch clause without an on-type hides the specific error type being caught and silently swallows critical failures like OutOfMemoryError and StackOverflowError. This can mask fatal programming bugs, making them impossible to detect in crash reports or monitoring systems.',
+        '[avoid_catch_all] Bare catch clause without an on-type hides the specific error type being caught and silently swallows critical failures like OutOfMemoryError and StackOverflowError. This can mask fatal programming bugs, making them impossible to detect in crash reports or monitoring systems. {v3}',
     correctionMessage:
         'Use "on Object catch (e, st)" for comprehensive error handling, or catch specific types like HttpException. Example: on Object catch (e, st) { logger.error(e, st); }',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -1345,6 +1367,8 @@ class _AddOnObjectToBareCatchFix extends DartFix {
 }
 
 /// Warns when `on Exception catch` is used without `on Object catch` fallback.
+///
+/// Since: v2.4.0 | Updated: v4.13.0 | Rule version: v2
 ///
 /// Alias: exception_without_fallback, catch_exception_alone,
 /// prefer_object_over_exception
@@ -1412,7 +1436,7 @@ class AvoidCatchExceptionAloneRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_catch_exception_alone',
     problemMessage:
-        '[avoid_catch_exception_alone] Using "on Exception catch" without an "on Object catch" fallback silently misses all Error types including StateError, TypeError, and RangeError. These programming errors will crash the app without being logged or reported, making production debugging extremely difficult.',
+        '[avoid_catch_exception_alone] Using "on Exception catch" without an "on Object catch" fallback silently misses all Error types including StateError, TypeError, and RangeError. These programming errors will crash the app without being logged or reported, making production debugging extremely difficult. {v2}',
     correctionMessage:
         'Use "on Object catch" to catch all throwables, or add an "on Object catch" fallback after your Exception handler. Example: on Object catch (e, st) { logger.error(e, st); }',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -1507,6 +1531,8 @@ class _ChangeExceptionToObjectFix extends DartFix {
 
 /// Warns when constructors throw exceptions.
 ///
+/// Since: v2.3.11 | Updated: v4.13.0 | Rule version: v3
+///
 /// Alias: constructor_throw, no_throw_constructor, factory_for_errors
 ///
 /// Throwing in constructors makes error handling difficult because the
@@ -1549,7 +1575,7 @@ class AvoidExceptionInConstructorRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_exception_in_constructor',
     problemMessage:
-        '[avoid_exception_in_constructor] Throwing in a constructor creates a partially constructed object that can leak resources and leave dependent fields uninitialized. Callers cannot easily recover because the constructor has already failed midway through initialization.',
+        '[avoid_exception_in_constructor] Throwing in a constructor creates a partially constructed object that can leak resources and leave dependent fields uninitialized. Callers cannot easily recover because the constructor has already failed midway through initialization. {v3}',
     correctionMessage:
         'Use a factory constructor, static tryCreate() method, or return null for invalid input. Example: static User? tryCreate(String email) { if (!valid) return null; }',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -1614,6 +1640,8 @@ class _AddHackCommentForConstructorThrowFix extends DartFix {
 
 /// Warns when cache keys use non-deterministic values.
 ///
+/// Since: v2.3.11 | Updated: v4.13.0 | Rule version: v4
+///
 /// Alias: cache_key_stable, deterministic_cache, cache_key_pure
 ///
 /// Cache keys must produce the same value for the same input. Using
@@ -1645,7 +1673,7 @@ class RequireCacheKeyDeterminismRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_cache_key_determinism',
     problemMessage:
-        '[require_cache_key_determinism] Cache key uses non-deterministic values (e.g., DateTime.now, Random, hashCode, or UUID). This causes cache misses, duplicated resources, and unpredictable behavior. Cache keys must uniquely and consistently identify the same resource for the same input. Using unstable values breaks cache integrity and wastes memory.',
+        '[require_cache_key_determinism] Cache key uses non-deterministic values (e.g., DateTime.now, Random, hashCode, or UUID). This causes cache misses, duplicated resources, and unpredictable behavior. Cache keys must uniquely and consistently identify the same resource for the same input. Using unstable values breaks cache integrity and wastes memory. {v4}',
     correctionMessage:
         'Construct cache keys only from stable, deterministic values such as unique IDs, query parameters, or content hashes. Never use timestamps, random numbers, or object hashCodes. Example: cacheKey = "user_\$userId" or hash(queryParams).',
     errorSeverity: DiagnosticSeverity.ERROR,
@@ -1954,6 +1982,8 @@ class _AddHackCommentForNonDeterministicCacheKeyFix extends DartFix {
 
 /// Warns when permission denials aren't handled with settings redirect.
 ///
+/// Since: v2.3.11 | Updated: v4.13.0 | Rule version: v3
+///
 /// Alias: permission_settings, permanent_denial_handling
 ///
 /// When permissions are permanently denied, apps should guide users to
@@ -1987,7 +2017,7 @@ class RequirePermissionPermanentDenialHandlingRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_permission_permanent_denial_handling',
     problemMessage:
-        '[require_permission_permanent_denial_handling] Permission request does not handle permanent denial. Users who permanently deny a permission are stuck with no way to re-enable it from within the app, causing frustration and feature abandonment.',
+        '[require_permission_permanent_denial_handling] Permission request does not handle permanent denial. Users who permanently deny a permission are stuck with no way to re-enable it from within the app, causing frustration and feature abandonment. {v3}',
     correctionMessage:
         'Check isPermanentlyDenied and call openAppSettings() to guide users to re-enable the permission. Example: if (status.isPermanentlyDenied) await openAppSettings();',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -2040,6 +2070,8 @@ class RequirePermissionPermanentDenialHandlingRule extends SaropaLintRule {
 
 /// Notification actions need handlers.
 ///
+/// Since: v2.6.0 | Updated: v4.13.0 | Rule version: v2
+///
 /// Adding actions to notifications without handling taps leads to
 /// broken user experience.
 ///
@@ -2073,7 +2105,7 @@ class RequireNotificationActionHandlingRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_notification_action_handling',
     problemMessage:
-        '[require_notification_action_handling] Notification with action buttons lacks an onDidReceiveNotificationResponse handler. Users who tap notification action buttons will see no response, breaking the expected interaction flow and frustrating users who may abandon the feature or uninstall the app entirely.',
+        '[require_notification_action_handling] Notification with action buttons lacks an onDidReceiveNotificationResponse handler. Users who tap notification action buttons will see no response, breaking the expected interaction flow and frustrating users who may abandon the feature or uninstall the app entirely. {v2}',
     correctionMessage:
         'Add onDidReceiveNotificationResponse to handle each action ID. Example: onDidReceiveNotificationResponse: (details) { if (details.actionId == "reply") handleReply(); }',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -2120,6 +2152,8 @@ class RequireNotificationActionHandlingRule extends SaropaLintRule {
 
 /// Use finally for guaranteed cleanup, not just in catch.
 ///
+/// Since: v2.6.0 | Updated: v4.13.0 | Rule version: v2
+///
 /// Cleanup code in catch blocks doesn't run for all exception types
 /// or when no exception occurs. Use finally for guaranteed cleanup.
 ///
@@ -2155,7 +2189,7 @@ class RequireFinallyCleanupRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_finally_cleanup',
     problemMessage:
-        '[require_finally_cleanup] Cleanup code such as close(), dispose(), or cancel() is placed in a catch block instead of a finally block. This means cleanup only runs when an exception occurs, causing resource leaks of file handles, database connections, or stream subscriptions during normal execution when no error is thrown.',
+        '[require_finally_cleanup] Cleanup code such as close(), dispose(), or cancel() is placed in a catch block instead of a finally block. This means cleanup only runs when an exception occurs, causing resource leaks of file handles, database connections, or stream subscriptions during normal execution when no error is thrown. {v2}',
     correctionMessage:
         'Move cleanup code to a finally block to guarantee it always runs regardless of success or failure. Example: try { file = open(); } finally { file?.close(); }',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -2199,6 +2233,8 @@ class RequireFinallyCleanupRule extends SaropaLintRule {
 }
 
 /// Warns when caught errors are not logged.
+///
+/// Since: v2.5.0 | Updated: v4.13.0 | Rule version: v2
 ///
 /// Alias: log_caught_errors, error_logging, catch_without_log
 ///
@@ -2247,7 +2283,7 @@ class RequireErrorLoggingRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_error_logging',
     problemMessage:
-        '[require_error_logging] Caught error is not logged to any logging framework or crash reporting service. Silent catch blocks make production debugging impossible because errors leave no trace in logs, crash reports, or monitoring dashboards. Without logging, you cannot detect, alert on, or diagnose failures reported by users.',
+        '[require_error_logging] Caught error is not logged to any logging framework or crash reporting service. Silent catch blocks make production debugging impossible because errors leave no trace in logs, crash reports, or monitoring dashboards. Without logging, you cannot detect, alert on, or diagnose failures reported by users. {v2}',
     correctionMessage:
         'Log the error using a structured logger, debugPrint, or a crash reporting service like Crashlytics. Example: logger.error("Fetch failed", error: e, stackTrace: st);',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -2419,6 +2455,8 @@ class _AddDebugPrintForErrorFix extends DartFix {
 
 /// Warns when main() or runApp() doesn't have error handling.
 ///
+/// Since: v4.2.0 | Updated: v4.13.0 | Rule version: v2
+///
 /// Alias: app_startup_errors, runapp_try_catch
 ///
 /// Unhandled errors in app startup can cause silent crashes. Wrap runApp in
@@ -2464,7 +2502,7 @@ class RequireAppStartupErrorHandlingRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_app_startup_error_handling',
     problemMessage:
-        '[require_app_startup_error_handling] runApp() is called without runZonedGuarded or FlutterError.onError. Uncaught errors during app startup will crash the application silently with no crash report sent to monitoring services. Users see a blank or frozen screen with no diagnostic information available to the development team.',
+        '[require_app_startup_error_handling] runApp() is called without runZonedGuarded or FlutterError.onError. Uncaught errors during app startup will crash the application silently with no crash report sent to monitoring services. Users see a blank or frozen screen with no diagnostic information available to the development team. {v2}',
     correctionMessage:
         'Wrap runApp() in runZonedGuarded and set FlutterError.onError to capture all errors. Example: runZonedGuarded(() { runApp(MyApp()); }, (e, st) { reportToCrashlytics(e, st); });',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -2506,6 +2544,8 @@ class RequireAppStartupErrorHandlingRule extends SaropaLintRule {
 // =============================================================================
 
 /// Warns when assert is used for validation that should work in production.
+///
+/// Since: v4.2.0 | Updated: v4.13.0 | Rule version: v2
 ///
 /// Alias: assert_production, no_assert_validation
 ///
@@ -2553,7 +2593,7 @@ class AvoidAssertInProductionRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_assert_in_production',
     problemMessage:
-        '[avoid_assert_in_production] assert() is compiled out of release builds by the Dart compiler. Any validation, input checking, or security enforcement using assert() will silently stop running in production, allowing invalid data, unauthorized access, or corrupted state to pass through unchecked.',
+        '[avoid_assert_in_production] assert() is compiled out of release builds by the Dart compiler. Any validation, input checking, or security enforcement using assert() will silently stop running in production, allowing invalid data, unauthorized access, or corrupted state to pass through unchecked. {v2}',
     correctionMessage:
         'Use if-throw for validation that must work in release mode. Example: if (amount <= 0) throw ArgumentError("Amount must be positive: \$amount");',
     errorSeverity: DiagnosticSeverity.WARNING,

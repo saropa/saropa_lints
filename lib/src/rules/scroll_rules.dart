@@ -16,6 +16,8 @@ import '../saropa_lint_rule.dart';
 
 /// Warns when shrinkWrap: true is used inside a ScrollView.
 ///
+/// Since: v1.7.9 | Updated: v4.13.0 | Rule version: v6
+///
 /// Using shrinkWrap: true in a ListView inside another scrollable
 /// disables virtualization, causing all items to be built immediately.
 ///
@@ -53,7 +55,7 @@ class AvoidShrinkWrapInScrollViewRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_shrinkwrap_in_scrollview',
     problemMessage:
-        '[avoid_shrinkwrap_in_scrollview] shrinkWrap: true on a scrollable list disables virtualization, forcing Flutter to lay out and render every child widget immediately regardless of visibility. This causes severe jank, high memory usage, and slow initial rendering for lists with more than a few dozen items, degrading the user experience.',
+        '[avoid_shrinkwrap_in_scrollview] shrinkWrap: true on a scrollable list disables virtualization, forcing Flutter to lay out and render every child widget immediately regardless of visibility. This causes severe jank, high memory usage, and slow initial rendering for lists with more than a few dozen items, degrading the user experience. {v6}',
     correctionMessage:
         'Use CustomScrollView with SliverList for nested scrollables, or add NeverScrollableScrollPhysics() and let the parent scrollable manage scrolling behavior.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -163,6 +165,8 @@ class AvoidShrinkWrapInScrollViewRule extends SaropaLintRule {
 
 /// Warns when nested scrollables don't have explicit physics.
 ///
+/// Since: v1.7.9 | Updated: v4.13.0 | Rule version: v3
+///
 /// Nested scrollable widgets cause gesture conflicts. The inner
 /// scrollable should have NeverScrollableScrollPhysics to let the
 /// outer one handle scrolling.
@@ -196,7 +200,7 @@ class AvoidNestedScrollablesConflictRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_nested_scrollables_conflict',
     problemMessage:
-        '[avoid_nested_scrollables_conflict] Nested scrollable without explicit physics causes gesture conflicts. Nested scrollable widgets cause gesture conflicts. The inner scrollable must have NeverScrollableScrollPhysics to let the outer one handle scrolling.',
+        '[avoid_nested_scrollables_conflict] Nested scrollable without explicit physics causes gesture conflicts. Nested scrollable widgets cause gesture conflicts. The inner scrollable must have NeverScrollableScrollPhysics to let the outer one handle scrolling. {v3}',
     correctionMessage:
         'Add physics: NeverScrollableScrollPhysics() to inner scrollable. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -286,6 +290,8 @@ class _NestedScrollableVisitor extends RecursiveAstVisitor<void> {
 
 /// Warns when ListView uses children property with many items.
 ///
+/// Since: v1.7.9 | Updated: v4.13.0 | Rule version: v2
+///
 /// `ListView(children: [...])` builds all children immediately.
 /// For lists with more than 20 items, use ListView.builder for
 /// better performance through virtualization.
@@ -316,7 +322,7 @@ class AvoidListViewChildrenForLargeListsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_listview_children_for_large_lists',
     problemMessage:
-        '[avoid_listview_children_for_large_lists] ListView with many children loads all items. Use ListView.builder. ListView(children: [..]) builds all children immediately. For lists with more than 20 items, use ListView.builder to improve performance through virtualization.',
+        '[avoid_listview_children_for_large_lists] ListView with many children loads all items. Use ListView.builder. ListView(children: [..]) builds all children immediately. For lists with more than 20 items, use ListView.builder to improve performance through virtualization. {v2}',
     correctionMessage:
         'Replace ListView(children: [..]) with ListView.builder to improve performance. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -358,6 +364,8 @@ class AvoidListViewChildrenForLargeListsRule extends SaropaLintRule {
 
 /// Warns when BottomNavigationBar has more than 5 items.
 ///
+/// Since: v1.7.9 | Updated: v4.13.0 | Rule version: v3
+///
 /// More than 5 bottom navigation items crowds the UI and makes
 /// tap targets too small for comfortable use.
 ///
@@ -387,7 +395,7 @@ class AvoidExcessiveBottomNavItemsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_excessive_bottom_nav_items',
     problemMessage:
-        '[avoid_excessive_bottom_nav_items] BottomNavigationBar with more than 5 items crowds the UI. More than 5 bottom navigation items crowds the UI and makes tap targets too small for comfortable use.',
+        '[avoid_excessive_bottom_nav_items] BottomNavigationBar with more than 5 items crowds the UI. More than 5 bottom navigation items crowds the UI and makes tap targets too small for comfortable use. {v3}',
     correctionMessage:
         'Limit to 5 items or use a navigation drawer for additional options. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -439,6 +447,8 @@ class AvoidExcessiveBottomNavItemsRule extends SaropaLintRule {
 
 /// Warns when TabController length doesn't match TabBar children count.
 ///
+/// Since: v1.7.9 | Updated: v4.13.0 | Rule version: v2
+///
 /// TabController length must exactly match the number of tabs.
 /// Mismatches cause runtime errors.
 ///
@@ -466,7 +476,7 @@ class RequireTabControllerLengthSyncRule extends SaropaLintRule {
     name: 'require_tab_controller_length_sync',
     problemMessage:
         '[require_tab_controller_length_sync] TabController length mismatch '
-        'throws RangeError when switching tabs, crashing the app.',
+        'throws RangeError when switching tabs, crashing the app. {v2}',
     correctionMessage: 'Ensure TabController length equals the number of tabs.',
     errorSeverity: DiagnosticSeverity.ERROR,
   );
@@ -547,6 +557,8 @@ class RequireTabControllerLengthSyncRule extends SaropaLintRule {
 
 /// Warns when RefreshIndicator onRefresh doesn't return Future.
 ///
+/// Since: v1.7.9 | Updated: v4.13.0 | Rule version: v4
+///
 /// RefreshIndicator needs the onRefresh callback to return a Future
 /// so it knows when to stop showing the loading indicator.
 ///
@@ -581,7 +593,7 @@ class AvoidRefreshWithoutAwaitRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_refresh_without_await',
     problemMessage:
-        '[avoid_refresh_without_await] RefreshIndicator onRefresh callback must return a Future that completes when data loading finishes. Without awaiting async operations, the refresh spinner dismisses immediately while data is still loading, leaving users confused about whether the refresh succeeded or failed and showing stale content.',
+        '[avoid_refresh_without_await] RefreshIndicator onRefresh callback must return a Future that completes when data loading finishes. Without awaiting async operations, the refresh spinner dismisses immediately while data is still loading, leaving users confused about whether the refresh succeeded or failed and showing stale content. {v4}',
     correctionMessage:
         'Make the onRefresh callback async and await all asynchronous data-fetching operations so the refresh indicator stays visible until loading completes.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -621,6 +633,8 @@ class AvoidRefreshWithoutAwaitRule extends SaropaLintRule {
 
 /// Warns when multiple widgets have autofocus: true.
 ///
+/// Since: v1.7.9 | Updated: v4.13.0 | Rule version: v2
+///
 /// Only one widget can have autofocus at a time. Multiple autofocus
 /// widgets cause unpredictable focus behavior.
 ///
@@ -657,7 +671,7 @@ class AvoidMultipleAutofocusRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_multiple_autofocus',
     problemMessage:
-        '[avoid_multiple_autofocus] Multiple widgets with autofocus: true causes unpredictable behavior. Only one widget can have autofocus at a time. Multiple autofocus widgets cause unpredictable focus behavior.',
+        '[avoid_multiple_autofocus] Multiple widgets with autofocus: true causes unpredictable behavior. Only one widget can have autofocus at a time. Multiple autofocus widgets cause unpredictable focus behavior. {v2}',
     correctionMessage:
         'Only one widget must have autofocus: true. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -708,6 +722,8 @@ class _AutofocusVisitor extends RecursiveAstVisitor<void> {
 
 /// Warns when ListView/GridView doesn't have RefreshIndicator.
 ///
+/// Since: v2.0.0 | Updated: v4.13.0 | Rule version: v3
+///
 /// Pull-to-refresh is a standard mobile UX pattern. Lists with
 /// dynamic content should support manual refresh.
 ///
@@ -742,7 +758,7 @@ class RequireRefreshIndicatorOnListsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_refresh_indicator_on_lists',
     problemMessage:
-        '[require_refresh_indicator_on_lists] ListView without RefreshIndicator. Users can\'t pull to refresh. Pull-to-refresh is a standard mobile UX pattern. Lists with dynamic content should support manual refresh.',
+        '[require_refresh_indicator_on_lists] ListView without RefreshIndicator. Users can\'t pull to refresh. Pull-to-refresh is a standard mobile UX pattern. Lists with dynamic content should support manual refresh. {v3}',
     correctionMessage:
         'Wrap with RefreshIndicator for pull-to-refresh support. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -797,6 +813,8 @@ class RequireRefreshIndicatorOnListsRule extends SaropaLintRule {
 
 /// Warns when shrinkWrap: true is used in scrollables (expensive operation).
 ///
+/// Since: v2.3.7 | Updated: v4.13.0 | Rule version: v5
+///
 /// Using shrinkWrap: true forces the scrollable to calculate the size of all
 /// its children immediately, disabling virtualization and causing performance
 /// issues with large lists.
@@ -829,7 +847,7 @@ class AvoidShrinkWrapExpensiveRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_shrink_wrap_expensive',
     problemMessage:
-        '[avoid_shrink_wrap_expensive] shrinkWrap: true disables list virtualization, forcing Flutter to measure and lay out every item upfront instead of lazily building only visible items. For lists with many children, this causes slow initial rendering, high memory consumption, and jank during scrolling as the framework processes the entire list eagerly.',
+        '[avoid_shrink_wrap_expensive] shrinkWrap: true disables list virtualization, forcing Flutter to measure and lay out every item upfront instead of lazily building only visible items. For lists with many children, this causes slow initial rendering, high memory consumption, and jank during scrolling as the framework processes the entire list eagerly. {v5}',
     correctionMessage:
         'Use a fixed-height parent container, replace with CustomScrollView and Slivers, or reconsider the layout to avoid disabling list virtualization.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -908,6 +926,8 @@ class AvoidShrinkWrapExpensiveRule extends SaropaLintRule {
 
 /// Warns when ListView with uniform items doesn't specify itemExtent.
 ///
+/// Since: v2.3.7 | Updated: v4.13.0 | Rule version: v3
+///
 /// When all items have the same height, specifying itemExtent improves
 /// scroll performance by avoiding per-item layout calculations.
 ///
@@ -939,7 +959,7 @@ class PreferItemExtentRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_item_extent',
     problemMessage:
-        '[prefer_item_extent] ListView without itemExtent recalculates layout on every scroll. When all items have the same height, specifying itemExtent improves scroll performance by avoiding per-item layout calculations.',
+        '[prefer_item_extent] ListView without itemExtent recalculates layout on every scroll. When all items have the same height, specifying itemExtent improves scroll performance by avoiding per-item layout calculations. {v3}',
     correctionMessage:
         'Add itemExtent parameter if all items have the same height. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -987,6 +1007,8 @@ class PreferItemExtentRule extends SaropaLintRule {
 
 /// Warns when ListView doesn't use prototypeItem for consistent sizing.
 ///
+/// Since: v2.3.7 | Updated: v4.13.0 | Rule version: v3
+///
 /// prototypeItem allows Flutter to determine item sizes from a single
 /// prototype widget, which is more efficient than calculating each item.
 ///
@@ -1018,7 +1040,7 @@ class PreferPrototypeItemRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_prototype_item',
     problemMessage:
-        '[prefer_prototype_item] ListView.builder without prototypeItem measures each child separately. prototypeItem allows Flutter to determine item sizes from a single prototype widget, which is more efficient than calculating each item.',
+        '[prefer_prototype_item] ListView.builder without prototypeItem measures each child separately. prototypeItem allows Flutter to determine item sizes from a single prototype widget, which is more efficient than calculating each item. {v3}',
     correctionMessage:
         'Add prototypeItem parameter if items have consistent dimensions. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -1064,6 +1086,8 @@ class PreferPrototypeItemRule extends SaropaLintRule {
 
 /// Warns when ReorderableListView items don't have keys.
 ///
+/// Since: v2.3.7 | Updated: v4.13.0 | Rule version: v3
+///
 /// ReorderableListView requires each item to have a unique key to properly
 /// track items during reordering. Without keys, reordering will not work
 /// correctly and may cause visual glitches or data corruption.
@@ -1101,7 +1125,7 @@ class RequireKeyForReorderableRule extends SaropaLintRule {
     name: 'require_key_for_reorderable',
     problemMessage:
         '[require_key_for_reorderable] Without unique keys, reordering fails '
-        'silently or shows wrong items after drag-and-drop.',
+        'silently or shows wrong items after drag-and-drop. {v3}',
     correctionMessage: 'Add a key parameter (e.g., ValueKey) to each item.',
     errorSeverity: DiagnosticSeverity.ERROR,
   );
@@ -1232,6 +1256,8 @@ class _ReturnKeyVisitor extends RecursiveAstVisitor<void> {
 
 /// Warns when long lists have addAutomaticKeepAlives enabled (default).
 ///
+/// Since: v2.3.7 | Updated: v4.13.0 | Rule version: v3
+///
 /// addAutomaticKeepAlives: true (the default) keeps list items alive in
 /// memory even when scrolled off-screen. For long lists, this can cause
 /// excessive memory usage. Set it to false for better memory efficiency.
@@ -1264,7 +1290,7 @@ class RequireAddAutomaticKeepAlivesOffRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_add_automatic_keep_alives_off',
     problemMessage:
-        '[require_add_automatic_keep_alives_off] Long lists with addAutomaticKeepAlives: true (default) can cause memory issues. addAutomaticKeepAlives: true (the default) keeps list items alive in memory even when scrolled off-screen. For long lists, this can cause excessive memory usage. Set it to false to improve memory efficiency.',
+        '[require_add_automatic_keep_alives_off] Long lists with addAutomaticKeepAlives: true (default) can cause memory issues. addAutomaticKeepAlives: true (the default) keeps list items alive in memory even when scrolled off-screen. For long lists, this can cause excessive memory usage. Set it to false to improve memory efficiency. {v3}',
     correctionMessage:
         'Add addAutomaticKeepAlives: false to improve memory efficiency. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
