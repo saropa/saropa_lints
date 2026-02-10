@@ -707,7 +707,7 @@ class VerifyDocumentedParametersExistRule extends SaropaLintRule {
     name: 'verify_documented_parameters_exist',
     problemMessage:
         '[verify_documented_parameters_exist] Documentation references '
-        'a parameter that does not exist in the signature. {v2}',
+        'a parameter that does not exist in the signature. {v3}',
     correctionMessage:
         'Remove the stale parameter reference or update it to match '
         'an actual parameter name.',
@@ -719,7 +719,7 @@ class VerifyDocumentedParametersExistRule extends SaropaLintRule {
         name: 'verify_documented_parameters_exist',
         problemMessage:
             '[verify_documented_parameters_exist] Documentation references '
-            "'[$name]' which does not exist in the signature. {v2}",
+            "'[$name]' which does not exist in the signature. {v3}",
         correctionMessage:
             'Remove the stale parameter reference or update it to match '
             'an actual parameter name.',
@@ -784,54 +784,60 @@ class VerifyDocumentedParametersExistRule extends SaropaLintRule {
 
     final Set<String> paramNames = _extractParamNames(parameters);
     final Set<String> classFieldNames = _extractClassFieldNames(enclosingClass);
+
+    // Joined text for semantic context (e.g. bullet/keyword detection).
     final String docText =
         docComment.tokens.map((Token t) => t.lexeme).join('\n');
 
-    for (final RegExpMatch match in _bracketedNamePattern.allMatches(docText)) {
-      final String name = match.group(1)!;
+    // Iterate per-token so reported offsets map to the correct source line.
+    // Joining tokens into a single string loses inter-line gaps (non-doc
+    // comment lines, blank lines), which shifts offsets.
+    int docTextOffset = 0;
+    for (final Token token in docComment.tokens) {
+      final String lexeme = token.lexeme;
+      for (final RegExpMatch match
+          in _bracketedNamePattern.allMatches(lexeme)) {
+        final String name = match.group(1)!;
 
-      // Skip if it's an actual parameter
-      if (paramNames.contains(name)) continue;
+        if (paramNames.contains(name)) continue;
+        if (name.length == 1 && name == name.toUpperCase()) continue;
 
-      // Skip single uppercase letter (generic type params like T, E, K, V)
-      if (name.length == 1 && name == name.toUpperCase()) continue;
+        if (name[0] == name[0].toUpperCase()) {
+          final int joinedStart = docTextOffset + match.start;
+          final int joinedEnd = docTextOffset + match.end;
+          if (!_isConfirmedParameterRef(docText, joinedStart, joinedEnd)) {
+            continue;
+          }
+        }
 
-      // Skip names starting with uppercase (type references like
-      // FormatException, Widget, DateTime)
-      if (name[0] == name[0].toUpperCase() &&
-          !_isConfirmedParameterReference(docText, match)) {
-        continue;
+        if (classFieldNames.contains(name)) continue;
+
+        reporter.atOffset(
+          offset: match.start + token.offset,
+          length: match.end - match.start,
+          errorCode: _codeForName(name),
+        );
       }
-
-      // Skip class fields/properties
-      if (classFieldNames.contains(name)) continue;
-
-      reporter.atOffset(
-        offset: match.start + docComment.offset,
-        length: match.end - match.start,
-        errorCode: _codeForName(name),
-      );
+      docTextOffset += lexeme.length + 1; // +1 for join('\n')
     }
   }
 
-  /// Checks whether the context around `[Name]` confirms it is meant
-  /// as a parameter reference (e.g. `[Name] parameter`, `- [Name]`).
-  bool _isConfirmedParameterReference(
+  /// Returns true when the context around `[Name]` at [start]..[end] in
+  /// [docText] confirms it is a parameter reference, not a type reference.
+  bool _isConfirmedParameterRef(
     String docText,
-    RegExpMatch match,
+    int start,
+    int end,
   ) {
-    // Check for bullet-style: `/// - [Name]`
-    final int matchStart = match.start;
-    if (matchStart >= 2) {
-      final String before =
-          docText.substring(matchStart - 2, matchStart).trimLeft();
+    // Bullet-style: `/// - [Name]`
+    if (start >= 2) {
+      final String before = docText.substring(start - 2, start).trimLeft();
       if (before.endsWith('-')) return true;
     }
 
-    // Check for keyword after: `[Name] parameter`, `[Name] argument`
-    final int matchEnd = match.end;
-    if (matchEnd < docText.length) {
-      final String after = docText.substring(matchEnd).trimLeft();
+    // Keyword after: `[Name] parameter`, `[Name] argument`
+    if (end < docText.length) {
+      final String after = docText.substring(end).trimLeft();
       final String firstWord =
           after.split(RegExp(r'\s+')).firstOrNull?.toLowerCase() ?? '';
       if (_parameterKeywords.contains(firstWord)) return true;
