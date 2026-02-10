@@ -149,8 +149,8 @@ class AvoidPurchaseInSandboxProductionRule extends SaropaLintRule {
 ///
 /// Alias: check_subscription, verify_subscription_status
 ///
-/// Subscriptions can be cancelled, refunded, or expired. Check status on app
-/// launch, not just after purchase. Users may have cancelled via App Store.
+/// Subscriptions can be canceled, refunded, or expired. Check status on app
+/// launch, not just after purchase. Users may have canceled via App Store.
 ///
 /// Detection uses word boundary matching to avoid false positives. For example,
 /// `isProportional` will NOT trigger this rule even though it contains `isPro`

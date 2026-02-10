@@ -1347,13 +1347,13 @@ class _DisposableField {
   final FieldDeclaration declaration;
 }
 
-/// Requires Timer and StreamSubscription fields to be cancelled in dispose().
+/// Requires Timer and StreamSubscription fields to be canceled in dispose().
 ///
 /// Since: v1.1.17 | Updated: v4.13.0 | Rule version: v5
 ///
 /// Alias: require_timer_cancel
 ///
-/// Timers and stream subscriptions that aren't cancelled will continue running
+/// Timers and stream subscriptions that aren't canceled will continue running
 /// after the widget is disposed, causing:
 /// - Crashes if they call setState on a disposed widget
 /// - Memory leaks from retained references
@@ -1409,10 +1409,10 @@ class RequireTimerCancellationRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_timer_cancellation',
     problemMessage:
-        '[require_timer_cancellation] Timer or StreamSubscription must be cancelled in dispose(). Timers and stream subscriptions that aren\'t cancelled will continue running after the widget is disposed, causing: - Crashes if they call setState on a disposed widget - Memory leaks from retained references - Wasted CPU cycles. {v5}',
+        '[require_timer_cancellation] Timer or StreamSubscription must be canceled in dispose(). Timers and stream subscriptions that aren\'t canceled will continue running after the widget is disposed, causing: - Crashes if they call setState on a disposed widget - Memory leaks from retained references - Wasted CPU cycles. {v5}',
     correctionMessage:
         'Add cancel() in dispose() to prevent crashes and memory leaks. Verify the change works correctly with existing tests and add coverage for the new behavior.'
-        'Uncancelled timers continue firing after widget disposal.',
+        'Uncanceled timers continue firing after widget disposal.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -1476,7 +1476,7 @@ class RequireTimerCancellationRule extends SaropaLintRule {
       for (final _CancellableField field in cancellableFields) {
         if (disposeMethod == null) {
           reporter.atNode(field.declaration.fields, code);
-        } else if (!_isFieldCancelled(field, disposeBody)) {
+        } else if (!_isFieldCanceled(field, disposeBody)) {
           reporter.atNode(field.declaration.fields, code);
         }
       }
@@ -1550,8 +1550,8 @@ class RequireTimerCancellationRule extends SaropaLintRule {
     return expanded.toString();
   }
 
-  /// Check if a field is properly cancelled
-  bool _isFieldCancelled(_CancellableField field, String disposeBody) {
+  /// Check if a field is properly canceled
+  bool _isFieldCanceled(_CancellableField field, String disposeBody) {
     final String name = field.name;
 
     // Common cancellation patterns
@@ -1592,7 +1592,7 @@ class _CancellableField {
 /// Since: v1.1.17 | Updated: v4.13.0 | Rule version: v7
 ///
 /// When a nullable disposable field (Timer?, StreamSubscription?, etc.) is
-/// disposed/cancelled, it's good practice to also set it to null. This:
+/// disposed/canceled, it's good practice to also set it to null. This:
 /// - Helps garbage collection
 /// - Prevents accidental reuse of disposed resources
 /// - Makes it clear the resource has been cleaned up
@@ -1628,7 +1628,7 @@ class NullifyAfterDisposeRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'nullify_after_dispose',
     problemMessage:
-        '[nullify_after_dispose] Nullable disposable field must be set to null after disposal. When a nullable disposable field (Timer?, StreamSubscription?, etc.) is disposed/cancelled, it\'s good practice to also set it to null. This: - Helps garbage collection - Prevents accidental reuse of disposed resources - Makes it clear the resource has been cleaned up. {v7}',
+        '[nullify_after_dispose] Nullable disposable field must be set to null after disposal. When a nullable disposable field (Timer?, StreamSubscription?, etc.) is disposed/canceled, it\'s good practice to also set it to null. This: - Helps garbage collection - Prevents accidental reuse of disposed resources - Makes it clear the resource has been cleaned up. {v7}',
     correctionMessage:
         'Add `fieldName = null;` after disposing to help garbage collection. Verify the change works correctly with existing tests and add coverage for the new behavior.'
         'and prevent accidental reuse.',

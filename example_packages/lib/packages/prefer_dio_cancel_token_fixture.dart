@@ -112,7 +112,7 @@ final url = 'https://example.com';
 // BAD: Should trigger prefer_dio_cancel_token
 // expect_lint: prefer_dio_cancel_token
 void _bad592() async {
-  await dio.download(url, path); // Can't be cancelled!
+  await dio.download(url, path); // Can't be canceled!
 }
 
 // GOOD: Should NOT trigger prefer_dio_cancel_token

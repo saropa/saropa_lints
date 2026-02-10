@@ -521,7 +521,7 @@ custom_lint:
     - avoid_stateful_test_setup: true # [WARNING] setUp should not mutate shared state.
     - avoid_stateless_widget_initialized_fields: true # [WARNING] StatelessWidget should not have initialized fields.
     - avoid_storing_user_data_in_auth: true # [WARNING] Large object in setCustomClaims. Claims are for roles, not data storage.
-    - avoid_stream_subscription_in_field: true # [WARNING] If a StreamSubscription is stored as a field in a State class but not properly cancelled in dispose(), the subscription will continue to receive events even after the widget is removed from the widget tree. This can cause memory leaks, unexpected UI updates, and subtle bugs, especially in dynamic lists or navigation flows where widgets are frequently created and destroyed. Always cancel subscriptions in the correct State object’s dispose() method. See https://docs.flutter.dev/perf/memory#dispose-resources.
+    - avoid_stream_subscription_in_field: true # [WARNING] If a StreamSubscription is stored as a field in a State class but not properly canceled in dispose(), the subscription will continue to receive events even after the widget is removed from the widget tree. This can cause memory leaks, unexpected UI updates, and subtle bugs, especially in dynamic lists or navigation flows where widgets are frequently created and destroyed. Always cancel subscriptions in the correct State object’s dispose() method. See https://docs.flutter.dev/perf/memory#dispose-resources.
     - avoid_stream_tostring: true # [WARNING] Calling toString() on a Stream returns only the type name (e.g., 'Instance of Stream'), not the actual stream data. This leads to data loss and can mislead developers or users expecting meaningful output.
     - avoid_string_concatenation_for_l10n: true # [WARNING] String concatenation may break word order in other languages.
     - avoid_string_concatenation_l10n: true # [WARNING] String concatenation in UI breaks word order for translations.
@@ -710,7 +710,7 @@ custom_lint:
     - require_dark_mode_testing: true # [WARNING] MaterialApp missing darkTheme. App won't adapt to dark mode.
     - require_database_close: true # [WARNING] Unclosed database connection leaks resources and may exhaust connection pool, causing app failures.
     - require_database_index: true # [INFO] Query on non-indexed field causes full table scan.
-    - require_debouncer_cancel: true # [ERROR] Uncancelled debounce timer fires after dispose, calling setState on unmounted widget causing crashes.
+    - require_debouncer_cancel: true # [ERROR] Uncanceled debounce timer fires after dispose, calling setState on unmounted widget causing crashes.
     - require_default_text_style: true # [INFO] Multiple Text widgets with same style - use DefaultTextStyle.
     - require_deprecation_message: true # [WARNING] Deprecated annotation should include migration guidance.
     - require_dialog_barrier_consideration: true # [INFO] Destructive dialog without explicit barrierDismissible.
@@ -783,7 +783,7 @@ custom_lint:
     - require_key_for_collection: true # [WARNING] List items in dynamic collections (ListView, GridView, etc.) must have a Key to preserve child widget state (e.g., TextField input, animations) when the list reorders or updates. Missing keys can cause UI bugs, loss of user input, broken animations, and confusing user experiences. This is a common source of hard-to-debug Flutter widget tree issues.
     - require_keyboard_action_type: true # [INFO] Text field should have textInputAction for better UX.
     - require_keyboard_dismiss_on_scroll: true # [INFO] Scroll view should have keyboardDismissBehavior for form UX.
-    - require_keyboard_visibility_dispose: true # [WARNING] Uncancelled subscription keeps firing callbacks after dispose, causing setState errors.
+    - require_keyboard_visibility_dispose: true # [WARNING] Uncanceled subscription keeps firing callbacks after dispose, causing setState errors.
     - require_location_timeout: true # [WARNING] Location request without timeout can hang indefinitely if GPS is unavailable, freezing the app.
     - require_logout_cleanup: true # [WARNING] Incomplete logout cleanup leaves session tokens, cached user data, and authentication state accessible in local storage. On shared or stolen devices, the next user can access the previous account, personal data, and session tokens without re-authenticating, enabling unauthorized account access.
     - require_long_press_callback: true # [INFO] Consider adding onLongPress for context menu.
@@ -846,7 +846,7 @@ custom_lint:
     - require_test_isolation: true # [WARNING] Mutable top-level variable may cause test coupling.
     - require_text_input_type: true # [INFO] TextField without keyboardType. Users may see wrong keyboard.
     - require_text_overflow_handling: true # [WARNING] Text with dynamic content should have overflow handling to prevent layout issues.
-    - require_timer_cancellation: true # [WARNING] Timer or StreamSubscription must be cancelled in dispose().
+    - require_timer_cancellation: true # [WARNING] Timer or StreamSubscription must be canceled in dispose().
     - require_universal_link_validation: true # [INFO] Deep link route may need iOS Universal Links server configuration.
     - require_url_launcher_can_launch_check: true # [INFO] launchUrl called without canLaunchUrl check. May fail silently on unsupported schemes, confusing users and breaking expected flows.
     - require_url_launcher_encoding: true # [WARNING] URL passed to launchUrl or canLaunchUrl contains string interpolation without Uri.encodeComponent(). Unencoded special characters (spaces, ampersands, Unicode) produce malformed URLs that fail to open, display incorrect content, or enable URL injection attacks where user input manipulates the destination path or query parameters.
@@ -1181,7 +1181,7 @@ custom_lint:
     - prefer_dedicated_media_query_method: true # [INFO] Prefer dedicated MediaQuery method.
     - prefer_descriptive_test_name: true # [INFO] Test name should be descriptive.
     - prefer_digit_separators: true # [INFO] Large number should use digit separators.
-    - prefer_dio_cancel_token: true # [INFO] Long-running Dio request without CancelToken. Cannot be cancelled.
+    - prefer_dio_cancel_token: true # [INFO] Long-running Dio request without CancelToken. Cannot be canceled.
     - prefer_dio_over_http: true # [INFO] Using http package. Dio provides interceptors, cancellation, and structured error handling suited for production apps.
     - prefer_dio_transformer: true # [INFO] Dio instance without custom transformer for large data.
     - prefer_encrypted_prefs: true # [WARNING] Unencrypted sensitive data is exposed via device backup, file browser, or rooted device access.
@@ -1326,7 +1326,7 @@ custom_lint:
     - require_bloc_transformer: true # [INFO] Bloc on<Event> without transformer processes all events sequentially.
     - require_cache_eviction_policy: true # [WARNING] Unbounded cache consumes memory until app crashes with OutOfMemoryError after extended use.
     - require_cache_key_uniqueness: true # [INFO] Cache key type may have unstable hashCode.
-    - require_cancel_token: true # [WARNING] Async request without cancellation continues after a StatefulWidget disposes its State, wasting bandwidth and causing setState errors. Not cancelling can lead to memory leaks, wasted network connections, and crashes from calling setState on a disposed State object after the parent removes the child from the widget tree.
+    - require_cancel_token: true # [WARNING] Async request without cancelation continues after a StatefulWidget disposes its State, wasting bandwidth and causing setState errors. Not canceling can lead to memory leaks, wasted network connections, and crashes from calling setState on a disposed State object after the parent removes the child from the widget tree.
     - require_certificate_pinning: true # [WARNING] HttpClient without certificate pinning accepts any valid certificate, making it vulnerable to man-in-the-middle attacks. Attackers on the same network can intercept, read, and modify all HTTPS traffic including authentication tokens, personal data, and financial information without detection.
     - require_completer_error_handling: true # [WARNING] Using a Completer in a try-catch block without calling completeError in the catch block can cause the Future to hang forever if an error occurs. This leads to memory leaks, dangling stream subscriptions, and unclosed connection handles that degrade app stability over time.
     - require_complex_logic_comments: true # [INFO] Complex method lacks explanatory comments.
@@ -1365,7 +1365,7 @@ custom_lint:
     - require_geolocator_battery_awareness: true # [WARNING] High-accuracy continuous location tracking without battery consideration drains battery quickly.
     - require_geolocator_error_handling: true # [WARNING] Location requests must be wrapped in error handling logic. Failing to handle errors can cause app crashes, lost user trust, and poor reviews—especially when location permissions are denied or hardware fails. Unhandled exceptions may also prevent your app from passing app store review.
     - require_geolocator_service_enabled: true # [WARNING] Location requests must check if the location service (GPS) is enabled before attempting to access position data. Failing to check service status can cause runtime errors, user confusion, and app store rejection due to non-compliance with platform requirements. On devices where GPS is disabled, location requests will fail, resulting in poor UX and potentially lost functionality.
-    - require_geolocator_stream_cancel: true # [WARNING] Position stream subscriptions must be cancelled when no longer needed. Failing to cancel subscriptions leads to battery drain, memory leaks, and background location updates that persist after the UI is disposed. This can degrade device performance and violate privacy expectations.
+    - require_geolocator_stream_cancel: true # [WARNING] Position stream subscriptions must be canceled when no longer needed. Failing to cancel subscriptions leads to battery drain, memory leaks, and background location updates that persist after the UI is disposed. This can degrade device performance and violate privacy expectations.
     - require_geolocator_timeout: true # [WARNING] Calling getCurrentPosition without a timeLimit can cause the request to hang indefinitely if the device cannot acquire a location fix (e.g., poor GPS signal, airplane mode). This can freeze your UI and frustrate users.
     - require_getit_reset_in_tests: true # [WARNING] GetIt singletons are not automatically reset between tests. If you do not call GetIt.I.reset(), state from one test can leak into others, causing unpredictable, flaky, or misleading results. This can hide real bugs and make tests unreliable.
     - require_getx_binding_routes: true # [INFO] GetPage without binding parameter.

@@ -24,6 +24,8 @@ from scripts.modules._utils import (
     print_warning,
 )
 
+# cspell:disable
+
 # =============================================================================
 # UK -> US SPELLING DICTIONARY
 # =============================================================================
@@ -32,7 +34,6 @@ from scripts.modules._utils import (
 # documentation, and user-facing lint messages.
 #
 # NOTE: This file is excluded from its own scan via _SKIP_FILES.
-
 UK_TO_US: dict[str, str] = {
     # -our -> -or
     "behaviour": "behavior",
@@ -98,26 +99,39 @@ UK_TO_US: dict[str, str] = {
     "programme": "program",
     "sceptical": "skeptical",
 }
+# cspell:enable
 
-# Generate derived forms (-s, -ed, -ing) for -our/-ise base words
-_derived: dict[str, str] = {}
-for _uk, _us in list(UK_TO_US.items()):
-    _derived[_uk + "s"] = _us + "s"
-    if _uk.endswith("ise"):
-        _derived[_uk[:-1] + "ed"] = _us[:-1] + "ed"
-        _derived[_uk[:-1] + "ing"] = _us[:-1] + "ing"
-        _derived[_uk + "r"] = _us + "r"
-        _derived[_uk + "rs"] = _us + "rs"
-    if _uk.endswith("our"):
-        _derived[_uk + "ed"] = _us + "ed"
-        _derived[_uk + "ing"] = _us + "ing"
-        _derived[_uk + "able"] = _us + "able"
+def _initialize_spellings():
+    """Internal helper to build derived words and keep the scope clean."""
+    derived: dict[str, str] = {}
+    
+    # 1. Generate versions with -s, -ed, -ing, etc.
+    for uk, us in UK_TO_US.items():
+        derived[uk + "s"] = us + "s"
+        if uk.endswith("ise"):
+            derived[uk[:-1] + "ed"] = us[:-1] + "ed"
+            derived[uk[:-1] + "ing"] = us[:-1] + "ing"
+            derived[uk + "r"] = us + "r"
+            derived[uk + "rs"] = us + "rs"
+        if uk.endswith("our"):
+            derived[uk + "ed"] = us + "ed"
+            derived[uk + "ing"] = us + "ing"
+            derived[uk + "able"] = us + "able"
+            
+    # 2. Add them back to the main dictionary
+    UK_TO_US.update(derived)
 
-for _k, _v in _derived.items():
-    UK_TO_US.setdefault(_k, _v)
+# Run the 'container' once, then it disappears
+_initialize_spellings()
 
-# Clean up module-level temp variables
-del _derived, _uk, _us, _k, _v
+# Optional: clean up the function itself so it can't be called again
+del _initialize_spellings
+
+# Modern Python is very good at cleaning up after itself; you don't actually need to "delete" these small temporary variables.
+# # Clean up module-level temp variables
+# del _derived, _uk, _us, _k, _v
+
+# cspell:ignore behaviour behaviours
 
 # Build a single regex that matches any UK spelling as a whole word.
 # Sorted longest-first so "behaviours" matches before "behaviour".

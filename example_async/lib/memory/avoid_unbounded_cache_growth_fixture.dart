@@ -181,7 +181,7 @@ class MessageKindCache {
 }
 
 // OK: Using Status suffix (common enum naming convention)
-enum TaskStatus { pending, inProgress, completed, cancelled }
+enum TaskStatus { pending, inProgress, completed, canceled }
 
 class TaskStatusCache {
   final Map<TaskStatus, List<String>> _taskCache = {};

@@ -27,7 +27,7 @@ Exit Codes:
     1 - Extension source not found
     2 - VS Code extensions folder not found
     3 - Copy failed
-    4 - User cancelled
+    4 - User canceled
 """
 
 from __future__ import annotations
@@ -276,7 +276,7 @@ def install_extension(source_dir: Path, extensions_dir: Path) -> bool:
         print_warning(f"Extension already exists at: {target_dir}")
         response = input("  Overwrite existing installation? [y/N] ").strip().lower()
         if not response.startswith("y"):
-            print_info("Installation cancelled")
+            print_info("Installation canceled")
             return False
 
         # Remove existing installation

@@ -558,7 +558,7 @@ class RequirePlatformChannelCleanupRule extends SaropaLintRule {
         if (member is MethodDeclaration && member.name.lexeme == 'dispose') {
           hasDispose = true;
           final String disposeSource = member.body.toSource();
-          // Check if handler is nullified or subscription cancelled
+          // Check if handler is nullified or subscription canceled
           // (including *Safe extension variants)
           if (disposeSource.contains('setMethodCallHandler(null)') ||
               disposeSource.contains('.cancel(') ||
