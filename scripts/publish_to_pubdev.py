@@ -66,6 +66,7 @@ Exit Codes:
 from __future__ import annotations
 
 import re
+import subprocess
 import sys
 import time
 import webbrowser
@@ -152,6 +153,7 @@ from scripts.modules._utils import (
     enable_ansi_support,
     exit_with_error,
     get_project_dir,
+    get_shell_mode,
     print_colored,
     print_header,
     print_info,
@@ -404,13 +406,11 @@ def main() -> int:
     else:
         default_version = pubspec_version
 
-    version = _prompt_version(default_version)
-
-    if not re.match(r"^\d+\.\d+\.\d+$", version):
-        exit_with_error(
-            f"Invalid version format '{version}'.",
-            ExitCode.VALIDATION_FAILED,
-        )
+    while True:
+        version = _prompt_version(default_version)
+        if re.match(r"^\d+\.\d+\.\d+$", version):
+            break
+        print_warning(f"Invalid version format '{version}'. Use X.Y.Z")
 
     if version != pubspec_version:
         set_version_in_pubspec(pubspec_path, version)
@@ -527,6 +527,32 @@ def main() -> int:
         webbrowser.open(f"https://pub.dev/packages/{package_name}")
     except Exception:
         pass
+
+    # Offer to launch custom_lint integration test in background
+    example_dir = project_dir / "example"
+    if example_dir.exists() and (example_dir / "pubspec.yaml").exists():
+        response = (
+            input(
+                "  Run custom_lint on example fixtures "
+                "(background, no wait)? [y/N] "
+            )
+            .strip()
+            .lower()
+        )
+        if response.startswith("y"):
+            subprocess.Popen(
+                ["dart", "run", "custom_lint"],
+                cwd=example_dir,
+                shell=get_shell_mode(),
+            )
+            print_success(
+                "custom_lint launched in background "
+                "(output in this terminal)"
+            )
+        else:
+            print_info(
+                "Run manually: cd example && dart run custom_lint"
+            )
 
     return ExitCode.SUCCESS.value
 
