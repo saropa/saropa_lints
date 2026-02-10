@@ -103,7 +103,7 @@
 // Test fixture for: avoid_singleton_pattern
 // Source: lib\src\rules\architecture_rules.dart
 
-import '../flutter_mocks.dart';
+import 'package:saropa_lints_example/flutter_mocks.dart';
 
 final getIt = GetIt.instance;
 

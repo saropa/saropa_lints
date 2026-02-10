@@ -103,7 +103,7 @@
 // Test fixture for: avoid_losing_stack_trace
 // Source: lib\src\rules\error_handling_rules.dart
 
-import '../flutter_mocks.dart';
+import 'package:saropa_lints_example/flutter_mocks.dart';
 
 // BAD: Should trigger avoid_losing_stack_trace
 // expect_lint: avoid_losing_stack_trace

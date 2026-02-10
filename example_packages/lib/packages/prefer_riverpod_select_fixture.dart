@@ -103,7 +103,7 @@
 // Test fixture for: prefer_riverpod_select
 // Source: lib\src\rules\packages\riverpod_rules.dart
 
-import '../flutter_mocks.dart';
+import 'package:saropa_lints_example/flutter_mocks.dart';
 
 final name = 'example';
 dynamic ref;

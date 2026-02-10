@@ -103,7 +103,7 @@
 // Test fixture for: avoid_unnecessary_type_assertions
 // Source: lib\src\rules\type_rules.dart
 
-import '../flutter_mocks.dart';
+import 'package:saropa_lints_example/flutter_mocks.dart';
 
 dynamic x;
 

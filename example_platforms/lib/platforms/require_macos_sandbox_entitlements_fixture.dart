@@ -103,7 +103,7 @@
 // Test fixture for: require_macos_sandbox_entitlements
 // Source: lib\src\rules\platforms\macos_rules.dart
 
-import '../flutter_mocks.dart';
+import 'package:saropa_lints_example/flutter_mocks.dart';
 
 // BAD: Should trigger require_macos_sandbox_entitlements
 // expect_lint: require_macos_sandbox_entitlements

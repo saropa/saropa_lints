@@ -103,7 +103,7 @@
 // Test fixture for: require_freezed_lint_package
 // Source: lib\src\rules\freezed_rules.dart
 
-import '../flutter_mocks.dart';
+import 'package:saropa_lints_example/flutter_mocks.dart';
 
 // BAD: Should trigger require_freezed_lint_package
 // expect_lint: require_freezed_lint_package

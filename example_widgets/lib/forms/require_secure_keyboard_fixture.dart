@@ -103,7 +103,7 @@
 // Test fixture for: require_secure_keyboard
 // Source: lib\src\rules\forms_rules.dart
 
-import '../flutter_mocks.dart';
+import 'package:saropa_lints_example/flutter_mocks.dart';
 
 // BAD: Should trigger require_secure_keyboard
 // expect_lint: require_secure_keyboard

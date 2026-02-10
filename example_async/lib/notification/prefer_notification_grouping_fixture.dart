@@ -103,7 +103,7 @@
 // Test fixture for: prefer_notification_grouping
 // Source: lib\src\rules\notification_rules.dart
 
-import '../flutter_mocks.dart';
+import 'package:saropa_lints_example/flutter_mocks.dart';
 
 final flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
 final id = '1';

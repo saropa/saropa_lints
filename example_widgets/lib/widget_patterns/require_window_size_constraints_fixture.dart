@@ -103,7 +103,7 @@
 // Test fixture for: require_window_size_constraints
 // Source: lib\src\rules\widget_patterns_rules.dart
 
-import '../flutter_mocks.dart';
+import 'package:saropa_lints_example/flutter_mocks.dart';
 
 // BAD: Should trigger require_window_size_constraints
 // expect_lint: require_window_size_constraints

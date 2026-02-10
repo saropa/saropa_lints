@@ -103,7 +103,7 @@
 // Test fixture for: avoid_large_isolate_communication
 // Source: lib\src\rules\memory_management_rules.dart
 
-import '../flutter_mocks.dart';
+import 'package:saropa_lints_example/flutter_mocks.dart';
 
 final largeList = List.generate(1000, (i) => i);
 dynamic list;

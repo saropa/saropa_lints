@@ -1,7 +1,7 @@
 // ignore_for_file: unused_element, unused_field
 // Test fixture for require_immutable_bloc_state rule
 
-import '../flutter_mocks.dart';
+import 'package:saropa_lints_example/flutter_mocks.dart';
 
 // ============================================================================
 // Mock types needed for this fixture

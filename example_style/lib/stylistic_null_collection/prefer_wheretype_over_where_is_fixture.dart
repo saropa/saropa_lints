@@ -103,7 +103,7 @@
 // Test fixture for: prefer_wheretype_over_where_is
 // Source: lib\src\rules\stylistic_null_collection_rules.dart
 
-import '../flutter_mocks.dart';
+import 'package:saropa_lints_example/flutter_mocks.dart';
 
 // BAD: Should trigger prefer_wheretype_over_where_is
 // expect_lint: prefer_wheretype_over_where_is

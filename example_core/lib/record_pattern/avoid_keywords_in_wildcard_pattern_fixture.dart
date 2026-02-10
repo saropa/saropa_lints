@@ -103,7 +103,7 @@
 // Test fixture for: avoid_keywords_in_wildcard_pattern
 // Source: lib\src\rules\record_pattern_rules.dart
 
-import '../flutter_mocks.dart';
+import 'package:saropa_lints_example/flutter_mocks.dart';
 
 // BAD: Should trigger avoid_keywords_in_wildcard_pattern
 // expect_lint: avoid_keywords_in_wildcard_pattern

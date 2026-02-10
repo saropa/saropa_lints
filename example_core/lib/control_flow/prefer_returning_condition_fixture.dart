@@ -103,7 +103,7 @@
 // Test fixture for: prefer_returning_condition
 // Source: lib\src\rules\control_flow_rules.dart
 
-import '../flutter_mocks.dart';
+import 'package:saropa_lints_example/flutter_mocks.dart';
 
 final isValid = true;
 dynamic x;

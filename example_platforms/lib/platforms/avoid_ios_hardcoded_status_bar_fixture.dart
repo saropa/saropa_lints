@@ -103,7 +103,7 @@
 // Test fixture for: avoid_ios_hardcoded_status_bar
 // Source: lib\src\rules\platforms\ios_rules.dart
 
-import '../flutter_mocks.dart';
+import 'package:saropa_lints_example/flutter_mocks.dart';
 
 dynamic child;
 final context = BuildContext();

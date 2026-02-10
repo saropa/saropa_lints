@@ -1,0 +1,41 @@
+analyzer:
+  plugins:
+    - custom_lint
+  errors:
+    unused_local_variable: ignore
+    unused_field: ignore
+    unused_element: ignore
+    todo: ignore
+    fixme: ignore
+    hack: ignore
+
+# Configure saropa_lints tier
+custom_lint:
+  saropa_lints:
+    tier: recommended
+  rules:
+    - prefer_sized_box_square: true
+    - prefer_center_over_align: true
+    - prefer_align_over_container: true
+    - prefer_padding_over_container: true
+    - prefer_constrained_box_over_container: true
+    - prefer_where_or_null: true
+    - avoid_gradient_in_build: true
+    - avoid_snackbar_in_build: true
+    - avoid_shrinkwrap_in_scrollview: true
+    - avoid_nested_scrollables_conflict: true
+    - avoid_multiple_autofocus: true
+    - avoid_excessive_bottom_nav_items: true
+    - avoid_image_rebuild_on_scroll: true
+    - require_dialog_result_handling: true
+    - avoid_snackbar_queue_buildup: true
+    - require_avatar_alt_text: true
+    - require_badge_semantics: true
+    - require_badge_count_limit: true
+    - require_avatar_fallback: true
+    - prefer_video_loading_placeholder: true
+    - require_snackbar_duration: true
+    - require_dialog_barrier_dismissible: true
+    - avoid_overlapping_animations: true
+    - require_dispose: false
+    - avoid_undisposed_instances: false

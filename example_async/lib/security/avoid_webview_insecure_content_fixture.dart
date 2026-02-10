@@ -103,7 +103,7 @@
 // Test fixture for: avoid_webview_insecure_content
 // Source: lib\src\rules\security_rules.dart
 
-import '../flutter_mocks.dart';
+import 'package:saropa_lints_example/flutter_mocks.dart';
 
 final url = 'https://example.com';
 

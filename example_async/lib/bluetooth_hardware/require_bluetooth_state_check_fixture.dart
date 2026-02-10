@@ -103,7 +103,7 @@
 // Test fixture for: require_bluetooth_state_check
 // Source: lib\src\rules\bluetooth_hardware_rules.dart
 
-import '../flutter_mocks.dart';
+import 'package:saropa_lints_example/flutter_mocks.dart';
 
 dynamic device;
 dynamic state;

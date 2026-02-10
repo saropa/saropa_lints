@@ -103,7 +103,7 @@
 // Test fixture for: require_graphql_error_handling
 // Source: lib\src\rules\file_handling_rules.dart
 
-import '../flutter_mocks.dart';
+import 'package:saropa_lints_example/flutter_mocks.dart';
 
 dynamic client;
 dynamic data;

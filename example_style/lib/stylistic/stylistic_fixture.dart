@@ -3,7 +3,7 @@
 // ignore_for_file: dead_code, unreachable_from_main
 // ignore_for_file: unnecessary_null_comparison, dead_null_aware_expression
 
-/// Fixture file for stylistic rules added in v2.7.0.
+/// Fixture file for stylistic rules.
 /// These are opinionated rules not included in any tier by default.
 
 // =============================================================================

@@ -83,7 +83,7 @@ class WorkerTestController extends GetxController {
 }
 
 // =============================================================================
-// GetX Rules (from v4.1.4)
+// GetX Rules
 // =============================================================================
 
 class BadGetxControllerDialog extends GetxController {

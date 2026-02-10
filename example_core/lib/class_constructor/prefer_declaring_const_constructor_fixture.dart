@@ -103,7 +103,7 @@
 // Test fixture for: prefer_declaring_const_constructor
 // Source: lib\src\rules\class_constructor_rules.dart
 
-import '../flutter_mocks.dart';
+import 'package:saropa_lints_example/flutter_mocks.dart';
 
 // BAD: Should trigger prefer_declaring_const_constructor
 // expect_lint: prefer_declaring_const_constructor

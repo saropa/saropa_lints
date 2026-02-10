@@ -103,7 +103,7 @@
 // Test fixture for: prefer_guard_clauses
 // Source: lib\src\rules\stylistic_control_flow_rules.dart
 
-import '../flutter_mocks.dart';
+import 'package:saropa_lints_example/flutter_mocks.dart';
 
 // BAD: Should trigger prefer_guard_clauses
 // expect_lint: prefer_guard_clauses

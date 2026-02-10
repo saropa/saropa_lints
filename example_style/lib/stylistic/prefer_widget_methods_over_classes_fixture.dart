@@ -103,7 +103,7 @@
 // Test fixture for: prefer_widget_methods_over_classes
 // Source: lib\src\rules\stylistic_rules.dart
 
-import '../flutter_mocks.dart';
+import 'package:saropa_lints_example/flutter_mocks.dart';
 
 // BAD: Should trigger prefer_widget_methods_over_classes
 // expect_lint: prefer_widget_methods_over_classes

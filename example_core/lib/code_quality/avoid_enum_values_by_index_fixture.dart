@@ -103,7 +103,7 @@
 // Test fixture for: avoid_enum_values_by_index
 // Source: lib\src\rules\code_quality_rules.dart
 
-import '../flutter_mocks.dart';
+import 'package:saropa_lints_example/flutter_mocks.dart';
 
 // BAD: Should trigger avoid_enum_values_by_index
 // expect_lint: avoid_enum_values_by_index

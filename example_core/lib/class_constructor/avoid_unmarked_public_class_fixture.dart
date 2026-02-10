@@ -103,7 +103,7 @@
 // Test fixture for: avoid_unmarked_public_class
 // Source: lib\src\rules\class_constructor_rules.dart
 
-import '../flutter_mocks.dart';
+import 'package:saropa_lints_example/flutter_mocks.dart';
 
 dynamic library;
 

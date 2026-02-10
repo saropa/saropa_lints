@@ -103,7 +103,7 @@
 // Test fixture for: dispose_getx_fields
 // Source: lib\src\rules\packages\getx_rules.dart
 
-import '../flutter_mocks.dart';
+import 'package:saropa_lints_example/flutter_mocks.dart';
 
 var count = 0;
 

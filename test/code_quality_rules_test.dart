@@ -8,7 +8,7 @@ import 'package:test/test.dart';
 /// pattern matching, collection best practices, string handling,
 /// switch expressions, and code maintainability.
 ///
-/// Test fixtures: example/lib/code_quality/*
+/// Test fixtures: example_core/lib/code_quality/*
 void main() {
   group('Code Quality Rules - Fixture Verification', () {
     final fixtures = [
@@ -113,7 +113,7 @@ void main() {
     for (final fixture in fixtures) {
       test('$fixture fixture exists', () {
         final file = File(
-          'example/lib/code_quality/${fixture}_fixture.dart',
+          'example_core/lib/code_quality/${fixture}_fixture.dart',
         );
         expect(file.existsSync(), isTrue);
       });

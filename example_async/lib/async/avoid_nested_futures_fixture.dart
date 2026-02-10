@@ -103,7 +103,7 @@
 // Test fixture for: avoid_nested_futures
 // Source: lib\src\rules\async_rules.dart
 
-import '../flutter_mocks.dart';
+import 'package:saropa_lints_example/flutter_mocks.dart';
 
 // BAD: Should trigger avoid_nested_futures
 // expect_lint: avoid_nested_futures

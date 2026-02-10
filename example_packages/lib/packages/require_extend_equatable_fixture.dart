@@ -103,7 +103,7 @@
 // Test fixture for: require_extend_equatable
 // Source: lib\src\rules\packages\equatable_rules.dart
 
-import '../flutter_mocks.dart';
+import 'package:saropa_lints_example/flutter_mocks.dart';
 
 // BAD: Should trigger require_extend_equatable
 // expect_lint: require_extend_equatable

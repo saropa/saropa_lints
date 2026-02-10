@@ -103,7 +103,7 @@
 // Test fixture for: require_geolocator_battery_awareness
 // Source: lib\src\rules\packages\geolocator_rules.dart
 
-import '../flutter_mocks.dart';
+import 'package:saropa_lints_example/flutter_mocks.dart';
 
 dynamic stream;
 

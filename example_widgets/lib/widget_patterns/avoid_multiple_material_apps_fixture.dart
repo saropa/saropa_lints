@@ -103,7 +103,7 @@
 // Test fixture for: avoid_multiple_material_apps
 // Source: lib\src\rules\widget_patterns_rules.dart
 
-import '../flutter_mocks.dart';
+import 'package:saropa_lints_example/flutter_mocks.dart';
 
 // BAD: Should trigger avoid_multiple_material_apps
 // expect_lint: avoid_multiple_material_apps

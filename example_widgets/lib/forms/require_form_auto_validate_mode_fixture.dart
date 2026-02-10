@@ -103,7 +103,7 @@
 // Test fixture for: require_form_auto_validate_mode
 // Source: lib\src\rules\forms_rules.dart
 
-import '../flutter_mocks.dart';
+import 'package:saropa_lints_example/flutter_mocks.dart';
 
 dynamic child;
 final key = 'key';

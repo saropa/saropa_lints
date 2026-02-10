@@ -2,7 +2,7 @@
 // ignore_for_file: prefer_const_literals_to_create_immutables
 // Fixtures for layout crash detection rules
 
-import '../flutter_mocks.dart';
+import 'package:saropa_lints_example/flutter_mocks.dart';
 
 // ============================================================
 // avoid_table_cell_outside_table

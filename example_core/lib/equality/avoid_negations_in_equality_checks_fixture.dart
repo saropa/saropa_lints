@@ -103,7 +103,7 @@
 // Test fixture for: avoid_negations_in_equality_checks
 // Source: lib\src\rules\equality_rules.dart
 
-import '../flutter_mocks.dart';
+import 'package:saropa_lints_example/flutter_mocks.dart';
 
 // BAD: Should trigger avoid_negations_in_equality_checks
 // expect_lint: avoid_negations_in_equality_checks

@@ -1,5 +1,5 @@
 // ignore_for_file: unused_local_variable, unused_element
-// Test fixtures for OWASP Coverage Gap Rules (v3.2.0)
+// Test fixtures for OWASP Coverage Gap Rules
 
 import 'dart:convert';
 import 'dart:io';

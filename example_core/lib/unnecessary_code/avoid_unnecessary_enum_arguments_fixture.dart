@@ -103,7 +103,7 @@
 // Test fixture for: avoid_unnecessary_enum_arguments
 // Source: lib\src\rules\unnecessary_code_rules.dart
 
-import '../flutter_mocks.dart';
+import 'package:saropa_lints_example/flutter_mocks.dart';
 
 // BAD: Should trigger avoid_unnecessary_enum_arguments
 // expect_lint: avoid_unnecessary_enum_arguments

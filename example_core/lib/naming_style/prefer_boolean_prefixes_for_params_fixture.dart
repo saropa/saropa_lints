@@ -103,7 +103,7 @@
 // Test fixture for: prefer_boolean_prefixes_for_params
 // Source: lib\src\rules\naming_style_rules.dart
 
-import '../flutter_mocks.dart';
+import 'package:saropa_lints_example/flutter_mocks.dart';
 
 // BAD: Should trigger prefer_boolean_prefixes_for_params
 // expect_lint: prefer_boolean_prefixes_for_params

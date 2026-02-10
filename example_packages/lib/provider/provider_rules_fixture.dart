@@ -60,7 +60,7 @@
 // ignore_for_file: not_a_type
 // Test fixture for Provider package rules
 
-import '../flutter_mocks.dart';
+import 'package:saropa_lints_example/flutter_mocks.dart';
 
 // Mock service classes for testing
 class AuthService {
@@ -138,7 +138,7 @@ void testDisposeProviders() {
 }
 
 // =============================================================================
-// Dependency Injection Rules (from v4.1.5)
+// Dependency Injection Rules
 // =============================================================================
 
 // BAD: GetIt in widget

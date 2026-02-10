@@ -103,7 +103,7 @@
 // Test fixture for: avoid_validation_in_build
 // Source: lib\src\rules\forms_rules.dart
 
-import '../flutter_mocks.dart';
+import 'package:saropa_lints_example/flutter_mocks.dart';
 
 final context = BuildContext();
 dynamic value;

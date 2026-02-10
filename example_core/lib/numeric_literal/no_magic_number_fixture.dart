@@ -103,7 +103,7 @@
 // Test fixture for: no_magic_number
 // Source: lib\src\rules\numeric_literal_rules.dart
 
-import '../flutter_mocks.dart';
+import 'package:saropa_lints_example/flutter_mocks.dart';
 
 // BAD: Should trigger no_magic_number
 // expect_lint: no_magic_number

@@ -103,7 +103,7 @@
 // Test fixture for: move_variable_outside_iteration
 // Source: lib\src\rules\code_quality_rules.dart
 
-import '../flutter_mocks.dart';
+import 'package:saropa_lints_example/flutter_mocks.dart';
 
 // BAD: Should trigger move_variable_outside_iteration
 // expect_lint: move_variable_outside_iteration

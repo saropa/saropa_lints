@@ -103,7 +103,7 @@
 // Test fixture for: require_yield_after_db_write
 // Source: lib\src\rules\db_yield_rules.dart
 
-import '../flutter_mocks.dart';
+import 'package:saropa_lints_example/flutter_mocks.dart';
 
 // BAD: Should trigger require_yield_after_db_write
 // expect_lint: require_yield_after_db_write

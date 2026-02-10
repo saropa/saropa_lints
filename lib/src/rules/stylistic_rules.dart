@@ -3595,7 +3595,7 @@ class PreferDocStraightApostropheRule extends SaropaLintRule {
     problemMessage:
         "[prefer_doc_straight_apostrophe] Use straight apostrophe (') instead of Right Single Quotation Mark (') in documentation. This is an opinionated rule - not included in any tier by default. {v4}",
     correctionMessage:
-        "Replace the Right Single Quotation Mark (U+2019) with a straight apostrophe (U+0027) for plain-text docs.",
+        "Replace the Right Single Quotation Mark (U+2019) with a straight apostrophe (U+0027) for plain text docs.",
     errorSeverity: DiagnosticSeverity.INFO,
   );
 

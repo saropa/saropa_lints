@@ -103,7 +103,7 @@
 // Test fixture for: prefer_prefixed_global_constants
 // Source: lib\src\rules\naming_style_rules.dart
 
-import '../flutter_mocks.dart';
+import 'package:saropa_lints_example/flutter_mocks.dart';
 
 // BAD: Should trigger prefer_prefixed_global_constants
 // expect_lint: prefer_prefixed_global_constants

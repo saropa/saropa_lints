@@ -103,7 +103,7 @@
 // Test fixture for: require_receive_port_close
 // Source: lib\src\rules\disposal_rules.dart
 
-import '../flutter_mocks.dart';
+import 'package:saropa_lints_example/flutter_mocks.dart';
 
 // BAD: Should trigger require_receive_port_close
 // expect_lint: require_receive_port_close

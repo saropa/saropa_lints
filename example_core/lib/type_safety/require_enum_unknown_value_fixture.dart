@@ -103,7 +103,7 @@
 // Test fixture for: require_enum_unknown_value
 // Source: lib\src\rules\type_safety_rules.dart
 
-import '../flutter_mocks.dart';
+import 'package:saropa_lints_example/flutter_mocks.dart';
 
 dynamic data;
 dynamic json;

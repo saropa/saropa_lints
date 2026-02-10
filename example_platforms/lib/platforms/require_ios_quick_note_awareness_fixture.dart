@@ -103,7 +103,7 @@
 // Test fixture for: require_ios_quick_note_awareness
 // Source: lib\src\rules\platforms\ios_rules.dart
 
-import '../flutter_mocks.dart';
+import 'package:saropa_lints_example/flutter_mocks.dart';
 
 final id = '1';
 final title = 'Title';

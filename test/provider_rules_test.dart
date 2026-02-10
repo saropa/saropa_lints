@@ -7,7 +7,7 @@ import 'package:test/test.dart';
 /// These rules cover proper Provider/ChangeNotifier usage, Consumer/Selector
 /// patterns, disposal, InheritedWidget requirements, and common anti-patterns.
 ///
-/// Test fixtures: example/lib/packages/*provider*
+/// Test fixtures: example_packages/lib/packages/*provider*
 void main() {
   group('Provider Rules - Fixture Verification', () {
     final fixtures = [
@@ -31,7 +31,7 @@ void main() {
     for (final fixture in fixtures) {
       test('$fixture fixture exists', () {
         final file = File(
-          'example/lib/packages/${fixture}_fixture.dart',
+          'example_packages/lib/packages/${fixture}_fixture.dart',
         );
         expect(file.existsSync(), isTrue);
       });

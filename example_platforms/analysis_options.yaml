@@ -1,0 +1,18 @@
+analyzer:
+  plugins:
+    - custom_lint
+  errors:
+    unused_local_variable: ignore
+    unused_field: ignore
+    unused_element: ignore
+    todo: ignore
+    fixme: ignore
+    hack: ignore
+
+# Configure saropa_lints tier
+custom_lint:
+  saropa_lints:
+    tier: recommended
+  rules:
+    - require_dispose: false
+    - avoid_undisposed_instances: false

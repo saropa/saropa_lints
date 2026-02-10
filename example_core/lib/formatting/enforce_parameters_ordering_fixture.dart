@@ -103,7 +103,7 @@
 // Test fixture for: enforce_parameters_ordering
 // Source: lib\src\rules\formatting_rules.dart
 
-import '../flutter_mocks.dart';
+import 'package:saropa_lints_example/flutter_mocks.dart';
 
 // BAD: Should trigger enforce_parameters_ordering
 // expect_lint: enforce_parameters_ordering

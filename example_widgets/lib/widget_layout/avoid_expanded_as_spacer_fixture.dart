@@ -103,7 +103,7 @@
 // Test fixture for: avoid_expanded_as_spacer
 // Source: lib\src\rules\widget_layout_rules.dart
 
-import '../flutter_mocks.dart';
+import 'package:saropa_lints_example/flutter_mocks.dart';
 
 // BAD: Should trigger avoid_expanded_as_spacer
 // expect_lint: avoid_expanded_as_spacer

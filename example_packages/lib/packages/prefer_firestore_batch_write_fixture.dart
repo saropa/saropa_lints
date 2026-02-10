@@ -103,7 +103,7 @@
 // Test fixture for: prefer_firestore_batch_write
 // Source: lib\src\rules\packages\firebase_rules.dart
 
-import '../flutter_mocks.dart';
+import 'package:saropa_lints_example/flutter_mocks.dart';
 
 // BAD: Should trigger prefer_firestore_batch_write
 // expect_lint: prefer_firestore_batch_write

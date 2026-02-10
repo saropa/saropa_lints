@@ -103,7 +103,7 @@
 // Test fixture for: avoid_unnecessary_setstate
 // Source: lib\src\rules\widget_lifecycle_rules.dart
 
-import '../flutter_mocks.dart';
+import 'package:saropa_lints_example/flutter_mocks.dart';
 
 // BAD: Should trigger avoid_unnecessary_setstate
 // expect_lint: avoid_unnecessary_setstate

@@ -103,7 +103,7 @@
 // Test fixture for: require_permission_manifest_android
 // Source: lib\src\rules\widget_patterns_rules.dart
 
-import '../flutter_mocks.dart';
+import 'package:saropa_lints_example/flutter_mocks.dart';
 
 // BAD: Should trigger require_permission_manifest_android
 // expect_lint: require_permission_manifest_android

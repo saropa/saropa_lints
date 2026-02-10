@@ -103,7 +103,7 @@
 // Test fixture for: require_vsync_mixin
 // Source: lib\src\rules\animation_rules.dart
 
-import '../flutter_mocks.dart';
+import 'package:saropa_lints_example/flutter_mocks.dart';
 
 // BAD: Should trigger require_vsync_mixin
 // expect_lint: require_vsync_mixin

@@ -103,7 +103,7 @@
 // Test fixture for: require_golden_test
 // Source: lib\src\rules\testing_best_practices_rules.dart
 
-import '../flutter_mocks.dart';
+import 'package:saropa_lints_example/flutter_mocks.dart';
 
 // BAD: Should trigger require_golden_test
 // expect_lint: require_golden_test

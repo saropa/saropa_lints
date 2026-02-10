@@ -103,7 +103,7 @@
 // Test fixture for: avoid_token_in_url
 // Source: lib\src\rules\security_rules.dart
 
-import '../flutter_mocks.dart';
+import 'package:saropa_lints_example/flutter_mocks.dart';
 
 dynamic api;
 dynamic http;

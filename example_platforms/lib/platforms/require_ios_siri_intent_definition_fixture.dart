@@ -103,7 +103,7 @@
 // Test fixture for: require_ios_siri_intent_definition
 // Source: lib\src\rules\platforms\ios_rules.dart
 
-import '../flutter_mocks.dart';
+import 'package:saropa_lints_example/flutter_mocks.dart';
 
 // BAD: Should trigger require_ios_siri_intent_definition
 // expect_lint: require_ios_siri_intent_definition

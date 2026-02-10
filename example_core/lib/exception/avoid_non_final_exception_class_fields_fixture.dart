@@ -103,7 +103,7 @@
 // Test fixture for: avoid_non_final_exception_class_fields
 // Source: lib\src\rules\exception_rules.dart
 
-import '../flutter_mocks.dart';
+import 'package:saropa_lints_example/flutter_mocks.dart';
 
 // BAD: Should trigger avoid_non_final_exception_class_fields
 // expect_lint: avoid_non_final_exception_class_fields

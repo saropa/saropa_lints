@@ -103,7 +103,7 @@
 // Test fixture for: require_file_path_sanitization
 // Source: lib\src\rules\file_handling_rules.dart
 
-import '../flutter_mocks.dart';
+import 'package:saropa_lints_example/flutter_mocks.dart';
 
 dynamic file;
 final path = '/path';

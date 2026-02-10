@@ -103,7 +103,7 @@
 // Test fixture for: prefer_isar_lazy_links
 // Source: lib\src\rules\packages\isar_rules.dart
 
-import '../flutter_mocks.dart';
+import 'package:saropa_lints_example/flutter_mocks.dart';
 
 // BAD: Should trigger prefer_isar_lazy_links
 // expect_lint: prefer_isar_lazy_links

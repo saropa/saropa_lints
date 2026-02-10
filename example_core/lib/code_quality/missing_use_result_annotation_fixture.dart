@@ -103,7 +103,7 @@
 // Test fixture for: missing_use_result_annotation
 // Source: lib\src\rules\code_quality_rules.dart
 
-import '../flutter_mocks.dart';
+import 'package:saropa_lints_example/flutter_mocks.dart';
 
 // BAD: Should trigger missing_use_result_annotation
 // expect_lint: missing_use_result_annotation

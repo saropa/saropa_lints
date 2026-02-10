@@ -7,7 +7,7 @@ import 'package:test/test.dart';
 /// These rules cover layout constraints, scroll behavior, Container
 /// alternatives, nesting depth, responsive design, and layout performance.
 ///
-/// Test fixtures: example/lib/widget_layout/*
+/// Test fixtures: example_widgets/lib/widget_layout/*
 void main() {
   group('Widget Layout Rules - Fixture Verification', () {
     final fixtures = [
@@ -69,7 +69,7 @@ void main() {
     for (final fixture in fixtures) {
       test('$fixture fixture exists', () {
         final file = File(
-          'example/lib/widget_layout/${fixture}_fixture.dart',
+          'example_widgets/lib/widget_layout/${fixture}_fixture.dart',
         );
         expect(file.existsSync(), isTrue);
       });

@@ -103,7 +103,7 @@
 // Test fixture for: format_comment_style
 // Source: lib\src\rules\formatting_rules.dart
 
-import '../flutter_mocks.dart';
+import 'package:saropa_lints_example/flutter_mocks.dart';
 
 // BAD: Should trigger format_comment_style
 // expect_lint: format_comment_style

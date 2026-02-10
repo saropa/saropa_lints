@@ -59,7 +59,7 @@
 // ignore_for_file: non_constant_default_value, not_a_type
 // Test fixture for prefer_center_over_align rule
 
-import '../flutter_mocks.dart';
+import 'package:saropa_lints_example/flutter_mocks.dart';
 
 void testPreferCenterOverAlign() {
   // BAD: Align with Alignment.center

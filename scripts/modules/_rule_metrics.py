@@ -12,6 +12,7 @@ Copyright: (c) 2025-2026 Saropa
 
 from __future__ import annotations
 
+import os
 import re
 from pathlib import Path
 
@@ -106,26 +107,46 @@ def _status_for_percentage(pct: float) -> tuple[Color, str]:
     return Color.GREEN, "GOOD"
 
 
+def _get_example_dirs(project_dir: Path) -> list[Path]:
+    """Return all example sub-package lib directories."""
+    return [
+        d
+        for name in [
+            "example", "example_core", "example_async",
+            "example_widgets", "example_style",
+            "example_packages", "example_platforms",
+        ]
+        if (d := project_dir / name / "lib").exists()
+    ]
+
+
+def _count_fixtures_for_category(
+    example_dirs: list[Path], category: str,
+) -> int:
+    """Count fixture files for a category across all sub-packages."""
+    for suffix in [category, f"{category}s"]:
+        for lib_dir in example_dirs:
+            fixture_dir = lib_dir / suffix
+            if fixture_dir.exists():
+                count = len(list(fixture_dir.glob("*_fixture.dart")))
+                if count > 0:
+                    return count
+    return 0
+
+
 def display_test_coverage(project_dir: Path) -> None:
     """Display test coverage report with bar chart visualization."""
     rules_dir = project_dir / "lib" / "src" / "rules"
-    example_dir = project_dir / "example" / "lib"
     if not rules_dir.exists():
         return
 
+    example_dirs = _get_example_dirs(project_dir)
     categories = _collect_category_rules(rules_dir)
     category_details: list[tuple[str, int, int]] = []
     for cat in categories:
-        fixture_count = 0
-        for suffix in [cat.category, f"{cat.category}s"]:
-            fixture_dir = example_dir / suffix
-            if fixture_dir.exists():
-                fixture_count = len(
-                    list(fixture_dir.glob("*_fixture.dart"))
-                )
-                if fixture_count > 0:
-                    break
-
+        fixture_count = _count_fixtures_for_category(
+            example_dirs, cat.category,
+        )
         category_details.append((cat.category, cat.rule_count, fixture_count))
 
     total_rules = sum(c[1] for c in category_details)
@@ -176,6 +197,92 @@ def display_test_coverage(project_dir: Path) -> None:
                 f"({pct:5.1f}%)",
                 row_color,
             )
+    print()
+
+
+_TODO_RE = re.compile(r"//\s*TODO:", re.IGNORECASE)
+
+
+def display_todo_audit(project_dir: Path) -> None:
+    """Display TODO audit with bar chart per package, write full log."""
+    example_dirs = _get_example_dirs(project_dir)
+    if not example_dirs:
+        return
+
+    # Collect TODOs per package and per file
+    pkg_counts: list[tuple[str, int]] = []
+    all_todos: list[str] = []  # "package/file:line: message"
+
+    for lib_dir in example_dirs:
+        pkg_name = lib_dir.parent.name
+        pkg_total = 0
+        for dart_file in sorted(lib_dir.rglob("*.dart")):
+            try:
+                lines = dart_file.read_text(
+                    encoding="utf-8", errors="replace",
+                ).splitlines()
+            except Exception:
+                continue
+            for line_no, line in enumerate(lines, 1):
+                if _TODO_RE.search(line):
+                    pkg_total += 1
+                    rel = dart_file.relative_to(project_dir)
+                    all_todos.append(f"  {rel}:{line_no}: {line.strip()}")
+        pkg_counts.append((pkg_name, pkg_total))
+
+    total = sum(c for _, c in pkg_counts)
+    if total == 0:
+        return
+
+    max_count = max(c for _, c in pkg_counts)
+
+    print()
+    print_colored("  ▶ Fixture TODOs (placeholder stubs)", Color.WHITE)
+    print()
+
+    # Overall count
+    print_colored(
+        f"    Total: {total} TODOs across fixture files",
+        Color.YELLOW if total > 0 else Color.GREEN,
+    )
+    print()
+
+    # Per-package breakdown with bars
+    for pkg_name, count in sorted(pkg_counts, key=lambda x: -x[1]):
+        if count == 0:
+            continue
+        bar = _make_bar(count, max_count)
+        label = pkg_name.replace("example_", "").replace("example", "mocks")
+        print_colored(
+            f"    {label:<12s} {bar}  {count:>3d}",
+            Color.YELLOW if count > 20 else Color.CYAN,
+        )
+
+    # Write full log to reports directory
+    reports_dir = project_dir / "example" / "reports"
+    reports_dir.mkdir(parents=True, exist_ok=True)
+    log_path = reports_dir / "todo_audit.log"
+    log_lines = [
+        f"TODO Audit - {total} items",
+        f"{'=' * 60}",
+        "",
+    ]
+    # Group by package
+    current_pkg = ""
+    for todo_line in all_todos:
+        parts = todo_line.strip().split(os.sep, 1)
+        pkg = parts[0] if len(parts) > 1 else ""
+        if pkg != current_pkg:
+            current_pkg = pkg
+            log_lines.append(f"\n--- {current_pkg} ---")
+        log_lines.append(todo_line)
+
+    log_path.write_text("\n".join(log_lines), encoding="utf-8")
+    print()
+    print_colored(
+        f"    Full log: {log_path.relative_to(project_dir)}",
+        Color.WHITE,
+    )
     print()
 
 

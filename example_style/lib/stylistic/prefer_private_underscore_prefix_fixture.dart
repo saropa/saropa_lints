@@ -103,7 +103,7 @@
 // Test fixture for: prefer_private_underscore_prefix
 // Source: lib\src\rules\stylistic_rules.dart
 
-import '../flutter_mocks.dart';
+import 'package:saropa_lints_example/flutter_mocks.dart';
 
 // BAD: Should trigger prefer_private_underscore_prefix
 // expect_lint: prefer_private_underscore_prefix

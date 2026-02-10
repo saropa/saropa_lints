@@ -103,7 +103,7 @@
 // Test fixture for: avoid_uncaught_future_errors
 // Source: lib\src\rules\error_handling_rules.dart
 
-import '../flutter_mocks.dart';
+import 'package:saropa_lints_example/flutter_mocks.dart';
 
 // BAD: Should trigger avoid_uncaught_future_errors
 // expect_lint: avoid_uncaught_future_errors

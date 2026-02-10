@@ -103,7 +103,7 @@
 // Test fixture for: require_freezed_private_constructor
 // Source: lib\src\rules\freezed_rules.dart
 
-import '../flutter_mocks.dart';
+import 'package:saropa_lints_example/flutter_mocks.dart';
 
 final name = 'example';
 

@@ -103,7 +103,7 @@
 // Test fixture for: prefer_rich_text_for_complex
 // Source: lib\src\rules\widget_patterns_rules.dart
 
-import '../flutter_mocks.dart';
+import 'package:saropa_lints_example/flutter_mocks.dart';
 
 final children = <Widget>[];
 final text = 'text';

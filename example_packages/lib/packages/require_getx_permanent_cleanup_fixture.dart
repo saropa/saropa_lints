@@ -103,7 +103,7 @@
 // Test fixture for: require_getx_permanent_cleanup
 // Source: lib\src\rules\packages\getx_rules.dart
 
-import '../flutter_mocks.dart';
+import 'package:saropa_lints_example/flutter_mocks.dart';
 
 // BAD: Should trigger require_getx_permanent_cleanup
 // expect_lint: require_getx_permanent_cleanup

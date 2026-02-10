@@ -1,6 +1,6 @@
 // ignore_for_file: unused_element, unused_field
 
-import '../flutter_mocks.dart';
+import 'package:saropa_lints_example/flutter_mocks.dart';
 
 /// Test fixture for avoid_overlapping_animations rule.
 ///

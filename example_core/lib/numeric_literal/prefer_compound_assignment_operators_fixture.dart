@@ -103,7 +103,7 @@
 // Test fixture for: prefer_compound_assignment_operators
 // Source: lib\src\rules\numeric_literal_rules.dart
 
-import '../flutter_mocks.dart';
+import 'package:saropa_lints_example/flutter_mocks.dart';
 
 // BAD: Should trigger prefer_compound_assignment_operators
 // expect_lint: prefer_compound_assignment_operators

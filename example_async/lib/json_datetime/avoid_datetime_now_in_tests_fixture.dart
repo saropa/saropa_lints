@@ -103,7 +103,7 @@
 // Test fixture for: avoid_datetime_now_in_tests
 // Source: lib\src\rules\json_datetime_rules.dart
 
-import '../flutter_mocks.dart';
+import 'package:saropa_lints_example/flutter_mocks.dart';
 
 dynamic file;
 

@@ -103,7 +103,7 @@
 // Test fixture for: prefer_inherited_widget_cache
 // Source: lib\src\rules\performance_rules.dart
 
-import '../flutter_mocks.dart';
+import 'package:saropa_lints_example/flutter_mocks.dart';
 
 final children = <Widget>[];
 final context = BuildContext();

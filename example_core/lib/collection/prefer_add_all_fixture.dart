@@ -103,7 +103,7 @@
 // Test fixture for: prefer_add_all
 // Source: lib\src\rules\collection_rules.dart
 
-import '../flutter_mocks.dart';
+import 'package:saropa_lints_example/flutter_mocks.dart';
 
 dynamic item;
 final items = <dynamic>[];

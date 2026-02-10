@@ -103,7 +103,7 @@
 // Test fixture for: avoid_async_callback_in_fake_async
 // Source: lib\src\rules\test_rules.dart
 
-import '../flutter_mocks.dart';
+import 'package:saropa_lints_example/flutter_mocks.dart';
 
 // BAD: Should trigger avoid_async_callback_in_fake_async
 // expect_lint: avoid_async_callback_in_fake_async

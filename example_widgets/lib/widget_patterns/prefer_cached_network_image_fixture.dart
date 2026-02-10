@@ -103,7 +103,7 @@
 // Test fixture for: prefer_cached_network_image
 // Source: lib\src\rules\widget_patterns_rules.dart
 
-import '../flutter_mocks.dart';
+import 'package:saropa_lints_example/flutter_mocks.dart';
 
 final context = BuildContext();
 final index = 0;

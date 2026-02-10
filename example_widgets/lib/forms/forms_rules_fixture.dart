@@ -58,9 +58,9 @@
 // ignore_for_file: abstract_super_member_reference, equal_keys_in_map
 // ignore_for_file: unused_catch_stack, non_constant_default_value
 // ignore_for_file: not_a_type
-// Test fixture for forms rules added in v2.3.10
+// Test fixture for forms rules
 
-import '../flutter_mocks.dart';
+import 'package:saropa_lints_example/flutter_mocks.dart';
 
 // =========================================================================
 // require_text_input_type

@@ -103,7 +103,7 @@
 // Test fixture for: prefer_shell_route_for_persistent_ui
 // Source: lib\src\rules\navigation_rules.dart
 
-import '../flutter_mocks.dart';
+import 'package:saropa_lints_example/flutter_mocks.dart';
 
 dynamic body;
 dynamic builder;

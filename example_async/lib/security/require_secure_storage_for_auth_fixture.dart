@@ -103,7 +103,7 @@
 // Test fixture for: require_secure_storage_for_auth
 // Source: lib\src\rules\security_rules.dart
 
-import '../flutter_mocks.dart';
+import 'package:saropa_lints_example/flutter_mocks.dart';
 
 dynamic data;
 final key = 'key';

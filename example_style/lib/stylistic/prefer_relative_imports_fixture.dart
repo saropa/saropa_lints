@@ -103,7 +103,7 @@
 // Test fixture for: prefer_relative_imports
 // Source: lib\src\rules\stylistic_rules.dart
 
-import '../flutter_mocks.dart';
+import 'package:saropa_lints_example/flutter_mocks.dart';
 
 // BAD: Should trigger prefer_relative_imports
 // expect_lint: prefer_relative_imports

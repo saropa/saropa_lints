@@ -103,7 +103,7 @@
 // Test fixture for: match_getter_setter_field_names
 // Source: lib\src\rules\naming_style_rules.dart
 
-import '../flutter_mocks.dart';
+import 'package:saropa_lints_example/flutter_mocks.dart';
 
 // BAD: Should trigger match_getter_setter_field_names
 // expect_lint: match_getter_setter_field_names

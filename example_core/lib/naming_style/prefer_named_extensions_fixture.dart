@@ -103,7 +103,7 @@
 // Test fixture for: prefer_named_extensions
 // Source: lib\src\rules\naming_style_rules.dart
 
-import '../flutter_mocks.dart';
+import 'package:saropa_lints_example/flutter_mocks.dart';
 
 // BAD: Should trigger prefer_named_extensions
 // expect_lint: prefer_named_extensions

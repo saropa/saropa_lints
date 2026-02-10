@@ -103,7 +103,7 @@
 // Test fixture for: prefer_bloc_listener_for_side_effects
 // Source: lib\src\rules\packages\bloc_rules.dart
 
-import '../flutter_mocks.dart';
+import 'package:saropa_lints_example/flutter_mocks.dart';
 
 dynamic builder;
 dynamic child;

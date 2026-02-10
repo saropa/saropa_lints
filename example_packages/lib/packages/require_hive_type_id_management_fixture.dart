@@ -103,7 +103,7 @@
 // Test fixture for: require_hive_type_id_management
 // Source: lib\src\rules\packages\hive_rules.dart
 
-import '../flutter_mocks.dart';
+import 'package:saropa_lints_example/flutter_mocks.dart';
 
 // BAD: Should trigger require_hive_type_id_management
 // expect_lint: require_hive_type_id_management

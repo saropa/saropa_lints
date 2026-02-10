@@ -62,7 +62,7 @@
 
 import 'dart:async';
 
-import '../flutter_mocks.dart';
+import 'package:saropa_lints_example/flutter_mocks.dart';
 
 // =========================================================================
 // require_media_player_dispose
@@ -880,7 +880,7 @@ Future<void> testSqliteReservedWords() async {
 }
 
 // =========================================================================
-// Hive/SharedPreferences Rules (from v4.1.4)
+// Hive/SharedPreferences Rules
 // =========================================================================
 
 // BAD: Regular Box for potentially large collection

@@ -103,7 +103,7 @@
 // Test fixture for: avoid_circular_imports
 // Source: lib\src\rules\architecture_rules.dart
 
-import '../flutter_mocks.dart';
+import 'package:saropa_lints_example/flutter_mocks.dart';
 
 // BAD: Should trigger avoid_circular_imports
 // expect_lint: avoid_circular_imports

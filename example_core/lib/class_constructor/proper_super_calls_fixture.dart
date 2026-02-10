@@ -103,7 +103,7 @@
 // Test fixture for: proper_super_calls
 // Source: lib\src\rules\class_constructor_rules.dart
 
-import '../flutter_mocks.dart';
+import 'package:saropa_lints_example/flutter_mocks.dart';
 
 // BAD: Should trigger proper_super_calls
 // expect_lint: proper_super_calls

@@ -103,7 +103,7 @@
 // Test fixture for: avoid_getx_context_outside_widget
 // Source: lib\src\rules\packages\getx_rules.dart
 
-import '../flutter_mocks.dart';
+import 'package:saropa_lints_example/flutter_mocks.dart';
 
 dynamic content;
 final context = BuildContext();

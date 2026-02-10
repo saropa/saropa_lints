@@ -103,7 +103,7 @@
 // Test fixture for: require_getit_registration_order
 // Source: lib\src\rules\packages\get_it_rules.dart
 
-import '../flutter_mocks.dart';
+import 'package:saropa_lints_example/flutter_mocks.dart';
 
 final getIt = GetIt.instance;
 

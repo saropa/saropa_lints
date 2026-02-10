@@ -103,7 +103,7 @@
 // Test fixture for: match_class_name_pattern
 // Source: lib\src\rules\naming_style_rules.dart
 
-import '../flutter_mocks.dart';
+import 'package:saropa_lints_example/flutter_mocks.dart';
 
 // BAD: Should trigger match_class_name_pattern
 // expect_lint: match_class_name_pattern

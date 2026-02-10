@@ -215,7 +215,7 @@ void goodLoggingNullChecks(Object? credential, String? token) {
 // );
 
 // =========================================================================
-// JSON/API Rules (from v4.1.6)
+// JSON/API Rules
 // =========================================================================
 
 // BAD: DateTime.parse with variable (non-literal)
@@ -280,7 +280,7 @@ class DateFormatDemo {
 }
 
 // =========================================================================
-// Configuration Rules (from v4.1.6)
+// Configuration Rules
 // =========================================================================
 
 // BAD: Hardcoded config values

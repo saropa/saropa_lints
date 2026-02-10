@@ -103,7 +103,7 @@
 // Test fixture for: avoid_dialog_context_after_async
 // Source: lib\src\rules\async_rules.dart
 
-import '../flutter_mocks.dart';
+import 'package:saropa_lints_example/flutter_mocks.dart';
 
 final context = BuildContext();
 final mounted = true;

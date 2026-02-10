@@ -22,6 +22,93 @@ RULES_DIR = PROJECT_ROOT / "lib" / "src" / "rules"
 EXAMPLE_DIR = PROJECT_ROOT / "example" / "lib"
 MOCKS_FILE = EXAMPLE_DIR / "flutter_mocks.dart"
 
+# Sub-package directories for split example project
+EXAMPLE_PACKAGES = [
+    PROJECT_ROOT / "example" / "lib",
+    PROJECT_ROOT / "example_core" / "lib",
+    PROJECT_ROOT / "example_async" / "lib",
+    PROJECT_ROOT / "example_widgets" / "lib",
+    PROJECT_ROOT / "example_style" / "lib",
+    PROJECT_ROOT / "example_packages" / "lib",
+    PROJECT_ROOT / "example_platforms" / "lib",
+]
+
+# Map categories to their sub-package directory name
+CATEGORY_TO_PACKAGE = {
+    # Platforms → example_platforms
+    "ios": "example_platforms", "android": "example_platforms",
+    "macos": "example_platforms", "web": "example_platforms",
+    "linux": "example_platforms", "windows": "example_platforms",
+    # Packages → example_packages
+    "bloc": "example_packages", "provider": "example_packages",
+    "riverpod": "example_packages", "getx": "example_packages",
+    "firebase": "example_packages", "isar": "example_packages",
+    "hive": "example_packages", "dio": "example_packages",
+    "equatable": "example_packages", "flame": "example_packages",
+    "flutter_hooks": "example_packages", "get_it": "example_packages",
+    "graphql": "example_packages", "package_specific": "example_packages",
+    "qr_scanner": "example_packages",
+    "shared_preferences": "example_packages",
+    "sqflite": "example_packages", "supabase": "example_packages",
+    "url_launcher": "example_packages",
+    "workmanager": "example_packages", "geolocator": "example_packages",
+    "freezed": "example_packages",
+    # Widgets → example_widgets
+    "widget_patterns": "example_widgets",
+    "widget_layout": "example_widgets",
+    "widget_lifecycle": "example_widgets",
+    "navigation": "example_widgets", "accessibility": "example_widgets",
+    "forms": "example_widgets", "ui_ux": "example_widgets",
+    "image": "example_widgets", "animation": "example_widgets",
+    "animations": "example_widgets", "scroll": "example_widgets",
+    "build_method": "example_widgets",
+    "dialog_snackbar": "example_widgets", "dialog": "example_widgets",
+    "theming": "example_widgets", "flutter_widget": "example_widgets",
+    "widgets": "example_widgets",
+    # Async/security → example_async
+    "async": "example_async", "performance": "example_async",
+    "security": "example_async", "api_network": "example_async",
+    "error_handling": "example_async", "file_handling": "example_async",
+    "resource_management": "example_async",
+    "memory_management": "example_async",
+    "disposal": "example_async", "crypto": "example_async",
+    "bluetooth_hardware": "example_async",
+    "notification": "example_async", "permission": "example_async",
+    "connectivity": "example_async",
+    "json_datetime": "example_async", "lifecycle": "example_async",
+    "config": "example_async", "context": "example_async",
+    "iap": "example_async", "db_yield": "example_async",
+    "json": "example_async", "debug": "example_async",
+    "money": "example_async", "media": "example_async",
+    "memory": "example_async", "state_management": "example_async",
+    "api": "example_async",
+    # Style/testing → example_style
+    "stylistic": "example_style",
+    "stylistic_additional": "example_style",
+    "stylistic_null_collection": "example_style",
+    "stylistic_whitespace_constructor": "example_style",
+    "stylistic_control_flow": "example_style",
+    "stylistic_error_testing": "example_style",
+    "stylistic_widget": "example_style",
+    "testing_best_practices": "example_style",
+    "test": "example_style", "testing": "example_style",
+    "internationalization": "example_style", "intl": "example_style",
+    "documentation": "example_style",
+    # Core → example_core (also the default)
+    "code_quality": "example_core", "structure": "example_core",
+    "control_flow": "example_core", "naming_style": "example_core",
+    "record_pattern": "example_core", "collection": "example_core",
+    "type_safety": "example_core", "type": "example_core",
+    "complexity": "example_core", "class_constructor": "example_core",
+    "unnecessary_code": "example_core",
+    "numeric_literal": "example_core", "formatting": "example_core",
+    "equality": "example_core", "return": "example_core",
+    "exception": "example_core", "collections": "example_core",
+    "dependency_injection": "example_core",
+    "architecture": "example_core", "build": "example_core",
+    "ignore_utils": "example_core",
+}
+
 # ── Data Classes ─────────────────────────────────────────────────────────
 
 
@@ -42,13 +129,16 @@ class RuleInfo:
 def find_existing_coverage() -> set:
     """Find rule names already covered by existing fixture files."""
     covered = set()
-    for fixture in EXAMPLE_DIR.rglob("*_fixture.dart"):
-        try:
-            text = fixture.read_text(encoding="utf-8", errors="replace")
-        except Exception:
+    for pkg_dir in EXAMPLE_PACKAGES:
+        if not pkg_dir.exists():
             continue
-        for m in re.finditer(r"expect_lint:\s*(\w+)", text):
-            covered.add(m.group(1))
+        for fixture in pkg_dir.rglob("*_fixture.dart"):
+            try:
+                text = fixture.read_text(encoding="utf-8", errors="replace")
+            except Exception:
+                continue
+            for m in re.finditer(r"expect_lint:\s*(\w+)", text):
+                covered.add(m.group(1))
     return covered
 
 
@@ -550,16 +640,18 @@ CATEGORY_DIR_MAP = {
 
 def get_output_dir(category: str) -> Path:
     """Get the output directory for a given category."""
+    package = CATEGORY_TO_PACKAGE.get(category, "example_core")
+    package_lib = PROJECT_ROOT / package / "lib"
     parent = CATEGORY_DIR_MAP.get(category, category)
     if parent == category:
-        return EXAMPLE_DIR / category
-    return EXAMPLE_DIR / parent
+        return package_lib / category
+    return package_lib / parent
 
 
 def compute_import_path(output_dir: Path) -> str:
-    """Compute relative import path to flutter_mocks.dart."""
-    rel = os.path.relpath(MOCKS_FILE, output_dir)
-    return rel.replace("\\", "/")
+    """Return the package import path to flutter_mocks.dart."""
+    # All sub-packages depend on saropa_lints_example via path dependency
+    return "package:saropa_lints_example/flutter_mocks.dart"
 
 
 def _detect_needed_stubs(code: str) -> set:

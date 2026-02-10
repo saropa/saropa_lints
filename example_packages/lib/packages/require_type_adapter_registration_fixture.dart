@@ -103,7 +103,7 @@
 // Test fixture for: require_type_adapter_registration
 // Source: lib\src\rules\packages\hive_rules.dart
 
-import '../flutter_mocks.dart';
+import 'package:saropa_lints_example/flutter_mocks.dart';
 
 final users = <dynamic>[];
 

@@ -103,7 +103,7 @@
 // Test fixture for: prefer_test_name_descriptive
 // Source: lib\src\rules\stylistic_error_testing_rules.dart
 
-import '../flutter_mocks.dart';
+import 'package:saropa_lints_example/flutter_mocks.dart';
 
 // BAD: Should trigger prefer_test_name_descriptive
 // expect_lint: prefer_test_name_descriptive

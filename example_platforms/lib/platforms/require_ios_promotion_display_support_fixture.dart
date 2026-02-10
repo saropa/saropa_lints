@@ -103,7 +103,7 @@
 // Test fixture for: require_ios_promotion_display_support
 // Source: lib\src\rules\platforms\ios_rules.dart
 
-import '../flutter_mocks.dart';
+import 'package:saropa_lints_example/flutter_mocks.dart';
 
 // BAD: Should trigger require_ios_promotion_display_support
 // expect_lint: require_ios_promotion_display_support

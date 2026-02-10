@@ -103,7 +103,7 @@
 // Test fixture for: prefer_typedef_for_callbacks
 // Source: lib\src\rules\naming_style_rules.dart
 
-import '../flutter_mocks.dart';
+import 'package:saropa_lints_example/flutter_mocks.dart';
 
 typedef StringCallback = void Function(String);
 

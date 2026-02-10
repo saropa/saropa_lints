@@ -103,7 +103,7 @@
 // Test fixture for: prefer_ignore_pointer
 // Source: lib\src\rules\widget_layout_rules.dart
 
-import '../flutter_mocks.dart';
+import 'package:saropa_lints_example/flutter_mocks.dart';
 
 // BAD: Should trigger prefer_ignore_pointer
 // expect_lint: prefer_ignore_pointer

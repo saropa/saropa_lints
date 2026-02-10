@@ -103,7 +103,7 @@
 // Test fixture for: require_http_client_close
 // Source: lib\src\rules\resource_management_rules.dart
 
-import '../flutter_mocks.dart';
+import 'package:saropa_lints_example/flutter_mocks.dart';
 
 dynamic client;
 dynamic response;

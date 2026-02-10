@@ -103,7 +103,7 @@
 // Test fixture for: pass_optional_argument
 // Source: lib\src\rules\code_quality_rules.dart
 
-import '../flutter_mocks.dart';
+import 'package:saropa_lints_example/flutter_mocks.dart';
 
 final name = 'example';
 

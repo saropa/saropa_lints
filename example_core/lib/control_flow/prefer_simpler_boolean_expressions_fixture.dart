@@ -103,7 +103,7 @@
 // Test fixture for: prefer_simpler_boolean_expressions
 // Source: lib\src\rules\control_flow_rules.dart
 
-import '../flutter_mocks.dart';
+import 'package:saropa_lints_example/flutter_mocks.dart';
 
 // BAD: Should trigger prefer_simpler_boolean_expressions
 // expect_lint: prefer_simpler_boolean_expressions

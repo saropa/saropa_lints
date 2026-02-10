@@ -7,7 +7,7 @@ import 'package:test/test.dart';
 /// These rules cover Future handling, Stream lifecycle, async/await patterns,
 /// widget async safety, and platform-specific async concerns.
 ///
-/// Test fixtures: example/lib/async/*
+/// Test fixtures: example_async/lib/async/*
 void main() {
   group('Async Rules - Fixture Verification', () {
     final fixtures = [
@@ -53,7 +53,7 @@ void main() {
 
     for (final fixture in fixtures) {
       test('$fixture fixture exists', () {
-        final file = File('example/lib/async/${fixture}_fixture.dart');
+        final file = File('example_async/lib/async/${fixture}_fixture.dart');
         expect(file.existsSync(), isTrue);
       });
     }

@@ -103,7 +103,7 @@
 // Test fixture for: avoid_function_type_in_records
 // Source: lib\src\rules\record_pattern_rules.dart
 
-import '../flutter_mocks.dart';
+import 'package:saropa_lints_example/flutter_mocks.dart';
 
 // BAD: Should trigger avoid_function_type_in_records
 // expect_lint: avoid_function_type_in_records

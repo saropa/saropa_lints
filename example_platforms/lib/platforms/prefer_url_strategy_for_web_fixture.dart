@@ -103,7 +103,7 @@
 // Test fixture for: prefer_url_strategy_for_web
 // Source: lib\src\rules\platforms\web_rules.dart
 
-import '../flutter_mocks.dart';
+import 'package:saropa_lints_example/flutter_mocks.dart';
 
 // BAD: Should trigger prefer_url_strategy_for_web
 // expect_lint: prefer_url_strategy_for_web

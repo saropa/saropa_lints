@@ -103,7 +103,7 @@
 // Test fixture for: avoid_long_event_handlers
 // Source: lib\src\rules\packages\bloc_rules.dart
 
-import '../flutter_mocks.dart';
+import 'package:saropa_lints_example/flutter_mocks.dart';
 
 dynamic api;
 dynamic data;

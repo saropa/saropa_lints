@@ -103,7 +103,7 @@
 // Test fixture for: avoid_datetime_comparison_without_precision
 // Source: lib\src\rules\equality_rules.dart
 
-import '../flutter_mocks.dart';
+import 'package:saropa_lints_example/flutter_mocks.dart';
 
 // BAD: Should trigger avoid_datetime_comparison_without_precision
 // expect_lint: avoid_datetime_comparison_without_precision

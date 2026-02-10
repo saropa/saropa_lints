@@ -103,7 +103,7 @@
 // Test fixture for: avoid_api_key_in_code
 // Source: lib\src\rules\security_rules.dart
 
-import '../flutter_mocks.dart';
+import 'package:saropa_lints_example/flutter_mocks.dart';
 
 // BAD: Should trigger avoid_api_key_in_code
 // expect_lint: avoid_api_key_in_code

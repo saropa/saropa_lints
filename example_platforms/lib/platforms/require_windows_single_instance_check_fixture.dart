@@ -103,7 +103,7 @@
 // Test fixture for: require_windows_single_instance_check
 // Source: lib\src\rules\platforms\windows_rules.dart
 
-import '../flutter_mocks.dart';
+import 'package:saropa_lints_example/flutter_mocks.dart';
 
 // BAD: Should trigger require_windows_single_instance_check
 // expect_lint: require_windows_single_instance_check

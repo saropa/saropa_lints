@@ -103,7 +103,7 @@
 // Test fixture for: avoid_sqflite_read_all_columns
 // Source: lib\src\rules\file_handling_rules.dart
 
-import '../flutter_mocks.dart';
+import 'package:saropa_lints_example/flutter_mocks.dart';
 
 // BAD: Should trigger avoid_sqflite_read_all_columns
 // expect_lint: avoid_sqflite_read_all_columns

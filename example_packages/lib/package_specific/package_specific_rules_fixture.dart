@@ -376,7 +376,7 @@ void testUuidV4() {
 }
 
 // -----------------------------------------------------------------------------
-// avoid_freezed_for_logic_classes (from v4.1.4)
+// avoid_freezed_for_logic_classes
 // -----------------------------------------------------------------------------
 
 const freezed = _Freezed();
@@ -395,7 +395,7 @@ class BadUserService {}
 class UserData {}
 
 // -----------------------------------------------------------------------------
-// Firebase Rules (from v4.1.5)
+// Firebase Rules
 // -----------------------------------------------------------------------------
 
 Future<void> testFirebaseWithoutErrorHandling() async {
