@@ -438,7 +438,7 @@ custom_lint:
     avoid_unnecessary_late_fields: false # Late unnecessary when assigned in ctor. [MEDIUM]
     avoid_unnecessary_local_late: false # Late local variable unnecessary. [MEDIUM]
     avoid_global_state: false # Avoid mutable global state. [HIGH]
-    avoid_shadowing: false # Declaration shadows outer scope. [MEDIUM]
+    avoid_variable_shadowing: false # Declaration shadows outer scope. [MEDIUM]
     avoid_generics_shadowing: false # Generic shadows top-level declaration. [MEDIUM]
     avoid_similar_names: false # Variable name is too similar to another. [MEDIUM]
     avoid_unused_assignment: false # Assignment may be unused. [MEDIUM]

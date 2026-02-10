@@ -13,8 +13,56 @@ Dates are not included in version headers — [pub.dev](https://pub.dev/packages
 ---
 ## [Unreleased]
 
+### Fixed
+
+- **`require_websocket_reconnection` false positive** (v4): Rule no longer fires on `WebSocket` and `WebSocketChannel` class definitions themselves; only classes that use WebSocket connections are checked
+- **Cross-rule noise in fixture files**: Added `ignore_for_file` directives to 8 example fixtures to suppress unrelated rule violations (e.g. `avoid_print_in_release` in `avoid_variable_shadowing_fixture.dart`)
+
+---
+## [4.14.2]
+
 ### Added
 
+- **US English spelling check** in publish pipeline: New `_us_spelling.py` module with ~90+ UK-to-US spelling pairs scans all source files for British English and blocks publish until fixed. Integrated as a blocking pre-publish audit step
+
+### Changed
+
+- **Split example project into 6 sub-packages**: Resolves Out of Memory crash during custom_lint analysis of 1,542 fixture files. Fixtures are now split across `example_core/`, `example_async/`, `example_widgets/`, `example_style/`, `example_packages/`, and `example_platforms/`, each independently analyzable within memory limits
+- **Fixture imports use package imports**: All fixtures now import `flutter_mocks.dart` via `package:saropa_lints_example/flutter_mocks.dart` instead of relative paths
+- **New convenience script**: `scripts/run_custom_lint_all.py` runs analysis across all sub-packages
+- **TODO audit in publish pipeline**: New `display_todo_audit()` shows per-package bar chart of placeholder TODOs and writes full log to `example/reports/todo_audit.log`
+- **VSCode analysis exclusion**: Example sub-packages excluded from Dart analysis via `.vscode/settings.json` to keep Problems view clean
+- **TODO/FIXME/HACK suppression**: All example `analysis_options.yaml` files suppress `todo`, `fixme`, and `hack` diagnostics
+
+### Changed (continued)
+
+- **Removed version numbers from fixture filenames**: 16 fixture files and 1 test file renamed to remove hard-coded version suffixes (e.g., `stylistic_v270_fixture.dart` → `stylistic_fixture.dart`)
+- **Stripped version references from comments**: Removed `(from vX.Y.Z)` and `added in vX.Y.Z` from ~22 section headers and comments across fixture files
+
+### Fixed
+
+- **British spellings corrected**: Fixed UK spellings to US English in `prefer_fields_before_methods` correction message, `db_yield_rules` comment, and several CHANGELOG entries
+- **TODO audit path separator**: Fixed hardcoded backslash in TODO log grouping to use `os.sep` for cross-platform compatibility
+- **`prefer_no_commented_out_code` false positives** (v5): Prose labels like `OK:`, `BAD:`, `GOOD:`, `LINT:` no longer falsely flagged as code. Removed colon from code detection pattern and added `expect_lint:` to special markers
+- **`prefer_capitalized_comment_start` false positive** (v4): Continuation comments on consecutive lines no longer flagged for lowercase start
+- **`prefer_explicit_type_arguments` false positives** (v6): Empty collections (`[]`, `{}`) with types inferred from context (return type, variable declaration) are no longer flagged
+- **`avoid_variable_shadowing` config name mismatch**: Fixed `avoid_shadowing` → `avoid_variable_shadowing` in `custom_lint.yaml` and `analysis_options_template.yaml` to match the actual rule name
+- **`verify_documented_parameters_exist` offset bug** (v3): Rule reported lints at wrong source offset when non-doc-comment lines (e.g. `// expect_lint:`) appeared between `///` doc comment lines. Fixed by iterating per-token instead of using joined string offset
+- **Unfulfilled `expect_lint` errors**: Enabled `avoid_nested_assignments`, `avoid_variable_shadowing`, and `verify_documented_parameters_exist` in example `analysis_options.yaml` so fixture `expect_lint` annotations are satisfied
+
+---
+## [4.14.1]
+
+### Changed
+
+- **Roadmap summary bars inverted**: Bars now show completion (0 remaining = full green bar) instead of remaining count, making progress more intuitive
+- **DX Message Quality label padding**: Widened impact label column from 10 to 12 chars so "Opinionated" aligns correctly
+- **Removed duplicate `_make_progress_bar`**: Consolidated with identical `_make_bar` function in rule metrics
+
+### Added
+
+- **Unit test coverage for 10 rule categories** (1256 tests): Behavior documentation tests for `widget_patterns` (101 rules), `code_quality` (100 rules), `ios` (89 rules), `widget_layout` (73 rules), `security` (53 rules), `async` (46 rules), `bloc` (52 rules), `riverpod` (37 rules), `provider` (27 rules), and `firebase` (25 rules) — covering fixture verification and expected trigger/no-trigger patterns
+- **Unit test coverage metric** in publish workflow: New `display_unit_test_coverage` report shows per-category test file status alongside the existing fixture coverage metric
 - **Structured JSON violation export** (`reports/.saropa_lints/violations.json`): Machine-readable export of all lint violations written alongside the markdown report after each analysis run. Enables Saropa Log Capture to cross-reference runtime errors with static analysis findings. Schema v1.0 includes per-violation OWASP mappings, correction messages, impact levels, severity, plus aggregate `issuesByFile`, `issuesByRule`, `ruleSeverities`, `enabledRuleNames`, `disabledPackages`, `userExclusions`, and `batchCount`
 - **`VIOLATION_EXPORT_API.md`**: Exhaustive API reference for the structured JSON export schema — field types, sort order, OWASP ID tables, consumer notes, and full examples
 - **`correction` field on `ViolationRecord`**: Carries `LintCode.correctionMessage` through the batch pipeline into both the markdown report and JSON export
@@ -232,8 +280,8 @@ Dates are not included in version headers — [pub.dev](https://pub.dev/packages
 
 - **`avoid_nested_assignments` reduced false positives on arrow function bodies**: Rule now skips `ExpressionFunctionBody` parents — `setState(() => _field = value)` and other arrow functions whose sole body is an assignment are no longer flagged. The arrow syntax `() => x = value` is semantically equivalent to `() { x = value; }`, which was already correctly skipped. Also downgraded severity from WARNING to INFO.
 - **`require_intl_currency_format` reduced false positives on non-currency interpolations**: The `StringInterpolation` handler used `node.toSource()` to check for currency symbols, but every interpolated string's source representation contains `$` (Dart's interpolation syntax), causing `r'$'` in `_currencySymbols` to always match. This made the rule flag any `toStringAsFixed()` inside a string interpolation — compass bearings, GPS coordinates, temperatures, percentages, etc. — as manual currency formatting. The fix checks only the literal text segments (`InterpolationString.value`) for currency symbols, consistent with how the `BinaryExpression` handler already works.
-- **`prefer_implicit_boolean_comparison` reduced false positives on nullable booleans**: Rule now checks the static type of the left operand and only fires when it is non-nullable `bool`. Previously the rule flagged `== true` / `== false` on `bool?` operands, where the explicit comparison is semantically necessary — removing it either causes a compile error or changes runtime behaviour (treating `null` the same as `false`). This also resolves a conflict with the sibling rule `prefer_explicit_boolean_comparison`, which recommends `== true` for nullable booleans.
-- **`prefer_stream_distinct` reduced false positives**: Three fixes — (1) rule now skips `Stream<void>` and `Stream<Null>` where `.distinct()` would suppress all events after the first (breaks `Stream.periodic` timers and signal-only streams like Isar's `watchLazy()`); (2) chain detection now walks the full method invocation chain instead of only checking the immediate parent, so `stream.distinct().map(f).listen(...)` is correctly recognised as already having `.distinct()`; (3) replaced string-based type matching (`getDisplayString().contains('Stream')`) with proper `InterfaceType` checking to avoid false matches on non-stream types.
+- **`prefer_implicit_boolean_comparison` reduced false positives on nullable booleans**: Rule now checks the static type of the left operand and only fires when it is non-nullable `bool`. Previously the rule flagged `== true` / `== false` on `bool?` operands, where the explicit comparison is semantically necessary — removing it either causes a compile error or changes runtime behavior (treating `null` the same as `false`). This also resolves a conflict with the sibling rule `prefer_explicit_boolean_comparison`, which recommends `== true` for nullable booleans.
+- **`prefer_stream_distinct` reduced false positives**: Three fixes — (1) rule now skips `Stream<void>` and `Stream<Null>` where `.distinct()` would suppress all events after the first (breaks `Stream.periodic` timers and signal-only streams like Isar's `watchLazy()`); (2) chain detection now walks the full method invocation chain instead of only checking the immediate parent, so `stream.distinct().map(f).listen(...)` is correctly recognized as already having `.distinct()`; (3) replaced string-based type matching (`getDisplayString().contains('Stream')`) with proper `InterfaceType` checking to avoid false matches on non-stream types.
 - **`prefer_edgeinsets_symmetric` reduced false positives**: Detection logic now matches the quick-fix validation — the rule no longer fires on `EdgeInsets.only()` calls that have a symmetric pair (e.g. `top == bottom`) but also contain an unpaired side (e.g. `right` without `left`) or a non-symmetric axis (e.g. `top != bottom`), since `EdgeInsets.symmetric()` cannot express these cases without chaining `.copyWith()`.
 
 ---
@@ -241,8 +289,8 @@ Dates are not included in version headers — [pub.dev](https://pub.dev/packages
 
 ### Fixed
 
-- **`require_did_update_widget_check` reduced false positives**: Rule now recognises function-based comparisons (`listEquals`, `setEquals`, `mapEquals`, `identical`, `DeepCollectionEquality().equals`) as valid property-change checks. Previously the regex only matched `oldWidget` adjacent to `!=`/`==` operators, so standard Flutter collection comparisons were falsely flagged.
-- **`prefer_const_widgets_in_lists` reduced false positives**: Two fixes — (1) rule now verifies list elements are actually `Widget` subclasses instead of treating any `InstanceCreationExpression` as a widget, eliminating false positives on `List<Color>`, `List<Offset>`, `List<EdgeInsets>`, and other non-widget types with const constructors; (2) rule now recognises implicitly const lists inside `static const` fields, `const` variable declarations, enum bodies, annotations, and const constructor calls, instead of only checking for an explicit `const` keyword on the list literal itself.
+- **`require_did_update_widget_check` reduced false positives**: Rule now recognizes function-based comparisons (`listEquals`, `setEquals`, `mapEquals`, `identical`, `DeepCollectionEquality().equals`) as valid property-change checks. Previously the regex only matched `oldWidget` adjacent to `!=`/`==` operators, so standard Flutter collection comparisons were falsely flagged.
+- **`prefer_const_widgets_in_lists` reduced false positives**: Two fixes — (1) rule now verifies list elements are actually `Widget` subclasses instead of treating any `InstanceCreationExpression` as a widget, eliminating false positives on `List<Color>`, `List<Offset>`, `List<EdgeInsets>`, and other non-widget types with const constructors; (2) rule now recognizes implicitly const lists inside `static const` fields, `const` variable declarations, enum bodies, annotations, and const constructor calls, instead of only checking for an explicit `const` keyword on the list literal itself.
 - **`avoid_positioned_outside_stack` / `avoid_table_cell_outside_table` / `avoid_spacer_in_wrap` reduced false positives in builder callbacks**: `_findWidgetAncestor` now treats named-parameter callbacks (e.g. `BlocBuilder.builder`, `StreamBuilder.builder`, `Builder.builder`, `LayoutBuilder.builder`) as indeterminate boundaries. Previously the AST walk crossed callback boundaries and incorrectly flagged widgets whose runtime parent depends on the call site, not the builder widget itself. Also applied the same fix to the inline ancestor walk in `avoid_flex_child_outside_flex`.
 
 ---
@@ -292,7 +340,7 @@ Dates are not included in version headers — [pub.dev](https://pub.dev/packages
 
 ### Fixed
 
-- **`avoid_async_call_in_sync_function` reduced false positives**: Five improvements: (1) exempts `cancel()` and `close()` calls in lifecycle methods (`dispose()`, `didUpdateWidget()`, `deactivate()`) — these synchronous overrides cannot be made async, and subscription/controller cleanup is the standard idiomatic pattern; (2) recognises `.ignore()` as an explicit fire-and-forget chain alongside `.then()`, `.catchError()`, and `.whenComplete()`; (3) exempts `StreamController.close()` inside `onDone`/`onError` callbacks, which are `void Function()` and cannot use await; (4) walks through transparent expression wrappers (`ParenthesizedExpression`, `PostfixExpression`) to correctly detect handled Futures like `(asyncCall())` passed to argument lists; (5) refactored visitor into `_shouldReport()` for clarity. Added test fixture with BAD and GOOD cases covering `unawaited()`, lifecycle cleanup, `.ignore()` chains, and void callbacks.
+- **`avoid_async_call_in_sync_function` reduced false positives**: Five improvements: (1) exempts `cancel()` and `close()` calls in lifecycle methods (`dispose()`, `didUpdateWidget()`, `deactivate()`) — these synchronous overrides cannot be made async, and subscription/controller cleanup is the standard idiomatic pattern; (2) recognizes `.ignore()` as an explicit fire-and-forget chain alongside `.then()`, `.catchError()`, and `.whenComplete()`; (3) exempts `StreamController.close()` inside `onDone`/`onError` callbacks, which are `void Function()` and cannot use await; (4) walks through transparent expression wrappers (`ParenthesizedExpression`, `PostfixExpression`) to correctly detect handled Futures like `(asyncCall())` passed to argument lists; (5) refactored visitor into `_shouldReport()` for clarity. Added test fixture with BAD and GOOD cases covering `unawaited()`, lifecycle cleanup, `.ignore()` chains, and void callbacks.
 
 - **`avoid_late_for_nullable` reduced false positives**: Exempts `late final` fields with inline initializers (e.g. `late final Stream<bool>? _stream = _init()`). The `late` keyword provides lazy evaluation in this pattern — the initializer runs on first access, so `LateInitializationError` is impossible. The nullable return type carries semantic meaning and should not be flagged.
 
@@ -300,7 +348,7 @@ Dates are not included in version headers — [pub.dev](https://pub.dev/packages
 
 - **`avoid_unbounded_constraints` reduced false positives**: Three improvements: (1) checks only direct children for `Expanded`/`Flexible` via AST instead of string-matching the entire nested subtree, eliminating false positives on parent Columns that contain nested Rows with `Expanded`; (2) scroll-direction-aware — only flags when the widget axis matches the scroll axis (e.g. `Row` with `Expanded` in a vertical `SingleChildScrollView` is no longer flagged); (3) constraint widget detection (`ConstrainedBox`/`SizedBox`/`Container`) now only counts widgets between the Column/Row and the scroll view, not above it.
 
-- **`avoid_positioned_outside_stack` now recognises `Stack` subclasses**: The rule previously only matched the exact types `Stack` and `IndexedStack` by name. Widgets that extend `Stack` (e.g. `Indexer` from `package:indexed`) triggered a false positive. The rule now uses the analyzer type hierarchy (`allSupertypes`) to accept any subclass of `Stack` as a valid parent.
+- **`avoid_positioned_outside_stack` now recognizes `Stack` subclasses**: The rule previously only matched the exact types `Stack` and `IndexedStack` by name. Widgets that extend `Stack` (e.g. `Indexer` from `package:indexed`) triggered a false positive. The rule now uses the analyzer type hierarchy (`allSupertypes`) to accept any subclass of `Stack` as a valid parent.
 
 - **Platform-aware filtering for keyboard/focus/hover rules**: `avoid_gesture_only_interactions`, `require_focus_indicator`, and `avoid_hover_only` now respect the project's `platforms:` configuration. These rules enforce desktop/web-specific patterns (keyboard alternatives, focus indicators, hover alternatives) and are auto-disabled for mobile-only projects where they produced false positives. Also corrected `require_focus_indicator` tier grouping — moved from Recommended to Professional in `webPlatformRules` to match its actual tier assignment.
 

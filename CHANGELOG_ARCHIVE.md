@@ -3428,7 +3428,7 @@ The original `avoid_context_in_static_methods` rule has been refined into a tier
 
 #### Disposal & Cleanup Rules (1 rule)
 
-- **`require_stream_subscription_cancel`**: Warns when StreamSubscription field is not cancelled in dispose() - memory leak risk
+- **`require_stream_subscription_cancel`**: Warns when StreamSubscription field is not canceled in dispose() - memory leak risk
 
 #### Async Safety Rules (5 rules)
 
@@ -4487,7 +4487,7 @@ The original `avoid_context_in_static_methods` rule has been refined into a tier
 
 ### Added
 
-- `require_timer_cancellation` - New dedicated rule for Timer and StreamSubscription fields that require `cancel()`. Separated from `require_dispose` for clearer semantics. Crashes can occur if uncancelled timers call setState after widget disposal.
+- `require_timer_cancellation` - New dedicated rule for Timer and StreamSubscription fields that require `cancel()`. Separated from `require_dispose` for clearer semantics. Crashes can occur if uncanceled timers call setState after widget disposal.
 - `nullify_after_dispose` - New rule that suggests setting nullable disposable fields to null after disposal (e.g., `_timer = null` after `_timer?.cancel()`). Helps garbage collection and prevents accidental reuse.
 
 ### Changed

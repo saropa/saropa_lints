@@ -212,8 +212,8 @@ def main() -> None:
     if not auto_rerun:
         answer = input("  Re-run all failed workflows? [y/N] ").strip().lower()
         if answer != "y":
-            print_info("Cancelled.")
-            sys.exit(ExitCode.USER_CANCELLED.value)
+            print_info("Canceled.")
+            sys.exit(ExitCode.USER_CANCELED.value)
 
     triggered = _rerun(failed_runs)
     if not triggered:

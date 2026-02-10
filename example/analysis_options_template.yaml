@@ -1065,7 +1065,7 @@ custom_lint:
     - avoid_unnecessary_late_fields: false
     - avoid_unnecessary_local_late: false
     - avoid_global_state: false
-    - avoid_shadowing: false
+    - avoid_variable_shadowing: false
     - avoid_generics_shadowing: false
     - avoid_similar_names: false
     - avoid_unused_assignment: false
