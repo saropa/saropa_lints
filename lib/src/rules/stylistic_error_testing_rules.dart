@@ -21,6 +21,8 @@ import '../saropa_lint_rule.dart';
 
 /// Warns when generic Exception is thrown instead of specific type.
 ///
+/// Since: v2.7.0 | Updated: v4.13.0 | Rule version: v2
+///
 /// This is an **opinionated rule** - not included in any tier by default.
 ///
 /// **Pros of specific exceptions:**
@@ -56,7 +58,7 @@ class PreferSpecificExceptionsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_specific_exceptions',
     problemMessage:
-        '[prefer_specific_exceptions] A generic Exception is thrown instead of a domain-specific type. Generic exceptions prevent callers from catching specific failures and limit targeted error recovery; define and throw a custom exception class.',
+        '[prefer_specific_exceptions] A generic Exception is thrown instead of a domain-specific type. Generic exceptions prevent callers from catching specific failures and limit targeted error recovery; define and throw a custom exception class. {v2}',
     correctionMessage:
         'Create a custom exception class so callers can catch specific failures and provide targeted error recovery.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -81,6 +83,8 @@ class PreferSpecificExceptionsRule extends SaropaLintRule {
 }
 
 /// Warns when specific exceptions are used instead of generic (opposite).
+///
+/// Since: v4.13.0 | Rule version: v1
 ///
 /// This is an **opinionated rule** - not included in any tier by default.
 ///
@@ -116,7 +120,7 @@ class PreferGenericExceptionRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_generic_exception',
     problemMessage:
-        '[prefer_generic_exception] Custom exception classes add boilerplate without proportional benefit. Use generic Exception to keep error handling simple.',
+        '[prefer_generic_exception] Custom exception classes add boilerplate without proportional benefit. Use generic Exception to keep error handling simple. {v1}',
     correctionMessage:
         'Replace the custom exception with Exception to reduce class boilerplate while still conveying the error message.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -148,6 +152,8 @@ class PreferGenericExceptionRule extends SaropaLintRule {
 }
 
 /// Warns when custom exception classes don't end with Exception suffix.
+///
+/// Since: v4.1.0 | Updated: v4.13.0 | Rule version: v2
 ///
 /// This is an **opinionated rule** - not included in any tier by default.
 ///
@@ -183,7 +189,7 @@ class PreferExceptionSuffixRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_exception_suffix',
     problemMessage:
-        '[prefer_exception_suffix] Exception classes missing the "Exception" suffix are harder to identify as throwable types during code review and IDE search.',
+        '[prefer_exception_suffix] Exception classes missing the "Exception" suffix are harder to identify as throwable types during code review and IDE search. {v2}',
     correctionMessage:
         'Rename the class to end with "Exception" so it is immediately recognizable as a throwable type in code and search results.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -220,6 +226,8 @@ class PreferExceptionSuffixRule extends SaropaLintRule {
 
 /// Warns when Error suffix is preferred over Exception (opposite).
 ///
+/// Since: v4.1.0 | Updated: v4.13.0 | Rule version: v2
+///
 /// This is an **opinionated rule** - not included in any tier by default.
 ///
 /// **Pros of Error suffix:**
@@ -252,7 +260,7 @@ class PreferErrorSuffixRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_error_suffix',
     problemMessage:
-        '[prefer_error_suffix] The "Exception" suffix is verbose and inconsistent with Dart core types like StateError and ArgumentError. Use "Error" for brevity.',
+        '[prefer_error_suffix] The "Exception" suffix is verbose and inconsistent with Dart core types like StateError and ArgumentError. Use "Error" for brevity. {v2}',
     correctionMessage:
         'Rename the class to end with "Error" instead of "Exception" to align with Dart core naming conventions and reduce verbosity.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -287,6 +295,8 @@ class PreferErrorSuffixRule extends SaropaLintRule {
 }
 
 /// Warns when `on SpecificException` is preferred over bare `catch (e)`.
+///
+/// Since: v4.13.0 | Rule version: v1
 ///
 /// This is an **opinionated rule** - not included in any tier by default.
 ///
@@ -332,7 +342,7 @@ class PreferOnOverCatchRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_on_over_catch',
     problemMessage:
-        '[prefer_on_over_catch] A bare "catch" clause catches all exception types indiscriminately, which can mask unexpected errors and hinder targeted recovery. Use "on ExceptionType" to restrict handling to known failures.',
+        '[prefer_on_over_catch] A bare "catch" clause catches all exception types indiscriminately, which can mask unexpected errors and hinder targeted recovery. Use "on ExceptionType" to restrict handling to known failures. {v1}',
     correctionMessage:
         'Add an "on ExceptionType" clause to catch only expected failures and let unexpected errors propagate to the caller.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -354,6 +364,8 @@ class PreferOnOverCatchRule extends SaropaLintRule {
 }
 
 /// Warns when bare catch is preferred over on clause (opposite).
+///
+/// Since: v2.7.0 | Updated: v4.13.0 | Rule version: v3
 ///
 /// This is an **opinionated rule** - not included in any tier by default.
 ///
@@ -397,7 +409,7 @@ class PreferCatchOverOnRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_catch_over_on',
     problemMessage:
-        '[prefer_catch_over_on] Typed "on" clauses add complexity and risk missing unexpected exception types. A bare catch ensures no failure goes unhandled.',
+        '[prefer_catch_over_on] Typed "on" clauses add complexity and risk missing unexpected exception types. A bare catch ensures no failure goes unhandled. {v3}',
     correctionMessage:
         'Replace the "on ExceptionType" clause with a bare "catch (e)" to simplify error handling and ensure all exceptions are caught.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -465,6 +477,8 @@ class _RemoveOnClauseFix extends DartFix {
 
 /// Warns when tests don't use Given/When/Then or Arrange/Act/Assert comments.
 ///
+/// Since: v4.13.0 | Rule version: v1
+///
 /// This is an **opinionated rule** - not included in any tier by default.
 ///
 /// **Pros of test structure comments:**
@@ -512,7 +526,7 @@ class PreferGivenWhenThenCommentsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_given_when_then_comments',
     problemMessage:
-        '[prefer_given_when_then_comments] Test body has three or more statements but lacks structural comments. Without Arrange/Act/Assert or Given/When/Then markers, readers must infer the setup, action, and verification phases. Add phase comments for clarity.',
+        '[prefer_given_when_then_comments] Test body has three or more statements but lacks structural comments. Without Arrange/Act/Assert or Given/When/Then markers, readers must infer the setup, action, and verification phases. Add phase comments for clarity. {v1}',
     correctionMessage:
         'Add "// Arrange", "// Act", "// Assert" (or Given/When/Then) comments to delineate setup, execution, and verification phases.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -560,6 +574,8 @@ class PreferGivenWhenThenCommentsRule extends SaropaLintRule {
 
 /// Warns when AAA/GWT comments are used (prefer self-documenting tests).
 ///
+/// Since: v4.13.0 | Rule version: v1
+///
 /// This is an **opinionated rule** - not included in any tier by default.
 ///
 /// **Pros of self-documenting tests:**
@@ -604,7 +620,7 @@ class PreferSelfDocumentingTestsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_self_documenting_tests',
     problemMessage:
-        '[prefer_self_documenting_tests] Structure comments like Arrange/Act/Assert add noise to well-written tests. Self-documenting code with clear variable names and assertions is more maintainable.',
+        '[prefer_self_documenting_tests] Structure comments like Arrange/Act/Assert add noise to well-written tests. Self-documenting code with clear variable names and assertions is more maintainable. {v1}',
     correctionMessage:
         'Remove the structure comments and use descriptive variable names and focused assertions to make the test self-documenting.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -649,6 +665,8 @@ class PreferSelfDocumentingTestsRule extends SaropaLintRule {
 
 /// Warns when expect() is not used in tests (using assert instead).
 ///
+/// Since: v4.9.7 | Updated: v4.13.0 | Rule version: v3
+///
 /// This is an **opinionated rule** - not included in any tier by default.
 ///
 /// **Pros of expect():**
@@ -692,7 +710,7 @@ class PreferExpectOverAssertInTestsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_expect_over_assert_in_tests',
     problemMessage:
-        '[prefer_expect_over_assert_in_tests] An assert() call was found in test code. Assertions are silently skipped in release mode and provide poor failure messages; use expect() with matchers instead for reliable and descriptive test failures.',
+        '[prefer_expect_over_assert_in_tests] An assert() call was found in test code. Assertions are silently skipped in release mode and provide poor failure messages; use expect() with matchers instead for reliable and descriptive test failures. {v3}',
     correctionMessage:
         'Use expect() for assertions in tests. Example: expect(user.name, "John"). This provides better error messages and matchers than assert.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -716,6 +734,8 @@ class PreferExpectOverAssertInTestsRule extends SaropaLintRule {
 }
 
 /// Warns when tests have multiple logical assertions.
+///
+/// Since: v2.7.0 | Updated: v4.13.0 | Rule version: v4
 ///
 /// This is an **opinionated rule** - not included in any tier by default.
 ///
@@ -767,7 +787,7 @@ class PreferSingleExpectationPerTestRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_single_expectation_per_test',
     problemMessage:
-        '[prefer_single_expectation_per_test] Test contains multiple logical assertions that verify unrelated behaviors. This is an opinionated rule - not included in any tier by default.',
+        '[prefer_single_expectation_per_test] Test contains multiple logical assertions that verify unrelated behaviors. This is an opinionated rule - not included in any tier by default. {v4}',
     correctionMessage:
         'Split into multiple focused tests, each verifying one behavior, so failures pinpoint exactly which expectation broke.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -821,6 +841,8 @@ class PreferSingleExpectationPerTestRule extends SaropaLintRule {
 
 /// Warns when tests should have multiple grouped expectations (opposite).
 ///
+/// Since: v4.13.0 | Rule version: v1
+///
 /// This is an **opinionated rule** - not included in any tier by default.
 ///
 /// **Pros of grouped expectations:**
@@ -869,7 +891,7 @@ class PreferGroupedExpectationsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_grouped_expectations',
     problemMessage:
-        '[prefer_grouped_expectations] Isolating every assertion into its own test duplicates setup logic and inflates the test suite. Group related assertions to reduce boilerplate.',
+        '[prefer_grouped_expectations] Isolating every assertion into its own test duplicates setup logic and inflates the test suite. Group related assertions to reduce boilerplate. {v1}',
     correctionMessage:
         'Combine related assertions into a single test to share setup logic, reduce duplication, and keep the test suite concise.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -924,6 +946,8 @@ class PreferGroupedExpectationsRule extends SaropaLintRule {
 
 /// Warns when test names don't follow "should X when Y" pattern.
 ///
+/// Since: v4.9.11 | Updated: v4.13.0 | Rule version: v2
+///
 /// This is an **opinionated rule** - not included in any tier by default.
 ///
 /// **Pros of should/when pattern:**
@@ -960,7 +984,7 @@ class PreferTestNameShouldWhenRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_test_name_should_when',
     problemMessage:
-        '[prefer_test_name_should_when] Test name does not follow the "should X when Y" pattern, making it harder to understand the expected behavior and triggering condition at a glance. Restructure as "should [behavior] when [condition]".',
+        '[prefer_test_name_should_when] Test name does not follow the "should X when Y" pattern, making it harder to understand the expected behavior and triggering condition at a glance. Restructure as "should [behavior] when [condition]". {v2}',
     correctionMessage:
         "Rename the test to follow the should-when pattern: test('should [behavior] when [condition]', ...) for clarity.",
     errorSeverity: DiagnosticSeverity.INFO,
@@ -994,6 +1018,8 @@ class PreferTestNameShouldWhenRule extends SaropaLintRule {
 }
 
 /// Warns when descriptive test names are preferred over should/when (opposite).
+///
+/// Since: v4.13.0 | Rule version: v1
 ///
 /// This is an **opinionated rule** - not included in any tier by default.
 ///
@@ -1029,7 +1055,7 @@ class PreferTestNameDescriptiveRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_test_name_descriptive',
     problemMessage:
-        '[prefer_test_name_descriptive] Test name is not descriptive. Rigid patterns make test failures harder to diagnose and understand. This is an opinionated rule - not included in any tier by default.',
+        '[prefer_test_name_descriptive] Test name is not descriptive. Rigid patterns make test failures harder to diagnose and understand. This is an opinionated rule - not included in any tier by default. {v1}',
     correctionMessage:
         'Use natural, descriptive test names that explain the behavior being tested. Example: test("user can authenticate with valid credentials").',
     errorSeverity: DiagnosticSeverity.INFO,

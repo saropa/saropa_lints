@@ -26,6 +26,8 @@ const Set<String> _textFieldTypes = <String>{
 
 /// Warns when AutovalidateMode.always is used.
 ///
+/// Since: v1.5.0 | Updated: v4.13.0 | Rule version: v3
+///
 /// AutovalidateMode.always validates on every keystroke, which shows
 /// error messages immediately before the user finishes typing. This is
 /// a poor UX. Use onUserInteraction instead.
@@ -60,7 +62,7 @@ class PreferAutovalidateOnInteractionRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_autovalidate_on_interaction',
     problemMessage:
-        '[prefer_autovalidate_on_interaction] AutovalidateMode.always triggers form validation on every keystroke and widget rebuild. This causes visible input lag as validators run continuously, fires excessive error messages before the user finishes typing, and degrades the user experience with distracting red error text that appears immediately on empty fields.',
+        '[prefer_autovalidate_on_interaction] AutovalidateMode.always triggers form validation on every keystroke and widget rebuild. This causes visible input lag as validators run continuously, fires excessive error messages before the user finishes typing, and degrades the user experience with distracting red error text that appears immediately on empty fields. {v3}',
     correctionMessage:
         'Use AutovalidateMode.onUserInteraction to defer validation until the user interacts with the field, reducing input lag and preventing premature error display.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -113,6 +115,8 @@ class _ChangeToOnUserInteractionFix extends DartFix {
 
 /// Warns when email or phone fields use the wrong keyboard type.
 ///
+/// Since: v1.5.0 | Updated: v4.13.0 | Rule version: v3
+///
 /// Using the correct keyboardType improves UX by showing relevant keys.
 /// Email fields should show @ and .com, phone fields should show numbers.
 ///
@@ -152,7 +156,7 @@ class RequireKeyboardTypeRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_keyboard_type',
     problemMessage:
-        '[require_keyboard_type] Text field label suggests email or phone input but no keyboardType is specified. Without TextInputType.emailAddress or TextInputType.phone, users see a generic text keyboard lacking the @ key, .com shortcut, or numeric layout. This causes input errors, slows data entry, and hurts accessibility for users who rely on specialized keyboard layouts.',
+        '[require_keyboard_type] Text field label suggests email or phone input but no keyboardType is specified. Without TextInputType.emailAddress or TextInputType.phone, users see a generic text keyboard lacking the @ key, .com shortcut, or numeric layout. This causes input errors, slows data entry, and hurts accessibility for users who rely on specialized keyboard layouts. {v3}',
     correctionMessage:
         'Add keyboardType: TextInputType.emailAddress for email fields or TextInputType.phone for phone number fields to show the appropriate keyboard layout.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -248,6 +252,8 @@ class RequireKeyboardTypeRule extends SaropaLintRule {
 
 /// Warns when Text widget lacks overflow handling inside Row.
 ///
+/// Since: v1.5.0 | Updated: v4.13.0 | Rule version: v3
+///
 /// Text without overflow handling can cause layout overflow errors when
 /// the text is longer than available space. Always specify overflow
 /// behavior for dynamic text content in horizontal layouts.
@@ -287,7 +293,7 @@ class RequireTextOverflowInRowRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_text_overflow_in_row',
     problemMessage:
-        '[require_text_overflow_in_row] Text child element inside a Row build tree has no overflow handling. When text content exceeds the available width, Flutter renders yellow and black diagonal overflow stripes that break the visual layout. Users see unreadable, clipped content with an ugly error indicator instead of gracefully truncated or wrapped text.',
+        '[require_text_overflow_in_row] Text child element inside a Row build tree has no overflow handling. When text content exceeds the available width, Flutter renders yellow and black diagonal overflow stripes that break the visual layout. Users see unreadable, clipped content with an ugly error indicator instead of gracefully truncated or wrapped text. {v3}',
     correctionMessage:
         'Add overflow: TextOverflow.ellipsis to the Text widget, or wrap it in an Expanded or Flexible widget to constrain its width within the Row layout.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -344,6 +350,8 @@ class RequireTextOverflowInRowRule extends SaropaLintRule {
 
 /// Warns when password field doesn't use obscureText.
 ///
+/// Since: v1.5.0 | Updated: v4.13.0 | Rule version: v3
+///
 /// Password fields should obscure input to prevent shoulder surfing.
 /// Not using obscureText exposes passwords on screen.
 ///
@@ -375,7 +383,7 @@ class RequireSecureKeyboardRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_secure_keyboard',
     problemMessage:
-        '[require_secure_keyboard] Password field detected without obscureText: true. The password is displayed as plain text on screen, exposing credentials to shoulder surfing attacks in public spaces. Nearby observers can read the password directly from the display, compromising user account security and violating OWASP M1 credential protection guidelines.',
+        '[require_secure_keyboard] Password field detected without obscureText: true. The password is displayed as plain text on screen, exposing credentials to shoulder surfing attacks in public spaces. Nearby observers can read the password directly from the display, compromising user account security and violating OWASP M1 credential protection guidelines. {v3}',
     correctionMessage:
         'Add obscureText: true to the TextField or TextFormField to mask password characters and protect user credentials from visual exposure on screen.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -501,6 +509,8 @@ class _AddObscureTextFix extends DartFix {
 
 /// Warns when form validation error messages lack context.
 ///
+/// Since: v1.6.0 | Updated: v4.13.0 | Rule version: v3
+///
 /// Generic error messages like "Invalid input" or "Required field" are
 /// unhelpful. Include the field name and what's expected.
 ///
@@ -536,7 +546,7 @@ class RequireErrorMessageContextRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_error_message_context',
     problemMessage:
-        '[require_error_message_context] Form validation returns a generic error message without explaining what the user did wrong or how to fix it. Vague messages like "Invalid" or "Required" frustrate users, increase form abandonment rates, and fail accessibility standards that require specific, actionable error feedback to help users correct their input.',
+        '[require_error_message_context] Form validation returns a generic error message without explaining what the user did wrong or how to fix it. Vague messages like "Invalid" or "Required" frustrate users, increase form abandonment rates, and fail accessibility standards that require specific, actionable error feedback to help users correct their input. {v3}',
     correctionMessage:
         'Replace generic messages with field-specific guidance: use "Email address format is invalid" instead of "Invalid" or "Phone number is required" instead of "Required".',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -599,6 +609,8 @@ class RequireErrorMessageContextRule extends SaropaLintRule {
 
 /// Warns when Form widget doesn't have a GlobalKey.
 ///
+/// Since: v1.7.2 | Updated: v4.13.0 | Rule version: v2
+///
 /// Alias: require_form_global_key
 ///
 /// Forms without GlobalKey can't call validate() or save(). The FormState
@@ -636,7 +648,7 @@ class RequireFormKeyRule extends SaropaLintRule {
     name: 'require_form_key',
     problemMessage:
         '[require_form_key] Without GlobalKey, validate() and save() calls '
-        'fail because FormState cannot be accessed.',
+        'fail because FormState cannot be accessed. {v2}',
     correctionMessage:
         'Add key: _formKey where _formKey = GlobalKey<FormState>()',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -671,6 +683,8 @@ class RequireFormKeyRule extends SaropaLintRule {
 }
 
 /// Warns when complex validation logic is in build method.
+///
+/// Since: v1.7.0 | Updated: v4.13.0 | Rule version: v3
 ///
 /// Complex validation (regex, API calls) in validator runs on every
 /// keystroke. Debounce or validate on submit only.
@@ -714,7 +728,7 @@ class AvoidValidationInBuildRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_validation_in_build',
     problemMessage:
-        '[avoid_validation_in_build] Complex or async validation running inside build() executes on every keystroke and widget rebuild. This causes visible input lag as network calls fire per character, floods the backend API with excessive requests, degrades performance with unnecessary widget rebuilds, and frustrates users who see delayed responses while typing in form fields.',
+        '[avoid_validation_in_build] Complex or async validation running inside build() executes on every keystroke and widget rebuild. This causes visible input lag as network calls fire per character, floods the backend API with excessive requests, degrades performance with unnecessary widget rebuilds, and frustrates users who see delayed responses while typing in form fields. {v3}',
     correctionMessage:
         'Move complex validation logic to the form onSubmit handler, or use a debounce mechanism to delay validation until the user pauses typing for a set interval.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -763,6 +777,8 @@ class _ValidatorVisitor extends RecursiveAstVisitor<void> {
 
 /// Warns when submit buttons don't show loading state during submission.
 ///
+/// Since: v1.7.2 | Updated: v4.13.0 | Rule version: v2
+///
 /// Submit buttons should disable during submission and show loading
 /// indicator. Prevents double-submit and shows progress.
 ///
@@ -800,7 +816,7 @@ class RequireSubmitButtonStateRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_submit_button_state',
     problemMessage:
-        '[require_submit_button_state] Submit button with an async onPressed handler lacks a loading state guard. Without disabling the button during submission, users can tap repeatedly and trigger duplicate network connection requests, duplicate database writes, and duplicate payment transactions. Each extra tap fires another async operation, wasting server memory and bandwidth while producing confusing duplicate entries.',
+        '[require_submit_button_state] Submit button with an async onPressed handler lacks a loading state guard. Without disabling the button during submission, users can tap repeatedly and trigger duplicate network connection requests, duplicate database writes, and duplicate payment transactions. Each extra tap fires another async operation, wasting server memory and bandwidth while producing confusing duplicate entries. {v2}',
     correctionMessage:
         'Add a boolean loading state flag and set onPressed: _isLoading ? null : _submit to disable the button during async submission.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -838,6 +854,8 @@ class RequireSubmitButtonStateRule extends SaropaLintRule {
 
 /// Warns when forms don't unfocus after submission.
 ///
+/// Since: v1.7.2 | Updated: v4.13.0 | Rule version: v2
+///
 /// Forms should unfocus (FocusScope.of(context).unfocus()) on submit.
 /// Keyboard staying open after submit feels broken.
 ///
@@ -873,7 +891,7 @@ class AvoidFormWithoutUnfocusRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_form_without_unfocus',
     problemMessage:
-        '[avoid_form_without_unfocus] Form submission handler does not call unfocus() before processing. The on-screen keyboard stays open after submission, blocking the success message, navigation, or dialog that confirms the action to the user. This creates a confusing experience where users cannot see feedback and may repeatedly tap the submit button.',
+        '[avoid_form_without_unfocus] Form submission handler does not call unfocus() before processing. The on-screen keyboard stays open after submission, blocking the success message, navigation, or dialog that confirms the action to the user. This creates a confusing experience where users cannot see feedback and may repeatedly tap the submit button. {v2}',
     correctionMessage:
         'Add FocusScope.of(context).unfocus() at the beginning of the submit handler to dismiss the keyboard before showing any success feedback or navigation.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -909,6 +927,8 @@ class AvoidFormWithoutUnfocusRule extends SaropaLintRule {
 
 /// Warns when long forms don't use state restoration.
 ///
+/// Since: v1.7.2 | Updated: v4.13.0 | Rule version: v2
+///
 /// Long forms should survive app backgrounding. Use RestorationMixin
 /// or persist draft state to avoid losing user input.
 ///
@@ -943,7 +963,7 @@ class RequireFormRestorationRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_form_restoration',
     problemMessage:
-        '[require_form_restoration] Form with 5+ TextEditingController fields lacks RestorationMixin. When the operating system kills the app in the background to reclaim memory, all user input is permanently lost. Users who spent time filling out a lengthy form return to find every field empty and must re-enter all data from scratch.',
+        '[require_form_restoration] Form with 5+ TextEditingController fields lacks RestorationMixin. When the operating system kills the app in the background to reclaim memory, all user input is permanently lost. Users who spent time filling out a lengthy form return to find every field empty and must re-enter all data from scratch. {v2}',
     correctionMessage:
         'Add RestorationMixin to the State class and use RestorableTextEditingController fields, or persist draft state to SharedPreferences to prevent data loss.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -1001,6 +1021,8 @@ class RequireFormRestorationRule extends SaropaLintRule {
 
 /// Warns when forms clear input on validation error.
 ///
+/// Since: v1.7.2 | Updated: v4.13.0 | Rule version: v2
+///
 /// Clearing fields when validation fails forces users to re-enter
 /// everything. Preserve input and highlight errors.
 ///
@@ -1036,7 +1058,7 @@ class AvoidClearingFormOnErrorRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_clearing_form_on_error',
     problemMessage:
-        '[avoid_clearing_form_on_error] Form fields are cleared when validation fails, destroying all user input. Users lose their partially-correct data and must re-enter everything from scratch. This frustrating pattern increases form abandonment, wastes user time, and creates a hostile experience that drives users away from completing the form submission.',
+        '[avoid_clearing_form_on_error] Form fields are cleared when validation fails, destroying all user input. Users lose their partially-correct data and must re-enter everything from scratch. This frustrating pattern increases form abandonment, wastes user time, and creates a hostile experience that drives users away from completing the form submission. {v2}',
     correctionMessage:
         'Preserve all form field values when validation fails. Only highlight the specific fields with errors and show inline error messages to guide the user in correcting their input.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -1069,6 +1091,8 @@ class AvoidClearingFormOnErrorRule extends SaropaLintRule {
 }
 
 /// Warns when TextFormField has neither controller nor onSaved.
+///
+/// Since: v1.7.2 | Updated: v4.13.0 | Rule version: v2
 ///
 /// TextFormField without controller loses value on rebuild. Either
 /// use controller or onSaved, but be consistent.
@@ -1106,7 +1130,7 @@ class RequireFormFieldControllerRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_form_field_controller',
     problemMessage:
-        '[require_form_field_controller] TextFormField has no controller, onSaved, or initialValue. When the parent StatefulWidget triggers a rebuild via setState(), the field value is silently discarded because there is no mechanism to persist or retrieve the user input. This causes typed data to vanish unpredictably and forces users to re-enter their input repeatedly.',
+        '[require_form_field_controller] TextFormField has no controller, onSaved, or initialValue. When the parent StatefulWidget triggers a rebuild via setState(), the field value is silently discarded because there is no mechanism to persist or retrieve the user input. This causes typed data to vanish unpredictably and forces users to re-enter their input repeatedly. {v2}',
     correctionMessage:
         'Add controller: _controller to persist the value, or onSaved: (value) => _field = value to capture input on form save.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -1147,6 +1171,8 @@ class RequireFormFieldControllerRule extends SaropaLintRule {
 
 /// Warns when Form is used inside AlertDialog or SimpleDialog.
 ///
+/// Since: v1.7.2 | Updated: v4.13.0 | Rule version: v2
+///
 /// Forms in dialogs can lose state when dialog rebuilds. Consider
 /// using a separate StatefulWidget for the form content.
 ///
@@ -1184,7 +1210,7 @@ class AvoidFormInAlertDialogRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_form_in_alert_dialog',
     problemMessage:
-        '[avoid_form_in_alert_dialog] Form placed directly inside AlertDialog loses all field values, validation state, and user input when the dialog rebuilds due to a parent setState() or keyboard appearance. Because the dialog builder creates a new Form on each build call, there is no StatefulWidget to preserve form state across rebuilds, producing a frustrating experience where typed data disappears.',
+        '[avoid_form_in_alert_dialog] Form placed directly inside AlertDialog loses all field values, validation state, and user input when the dialog rebuilds due to a parent setState() or keyboard appearance. Because the dialog builder creates a new Form on each build call, there is no StatefulWidget to preserve form state across rebuilds, producing a frustrating experience where typed data disappears. {v2}',
     correctionMessage:
         'Extract the form content into a dedicated StatefulWidget class and use that as the dialog content to preserve form state reliably.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -1217,6 +1243,8 @@ class AvoidFormInAlertDialogRule extends SaropaLintRule {
 
 /// Warns when TextField or TextFormField lacks textInputAction parameter.
 ///
+/// Since: v1.8.2 | Updated: v4.13.0 | Rule version: v2
+///
 /// The textInputAction parameter controls the keyboard action button
 /// (e.g., Next, Done). This improves form navigation and UX.
 ///
@@ -1247,7 +1275,7 @@ class RequireKeyboardActionTypeRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_keyboard_action_type',
     problemMessage:
-        '[require_keyboard_action_type] Text field must have textInputAction to improve UX. The textInputAction parameter controls the keyboard action button (e.g., Next, Done). This improves form navigation and UX.',
+        '[require_keyboard_action_type] Text field must have textInputAction to improve UX. The textInputAction parameter controls the keyboard action button (e.g., Next, Done). This improves form navigation and UX. {v2}',
     correctionMessage:
         'Add textInputAction: TextInputAction.next or TextInputAction.done. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -1289,6 +1317,8 @@ class RequireKeyboardActionTypeRule extends SaropaLintRule {
 
 /// Warns when scroll views lack keyboardDismissBehavior parameter.
 ///
+/// Since: v1.8.2 | Updated: v4.13.0 | Rule version: v2
+///
 /// ScrollViews containing text fields should specify how the keyboard
 /// dismisses when the user scrolls. This provides better UX for forms
 /// in scrollable content.
@@ -1320,7 +1350,7 @@ class RequireKeyboardDismissOnScrollRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_keyboard_dismiss_on_scroll',
     problemMessage:
-        '[require_keyboard_dismiss_on_scroll] Scroll view must have keyboardDismissBehavior for form UX. ScrollViews containing text fields should specify how the keyboard dismisses when the user scrolls. This provides better UX for forms in scrollable content.',
+        '[require_keyboard_dismiss_on_scroll] Scroll view must have keyboardDismissBehavior for form UX. ScrollViews containing text fields should specify how the keyboard dismisses when the user scrolls. This provides better UX for forms in scrollable content. {v2}',
     correctionMessage:
         'Add keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -1363,6 +1393,8 @@ class RequireKeyboardDismissOnScrollRule extends SaropaLintRule {
 }
 
 /// Warns when TextField at bottom of screen doesn't handle keyboard overlap.
+///
+/// Since: v2.3.5 | Updated: v4.13.0 | Rule version: v5
 ///
 /// When keyboard appears, TextFields at the bottom can be hidden.
 /// Use viewInsets or resizeToAvoidBottomInset to handle this.
@@ -1418,7 +1450,7 @@ class AvoidKeyboardOverlapRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_keyboard_overlap',
     problemMessage:
-        '[avoid_keyboard_overlap] TextField may be hidden behind the soft keyboard when no viewInsets handling is detected. Users cannot see what they are typing, leading to input errors, frustration, and accessibility failures on devices where the keyboard covers a large portion of the screen.',
+        '[avoid_keyboard_overlap] TextField may be hidden behind the soft keyboard when no viewInsets handling is detected. Users cannot see what they are typing, leading to input errors, frustration, and accessibility failures on devices where the keyboard covers a large portion of the screen. {v5}',
     correctionMessage:
         'Wrap the form content in a SingleChildScrollView, or use MediaQuery.viewInsets.bottom to add padding that keeps the focused TextField visible.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -1565,6 +1597,8 @@ class _AddKeyboardHandlingCommentFix extends DartFix {
 
 /// Warns when Form widget doesn't have autovalidateMode parameter.
 ///
+/// Since: v2.3.7 | Updated: v4.13.0 | Rule version: v2
+///
 /// Forms should specify how validation is triggered for consistent UX.
 /// The autovalidateMode parameter controls when the form fields validate.
 ///
@@ -1599,7 +1633,7 @@ class RequireFormAutoValidateModeRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_form_auto_validate_mode',
     problemMessage:
-        '[require_form_auto_validate_mode] Form should specify autovalidateMode for consistent UX. Forms should specify how validation is triggered for consistent UX. The autovalidateMode parameter controls when the form fields validate.',
+        '[require_form_auto_validate_mode] Form should specify autovalidateMode for consistent UX. Forms should specify how validation is triggered for consistent UX. The autovalidateMode parameter controls when the form fields validate. {v2}',
     correctionMessage:
         'Add autovalidateMode: AutovalidateMode.onUserInteraction. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -1676,6 +1710,8 @@ class _AddAutoValidateModeFix extends DartFix {
 
 /// Warns when TextField or TextFormField lacks autofillHints parameter.
 ///
+/// Since: v2.3.7 | Updated: v4.13.0 | Rule version: v2
+///
 /// The autofillHints parameter enables system autofill to help users complete
 /// forms faster. This improves UX especially for common fields like email,
 /// password, name, and address.
@@ -1709,7 +1745,7 @@ class RequireAutofillHintsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_autofill_hints',
     problemMessage:
-        '[require_autofill_hints] Form field must have autofillHints to improve user experience. The autofillHints parameter enables system autofill to help users complete forms faster. This improves UX especially for common fields like email, password, name, and address.',
+        '[require_autofill_hints] Form field must have autofillHints to improve user experience. The autofillHints parameter enables system autofill to help users complete forms faster. This improves UX especially for common fields like email, password, name, and address. {v2}',
     correctionMessage:
         'Add autofillHints: [AutofillHints.email] or appropriate hint. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -1750,6 +1786,8 @@ class RequireAutofillHintsRule extends SaropaLintRule {
 
 /// Warns when form fields lack onFieldSubmitted handler.
 ///
+/// Since: v2.3.7 | Updated: v4.13.0 | Rule version: v3
+///
 /// The onFieldSubmitted callback is triggered when the user presses the
 /// keyboard action button (e.g., Done, Next). This should be used to move
 /// focus to the next field or submit the form for better UX.
@@ -1785,7 +1823,7 @@ class PreferOnFieldSubmittedRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_on_field_submitted',
     problemMessage:
-        '[prefer_on_field_submitted] Form field must have onFieldSubmitted to handle keyboard action. This callback fires when the user presses the keyboard action button (e.g., Done, Next). Add it to move focus to the next field or submit the form for a smooth keyboard-driven workflow.',
+        '[prefer_on_field_submitted] Form field must have onFieldSubmitted to handle keyboard action. This callback fires when the user presses the keyboard action button (e.g., Done, Next). Add it to move focus to the next field or submit the form for a smooth keyboard-driven workflow. {v3}',
     correctionMessage:
         'Add onFieldSubmitted: (_) => nextFocusNode.requestFocus() or submit. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -1829,6 +1867,8 @@ class PreferOnFieldSubmittedRule extends SaropaLintRule {
 
 /// Warns when TextField is missing keyboardType.
 ///
+/// Since: v2.3.10 | Updated: v4.13.0 | Rule version: v2
+///
 /// Alias: keyboard_type, text_input_type
 ///
 /// Setting the appropriate keyboardType improves user experience by showing
@@ -1861,7 +1901,7 @@ class RequireTextInputTypeRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_text_input_type',
     problemMessage:
-        '[require_text_input_type] TextField without keyboardType. Users may see wrong keyboard. Setting the appropriate keyboardType improves user experience by showing the right keyboard layout for the expected input.',
+        '[require_text_input_type] TextField without keyboardType. Users may see wrong keyboard. Setting the appropriate keyboardType improves user experience by showing the right keyboard layout for the expected input. {v2}',
     correctionMessage:
         'Add keyboardType parameter for appropriate keyboard layout. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -1886,6 +1926,8 @@ class RequireTextInputTypeRule extends SaropaLintRule {
 }
 
 /// Warns when TextField is missing textInputAction.
+///
+/// Since: v2.3.10 | Updated: v4.13.0 | Rule version: v2
 ///
 /// Alias: input_action, keyboard_action
 ///
@@ -1919,7 +1961,7 @@ class PreferTextInputActionRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_text_input_action',
     problemMessage:
-        '[prefer_text_input_action] TextField without textInputAction. Keyboard action button unclear. Setting textInputAction helps users navigate forms efficiently with the keyboard action button (Done, Next, Search, etc.).',
+        '[prefer_text_input_action] TextField without textInputAction. Keyboard action button unclear. Setting textInputAction helps users navigate forms efficiently with the keyboard action button (Done, Next, Search, etc.). {v2}',
     correctionMessage:
         'Add textInputAction (e.g., TextInputAction.next or .done). Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -1944,6 +1986,8 @@ class PreferTextInputActionRule extends SaropaLintRule {
 }
 
 /// Warns when `GlobalKey<FormState>` is created inside build().
+///
+/// Since: v2.3.10 | Updated: v4.13.0 | Rule version: v2
 ///
 /// Alias: form_key_in_build, global_key_in_build
 ///
@@ -1984,7 +2028,7 @@ class RequireFormKeyInStatefulWidgetRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_form_key_in_stateful_widget',
     problemMessage:
-        '[require_form_key_in_stateful_widget] GlobalKey<FormState> created inside the build() method is re-instantiated on every widget rebuild triggered by setState(). Each rebuild creates a new key, causing the form to lose all current field values, validation state, and user input. This produces a frustrating user experience where typed data disappears unpredictably during state changes.',
+        '[require_form_key_in_stateful_widget] GlobalKey<FormState> created inside the build() method is re-instantiated on every widget rebuild triggered by setState(). Each rebuild creates a new key, causing the form to lose all current field values, validation state, and user input. This produces a frustrating user experience where typed data disappears unpredictably during state changes. {v2}',
     correctionMessage:
         'Declare the GlobalKey<FormState> as a field in the State class rather than inside build(). State class fields persist across rebuilds and preserve form data.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -2017,6 +2061,8 @@ class RequireFormKeyInStatefulWidgetRule extends SaropaLintRule {
 // =============================================================================
 
 /// Warns when form fields use basic validators instead of regex patterns.
+///
+/// Since: v4.2.0 | Updated: v4.13.0 | Rule version: v2
 ///
 /// Alias: regex_validator, pattern_validation
 ///
@@ -2069,7 +2115,7 @@ class PreferRegexValidationRule extends SaropaLintRule {
     name: 'prefer_regex_validation',
     problemMessage:
         '[prefer_regex_validation] Form field with basic empty check but label '
-        'suggests structured data (email/phone/url). Use regex validation.',
+        'suggests structured data (email/phone/url). Use regex validation. {v2}',
     correctionMessage:
         'Add regex pattern validation for the field type (email, phone, URL, etc.).',
     errorSeverity: DiagnosticSeverity.INFO,

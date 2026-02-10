@@ -18,12 +18,14 @@ Standard linters see valid Dart code. saropa_lints understands Hive's requiremen
 | Unencrypted sensitive data | Security vulnerability | `prefer_hive_encryption` |
 | Hardcoded encryption key | Key extractable from APK | `require_hive_encryption_key_secure` |
 | Missing adapter registration | Runtime crash | `require_type_adapter_registration` |
+| Missing web subdirectory | Data conflicts on web | `require_hive_web_subdirectory` |
 | Large data in regular box | Memory bloat | `prefer_lazy_box_for_large` |
 | Database not closed | Resource leak | `require_hive_database_close` |
 | Missing field default value | Null errors on migration | `require_hive_field_default_value` |
 | Wrong adapter registration order | Runtime crash | `require_hive_adapter_registration_order` |
 | Missing nested object adapter | Runtime crash | `require_hive_nested_object_adapter` |
 | Duplicate box names | Data corruption | `avoid_hive_box_name_collision` |
+| Sync ops in build/initState | UI thread blocked | `avoid_hive_synchronous_in_ui` |
 
 ## What saropa_lints Catches
 
@@ -364,6 +366,7 @@ dart run custom_lint
 | `require_hive_nested_object_adapter` | essential | Nested objects missing @HiveType |
 | `avoid_hive_box_name_collision` | essential | Same box name used for different types |
 | `prefer_hive_value_listenable` | professional | setState after Hive changes instead of box.listenable() (v2.6.0) |
+| `avoid_hive_synchronous_in_ui` | essential | Sync Hive ops in build/initState blocking UI (v4.12.0) |
 
 ## Common Patterns
 

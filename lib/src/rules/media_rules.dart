@@ -15,6 +15,8 @@ import '../saropa_lint_rule.dart';
 
 /// Warns when autoPlay: true is set on audio/video players.
 ///
+/// Since: v1.7.9 | Updated: v4.13.0 | Rule version: v3
+///
 /// Autoplaying audio is blocked on iOS/web and annoying to users.
 /// Require explicit user interaction to start playback.
 ///
@@ -44,7 +46,7 @@ class AvoidAutoplayAudioRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_autoplay_audio',
     problemMessage:
-        '[avoid_autoplay_audio] Autoplay is blocked on iOS/web and annoys users. Autoplaying audio is blocked on iOS/web and annoying to users. Require explicit user interaction to start playback.',
+        '[avoid_autoplay_audio] Autoplay is blocked on iOS/web and annoys users. Autoplaying audio is blocked on iOS/web and annoying to users. Require explicit user interaction to start playback. {v3}',
     correctionMessage:
         'Set autoPlay: false and require user interaction to play. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -105,6 +107,8 @@ class _DisableAutoplayFix extends DartFix {
 
 /// Warns when CameraController is created without explicit resolution preset.
 ///
+/// Since: v2.1.0 | Updated: v4.13.0 | Rule version: v2
+///
 /// Camera resolution affects performance, battery, and storage.
 /// Always specify the desired resolution for your use case.
 ///
@@ -134,7 +138,7 @@ class PreferCameraResolutionSelectionRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_camera_resolution_selection',
     problemMessage:
-        '[prefer_camera_resolution_selection] CameraController with max resolution. Prefer app-specific needs. Camera resolution affects performance, battery, and storage. Always specify the desired resolution for your use case.',
+        '[prefer_camera_resolution_selection] CameraController with max resolution. Prefer app-specific needs. Camera resolution affects performance, battery, and storage. Always specify the desired resolution for your use case. {v2}',
     correctionMessage:
         'Use ResolutionPreset.medium for video calls, .high for photos. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -170,6 +174,8 @@ class PreferCameraResolutionSelectionRule extends SaropaLintRule {
 
 /// Warns when AudioPlayer is used without audio session configuration.
 ///
+/// Since: v2.1.0 | Updated: v4.13.0 | Rule version: v2
+///
 /// Audio session determines how your app interacts with other audio.
 /// Without configuration, audio may behave unexpectedly.
 ///
@@ -199,7 +205,7 @@ class PreferAudioSessionConfigRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_audio_session_config',
     problemMessage:
-        '[prefer_audio_session_config] AudioPlayer used without audio session config. May conflict with other audio. Audio session determines how your app interacts with other audio. Without configuration, audio may behave unexpectedly.',
+        '[prefer_audio_session_config] AudioPlayer used without audio session config. May conflict with other audio. Audio session determines how your app interacts with other audio. Without configuration, audio may behave unexpectedly. {v2}',
     correctionMessage:
         'Configure AudioSession.instance before playing audio. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,

@@ -29,12 +29,13 @@
 /// Map format (without `-`) is silently ignored by custom_lint!
 library;
 
-import 'dart:io' show Directory, File;
+import 'dart:io' show Directory, File, Platform, stderr;
 
 import 'package:custom_lint_builder/custom_lint_builder.dart';
 
 import 'package:saropa_lints/src/baseline/baseline_config.dart';
 import 'package:saropa_lints/src/baseline/baseline_manager.dart';
+import 'package:saropa_lints/src/report/analysis_reporter.dart';
 import 'package:saropa_lints/src/rules/all_rules.dart';
 import 'package:saropa_lints/src/saropa_lint_rule.dart';
 import 'package:saropa_lints/src/tiers.dart';
@@ -2214,6 +2215,7 @@ final List<LintRule Function()> _allRuleFactories = <LintRule Function()>[
 
   // Firebase rules (firebase_rules.dart)
   RequireFirestoreIndexRule.new,
+  RequireFirebaseCompositeIndexRule.new,
 
   // Notification rules (notification_rules.dart)
   PreferNotificationGroupingRule.new,
@@ -2409,6 +2411,33 @@ final List<LintRule Function()> _allRuleFactories = <LintRule Function()>[
   AvoidX11OnlyAssumptionsRule.new,
   RequireLinuxFontFallbackRule.new,
   AvoidSudoShellCommandsRule.new,
+
+  // ROADMAP ⭐ Rules (new batch)
+  AvoidContextDependencyInCallbackRule.new,
+  AvoidDatetimeComparisonWithoutPrecisionRule.new,
+  AvoidGetxStaticGetRule.new,
+  AvoidMissingInterpolationRule.new,
+  AvoidProviderListenFalseInBuildRule.new,
+  PreferSpringAnimationRule.new,
+  RequireNavigationResultHandlingRule.new,
+  AvoidHiveSynchronousInUiRule.new,
+  RequireSemanticColorsRule.new,
+  PreferAvatarLoadingPlaceholderRule.new,
+
+  // ROADMAP 🚨 Rules (Essential - ERROR severity)
+  PreferCorrectPackageNameRule.new,
+  AvoidGetxBuildContextBypassRule.new,
+  AvoidPermissionHandlerNullSafetyRule.new,
+  AvoidRetainingDisposedWidgetsRule.new,
+  RequireSecureKeyGenerationRule.new,
+  RequireHiveWebSubdirectoryRule.new,
+
+  // v4.14.0 - GitHub issue rules
+  AvoidBlockingMainThreadRule.new,
+  RequireLogLevelForProductionRule.new,
+  RequireFeatureFlagTypeSafetyRule.new,
+  RequireAnalyticsEventNamingRule.new,
+  RequireTimezoneDisplayRule.new,
 ];
 
 // =============================================================================
@@ -2501,13 +2530,14 @@ class _SaropaLints extends PluginBase {
     }
 
     // =========================================================================
-    // ISSUE LIMIT CONFIGURATION
+    // ANALYSIS CONFIGURATION
     // =========================================================================
-    // Configure maximum issues to report before stopping detailed tracking.
-    // Read from analysis_options_custom.yaml in project root:
-    //   max_issues: 500  # default: 1000, 0 = unlimited
-    // This file is read directly (not via custom_lint config).
-    _loadMaxIssuesConfig();
+    // Load max_issues and output mode from env vars or yaml config.
+    // Priority: env var > analysis_options_custom.yaml > default.
+    _loadAnalysisConfig();
+
+    // Log active configuration so users know what's happening
+    _logActiveConfig();
 
     // =========================================================================
     // PERFORMANCE INFRASTRUCTURE INITIALIZATION
@@ -2678,6 +2708,13 @@ class _SaropaLints extends PluginBase {
     // Tell progress tracker how many rules are active
     ProgressTracker.setEnabledRuleCount(filteredRules.length);
 
+    // Capture analysis config for the report header
+    _captureReportConfig(
+      effectiveTier: effectiveTier,
+      enabledRuleNames: enabledRuleNames,
+      configs: configs,
+    );
+
     return filteredRules;
   }
 
@@ -2700,6 +2737,167 @@ class _SaropaLints extends PluginBase {
     }
     return 'custom';
   }
+}
+
+/// Capture analysis config snapshot for the report header.
+///
+/// Reads platform/package settings from `analysis_options_custom.yaml`
+/// and combines with the resolved tier, enabled rules, and user
+/// exclusions from [configs].
+void _captureReportConfig({
+  required String effectiveTier,
+  required Set<String> enabledRuleNames,
+  required CustomLintConfigs configs,
+}) {
+  // Collect explicitly disabled rules from the YAML config
+  final userExclusions = <String>[];
+  for (final entry in configs.rules.entries) {
+    if (entry.key == 'saropa_lints') continue;
+    if (!entry.value.enabled) {
+      userExclusions.add(entry.key);
+    }
+  }
+  userExclusions.sort();
+
+  // Read platform/package settings from custom yaml
+  final customSettings = _parseCustomYamlSettings();
+
+  AnalysisReporter.setAnalysisConfig(ReportConfig(
+    version: saropaLintsVersion,
+    effectiveTier: effectiveTier,
+    enabledRuleCount: enabledRuleNames.length,
+    enabledRuleNames: enabledRuleNames.toList()..sort(),
+    enabledPlatforms: customSettings.enabledPlatforms,
+    disabledPlatforms: customSettings.disabledPlatforms,
+    enabledPackages: customSettings.enabledPackages,
+    disabledPackages: customSettings.disabledPackages,
+    userExclusions: userExclusions,
+    maxIssues: ProgressTracker.maxIssues,
+    outputMode: ProgressTracker.isFileOnly ? 'file' : 'both',
+  ));
+
+  // Build OWASP lookup map for the structured JSON export.
+  // Iterates all rule factories once to extract OWASP mappings.
+  AnalysisReporter.setOwaspLookup(_buildOwaspLookup());
+}
+
+/// Build a map from rule name to OWASP mapping for all registered rules.
+///
+/// Iterates all rule factories once at config time. Rules without OWASP
+/// mappings are omitted from the map.
+Map<String, OwaspMapping> _buildOwaspLookup() {
+  final lookup = <String, OwaspMapping>{};
+  for (final factory in _allRuleFactories) {
+    final rule = factory();
+    if (rule is SaropaLintRule) {
+      final owasp = rule.owasp;
+      if (owasp != null && owasp.isNotEmpty) {
+        lookup[rule.code.name] = owasp;
+      }
+    }
+  }
+  return lookup;
+}
+
+/// Parsed platform and package settings from custom YAML.
+class _CustomYamlSettings {
+  const _CustomYamlSettings({
+    required this.enabledPlatforms,
+    required this.disabledPlatforms,
+    required this.enabledPackages,
+    required this.disabledPackages,
+  });
+
+  final List<String> enabledPlatforms;
+  final List<String> disabledPlatforms;
+  final List<String> enabledPackages;
+  final List<String> disabledPackages;
+}
+
+/// Parse platform and package settings from `analysis_options_custom.yaml`.
+_CustomYamlSettings _parseCustomYamlSettings() {
+  const empty = _CustomYamlSettings(
+    enabledPlatforms: [],
+    disabledPlatforms: [],
+    enabledPackages: [],
+    disabledPackages: [],
+  );
+
+  try {
+    final configFile = File(_customYamlPath);
+    if (!configFile.existsSync()) return empty;
+
+    final content = configFile.readAsStringSync();
+    final enabledPlatforms = <String>[];
+    final disabledPlatforms = <String>[];
+    final enabledPackages = <String>[];
+    final disabledPackages = <String>[];
+
+    _parseYamlSection(
+      content: content,
+      sectionName: 'platforms',
+      onEntry: (name, enabled) {
+        (enabled ? enabledPlatforms : disabledPlatforms).add(name);
+      },
+    );
+
+    _parseYamlSection(
+      content: content,
+      sectionName: 'packages',
+      onEntry: (name, enabled) {
+        (enabled ? enabledPackages : disabledPackages).add(name);
+      },
+    );
+
+    return _CustomYamlSettings(
+      enabledPlatforms: enabledPlatforms,
+      disabledPlatforms: disabledPlatforms,
+      enabledPackages: enabledPackages,
+      disabledPackages: disabledPackages,
+    );
+  } catch (e) {
+    // ignore: avoid_print
+    print('[saropa_lints] Failed to parse analysis_options_custom.yaml: $e');
+    return empty;
+  }
+}
+
+/// Parse a YAML section of `key: true/false` entries indented under
+/// [sectionName].
+void _parseYamlSection({
+  required String content,
+  required String sectionName,
+  required void Function(String name, bool enabled) onEntry,
+}) {
+  // Match "sectionName:" then capture indented "key: true/false" lines
+  final escaped = RegExp.escape(sectionName);
+  final sectionPattern = RegExp(
+    '^$escaped:\\s*\$',
+    multiLine: true,
+  );
+  final match = sectionPattern.firstMatch(content);
+  if (match == null) return;
+
+  final lines = content.substring(match.end).split('\n');
+  for (final line in lines) {
+    // Stop at next non-indented, non-empty, non-comment line
+    if (line.trim().isEmpty || line.trimLeft().startsWith('#')) continue;
+    if (!line.startsWith('  ')) break;
+
+    final entryMatch = RegExp(r'^\s+(\w+):\s*(true|false)').firstMatch(line);
+    if (entryMatch != null) {
+      final name = entryMatch.group(1)!;
+      final enabled = entryMatch.group(2) == 'true';
+      onEntry(name, enabled);
+    }
+  }
+}
+
+/// Resolve `analysis_options_custom.yaml` against the current working
+/// directory so the path is absolute rather than CWD-relative.
+String get _customYamlPath {
+  final sep = Platform.pathSeparator;
+  return '${Directory.current.path}${sep}analysis_options_custom.yaml';
 }
 
 /// Conflicting rule pairs that should not be enabled together.
@@ -2737,30 +2935,99 @@ void _checkConflictingRules(List<LintRule> enabledRules) {
   }
 }
 
-/// Load max_issues config from analysis_options_custom.yaml.
+/// Load analysis configuration from environment variables and yaml.
 ///
-/// Reads directly from the project's custom config file:
-/// ```yaml
-/// # In analysis_options_custom.yaml
-/// max_issues: 500  # Limit warning/info tracking (errors always tracked)
+/// Reads two settings:
+/// - `max_issues` — cap on Problems tab (default 500, 0 = unlimited)
+/// - `output` — `both` (default) or `file` (report log only)
+///
+/// Priority (highest wins):
+/// 1. Environment variables (`SAROPA_LINTS_MAX`, `SAROPA_LINTS_OUTPUT`)
+/// 2. `analysis_options_custom.yaml` root-level keys
+/// 3. Defaults
+///
+/// Examples:
+/// ```sh
+/// # One-off overrides via environment:
+/// SAROPA_LINTS_MAX=0 SAROPA_LINTS_OUTPUT=file dart run custom_lint
+///
+/// # Persistent config (analysis_options_custom.yaml):
+/// max_issues: 500
+/// output: both
 /// ```
-void _loadMaxIssuesConfig() {
-  try {
-    final customConfigFile = File('analysis_options_custom.yaml');
-    if (!customConfigFile.existsSync()) return;
+void _loadAnalysisConfig() {
+  var maxFromEnv = false;
+  var outputFromEnv = false;
 
-    final content = customConfigFile.readAsStringSync();
-    // Simple regex to extract max_issues value
-    // Matches: max_issues: 500 or max_issues:500
-    final match = RegExp(r'max_issues:\s*(\d+)').firstMatch(content);
-    if (match != null) {
-      final value = int.tryParse(match.group(1)!);
+  // Environment variables (highest priority)
+  try {
+    final envMax = Platform.environment['SAROPA_LINTS_MAX'];
+    if (envMax != null) {
+      final value = int.tryParse(envMax);
       if (value != null) {
         ProgressTracker.setMaxIssues(value);
+        maxFromEnv = true;
       }
     }
+
+    final envOutput = Platform.environment['SAROPA_LINTS_OUTPUT'];
+    if (envOutput != null) {
+      final normalized = envOutput.toLowerCase();
+      if (normalized == 'file' || normalized == 'both') {
+        ProgressTracker.setFileOnly(fileOnly: normalized == 'file');
+      }
+      outputFromEnv = true;
+    }
   } catch (_) {
-    // Silently ignore - use default if config can't be read
+    // Platform.environment may throw on some platforms
+  }
+
+  // Fall back to yaml for any settings not set by env vars
+  if (maxFromEnv && outputFromEnv) return;
+
+  try {
+    final configFile = File(_customYamlPath);
+    if (!configFile.existsSync()) return;
+
+    final content = configFile.readAsStringSync();
+
+    // Parse max_issues (root-level key only)
+    if (!maxFromEnv) {
+      final match =
+          RegExp(r'^max_issues:\s*(\d+)', multiLine: true).firstMatch(content);
+      if (match != null) {
+        final value = int.tryParse(match.group(1)!);
+        if (value != null) ProgressTracker.setMaxIssues(value);
+      }
+    }
+
+    // Parse output (root-level key only)
+    if (!outputFromEnv) {
+      final match =
+          RegExp(r'^output:\s*(\w+)', multiLine: true).firstMatch(content);
+      if (match != null && match.group(1)!.toLowerCase() == 'file') {
+        ProgressTracker.setFileOnly(fileOnly: true);
+      }
+    }
+  } catch (e) {
+    // ignore: avoid_print
+    print('[saropa_lints] Failed to read analysis_options_custom.yaml: $e');
+  }
+}
+
+/// Log the active analysis configuration to stderr so users know
+/// what the system is configured to do.
+void _logActiveConfig() {
+  final output = ProgressTracker.isFileOnly ? 'file' : 'both';
+  final max = ProgressTracker.maxIssues;
+  final maxLabel = max == 0 ? 'unlimited' : '$max';
+
+  if (ProgressTracker.isFileOnly) {
+    stderr.writeln('[saropa_lints] Output: file-only — '
+        'all violations go to report log, nothing in Problems tab.');
+  } else {
+    stderr.writeln('[saropa_lints] Output: $output — '
+        'Problems tab capped at $maxLabel, all issues in report log.');
   }
 }
 

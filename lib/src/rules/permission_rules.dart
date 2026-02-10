@@ -18,6 +18,8 @@ import '../saropa_lint_rule.dart';
 
 /// Warns when location permission is requested without showing rationale.
 ///
+/// Since: v4.2.0 | Updated: v4.13.0 | Rule version: v2
+///
 /// Alias: location_rationale, permission_explanation
 ///
 /// Explain why you need location before requesting. "Weather app needs location
@@ -64,7 +66,7 @@ class RequireLocationPermissionRationaleRule extends SaropaLintRule {
     name: 'require_location_permission_rationale',
     problemMessage:
         '[require_location_permission_rationale] Location permission requested '
-        'without showing rationale. Users may deny without understanding why.',
+        'without showing rationale. Users may deny without understanding why. {v2}',
     correctionMessage:
         'Show a dialog explaining why location is needed before requesting.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -87,8 +89,10 @@ class RequireLocationPermissionRationaleRule extends SaropaLintRule {
       if (target == null) return;
 
       final String targetSource = target.toSource();
-      if (!targetSource.contains('location') &&
-          !targetSource.contains('Location')) {
+      // Match specific permission enum values, not any class with "location"
+      if (targetSource != 'Permission.location' &&
+          targetSource != 'Permission.locationAlways' &&
+          targetSource != 'Permission.locationWhenInUse') {
         return;
       }
 
@@ -108,13 +112,11 @@ class RequireLocationPermissionRationaleRule extends SaropaLintRule {
 
       final String bodySource = functionBody.toSource();
 
-      // Check for rationale patterns
+      // Check for rationale patterns using specific function/class names
       if (bodySource.contains('showDialog') ||
           bodySource.contains('AlertDialog') ||
           bodySource.contains('showModalBottomSheet') ||
           bodySource.contains('SnackBar') ||
-          bodySource.contains('rationale') ||
-          bodySource.contains('explanation') ||
           bodySource.contains('shouldShowRationale') ||
           bodySource.contains('shouldShowRequestRationale')) {
         return; // Has rationale
@@ -130,6 +132,8 @@ class RequireLocationPermissionRationaleRule extends SaropaLintRule {
 // =============================================================================
 
 /// Warns when camera is accessed without permission check.
+///
+/// Since: v4.2.0 | Updated: v4.13.0 | Rule version: v3
 ///
 /// Alias: camera_permission, check_camera_access
 ///
@@ -180,7 +184,7 @@ class RequireCameraPermissionCheckRule extends SaropaLintRule {
     name: 'require_camera_permission_check',
     problemMessage:
         '[require_camera_permission_check] Camera initialized without permission '
-        'check. This crashes on iOS and throws on Android.',
+        'check. This crashes on iOS and throws on Android. {v3}',
     correctionMessage:
         'Request Permission.camera before creating CameraController.',
     errorSeverity: DiagnosticSeverity.ERROR,
@@ -211,7 +215,6 @@ class RequireCameraPermissionCheckRule extends SaropaLintRule {
           // Check the entire class for permission handling
           final String classSource = current.toSource();
           if (classSource.contains('Permission.camera') ||
-              classSource.contains('permission_handler') ||
               classSource.contains('.camera.request') ||
               classSource.contains('.camera.status') ||
               classSource.contains('requestCameraPermission') ||
@@ -276,8 +279,8 @@ class RequireCameraPermissionCheckRule extends SaropaLintRule {
       if (!bodySource.contains('Permission.camera') &&
           !bodySource.contains('.camera.request') &&
           !bodySource.contains('.camera.status') &&
-          !bodySource.contains('isGranted') &&
-          !bodySource.contains('checkPermission')) {
+          !bodySource.contains('checkCameraPermission') &&
+          !bodySource.contains('requestCameraPermission')) {
         reporter.atNode(node, code);
       }
     });
@@ -289,6 +292,8 @@ class RequireCameraPermissionCheckRule extends SaropaLintRule {
 // =============================================================================
 
 /// Warns when image picker is used for profile photos without cropping.
+///
+/// Since: v4.2.0 | Updated: v4.13.0 | Rule version: v2
 ///
 /// Alias: crop_profile_image, image_cropping
 ///
@@ -334,7 +339,7 @@ class PreferImageCroppingRule extends SaropaLintRule {
     name: 'prefer_image_cropping',
     problemMessage:
         '[prefer_image_cropping] Profile/avatar image picked without cropping. '
-        'Raw photos may have wrong aspect ratio for profile display.',
+        'Raw photos may have wrong aspect ratio for profile display. {v2}',
     correctionMessage:
         'Use ImageCropper to let users crop the image to the correct aspect ratio.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -405,6 +410,118 @@ class PreferImageCroppingRule extends SaropaLintRule {
       }
 
       reporter.atNode(node, code);
+    });
+  }
+}
+
+// =============================================================================
+// avoid_permission_handler_null_safety
+// =============================================================================
+
+/// Warns when deprecated permission_handler APIs from pre-null-safety versions
+///
+/// Since: v4.14.0 | Rule version: v2
+///
+/// are detected.
+///
+/// Alias: permission_handler_null_safety, outdated_permission_handler
+///
+/// Older permission_handler versions (pre-8.0) used deprecated API patterns
+/// like `PermissionHandler()` singleton and `checkPermissionStatus` method.
+/// These are removed in null-safe versions and cause compile errors.
+///
+/// **BAD:**
+/// ```dart
+/// final handler = PermissionHandler();
+/// var status = await handler.checkPermissionStatus(PermissionGroup.camera);
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// var status = await Permission.camera.status;
+/// if (!status.isGranted) {
+///   status = await Permission.camera.request();
+/// }
+/// ```
+class AvoidPermissionHandlerNullSafetyRule extends SaropaLintRule {
+  const AvoidPermissionHandlerNullSafetyRule() : super(code: _code);
+
+  /// Using deprecated APIs causes compile errors after migration.
+  @override
+  LintImpact get impact => LintImpact.critical;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  static const LintCode _code = LintCode(
+    name: 'avoid_permission_handler_null_safety',
+    problemMessage:
+        '[avoid_permission_handler_null_safety] Deprecated pre-null-safety '
+        'permission_handler API detected. The PermissionHandler() constructor '
+        'and PermissionGroup enum were removed in permission_handler 8.0+. '
+        'Using these deprecated APIs prevents migration to null-safe versions '
+        'and causes compile errors when updating the package. The modern API '
+        'uses Permission.camera.status and Permission.camera.request() instead. {v2}',
+    correctionMessage: 'Migrate to the null-safe permission_handler API: use '
+        'Permission.camera.status instead of '
+        'PermissionHandler().checkPermissionStatus(PermissionGroup.camera).',
+    errorSeverity: DiagnosticSeverity.ERROR,
+  );
+
+  /// Deprecated class names from pre-null-safety permission_handler
+  static const Set<String> _deprecatedClasses = <String>{
+    'PermissionHandler',
+    'PermissionGroup',
+    'ServiceStatus',
+  };
+
+  /// Deprecated method names from pre-null-safety permission_handler
+  static const Set<String> _deprecatedMethods = <String>{
+    'checkPermissionStatus',
+    'requestPermissions',
+    'checkServiceStatus',
+    'shouldShowRequestPermissionRationale',
+  };
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    // Detect deprecated constructor: PermissionHandler()
+    context.registry
+        .addInstanceCreationExpression((InstanceCreationExpression node) {
+      final String typeName = node.constructorName.type.name2.lexeme;
+      if (_deprecatedClasses.contains(typeName)) {
+        reporter.atNode(node, code);
+      }
+    });
+
+    // Detect deprecated method calls on PermissionHandler instances
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      final String methodName = node.methodName.name;
+      if (!_deprecatedMethods.contains(methodName)) return;
+
+      // Check if target is a PermissionHandler identifier or constructor
+      final Expression? target = node.target;
+      if (target == null) return;
+
+      if (target is SimpleIdentifier &&
+          _deprecatedClasses.contains(target.name)) {
+        reporter.atNode(node, code);
+      } else if (target is InstanceCreationExpression &&
+          _deprecatedClasses
+              .contains(target.constructorName.type.name2.lexeme)) {
+        reporter.atNode(node, code);
+      }
+    });
+
+    // Detect PermissionGroup enum usage
+    context.registry.addPrefixedIdentifier((PrefixedIdentifier node) {
+      if (node.prefix.name == 'PermissionGroup') {
+        reporter.atNode(node, code);
+      }
     });
   }
 }

@@ -1,7 +1,9 @@
 // ignore_for_file: always_specify_types, depend_on_referenced_packages, unused_element
 
+import 'dart:collection' show LinkedHashSet;
 import 'dart:developer' as developer;
 import 'dart:io' show Directory, File, Platform, stderr, stdout;
+import 'dart:math' show max;
 
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/token.dart';
@@ -13,6 +15,7 @@ import 'baseline/baseline_manager.dart';
 import 'ignore_fixes.dart';
 import 'ignore_utils.dart';
 import 'report/analysis_reporter.dart';
+import 'report/import_graph_tracker.dart';
 import 'owasp/owasp.dart';
 import 'project_context.dart';
 import 'tiers.dart' show essentialRules;
@@ -209,6 +212,14 @@ class ProgressTracker {
   static final Map<String, int> _issuesByRule = {};
   static final Map<String, String> _ruleSeverities = {}; // rule -> severity
 
+  // Per-file breakdown for accurate clearing on re-analysis
+  static final Map<String, Map<String, int>> _issuesByFileBySeverity = {};
+  static final Map<String, Map<String, int>> _issuesByFileByRule = {};
+
+  // Per-file dedup keys: 'ruleName:line' — prevents duplicate counting when
+  // the analyzer re-visits the same file without _clearFileData firing.
+  static final Map<String, Set<String>> _fileViolationKeys = {};
+
   // Rolling rate samples for more stable ETA (last N samples)
   static final List<double> _rateSamples = [];
   static const int _maxRateSamples = 5;
@@ -217,9 +228,18 @@ class ProgressTracker {
   static final Map<String, int> _slowFiles = {}; // file -> seconds
 
   // Issue limit tracking
-  static int _maxIssues = 1000; // Default limit (0 = unlimited)
+  static int _maxIssues = 500; // Default limit (0 = unlimited)
   static bool _limitReached = false;
-  static int _issuesAfterLimit = 0; // Count of issues we stopped tracking
+
+  // Abort tracking (triggered by .saropa_stop sentinel file)
+  static bool _abortRequested = false;
+
+  // Re-analysis detection: set when _clearFileData fires, indicating a
+  // previously-completed file is being analyzed again (new build/session).
+  static bool _hasReanalyzedFile = false;
+
+  // Output mode: when true, all violations go to report file only
+  static bool _fileOnly = false;
 
   // Total enabled rules (set from plugin entry point)
   static int _totalEnabledRules = 0;
@@ -229,21 +249,52 @@ class ProgressTracker {
     _totalEnabledRules = count;
   }
 
-  /// Set the maximum number of issues to report.
+  /// Set the maximum number of issues to show in the Problems tab.
   ///
-  /// Configure in `analysis_options_custom.yaml`:
-  /// ```yaml
-  /// max_issues: 500  # Stop after 500 issues (default: 1000, 0 = unlimited)
-  /// ```
+  /// After this limit, rules keep running but violations only go to the
+  /// report log. Set to 0 for unlimited Problems tab output.
   ///
-  /// Once the limit is reached, non-ERROR rules stop running entirely.
-  /// ERROR-severity rules always run to catch critical issues.
+  /// Configured via `SAROPA_LINTS_MAX` env var or `max_issues` in
+  /// `analysis_options_custom.yaml`. Default: 500.
   static void setMaxIssues(int limit) {
     _maxIssues = limit;
   }
 
+  /// The configured maximum issues for the Problems tab.
+  static int get maxIssues => _maxIssues;
+
   /// Returns true if issue limit has been reached.
   static bool get isLimitReached => _limitReached;
+
+  /// Returns true if abort was requested via `.saropa_stop` sentinel file.
+  static bool get isAbortRequested => _abortRequested;
+
+  /// Returns true if a previously-completed file has been re-analyzed,
+  /// indicating a new build/analysis session has started.
+  static bool get hasReanalyzedFile => _hasReanalyzedFile;
+
+  /// Clear the re-analysis flag after the reporter has acted on it.
+  static void clearReanalysisFlag() {
+    _hasReanalyzedFile = false;
+  }
+
+  /// Returns true if violations should go to the report file only,
+  /// not the Problems tab.
+  ///
+  /// Set via `SAROPA_LINTS_OUTPUT=file`. Default is `both`.
+  static bool get isFileOnly => _fileOnly;
+
+  /// Set the output mode.
+  static void setFileOnly({required bool fileOnly}) {
+    _fileOnly = fileOnly;
+  }
+
+  /// Whether violations should be sent to the Problems tab delegate.
+  ///
+  /// False when file-only mode is active, issue limit is reached, or
+  /// abort was requested.
+  static bool get shouldReportToProblems =>
+      !_fileOnly && !_limitReached && !_abortRequested;
 
   /// Interval between progress reports (in files or time).
   static const int _fileInterval = 10; // More frequent updates
@@ -291,15 +342,29 @@ class ProgressTracker {
   /// [severity] should be 'ERROR', 'WARNING', or 'INFO'
   /// [ruleName] is the lint rule that triggered
   ///
-  /// ERROR severity issues are ALWAYS fully tracked (no limit).
-  /// The limit only applies to WARNING/INFO to ensure critical issues
-  /// are never lost in favor of formatting nits.
-  static void recordViolation({String? severity, String? ruleName}) {
+  /// After [_maxIssues] non-ERROR issues, [isLimitReached] becomes true
+  /// which stops non-ERROR rules from running (performance safeguard)
+  /// and prevents diagnostics from reaching the Problems tab.
+  /// The report log captures all issues found up to the limit.
+  static void recordViolation({
+    String? severity,
+    String? ruleName,
+    int line = 0,
+  }) {
+    // Dedup: skip if this exact violation was already counted for this file.
+    // Prevents inflated counts when the analyzer re-visits a file without
+    // _clearFileData firing (consecutive re-analysis of the same file).
+    if (_currentFile != null && ruleName != null) {
+      final key = '$ruleName:$line';
+      final keys = _fileViolationKeys[_currentFile!] ??= {};
+      if (!keys.add(key)) return;
+    }
+
     _violationsFound++;
     final severityUpper = severity?.toUpperCase();
     final isError = severityUpper == 'ERROR';
 
-    // Track by severity (always counted, regardless of limit)
+    // Track by severity (always counted)
     switch (severityUpper) {
       case 'ERROR':
         _errorCount++;
@@ -309,31 +374,49 @@ class ProgressTracker {
         _infoCount++;
     }
 
-    // ERROR severity ALWAYS gets full tracking - critical issues never skipped
-    // Limit only applies to WARNING/INFO (formatting, style, etc.)
+    // Mark limit when non-ERROR count exceeds threshold. The reporter
+    // checks this flag to stop pushing diagnostics to the Problems tab.
     final nonErrorCount = _warningCount + _infoCount;
     if (!isError && _maxIssues > 0 && nonErrorCount > _maxIssues) {
       if (!_limitReached) {
         _limitReached = true;
+        stderr.writeln('');
+        stderr.writeln('[saropa_lints] $_maxIssues issues in Problems tab. '
+            'Remaining issues will be in the report only.');
+        stderr.writeln('[saropa_lints] Create .saropa_stop in project root '
+            'to abort analysis.');
       }
-      _issuesAfterLimit++;
-      return; // Skip detailed tracking for non-critical issues after limit
     }
 
-    // Track by file
+    _trackByFileAndRule(severityUpper, ruleName);
+  }
+
+  /// Track violation counts by file and by rule for report generation.
+  static void _trackByFileAndRule(String? severity, String? ruleName) {
     if (_currentFile != null) {
       _issuesByFile[_currentFile!] = (_issuesByFile[_currentFile!] ?? 0) + 1;
       if (_currentFile != _lastFileWithIssue) {
         _filesWithIssues++;
         _lastFileWithIssue = _currentFile;
       }
+
+      // Per-file severity breakdown (for accurate clearing on re-analysis)
+      if (severity != null) {
+        final fileSev = _issuesByFileBySeverity[_currentFile!] ??= {};
+        fileSev[severity] = (fileSev[severity] ?? 0) + 1;
+      }
     }
 
-    // Track by rule
     if (ruleName != null) {
       _issuesByRule[ruleName] = (_issuesByRule[ruleName] ?? 0) + 1;
-      if (severityUpper != null) {
-        _ruleSeverities[ruleName] = severityUpper;
+      if (severity != null) {
+        _ruleSeverities[ruleName] = severity;
+      }
+
+      // Per-file rule breakdown (for accurate clearing on re-analysis)
+      if (_currentFile != null) {
+        final fileRules = _issuesByFileByRule[_currentFile!] ??= {};
+        fileRules[ruleName] = (fileRules[ruleName] ?? 0) + 1;
       }
     }
   }
@@ -359,24 +442,19 @@ class ProgressTracker {
     // Check if this is a new file or we're still on the same file
     final wasNew = _seenFiles.add(path);
 
-    if (wasNew) {
-      // Track long-running files (> 2 seconds) for summary report
-      if (_currentFile != null && _currentFileStart != null) {
-        final fileTime = now.difference(_currentFileStart!);
-        if (fileTime.inSeconds >= 2) {
-          _slowFiles[_currentFile!] = fileTime.inSeconds;
-        }
-      }
-
+    // Detect file re-analysis: file was already fully processed but is
+    // now being analyzed again (e.g. user saved during active analysis).
+    // Clear stale violation data before recording new violations.
+    // Update _currentFile so subsequent rules for this file don't
+    // re-trigger _clearFileData and so _trackByFileAndRule attributes
+    // violations to the correct file.
+    if (!wasNew && path != _currentFile) {
+      _clearFileData(path);
       _currentFile = path;
-      _currentFileStart = now;
+    }
 
-      // Recalibrate ETA after seeing some files
-      // If we're seeing more files than expected, adjust upward
-      if (_etaCalibrated && _seenFiles.length > _totalExpectedFiles * 0.9) {
-        // Increase estimate by 20% if we're approaching the limit
-        _totalExpectedFiles = (_seenFiles.length * 1.2).round();
-      }
+    if (wasNew) {
+      _handleNewFile(path, now);
     }
 
     final fileCount = _seenFiles.length;
@@ -390,6 +468,31 @@ class ProgressTracker {
       _reportProgress(fileCount, now);
       _lastProgressTime = now;
       _lastReportedCount = fileCount;
+    }
+  }
+
+  /// Handle a newly-seen file: track slow files, update current file,
+  /// check for abort sentinel, and recalibrate ETA.
+  static void _handleNewFile(String path, DateTime now) {
+    // Track long-running files (> 2 seconds) for summary report
+    if (_currentFile != null && _currentFileStart != null) {
+      final fileTime = now.difference(_currentFileStart!);
+      if (fileTime.inSeconds >= 2) {
+        _slowFiles[_currentFile!] = fileTime.inSeconds;
+      }
+    }
+
+    _currentFile = path;
+    _currentFileStart = now;
+
+    // Check for abort sentinel every 50 new files
+    if (_seenFiles.length % 50 == 0) {
+      _checkAbortSentinel();
+    }
+
+    // Recalibrate ETA after seeing some files
+    if (_etaCalibrated && _seenFiles.length > _totalExpectedFiles * 0.9) {
+      _totalExpectedFiles = (_seenFiles.length * 1.2).round();
     }
   }
 
@@ -438,6 +541,11 @@ class ProgressTracker {
     final brightGreen = _ProgressColors.brightGreen;
     final clearLine = _ProgressColors.clearLine;
 
+    // Issue count string shared by both progress line variants
+    final issuesDisplay = _limitReached
+        ? '$_maxIssues shown, $_violationsFound total'
+        : '$_violationsFound';
+
     if (_discoveredFromFiles && _totalExpectedFiles > 0) {
       final percent =
           (fileCount * 100 / _totalExpectedFiles).clamp(0, 100).round();
@@ -452,14 +560,12 @@ class ProgressTracker {
       final empty = barWidth - filled;
       final bar = '$brightGreen${'█' * filled}$dim${'░' * empty}$reset';
 
-      // Color-code issues count (show limit indicator if reached)
+      // Color-code issues count
       final issuesColor = _violationsFound == 0
           ? green
           : _errorCount > 0
               ? red
               : yellow;
-      final issuesDisplay =
-          _limitReached ? '$_maxIssues+' : '$_violationsFound';
       final issuesStr = '$issuesColor$issuesDisplay$reset';
 
       // Build compact status line with clear labels
@@ -490,7 +596,7 @@ class ProgressTracker {
         ..write('$dim│$reset ')
         ..write('${dim}Rate:$reset ${filesPerSec.round()}/s ')
         ..write('$dim│$reset ')
-        ..write('${dim}Issues:$reset $_violationsFound ')
+        ..write('${dim}Issues:$reset $issuesDisplay ')
         ..write('$dim│$reset ')
         ..write('$dim$displayName$reset');
 
@@ -539,15 +645,15 @@ class ProgressTracker {
     buf.writeln(
         '  $dim📄$reset Files with issues: $issueColor$_filesWithIssues$reset ($issuePercent%)');
 
-    // Warning if issue limit was reached (only applies to warnings/info, not errors)
+    // Note if issue limit was reached (Problems tab capped, report has all)
     if (_limitReached) {
+      final report = AnalysisReporter.reportPath;
       buf.writeln();
-      buf.writeln(
-          '$yellow  ⚠️  Limit reached: $_maxIssues warnings/info. Skipping remaining non-error rules.$reset');
-      buf.writeln(
-          '$dim     All $_errorCount errors fully checked. $_issuesAfterLimit warning/info rules skipped.$reset');
-      buf.writeln(
-          '$dim     To adjust: echo "max_issues: 2000" > analysis_options_custom.yaml$reset');
+      buf.writeln('$yellow  ⚠️  Problems tab capped at $_maxIssues. '
+          'All $_violationsFound issues in report.$reset');
+      if (report != null) {
+        buf.writeln('$dim     $report$reset');
+      }
     }
 
     // Severity breakdown (only if there are issues)
@@ -696,6 +802,9 @@ class ProgressTracker {
     }
   }
 
+  /// Unmodifiable view of all file paths analyzed in this session.
+  static Set<String> get analyzedFiles => Set<String>.unmodifiable(_seenFiles);
+
   /// Get a snapshot of all tracking data for report generation.
   static ProgressTrackerData get reportData => ProgressTrackerData(
         filesAnalyzed: _seenFiles.length,
@@ -708,6 +817,92 @@ class ProgressTracker {
         issuesByRule: Map<String, int>.unmodifiable(_issuesByRule),
         ruleSeverities: Map<String, String>.unmodifiable(_ruleSeverities),
       );
+
+  /// Check for `.saropa_stop` sentinel file in the project root.
+  ///
+  /// When found, sets [_abortRequested] so all subsequent rules return
+  /// early, writes a partial report immediately, and deletes the file.
+  static void _checkAbortSentinel() {
+    final root = AnalysisReporter.projectRoot;
+    if (root == null) return;
+
+    try {
+      final sentinel = File('$root${Platform.pathSeparator}.saropa_stop');
+      if (!sentinel.existsSync()) return;
+
+      _abortRequested = true;
+      sentinel.deleteSync();
+
+      stderr.writeln('');
+      stderr.writeln('[saropa_lints] Abort requested (.saropa_stop). '
+          'Partial report: $_violationsFound issues '
+          'from ${_seenFiles.length} files.');
+
+      AnalysisReporter.writeNow();
+    } catch (e) {
+      stderr.writeln('[saropa_lints] Error checking abort sentinel: $e');
+    }
+  }
+
+  /// Clear stale violation data for a file being re-analyzed.
+  ///
+  /// Called when [recordFile] detects a previously-completed file appearing
+  /// again within the same session (e.g. user saved during active analysis).
+  /// Subtracts old counts from totals and removes old violation records so
+  /// the re-analysis starts from a clean baseline for that file.
+  static void _clearFileData(String path) {
+    // Signal that file re-analysis was detected (a previously-completed
+    // file is being analyzed again). AnalysisReporter uses this to start
+    // a new report session on the next scheduleWrite() call.
+    _hasReanalyzedFile = true;
+
+    final oldCount = _issuesByFile[path] ?? 0;
+    if (oldCount == 0) return;
+
+    // Subtract severity counts for this file
+    final severities = _issuesByFileBySeverity[path];
+    if (severities != null) {
+      _errorCount = max(0, _errorCount - (severities['ERROR'] ?? 0));
+      _warningCount = max(0, _warningCount - (severities['WARNING'] ?? 0));
+      _infoCount = max(0, _infoCount - (severities['INFO'] ?? 0));
+      _issuesByFileBySeverity.remove(path);
+    }
+
+    // Subtract per-rule counts for this file
+    final rules = _issuesByFileByRule[path];
+    if (rules != null) {
+      for (final entry in rules.entries) {
+        final adjusted = (_issuesByRule[entry.key] ?? 0) - entry.value;
+        if (adjusted <= 0) {
+          _issuesByRule.remove(entry.key);
+          // Keep _ruleSeverities — other files may still have this rule.
+          // Stale entries are harmless (just a label for reports).
+        } else {
+          _issuesByRule[entry.key] = adjusted;
+        }
+      }
+      _issuesByFileByRule.remove(path);
+    }
+
+    // Subtract file total and recalculate files-with-issues
+    _violationsFound = max(0, _violationsFound - oldCount);
+    _issuesByFile.remove(path);
+    _filesWithIssues = _issuesByFile.keys.length;
+
+    // Recalculate limit (may un-reach if enough were cleared)
+    if (_limitReached && _maxIssues > 0) {
+      final nonErrorCount = _warningCount + _infoCount;
+      if (nonErrorCount <= _maxIssues) {
+        _limitReached = false;
+      }
+    }
+
+    // Clear dedup keys so new violations for this file are counted fresh
+    _fileViolationKeys.remove(path);
+
+    // Clear from ImpactTracker
+    ImpactTracker.removeViolationsForFile(path);
+  }
 
   /// Reset tracking state (useful between analysis runs).
   static void reset() {
@@ -728,11 +923,15 @@ class ProgressTracker {
     _issuesByFile.clear();
     _issuesByRule.clear();
     _ruleSeverities.clear();
+    _issuesByFileBySeverity.clear();
+    _issuesByFileByRule.clear();
+    _fileViolationKeys.clear();
     _rateSamples.clear();
     _slowFiles.clear();
     _limitReached = false;
-    _issuesAfterLimit = 0;
-    // Note: _maxIssues is not reset - it's config, not state
+    _abortRequested = false;
+    _hasReanalyzedFile = false;
+    // Note: _maxIssues and _fileOnly are not reset - they're config, not state
   }
 }
 
@@ -1308,33 +1507,37 @@ enum TestRelevance {
 class ImpactTracker {
   ImpactTracker._();
 
-  static final Map<LintImpact, List<ViolationRecord>> _violations = {
-    LintImpact.critical: [],
-    LintImpact.high: [],
-    LintImpact.medium: [],
-    LintImpact.low: [],
-    LintImpact.opinionated: [],
+  static final Map<LintImpact, LinkedHashSet<ViolationRecord>> _violations = {
+    LintImpact.critical: LinkedHashSet<ViolationRecord>(),
+    LintImpact.high: LinkedHashSet<ViolationRecord>(),
+    LintImpact.medium: LinkedHashSet<ViolationRecord>(),
+    LintImpact.low: LinkedHashSet<ViolationRecord>(),
+    LintImpact.opinionated: LinkedHashSet<ViolationRecord>(),
   };
 
-  /// Record a violation.
+  /// Record a violation. Duplicates (same file + line + rule) are ignored.
   static void record({
     required LintImpact impact,
     required String rule,
     required String file,
     required int line,
     required String message,
+    String? correction,
   }) {
     _violations[impact]!.add(ViolationRecord(
       rule: rule,
       file: file,
       line: line,
       message: message,
+      correction: correction,
     ));
   }
 
   /// Get all violations grouped by impact.
-  static Map<LintImpact, List<ViolationRecord>> get violations =>
-      Map.unmodifiable(_violations);
+  static Map<LintImpact, List<ViolationRecord>> get violations => {
+        for (final entry in _violations.entries)
+          entry.key: entry.value.toList(),
+      };
 
   /// Get count of violations by impact level.
   static Map<LintImpact, int> get counts => {
@@ -1406,27 +1609,53 @@ class ImpactTracker {
     return result;
   }
 
+  /// Remove all violations for a specific file (used on re-analysis).
+  static void removeViolationsForFile(String filePath) {
+    for (final set in _violations.values) {
+      set.removeWhere((v) => v.file == filePath);
+    }
+  }
+
   /// Clear all tracked violations (useful between analysis runs).
   static void reset() {
-    for (final list in _violations.values) {
-      list.clear();
+    for (final set in _violations.values) {
+      set.clear();
     }
   }
 }
 
 /// A recorded lint violation with location and metadata.
+///
+/// Equality is based on [file], [line], and [rule] so that duplicate
+/// reports of the same violation (from consecutive re-analysis passes)
+/// are collapsed when stored in a [Set].
 class ViolationRecord {
   const ViolationRecord({
     required this.rule,
     required this.file,
     required this.line,
     required this.message,
+    this.correction,
   });
 
   final String rule;
   final String file;
   final int line;
   final String message;
+
+  /// Optional correction message suggesting how to fix the violation.
+  final String? correction;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is ViolationRecord &&
+          file == other.file &&
+          line == other.line &&
+          rule == other.rule;
+
+  @override
+  int get hashCode => Object.hash(file, line, rule);
 
   @override
   String toString() => '$file:$line - $rule: $message';
@@ -2145,16 +2374,8 @@ abstract class SaropaLintRule extends DartLintRule {
     // Check if rule is disabled
     if (isDisabled) return;
 
-    // =========================================================================
-    // ISSUE LIMIT CHECK (Performance Optimization)
-    // =========================================================================
-    // After hitting the warning/info limit, skip non-ERROR rules entirely.
-    // This provides real speedup on legacy codebases with many issues.
-    // ERROR-severity rules always run (security, crashes, etc.)
-    if (ProgressTracker.isLimitReached &&
-        code.errorSeverity != DiagnosticSeverity.ERROR) {
-      return;
-    }
+    // Check if abort was requested via .saropa_stop sentinel file
+    if (ProgressTracker.isAbortRequested) return;
 
     // =========================================================================
     // SLOW RULE DEFERRAL (Performance Optimization)
@@ -2179,6 +2400,10 @@ abstract class SaropaLintRule extends DartLintRule {
     // environment variable SAROPA_LINTS_PROGRESS=true
     ProgressTracker.recordFile(path);
 
+    // Reset the report-write debounce on every file so the timer only fires
+    // after analysis truly goes idle, not just between violations.
+    AnalysisReporter.scheduleWrite();
+
     // =========================================================================
     // BATCH EXECUTION PLAN CHECK (Performance Optimization)
     // =========================================================================
@@ -2190,6 +2415,10 @@ abstract class SaropaLintRule extends DartLintRule {
 
     // Get file content from resolver (already loaded by analyzer)
     final content = resolver.source.contents.data;
+
+    // Collect imports for dependency graph before ignore checks so that
+    // ignored files still contribute edges to the project structure.
+    ImportGraphTracker.collectImports(path, content);
 
     // =========================================================================
     // FILE-LEVEL IGNORE CHECK
@@ -2224,6 +2453,11 @@ abstract class SaropaLintRule extends DartLintRule {
         GitAwarePriority.initialize(projectRoot);
         // Initialize report writer for automatic report generation
         AnalysisReporter.initialize(projectRoot);
+        // Initialize import graph tracker for priority-based reports
+        ImportGraphTracker.setProjectInfo(
+          projectRoot,
+          ProjectContext.getPackageName(projectRoot),
+        );
       }
     }
 
@@ -2510,10 +2744,13 @@ class SaropaDiagnosticReporter {
       return;
     }
 
-    // Track the violation by impact level
+    // Track the violation by impact level (always, for report log)
     _trackViolation(code, line);
 
-    _delegate.atNode(node, _applyOverride(code));
+    // Only push to Problems tab if under the issue limit
+    if (ProgressTracker.shouldReportToProblems) {
+      _delegate.atNode(node, _applyOverride(code));
+    }
   }
 
   /// Reports a diagnostic at the given [token].
@@ -2529,17 +2766,20 @@ class SaropaDiagnosticReporter {
       return;
     }
 
-    // Track the violation by impact level
+    // Track the violation by impact level (always, for report log)
     _trackViolation(code, 0); // Token doesn't have easy line access
 
+    // Only push to Problems tab if under the issue limit.
     // Use atOffset instead of atToken to ensure proper span width.
     // The built-in atToken has a bug where endColumn equals startColumn
     // (zero-width highlight). Using atOffset with explicit length fixes this.
-    _delegate.atOffset(
-      offset: token.offset,
-      length: token.length,
-      diagnosticCode: _applyOverride(code),
-    );
+    if (ProgressTracker.shouldReportToProblems) {
+      _delegate.atOffset(
+        offset: token.offset,
+        length: token.length,
+        diagnosticCode: _applyOverride(code),
+      );
+    }
   }
 
   /// Reports a diagnostic at the given offset and length.
@@ -2556,16 +2796,17 @@ class SaropaDiagnosticReporter {
       return;
     }
 
-    // Track the violation by impact level
+    // Track the violation by impact level (always, for report log)
     _trackViolation(errorCode, 0);
 
-    // Cannot easily check for ignore comments with just offset/length
-    // Delegate directly to the underlying reporter
-    _delegate.atOffset(
-      offset: offset,
-      length: length,
-      diagnosticCode: _applyOverride(errorCode),
-    );
+    // Only push to Problems tab if under the issue limit
+    if (ProgressTracker.shouldReportToProblems) {
+      _delegate.atOffset(
+        offset: offset,
+        length: length,
+        diagnosticCode: _applyOverride(errorCode),
+      );
+    }
   }
 
   /// Track a violation in the ImpactTracker and ProgressTracker.
@@ -2577,11 +2818,16 @@ class SaropaDiagnosticReporter {
       file: filePath,
       line: line,
       message: code.problemMessage,
+      correction: code.correctionMessage,
     );
 
     // Track for progress reporting with severity
     final severity = code.errorSeverity.name;
-    ProgressTracker.recordViolation(severity: severity, ruleName: _ruleName);
+    ProgressTracker.recordViolation(
+      severity: severity,
+      ruleName: _ruleName,
+      line: line,
+    );
 
     // Schedule report file writing (debounced)
     AnalysisReporter.scheduleWrite();

@@ -21,6 +21,8 @@ import '../saropa_lint_rule.dart';
 
 /// Warns when sensitive data might be logged.
 ///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v6
+///
 /// Alias: no_sensitive_logs, pii_in_logs, credential_logging
 ///
 /// Logging PII (Personally Identifiable Information) or sensitive data
@@ -59,7 +61,7 @@ class AvoidLoggingSensitiveDataRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_logging_sensitive_data',
     problemMessage:
-        '[avoid_logging_sensitive_data] Logging sensitive data such as passwords, tokens, or personally identifiable information (PII) exposes users to privacy risks and can result in data leaks if logs are accessed by unauthorized parties. Sensitive information in logs may appear in crash reports, debug output, or be inadvertently shared with third parties, leading to compliance violations and loss of user trust. Always sanitize logs to prevent exposure of confidential data.',
+        '[avoid_logging_sensitive_data] Logging sensitive data such as passwords, tokens, or personally identifiable information (PII) exposes users to privacy risks and can result in data leaks if logs are accessed by unauthorized parties. Sensitive information in logs may appear in crash reports, debug output, or be inadvertently shared with third parties, leading to compliance violations and loss of user trust. Always sanitize logs to prevent exposure of confidential data. {v6}',
     correctionMessage:
         'Remove all sensitive data (passwords, tokens, PII) from logs. Instead, log only non-sensitive metadata or a generic success/failure message. Use dedicated logging utilities to redact or filter sensitive fields before outputting logs.',
     errorSeverity: DiagnosticSeverity.ERROR,
@@ -234,6 +236,8 @@ class _AddTodoForSensitiveLoggingFix extends DartFix {
 
 /// Warns when SharedPreferences is used for sensitive data.
 ///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v7
+///
 /// Alias: use_secure_storage, no_plaintext_storage, encrypted_storage
 ///
 /// SharedPreferences stores data in plain text and is not suitable
@@ -271,7 +275,7 @@ class RequireSecureStorageRule extends SaropaLintRule {
     name: 'require_secure_storage',
     problemMessage:
         '[require_secure_storage] SharedPreferences stores data in plain XML. '
-        'On rooted/jailbroken devices, attackers extract credentials for account takeover.',
+        'On rooted/jailbroken devices, attackers extract credentials for account takeover. {v7}',
     correctionMessage:
         'Use flutter_secure_storage: secureStorage.write(key: k, value: v).',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -335,6 +339,8 @@ class RequireSecureStorageRule extends SaropaLintRule {
 
 /// Warns when hardcoded credentials are detected in source code.
 ///
+/// Since: v0.1.8 | Updated: v4.13.0 | Rule version: v5
+///
 /// Alias: no_hardcoded_secrets, embedded_credentials, hardcoded_password
 ///
 /// Credentials should never be hardcoded. Use environment variables,
@@ -371,7 +377,7 @@ class AvoidHardcodedCredentialsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_hardcoded_credentials',
     problemMessage:
-        '[avoid_hardcoded_credentials] Hardcoding credentials (such as passwords, API keys, or tokens) in source code exposes them to anyone with access to the codebase, including public repositories and version control history. This can lead to unauthorized access, data breaches, and compromised systems. Credentials should always be stored securely and never committed to version control.',
+        '[avoid_hardcoded_credentials] Hardcoding credentials (such as passwords, API keys, or tokens) in source code exposes them to anyone with access to the codebase, including public repositories and version control history. This can lead to unauthorized access, data breaches, and compromised systems. Credentials should always be stored securely and never committed to version control. {v5}',
     correctionMessage:
         'Store credentials in secure storage or environment variables. Use String.fromEnvironment(\'KEY\') or a secure vault at runtime. Never commit secrets to source control.',
     errorSeverity: DiagnosticSeverity.ERROR,
@@ -487,6 +493,8 @@ class _AddTodoForHardcodedCredentialsFix extends DartFix {
 
 /// Warns when user input is used without sanitization.
 ///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v6
+///
 /// Alias: validate_input, sanitize_user_input, injection_prevention
 ///
 /// Unsanitized user input can lead to injection attacks, XSS,
@@ -528,7 +536,7 @@ class RequireInputSanitizationRule extends SaropaLintRule {
     name: 'require_input_sanitization',
     problemMessage:
         '[require_input_sanitization] Unsanitized user input in SQL or commands '
-        'enables injection attacks, allowing data theft or system compromise.',
+        'enables injection attacks, allowing data theft or system compromise. {v6}',
     correctionMessage:
         'Validate and sanitize user input to prevent injection attacks.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -581,6 +589,8 @@ class RequireInputSanitizationRule extends SaropaLintRule {
 
 /// Warns when WebView has JavaScript enabled without consideration.
 ///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v5
+///
 /// Enabling JavaScript in WebView can expose the app to XSS attacks
 /// if loading untrusted content.
 ///
@@ -622,7 +632,7 @@ class AvoidWebViewJavaScriptEnabledRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_webview_javascript_enabled',
     problemMessage:
-        '[avoid_webview_javascript_enabled] WebView with JavaScript enabled expands the attack surface to cross-site scripting (XSS) vulnerabilities. Malicious scripts injected through untrusted content can steal session tokens, access device APIs, redirect users to phishing pages, and exfiltrate sensitive data without the user\'s knowledge.',
+        '[avoid_webview_javascript_enabled] WebView with JavaScript enabled expands the attack surface to cross-site scripting (XSS) vulnerabilities. Malicious scripts injected through untrusted content can steal session tokens, access device APIs, redirect users to phishing pages, and exfiltrate sensitive data without the user\'s knowledge. {v5}',
     correctionMessage:
         'Disable JavaScript with javaScriptEnabled: false unless required, and ensure only trusted HTTPS content is loaded when JavaScript must remain enabled.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -666,6 +676,8 @@ class AvoidWebViewJavaScriptEnabledRule extends SaropaLintRule {
 
 /// Warns when biometric authentication lacks a fallback mechanism.
 ///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v6
+///
 /// Not all devices support biometrics, and users should have an
 /// alternative authentication method.
 ///
@@ -708,7 +720,7 @@ class RequireBiometricFallbackRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_biometric_fallback',
     problemMessage:
-        '[require_biometric_fallback] Biometric-only auth locks out users with damaged sensors. Not all devices support biometrics, and users must have an alternative authentication method.',
+        '[require_biometric_fallback] Biometric-only auth locks out users with damaged sensors. Not all devices support biometrics, and users must have an alternative authentication method. {v6}',
     correctionMessage:
         'Set biometricOnly to false or provide an alternative auth method. Audit similar patterns across the codebase to ensure consistent security practices.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -753,6 +765,8 @@ class RequireBiometricFallbackRule extends SaropaLintRule {
 
 /// Warns when eval-like patterns are detected.
 ///
+/// Since: v4.8.3 | Updated: v4.13.0 | Rule version: v7
+///
 /// Dynamic code execution (eval, Function constructor, etc.) can
 /// be exploited for code injection attacks.
 ///
@@ -791,7 +805,7 @@ class AvoidEvalLikePatternsRule extends SaropaLintRule {
     name: 'avoid_eval_like_patterns',
     problemMessage:
         '[avoid_eval_like_patterns] Dynamic code execution allows arbitrary '
-        'code injection, enabling attackers to execute malicious code.',
+        'code injection, enabling attackers to execute malicious code. {v7}',
     correctionMessage:
         'Use static dispatch or explicit mappings instead of dynamic invocation.',
     errorSeverity: DiagnosticSeverity.ERROR,
@@ -876,6 +890,9 @@ class _AddTodoForEvalPatternFix extends DartFix {
 }
 
 /// Warns when code is loaded dynamically at runtime, bypassing compile-time
+///
+/// Since: v4.8.3 | Updated: v4.13.0 | Rule version: v3
+///
 /// dependency verification.
 ///
 /// Dynamic code loading via `Isolate.spawnUri()` or runtime package management
@@ -930,7 +947,7 @@ class AvoidDynamicCodeLoadingRule extends SaropaLintRule {
     problemMessage:
         '[avoid_dynamic_code_loading] Dynamic code loading at runtime '
         'bypasses compile-time dependency verification, allowing execution '
-        'of unverified code and creating supply chain attack vectors.',
+        'of unverified code and creating supply chain attack vectors. {v3}',
     correctionMessage:
         'Use static imports for all code dependencies. For background '
         'computation, use Isolate.run() or Isolate.spawn() with static '
@@ -1062,6 +1079,8 @@ class _AddTodoForDynamicCodeLoadingFix extends DartFix {
 
 /// Warns when native libraries are loaded from dynamic or absolute paths.
 ///
+/// Since: v4.8.3 | Updated: v4.13.0 | Rule version: v3
+///
 /// Loading native libraries via `DynamicLibrary.open()` with non-constant or
 /// path-containing arguments bypasses Dart's package management, allowing
 /// attackers to substitute malicious native libraries.
@@ -1114,7 +1133,7 @@ class AvoidUnverifiedNativeLibraryRule extends SaropaLintRule {
     problemMessage:
         '[avoid_unverified_native_library] Loading native libraries from '
         'dynamic or absolute paths bypasses package verification, allowing '
-        'attackers to substitute malicious native code.',
+        'attackers to substitute malicious native code. {v3}',
     correctionMessage:
         'Use library names without paths (e.g., \'libfoo.so\') to load '
         'from verified app bundle resources. Avoid loading from dynamic '
@@ -1192,6 +1211,9 @@ class _AddTodoForUnverifiedNativeLibraryFix extends DartFix {
 }
 
 /// Warns when signing configuration (keystore paths, passwords, aliases)
+///
+/// Since: v4.8.3 | Updated: v4.13.0 | Rule version: v3
+///
 /// is hardcoded in source code.
 ///
 /// Hardcoded signing configuration is extractable from compiled binaries
@@ -1246,7 +1268,7 @@ class AvoidHardcodedSigningConfigRule extends SaropaLintRule {
         '[avoid_hardcoded_signing_config] Hardcoding keystore paths, '
         'passwords, or signing configuration in source code exposes them '
         'to reverse engineering. These values are extractable from compiled '
-        'binaries and enable attackers to sign malicious builds.',
+        'binaries and enable attackers to sign malicious builds. {v3}',
     correctionMessage:
         'Store signing configuration in environment variables or secure '
         'CI/CD secrets. Use Platform.environment or load from external '
@@ -1376,6 +1398,8 @@ class _AddTodoForHardcodedSigningConfigFix extends DartFix {
 
 /// Warns when certificate pinning is not implemented for HTTPS.
 ///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v6
+///
 /// Without certificate pinning, the app is vulnerable to
 /// man-in-the-middle attacks with forged certificates.
 ///
@@ -1413,7 +1437,7 @@ class RequireCertificatePinningRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_certificate_pinning',
     problemMessage:
-        '[require_certificate_pinning] HttpClient without certificate pinning accepts any valid certificate, making it vulnerable to man-in-the-middle attacks. Attackers on the same network can intercept, read, and modify all HTTPS traffic including authentication tokens, personal data, and financial information without detection.',
+        '[require_certificate_pinning] HttpClient without certificate pinning accepts any valid certificate, making it vulnerable to man-in-the-middle attacks. Attackers on the same network can intercept, read, and modify all HTTPS traffic including authentication tokens, personal data, and financial information without detection. {v6}',
     correctionMessage:
         'Set badCertificateCallback to validate the server certificate fingerprint against a known pin, rejecting connections that do not match your expected certificate.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -1452,6 +1476,8 @@ class RequireCertificatePinningRule extends SaropaLintRule {
 
 /// Warns when tokens or API keys appear in URLs.
 ///
+/// Since: v1.3.0 | Updated: v4.13.0 | Rule version: v5
+///
 /// Tokens in URLs are logged, cached, and visible in browser history.
 /// Use headers or request body instead.
 ///
@@ -1489,7 +1515,7 @@ class AvoidTokenInUrlRule extends SaropaLintRule {
     name: 'avoid_token_in_url',
     problemMessage:
         '[avoid_token_in_url] Tokens in URLs are logged in browser history, '
-        'server logs, and referrer headers, exposing credentials.',
+        'server logs, and referrer headers, exposing credentials. {v5}',
     correctionMessage:
         'Use Authorization header or request body for sensitive data.',
     errorSeverity: DiagnosticSeverity.ERROR,
@@ -1528,6 +1554,8 @@ class AvoidTokenInUrlRule extends SaropaLintRule {
 
 /// Warns when sensitive data is copied to clipboard.
 ///
+/// Since: v1.3.0 | Updated: v4.13.0 | Rule version: v4
+///
 /// Clipboard contents can be accessed by other apps and may persist
 /// across app sessions. Never copy passwords or tokens to clipboard.
 ///
@@ -1563,7 +1591,7 @@ class AvoidClipboardSensitiveRule extends SaropaLintRule {
     name: 'avoid_clipboard_sensitive',
     problemMessage:
         '[avoid_clipboard_sensitive] Clipboard contents persist and are '
-        'readable by other apps, exposing passwords and tokens.',
+        'readable by other apps, exposing passwords and tokens. {v4}',
     correctionMessage:
         'Clipboard can be read by other apps. Never copy passwords or tokens.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -1610,6 +1638,8 @@ class AvoidClipboardSensitiveRule extends SaropaLintRule {
 
 /// Warns when passwords are stored in SharedPreferences.
 ///
+/// Since: v1.3.0 | Updated: v4.13.0 | Rule version: v4
+///
 /// SharedPreferences is plain text storage. Use flutter_secure_storage
 /// or other encrypted storage for passwords.
 ///
@@ -1645,7 +1675,7 @@ class AvoidStoringPasswordsRule extends SaropaLintRule {
     name: 'avoid_storing_passwords',
     problemMessage:
         '[avoid_storing_passwords] SharedPreferences stores passwords in '
-        'plaintext, readable by anyone with device access or backup.',
+        'plaintext, readable by anyone with device access or backup. {v4}',
     correctionMessage:
         'Use flutter_secure_storage for passwords and sensitive data.',
     errorSeverity: DiagnosticSeverity.ERROR,
@@ -1685,6 +1715,8 @@ class AvoidStoringPasswordsRule extends SaropaLintRule {
 
 /// Warns when SQL queries are built using string interpolation.
 ///
+/// Since: v2.3.5 | Updated: v4.13.0 | Rule version: v3
+///
 /// Building SQL queries with string interpolation or concatenation
 /// exposes your application to SQL injection attacks. Always use
 /// parameterized queries instead.
@@ -1721,7 +1753,7 @@ class AvoidDynamicSqlRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_dynamic_sql',
     problemMessage:
-        '[avoid_dynamic_sql] Constructing SQL queries by concatenating or interpolating user input directly into the query string exposes your application to SQL injection attacks. Attackers can craft input that alters the structure of your query, allowing them to read, modify, or delete arbitrary data, escalate privileges, or compromise the entire database. SQL injection is one of the most critical and well-documented security vulnerabilities in software development, and has led to major data breaches across industries.',
+        '[avoid_dynamic_sql] Constructing SQL queries by concatenating or interpolating user input directly into the query string exposes your application to SQL injection attacks. Attackers can craft input that alters the structure of your query, allowing them to read, modify, or delete arbitrary data, escalate privileges, or compromise the entire database. SQL injection is one of the most critical and well-documented security vulnerabilities in software development, and has led to major data breaches across industries. {v3}',
     correctionMessage:
         'Always use parameterized queries, prepared statements, or trusted query builders to safely insert user input into SQL queries. Never concatenate or interpolate user data directly into SQL strings. Audit your codebase for dynamic SQL construction and refactor to use safe patterns. Test your application for SQL injection vulnerabilities using automated tools or manual review. Document secure query practices in your team guidelines.',
     errorSeverity: DiagnosticSeverity.ERROR,
@@ -1818,6 +1850,8 @@ class _AddTodoForDynamicSqlFix extends DartFix {
 
 /// Warns when generic key/auth parameters appear in URLs (pedantic tier).
 ///
+/// Since: v1.4.0 | Updated: v4.13.0 | Rule version: v4
+///
 /// This is a stricter variant of [AvoidTokenInUrlRule] that catches
 /// generic parameter names that might contain sensitive data. More prone
 /// to false positives in test code.
@@ -1848,7 +1882,7 @@ class AvoidGenericKeyInUrlRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_generic_key_in_url',
     problemMessage:
-        '[avoid_generic_key_in_url] Sensitive data embedded in URL query parameters is logged by web servers, proxy caches, browser history, and analytics tools. This exposes API keys, tokens, and credentials in access logs and referrer headers, where they persist indefinitely and can be harvested by attackers with log access.',
+        '[avoid_generic_key_in_url] Sensitive data embedded in URL query parameters is logged by web servers, proxy caches, browser history, and analytics tools. This exposes API keys, tokens, and credentials in access logs and referrer headers, where they persist indefinitely and can be harvested by attackers with log access. {v4}',
     correctionMessage:
         'Move sensitive parameters to the Authorization header or request body where they are not logged by intermediate network infrastructure.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -1885,6 +1919,8 @@ class AvoidGenericKeyInUrlRule extends SaropaLintRule {
 
 /// Warns when Random() is used instead of Random.secure().
 ///
+/// Since: v1.5.0 | Updated: v4.13.0 | Rule version: v3
+///
 /// Random() uses a predictable pseudo-random number generator that is
 /// not suitable for security-sensitive operations like generating tokens,
 /// passwords, or cryptographic keys.
@@ -1920,7 +1956,7 @@ class PreferSecureRandomRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_secure_random',
     problemMessage:
-        '[prefer_secure_random] Random() uses a predictable pseudo-random number generator that produces reproducible sequences from a known seed. Tokens, passwords, encryption keys, or nonces generated with Random() can be predicted by attackers, enabling session hijacking, credential guessing, and cryptographic attacks.',
+        '[prefer_secure_random] Random() uses a predictable pseudo-random number generator that produces reproducible sequences from a known seed. Tokens, passwords, encryption keys, or nonces generated with Random() can be predicted by attackers, enabling session hijacking, credential guessing, and cryptographic attacks. {v3}',
     correctionMessage:
         'Replace Random() with Random.secure() for security-sensitive operations such as token generation, password creation, nonce generation, and cryptographic key derivation.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -1981,6 +2017,8 @@ class _UseSecureRandomFix extends DartFix {
 
 /// Warns when `List<int>` is used for binary data instead of Uint8List.
 ///
+/// Since: v1.5.0 | Updated: v4.13.0 | Rule version: v3
+///
 /// Uint8List is more memory-efficient for binary data and provides better
 /// interoperability with native code and I/O operations. `List<int>` uses
 /// 8 bytes per element vs 1 byte for Uint8List.
@@ -2010,7 +2048,7 @@ class PreferTypedDataRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_typed_data',
     problemMessage:
-        '[prefer_typed_data] List<int> for binary data wastes memory. Use Uint8List instead. Uint8List is more memory-efficient for binary data and provides better interoperability with native code and I/O operations. List<int> uses 8 bytes per element vs 1 byte for Uint8List.',
+        '[prefer_typed_data] List<int> for binary data wastes memory. Use Uint8List instead. Uint8List is more memory-efficient for binary data and provides better interoperability with native code and I/O operations. List<int> uses 8 bytes per element vs 1 byte for Uint8List. {v3}',
     correctionMessage:
         'Use Uint8List for binary data - 8x more memory efficient. Audit similar patterns across the codebase to ensure consistent security practices.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -2050,6 +2088,8 @@ class PreferTypedDataRule extends SaropaLintRule {
 
 /// Warns when .toList() is called unnecessarily on iterable operations.
 ///
+/// Since: v1.5.0 | Updated: v4.13.0 | Rule version: v3
+///
 /// Calling .toList() after .map(), .where(), .take(), etc. creates an
 /// intermediate list that may not be needed. Dart's lazy iterables are
 /// more memory efficient.
@@ -2085,7 +2125,7 @@ class AvoidUnnecessaryToListRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_unnecessary_to_list',
     problemMessage:
-        '[avoid_unnecessary_to_list] .toList() may be unnecessary here. Lazy iterables are more efficient. Calling .toList() after .map(), .where(), .take(), etc. creates an intermediate list that may not be needed. Dart\'s lazy iterables are more memory efficient.',
+        '[avoid_unnecessary_to_list] .toList() may be unnecessary here. Lazy iterables are more efficient. Calling .toList() after .map(), .where(), .take(), etc. creates an intermediate list that may not be needed. Dart\'s lazy iterables are more memory efficient. {v3}',
     correctionMessage:
         'Remove .toList() unless you need to modify the list or access by index. Audit similar patterns across the codebase to ensure consistent security practices.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -2147,6 +2187,8 @@ class AvoidUnnecessaryToListRule extends SaropaLintRule {
 
 /// Warns when API endpoints don't verify authentication.
 ///
+/// Since: v1.7.0 | Updated: v4.13.0 | Rule version: v5
+///
 /// Detects server-side request handler functions with protected-sounding
 /// names that lack authentication checks. Uses parameter and return type
 /// analysis to distinguish API endpoints from Flutter UI code.
@@ -2191,7 +2233,7 @@ class RequireAuthCheckRule extends SaropaLintRule {
     name: 'require_auth_check',
     problemMessage:
         '[require_auth_check] Missing auth check allows unauthorized access '
-        'to protected user data and privileged operations.',
+        'to protected user data and privileged operations. {v5}',
     correctionMessage:
         'Add authentication verification before processing protected requests.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -2386,6 +2428,8 @@ class RequireAuthCheckRule extends SaropaLintRule {
 
 /// Warns when token refresh logic is missing for auth tokens.
 ///
+/// Since: v2.3.5 | Updated: v4.13.0 | Rule version: v2
+///
 /// Access tokens expire. Without refresh logic, users get logged out
 /// unexpectedly. Implement proactive token refresh.
 ///
@@ -2436,7 +2480,7 @@ class RequireTokenRefreshRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_token_refresh',
     problemMessage:
-        '[require_token_refresh] Auth service stores access token but may lack refresh logic. Access tokens expire. Without refresh logic, users get logged out unexpectedly. Implement proactive token refresh.',
+        '[require_token_refresh] Auth service stores access token but may lack refresh logic. Access tokens expire. Without refresh logic, users get logged out unexpectedly. Implement proactive token refresh. {v2}',
     correctionMessage:
         'Implement token refresh to handle expiration gracefully. Audit similar patterns across the codebase to ensure consistent security practices.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -2504,6 +2548,8 @@ class RequireTokenRefreshRule extends SaropaLintRule {
 
 /// Warns when JWT is decoded on client for authorization decisions.
 ///
+/// Since: v1.7.0 | Updated: v4.13.0 | Rule version: v4
+///
 /// JWTs can be manipulated on the client. Never trust client-decoded
 /// JWT claims for authorization - always verify on the server.
 ///
@@ -2543,7 +2589,7 @@ class AvoidJwtDecodeClientRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_jwt_decode_client',
     problemMessage:
-        '[avoid_jwt_decode_client] Decoding JWT tokens on the client for authorization decisions is insecure because the client cannot verify token signatures. Attackers can craft or modify JWT claims to bypass permission checks, escalate privileges, and access restricted features or data without valid server-issued credentials.',
+        '[avoid_jwt_decode_client] Decoding JWT tokens on the client for authorization decisions is insecure because the client cannot verify token signatures. Attackers can craft or modify JWT claims to bypass permission checks, escalate privileges, and access restricted features or data without valid server-issued credentials. {v4}',
     correctionMessage:
         'Verify JWT claims and signature on the server side only. Use client-decoded JWT data for display purposes only, never for authorization or access control decisions.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -2604,6 +2650,8 @@ class AvoidJwtDecodeClientRule extends SaropaLintRule {
 
 /// Warns when logout doesn't clear all sensitive data.
 ///
+/// Since: v1.7.0 | Updated: v4.13.0 | Rule version: v4
+///
 /// Logout must clear tokens, cached user data, and sensitive state.
 /// Incomplete cleanup leaves users vulnerable.
 ///
@@ -2645,7 +2693,7 @@ class RequireLogoutCleanupRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_logout_cleanup',
     problemMessage:
-        '[require_logout_cleanup] Incomplete logout cleanup leaves session tokens, cached user data, and authentication state accessible in local storage. On shared or stolen devices, the next user can access the previous account, personal data, and session tokens without re-authenticating, enabling unauthorized account access.',
+        '[require_logout_cleanup] Incomplete logout cleanup leaves session tokens, cached user data, and authentication state accessible in local storage. On shared or stolen devices, the next user can access the previous account, personal data, and session tokens without re-authenticating, enabling unauthorized account access. {v4}',
     correctionMessage:
         'Ensure logout clears all tokens from secure storage, removes cached user data, resets navigation state, and invalidates the server session to prevent unauthorized access.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -2690,6 +2738,8 @@ class RequireLogoutCleanupRule extends SaropaLintRule {
 
 /// Warns when auth tokens are passed in query parameters.
 ///
+/// Since: v2.3.5 | Updated: v4.13.0 | Rule version: v3
+///
 /// Query parameters are logged in server access logs, browser history,
 /// and can leak through referrer headers. Use Authorization header instead.
 ///
@@ -2727,7 +2777,7 @@ class AvoidAuthInQueryParamsRule extends SaropaLintRule {
     name: 'avoid_auth_in_query_params',
     problemMessage:
         '[avoid_auth_in_query_params] Query params are logged in server logs, '
-        'browser history, and referrer headers, leaking auth tokens.',
+        'browser history, and referrer headers, leaking auth tokens. {v3}',
     correctionMessage:
         'Move token to Authorization header to prevent logging and leakage.',
     errorSeverity: DiagnosticSeverity.ERROR,
@@ -2789,6 +2839,8 @@ class AvoidAuthInQueryParamsRule extends SaropaLintRule {
 
 /// Warns when deep link handlers don't validate parameters.
 ///
+/// Since: v2.3.5 | Updated: v4.13.0 | Rule version: v3
+///
 /// Deep links can pass arbitrary data to your app. Validate and sanitize
 /// all deep link parameters before using them to prevent injection attacks.
 ///
@@ -2838,7 +2890,7 @@ class RequireDeepLinkValidationRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_deep_link_validation',
     problemMessage:
-        '[require_deep_link_validation] Deep link parameter used without validation allows attackers to craft malicious URLs that inject arbitrary data into your app. Unvalidated deep link parameters can cause crashes from unexpected types, unauthorized access to restricted screens, or execution of unintended actions on behalf of the user.',
+        '[require_deep_link_validation] Deep link parameter used without validation allows attackers to craft malicious URLs that inject arbitrary data into your app. Unvalidated deep link parameters can cause crashes from unexpected types, unauthorized access to restricted screens, or execution of unintended actions on behalf of the user. {v3}',
     correctionMessage:
         'Add null checks, type validation, and format verification for all deep link parameters before using them for navigation or data operations.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -2973,6 +3025,8 @@ class _AddDeepLinkValidationFix extends DartFix {
 
 /// Warns when sensitive data is stored without encryption.
 ///
+/// Since: v1.7.8 | Updated: v4.13.0 | Rule version: v5
+///
 /// Sensitive data (PII, financial, health) must be encrypted at rest.
 /// Use AES-256 or platform encryption APIs, not custom schemes.
 ///
@@ -3009,7 +3063,7 @@ class RequireDataEncryptionRule extends SaropaLintRule {
     name: 'require_data_encryption',
     problemMessage:
         '[require_data_encryption] Unencrypted sensitive data exposes '
-        'credentials to attackers via device access or backup extraction.',
+        'credentials to attackers via device access or backup extraction. {v5}',
     correctionMessage:
         'Use flutter_secure_storage, encrypted Hive box, or AES encryption.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -3081,6 +3135,8 @@ class RequireDataEncryptionRule extends SaropaLintRule {
 
 /// Warns when sensitive data is displayed without masking.
 ///
+/// Since: v1.7.8 | Updated: v4.13.0 | Rule version: v4
+///
 /// Sensitive data (SSN, credit cards, passwords) should be partially masked
 /// when displayed to prevent shoulder surfing.
 ///
@@ -3115,7 +3171,7 @@ class PreferDataMaskingRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_data_masking',
     problemMessage:
-        '[prefer_data_masking] Unmasked sensitive data visible in UI and screenshots. Sensitive data (SSN, credit cards, passwords) must be partially masked when displayed to prevent shoulder surfing.',
+        '[prefer_data_masking] Unmasked sensitive data visible in UI and screenshots. Sensitive data (SSN, credit cards, passwords) must be partially masked when displayed to prevent shoulder surfing. {v4}',
     correctionMessage:
         'Mask sensitive data: "****-****-****-1234" instead of full number. Audit similar patterns across the codebase to ensure consistent security practices.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -3175,6 +3231,8 @@ class PreferDataMaskingRule extends SaropaLintRule {
 
 /// Warns when sensitive screens don't disable screenshots.
 ///
+/// Since: v1.7.8 | Updated: v4.13.0 | Rule version: v5
+///
 /// Financial and authentication screens should disable screenshots using
 /// platform APIs to prevent sensitive data exposure.
 ///
@@ -3222,7 +3280,7 @@ class AvoidScreenshotSensitiveRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_screenshot_sensitive',
     problemMessage:
-        '[avoid_screenshot_sensitive] Sensitive screen allows screenshots and screen recording. Financial and authentication screens should disable screenshots using platform APIs to prevent sensitive data exposure.',
+        '[avoid_screenshot_sensitive] Sensitive screen allows screenshots and screen recording. Financial and authentication screens should disable screenshots using platform APIs to prevent sensitive data exposure. {v5}',
     correctionMessage:
         'Use FlutterWindowManager.addFlags(FLAG_SECURE) for sensitive screens. Audit similar patterns across the codebase to ensure consistent security practices.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -3289,6 +3347,8 @@ class AvoidScreenshotSensitiveRule extends SaropaLintRule {
 
 /// Warns when password fields don't use secure keyboard settings.
 ///
+/// Since: v1.7.8 | Updated: v4.13.0 | Rule version: v5
+///
 /// Password fields should use secure text entry to disable keyboard
 /// autocomplete, suggestions, and clipboard history.
 ///
@@ -3329,7 +3389,7 @@ class RequireSecurePasswordFieldRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_secure_password_field',
     problemMessage:
-        '[require_secure_password_field] Password input fields must disable suggestions and autocorrect to prevent sensitive information from being stored in device dictionaries or suggested to users inappropriately. Failing to do so increases the risk of password leakage, accidental exposure, and poor user privacy. Always configure password fields to maximize security and user trust.',
+        '[require_secure_password_field] Password input fields must disable suggestions and autocorrect to prevent sensitive information from being stored in device dictionaries or suggested to users inappropriately. Failing to do so increases the risk of password leakage, accidental exposure, and poor user privacy. Always configure password fields to maximize security and user trust. {v5}',
     correctionMessage:
         'Set enableSuggestions: false and autocorrect: false on all password fields (TextField, TextFormField, CupertinoTextField) to prevent password suggestions and autocorrect. This helps protect user credentials from being stored or exposed.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -3426,6 +3486,9 @@ class _AddSecureKeyboardSettingsFix extends DartFix {
 }
 
 /// Warns when File/Directory paths include function parameters without
+///
+/// Since: v1.7.8 | Updated: v4.13.0 | Rule version: v7
+///
 /// validation, which could allow path traversal attacks.
 ///
 /// Path traversal attacks use sequences like `../` to escape intended
@@ -3491,7 +3554,7 @@ class AvoidPathTraversalRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_path_traversal',
     problemMessage:
-        '[avoid_path_traversal] File paths constructed from user input may allow path traversal attacks (e.g., "../"), enabling access to sensitive files outside the intended directory. This is a critical security risk.',
+        '[avoid_path_traversal] File paths constructed from user input may allow path traversal attacks (e.g., "../"), enabling access to sensitive files outside the intended directory. This is a critical security risk. {v7}',
     correctionMessage:
         'Sanitize and validate file paths to prevent traversal (e.g., remove "../", use path package), and restrict access to allowed directories only.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -3594,6 +3657,8 @@ class AvoidPathTraversalRule extends SaropaLintRule {
 
 /// Warns when user content is displayed in WebViews without HTML escaping.
 ///
+/// Since: v1.7.8 | Updated: v4.13.0 | Rule version: v4
+///
 /// User content displayed in WebViews must be HTML-escaped to prevent XSS
 /// attacks. Use html.escape() or sanitization libraries.
 ///
@@ -3633,7 +3698,7 @@ class PreferHtmlEscapeRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_html_escape',
     problemMessage:
-        '[prefer_html_escape] Displaying user-generated content in a WebView without proper HTML escaping exposes your app to cross-site scripting (XSS) attacks. Malicious input can execute scripts, steal user data, or compromise device security. Always sanitize and escape user content before rendering it in a web context.',
+        '[prefer_html_escape] Displaying user-generated content in a WebView without proper HTML escaping exposes your app to cross-site scripting (XSS) attacks. Malicious input can execute scripts, steal user data, or compromise device security. Always sanitize and escape user content before rendering it in a web context. {v4}',
     correctionMessage:
         'Escape all user content using htmlEscape.convert() or a trusted sanitization library before displaying it in a WebView or similar widget. This prevents XSS and protects users from malicious input.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -3711,6 +3776,9 @@ class PreferHtmlEscapeRule extends SaropaLintRule {
 // =============================================================================
 
 /// Warns when authentication tokens are stored in SharedPreferences instead
+///
+/// Since: v2.1.0 | Updated: v4.13.0 | Rule version: v4
+///
 /// of flutter_secure_storage.
 ///
 /// This rule complements `avoid_shared_prefs_sensitive_data` by specifically
@@ -3748,7 +3816,7 @@ class RequireSecureStorageForAuthRule extends SaropaLintRule {
     name: 'require_secure_storage_for_auth',
     problemMessage:
         '[require_secure_storage_for_auth] Auth tokens in SharedPreferences '
-        'leak via backup extraction, enabling account takeover.',
+        'leak via backup extraction, enabling account takeover. {v4}',
     correctionMessage:
         'Use FlutterSecureStorage for JWT, bearer tokens, and auth credentials.',
     errorSeverity: DiagnosticSeverity.ERROR,
@@ -3808,6 +3876,8 @@ class RequireSecureStorageForAuthRule extends SaropaLintRule {
 
 /// Warns when Uri.parse is used on user input without scheme validation.
 ///
+/// Since: v2.1.0 | Updated: v4.13.0 | Rule version: v5
+///
 /// Parsing URLs from user input without validation can lead to
 /// security issues like SSRF or accessing unintended protocols.
 ///
@@ -3844,7 +3914,7 @@ class RequireUrlValidationRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_url_validation',
     problemMessage:
-        '[require_url_validation] Uri.parse on user input without scheme validation enables SSRF attacks. Attackers can make your app connect to internal servers, databases, or use malicious protocols to exfiltrate data.',
+        '[require_url_validation] Uri.parse on user input without scheme validation enables SSRF attacks. Attackers can make your app connect to internal servers, databases, or use malicious protocols to exfiltrate data. {v5}',
     correctionMessage:
         'Validate url.scheme is https or http before making requests, and reject file://, data://, and other dangerous schemes that could access local resources.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -3910,6 +3980,8 @@ class RequireUrlValidationRule extends SaropaLintRule {
 
 /// Warns when redirect URL is taken from parameter without domain validation.
 ///
+/// Since: v2.3.5 | Updated: v4.13.0 | Rule version: v5
+///
 /// Open redirects can be used for phishing attacks. Always validate
 /// redirect URLs against an allowlist of trusted domains.
 ///
@@ -3951,7 +4023,7 @@ class AvoidRedirectInjectionRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_redirect_injection',
     problemMessage:
-        '[avoid_redirect_injection] Redirect URL read from a parameter or user input without domain validation creates an open redirect vulnerability. Attackers craft URLs pointing to your app that redirect victims to phishing sites, credential harvesters, or malware downloads while appearing to originate from your trusted domain.',
+        '[avoid_redirect_injection] Redirect URL read from a parameter or user input without domain validation creates an open redirect vulnerability. Attackers craft URLs pointing to your app that redirect victims to phishing sites, credential harvesters, or malware downloads while appearing to originate from your trusted domain. {v5}',
     correctionMessage:
         'Validate the redirect URL host against an allowlist of trusted domains before performing the redirect, and reject URLs with unexpected schemes or external hosts.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -4111,6 +4183,8 @@ class _AddRedirectValidationCommentFix extends DartFix {
 
 /// Warns when sensitive data is written to external storage.
 ///
+/// Since: v2.1.0 | Updated: v4.13.0 | Rule version: v4
+///
 /// External storage is accessible by other apps and users. Sensitive
 /// data should be stored in app-private directories or encrypted.
 ///
@@ -4152,7 +4226,7 @@ class AvoidExternalStorageSensitiveRule extends SaropaLintRule {
     name: 'avoid_external_storage_sensitive',
     problemMessage:
         '[avoid_external_storage_sensitive] External storage is world-readable '
-        'on Android, exposing credentials to any installed app.',
+        'on Android, exposing credentials to any installed app. {v4}',
     correctionMessage:
         'Use getApplicationDocumentsDirectory() or encrypt data first.',
     errorSeverity: DiagnosticSeverity.ERROR,
@@ -4233,6 +4307,8 @@ class AvoidExternalStorageSensitiveRule extends SaropaLintRule {
 
 /// Warns when payment or sensitive operations lack biometric authentication.
 ///
+/// Since: v2.1.0 | Updated: v4.13.0 | Rule version: v3
+///
 /// Critical operations like payments should require additional authentication
 /// to prevent unauthorized access even if the device is unlocked.
 ///
@@ -4272,7 +4348,7 @@ class PreferLocalAuthRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_local_auth',
     problemMessage:
-        '[prefer_local_auth] Payment/sensitive operation without biometric authentication. Critical operations like payments should require additional authentication to prevent unauthorized access even if the device is unlocked.',
+        '[prefer_local_auth] Payment/sensitive operation without biometric authentication. Critical operations like payments should require additional authentication to prevent unauthorized access even if the device is unlocked. {v3}',
     correctionMessage:
         'Add LocalAuthentication().authenticate() before sensitive operations. Audit similar patterns across the codebase to ensure consistent security practices.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -4329,6 +4405,8 @@ class PreferLocalAuthRule extends SaropaLintRule {
 
 /// Warns when JWT/auth tokens are stored in SharedPreferences.
 ///
+/// Since: v2.3.5 | Updated: v4.13.0 | Rule version: v3
+///
 /// Alias: insecure_token_storage, shared_prefs_auth_data
 ///
 /// SharedPreferences is not encrypted. Auth tokens should use
@@ -4365,7 +4443,7 @@ class RequireSecureStorageAuthDataRule extends SaropaLintRule {
     name: 'require_secure_storage_auth_data',
     problemMessage:
         '[require_secure_storage_auth_data] Plaintext auth tokens enable '
-        'session hijacking via device backup or physical access.',
+        'session hijacking via device backup or physical access. {v3}',
     correctionMessage:
         'Replace SharedPreferences with FlutterSecureStorage for sensitive data.',
     errorSeverity: DiagnosticSeverity.ERROR,
@@ -4439,6 +4517,8 @@ class RequireSecureStorageAuthDataRule extends SaropaLintRule {
 
 /// Warns when WebView is created without explicitly disabling JavaScript.
 ///
+/// Since: v2.3.7 | Updated: v4.13.0 | Rule version: v4
+///
 /// Many WebViews don't need JavaScript, and leaving it enabled increases
 /// the attack surface for XSS vulnerabilities. Explicitly disable JavaScript
 /// when it's not required.
@@ -4488,7 +4568,7 @@ class PreferWebViewJavaScriptDisabledRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_webview_javascript_disabled',
     problemMessage:
-        '[prefer_webview_javascript_disabled] WebView with JavaScript enabled expands the attack surface for cross-site scripting and remote code execution. Malicious scripts can steal authentication tokens, access device APIs through JavaScript bridges, read local storage, and exfiltrate user data to attacker-controlled servers without detection.',
+        '[prefer_webview_javascript_disabled] WebView with JavaScript enabled expands the attack surface for cross-site scripting and remote code execution. Malicious scripts can steal authentication tokens, access device APIs through JavaScript bridges, read local storage, and exfiltrate user data to attacker-controlled servers without detection. {v4}',
     correctionMessage:
         'Set javaScriptEnabled: false or javascriptMode: JavascriptMode.disabled unless JavaScript is required, and restrict content to trusted HTTPS sources only.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -4549,6 +4629,8 @@ class PreferWebViewJavaScriptDisabledRule extends SaropaLintRule {
 
 /// Warns when WebView allows loading mixed (HTTP) content on HTTPS pages.
 ///
+/// Since: v2.3.7 | Updated: v4.13.0 | Rule version: v3
+///
 /// Loading insecure HTTP content in a secure HTTPS context bypasses
 /// encryption and enables man-in-the-middle attacks.
 ///
@@ -4597,7 +4679,7 @@ class AvoidWebViewInsecureContentRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_webview_insecure_content',
     problemMessage:
-        '[avoid_webview_insecure_content] Allowing mixed (HTTP and HTTPS) content in a WebView exposes users to man-in-the-middle attacks, data interception, and content tampering. Insecure content can compromise the confidentiality and integrity of user data. Always restrict WebView to load only secure (HTTPS) content.',
+        '[avoid_webview_insecure_content] Allowing mixed (HTTP and HTTPS) content in a WebView exposes users to man-in-the-middle attacks, data interception, and content tampering. Insecure content can compromise the confidentiality and integrity of user data. Always restrict WebView to load only secure (HTTPS) content. {v3}',
     correctionMessage:
         'Set mixedContentMode to MIXED_CONTENT_NEVER_ALLOW (or equivalent) to block insecure HTTP content in WebView. This ensures all loaded resources are secure and protects users from network-based attacks.',
     errorSeverity: DiagnosticSeverity.ERROR,
@@ -4662,6 +4744,8 @@ class AvoidWebViewInsecureContentRule extends SaropaLintRule {
 
 /// Warns when WebView lacks error handling for resource loading failures.
 ///
+/// Since: v2.3.7 | Updated: v4.13.0 | Rule version: v3
+///
 /// WebViews can fail to load resources due to network issues, invalid URLs,
 /// SSL errors, or blocked content. Without error handling, users see blank
 /// pages or confusing behavior.
@@ -4715,7 +4799,7 @@ class RequireWebViewErrorHandlingRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_webview_error_handling',
     problemMessage:
-        '[require_webview_error_handling] WebView without an error handler displays a blank white page when network requests fail, SSL errors occur, or resources cannot be loaded. Users see no feedback about what went wrong and have no way to retry, creating a confusing and broken experience that appears as an app crash.',
+        '[require_webview_error_handling] WebView without an error handler displays a blank white page when network requests fail, SSL errors occur, or resources cannot be loaded. Users see no feedback about what went wrong and have no way to retry, creating a confusing and broken experience that appears as an app crash. {v3}',
     correctionMessage:
         'Add an onWebResourceError or onLoadError callback that displays a user-friendly error message with a retry option when WebView content fails to load.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -4781,6 +4865,8 @@ class RequireWebViewErrorHandlingRule extends SaropaLintRule {
 
 /// Warns when API keys appear to be hardcoded in source code.
 ///
+/// Since: v2.3.11 | Updated: v4.13.0 | Rule version: v3
+///
 /// Alias: hardcoded_api_key, api_key_in_source, secret_in_code
 ///
 /// HEURISTIC: Detects string patterns that look like API keys.
@@ -4817,7 +4903,7 @@ class AvoidApiKeyInCodeRule extends SaropaLintRule {
     name: 'avoid_api_key_in_code',
     problemMessage:
         '[avoid_api_key_in_code] Hardcoded keys are extractable from app '
-        'binaries, enabling unauthorized API access and billing abuse.',
+        'binaries, enabling unauthorized API access and billing abuse. {v3}',
     correctionMessage:
         'Use environment variables, secure storage, or build config to inject keys.',
     errorSeverity: DiagnosticSeverity.ERROR,
@@ -4903,6 +4989,8 @@ class AvoidApiKeyInCodeRule extends SaropaLintRule {
 
 /// Warns when sensitive data is stored in unencrypted storage.
 ///
+/// Since: v2.3.11 | Updated: v4.13.0 | Rule version: v4
+///
 /// Alias: encrypt_sensitive_storage, secure_storage_required
 ///
 /// Hive and SharedPreferences store data in plain files. Use encrypted
@@ -4939,7 +5027,7 @@ class AvoidStoringSensitiveUnencryptedRule extends SaropaLintRule {
     name: 'avoid_storing_sensitive_unencrypted',
     problemMessage:
         '[avoid_storing_sensitive_unencrypted] Unencrypted sensitive data exposed '
-        'via device backup extraction or rooted device access, enabling identity theft.',
+        'via device backup extraction or rooted device access, enabling identity theft. {v4}',
     correctionMessage:
         'Use flutter_secure_storage or an encrypted Hive box for sensitive data.',
     errorSeverity: DiagnosticSeverity.ERROR,
@@ -5035,6 +5123,8 @@ class AvoidStoringSensitiveUnencryptedRule extends SaropaLintRule {
 
 /// Warns when SSL/TLS certificate errors are ignored.
 ///
+/// Since: v4.0.0 | Updated: v4.13.0 | Rule version: v3
+///
 /// Alias: ssl_pinning_bypass, ignore_certificate_errors
 ///
 /// Ignoring SSL certificate errors allows man-in-the-middle attacks.
@@ -5083,7 +5173,7 @@ class AvoidIgnoringSslErrorsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_ignoring_ssl_errors',
     problemMessage:
-        '[avoid_ignoring_ssl_errors] Bypassing or ignoring SSL/TLS certificate errors disables the core security guarantees of HTTPS, allowing man-in-the-middle attackers to intercept, modify, or steal all data sent over the network. This exposes user credentials, tokens, and sensitive personal data to silent compromise, and is a leading cause of real-world security breaches. SSL validation must never be disabled in production code.',
+        '[avoid_ignoring_ssl_errors] Bypassing or ignoring SSL/TLS certificate errors disables the core security guarantees of HTTPS, allowing man-in-the-middle attackers to intercept, modify, or steal all data sent over the network. This exposes user credentials, tokens, and sensitive personal data to silent compromise, and is a leading cause of real-world security breaches. SSL validation must never be disabled in production code. {v3}',
     correctionMessage:
         'Always validate SSL/TLS certificates in your network stack. Never return true unconditionally or bypass certificate checks, even for testing. Use certificate pinning or trusted certificate authorities for additional security. Audit your codebase for insecure SSL handling and refactor to enforce strict validation. Document secure network practices for your team.',
     errorSeverity: DiagnosticSeverity.ERROR,
@@ -5184,6 +5274,8 @@ class AvoidIgnoringSslErrorsRule extends SaropaLintRule {
 
 /// Warns when HTTP (non-HTTPS) URLs are hardcoded in source code.
 ///
+/// Since: v4.8.2 | Updated: v4.13.0 | Rule version: v4
+///
 /// Alias: no_http_urls, https_only, insecure_url
 ///
 /// HTTP traffic is unencrypted and vulnerable to interception.
@@ -5223,7 +5315,7 @@ class RequireHttpsOnlyRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_https_only',
     problemMessage:
-        '[require_https_only] HTTP URL detected in network request. Unencrypted HTTP traffic is vulnerable to interception, modification, and eavesdropping by any attacker on the network path. Sensitive data including credentials, personal information, and session tokens transmitted over HTTP can be silently captured in plaintext.',
+        '[require_https_only] HTTP URL detected in network request. Unencrypted HTTP traffic is vulnerable to interception, modification, and eavesdropping by any attacker on the network path. Sensitive data including credentials, personal information, and session tokens transmitted over HTTP can be silently captured in plaintext. {v4}',
     correctionMessage:
         'Replace http:// with https:// to encrypt all network traffic and prevent man-in-the-middle attacks, data interception, and content tampering.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -5359,6 +5451,8 @@ class _ReplaceWithHttpsFix extends DartFix {
 
 /// Detects HTTP URLs in test files at reduced severity.
 ///
+/// Since: v4.8.2 | Updated: v4.13.0 | Rule version: v3
+///
 /// This is the test-file companion to [RequireHttpsOnlyRule]. The production
 /// rule skips test files entirely; this rule covers them at INFO severity
 /// so teams can independently disable it without losing production protection.
@@ -5391,7 +5485,7 @@ class RequireHttpsOnlyTestRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_https_only_test',
     problemMessage: '[require_https_only_test] HTTP URL detected in test file. '
-        'Consider using HTTPS even in test data.',
+        'Consider using HTTPS even in test data. {v3}',
     correctionMessage:
         'Replace http:// with https:// or disable this rule for test files.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -5414,6 +5508,8 @@ class RequireHttpsOnlyTestRule extends SaropaLintRule {
 }
 
 /// Warns when JSON is decoded from untrusted sources without type validation.
+///
+/// Since: v4.0.0 | Updated: v4.13.0 | Rule version: v4
 ///
 /// Alias: unsafe_json_decode, json_injection, untrusted_deserialization
 ///
@@ -5460,7 +5556,7 @@ class AvoidUnsafeDeserializationRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_unsafe_deserialization',
     problemMessage:
-        '[avoid_unsafe_deserialization] Unvalidated JSON from untrusted sources can crash the app, inject malicious data, or corrupt application state. Attackers can exploit this vulnerability to trigger unexpected behavior, bypass security checks, or cause data loss by crafting malicious payloads.',
+        '[avoid_unsafe_deserialization] Unvalidated JSON from untrusted sources can crash the app, inject malicious data, or corrupt application state. Attackers can exploit this vulnerability to trigger unexpected behavior, bypass security checks, or cause data loss by crafting malicious payloads. {v4}',
     correctionMessage:
         'Validate JSON structure with pattern matching or deserialize into typed model classes.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -5591,6 +5687,8 @@ class AvoidUnsafeDeserializationRule extends SaropaLintRule {
 
 /// Warns when user-controlled input is used directly in HTTP requests.
 ///
+/// Since: v4.0.0 | Updated: v4.13.0 | Rule version: v3
+///
 /// Alias: ssrf_prevention, user_url_validation, untrusted_url
 ///
 /// Using user input directly in HTTP client methods enables Server-Side
@@ -5644,7 +5742,7 @@ class AvoidUserControlledUrlsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_user_controlled_urls',
     problemMessage:
-        'Allowing user-controlled URLs to be loaded without validation exposes your app to security vulnerabilities such as phishing, open redirects, and malicious content injection. This can compromise user data and app integrity. Always validate and sanitize URLs before loading or displaying them. See https://owasp.org/www-community/attacks/Unvalidated_Redirects_and_Forwards_Cheat_Sheet and https://pub.dev/packages/webview_flutter#security-considerations.',
+        '[avoid_user_controlled_urls] Allowing user-controlled URLs to be loaded without validation exposes your app to security vulnerabilities such as phishing, open redirects, and malicious content injection. This can compromise user data and app integrity. Always validate and sanitize URLs before loading or displaying them. See https://owasp.org/www-community/attacks/Unvalidated_Redirects_and_Forwards_Cheat_Sheet and https://pub.dev/packages/webview_flutter#security-considerations. {v3}',
     correctionMessage:
         'Implement strict validation and sanitization of all user-provided URLs to prevent security breaches and protect users from malicious content. See https://owasp.org/www-community/attacks/Unvalidated_Redirects_and_Forwards_Cheat_Sheet and https://pub.dev/packages/webview_flutter#security-considerations.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -5809,6 +5907,8 @@ class AvoidUserControlledUrlsRule extends SaropaLintRule {
 
 /// Warns when catch blocks silently swallow exceptions without logging.
 ///
+/// Since: v4.0.0 | Updated: v4.13.0 | Rule version: v2
+///
 /// Alias: silent_catch, empty_catch_logging, exception_swallowing
 ///
 /// Catch blocks that neither log the exception nor rethrow it hide errors
@@ -5866,7 +5966,7 @@ class RequireCatchLoggingRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_catch_logging',
     problemMessage:
-        '[require_catch_logging] Catch block swallows the exception without logging or rethrowing. Security-relevant errors such as authentication failures, permission violations, and data corruption go completely undetected. This prevents incident response, makes debugging production issues impossible, and hides potential attack activity.',
+        '[require_catch_logging] Catch block swallows the exception without logging or rethrowing. Security-relevant errors such as authentication failures, permission violations, and data corruption go completely undetected. This prevents incident response, makes debugging production issues impossible, and hides potential attack activity. {v2}',
     correctionMessage:
         'Log the exception with a structured logger (e.g., logger.error(message, error, stackTrace)) or rethrow to ensure errors are visible for debugging and monitoring.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -6003,6 +6103,8 @@ class RequireCatchLoggingRule extends SaropaLintRule {
 
 /// Secure storage operations can fail and need error handling.
 ///
+/// Since: v4.1.5 | Updated: v4.13.0 | Rule version: v3
+///
 /// Secure storage may fail on some devices due to:
 /// - Biometric unavailable
 /// - Device not secure
@@ -6035,7 +6137,7 @@ class RequireSecureStorageErrorHandlingRule extends SaropaLintRule {
     name: 'require_secure_storage_error_handling',
     problemMessage:
         '[require_secure_storage_error_handling] Secure storage operation '
-        'without error handling. May fail on some devices.',
+        'without error handling. May fail on some devices. {v3}',
     correctionMessage: 'Wrap in try-catch to handle PlatformException.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
@@ -6099,6 +6201,8 @@ class RequireSecureStorageErrorHandlingRule extends SaropaLintRule {
 
 /// Secure storage isn't designed for large data (>1KB).
 ///
+/// Since: v4.1.5 | Updated: v4.13.0 | Rule version: v3
+///
 /// Secure storage is slow and has size limits. For large data,
 /// use regular encrypted file storage.
 ///
@@ -6127,7 +6231,7 @@ class AvoidSecureStorageLargeDataRule extends SaropaLintRule {
     name: 'avoid_secure_storage_large_data',
     problemMessage:
         '[avoid_secure_storage_large_data] `[HEURISTIC]` Storing large data in '
-        'secure storage. It\'s designed for small secrets like tokens.',
+        'secure storage. It\'s designed for small secrets like tokens. {v3}',
     correctionMessage:
         'Use encrypted file storage for large data. Secure storage is slow '
         'and has size limits.',
@@ -6180,6 +6284,8 @@ class AvoidSecureStorageLargeDataRule extends SaropaLintRule {
 
 /// Warns when sensitive data is copied to clipboard.
 ///
+/// Since: v4.1.8 | Updated: v4.13.0 | Rule version: v3
+///
 /// `[HEURISTIC]` - Detects Clipboard.setData with sensitive variable names.
 ///
 /// Clipboard contents are accessible to other apps. Don't copy passwords,
@@ -6214,7 +6320,7 @@ class AvoidSensitiveDataInClipboardRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_sensitive_data_in_clipboard',
     problemMessage:
-        'Copying sensitive data such as passwords, tokens, or personal information to the clipboard exposes users to data theft, as other apps or malicious actors can access clipboard contents. This is a significant privacy and security risk, especially on shared or compromised devices. See https://owasp.org/www-project-top-ten/2017/A3_2017-Sensitive_Data_Exposure.html and https://api.flutter.dev/flutter/services/Clipboard-class.html.',
+        '[avoid_sensitive_data_in_clipboard] Copying sensitive data such as passwords, tokens, or personal information to the clipboard exposes users to data theft, as other apps or malicious actors can access clipboard contents. This is a significant privacy and security risk, especially on shared or compromised devices. See https://owasp.org/www-project-top-ten/2017/A3_2017-Sensitive_Data_Exposure.html and https://api.flutter.dev/flutter/services/Clipboard-class.html. {v3}',
     correctionMessage:
         'Avoid placing sensitive data on the clipboard and implement safeguards to prevent accidental exposure. Educate users about the risks and follow platform-specific security guidelines. See https://owasp.org/www-project-top-ten/2017/A3_2017-Sensitive_Data_Exposure.html and https://api.flutter.dev/flutter/services/Clipboard-class.html.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -6254,6 +6360,8 @@ class AvoidSensitiveDataInClipboardRule extends SaropaLintRule {
 
 /// Warns when clipboard paste is used without validation.
 ///
+/// Since: v4.1.8 | Updated: v4.13.0 | Rule version: v2
+///
 /// `[HEURISTIC]` - Detects Clipboard.getData without validation.
 ///
 /// Pasted content can be unexpected format or malicious.
@@ -6289,7 +6397,7 @@ class RequireClipboardPasteValidationRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_clipboard_paste_validation',
     problemMessage:
-        '[require_clipboard_paste_validation] Clipboard data used without validation. Pasted content can be unexpected format or malicious. Validate clipboard data before using it. This creates a security vulnerability that attackers can exploit to compromise user data or application integrity.',
+        '[require_clipboard_paste_validation] Clipboard data used without validation. Pasted content can be unexpected format or malicious. Validate clipboard data before using it. This creates a security vulnerability that attackers can exploit to compromise user data or application integrity. {v2}',
     correctionMessage:
         'Validate clipboard content format and sanitize before using. Audit similar patterns across the codebase to ensure consistent security practices.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -6347,6 +6455,8 @@ class RequireClipboardPasteValidationRule extends SaropaLintRule {
 
 /// Warns when encryption keys are stored as class fields.
 ///
+/// Since: v4.1.8 | Updated: v4.13.0 | Rule version: v2
+///
 /// `[HEURISTIC]` - Detects fields with key-related names.
 ///
 /// Keys kept in memory can be extracted from memory dumps.
@@ -6387,7 +6497,7 @@ class AvoidEncryptionKeyInMemoryRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_encryption_key_in_memory',
     problemMessage:
-        '[avoid_encryption_key_in_memory] Encryption key stored as a persistent class field remains in process memory for the lifetime of the object. Memory dumps, debugging tools, or memory-scanning malware can extract the key, compromising all data encrypted with it. Keys in memory survive garbage collection and are visible in heap snapshots.',
+        '[avoid_encryption_key_in_memory] Encryption key stored as a persistent class field remains in process memory for the lifetime of the object. Memory dumps, debugging tools, or memory-scanning malware can extract the key, compromising all data encrypted with it. Keys in memory survive garbage collection and are visible in heap snapshots. {v2}',
     correctionMessage:
         'Load encryption keys on demand from secure storage, use them immediately for the operation, and clear the variable after use to minimize the exposure window.',
     errorSeverity: DiagnosticSeverity.INFO,

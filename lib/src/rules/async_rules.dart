@@ -13,6 +13,8 @@ import '../saropa_lint_rule.dart';
 
 /// Warns when calling .ignore() on a Future.
 ///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v6
+///
 /// Alias: no_future_ignore, future_ignore_error, silent_future_discard
 ///
 /// **Quick fix available:** Adds a comment to flag for manual review.
@@ -29,7 +31,7 @@ class AvoidFutureIgnoreRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_future_ignore',
     problemMessage:
-        '[avoid_future_ignore] Calling Future.ignore() discards all errors and exceptions from the Future, causing failures to go unnoticed. This can result in silent bugs, missed exceptions, and unreliable app behavior, especially in production where error reporting is critical.',
+        '[avoid_future_ignore] Calling Future.ignore() discards all errors and exceptions from the Future, causing failures to go unnoticed. This can result in silent bugs, missed exceptions, and unreliable app behavior, especially in production where error reporting is critical. {v6}',
     correctionMessage:
         'Use await to handle the Future, unawaited() if you intentionally ignore it, or add .catchError() to log or handle errors. Never ignore errors in production code.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -65,6 +67,8 @@ class AvoidFutureIgnoreRule extends SaropaLintRule {
 
 /// Warns when calling toString() or using string interpolation on a Future.
 ///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v7
+///
 /// Alias: no_future_tostring, future_to_string, await_before_tostring
 ///
 /// **Quick fix available:** Adds a comment to flag for manual review.
@@ -81,7 +85,7 @@ class AvoidFutureToStringRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_future_tostring',
     problemMessage:
-        "[avoid_future_tostring] Future.toString() returns 'Instance of Future', not the resolved value. Logs show useless output, error messages fail to include actual data, and debugging async code becomes nearly impossible.",
+        "[avoid_future_tostring] Future.toString() returns 'Instance of Future', not the resolved value. Logs show useless output, error messages fail to include actual data, and debugging async code becomes nearly impossible. {v7}",
     correctionMessage:
         'Use await to get the resolved value first: (await future).toString(). Only call toString() after the Future has completed to log meaningful information.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -126,6 +130,8 @@ class AvoidFutureToStringRule extends SaropaLintRule {
 
 /// Warns when `Future<Future<T>>` is used (nested futures).
 ///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v4
+///
 /// Alias: nested_future, future_future, flatten_future
 ///
 /// Example of **bad** code:
@@ -152,7 +158,7 @@ class AvoidNestedFuturesRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_nested_futures',
     problemMessage:
-        '[avoid_nested_futures] Future<Future<T>> detected. Outer Future resolves to inner Future, not value - requires double await. Consequence: This pattern makes code harder to read, maintain, and debug, and can introduce subtle async bugs and runtime errors.',
+        '[avoid_nested_futures] Future<Future<T>> detected. Outer Future resolves to inner Future, not value - requires double await. Consequence: This pattern makes code harder to read, maintain, and debug, and can introduce subtle async bugs and runtime errors. {v4}',
     correctionMessage:
         'Flatten to Future<T>. If returning async result, just return it directly without wrapping.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -183,6 +189,8 @@ class AvoidNestedFuturesRule extends SaropaLintRule {
 
 /// Warns when `Stream<Future<T>>` or `Future<Stream<T>>` is used.
 ///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v4
+///
 /// Alias: stream_future_mix, nested_stream_future, flatten_stream
 ///
 /// Example of **bad** code:
@@ -209,7 +217,7 @@ class AvoidNestedStreamsAndFuturesRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_nested_streams_and_futures',
     problemMessage:
-        '[avoid_nested_streams_and_futures] Stream<Future<T>> or Future<Stream<T>> detected. Complex to consume - each item needs await or stream needs await. This increases cognitive load and can lead to memory leaks, unclosed stream subscriptions, or missed events.',
+        '[avoid_nested_streams_and_futures] Stream<Future<T>> or Future<Stream<T>> detected. Complex to consume - each item needs await or stream needs await. This increases cognitive load and can lead to memory leaks, unclosed stream subscriptions, or missed events. {v4}',
     correctionMessage:
         'Flatten the nested type by using an async* generator function or Stream.asyncMap() to produce a simpler type.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -249,6 +257,8 @@ class AvoidNestedStreamsAndFuturesRule extends SaropaLintRule {
 
 /// Warns when an async function is passed where a sync function is expected.
 ///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v4
+///
 /// Alias: async_callback_in_sync, async_where_sync_expected, ignored_future_return
 ///
 /// Passing an async function to a parameter expecting a synchronous function
@@ -271,7 +281,7 @@ class AvoidPassingAsyncWhenSyncExpectedRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_passing_async_when_sync_expected',
     problemMessage:
-        '[avoid_passing_async_when_sync_expected] Async callback passed to a sync-only method such as forEach, map, or where. The returned Future is silently discarded, which means any errors thrown inside the callback are lost and never reported. This makes debugging extremely difficult and can hide critical failures in your application logic.',
+        '[avoid_passing_async_when_sync_expected] Async callback passed to a sync-only method such as forEach, map, or where. The returned Future is silently discarded, which means any errors thrown inside the callback are lost and never reported. This makes debugging extremely difficult and can hide critical failures in your application logic. {v4}',
     correctionMessage:
         'Use Future.wait() with map(), or for-loop with await, instead of forEach/where/etc.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -324,6 +334,8 @@ class AvoidPassingAsyncWhenSyncExpectedRule extends SaropaLintRule {
 
 /// Warns when async is used but no await is present in the function body.
 ///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v7
+///
 /// Alias: unnecessary_async, async_without_await, remove_async, require_await_in_async
 ///
 /// Example of **bad** code:
@@ -356,7 +368,7 @@ class AvoidRedundantAsyncRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_redundant_async',
     problemMessage:
-        '[avoid_redundant_async] Declaring a function async without using await adds unnecessary Future wrapping and microtask scheduling overhead. This can make code harder to read, debug, and maintain, and may introduce subtle timing bugs.',
+        '[avoid_redundant_async] Declaring a function async without using await adds unnecessary Future wrapping and microtask scheduling overhead. This can make code harder to read, debug, and maintain, and may introduce subtle timing bugs. {v7}',
     correctionMessage:
         'Remove the async keyword if not needed, or add await if asynchronous behavior is required. Keep code clean and efficient.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -450,6 +462,8 @@ class _AvoidRedundantAsyncFix extends DartFix {
 
 /// Warns when a Stream is converted to String via toString().
 ///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v5
+///
 /// Alias: no_stream_tostring, stream_to_string, stream_tolist_instead
 ///
 /// Example of **bad** code:
@@ -472,7 +486,7 @@ class AvoidStreamToStringRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_stream_tostring',
     problemMessage:
-        "[avoid_stream_tostring] Calling toString() on a Stream returns only the type name (e.g., 'Instance of Stream'), not the actual stream data. This leads to data loss and can mislead developers or users expecting meaningful output.",
+        "[avoid_stream_tostring] Calling toString() on a Stream returns only the type name (e.g., 'Instance of Stream'), not the actual stream data. This leads to data loss and can mislead developers or users expecting meaningful output. {v5}",
     correctionMessage:
         'Use await stream.toList() to collect all values, or listen() to process stream data. Never rely on toString() for stream contents.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -508,6 +522,8 @@ class AvoidStreamToStringRule extends SaropaLintRule {
 
 /// Warns when .listen() result is not assigned to a variable.
 ///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v5
+///
 /// Alias: require_stream_subscription_cancel
 ///
 /// **Quick fix available:** Adds a comment to flag for manual review.
@@ -524,7 +540,7 @@ class AvoidUnassignedStreamSubscriptionsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_unassigned_stream_subscriptions',
     problemMessage:
-        '[avoid_unassigned_stream_subscriptions] Stream subscription created by listen() is not assigned to a variable. Without a reference to the StreamSubscription, you cannot cancel it during dispose, which causes memory leaks, prevents garbage collection, and allows callbacks to fire after the StatefulWidget has been destroyed and unmounted from the widget tree.',
+        '[avoid_unassigned_stream_subscriptions] Stream subscription created by listen() is not assigned to a variable. Without a reference to the StreamSubscription, you cannot cancel it during dispose, which causes memory leaks, prevents garbage collection, and allows callbacks to fire after the StatefulWidget has been destroyed and unmounted from the widget tree. {v5}',
     correctionMessage:
         'Assign to variable: final sub = stream.listen(...); then sub.cancel() in dispose.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -568,6 +584,8 @@ class AvoidUnassignedStreamSubscriptionsRule extends SaropaLintRule {
 
 /// Warns when .then() is used instead of async/await in async functions.
 ///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v6
+///
 /// Alias: use_async_await, then_to_await, avoid_then_chain
 ///
 /// Using async/await is generally more readable than .then() chains.
@@ -586,7 +604,7 @@ class PreferAsyncAwaitRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_async_await',
     problemMessage:
-        "[prefer_async_await] Using .then() inside an async function can hide errors in nested callbacks and makes code harder to debug, trace, and maintain. This can lead to missed exceptions and subtle bugs in complex async flows.",
+        "[prefer_async_await] Using .then() inside an async function can hide errors in nested callbacks and makes code harder to debug, trace, and maintain. This can lead to missed exceptions and subtle bugs in complex async flows. {v6}",
     correctionMessage:
         'Refactor to use async/await syntax for clearer error handling and more readable code.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -622,6 +640,8 @@ class PreferAsyncAwaitRule extends SaropaLintRule {
 
 /// Warns when await is used inline instead of assigning to a variable first.
 ///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v5
+///
 /// Alias: prefer_await_completion, inline_await, extract_await, await_variable
 class PreferAssigningAwaitExpressionsRule extends SaropaLintRule {
   const PreferAssigningAwaitExpressionsRule() : super(code: _code);
@@ -636,7 +656,7 @@ class PreferAssigningAwaitExpressionsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_assigning_await_expressions',
     problemMessage:
-        '[prefer_assigning_await_expressions] Inline await expression. Harder to debug and inspect intermediate values. Consequence: Extracting to a variable improves readability, makes debugging easier, and helps catch errors sooner.',
+        '[prefer_assigning_await_expressions] Inline await expression. Harder to debug and inspect intermediate values. Consequence: Extracting to a variable improves readability, makes debugging easier, and helps catch errors sooner. {v5}',
     correctionMessage:
         'Extract the await expression to a named variable: final result = await fetch(); then use result in subsequent code.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -681,6 +701,8 @@ class PreferAssigningAwaitExpressionsRule extends SaropaLintRule {
 
 /// Warns when Future.delayed doesn't have a comment explaining why.
 ///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v4
+///
 /// Alias: document_future_delayed, explain_delay, delay_comment
 ///
 /// Delays should be documented to explain their purpose.
@@ -711,7 +733,7 @@ class PreferCommentingFutureDelayedRule extends SaropaLintRule {
     name: 'prefer_commenting_future_delayed',
     problemMessage:
         '[prefer_commenting_future_delayed] Unexplained delay is a code smell '
-        'that often hides race conditions or timing bugs.',
+        'that often hides race conditions or timing bugs. {v4}',
     correctionMessage: 'Add a comment before the delay explaining its purpose.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -743,6 +765,8 @@ class PreferCommentingFutureDelayedRule extends SaropaLintRule {
 
 /// Warns when Future-returning functions have incorrect return type annotations.
 ///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v3
+///
 /// Alias: async_return_type, future_return_type, explicit_future_type
 class PreferCorrectFutureReturnTypeRule extends SaropaLintRule {
   const PreferCorrectFutureReturnTypeRule() : super(code: _code);
@@ -751,7 +775,7 @@ class PreferCorrectFutureReturnTypeRule extends SaropaLintRule {
     name: 'prefer_correct_future_return_type',
     problemMessage:
         '[prefer_correct_future_return_type] Missing Future return type causes '
-        'callers to handle dynamic, losing type safety and IDE support.',
+        'callers to handle dynamic, losing type safety and IDE support. {v3}',
     correctionMessage: 'Add explicit Future<T> return type.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -799,6 +823,8 @@ class PreferCorrectFutureReturnTypeRule extends SaropaLintRule {
 
 /// Warns when Stream-returning functions have incorrect return type annotations.
 ///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v5
+///
 /// Alias: async_star_return_type, stream_return_type, explicit_stream_type
 class PreferCorrectStreamReturnTypeRule extends SaropaLintRule {
   const PreferCorrectStreamReturnTypeRule() : super(code: _code);
@@ -814,7 +840,7 @@ class PreferCorrectStreamReturnTypeRule extends SaropaLintRule {
     name: 'prefer_correct_stream_return_type',
     problemMessage:
         '[prefer_correct_stream_return_type] Missing Stream return type causes '
-        'listeners to receive dynamic, losing type safety and IDE support.',
+        'listeners to receive dynamic, losing type safety and IDE support. {v5}',
     correctionMessage: 'Add explicit Stream<T> return type.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -861,6 +887,8 @@ class PreferCorrectStreamReturnTypeRule extends SaropaLintRule {
 }
 
 /// Warns when Future.value() is called without explicit type argument.
+///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v5
 class PreferSpecifyingFutureValueTypeRule extends SaropaLintRule {
   const PreferSpecifyingFutureValueTypeRule() : super(code: _code);
 
@@ -874,7 +902,7 @@ class PreferSpecifyingFutureValueTypeRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_specifying_future_value_type',
     problemMessage:
-        '[prefer_specifying_future_value_type] Calling Future.value() without specifying a type returns Future<dynamic>, which loses compile-time safety. This can lead to type errors, runtime bugs, and code that is harder to maintain and refactor.',
+        '[prefer_specifying_future_value_type] Calling Future.value() without specifying a type returns Future<dynamic>, which loses compile-time safety. This can lead to type errors, runtime bugs, and code that is harder to maintain and refactor. {v5}',
     correctionMessage:
         'Always specify the value type explicitly: Future<Type>.value(...). This improves type safety and code clarity.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -904,6 +932,8 @@ class PreferSpecifyingFutureValueTypeRule extends SaropaLintRule {
 }
 
 /// Warns when a Future is returned without await in an async function.
+///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v6
 ///
 /// In async functions, returning a Future without await can cause issues
 /// with error handling and stack traces.
@@ -940,7 +970,7 @@ class PreferReturnAwaitRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_return_await',
     problemMessage:
-        '[prefer_return_await] Returning a Future directly from an async function skips error propagation and stack trace preservation, making debugging harder. This can hide the source of exceptions and complicate error handling.',
+        '[prefer_return_await] Returning a Future directly from an async function skips error propagation and stack trace preservation, making debugging harder. This can hide the source of exceptions and complicate error handling. {v6}',
     correctionMessage:
         'Use return await to ensure errors are properly propagated and stack traces are preserved in async functions.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -1267,6 +1297,9 @@ class _AddHackForUnassignedSubscriptionFix extends DartFix {
 /// explicit `Future<void> Function()` form because:
 
 /// 1. **No Flutter-specific type dependency** — works in pure Dart and Flutter
+///
+/// Since: v1.4.0 | Updated: v4.13.0 | Rule version: v4
+///
 ///    projects alike without importing Flutter foundation types
 /// 2. **Self-documenting** - the signature is immediately clear
 /// 3. **Consistent** - matches how parameterized async callbacks are written:
@@ -1294,7 +1327,7 @@ class PreferAsyncCallbackRule extends SaropaLintRule {
     name: 'prefer_async_callback',
     problemMessage:
         '[prefer_async_callback] VoidCallback discards Futures silently. Errors will be swallowed and '
-        'callers cannot await completion.',
+        'callers cannot await completion. {v4}',
     correctionMessage:
         'Use Future<void> Function() to allow proper async handling.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -1479,6 +1512,8 @@ class _ChangeToFutureVoidFunctionFix extends DartFix {
 }
 
 /// Enforces using explicit Future-returning callbacks instead of AsyncCallback.
+///
+/// Since: v1.7.5 | Updated: v4.13.0 | Rule version: v3
 class PreferFutureVoidFunctionOverAsyncCallbackRule extends SaropaLintRule {
   const PreferFutureVoidFunctionOverAsyncCallbackRule() : super(code: _code);
 
@@ -1491,7 +1526,7 @@ class PreferFutureVoidFunctionOverAsyncCallbackRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_future_void_function_over_async_callback',
     problemMessage:
-        '[prefer_future_void_function_over_async_callback] Prefer explicit Future<void> Function() instead of AsyncCallback. Enforces using explicit Future-returning callbacks instead of AsyncCallback.',
+        '[prefer_future_void_function_over_async_callback] Prefer explicit Future<void> Function() instead of AsyncCallback. Enforces using explicit Future-returning callbacks instead of AsyncCallback. {v3}',
     correctionMessage:
         'Use Future<void> Function() instead of AsyncCallback to keep the signature framework-agnostic and self-documenting.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -1549,6 +1584,8 @@ class _ReplaceAsyncCallbackWithFutureVoidFunctionFix extends DartFix {
 
 /// Warns when Navigator.pop or context is used after await in a dialog callback.
 ///
+/// Since: v2.0.0 | Updated: v4.13.0 | Rule version: v5
+///
 /// After an async operation in a dialog, the dialog may have been dismissed
 /// or the context may no longer be valid. Using context after await can crash.
 ///
@@ -1581,7 +1618,7 @@ class AvoidDialogContextAfterAsyncRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_dialog_context_after_async',
     problemMessage:
-        '[avoid_dialog_context_after_async] If you call Navigator.pop() or use BuildContext after an await, the widget may have been disposed, causing a "Looking up deactivated widget" crash. This leads to app instability and poor user experience.',
+        '[avoid_dialog_context_after_async] If you call Navigator.pop() or use BuildContext after an await, the widget may have been disposed, causing a "Looking up deactivated widget" crash. This leads to app instability and poor user experience. {v5}',
     correctionMessage:
         'Always check if (context.mounted) before using BuildContext or Navigator.pop() after an await to prevent crashes.',
     errorSeverity: DiagnosticSeverity.ERROR,
@@ -1602,7 +1639,10 @@ class AvoidDialogContextAfterAsyncRule extends SaropaLintRule {
       if (target == null) return;
 
       final String targetSource = target.toSource();
-      if (!targetSource.contains('Navigator')) return;
+      if (targetSource != 'Navigator' &&
+          !targetSource.startsWith('Navigator.')) {
+        return;
+      }
 
       // Check if there's an await before this in the same function
       final FunctionBody? body = _findEnclosingFunctionBody(node);
@@ -1695,6 +1735,8 @@ class _AwaitBeforeChecker extends RecursiveAstVisitor<void> {
 
 /// Warns when setState or context is accessed after await without mounted check.
 ///
+/// Since: v4.0.1 | Updated: v4.13.0 | Rule version: v4
+///
 /// After an async gap, the widget may have been disposed. Calling setState
 /// or using context without checking mounted will cause errors.
 ///
@@ -1728,7 +1770,7 @@ class CheckMountedAfterAsyncRule extends SaropaLintRule {
     name: 'check_mounted_after_async',
     problemMessage:
         '[check_mounted_after_async] setState() after await without mounted check. '
-        'State may be disposed during async gap, causing "setState() called after dispose()" crash.',
+        'State may be disposed during async gap, causing "setState() called after dispose()" crash. {v4}',
     correctionMessage: 'Add if (mounted) { setState(...) } after the await.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
@@ -1810,6 +1852,8 @@ class CheckMountedAfterAsyncRule extends SaropaLintRule {
 
 /// Warns when WebSocket message is handled without validation.
 ///
+/// Since: v2.0.0 | Updated: v4.13.0 | Rule version: v3
+///
 /// WebSocket messages from external sources should be validated
 /// before processing to prevent security issues and crashes.
 ///
@@ -1847,7 +1891,7 @@ class RequireWebsocketMessageValidationRule extends SaropaLintRule {
     name: 'require_websocket_message_validation',
     problemMessage:
         '[require_websocket_message_validation] Unvalidated WebSocket messages '
-        'crash when malformed data arrives, or enable injection attacks.',
+        'crash when malformed data arrives, or enable injection attacks. {v3}',
     correctionMessage:
         'Add try-catch and type checking for WebSocket messages.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -1868,10 +1912,10 @@ class RequireWebsocketMessageValidationRule extends SaropaLintRule {
 
       // Check for WebSocket-related patterns
       final String targetSource = target.toSource();
-      if (!targetSource.contains('socket') &&
-          !targetSource.contains('Socket') &&
-          !targetSource.contains('channel') &&
-          !targetSource.contains('Channel')) {
+      if (!targetSource.endsWith('socket') &&
+          !targetSource.endsWith('Socket') &&
+          !targetSource.endsWith('channel') &&
+          !targetSource.endsWith('Channel')) {
         return;
       }
 
@@ -1904,6 +1948,8 @@ class RequireWebsocketMessageValidationRule extends SaropaLintRule {
 
 /// Warns when feature flag is checked without a default/fallback value.
 ///
+/// Since: v2.0.0 | Updated: v4.13.0 | Rule version: v3
+///
 /// Feature flags may not be available (network issues, not loaded yet).
 /// Always provide a default value for graceful degradation.
 ///
@@ -1934,7 +1980,7 @@ class RequireFeatureFlagDefaultRule extends SaropaLintRule {
     name: 'require_feature_flag_default',
     problemMessage:
         '[require_feature_flag_default] Missing default causes null/zero when '
-        'remote config fetch fails, breaking expected feature behavior.',
+        'remote config fetch fails, breaking expected feature behavior. {v3}',
     correctionMessage:
         'Use ?? operator or provide default in getBool/getString.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -1983,6 +2029,8 @@ class RequireFeatureFlagDefaultRule extends SaropaLintRule {
 }
 
 /// Warns when DateTime is stored or serialized without converting to UTC.
+///
+/// Since: v2.0.0 | Updated: v4.13.0 | Rule version: v4
 ///
 /// Local DateTime values contain timezone offset information that becomes
 /// invalid when restored in a different timezone. A timestamp saved as
@@ -2037,7 +2085,7 @@ class PreferUtcForStorageRule extends SaropaLintRule {
     name: 'prefer_utc_for_storage',
     problemMessage:
         '[prefer_utc_for_storage] Local time stored without UTC conversion '
-        'causes incorrect values when restored in different timezones.',
+        'causes incorrect values when restored in different timezones. {v4}',
     correctionMessage: 'Call .toUtc() before storing DateTime values.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
@@ -2157,6 +2205,8 @@ class _AddToUtcFix extends DartFix {
 
 /// Warns when location request is made without a timeout.
 ///
+/// Since: v2.0.0 | Updated: v4.13.0 | Rule version: v3
+///
 /// Location requests can hang indefinitely if GPS is unavailable.
 /// Always specify a timeout to prevent blocking the UI.
 ///
@@ -2184,11 +2234,33 @@ class RequireLocationTimeoutRule extends SaropaLintRule {
     name: 'require_location_timeout',
     problemMessage:
         '[require_location_timeout] Location request without timeout can hang '
-        'indefinitely if GPS is unavailable, freezing the app.',
+        'indefinitely if GPS is unavailable, freezing the app. {v3}',
     correctionMessage:
         'Add timeLimit or timeout parameter to location request.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
+
+  /// Methods that actually request GPS coordinates.
+  static const Set<String> _gpsRequestMethods = {
+    'getCurrentPosition',
+    'getLastKnownPosition',
+    'getLocation',
+    'getPositionStream',
+    'requestPosition',
+  };
+
+  /// Classes that own GPS-requesting methods.
+  static const Set<String> _gpsRequestTargets = {
+    'Geolocator',
+    'Location', // from location package
+  };
+
+  /// Named args that indicate a timeout is configured.
+  static const Set<String> _timeoutArgNames = {
+    'timeLimit',
+    'timeout',
+    'duration',
+  };
 
   @override
   void runWithReporter(
@@ -2197,43 +2269,67 @@ class RequireLocationTimeoutRule extends SaropaLintRule {
     CustomLintContext context,
   ) {
     context.registry.addMethodInvocation((MethodInvocation node) {
-      // Check for location-related methods
       final String methodName = node.methodName.name;
-      if (!methodName.contains('Position') &&
-          !methodName.contains('Location') &&
-          !methodName.contains('location') &&
-          methodName != 'getCurrentPosition' &&
-          methodName != 'getLastKnownPosition' &&
-          methodName != 'getLocation') {
-        return;
-      }
+      if (!_gpsRequestMethods.contains(methodName)) return;
 
       final Expression? target = node.target;
       if (target == null) return;
 
-      final String targetSource = target.toSource();
-      if (!targetSource.contains('Geolocator') &&
-          !targetSource.contains('Location') &&
-          !targetSource.contains('location')) {
-        return;
-      }
+      // Match exact class name, not substrings
+      final String targetName = _extractTargetName(target);
+      if (!_gpsRequestTargets.contains(targetName)) return;
 
-      // Check for timeout parameter
-      bool hasTimeout = false;
-      for (final Expression arg in node.argumentList.arguments) {
-        if (arg is NamedExpression) {
-          final String name = arg.name.label.name;
-          if (name == 'timeLimit' || name == 'timeout' || name == 'duration') {
-            hasTimeout = true;
-            break;
-          }
-        }
-      }
+      // Check for timeout in direct arguments
+      if (_hasTimeoutArg(node)) return;
 
-      if (!hasTimeout) {
-        reporter.atNode(node, code);
-      }
+      // Check for chained .timeout() on the returned Future
+      if (_hasChainedTimeout(node)) return;
+
+      reporter.atNode(node, code);
     });
+  }
+
+  /// Extracts the simple class/identifier name from the call target,
+  /// ignoring instance chains like `widget.geolocator`.
+  static String _extractTargetName(Expression target) {
+    if (target is SimpleIdentifier) return target.name;
+    if (target is PrefixedIdentifier) return target.identifier.name;
+    if (target is PropertyAccess) return target.propertyName.name;
+    return '';
+  }
+
+  /// Checks if any named argument is a timeout parameter.
+  static bool _hasTimeoutArg(MethodInvocation node) {
+    for (final Expression arg in node.argumentList.arguments) {
+      if (arg is NamedExpression &&
+          _timeoutArgNames.contains(arg.name.label.name)) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  /// Checks if `.timeout()` is chained anywhere on the returned Future.
+  ///
+  /// Handles patterns like:
+  /// - `call().timeout(...)`
+  /// - `call().then(...).timeout(...)`
+  /// - `call().catchError(...).timeout(...)`
+  static bool _hasChainedTimeout(MethodInvocation node) {
+    AstNode? current = node.parent;
+    while (current != null) {
+      if (current is MethodInvocation && current.methodName.name == 'timeout') {
+        return true;
+      }
+      // Walk through chained method calls and property accesses
+      if (current is MethodInvocation || current is PropertyAccess) {
+        current = current.parent;
+        continue;
+      }
+      // Stop at expression boundaries
+      break;
+    }
+    return false;
   }
 }
 
@@ -2242,6 +2338,8 @@ class RequireLocationTimeoutRule extends SaropaLintRule {
 // =============================================================================
 
 /// Warns when StreamController is created inside build() method.
+///
+/// Since: v2.1.0 | Updated: v4.13.0 | Rule version: v2
 ///
 /// Creating streams in build causes them to be recreated on every rebuild,
 /// leading to memory leaks and lost events.
@@ -2275,7 +2373,7 @@ class AvoidStreamInBuildRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_stream_in_build',
     problemMessage:
-        'Creating a Stream or StreamController inside a widget’s build() method causes a new stream instance to be created on every rebuild of that widget. This leads to multiple overlapping subscriptions, memory leaks, and lost or duplicated events, making the widget’s state unpredictable and difficult to debug. Always manage streams as persistent fields in the State class, not as local variables in build(). See https://docs.flutter.dev/cookbook/networking/web-sockets#using-streambuilder.',
+        "[avoid_stream_in_build] Creating a Stream or StreamController inside a widget's build() method causes a new stream instance to be created on every rebuild of that widget. This leads to multiple overlapping subscriptions, memory leaks, and lost or duplicated events, making the widget's state unpredictable and difficult to debug. Always manage streams as persistent fields in the State class, not as local variables in build(). See https://docs.flutter.dev/cookbook/networking/web-sockets#using-streambuilder. {v2}",
     correctionMessage:
         'Move all Stream and StreamController creation out of the build() method and into the State class, typically initializing them in initState() and disposing them in dispose(). This ensures a single, consistent stream lifecycle per widget instance and prevents memory leaks or event loss. See https://docs.flutter.dev/cookbook/networking/web-sockets#using-streambuilder for recommended patterns.',
     errorSeverity: DiagnosticSeverity.ERROR,
@@ -2291,7 +2389,7 @@ class AvoidStreamInBuildRule extends SaropaLintRule {
       InstanceCreationExpression node,
     ) {
       final String typeName = node.constructorName.type.name.lexeme;
-      if (!typeName.contains('StreamController')) return;
+      if (typeName != 'StreamController') return;
 
       // Check if inside build method
       AstNode? current = node.parent;
@@ -2307,6 +2405,8 @@ class AvoidStreamInBuildRule extends SaropaLintRule {
 }
 
 /// Warns when StreamController is not closed in dispose().
+///
+/// Since: v4.7.4 | Updated: v4.13.0 | Rule version: v5
 ///
 /// StreamControllers must be closed to prevent memory leaks and
 /// allow garbage collection.
@@ -2352,7 +2452,7 @@ class RequireStreamControllerCloseRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_stream_controller_close',
     problemMessage:
-        '[require_stream_controller_close] Failing to close a StreamController in the dispose() method leaves the stream open, causing memory leaks, connection handle exhaustion, and potential app crashes. Unclosed streams can accumulate events and listeners, degrading performance and making debugging difficult. Proper closure is essential for robust, production-quality Flutter apps.',
+        '[require_stream_controller_close] Failing to close a StreamController in the dispose() method leaves the stream open, causing memory leaks, connection handle exhaustion, and potential app crashes. Unclosed streams can accumulate events and listeners, degrading performance and making debugging difficult. Proper closure is essential for robust, production-quality Flutter apps. {v5}',
     correctionMessage:
         'Call controller.close() in dispose() before super.dispose(). For wrapper types (e.g., IsarStreamController), calling wrapper.dispose() is also acceptable if the wrapper internally closes its StreamController.',
     errorSeverity: DiagnosticSeverity.ERROR,
@@ -2373,11 +2473,12 @@ class RequireStreamControllerCloseRule extends SaropaLintRule {
       for (final member in node.members) {
         if (member is FieldDeclaration) {
           final String? typeStr = member.fields.type?.toSource();
-          if (typeStr != null && typeStr.contains('StreamController')) {
-            // Check if this is an exact StreamController type vs a wrapper
-            final bool isExactType = typeStr.startsWith('StreamController<') ||
-                typeStr.startsWith('StreamController ') ||
-                typeStr == 'StreamController';
+          if (typeStr != null &&
+              (typeStr.startsWith('StreamController') ||
+                  typeStr.startsWith('StreamController?'))) {
+            final bool isExactType = typeStr == 'StreamController' ||
+                typeStr.startsWith('StreamController<') ||
+                typeStr.startsWith('StreamController?');
             for (final variable in member.fields.variables) {
               controllers.add((variable, isExactType));
             }
@@ -2506,6 +2607,8 @@ class _AddStreamControllerCloseFix extends DartFix {
 
 /// Warns when multiple listeners are added to a non-broadcast stream.
 ///
+/// Since: v2.1.0 | Updated: v4.13.0 | Rule version: v2
+///
 /// Regular streams can only have one listener. Adding multiple causes an error.
 ///
 /// **BAD:**
@@ -2533,7 +2636,7 @@ class AvoidMultipleStreamListenersRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_multiple_stream_listeners',
     problemMessage:
-        '[avoid_multiple_stream_listeners] Multiple listen() calls detected on the same non-broadcast stream. Single-subscription streams only allow one active listener at a time. Adding a second listener throws a StateError at runtime, which crashes your app and makes the stream connection unusable for all subscribers.',
+        '[avoid_multiple_stream_listeners] Multiple listen() calls detected on the same non-broadcast stream. Single-subscription streams only allow one active listener at a time. Adding a second listener throws a StateError at runtime, which crashes your app and makes the stream connection unusable for all subscribers. {v2}',
     correctionMessage:
         'Convert the stream to a broadcast stream using .asBroadcastStream(), or ensure only one listener is attached.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -2588,6 +2691,8 @@ class AvoidMultipleStreamListenersRule extends SaropaLintRule {
 
 /// Warns when stream.listen() is called without onError handler.
 ///
+/// Since: v2.1.0 | Updated: v4.13.0 | Rule version: v2
+///
 /// Streams can emit errors. Unhandled errors cause uncaught exceptions.
 ///
 /// **BAD:**
@@ -2614,7 +2719,7 @@ class RequireStreamErrorHandlingRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_stream_error_handling',
     problemMessage:
-        '[require_stream_error_handling] Stream.listen() is called without providing an onError callback or wrapping the stream in a try-catch. Unhandled stream errors propagate as uncaught exceptions, which crash your app in production and terminate the stream connection permanently, preventing any further data from being received.',
+        '[require_stream_error_handling] Stream.listen() is called without providing an onError callback or wrapping the stream in a try-catch. Unhandled stream errors propagate as uncaught exceptions, which crash your app in production and terminate the stream connection permanently, preventing any further data from being received. {v2}',
     correctionMessage:
         'Add an onError callback to your stream.listen() to handle errors gracefully and prevent crashes.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -2661,6 +2766,8 @@ class RequireStreamErrorHandlingRule extends SaropaLintRule {
 
 /// Warns when long-running Futures don't have a timeout.
 ///
+/// Since: v2.1.0 | Updated: v4.13.0 | Rule version: v3
+///
 /// Futures without timeouts can hang indefinitely, causing poor UX.
 ///
 /// **BAD:**
@@ -2685,7 +2792,7 @@ class RequireFutureTimeoutRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_future_timeout',
     problemMessage:
-        '[require_future_timeout] Executing a long-running Future (such as network or I/O operations) without a timeout can cause your app to hang indefinitely if the operation never completes. This can freeze the UI and degrade user experience.',
+        '[require_future_timeout] Executing a long-running Future (such as network or I/O operations) without a timeout can cause your app to hang indefinitely if the operation never completes. This can freeze the UI and degrade user experience. {v3}',
     correctionMessage:
         'Always add .timeout(Duration(...)) to long-running Futures to ensure your app remains responsive and can handle failures gracefully.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -2746,6 +2853,8 @@ class RequireFutureTimeoutRule extends SaropaLintRule {
 
 /// Warns when Future.wait is used without error handling for partial failures.
 ///
+/// Since: v2.1.0 | Updated: v4.13.0 | Rule version: v2
+///
 /// When one Future in Future.wait fails, all results are lost by default.
 /// Use eagerError: false to get partial results on failure.
 ///
@@ -2789,7 +2898,7 @@ class RequireFutureWaitErrorHandlingRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_future_wait_error_handling',
     problemMessage:
-        '[require_future_wait_error_handling] Future.wait without eagerError: false. Partial results lost on failure. When one Future in Future.wait fails, all results are lost by default. Use eagerError: false to get partial results on failure.',
+        '[require_future_wait_error_handling] Future.wait without eagerError: false. Partial results lost on failure. When one Future in Future.wait fails, all results are lost by default. Use eagerError: false to get partial results on failure. {v2}',
     correctionMessage:
         'Add eagerError: false or wrap individual futures with catchError. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -2825,6 +2934,8 @@ class RequireFutureWaitErrorHandlingRule extends SaropaLintRule {
 
 /// Warns when Stream is listened to without onDone handler.
 ///
+/// Since: v2.1.0 | Updated: v4.13.0 | Rule version: v2
+///
 /// Streams should handle completion to clean up resources
 /// and update UI state appropriately.
 ///
@@ -2856,7 +2967,7 @@ class RequireStreamOnDoneRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_stream_on_done',
     problemMessage:
-        '[require_stream_on_done] Stream.listen() is called without an onDone handler. When the stream completes, you will not be notified, which can lead to missed cleanup or UI updates.',
+        '[require_stream_on_done] Stream.listen() is called without an onDone handler. When the stream completes, you will not be notified, which can lead to missed cleanup or UI updates. {v2}',
     correctionMessage:
         'Add an onDone callback to handle stream completion and perform necessary cleanup or state updates.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -2876,7 +2987,7 @@ class RequireStreamOnDoneRule extends SaropaLintRule {
       if (targetType == null) return;
 
       final typeName = targetType.getDisplayString();
-      if (!typeName.contains('Stream')) return;
+      if (!typeName.startsWith('Stream<') && typeName != 'Stream') return;
 
       // Check for onDone parameter
       bool hasOnDone = false;
@@ -2895,6 +3006,8 @@ class RequireStreamOnDoneRule extends SaropaLintRule {
 }
 
 /// Warns when Completer is created but never completed in error paths.
+///
+/// Since: v2.1.0 | Updated: v4.13.0 | Rule version: v3
 ///
 /// Uncompleted Completers can cause futures to hang forever.
 /// Always complete with error in catch blocks.
@@ -2937,7 +3050,7 @@ class RequireCompleterErrorHandlingRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_completer_error_handling',
     problemMessage:
-        '[require_completer_error_handling] Using a Completer in a try-catch block without calling completeError in the catch block can cause the Future to hang forever if an error occurs. This leads to memory leaks, dangling stream subscriptions, and unclosed connection handles that degrade app stability over time.',
+        '[require_completer_error_handling] Using a Completer in a try-catch block without calling completeError in the catch block can cause the Future to hang forever if an error occurs. This leads to memory leaks, dangling stream subscriptions, and unclosed connection handles that degrade app stability over time. {v3}',
     correctionMessage:
         'Always call completer.completeError(e) in the catch block to ensure the Future completes with an error and does not hang.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -2983,6 +3096,9 @@ class RequireCompleterErrorHandlingRule extends SaropaLintRule {
 }
 
 /// Warns when stream.listen() is called in a field initializer without
+///
+/// Since: v2.3.7 | Updated: v4.13.0 | Rule version: v4
+///
 /// storing the subscription for later cancellation.
 ///
 /// Stream subscriptions in field initializers are particularly dangerous
@@ -3036,7 +3152,7 @@ class AvoidStreamSubscriptionInFieldRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_stream_subscription_in_field',
     problemMessage:
-        'If a StreamSubscription is stored as a field in a State class but not properly cancelled in dispose(), the subscription will continue to receive events even after the widget is removed from the widget tree. This can cause memory leaks, unexpected UI updates, and subtle bugs, especially in dynamic lists or navigation flows where widgets are frequently created and destroyed. Always cancel subscriptions in the correct State object’s dispose() method. See https://docs.flutter.dev/perf/memory#dispose-resources.',
+        '[avoid_stream_subscription_in_field] If a StreamSubscription is stored as a field in a State class but not properly cancelled in dispose(), the subscription will continue to receive events even after the widget is removed from the widget tree. This can cause memory leaks, unexpected UI updates, and subtle bugs, especially in dynamic lists or navigation flows where widgets are frequently created and destroyed. Always cancel subscriptions in the correct State object’s dispose() method. See https://docs.flutter.dev/perf/memory#dispose-resources. {v4}',
     correctionMessage:
         'In every State class that owns a StreamSubscription field, call subscription.cancel() in the dispose() method before calling super.dispose(). This ensures the subscription is cleaned up when the widget is removed, preventing leaks and unwanted callbacks. See https://docs.flutter.dev/perf/memory#dispose-resources for more information.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -3175,6 +3291,8 @@ class _AddStreamSubscriptionStorageFix extends DartFix {
 
 /// Warns when .then() is used inside an async function.
 ///
+/// Since: v2.3.10 | Updated: v4.13.0 | Rule version: v2
+///
 /// Alias: then_in_async, prefer_await_over_then
 ///
 /// Using .then() inside an async function mixes two async patterns.
@@ -3209,7 +3327,7 @@ class AvoidFutureThenInAsyncRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_future_then_in_async',
     problemMessage:
-        '[avoid_future_then_in_async] Using .then() inside async function. Prefer await for consistency. Using .then() inside an async function mixes two async patterns. Prefer await for cleaner, more readable code.',
+        '[avoid_future_then_in_async] Using .then() inside async function. Prefer await for consistency. Using .then() inside an async function mixes two async patterns. Prefer await for cleaner, more readable code. {v2}',
     correctionMessage:
         'Use await instead of .then() for cleaner async code. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -3249,6 +3367,8 @@ class AvoidFutureThenInAsyncRule extends SaropaLintRule {
 }
 
 /// Warns when a Future is not awaited and not explicitly marked.
+///
+/// Since: v2.3.10 | Updated: v4.13.0 | Rule version: v3
 ///
 /// Alias: unawaited_future, missing_await, fire_and_forget
 ///
@@ -3304,7 +3424,7 @@ class AvoidUnawaitedFutureRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_unawaited_future',
     problemMessage:
-        '[avoid_unawaited_future] Not awaiting a Future means any errors or exceptions it throws may be silently lost, leading to missed bugs and unreliable app behavior. This is especially risky in production code where error reporting is critical.',
+        '[avoid_unawaited_future] Not awaiting a Future means any errors or exceptions it throws may be silently lost, leading to missed bugs and unreliable app behavior. This is especially risky in production code where error reporting is critical. {v3}',
     correctionMessage:
         'Always use await or unawaited() to explicitly handle Futures and ensure errors are not lost.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -3432,7 +3552,7 @@ class AvoidUnawaitedFutureRule extends SaropaLintRule {
       final DartType? targetType = target.staticType;
       if (targetType != null) {
         final String targetTypeName = targetType.getDisplayString();
-        if (!targetTypeName.contains('StreamController')) {
+        if (!targetTypeName.startsWith('StreamController')) {
           return false;
         }
       }
@@ -3466,6 +3586,8 @@ class AvoidUnawaitedFutureRule extends SaropaLintRule {
 // =============================================================================
 
 /// Warns when sequential awaits could use Future.wait for parallelism.
+///
+/// Since: v2.5.0 | Updated: v4.13.0 | Rule version: v2
 ///
 /// Alias: future_wait, parallel_await, concurrent_futures
 ///
@@ -3522,7 +3644,7 @@ class PreferFutureWaitRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_future_wait',
     problemMessage:
-        '[prefer_future_wait] Sequential awaits could run in parallel with Future.wait.',
+        '[prefer_future_wait] Sequential awaits could run in parallel with Future.wait. {v2}',
     correctionMessage:
         'Use Future.wait([future1, future2]) to run independent futures '
         'concurrently, or (future1, future2).wait in Dart 3.',
@@ -3639,6 +3761,8 @@ class _VariableCollector extends RecursiveAstVisitor<void> {
 
 /// Warns when Stream is listened multiple times without .distinct().
 ///
+/// Since: v4.1.4 | Updated: v4.13.0 | Rule version: v3
+///
 /// Use .distinct() to skip consecutive duplicate values and avoid
 /// unnecessary processing or rebuilds.
 ///
@@ -3668,7 +3792,7 @@ class PreferStreamDistinctRule extends SaropaLintRule {
     name: 'prefer_stream_distinct',
     problemMessage:
         '[prefer_stream_distinct] Stream.listen() without .distinct() may '
-        'process duplicate values unnecessarily.',
+        'process duplicate values unnecessarily. {v3}',
     correctionMessage:
         'Add .distinct() before .listen() to skip duplicate consecutive values.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -3737,6 +3861,8 @@ class PreferStreamDistinctRule extends SaropaLintRule {
 
 /// Warns when single-subscription Stream needs multiple listeners.
 ///
+/// Since: v4.1.4 | Updated: v4.13.0 | Rule version: v2
+///
 /// Use .asBroadcastStream() when you need multiple listeners on a Stream.
 ///
 /// **BAD:**
@@ -3765,7 +3891,7 @@ class PreferBroadcastStreamRule extends SaropaLintRule {
     name: 'prefer_broadcast_stream',
     problemMessage:
         '[prefer_broadcast_stream] Stream from StreamController is single-subscription. '
-        'Multiple listeners will cause an error.',
+        'Multiple listeners will cause an error. {v2}',
     correctionMessage:
         'Use .asBroadcastStream() or StreamController.broadcast().',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -3826,6 +3952,8 @@ class _StreamAccessVisitor extends RecursiveAstVisitor<void> {
 
 /// Warns when Future is created inside build() method.
 ///
+/// Since: v4.1.4 | Updated: v4.13.0 | Rule version: v2
+///
 /// Creating futures in build() can cause repeated async calls on every rebuild.
 /// Create futures in initState() and store the result.
 ///
@@ -3864,7 +3992,7 @@ class AvoidFutureInBuildRule extends SaropaLintRule {
     name: 'avoid_future_in_build',
     problemMessage:
         '[avoid_future_in_build] Creating Future in build() causes repeated '
-        'async calls on every rebuild.',
+        'async calls on every rebuild. {v2}',
     correctionMessage:
         'Create the Future in initState() and store it in a field.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -3934,6 +4062,8 @@ class _FutureCreationVisitor extends RecursiveAstVisitor<void> {
 
 /// Warns when setState is called after await without mounted check.
 ///
+/// Since: v4.1.4 | Updated: v4.13.0 | Rule version: v2
+///
 /// After an await, the widget may have been disposed. Always check mounted
 /// before calling setState.
 ///
@@ -3966,7 +4096,7 @@ class RequireMountedCheckAfterAwaitRule extends SaropaLintRule {
     name: 'require_mounted_check_after_await',
     problemMessage:
         '[require_mounted_check_after_await] setState called after await '
-        'without mounted check. Widget may have been disposed.',
+        'without mounted check. Widget may have been disposed. {v2}',
     correctionMessage:
         'Add "if (!mounted) return;" before setState after await.',
     errorSeverity: DiagnosticSeverity.ERROR,
@@ -4049,6 +4179,8 @@ class _MountedCheckVisitor extends RecursiveAstVisitor<void> {
 
 /// Warns when build() method is marked async.
 ///
+/// Since: v4.1.4 | Updated: v4.13.0 | Rule version: v2
+///
 /// Build methods should never be async. Use FutureBuilder or AsyncBuilder
 /// for async data.
 ///
@@ -4084,7 +4216,7 @@ class AvoidAsyncInBuildRule extends SaropaLintRule {
     name: 'avoid_async_in_build',
     problemMessage:
         '[avoid_async_in_build] Build method should never be async. '
-        'This will cause rendering issues.',
+        'This will cause rendering issues. {v2}',
     correctionMessage: 'Use FutureBuilder or fetch data in initState instead.',
     errorSeverity: DiagnosticSeverity.ERROR,
   );
@@ -4106,6 +4238,8 @@ class AvoidAsyncInBuildRule extends SaropaLintRule {
 }
 
 /// Warns when async operations should use FutureBuilder in initState pattern.
+///
+/// Since: v4.1.4 | Updated: v4.13.0 | Rule version: v2
 ///
 /// For widgets that need async initialization, use the initState + FutureBuilder
 /// pattern for proper loading states.
@@ -4158,7 +4292,7 @@ class PreferAsyncInitStateRule extends SaropaLintRule {
     name: 'prefer_async_init_state',
     problemMessage:
         '[prefer_async_init_state] Using .then().setState() pattern in initState. '
-        'Store the Future in a field and use FutureBuilder to manage loading states declaratively.',
+        'Store the Future in a field and use FutureBuilder to manage loading states declaratively. {v2}',
     correctionMessage:
         'Store the Future in a field and use FutureBuilder in build().',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -4210,6 +4344,8 @@ class _ThenSetStateVisitor extends RecursiveAstVisitor<void> {
 
 /// Check connectivity before making requests that will obviously fail.
 ///
+/// Since: v4.1.5 | Updated: v4.13.0 | Rule version: v2
+///
 /// Making network requests without checking connectivity results in
 /// confusing timeout errors instead of appropriate offline UI.
 ///
@@ -4244,7 +4380,7 @@ class RequireNetworkStatusCheckRule extends SaropaLintRule {
     name: 'require_network_status_check',
     problemMessage:
         '[require_network_status_check] `[HEURISTIC]` Network call without '
-        'connectivity check. Verify network status before making requests to avoid silent failures.',
+        'connectivity check. Verify network status before making requests to avoid silent failures. {v2}',
     correctionMessage:
         'Check Connectivity().checkConnectivity() before making requests.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -4296,6 +4432,8 @@ class RequireNetworkStatusCheckRule extends SaropaLintRule {
 
 /// Syncing each keystroke wastes battery and bandwidth.
 ///
+/// Since: v4.1.5 | Updated: v4.13.0 | Rule version: v2
+///
 /// Batch changes and sync on intervals or app background instead of
 /// syncing after every small change.
 ///
@@ -4334,7 +4472,7 @@ class AvoidSyncOnEveryChangeRule extends SaropaLintRule {
     name: 'avoid_sync_on_every_change',
     problemMessage:
         '[avoid_sync_on_every_change] `[HEURISTIC]` API call in onChanged '
-        'callback may fire on every keystroke. Add a debounce timer to batch rapid inputs before syncing.',
+        'callback may fire on every keystroke. Add a debounce timer to batch rapid inputs before syncing. {v2}',
     correctionMessage:
         'Use a debouncer or batch changes before syncing to server.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -4389,6 +4527,8 @@ class AvoidSyncOnEveryChangeRule extends SaropaLintRule {
 
 /// Users should see when local changes haven't synced.
 ///
+/// Since: v4.1.5 | Updated: v4.13.0 | Rule version: v2
+///
 /// Show "Saving..." or pending count to set user expectations about
 /// sync status.
 ///
@@ -4425,7 +4565,7 @@ class RequirePendingChangesIndicatorRule extends SaropaLintRule {
     name: 'require_pending_changes_indicator',
     problemMessage:
         '[require_pending_changes_indicator] `[HEURISTIC]` Pending changes '
-        'collection without UI notification. Users cannot see sync status.',
+        'collection without UI notification. Users cannot see sync status. {v2}',
     correctionMessage:
         'Call notifyListeners() or setState() when pending changes update.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -4468,6 +4608,8 @@ class RequirePendingChangesIndicatorRule extends SaropaLintRule {
 // =============================================================================
 
 /// Warns when synchronous events are added to a stream.
+///
+/// Since: v4.2.0 | Updated: v4.13.0 | Rule version: v2
 ///
 /// Alias: stream_sync_add, async_stream_events
 ///
@@ -4513,7 +4655,7 @@ class AvoidStreamSyncEventsRule extends SaropaLintRule {
     name: 'avoid_stream_sync_events',
     problemMessage:
         '[avoid_stream_sync_events] Stream event added synchronously right '
-        'after controller creation. Listeners may not be attached yet.',
+        'after controller creation. Listeners may not be attached yet. {v2}',
     correctionMessage:
         'Use scheduleMicrotask() or Future.microtask() to delay first event, '
         'or use StreamController(sync: true) if synchronous delivery is intended.',
@@ -4561,7 +4703,10 @@ class AvoidStreamSyncEventsRule extends SaropaLintRule {
       final int bodyOffset = functionBody.offset;
 
       // Check if StreamController is created in this function
-      if (!bodySource.contains('StreamController')) return;
+      if (!bodySource.contains('StreamController(') &&
+          !bodySource.contains('StreamController<')) {
+        return;
+      }
 
       // Check if the add is close to the controller creation (within a few statements)
       final String beforeAdd = bodySource.substring(0, nodeOffset - bodyOffset);
@@ -4588,6 +4733,8 @@ class AvoidStreamSyncEventsRule extends SaropaLintRule {
 // =============================================================================
 
 /// Warns when multiple independent awaits are performed sequentially.
+///
+/// Since: v4.2.0 | Updated: v4.13.0 | Rule version: v2
 ///
 /// Alias: parallel_await, concurrent_futures
 ///
@@ -4638,7 +4785,7 @@ class AvoidSequentialAwaitsRule extends SaropaLintRule {
     name: 'avoid_sequential_awaits',
     problemMessage:
         '[avoid_sequential_awaits] Multiple sequential awaits on independent '
-        'operations. Total time is sum of all; could run in parallel.',
+        'operations. Total time is sum of all; could run in parallel. {v2}',
     correctionMessage:
         'Use Future.wait([...]) to run independent futures concurrently.',
     errorSeverity: DiagnosticSeverity.INFO,

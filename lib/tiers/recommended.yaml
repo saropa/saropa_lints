@@ -58,7 +58,6 @@ custom_lint:
     avoid_text_scale_factor: true
     prefer_using_list_view: true
     avoid_scaffold_messenger_after_await: true
-    avoid_empty_setstate: true
     avoid_unnecessary_setstate: true
     avoid_stateless_widget_initialized_fields: true
     avoid_state_constructors: true

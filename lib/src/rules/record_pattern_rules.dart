@@ -11,6 +11,8 @@ import '../saropa_lint_rule.dart';
 
 /// Warns when pattern contains bottom types (void, Never, Null).
 ///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v4
+///
 /// Bottom types in patterns are usually mistakes since they match nothing
 /// or have unexpected behavior.
 ///
@@ -37,7 +39,7 @@ class AvoidBottomTypeInPatternsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_bottom_type_in_patterns',
     problemMessage:
-        '[avoid_bottom_type_in_patterns] Pattern uses a bottom type (void, Never, or Null) that either never matches any value or only matches null. This creates dead code in switch cases and if-case expressions, silently hiding logic errors.',
+        '[avoid_bottom_type_in_patterns] Pattern uses a bottom type (void, Never, or Null) that either never matches any value or only matches null. This creates dead code in switch cases and if-case expressions, silently hiding logic errors. {v4}',
     correctionMessage:
         'Replace the bottom type with the actual expected type, or use Object? if matching any value including null.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -72,6 +74,8 @@ class AvoidBottomTypeInPatternsRule extends SaropaLintRule {
 
 /// Warns when record contains bottom types (void, Never, Null).
 ///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v4
+///
 /// Record fields with bottom types are usually mistakes.
 ///
 /// ### Example
@@ -94,7 +98,7 @@ class AvoidBottomTypeInRecordsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_bottom_type_in_records',
     problemMessage:
-        '[avoid_bottom_type_in_records] Record field uses void/Never/Null which cannot hold useful values. Record fields with bottom types are usually mistakes. Record contains bottom types (void, Never, Null).',
+        '[avoid_bottom_type_in_records] Record field uses void/Never/Null which cannot hold useful values. Record fields with bottom types are usually mistakes. Record contains bottom types (void, Never, Null). {v4}',
     correctionMessage:
         'Replace with a meaningful type. Use dynamic or Object? if any type is needed. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -139,6 +143,9 @@ class AvoidBottomTypeInRecordsRule extends SaropaLintRule {
 }
 
 /// Warns when explicit field names are used in pattern matching
+///
+/// Since: v1.3.0 | Updated: v4.13.0 | Rule version: v3
+///
 /// when they match the variable name.
 ///
 /// Example of **bad** code:
@@ -166,7 +173,7 @@ class AvoidExplicitPatternFieldNameRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_explicit_pattern_field_name',
     problemMessage:
-        '[avoid_explicit_pattern_field_name] Explicit pattern field name matches variable name. Explicit field names are used in pattern matching when they match the variable name. This pattern matching usage can cause unexpected behavior or miss important type information.',
+        '[avoid_explicit_pattern_field_name] Explicit pattern field name matches variable name. Explicit field names are used in pattern matching when they match the variable name. This pattern matching usage can cause unexpected behavior or miss important type information. {v3}',
     correctionMessage:
         'Use shorthand syntax: `:fieldName` instead of. Verify the change works correctly with existing tests and add coverage for the new behavior.'
         '`fieldName: fieldName`.',
@@ -238,6 +245,8 @@ class _UseShorthandPatternFieldFix extends DartFix {
 
 /// Warns when extension is defined on a Record type.
 ///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v4
+///
 /// Extensions on records can be confusing and are often a sign
 /// that a proper class should be used instead.
 ///
@@ -271,7 +280,7 @@ class AvoidExtensionsOnRecordsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_extensions_on_records',
     problemMessage:
-        '[avoid_extensions_on_records] Extension on record type. Records lack identity for extension discovery. This pattern matching usage can cause unexpected behavior or miss important type information.',
+        '[avoid_extensions_on_records] Extension on record type. Records lack identity for extension discovery. This pattern matching usage can cause unexpected behavior or miss important type information. {v4}',
     correctionMessage:
         'Create a class with named fields and methods, or use a typedef with extension. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -296,6 +305,8 @@ class AvoidExtensionsOnRecordsRule extends SaropaLintRule {
 }
 
 /// Warns when Function type is used in record definitions.
+///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v5
 ///
 /// Function types in records are hard to read and maintain.
 /// Use a typedef instead.
@@ -323,7 +334,7 @@ class AvoidFunctionTypeInRecordsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_function_type_in_records',
     problemMessage:
-        '[avoid_function_type_in_records] Inline function type in record reduces readability. Function types in records are hard to read and maintain. Use a typedef instead. This pattern matching usage can cause unexpected behavior or miss important type information.',
+        '[avoid_function_type_in_records] Inline function type in record reduces readability. Function types in records are hard to read and maintain. Use a typedef instead. This pattern matching usage can cause unexpected behavior or miss important type information. {v5}',
     correctionMessage:
         'Create typedef: typedef MyCallback = void Function(String); then use (int, MyCallback).',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -359,6 +370,8 @@ class AvoidFunctionTypeInRecordsRule extends SaropaLintRule {
 
 /// Warns when wildcard patterns use Dart keywords.
 ///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v4
+///
 /// Using keywords in wildcard patterns can be confusing.
 ///
 /// ### Example
@@ -382,7 +395,7 @@ class AvoidKeywordsInWildcardPatternRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_keywords_in_wildcard_pattern',
     problemMessage:
-        '[avoid_keywords_in_wildcard_pattern] Pattern variable uses a Dart keyword. Using keywords in wildcard patterns can be confusing. This pattern matching usage can cause unexpected behavior or miss important type information.',
+        '[avoid_keywords_in_wildcard_pattern] Pattern variable uses a Dart keyword. Using keywords in wildcard patterns can be confusing. This pattern matching usage can cause unexpected behavior or miss important type information. {v4}',
     correctionMessage:
         'Use a different variable name. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -475,6 +488,8 @@ class AvoidKeywordsInWildcardPatternRule extends SaropaLintRule {
 
 /// Warns when a record type has too many fields.
 ///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v3
+///
 /// Records with many fields become hard to understand.
 /// Consider using a class instead.
 ///
@@ -495,7 +510,7 @@ class AvoidLongRecordsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_long_records',
     problemMessage:
-        '[avoid_long_records] Record has more than $_maxFields fields, reducing readability. Records with excessive fields lose their clarity advantage over classes and become harder to destructure, understand, and maintain.',
+        '[avoid_long_records] Record has more than $_maxFields fields, reducing readability. Records with excessive fields lose their clarity advantage over classes and become harder to destructure, understand, and maintain. {v3}',
     correctionMessage:
         'Use a class to improve readability. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -530,6 +545,8 @@ class AvoidLongRecordsRule extends SaropaLintRule {
 
 /// Warns when record type mixes named and positional fields.
 ///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v4
+///
 /// Mixing named and positional fields in records reduces readability.
 ///
 /// Example of **bad** code:
@@ -556,7 +573,7 @@ class AvoidMixingNamedAndPositionalFieldsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_mixing_named_and_positional_fields',
     problemMessage:
-        '[avoid_mixing_named_and_positional_fields] Record mixes named and positional fields. Mixing named and positional fields in records reduces readability. This pattern matching usage can cause unexpected behavior or miss important type information.',
+        '[avoid_mixing_named_and_positional_fields] Record mixes named and positional fields. Mixing named and positional fields in records reduces readability. This pattern matching usage can cause unexpected behavior or miss important type information. {v4}',
     correctionMessage:
         'Use either all named or all positional fields. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -599,6 +616,8 @@ class AvoidMixingNamedAndPositionalFieldsRule extends SaropaLintRule {
 
 /// Warns when record types are nested.
 ///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v5
+///
 /// Example of **bad** code:
 /// ```dart
 /// (int, (String, bool)) nested;
@@ -624,7 +643,7 @@ class AvoidNestedRecordsRule extends SaropaLintRule {
     name: 'avoid_nested_records',
     problemMessage:
         '[avoid_nested_records] Nested record type creates deeply coupled structure that is difficult to read, maintain, and refactor. '
-        'Inner record positions become ambiguous (e.g., value.\$1.\$2), and changes to the inner record layout silently break all access sites without a compile-time error in many cases.',
+        'Inner record positions become ambiguous (e.g., value.\$1.\$2), and changes to the inner record layout silently break all access sites without a compile-time error in many cases. {v5}',
     correctionMessage:
         'Flatten the nested record into a single record with more fields, or extract the inner record into a named typedef or class. '
         'Named types provide better documentation, enable IDE navigation, and make the structure easier to evolve without breaking callers.',
@@ -663,6 +682,8 @@ class AvoidNestedRecordsRule extends SaropaLintRule {
 
 /// Warns when a record has only one field.
 ///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v5
+///
 /// Example of **bad** code:
 /// ```dart
 /// (int,) singleField = (42,);
@@ -686,7 +707,7 @@ class AvoidOneFieldRecordsRule extends SaropaLintRule {
     name: 'avoid_one_field_records',
     problemMessage:
         '[avoid_one_field_records] Single-field record adds unnecessary wrapping overhead; the value type alone is simpler and equally expressive. '
-        'The extra parentheses and trailing comma add syntactic noise, and the field can only be accessed via positional notation (\$1), which obscures intent compared to a plain variable.',
+        'The extra parentheses and trailing comma add syntactic noise, and the field can only be accessed via positional notation (\$1), which obscures intent compared to a plain variable. {v5}',
     correctionMessage:
         'Replace the single-field record with the underlying value type directly (e.g., use int instead of (int,)). '
         'If you need a distinct type for documentation or type safety, consider a typedef or an extension type, which provide naming without runtime overhead.',
@@ -711,6 +732,8 @@ class AvoidOneFieldRecordsRule extends SaropaLintRule {
 
 /// Warns when a positional record field is accessed with $1, $2, etc.
 ///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v5
+///
 /// Example of **bad** code:
 /// ```dart
 /// final record = (1, 'hello');
@@ -729,7 +752,7 @@ class AvoidPositionalRecordFieldAccessRule extends SaropaLintRule {
     name: 'avoid_positional_record_field_access',
     problemMessage:
         '[avoid_positional_record_field_access] Positional record field access (\$1, \$2) is cryptic and forces readers to count positions to understand the code. '
-        'As records grow, positional access becomes increasingly error-prone and makes refactoring dangerous, since reordering fields silently changes which value each accessor returns.',
+        'As records grow, positional access becomes increasingly error-prone and makes refactoring dangerous, since reordering fields silently changes which value each accessor returns. {v5}',
     correctionMessage:
         'Use destructuring to bind record fields to named variables (e.g., final (name, age) = record;) or switch to named record fields (e.g., ({String name, int age})). '
         'Named access is self-documenting and resilient to field reordering.',
@@ -753,6 +776,9 @@ class AvoidPositionalRecordFieldAccessRule extends SaropaLintRule {
 }
 
 /// Warns when positional record field has an explicit name that matches
+///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v4
+///
 /// the default positional field name pattern ($1, $2, etc.).
 ///
 /// ### Example
@@ -781,7 +807,7 @@ class AvoidRedundantPositionalFieldNameRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_redundant_positional_field_name',
     problemMessage:
-        '[avoid_redundant_positional_field_name] Positional record field uses redundant default name. Positional record field has an explicit name that matches the default positional field name pattern (\$1, \$2, etc.).',
+        '[avoid_redundant_positional_field_name] Positional record field uses redundant default name. Positional record field has an explicit name that matches the default positional field name pattern (\$1, \$2, etc.). {v4}',
     correctionMessage:
         'Use a meaningful name or omit the name entirely. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -813,6 +839,8 @@ class AvoidRedundantPositionalFieldNameRule extends SaropaLintRule {
 
 /// Warns when destructuring is used for only one field.
 ///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v5
+///
 /// Single-field destructuring adds syntax complexity without benefit.
 /// Use direct property access instead.
 ///
@@ -841,7 +869,7 @@ class AvoidSingleFieldDestructuringRule extends SaropaLintRule {
     name: 'avoid_single_field_destructuring',
     problemMessage:
         '[avoid_single_field_destructuring] Single-field destructuring adds syntactic overhead without the readability benefit of multi-field destructuring. '
-        'The pattern syntax (e.g., final (:name) = obj;) is unfamiliar to many Dart developers and introduces unnecessary complexity when accessing just one property.',
+        'The pattern syntax (e.g., final (:name) = obj;) is unfamiliar to many Dart developers and introduces unnecessary complexity when accessing just one property. {v5}',
     correctionMessage:
         'Use direct property access instead (e.g., final name = obj.name;). Destructuring is most valuable when extracting multiple fields at once. '
         'For a single field, direct access is simpler, more widely understood, and produces equivalent compiled code.',
@@ -878,6 +906,8 @@ class AvoidSingleFieldDestructuringRule extends SaropaLintRule {
 
 /// Warns when inline record types should be moved to typedefs.
 ///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v5
+///
 /// Complex record types are easier to read as typedefs.
 ///
 /// ### Example
@@ -907,7 +937,7 @@ class MoveRecordsToTypedefsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'move_records_to_typedefs',
     problemMessage:
-        '[move_records_to_typedefs] Inline record with >$_maxInlineFields fields reduces readability. Complex record types are easier to read as typedefs. This pattern matching usage can cause unexpected behavior or miss important type information.',
+        '[move_records_to_typedefs] Inline record with >$_maxInlineFields fields reduces readability. Complex record types are easier to read as typedefs. This pattern matching usage can cause unexpected behavior or miss important type information. {v5}',
     correctionMessage:
         'Extract to a typedef for reuse and documentation. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -939,6 +969,8 @@ class MoveRecordsToTypedefsRule extends SaropaLintRule {
 
 /// Warns when pattern fields are not in alphabetical order.
 ///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v5
+///
 /// Consistent field ordering in patterns improves readability.
 ///
 /// ### Example
@@ -958,7 +990,7 @@ class PatternFieldsOrderingRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_sorted_pattern_fields',
     problemMessage:
-        '[prefer_sorted_pattern_fields] Unsorted pattern fields slow code review and make refactoring error-prone. Alphabetical ordering provides a predictable scanning path, reduces merge conflicts when multiple developers modify the same pattern, and makes it easier to spot missing or duplicate fields at a glance.',
+        '[prefer_sorted_pattern_fields] Unsorted pattern fields slow code review and make refactoring error-prone. Alphabetical ordering provides a predictable scanning path, reduces merge conflicts when multiple developers modify the same pattern, and makes it easier to spot missing or duplicate fields at a glance. {v5}',
     correctionMessage:
         'Reorder the pattern fields in alphabetical order. The quick fix can sort them automatically while preserving comments.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -996,6 +1028,8 @@ class PatternFieldsOrderingRule extends SaropaLintRule {
 
 /// Warns when pattern null checks can be simplified.
 ///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v5
+///
 /// Use simpler patterns when possible.
 ///
 /// ### Example
@@ -1024,7 +1058,7 @@ class PreferSimplerPatternsNullCheckRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_simpler_patterns_null_check',
     problemMessage:
-        '[prefer_simpler_patterns_null_check] Verbose null check pattern reduces readability. Use simpler patterns when possible. Pattern null checks can be simplified. This pattern matching usage can cause unexpected behavior or miss important type information.',
+        '[prefer_simpler_patterns_null_check] Verbose null check pattern reduces readability. Use simpler patterns when possible. Pattern null checks can be simplified. This pattern matching usage can cause unexpected behavior or miss important type information. {v5}',
     correctionMessage:
         'Use != null or final instead of var for null checks. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -1051,6 +1085,8 @@ class PreferSimplerPatternsNullCheckRule extends SaropaLintRule {
 }
 
 /// Warns when a variable could use wildcard pattern (_) instead.
+///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v4
 ///
 /// If a variable is declared but never used, use _ instead.
 ///
@@ -1080,7 +1116,7 @@ class PreferWildcardPatternRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_wildcard_pattern',
     problemMessage:
-        '[prefer_wildcard_pattern] Unused pattern variable should use wildcard (_). If a variable is declared but never used, use _ instead. This pattern matching usage can cause unexpected behavior or miss important type information.',
+        '[prefer_wildcard_pattern] Unused pattern variable should use wildcard (_). If a variable is declared but never used, use _ instead. This pattern matching usage can cause unexpected behavior or miss important type information. {v4}',
     correctionMessage:
         'Replace with _ if the value is not used. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -1113,6 +1149,8 @@ class PreferWildcardPatternRule extends SaropaLintRule {
 
 /// Warns when record fields are not in alphabetical order.
 ///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v6
+///
 /// Consistent field ordering improves readability.
 ///
 /// ### Example
@@ -1139,7 +1177,7 @@ class RecordFieldsOrderingRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_sorted_record_fields',
     problemMessage:
-        '[prefer_sorted_record_fields] Unsorted record fields slow code review and make refactoring error-prone. Alphabetical ordering provides a predictable scanning path, reduces merge conflicts when multiple developers modify the same record definition, and makes it easier to spot duplicate or missing fields.',
+        '[prefer_sorted_record_fields] Unsorted record fields slow code review and make refactoring error-prone. Alphabetical ordering provides a predictable scanning path, reduces merge conflicts when multiple developers modify the same record definition, and makes it easier to spot duplicate or missing fields. {v6}',
     correctionMessage:
         'Reorder the record fields in alphabetical order. The quick fix can sort them automatically while preserving type annotations.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -1172,6 +1210,8 @@ class RecordFieldsOrderingRule extends SaropaLintRule {
 
 /// Warns when multiple positional record accesses could use destructuring.
 ///
+/// Since: v1.3.0 | Updated: v4.13.0 | Rule version: v2
+///
 /// When accessing multiple positional fields from the same record variable,
 /// pattern destructuring is clearer and more idiomatic (Dart 3.0+).
 ///
@@ -1196,7 +1236,7 @@ class PreferPatternDestructuringRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_pattern_destructuring',
     problemMessage:
-        '[prefer_pattern_destructuring] Multiple positional record field accesses could use destructuring. When accessing multiple positional fields from the same record variable, pattern destructuring is clearer and more idiomatic (Dart 3.0+).',
+        '[prefer_pattern_destructuring] Multiple positional record field accesses could use destructuring. When accessing multiple positional fields from the same record variable, pattern destructuring is clearer and more idiomatic (Dart 3.0+). {v2}',
     correctionMessage:
         'Use pattern destructuring: final (a, b) = record; (Dart 3.0+). Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,

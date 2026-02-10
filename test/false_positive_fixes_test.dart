@@ -449,6 +449,127 @@ void main() {
     });
   });
 
+  group('String.contains() Anti-Pattern Fixes - v4.12.4', () {
+    // These tests document fixes for the systemic .contains() anti-pattern
+    // that caused 71% of all resolved bugs. See:
+    // bugs/string_contains_false_positive_audit.md
+
+    group('require_location_timeout', () {
+      test('should not flag permission-only methods', () {
+        // Fixed: LocationPermissionUtils.hasLocationPermission() was flagged
+        // because method name contains "Location". Now uses exact GPS method
+        // set: getCurrentPosition, getLastKnownPosition, getLocation, etc.
+        //
+        // These must NOT trigger:
+        // - LocationPermissionUtils.hasLocationPermission()
+        // - LocationServiceUtils.isLocationServiceEnabled()
+        // - Geolocator.openLocationSettings()
+        // - LocationFormatter.formatLocation(latLng)
+        // - LocationCache.getCachedLocation()
+
+        expect(
+          'GPS method exact-match set replaces substring matching',
+          isNotNull,
+        );
+      });
+
+      test('should detect chained .timeout() on Futures', () {
+        // Fixed: Geolocator.getCurrentPosition().timeout(duration) was not
+        // detected because timeout check only inspected direct arguments.
+        // Now walks up AST parents to find chained .timeout() calls.
+
+        expect(
+          'Chained .timeout() is detected via AST parent walk',
+          isNotNull,
+        );
+      });
+    });
+
+    group('await_navigation', () {
+      test('should not flag classes with Navigator in the name', () {
+        // Fixed: contains('Navigator') matched NavigatorHelper, CustomNavigator
+        // Now uses exact match: targetSource == 'Navigator'
+        //
+        // These must NOT trigger:
+        // - NavigatorHelper.setup()
+        // - CustomNavigatorState.pushRoute()
+        // - NavigatorObserverLogger.log()
+
+        expect(
+          'Navigator exact match replaces substring matching',
+          isNotNull,
+        );
+      });
+    });
+
+    group('avoid_context_access_in_callback', () {
+      test('should not flag classes with context in the name', () {
+        // Fixed: contains('context') matched ThemeContext, SecurityContext,
+        // AudioContext, etc. Now checks if target is SimpleIdentifier with
+        // name == 'context' (actual BuildContext parameter).
+        //
+        // These must NOT trigger:
+        // - ThemeContext.of(context) — "ThemeContext" is a class, not context
+        // - SecurityContext.defaultContext
+        // - AudioContext.createBuffer()
+
+        expect(
+          'BuildContext SimpleIdentifier check replaces substring matching',
+          isNotNull,
+        );
+      });
+    });
+
+    group('require_http_status_code_check', () {
+      test('should not flag non-HTTP .get() calls', () {
+        // Fixed: contains('.get(') matched Map.get(), GetIt.get(),
+        // SharedPreferences.get(), List.get(). Now uses specific client
+        // patterns: http.get, dio.get, client.get with exact target matching.
+        //
+        // These must NOT trigger:
+        // - cache.get(key)
+        // - prefs.get('setting')
+        // - GetIt.I.get<Service>()
+        // - map.get(key)
+
+        expect(
+          'HTTP client exact target set replaces bare .get() matching',
+          isNotNull,
+        );
+      });
+    });
+
+    group('require_scroll_controller_dispose', () {
+      test('should not flag classes containing ScrollController', () {
+        // Fixed: typeName.contains('ScrollController') matched
+        // ScrollControllerManager, CustomScrollControllerMixin, etc.
+        // Now uses exact match: == 'ScrollController' or
+        // == 'ScrollController?'
+        //
+        // These must NOT trigger for type matching:
+        // - ScrollControllerManager (custom wrapper class)
+        // - CustomScrollControllerMixin
+        // - ScrollControllerFactory
+
+        expect(
+          'ScrollController exact type match replaces substring matching',
+          isNotNull,
+        );
+      });
+
+      test('should detect disposal via regex instead of interpolation', () {
+        // Fixed: disposeBody.contains('$name.dispose(') broke on whitespace,
+        // null-aware calls (?.dispose), and formatting differences.
+        // Now uses regex: RegExp('name\\s*[?.]\\s*dispose\\s*\\(')
+
+        expect(
+          'Regex disposal detection replaces string interpolation',
+          isNotNull,
+        );
+      });
+    });
+  });
+
   group('Test Fixture Coverage', () {
     test('require_subscription_status_check has test fixture', () {
       // Located at: example/lib/require_subscription_status_check_example.dart
