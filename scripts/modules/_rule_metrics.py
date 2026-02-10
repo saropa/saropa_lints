@@ -186,7 +186,7 @@ def display_unit_test_coverage(project_dir: Path) -> None:
     """Display unit test file coverage for each rule category.
 
     Counts ``test()`` calls in dedicated ``test/*_rules_test.dart``
-    files. This complements fixture coverage by showing behaviour-level
+    files. This complements fixture coverage by showing behavior-level
     test documentation.
     """
     rules_dir = project_dir / "lib" / "src" / "rules"

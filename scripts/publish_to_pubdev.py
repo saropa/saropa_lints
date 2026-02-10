@@ -97,6 +97,7 @@ _REQUIRED_MODULES = [
     "modules/_publish_steps.py",
     "modules/_rule_metrics.py",
     "modules/_version_changelog.py",
+    "modules/_us_spelling.py",
 ]
 
 
@@ -529,29 +530,46 @@ def main() -> int:
         pass
 
     # Offer to launch custom_lint integration test in background
-    example_dir = project_dir / "example"
-    if example_dir.exists() and (example_dir / "pubspec.yaml").exists():
+    example_dirs = [
+        project_dir / d
+        for d in [
+            "example", "example_core", "example_async",
+            "example_widgets", "example_style",
+            "example_packages", "example_platforms",
+        ]
+        if (project_dir / d / "pubspec.yaml").exists()
+    ]
+    if example_dirs:
         response = (
             input(
                 "  Run custom_lint on example fixtures "
-                "(background, no wait)? [y/N] "
+                f"({len(example_dirs)} packages, background)? [y/N] "
             )
             .strip()
             .lower()
         )
         if response.startswith("y"):
-            subprocess.Popen(
-                ["dart", "run", "custom_lint"],
-                cwd=example_dir,
-                shell=get_shell_mode(),
-            )
+            use_shell = get_shell_mode()
+            for example_dir in example_dirs:
+                print_info(f"  Launching custom_lint in {example_dir.name}/")
+                subprocess.run(
+                    ["dart", "pub", "get"],
+                    cwd=example_dir,
+                    shell=use_shell,
+                    capture_output=True,
+                )
+                subprocess.Popen(
+                    ["dart", "run", "custom_lint"],
+                    cwd=example_dir,
+                    shell=use_shell,
+                )
             print_success(
-                "custom_lint launched in background "
-                "(output in this terminal)"
+                f"custom_lint launched in {len(example_dirs)} packages"
             )
         else:
             print_info(
-                "Run manually: cd example && dart run custom_lint"
+                "Run manually: "
+                "python scripts/run_custom_lint_all.py"
             )
 
     return ExitCode.SUCCESS.value

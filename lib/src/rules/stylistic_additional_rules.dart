@@ -496,7 +496,7 @@ class PreferFieldsBeforeMethodsRule extends SaropaLintRule {
     problemMessage:
         '[prefer_fields_before_methods] A method appears before a field declaration in this class. Placing fields first improves readability by showing the data model before behavior. Move all field declarations above methods. {v4}',
     correctionMessage:
-        'Move field declarations above method declarations so readers see the data model before the behaviour.',
+        'Move field declarations above method declarations so readers see the data model before the behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 

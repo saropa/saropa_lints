@@ -154,7 +154,7 @@ Example 2 shows `[DateTime]` used where `[date]` should be. This passes the exis
 
 ---
 
-## Current Behaviour (No Lint)
+## Current Behavior (No Lint)
 
 All of these pass without any warning:
 
@@ -174,7 +174,7 @@ void _showCountryPicker(BuildContext context) {
 
 ---
 
-## Expected Behaviour
+## Expected Behavior
 
 The linter should warn when a doc comment contains `[name]` where `name`:
 1. Is NOT a parameter in the function/method/constructor signature, AND
