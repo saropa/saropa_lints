@@ -59,13 +59,14 @@ Exit Codes:
     7  - Publish failed
     8  - Git operations failed
     9  - GitHub release failed
-    10 - User cancelled
+    10 - User canceled
     11 - Audit failed (tier integrity or duplicates)
 """
 
 from __future__ import annotations
 
 import re
+import subprocess
 import sys
 import time
 import webbrowser
@@ -96,6 +97,7 @@ _REQUIRED_MODULES = [
     "modules/_publish_steps.py",
     "modules/_rule_metrics.py",
     "modules/_version_changelog.py",
+    "modules/_us_spelling.py",
 ]
 
 
@@ -152,6 +154,7 @@ from scripts.modules._utils import (
     enable_ansi_support,
     exit_with_error,
     get_project_dir,
+    get_shell_mode,
     print_colored,
     print_header,
     print_info,
@@ -192,6 +195,8 @@ from scripts.modules._rule_metrics import (
     count_rules,
     display_roadmap_summary,
     display_test_coverage,
+    display_todo_audit,
+    display_unit_test_coverage,
     sync_readme_badges,
 )
 from scripts.modules._version_changelog import (
@@ -343,6 +348,8 @@ def main() -> int:
 
     display_changelog(project_dir)
     display_test_coverage(project_dir)
+    display_unit_test_coverage(project_dir)
+    display_todo_audit(project_dir)
     display_roadmap_summary(project_dir)
 
     # --- Step 1: Pre-publish audits (unless --skip-audit) ---
@@ -369,11 +376,11 @@ def main() -> int:
             .lower()
         )
         if response.startswith("n"):
-            print_warning("Publish cancelled by user.")
-            return ExitCode.USER_CANCELLED.value
+            print_warning("Publish canceled by user.")
+            return ExitCode.USER_CANCELED.value
     elif audit_only:
         print_warning("--audit-only and --skip-audit are contradictory.")
-        return ExitCode.USER_CANCELLED.value
+        return ExitCode.USER_CANCELED.value
 
     # --- Steps 2-7: Analysis workflow (version-independent) ---
     if not check_prerequisites():
@@ -381,7 +388,7 @@ def main() -> int:
 
     ok, _ = check_working_tree(project_dir)
     if not ok:
-        exit_with_error("Aborted.", ExitCode.USER_CANCELLED)
+        exit_with_error("Aborted.", ExitCode.USER_CANCELED)
 
     if not check_remote_sync(project_dir, branch):
         exit_with_error("Remote sync failed", ExitCode.WORKING_TREE_FAILED)
@@ -402,13 +409,11 @@ def main() -> int:
     else:
         default_version = pubspec_version
 
-    version = _prompt_version(default_version)
-
-    if not re.match(r"^\d+\.\d+\.\d+$", version):
-        exit_with_error(
-            f"Invalid version format '{version}'.",
-            ExitCode.VALIDATION_FAILED,
-        )
+    while True:
+        version = _prompt_version(default_version)
+        if re.match(r"^\d+\.\d+\.\d+$", version):
+            break
+        print_warning(f"Invalid version format '{version}'. Use X.Y.Z")
 
     if version != pubspec_version:
         set_version_in_pubspec(pubspec_path, version)
@@ -525,6 +530,49 @@ def main() -> int:
         webbrowser.open(f"https://pub.dev/packages/{package_name}")
     except Exception:
         pass
+
+    # Offer to launch custom_lint integration test in background
+    example_dirs = [
+        project_dir / d
+        for d in [
+            "example", "example_core", "example_async",
+            "example_widgets", "example_style",
+            "example_packages", "example_platforms",
+        ]
+        if (project_dir / d / "pubspec.yaml").exists()
+    ]
+    if example_dirs:
+        response = (
+            input(
+                "  Run custom_lint on example fixtures "
+                f"({len(example_dirs)} packages, background)? [y/N] "
+            )
+            .strip()
+            .lower()
+        )
+        if response.startswith("y"):
+            use_shell = get_shell_mode()
+            for example_dir in example_dirs:
+                print_info(f"  Launching custom_lint in {example_dir.name}/")
+                subprocess.run(
+                    ["dart", "pub", "get"],
+                    cwd=example_dir,
+                    shell=use_shell,
+                    capture_output=True,
+                )
+                subprocess.Popen(
+                    ["dart", "run", "custom_lint"],
+                    cwd=example_dir,
+                    shell=use_shell,
+                )
+            print_success(
+                f"custom_lint launched in {len(example_dirs)} packages"
+            )
+        else:
+            print_info(
+                "Run manually: "
+                "python scripts/run_custom_lint_all.py"
+            )
 
     return ExitCode.SUCCESS.value
 

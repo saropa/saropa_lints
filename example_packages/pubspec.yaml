@@ -1,0 +1,16 @@
+name: saropa_lints_example_packages
+description: Package-specific fixture files (bloc, riverpod, provider, etc.) for saropa_lints testing
+publish_to: none
+
+environment:
+  sdk: ">=3.1.0 <4.0.0"
+
+dependencies:
+  saropa_lints_example:
+    path: ../example
+  crypto: ^3.0.0
+
+dev_dependencies:
+  custom_lint: ^0.8.0
+  saropa_lints:
+    path: ../

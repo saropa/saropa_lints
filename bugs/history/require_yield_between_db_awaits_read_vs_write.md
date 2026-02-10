@@ -70,7 +70,7 @@ The yield between reading and using the result opens a window where another writ
 
 ---
 
-## Current Behaviour (Incorrect)
+## Current Behavior (Incorrect)
 
 All of these trigger the same WARNING:
 
@@ -90,7 +90,7 @@ final List<Contact> all = await isar.contacts.findAll();
 
 ---
 
-## Expected Behaviour
+## Expected Behavior
 
 The rule should differentiate by operation type:
 
@@ -121,7 +121,7 @@ Create separate rules with distinct severities:
 **Benefits:**
 - Teams can suppress the INFO rule in code that needs low-latency reads
 - The WARNING on writes stays non-negotiable
-- No behaviour change for existing codebases that already yield everywhere
+- No behavior change for existing codebases that already yield everywhere
 
 ### Option B: Add severity tiers within the existing rule
 

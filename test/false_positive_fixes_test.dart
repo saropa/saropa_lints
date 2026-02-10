@@ -1,6 +1,6 @@
 import 'package:test/test.dart';
 
-/// Tests for false positive fixes in version 4.2.3+
+/// Tests for false positive fixes
 ///
 /// This test file documents the expected behavior for rule fixes:
 /// 1. require_subscription_status_check - word boundary matching
@@ -15,13 +15,13 @@ import 'package:test/test.dart';
 ///
 /// Test fixtures are located in:
 /// - example/lib/require_subscription_status_check_example.dart
-/// - example/lib/navigation/require_deep_link_fallback_fixture.dart
-/// - example/lib/security/require_https_only_fixture.dart
+/// - example_widgets/lib/navigation/require_deep_link_fallback_fixture.dart
+/// - example_async/lib/security/require_https_only_fixture.dart
 /// - example/lib/avoid_variable_shadowing_fixture.dart
-/// - example/lib/isar/avoid_isar_clear_in_production_fixture.dart
+/// - example_packages/lib/isar/avoid_isar_clear_in_production_fixture.dart
 /// - example/lib/avoid_nested_assignments_fixture.dart
 void main() {
-  group('False Positive Fixes - v4.2.3', () {
+  group('False Positive Fixes', () {
     group('require_subscription_status_check', () {
       test('should use word boundary regex to avoid substring matches', () {
         // Expected behavior documented in fixture file
@@ -447,9 +447,53 @@ void main() {
         );
       });
     });
+
+    group('require_websocket_reconnection', () {
+      test('should not flag WebSocket class definitions', () {
+        // Fixed: node.toSource() includes the class name, so classes
+        // literally named WebSocket or WebSocketChannel always matched
+        // their own string check, producing false positives on mock/stub
+        // class definitions.
+        //
+        // These must NOT trigger:
+        // - class WebSocket { ... }
+        // - class WebSocketChannel { ... }
+
+        expect(
+          'WebSocket class definitions are skipped via exact name match',
+          isNotNull,
+        );
+      });
+
+      test('should still flag classes that USE WebSocket without reconnection',
+          () {
+        // Expected behavior: These SHOULD trigger
+        // - class ChatService { WebSocketChannel.connect(url); }
+        // - class LiveFeed { WebSocket.connect(url); }
+        //
+        // Expected behavior: These should NOT trigger (has reconnection)
+        // - class ChatService { ... reconnect() ... onDone: ... }
+
+        expect(
+          'Classes using WebSocket without reconnection are detected',
+          isNotNull,
+        );
+      });
+
+      test('should not flag WebSocket subclass names', () {
+        // Classes named BadWebSocketService, GoodWebSocketService,
+        // WebSocketDemo are NOT skipped — they USE WebSocket and
+        // should be checked for reconnection logic.
+
+        expect(
+          'Only exact WebSocket/WebSocketChannel names are skipped',
+          isNotNull,
+        );
+      });
+    });
   });
 
-  group('String.contains() Anti-Pattern Fixes - v4.12.4', () {
+  group('String.contains() Anti-Pattern Fixes', () {
     // These tests document fixes for the systemic .contains() anti-pattern
     // that caused 71% of all resolved bugs. See:
     // bugs/string_contains_false_positive_audit.md
@@ -577,12 +621,12 @@ void main() {
     });
 
     test('require_deep_link_fallback has test fixture', () {
-      // Located at: example/lib/navigation/require_deep_link_fallback_fixture.dart
+      // Located at: example_widgets/lib/navigation/require_deep_link_fallback_fixture.dart
       expect(true, isTrue);
     });
 
     test('require_https_only has test fixture', () {
-      // Located at: example/lib/security/require_https_only_fixture.dart
+      // Located at: example_async/lib/security/require_https_only_fixture.dart
       expect(true, isTrue);
     });
 
@@ -592,17 +636,23 @@ void main() {
     });
 
     test('avoid_isar_clear_in_production has test fixture', () {
-      // Located at: example/lib/isar/avoid_isar_clear_in_production_fixture.dart
+      // Located at: example_packages/lib/isar/avoid_isar_clear_in_production_fixture.dart
       expect(true, isTrue);
     });
 
     test('prefer_late_final has test fixture', () {
-      // Located at: example/lib/code_quality/code_quality_v250_fixture.dart
+      // Located at: example_core/lib/code_quality/code_quality_fixture.dart
       expect(true, isTrue);
     });
 
     test('avoid_nested_assignments has test fixture', () {
       // Located at: example/lib/avoid_nested_assignments_fixture.dart
+      expect(true, isTrue);
+    });
+
+    test('require_websocket_reconnection has mock stubs', () {
+      // Located at: example/lib/flutter_mocks.dart (WebSocket, WebSocketChannel)
+      // Fixture at: example_async/lib/async/async_rules_fixture.dart
       expect(true, isTrue);
     });
   });

@@ -1,4 +1,5 @@
 // Test fixture for no_magic_number_in_tests rule
+// ignore_for_file: avoid_double_for_money
 
 void badExamples() {
   // LINT: Domain-specific values should be named constants

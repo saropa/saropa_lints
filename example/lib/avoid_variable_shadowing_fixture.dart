@@ -1,6 +1,7 @@
 // Test fixture for avoid_variable_shadowing rule
 
 // ignore_for_file: prefer_const_declarations, unused_local_variable
+// ignore_for_file: avoid_print_in_release
 
 /// True shadowing - SHOULD trigger the rule
 void trueShadowingExample() {

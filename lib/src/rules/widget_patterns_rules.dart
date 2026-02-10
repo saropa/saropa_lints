@@ -8339,7 +8339,7 @@ class RequireDialogBarrierConsiderationRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_dialog_barrier_consideration',
     problemMessage:
-        '[require_dialog_barrier_consideration] Destructive confirmation dialog (delete, remove, logout) defaults to barrierDismissible: true, allowing users to accidentally dismiss the dialog by tapping outside. This can silently skip the confirmation step, or worse, leave the user unsure whether the action was confirmed or cancelled. {v2}',
+        '[require_dialog_barrier_consideration] Destructive confirmation dialog (delete, remove, logout) defaults to barrierDismissible: true, allowing users to accidentally dismiss the dialog by tapping outside. This can silently skip the confirmation step, or worse, leave the user unsure whether the action was confirmed or canceled. {v2}',
     correctionMessage:
         'Set barrierDismissible: false on destructive confirmation dialogs so users must explicitly tap a button to confirm or cancel the action.',
     errorSeverity: DiagnosticSeverity.INFO,

@@ -3595,7 +3595,7 @@ class PreferDocStraightApostropheRule extends SaropaLintRule {
     problemMessage:
         "[prefer_doc_straight_apostrophe] Use straight apostrophe (') instead of Right Single Quotation Mark (') in documentation. This is an opinionated rule - not included in any tier by default. {v4}",
     correctionMessage:
-        "Replace the Right Single Quotation Mark (U+2019) with a straight apostrophe (U+0027) for plain-text docs.",
+        "Replace the Right Single Quotation Mark (U+2019) with a straight apostrophe (U+0027) for plain text docs.",
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -4157,7 +4157,8 @@ class AvoidCommentedOutCodeRule extends SaropaLintRule {
     name: 'prefer_no_commented_out_code',
     problemMessage:
         '[prefer_no_commented_out_code] Commented-out code clutters the codebase. '
-        'Delete it - git preserves history. {v4}',
+        'Delete it - git preserves history. Prose comments and special markers '
+        'like TODO, FIXME, and test directives are automatically skipped. {v5}',
     correctionMessage:
         'Delete the commented-out code. Use version control to retrieve it if needed.',
     errorSeverity: DiagnosticSeverity.INFO,

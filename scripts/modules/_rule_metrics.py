@@ -12,6 +12,7 @@ Copyright: (c) 2025-2026 Saropa
 
 from __future__ import annotations
 
+import os
 import re
 from pathlib import Path
 
@@ -74,43 +75,79 @@ def _make_bar(value: int, max_value: int, width: int = _BAR_WIDTH) -> str:
     return _BAR_FILLED * filled + _BAR_EMPTY * (width - filled)
 
 
-def _make_progress_bar(
-    done: int, total: int, width: int = _BAR_WIDTH
-) -> str:
-    """Create a progress bar showing done/total as filled/empty."""
-    if total <= 0:
-        return _BAR_EMPTY * width
-    filled = int((done / total) * width)
-    filled = min(filled, width)
-    return _BAR_FILLED * filled + _BAR_EMPTY * (width - filled)
+class _CategoryInfo(NamedTuple):
+    """Rule category with name, rule count, and originating file."""
+
+    category: str
+    rule_count: int
+    dart_file: Path
 
 
-def display_test_coverage(project_dir: Path) -> None:
-    """Display test coverage report with bar chart visualization."""
-    rules_dir = project_dir / "lib" / "src" / "rules"
-    example_dir = project_dir / "example" / "lib"
-    if not rules_dir.exists():
-        return
-
-    category_details: list[tuple[str, int, int]] = []
+def _collect_category_rules(rules_dir: Path) -> list[_CategoryInfo]:
+    """Scan rule files and return (category, rule_count, file) tuples."""
+    result: list[_CategoryInfo] = []
     for dart_file in sorted(rules_dir.glob("**/*_rules.dart")):
         if dart_file.name == "all_rules.dart":
             continue
         category = dart_file.stem.replace("_rules", "")
         content = dart_file.read_text(encoding="utf-8")
         rule_count = len(_RULE_CLASS_RE.findall(content))
+        result.append(_CategoryInfo(category, rule_count, dart_file))
+    return result
 
-        fixture_count = 0
-        for suffix in [category, f"{category}s"]:
-            fixture_dir = example_dir / suffix
+
+def _status_for_percentage(pct: float) -> tuple[Color, str]:
+    """Map a coverage percentage to a (color, label) pair."""
+    if pct < 10:
+        return Color.RED, "CRITICAL"
+    if pct < 30:
+        return Color.YELLOW, "LOW"
+    if pct < 70:
+        return Color.CYAN, "MODERATE"
+    return Color.GREEN, "GOOD"
+
+
+def _get_example_dirs(project_dir: Path) -> list[Path]:
+    """Return all example sub-package lib directories."""
+    return [
+        d
+        for name in [
+            "example", "example_core", "example_async",
+            "example_widgets", "example_style",
+            "example_packages", "example_platforms",
+        ]
+        if (d := project_dir / name / "lib").exists()
+    ]
+
+
+def _count_fixtures_for_category(
+    example_dirs: list[Path], category: str,
+) -> int:
+    """Count fixture files for a category across all sub-packages."""
+    for suffix in [category, f"{category}s"]:
+        for lib_dir in example_dirs:
+            fixture_dir = lib_dir / suffix
             if fixture_dir.exists():
-                fixture_count = len(
-                    list(fixture_dir.glob("*_fixture.dart"))
-                )
-                if fixture_count > 0:
-                    break
+                count = len(list(fixture_dir.glob("*_fixture.dart")))
+                if count > 0:
+                    return count
+    return 0
 
-        category_details.append((category, rule_count, fixture_count))
+
+def display_test_coverage(project_dir: Path) -> None:
+    """Display test coverage report with bar chart visualization."""
+    rules_dir = project_dir / "lib" / "src" / "rules"
+    if not rules_dir.exists():
+        return
+
+    example_dirs = _get_example_dirs(project_dir)
+    categories = _collect_category_rules(rules_dir)
+    category_details: list[tuple[str, int, int]] = []
+    for cat in categories:
+        fixture_count = _count_fixtures_for_category(
+            example_dirs, cat.category,
+        )
+        category_details.append((cat.category, cat.rule_count, fixture_count))
 
     total_rules = sum(c[1] for c in category_details)
     total_fixtures = sum(c[2] for c in category_details)
@@ -118,22 +155,14 @@ def display_test_coverage(project_dir: Path) -> None:
         (total_fixtures / total_rules * 100) if total_rules > 0 else 0
     )
 
-    # Determine status color
-    if coverage_pct < 10:
-        status_color, status = Color.RED, "CRITICAL"
-    elif coverage_pct < 30:
-        status_color, status = Color.YELLOW, "LOW"
-    elif coverage_pct < 70:
-        status_color, status = Color.CYAN, "MODERATE"
-    else:
-        status_color, status = Color.GREEN, "GOOD"
+    status_color, status = _status_for_percentage(coverage_pct)
 
     print()
     print_colored("  ▶ Test Coverage", Color.WHITE)
     print()
 
     # Overall bar
-    bar = _make_progress_bar(total_fixtures, total_rules)
+    bar = _make_bar(total_fixtures, total_rules)
     print_colored(
         f"    Overall      {bar}  {total_fixtures:>4d}/{total_rules:<4d} "
         f"({coverage_pct:5.1f}%) {status}",
@@ -156,7 +185,7 @@ def display_test_coverage(project_dir: Path) -> None:
             if untested <= 0:
                 break
             pct = (fixtures / rules * 100) if rules > 0 else 0
-            bar = _make_progress_bar(fixtures, rules)
+            bar = _make_bar(fixtures, rules)
             if pct < 10:
                 row_color = Color.RED
             elif pct < 30:
@@ -167,6 +196,166 @@ def display_test_coverage(project_dir: Path) -> None:
                 f"    {category:<14s} {bar}  {fixtures:>3d}/{rules:<3d} "
                 f"({pct:5.1f}%)",
                 row_color,
+            )
+    print()
+
+
+_TODO_RE = re.compile(r"//\s*TODO:", re.IGNORECASE)
+
+
+def display_todo_audit(project_dir: Path) -> None:
+    """Display TODO audit with bar chart per package, write full log."""
+    example_dirs = _get_example_dirs(project_dir)
+    if not example_dirs:
+        return
+
+    # Collect TODOs per package and per file
+    pkg_counts: list[tuple[str, int]] = []
+    all_todos: list[str] = []  # "package/file:line: message"
+
+    for lib_dir in example_dirs:
+        pkg_name = lib_dir.parent.name
+        pkg_total = 0
+        for dart_file in sorted(lib_dir.rglob("*.dart")):
+            try:
+                lines = dart_file.read_text(
+                    encoding="utf-8", errors="replace",
+                ).splitlines()
+            except Exception:
+                continue
+            for line_no, line in enumerate(lines, 1):
+                if _TODO_RE.search(line):
+                    pkg_total += 1
+                    rel = dart_file.relative_to(project_dir)
+                    all_todos.append(f"  {rel}:{line_no}: {line.strip()}")
+        pkg_counts.append((pkg_name, pkg_total))
+
+    total = sum(c for _, c in pkg_counts)
+    if total == 0:
+        return
+
+    max_count = max(c for _, c in pkg_counts)
+
+    print()
+    print_colored("  ▶ Fixture TODOs (placeholder stubs)", Color.WHITE)
+    print()
+
+    # Overall count
+    print_colored(
+        f"    Total: {total} TODOs across fixture files",
+        Color.YELLOW if total > 0 else Color.GREEN,
+    )
+    print()
+
+    # Per-package breakdown with bars
+    for pkg_name, count in sorted(pkg_counts, key=lambda x: -x[1]):
+        if count == 0:
+            continue
+        bar = _make_bar(count, max_count)
+        label = pkg_name.replace("example_", "").replace("example", "mocks")
+        print_colored(
+            f"    {label:<12s} {bar}  {count:>3d}",
+            Color.YELLOW if count > 20 else Color.CYAN,
+        )
+
+    # Write full log to reports directory
+    reports_dir = project_dir / "example" / "reports"
+    reports_dir.mkdir(parents=True, exist_ok=True)
+    log_path = reports_dir / "todo_audit.log"
+    log_lines = [
+        f"TODO Audit - {total} items",
+        f"{'=' * 60}",
+        "",
+    ]
+    # Group by package
+    current_pkg = ""
+    for todo_line in all_todos:
+        parts = todo_line.strip().split(os.sep, 1)
+        pkg = parts[0] if len(parts) > 1 else ""
+        if pkg != current_pkg:
+            current_pkg = pkg
+            log_lines.append(f"\n--- {current_pkg} ---")
+        log_lines.append(todo_line)
+
+    log_path.write_text("\n".join(log_lines), encoding="utf-8")
+    print()
+    print_colored(
+        f"    Full log: {log_path.relative_to(project_dir)}",
+        Color.WHITE,
+    )
+    print()
+
+
+_TEST_COUNT_RE = re.compile(r"^\s+test\(", re.MULTILINE)
+
+
+def display_unit_test_coverage(project_dir: Path) -> None:
+    """Display unit test file coverage for each rule category.
+
+    Counts ``test()`` calls in dedicated ``test/*_rules_test.dart``
+    files. This complements fixture coverage by showing behavior-level
+    test documentation.
+    """
+    rules_dir = project_dir / "lib" / "src" / "rules"
+    test_dir = project_dir / "test"
+    if not rules_dir.exists() or not test_dir.exists():
+        return
+
+    # Build index of test files → test() call count
+    test_files: dict[str, int] = {}
+    for tf in test_dir.glob("*_test.dart"):
+        content = tf.read_text(encoding="utf-8")
+        test_files[tf.stem] = len(_TEST_COUNT_RE.findall(content))
+
+    categories = _collect_category_rules(rules_dir)
+    category_details: list[tuple[str, int, int]] = []
+    for cat in categories:
+        # Match: {category}_rules_test or {category}_test
+        test_count = 0
+        for stem in [f"{cat.category}_rules_test", f"{cat.category}_test"]:
+            if stem in test_files:
+                test_count = test_files[stem]
+                break
+        category_details.append((cat.category, cat.rule_count, test_count))
+
+    tested = sum(1 for c in category_details if c[2] > 0)
+    total_cats = len(category_details)
+    coverage_pct = (tested / total_cats * 100) if total_cats > 0 else 0
+
+    status_color, status = _status_for_percentage(coverage_pct)
+
+    print()
+    print_colored("  ▶ Unit Test Coverage", Color.WHITE)
+    print()
+
+    bar = _make_bar(tested, total_cats)
+    print_colored(
+        f"    Categories   {bar}  {tested:>4d}/{total_cats:<4d} "
+        f"({coverage_pct:5.1f}%) {status}",
+        status_color,
+    )
+
+    total_tests = sum(c[2] for c in category_details)
+    print_colored(
+        f"    Total tests: {total_tests}",
+        Color.CYAN,
+    )
+
+    # Top 5 categories without test files
+    untested = sorted(
+        [(name, rules) for name, rules, tests in category_details if tests == 0],
+        key=lambda c: c[1],
+        reverse=True,
+    )[:5]
+
+    if untested:
+        print()
+        print_colored("    Missing test files:", Color.WHITE)
+        for category, rules in untested:
+            print_colored(
+                f"    {category:<14s} ({rules:>3d} rules) "
+                f"needs test/{category}_rules_test.dart",
+                Color.RED if rules > 20 else Color.YELLOW,
             )
     print()
 
@@ -289,11 +478,25 @@ def get_roadmap_summary(project_dir: Path) -> RoadmapSummary:
 def _format_severity_row(
     emoji: str, count: int, total: int, max_count: int
 ) -> str:
-    """Format a severity row with label, bar chart, and stats."""
+    """Format a severity row with inverted bar (less remaining = more filled).
+
+    The bar represents completion: 0 remaining → full bar, max remaining → empty.
+    """
     label, ascii_fallback = _SEVERITY_LABELS.get(emoji, ("OTHER", "[?]"))
     pct = (count / total * 100) if total > 0 else 0
-    bar = _make_bar(count, max_count)
+    bar = _make_bar(max_count - count, max_count)
     return f"    {label:<12s} {bar}  {count:>4d} ({pct:5.1f}%)"
+
+
+def _severity_color(emoji: str, count: int) -> Color:
+    """Pick color based on remaining count: green if done, else by severity."""
+    if count == 0:
+        return Color.GREEN
+    if emoji == "🚨":
+        return Color.RED
+    if emoji == "⚠️":
+        return Color.YELLOW
+    return Color.CYAN
 
 
 def display_roadmap_summary(project_dir: Path) -> None:
@@ -317,14 +520,7 @@ def display_roadmap_summary(project_dir: Path) -> None:
     for emoji in ["🚨", "⚠️", "ℹ️"]:
         count = summary.roadmap_by_severity.get(emoji, 0)
         row = _format_severity_row(emoji, count, summary.roadmap_total, roadmap_max)
-        # Color by severity
-        if emoji == "🚨":
-            color = Color.RED
-        elif emoji == "⚠️":
-            color = Color.YELLOW
-        else:
-            color = Color.CYAN
-        print_colored(row, color)
+        print_colored(row, _severity_color(emoji, count))
 
     # ROADMAP_DEFERRED.md breakdown by severity
     print()
@@ -338,14 +534,7 @@ def display_roadmap_summary(project_dir: Path) -> None:
         row = _format_severity_row(
             emoji, count, summary.deferred_total, deferred_max
         )
-        # Color by severity
-        if emoji == "🚨":
-            color = Color.RED
-        elif emoji == "⚠️":
-            color = Color.YELLOW
-        else:
-            color = Color.CYAN
-        print_colored(row, color)
+        print_colored(row, _severity_color(emoji, count))
 
     # Summary totals
     print()

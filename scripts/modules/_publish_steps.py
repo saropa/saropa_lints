@@ -45,6 +45,7 @@ def run_pre_publish_audits(project_dir: Path) -> bool:
       - Tier integrity: orphans, phantoms, multi-tier, misplaced opinionated
       - Duplicate rule names, class names, or aliases
       - Missing [rule_name] prefix in problemMessage
+      - British English spellings (US English required)
 
     INFORMATIONAL checks (warn but don't block):
       - DX message quality
@@ -95,6 +96,13 @@ def run_pre_publish_audits(project_dir: Path) -> bool:
         print_error(
             f"Blocking audit issues: {'; '.join(issues)}."
         )
+        return False
+
+    # --- BLOCKING: US English spelling check ---
+    from scripts.modules._us_spelling import check_us_spelling
+
+    spelling_hits = check_us_spelling(project_dir)
+    if spelling_hits:
         return False
 
     # --- INFORMATIONAL: DX message improvement analysis ---
@@ -245,7 +253,13 @@ def check_remote_sync(project_dir: Path, branch: str) -> bool:
 
 
 def run_tests(project_dir: Path) -> bool:
-    """Step 5: Run flutter test and custom_lint tests."""
+    """Step 5: Run unit tests.
+
+    Note: custom_lint integration tests (dart run custom_lint in example/)
+    are skipped during publish because 1700+ rules x 1500+ fixture files
+    takes too long. Run manually when needed:
+        cd example && dart run custom_lint
+    """
     print_header("STEP 5: RUNNING TESTS")
 
     clear_flutter_lock()
@@ -259,46 +273,6 @@ def run_tests(project_dir: Path) -> bool:
             return False
     else:
         print_warning("No test directory found, skipping unit tests")
-
-    # Run custom_lint tests on example/
-    example_dir = project_dir / "example"
-    if example_dir.exists() and (example_dir / "pubspec.yaml").exists():
-        print_info("Running custom_lint tests on example fixtures...")
-        result = run_command(
-            ["dart", "pub", "get"],
-            example_dir,
-            "Installing example dependencies",
-        )
-        if result.returncode != 0:
-            print_warning("Could not install example deps, skipping")
-            return True
-
-        print_info("Running custom_lint tests...")
-        print_colored("      $ dart run custom_lint", Color.WHITE)
-        use_shell = get_shell_mode()
-        result = subprocess.run(
-            ["dart", "run", "custom_lint"],
-            cwd=example_dir,
-            capture_output=True,
-            text=True,
-            shell=use_shell,
-        )
-        output = result.stdout + result.stderr
-        error_count = output.count(" • ERROR")
-        warning_count = output.count(" • WARNING")
-        info_count = output.count(" • INFO")
-        total_count = error_count + warning_count + info_count
-
-        if total_count > 0:
-            print_success(
-                f"Custom lint: {total_count} issues "
-                f"({error_count}E, {warning_count}W, {info_count}I)"
-            )
-            print_colored(
-                "      (Expected - fixture files trigger lints)", Color.WHITE
-            )
-        else:
-            print_success("Custom lint tests completed: no issues found")
 
     return True
 
