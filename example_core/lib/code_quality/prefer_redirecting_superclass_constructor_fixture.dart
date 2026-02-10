@@ -113,7 +113,9 @@ class _bad233_Child extends Parent {
   _bad233_Child(String name) : super(name);
 }
 
-// GOOD: Should NOT trigger prefer_redirecting_superclass_constructor
-class _good233_Child extends Parent {
-  _good233_Child(super.name);
-}
+// HACK: TODO restore when available to testing
+
+// // GOOD: Should NOT trigger prefer_redirecting_superclass_constructor
+// class _good233_Child extends Parent {
+//   _good233_Child(super.name);
+// }

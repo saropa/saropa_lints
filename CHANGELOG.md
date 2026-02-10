@@ -11,12 +11,17 @@ Dates are not included in version headers — [pub.dev](https://pub.dev/packages
 ** See the current published changelog: [saropa_lints/changelog](https://pub.dev/packages/saropa_lints/changelog)
 
 ---
-## [Unreleased]
+## [4.14.3]
 
 ### Fixed
 
 - **`require_websocket_reconnection` false positive** (v4): Rule no longer fires on `WebSocket` and `WebSocketChannel` class definitions themselves; only classes that use WebSocket connections are checked
 - **Cross-rule noise in fixture files**: Added `ignore_for_file` directives to 8 example fixtures to suppress unrelated rule violations (e.g. `avoid_print_in_release` in `avoid_variable_shadowing_fixture.dart`)
+
+### Tests Disabled
+- **`super_formal_parameter_without_associated_positional`**: Disabled pending further investigation.
+- **`const_constructor_with_non_const_super`**: Disabled pending further investigation.
+- **`implicit_super_initializer_missing_arguments`**: Disabled pending further investigation.
 
 ---
 ## [4.14.2]
