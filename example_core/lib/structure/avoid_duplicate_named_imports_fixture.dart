@@ -103,7 +103,7 @@
 // Test fixture for: avoid_duplicate_named_imports
 // Source: lib\src\rules\structure_rules.dart
 
-import '../flutter_mocks.dart';
+import 'package:saropa_lints_example/flutter_mocks.dart';
 
 // BAD: Should trigger avoid_duplicate_named_imports
 // expect_lint: avoid_duplicate_named_imports

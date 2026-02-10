@@ -103,7 +103,7 @@
 // Test fixture for: require_subscription_status_check
 // Source: lib\src\rules\iap_rules.dart
 
-import '../flutter_mocks.dart';
+import 'package:saropa_lints_example/flutter_mocks.dart';
 
 dynamic builder;
 final context = BuildContext();

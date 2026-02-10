@@ -60,7 +60,7 @@
 // ignore_for_file: not_a_type
 // Test fixture for context safety rules
 
-import '../flutter_mocks.dart';
+import 'package:saropa_lints_example/flutter_mocks.dart';
 
 // =========================================================================
 // avoid_storing_context

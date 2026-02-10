@@ -103,7 +103,7 @@
 // Test fixture for: require_crashlytics_user_id
 // Source: lib\src\rules\packages\firebase_rules.dart
 
-import '../flutter_mocks.dart';
+import 'package:saropa_lints_example/flutter_mocks.dart';
 
 final userId = '123';
 

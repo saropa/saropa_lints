@@ -103,7 +103,7 @@
 // Test fixture for: prefer_dot_shorthand
 // Source: lib\src\rules\code_quality_rules.dart
 
-import '../flutter_mocks.dart';
+import 'package:saropa_lints_example/flutter_mocks.dart';
 
 // BAD: Should trigger prefer_dot_shorthand
 // expect_lint: prefer_dot_shorthand

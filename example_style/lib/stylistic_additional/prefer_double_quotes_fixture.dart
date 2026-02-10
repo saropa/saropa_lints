@@ -103,7 +103,7 @@
 // Test fixture for: prefer_double_quotes
 // Source: lib\src\rules\stylistic_additional_rules.dart
 
-import '../flutter_mocks.dart';
+import 'package:saropa_lints_example/flutter_mocks.dart';
 
 // BAD: Should trigger prefer_double_quotes
 // expect_lint: prefer_double_quotes

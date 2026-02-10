@@ -103,7 +103,7 @@
 // Test fixture for: avoid_notifier_constructors
 // Source: lib\src\rules\packages\riverpod_rules.dart
 
-import '../flutter_mocks.dart';
+import 'package:saropa_lints_example/flutter_mocks.dart';
 
 // BAD: Should trigger avoid_notifier_constructors
 // expect_lint: avoid_notifier_constructors

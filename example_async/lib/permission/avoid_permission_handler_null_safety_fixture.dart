@@ -103,7 +103,7 @@
 // Test fixture for: avoid_permission_handler_null_safety
 // Source: lib\src\rules\permission_rules.dart
 
-import '../flutter_mocks.dart';
+import 'package:saropa_lints_example/flutter_mocks.dart';
 
 dynamic status;
 

@@ -103,7 +103,7 @@
 // Test fixture for: avoid_singleton_for_scoped_dependencies
 // Source: lib\src\rules\dependency_injection_rules.dart
 
-import '../flutter_mocks.dart';
+import 'package:saropa_lints_example/flutter_mocks.dart';
 
 dynamic data;
 final getIt = GetIt.instance;

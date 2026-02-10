@@ -103,7 +103,7 @@
 // Test fixture for: require_notification_timezone_awareness
 // Source: lib\src\rules\notification_rules.dart
 
-import '../flutter_mocks.dart';
+import 'package:saropa_lints_example/flutter_mocks.dart';
 
 dynamic body;
 dynamic details;

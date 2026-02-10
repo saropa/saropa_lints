@@ -57,103 +57,196 @@
 // ignore_for_file: const_with_undefined_constructor, abstract_super_member_reference
 // ignore_for_file: equal_keys_in_map, unused_catch_stack
 // ignore_for_file: non_constant_default_value, not_a_type
-// Test fixture for test rules added in v2.3.10
+// Test fixture for testing rules
+
+import 'package:saropa_lints_example/flutter_mocks.dart';
 
 // =========================================================================
-// avoid_test_print_statements
+// prefer_test_find_by_key
 // =========================================================================
-// Warns when print statements are used in test files instead of expect().
+// Warns when find.byType is used instead of find.byKey for interactions.
 
-void badTestWithPrint() {
-  test('should fetch data', () async {
-    final result = await fetchData();
-    // expect_lint: avoid_test_print_statements
-    print('Result: $result'); // Bad - use expect() instead!
+void badTestFindByType() {
+  testWidgets('should tap button', (tester) async {
+    await tester.pumpWidget(MaterialApp(home: MyWidget()));
+    // expect_lint: prefer_test_find_by_key
+    await tester.tap(find.byType(ElevatedButton));
+    await tester.pump();
   });
 }
 
-void badTestWithDebugPrint() {
-  test('should process data', () async {
-    final data = processData('input');
-    // expect_lint: avoid_test_print_statements
-    debugPrint('Processed: $data'); // Also bad
-  });
-}
-
-void goodTestWithExpect() {
-  test('should fetch data correctly', () async {
-    final result = await fetchData();
-    expect(result, equals('expected data')); // Good - proper assertion
+void goodTestFindByKey() {
+  testWidgets('should tap button', (tester) async {
+    await tester.pumpWidget(MaterialApp(home: MyWidget()));
+    await tester.tap(find.byKey(Key('submit_button'))); // Good - stable
+    await tester.pump();
   });
 }
 
 // =========================================================================
-// require_mock_http_client
+// prefer_setup_teardown
 // =========================================================================
-// Warns when tests make real HTTP calls instead of using mocks.
+// Warns when test setup is duplicated across multiple tests.
 
-void badTestWithRealHttp() {
-  test('should fetch user', () async {
-    // expect_lint: require_mock_http_client
-    final response = await http.get(Uri.parse('https://api.example.com/user'));
-    expect(response.statusCode, equals(200));
+void badRepeatedSetup() {
+  test('test 1', () {
+    // expect_lint: prefer_setup_teardown
+    final repo = MockRepository();
+    final bloc = MyBloc(repo);
+    // ... test logic
+  });
+
+  test('test 2', () {
+    // expect_lint: prefer_setup_teardown
+    final repo = MockRepository();
+    final bloc = MyBloc(repo);
+    // ... test logic
+  });
+
+  test('test 3', () {
+    // expect_lint: prefer_setup_teardown
+    final repo = MockRepository();
+    final bloc = MyBloc(repo);
+    // ... test logic
   });
 }
 
-void badTestWithDioRealCall() {
-  test('should post data', () async {
-    final dio = Dio();
-    // expect_lint: require_mock_http_client
-    final response = await dio.post('https://api.example.com/data');
-    expect(response.statusCode, equals(201));
+void goodWithSetUp() {
+  late MockRepository repo;
+  late MyBloc bloc;
+
+  setUp(() {
+    repo = MockRepository();
+    bloc = MyBloc(repo);
+  });
+
+  test('test 1', () {
+    // ... test logic
   });
 }
 
-void goodTestWithMockClient() {
-  test('should fetch user with mock', () async {
-    final mockClient = MockHttpClient();
-    when(mockClient.get(any)).thenReturn(Response(statusCode: 200));
+// OK: Independent primitive locals should not trigger prefer_setup_teardown.
+// Each test declares its own counter/constant — these are not shared setup.
+void goodRepeatedPrimitiveLocals() {
+  test('default probability', () {
+    int trueCount = 0;
+    const int iterations = 1000;
+    // ... loop and assertions
+  });
 
-    final response = await mockClient.get(Uri.parse('/user'));
-    expect(response.statusCode, equals(200));
+  test('low probability', () {
+    int trueCount = 0;
+    const int iterations = 1000;
+    // ... loop and assertions
+  });
+
+  test('high probability', () {
+    int trueCount = 0;
+    const int iterations = 1000;
+    // ... loop and assertions
   });
 }
 
 // =========================================================================
-// Helper mocks
+// require_test_description_convention
+// =========================================================================
+// Warns when test descriptions are vague.
+
+void badVagueTestNames() {
+  // expect_lint: require_test_description_convention
+  test('test 1', () {});
+
+  // expect_lint: require_test_description_convention
+  test('it works', () {});
+
+  // expect_lint: require_test_description_convention
+  test('MyBloc', () {});
+}
+
+void goodDescriptiveTestNames() {
+  test('should emit Loading then Success when fetch succeeds', () {});
+  test('returns null when user not found', () {});
+}
+
+// =========================================================================
+// prefer_bloc_test_package
+// =========================================================================
+// Warns when Bloc is tested manually instead of using blocTest().
+
+void badManualBlocTest() {
+  test('MyBloc emits states', () async {
+    // expect_lint: prefer_bloc_test_package
+    final bloc = MyBloc();
+    bloc.add(MyEvent());
+    await expectLater(
+      bloc.stream,
+      emitsInOrder([MyState()]),
+    );
+  });
+}
+
+void goodBlocTestPackage() {
+  blocTest<MyBloc, MyState>(
+    'emits [Loading, Success] when MyEvent added',
+    build: () => MyBloc(),
+    act: (bloc) => bloc.add(MyEvent()),
+    expect: () => [Loading(), Success()],
+  );
+}
+
+// =========================================================================
+// prefer_mock_verify
+// =========================================================================
+// Warns when mocks are set up with when() but never verified.
+
+void badNoVerify() {
+  test('creates user', () async {
+    // expect_lint: prefer_mock_verify
+    final mockRepo = MockUserRepository();
+    when(mockRepo.create(any)).thenAnswer((_) async => User());
+    await useCase.execute(userData);
+    // Missing: verify(mockRepo.create(any)).called(1);
+  });
+}
+
+void goodWithVerify() {
+  test('creates user', () async {
+    final mockRepo = MockUserRepository();
+    when(mockRepo.create(any)).thenAnswer((_) async => User());
+    await useCase.execute(userData);
+    verify(mockRepo.create(any)).called(1); // Good - verified
+  });
+}
+
+// =========================================================================
+// Mock classes for testing
 // =========================================================================
 
-void test(String description, Function body) {}
-void expect(dynamic actual, Matcher matcher) {}
-Matcher equals(dynamic value) => Matcher();
+class MockRepository {}
 
-class Matcher {}
-
-Future<String> fetchData() async => 'data';
-String processData(String input) => input;
-void debugPrint(String message) {}
-
-class http {
-  static Future<Response> get(Uri uri) async => Response(statusCode: 200);
+class MockUserRepository {
+  Future<User> create(dynamic data) async => User();
 }
 
-class Dio {
-  Future<Response> post(String url) async => Response(statusCode: 201);
-  Future<Response> get(String url) async => Response(statusCode: 200);
+class MyBloc {
+  MyBloc([MockRepository? repo]);
+  void add(dynamic event) {}
+  Stream<dynamic> get stream => Stream.empty();
 }
 
-class Response {
-  Response({required this.statusCode});
-  final int statusCode;
+class MyEvent {}
+
+class MyState {}
+
+class Loading extends MyState {}
+
+class Success extends MyState {}
+
+class User {}
+
+class UseCase {
+  Future<void> execute(dynamic data) async {}
 }
 
-class MockHttpClient {
-  Future<Response> get(Uri uri) async => Response(statusCode: 200);
-}
-
-void when(dynamic call) {}
-
-class Uri {
-  static Uri parse(String source) => Uri._();
-  Uri._();
-}
+final useCase = UseCase();
+final userData = {};

@@ -103,7 +103,7 @@
 // Test fixture for: prefer_cached_paint_objects
 // Source: lib\src\rules\ui_ux_rules.dart
 
-import '../flutter_mocks.dart';
+import 'package:saropa_lints_example/flutter_mocks.dart';
 
 // BAD: Should trigger prefer_cached_paint_objects
 // expect_lint: prefer_cached_paint_objects

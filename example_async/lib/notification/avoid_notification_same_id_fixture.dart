@@ -103,7 +103,7 @@
 // Test fixture for: avoid_notification_same_id
 // Source: lib\src\rules\notification_rules.dart
 
-import '../flutter_mocks.dart';
+import 'package:saropa_lints_example/flutter_mocks.dart';
 
 final id = '1';
 final title = 'Title';

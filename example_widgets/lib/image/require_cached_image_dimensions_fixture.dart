@@ -103,7 +103,7 @@
 // Test fixture for: require_cached_image_dimensions
 // Source: lib\src\rules\image_rules.dart
 
-import '../flutter_mocks.dart';
+import 'package:saropa_lints_example/flutter_mocks.dart';
 
 final url = 'https://example.com';
 

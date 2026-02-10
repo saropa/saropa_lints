@@ -103,7 +103,7 @@
 // Test fixture for: avoid_listview_children_for_large_lists
 // Source: lib\src\rules\scroll_rules.dart
 
-import '../flutter_mocks.dart';
+import 'package:saropa_lints_example/flutter_mocks.dart';
 
 dynamic builder;
 final children = <Widget>[];

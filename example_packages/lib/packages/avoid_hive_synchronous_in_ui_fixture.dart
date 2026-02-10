@@ -103,7 +103,7 @@
 // Test fixture for: avoid_hive_synchronous_in_ui
 // Source: lib\src\rules\packages\hive_rules.dart
 
-import '../flutter_mocks.dart';
+import 'package:saropa_lints_example/flutter_mocks.dart';
 
 dynamic box;
 final context = BuildContext();

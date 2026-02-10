@@ -103,7 +103,7 @@
 // Test fixture for: prefer_null_object_pattern
 // Source: lib\src\rules\dependency_injection_rules.dart
 
-import '../flutter_mocks.dart';
+import 'package:saropa_lints_example/flutter_mocks.dart';
 
 dynamic event;
 

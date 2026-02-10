@@ -103,7 +103,7 @@
 // Test fixture for: prefer_correct_switch_length
 // Source: lib\src\rules\control_flow_rules.dart
 
-import '../flutter_mocks.dart';
+import 'package:saropa_lints_example/flutter_mocks.dart';
 
 // BAD: Should trigger prefer_correct_switch_length
 // expect_lint: prefer_correct_switch_length

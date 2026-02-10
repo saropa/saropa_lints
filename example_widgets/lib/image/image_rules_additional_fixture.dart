@@ -1,8 +1,8 @@
 // ignore_for_file: unused_local_variable, unused_element, unused_field
 // ignore_for_file: prefer_const_constructors
-// Test fixture for image rules added in v2.3.10
+// Test fixture for image rules
 
-import '../flutter_mocks.dart';
+import 'package:saropa_lints_example/flutter_mocks.dart';
 
 // =========================================================================
 // require_image_cache_dimensions

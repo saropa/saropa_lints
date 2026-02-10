@@ -103,7 +103,7 @@
 // Test fixture for: prefer_wildcard_for_unused_param
 // Source: lib\src\rules\naming_style_rules.dart
 
-import '../flutter_mocks.dart';
+import 'package:saropa_lints_example/flutter_mocks.dart';
 
 final context = BuildContext();
 final index = 0;

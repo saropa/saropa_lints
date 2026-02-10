@@ -103,7 +103,7 @@
 // Test fixture for: require_dio_singleton
 // Source: lib\src\rules\packages\dio_rules.dart
 
-import '../flutter_mocks.dart';
+import 'package:saropa_lints_example/flutter_mocks.dart';
 
 // BAD: Should trigger require_dio_singleton
 // expect_lint: require_dio_singleton

@@ -103,7 +103,7 @@
 // Test fixture for: prefer_null_aware_spread
 // Source: lib\src\rules\code_quality_rules.dart
 
-import '../flutter_mocks.dart';
+import 'package:saropa_lints_example/flutter_mocks.dart';
 
 // BAD: Should trigger prefer_null_aware_spread
 // expect_lint: prefer_null_aware_spread

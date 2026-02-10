@@ -103,7 +103,7 @@
 // Test fixture for: prefer_exception_suffix
 // Source: lib\src\rules\stylistic_error_testing_rules.dart
 
-import '../flutter_mocks.dart';
+import 'package:saropa_lints_example/flutter_mocks.dart';
 
 // BAD: Should trigger prefer_exception_suffix
 // expect_lint: prefer_exception_suffix

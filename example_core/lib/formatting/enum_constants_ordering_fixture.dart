@@ -103,7 +103,7 @@
 // Test fixture for: enum_constants_ordering
 // Source: lib\src\rules\formatting_rules.dart
 
-import '../flutter_mocks.dart';
+import 'package:saropa_lints_example/flutter_mocks.dart';
 
 // BAD: Should trigger enum_constants_ordering
 // expect_lint: enum_constants_ordering

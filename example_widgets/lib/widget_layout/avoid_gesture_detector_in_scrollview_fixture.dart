@@ -103,7 +103,7 @@
 // Test fixture for: avoid_gesture_detector_in_scrollview
 // Source: lib\src\rules\widget_layout_rules.dart
 
-import '../flutter_mocks.dart';
+import 'package:saropa_lints_example/flutter_mocks.dart';
 
 dynamic image;
 

@@ -103,7 +103,7 @@
 // Test fixture for: check_is_not_closed_after_async_gap
 // Source: lib\src\rules\packages\bloc_rules.dart
 
-import '../flutter_mocks.dart';
+import 'package:saropa_lints_example/flutter_mocks.dart';
 
 // BAD: Should trigger check_is_not_closed_after_async_gap
 // expect_lint: check_is_not_closed_after_async_gap

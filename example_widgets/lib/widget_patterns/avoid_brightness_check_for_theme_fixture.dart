@@ -103,7 +103,7 @@
 // Test fixture for: avoid_brightness_check_for_theme
 // Source: lib\src\rules\widget_patterns_rules.dart
 
-import '../flutter_mocks.dart';
+import 'package:saropa_lints_example/flutter_mocks.dart';
 
 dynamic child;
 final isLoading = false;

@@ -103,7 +103,7 @@
 // Test fixture for: avoid_hardcoded_asset_paths
 // Source: lib\src\rules\widget_patterns_rules.dart
 
-import '../flutter_mocks.dart';
+import 'package:saropa_lints_example/flutter_mocks.dart';
 
 // BAD: Should trigger avoid_hardcoded_asset_paths
 // expect_lint: avoid_hardcoded_asset_paths

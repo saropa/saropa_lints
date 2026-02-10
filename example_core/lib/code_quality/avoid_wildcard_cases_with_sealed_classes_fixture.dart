@@ -103,7 +103,7 @@
 // Test fixture for: avoid_wildcard_cases_with_sealed_classes
 // Source: lib\src\rules\code_quality_rules.dart
 
-import '../flutter_mocks.dart';
+import 'package:saropa_lints_example/flutter_mocks.dart';
 
 // BAD: Should trigger avoid_wildcard_cases_with_sealed_classes
 // expect_lint: avoid_wildcard_cases_with_sealed_classes

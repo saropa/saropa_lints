@@ -103,7 +103,7 @@
 // Test fixture for: avoid_ios_debug_code_in_release
 // Source: lib\src\rules\platforms\ios_rules.dart
 
-import '../flutter_mocks.dart';
+import 'package:saropa_lints_example/flutter_mocks.dart';
 
 // BAD: Should trigger avoid_ios_debug_code_in_release
 // expect_lint: avoid_ios_debug_code_in_release

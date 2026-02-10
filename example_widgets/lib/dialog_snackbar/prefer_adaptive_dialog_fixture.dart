@@ -103,7 +103,7 @@
 // Test fixture for: prefer_adaptive_dialog
 // Source: lib\src\rules\dialog_snackbar_rules.dart
 
-import '../flutter_mocks.dart';
+import 'package:saropa_lints_example/flutter_mocks.dart';
 
 dynamic builder;
 final context = BuildContext();

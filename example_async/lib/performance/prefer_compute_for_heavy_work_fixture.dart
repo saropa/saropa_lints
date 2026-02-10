@@ -103,7 +103,7 @@
 // Test fixture for: prefer_compute_for_heavy_work
 // Source: lib\src\rules\performance_rules.dart
 
-import '../flutter_mocks.dart';
+import 'package:saropa_lints_example/flutter_mocks.dart';
 
 dynamic data;
 dynamic result;

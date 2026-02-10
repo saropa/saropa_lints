@@ -103,7 +103,7 @@
 // Test fixture for: avoid_generics_shadowing
 // Source: lib\src\rules\class_constructor_rules.dart
 
-import '../flutter_mocks.dart';
+import 'package:saropa_lints_example/flutter_mocks.dart';
 
 // BAD: Should trigger avoid_generics_shadowing
 // expect_lint: avoid_generics_shadowing

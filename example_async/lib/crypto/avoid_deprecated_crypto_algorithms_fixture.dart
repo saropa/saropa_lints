@@ -103,7 +103,7 @@
 // Test fixture for: avoid_deprecated_crypto_algorithms
 // Source: lib\src\rules\crypto_rules.dart
 
-import '../flutter_mocks.dart';
+import 'package:saropa_lints_example/flutter_mocks.dart';
 
 dynamic data;
 

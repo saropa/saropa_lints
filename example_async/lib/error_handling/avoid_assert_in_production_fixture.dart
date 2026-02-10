@@ -103,7 +103,7 @@
 // Test fixture for: avoid_assert_in_production
 // Source: lib\src\rules\error_handling_rules.dart
 
-import '../flutter_mocks.dart';
+import 'package:saropa_lints_example/flutter_mocks.dart';
 
 dynamic user;
 

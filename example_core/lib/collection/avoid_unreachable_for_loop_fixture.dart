@@ -103,7 +103,7 @@
 // Test fixture for: avoid_unreachable_for_loop
 // Source: lib\src\rules\collection_rules.dart
 
-import '../flutter_mocks.dart';
+import 'package:saropa_lints_example/flutter_mocks.dart';
 
 // BAD: Should trigger avoid_unreachable_for_loop
 // expect_lint: avoid_unreachable_for_loop

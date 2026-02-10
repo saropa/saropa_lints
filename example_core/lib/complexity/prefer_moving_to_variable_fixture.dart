@@ -103,7 +103,7 @@
 // Test fixture for: prefer_moving_to_variable
 // Source: lib\src\rules\complexity_rules.dart
 
-import '../flutter_mocks.dart';
+import 'package:saropa_lints_example/flutter_mocks.dart';
 
 // BAD: Should trigger prefer_moving_to_variable
 // expect_lint: prefer_moving_to_variable

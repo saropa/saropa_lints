@@ -103,7 +103,7 @@
 // Test fixture for: prefer_url_launcher_fallback
 // Source: lib\src\rules\packages\url_launcher_rules.dart
 
-import '../flutter_mocks.dart';
+import 'package:saropa_lints_example/flutter_mocks.dart';
 
 final email = 'test@example.com';
 final text = 'text';

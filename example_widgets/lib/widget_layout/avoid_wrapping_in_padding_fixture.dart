@@ -103,7 +103,7 @@
 // Test fixture for: avoid_wrapping_in_padding
 // Source: lib\src\rules\widget_layout_rules.dart
 
-import '../flutter_mocks.dart';
+import 'package:saropa_lints_example/flutter_mocks.dart';
 
 // BAD: Should trigger avoid_wrapping_in_padding
 // expect_lint: avoid_wrapping_in_padding

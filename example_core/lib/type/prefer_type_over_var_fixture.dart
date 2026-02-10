@@ -103,7 +103,7 @@
 // Test fixture for: prefer_type_over_var
 // Source: lib\src\rules\type_rules.dart
 
-import '../flutter_mocks.dart';
+import 'package:saropa_lints_example/flutter_mocks.dart';
 
 var count = 0;
 final name = 'example';

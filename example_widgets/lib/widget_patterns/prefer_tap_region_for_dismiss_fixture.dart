@@ -103,7 +103,7 @@
 // Test fixture for: prefer_tap_region_for_dismiss
 // Source: lib\src\rules\widget_patterns_rules.dart
 
-import '../flutter_mocks.dart';
+import 'package:saropa_lints_example/flutter_mocks.dart';
 
 // BAD: Should trigger prefer_tap_region_for_dismiss
 // expect_lint: prefer_tap_region_for_dismiss

@@ -103,7 +103,7 @@
 // Test fixture for: require_deprecation_message
 // Source: lib\src\rules\documentation_rules.dart
 
-import '../flutter_mocks.dart';
+import 'package:saropa_lints_example/flutter_mocks.dart';
 
 // BAD: Should trigger require_deprecation_message
 // expect_lint: require_deprecation_message

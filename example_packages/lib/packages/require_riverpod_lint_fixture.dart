@@ -103,7 +103,7 @@
 // Test fixture for: require_riverpod_lint
 // Source: lib\src\rules\packages\riverpod_rules.dart
 
-import '../flutter_mocks.dart';
+import 'package:saropa_lints_example/flutter_mocks.dart';
 
 // BAD: Should trigger require_riverpod_lint
 // expect_lint: require_riverpod_lint

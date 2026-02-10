@@ -1,6 +1,6 @@
 import 'package:test/test.dart';
 
-/// Tests for false positive fixes in version 4.2.3+
+/// Tests for false positive fixes
 ///
 /// This test file documents the expected behavior for rule fixes:
 /// 1. require_subscription_status_check - word boundary matching
@@ -15,13 +15,13 @@ import 'package:test/test.dart';
 ///
 /// Test fixtures are located in:
 /// - example/lib/require_subscription_status_check_example.dart
-/// - example/lib/navigation/require_deep_link_fallback_fixture.dart
-/// - example/lib/security/require_https_only_fixture.dart
+/// - example_widgets/lib/navigation/require_deep_link_fallback_fixture.dart
+/// - example_async/lib/security/require_https_only_fixture.dart
 /// - example/lib/avoid_variable_shadowing_fixture.dart
-/// - example/lib/isar/avoid_isar_clear_in_production_fixture.dart
+/// - example_packages/lib/isar/avoid_isar_clear_in_production_fixture.dart
 /// - example/lib/avoid_nested_assignments_fixture.dart
 void main() {
-  group('False Positive Fixes - v4.2.3', () {
+  group('False Positive Fixes', () {
     group('require_subscription_status_check', () {
       test('should use word boundary regex to avoid substring matches', () {
         // Expected behavior documented in fixture file
@@ -449,7 +449,7 @@ void main() {
     });
   });
 
-  group('String.contains() Anti-Pattern Fixes - v4.12.4', () {
+  group('String.contains() Anti-Pattern Fixes', () {
     // These tests document fixes for the systemic .contains() anti-pattern
     // that caused 71% of all resolved bugs. See:
     // bugs/string_contains_false_positive_audit.md
@@ -577,12 +577,12 @@ void main() {
     });
 
     test('require_deep_link_fallback has test fixture', () {
-      // Located at: example/lib/navigation/require_deep_link_fallback_fixture.dart
+      // Located at: example_widgets/lib/navigation/require_deep_link_fallback_fixture.dart
       expect(true, isTrue);
     });
 
     test('require_https_only has test fixture', () {
-      // Located at: example/lib/security/require_https_only_fixture.dart
+      // Located at: example_async/lib/security/require_https_only_fixture.dart
       expect(true, isTrue);
     });
 
@@ -592,12 +592,12 @@ void main() {
     });
 
     test('avoid_isar_clear_in_production has test fixture', () {
-      // Located at: example/lib/isar/avoid_isar_clear_in_production_fixture.dart
+      // Located at: example_packages/lib/isar/avoid_isar_clear_in_production_fixture.dart
       expect(true, isTrue);
     });
 
     test('prefer_late_final has test fixture', () {
-      // Located at: example/lib/code_quality/code_quality_v250_fixture.dart
+      // Located at: example_core/lib/code_quality/code_quality_fixture.dart
       expect(true, isTrue);
     });
 

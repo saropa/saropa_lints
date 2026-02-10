@@ -103,7 +103,7 @@
 // Test fixture for: prefer_cached_image_fade_animation
 // Source: lib\src\rules\image_rules.dart
 
-import '../flutter_mocks.dart';
+import 'package:saropa_lints_example/flutter_mocks.dart';
 
 // BAD: Should trigger prefer_cached_image_fade_animation
 // expect_lint: prefer_cached_image_fade_animation

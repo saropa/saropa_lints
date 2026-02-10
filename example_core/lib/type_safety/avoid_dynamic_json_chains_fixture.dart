@@ -103,7 +103,7 @@
 // Test fixture for: avoid_dynamic_json_chains
 // Source: lib\src\rules\type_safety_rules.dart
 
-import '../flutter_mocks.dart';
+import 'package:saropa_lints_example/flutter_mocks.dart';
 
 dynamic a;
 dynamic data;

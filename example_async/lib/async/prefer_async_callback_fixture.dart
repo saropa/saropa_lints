@@ -1,6 +1,6 @@
 // ignore_for_file: unused_field, unused_element, prefer_typing_uninitialized_variables
 
-import '../flutter_mocks.dart';
+import 'package:saropa_lints_example/flutter_mocks.dart';
 
 /// Test fixture for prefer_async_callback rule.
 ///

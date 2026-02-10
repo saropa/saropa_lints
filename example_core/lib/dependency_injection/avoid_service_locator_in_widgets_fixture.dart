@@ -103,7 +103,7 @@
 // Test fixture for: avoid_service_locator_in_widgets
 // Source: lib\src\rules\dependency_injection_rules.dart
 
-import '../flutter_mocks.dart';
+import 'package:saropa_lints_example/flutter_mocks.dart';
 
 final context = BuildContext();
 final name = 'example';

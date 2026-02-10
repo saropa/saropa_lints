@@ -103,7 +103,7 @@
 // Test fixture for: require_focus_node_dispose
 // Source: lib\src\rules\widget_lifecycle_rules.dart
 
-import '../flutter_mocks.dart';
+import 'package:saropa_lints_example/flutter_mocks.dart';
 
 // BAD: Should trigger require_focus_node_dispose
 // expect_lint: require_focus_node_dispose

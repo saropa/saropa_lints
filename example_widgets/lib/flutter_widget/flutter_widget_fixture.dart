@@ -57,7 +57,7 @@
 // ignore_for_file: const_with_undefined_constructor, abstract_super_member_reference
 // ignore_for_file: equal_keys_in_map, unused_catch_stack
 // ignore_for_file: non_constant_default_value, not_a_type
-// Test fixture for flutter widget rules added in v2.3.11
+// Test fixture for flutter widget rules
 
 // =========================================================================
 // avoid_builder_index_out_of_bounds
@@ -237,7 +237,7 @@ class BadListBuilderMultipleLists extends StatelessWidget {
 }
 
 // =========================================================================
-// Flutter Widget Rules (from v4.1.5)
+// Flutter Widget Rules
 // =========================================================================
 
 // BAD: GlobalKey in StatefulWidget

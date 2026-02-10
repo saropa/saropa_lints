@@ -103,7 +103,7 @@
 // Test fixture for: avoid_passing_default_values
 // Source: lib\src\rules\code_quality_rules.dart
 
-import '../flutter_mocks.dart';
+import 'package:saropa_lints_example/flutter_mocks.dart';
 
 final items = <dynamic>[];
 dynamic value;

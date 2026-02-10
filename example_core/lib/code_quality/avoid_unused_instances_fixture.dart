@@ -103,7 +103,7 @@
 // Test fixture for: avoid_unused_instances
 // Source: lib\src\rules\code_quality_rules.dart
 
-import '../flutter_mocks.dart';
+import 'package:saropa_lints_example/flutter_mocks.dart';
 
 // BAD: Should trigger avoid_unused_instances
 // expect_lint: avoid_unused_instances

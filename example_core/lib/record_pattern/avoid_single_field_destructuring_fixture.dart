@@ -103,7 +103,7 @@
 // Test fixture for: avoid_single_field_destructuring
 // Source: lib\src\rules\record_pattern_rules.dart
 
-import '../flutter_mocks.dart';
+import 'package:saropa_lints_example/flutter_mocks.dart';
 
 final name = 'example';
 

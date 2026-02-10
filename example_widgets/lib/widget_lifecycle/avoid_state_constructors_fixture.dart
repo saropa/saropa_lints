@@ -103,7 +103,7 @@
 // Test fixture for: avoid_state_constructors
 // Source: lib\src\rules\widget_lifecycle_rules.dart
 
-import '../flutter_mocks.dart';
+import 'package:saropa_lints_example/flutter_mocks.dart';
 
 // BAD: Should trigger avoid_state_constructors
 // expect_lint: avoid_state_constructors

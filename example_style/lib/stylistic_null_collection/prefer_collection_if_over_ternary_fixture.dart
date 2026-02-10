@@ -103,7 +103,7 @@
 // Test fixture for: prefer_collection_if_over_ternary
 // Source: lib\src\rules\stylistic_null_collection_rules.dart
 
-import '../flutter_mocks.dart';
+import 'package:saropa_lints_example/flutter_mocks.dart';
 
 // BAD: Should trigger prefer_collection_if_over_ternary
 // expect_lint: prefer_collection_if_over_ternary
