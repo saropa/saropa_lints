@@ -371,6 +371,8 @@ String? _getDisposeMethodBody(ClassDeclaration node) {
   return null;
 }
 
+// cspell:ignore xxxDisposezzz ispose
+
 /// Helper to check if a field is disposed in the dispose body.
 ///
 /// Recognizes direct `.dispose()` calls and method names containing "dispose"
@@ -382,6 +384,7 @@ bool _isFieldDisposed(String fieldName, String? disposeBody) {
   // Also match fieldName.xxxDisposezzz( or fieldName?.xxxDisposezzz(
   final RegExp disposePattern = RegExp(
     '${RegExp.escape(fieldName)}\\??\\.' // fieldName. or fieldName?.
+
     r'\w*[Dd]ispose\w*\(', // any method containing "dispose"
   );
   return disposePattern.hasMatch(disposeBody);
@@ -909,7 +912,7 @@ class RequireVideoPlayerControllerDisposeRule extends SaropaLintRule {
   }
 }
 
-/// Warns when StreamSubscription is not cancelled in dispose().
+/// Warns when StreamSubscription is not canceled in dispose().
 ///
 /// Since: v2.0.0 | Updated: v4.13.0 | Rule version: v4
 ///
@@ -927,7 +930,7 @@ class RequireVideoPlayerControllerDisposeRule extends SaropaLintRule {
 /// - Collection for-in: `for (final sub in _subs) { sub.cancel(); }`
 /// - Collection forEach: `_subs.forEach((s) => s.cancel())`
 ///
-/// **Quick fix available:** Adds cancel() calls for uncancelled subscriptions.
+/// **Quick fix available:** Adds cancel() calls for uncanceled subscriptions.
 /// Creates dispose() method if missing.
 ///
 /// **BAD:**
@@ -1034,7 +1037,7 @@ class RequireStreamSubscriptionCancelRule extends SaropaLintRule {
       }
 
       // Check dispose method for cancel calls
-      final Set<String> cancelledFields = <String>{};
+      final Set<String> canceledFields = <String>{};
       for (final ClassMember member in node.members) {
         if (member is MethodDeclaration && member.name.lexeme == 'dispose') {
           final String disposeSource = member.toSource();
@@ -1043,30 +1046,30 @@ class RequireStreamSubscriptionCancelRule extends SaropaLintRule {
           for (final String field in singleSubscriptionFields) {
             if (disposeSource.contains('$field.cancel()') ||
                 disposeSource.contains('$field?.cancel()')) {
-              cancelledFields.add(field);
+              canceledFields.add(field);
             }
           }
 
           // Check collection subscription fields for iteration-based cancel
           for (final String field in collectionSubscriptionFields) {
             if (_hasCollectionCancellation(disposeSource, field)) {
-              cancelledFields.add(field);
+              canceledFields.add(field);
             }
           }
         }
       }
 
-      // Report uncancelled single subscriptions
+      // Report uncanceled single subscriptions
       for (final String field in singleSubscriptionFields) {
-        if (!cancelledFields.contains(field)) {
+        if (!canceledFields.contains(field)) {
           reporter.atNode(node, code);
           return;
         }
       }
 
-      // Report uncancelled collection subscriptions
+      // Report uncanceled collection subscriptions
       for (final String field in collectionSubscriptionFields) {
-        if (!cancelledFields.contains(field)) {
+        if (!canceledFields.contains(field)) {
           reporter.atNode(node, code);
           return;
         }
@@ -1143,8 +1146,8 @@ class _AddStreamSubscriptionCancelFix extends DartFix {
     context.registry.addClassDeclaration((ClassDeclaration node) {
       if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
 
-      // Collect uncancelled subscription fields
-      final List<_SubscriptionField> uncancelledFields = <_SubscriptionField>[];
+      // Collect uncanceled subscription fields
+      final List<_SubscriptionField> uncanceledFields = <_SubscriptionField>[];
 
       // Find all subscription fields
       for (final ClassMember member in node.members) {
@@ -1158,7 +1161,7 @@ class _AddStreamSubscriptionCancelFix extends DartFix {
 
             for (final VariableDeclaration variable
                 in member.fields.variables) {
-              uncancelledFields.add(_SubscriptionField(
+              uncanceledFields.add(_SubscriptionField(
                 name: variable.name.lexeme,
                 isNullable: isNullable,
                 isCollection: isCollection,
@@ -1168,7 +1171,7 @@ class _AddStreamSubscriptionCancelFix extends DartFix {
         }
       }
 
-      if (uncancelledFields.isEmpty) return;
+      if (uncanceledFields.isEmpty) return;
 
       // Find existing dispose method
       MethodDeclaration? disposeMethod;
@@ -1179,10 +1182,10 @@ class _AddStreamSubscriptionCancelFix extends DartFix {
         }
       }
 
-      // Check which fields are already cancelled
+      // Check which fields are already canceled
       if (disposeMethod != null) {
         final String disposeSource = disposeMethod.body.toSource();
-        uncancelledFields.removeWhere((field) {
+        uncanceledFields.removeWhere((field) {
           if (field.isCollection) {
             return _hasCollectionCancellationInSource(
                 disposeSource, field.name);
@@ -1193,11 +1196,11 @@ class _AddStreamSubscriptionCancelFix extends DartFix {
         });
       }
 
-      if (uncancelledFields.isEmpty) return;
+      if (uncanceledFields.isEmpty) return;
 
       // Generate cancel code
       final StringBuffer cancelCode = StringBuffer();
-      for (final _SubscriptionField field in uncancelledFields) {
+      for (final _SubscriptionField field in uncanceledFields) {
         if (field.isCollection) {
           cancelCode.writeln(
               '    for (final sub in ${field.name}) {\n      sub.cancel();\n    }');
@@ -1634,13 +1637,13 @@ class RequireSocketCloseRule extends SaropaLintRule {
   }
 }
 
-/// Warns when a debouncer Timer is not cancelled in dispose().
+/// Warns when a debouncer Timer is not canceled in dispose().
 ///
 /// Since: v4.13.0 | Rule version: v1
 ///
 /// Alias: cancel_debouncer, debouncer_leak
 ///
-/// Debounce timers used for search or input delay must be cancelled
+/// Debounce timers used for search or input delay must be canceled
 /// to prevent callbacks firing after widget disposal.
 ///
 /// **BAD:**
@@ -1689,7 +1692,7 @@ class RequireDebouncerCancelRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_debouncer_cancel',
     problemMessage:
-        '[require_debouncer_cancel] Uncancelled debounce timer fires after '
+        '[require_debouncer_cancel] Uncanceled debounce timer fires after '
         'dispose, calling setState on unmounted widget causing crashes. {v1}',
     correctionMessage: 'Add _debounce?.cancel() in the dispose() method.',
     errorSeverity: DiagnosticSeverity.ERROR,
@@ -1731,10 +1734,10 @@ class RequireDebouncerCancelRule extends SaropaLintRule {
       }
 
       for (final String field in timerFields) {
-        final bool isCancelled = disposeBody != null &&
+        final bool isCanceled = disposeBody != null &&
             (disposeBody.contains('$field.cancel()') ||
                 disposeBody.contains('$field?.cancel()'));
-        if (!isCancelled) {
+        if (!isCanceled) {
           for (final ClassMember member in node.members) {
             if (member is FieldDeclaration) {
               for (final VariableDeclaration variable
@@ -1751,13 +1754,13 @@ class RequireDebouncerCancelRule extends SaropaLintRule {
   }
 }
 
-/// Warns when Timer.periodic is not cancelled in dispose().
+/// Warns when Timer.periodic is not canceled in dispose().
 ///
 /// Since: v4.0.1 | Updated: v4.13.0 | Rule version: v2
 ///
 /// Alias: cancel_interval_timer, periodic_timer_leak
 ///
-/// Periodic timers keep firing indefinitely. Not cancelling them
+/// Periodic timers keep firing indefinitely. Not canceling them
 /// wastes resources and can call setState on disposed widgets.
 ///
 /// **BAD:**
@@ -1876,11 +1879,11 @@ class RequireIntervalTimerCancelRule extends SaropaLintRule {
         }
       }
 
-      final bool isCancelled = disposeBody != null &&
+      final bool isCanceled = disposeBody != null &&
           (disposeBody.contains('$fieldName.cancel()') ||
               disposeBody.contains('$fieldName?.cancel()'));
 
-      if (!isCancelled) {
+      if (!isCanceled) {
         reporter.atNode(node.methodName, code);
       }
     });
