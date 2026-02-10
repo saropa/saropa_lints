@@ -98,6 +98,9 @@ a history. Consumers can snapshot it if they need historical tracking.
 
 ### R2: Export file schema
 
+> **Note:** `VIOLATION_EXPORT_API.md` is the canonical field-level reference.
+> The schema below is illustrative; in case of conflict, the API doc wins.
+
 ```jsonc
 {
   // Schema version for forward compatibility. Consumers MUST check this
@@ -105,6 +108,7 @@ a history. Consumers can snapshot it if they need historical tracking.
   "schema": "1.0",
 
   // Saropa Lints package version that produced this file.
+  // Absent (not null) when config was not captured.
   "version": "4.12.2",
 
   // ISO 8601 timestamp of when this analysis completed.
@@ -148,8 +152,8 @@ a history. Consumers can snapshot it if they need historical tracking.
       "opinionated": 5
     },
     // Per-file and per-rule counts for quick lookups.
-    "issuesByFile": { "lib/services/auth_service.dart": 8, "...": 0 },
-    "issuesByRule": { "require_field_dispose": 12, "avoid_print": 5, "...": 0 },
+    "issuesByFile": { "lib/services/auth_service.dart": 8, "lib/main.dart": 3 },
+    "issuesByRule": { "require_field_dispose": 12, "avoid_print": 5 },
     // Rule-to-severity lookup table (lowercase values).
     "ruleSeverities": { "require_field_dispose": "error", "avoid_print": "warning" }
   },
@@ -168,8 +172,8 @@ a history. Consumers can snapshot it if they need historical tracking.
       // Rule identifier. Matches the rule name in analysis_options.yaml.
       "rule": "require_field_dispose",
 
-      // Human-readable violation message.
-      "message": "TextEditingController is never disposed",
+      // Human-readable violation message. Prefixed with [rule_name].
+      "message": "[require_field_dispose] TextEditingController is never disposed...",
 
       // Optional correction message. Omitted when the rule has no
       // correctionMessage. Consumers MUST treat this field as optional.
@@ -309,9 +313,11 @@ The data needed maps directly to existing structures:
 
 ### Estimated size
 
-For a project with 2,400 violations (the self-analysis benchmark), the JSON file would
-be approximately 400-600 KB uncompressed. This is acceptable for a file that's
-overwritten each run.
+For a project with 2,400 violations (the self-analysis benchmark) at comprehensive tier
+(~1,590 enabled rules), the JSON file is approximately 650-850 KB uncompressed. The
+`enabledRuleNames` array (~48 KB) and per-violation `correction` messages (~190 KB) are
+the largest contributors beyond the violation entries themselves. This is acceptable for
+a file that's overwritten each run.
 
 ### Cleanup
 
