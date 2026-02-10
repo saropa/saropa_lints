@@ -74,6 +74,38 @@ def _make_bar(value: int, max_value: int, width: int = _BAR_WIDTH) -> str:
     return _BAR_FILLED * filled + _BAR_EMPTY * (width - filled)
 
 
+class _CategoryInfo(NamedTuple):
+    """Rule category with name, rule count, and originating file."""
+
+    category: str
+    rule_count: int
+    dart_file: Path
+
+
+def _collect_category_rules(rules_dir: Path) -> list[_CategoryInfo]:
+    """Scan rule files and return (category, rule_count, file) tuples."""
+    result: list[_CategoryInfo] = []
+    for dart_file in sorted(rules_dir.glob("**/*_rules.dart")):
+        if dart_file.name == "all_rules.dart":
+            continue
+        category = dart_file.stem.replace("_rules", "")
+        content = dart_file.read_text(encoding="utf-8")
+        rule_count = len(_RULE_CLASS_RE.findall(content))
+        result.append(_CategoryInfo(category, rule_count, dart_file))
+    return result
+
+
+def _status_for_percentage(pct: float) -> tuple[Color, str]:
+    """Map a coverage percentage to a (color, label) pair."""
+    if pct < 10:
+        return Color.RED, "CRITICAL"
+    if pct < 30:
+        return Color.YELLOW, "LOW"
+    if pct < 70:
+        return Color.CYAN, "MODERATE"
+    return Color.GREEN, "GOOD"
+
+
 def display_test_coverage(project_dir: Path) -> None:
     """Display test coverage report with bar chart visualization."""
     rules_dir = project_dir / "lib" / "src" / "rules"
@@ -81,16 +113,11 @@ def display_test_coverage(project_dir: Path) -> None:
     if not rules_dir.exists():
         return
 
+    categories = _collect_category_rules(rules_dir)
     category_details: list[tuple[str, int, int]] = []
-    for dart_file in sorted(rules_dir.glob("**/*_rules.dart")):
-        if dart_file.name == "all_rules.dart":
-            continue
-        category = dart_file.stem.replace("_rules", "")
-        content = dart_file.read_text(encoding="utf-8")
-        rule_count = len(_RULE_CLASS_RE.findall(content))
-
+    for cat in categories:
         fixture_count = 0
-        for suffix in [category, f"{category}s"]:
+        for suffix in [cat.category, f"{cat.category}s"]:
             fixture_dir = example_dir / suffix
             if fixture_dir.exists():
                 fixture_count = len(
@@ -99,7 +126,7 @@ def display_test_coverage(project_dir: Path) -> None:
                 if fixture_count > 0:
                     break
 
-        category_details.append((category, rule_count, fixture_count))
+        category_details.append((cat.category, cat.rule_count, fixture_count))
 
     total_rules = sum(c[1] for c in category_details)
     total_fixtures = sum(c[2] for c in category_details)
@@ -107,15 +134,7 @@ def display_test_coverage(project_dir: Path) -> None:
         (total_fixtures / total_rules * 100) if total_rules > 0 else 0
     )
 
-    # Determine status color
-    if coverage_pct < 10:
-        status_color, status = Color.RED, "CRITICAL"
-    elif coverage_pct < 30:
-        status_color, status = Color.YELLOW, "LOW"
-    elif coverage_pct < 70:
-        status_color, status = Color.CYAN, "MODERATE"
-    else:
-        status_color, status = Color.GREEN, "GOOD"
+    status_color, status = _status_for_percentage(coverage_pct)
 
     print()
     print_colored("  ▶ Test Coverage", Color.WHITE)
@@ -156,6 +175,80 @@ def display_test_coverage(project_dir: Path) -> None:
                 f"    {category:<14s} {bar}  {fixtures:>3d}/{rules:<3d} "
                 f"({pct:5.1f}%)",
                 row_color,
+            )
+    print()
+
+
+_TEST_COUNT_RE = re.compile(r"^\s+test\(", re.MULTILINE)
+
+
+def display_unit_test_coverage(project_dir: Path) -> None:
+    """Display unit test file coverage for each rule category.
+
+    Counts ``test()`` calls in dedicated ``test/*_rules_test.dart``
+    files. This complements fixture coverage by showing behaviour-level
+    test documentation.
+    """
+    rules_dir = project_dir / "lib" / "src" / "rules"
+    test_dir = project_dir / "test"
+    if not rules_dir.exists() or not test_dir.exists():
+        return
+
+    # Build index of test files → test() call count
+    test_files: dict[str, int] = {}
+    for tf in test_dir.glob("*_test.dart"):
+        content = tf.read_text(encoding="utf-8")
+        test_files[tf.stem] = len(_TEST_COUNT_RE.findall(content))
+
+    categories = _collect_category_rules(rules_dir)
+    category_details: list[tuple[str, int, int]] = []
+    for cat in categories:
+        # Match: {category}_rules_test or {category}_test
+        test_count = 0
+        for stem in [f"{cat.category}_rules_test", f"{cat.category}_test"]:
+            if stem in test_files:
+                test_count = test_files[stem]
+                break
+        category_details.append((cat.category, cat.rule_count, test_count))
+
+    tested = sum(1 for c in category_details if c[2] > 0)
+    total_cats = len(category_details)
+    coverage_pct = (tested / total_cats * 100) if total_cats > 0 else 0
+
+    status_color, status = _status_for_percentage(coverage_pct)
+
+    print()
+    print_colored("  ▶ Unit Test Coverage", Color.WHITE)
+    print()
+
+    bar = _make_bar(tested, total_cats)
+    print_colored(
+        f"    Categories   {bar}  {tested:>4d}/{total_cats:<4d} "
+        f"({coverage_pct:5.1f}%) {status}",
+        status_color,
+    )
+
+    total_tests = sum(c[2] for c in category_details)
+    print_colored(
+        f"    Total tests: {total_tests}",
+        Color.CYAN,
+    )
+
+    # Top 5 categories without test files
+    untested = sorted(
+        [(name, rules) for name, rules, tests in category_details if tests == 0],
+        key=lambda c: c[1],
+        reverse=True,
+    )[:5]
+
+    if untested:
+        print()
+        print_colored("    Missing test files:", Color.WHITE)
+        for category, rules in untested:
+            print_colored(
+                f"    {category:<14s} ({rules:>3d} rules) "
+                f"needs test/{category}_rules_test.dart",
+                Color.RED if rules > 20 else Color.YELLOW,
             )
     print()
 
