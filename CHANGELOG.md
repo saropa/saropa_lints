@@ -38,6 +38,9 @@ Dates are not included in version headers — [pub.dev](https://pub.dev/packages
 - **`prefer_no_commented_out_code` false positives** (v5): Prose labels like `OK:`, `BAD:`, `GOOD:`, `LINT:` no longer falsely flagged as code. Removed colon from code detection pattern and added `expect_lint:` to special markers
 - **`prefer_capitalized_comment_start` false positive** (v4): Continuation comments on consecutive lines no longer flagged for lowercase start
 - **`prefer_explicit_type_arguments` false positives** (v6): Empty collections (`[]`, `{}`) with types inferred from context (return type, variable declaration) are no longer flagged
+- **`avoid_variable_shadowing` config name mismatch**: Fixed `avoid_shadowing` → `avoid_variable_shadowing` in `custom_lint.yaml` and `analysis_options_template.yaml` to match the actual rule name
+- **`verify_documented_parameters_exist` offset bug** (v3): Rule reported lints at wrong source offset when non-doc-comment lines (e.g. `// expect_lint:`) appeared between `///` doc comment lines. Fixed by iterating per-token instead of using joined string offset
+- **Unfulfilled `expect_lint` errors**: Enabled `avoid_nested_assignments`, `avoid_variable_shadowing`, and `verify_documented_parameters_exist` in example `analysis_options.yaml` so fixture `expect_lint` annotations are satisfied
 
 ---
 ## [4.14.1]
