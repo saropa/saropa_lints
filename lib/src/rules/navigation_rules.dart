@@ -23,6 +23,8 @@ import '../saropa_lint_rule.dart';
 
 /// Warns when MaterialApp/CupertinoApp lacks onUnknownRoute.
 ///
+/// Since: v1.5.0 | Updated: v4.13.0 | Rule version: v4
+///
 /// Alias: add_unknown_route, fallback_route, route_not_found_handler
 ///
 /// Without onUnknownRoute, navigating to an undefined route crashes the app.
@@ -62,7 +64,7 @@ class RequireUnknownRouteHandlerRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_unknown_route_handler',
     problemMessage:
-        '[require_unknown_route_handler] MaterialApp or CupertinoApp defines routes or onGenerateRoute but does not provide an onUnknownRoute handler. When a user navigates to an undefined route path via deep link, push notification, or programmatic navigation, the app throws an unhandled exception and crashes instead of showing a helpful error screen.',
+        '[require_unknown_route_handler] MaterialApp or CupertinoApp defines routes or onGenerateRoute but does not provide an onUnknownRoute handler. When a user navigates to an undefined route path via deep link, push notification, or programmatic navigation, the app throws an unhandled exception and crashes instead of showing a helpful error screen. {v4}',
     correctionMessage:
         'Add an onUnknownRoute callback to MaterialApp that returns a route to a user-friendly 404 error page when navigation targets an undefined route path.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -112,6 +114,8 @@ class RequireUnknownRouteHandlerRule extends SaropaLintRule {
 
 /// Warns when BuildContext is used after an await in navigation.
 ///
+/// Since: v1.5.0 | Updated: v4.13.0 | Rule version: v3
+///
 /// Alias: avoid_dialog_context_after_async, context_after_await, mounted_check
 ///
 /// After awaiting a navigation operation, the widget may be disposed.
@@ -146,7 +150,7 @@ class AvoidContextAfterNavigationRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_context_after_navigation',
     problemMessage:
-        '[avoid_context_after_navigation] BuildContext accessed after an awaited navigation call without a mounted check. The widget that owns this context is likely disposed by the time the await completes, and calling ScaffoldMessenger.of(), Navigator.of(), or Theme.of() on a disposed context throws a FlutterError that crashes the app or produces silent failures in release mode.',
+        '[avoid_context_after_navigation] BuildContext accessed after an awaited navigation call without a mounted check. The widget that owns this context is likely disposed by the time the await completes, and calling ScaffoldMessenger.of(), Navigator.of(), or Theme.of() on a disposed context throws a FlutterError that crashes the app or produces silent failures in release mode. {v3}',
     correctionMessage:
         'Insert "if (!mounted) return;" immediately after the awaited navigation call and before any subsequent BuildContext usage to guard against accessing a disposed widget tree.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -227,23 +231,22 @@ class _NavigationContextVisitor extends RecursiveAstVisitor<void> {
   void visitMethodInvocation(MethodInvocation node) {
     // Check for context usage after awaited navigation
     if (_awaitedNavigation && !_hasMountedCheck) {
-      final String source = node.toSource();
-      if (source.contains('context') || source.contains('Context')) {
-        // Check if it's using context
-        final Expression? target = node.target;
-        if (target != null) {
-          final String targetSource = target.toSource();
-          if (targetSource == 'context' ||
-              targetSource.contains('.of(context')) {
-            reporter.atNode(node, code);
-          }
+      // Check if target is a context-dependent call (e.g., Navigator.of(context))
+      final Expression? target = node.target;
+      if (target != null) {
+        final String targetSource = target.toSource();
+        if (targetSource == 'context' ||
+            targetSource == 'Navigator.of(context)' ||
+            targetSource == 'ScaffoldMessenger.of(context)' ||
+            targetSource == 'Theme.of(context)') {
+          reporter.atNode(node, code);
         }
-        // Check arguments for context
-        for (final Expression arg in node.argumentList.arguments) {
-          if (arg is SimpleIdentifier && arg.name == 'context') {
-            reporter.atNode(node, code);
-            break;
-          }
+      }
+      // Check arguments for direct context usage
+      for (final Expression arg in node.argumentList.arguments) {
+        if (arg is SimpleIdentifier && arg.name == 'context') {
+          reporter.atNode(node, code);
+          break;
         }
       }
     }
@@ -279,6 +282,8 @@ class _AddMountedCheckFix extends DartFix {
 }
 
 /// Warns when different page route transition types are mixed in the same app.
+///
+/// Since: v1.6.0 | Updated: v4.13.0 | Rule version: v4
 ///
 /// Alias: consistent_transitions, mixed_page_routes, page_transition_theme
 ///
@@ -318,7 +323,7 @@ class RequireRouteTransitionConsistencyRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_route_transition_consistency',
     problemMessage:
-        '[require_route_transition_consistency] Multiple route transition types (MaterialPageRoute, CupertinoPageRoute, PageRouteBuilder) are mixed in the same file. Mixing slide, fade, and zoom transitions within a single app produces a jarring, unprofessional navigation experience that disorients users and undermines perceived app quality.',
+        '[require_route_transition_consistency] Multiple route transition types (MaterialPageRoute, CupertinoPageRoute, PageRouteBuilder) are mixed in the same file. Mixing slide, fade, and zoom transitions within a single app produces a jarring, unprofessional navigation experience that disorients users and undermines perceived app quality. {v4}',
     correctionMessage:
         'Define a unified transition strategy in ThemeData.pageTransitionsTheme and use a single route type throughout the app to ensure all page transitions are visually consistent.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -374,6 +379,8 @@ class RequireRouteTransitionConsistencyRule extends SaropaLintRule {
 
 /// Warns when Navigator.push is used without named routes.
 ///
+/// Since: v1.7.2 | Updated: v4.13.0 | Rule version: v3
+///
 /// Named routes provide better maintainability, deep linking support,
 /// and enable route guards. Inline routes are harder to track.
 ///
@@ -405,7 +412,7 @@ class AvoidNavigatorPushUnnamedRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_navigator_push_unnamed',
     problemMessage:
-        '[avoid_navigator_push_unnamed] Navigator.push used with an inline route constructor instead of a named route. Inline routes prevent deep linking, break URL-based navigation, and make route management unmaintainable. Users cannot share or bookmark specific screens, and analytics tools cannot track page views accurately.',
+        '[avoid_navigator_push_unnamed] Navigator.push used with an inline route constructor instead of a named route. Inline routes prevent deep linking, break URL-based navigation, and make route management unmaintainable. Users cannot share or bookmark specific screens, and analytics tools cannot track page views accurately. {v3}',
     correctionMessage:
         'Define named routes in MaterialApp.routes or use a router package such as go_router. This ensures navigation is maintainable, testable, and less error-prone as your app scales. Update all push calls to use named routes for clarity and reliability.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -427,7 +434,10 @@ class AvoidNavigatorPushUnnamedRule extends SaropaLintRule {
       if (target == null) return;
 
       final String targetSource = target.toSource();
-      if (!targetSource.contains('Navigator')) return;
+      if (targetSource != 'Navigator' &&
+          !targetSource.startsWith('Navigator.')) {
+        return;
+      }
 
       // Check if second argument is a MaterialPageRoute/CupertinoPageRoute
       // (which indicates inline route definition)
@@ -447,6 +457,8 @@ class AvoidNavigatorPushUnnamedRule extends SaropaLintRule {
 }
 
 /// Warns when protected routes lack authentication checks.
+///
+/// Since: v1.7.0 | Updated: v4.13.0 | Rule version: v3
 ///
 /// Routes that require authentication should redirect unauthenticated
 /// users. Missing auth checks can expose sensitive data.
@@ -483,7 +495,7 @@ class RequireRouteGuardsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_route_guards',
     problemMessage:
-        '[require_route_guards] Protected route path (profile, settings, admin, payment) lacks an authentication guard. Without a redirect callback, unauthorized users can access sensitive pages directly via deep link or URL manipulation, exposing personal data, financial information, or admin controls to unauthenticated sessions.',
+        '[require_route_guards] Protected route path (profile, settings, admin, payment) lacks an authentication guard. Without a redirect callback, unauthorized users can access sensitive pages directly via deep link or URL manipulation, exposing personal data, financial information, or admin controls to unauthenticated sessions. {v3}',
     correctionMessage:
         'Add a redirect callback or middleware to check authentication before allowing access to this route. Ensure that only authorized users can reach protected pages, and redirect unauthenticated users to a login or error page. This helps prevent unauthorized access and protects user data.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -546,6 +558,8 @@ class RequireRouteGuardsRule extends SaropaLintRule {
 
 /// Warns when route redirects could create infinite loops.
 ///
+/// Since: v1.7.2 | Updated: v4.13.0 | Rule version: v2
+///
 /// Circular redirects (A -> B -> A) cause the app to hang or crash.
 /// Always ensure redirect chains terminate.
 ///
@@ -586,7 +600,7 @@ class AvoidCircularRedirectsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_circular_redirects',
     problemMessage:
-        '[avoid_circular_redirects] GoRoute redirect callback always returns a path and never returns null, creating an unconditional redirect that forms an infinite loop. The router exhausts the redirect limit and throws an exception, crashing the app or permanently locking users out of all navigation when the redirect chain has no termination condition.',
+        '[avoid_circular_redirects] GoRoute redirect callback always returns a path and never returns null, creating an unconditional redirect that forms an infinite loop. The router exhausts the redirect limit and throws an exception, crashing the app or permanently locking users out of all navigation when the redirect chain has no termination condition. {v2}',
     correctionMessage:
         'Update your redirect callback to always include a condition that returns null in some cases, breaking the redirect chain. This prevents infinite navigation loops and ensures users can access the intended pages without being stuck.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -637,6 +651,8 @@ class AvoidCircularRedirectsRule extends SaropaLintRule {
 
 /// Warns when Navigator.pop result is not handled.
 ///
+/// Since: v1.7.2 | Updated: v4.13.0 | Rule version: v2
+///
 /// When a page returns a result via pop, the caller should handle
 /// the possibility of null (user pressed back button).
 ///
@@ -666,7 +682,7 @@ class AvoidPopWithoutResultRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_pop_without_result',
     problemMessage:
-        '[avoid_pop_without_result] Navigator.push awaits a result but does not handle the null case when the user dismisses the route by pressing the back button or using a system gesture. Accessing properties on a null result throws a runtime exception that crashes the app. This creates a fragile navigation flow that fails under normal user interaction patterns.',
+        '[avoid_pop_without_result] Navigator.push awaits a result but does not handle the null case when the user dismisses the route by pressing the back button or using a system gesture. Accessing properties on a null result throws a runtime exception that crashes the app. This creates a fragile navigation flow that fails under normal user interaction patterns. {v2}',
     correctionMessage:
         'Check if the navigation result is null before accessing its properties, and provide a default value or early return to handle route dismissal without a result.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -693,7 +709,10 @@ class AvoidPopWithoutResultRule extends SaropaLintRule {
       // Check if target is Navigator
       final Expression? target = expression.target;
       if (target == null) return;
-      if (!target.toSource().contains('Navigator')) return;
+      final String navTarget = target.toSource();
+      if (navTarget != 'Navigator' && !navTarget.startsWith('Navigator.')) {
+        return;
+      }
 
       // Check if result is used without null check
       final AstNode? parent = node.parent;
@@ -720,6 +739,8 @@ class AvoidPopWithoutResultRule extends SaropaLintRule {
 }
 
 /// Warns when persistent UI elements aren't using ShellRoute.
+///
+/// Since: v1.7.2 | Updated: v4.13.0 | Rule version: v2
 ///
 /// Bottom navigation bars, sidebars, and other persistent UI should
 /// use ShellRoute to avoid rebuilding on navigation.
@@ -775,7 +796,7 @@ class PreferShellRouteForPersistentUiRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_shell_route_for_persistent_ui',
     problemMessage:
-        '[prefer_shell_route_for_persistent_ui] Multiple GoRoute builders duplicate the same bottomNavigationBar, drawer, or NavigationRail instead of sharing a single wrapper. Each route rebuilds the persistent UI independently, causing duplicated code, inconsistent selection state across tabs, visual flicker during navigation, and increased memory usage from redundant widget trees.',
+        '[prefer_shell_route_for_persistent_ui] Multiple GoRoute builders duplicate the same bottomNavigationBar, drawer, or NavigationRail instead of sharing a single wrapper. Each route rebuilds the persistent UI independently, causing duplicated code, inconsistent selection state across tabs, visual flicker during navigation, and increased memory usage from redundant widget trees. {v2}',
     correctionMessage:
         'Wrap related routes in a ShellRoute to share persistent UI elements like bottomNavigationBar or drawer. This ensures consistent UI state, reduces code duplication, and improves navigation reliability across your app.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -822,6 +843,8 @@ class PreferShellRouteForPersistentUiRule extends SaropaLintRule {
 }
 
 /// Warns when deep link handler lacks fallback for invalid/missing content.
+///
+/// Since: v2.0.0 | Updated: v4.13.0 | Rule version: v9
 ///
 /// Deep links may reference content that doesn't exist or has been deleted.
 /// Always handle the case where the linked content is unavailable.
@@ -878,7 +901,7 @@ class RequireDeepLinkFallbackRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_deep_link_fallback',
     problemMessage:
-        '[require_deep_link_fallback] Deep link handler navigates to content without verifying the target exists or is accessible. When a deep link references deleted, restricted, or invalid content, the app either crashes with a null reference error or displays a blank screen. Users tapping expired links in emails, notifications, or shared messages encounter a broken experience.',
+        '[require_deep_link_fallback] Deep link handler navigates to content without verifying the target exists or is accessible. When a deep link references deleted, restricted, or invalid content, the app either crashes with a null reference error or displays a blank screen. Users tapping expired links in emails, notifications, or shared messages encounter a broken experience. {v9}',
     correctionMessage:
         'Add a fallback route or error screen that displays a user-friendly message when deep-linked content is missing, deleted, or inaccessible, with an option to navigate home.',
     errorSeverity: DiagnosticSeverity.ERROR,
@@ -1112,6 +1135,8 @@ class _AddDeepLinkFallbackFix extends DartFix {
 // cspell:ignore myapp
 /// Warns when deep link contains sensitive parameters like password or token.
 ///
+/// Since: v2.0.0 | Updated: v4.13.0 | Rule version: v4
+///
 /// Deep links are logged and may be visible in browser history or analytics.
 /// Never pass sensitive data via deep link parameters.
 ///
@@ -1139,7 +1164,7 @@ class AvoidDeepLinkSensitiveParamsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_deep_link_sensitive_params',
     problemMessage:
-        '[avoid_deep_link_sensitive_params] Deep link query parameter contains sensitive data (password, token, secret, API key, or credential), creating a security breach. Deep link URLs are recorded in system logs, browser history, HTTP referrer headers, and analytics platforms, permanently exposing credentials to attackers who gain access to those logs or the device history.',
+        '[avoid_deep_link_sensitive_params] Deep link query parameter contains sensitive data (password, token, secret, API key, or credential), creating a security breach. Deep link URLs are recorded in system logs, browser history, HTTP referrer headers, and analytics platforms, permanently exposing credentials to attackers who gain access to those logs or the device history. {v4}',
     correctionMessage:
         'Remove sensitive parameters from deep link URLs and exchange them server-side using a one-time token or secure session instead of transmitting credentials in the URL.',
     errorSeverity: DiagnosticSeverity.ERROR,
@@ -1191,6 +1216,8 @@ class AvoidDeepLinkSensitiveParamsRule extends SaropaLintRule {
 
 /// Warns when route parameters are used as strings without type conversion.
 ///
+/// Since: v2.0.0 | Updated: v4.13.0 | Rule version: v3
+///
 /// Route parameters are always strings. Using them directly without parsing
 /// can cause type mismatches and bugs. Parse to correct type.
 ///
@@ -1227,7 +1254,7 @@ class PreferTypedRouteParamsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_typed_route_params',
     problemMessage:
-        '[prefer_typed_route_params] Route parameter from pathParameters or queryParameters is passed directly without type conversion. All route parameters are strings at runtime, and passing them where an int, double, or bool is expected causes type mismatch errors or silent data corruption.',
+        '[prefer_typed_route_params] Route parameter from pathParameters or queryParameters is passed directly without type conversion. All route parameters are strings at runtime, and passing them where an int, double, or bool is expected causes type mismatch errors or silent data corruption. {v3}',
     correctionMessage:
         'Parse route parameters with int.tryParse(), double.tryParse(), or bool.parse() and provide a fallback default value to handle malformed or missing input safely.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -1280,6 +1307,8 @@ class PreferTypedRouteParamsRule extends SaropaLintRule {
 
 /// Warns when Stepper widget lacks validation in onStepContinue.
 ///
+/// Since: v2.0.0 | Updated: v4.13.0 | Rule version: v3
+///
 /// Steppers should validate the current step before allowing progression.
 /// Without validation, users can skip required fields.
 ///
@@ -1314,7 +1343,7 @@ class RequireStepperValidationRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_stepper_validation',
     problemMessage:
-        '[require_stepper_validation] Stepper onStepContinue callback does not validate form input before proceeding. This can allow users to advance with incomplete or invalid data, leading to errors or inconsistent state.',
+        '[require_stepper_validation] Stepper onStepContinue callback does not validate form input before proceeding. This can allow users to advance with incomplete or invalid data, leading to errors or inconsistent state. {v3}',
     correctionMessage:
         'Add form validation logic in the onStepContinue callback to ensure all required fields are valid before allowing the user to proceed to the next step. This prevents incomplete or invalid submissions and improves data integrity.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -1357,6 +1386,8 @@ class RequireStepperValidationRule extends SaropaLintRule {
 
 /// Warns when multi-step flow lacks a progress indicator.
 ///
+/// Since: v2.0.0 | Updated: v4.13.0 | Rule version: v2
+///
 /// Users need to know where they are in a multi-step process.
 /// Show step count or progress indicator.
 ///
@@ -1390,7 +1421,7 @@ class RequireStepCountIndicatorRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_step_count_indicator',
     problemMessage:
-        '[require_step_count_indicator] Multi-step flow with 3+ conditional step views lacks a progress indicator. Users have no visibility into how many steps remain, leading to abandonment when the process feels open-ended.',
+        '[require_step_count_indicator] Multi-step flow with 3+ conditional step views lacks a progress indicator. Users have no visibility into how many steps remain, leading to abandonment when the process feels open-ended. {v2}',
     correctionMessage:
         'Add a LinearProgressIndicator, Stepper widget, or "Step X of Y" text label so users know their current position and how many steps remain in the flow.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -1438,6 +1469,8 @@ class RequireStepCountIndicatorRule extends SaropaLintRule {
 
 /// Warns when GoRouter is created inline in build() method.
 ///
+/// Since: v2.1.0 | Updated: v4.13.0 | Rule version: v3
+///
 /// Creating GoRouter in build() causes issues with hot reload and state.
 ///
 /// **BAD:**
@@ -1469,7 +1502,7 @@ class AvoidGoRouterInlineCreationRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_go_router_inline_creation',
     problemMessage:
-        '[avoid_go_router_inline_creation] GoRouter instance created inside build() is destroyed and recreated on every widget rebuild. This resets all navigation state including the current route stack, destroys in-flight transitions, breaks hot reload during development, and causes users to lose their navigation position whenever the parent widget rebuilds.',
+        '[avoid_go_router_inline_creation] GoRouter instance created inside build() is destroyed and recreated on every widget rebuild. This resets all navigation state including the current route stack, destroys in-flight transitions, breaks hot reload during development, and causes users to lose their navigation position whenever the parent widget rebuilds. {v3}',
     correctionMessage:
         'Create the GoRouter instance as a final field in the State class or initialize it in initState() so the router persists across rebuilds and preserves navigation state.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -1505,6 +1538,8 @@ class AvoidGoRouterInlineCreationRule extends SaropaLintRule {
 
 /// Warns when GoRouter is configured without error handler.
 ///
+/// Since: v2.1.0 | Updated: v4.13.0 | Rule version: v3
+///
 /// Without an error handler, unknown routes show a blank screen.
 ///
 /// **BAD:**
@@ -1531,7 +1566,7 @@ class RequireGoRouterErrorHandlerRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_go_router_error_handler',
     problemMessage:
-        '[require_go_router_error_handler] GoRouter instance lacks an errorBuilder or errorPageBuilder parameter. When a user navigates to an undefined path via deep link, push notification, or typo, the router displays a blank white screen with no explanation or way to recover.',
+        '[require_go_router_error_handler] GoRouter instance lacks an errorBuilder or errorPageBuilder parameter. When a user navigates to an undefined path via deep link, push notification, or typo, the router displays a blank white screen with no explanation or way to recover. {v3}',
     correctionMessage:
         'Add an errorBuilder parameter that returns a user-friendly error page with a message explaining the route was not found and a button to navigate back to the home screen.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -1574,6 +1609,8 @@ class RequireGoRouterErrorHandlerRule extends SaropaLintRule {
 
 /// Warns when GoRouter with auth doesn't have refreshListenable.
 ///
+/// Since: v2.1.0 | Updated: v4.13.0 | Rule version: v3
+///
 /// Auth state changes should refresh the router to update protected routes.
 ///
 /// **BAD:**
@@ -1604,7 +1641,7 @@ class RequireGoRouterRefreshListenableRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_go_router_refresh_listenable',
     problemMessage:
-        '[require_go_router_refresh_listenable] GoRouter has a redirect callback but no refreshListenable. When authentication state changes (login, logout, token expiry), the router does not re-evaluate redirects, leaving users stranded on protected pages after logout or blocked from authenticated pages after login.',
+        '[require_go_router_refresh_listenable] GoRouter has a redirect callback but no refreshListenable. When authentication state changes (login, logout, token expiry), the router does not re-evaluate redirects, leaving users stranded on protected pages after logout or blocked from authenticated pages after login. {v3}',
     correctionMessage:
         'Add a refreshListenable parameter pointing to your auth state ChangeNotifier so the router re-evaluates redirect logic whenever authentication state changes.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -1645,6 +1682,8 @@ class RequireGoRouterRefreshListenableRule extends SaropaLintRule {
 
 /// Warns when string literals are used in go_router navigation.
 ///
+/// Since: v2.1.0 | Updated: v4.13.0 | Rule version: v3
+///
 /// Type-safe navigation with go_router_builder is preferred.
 ///
 /// **BAD:**
@@ -1671,7 +1710,7 @@ class AvoidGoRouterStringPathsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_go_router_string_paths',
     problemMessage:
-        '[avoid_go_router_string_paths] String literal used as a navigation path in go_router. Hardcoded path strings are error-prone, bypass compile-time validation, and break silently when route definitions change.',
+        '[avoid_go_router_string_paths] String literal used as a navigation path in go_router. Hardcoded path strings are error-prone, bypass compile-time validation, and break silently when route definitions change. {v3}',
     correctionMessage:
         'Use go_router_builder to generate typed route classes that provide compile-time safety, auto-complete support, and catch route path mismatches at build time.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -1727,6 +1766,8 @@ class AvoidGoRouterStringPathsRule extends SaropaLintRule {
 
 /// Suggests using go_router redirect instead of auth checks in page builders.
 ///
+/// Since: v2.3.0 | Updated: v4.13.0 | Rule version: v3
+///
 /// Alias: go_router_auth_redirect, auth_in_redirect
 ///
 /// Authentication logic belongs in go_router's redirect callback, not in
@@ -1771,7 +1812,7 @@ class PreferGoRouterRedirectAuthRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_go_router_redirect_auth',
     problemMessage:
-        '[prefer_go_router_redirect_auth] Authentication check detected inside a GoRoute builder instead of the router-level redirect callback. Scattering auth logic across individual page builders duplicates code, creates inconsistent enforcement, and allows new routes to accidentally skip authentication.',
+        '[prefer_go_router_redirect_auth] Authentication check detected inside a GoRoute builder instead of the router-level redirect callback. Scattering auth logic across individual page builders duplicates code, creates inconsistent enforcement, and allows new routes to accidentally skip authentication. {v3}',
     correctionMessage:
         'Move authentication logic to the GoRouter redirect parameter so all routes are protected by a single, centralized auth check that runs before any page builder executes.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -1817,6 +1858,8 @@ class PreferGoRouterRedirectAuthRule extends SaropaLintRule {
 
 /// Warns when go_router path parameters are used without type conversion.
 ///
+/// Since: v2.3.0 | Updated: v4.13.0 | Rule version: v2
+///
 /// Alias: typed_go_router_params, go_router_param_types
 ///
 /// Path parameters from go_router are strings. Using them without parsing
@@ -1855,7 +1898,7 @@ class RequireGoRouterTypedParamsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_go_router_typed_params',
     problemMessage:
-        '[require_go_router_typed_params] go_router pathParameters value accessed without type conversion. All path parameters are strings, and assigning them directly to int, double, or bool variables causes a runtime TypeError that crashes the app when users navigate to the route.',
+        '[require_go_router_typed_params] go_router pathParameters value accessed without type conversion. All path parameters are strings, and assigning them directly to int, double, or bool variables causes a runtime TypeError that crashes the app when users navigate to the route. {v2}',
     correctionMessage:
         'Parse path parameters with int.tryParse(), double.tryParse(), or a custom parser, and provide a fallback default value to handle malformed or missing input safely.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -1923,6 +1966,8 @@ class RequireGoRouterTypedParamsRule extends SaropaLintRule {
 
 /// Warns when go_router extra parameter is Map or dynamic instead of typed.
 ///
+/// Since: v2.3.7 | Updated: v4.13.0 | Rule version: v2
+///
 /// Using untyped extra parameters leads to runtime errors and makes code
 /// harder to maintain. Use a typed class for type safety.
 ///
@@ -1961,7 +2006,7 @@ class PreferGoRouterExtraTypedRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_go_router_extra_typed',
     problemMessage:
-        '[prefer_go_router_extra_typed] go_router extra parameter passes a Map or dynamic value instead of a typed class. Untyped extras require unsafe casts at the destination route, causing runtime ClassCastException crashes when the map structure changes or keys are misspelled.',
+        '[prefer_go_router_extra_typed] go_router extra parameter passes a Map or dynamic value instead of a typed class. Untyped extras require unsafe casts at the destination route, causing runtime ClassCastException crashes when the map structure changes or keys are misspelled. {v2}',
     correctionMessage:
         'Create a dedicated data class for the extra parameter and cast to that type in the route builder. This provides compile-time field validation and eliminates unsafe string-keyed map lookups.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -2044,6 +2089,8 @@ class PreferGoRouterExtraTypedRule extends SaropaLintRule {
 
 /// Warns when Navigator.pop() is used without checking if it can pop.
 ///
+/// Since: v2.3.7 | Updated: v4.13.0 | Rule version: v3
+///
 /// Using Navigator.pop() directly can crash the app if there's no route to pop.
 /// Use Navigator.maybePop() which safely checks before popping.
 ///
@@ -2087,7 +2134,7 @@ class PreferMaybePopRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_maybe_pop',
     problemMessage:
-        '[prefer_maybe_pop] Navigator.pop() called without verifying that a route exists on the navigation stack to pop. When the stack is empty or contains only the root route, this call throws a FlutterError at runtime, crashing the app. On Android, this also bypasses the system back button contract, preventing the app from exiting gracefully.',
+        '[prefer_maybe_pop] Navigator.pop() called without verifying that a route exists on the navigation stack to pop. When the stack is empty or contains only the root route, this call throws a FlutterError at runtime, crashing the app. On Android, this also bypasses the system back button contract, preventing the app from exiting gracefully. {v3}',
     correctionMessage:
         'Replace Navigator.pop(context) with Navigator.maybePop(context), or check canPop() before calling pop. This prevents runtime errors and ensures your app only attempts to pop routes when it is safe to do so.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -2206,6 +2253,8 @@ class _ReplaceWithMaybePopFix extends DartFix {
 
 /// Warns when launchUrl is used with string parsing instead of Uri objects.
 ///
+/// Since: v2.3.10 | Updated: v4.13.0 | Rule version: v2
+///
 /// Alias: url_launcher_uri, launch_with_uri
 ///
 /// Using Uri objects instead of parsing strings reduces parsing overhead
@@ -2234,7 +2283,7 @@ class PreferUrlLauncherUriOverStringRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_url_launcher_uri_over_string',
     problemMessage:
-        '[prefer_url_launcher_uri_over_string] launchUrl called with Uri.parse() on a string literal instead of constructing a Uri object directly. Uri.parse() defers validation to runtime, where malformed strings throw FormatException and crash the app.',
+        '[prefer_url_launcher_uri_over_string] launchUrl called with Uri.parse() on a string literal instead of constructing a Uri object directly. Uri.parse() defers validation to runtime, where malformed strings throw FormatException and crash the app. {v2}',
     correctionMessage:
         'Replace Uri.parse() with Uri.https() or Uri.http() constructors that validate the URL structure at compile time and auto-encode query parameters correctly.',
     errorSeverity: DiagnosticSeverity.ERROR,
@@ -2270,6 +2319,8 @@ class PreferUrlLauncherUriOverStringRule extends SaropaLintRule {
 
 /// Warns about potential confusion between go() and push() in GoRouter.
 ///
+/// Since: v2.3.10 | Updated: v4.13.0 | Rule version: v2
+///
 /// Alias: go_router_navigation, go_vs_push
 ///
 /// go() replaces the entire stack, push() adds to it. Using the wrong one
@@ -2300,7 +2351,7 @@ class AvoidGoRouterPushReplacementConfusionRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_go_router_push_replacement_confusion',
     problemMessage:
-        '[avoid_go_router_push_replacement_confusion] context.go() used to navigate to a detail route with a dynamic ID parameter. go() replaces the entire navigation stack, destroying the back button history and preventing users from returning to the previous screen.',
+        '[avoid_go_router_push_replacement_confusion] context.go() used to navigate to a detail route with a dynamic ID parameter. go() replaces the entire navigation stack, destroying the back button history and preventing users from returning to the previous screen. {v2}',
     correctionMessage:
         'Replace context.go() with context.push() for detail routes so the previous screen remains on the stack and the back button navigates users to their prior location.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -2333,9 +2384,8 @@ class AvoidGoRouterPushReplacementConfusionRule extends SaropaLintRule {
       if (target == null) return;
 
       final String targetSource = target.toSource();
-      if (targetSource != 'context' && !targetSource.contains('context')) {
-        return;
-      }
+      // Only match direct 'context' usage, not variables with "context" as substring
+      if (targetSource != 'context') return;
 
       // Check if the path looks like a detail route
       final ArgumentList args = node.argumentList;
@@ -2370,6 +2420,8 @@ class AvoidGoRouterPushReplacementConfusionRule extends SaropaLintRule {
 
 /// Warns when URL strings are not properly encoded before launching.
 ///
+/// Since: v2.3.11 | Updated: v4.13.0 | Rule version: v2
+///
 /// Alias: encode_url, url_encode_required, url_launcher_encoding
 ///
 /// URLs with special characters must be encoded before using with url_launcher.
@@ -2401,7 +2453,7 @@ class RequireUrlLauncherEncodingRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_url_launcher_encoding',
     problemMessage:
-        '[require_url_launcher_encoding] URL passed to launchUrl or canLaunchUrl contains string interpolation without Uri.encodeComponent(). Unencoded special characters (spaces, ampersands, Unicode) produce malformed URLs that fail to open, display incorrect content, or enable URL injection attacks where user input manipulates the destination path or query parameters.',
+        '[require_url_launcher_encoding] URL passed to launchUrl or canLaunchUrl contains string interpolation without Uri.encodeComponent(). Unencoded special characters (spaces, ampersands, Unicode) produce malformed URLs that fail to open, display incorrect content, or enable URL injection attacks where user input manipulates the destination path or query parameters. {v2}',
     correctionMessage:
         'Use Uri.encodeComponent() for query parameters or construct URLs with Uri.https() to ensure all parts are properly encoded. This prevents malformed URLs and potential security vulnerabilities.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -2512,6 +2564,8 @@ class _WrapWithEncodeComponentFix extends DartFix {
 
 /// Warns when navigating to nested routes without ensuring parent is in stack.
 ///
+/// Since: v2.3.11 | Updated: v4.13.0 | Rule version: v2
+///
 /// Alias: nested_route_parent, route_hierarchy, go_router_nested
 ///
 /// In go_router, navigating directly to a nested route without its parent
@@ -2543,7 +2597,7 @@ class AvoidNestedRoutesWithoutParentRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_nested_routes_without_parent',
     problemMessage:
-        '[avoid_nested_routes_without_parent] context.go() navigates to a path with 3+ segments, which places users deep in the route hierarchy without parent routes on the stack. The back button skips intermediate screens, breaking expected navigation flow and disorienting users.',
+        '[avoid_nested_routes_without_parent] context.go() navigates to a path with 3+ segments, which places users deep in the route hierarchy without parent routes on the stack. The back button skips intermediate screens, breaking expected navigation flow and disorienting users. {v2}',
     correctionMessage:
         'Use context.push() to preserve the navigation stack, or verify that your route hierarchy supports deep linking and restores parent routes automatically via ShellRoute.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -2586,6 +2640,8 @@ class AvoidNestedRoutesWithoutParentRule extends SaropaLintRule {
 
 /// Use ShellRoute for shared AppBar/BottomNav instead of duplicating Scaffold.
 ///
+/// Since: v2.6.0 | Updated: v4.13.0 | Rule version: v2
+///
 /// Multiple routes with the same Scaffold layout cause code duplication
 /// and inconsistent behavior. ShellRoute provides a shared wrapper.
 ///
@@ -2618,7 +2674,7 @@ class PreferShellRouteSharedLayoutRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_shell_route_shared_layout',
     problemMessage:
-        '[prefer_shell_route_shared_layout] GoRoute with Scaffold builder may duplicate layout code. Multiple routes with the same Scaffold layout cause code duplication and inconsistent behavior. ShellRoute provides a shared wrapper.',
+        '[prefer_shell_route_shared_layout] GoRoute with Scaffold builder may duplicate layout code. Multiple routes with the same Scaffold layout cause code duplication and inconsistent behavior. ShellRoute provides a shared wrapper. {v2}',
     correctionMessage:
         'Use ShellRoute for shared AppBar/BottomNav layouts. Test the full navigation flow including back button and deep links.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -2660,6 +2716,8 @@ class PreferShellRouteSharedLayoutRule extends SaropaLintRule {
 
 /// Tab navigation should use StatefulShellRoute to preserve state.
 ///
+/// Since: v2.6.0 | Updated: v4.13.0 | Rule version: v2
+///
 /// Regular ShellRoute recreates child widgets on tab switch, losing state.
 /// StatefulShellRoute preserves each tab's state.
 ///
@@ -2694,7 +2752,7 @@ class RequireStatefulShellRouteTabsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_stateful_shell_route_tabs',
     problemMessage:
-        '[require_stateful_shell_route_tabs] ShellRoute with tab-like navigation may lose state on tab switch. Regular ShellRoute recreates child widgets on tab switch, losing state. StatefulShellRoute preserves each tab\'s state.',
+        '[require_stateful_shell_route_tabs] ShellRoute with tab-like navigation may lose state on tab switch. Regular ShellRoute recreates child widgets on tab switch, losing state. StatefulShellRoute preserves each tab\'s state. {v2}',
     correctionMessage:
         'Use StatefulShellRoute.indexedStack for preserving tab state. Test the full navigation flow including back button and deep links.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -2737,6 +2795,8 @@ class RequireStatefulShellRouteTabsRule extends SaropaLintRule {
 
 /// Router should have catch-all or error route for unknown paths.
 ///
+/// Since: v2.6.0 | Updated: v4.13.0 | Rule version: v2
+///
 /// Without error handling, navigating to unknown paths crashes or shows
 /// blank screens.
 ///
@@ -2768,7 +2828,7 @@ class RequireGoRouterFallbackRouteRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_go_router_fallback_route',
     problemMessage:
-        '[require_go_router_fallback_route] GoRouter configuration without errorBuilder or errorPageBuilder has no fallback for unmatched routes. When users navigate to a non-existent path via deep link, push notification, or typo, the router throws an unhandled exception that crashes the app instead of showing a helpful error page.',
+        '[require_go_router_fallback_route] GoRouter configuration without errorBuilder or errorPageBuilder has no fallback for unmatched routes. When users navigate to a non-existent path via deep link, push notification, or typo, the router throws an unhandled exception that crashes the app instead of showing a helpful error page. {v2}',
     correctionMessage:
         'Add errorBuilder: (context, state) => NotFoundPage() or errorPageBuilder to display a user-friendly error screen when navigation targets an undefined route.',
     errorSeverity: DiagnosticSeverity.ERROR,
@@ -2815,6 +2875,8 @@ class RequireGoRouterFallbackRouteRule extends SaropaLintRule {
 
 /// Warns when RouteSettings.name is not provided for analytics tracking.
 ///
+/// Since: v4.1.4 | Updated: v4.13.0 | Rule version: v2
+///
 /// Route names are essential for analytics, debugging, and deep linking.
 /// Always provide meaningful route names.
 ///
@@ -2849,7 +2911,7 @@ class PreferRouteSettingsNameRule extends SaropaLintRule {
     name: 'prefer_route_settings_name',
     problemMessage:
         '[prefer_route_settings_name] MaterialPageRoute without RouteSettings.name. '
-        'Analytics and debugging will be harder.',
+        'Analytics and debugging will be harder. {v2}',
     correctionMessage:
         'Add settings: RouteSettings(name: "/route_name") to the route.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -2896,6 +2958,8 @@ class PreferRouteSettingsNameRule extends SaropaLintRule {
 // =============================================================================
 
 /// Navigator.of() needs proper context from the widget tree.
+///
+/// Since: v4.1.5 | Updated: v4.13.0 | Rule version: v2
 ///
 /// Using context from a different part of the tree (like a GlobalKey's
 /// `currentContext`) can cause navigation failures or unexpected behavior.
@@ -2945,7 +3009,7 @@ class AvoidNavigatorContextIssueRule extends SaropaLintRule {
     name: 'avoid_navigator_context_issue',
     problemMessage:
         '[avoid_navigator_context_issue] Using context from GlobalKey for '
-        'navigation can fail if widget is not in tree.',
+        'navigation can fail if widget is not in tree. {v2}',
     correctionMessage:
         'Use the BuildContext parameter directly instead of currentContext.',
     errorSeverity: DiagnosticSeverity.ERROR,
@@ -2964,9 +3028,11 @@ class AvoidNavigatorContextIssueRule extends SaropaLintRule {
 
       final String targetSource = target.toSource();
 
-      // Only flag Navigator operations, not Scrollable or other APIs
-      if (!targetSource.contains('Navigator')) return;
-      if (targetSource.contains('Scrollable')) return;
+      // Only flag Navigator operations
+      if (targetSource != 'Navigator' &&
+          !targetSource.startsWith('Navigator.')) {
+        return;
+      }
 
       // Check arguments for currentContext usage
       final ArgumentList args = node.argumentList;
@@ -2985,9 +3051,9 @@ class AvoidNavigatorContextIssueRule extends SaropaLintRule {
       final String constructorName = node.constructorName.toSource();
 
       // Only check Navigator-related instance creations
-      if (!constructorName.contains('Route') &&
-          !constructorName.contains('Page') &&
-          !constructorName.contains('Navigator')) {
+      if (!constructorName.endsWith('Route') &&
+          !constructorName.endsWith('Page') &&
+          !constructorName.startsWith('Navigator')) {
         return;
       }
 
@@ -3027,6 +3093,8 @@ class AvoidNavigatorContextIssueRule extends SaropaLintRule {
 
 /// MaterialPageRoute should specify result type when expecting a return value.
 ///
+/// Since: v4.1.5 | Updated: v4.13.0 | Rule version: v2
+///
 /// When using Navigator.pop(context, result), the route should have
 /// a type parameter for type safety.
 ///
@@ -3058,7 +3126,7 @@ class RequirePopResultTypeRule extends SaropaLintRule {
     name: 'require_pop_result_type',
     problemMessage:
         '[require_pop_result_type] Awaited route push without type parameter. '
-        'Return type will be dynamic.',
+        'Return type will be dynamic. {v2}',
     correctionMessage:
         'Add type parameter: Navigator.push<ReturnType>(...) and '
         'MaterialPageRoute<ReturnType>(...).',
@@ -3088,7 +3156,10 @@ class RequirePopResultTypeRule extends SaropaLintRule {
 
       // Check if it's a Navigator call
       final String targetSource = target.toSource();
-      if (!targetSource.contains('Navigator')) return;
+      if (targetSource != 'Navigator' &&
+          !targetSource.startsWith('Navigator.')) {
+        return;
+      }
 
       // Check if type argument is provided
       final TypeArgumentList? typeArgs = expr.typeArguments;
@@ -3104,6 +3175,8 @@ class RequirePopResultTypeRule extends SaropaLintRule {
 // =============================================================================
 
 /// Understand push vs pushReplacement vs pushAndRemoveUntil.
+///
+/// Since: v4.1.5 | Updated: v4.13.0 | Rule version: v2
 ///
 /// Using the wrong navigation method can cause unexpected back button
 /// behavior or memory issues.
@@ -3135,7 +3208,7 @@ class AvoidPushReplacementMisuseRule extends SaropaLintRule {
     name: 'avoid_push_replacement_misuse',
     problemMessage:
         '[avoid_push_replacement_misuse] `[HEURISTIC]` pushReplacement removes '
-        'current route from stack. User cannot go back.',
+        'current route from stack. User cannot go back. {v2}',
     correctionMessage:
         'Use Navigator.push() if user should be able to go back. Use '
         'pushReplacement only for login->home or similar transitions.',
@@ -3192,6 +3265,8 @@ class AvoidPushReplacementMisuseRule extends SaropaLintRule {
 
 /// Nested Navigators need careful WillPopScope handling.
 ///
+/// Since: v4.1.5 | Updated: v4.13.0 | Rule version: v2
+///
 /// When using nested Navigators (e.g., tabs with their own navigation stacks),
 /// the back button behavior can confuse users if not handled properly.
 ///
@@ -3240,7 +3315,7 @@ class AvoidNestedNavigatorsMisuseRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_nested_navigators_misuse',
     problemMessage: '[avoid_nested_navigators_misuse] Nested Navigator without '
-        'WillPopScope/PopScope. Back button may behave unexpectedly.',
+        'WillPopScope/PopScope. Back button may behave unexpectedly. {v2}',
     correctionMessage:
         'Wrap with WillPopScope/PopScope to handle back navigation properly.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -3293,6 +3368,8 @@ class AvoidNestedNavigatorsMisuseRule extends SaropaLintRule {
 
 /// Every route should be testable via deep link.
 ///
+/// Since: v4.1.5 | Updated: v4.13.0 | Rule version: v2
+///
 /// Routes only reachable through navigation chains break when users share
 /// links or use app shortcuts.
 ///
@@ -3329,7 +3406,7 @@ class RequireDeepLinkTestingRule extends SaropaLintRule {
     name: 'require_deep_link_testing',
     problemMessage:
         '[require_deep_link_testing] `[HEURISTIC]` Route uses object parameter '
-        'instead of ID. Consider using path parameters for deep link support.',
+        'instead of ID. Consider using path parameters for deep link support. {v2}',
     correctionMessage:
         'Use path/query parameters (e.g., /product/:id) instead of passing '
         'full objects for better deep link support.',
@@ -3363,6 +3440,111 @@ class RequireDeepLinkTestingRule extends SaropaLintRule {
           }
         }
       }
+    });
+  }
+}
+
+// =============================================================================
+// Navigation Result Handling Rules
+// =============================================================================
+
+/// Warns when Navigator.push() or Navigator.pushNamed() is called without
+///
+/// Since: v4.12.0 | Updated: v4.13.0 | Rule version: v2
+///
+/// awaiting the result or assigning it to a variable.
+///
+/// Navigator.push returns a Future that resolves to the value passed to
+/// Navigator.pop(). Ignoring this result means the calling screen cannot
+/// react to what happened on the pushed screen.
+///
+/// **BAD:**
+/// ```dart
+/// Navigator.push(context, MaterialPageRoute(builder: (_) => EditPage()));
+/// // Result from EditPage is lost!
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// final result = await Navigator.push<bool>(
+///   context,
+///   MaterialPageRoute(builder: (_) => EditPage()),
+/// );
+/// if (result == true) refreshData();
+/// ```
+class RequireNavigationResultHandlingRule extends SaropaLintRule {
+  const RequireNavigationResultHandlingRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  static const LintCode _code = LintCode(
+    name: 'require_navigation_result_handling',
+    problemMessage:
+        '[require_navigation_result_handling] Navigator push method is called as a fire-and-forget statement without awaiting or assigning its Future result. Navigator.push() returns a Future<T?> that resolves to the value passed to Navigator.pop(result). Ignoring this return value means the calling screen cannot react to user actions on the pushed screen, leading to stale UI, missed data updates, and broken back-navigation workflows that frustrate users. {v2}',
+    correctionMessage:
+        'Await the Navigator.push() call and handle the returned result, or assign it to a variable for later use. If no result is expected, add an explicit comment.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  /// Navigator push methods that return results.
+  static const Set<String> _pushMethods = <String>{
+    'push',
+    'pushNamed',
+    'pushReplacement',
+    'pushReplacementNamed',
+    'pushAndRemoveUntil',
+    'pushNamedAndRemoveUntil',
+  };
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      if (!_pushMethods.contains(node.methodName.name)) return;
+
+      // Check target is Navigator
+      final Expression? target = node.target;
+      if (target is! SimpleIdentifier || target.name != 'Navigator') return;
+
+      // Check if it's an expression statement (not awaited, not assigned)
+      final AstNode? parent = node.parent;
+      if (parent is ExpressionStatement) {
+        reporter.atNode(node, code);
+      }
+    });
+  }
+
+  @override
+  List<Fix> getFixes() => <Fix>[_AddAwaitToNavigatorPushFix()];
+}
+
+class _AddAwaitToNavigatorPushFix extends DartFix {
+  @override
+  void run(
+    CustomLintResolver resolver,
+    ChangeReporter reporter,
+    CustomLintContext context,
+    AnalysisError analysisError,
+    List<AnalysisError> others,
+  ) {
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
+
+      final changeBuilder = reporter.createChangeBuilder(
+        message: 'Add await to handle navigation result',
+        priority: 1,
+      );
+
+      changeBuilder.addDartFileEdit((builder) {
+        builder.addSimpleInsertion(node.offset, 'await ');
+      });
     });
   }
 }

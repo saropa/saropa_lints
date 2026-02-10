@@ -25,6 +25,8 @@ import '../saropa_lint_rule.dart';
 
 /// Warns when absolute imports are used instead of relative imports.
 ///
+/// Since: v1.3.0 | Updated: v4.13.0 | Rule version: v6
+///
 /// This is an **opinionated rule** - not included in any tier by default.
 ///
 /// **Pros of relative imports:**
@@ -61,7 +63,7 @@ class PreferRelativeImportsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_relative_imports',
     problemMessage:
-        '[prefer_relative_imports] An absolute package import was used for a file within the same package. Relative imports simplify refactoring and clearly signal local dependencies. Replace the absolute import with a relative path.',
+        '[prefer_relative_imports] An absolute package import was used for a file within the same package. Relative imports simplify refactoring and clearly signal local dependencies. Replace the absolute import with a relative path. {v6}',
     correctionMessage:
         'Relative imports make refactoring easier and clearly signal local dependencies within the package.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -197,6 +199,8 @@ class _ConvertToRelativeImportFix extends DartFix {
 
 /// Warns when multiple widget classes are defined in a single file.
 ///
+/// Since: v1.3.0 | Updated: v4.13.0 | Rule version: v3
+///
 /// This is an **opinionated rule** - not included in any tier by default.
 ///
 /// **Pros of one widget per file:**
@@ -245,7 +249,7 @@ class PreferOneWidgetPerFileRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_one_widget_per_file',
     problemMessage:
-        '[prefer_one_widget_per_file] Multiple widget classes are defined in a single file, which makes it harder to locate widgets by filename. Move each widget class into its own file so names map directly to files for faster navigation.',
+        '[prefer_one_widget_per_file] Multiple widget classes are defined in a single file, which makes it harder to locate widgets by filename. Move each widget class into its own file so names map directly to files for faster navigation. {v3}',
     correctionMessage:
         'Move each widget class to its own file so file names map directly to widget names for faster navigation.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -294,6 +298,8 @@ class PreferOneWidgetPerFileRule extends SaropaLintRule {
 
 /// Warns when block body functions could be written as arrow functions.
 ///
+/// Since: v1.3.0 | Updated: v4.13.0 | Rule version: v3
+///
 /// This is an **opinionated rule** - not included in any tier by default.
 ///
 /// **Pros of arrow functions:**
@@ -332,7 +338,7 @@ class PreferArrowFunctionsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_arrow_functions',
     problemMessage:
-        '[prefer_arrow_functions] Function body contains only a single return statement. Block syntax adds unnecessary braces and visual noise for simple expressions; convert to arrow syntax (=>) to signal a pure, single-expression return.',
+        '[prefer_arrow_functions] Function body contains only a single return statement. Block syntax adds unnecessary braces and visual noise for simple expressions; convert to arrow syntax (=>) to signal a pure, single-expression return. {v3}',
     correctionMessage:
         'Convert to arrow syntax (=> expression) to signal a pure, single-expression return and reduce visual noise.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -463,6 +469,8 @@ class _ConvertToArrowFunctionFix extends DartFix {
 
 /// Warns when functions have multiple positional parameters that could be named.
 ///
+/// Since: v1.3.0 | Updated: v4.13.0 | Rule version: v2
+///
 /// This is an **opinionated rule** - not included in any tier by default.
 ///
 /// **Pros of named parameters:**
@@ -515,7 +523,7 @@ class PreferAllNamedParametersRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_all_named_parameters',
     problemMessage:
-        '[prefer_all_named_parameters] Function has $_threshold or more positional parameters that lack self-documenting call sites. This is an opinionated rule - not included in any tier by default.',
+        '[prefer_all_named_parameters] Function has $_threshold or more positional parameters that lack self-documenting call sites. This is an opinionated rule - not included in any tier by default. {v2}',
     correctionMessage:
         'Convert positional parameters to named parameters so call sites are self-documenting and order-independent.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -579,6 +587,8 @@ class PreferAllNamedParametersRule extends SaropaLintRule {
 
 /// Warns when multi-line constructs don't have trailing commas.
 ///
+/// Since: v1.3.0 | Updated: v4.13.0 | Rule version: v4
+///
 /// This is an **opinionated rule** - not included in any tier by default.
 ///
 /// **Pros of trailing commas:**
@@ -633,7 +643,7 @@ class PreferTrailingCommaAlwaysRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_trailing_comma_always',
     problemMessage:
-        '[prefer_trailing_comma_always] A multi-line argument list or collection is missing a trailing comma. Add one so dart format keeps each element on its own line, producing cleaner diffs and easier reordering.',
+        '[prefer_trailing_comma_always] A multi-line argument list or collection is missing a trailing comma. Add one so dart format keeps each element on its own line, producing cleaner diffs and easier reordering. {v4}',
     correctionMessage:
         'Add a trailing comma so dart format keeps each argument on its own line, producing cleaner git diffs.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -788,6 +798,8 @@ class _AddTrailingCommaAlwaysFix extends DartFix {
 
 /// Warns when private fields don't use underscore prefix consistently.
 ///
+/// Since: v1.3.0 | Updated: v4.13.0 | Rule version: v3
+///
 /// This is an **opinionated rule** - not included in any tier by default.
 ///
 /// **Pros of underscore prefix for all instance fields:**
@@ -834,7 +846,7 @@ class PreferPrivateUnderscorePrefixRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_private_underscore_prefix',
     problemMessage:
-        '[prefer_private_underscore_prefix] Instance field is public without documentation, exposing internal state. This is an opinionated rule - not included in any tier by default.',
+        '[prefer_private_underscore_prefix] Instance field is public without documentation, exposing internal state. This is an opinionated rule - not included in any tier by default. {v3}',
     correctionMessage:
         'Prefix with underscore to enforce encapsulation, then expose via a getter if external access is needed.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -915,6 +927,8 @@ class PreferPrivateUnderscorePrefixRule extends SaropaLintRule {
 
 /// Warns when small widgets could be extracted as methods instead of classes.
 ///
+/// Since: v1.3.0 | Updated: v4.13.0 | Rule version: v2
+///
 /// This is an **opinionated rule** - not included in any tier by default.
 ///
 /// **Pros of widget methods:**
@@ -973,7 +987,7 @@ class PreferWidgetMethodsOverClassesRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_widget_methods_over_classes',
     problemMessage:
-        '[prefer_widget_methods_over_classes] Simple widget class with a short build method detected. A separate class adds unnecessary boilerplate when the widget could be a method in the parent, giving direct access to parent state.',
+        '[prefer_widget_methods_over_classes] Simple widget class with a short build method detected. A separate class adds unnecessary boilerplate when the widget could be a method in the parent, giving direct access to parent state. {v2}',
     correctionMessage:
         'Convert to a build method in the parent widget to eliminate class boilerplate and access parent state directly.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -1047,6 +1061,9 @@ class PreferWidgetMethodsOverClassesRule extends SaropaLintRule {
 }
 
 /// Warns when `var`, `final` (without type), or `dynamic` is used instead of
+///
+/// Since: v1.3.0 | Updated: v4.13.0 | Rule version: v4
+///
 /// explicit types.
 ///
 /// This is an **opinionated rule** - not included in any tier by default.
@@ -1089,7 +1106,7 @@ class PreferExplicitTypesRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_explicit_types',
     problemMessage:
-        '[prefer_explicit_types] Variable uses var instead of an explicit type annotation. Without a visible type, readers must inspect the right-hand side or hover in the IDE to determine the declared type.',
+        '[prefer_explicit_types] Variable uses var instead of an explicit type annotation. Without a visible type, readers must inspect the right-hand side or hover in the IDE to determine the declared type. {v4}',
     correctionMessage:
         'Replace var with the explicit type annotation so the declared type is visible without hovering or reading the initializer.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -1130,6 +1147,8 @@ class PreferExplicitTypesRule extends SaropaLintRule {
 }
 
 /// Warns when methods return records instead of dedicated classes.
+///
+/// Since: v1.3.0 | Updated: v4.13.0 | Rule version: v4
 ///
 /// This is an **opinionated rule** - not included in any tier by default.
 ///
@@ -1183,7 +1202,7 @@ class PreferClassOverRecordReturnRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_class_over_record_return',
     problemMessage:
-        '[prefer_class_over_record_return] Method returns a record type, which lacks named fields and dedicated methods. This is an opinionated rule - not included in any tier by default.',
+        '[prefer_class_over_record_return] Method returns a record type, which lacks named fields and dedicated methods. This is an opinionated rule - not included in any tier by default. {v4}',
     correctionMessage:
         'Create a class with named fields to improve IDE support, type documentation, and long-term maintainability.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -1219,6 +1238,8 @@ class PreferClassOverRecordReturnRule extends SaropaLintRule {
 }
 
 /// Warns when callbacks are extracted to separate methods/variables.
+///
+/// Since: v1.3.0 | Updated: v4.13.0 | Rule version: v3
 ///
 /// This is an **opinionated rule** - not included in any tier by default.
 ///
@@ -1279,7 +1300,7 @@ class PreferInlineCallbacksRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_inline_callbacks',
     problemMessage:
-        '[prefer_inline_callbacks] Callback references a separate method, forcing readers to jump away to understand behavior. This is an opinionated rule - not included in any tier by default.',
+        '[prefer_inline_callbacks] Callback references a separate method, forcing readers to jump away to understand behavior. This is an opinionated rule - not included in any tier by default. {v3}',
     correctionMessage:
         'Inline the callback body at the call site so the behavior is visible where the widget is constructed.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -1334,6 +1355,8 @@ class PreferInlineCallbacksRule extends SaropaLintRule {
 
 /// Warns when double quotes are used instead of single quotes for strings.
 ///
+/// Since: v1.3.0 | Updated: v4.13.0 | Rule version: v6
+///
 /// This is an **opinionated rule** - not included in any tier by default.
 ///
 /// **Pros of single quotes:**
@@ -1372,7 +1395,7 @@ class PreferSingleQuotesRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_single_quotes',
     problemMessage:
-        '[prefer_single_quotes] Double quotes detected where single quotes would suffice. Prefer single quotes for consistency with Dart style conventions and to reduce visual noise in string literals.',
+        '[prefer_single_quotes] Double quotes detected where single quotes would suffice. Prefer single quotes for consistency with Dart style conventions and to reduce visual noise in string literals. {v6}',
     correctionMessage:
         "Replace double quotes with single quotes to follow Dart style conventions and maintain codebase consistency.",
     errorSeverity: DiagnosticSeverity.INFO,
@@ -1459,6 +1482,8 @@ class _ConvertToSingleQuotesFix extends DartFix {
 
 /// Warns when TODO comments don't follow the standard format.
 ///
+/// Since: v1.3.0 | Updated: v4.13.0 | Rule version: v3
+///
 /// This is an **opinionated rule** - not included in any tier by default.
 ///
 /// The standard format is: `TODO(author): description`
@@ -1500,7 +1525,7 @@ class PreferTodoFormatRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_todo_format',
     problemMessage:
-        '[prefer_todo_format] TODO comment is missing the required author and description format. Use TODO(author): description so the comment is trackable, searchable, and attributable to an owner.',
+        '[prefer_todo_format] TODO comment is missing the required author and description format. Use TODO(author): description so the comment is trackable, searchable, and attributable to an owner. {v3}',
     correctionMessage:
         'Add author name in parentheses: TODO(author): ... so the TODO is trackable and searchable by owner.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -1555,6 +1580,8 @@ class PreferTodoFormatRule extends SaropaLintRule {
 
 /// Warns when FIXME comments don't follow the standard format.
 ///
+/// Since: v1.3.0 | Updated: v4.13.0 | Rule version: v3
+///
 /// This is an **opinionated rule** - not included in any tier by default.
 ///
 /// The standard format is: `FIXME(author): description`
@@ -1595,7 +1622,7 @@ class PreferFixmeFormatRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_fixme_format',
     problemMessage:
-        '[prefer_fixme_format] FIXME comment is missing the required author tag. Without an owner, FIXMEs become orphaned and unactionable; use the format FIXME(author): description so the issue is trackable.',
+        '[prefer_fixme_format] FIXME comment is missing the required author tag. Without an owner, FIXMEs become orphaned and unactionable; use the format FIXME(author): description so the issue is trackable. {v3}',
     correctionMessage:
         'Add author name in parentheses: FIXME(author): ... so the issue is trackable and searchable by owner.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -1650,6 +1677,8 @@ class PreferFixmeFormatRule extends SaropaLintRule {
 
 /// Warns when comments don't start with a capital letter.
 ///
+/// Since: v1.3.0 | Updated: v4.13.0 | Rule version: v4
+///
 /// This is an **opinionated rule** - not included in any tier by default.
 ///
 /// **Pros of sentence case comments:**
@@ -1687,7 +1716,7 @@ class PreferSentenceCaseCommentsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_sentence_case_comments',
     problemMessage:
-        '[prefer_sentence_case_comments] Comment starts with a lowercase letter. Inconsistent capitalization in comments reduces readability and gives the codebase an unfinished appearance.',
+        '[prefer_sentence_case_comments] Comment starts with a lowercase letter. Inconsistent capitalization in comments reduces readability and gives the codebase an unfinished appearance. {v4}',
     correctionMessage:
         'Capitalize the first letter of the comment to maintain sentence-case consistency across the codebase.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -1893,6 +1922,8 @@ class _CapitalizeCommentFix extends DartFix {
 
 /// Warns when doc comments don't end with a period.
 ///
+/// Since: v1.3.0 | Updated: v4.13.0 | Rule version: v3
+///
 /// This is an **opinionated rule** - not included in any tier by default.
 ///
 /// **Pros of periods in doc comments:**
@@ -1936,7 +1967,7 @@ class PreferPeriodAfterDocRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_period_after_doc',
     problemMessage:
-        '[prefer_period_after_doc] Doc comment missing period at end. Incomplete sentences reduce clarity and professionalism in API docs.',
+        '[prefer_period_after_doc] Doc comment missing period at end. Incomplete sentences reduce clarity and professionalism in API docs. {v3}',
     correctionMessage:
         'Add a period at the end of every doc comment sentence. Example: /// Returns the user name.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -2057,6 +2088,8 @@ class _AddPeriodFix extends DartFix {
 
 /// Warns when constants don't use SCREAMING_SNAKE_CASE.
 ///
+/// Since: v1.3.0 | Updated: v4.13.0 | Rule version: v5
+///
 /// This is an **opinionated rule** - not included in any tier by default.
 ///
 /// **Pros of SCREAMING_SNAKE_CASE:**
@@ -2097,7 +2130,7 @@ class PreferScreamingCaseConstantsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_screaming_case_constants',
     problemMessage:
-        '[prefer_screaming_case_constants] Constant name does not use SCREAMING_SNAKE_CASE convention. Without visual distinction, constants blend with regular variables and their immutable intent is lost.',
+        '[prefer_screaming_case_constants] Constant name does not use SCREAMING_SNAKE_CASE convention. Without visual distinction, constants blend with regular variables and their immutable intent is lost. {v5}',
     correctionMessage:
         'Rename the constant to SCREAMING_SNAKE_CASE (e.g., MAX_VALUE instead of maxValue) for visual distinction.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -2198,6 +2231,8 @@ class _ConvertToScreamingCaseFix extends DartFix {
 
 /// Warns when boolean variables/parameters don't use descriptive prefixes.
 ///
+/// Since: v1.3.0 | Updated: v4.13.0 | Rule version: v5
+///
 /// This rule is suitable for the **professional** tier.
 ///
 /// This is the lenient version that allows action verb prefixes (like
@@ -2248,7 +2283,7 @@ class PreferDescriptiveBoolNamesRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_descriptive_bool_names',
     problemMessage:
-        '[prefer_descriptive_bool_names] Boolean should use a descriptive prefix (is, has, can, should, etc.) or action verb. This rule is suitable for the professional tier.',
+        '[prefer_descriptive_bool_names] Boolean should use a descriptive prefix (is, has, can, should, etc.) or action verb. This rule is suitable for the professional tier. {v5}',
     correctionMessage:
         'Rename with a descriptive prefix: isEnabled, hasData, canEdit, shouldUpdate, or an action verb like processData.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -2480,6 +2515,8 @@ class _AddBoolPrefixFix extends DartFix {
 
 /// Warns when boolean variables/parameters don't use descriptive prefixes.
 ///
+/// Since: v3.1.1 | Updated: v4.13.0 | Rule version: v3
+///
 /// This rule is suitable for the **pedantic** tier.
 ///
 /// This is the strict version that only allows traditional boolean prefixes
@@ -2520,7 +2557,7 @@ class PreferDescriptiveBoolNamesStrictRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_descriptive_bool_names_strict',
     problemMessage:
-        '[prefer_descriptive_bool_names_strict] Boolean should use a descriptive prefix (is, has, can, should, etc.). This rule is suitable for the pedantic tier.',
+        '[prefer_descriptive_bool_names_strict] Boolean should use a descriptive prefix (is, has, can, should, etc.). This rule is suitable for the pedantic tier. {v3}',
     correctionMessage:
         'Rename with a descriptive boolean prefix: isEnabled, hasData, canEdit, shouldUpdate, doesExist, or willChange.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -2648,6 +2685,8 @@ class PreferDescriptiveBoolNamesStrictRule extends SaropaLintRule {
 
 /// Warns when Dart file names don't use snake_case.
 ///
+/// Since: v1.3.0 | Updated: v4.13.0 | Rule version: v4
+///
 /// This is an **opinionated rule** - not included in any tier by default.
 ///
 /// **Pros of snake_case file names:**
@@ -2685,7 +2724,7 @@ class PreferSnakeCaseFilesRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_snake_case_files',
     problemMessage:
-        '[prefer_snake_case_files] File name does not follow snake_case convention. Non-standard file names break import autocompletion and make the project structure harder to navigate on case-sensitive file systems.',
+        '[prefer_snake_case_files] File name does not follow snake_case convention. Non-standard file names break import autocompletion and make the project structure harder to navigate on case-sensitive file systems. {v4}',
     correctionMessage:
         'Rename the file to snake_case (e.g., user_service.dart instead of UserService.dart) to follow Dart conventions.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -2809,6 +2848,8 @@ class PreferSnakeCaseFilesRule extends SaropaLintRule {
 
 /// Warns when text size is smaller than the recommended minimum.
 ///
+/// Since: v1.3.0 | Updated: v4.13.0 | Rule version: v4
+///
 /// This is an **opinionated rule** - not included in any tier by default.
 /// Default minimum is 12 logical pixels.
 ///
@@ -2848,7 +2889,7 @@ class AvoidSmallTextRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_small_text',
     problemMessage:
-        '[avoid_small_text] Font size is smaller than $_minFontSize, which reduces readability for users with low vision. This is an opinionated rule - not included in any tier by default. Default minimum is 12 logical pixels.',
+        '[avoid_small_text] Font size is smaller than $_minFontSize, which reduces readability for users with low vision. This is an opinionated rule - not included in any tier by default. Default minimum is 12 logical pixels. {v4}',
     correctionMessage:
         'Use a font size of at least $_minFontSize to meet accessibility readability guidelines for body text.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -2933,6 +2974,9 @@ class _IncreaseFontSizeFix extends DartFix {
 }
 
 /// Warns when regular comments (`//`) are used instead of doc comments (`///`)
+///
+/// Since: v1.3.0 | Updated: v4.13.0 | Rule version: v5
+///
 /// for public members.
 ///
 /// This is an **opinionated rule** - not included in any tier by default.
@@ -2978,7 +3022,7 @@ class PreferDocCommentsOverRegularRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_doc_comments_over_regular',
     problemMessage:
-        '[prefer_doc_comments_over_regular] Use doc comments (///) instead of regular comments (//) for public API documentation. This is an opinionated rule - not included in any tier by default.',
+        '[prefer_doc_comments_over_regular] Use doc comments (///) instead of regular comments (//) for public API documentation. This is an opinionated rule - not included in any tier by default. {v5}',
     correctionMessage:
         'Replace // with /// so the comment appears in IDE hover docs and can be extracted by dartdoc for API reference.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -3157,6 +3201,8 @@ class _ConvertToDocCommentFix extends DartFix {
 // cspell:ignore Brien
 /// Warns when stylized (curly) apostrophes are used instead of straight apostrophes.
 ///
+/// Since: v4.2.3 | Updated: v4.13.0 | Rule version: v5
+///
 /// This is an **opinionated rule** - not included in any tier by default.
 ///
 /// Code should use straight/ASCII apostrophes (') (U+0027) rather than
@@ -3200,7 +3246,7 @@ class PreferStraightApostropheRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_straight_apostrophe',
     problemMessage:
-        "[prefer_straight_apostrophe] A Right Single Quotation Mark (U+2019) was found where a straight apostrophe (U+0027) is expected. Curly quotes cause inconsistent string delimiters and can break tooling. Replace with a straight apostrophe.",
+        "[prefer_straight_apostrophe] A Right Single Quotation Mark (U+2019) was found where a straight apostrophe (U+0027) is expected. Curly quotes cause inconsistent string delimiters and can break tooling. Replace with a straight apostrophe. {v5}",
     correctionMessage:
         "Replace the Right Single Quotation Mark (U+2019) with a straight apostrophe (U+0027) for code consistency.",
     errorSeverity: DiagnosticSeverity.INFO,
@@ -3287,6 +3333,8 @@ class _ReplaceCurlyApostropheFix extends DartFix {
 
 /// Warns when straight apostrophes are used instead of stylized (curly) apostrophes.
 ///
+/// Since: v4.2.3 | Updated: v4.13.0 | Rule version: v5
+///
 /// This is an **opinionated rule** - not included in any tier by default.
 ///
 /// For documentation and user-facing strings, Right Single Quotation Mark (\u2019) (U+2019)
@@ -3331,7 +3379,7 @@ class PreferDocCurlyApostropheRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_doc_curly_apostrophe',
     problemMessage:
-        "[prefer_doc_curly_apostrophe] Use Right Single Quotation Mark (') instead of straight apostrophe (') in documentation. This is an opinionated rule - not included in any tier by default.",
+        "[prefer_doc_curly_apostrophe] Use Right Single Quotation Mark (') instead of straight apostrophe (') in documentation. This is an opinionated rule - not included in any tier by default. {v5}",
     correctionMessage:
         "Replace the straight apostrophe with a Right Single Quotation Mark (U+2019) for typographic correctness.",
     errorSeverity: DiagnosticSeverity.INFO,
@@ -3495,6 +3543,9 @@ class _ReplaceStraightApostropheFix extends DartFix {
 }
 
 /// Warns when stylized (curly) apostrophes are used instead of straight apostrophes
+///
+/// Since: v4.2.3 | Updated: v4.13.0 | Rule version: v4
+///
 /// in documentation comments.
 ///
 /// This is an **opinionated rule** - not included in any tier by default.
@@ -3542,7 +3593,7 @@ class PreferDocStraightApostropheRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_doc_straight_apostrophe',
     problemMessage:
-        "[prefer_doc_straight_apostrophe] Use straight apostrophe (') instead of Right Single Quotation Mark (') in documentation. This is an opinionated rule - not included in any tier by default.",
+        "[prefer_doc_straight_apostrophe] Use straight apostrophe (') instead of Right Single Quotation Mark (') in documentation. This is an opinionated rule - not included in any tier by default. {v4}",
     correctionMessage:
         "Replace the Right Single Quotation Mark (U+2019) with a straight apostrophe (U+0027) for plain-text docs.",
     errorSeverity: DiagnosticSeverity.INFO,
@@ -3675,6 +3726,9 @@ class _ReplaceDocCurlyApostropheFix extends DartFix {
 }
 
 /// Warns when straight apostrophes are used instead of stylized (curly) apostrophes
+///
+/// Since: v4.2.3 | Updated: v4.13.0 | Rule version: v4
+///
 /// in string literals.
 ///
 /// This is an **opinionated rule** - not included in any tier by default.
@@ -3724,7 +3778,7 @@ class PreferCurlyApostropheRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_curly_apostrophe',
     problemMessage:
-        "[prefer_curly_apostrophe] Use Right Single Quotation Mark (') instead of straight apostrophe (') in strings. This is an opinionated rule - not included in any tier by default.",
+        "[prefer_curly_apostrophe] Use Right Single Quotation Mark (') instead of straight apostrophe (') in strings. This is an opinionated rule - not included in any tier by default. {v4}",
     correctionMessage:
         "Replace the straight apostrophe with a Right Single Quotation Mark (U+2019) for typographic polish in strings.",
     errorSeverity: DiagnosticSeverity.INFO,
@@ -3837,6 +3891,8 @@ class _ReplaceStraightWithCurlyFix extends DartFix {
 
 /// Warns when named arguments in function calls are not in alphabetical order.
 ///
+/// Since: v4.8.2 | Updated: v4.13.0 | Rule version: v3
+///
 /// This is an **opinionated rule** - not included in any tier by default.
 ///
 /// Consistent argument ordering at call sites improves readability and makes
@@ -3896,7 +3952,7 @@ class ArgumentsOrderingRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_arguments_ordering',
     problemMessage:
-        '[prefer_arguments_ordering] Named arguments are not in alphabetical order. Unsorted arguments force reviewers to scan the entire call site to spot missing or duplicated parameters.',
+        '[prefer_arguments_ordering] Named arguments are not in alphabetical order. Unsorted arguments force reviewers to scan the entire call site to spot missing or duplicated parameters. {v3}',
     correctionMessage:
         'Reorder named arguments alphabetically so reviewers can quickly spot missing or duplicate arguments.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -4035,6 +4091,8 @@ class _SortArgumentsFix extends DartFix {
 
 /// Warns when commented-out code is detected.
 ///
+/// Since: v4.3.0 | Updated: v4.13.0 | Rule version: v4
+///
 /// Commented-out code clutters the codebase and creates confusion about intent.
 /// It's better to delete unused code - version control preserves history if you
 /// need to restore it later.
@@ -4099,7 +4157,7 @@ class AvoidCommentedOutCodeRule extends SaropaLintRule {
     name: 'prefer_no_commented_out_code',
     problemMessage:
         '[prefer_no_commented_out_code] Commented-out code clutters the codebase. '
-        'Delete it - git preserves history.',
+        'Delete it - git preserves history. {v4}',
     correctionMessage:
         'Delete the commented-out code. Use version control to retrieve it if needed.',
     errorSeverity: DiagnosticSeverity.INFO,

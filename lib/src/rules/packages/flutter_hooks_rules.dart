@@ -19,6 +19,8 @@ import '../../saropa_lint_rule.dart';
 
 /// Warns when Flutter Hooks are called outside of a build method.
 ///
+/// Since: v2.0.0 | Updated: v4.13.0 | Rule version: v2
+///
 /// Hooks (functions starting with `use`) must be called from within
 /// the build method of a HookWidget. Calling them elsewhere violates
 /// the rules of hooks and causes runtime errors.
@@ -56,7 +58,7 @@ class AvoidHooksOutsideBuildRule extends SaropaLintRule {
     name: 'avoid_hooks_outside_build',
     problemMessage:
         '[avoid_hooks_outside_build] Hook function called outside of build method. '
-        'Hooks must only be called from build().',
+        'Hooks must only be called from build(). {v2}',
     correctionMessage: 'Move this hook call inside the build() method.',
     errorSeverity: DiagnosticSeverity.ERROR,
   );
@@ -93,6 +95,8 @@ class AvoidHooksOutsideBuildRule extends SaropaLintRule {
 }
 
 /// Warns when Flutter Hooks are called inside conditionals.
+///
+/// Since: v2.0.0 | Updated: v4.13.0 | Rule version: v2
 ///
 /// Hooks must be called unconditionally in the same order every build.
 /// Calling hooks inside if/else, switch, or ternary expressions violates
@@ -132,7 +136,7 @@ class AvoidConditionalHooksRule extends SaropaLintRule {
     name: 'avoid_conditional_hooks',
     problemMessage:
         '[avoid_conditional_hooks] Hook function called conditionally. '
-        'Hooks must be called unconditionally in the same order.',
+        'Hooks must be called unconditionally in the same order. {v2}',
     correctionMessage:
         'Move hook calls outside of conditionals. Use the hook value conditionally instead.',
     errorSeverity: DiagnosticSeverity.ERROR,
@@ -201,6 +205,8 @@ class AvoidConditionalHooksRule extends SaropaLintRule {
 
 /// Warns when a HookWidget doesn't use any hooks.
 ///
+/// Since: v2.0.0 | Updated: v4.13.0 | Rule version: v2
+///
 /// If a widget extends HookWidget but doesn't call any hook functions,
 /// it should be a regular StatelessWidget instead.
 ///
@@ -240,7 +246,7 @@ class AvoidUnnecessaryHookWidgetsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_unnecessary_hook_widgets',
     problemMessage:
-        '[avoid_unnecessary_hook_widgets] HookWidget without any hook calls. Use StatelessWidget instead. If a widget extends HookWidget but doesn\'t call any hook functions, it must be a regular StatelessWidget instead.',
+        '[avoid_unnecessary_hook_widgets] HookWidget without any hook calls. Use StatelessWidget instead. If a widget extends HookWidget but doesn\'t call any hook functions, it must be a regular StatelessWidget instead. {v2}',
     correctionMessage:
         'Change to StatelessWidget if no hooks are needed. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,

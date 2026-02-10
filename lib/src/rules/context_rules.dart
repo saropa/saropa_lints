@@ -20,6 +20,8 @@ import '../saropa_lint_rule.dart';
 
 /// Warns when BuildContext is stored in a field.
 ///
+/// Since: v2.3.10 | Updated: v4.13.0 | Rule version: v4
+///
 /// Alias: store_context, context_field, cache_context
 ///
 /// BuildContext is tied to the widget tree lifecycle. Storing it in a field
@@ -65,7 +67,7 @@ class AvoidStoringContextRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_storing_context',
     problemMessage:
-        '[avoid_storing_context] Storing a BuildContext in a field or variable for later use is dangerous because the context may become invalid after the widget is disposed or rebuilt. Using a stale context can cause exceptions, show dialogs on the wrong screen, or trigger subtle bugs. This is a common source of crashes and hard-to-diagnose UI issues in Flutter apps.',
+        '[avoid_storing_context] Storing a BuildContext in a field or variable for later use is dangerous because the context may become invalid after the widget is disposed or rebuilt. Using a stale context can cause exceptions, show dialogs on the wrong screen, or trigger subtle bugs. This is a common source of crashes and hard-to-diagnose UI issues in Flutter apps. {v4}',
     correctionMessage:
         'Always use BuildContext directly where needed, and avoid storing it in fields or long-lived variables. If you must use context asynchronously, check if the widget is still mounted before using it. Audit your codebase for stored BuildContext references and refactor to use context safely.',
     errorSeverity: DiagnosticSeverity.ERROR,
@@ -154,6 +156,8 @@ class AvoidStoringContextRule extends SaropaLintRule {
 
 /// Warns when BuildContext is used after an await without a mounted check.
 ///
+/// Since: v2.3.10 | Updated: v4.13.0 | Rule version: v6
+///
 /// Alias: async_context, stale_context,
 ///        avoid_using_context_after_dispose
 ///
@@ -231,7 +235,7 @@ class AvoidContextAcrossAsyncRule extends SaropaLintRule {
     name: 'avoid_context_across_async',
     problemMessage:
         '[avoid_context_across_async] BuildContext used after await crashes '
-        'if widget was disposed during the async gap. Check mounted first.',
+        'if widget was disposed during the async gap. Check mounted first. {v6}',
     correctionMessage: 'Check "if (!mounted) return;" before using context.',
     errorSeverity: DiagnosticSeverity.ERROR,
   );
@@ -446,6 +450,8 @@ class _AddMountedGuardFix extends DartFix {
 
 /// Warns when BuildContext is used after await in async static methods.
 ///
+/// Since: v2.4.0 | Updated: v4.13.0 | Rule version: v4
+///
 /// Alias: context_after_await_static, async_static_context_danger
 ///
 /// This is the most dangerous pattern: after an await, the widget may have
@@ -519,7 +525,7 @@ class AvoidContextAfterAwaitInStaticRule extends SaropaLintRule {
     name: 'avoid_context_after_await_in_static',
     problemMessage:
         '[avoid_context_after_await_in_static] BuildContext used after await in static method. Context may be '
-        'invalid after async gap.',
+        'invalid after async gap. {v4}',
     correctionMessage:
         'Pass an isMounted callback, use a navigator key, or restructure '
         'to avoid context after await.',
@@ -937,6 +943,8 @@ class _StaticContextUsageFinder extends RecursiveAstVisitor<void> {
 
 /// Warns when BuildContext parameter is used in async static methods.
 ///
+/// Since: v2.4.0 | Updated: v4.13.0 | Rule version: v2
+///
 /// Alias: async_static_context, context_in_async_static
 ///
 /// Async static methods with BuildContext are risky because the widget
@@ -984,7 +992,7 @@ class AvoidContextInAsyncStaticRule extends SaropaLintRule {
     name: 'avoid_context_in_async_static',
     problemMessage:
         '[avoid_context_in_async_static] BuildContext in async static method may become invalid during '
-        'async operations.',
+        'async operations. {v2}',
     correctionMessage:
         'Pass an isMounted callback, use a navigator key, or convert to '
         'instance method.',
@@ -1057,6 +1065,8 @@ class _AddIsMountedCallbackFix extends DartFix {
 
 /// Warns when BuildContext is used in any static method.
 ///
+/// Since: v2.3.10 | Updated: v4.13.0 | Rule version: v3
+///
 /// Alias: static_context, context_in_static
 ///
 /// Static methods don't have access to widget instance state, so they
@@ -1114,7 +1124,7 @@ class AvoidContextInStaticMethodsRule extends SaropaLintRule {
     name: 'avoid_context_in_static_methods',
     problemMessage:
         '[avoid_context_in_static_methods] BuildContext in static method. Consider instance method or '
-        'extension instead.',
+        'extension instead. {v3}',
     correctionMessage:
         'Use instance methods, extension methods, or a navigator key.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -1142,6 +1152,152 @@ class AvoidContextInStaticMethodsRule extends SaropaLintRule {
           reporter.atNode(param, _code);
         }
       }
+    });
+  }
+}
+
+// =============================================================================
+// Context Dependency in Callback Rules
+// =============================================================================
+
+/// Warns when BuildContext-dependent calls (Theme.of, MediaQuery.of,
+///
+/// Since: v4.12.0 | Updated: v4.13.0 | Rule version: v2
+///
+/// Navigator.of, etc.) are used inside asynchronous callbacks such as
+/// Future.then(), Future.delayed(), or Timer callbacks.
+///
+/// After an async gap the widget may have been disposed, making the
+/// captured BuildContext stale. Using a stale context causes
+/// "Looking up a deactivated widget's ancestor" exceptions at runtime.
+///
+/// **BAD:**
+/// ```dart
+/// Future.delayed(Duration(seconds: 1), () {
+///   final theme = Theme.of(context); // context may be stale
+/// });
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// final theme = Theme.of(context); // capture before async gap
+/// Future.delayed(Duration(seconds: 1), () {
+///   // use captured theme
+/// });
+/// ```
+class AvoidContextDependencyInCallbackRule extends SaropaLintRule {
+  const AvoidContextDependencyInCallbackRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  static const LintCode _code = LintCode(
+    name: 'avoid_context_dependency_in_callback',
+    problemMessage:
+        '[avoid_context_dependency_in_callback] BuildContext-dependent call (Theme.of, MediaQuery.of, Navigator.of, ScaffoldMessenger.of, etc.) is used inside an asynchronous callback such as Future.then(), Future.delayed(), or Timer. After an async gap the originating widget may have been unmounted, making the captured BuildContext stale and causing a "Looking up a deactivated widget\'s ancestor" exception at runtime. {v2}',
+    correctionMessage:
+        'Capture the context-dependent value (e.g., final theme = Theme.of(context)) before the async gap and use the captured value inside the callback instead of accessing context directly.',
+    errorSeverity: DiagnosticSeverity.WARNING,
+  );
+
+  /// Known context-dependent static accessor methods.
+  static const Set<String> _contextOfMethods = <String>{
+    'Theme',
+    'MediaQuery',
+    'Navigator',
+    'ScaffoldMessenger',
+    'Scaffold',
+    'DefaultTextStyle',
+    'IconTheme',
+    'Directionality',
+    'Localizations',
+    'FocusScope',
+    'ModalRoute',
+    'InheritedTheme',
+  };
+
+  /// Async callback creator method names.
+  static const Set<String> _asyncCallbackMethods = <String>{
+    'then',
+    'whenComplete',
+    'catchError',
+    'delayed',
+    'periodic',
+    'run',
+    'schedule',
+  };
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      // Look for Xxx.of(context) pattern
+      if (node.methodName.name != 'of') return;
+
+      final Expression? target = node.target;
+      if (target is! SimpleIdentifier) return;
+      if (!_contextOfMethods.contains(target.name)) return;
+
+      // Walk up to find if we're inside an async callback
+      AstNode? current = node.parent;
+      while (current != null) {
+        if (current is FunctionExpression) {
+          final AstNode? funcParent = current.parent;
+          // Check if this function is an argument to an async method
+          if (funcParent is ArgumentList) {
+            final AstNode? callParent = funcParent.parent;
+            if (callParent is MethodInvocation) {
+              final String methodName = callParent.methodName.name;
+              if (_asyncCallbackMethods.contains(methodName)) {
+                reporter.atNode(node, code);
+                return;
+              }
+            }
+          }
+        }
+        current = current.parent;
+      }
+    });
+  }
+
+  @override
+  List<Fix> getFixes() => <Fix>[_CaptureContextBeforeAsyncFix()];
+}
+
+class _CaptureContextBeforeAsyncFix extends DartFix {
+  @override
+  void run(
+    CustomLintResolver resolver,
+    ChangeReporter reporter,
+    CustomLintContext context,
+    AnalysisError analysisError,
+    List<AnalysisError> others,
+  ) {
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
+      if (node.methodName.name != 'of') return;
+
+      final Expression? target = node.target;
+      if (target is! SimpleIdentifier) return;
+
+      final changeBuilder = reporter.createChangeBuilder(
+        message:
+            'Add comment: capture ${target.name}.of(context) before async gap',
+        priority: 1,
+      );
+
+      changeBuilder.addDartFileEdit((builder) {
+        builder.addSimpleInsertion(
+          node.offset,
+          '/* TODO: capture ${target.name}.of(context) before the async gap */ ',
+        );
+      });
     });
   }
 }

@@ -5,6 +5,8 @@ import 'package:saropa_lints/src/saropa_lint_rule.dart';
 
 /// Warns when QR scan success callback lacks haptic/visual feedback.
 ///
+/// Since: v1.8.2 | Updated: v4.13.0 | Rule version: v2
+///
 /// Users need confirmation that their scan was successful. Haptic feedback
 /// (vibration) or visual feedback (flash, animation) improves user experience
 /// and prevents double-scanning.
@@ -40,7 +42,7 @@ class RequireQrScanFeedbackRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_qr_scan_feedback',
     problemMessage:
-        '[require_qr_scan_feedback] QR scan callback should provide user feedback. Users need confirmation that their scan was successful. Haptic feedback (vibration) or visual feedback (flash, animation) improves user experience and prevents double-scanning.',
+        '[require_qr_scan_feedback] QR scan callback should provide user feedback. Users need confirmation that their scan was successful. Haptic feedback (vibration) or visual feedback (flash, animation) improves user experience and prevents double-scanning. {v2}',
     correctionMessage:
         'Add HapticFeedback.mediumImpact() or visual feedback on scan. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -92,6 +94,8 @@ class RequireQrScanFeedbackRule extends SaropaLintRule {
 
 /// Warns when QR scanner lacks lifecycle pause/resume handling.
 ///
+/// Since: v1.8.2 | Updated: v4.13.0 | Rule version: v2
+///
 /// Camera for QR scanning drains battery significantly. Without proper
 /// lifecycle handling, the camera stays active when the app is backgrounded
 /// or the screen is turned off.
@@ -132,7 +136,7 @@ class AvoidQrScannerAlwaysActiveRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_qr_scanner_always_active',
     problemMessage:
-        '[avoid_qr_scanner_always_active] QR scanner should pause when app is backgrounded. Camera for QR scanning drains battery significantly. Without proper lifecycle handling, the camera stays active when the app is backgrounded or the screen is turned off.',
+        '[avoid_qr_scanner_always_active] QR scanner should pause when app is backgrounded. Camera for QR scanning drains battery significantly. Without proper lifecycle handling, the camera stays active when the app is backgrounded or the screen is turned off. {v2}',
     correctionMessage:
         'Add WidgetsBindingObserver and pause camera in didChangeAppLifecycleState. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -194,6 +198,8 @@ class AvoidQrScannerAlwaysActiveRule extends SaropaLintRule {
 
 /// Warns when QR scan result is used without URL or content validation.
 ///
+/// Since: v2.3.7 | Updated: v4.13.0 | Rule version: v2
+///
 /// QR codes can contain malicious URLs, scripts, or malformed data. Using
 /// scanned content directly without validation exposes the app to security
 /// risks including phishing, XSS, and injection attacks.
@@ -245,7 +251,7 @@ class RequireQrContentValidationRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_qr_content_validation',
     problemMessage:
-        '[require_qr_content_validation] QR code scan result used without validation creates a security vulnerability. Malicious QR codes can contain crafted URLs that redirect to phishing sites, inject JavaScript through URL schemes, trigger automatic downloads, or launch unintended app actions. Users scanning codes in public places are especially vulnerable.',
+        '[require_qr_content_validation] QR code scan result used without validation creates a security vulnerability. Malicious QR codes can contain crafted URLs that redirect to phishing sites, inject JavaScript through URL schemes, trigger automatic downloads, or launch unintended app actions. Users scanning codes in public places are especially vulnerable. {v2}',
     correctionMessage:
         'Validate the URL scheme (allow only https://), optionally verify the domain against an allowlist, and sanitize content before navigation or processing.',
     errorSeverity: DiagnosticSeverity.WARNING,

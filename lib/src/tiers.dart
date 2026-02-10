@@ -642,6 +642,7 @@ const Set<String> essentialRules = <String>{
   'require_location_permission_rationale', // WARNING - location permission needs rationale
   'require_camera_permission_check', // ERROR - camera needs permission check
   'require_firestore_index', // ERROR - Firestore queries need composite indexes
+  'require_firebase_composite_index', // ERROR - RTDB queries need .indexOn rules
   'avoid_notification_silent_failure', // WARNING - notification failures should be handled
   'require_file_path_sanitization', // WARNING - file paths need sanitization
   'require_app_startup_error_handling', // WARNING - app startup needs error handling
@@ -649,6 +650,21 @@ const Set<String> essentialRules = <String>{
   'prefer_lazy_loading_images', // WARNING - large images should be lazy loaded
   'avoid_sqflite_type_mismatch', // ERROR - SQLite type mismatches cause runtime errors
   'avoid_sudo_shell_commands', // ERROR - elevated privileges are a security risk
+
+  // ROADMAP ⭐ Rules - Essential (new batch)
+  'avoid_context_dependency_in_callback', // WARNING - stale context in async callbacks
+  'avoid_hive_synchronous_in_ui', // WARNING - sync Hive I/O blocks UI thread
+
+  // ROADMAP 🚨 Rules (Essential - ERROR severity)
+  'prefer_correct_package_name', // ERROR - package naming convention
+  'avoid_getx_build_context_bypass', // ERROR - bypasses BuildContext
+  'avoid_permission_handler_null_safety', // ERROR - deprecated API
+  'avoid_retaining_disposed_widgets', // ERROR - memory leak from widget refs
+  'require_secure_key_generation', // ERROR - hardcoded encryption keys
+  'require_hive_web_subdirectory', // ERROR - web storage conflicts
+
+  // v4.14.0 - GitHub issue rules (Essential)
+  'avoid_blocking_main_thread', // WARNING - sync I/O blocks main thread
 };
 
 /// Recommended tier rules - Essential + common mistakes, performance basics.
@@ -770,7 +786,6 @@ const Set<String> recommendedOnlyRules = <String>{
   'avoid_text_scale_factor',
   'prefer_using_list_view',
   'avoid_scaffold_messenger_after_await',
-  'avoid_empty_setstate',
   'avoid_unnecessary_setstate',
   'avoid_stateless_widget_initialized_fields',
   'avoid_state_constructors',
@@ -1442,6 +1457,16 @@ const Set<String> recommendedOnlyRules = <String>{
   'avoid_x11_only_assumptions', // WARNING - X11-only code fails on Wayland
   'require_video_player_controller_dispose',
   'require_wss_over_ws',
+
+  // ROADMAP ⭐ Rules - Recommended (new batch)
+  'avoid_missing_interpolation', // WARNING - use string interpolation over +
+  'avoid_provider_listen_false_in_build', // INFO - stale data from listen: false
+  'prefer_spring_animation', // INFO - natural physics-based animation
+  'prefer_avatar_loading_placeholder', // INFO - fallback for network avatars
+
+  // v4.14.0 - GitHub issue rules (Recommended)
+  'require_feature_flag_type_safety', // INFO - typed feature flag accessors
+  'require_timezone_display', // INFO - timezone context in time display
 };
 
 /// Professional tier rules - Recommended + architecture, testing, maintainability.
@@ -1500,7 +1525,7 @@ const Set<String> professionalOnlyRules = <String>{
 
   // Performance
   'require_keys_in_animated_lists',
-  'avoid_synchronous_file_io',
+  'avoid_synchronous_file_io', // also covered by avoid_blocking_main_thread (Essential)
   'prefer_compute_for_heavy_work',
   'prefer_cached_getter',
   // Note: avoid_object_creation_in_hot_loops moved to Pedantic (micro-optimization)
@@ -1984,6 +2009,10 @@ const Set<String> professionalOnlyRules = <String>{
   'prefer_lazy_singleton_registration', // INFO - eager singletons slow startup
   'require_cache_key_uniqueness', // INFO - cache keys need stable hashCode
 
+  // v4.14.0 - GitHub issue rules (Professional)
+  'require_log_level_for_production', // INFO - guard verbose logs for production
+  'require_analytics_event_naming', // INFO - snake_case analytics events
+
   // Best practices (auto-assigned by severity)
   'avoid_adjacent_strings',
   'avoid_always_null_parameters',
@@ -2002,6 +2031,7 @@ const Set<String> professionalOnlyRules = <String>{
   'avoid_duplicate_constant_values',
   'avoid_duplicate_initializers',
   'avoid_duplicate_string_literals_pair',
+  'avoid_empty_setstate', // stylistic: moved from recommended (v4.12.4)
   'avoid_excessive_bottom_nav_items',
   'avoid_excessive_expressions',
   'avoid_explicit_pattern_field_name',
@@ -2399,6 +2429,12 @@ const Set<String> professionalOnlyRules = <String>{
   'avoid_max_path_risk', // INFO - deeply nested paths hit MAX_PATH on Windows
   'prefer_xdg_directory_convention', // INFO - use XDG base directories on Linux
   'require_linux_font_fallback', // INFO - platform fonts need fallback on Linux
+
+  // ROADMAP ⭐ Rules - Professional (new batch)
+  'avoid_datetime_comparison_without_precision', // INFO - DateTime == fails on microseconds
+  'avoid_getx_static_get', // WARNING - Get.find() hides dependencies
+  'require_navigation_result_handling', // INFO - Navigator.push result ignored
+  'require_semantic_colors', // INFO - name colors by purpose not appearance
 };
 
 /// Rules that are only included in the comprehensive tier (not in professional).
@@ -3162,6 +3198,7 @@ const Set<String> firebasePackageRules = <String>{
   'require_firebase_error_handling',
   'avoid_firebase_realtime_in_build',
   'require_firestore_index',
+  'require_firebase_composite_index',
   'avoid_firestore_unbounded_query',
   'avoid_map_markers_in_build',
   'require_map_idle_callback',

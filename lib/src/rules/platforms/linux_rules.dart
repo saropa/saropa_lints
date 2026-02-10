@@ -34,6 +34,8 @@ import '../../saropa_lint_rule.dart';
 
 /// Detects hardcoded Unix filesystem paths that should use `path_provider`.
 ///
+/// Since: v4.9.20 | Updated: v4.13.0 | Rule version: v3
+///
 /// Alias: unix_paths, hardcoded_linux_path
 ///
 /// Hardcoded paths like `/home/`, `/tmp/`, `/etc/` break when the app runs
@@ -69,7 +71,7 @@ class AvoidHardcodedUnixPathsRule extends SaropaLintRule {
     name: 'avoid_hardcoded_unix_paths',
     problemMessage:
         '[avoid_hardcoded_unix_paths] Hardcoded Unix path detected. '
-        'This breaks under different users, containers, or non-standard layouts.',
+        'This breaks under different users, containers, or non-standard layouts. {v3}',
     correctionMessage: 'Use path_provider (getApplicationSupportDirectory, '
         'getTemporaryDirectory) or Platform.environment instead.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -112,6 +114,8 @@ class AvoidHardcodedUnixPathsRule extends SaropaLintRule {
 
 /// Detects manual construction of XDG directory paths.
 ///
+/// Since: v4.9.20 | Updated: v4.13.0 | Rule version: v3
+///
 /// Alias: xdg_directories, xdg_base_dir
 ///
 /// On Linux, user configuration, data, and cache should follow the XDG Base
@@ -147,7 +151,7 @@ class PreferXdgDirectoryConventionRule extends SaropaLintRule {
     name: 'prefer_xdg_directory_convention',
     problemMessage:
         '[prefer_xdg_directory_convention] Manual XDG directory path '
-        'construction detected. This ignores XDG environment overrides.',
+        'construction detected. This ignores XDG environment overrides. {v3}',
     correctionMessage: 'Use path_provider (getApplicationSupportDirectory, '
         'getApplicationCacheDirectory) which respects XDG variables.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -187,6 +191,8 @@ class PreferXdgDirectoryConventionRule extends SaropaLintRule {
 
 /// Detects X11-specific code without Wayland fallback considerations.
 ///
+/// Since: v4.9.20 | Updated: v4.13.0 | Rule version: v3
+///
 /// Alias: x11_wayland, display_server
 ///
 /// Most major Linux distributions now default to Wayland. Code that directly
@@ -225,7 +231,7 @@ class AvoidX11OnlyAssumptionsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_x11_only_assumptions',
     problemMessage: '[avoid_x11_only_assumptions] X11-specific code detected. '
-        'Most Linux distros now default to Wayland.',
+        'Most Linux distros now default to Wayland. {v3}',
     correctionMessage:
         'Use Flutter abstractions or check XDG_SESSION_TYPE before '
         'using display-server-specific APIs.',
@@ -301,6 +307,8 @@ class AvoidX11OnlyAssumptionsRule extends SaropaLintRule {
 
 /// Detects TextStyle with platform-specific fonts without fallback fonts.
 ///
+/// Since: v4.9.20 | Updated: v4.13.0 | Rule version: v3
+///
 /// Alias: linux_font, font_fallback
 ///
 /// Linux distributions ship different default fonts than macOS (San Francisco)
@@ -339,7 +347,7 @@ class RequireLinuxFontFallbackRule extends SaropaLintRule {
     name: 'require_linux_font_fallback',
     problemMessage:
         '[require_linux_font_fallback] Platform-specific font used without '
-        'fontFamilyFallback. This font may not exist on Linux.',
+        'fontFamilyFallback. This font may not exist on Linux. {v3}',
     correctionMessage: 'Add fontFamilyFallback with cross-platform fonts like '
         "'Roboto', 'Noto Sans', or 'Liberation Sans'.",
     errorSeverity: DiagnosticSeverity.INFO,
@@ -465,6 +473,8 @@ class _AddFontFallbackFix extends DartFix {
 
 /// Detects Process.run calls that invoke sudo or assume root privileges.
 ///
+/// Since: v4.9.20 | Updated: v4.13.0 | Rule version: v3
+///
 /// Alias: no_sudo, avoid_root
 ///
 /// Desktop applications should never assume root/superuser privileges or
@@ -506,7 +516,7 @@ class AvoidSudoShellCommandsRule extends SaropaLintRule {
     name: 'avoid_sudo_shell_commands',
     problemMessage:
         '[avoid_sudo_shell_commands] Process invocation with elevated '
-        'privileges detected. Apps should not assume root access.',
+        'privileges detected. Apps should not assume root access. {v3}',
     correctionMessage:
         'Use polkit for privilege escalation, or redesign to avoid '
         'needing elevated permissions. Sandboxed apps cannot use sudo.',

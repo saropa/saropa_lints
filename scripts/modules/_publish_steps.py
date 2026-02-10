@@ -44,6 +44,7 @@ def run_pre_publish_audits(project_dir: Path) -> bool:
     BLOCKING checks (fail = no publish):
       - Tier integrity: orphans, phantoms, multi-tier, misplaced opinionated
       - Duplicate rule names, class names, or aliases
+      - Missing [rule_name] prefix in problemMessage
 
     INFORMATIONAL checks (warn but don't block):
       - DX message quality
@@ -79,7 +80,21 @@ def run_pre_publish_audits(project_dir: Path) -> bool:
     )
 
     if audit_result.has_blocking_issues:
-        print_error("Blocking audit issues found (duplicate rules).")
+        issues: list[str] = []
+        if (
+            audit_result.duplicate_report.get("class_names")
+            or audit_result.duplicate_report.get("rule_names")
+            or audit_result.duplicate_report.get("aliases")
+        ):
+            issues.append("duplicate rules")
+        if audit_result.rules_missing_prefix:
+            issues.append(
+                f"{len(audit_result.rules_missing_prefix)} rule(s) "
+                f"missing [rule_name] prefix"
+            )
+        print_error(
+            f"Blocking audit issues: {'; '.join(issues)}."
+        )
         return False
 
     # --- INFORMATIONAL: DX message improvement analysis ---

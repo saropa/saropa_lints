@@ -15,6 +15,8 @@ import '../saropa_lint_rule.dart';
 
 /// Warns when double is used for money/currency values.
 ///
+/// Since: v1.7.9 | Updated: v4.13.0 | Rule version: v4
+///
 /// Alias: no_double_for_currency, money_type_safety, decimal_for_money
 ///
 /// Floating point arithmetic has precision issues (0.1 + 0.2 != 0.3).
@@ -49,7 +51,7 @@ class AvoidDoubleForMoneyRule extends SaropaLintRule {
     name: 'avoid_double_for_money',
     problemMessage:
         '[avoid_double_for_money] Floating point causes rounding errors in '
-        r'money calculations. $0.1 + $0.2 != $0.3, causing financial loss.',
+        r'money calculations. $0.1 + $0.2 != $0.3, causing financial loss. {v4}',
     correctionMessage: 'Store money as int cents or use a Decimal package.',
     errorSeverity: DiagnosticSeverity.ERROR,
   );
@@ -200,6 +202,8 @@ class _AddMoneyHackCommentFix extends DartFix {
 
 /// Warns when money amounts are stored without currency information.
 ///
+/// Since: v4.1.8 | Updated: v4.13.0 | Rule version: v2
+///
 /// `[HEURISTIC]` - Detects money-related classes without currency field.
 ///
 /// Amounts without currency are ambiguous. Always pair amounts with
@@ -243,7 +247,7 @@ class RequireCurrencyCodeWithAmountRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_currency_code_with_amount',
     problemMessage:
-        '[require_currency_code_with_amount] Money amount without currency information. Amounts without currency are ambiguous. Always pair amounts with currency codes. This monetary calculation can produce rounding errors that accumulate, causing financial discrepancies.',
+        '[require_currency_code_with_amount] Money amount without currency information. Amounts without currency are ambiguous. Always pair amounts with currency codes. This monetary calculation can produce rounding errors that accumulate, causing financial discrepancies. {v2}',
     correctionMessage:
         'Add currency field (String currency or CurrencyCode enum) alongside amount. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     errorSeverity: DiagnosticSeverity.INFO,

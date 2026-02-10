@@ -18,6 +18,8 @@ import '../../saropa_lint_rule.dart';
 
 /// Warns when Android permissions are declared but runtime request is missing.
 ///
+/// Since: v4.2.0 | Updated: v4.13.0 | Rule version: v2
+///
 /// Alias: android_runtime_permission, request_permission
 ///
 /// Android 6.0+ (API 23) requires runtime permission requests for dangerous
@@ -52,7 +54,7 @@ class RequireAndroidPermissionRequestRule extends SaropaLintRule {
     name: 'require_android_permission_request',
     problemMessage:
         '[require_android_permission_request] Permission-gated API called without '
-        'runtime permission request. Android 6+ will deny access or crash.',
+        'runtime permission request. Android 6+ will deny access or crash. {v2}',
     correctionMessage:
         'Call Permission.X.request() before using permission-gated APIs.',
     errorSeverity: DiagnosticSeverity.ERROR,
@@ -155,6 +157,8 @@ class RequireAndroidPermissionRequestRule extends SaropaLintRule {
 
 /// Warns when multiple activities use default taskAffinity.
 ///
+/// Since: v4.2.0 | Updated: v4.13.0 | Rule version: v2
+///
 /// Alias: task_affinity, android_back_stack
 ///
 /// Multiple activities with default taskAffinity can cause confusing back stack
@@ -188,7 +192,7 @@ class AvoidAndroidTaskAffinityDefaultRule extends SaropaLintRule {
     name: 'avoid_android_task_affinity_default',
     problemMessage:
         '[avoid_android_task_affinity_default] Starting Android activity via '
-        'platform channel. Verify taskAffinity is set in AndroidManifest.xml.',
+        'platform channel. Verify taskAffinity is set in AndroidManifest.xml. {v2}',
     correctionMessage:
         'Set android:taskAffinity on activities or use Flutter navigation.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -226,6 +230,8 @@ class AvoidAndroidTaskAffinityDefaultRule extends SaropaLintRule {
 
 /// Warns when Flutter app may show double splash on Android 12+.
 ///
+/// Since: v4.2.0 | Updated: v4.13.0 | Rule version: v2
+///
 /// Alias: android_splash, splash_screen_api_31
 ///
 /// Android 12+ enforces a system splash screen. Without customization via
@@ -260,7 +266,7 @@ class RequireAndroid12SplashRule extends SaropaLintRule {
     name: 'require_android_12_splash',
     problemMessage:
         '[require_android_12_splash] Flutter splash screen widget detected. '
-        'Android 12+ shows system splash first, causing potential double-splash.',
+        'Android 12+ shows system splash first, causing potential double-splash. {v2}',
     correctionMessage:
         'Configure Android 12 splash in styles.xml or use flutter_native_splash.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -299,6 +305,8 @@ class RequireAndroid12SplashRule extends SaropaLintRule {
 
 /// Warns when PendingIntent is created without FLAG_IMMUTABLE or FLAG_MUTABLE.
 ///
+/// Since: v4.2.0 | Updated: v4.13.0 | Rule version: v2
+///
 /// Alias: pending_intent_flag, android_12_pending_intent
 ///
 /// Android 12+ (API 31) requires PendingIntent to specify either
@@ -334,7 +342,7 @@ class PreferPendingIntentFlagsRule extends SaropaLintRule {
     name: 'prefer_pending_intent_flags',
     problemMessage:
         '[prefer_pending_intent_flags] PendingIntent without FLAG_IMMUTABLE or '
-        'FLAG_MUTABLE crashes on Android 12+.',
+        'FLAG_MUTABLE crashes on Android 12+. {v2}',
     correctionMessage:
         'Specify FLAG_IMMUTABLE (preferred) or FLAG_MUTABLE in PendingIntent flags.',
     errorSeverity: DiagnosticSeverity.ERROR,
@@ -385,6 +393,8 @@ class PreferPendingIntentFlagsRule extends SaropaLintRule {
 
 /// Warns when HTTP (non-HTTPS) URLs are used without platform check.
 ///
+/// Since: v4.2.0 | Updated: v4.13.0 | Rule version: v2
+///
 /// Alias: cleartext_traffic, android_network_security
 ///
 /// Android 9+ (API 28) blocks cleartext (HTTP) traffic by default. Enable
@@ -416,7 +426,7 @@ class AvoidAndroidCleartextTrafficRule extends SaropaLintRule {
     name: 'avoid_android_cleartext_traffic',
     problemMessage:
         '[avoid_android_cleartext_traffic] HTTP URL detected. Android 9+ blocks '
-        'cleartext traffic by default. This request will fail silently.',
+        'cleartext traffic by default. This request will fail silently. {v2}',
     correctionMessage:
         'Use HTTPS or configure network_security_config.xml for debug builds.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -479,6 +489,8 @@ class AvoidAndroidCleartextTrafficRule extends SaropaLintRule {
 
 /// Warns when sensitive data storage is used without backup exclusion.
 ///
+/// Since: v4.2.0 | Updated: v4.13.0 | Rule version: v3
+///
 /// Alias: android_backup, backup_rules
 ///
 /// Android auto-backup includes SharedPreferences by default. Define
@@ -512,7 +524,7 @@ class RequireAndroidBackupRulesRule extends SaropaLintRule {
     name: 'require_android_backup_rules',
     problemMessage:
         '[require_android_backup_rules] Sensitive data in SharedPreferences '
-        'may be included in Android auto-backup.',
+        'may be included in Android auto-backup. {v3}',
     correctionMessage:
         'Use flutter_secure_storage or configure backup_rules.xml to exclude sensitive data.',
     errorSeverity: DiagnosticSeverity.INFO,

@@ -19,6 +19,8 @@ import '../../saropa_lint_rule.dart';
 
 /// Warns when WorkManager task registration lacks constraints.
 ///
+/// Since: v2.2.0 | Updated: v4.13.0 | Rule version: v3
+///
 /// Alias: workmanager_constraints, require_task_constraints
 ///
 /// WorkManager tasks without constraints may run at inappropriate times,
@@ -55,7 +57,7 @@ class RequireWorkmanagerConstraintsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_workmanager_constraints',
     problemMessage:
-        '[require_workmanager_constraints] WorkManager task registered without constraints runs unconditionally regardless of network availability, battery level, or charging state. This drains battery during low-power conditions, consumes metered mobile data, and causes failed network connection requests when connectivity is unavailable, wasting battery, memory, and processing resources.',
+        '[require_workmanager_constraints] WorkManager task registered without constraints runs unconditionally regardless of network availability, battery level, or charging state. This drains battery during low-power conditions, consumes metered mobile data, and causes failed network connection requests when connectivity is unavailable, wasting battery, memory, and processing resources. {v3}',
     correctionMessage:
         'Add Constraints(networkType: NetworkType.connected) and optionally requiresBatteryNotLow or requiresCharging to control when background tasks execute.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -105,6 +107,8 @@ class RequireWorkmanagerConstraintsRule extends SaropaLintRule {
 
 /// Warns when WorkManager callback does not return a result.
 ///
+/// Since: v2.2.0 | Updated: v4.13.0 | Rule version: v2
+///
 /// Alias: workmanager_return_result, require_task_result
 ///
 /// WorkManager callbacks must return a bool (or `Future<bool>`) to indicate
@@ -143,7 +147,7 @@ class RequireWorkmanagerResultReturnRule extends SaropaLintRule {
     name: 'require_workmanager_result_return',
     problemMessage:
         '[require_workmanager_result_return] Missing return value makes '
-        'WorkManager assume failure, triggering unnecessary retries.',
+        'WorkManager assume failure, triggering unnecessary retries. {v2}',
     correctionMessage:
         'Return true/false from the executeTask callback to indicate success.',
     errorSeverity: DiagnosticSeverity.ERROR,
@@ -191,6 +195,8 @@ class RequireWorkmanagerResultReturnRule extends SaropaLintRule {
 
 /// Warns when workmanager is needed for reliable background tasks.
 ///
+/// Since: v2.4.0 | Updated: v4.13.0 | Rule version: v2
+///
 /// Dart isolates die when the app goes to background. For reliable
 /// background execution on iOS and Android, use the workmanager package.
 ///
@@ -233,7 +239,7 @@ class RequireWorkmanagerForBackgroundRule extends SaropaLintRule {
     name: 'require_workmanager_for_background',
     problemMessage:
         '[require_workmanager_for_background] Periodic task detected without workmanager. Dart isolates die when '
-        'app backgrounds. Use workmanager for reliable background tasks.',
+        'app backgrounds. Use workmanager for reliable background tasks. {v2}',
     correctionMessage:
         'Replace Timer.periodic with Workmanager().registerPeriodicTask() '
         'for reliable background execution.',

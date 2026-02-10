@@ -17,6 +17,11 @@ tmp_implemented.txt
 temp_output.txt
 dx_full.txt
 dx_audit_output.txt
+analyze_output*.txt
+format_output*.txt
+*analyze_output*.txt
+*format_output*.txt
+*format_errors*.txt
 
 # IDE
 .idea/
