@@ -3,6 +3,7 @@
 // ignore_for_file: prefer_const_constructors
 // ignore_for_file: unnecessary_import, unused_import
 // ignore_for_file: avoid_unused_constructor_parameters
+// ignore_for_file: prefer_async_callback
 // ignore_for_file: override_on_non_overriding_member
 // ignore_for_file: annotate_overrides, duplicate_ignore
 // ignore_for_file: non_abstract_class_inherits_abstract_member

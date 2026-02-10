@@ -115,14 +115,14 @@ final picker = ImagePicker();
 // expect_lint: require_image_picker_error_handling
 void _bad63() async {
   final image = await picker.pickImage(source: ImageSource.camera);
-  File file = File(image!.path); // Crash if cancelled!
+  File file = File(image!.path); // Crash if canceled!
 }
 
 // GOOD: Should NOT trigger require_image_picker_error_handling
 void _good63() async {
   try {
     final image = await picker.pickImage(source: ImageSource.camera);
-    if (image == null) return; // User cancelled
+    if (image == null) return; // User canceled
     File file = File(image.path);
   } catch (e) {
     // Handle permission error

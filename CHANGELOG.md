@@ -11,6 +11,14 @@ Dates are not included in version headers — [pub.dev](https://pub.dev/packages
 ** See the current published changelog: [saropa_lints/changelog](https://pub.dev/packages/saropa_lints/changelog)
 
 ---
+## [Unreleased]
+
+### Fixed
+
+- **`require_websocket_reconnection` false positive** (v4): Rule no longer fires on `WebSocket` and `WebSocketChannel` class definitions themselves; only classes that use WebSocket connections are checked
+- **Cross-rule noise in fixture files**: Added `ignore_for_file` directives to 8 example fixtures to suppress unrelated rule violations (e.g. `avoid_print_in_release` in `avoid_variable_shadowing_fixture.dart`)
+
+---
 ## [4.14.2]
 
 ### Added
@@ -281,8 +289,8 @@ Dates are not included in version headers — [pub.dev](https://pub.dev/packages
 
 ### Fixed
 
-- **`require_did_update_widget_check` reduced false positives**: Rule now recognises function-based comparisons (`listEquals`, `setEquals`, `mapEquals`, `identical`, `DeepCollectionEquality().equals`) as valid property-change checks. Previously the regex only matched `oldWidget` adjacent to `!=`/`==` operators, so standard Flutter collection comparisons were falsely flagged.
-- **`prefer_const_widgets_in_lists` reduced false positives**: Two fixes — (1) rule now verifies list elements are actually `Widget` subclasses instead of treating any `InstanceCreationExpression` as a widget, eliminating false positives on `List<Color>`, `List<Offset>`, `List<EdgeInsets>`, and other non-widget types with const constructors; (2) rule now recognises implicitly const lists inside `static const` fields, `const` variable declarations, enum bodies, annotations, and const constructor calls, instead of only checking for an explicit `const` keyword on the list literal itself.
+- **`require_did_update_widget_check` reduced false positives**: Rule now recognizes function-based comparisons (`listEquals`, `setEquals`, `mapEquals`, `identical`, `DeepCollectionEquality().equals`) as valid property-change checks. Previously the regex only matched `oldWidget` adjacent to `!=`/`==` operators, so standard Flutter collection comparisons were falsely flagged.
+- **`prefer_const_widgets_in_lists` reduced false positives**: Two fixes — (1) rule now verifies list elements are actually `Widget` subclasses instead of treating any `InstanceCreationExpression` as a widget, eliminating false positives on `List<Color>`, `List<Offset>`, `List<EdgeInsets>`, and other non-widget types with const constructors; (2) rule now recognizes implicitly const lists inside `static const` fields, `const` variable declarations, enum bodies, annotations, and const constructor calls, instead of only checking for an explicit `const` keyword on the list literal itself.
 - **`avoid_positioned_outside_stack` / `avoid_table_cell_outside_table` / `avoid_spacer_in_wrap` reduced false positives in builder callbacks**: `_findWidgetAncestor` now treats named-parameter callbacks (e.g. `BlocBuilder.builder`, `StreamBuilder.builder`, `Builder.builder`, `LayoutBuilder.builder`) as indeterminate boundaries. Previously the AST walk crossed callback boundaries and incorrectly flagged widgets whose runtime parent depends on the call site, not the builder widget itself. Also applied the same fix to the inline ancestor walk in `avoid_flex_child_outside_flex`.
 
 ---
@@ -332,7 +340,7 @@ Dates are not included in version headers — [pub.dev](https://pub.dev/packages
 
 ### Fixed
 
-- **`avoid_async_call_in_sync_function` reduced false positives**: Five improvements: (1) exempts `cancel()` and `close()` calls in lifecycle methods (`dispose()`, `didUpdateWidget()`, `deactivate()`) — these synchronous overrides cannot be made async, and subscription/controller cleanup is the standard idiomatic pattern; (2) recognises `.ignore()` as an explicit fire-and-forget chain alongside `.then()`, `.catchError()`, and `.whenComplete()`; (3) exempts `StreamController.close()` inside `onDone`/`onError` callbacks, which are `void Function()` and cannot use await; (4) walks through transparent expression wrappers (`ParenthesizedExpression`, `PostfixExpression`) to correctly detect handled Futures like `(asyncCall())` passed to argument lists; (5) refactored visitor into `_shouldReport()` for clarity. Added test fixture with BAD and GOOD cases covering `unawaited()`, lifecycle cleanup, `.ignore()` chains, and void callbacks.
+- **`avoid_async_call_in_sync_function` reduced false positives**: Five improvements: (1) exempts `cancel()` and `close()` calls in lifecycle methods (`dispose()`, `didUpdateWidget()`, `deactivate()`) — these synchronous overrides cannot be made async, and subscription/controller cleanup is the standard idiomatic pattern; (2) recognizes `.ignore()` as an explicit fire-and-forget chain alongside `.then()`, `.catchError()`, and `.whenComplete()`; (3) exempts `StreamController.close()` inside `onDone`/`onError` callbacks, which are `void Function()` and cannot use await; (4) walks through transparent expression wrappers (`ParenthesizedExpression`, `PostfixExpression`) to correctly detect handled Futures like `(asyncCall())` passed to argument lists; (5) refactored visitor into `_shouldReport()` for clarity. Added test fixture with BAD and GOOD cases covering `unawaited()`, lifecycle cleanup, `.ignore()` chains, and void callbacks.
 
 - **`avoid_late_for_nullable` reduced false positives**: Exempts `late final` fields with inline initializers (e.g. `late final Stream<bool>? _stream = _init()`). The `late` keyword provides lazy evaluation in this pattern — the initializer runs on first access, so `LateInitializationError` is impossible. The nullable return type carries semantic meaning and should not be flagged.
 
@@ -340,7 +348,7 @@ Dates are not included in version headers — [pub.dev](https://pub.dev/packages
 
 - **`avoid_unbounded_constraints` reduced false positives**: Three improvements: (1) checks only direct children for `Expanded`/`Flexible` via AST instead of string-matching the entire nested subtree, eliminating false positives on parent Columns that contain nested Rows with `Expanded`; (2) scroll-direction-aware — only flags when the widget axis matches the scroll axis (e.g. `Row` with `Expanded` in a vertical `SingleChildScrollView` is no longer flagged); (3) constraint widget detection (`ConstrainedBox`/`SizedBox`/`Container`) now only counts widgets between the Column/Row and the scroll view, not above it.
 
-- **`avoid_positioned_outside_stack` now recognises `Stack` subclasses**: The rule previously only matched the exact types `Stack` and `IndexedStack` by name. Widgets that extend `Stack` (e.g. `Indexer` from `package:indexed`) triggered a false positive. The rule now uses the analyzer type hierarchy (`allSupertypes`) to accept any subclass of `Stack` as a valid parent.
+- **`avoid_positioned_outside_stack` now recognizes `Stack` subclasses**: The rule previously only matched the exact types `Stack` and `IndexedStack` by name. Widgets that extend `Stack` (e.g. `Indexer` from `package:indexed`) triggered a false positive. The rule now uses the analyzer type hierarchy (`allSupertypes`) to accept any subclass of `Stack` as a valid parent.
 
 - **Platform-aware filtering for keyboard/focus/hover rules**: `avoid_gesture_only_interactions`, `require_focus_indicator`, and `avoid_hover_only` now respect the project's `platforms:` configuration. These rules enforce desktop/web-specific patterns (keyboard alternatives, focus indicators, hover alternatives) and are auto-disabled for mobile-only projects where they produced false positives. Also corrected `require_focus_indicator` tier grouping — moved from Recommended to Professional in `webPlatformRules` to match its actual tier assignment.
 

@@ -1,6 +1,7 @@
 // Test fixture for avoid_nested_assignments rule
 // ignore_for_file: unused_local_variable, prefer_const_declarations
 // ignore_for_file: prefer_final_locals, dead_code, unused_element
+// ignore_for_file: avoid_variable_shadowing
 
 int _next(int i) => i + 1;
 

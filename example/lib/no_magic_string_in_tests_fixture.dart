@@ -1,4 +1,6 @@
 // Test fixture for no_magic_string_in_tests rule
+// ignore_for_file: avoid_hardcoded_config, avoid_api_key_in_code
+// ignore_for_file: avoid_hardcoded_credentials
 
 void badExamples() {
   // LINT: Domain-specific strings should be named constants
