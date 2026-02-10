@@ -4157,7 +4157,8 @@ class AvoidCommentedOutCodeRule extends SaropaLintRule {
     name: 'prefer_no_commented_out_code',
     problemMessage:
         '[prefer_no_commented_out_code] Commented-out code clutters the codebase. '
-        'Delete it - git preserves history. {v4}',
+        'Delete it - git preserves history. Prose comments and special markers '
+        'like TODO, FIXME, and test directives are automatically skipped. {v5}',
     correctionMessage:
         'Delete the commented-out code. Use version control to retrieve it if needed.',
     errorSeverity: DiagnosticSeverity.INFO,
