@@ -25,7 +25,7 @@ class CommentPatterns {
   /// Pattern to detect commented-out code.
   ///
   /// This pattern detects common code constructs:
-  /// - Identifier followed by code punctuation: `foo.bar`, `x = 5`
+  /// - Identifier followed by code punctuation: `foo.bar`, `foo(`, `foo[`
   /// - Control flow with parens/blocks: `if (`, `for (`, `while {`
   /// - Simple statements: `return x`, `break;`, `throw error`
   /// - Declarations: `final x`, `const y`, `class Foo`
@@ -44,8 +44,10 @@ class CommentPatterns {
   /// - `return when done` ✓ prose (not followed by identifier/semicolon)
   /// - `true means success` ✓ prose (not followed by code punctuation)
   static final RegExp codePattern = RegExp(
-    // Identifier immediately followed by code punctuation (no space)
-    r'^[a-zA-Z_$][a-zA-Z0-9_$]*[:\.\(\[\{]|'
+    // Identifier immediately followed by code punctuation (no space).
+    // Colon excluded: prose labels (OK:, BAD:, LINT:) cause too many false
+    // positives. Dart loop labels (outerLoop:) are caught by keyword patterns.
+    r'^[a-zA-Z_$][a-zA-Z0-9_$]*[\.\(\[\{]|'
     // Assignment pattern: identifier = something
     r'^[a-zA-Z_$][a-zA-Z0-9_$]*\s*=\s*\S|'
     // Control flow keywords followed by opening paren or block
@@ -80,11 +82,11 @@ class CommentPatterns {
   ///
   /// These are intentional comments, not commented-out code:
   /// - TODO/FIXME/NOTE/HACK markers
-  /// - Lint ignore directives
+  /// - Lint ignore and expect directives
   /// - Spell checker directives
   /// - Documentation references
   static final RegExp specialMarkerPattern = RegExp(
-    r'(TODO|FIXME|FIX|NOTE|HACK|XXX|BUG|OPTIMIZE|WARNING|CHANGED|REVIEW|DEPRECATED|IMPORTANT|MARK|See:|ignore:|ignore_for_file:|cspell:)',
+    r'(TODO|FIXME|FIX|NOTE|HACK|XXX|BUG|OPTIMIZE|WARNING|CHANGED|REVIEW|DEPRECATED|IMPORTANT|MARK|See:|ignore:|ignore_for_file:|expect_lint:|cspell:)',
     caseSensitive: false,
   );
 

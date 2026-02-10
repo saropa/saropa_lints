@@ -148,4 +148,10 @@ void edgeCases() {
   // Punctuation at start
   // - list item
   // * bullet point
+
+  // Prose labels with colons are NOT code
+  // OK: This value is allowed
+  // BAD: This should not be done
+  // GOOD: Preferred approach
+  // LINT: Description of why this triggers
 }

@@ -109,4 +109,8 @@ void edgeCases() {
   // URLs and file paths often look like code
   // /path/to/file.dart - starts with /
   // https://example.com - starts with protocol
+
+  // Continuation comments on consecutive lines are NOT flagged
+  // even when the second line starts with lowercase,
+  // because it continues the thought from the previous line
 }

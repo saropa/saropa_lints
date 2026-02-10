@@ -11,7 +11,7 @@ Dates are not included in version headers — [pub.dev](https://pub.dev/packages
 ** See the current published changelog: [saropa_lints/changelog](https://pub.dev/packages/saropa_lints/changelog)
 
 ---
-## [Unreleased]
+## [4.14.2]
 
 ### Added
 
@@ -35,6 +35,9 @@ Dates are not included in version headers — [pub.dev](https://pub.dev/packages
 
 - **British spellings corrected**: Fixed UK spellings to US English in `prefer_fields_before_methods` correction message, `db_yield_rules` comment, and several CHANGELOG entries
 - **TODO audit path separator**: Fixed hardcoded backslash in TODO log grouping to use `os.sep` for cross-platform compatibility
+- **`prefer_no_commented_out_code` false positives** (v5): Prose labels like `OK:`, `BAD:`, `GOOD:`, `LINT:` no longer falsely flagged as code. Removed colon from code detection pattern and added `expect_lint:` to special markers
+- **`prefer_capitalized_comment_start` false positive** (v4): Continuation comments on consecutive lines no longer flagged for lowercase start
+- **`prefer_explicit_type_arguments` false positives** (v6): Empty collections (`[]`, `{}`) with types inferred from context (return type, variable declaration) are no longer flagged
 
 ---
 ## [4.14.1]

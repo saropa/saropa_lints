@@ -124,3 +124,8 @@ void _good1244() {
   final map = <String, int>{};
   final future = Future<int>.value(1);
 }
+
+// GOOD: Type inferred from context (return type provides type arguments)
+List<int> _good1245() => [];
+Map<String, int> _good1246() => {};
+Future<List<int>> _good1247() async => [];
