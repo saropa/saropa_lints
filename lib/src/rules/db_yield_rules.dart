@@ -49,7 +49,7 @@ enum _DbOperationType {
 }
 
 /// Classifies the awaited expression as a DB/IO operation, or returns `null`
-/// if the expression is not recognised as a heavy I/O call.
+/// if the expression is not recognized as a heavy I/O call.
 _DbOperationType? _classifyDbAwait(AwaitExpression awaitExpr) {
   final expr = awaitExpr.expression;
   if (expr is! MethodInvocation) return null;

@@ -45,6 +45,7 @@ def run_pre_publish_audits(project_dir: Path) -> bool:
       - Tier integrity: orphans, phantoms, multi-tier, misplaced opinionated
       - Duplicate rule names, class names, or aliases
       - Missing [rule_name] prefix in problemMessage
+      - British English spellings (US English required)
 
     INFORMATIONAL checks (warn but don't block):
       - DX message quality
@@ -95,6 +96,13 @@ def run_pre_publish_audits(project_dir: Path) -> bool:
         print_error(
             f"Blocking audit issues: {'; '.join(issues)}."
         )
+        return False
+
+    # --- BLOCKING: US English spelling check ---
+    from scripts.modules._us_spelling import check_us_spelling
+
+    spelling_hits = check_us_spelling(project_dir)
+    if spelling_hits:
         return False
 
     # --- INFORMATIONAL: DX message improvement analysis ---

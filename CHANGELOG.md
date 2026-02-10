@@ -11,6 +11,17 @@ Dates are not included in version headers — [pub.dev](https://pub.dev/packages
 ** See the current published changelog: [saropa_lints/changelog](https://pub.dev/packages/saropa_lints/changelog)
 
 ---
+## [Unreleased]
+
+### Added
+
+- **US English spelling check** in publish pipeline: New `_us_spelling.py` module with ~90+ UK-to-US spelling pairs scans all source files for British English and blocks publish until fixed. Integrated as a blocking pre-publish audit step
+
+### Fixed
+
+- **British spellings corrected**: Fixed UK spellings to US English in `prefer_fields_before_methods` correction message, `db_yield_rules` comment, and several CHANGELOG entries
+
+---
 ## [4.14.1]
 
 ### Changed
@@ -21,7 +32,7 @@ Dates are not included in version headers — [pub.dev](https://pub.dev/packages
 
 ### Added
 
-- **Unit test coverage for 10 rule categories** (1256 tests): Behaviour documentation tests for `widget_patterns` (101 rules), `code_quality` (100 rules), `ios` (89 rules), `widget_layout` (73 rules), `security` (53 rules), `async` (46 rules), `bloc` (52 rules), `riverpod` (37 rules), `provider` (27 rules), and `firebase` (25 rules) — covering fixture verification and expected trigger/no-trigger patterns
+- **Unit test coverage for 10 rule categories** (1256 tests): Behavior documentation tests for `widget_patterns` (101 rules), `code_quality` (100 rules), `ios` (89 rules), `widget_layout` (73 rules), `security` (53 rules), `async` (46 rules), `bloc` (52 rules), `riverpod` (37 rules), `provider` (27 rules), and `firebase` (25 rules) — covering fixture verification and expected trigger/no-trigger patterns
 - **Unit test coverage metric** in publish workflow: New `display_unit_test_coverage` report shows per-category test file status alongside the existing fixture coverage metric
 - **Structured JSON violation export** (`reports/.saropa_lints/violations.json`): Machine-readable export of all lint violations written alongside the markdown report after each analysis run. Enables Saropa Log Capture to cross-reference runtime errors with static analysis findings. Schema v1.0 includes per-violation OWASP mappings, correction messages, impact levels, severity, plus aggregate `issuesByFile`, `issuesByRule`, `ruleSeverities`, `enabledRuleNames`, `disabledPackages`, `userExclusions`, and `batchCount`
 - **`VIOLATION_EXPORT_API.md`**: Exhaustive API reference for the structured JSON export schema — field types, sort order, OWASP ID tables, consumer notes, and full examples
@@ -240,8 +251,8 @@ Dates are not included in version headers — [pub.dev](https://pub.dev/packages
 
 - **`avoid_nested_assignments` reduced false positives on arrow function bodies**: Rule now skips `ExpressionFunctionBody` parents — `setState(() => _field = value)` and other arrow functions whose sole body is an assignment are no longer flagged. The arrow syntax `() => x = value` is semantically equivalent to `() { x = value; }`, which was already correctly skipped. Also downgraded severity from WARNING to INFO.
 - **`require_intl_currency_format` reduced false positives on non-currency interpolations**: The `StringInterpolation` handler used `node.toSource()` to check for currency symbols, but every interpolated string's source representation contains `$` (Dart's interpolation syntax), causing `r'$'` in `_currencySymbols` to always match. This made the rule flag any `toStringAsFixed()` inside a string interpolation — compass bearings, GPS coordinates, temperatures, percentages, etc. — as manual currency formatting. The fix checks only the literal text segments (`InterpolationString.value`) for currency symbols, consistent with how the `BinaryExpression` handler already works.
-- **`prefer_implicit_boolean_comparison` reduced false positives on nullable booleans**: Rule now checks the static type of the left operand and only fires when it is non-nullable `bool`. Previously the rule flagged `== true` / `== false` on `bool?` operands, where the explicit comparison is semantically necessary — removing it either causes a compile error or changes runtime behaviour (treating `null` the same as `false`). This also resolves a conflict with the sibling rule `prefer_explicit_boolean_comparison`, which recommends `== true` for nullable booleans.
-- **`prefer_stream_distinct` reduced false positives**: Three fixes — (1) rule now skips `Stream<void>` and `Stream<Null>` where `.distinct()` would suppress all events after the first (breaks `Stream.periodic` timers and signal-only streams like Isar's `watchLazy()`); (2) chain detection now walks the full method invocation chain instead of only checking the immediate parent, so `stream.distinct().map(f).listen(...)` is correctly recognised as already having `.distinct()`; (3) replaced string-based type matching (`getDisplayString().contains('Stream')`) with proper `InterfaceType` checking to avoid false matches on non-stream types.
+- **`prefer_implicit_boolean_comparison` reduced false positives on nullable booleans**: Rule now checks the static type of the left operand and only fires when it is non-nullable `bool`. Previously the rule flagged `== true` / `== false` on `bool?` operands, where the explicit comparison is semantically necessary — removing it either causes a compile error or changes runtime behavior (treating `null` the same as `false`). This also resolves a conflict with the sibling rule `prefer_explicit_boolean_comparison`, which recommends `== true` for nullable booleans.
+- **`prefer_stream_distinct` reduced false positives**: Three fixes — (1) rule now skips `Stream<void>` and `Stream<Null>` where `.distinct()` would suppress all events after the first (breaks `Stream.periodic` timers and signal-only streams like Isar's `watchLazy()`); (2) chain detection now walks the full method invocation chain instead of only checking the immediate parent, so `stream.distinct().map(f).listen(...)` is correctly recognized as already having `.distinct()`; (3) replaced string-based type matching (`getDisplayString().contains('Stream')`) with proper `InterfaceType` checking to avoid false matches on non-stream types.
 - **`prefer_edgeinsets_symmetric` reduced false positives**: Detection logic now matches the quick-fix validation — the rule no longer fires on `EdgeInsets.only()` calls that have a symmetric pair (e.g. `top == bottom`) but also contain an unpaired side (e.g. `right` without `left`) or a non-symmetric axis (e.g. `top != bottom`), since `EdgeInsets.symmetric()` cannot express these cases without chaining `.copyWith()`.
 
 ---

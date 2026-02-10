@@ -5,7 +5,7 @@
 The `prefer_implicit_boolean_comparison` rule fires on `== true` and `== false`
 comparisons where the left operand is a **nullable** `bool?`. In these cases the
 explicit comparison is semantically necessary — removing it either changes
-behaviour or produces a compile error. The rule should only fire when the left
+behavior or produces a compile error. The rule should only fire when the left
 operand is a non-nullable `bool`.
 
 ## Severity
