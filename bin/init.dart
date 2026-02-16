@@ -7,10 +7,10 @@ library;
 ///
 /// ## Purpose
 ///
-/// The `custom_lint` plugin has a known limitation where YAML configuration
-/// (like `tier: recommended`) is not reliably passed to plugins. This tool
-/// bypasses that limitation by generating explicit `- rule_name: true/false`
-/// entries for ALL saropa_lints rules.
+/// The native analyzer plugin system requires lint rules to be explicitly
+/// enabled in the `diagnostics:` section. This tool generates the full
+/// `plugins: saropa_lints: diagnostics:` configuration with explicit
+/// `rule_name: true/false` entries for ALL saropa_lints rules.
 ///
 /// ## Usage
 ///
@@ -40,8 +40,8 @@ library;
 /// ## Preservation Behavior
 ///
 /// When regenerating an existing file, this tool preserves:
-/// - All non-custom_lint sections (analyzer, linter, formatter, etc.)
-/// - User customizations in custom_lint.rules (unless --reset is used)
+/// - All non-plugins sections (analyzer, linter, formatter, etc.)
+/// - User customizations in plugins.saropa_lints.diagnostics (unless --reset)
 ///
 /// User customizations appear first in the generated output, making it easy
 /// to see which rules have been manually configured.
@@ -427,18 +427,15 @@ RuleTier _getRuleTierFromMetadata(String ruleName) {
 // Regex patterns (defined once, used in multiple places)
 // ---------------------------------------------------------------------------
 
-/// Matches the `custom_lint:` section header in YAML.
-final RegExp _customLintSectionPattern = RegExp(
-  r'^custom_lint:\s*$',
-  multiLine: true,
-);
+/// Matches the `plugins:` section header in YAML.
+final RegExp _pluginsSectionPattern = RegExp(r'^plugins:\s*$', multiLine: true);
 
 /// Matches any top-level YAML key (for finding section boundaries).
 final RegExp _topLevelKeyPattern = RegExp(r'^\w+:', multiLine: true);
 
-/// Matches rule entries like `- rule_name: true` or `- rule_name: false`.
+/// Matches rule entries like `rule_name: true` or `rule_name: false`.
 final RegExp _ruleEntryPattern = RegExp(
-  r'^\s+-\s+(\w+):\s*(true|false)',
+  r'^\s+(\w+):\s*(true|false)',
   multiLine: true,
 );
 
@@ -954,8 +951,8 @@ Future<void> main(List<String> args) async {
   }
   _logTerminal('');
 
-  // Generate the new custom_lint section with proper formatting
-  final String customLintYaml = _generateCustomLintYaml(
+  // Generate the new plugins section with proper formatting
+  final String pluginsYaml = _generatePluginsYaml(
     tier: tier,
     enabledRules: finalEnabled,
     disabledRules: finalDisabled,
@@ -966,10 +963,10 @@ Future<void> main(List<String> args) async {
     packageSettings: packageSettings,
   );
 
-  // Replace custom_lint section in existing content, preserving everything else
-  final String newContent = _replaceCustomLintSection(
+  // Replace plugins section in existing content, preserving everything else
+  final String newContent = _replacePluginsSection(
     existingContent,
-    customLintYaml,
+    pluginsYaml,
   );
 
   if (cliArgs.dryRun) {
@@ -979,8 +976,8 @@ Future<void> main(List<String> args) async {
     );
     _logTerminal('');
 
-    // Show preview of custom_lint section only
-    final List<String> lines = customLintYaml.split('\n');
+    // Show preview of plugins section only
+    final List<String> lines = pluginsYaml.split('\n');
     const int previewLines = 100;
     _logTerminal(
       '${_Colors.bold}Preview${_Colors.reset} ${_Colors.dim}(first $previewLines of ${lines.length} lines):${_Colors.reset}',
@@ -1035,16 +1032,14 @@ Future<void> main(List<String> args) async {
 
     if (response == 'y' || response == 'yes') {
       _logTerminal('');
-      _logTerminal(
-        '🚀 ${_Colors.bold}Running: dart run custom_lint${_Colors.reset}',
-      );
+      _logTerminal('🚀 ${_Colors.bold}Running: dart analyze${_Colors.reset}');
       _logTerminal('${'─' * 60}');
 
       // Run with inheritStdio for real-time output streaming
       // Must await to prevent parent exit from killing child process
       final process = await Process.start(
         'dart',
-        ['run', 'custom_lint'],
+        ['analyze'],
         mode: ProcessStartMode.inheritStdio,
         runInShell: true,
       );
@@ -1195,12 +1190,12 @@ void _createCustomOverridesFile(File file) {
 #   report log only (reports/<timestamp>_saropa_lint_report.log).
 #   - Default: 500
 #   - Set to 0 for unlimited (all issues in Problems tab)
-#   - Override per-run: SAROPA_LINTS_MAX=200 dart run custom_lint
+#   - Override per-run: SAROPA_LINTS_MAX=200 dart analyze
 #
 # output: Where violations are sent.
 #   - "both"  (default) — Problems tab + report file
 #   - "file"  — Report file only (nothing in Problems tab)
-#   - Override per-run: SAROPA_LINTS_OUTPUT=file dart run custom_lint
+#   - Override per-run: SAROPA_LINTS_OUTPUT=file dart analyze
 
 max_issues: 500
 output: both
@@ -1292,12 +1287,12 @@ String _addAnalysisSettingsBlock(String content) {
 #   report log only (reports/<timestamp>_saropa_lint_report.log).
 #   - Default: 500
 #   - Set to 0 for unlimited (all issues in Problems tab)
-#   - Override per-run: SAROPA_LINTS_MAX=200 dart run custom_lint
+#   - Override per-run: SAROPA_LINTS_MAX=200 dart analyze
 #
 # output: Where violations are sent.
 #   - "both"  (default) — Problems tab + report file
 #   - "file"  — Report file only (nothing in Problems tab)
-#   - Override per-run: SAROPA_LINTS_OUTPUT=file dart run custom_lint
+#   - Override per-run: SAROPA_LINTS_OUTPUT=file dart analyze
 
 max_issues: 500
 output: both
@@ -1328,7 +1323,7 @@ String _addOutputSetting(String content) {
 # output: Where violations are sent.
 #   - "both"  (default) — Problems tab + report file
 #   - "file"  — Report file only (nothing in Problems tab)
-#   - Override per-run: SAROPA_LINTS_OUTPUT=file dart run custom_lint
+#   - Override per-run: SAROPA_LINTS_OUTPUT=file dart analyze
 output: both
 
 ''';
@@ -1830,10 +1825,10 @@ Map<String, bool> _extractPackagesFromFile(File file) {
   return packages;
 }
 
-/// Generate the custom_lint YAML section with proper formatting.
+/// Generate the plugins YAML section with proper formatting.
 ///
 /// Organizes rules by tier with problem message comments.
-String _generateCustomLintYaml({
+String _generatePluginsYaml({
   required String tier,
   required Set<String> enabledRules,
   required Set<String> disabledRules,
@@ -1846,41 +1841,46 @@ String _generateCustomLintYaml({
   final StringBuffer buffer = StringBuffer();
   final customizedRuleNames = userCustomizations.keys.toSet();
 
-  buffer.writeln('custom_lint:');
+  buffer.writeln('plugins:');
+  buffer.writeln('  saropa_lints:');
   buffer.writeln(
-    '  # ═══════════════════════════════════════════════════════════════════════',
+    '    # ═══════════════════════════════════════════════════════════════════',
   );
-  buffer.writeln('  # SAROPA LINTS CONFIGURATION');
+  buffer.writeln('    # SAROPA LINTS CONFIGURATION');
   buffer.writeln(
-    '  # ═══════════════════════════════════════════════════════════════════════',
-  );
-  buffer.writeln(
-    '  # Regenerate with: dart run saropa_lints:init --tier $tier',
+    '    # ═══════════════════════════════════════════════════════════════════',
   );
   buffer.writeln(
-    '  # Tier: $tier (${enabledRules.length} of ${allRules.length} rules enabled)',
+    '    # Regenerate with: dart run saropa_lints:init --tier $tier',
   );
   buffer.writeln(
-    '  # custom_lint enables ALL rules by default. To disable a rule, set it to false.',
+    '    # Tier: $tier (${enabledRules.length} of ${allRules.length} rules enabled)',
   );
   buffer.writeln(
-    '  # User customizations are preserved unless --reset is used',
-  );
-  buffer.writeln('  #');
-  buffer.writeln('  # Tiers (cumulative):');
-  buffer.writeln(
-    '  #   1. essential    - Critical: crashes, security, memory leaks',
+    '    # Lint rules are disabled by default. Set to true to enable.',
   );
   buffer.writeln(
-    '  #   2. recommended  - Essential + accessibility, performance',
+    '    # User customizations are preserved unless --reset is used',
   );
-  buffer.writeln('  #   3. professional - Recommended + architecture, testing');
-  buffer.writeln('  #   4. comprehensive - Professional + thorough coverage');
+  buffer.writeln('    #');
+  buffer.writeln('    # Tiers (cumulative):');
   buffer.writeln(
-    '  #   5. pedantic     - All rules (pedantic, highly opinionated)',
+    '    #   1. essential    - Critical: crashes, security, memory leaks',
   );
-  buffer.writeln('  #   +  stylistic    - Opt-in only (formatting, ordering)');
-  buffer.writeln('  #');
+  buffer.writeln(
+    '    #   2. recommended  - Essential + accessibility, performance',
+  );
+  buffer.writeln(
+    '    #   3. professional - Recommended + architecture, testing',
+  );
+  buffer.writeln('    #   4. comprehensive - Professional + thorough coverage');
+  buffer.writeln(
+    '    #   5. pedantic     - All rules (pedantic, highly opinionated)',
+  );
+  buffer.writeln(
+    '    #   +  stylistic    - Opt-in only (formatting, ordering)',
+  );
+  buffer.writeln('    #');
 
   // Show platform status
   final disabledPlatforms = platformSettings.entries
@@ -1888,8 +1888,8 @@ String _generateCustomLintYaml({
       .map((e) => e.key)
       .toList();
   if (disabledPlatforms.isNotEmpty) {
-    buffer.writeln('  # Disabled platforms: ${disabledPlatforms.join(', ')}');
-    buffer.writeln('  #');
+    buffer.writeln('    # Disabled platforms: ${disabledPlatforms.join(', ')}');
+    buffer.writeln('    #');
   }
 
   // Show package status
@@ -1898,27 +1898,27 @@ String _generateCustomLintYaml({
       .map((e) => e.key)
       .toList();
   if (disabledPackages.isNotEmpty) {
-    buffer.writeln('  # Disabled packages: ${disabledPackages.join(', ')}');
-    buffer.writeln('  #');
+    buffer.writeln('    # Disabled packages: ${disabledPackages.join(', ')}');
+    buffer.writeln('    #');
   }
 
   buffer.writeln(
-    '  # Settings (max_issues, platforms, packages) are in analysis_options_custom.yaml',
+    '    # Settings (max_issues, platforms, packages) are in analysis_options_custom.yaml',
   );
   buffer.writeln(
-    '  # ═══════════════════════════════════════════════════════════════════════',
+    '    # ═══════════════════════════════════════════════════════════════════',
   );
   buffer.writeln('');
-  buffer.writeln('  rules:');
+  buffer.writeln('    diagnostics:');
 
   // Section 1: User customizations (always at top, preserved)
   if (userCustomizations.isNotEmpty) {
     buffer.writeln(_sectionHeader('USER CUSTOMIZATIONS', '~'));
     buffer.writeln(
-      '    # These rules have been manually configured and will be preserved',
+      '      # These rules have been manually configured and will be preserved',
     );
     buffer.writeln(
-      '    # when regenerating. Use --reset to discard these customizations.',
+      '      # when regenerating. Use --reset to discard these customizations.',
     );
     buffer.writeln('');
 
@@ -1928,7 +1928,7 @@ String _generateCustomLintYaml({
       final bool enabled = userCustomizations[rule]!;
       final String msg = _getProblemMessage(rule);
       final String severity = _getRuleSeverity(rule);
-      buffer.writeln('    - $rule: $enabled  # [$severity] $msg');
+      buffer.writeln('      $rule: $enabled  # [$severity] $msg');
     }
     buffer.writeln('');
   }
@@ -1971,15 +1971,15 @@ String _generateCustomLintYaml({
 
     final tierName = _tierToString(tierLevel).toUpperCase();
     final tierNum = _tierIndex(tierLevel) + 1;
-    buffer.writeln('    #');
+    buffer.writeln('      #');
     buffer.writeln(
-      '    # --- TIER $tierNum: $tierName (${rules.length} rules) ---',
+      '      # --- TIER $tierNum: $tierName (${rules.length} rules) ---',
     );
-    buffer.writeln('    #');
+    buffer.writeln('      #');
     for (final String rule in rules) {
       final String msg = _getProblemMessage(rule);
       final String severity = _getRuleSeverity(rule);
-      buffer.writeln('    - $rule: true  # [$severity] $msg');
+      buffer.writeln('      $rule: true  # [$severity] $msg');
     }
     buffer.writeln('');
   }
@@ -1990,46 +1990,46 @@ String _generateCustomLintYaml({
 
   if (stylisticEnabled.isNotEmpty || stylisticDisabled.isNotEmpty) {
     buffer.writeln(_sectionHeader('STYLISTIC RULES (opt-in)', '~'));
-    buffer.writeln('    # Formatting, ordering, naming conventions.');
+    buffer.writeln('      # Formatting, ordering, naming conventions.');
     buffer.writeln(
-      '    # Enable with: dart run saropa_lints:init --tier <tier> --stylistic',
+      '      # Enable with: dart run saropa_lints:init --tier <tier> --stylistic',
     );
     buffer.writeln('');
 
     if (stylisticEnabled.isNotEmpty) {
-      buffer.writeln('    #');
+      buffer.writeln('      #');
       buffer.writeln(
-        '    # ┌───────────────────────────────────────────────────────────────────────┐',
+        '      # ┌─────────────────────────────────────────────────────────────────┐',
       );
       buffer.writeln(
-        '    # │  ✓ ENABLED STYLISTIC (${stylisticEnabled.length} rules)${' ' * (47 - stylisticEnabled.length.toString().length)}│',
+        '      # │  ✓ ENABLED STYLISTIC (${stylisticEnabled.length} rules)${' ' * (43 - stylisticEnabled.length.toString().length)}│',
       );
       buffer.writeln(
-        '    # └───────────────────────────────────────────────────────────────────────┘',
+        '      # └─────────────────────────────────────────────────────────────────┘',
       );
-      buffer.writeln('    #');
+      buffer.writeln('      #');
       for (final String rule in stylisticEnabled) {
         final String msg = _getProblemMessage(rule);
-        buffer.writeln('    - $rule: true  # $msg');
+        buffer.writeln('      $rule: true  # $msg');
       }
       buffer.writeln('');
     }
 
     if (stylisticDisabled.isNotEmpty) {
-      buffer.writeln('    #');
+      buffer.writeln('      #');
       buffer.writeln(
-        '    # ┌───────────────────────────────────────────────────────────────────────┐',
+        '      # ┌─────────────────────────────────────────────────────────────────┐',
       );
       buffer.writeln(
-        '    # │  ✗ DISABLED STYLISTIC (${stylisticDisabled.length} rules)${' ' * (46 - stylisticDisabled.length.toString().length)}│',
+        '      # │  ✗ DISABLED STYLISTIC (${stylisticDisabled.length} rules)${' ' * (42 - stylisticDisabled.length.toString().length)}│',
       );
       buffer.writeln(
-        '    # └───────────────────────────────────────────────────────────────────────┘',
+        '      # └─────────────────────────────────────────────────────────────────┘',
       );
-      buffer.writeln('    #');
+      buffer.writeln('      #');
       for (final String rule in stylisticDisabled) {
         final String msg = _getProblemMessage(rule);
-        buffer.writeln('    - $rule: false  # $msg');
+        buffer.writeln('      $rule: false  # $msg');
       }
       buffer.writeln('');
     }
@@ -2046,10 +2046,10 @@ String _generateCustomLintYaml({
 
   if (hasDisabledNonStylistic) {
     buffer.writeln(_sectionHeader('DISABLED RULES (above $tier tier)', '-'));
-    buffer.writeln('    # These rules are in higher tiers. To enable:');
-    buffer.writeln('    #   1. Choose a higher tier with --tier <tier>');
+    buffer.writeln('      # These rules are in higher tiers. To enable:');
+    buffer.writeln('      #   1. Choose a higher tier with --tier <tier>');
     buffer.writeln(
-      '    #   2. Or manually set to true in USER CUSTOMIZATIONS above',
+      '      #   2. Or manually set to true in USER CUSTOMIZATIONS above',
     );
     buffer.writeln('');
 
@@ -2066,21 +2066,21 @@ String _generateCustomLintYaml({
 
       final tierName = _tierToString(tierLevel).toUpperCase();
       final tierNum = _tierIndex(tierLevel) + 1;
-      buffer.writeln('    #');
+      buffer.writeln('      #');
       buffer.writeln(
-        '    # ┌ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ┐',
+        '      # ┌ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ┐',
       );
       buffer.writeln(
-        '    #   TIER $tierNum: $tierName (${rules.length} rules disabled)',
+        '      #   TIER $tierNum: $tierName (${rules.length} rules disabled)',
       );
       buffer.writeln(
-        '    # └ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ┘',
+        '      # └ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ┘',
       );
-      buffer.writeln('    #');
+      buffer.writeln('      #');
       for (final String rule in rules) {
         final String msg = _getProblemMessage(rule);
         final String severity = _getRuleSeverity(rule);
-        buffer.writeln('    - $rule: false  # [$severity] $msg');
+        buffer.writeln('      $rule: false  # [$severity] $msg');
       }
       buffer.writeln('');
     }
@@ -2092,70 +2092,68 @@ String _generateCustomLintYaml({
 /// Generate a clear, visible section header for YAML.
 String _sectionHeader(String title, String char) {
   final String upperTitle = title.toUpperCase();
-  const int width = 76;
+  const int width = 72;
 
   if (char == '=') {
     // ENABLED RULES - Double-line box
     return '''
-    #
-    # ${'═' * width}
-    #   ✓ $upperTitle
-    # ${'═' * width}
-    #''';
+      #
+      # ${'═' * width}
+      #   ✓ $upperTitle
+      # ${'═' * width}
+      #''';
   } else if (char == '~') {
     // STYLISTIC or USER CUSTOMIZATIONS - Wavy pattern
     return '''
-    #
-    # ${'~' * width}
-    #   ◆ $upperTitle
-    # ${'~' * width}
-    #''';
+      #
+      # ${'~' * width}
+      #   ◆ $upperTitle
+      # ${'~' * width}
+      #''';
   } else {
     // DISABLED RULES - Dashed pattern
     return '''
-    #
-    # ${'-' * width}
-    #   ✗ $upperTitle
-    # ${'-' * width}
-    #''';
+      #
+      # ${'-' * width}
+      #   ✗ $upperTitle
+      # ${'-' * width}
+      #''';
   }
 }
 
-/// Replace the custom_lint section in existing content, preserving everything else.
-String _replaceCustomLintSection(String existingContent, String newCustomLint) {
+/// Replace the plugins section in existing content, preserving everything else.
+String _replacePluginsSection(String existingContent, String newPlugins) {
   if (existingContent.isEmpty) {
-    return newCustomLint;
+    return newPlugins;
   }
 
-  // Find custom_lint: section
-  final Match? customLintMatch = _customLintSectionPattern.firstMatch(
+  // Find plugins: section
+  final Match? customLintMatch = _pluginsSectionPattern.firstMatch(
     existingContent,
   );
 
   if (customLintMatch == null) {
-    // No existing custom_lint section - append to end
-    return '$existingContent\n$newCustomLint';
+    // No existing plugins section - append to end
+    return '$existingContent\n$newPlugins';
   }
 
-  // Find the end of the custom_lint section (next top-level key or end of file)
-  final String beforeCustomLint = existingContent.substring(
+  // Find the end of the plugins section (next top-level key or end of file)
+  final String beforePlugins = existingContent.substring(
     0,
     customLintMatch.start,
   );
-  final String afterCustomLintStart = existingContent.substring(
+  final String afterPluginsStart = existingContent.substring(
     customLintMatch.end,
   );
 
   // Find next top-level section (line starting with a word followed by colon, no indentation)
-  final Match? nextSection = _topLevelKeyPattern.firstMatch(
-    afterCustomLintStart,
-  );
+  final Match? nextSection = _topLevelKeyPattern.firstMatch(afterPluginsStart);
 
-  final String afterCustomLint = nextSection != null
-      ? afterCustomLintStart.substring(nextSection.start)
+  final String afterPlugins = nextSection != null
+      ? afterPluginsStart.substring(nextSection.start)
       : '';
 
-  return '$beforeCustomLint$newCustomLint\n$afterCustomLint';
+  return '$beforePlugins$newPlugins\n$afterPlugins';
 }
 
 /// Struct for parsed CLI arguments.
@@ -2245,12 +2243,12 @@ void _printUsage() {
 
 Saropa Lints Configuration Generator
 
-Generates analysis_options.yaml with explicit rule configuration,
-bypassing custom_lint's limited plugin config support.
+Generates analysis_options.yaml with explicit rule configuration
+for the native analyzer plugin system.
 
 IMPORTANT: This tool preserves:
-  - All non-custom_lint sections (analyzer, linter, formatter, etc.)
-  - User customizations in custom_lint.rules (unless --reset is used)
+  - All non-plugins sections (analyzer, linter, formatter, etc.)
+  - User customizations in plugins.saropa_lints.diagnostics (unless --reset)
 
 Usage: dart run saropa_lints:init [options]
 
@@ -2273,6 +2271,6 @@ Examples:
   dart run saropa_lints:init --tier pedantic --stylistic
   dart run saropa_lints:init --dry-run
 
-After generating, run `dart run custom_lint` to verify.
+After generating, run `dart analyze` to verify.
 ''');
 }

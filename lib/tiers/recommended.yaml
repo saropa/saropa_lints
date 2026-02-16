@@ -8,128 +8,129 @@
 
 include: package:saropa_lints/tiers/essential.yaml
 
-custom_lint:
-  rules:
-    # =========================================================================
-    # PERFORMANCE - Faster app, better battery
-    # =========================================================================
-    avoid_expensive_build: true
-    avoid_listview_without_item_extent: true
-    avoid_shrink_wrap_in_lists: true
-    avoid_mediaquery_in_build: true
-    prefer_dedicated_media_query_method: true
-    avoid_singlechildscrollview_with_column: true
-    avoid_stateful_widget_in_list: true
-    prefer_cached_network_image: true
-    avoid_controller_in_build: true
-    avoid_regex_in_loop: true
-    prefer_const_string_list: true
-    prefer_const_widgets_in_lists: true
+plugins:
+  saropa_lints:
+    diagnostics:
+      # =========================================================================
+      # PERFORMANCE - Faster app, better battery
+      # =========================================================================
+      avoid_expensive_build: true
+      avoid_listview_without_item_extent: true
+      avoid_shrink_wrap_in_lists: true
+      avoid_mediaquery_in_build: true
+      prefer_dedicated_media_query_method: true
+      avoid_singlechildscrollview_with_column: true
+      avoid_stateful_widget_in_list: true
+      prefer_cached_network_image: true
+      avoid_controller_in_build: true
+      avoid_regex_in_loop: true
+      prefer_const_string_list: true
+      prefer_const_widgets_in_lists: true
 
-    # =========================================================================
-    # ACCESSIBILITY - Usable by everyone
-    # =========================================================================
-    require_semantics_label: true
-    avoid_icon_buttons_without_tooltip: true
-    avoid_image_buttons_without_tooltip: true
-    avoid_gesture_only_interactions: true
-    avoid_color_only_indicators: true
-    avoid_small_touch_targets: true
+      # =========================================================================
+      # ACCESSIBILITY - Usable by everyone
+      # =========================================================================
+      require_semantics_label: true
+      avoid_icon_buttons_without_tooltip: true
+      avoid_image_buttons_without_tooltip: true
+      avoid_gesture_only_interactions: true
+      avoid_color_only_indicators: true
+      avoid_small_touch_targets: true
 
-    # =========================================================================
-    # STATE MANAGEMENT - Predictable behavior
-    # =========================================================================
-    require_notify_listeners: true
-    avoid_bloc_event_in_constructor: true
+      # =========================================================================
+      # STATE MANAGEMENT - Predictable behavior
+      # =========================================================================
+      require_notify_listeners: true
+      avoid_bloc_event_in_constructor: true
 
-    # =========================================================================
-    # ERROR HANDLING - Better user experience
-    # =========================================================================
-    avoid_generic_exceptions: true
-    avoid_catching_generic_exception: true
+      # =========================================================================
+      # ERROR HANDLING - Better user experience
+      # =========================================================================
+      avoid_generic_exceptions: true
+      avoid_catching_generic_exception: true
 
-    # =========================================================================
-    # FLUTTER WIDGETS - Correct usage
-    # =========================================================================
-    avoid_deeply_nested_widgets: true
-    avoid_single_child_column_row: true
-    avoid_form_without_key: true
-    avoid_uncontrolled_text_field: true
-    avoid_text_scale_factor: true
-    prefer_using_list_view: true
-    avoid_scaffold_messenger_after_await: true
-    avoid_unnecessary_setstate: true
-    avoid_stateless_widget_initialized_fields: true
-    avoid_state_constructors: true
+      # =========================================================================
+      # FLUTTER WIDGETS - Correct usage
+      # =========================================================================
+      avoid_deeply_nested_widgets: true
+      avoid_single_child_column_row: true
+      avoid_form_without_key: true
+      avoid_uncontrolled_text_field: true
+      avoid_text_scale_factor: true
+      prefer_using_list_view: true
+      avoid_scaffold_messenger_after_await: true
+      avoid_unnecessary_setstate: true
+      avoid_stateless_widget_initialized_fields: true
+      avoid_state_constructors: true
 
-    # =========================================================================
-    # ASYNC - Correct patterns
-    # =========================================================================
-    avoid_async_call_in_sync_function: true
-    avoid_redundant_async: true
-    avoid_future_tostring: true
-    prefer_return_await: true
-    avoid_future_ignore: true
-    avoid_stream_tostring: true
+      # =========================================================================
+      # ASYNC - Correct patterns
+      # =========================================================================
+      avoid_async_call_in_sync_function: true
+      avoid_redundant_async: true
+      avoid_future_tostring: true
+      prefer_return_await: true
+      avoid_future_ignore: true
+      avoid_stream_tostring: true
 
-    # =========================================================================
-    # CODE QUALITY - Fewer bugs
-    # =========================================================================
-    avoid_self_assignment: true
-    avoid_self_compare: true
-    avoid_assignments_as_conditions: true
-    avoid_equal_expressions: true
-    no_equal_then_else: true
-    avoid_unnecessary_conditionals: true
-    avoid_constant_conditions: true
-    avoid_conditions_with_boolean_literals: true
-    no_empty_string: true
-    avoid_misnamed_padding: true
+      # =========================================================================
+      # CODE QUALITY - Fewer bugs
+      # =========================================================================
+      avoid_self_assignment: true
+      avoid_self_compare: true
+      avoid_assignments_as_conditions: true
+      avoid_equal_expressions: true
+      no_equal_then_else: true
+      avoid_unnecessary_conditionals: true
+      avoid_constant_conditions: true
+      avoid_conditions_with_boolean_literals: true
+      no_empty_string: true
+      avoid_misnamed_padding: true
 
-    # =========================================================================
-    # COLLECTIONS - Safe access
-    # =========================================================================
-    avoid_map_keys_contains: true
-    avoid_collection_equality_checks: true
-    avoid_missing_enum_constant_in_map: true
-    avoid_enum_values_by_index: true
-    prefer_contains: true
-    prefer_first: true
-    prefer_last: true
+      # =========================================================================
+      # COLLECTIONS - Safe access
+      # =========================================================================
+      avoid_map_keys_contains: true
+      avoid_collection_equality_checks: true
+      avoid_missing_enum_constant_in_map: true
+      avoid_enum_values_by_index: true
+      prefer_contains: true
+      prefer_first: true
+      prefer_last: true
 
-    # =========================================================================
-    # TESTING - Reliable tests
-    # =========================================================================
-    require_test_assertions: true
-    avoid_real_network_calls_in_tests: true
-    avoid_hardcoded_test_delays: true
-    missing_test_assertion: true
-    avoid_duplicate_test_assertions: true
+      # =========================================================================
+      # TESTING - Reliable tests
+      # =========================================================================
+      require_test_assertions: true
+      avoid_real_network_calls_in_tests: true
+      avoid_hardcoded_test_delays: true
+      missing_test_assertion: true
+      avoid_duplicate_test_assertions: true
 
-    # =========================================================================
-    # API & NETWORK - Robust networking
-    # =========================================================================
-    require_http_status_check: true
-    require_request_timeout: true  # Alias: require_api_timeout
-    avoid_hardcoded_api_urls: true
+      # =========================================================================
+      # API & NETWORK - Robust networking
+      # =========================================================================
+      require_http_status_check: true
+      require_request_timeout: true  # Alias: require_api_timeout
+      avoid_hardcoded_api_urls: true
 
-    # =========================================================================
-    # DOCUMENTATION - Maintainable code
-    # =========================================================================
-    require_deprecation_message: true
+      # =========================================================================
+      # DOCUMENTATION - Maintainable code
+      # =========================================================================
+      require_deprecation_message: true
 
-    # =========================================================================
-    # TYPE SAFETY - Fewer runtime errors
-    # =========================================================================
-    avoid_unsafe_cast: true
-    require_safe_json_parsing: true
-    require_null_safe_extensions: true
-    avoid_unrelated_type_assertions: true
-    avoid_unnecessary_type_assertions: true
-    avoid_unnecessary_type_casts: true
+      # =========================================================================
+      # TYPE SAFETY - Fewer runtime errors
+      # =========================================================================
+      avoid_unsafe_cast: true
+      require_safe_json_parsing: true
+      require_null_safe_extensions: true
+      avoid_unrelated_type_assertions: true
+      avoid_unnecessary_type_assertions: true
+      avoid_unnecessary_type_casts: true
 
-    # =========================================================================
-    # NAMING & STYLE - Consistency
-    # =========================================================================
-    prefer_boolean_prefixes: true
-    prefer_no_getter_prefix: true
+      # =========================================================================
+      # NAMING & STYLE - Consistency
+      # =========================================================================
+      prefer_boolean_prefixes: true
+      prefer_no_getter_prefix: true
