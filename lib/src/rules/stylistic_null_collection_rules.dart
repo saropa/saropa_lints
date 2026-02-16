@@ -953,6 +953,9 @@ class PreferWhereTypeOverWhereIsRule extends SaropaLintRule {
       final expr = body.expression;
       if (expr is! IsExpression) return;
 
+      // Skip negated type checks — no whereType equivalent for exclusion
+      if (expr.notOperator != null) return;
+
       // It's a where((e) => e is T) pattern
       reporter.atNode(node, code);
     });
@@ -986,6 +989,9 @@ class _PreferWhereTypeOverWhereIsFix extends DartFix {
 
       final expr = body.expression;
       if (expr is! IsExpression) return;
+
+      // Skip negated type checks — no whereType equivalent for exclusion
+      if (expr.notOperator != null) return;
 
       // Get the type being checked
       final typeStr = expr.type.toSource();

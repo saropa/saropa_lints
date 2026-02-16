@@ -3233,6 +3233,14 @@ class FunctionAlwaysReturnsNullRule extends SaropaLintRule {
     if (body.isGenerator) return;
     if (body is BlockFunctionBody && body.star != null) return;
 
+    // Belt-and-suspenders: also check return type for generator types.
+    // Catches generators even if body.isGenerator fails to resolve
+    // correctly in some analyzer versions.
+    if (returnType is NamedType) {
+      final String typeName = returnType.name.lexeme;
+      if (typeName == 'Stream' || typeName == 'Iterable') return;
+    }
+
     // Skip void functions - bare return statements are valid
     if (_isVoidType(returnType)) return;
 
