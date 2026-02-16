@@ -1748,8 +1748,20 @@ abstract class SaropaLintRule extends AnalysisRule {
   /// The lint code for this rule.
   LintCode get code => _lintCode;
 
+  /// Cached lint code with severity override applied.
+  LintCode? _overriddenCode;
+
   @override
-  DiagnosticCode get diagnosticCode => _lintCode;
+  DiagnosticCode get diagnosticCode {
+    final override = severityOverrides?[code.name];
+    if (override == null) return _lintCode;
+    return _overriddenCode ??= LintCode(
+      _lintCode.name,
+      _lintCode.problemMessage,
+      correctionMessage: _lintCode.correctionMessage,
+      severity: override,
+    );
+  }
 
   // ============================================================
   // Impact Classification
@@ -2406,6 +2418,7 @@ abstract class SaropaLintRule extends AnalysisRule {
       code.name,
       impact: impact,
       lintCode: _lintCode,
+      ruleContext: ruleContext,
     );
     runWithReporter(reporter, saropaContext);
   }
@@ -2441,24 +2454,30 @@ class SaropaDiagnosticReporter {
     this._ruleName, {
     required this.impact,
     required this.lintCode,
-  });
+    required RuleContext ruleContext,
+  }) : _ruleContext = ruleContext;
 
   final AnalysisRule _rule;
   final String _ruleName;
   final LintImpact impact;
   final LintCode lintCode;
+  final RuleContext _ruleContext;
 
   /// Reports a diagnostic at the given [node].
   ///
   /// The optional [code] parameter is accepted for backwards compatibility
   /// but ignored — the native system uses the rule's diagnosticCode.
   void atNode(AstNode node, [LintCode? code]) {
+    if (_isBaselined(node.offset)) return;
     _rule.reportAtNode(node);
+    _trackViolation(node.offset);
   }
 
   /// Reports a diagnostic at the given [token].
   void atToken(Token token, [LintCode? code]) {
+    if (_isBaselined(token.offset)) return;
     _rule.reportAtToken(token);
+    _trackViolation(token.offset);
   }
 
   /// Reports a diagnostic at the given offset and length.
@@ -2470,6 +2489,45 @@ class SaropaDiagnosticReporter {
     required int length,
     LintCode? errorCode,
   }) {
+    if (_isBaselined(offset)) return;
     _rule.reportAtOffset(offset, length);
+    _trackViolation(offset);
+  }
+
+  /// Check if this violation is suppressed by the baseline.
+  bool _isBaselined(int offset) {
+    if (!BaselineManager.isEnabled) return false;
+    final unit = _ruleContext.currentUnit;
+    if (unit == null) return false;
+    final line = unit.unit.lineInfo.getLocation(offset).lineNumber;
+    return BaselineManager.isBaselined(
+      unit.file.path,
+      _ruleName,
+      line,
+      impact: impact.name,
+    );
+  }
+
+  /// Record this violation in impact and progress trackers.
+  void _trackViolation(int offset) {
+    final unit = _ruleContext.currentUnit;
+    if (unit == null) return;
+    final path = unit.file.path;
+    final line = unit.unit.lineInfo.getLocation(offset).lineNumber;
+
+    ImpactTracker.record(
+      impact: impact,
+      rule: _ruleName,
+      file: path,
+      line: line,
+      message: lintCode.problemMessage,
+      correction: lintCode.correctionMessage,
+    );
+
+    ProgressTracker.recordViolation(
+      severity: lintCode.severity.name,
+      ruleName: _ruleName,
+      line: line,
+    );
   }
 }

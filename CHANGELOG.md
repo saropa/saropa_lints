@@ -29,6 +29,12 @@ Migrated from `custom_lint_builder` to the native `analysis_server_plugin` syste
 - `CompatVisitor` bridging callbacks to native `SimpleAstVisitor` dispatch
 - PoC quick fixes: `CommentOutDebugPrintFix`, `RemoveEmptySetStateFix`
 - Native framework provides ignore-comment fixes automatically (no custom code needed)
+- Config loader (`config_loader.dart`) reads `analysis_options_custom.yaml` at startup
+- Severity overrides via `severities:` section (ERROR/WARNING/INFO/false per rule)
+- Baseline suppression wired into reporter — checks `BaselineManager` before every report
+- Impact tracking — every violation recorded in `ImpactTracker` by impact level
+- Progress tracking — files and violations tracked in `ProgressTracker` per file/rule
+- `Plugin.start()` lifecycle hook for one-time config loading
 
 ### Changed
 - All 96 rule files migrated to native `AnalysisRule` API

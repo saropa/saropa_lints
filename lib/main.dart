@@ -12,10 +12,13 @@
 /// ```
 library;
 
+import 'dart:async' show FutureOr;
+
 import 'package:analysis_server_plugin/plugin.dart';
 import 'package:analysis_server_plugin/registry.dart';
 
 import 'saropa_lints.dart';
+import 'src/native/config_loader.dart';
 
 /// Top-level plugin instance discovered by the analysis server.
 final plugin = SaropaLintsPlugin();
@@ -28,6 +31,11 @@ final plugin = SaropaLintsPlugin();
 class SaropaLintsPlugin extends Plugin {
   @override
   String get name => 'saropa_lints';
+
+  @override
+  FutureOr<void> start() {
+    loadNativePluginConfig();
+  }
 
   @override
   void register(PluginRegistry registry) {

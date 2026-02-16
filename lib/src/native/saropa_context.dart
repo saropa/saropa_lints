@@ -17,7 +17,7 @@ import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/source/line_info.dart';
 
 import '../project_context.dart' show FileTypeDetector;
-import '../saropa_lint_rule.dart' show SaropaLintRule;
+import '../saropa_lint_rule.dart' show ProgressTracker, SaropaLintRule;
 import 'compat_visitor.dart';
 
 /// Wraps [RuleVisitorRegistry] to provide callback-based registration.
@@ -99,6 +99,7 @@ class SaropaContext {
     if (path.isEmpty) return false;
     if (path == _lastCheckedPath) return _lastSkipResult;
     _lastCheckedPath = path;
+    ProgressTracker.recordFile(path);
 
     final rule = _saropaRule!;
 
