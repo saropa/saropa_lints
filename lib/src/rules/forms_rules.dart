@@ -2301,7 +2301,7 @@ class PreferInputFormattersRule extends SaropaLintRule {
 /// Flutter's Stepper widget does not preserve form state across steps by
 /// default. When a user navigates back to a previous step, text fields
 /// lose their values unless state is explicitly preserved using
-/// GlobalKey<FormState>, AutomaticKeepAliveClientMixin, or a state
+/// `GlobalKey<FormState>`, AutomaticKeepAliveClientMixin, or a state
 /// management solution. Always manage step form state to avoid data loss.
 ///
 /// **BAD:**
