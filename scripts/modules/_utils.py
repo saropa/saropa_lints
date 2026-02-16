@@ -344,6 +344,7 @@ def run_command(
     description: str,
     capture_output: bool = False,
     allow_failure: bool = False,
+    summarize: bool = False,
 ) -> subprocess.CompletedProcess:
     """Run a shell command and handle errors.
 
@@ -353,34 +354,96 @@ def run_command(
         description: Human-readable description for logging.
         capture_output: If True, capture stdout/stderr.
         allow_failure: If True, don't print error on non-zero exit.
+        summarize: If True, capture output and show only a summary.
+            On success: prints the last meaningful line.
+            On failure: prints the last 10 lines of output.
+            Full output is shown in --verbose mode on failure.
 
     Returns:
         The CompletedProcess result.
     """
     print_info(f"{description}...")
-    print_colored(f"      $ {' '.join(cmd)}", Color.WHITE)
+    if _output_level.value >= OutputLevel.VERBOSE.value:
+        print_colored(f"      $ {' '.join(cmd)}", Color.WHITE)
 
     use_shell = get_shell_mode()
+
+    # summarize mode always captures output
+    should_capture = capture_output or summarize
 
     result = subprocess.run(
         cmd,
         cwd=cwd,
-        capture_output=capture_output,
+        capture_output=should_capture,
         text=True,
         shell=use_shell,
     )
 
     if result.returncode != 0 and not allow_failure:
-        if capture_output:
-            if result.stdout:
-                print(result.stdout)
-            if result.stderr:
-                print(result.stderr)
+        if should_capture:
+            _print_failure_output(result, summarize)
         print_error(f"{description} failed (exit code {result.returncode})")
         return result
 
+    if summarize and result.stdout:
+        _print_summary_line(result.stdout)
+
     print_success(f"{description} completed")
     return result
+
+
+def _print_summary_line(stdout: str) -> None:
+    """Extract and print a one-line summary from command output."""
+    lines = stdout.strip().splitlines()
+    if not lines:
+        return
+
+    # Look for common summary patterns from the end
+    for line in reversed(lines):
+        stripped = line.strip()
+        if not stripped:
+            continue
+        # dart test: "+1543: All tests passed!"
+        if "All tests passed" in stripped:
+            print_colored(f"      {stripped}", Color.GREEN)
+            return
+        # dart analyze: "No issues found!" or "N issues found."
+        if "issues found" in stripped or "No issues found" in stripped:
+            print_colored(f"      {stripped}", Color.CYAN)
+            return
+    # Fallback: last non-empty line
+    for line in reversed(lines):
+        stripped = line.strip()
+        if stripped:
+            print_colored(f"      {stripped}", Color.CYAN)
+            return
+
+
+def _print_failure_output(
+    result: subprocess.CompletedProcess,
+    summarize: bool,
+) -> None:
+    """Print output from a failed command, respecting summarize mode."""
+    combined = (result.stdout or "") + (result.stderr or "")
+    if not combined.strip():
+        return
+
+    if not summarize or _output_level.value >= OutputLevel.VERBOSE.value:
+        # Full output in verbose mode or non-summarized mode
+        print(combined)
+        return
+
+    # Summarized failure: show last 10 meaningful lines
+    lines = combined.strip().splitlines()
+    tail = lines[-10:] if len(lines) > 10 else lines
+    if len(lines) > 10:
+        print_colored(
+            f"      ... ({len(lines) - 10} lines omitted, "
+            f"use --verbose for full output)",
+            Color.YELLOW,
+        )
+    for line in tail:
+        print(f"      {line}")
 
 
 def command_exists(cmd: str) -> bool:

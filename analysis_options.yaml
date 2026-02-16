@@ -31,6 +31,12 @@ analyzer:
     - "build/**"
     - ".dart_tool/**"
     - "example/**"
+    - "example_async/**"
+    - "example_core/**"
+    - "example_packages/**"
+    - "example_platforms/**"
+    - "example_style/**"
+    - "example_widgets/**"
 linter:
   rules:
     - curly_braces_in_flow_control_structures
