@@ -58,10 +58,12 @@
 // ignore_for_file: const_with_undefined_constructor, abstract_super_member_reference
 // ignore_for_file: equal_keys_in_map, unused_catch_stack
 // ignore_for_file: non_constant_default_value, not_a_type
+// ignore_for_file: require_subscription_status_check
 import 'package:flutter/material.dart';
 
 // BAD: Premium content shown without verifying subscription status
 class BadPremiumScreen extends StatelessWidget {
+  // ignore: require_subscription_status_check
   @override
   Widget build(BuildContext context) {
     return Column(

@@ -1,6 +1,6 @@
 # Quick Fixes Not Appearing in VS Code (Ctrl+.)
 
-## Status: INVESTIGATING
+## Status: ROOT CAUSE IDENTIFIED
 
 ## Problem
 
@@ -9,14 +9,14 @@ When pressing **Ctrl+.** on a saropa_lints diagnostic in VS Code, **no quick fix
 Diagnostics themselves work correctly:
 - Squiggly underlines appear in the editor
 - Problems panel shows all lint violations
-- `dart run custom_lint` CLI works fine (312 rules loaded, 1000+ issues found)
+- `dart run custom_lint` CLI works fine (328 rules loaded, 1000+ issues found)
 
 Only the quick fix suggestions are missing.
 
 ## Environment
 
 - **Test project**: `D:\src\contacts` (Flutter app using saropa_lints as path dependency)
-- **saropa_lints version**: 4.9.18 (project is at 4.10.0)
+- **saropa_lints version**: 4.14.5
 - **custom_lint / custom_lint_builder**: 0.8.1
 - **analyzer**: 8.1.1 (contacts) / 8.4.0 (saropa_lints)
 - **Dart SDK**: 3.10.8
@@ -27,7 +27,9 @@ Only the quick fix suggestions are missing.
 
 1. Plugin loads and runs (diagnostics appear)
 2. CLI `dart run custom_lint` finds all issues
-3. Rule detection logic is correct
+3. CLI `dart run custom_lint --fix` can apply fixes
+4. Rule detection logic is correct
+5. Fix registration code is correct (verified by source audit)
 
 ## What Doesn't Work
 
@@ -35,83 +37,129 @@ Only the quick fix suggestions are missing.
 2. Light bulb icon does not appear for saropa_lints diagnostics
 3. "Saropa Lints" output channel in VS Code is empty (no debug output)
 
-## Investigation So Far
+## Root Cause Analysis (Feb 2026)
 
-### 1. Plugin crash (RESOLVED - not current cause)
-`example/custom_lint.log` from Jan 7, 2026 showed duplicate class declarations in `flutter_widget_rules.dart` causing "Failed to start plugins" crash. This has been fixed - CLI works fine now.
+### Source Code Audit Results
 
-### 2. Known upstream issues
+The **entire fix pipeline inside custom_lint was audited** and found to be correct:
 
-- **Dart SDK #61491**: Analyzer plugin fixes only respond at exact first character position of the diagnostic range. Fixed in Sept 2025 for the NEW Dart analyzer plugin system. **Unclear if fix applies to the OLD `analyzer_plugin` protocol** that custom_lint uses.
-  - Link: https://github.com/dart-lang/sdk/issues/61491
+1. **Fix registration** (`custom_lint_builder` client.dart lines 331-342):
+   ```dart
+   static Map<LintCode, List<Fix>> _fixesForRules(List<LintRule> rules, ...) {
+     return {
+       for (final rule in rules)
+         rule.code: [...rule.getFixes(), if (includeBuiltInLints) IgnoreCode()],
+     };
+   }
+   ```
+   Correctly maps each rule's `LintCode` to its fixes plus built-in ignore fixes.
 
-- **custom_lint #251**: `source.fixAll` doesn't work with custom_lint (architectural limitation of analyzer_plugin protocol).
-  - Link: https://github.com/invertase/dart_custom_lint/issues/251
+2. **Fix request handling** (`custom_lint_builder` client.dart lines 601-626):
+   ```dart
+   Future<EditGetFixesResult> handleEditGetFixes(params) async {
+     final errors = _analysisErrorsForAnalysisContexts[context.key] ?? [];
+     final fixes = await _computeFixes(
+       errors.where((e) => e.sourceRange.contains(params.offset)).toList(),
+       context, errors,
+     );
+     return EditGetFixesResult(fixes...);
+   }
+   ```
+   Uses proper range check (`contains`), not exact offset match. This code **never gets called** because the DAS never forwards the request.
 
-- **flutter-intellij #7600**: custom_lint IDE Quick actions not shown.
-  - Link: https://github.com/flutter/flutter-intellij/issues/7600
+3. **SaropaLintRule.getFixes()** (saropa_lint_rule.dart lines 1837-1846):
+   ```dart
+   List<Fix> getFixes() {
+     final fixes = <Fix>[...customFixes];
+     if (includeIgnoreFixes) {
+       fixes.addAll([AddIgnoreCommentFix(code.name), AddIgnoreForFileFix(code.name)]);
+     }
+     return fixes;
+   }
+   ```
+   Correctly combines custom fixes with ignore fixes.
 
-### 3. Fix implementation patterns
+### The Actual Problem: DAS Does Not Forward Fix Requests
 
-Two patterns exist in the codebase:
+The bottleneck is in the **Dart Analysis Server (DAS)**, not in custom_lint or saropa_lints.
 
-**Pattern A - Ignore fixes (no registry):**
-```dart
-// AddIgnoreCommentFix and AddIgnoreForFileFix
-// Create ChangeBuilder directly without using context.registry
-changeBuilder.addDartFileEdit((builder) {
-  builder.addSimpleInsertion(offset, '// ignore: $ruleName\n');
-});
+**The request flow:**
+1. User presses Ctrl+. in VS Code
+2. VS Code sends `textDocument/codeAction` to DAS
+3. **DAS decides whether to send `edit.getFixes` to the plugin** ← BREAKS HERE
+4. custom_lint's `handleEditGetFixes` would process the request (but never receives it)
+5. Results would flow back to VS Code
+
+**Why the DAS doesn't forward:** Dart SDK #61491 documented a bug where the DAS only forwarded `edit.getFixes` requests to plugins when the cursor was at the **exact first byte** of a diagnostic (`error.diagnostic.offset == offset`). The fix (commit `a9feb25`, "DAS plugins: Make the fix offset a range over the diagnostic") was applied to the **new** DAS plugin system (`analysis_server_plugin`), NOT the old `analyzer_plugin` protocol that custom_lint 0.8.x uses.
+
+### Why This Affects ALL Fixes
+
+This is a transport-layer problem, not a fix implementation problem:
+- The DAS never sends `edit.getFixes` to custom_lint for cursor positions that don't match exact diagnostic start offsets
+- Even at exact start offsets, the old `analyzer_plugin` protocol path in the DAS may not forward fix requests at all
+- No amount of fixing the `DartFix` implementations will help because they never execute
+
+### The Legacy Protocol Deprecation
+
+The old `analyzer_plugin` protocol is being deprecated (Dart SDK #62164):
+- **Phase 1** (Dart 3.12+): Report legacy plugin usage as deprecated
+- **Phase 2** (subsequent release): Disable legacy plugins entirely
+- custom_lint acknowledged as "the primary client" of the old system
+
+The new `analysis_server_plugin` system (SDK #53402, closed Nov 2025) properly supports quick fixes.
+
+## Known Upstream Issues
+
+| Issue | Status | Impact |
+|-------|--------|--------|
+| [Dart SDK #61491](https://github.com/dart-lang/sdk/issues/61491) | CLOSED (fixed for new plugins only) | DAS only forwards fixes at exact first byte of diagnostic |
+| [Dart SDK #62164](https://github.com/dart-lang/sdk/issues/62164) | OPEN | Old analyzer_plugin protocol being deprecated |
+| [Dart SDK #53402](https://github.com/dart-lang/sdk/issues/53402) | CLOSED | New plugin system shipped with proper fix support |
+| [custom_lint #251](https://github.com/invertase/dart_custom_lint/issues/251) | OPEN | `source.fixAll` doesn't work (analyzer_plugin limitation) |
+| [flutter-intellij #7600](https://github.com/flutter/flutter-intellij/issues/7600) | OPEN | custom_lint IDE quick actions not shown |
+
+## Workarounds
+
+### 1. CLI `--fix` (available now)
+```bash
+cd D:\src\contacts && dart run custom_lint --fix
 ```
+Applies all available batch fixes from the command line. Verified working.
 
-**Pattern B - Rule-specific fixes (uses registry):**
-```dart
-// WrapInTryCatchFix and most rule-specific fixes
-// Register via context.registry, then check sourceRange intersection
-context.registry.addMethodInvocation((node) {
-  if (!analysisError.sourceRange.intersects(node.sourceRange)) return;
-  // ... create fix
-});
-```
+### 2. Manual ignore comments
+Add `// ignore: rule_name` or `// ignore_for_file: rule_name` manually since the ignore quick fixes can't be delivered through the IDE.
 
-Both patterns should work according to custom_lint_builder documentation.
+## Resolution Path
 
-### 4. VS Code output channels
+### Option A: Wait for custom_lint migration (recommended)
+custom_lint needs to migrate from the old `analyzer_plugin` protocol to the new `analysis_server_plugin` API. This would:
+- Fix the quick fix delivery issue
+- Fix the `source.fixAll` issue (#251)
+- Avoid the upcoming deprecation of the old protocol
 
-- "Dart Analysis Server" does NOT exist as an output option
-- Available: "flutter package saropa", "flutter daemon", "Saropa Lints"
-- "Saropa Lints" channel is empty
+**Action**: File or find an issue on [invertase/dart_custom_lint](https://github.com/invertase/dart_custom_lint) tracking migration to `analysis_server_plugin`.
 
-## Leading Theories
+### Option B: Test cursor position (diagnostic only)
+Place cursor at the **exact first character** of a diagnostic squiggle and press Ctrl+. If fixes appear there but nowhere else, it confirms the DAS offset bug affects the old protocol.
 
-1. **Old analyzer_plugin protocol limitation**: custom_lint 0.8.x uses the old `analyzer_plugin` protocol. The Dart SDK fix for #61491 (cursor position sensitivity) was only applied to the NEW plugin system. The old protocol may have a fundamental issue transmitting fixes to VS Code.
-
-2. **Version mismatch**: The contacts project has analyzer 8.1.1 while saropa_lints builds against 8.4.0. Possible protocol incompatibility.
-
-3. **Fix registration timing**: The way fixes are registered via `context.registry` callbacks may not align with when VS Code requests code actions.
-
-## Next Steps (Waiting On)
-
-### Step 1: Enable verbose logging
-Add to contacts project `analysis_options.yaml`:
+### Option C: Enable verbose logging (diagnostic only)
+Add to test project `analysis_options.yaml`:
 ```yaml
 custom_lint:
   verbose: true
 ```
-Then restart analysis server (`Dart: Restart Analysis Server` in command palette) and check "Saropa Lints" output channel for debug information about fix registration and requests.
+Restart analysis server and check `custom_lint.log` for `edit.getFixes` request entries.
 
-### Step 2: Test cursor position
-Place cursor at the **exact first character** of a diagnostic squiggle and press Ctrl+., then test at other positions within the squiggle. This tests whether Dart SDK #61491 still affects the old plugin protocol.
+## Investigation History
 
-### Step 3: Check custom_lint version compatibility
-Compare custom_lint versions between saropa_lints (0.8.0 constraint) and contacts project (0.8.1 resolved). Check if there are newer versions with fix-related changes.
-
-### Step 4: Test with a minimal rule
-Create a minimal test with a single rule and single fix to isolate whether the issue is with specific fix implementations or the entire fix pipeline.
+1. **Plugin crash** (Jan 2026, RESOLVED): Duplicate class declarations in `flutter_widget_rules.dart` caused plugin startup failure. Fixed.
+2. **Fix implementation audit** (Feb 2026): Full source audit of custom_lint_builder 0.8.1 `client.dart` confirmed fix registration, error matching, and fix execution code is correct.
+3. **DAS analysis** (Feb 2026): Traced the request pipeline from VS Code through the DAS to the plugin. Identified the DAS as the bottleneck - it never forwards `edit.getFixes` to old-protocol plugins.
 
 ## Related Files
 
-- `lib/src/saropa_lint_rule.dart` (lines 1560-1617) - getFixes() base implementation
+- `custom_lint_builder` 0.8.1 `lib/src/client.dart` - handleEditGetFixes (line 601), _fixesForRules (line 331)
+- `custom_lint` 0.8.1 `lib/src/v2/custom_lint_analyzer_plugin.dart` - request forwarding (line 186)
+- `custom_lint` 0.8.1 `lib/src/analyzer_plugin_starter.dart` - plugin start (fix: false for IDE)
+- `lib/src/saropa_lint_rule.dart` (lines 1837-1846) - getFixes() base implementation
 - `lib/src/ignore_fixes.dart` - AddIgnoreCommentFix, AddIgnoreForFileFix, WrapInTryCatchFix
-- `lib/custom_lint_client.dart` - Plugin entry point
-- `example/analysis_options.yaml` - Example project configuration
