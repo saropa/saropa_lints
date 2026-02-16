@@ -98,6 +98,7 @@ _REQUIRED_MODULES = [
     "modules/_rule_metrics.py",
     "modules/_version_changelog.py",
     "modules/_us_spelling.py",
+    "modules/_timing.py",
 ]
 
 
@@ -199,6 +200,7 @@ from scripts.modules._rule_metrics import (
     display_unit_test_coverage,
     sync_readme_badges,
 )
+from scripts.modules._timing import StepTimer
 from scripts.modules._version_changelog import (
     display_changelog,
     get_latest_changelog_version,
@@ -272,6 +274,86 @@ def _prompt_version(default: str, timeout: int = 30) -> str:
         return user_input if user_input else default
     print()
     return default
+
+
+# =============================================================================
+# HELPERS
+# =============================================================================
+
+
+def _offer_custom_lint(project_dir: Path) -> None:
+    """Offer to launch custom_lint on example fixtures in background."""
+    example_dirs = [
+        project_dir / d
+        for d in [
+            "example", "example_core", "example_async",
+            "example_widgets", "example_style",
+            "example_packages", "example_platforms",
+        ]
+        if (project_dir / d / "pubspec.yaml").exists()
+    ]
+    if not example_dirs:
+        return
+
+    response = (
+        input(
+            "  Run custom_lint on example fixtures "
+            f"({len(example_dirs)} packages, background)? [y/N] "
+        )
+        .strip()
+        .lower()
+    )
+    if response.startswith("y"):
+        use_shell = get_shell_mode()
+        for example_dir in example_dirs:
+            print_info(f"  Launching custom_lint in {example_dir.name}/")
+            subprocess.run(
+                ["dart", "pub", "get"],
+                cwd=example_dir,
+                shell=use_shell,
+                capture_output=True,
+            )
+            subprocess.Popen(
+                ["dart", "run", "custom_lint"],
+                cwd=example_dir,
+                shell=use_shell,
+            )
+        print_success(
+            f"custom_lint launched in {len(example_dirs)} packages"
+        )
+    else:
+        print_info(
+            "Run manually: python scripts/run_custom_lint_all.py"
+        )
+
+
+def _print_success_banner(
+    package_name: str, version: str, repo_path: str,
+) -> None:
+    """Print final success status with links."""
+    print_colored(
+        f"  \u2713 PUBLISHED {package_name} v{version}",
+        Color.GREEN,
+    )
+    print()
+    print_colored(
+        f"      Package:  https://pub.dev/packages/{package_name}",
+        Color.CYAN,
+    )
+    print_colored(
+        f"      Score:    https://pub.dev/packages/{package_name}/score",
+        Color.CYAN,
+    )
+    print_colored(
+        f"      CI:       https://github.com/{repo_path}/actions",
+        Color.CYAN,
+    )
+    print_colored(
+        f"      Release:  https://github.com/{repo_path}"
+        f"/releases/tag/v{version}",
+        Color.CYAN,
+    )
+    print()
 
 
 # =============================================================================
@@ -352,243 +434,259 @@ def main() -> int:
     display_todo_audit(project_dir)
     display_roadmap_summary(project_dir)
 
-    # --- Step 1: Pre-publish audits (unless --skip-audit) ---
+    # --- Timed workflow ---
     audit_only = "--audit-only" in sys.argv
     skip_audit = "--skip-audit" in sys.argv
+    timer = StepTimer()
+    exit_code = ExitCode.SUCCESS.value
+    version = pubspec_version
+    release_notes = ""
+    succeeded = False
 
-    if not skip_audit:
-        print_header("STEP 1: PRE-PUBLISH AUDIT")
-        if not run_pre_publish_audits(project_dir):
-            exit_with_error(
-                "Pre-publish audit failed. Fix issues before publishing.",
-                ExitCode.AUDIT_FAILED,
-            )
-
-        if audit_only:
-            print_success("Audit complete (--audit-only mode).")
-            return ExitCode.SUCCESS.value
-
-        # Gate: ask to continue
-        print()
-        response = (
-            input("  Audit passed. Continue to publish? [Y/n] ")
-            .strip()
-            .lower()
-        )
-        if response.startswith("n"):
-            print_warning("Publish canceled by user.")
-            return ExitCode.USER_CANCELED.value
-    elif audit_only:
-        print_warning("--audit-only and --skip-audit are contradictory.")
-        return ExitCode.USER_CANCELED.value
-
-    # --- Steps 2-7: Analysis workflow (version-independent) ---
-    if not check_prerequisites():
-        exit_with_error("Prerequisites failed", ExitCode.PREREQUISITES_FAILED)
-
-    ok, _ = check_working_tree(project_dir)
-    if not ok:
-        exit_with_error("Aborted.", ExitCode.USER_CANCELED)
-
-    if not check_remote_sync(project_dir, branch):
-        exit_with_error("Remote sync failed", ExitCode.WORKING_TREE_FAILED)
-
-    if not run_tests(project_dir):
-        exit_with_error("Tests failed.", ExitCode.TEST_FAILED)
-
-    if not run_format(project_dir):
-        exit_with_error("Formatting failed.", ExitCode.VALIDATION_FAILED)
-
-    if not run_analysis(project_dir):
-        exit_with_error("Analysis failed.", ExitCode.ANALYSIS_FAILED)
-
-    # --- Step 8: Prompt for version (after analysis passes) ---
-    print_header("VERSION")
-    if tag_exists_on_remote(project_dir, f"v{pubspec_version}"):
-        default_version = increment_patch_version(pubspec_version)
-    else:
-        default_version = pubspec_version
-
-    while True:
-        version = _prompt_version(default_version)
-        if re.match(r"^\d+\.\d+\.\d+$", version):
-            break
-        print_warning(f"Invalid version format '{version}'. Use X.Y.Z")
-
-    if version != pubspec_version:
-        set_version_in_pubspec(pubspec_path, version)
-        print_success(f"Updated pubspec.yaml to {version}")
-
-    # Rename [Unreleased] to this version before validation
     try:
-        if rename_unreleased_to_version(changelog_path, version):
-            print_success(
-                f"Renamed [Unreleased] to [{version}] in CHANGELOG.md"
-            )
-    except ValueError as exc:
-        exit_with_error(str(exc), ExitCode.CHANGELOG_FAILED)
+        # --- Step 1: Pre-publish audits (unless --skip-audit) ---
+        if not skip_audit:
+            with timer.step("Pre-publish audit"):
+                print_header("STEP 1: PRE-PUBLISH AUDIT")
+                if not run_pre_publish_audits(project_dir):
+                    exit_with_error(
+                        "Pre-publish audit failed. "
+                        "Fix issues before publishing.",
+                        ExitCode.AUDIT_FAILED,
+                    )
 
-    # Validate versions in sync
-    changelog_version = get_latest_changelog_version(changelog_path)
-    if changelog_version is None:
-        exit_with_error(
-            "Could not extract version from CHANGELOG.md",
-            ExitCode.CHANGELOG_FAILED,
-        )
-    if version != changelog_version:
-        if parse_version(version) < parse_version(changelog_version):
+            if audit_only:
+                print_success("Audit complete (--audit-only mode).")
+                succeeded = True
+                return ExitCode.SUCCESS.value
+
+            # Gate: ask to continue (interactive, not timed)
+            print()
+            response = (
+                input("  Audit passed. Continue to publish? [Y/n] ")
+                .strip()
+                .lower()
+            )
+            if response.startswith("n"):
+                print_warning("Publish canceled by user.")
+                return ExitCode.USER_CANCELED.value
+        elif audit_only:
             print_warning(
-                f"pubspec version ({version}) is behind "
-                f"CHANGELOG ({changelog_version}). Updating pubspec..."
+                "--audit-only and --skip-audit are contradictory."
             )
-            set_version_in_pubspec(pubspec_path, changelog_version)
-            version = changelog_version
-            print_success(f"Updated pubspec.yaml to {version}")
-        else:
-            exit_with_error(
-                f"Version mismatch: pubspec={version} is ahead of "
-                f"CHANGELOG={changelog_version}. Update CHANGELOG.md first.",
-                ExitCode.CHANGELOG_FAILED,
-            )
+            return ExitCode.USER_CANCELED.value
 
-    # Fail fast if this version is already published
-    tag_name = f"v{version}"
-    if tag_exists_on_remote(project_dir, tag_name):
-        exit_with_error(
-            f"Tag {tag_name} already exists on remote. "
-            f"Version {version} has already been published.",
-            ExitCode.GIT_FAILED,
-        )
-
-    print_colored(f"      Publishing: {version}", Color.CYAN)
-    print_colored(f"      Tag:        v{version}", Color.CYAN)
-    print()
-
-    # --- Steps 9-11: Version-dependent validation ---
-    sync_readme_badges(project_dir, version, rule_count)
-
-    ok, release_notes = validate_changelog(project_dir, version)
-    if not ok:
-        exit_with_error("CHANGELOG failed", ExitCode.CHANGELOG_FAILED)
-
-    if not generate_docs(project_dir):
-        exit_with_error("Docs failed", ExitCode.VALIDATION_FAILED)
-
-    if not pre_publish_validation(project_dir):
-        exit_with_error("Validation failed", ExitCode.VALIDATION_FAILED)
-
-    # --- Final CI-equivalent gate (before creating any irreversible tags) ---
-    print_header("FINAL CI GATE")
-    print_info(
-        "Re-running CI checks after version changes to prevent "
-        "burning a tag on a broken build..."
-    )
-    if not run_analysis(project_dir):
-        exit_with_error(
-            "Final CI gate failed — aborting before tag creation. "
-            "Fix analysis issues and re-run.",
-            ExitCode.ANALYSIS_FAILED,
-        )
-    print_success("CI gate passed — safe to create tag")
-
-    # --- Commit, tag, publish, release ---
-    if not git_commit_and_push(project_dir, version, branch):
-        exit_with_error("Git operations failed", ExitCode.GIT_FAILED)
-
-    if not create_git_tag(project_dir, version):
-        exit_with_error("Git tag failed", ExitCode.GIT_FAILED)
-
-    if not publish_to_pubdev_step(project_dir):
-        exit_with_error("Publish failed", ExitCode.PUBLISH_FAILED)
-
-    gh_success, gh_error = create_github_release(
-        project_dir, version, release_notes
-    )
-    if not gh_success:
-        exit_with_error(
-            f"GitHub release failed: {gh_error}",
-            ExitCode.GITHUB_RELEASE_FAILED,
-        )
-
-    # --- Success ---
-    repo_path = extract_repo_path(remote_url)
-    print()
-    print_colored("=" * 70, Color.GREEN)
-    print_colored(
-        f"  PUBLISHED {package_name} v{version} TO PUB.DEV!",
-        Color.GREEN,
-    )
-    print_colored("=" * 70, Color.GREEN)
-    print()
-
-    print_colored(
-        f"      Package:  https://pub.dev/packages/{package_name}",
-        Color.CYAN,
-    )
-    print_colored(
-        f"      Score:    https://pub.dev/packages/{package_name}/score",
-        Color.CYAN,
-    )
-    print_colored(
-        f"      CI:       https://github.com/{repo_path}/actions",
-        Color.CYAN,
-    )
-    print_colored(
-        f"      Release:  https://github.com/{repo_path}"
-        f"/releases/tag/v{version}",
-        Color.CYAN,
-    )
-    print()
-
-    try:
-        webbrowser.open(f"https://pub.dev/packages/{package_name}")
-    except Exception:
-        pass
-
-    # Offer to launch custom_lint integration test in background
-    example_dirs = [
-        project_dir / d
-        for d in [
-            "example", "example_core", "example_async",
-            "example_widgets", "example_style",
-            "example_packages", "example_platforms",
-        ]
-        if (project_dir / d / "pubspec.yaml").exists()
-    ]
-    if example_dirs:
-        response = (
-            input(
-                "  Run custom_lint on example fixtures "
-                f"({len(example_dirs)} packages, background)? [y/N] "
-            )
-            .strip()
-            .lower()
-        )
-        if response.startswith("y"):
-            use_shell = get_shell_mode()
-            for example_dir in example_dirs:
-                print_info(f"  Launching custom_lint in {example_dir.name}/")
-                subprocess.run(
-                    ["dart", "pub", "get"],
-                    cwd=example_dir,
-                    shell=use_shell,
-                    capture_output=True,
+        # --- Steps 2-7: Analysis workflow ---
+        with timer.step("Prerequisites"):
+            if not check_prerequisites():
+                exit_with_error(
+                    "Prerequisites failed",
+                    ExitCode.PREREQUISITES_FAILED,
                 )
-                subprocess.Popen(
-                    ["dart", "run", "custom_lint"],
-                    cwd=example_dir,
-                    shell=use_shell,
+
+        with timer.step("Working tree"):
+            ok, _ = check_working_tree(project_dir)
+            if not ok:
+                exit_with_error("Aborted.", ExitCode.USER_CANCELED)
+
+        with timer.step("Remote sync"):
+            if not check_remote_sync(project_dir, branch):
+                exit_with_error(
+                    "Remote sync failed",
+                    ExitCode.WORKING_TREE_FAILED,
                 )
-            print_success(
-                f"custom_lint launched in {len(example_dirs)} packages"
-            )
+
+        with timer.step("Tests"):
+            if not run_tests(project_dir):
+                exit_with_error("Tests failed.", ExitCode.TEST_FAILED)
+
+        with timer.step("Format"):
+            if not run_format(project_dir):
+                exit_with_error(
+                    "Formatting failed.", ExitCode.VALIDATION_FAILED,
+                )
+
+        with timer.step("Analysis"):
+            if not run_analysis(project_dir):
+                exit_with_error(
+                    "Analysis failed.", ExitCode.ANALYSIS_FAILED,
+                )
+
+        # --- Step 8: Version prompt (interactive, not timed) ---
+        print_header("VERSION")
+        if tag_exists_on_remote(project_dir, f"v{pubspec_version}"):
+            default_version = increment_patch_version(pubspec_version)
         else:
+            default_version = pubspec_version
+
+        while True:
+            version = _prompt_version(default_version)
+            if re.match(r"^\d+\.\d+\.\d+$", version):
+                break
+            print_warning(
+                f"Invalid version format '{version}'. Use X.Y.Z"
+            )
+
+        with timer.step("Version sync"):
+            if version != pubspec_version:
+                set_version_in_pubspec(pubspec_path, version)
+                print_success(f"Updated pubspec.yaml to {version}")
+
+            # Rename [Unreleased] to this version
+            try:
+                if rename_unreleased_to_version(changelog_path, version):
+                    print_success(
+                        f"Renamed [Unreleased] to [{version}] "
+                        f"in CHANGELOG.md"
+                    )
+            except ValueError as exc:
+                exit_with_error(
+                    str(exc), ExitCode.CHANGELOG_FAILED,
+                )
+
+            # Validate versions in sync
+            changelog_version = get_latest_changelog_version(
+                changelog_path,
+            )
+            if changelog_version is None:
+                exit_with_error(
+                    "Could not extract version from CHANGELOG.md",
+                    ExitCode.CHANGELOG_FAILED,
+                )
+            if version != changelog_version:
+                if parse_version(version) < parse_version(
+                    changelog_version,
+                ):
+                    print_warning(
+                        f"pubspec version ({version}) is behind "
+                        f"CHANGELOG ({changelog_version}). "
+                        f"Updating pubspec..."
+                    )
+                    set_version_in_pubspec(
+                        pubspec_path, changelog_version,
+                    )
+                    version = changelog_version
+                    print_success(
+                        f"Updated pubspec.yaml to {version}"
+                    )
+                else:
+                    exit_with_error(
+                        f"Version mismatch: pubspec={version} "
+                        f"is ahead of CHANGELOG="
+                        f"{changelog_version}. "
+                        f"Update CHANGELOG.md first.",
+                        ExitCode.CHANGELOG_FAILED,
+                    )
+
+            # Fail fast if already published
+            tag_name = f"v{version}"
+            if tag_exists_on_remote(project_dir, tag_name):
+                exit_with_error(
+                    f"Tag {tag_name} already exists on remote. "
+                    f"Version {version} has already been published.",
+                    ExitCode.GIT_FAILED,
+                )
+
+        print_colored(
+            f"      Publishing: {version}", Color.CYAN,
+        )
+        print_colored(f"      Tag:        v{version}", Color.CYAN)
+        print()
+
+        # --- Steps 9-11: Version-dependent validation ---
+        with timer.step("Badge sync"):
+            sync_readme_badges(project_dir, version, rule_count)
+
+        with timer.step("CHANGELOG validation"):
+            ok, release_notes = validate_changelog(
+                project_dir, version,
+            )
+            if not ok:
+                exit_with_error(
+                    "CHANGELOG failed", ExitCode.CHANGELOG_FAILED,
+                )
+
+        with timer.step("Docs"):
+            if not generate_docs(project_dir):
+                exit_with_error(
+                    "Docs failed", ExitCode.VALIDATION_FAILED,
+                )
+
+        with timer.step("Pre-publish validation"):
+            if not pre_publish_validation(project_dir):
+                exit_with_error(
+                    "Validation failed", ExitCode.VALIDATION_FAILED,
+                )
+
+        # --- Final CI gate ---
+        with timer.step("Final CI gate"):
+            print_header("FINAL CI GATE")
             print_info(
-                "Run manually: "
-                "python scripts/run_custom_lint_all.py"
+                "Re-running CI checks after version changes to "
+                "prevent burning a tag on a broken build..."
             )
+            if not run_analysis(project_dir):
+                exit_with_error(
+                    "Final CI gate failed \u2014 aborting before "
+                    "tag creation. Fix analysis issues and re-run.",
+                    ExitCode.ANALYSIS_FAILED,
+                )
+            print_success("CI gate passed \u2014 safe to create tag")
 
-    return ExitCode.SUCCESS.value
+        # --- Commit, tag, publish, release ---
+        with timer.step("Git commit & push"):
+            if not git_commit_and_push(
+                project_dir, version, branch,
+            ):
+                exit_with_error(
+                    "Git operations failed", ExitCode.GIT_FAILED,
+                )
+
+        with timer.step("Git tag"):
+            if not create_git_tag(project_dir, version):
+                exit_with_error(
+                    "Git tag failed", ExitCode.GIT_FAILED,
+                )
+
+        with timer.step("Publish"):
+            if not publish_to_pubdev_step(project_dir):
+                exit_with_error(
+                    "Publish failed", ExitCode.PUBLISH_FAILED,
+                )
+
+        with timer.step("GitHub release"):
+            gh_success, gh_error = create_github_release(
+                project_dir, version, release_notes,
+            )
+            if not gh_success:
+                exit_with_error(
+                    f"GitHub release failed: {gh_error}",
+                    ExitCode.GITHUB_RELEASE_FAILED,
+                )
+
+        # --- Post-publish (before timing summary) ---
+        try:
+            webbrowser.open(
+                f"https://pub.dev/packages/{package_name}",
+            )
+        except Exception:
+            pass
+
+        _offer_custom_lint(project_dir)
+        succeeded = True
+
+    except SystemExit as exc:
+        exit_code = exc.code if isinstance(exc.code, int) else 1
+
+    finally:
+        timer.print_summary()
+
+    # Final status (always the last output)
+    if succeeded:
+        repo_path = extract_repo_path(remote_url)
+        _print_success_banner(package_name, version, repo_path)
+
+    return exit_code
 
 
 if __name__ == "__main__":

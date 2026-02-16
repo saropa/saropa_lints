@@ -660,9 +660,9 @@ dart run saropa_lints:init --tier professional
 The tier you choose has a direct impact on analysis speed:
 
 - `essential`: ~300 rules → **fastest** (memory leaks, security, crashes)
-- `recommended`: ~800 rules → moderate (+ accessibility, performance)
+- `recommended`: ~850 rules → moderate (+ accessibility, performance)
 - `professional`: ~1500 rules → slower (+ architecture, documentation)
-- `comprehensive`/`pedantic`: 1567+ rules → **slowest** (everything)
+- `comprehensive`/`pedantic`: 1572+ rules → **slowest** (everything)
 
 ## Adoption Strategy
 
@@ -1127,6 +1127,7 @@ Built with care by the Flutter community. Questions? Ideas? We'd love to hear fr
 [pub_link]: https://pub.dev/packages/saropa_lints
 [github_link]: https://github.com/saropa/saropa_lints
 [issues_link]: https://github.com/saropa/saropa_lints/issues
+[saropa_link]: https://saropa.com
 
 ---
 
