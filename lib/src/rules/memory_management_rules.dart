@@ -1136,7 +1136,7 @@ class RequireCacheKeyUniquenessRule extends SaropaLintRule {
 /// is disposed. This causes memory leaks and potential use-after-dispose
 /// crashes.
 ///
-/// [HEURISTIC] This rule uses extends-clause analysis to identify widget
+/// `[HEURISTIC]` This rule uses extends-clause analysis to identify widget
 /// classes. Classes without an extends clause that happen to end with
 /// "Widget" or "State" are NOT treated as widgets — only explicit
 /// inheritance from Flutter widget base classes is checked. Classes with
