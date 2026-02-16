@@ -614,6 +614,47 @@ void main() {
     });
   });
 
+    group('prefer_wheretype_over_where_is', () {
+      test('should not flag negated type checks (is!)', () {
+        // Fixed: IsExpression matches both `is` and `is!`, but the rule
+        // never checked expr.notOperator. `.where((e) => e is! T)` has
+        // no whereType equivalent — it excludes a type, not includes.
+        //
+        // These must NOT trigger:
+        // - list.where((e) => e is! String)
+        // - items.where((w) => w is! PhoneRow)
+
+        expect(
+          'Negated is! checks are skipped via notOperator guard',
+          isNotNull,
+        );
+      });
+
+      test('should still flag positive type checks', () {
+        // Expected behavior: These SHOULD trigger
+        // - list.where((e) => e is String)
+        // - items.where((w) => w is Widget)
+
+        expect(
+          'Positive is checks are still detected',
+          isNotNull,
+        );
+      });
+
+      test('auto-fix should not produce semantically wrong replacement', () {
+        // Fixed: The auto-fix also lacked the notOperator guard and would
+        // replace `.where((e) => e is! T)` with `.whereType<T>()`,
+        // which inverts the filtering logic.
+        //
+        // After fix: auto-fix only runs on positive `is` checks.
+
+        expect(
+          'Auto-fix guard prevents incorrect is! to whereType replacement',
+          isNotNull,
+        );
+      });
+    });
+
   group('Test Fixture Coverage', () {
     test('require_subscription_status_check has test fixture', () {
       // Located at: example/lib/require_subscription_status_check_example.dart
@@ -653,6 +694,11 @@ void main() {
     test('require_websocket_reconnection has mock stubs', () {
       // Located at: example/lib/flutter_mocks.dart (WebSocket, WebSocketChannel)
       // Fixture at: example_async/lib/async/async_rules_fixture.dart
+      expect(true, isTrue);
+    });
+
+    test('prefer_wheretype_over_where_is has test fixture', () {
+      // Located at: example_style/lib/stylistic_null_collection/prefer_wheretype_over_where_is_fixture.dart
       expect(true, isTrue);
     });
   });

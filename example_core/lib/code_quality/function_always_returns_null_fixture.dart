@@ -184,6 +184,29 @@ class _ItemGenerator {
   }
 }
 
+// Extension method async* generator — should NOT be flagged
+extension _QueryExtension on List<int> {
+  Stream<List<int>> watchResultsSafe() async* {
+    if (isEmpty) return; // Ends stream
+    yield this;
+  }
+}
+
+// Nullable Stream? async* generator — should NOT be flagged
+// Matches the bug report pattern: Stream<T>? method() async* { ... }
+Stream<List<int>>? nullableStreamGenerator(List<int>? items) async* {
+  if (items == null || items.isEmpty) return; // Ends stream
+  yield items;
+}
+
+// =========================================================================
+// Known trade-off: Non-generator Stream?/Iterable? returning null
+// =========================================================================
+// The return-type guard skips Stream/Iterable return types entirely.
+// A non-generator function returning Stream? that always returns null is
+// NOT flagged. This is an intentional trade-off — the pattern is extremely
+// rare, and the benefit of correctly handling generators far outweighs it.
+
 // =========================================================================
 // Mock functions
 // =========================================================================

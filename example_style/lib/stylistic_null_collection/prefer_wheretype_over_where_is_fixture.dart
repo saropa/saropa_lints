@@ -106,12 +106,22 @@
 import 'package:saropa_lints_example/flutter_mocks.dart';
 
 // BAD: Should trigger prefer_wheretype_over_where_is
-// expect_lint: prefer_wheretype_over_where_is
 void _bad1117() {
-  // TODO: Add method call that triggers prefer_wheretype_over_where_is
+  final items = <Object>[1, 'a', 2.0];
+  // expect_lint: prefer_wheretype_over_where_is
+  final strings = items.where((e) => e is String).toList();
 }
 
 // GOOD: Should NOT trigger prefer_wheretype_over_where_is
 void _good1117() {
-  // TODO: Add compliant method call for prefer_wheretype_over_where_is
+  final items = <Object>[1, 'a', 2.0];
+  // Using whereType directly
+  final strings = items.whereType<String>().toList();
+}
+
+// GOOD: Negated type check — no whereType equivalent for exclusion
+void _goodNegated1117() {
+  final items = <Object>[1, 'a', 2.0];
+  // is! has no whereType equivalent, should NOT trigger
+  final nonStrings = items.where((e) => e is! String).toList();
 }
