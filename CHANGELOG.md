@@ -15,7 +15,13 @@ Dates are not included in version headers — [pub.dev](https://pub.dev/packages
 
 ### Fixed
 
+- **`require_error_case_tests` false positive on defensive try-catch source code**: Expanded test-name keyword detection from 12 to 30 keywords, covering defensive behavior patterns (`safely`, `graceful`, `defensive`, `default`, `zero`), lifecycle conditions (`dispose`, `closed`, `disconnect`), failure conditions (`timeout`, `cancel`, `overflow`), input validation (`malformed`, `corrupt`), and access control (`denied`, `unauthorized`, `reject`). Test files whose names describe fallback-value testing (e.g. "returns zero when unattached") are no longer flagged
+- **`prefer_setup_teardown` false positive on assertion calls**: The rule no longer treats `expect()`, `verify()`, `fail()`, and other test assertion/verification functions as duplicated setup code. Also scoped signature matching to within a single `group()` block — tests in unrelated groups no longer inflate the duplicate count
+- **`avoid_url_launcher_simulator_tests` false positive on non-url_launcher tests**: Rule now requires both a `url_launcher` import and launcher API usage (e.g. `launchUrl`, `canLaunchUrl`) — scheme strings alone no longer trigger the warning. Also removed `group()` matching to avoid flagging hundreds of lines for a single scheme string
+- **`function_always_returns_null` false positive on generator functions**: Added return-type guard (`Stream`/`Iterable`) as belt-and-suspenders for `async*`/`sync*` generators where `body.isGenerator` fails to resolve correctly in some analyzer versions
+- **`require_ios_callkit_integration` false positive from substring matching**: Pattern matching now uses word boundaries instead of `String.contains()`, preventing false positives when VoIP SDK names appear as substrings of unrelated words (e.g. "Zagora" no longer matches the "Agora" pattern)
 - **`avoid_unnecessary_setstate` false positive on closure callbacks**: The rule no longer flags `setState` inside deferred callbacks (`.listen()`, `Future.delayed()`, `.then()`, `addPostFrameCallback()`) defined within lifecycle methods — only direct synchronous `setState` calls are flagged
+- **`prefer_wheretype_over_where_is` false positive on negated type checks**: The rule no longer fires on `.where((e) => e is! T)` patterns, since `whereType<T>()` only filters *for* a type and cannot exclude one. The auto-fix is also guarded to prevent generating semantically incorrect replacements
 
 ### Added
 
