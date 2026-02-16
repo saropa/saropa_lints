@@ -113,7 +113,6 @@ See [CHANGELOG.md](CHANGELOG.md) for implemented rules. Goal: 2200 rules (1726 i
 
 | Rule Name | Tier | Severity | Description |
 |-----------|------|----------|-------------|
-| ⚠️⭐ `avoid_color_only_meaning` | Essential | WARNING | Never use color alone to convey information (red=error). Add icons, text, or patterns for colorblind users. |
 | ℹ️ `prefer_high_contrast_mode` | Professional | INFO | Support MediaQuery.highContrast for users who need stark color differences. Provide high-contrast theme variant. |
 | ℹ️ `prefer_dark_mode_colors` | Professional | INFO | Dark mode isn't just inverted colors. Ensure proper contrast, reduce pure white text, and test readability. |
 | ℹ️ `require_link_distinction` | Comprehensive | INFO | Links must be distinguishable from regular text without relying on color alone. Use underline or other visual treatment. |
@@ -262,8 +261,6 @@ See [CHANGELOG.md](CHANGELOG.md) for implemented rules. Goal: 2200 rules (1726 i
 
 | Rule Name | Tier | Severity | Description |
 |-----------|------|----------|-------------|
-| ⚠️⭐ `require_rtl_layout_support` | Recommended | WARNING | RTL languages need directional awareness. Detect hardcoded left/right in layouts without Directionality check. |
-
 ### 1.47 Stepper & Multi-step Flow Rules
 
 | Rule Name | Tier | Severity | Description |
@@ -364,8 +361,6 @@ See [CHANGELOG.md](CHANGELOG.md) for implemented rules. Goal: 2200 rules (1726 i
 
 | Rule Name | Tier | Severity | Description |
 |-----------|------|----------|-------------|
-| ⚠️⭐ `avoid_misused_hooks` | Essential | WARNING | Detect common hook misuse patterns. |
-
 #### Intl/Localization Rules
 
 | Rule Name | Tier | Severity | Description |
@@ -378,7 +373,6 @@ See [CHANGELOG.md](CHANGELOG.md) for implemented rules. Goal: 2200 rules (1726 i
 | Rule Name | Tier | Severity | Description |
 |-----------|------|----------|-------------|
 | ⚠️ `avoid_missing_controller` | Essential | WARNING | Widgets with controllers should have controllers provided. |
-| ⚠️⭐ `avoid_misused_test_matchers` | Recommended | WARNING | Detect incorrect usage of test matchers. |
 | ℹ️ `format_test_name` | Stylistic | INFO | Test names should follow a consistent format. |
 | ℹ️ `prefer_custom_finder_over_find` | Professional | INFO | Use custom finders for better test readability and maintenance. |
 
@@ -752,7 +746,6 @@ Rules for popular Flutter packages based on common gotchas, anti-patterns, and b
 | Rule Name | Tier | Severity | Description |
 |-----------|------|----------|-------------|
 | ⚠️ `avoid_clip_during_animation` | Professional | WARNING | Pre-clip content before animating. Detect ClipRect in animated widget. |
-| ⚠️⭐ `avoid_excessive_rebuilds_animation` | Essential | WARNING | Don't wrap entire screen in AnimatedBuilder. Detect large subtree in builder. |
 | ⚠️ `avoid_multiple_animation_controllers` | Professional | WARNING | Multiple controllers on same widget conflict. Detect multiple controllers without coordination. |
 
 ### 5.21 Stream/StreamBuilder Rules

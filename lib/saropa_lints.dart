@@ -2467,6 +2467,13 @@ final List<LintRule Function()> _allRuleFactories = <LintRule Function()>[
   AvoidFullSyncOnEveryLaunchRule.new,
   AvoidCachedImageUnboundedListRule.new,
   RequireSessionTimeoutRule.new,
+
+  // v4.16.0 - ROADMAP ⭐ Rules
+  AvoidColorOnlyMeaningRule.new,
+  AvoidExcessiveRebuildsAnimationRule.new,
+  AvoidMisusedHooksRule.new,
+  RequireRtlLayoutSupportRule.new,
+  AvoidMisusedTestMatchersRule.new,
 ];
 
 // =============================================================================
