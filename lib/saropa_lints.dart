@@ -2438,6 +2438,28 @@ final List<LintRule Function()> _allRuleFactories = <LintRule Function()>[
   RequireFeatureFlagTypeSafetyRule.new,
   RequireAnalyticsEventNamingRule.new,
   RequireTimezoneDisplayRule.new,
+
+  // v4.15.0 - ROADMAP ⭐ Rules
+  PreferSemanticsContainerRule.new,
+  AvoidRedundantSemanticsRule.new,
+  AvoidImagePickerQuickSuccessionRule.new,
+  RequireAnalyticsErrorHandlingRule.new,
+  PreferInputFormattersRule.new,
+  PreferGoRouterRedirectRule.new,
+  PreferPermissionRequestInContextRule.new,
+  AvoidSharedPrefsLargeDataRule.new,
+  PreferGeocodingCacheRule.new,
+  PreferOauthPkceRule.new,
+  AvoidContinuousLocationUpdatesRule.new,
+  PreferAdaptiveIconsRule.new,
+  PreferGracePeriodHandlingRule.new,
+  RequireCachedImageDevicePixelRatioRule.new,
+  PreferForegroundServiceAndroidRule.new,
+  PreferSliverFillRemainingForEmptyRule.new,
+  AvoidInfiniteScrollDuplicateRequestsRule.new,
+  PreferInfiniteScrollPreloadRule.new,
+  PreferUseCallbackRule.new,
+  RequireStepperStateManagementRule.new,
 ];
 
 // =============================================================================

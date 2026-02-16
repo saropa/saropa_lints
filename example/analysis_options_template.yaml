@@ -1376,3 +1376,55 @@ custom_lint:
     - avoid_case_sensitive_path_comparison: false   # WARNING - path == without case normalization (v4.9.20)
     - require_windows_single_instance_check: false  # INFO - main() without single-instance check (v4.9.20)
     - avoid_max_path_risk: false                    # INFO - deeply nested paths exceeding MAX_PATH (v4.9.20)
+
+    # =========================================================================
+    # V4.15.0 RULES - ROADMAP ⭐ Rules
+    # =========================================================================
+
+    # --- Accessibility ---
+    - prefer_semantics_container: false              # INFO - Semantics needs container: true for grouped children (v4.15.0)
+    - avoid_redundant_semantics: false               # INFO - Semantics wrapping Image with semanticLabel causes double announcements (v4.15.0)
+
+    # --- Forms & Input ---
+    - prefer_input_formatters: false                 # INFO - numeric/phone fields need TextInputFormatter (v4.15.0)
+    - require_stepper_state_management: false         # INFO - Stepper form state lost on back navigation (v4.15.0)
+
+    # --- Navigation ---
+    - prefer_go_router_redirect: false               # INFO - GoRouter without redirect exposes protected pages (v4.15.0)
+
+    # --- Permissions ---
+    - prefer_permission_request_in_context: false    # INFO - don't request permissions in main/initState (v4.15.0)
+
+    # --- Security ---
+    - prefer_oauth_pkce: false                       # INFO - OAuth without PKCE vulnerable to code interception (v4.15.0)
+
+    # --- UI/UX ---
+    - prefer_adaptive_icons: false                   # INFO - hardcoded Icon size ignores device form factor (v4.15.0)
+
+    # --- In-App Purchase ---
+    - prefer_grace_period_handling: false             # INFO - IAP check ignores billing grace period (v4.15.0)
+
+    # --- Image & Media ---
+    - avoid_image_picker_quick_succession: false      # WARNING - pickImage without loading guard causes crash (v4.15.0)
+    - require_cached_image_device_pixel_ratio: false  # INFO - CachedNetworkImage fixed size without DPR (v4.15.0)
+
+    # --- Analytics ---
+    - require_analytics_error_handling: false         # INFO - analytics calls need try-catch (v4.15.0)
+
+    # --- Storage ---
+    - avoid_shared_prefs_large_data: false            # WARNING - serialized data in SharedPreferences (v4.15.0)
+
+    # --- Location ---
+    - prefer_geocoding_cache: false                  # INFO - reverse geocoding without cache (v4.15.0)
+    - avoid_continuous_location_updates: false        # WARNING - GPS stream without distance filter (v4.15.0)
+
+    # --- Android Platform ---
+    - prefer_foreground_service_android: false        # INFO - Timer.periodic without foreground service (v4.15.0)
+
+    # --- Scroll & Lists ---
+    - prefer_sliverfillremaining_for_empty: false     # INFO - empty state needs SliverFillRemaining (v4.15.0)
+    - avoid_infinite_scroll_duplicate_requests: false # WARNING - scroll listener without loading guard (v4.15.0)
+    - prefer_infinite_scroll_preload: false           # INFO - load next page before reaching bottom (v4.15.0)
+
+    # --- Flutter Hooks ---
+    - prefer_use_callback: false                     # INFO - inline closure in HookWidget needs useCallback (v4.15.0)

@@ -525,3 +525,100 @@ class AvoidPermissionHandlerNullSafetyRule extends SaropaLintRule {
     });
   }
 }
+
+// =============================================================================
+// PERMISSION REQUEST CONTEXT RULES
+// =============================================================================
+
+/// Warns when permissions are requested at app startup instead of in context.
+///
+/// Since: v4.15.0 | Rule version: v1
+///
+/// Requesting all permissions in main() or initState() confuses users —
+/// they see permission dialogs before understanding why the app needs
+/// access. Request permissions when the user performs a relevant action
+/// (e.g., request camera when they tap "Take Photo"). This increases
+/// grant rates and follows platform guidelines.
+///
+/// **BAD:**
+/// ```dart
+/// void main() async {
+///   await Permission.camera.request();
+///   await Permission.location.request();
+///   runApp(MyApp());
+/// }
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// void onTakePhoto() async {
+///   final status = await Permission.camera.request();
+///   if (status.isGranted) { /* open camera */ }
+/// }
+/// ```
+class PreferPermissionRequestInContextRule extends SaropaLintRule {
+  const PreferPermissionRequestInContextRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  static const LintCode _code = LintCode(
+    name: 'prefer_permission_request_in_context',
+    problemMessage:
+        '[prefer_permission_request_in_context] Permission requested at app startup (main or initState) instead of in response to user action. Users see permission dialogs before understanding why the app needs access, leading to higher denial rates and a confusing first-launch experience. Platform guidelines (Apple, Google) recommend requesting permissions just-in-time when the user performs a relevant action. {v1}',
+    correctionMessage:
+        'Move the permission request to the point where the user performs the action that needs the permission (e.g., request camera when user taps "Take Photo").',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  /// Function names that indicate startup context.
+  static const Set<String> _startupFunctions = <String>{
+    'main',
+    'initState',
+    'init',
+    'initialize',
+    'setup',
+    'setUp',
+  };
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      // Check if this is a .request() call
+      if (node.methodName.name != 'request') return;
+
+      // Check if target looks like a Permission
+      final String? targetSource = node.target?.toSource();
+      if (targetSource == null) return;
+
+      final bool isPermission = targetSource.contains('Permission') ||
+          targetSource.contains('permission');
+      if (!isPermission) return;
+
+      // Check if inside a startup function
+      AstNode? current = node.parent;
+      while (current != null) {
+        if (current is FunctionDeclaration) {
+          if (_startupFunctions.contains(current.name.lexeme)) {
+            reporter.atNode(node, code);
+          }
+          return;
+        }
+        if (current is MethodDeclaration) {
+          if (_startupFunctions.contains(current.name.lexeme)) {
+            reporter.atNode(node, code);
+          }
+          return;
+        }
+        current = current.parent;
+      }
+    });
+  }
+}

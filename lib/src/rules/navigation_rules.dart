@@ -3548,3 +3548,80 @@ class _AddAwaitToNavigatorPushFix extends DartFix {
     });
   }
 }
+
+// =============================================================================
+// GO ROUTER REDIRECT RULES
+// =============================================================================
+
+/// Warns when GoRouter is created without a redirect callback.
+///
+/// Since: v4.15.0 | Rule version: v1
+///
+/// Authentication checks in GoRouter's `redirect` callback run before
+/// `build()`, preventing a flash of protected content. If auth checks
+/// are done in `build()` instead, users briefly see the protected page
+/// before being redirected — a poor UX and a potential information leak.
+///
+/// **BAD:**
+/// ```dart
+/// GoRouter(
+///   routes: [
+///     GoRoute(path: '/home', builder: (_, __) => HomeScreen()),
+///   ],
+/// )
+/// // Auth check done in HomeScreen.build()
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// GoRouter(
+///   redirect: (context, state) {
+///     if (!isLoggedIn) return '/login';
+///     return null;
+///   },
+///   routes: [
+///     GoRoute(path: '/home', builder: (_, __) => HomeScreen()),
+///   ],
+/// )
+/// ```
+class PreferGoRouterRedirectRule extends SaropaLintRule {
+  const PreferGoRouterRedirectRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  static const LintCode _code = LintCode(
+    name: 'prefer_go_router_redirect',
+    problemMessage:
+        '[prefer_go_router_redirect] GoRouter created without a redirect callback. Without redirect, authentication and authorization checks must happen in build(), which briefly shows the protected page before redirecting. Users see a flash of content they should not access, and crawlers or screen readers may capture protected information. Use the redirect callback to intercept navigation before any UI renders. {v1}',
+    correctionMessage:
+        'Add a redirect callback to GoRouter that checks authentication state and returns the login route for unauthenticated users.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addInstanceCreationExpression((
+      InstanceCreationExpression node,
+    ) {
+      final String typeName = node.constructorName.type.name.lexeme;
+      if (typeName != 'GoRouter') return;
+
+      // Check if redirect parameter is present
+      for (final Expression arg in node.argumentList.arguments) {
+        if (arg is NamedExpression && arg.name.label.name == 'redirect') {
+          return; // Has redirect, OK
+        }
+      }
+
+      reporter.atNode(node.constructorName, code);
+    });
+  }
+}
