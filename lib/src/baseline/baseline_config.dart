@@ -111,7 +111,8 @@ class BaselineConfig {
   }
 
   @override
-  String toString() => 'BaselineConfig('
+  String toString() =>
+      'BaselineConfig('
       'file: $file, '
       'date: $date, '
       'paths: $paths, '

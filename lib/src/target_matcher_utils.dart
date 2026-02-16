@@ -59,11 +59,7 @@ bool isExactTarget(Expression target, Set<String> targets) {
 ///   return; // Already disposed
 /// }
 /// ```
-bool isFieldCleanedUp(
-  String fieldName,
-  String methodName,
-  FunctionBody body,
-) {
+bool isFieldCleanedUp(String fieldName, String methodName, FunctionBody body) {
   final source = body.toSource();
   final pattern = RegExp(
     '${RegExp.escape(fieldName)}\\s*[?.]\\s*$methodName\\s*\\(',

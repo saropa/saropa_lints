@@ -97,8 +97,11 @@ class SeverityCounts {
 // JSON helpers — kept as top-level functions to avoid bloating BatchData.
 // ─────────────────────────────────────────────────────────────────────────────
 
-Map<String, Object> _severityCountsToJson(SeverityCounts sc) =>
-    {'e': sc.error, 'w': sc.warning, 'i': sc.info};
+Map<String, Object> _severityCountsToJson(SeverityCounts sc) => {
+  'e': sc.error,
+  'w': sc.warning,
+  'i': sc.info,
+};
 
 SeverityCounts _severityCountsFromJson(dynamic raw) {
   final m = raw as Map<String, dynamic>? ?? {};
@@ -117,13 +120,15 @@ Map<String, List<Map<String, Object>>> _violationsToJson(
     final list = violations[impact];
     if (list == null || list.isEmpty) continue;
     result[impact.name] = list
-        .map((v) => <String, Object>{
-              'r': v.rule,
-              'f': v.file,
-              'l': v.line,
-              'm': v.message,
-              if (v.correction != null) 'c2': v.correction!,
-            })
+        .map(
+          (v) => <String, Object>{
+            'r': v.rule,
+            'f': v.file,
+            'l': v.line,
+            'm': v.message,
+            if (v.correction != null) 'c2': v.correction!,
+          },
+        )
         .toList();
   }
   return result;
@@ -139,31 +144,33 @@ Map<LintImpact, List<ViolationRecord>> _violationsFromJson(dynamic raw) {
 
     result[impact] = list
         .cast<Map<String, dynamic>>()
-        .map((m) => ViolationRecord(
-              rule: m['r'] as String,
-              file: m['f'] as String,
-              line: m['l'] as int,
-              message: m['m'] as String,
-              correction: m['c2'] as String?,
-            ))
+        .map(
+          (m) => ViolationRecord(
+            rule: m['r'] as String,
+            file: m['f'] as String,
+            line: m['l'] as int,
+            message: m['m'] as String,
+            correction: m['c2'] as String?,
+          ),
+        )
         .toList();
   }
   return result;
 }
 
 Map<String, Object> _configToJson(ReportConfig c) => <String, Object>{
-      'version': c.version,
-      'tier': c.effectiveTier,
-      'ruleCount': c.enabledRuleCount,
-      'rules': c.enabledRuleNames,
-      'ePlatforms': c.enabledPlatforms,
-      'dPlatforms': c.disabledPlatforms,
-      'ePackages': c.enabledPackages,
-      'dPackages': c.disabledPackages,
-      'exclusions': c.userExclusions,
-      'maxIssues': c.maxIssues,
-      'output': c.outputMode,
-    };
+  'version': c.version,
+  'tier': c.effectiveTier,
+  'ruleCount': c.enabledRuleCount,
+  'rules': c.enabledRuleNames,
+  'ePlatforms': c.enabledPlatforms,
+  'dPlatforms': c.disabledPlatforms,
+  'ePackages': c.enabledPackages,
+  'dPackages': c.disabledPackages,
+  'exclusions': c.userExclusions,
+  'maxIssues': c.maxIssues,
+  'output': c.outputMode,
+};
 
 ReportConfig? _configFromJson(dynamic raw) {
   if (raw is! Map<String, dynamic>) return null;

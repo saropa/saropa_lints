@@ -120,10 +120,7 @@ class ReportConsolidator {
   ///
   /// If no batch files exist, returns null. Corrupted or locked
   /// batch files are silently skipped.
-  static ConsolidatedData? consolidate(
-    String projectRoot,
-    String sessionId,
-  ) {
+  static ConsolidatedData? consolidate(String projectRoot, String sessionId) {
     final batches = _readAllBatches(projectRoot, sessionId);
     if (batches.isEmpty) return null;
     return _merge(batches);
@@ -206,10 +203,7 @@ class ReportConsolidator {
   }
 
   /// Read and parse all batch JSON files for [sessionId].
-  static List<BatchData> _readAllBatches(
-    String projectRoot,
-    String sessionId,
-  ) {
+  static List<BatchData> _readAllBatches(String projectRoot, String sessionId) {
     final batches = <BatchData>[];
     try {
       final dir = Directory(_batchDir(projectRoot));
