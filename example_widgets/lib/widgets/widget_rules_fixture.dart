@@ -530,7 +530,7 @@ class GoodDateFormatWidget extends StatelessWidget {
 // BAD: Destructive dialog without barrierDismissible
 void showDeleteDialog(BuildContext context) {
   // expect_lint: require_dialog_barrier_consideration
-  showDialogMock(
+  showDialog(
     context: context,
     builder: (context) => AlertDialog(
       title: Text('Delete account?'),
@@ -541,7 +541,7 @@ void showDeleteDialog(BuildContext context) {
 
 // GOOD: Destructive dialog with barrierDismissible: false
 void showDeleteDialogGood(BuildContext context) {
-  showDialogMock(
+  showDialog(
     context: context,
     barrierDismissible: false, // Explicit
     builder: (context) => AlertDialog(
@@ -557,7 +557,7 @@ class DateFormatMock {
   String format(DateTime date) => '';
 }
 
-Future<T?> showDialogMock<T>({
+Future<T?> showDialog<T>({
   required BuildContext context,
   required Widget Function(BuildContext) builder,
   bool barrierDismissible = true,

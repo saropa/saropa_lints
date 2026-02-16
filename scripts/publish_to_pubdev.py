@@ -477,6 +477,20 @@ def main() -> int:
     if not pre_publish_validation(project_dir):
         exit_with_error("Validation failed", ExitCode.VALIDATION_FAILED)
 
+    # --- Final CI-equivalent gate (before creating any irreversible tags) ---
+    print_header("FINAL CI GATE")
+    print_info(
+        "Re-running CI checks after version changes to prevent "
+        "burning a tag on a broken build..."
+    )
+    if not run_analysis(project_dir):
+        exit_with_error(
+            "Final CI gate failed — aborting before tag creation. "
+            "Fix analysis issues and re-run.",
+            ExitCode.ANALYSIS_FAILED,
+        )
+    print_success("CI gate passed — safe to create tag")
+
     # --- Commit, tag, publish, release ---
     if not git_commit_and_push(project_dir, version, branch):
         exit_with_error("Git operations failed", ExitCode.GIT_FAILED)

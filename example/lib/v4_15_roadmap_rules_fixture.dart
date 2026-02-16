@@ -8,7 +8,7 @@
 // =============================================================================
 
 // BAD: Semantics wraps Column without container: true
-// expect_lint: prefer_semantics_container
+// TODO: expect_lint: prefer_semantics_container (uncomment when code is uncommented)
 // Widget badSemantics() => Semantics(
 //   label: 'User info',
 //   child: Column(children: []),
@@ -32,7 +32,7 @@
 // =============================================================================
 
 // BAD: Semantics wrapping Image with semanticLabel
-// expect_lint: avoid_redundant_semantics
+// TODO: expect_lint: avoid_redundant_semantics (uncomment when code is uncommented)
 // Widget badRedundant() => Semantics(
 //   label: 'Logo',
 //   child: Image.asset('logo.png', semanticLabel: 'Logo'),
