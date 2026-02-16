@@ -115,9 +115,37 @@ void _bad862() {
   }
 }
 
+// BAD: Standalone iPad references
+// expect_lint: avoid_ios_hardcoded_device_model
+void _badIPadPro() {
+  if (deviceModel.contains('iPad Pro')) {}
+}
+
+// expect_lint: avoid_ios_hardcoded_device_model
+void _badIPadAir() {
+  if (deviceModel.contains('iPad Air 5')) {}
+}
+
+// expect_lint: avoid_ios_hardcoded_device_model
+void _badIPadMini() {
+  if (deviceModel.contains('iPad mini')) {}
+}
+
+// expect_lint: avoid_ios_hardcoded_device_model
+void _badIPodTouch() {
+  if (deviceModel.contains('iPod touch')) {}
+}
+
 // GOOD: Should NOT trigger avoid_ios_hardcoded_device_model
 void _good862() {
   // Use MediaQuery for safe area detection
   final topPadding = MediaQuery.of(context).padding.top;
   final hasDynamicIsland = topPadding > 50;
+}
+
+// GOOD: Domains containing "ipad" as a substring — not device models
+void _goodSubstringDomains() {
+  const domain1 = 'tripadvisor.com';
+  const domain2 = 'tripadvisor.co.uk';
+  const brand = 'tripadvisor';
 }

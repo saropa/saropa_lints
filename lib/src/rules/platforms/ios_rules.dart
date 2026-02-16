@@ -3506,15 +3506,18 @@ class AvoidIosHardcodedDeviceModelRule extends SaropaLintRule {
     name: 'avoid_ios_hardcoded_device_model',
     problemMessage:
         '[avoid_ios_hardcoded_device_model] Hardcoded iOS device model detected. Device-specific code breaks '
-        'when new devices are released. {v2}',
+        'when new devices are released. {v3}',
     correctionMessage:
         'Use platform APIs to detect capabilities instead of device names.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
   /// Device model patterns to detect.
+  ///
+  /// Word boundaries prevent false positives on substrings
+  /// (e.g. 'tripadvisor' matching 'iPad').
   static final RegExp _deviceModelPattern = RegExp(
-    r'iPhone\s*\d+|iPad\s*(Pro|Air|mini)?\s*\d*|iPod\s+touch',
+    r'\biPhone\s*\d+|\biPad\b(\s+(Pro|Air|mini))?\s*\d*|\biPod\s+touch\b',
     caseSensitive: false,
   );
 

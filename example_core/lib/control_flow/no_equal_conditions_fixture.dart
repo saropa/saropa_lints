@@ -127,3 +127,37 @@ void _good292() {
     doB();
   }
 }
+
+// GOOD: Different if-case patterns on same scrutinee — should NOT trigger
+void _goodIfCaseDifferentPatterns() {
+  if (x case int _) {
+    doA();
+  } else if (x case String _) {
+    doB();
+  } else if (x case List<int> _) {
+    doC();
+  }
+}
+
+// BAD: Same if-case pattern on same scrutinee — SHOULD trigger
+// expect_lint: no_equal_conditions
+void _badIfCaseSamePattern() {
+  if (x case int _) {
+    doA();
+  } else if (x case int _) {
+    doB();
+  }
+}
+
+// GOOD: Enum if-case with different values — should NOT trigger
+enum _TestColor { red, green, blue }
+
+void _goodEnumIfCase(_TestColor c) {
+  if (c case _TestColor.red) {
+    doA();
+  } else if (c case _TestColor.green) {
+    doB();
+  } else if (c case _TestColor.blue) {
+    doC();
+  }
+}
