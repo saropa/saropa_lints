@@ -3673,7 +3673,7 @@ class AvoidBlocBusinessLogicInUiRule extends SaropaLintRule {
       while (current != null) {
         if (current is ClassDeclaration) {
           final String? extendsName =
-              current.extendsClause?.superclass.name2.lexeme;
+              current.extendsClause?.superclass.name.lexeme;
           if (extendsName != null &&
               (extendsName == 'Bloc' || extendsName == 'Cubit')) {
             reporter.atNode(node);
@@ -4380,7 +4380,7 @@ class RequireBlocRepositoryInjectionRule extends SaropaLintRule {
     for (final variable in field.fields.variables) {
       final initializer = variable.initializer;
       if (initializer is InstanceCreationExpression) {
-        final typeName = initializer.constructorName.type.name2.lexeme;
+        final typeName = initializer.constructorName.type.name.lexeme;
         if (_repositorySuffixes.any((s) => typeName.endsWith(s))) {
           reporter.atNode(initializer);
         }
@@ -4403,7 +4403,7 @@ class _RepositoryCreationVisitor extends RecursiveAstVisitor<void> {
 
   @override
   void visitInstanceCreationExpression(InstanceCreationExpression node) {
-    final typeName = node.constructorName.type.name2.lexeme;
+    final typeName = node.constructorName.type.name.lexeme;
     if (_repositorySuffixes.any((s) => typeName.endsWith(s))) {
       onCreation(node);
     }

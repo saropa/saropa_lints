@@ -378,7 +378,7 @@ class RequireLinuxFontFallbackRule extends SaropaLintRule {
     SaropaContext context,
   ) {
     context.addInstanceCreationExpression((InstanceCreationExpression node) {
-      final String typeName = node.constructorName.type.name2.lexeme;
+      final String typeName = node.constructorName.type.name.lexeme;
       if (typeName != 'TextStyle') return;
 
       final NodeList<Expression> args = node.argumentList.arguments;

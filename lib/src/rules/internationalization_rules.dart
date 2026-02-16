@@ -1888,7 +1888,7 @@ class AvoidStringConcatenationForL10nRule extends SaropaLintRule {
       AstNode? current = node.parent;
       while (current != null) {
         if (current is InstanceCreationExpression) {
-          final String typeName = current.constructorName.type.name2.lexeme;
+          final String typeName = current.constructorName.type.name.lexeme;
           if (typeName == 'Text' ||
               typeName == 'RichText' ||
               typeName == 'SelectableText') {
@@ -1986,7 +1986,7 @@ class PreferNumberFormatRule extends SaropaLintRule {
     AstNode? current = node.parent;
     while (current != null) {
       if (current is InstanceCreationExpression) {
-        final String typeName = current.constructorName.type.name2.lexeme;
+        final String typeName = current.constructorName.type.name.lexeme;
         if (typeName == 'Text' ||
             typeName == 'RichText' ||
             typeName == 'SelectableText') {
@@ -2143,7 +2143,7 @@ class AvoidStringConcatenationL10nRule extends SaropaLintRule {
     SaropaContext context,
   ) {
     context.addInstanceCreationExpression((InstanceCreationExpression node) {
-      final String typeName = node.constructorName.type.name2.lexeme;
+      final String typeName = node.constructorName.type.name.lexeme;
       if (typeName != 'Text') return;
 
       final args = node.argumentList.arguments;
@@ -2305,7 +2305,7 @@ class AvoidHardcodedLocaleStringsRule extends SaropaLintRule {
     SaropaContext context,
   ) {
     context.addInstanceCreationExpression((InstanceCreationExpression node) {
-      final String typeName = node.constructorName.type.name2.lexeme;
+      final String typeName = node.constructorName.type.name.lexeme;
       if (typeName != 'Text') return;
 
       final args = node.argumentList.arguments;

@@ -2907,7 +2907,7 @@ class AvoidRiverpodNotifierInBuildRule extends SaropaLintRule {
     SaropaContext context,
   ) {
     context.addInstanceCreationExpression((InstanceCreationExpression node) {
-      final String typeName = node.constructorName.type.name2.lexeme;
+      final String typeName = node.constructorName.type.name.lexeme;
 
       // Check if it's a Notifier type
       bool isNotifier = _notifierTypes.contains(typeName);
@@ -2995,7 +2995,7 @@ class RequireRiverpodAsyncValueGuardRule extends SaropaLintRule {
       while (current != null) {
         if (current is ClassDeclaration) {
           final String? extendsName =
-              current.extendsClause?.superclass.name2.lexeme;
+              current.extendsClause?.superclass.name.lexeme;
           if (extendsName != null &&
               (extendsName.contains('AsyncNotifier') ||
                   extendsName.contains('FutureProvider'))) {

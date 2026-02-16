@@ -707,7 +707,7 @@ class PreferIso8601DatesRule extends SaropaLintRule {
     SaropaContext context,
   ) {
     context.addInstanceCreationExpression((InstanceCreationExpression node) {
-      final String constructorName = node.constructorName.type.name2.lexeme;
+      final String constructorName = node.constructorName.type.name.lexeme;
       if (constructorName != 'DateFormat') return;
 
       final NodeList<Expression> args = node.argumentList.arguments;
@@ -1204,7 +1204,7 @@ class RequireTimezoneDisplayRule extends SaropaLintRule {
     SaropaContext context,
   ) {
     context.addInstanceCreationExpression((InstanceCreationExpression node) {
-      final String typeName = node.constructorName.type.name2.lexeme;
+      final String typeName = node.constructorName.type.name.lexeme;
       if (typeName != 'DateFormat') return;
 
       final String? namedCtor = node.constructorName.name?.name;

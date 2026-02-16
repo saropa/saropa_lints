@@ -404,7 +404,7 @@ class PreferUseCallbackRule extends SaropaLintRule {
       final ExtendsClause? extendsClause = parent.extendsClause;
       if (extendsClause == null) return;
 
-      final String superclass = extendsClause.superclass.name2.lexeme;
+      final String superclass = extendsClause.superclass.name.lexeme;
       if (superclass != 'HookWidget' && superclass != 'HookConsumerWidget') {
         return;
       }
@@ -573,8 +573,7 @@ class AvoidMisusedHooksRule extends SaropaLintRule {
     AstNode? current = node.parent;
     while (current != null) {
       if (current is ClassDeclaration) {
-        final String? superName =
-            current.extendsClause?.superclass.name2.lexeme;
+        final String? superName = current.extendsClause?.superclass.name.lexeme;
         return superName == 'HookWidget' || superName == 'HookConsumerWidget';
       }
       current = current.parent;

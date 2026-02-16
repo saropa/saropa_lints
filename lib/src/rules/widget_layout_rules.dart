@@ -6050,7 +6050,7 @@ class PreferCustomSingleChildLayoutRule extends SaropaLintRule {
     SaropaContext context,
   ) {
     context.addInstanceCreationExpression((InstanceCreationExpression node) {
-      final String widgetName = node.constructorName.type.name2.lexeme;
+      final String widgetName = node.constructorName.type.name.lexeme;
 
       if (!_positioningWidgets.contains(widgetName)) return;
 
@@ -6059,7 +6059,7 @@ class PreferCustomSingleChildLayoutRule extends SaropaLintRule {
       AstNode? current = node.parent;
       while (current != null) {
         if (current is InstanceCreationExpression) {
-          final String parentName = current.constructorName.type.name2.lexeme;
+          final String parentName = current.constructorName.type.name.lexeme;
           if (_positioningWidgets.contains(parentName)) {
             depth++;
           }

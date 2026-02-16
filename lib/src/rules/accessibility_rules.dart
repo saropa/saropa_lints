@@ -3233,7 +3233,7 @@ class PreferLargeTouchTargetsRule extends SaropaLintRule {
     SaropaContext context,
   ) {
     context.addInstanceCreationExpression((InstanceCreationExpression node) {
-      final String typeName = node.constructorName.type.name2.lexeme;
+      final String typeName = node.constructorName.type.name.lexeme;
       if (!_interactiveWidgets.contains(typeName)) return;
 
       // Check for explicit small size constraints
@@ -3284,7 +3284,7 @@ class PreferLargeTouchTargetsRule extends SaropaLintRule {
   ) {
     if (expr is! InstanceCreationExpression) return;
 
-    final String typeName = expr.constructorName.type.name2.lexeme;
+    final String typeName = expr.constructorName.type.name.lexeme;
     if (typeName != 'BoxConstraints') return;
 
     for (final Expression arg in expr.argumentList.arguments) {
@@ -3378,7 +3378,7 @@ class AvoidTimeLimitsRule extends SaropaLintRule {
     SaropaContext context,
   ) {
     context.addInstanceCreationExpression((InstanceCreationExpression node) {
-      final String constructorName = node.constructorName.type.name2.lexeme;
+      final String constructorName = node.constructorName.type.name.lexeme;
       if (constructorName != 'SnackBar' && constructorName != 'Toast') return;
 
       // Check for duration parameter
@@ -3421,7 +3421,7 @@ class AvoidTimeLimitsRule extends SaropaLintRule {
   int? _extractDurationSeconds(Expression expr) {
     if (expr is! InstanceCreationExpression) return null;
 
-    final typeName = expr.constructorName.type.name2.lexeme;
+    final typeName = expr.constructorName.type.name.lexeme;
     if (typeName != 'Duration') return null;
 
     final constructorNameNode = expr.constructorName.name;

@@ -1895,7 +1895,7 @@ class PreferDescriptiveBoolNamesRule extends SaropaLintRule {
   ) {
     // Check variable declarations
     context.addVariableDeclaration((VariableDeclaration node) {
-      final element = node.declaredElement;
+      final element = node.declaredFragment?.element;
       if (element == null) return;
 
       // Check for bool or bool?
@@ -1924,7 +1924,7 @@ class PreferDescriptiveBoolNamesRule extends SaropaLintRule {
     // Check field declarations (class members)
     context.addFieldDeclaration((FieldDeclaration node) {
       for (final VariableDeclaration variable in node.fields.variables) {
-        final element = variable.declaredElement;
+        final element = variable.declaredFragment?.element;
         if (element == null) continue;
 
         final String typeStr = element.type.toString();
@@ -2067,7 +2067,7 @@ class PreferDescriptiveBoolNamesStrictRule extends SaropaLintRule {
   ) {
     // Check variable declarations
     context.addVariableDeclaration((VariableDeclaration node) {
-      final element = node.declaredElement;
+      final element = node.declaredFragment?.element;
       if (element == null) return;
 
       // Check for bool or bool?
@@ -2096,7 +2096,7 @@ class PreferDescriptiveBoolNamesStrictRule extends SaropaLintRule {
     // Check field declarations (class members)
     context.addFieldDeclaration((FieldDeclaration node) {
       for (final VariableDeclaration variable in node.fields.variables) {
-        final element = variable.declaredElement;
+        final element = variable.declaredFragment?.element;
         if (element == null) continue;
 
         final String typeStr = element.type.toString();

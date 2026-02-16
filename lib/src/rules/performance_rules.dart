@@ -3017,7 +3017,7 @@ class RequireWindowCloseConfirmationRule extends SaropaLintRule {
     context.addClassDeclaration((ClassDeclaration node) {
       final ExtendsClause? extendsClause = node.extendsClause;
       if (extendsClause != null) {
-        final String superName = extendsClause.superclass.name2.lexeme;
+        final String superName = extendsClause.superclass.name.lexeme;
         if (superName == 'WidgetsBindingObserver') {
           observerClass = node;
         }
@@ -3848,7 +3848,7 @@ class PreferElementRebuildRule extends SaropaLintRule {
       for (final ReturnStatement ret in returns) {
         final Expression? expr = ret.expression;
         if (expr is InstanceCreationExpression) {
-          returnTypes.add(expr.constructorName.type.name2.lexeme);
+          returnTypes.add(expr.constructorName.type.name.lexeme);
         } else if (expr is MethodInvocation) {
           returnTypes.add(expr.methodName.name);
         }
