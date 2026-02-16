@@ -155,6 +155,12 @@ void testNumberFormatLocale() {
   final goodFormat3 = NumberFormat.currency(locale: locale, symbol: r'$');
   final goodFormat4 = NumberFormat.decimalPattern('de_DE');
   final goodFormat5 = NumberFormat.percentPattern('fr_FR');
+
+  // GOOD: Explicit device locale — intentionally uses user's locale
+  final goodFormat6 = NumberFormat('#,###', Intl.defaultLocale);
+  final goodFormat7 = NumberFormat.decimalPattern(Intl.defaultLocale);
+  final goodFormat8 = NumberFormat.compact(locale: Intl.defaultLocale);
+  final goodFormat9 = NumberFormat.percentPattern(Intl.defaultLocale);
 }
 
 // =========================================================================
@@ -421,6 +427,7 @@ void testIntlArgs() {
 
 // Mock Intl class
 class Intl {
+  static String? defaultLocale;
   static String message(String text, {String? desc, List<Object>? args}) =>
       text;
 }

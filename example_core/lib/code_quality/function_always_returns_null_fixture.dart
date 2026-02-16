@@ -107,8 +107,87 @@ void outerFunction() {
 }
 
 // =========================================================================
+// GOOD: Generator functions — yield values, return; ends the sequence
+// =========================================================================
+
+// Async generator with early exit — should NOT be flagged
+Stream<List<String>> asyncGeneratorWithEarlyExit(String query) async* {
+  final List<String>? items = await _loadItems(query);
+  if (items == null || items.isEmpty) {
+    yield <String>[];
+    return; // Ends stream, not a null return
+  }
+  yield items;
+}
+
+// Sync generator with early exit — should NOT be flagged
+Iterable<int> syncGeneratorWithEarlyExit(int count) sync* {
+  if (count <= 0) return; // Ends iterable, not a null return
+  for (int i = 0; i < count; i++) {
+    yield i;
+  }
+}
+
+// Async generator with no return statement — should NOT be flagged
+Stream<int> asyncGeneratorNoReturn() async* {
+  yield 1;
+  yield 2;
+}
+
+// Sync generator with multiple early exits — should NOT be flagged
+Iterable<String> syncGeneratorMultipleExits(List<String>? input) sync* {
+  if (input == null) return;
+  if (input.isEmpty) return;
+  for (final String item in input) {
+    yield item;
+  }
+}
+
+// =========================================================================
+// GOOD: Generator METHODS inside classes — should NOT be flagged
+// =========================================================================
+
+abstract class _SearchProviderBase {
+  Stream<List<String>> search(String query);
+}
+
+// Override async* method — should NOT be flagged
+class _ConcreteSearchProvider extends _SearchProviderBase {
+  @override
+  Stream<List<String>> search(String query) async* {
+    if (query.isEmpty) {
+      yield <String>[];
+      return; // Ends stream, not a null return
+    }
+    yield <String>[query];
+  }
+}
+
+// Class method async* generator — should NOT be flagged
+class _DataLoader {
+  Stream<int> loadBatches(int count) async* {
+    if (count <= 0) return;
+    for (int i = 0; i < count; i++) {
+      yield i;
+    }
+  }
+}
+
+// Class method sync* generator — should NOT be flagged
+class _ItemGenerator {
+  Iterable<String> generateItems(List<String>? input) sync* {
+    if (input == null) return;
+    if (input.isEmpty) return;
+    for (final String item in input) {
+      yield item;
+    }
+  }
+}
+
+// =========================================================================
 // Mock functions
 // =========================================================================
 
 void doSomething() {}
 Future<void> doAsyncWork() async {}
+Future<List<String>?> _loadItems(String query) async => <String>['a'];

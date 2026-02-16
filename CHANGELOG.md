@@ -11,6 +11,21 @@ Dates are not included in version headers — [pub.dev](https://pub.dev/packages
 ** See the current published changelog: [saropa_lints/changelog](https://pub.dev/packages/saropa_lints/changelog)
 
 ---
+## [4.14.4]
+
+### Added
+
+- **`require_number_format_locale` quick fix**: New "Use device locale (Intl.defaultLocale)" quick fix inserts `Intl.defaultLocale` as the locale argument, letting developers explicitly acknowledge intentional device-locale formatting without `// ignore` comments
+
+### Fixed
+
+- **`avoid_ios_hardcoded_device_model` false positive on substring matches**: Added word boundary assertions to the device model regex so strings like `'tripadvisor.com'` (containing `ipad` as a substring) are no longer flagged as hardcoded iOS device models (v3)
+- **`check_mounted_after_async` false positive on early-return guards**: Rule now recognizes `if (!mounted) return;` and `if (!context.mounted) return;` guard patterns as valid mounted checks, not just wrapping `if (mounted) { ... }` blocks. Also correctly invalidates guards when a subsequent await occurs between the guard and the target call (v5)
+- **`avoid_missing_enum_constant_in_map` false positive on complete maps**: Rule now resolves the actual enum type instead of using a 2-5 key heuristic, eliminating false positives on maps that include all enum constants
+- **`no_equal_conditions` false positive on `if-case` pattern matching**: Rule now includes the `caseClause` in the condition key so `if (x case A) ... else if (x case B)` chains with different patterns are no longer flagged as duplicate conditions (v5)
+- **`function_always_returns_null` false positive on generators**: Rule no longer flags `async*` and `sync*` generator functions or methods where bare `return;` statements end the stream/iterable rather than returning null. Covers both top-level functions (`addFunctionDeclaration`) and class methods (`addMethodDeclaration`)
+
+---
 ## [4.14.3]
 
 ### Fixed

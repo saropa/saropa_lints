@@ -466,3 +466,102 @@ class _GoodShowDialogAfterAwaitWithGuardState
   @override
   Widget build(BuildContext context) => const Text('test');
 }
+
+// =========================================================================
+// check_mounted_after_async - early-return guard pattern recognition
+// =========================================================================
+
+// GOOD: Early-return guard with !mounted before setState
+class GoodEarlyReturnMountedGuard extends StatefulWidget {
+  const GoodEarlyReturnMountedGuard({super.key});
+
+  @override
+  State<GoodEarlyReturnMountedGuard> createState() =>
+      _GoodEarlyReturnMountedGuardState();
+}
+
+class _GoodEarlyReturnMountedGuardState
+    extends State<GoodEarlyReturnMountedGuard> {
+  String _data = '';
+
+  Future<void> loadData() async {
+    final data = await Future.value('data');
+    if (!mounted) return;
+    setState(() => _data = data); // Protected by early-return guard
+  }
+
+  @override
+  Widget build(BuildContext context) => Text(_data);
+}
+
+// GOOD: Early-return guard with !context.mounted before showDialog
+class GoodContextMountedGuard extends StatefulWidget {
+  const GoodContextMountedGuard({super.key});
+
+  @override
+  State<GoodContextMountedGuard> createState() =>
+      _GoodContextMountedGuardState();
+}
+
+class _GoodContextMountedGuardState extends State<GoodContextMountedGuard> {
+  Future<void> loadAndShow() async {
+    await Future.value('data');
+    if (!context.mounted) return;
+    showDialog(
+      context: context,
+      builder: (_) => const Text('dialog'),
+    ); // Protected by context.mounted early-return guard
+  }
+
+  @override
+  Widget build(BuildContext context) => const Text('test');
+}
+
+// GOOD: Double guard — await, guard, await, guard, setState
+class GoodDoubleGuard extends StatefulWidget {
+  const GoodDoubleGuard({super.key});
+
+  @override
+  State<GoodDoubleGuard> createState() => _GoodDoubleGuardState();
+}
+
+class _GoodDoubleGuardState extends State<GoodDoubleGuard> {
+  String _data = '';
+
+  Future<void> loadThenSave() async {
+    final data = await Future.value('data');
+    if (!mounted) return;
+    await Future.value(null);
+    if (!mounted) return;
+    setState(
+        () => _data = data); // Protected by second guard after second await
+  }
+
+  @override
+  Widget build(BuildContext context) => Text(_data);
+}
+
+// BAD: Guard before first await but NOT after second await
+class BadGuardBeforeSecondAwait extends StatefulWidget {
+  const BadGuardBeforeSecondAwait({super.key});
+
+  @override
+  State<BadGuardBeforeSecondAwait> createState() =>
+      _BadGuardBeforeSecondAwaitState();
+}
+
+class _BadGuardBeforeSecondAwaitState extends State<BadGuardBeforeSecondAwait> {
+  String _data = '';
+
+  Future<void> loadThenSave() async {
+    final data = await Future.value('data');
+    if (!mounted) return;
+    await Future.value(null); // Second await invalidates the first guard
+    // expect_lint: check_mounted_after_async
+    setState(
+        () => _data = data); // NOT protected — needs guard after second await
+  }
+
+  @override
+  Widget build(BuildContext context) => Text(_data);
+}
