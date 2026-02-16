@@ -1861,3 +1861,102 @@ class _RequireImageCacheDimensionsFix extends DartFix {
     });
   }
 }
+
+// =============================================================================
+// CACHED IMAGE DEVICE PIXEL RATIO RULES
+// =============================================================================
+
+/// Warns when CachedNetworkImage uses fixed width/height without DPR.
+///
+/// Since: v4.15.0 | Rule version: v1
+///
+/// Using fixed pixel dimensions for network images ignores device pixel
+/// ratio (DPR). A 200px image looks crisp on a 1x screen but blurry on
+/// a 3x screen. Multiply dimensions by devicePixelRatio or use
+/// MediaQuery-based sizing.
+///
+/// **BAD:**
+/// ```dart
+/// CachedNetworkImage(
+///   imageUrl: url,
+///   width: 200,
+///   height: 200,
+/// )
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// CachedNetworkImage(
+///   imageUrl: url,
+///   width: 200 * MediaQuery.of(context).devicePixelRatio,
+///   height: 200 * MediaQuery.of(context).devicePixelRatio,
+///   memCacheWidth: (200 * dpr).toInt(),
+/// )
+/// ```
+class RequireCachedImageDevicePixelRatioRule extends SaropaLintRule {
+  const RequireCachedImageDevicePixelRatioRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  static const LintCode _code = LintCode(
+    name: 'require_cached_image_device_pixel_ratio',
+    problemMessage:
+        '[require_cached_image_device_pixel_ratio] CachedNetworkImage has fixed width or height without considering devicePixelRatio. A 200px image looks crisp on a 1x display but blurry on 2x and 3x screens (most modern phones). Without DPR scaling, images appear pixelated on high-density devices or waste bandwidth on low-density ones. Scale dimensions by MediaQuery.of(context).devicePixelRatio or use memCacheWidth/memCacheHeight for memory-efficient DPR-aware sizing. {v1}',
+    correctionMessage:
+        'Multiply the fixed dimensions by MediaQuery.of(context).devicePixelRatio, or use memCacheWidth/memCacheHeight for cache-level DPR scaling.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addInstanceCreationExpression((
+      InstanceCreationExpression node,
+    ) {
+      final String typeName = node.constructorName.type.name.lexeme;
+      if (typeName != 'CachedNetworkImage') return;
+
+      bool hasFixedSize = false;
+      bool hasDprScaling = false;
+
+      for (final Expression arg in node.argumentList.arguments) {
+        if (arg is! NamedExpression) continue;
+        final String name = arg.name.label.name;
+
+        // Check for fixed width/height
+        if (name == 'width' || name == 'height') {
+          if (arg.expression is IntegerLiteral ||
+              arg.expression is DoubleLiteral) {
+            hasFixedSize = true;
+          }
+        }
+
+        // Check for DPR-aware parameters
+        if (name == 'memCacheWidth' || name == 'memCacheHeight') {
+          hasDprScaling = true;
+        }
+      }
+
+      // Check if the size expressions reference devicePixelRatio
+      if (hasFixedSize) {
+        final String source = node.toSource();
+        if (source.contains('devicePixelRatio') ||
+            source.contains('dpr') ||
+            source.contains('DPR')) {
+          hasDprScaling = true;
+        }
+      }
+
+      if (hasFixedSize && !hasDprScaling) {
+        reporter.atNode(node.constructorName, code);
+      }
+    });
+  }
+}

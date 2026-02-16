@@ -620,3 +620,110 @@ class RequireAndroidBackupRulesRule extends SaropaLintRule {
     });
   }
 }
+
+// =============================================================================
+// prefer_foreground_service_android
+// =============================================================================
+
+/// Warns when long-running background work lacks a foreground service.
+///
+/// Since: v4.15.0 | Rule version: v1
+///
+/// Android aggressively kills background services and tasks. Starting with
+/// Android 8 (Oreo), background execution limits mean that Timer.periodic,
+/// Isolate.spawn, or scheduled work running outside a foreground service
+/// will be killed within minutes. Use a foreground service with a
+/// notification for any ongoing work (music playback, GPS tracking,
+/// file upload).
+///
+/// **BAD:**
+/// ```dart
+/// Timer.periodic(Duration(seconds: 30), (_) {
+///   uploadData();
+/// });
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// // Use flutter_foreground_task or android_alarm_manager
+/// FlutterForegroundTask.startService(
+///   notificationTitle: 'Uploading',
+///   callback: uploadCallback,
+/// );
+/// ```
+class PreferForegroundServiceAndroidRule extends SaropaLintRule {
+  const PreferForegroundServiceAndroidRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  static const LintCode _code = LintCode(
+    name: 'prefer_foreground_service_android',
+    problemMessage:
+        '[prefer_foreground_service_android] Long-running periodic timer '
+        'without foreground service. Android 8+ aggressively kills background '
+        'tasks — Timer.periodic and Isolate.spawn are terminated within '
+        'minutes when the app is backgrounded. Use a foreground service with '
+        'notification (flutter_foreground_task, android_alarm_manager) for '
+        'reliable ongoing work like uploads, GPS tracking, or audio. {v1}',
+    correctionMessage:
+        'Use FlutterForegroundTask.startService() or WorkManager for '
+        'reliable background execution on Android.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      final String methodName = node.methodName.name;
+
+      // Detect Timer.periodic calls
+      if (methodName != 'periodic') return;
+
+      final Expression? target = node.target;
+      if (target is! SimpleIdentifier || target.name != 'Timer') return;
+
+      // Check if there's a foreground service setup in the enclosing body
+      AstNode? current = node.parent;
+      while (current != null) {
+        if (current is FunctionBody) {
+          final String bodySource = current.toSource();
+          if (bodySource.contains('ForegroundTask') ||
+              bodySource.contains('foregroundService') ||
+              bodySource.contains('ForegroundService') ||
+              bodySource.contains('WorkManager') ||
+              bodySource.contains('startForeground') ||
+              bodySource.contains('AlarmManager')) {
+            return; // Has foreground service, OK
+          }
+          break;
+        }
+        current = current.parent;
+      }
+
+      // Check enclosing class for foreground service patterns
+      current = node.parent;
+      while (current != null) {
+        if (current is ClassDeclaration) {
+          final String classSource = current.toSource();
+          if (classSource.contains('ForegroundTask') ||
+              classSource.contains('ForegroundService') ||
+              classSource.contains('WorkManager')) {
+            return; // Class uses foreground service, OK
+          }
+          break;
+        }
+        current = current.parent;
+      }
+
+      reporter.atNode(node, code);
+    });
+  }
+}
