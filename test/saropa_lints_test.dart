@@ -1,30 +1,29 @@
-import 'package:custom_lint_builder/custom_lint_builder.dart';
 import 'package:saropa_lints/saropa_lints.dart';
 import 'package:test/test.dart';
 
 /// All tier sets in tiers.dart, for validation.
 const List<({String name, Set<String> rules})> _allTierSets =
     <({String name, Set<String> rules})>[
-  (name: 'stylisticRules', rules: stylisticRules),
-  (name: 'essentialRules', rules: essentialRules),
-  (name: 'recommendedOnlyRules', rules: recommendedOnlyRules),
-  (name: 'professionalOnlyRules', rules: professionalOnlyRules),
-  (name: 'comprehensiveOnlyRules', rules: comprehensiveOnlyRules),
-  (name: 'pedanticOnlyRules', rules: pedanticOnlyRules),
-];
+      (name: 'stylisticRules', rules: stylisticRules),
+      (name: 'essentialRules', rules: essentialRules),
+      (name: 'recommendedOnlyRules', rules: recommendedOnlyRules),
+      (name: 'professionalOnlyRules', rules: professionalOnlyRules),
+      (name: 'comprehensiveOnlyRules', rules: comprehensiveOnlyRules),
+      (name: 'pedanticOnlyRules', rules: pedanticOnlyRules),
+    ];
 
 void main() {
   group('SaropaLints Plugin', () {
-    test('createPlugin returns a PluginBase instance', () {
-      final PluginBase plugin = createPlugin();
-      expect(plugin, isA<PluginBase>());
+    test('allSaropaRules returns non-empty list', () {
+      final rules = allSaropaRules;
+      expect(rules, isNotEmpty);
     });
 
-    test('createPlugin is callable multiple times', () {
-      final PluginBase plugin1 = createPlugin();
-      final PluginBase plugin2 = createPlugin();
-      expect(plugin1, isA<PluginBase>());
-      expect(plugin2, isA<PluginBase>());
+    test('allSaropaRules returns SaropaLintRule instances', () {
+      final rules = allSaropaRules;
+      for (final rule in rules) {
+        expect(rule, isA<SaropaLintRule>());
+      }
     });
   });
 
@@ -34,32 +33,37 @@ void main() {
     late Set<String> tierRuleNames;
 
     setUpAll(() {
-      pluginRuleNames =
-          allSaropaRules.map((LintRule rule) => rule.code.name).toSet();
+      pluginRuleNames = allSaropaRules
+          .map((SaropaLintRule rule) => rule.code.name)
+          .toSet();
       tierRuleNames = getAllDefinedRules();
     });
 
     test('all plugin rules must be in tiers.dart', () {
-      final Set<String> missingFromTiers =
-          pluginRuleNames.difference(tierRuleNames);
+      final Set<String> missingFromTiers = pluginRuleNames.difference(
+        tierRuleNames,
+      );
 
       expect(
         missingFromTiers,
         isEmpty,
-        reason: 'Rules exist in plugin but not in tiers.dart:\n'
+        reason:
+            'Rules exist in plugin but not in tiers.dart:\n'
             '${missingFromTiers.toList()..sort()}\n\n'
             'Add these rules to the appropriate tier in lib/src/tiers.dart',
       );
     });
 
     test('all tier rules must exist in plugin', () {
-      final Set<String> phantomRules =
-          tierRuleNames.difference(pluginRuleNames);
+      final Set<String> phantomRules = tierRuleNames.difference(
+        pluginRuleNames,
+      );
 
       expect(
         phantomRules,
         isEmpty,
-        reason: 'Rules in tiers.dart do not exist in plugin:\n'
+        reason:
+            'Rules in tiers.dart do not exist in plugin:\n'
             '${phantomRules.toList()..sort()}\n\n'
             'Remove these phantom rules from lib/src/tiers.dart',
       );
@@ -78,35 +82,40 @@ void main() {
 
       final Map<String, List<String>> duplicates =
           Map<String, List<String>>.fromEntries(
-        ruleToSets.entries
-            .where((MapEntry<String, List<String>> e) => e.value.length > 1),
-      );
+            ruleToSets.entries.where(
+              (MapEntry<String, List<String>> e) => e.value.length > 1,
+            ),
+          );
 
       expect(
         duplicates,
         isEmpty,
-        reason: 'Rules found in multiple tier sets:\n'
+        reason:
+            'Rules found in multiple tier sets:\n'
             '${duplicates.entries.map((e) => '  ${e.key}: ${e.value.join(', ')}').join('\n')}\n\n'
             'Each rule must appear in exactly one tier set.',
       );
     });
 
     test('every plugin rule is in exactly one tier set', () {
-      final Set<String> pluginRuleNames =
-          allSaropaRules.map((LintRule rule) => rule.code.name).toSet();
+      final Set<String> pluginRuleNames = allSaropaRules
+          .map((SaropaLintRule rule) => rule.code.name)
+          .toSet();
 
       final Set<String> allTierRuleNames = <String>{};
       for (final tier in _allTierSets) {
         allTierRuleNames.addAll(tier.rules);
       }
 
-      final Set<String> missingRules =
-          pluginRuleNames.difference(allTierRuleNames);
+      final Set<String> missingRules = pluginRuleNames.difference(
+        allTierRuleNames,
+      );
 
       expect(
         missingRules,
         isEmpty,
-        reason: 'Rules not in any tier set:\n'
+        reason:
+            'Rules not in any tier set:\n'
             '${missingRules.toList()..sort()}\n\n'
             'Every rule must be in exactly one tier set in tiers.dart.',
       );
@@ -128,7 +137,8 @@ void main() {
       expect(
         totalCount,
         allRules.length,
-        reason: 'Total entries across all tier sets ($totalCount) '
+        reason:
+            'Total entries across all tier sets ($totalCount) '
             'exceeds unique rule count (${allRules.length}). '
             'A rule appears in multiple sets.',
       );
@@ -137,8 +147,7 @@ void main() {
     test('opinionated prefer_* rules must be in stylisticRules', () {
       final List<String> misclassified = <String>[];
 
-      for (final LintRule rule in allSaropaRules) {
-        if (rule is! SaropaLintRule) continue;
+      for (final SaropaLintRule rule in allSaropaRules) {
         if (rule.impact != LintImpact.opinionated) continue;
 
         final String name = rule.code.name;
@@ -155,7 +164,8 @@ void main() {
       expect(
         misclassified,
         isEmpty,
-        reason: 'Opinionated prefer_* rules must be in '
+        reason:
+            'Opinionated prefer_* rules must be in '
             'stylisticRules, not a tier set:\n'
             '${misclassified.map((n) => '  $n').join('\n')}\n\n'
             'Move these rules to stylisticRules in lib/src/tiers.dart.',
@@ -168,8 +178,9 @@ void main() {
     late Map<String, Set<String>> pkgSets;
 
     setUpAll(() {
-      pluginRuleNames =
-          allSaropaRules.map((LintRule rule) => rule.code.name).toSet();
+      pluginRuleNames = allSaropaRules
+          .map((SaropaLintRule rule) => rule.code.name)
+          .toSet();
       pkgSets = packageRuleSets;
     });
 
@@ -179,13 +190,15 @@ void main() {
         allPackageRules.addAll(rules);
       }
 
-      final Set<String> phantomRules =
-          allPackageRules.difference(pluginRuleNames);
+      final Set<String> phantomRules = allPackageRules.difference(
+        pluginRuleNames,
+      );
 
       expect(
         phantomRules,
         isEmpty,
-        reason: 'Rules in package sets do not exist in plugin:\n'
+        reason:
+            'Rules in package sets do not exist in plugin:\n'
             '${phantomRules.toList()..sort()}\n\n'
             'Remove these phantom rules from package sets in '
             'lib/src/tiers.dart',
@@ -204,7 +217,8 @@ void main() {
       expect(
         orphaned,
         isEmpty,
-        reason: 'Package rules not in any tier set:\n'
+        reason:
+            'Package rules not in any tier set:\n'
             '${orphaned.toList()..sort()}\n\n'
             'Package sets are orthogonal to tiers. Every rule '
             'in a package set must also be in a tier set.',
@@ -218,7 +232,8 @@ void main() {
       expect(
         allSet,
         defaultKeys,
-        reason: 'allPackages and defaultPackages.keys must match.\n'
+        reason:
+            'allPackages and defaultPackages.keys must match.\n'
             'In allPackages only: ${allSet.difference(defaultKeys)}\n'
             'In defaultPackages only: ${defaultKeys.difference(allSet)}',
       );
@@ -231,7 +246,8 @@ void main() {
       expect(
         allSet,
         ruleSetKeys,
-        reason: 'allPackages and packageRuleSets.keys must match.\n'
+        reason:
+            'allPackages and packageRuleSets.keys must match.\n'
             'In allPackages only: ${allSet.difference(ruleSetKeys)}\n'
             'In packageRuleSets only: ${ruleSetKeys.difference(allSet)}',
       );

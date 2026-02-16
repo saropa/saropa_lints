@@ -1,9 +1,6 @@
 // ignore_for_file: deprecated_member_use
 
 import 'package:analyzer/dart/ast/ast.dart';
-import 'package:analyzer/error/error.dart'
-    show AnalysisError, DiagnosticSeverity;
-import 'package:custom_lint_builder/custom_lint_builder.dart';
 import 'package:saropa_lints/src/saropa_lint_rule.dart';
 
 /// Warns when Bluetooth scan is started without timeout parameter.
@@ -24,7 +21,7 @@ import 'package:saropa_lints/src/saropa_lint_rule.dart';
 /// FlutterBluePlus.startScan(timeout: const Duration(seconds: 10));
 /// ```
 class AvoidBluetoothScanWithoutTimeoutRule extends SaropaLintRule {
-  const AvoidBluetoothScanWithoutTimeoutRule() : super(code: _code);
+  AvoidBluetoothScanWithoutTimeoutRule() : super(code: _code);
 
   /// Significant issue for battery life.
   @override
@@ -34,13 +31,12 @@ class AvoidBluetoothScanWithoutTimeoutRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_bluetooth_scan_without_timeout',
-    problemMessage:
-        '[avoid_bluetooth_scan_without_timeout] Infinite Bluetooth scan drains '
+    'avoid_bluetooth_scan_without_timeout',
+    '[avoid_bluetooth_scan_without_timeout] Infinite Bluetooth scan drains '
         'battery and may run until app termination. {v3}',
     correctionMessage:
         'Add timeout parameter: startScan(timeout: Duration(seconds: 10))',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   static const Set<String> _scanMethods = <String>{
@@ -48,17 +44,12 @@ class AvoidBluetoothScanWithoutTimeoutRule extends SaropaLintRule {
     'startBluetoothScan',
     'scan',
   };
-
-  @override
-  List<Fix> get customFixes => [_AddScanTimeoutFix()];
-
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       final String methodName = node.methodName.name;
       if (!_scanMethods.contains(methodName)) return;
 
@@ -74,46 +65,6 @@ class AvoidBluetoothScanWithoutTimeoutRule extends SaropaLintRule {
       if (!hasTimeout) {
         reporter.atNode(node.methodName, code);
       }
-    });
-  }
-}
-
-class _AddScanTimeoutFix extends DartFix {
-  @override
-  void run(
-    CustomLintResolver resolver,
-    ChangeReporter reporter,
-    CustomLintContext context,
-    AnalysisError analysisError,
-    List<AnalysisError> others,
-  ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
-      if (!node.methodName.sourceRange.intersects(analysisError.sourceRange)) {
-        return;
-      }
-
-      final NodeList<Expression> args = node.argumentList.arguments;
-
-      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
-        message: 'Add timeout: Duration(seconds: 10)',
-        priority: 1,
-      );
-
-      changeBuilder.addDartFileEdit((builder) {
-        final int insertOffset = node.argumentList.rightParenthesis.offset;
-
-        if (args.isEmpty) {
-          builder.addSimpleInsertion(
-            insertOffset,
-            'timeout: const Duration(seconds: 10)',
-          );
-        } else {
-          builder.addSimpleInsertion(
-            insertOffset,
-            ', timeout: const Duration(seconds: 10)',
-          );
-        }
-      });
     });
   }
 }
@@ -144,7 +95,7 @@ class _AddScanTimeoutFix extends DartFix {
 /// }
 /// ```
 class RequireBluetoothStateCheckRule extends SaropaLintRule {
-  const RequireBluetoothStateCheckRule() : super(code: _code);
+  RequireBluetoothStateCheckRule() : super(code: _code);
 
   /// Critical for robust Bluetooth apps.
   @override
@@ -154,12 +105,11 @@ class RequireBluetoothStateCheckRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'require_bluetooth_state_check',
-    problemMessage:
-        '[require_bluetooth_state_check] Bluetooth Low Energy (BLE) operations must check the adapter state before attempting connections, scans, or service discovery. Failing to check adapter state can result in failed connections, wasted battery due to repeated attempts, degraded user experience, and hard-to-debug errors—especially on devices where Bluetooth is disabled or unavailable. This can also cause your app to be rejected during app store review for reliability issues. {v3}',
+    'require_bluetooth_state_check',
+    '[require_bluetooth_state_check] Bluetooth Low Energy (BLE) operations must check the adapter state before attempting connections, scans, or service discovery. Failing to check adapter state can result in failed connections, wasted battery due to repeated attempts, degraded user experience, and hard-to-debug errors—especially on devices where Bluetooth is disabled or unavailable. This can also cause your app to be rejected during app store review for reliability issues. {v3}',
     correctionMessage:
         'Always check FlutterBluePlus.adapterState (or equivalent) before performing BLE operations. If the adapter is not powered on, prompt the user to enable Bluetooth or handle the error gracefully. Document this check in your connection logic to ensure robust and user-friendly BLE workflows.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   /// BLE type names from flutter_blue_plus and similar packages.
@@ -173,11 +123,10 @@ class RequireBluetoothStateCheckRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       final String methodName = node.methodName.name;
 
       // Only check BLE-specific methods
@@ -256,7 +205,7 @@ class RequireBluetoothStateCheckRule extends SaropaLintRule {
 /// });
 /// ```
 class RequireBleDisconnectHandlingRule extends SaropaLintRule {
-  const RequireBleDisconnectHandlingRule() : super(code: _code);
+  RequireBleDisconnectHandlingRule() : super(code: _code);
 
   /// Critical for robust Bluetooth apps.
   @override
@@ -266,12 +215,11 @@ class RequireBleDisconnectHandlingRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'require_ble_disconnect_handling',
-    problemMessage:
-        '[require_ble_disconnect_handling] BLE connections must handle disconnect events to maintain app stability and resource management. Ignoring disconnects can lead to stale UI (showing devices as connected when they are not), resource leaks (unreleased connections or streams), and user confusion when devices unexpectedly disappear or fail to reconnect. This can also cause battery drain and degraded reliability, especially in apps that manage multiple devices. {v3}',
+    'require_ble_disconnect_handling',
+    '[require_ble_disconnect_handling] BLE connections must handle disconnect events to maintain app stability and resource management. Ignoring disconnects can lead to stale UI (showing devices as connected when they are not), resource leaks (unreleased connections or streams), and user confusion when devices unexpectedly disappear or fail to reconnect. This can also cause battery drain and degraded reliability, especially in apps that manage multiple devices. {v3}',
     correctionMessage:
         'Listen to device.connectionState (or equivalent) for disconnect events and update your UI and resources accordingly. Clean up streams, subscriptions, and device references when a disconnect occurs. Provide user feedback and attempt reconnection only when appropriate, to avoid infinite loops or excessive battery usage.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   /// BLE device type names from flutter_blue_plus and similar packages.
@@ -283,11 +231,10 @@ class RequireBleDisconnectHandlingRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       if (node.methodName.name != 'connect') return;
 
       // Check if this is a BLE device connect using type resolution
@@ -352,7 +299,7 @@ class RequireBleDisconnectHandlingRule extends SaropaLintRule {
 /// player.play();
 /// ```
 class RequireAudioFocusHandlingRule extends SaropaLintRule {
-  const RequireAudioFocusHandlingRule() : super(code: _code);
+  RequireAudioFocusHandlingRule() : super(code: _code);
 
   /// Important for proper audio behavior.
   @override
@@ -362,12 +309,11 @@ class RequireAudioFocusHandlingRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'require_audio_focus_handling',
-    problemMessage:
-        '[require_audio_focus_handling] Audio playback should configure AudioSession for proper focus handling. Without proper audio session handling, your app may conflict with other audio sources (music apps, calls, navigation). Use audio_session package to configure proper audio focus behavior. {v2}',
+    'require_audio_focus_handling',
+    '[require_audio_focus_handling] Audio playback should configure AudioSession for proper focus handling. Without proper audio session handling, your app may conflict with other audio sources (music apps, calls, navigation). Use audio_session package to configure proper audio focus behavior. {v2}',
     correctionMessage:
         'Use AudioSession.instance to configure audio behavior. Verify the change works correctly with existing tests and add coverage for the new behavior.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   /// Audio player type names from just_audio, audioplayers, and similar packages.
@@ -381,11 +327,10 @@ class RequireAudioFocusHandlingRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       if (node.methodName.name != 'play') return;
 
       // Check if this is an audio player play call using type resolution
@@ -457,7 +402,7 @@ class RequireAudioFocusHandlingRule extends SaropaLintRule {
 /// }
 /// ```
 class RequireQrPermissionCheckRule extends SaropaLintRule {
-  const RequireQrPermissionCheckRule() : super(code: _code);
+  RequireQrPermissionCheckRule() : super(code: _code);
 
   /// Critical for app store compliance.
   @override
@@ -467,12 +412,11 @@ class RequireQrPermissionCheckRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'require_qr_permission_check',
-    problemMessage:
-        '[require_qr_permission_check] If you open the QR scanner without first requesting camera permission, your app will show a black screen on iOS or crash on some Android devices. This breaks user experience and can cause app store rejection. {v2}',
+    'require_qr_permission_check',
+    '[require_qr_permission_check] If you open the QR scanner without first requesting camera permission, your app will show a black screen on iOS or crash on some Android devices. This breaks user experience and can cause app store rejection. {v2}',
     correctionMessage:
         'Always request Permission.camera before showing the QR scanner to ensure your app works reliably and passes app store review.',
-    errorSeverity: DiagnosticSeverity.ERROR,
+    severity: DiagnosticSeverity.ERROR,
   );
 
   static const Set<String> _qrWidgets = <String>{
@@ -485,13 +429,10 @@ class RequireQrPermissionCheckRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addInstanceCreationExpression((
-      InstanceCreationExpression node,
-    ) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final String typeName = node.constructorName.type.name.lexeme;
       if (!_qrWidgets.contains(typeName)) return;
 
@@ -553,7 +494,7 @@ class RequireQrPermissionCheckRule extends SaropaLintRule {
 /// final position = await Geolocator.getCurrentPosition();
 /// ```
 class RequireGeolocatorPermissionCheckRule extends SaropaLintRule {
-  const RequireGeolocatorPermissionCheckRule() : super(code: _code);
+  RequireGeolocatorPermissionCheckRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.critical;
@@ -562,21 +503,19 @@ class RequireGeolocatorPermissionCheckRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'require_geolocator_permission_check',
-    problemMessage:
-        '[require_geolocator_permission_check] Accessing location without checking permission will crash your app on iOS and may cause unpredictable behavior on Android. This can result in app store rejection and poor user experience. {v2}',
+    'require_geolocator_permission_check',
+    '[require_geolocator_permission_check] Accessing location without checking permission will crash your app on iOS and may cause unpredictable behavior on Android. This can result in app store rejection and poor user experience. {v2}',
     correctionMessage:
         'Always call Geolocator.checkPermission() before getCurrentPosition() or any location access to ensure your app works reliably and passes app store review.',
-    errorSeverity: DiagnosticSeverity.ERROR,
+    severity: DiagnosticSeverity.ERROR,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       final String methodName = node.methodName.name;
       if (methodName != 'getCurrentPosition' &&
           methodName != 'getPositionStream') {
@@ -606,7 +545,7 @@ class RequireGeolocatorPermissionCheckRule extends SaropaLintRule {
       final String bodySource = enclosingBody.toSource();
       if (!bodySource.contains('checkPermission') &&
           !bodySource.contains('requestPermission')) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
   }
@@ -632,7 +571,7 @@ class RequireGeolocatorPermissionCheckRule extends SaropaLintRule {
 /// final position = await Geolocator.getCurrentPosition();
 /// ```
 class RequireGeolocatorServiceEnabledRule extends SaropaLintRule {
-  const RequireGeolocatorServiceEnabledRule() : super(code: _code);
+  RequireGeolocatorServiceEnabledRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.high;
@@ -641,21 +580,19 @@ class RequireGeolocatorServiceEnabledRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'require_geolocator_service_enabled',
-    problemMessage:
-        '[require_geolocator_service_enabled] Location requests must check if the location service (GPS) is enabled before attempting to access position data. Failing to check service status can cause runtime errors, user confusion, and app store rejection due to non-compliance with platform requirements. On devices where GPS is disabled, location requests will fail, resulting in poor UX and potentially lost functionality. {v3}',
+    'require_geolocator_service_enabled',
+    '[require_geolocator_service_enabled] Location requests must check if the location service (GPS) is enabled before attempting to access position data. Failing to check service status can cause runtime errors, user confusion, and app store rejection due to non-compliance with platform requirements. On devices where GPS is disabled, location requests will fail, resulting in poor UX and potentially lost functionality. {v3}',
     correctionMessage:
         'Always call Geolocator.isLocationServiceEnabled() before requesting location. If the service is disabled, prompt the user to enable it or handle the error gracefully. Document this check in your location logic to ensure robust and compliant location workflows.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       final String methodName = node.methodName.name;
       if (methodName != 'getCurrentPosition') return;
 
@@ -680,7 +617,7 @@ class RequireGeolocatorServiceEnabledRule extends SaropaLintRule {
 
       final String bodySource = enclosingBody.toSource();
       if (!bodySource.contains('isLocationServiceEnabled')) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
   }
@@ -711,7 +648,7 @@ class RequireGeolocatorServiceEnabledRule extends SaropaLintRule {
 /// }
 /// ```
 class RequireGeolocatorStreamCancelRule extends SaropaLintRule {
-  const RequireGeolocatorStreamCancelRule() : super(code: _code);
+  RequireGeolocatorStreamCancelRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.high;
@@ -720,21 +657,19 @@ class RequireGeolocatorStreamCancelRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'require_geolocator_stream_cancel',
-    problemMessage:
-        '[require_geolocator_stream_cancel] Position stream subscriptions must be canceled when no longer needed. Failing to cancel subscriptions leads to battery drain, memory leaks, and background location updates that persist after the UI is disposed. This can degrade device performance and violate privacy expectations. {v3}',
+    'require_geolocator_stream_cancel',
+    '[require_geolocator_stream_cancel] Position stream subscriptions must be canceled when no longer needed. Failing to cancel subscriptions leads to battery drain, memory leaks, and background location updates that persist after the UI is disposed. This can degrade device performance and violate privacy expectations. {v3}',
     correctionMessage:
         'Store the stream subscription and always call cancel() in dispose() or when the subscription is no longer needed. Document this cleanup to prevent resource leaks and ensure responsible location usage.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       if (node.methodName.name != 'listen') return;
 
       // Check if target is getPositionStream
@@ -752,7 +687,7 @@ class RequireGeolocatorStreamCancelRule extends SaropaLintRule {
       // Check if result is assigned to a variable
       AstNode? parent = node.parent;
       if (parent is! VariableDeclaration && parent is! AssignmentExpression) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
   }
@@ -778,7 +713,7 @@ class RequireGeolocatorStreamCancelRule extends SaropaLintRule {
 /// }
 /// ```
 class RequireGeolocatorErrorHandlingRule extends SaropaLintRule {
-  const RequireGeolocatorErrorHandlingRule() : super(code: _code);
+  RequireGeolocatorErrorHandlingRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.high;
@@ -787,24 +722,18 @@ class RequireGeolocatorErrorHandlingRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'require_geolocator_error_handling',
-    problemMessage:
-        '[require_geolocator_error_handling] Location requests must be wrapped in error handling logic. Failing to handle errors can cause app crashes, lost user trust, and poor reviews—especially when location permissions are denied or hardware fails. Unhandled exceptions may also prevent your app from passing app store review. {v4}',
+    'require_geolocator_error_handling',
+    '[require_geolocator_error_handling] Location requests must be wrapped in error handling logic. Failing to handle errors can cause app crashes, lost user trust, and poor reviews—especially when location permissions are denied or hardware fails. Unhandled exceptions may also prevent your app from passing app store review. {v4}',
     correctionMessage:
         'Wrap location requests in try-catch blocks to handle errors such as permission denial, hardware failure, or service unavailability. Provide user feedback and fallback logic to maintain a robust and user-friendly experience.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
-
-  @override
-  List<Fix> get customFixes => [WrapInTryCatchFix()];
-
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       final String methodName = node.methodName.name;
       if (methodName != 'getCurrentPosition' &&
           methodName != 'getLastKnownPosition') {
@@ -824,7 +753,7 @@ class RequireGeolocatorErrorHandlingRule extends SaropaLintRule {
         current = current.parent;
       }
 
-      reporter.atNode(node, code);
+      reporter.atNode(node);
     });
   }
 }
@@ -855,7 +784,7 @@ class RequireGeolocatorErrorHandlingRule extends SaropaLintRule {
 /// await characteristic.write(largeData); // Faster transfer
 /// ```
 class PreferBleMtuNegotiationRule extends SaropaLintRule {
-  const PreferBleMtuNegotiationRule() : super(code: _code);
+  PreferBleMtuNegotiationRule() : super(code: _code);
 
   /// Important for BLE performance.
   @override
@@ -865,12 +794,11 @@ class PreferBleMtuNegotiationRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'prefer_ble_mtu_negotiation',
-    problemMessage:
-        '[prefer_ble_mtu_negotiation] BLE data transfer without MTU negotiation causes slow, fragmented transfers. BLE default MTU is only 23 bytes (20 bytes payload). Without negotiating a larger MTU, data transfers are fragmented into many small packets, causing poor throughput and increased latency. Always request MTU negotiation before transferring data. {v2}',
+    'prefer_ble_mtu_negotiation',
+    '[prefer_ble_mtu_negotiation] BLE data transfer without MTU negotiation causes slow, fragmented transfers. BLE default MTU is only 23 bytes (20 bytes payload). Without negotiating a larger MTU, data transfers are fragmented into many small packets, causing poor throughput and increased latency. Always request MTU negotiation before transferring data. {v2}',
     correctionMessage:
         'Call device.requestMtu(512) after connect() and before write operations. Verify the change works correctly with existing tests and add coverage for the new behavior.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   /// Methods that transfer data over BLE.
@@ -884,11 +812,10 @@ class PreferBleMtuNegotiationRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       final String methodName = node.methodName.name;
       if (!_dataTransferMethods.contains(methodName)) return;
 
@@ -898,7 +825,8 @@ class PreferBleMtuNegotiationRule extends SaropaLintRule {
 
       // Check the target's static type
       final String? typeName = target.staticType?.element?.name;
-      final bool isBleCharacteristic = typeName == 'BluetoothCharacteristic' ||
+      final bool isBleCharacteristic =
+          typeName == 'BluetoothCharacteristic' ||
           typeName == 'BleCharacteristic' ||
           typeName == 'Characteristic';
 

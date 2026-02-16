@@ -3,9 +3,6 @@
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/token.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
-import 'package:analyzer/error/error.dart'
-    show AnalysisError, DiagnosticSeverity;
-import 'package:custom_lint_builder/custom_lint_builder.dart';
 
 import '../saropa_lint_rule.dart';
 
@@ -27,7 +24,7 @@ import '../saropa_lint_rule.dart';
 /// }
 /// ```
 class AvoidDeclaringCallMethodRule extends SaropaLintRule {
-  const AvoidDeclaringCallMethodRule() : super(code: _code);
+  AvoidDeclaringCallMethodRule() : super(code: _code);
 
   /// Style/consistency. Large counts acceptable in legacy code.
   @override
@@ -37,23 +34,21 @@ class AvoidDeclaringCallMethodRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_declaring_call_method',
-    problemMessage:
-        '[avoid_declaring_call_method] call() method makes class callable but hides intent. Code reads ambiguously. A class declares a call() method. {v5}',
+    'avoid_declaring_call_method',
+    '[avoid_declaring_call_method] call() method makes class callable but hides intent. Code reads ambiguously. A class declares a call() method. {v5}',
     correctionMessage:
         'Use descriptive method name: execute(), invoke(), or run() instead. Verify the change works correctly with existing tests and add coverage for the new behavior.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodDeclaration((MethodDeclaration node) {
+    context.addMethodDeclaration((MethodDeclaration node) {
       if (node.name.lexeme == 'call') {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
   }
@@ -77,7 +72,7 @@ class AvoidDeclaringCallMethodRule extends SaropaLintRule {
 /// class Container<T> {} // clear generic parameter
 /// ```
 class AvoidGenericsShadowingRule extends SaropaLintRule {
-  const AvoidGenericsShadowingRule() : super(code: _code);
+  AvoidGenericsShadowingRule() : super(code: _code);
 
   /// Style/consistency. Large counts acceptable in legacy code.
   @override
@@ -87,12 +82,11 @@ class AvoidGenericsShadowingRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_generics_shadowing',
-    problemMessage:
-        '[avoid_generics_shadowing] Generic type parameter shadows a top-level declaration. This class design reduces clarity and can lead to incorrect object initialization. {v4}',
+    'avoid_generics_shadowing',
+    '[avoid_generics_shadowing] Generic type parameter shadows a top-level declaration. This class design reduces clarity and can lead to incorrect object initialization. {v4}',
     correctionMessage:
         'Rename the generic parameter to avoid shadowing. Verify the change works correctly with existing tests and add coverage for the new behavior.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   static const Set<String> _commonTypes = <String>{
@@ -132,15 +126,14 @@ class AvoidGenericsShadowingRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addTypeParameterList((TypeParameterList node) {
+    context.addTypeParameterList((TypeParameterList node) {
       for (final TypeParameter param in node.typeParameters) {
         final String name = param.name.lexeme;
         if (_commonTypes.contains(name)) {
-          reporter.atNode(param, code);
+          reporter.atNode(param);
         }
       }
     });
@@ -172,7 +165,7 @@ class AvoidGenericsShadowingRule extends SaropaLintRule {
 /// }
 /// ```
 class AvoidIncompleteCopyWithRule extends SaropaLintRule {
-  const AvoidIncompleteCopyWithRule() : super(code: _code);
+  AvoidIncompleteCopyWithRule() : super(code: _code);
 
   /// Style/consistency. Large counts acceptable in legacy code.
   @override
@@ -182,21 +175,19 @@ class AvoidIncompleteCopyWithRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_incomplete_copy_with',
-    problemMessage:
-        '[avoid_incomplete_copy_with] copyWith() is missing fields. Copied objects will lose data for those fields. All non-final fields must be included in copyWith for complete copying. {v4}',
+    'avoid_incomplete_copy_with',
+    '[avoid_incomplete_copy_with] copyWith() is missing fields. Copied objects will lose data for those fields. All non-final fields must be included in copyWith for complete copying. {v4}',
     correctionMessage:
         'Add missing fields as nullable parameters: copyWith({String? name, int? age}). Verify the change works correctly with existing tests and add coverage for the new behavior.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addClassDeclaration((ClassDeclaration node) {
+    context.addClassDeclaration((ClassDeclaration node) {
       // Collect all instance fields
       final Set<String> fieldNames = <String>{};
       for (final ClassMember member in node.members) {
@@ -227,7 +218,7 @@ class AvoidIncompleteCopyWithRule extends SaropaLintRule {
           // Check if any fields are missing
           final Set<String> missingFields = fieldNames.difference(paramNames);
           if (missingFields.isNotEmpty) {
-            reporter.atNode(member, code);
+            reporter.atNode(member);
           }
         }
       }
@@ -262,7 +253,7 @@ class AvoidIncompleteCopyWithRule extends SaropaLintRule {
 /// }
 /// ```
 class AvoidNonEmptyConstructorBodiesRule extends SaropaLintRule {
-  const AvoidNonEmptyConstructorBodiesRule() : super(code: _code);
+  AvoidNonEmptyConstructorBodiesRule() : super(code: _code);
 
   /// Style/consistency. Large counts acceptable in legacy code.
   @override
@@ -272,21 +263,19 @@ class AvoidNonEmptyConstructorBodiesRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_non_empty_constructor_bodies',
-    problemMessage:
-        '[avoid_non_empty_constructor_bodies] Constructor body has logic. Final fields cannot be set in body, only initializers. Constructor bodies with logic can be harder to understand. Prefer using initializer lists or factory constructors. {v4}',
+    'avoid_non_empty_constructor_bodies',
+    '[avoid_non_empty_constructor_bodies] Constructor body has logic. Final fields cannot be set in body, only initializers. Constructor bodies with logic can be harder to understand. Prefer using initializer lists or factory constructors. {v4}',
     correctionMessage:
         'Move logic to initializer list: MyClass(input) : name = input.trim();. Verify the change works correctly with existing tests and add coverage for the new behavior.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addConstructorDeclaration((ConstructorDeclaration node) {
+    context.addConstructorDeclaration((ConstructorDeclaration node) {
       final FunctionBody body = node.body;
 
       // Skip empty or expression bodies
@@ -313,7 +302,7 @@ class AvoidNonEmptyConstructorBodiesRule extends SaropaLintRule {
 
         final Token? nameToken = node.name;
         if (nameToken != null) {
-          reporter.atToken(nameToken, code);
+          reporter.atToken(nameToken);
         } else {
           reporter.atNode(node.returnType, code);
         }
@@ -365,7 +354,7 @@ class AvoidNonEmptyConstructorBodiesRule extends SaropaLintRule {
 /// });
 /// ```
 class AvoidShadowingRule extends SaropaLintRule {
-  const AvoidShadowingRule() : super(code: _code);
+  AvoidShadowingRule() : super(code: _code);
 
   /// Style/consistency. Large counts acceptable in legacy code.
   @override
@@ -376,24 +365,25 @@ class AvoidShadowingRule extends SaropaLintRule {
 
   /// Alias: avoid_shadowing
   static const LintCode _code = LintCode(
-    name: 'avoid_variable_shadowing',
-    problemMessage:
-        '[avoid_variable_shadowing] Declaration shadows a declaration from an outer scope. Shadowing occurs when a nested scope declares a variable with the same name as one in an enclosing scope. This can lead to confusion about which variable is being referenced and is a common source of subtle bugs. {v3}',
+    'avoid_variable_shadowing',
+    '[avoid_variable_shadowing] Declaration shadows a declaration from an outer scope. Shadowing occurs when a nested scope declares a variable with the same name as one in an enclosing scope. This can lead to confusion about which variable is being referenced and is a common source of subtle bugs. {v3}',
     correctionMessage:
         'Rename the variable to avoid confusion. Verify the change works correctly with existing tests and add coverage for the new behavior.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addFunctionDeclaration((FunctionDeclaration node) {
+    context.addFunctionDeclaration((FunctionDeclaration node) {
       final String functionName = node.name.lexeme;
-      final _ShadowingChecker checker =
-          _ShadowingChecker(reporter, code, <String>{functionName});
+      final _ShadowingChecker checker = _ShadowingChecker(
+        reporter,
+        code,
+        <String>{functionName},
+      );
 
       // Collect parameter names
       final FormalParameterList? params = node.functionExpression.parameters;
@@ -409,10 +399,13 @@ class AvoidShadowingRule extends SaropaLintRule {
       node.functionExpression.body.accept(checker);
     });
 
-    context.registry.addMethodDeclaration((MethodDeclaration node) {
+    context.addMethodDeclaration((MethodDeclaration node) {
       final String methodName = node.name.lexeme;
-      final _ShadowingChecker checker =
-          _ShadowingChecker(reporter, code, <String>{methodName});
+      final _ShadowingChecker checker = _ShadowingChecker(
+        reporter,
+        code,
+        <String>{methodName},
+      );
 
       // Collect parameter names
       final FormalParameterList? params = node.parameters;
@@ -441,7 +434,7 @@ class _ShadowingChecker extends RecursiveAstVisitor<void> {
   void visitVariableDeclaration(VariableDeclaration node) {
     final String name = node.name.lexeme;
     if (outerNames.contains(name)) {
-      reporter.atNode(node, code);
+      reporter.atNode(node);
     } else {
       outerNames.add(name);
     }
@@ -452,7 +445,7 @@ class _ShadowingChecker extends RecursiveAstVisitor<void> {
   void visitDeclaredIdentifier(DeclaredIdentifier node) {
     final String name = node.name.lexeme;
     if (outerNames.contains(name)) {
-      reporter.atNode(node, code);
+      reporter.atNode(node);
     } else {
       outerNames.add(name);
     }
@@ -518,7 +511,7 @@ class _ShadowingChecker extends RecursiveAstVisitor<void> {
 /// final List<String> countries = const <String>['US', 'CA', 'MX'];
 /// ```
 class PreferConstStringListRule extends SaropaLintRule {
-  const PreferConstStringListRule() : super(code: _code);
+  PreferConstStringListRule() : super(code: _code);
 
   /// Style/consistency. Large counts acceptable in legacy code.
   @override
@@ -528,22 +521,21 @@ class PreferConstStringListRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'prefer_const_string_list',
-    problemMessage:
-        '[prefer_const_string_list] This <String>[...] list contains only string literals '
+    'prefer_const_string_list',
+    '[prefer_const_string_list] This <String>[...] list contains only string literals '
         'and could be const. {v3}',
-    correctionMessage: 'Add const before the list literal or use a const '
+    correctionMessage:
+        'Add const before the list literal or use a const '
         'variable declaration.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addListLiteral((ListLiteral node) {
+    context.addListLiteral((ListLiteral node) {
       // Skip if already const
       if (node.constKeyword != null) {
         return;
@@ -571,27 +563,26 @@ class PreferConstStringListRule extends SaropaLintRule {
         return; // Empty lists are handled by other rules
       }
 
-      final bool allStringLiterals =
-          elements.every((CollectionElement element) {
+      final bool allStringLiterals = elements.every((
+        CollectionElement element,
+      ) {
         if (element is SimpleStringLiteral) {
           return true;
         }
         if (element is AdjacentStrings) {
           // Adjacent string literals like 'hello' 'world'
-          return element.strings
-              .every((StringLiteral s) => s is SimpleStringLiteral);
+          return element.strings.every(
+            (StringLiteral s) => s is SimpleStringLiteral,
+          );
         }
         return false;
       });
 
       if (allStringLiterals) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
   }
-
-  @override
-  List<Fix> getFixes() => <Fix>[_PreferConstStringListFix()];
 
   /// Check if a node is within a const context (const declaration,
   /// const constructor, enum body, etc.)
@@ -638,7 +629,7 @@ class PreferConstStringListRule extends SaropaLintRule {
 ///
 /// Since: v4.9.0 | Updated: v4.13.0 | Rule version: v5
 class PreferDeclaringConstConstructorRule extends SaropaLintRule {
-  const PreferDeclaringConstConstructorRule() : super(code: _code);
+  PreferDeclaringConstConstructorRule() : super(code: _code);
 
   /// Style/consistency. Large counts acceptable in legacy code.
   @override
@@ -648,21 +639,19 @@ class PreferDeclaringConstConstructorRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'prefer_declaring_const_constructor',
-    problemMessage:
-        '[prefer_declaring_const_constructor] Class could have a const constructor. A class could have a const constructor but doesn\'t. This class design reduces clarity and can lead to incorrect object initialization. {v5}',
+    'prefer_declaring_const_constructor',
+    '[prefer_declaring_const_constructor] Class could have a const constructor. A class could have a const constructor but doesn\'t. This class design reduces clarity and can lead to incorrect object initialization. {v5}',
     correctionMessage:
         'Add const keyword to constructor. Verify the change works correctly with existing tests and add coverage for the new behavior.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addClassDeclaration((ClassDeclaration node) {
+    context.addClassDeclaration((ClassDeclaration node) {
       // Check if all instance fields are final
       bool allFieldsFinal = true;
       bool hasFields = false;
@@ -709,9 +698,6 @@ class PreferDeclaringConstConstructorRule extends SaropaLintRule {
       }
     });
   }
-
-  @override
-  List<Fix> getFixes() => <Fix>[_PreferDeclaringConstConstructorFix()];
 }
 
 /// Warns when extension type representation fields are public.
@@ -734,7 +720,7 @@ class PreferDeclaringConstConstructorRule extends SaropaLintRule {
 /// }
 /// ```
 class PreferPrivateExtensionTypeFieldRule extends SaropaLintRule {
-  const PreferPrivateExtensionTypeFieldRule() : super(code: _code);
+  PreferPrivateExtensionTypeFieldRule() : super(code: _code);
 
   /// Style/consistency. Large counts acceptable in legacy code.
   @override
@@ -744,27 +730,24 @@ class PreferPrivateExtensionTypeFieldRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'prefer_private_extension_type_field',
-    problemMessage:
-        '[prefer_private_extension_type_field] Extension type representation field must be private. Extension type fields must be private for encapsulation. {v4}',
+    'prefer_private_extension_type_field',
+    '[prefer_private_extension_type_field] Extension type representation field must be private. Extension type fields must be private for encapsulation. {v4}',
     correctionMessage:
         'Use a private field with underscore prefix. Verify the change works correctly with existing tests and add coverage for the new behavior.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry
-        .addExtensionTypeDeclaration((ExtensionTypeDeclaration node) {
+    context.addExtensionTypeDeclaration((ExtensionTypeDeclaration node) {
       final RepresentationDeclaration representation = node.representation;
       final Token fieldName = representation.fieldName;
 
       if (!fieldName.lexeme.startsWith('_')) {
-        reporter.atToken(fieldName, code);
+        reporter.atToken(fieldName);
       }
     });
   }
@@ -807,7 +790,7 @@ class PreferPrivateExtensionTypeFieldRule extends SaropaLintRule {
 /// }
 /// ```
 class ProperSuperCallsRule extends SaropaLintRule {
-  const ProperSuperCallsRule() : super(code: _code);
+  ProperSuperCallsRule() : super(code: _code);
 
   /// Style/consistency. Large counts acceptable in legacy code.
   @override
@@ -817,21 +800,19 @@ class ProperSuperCallsRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'proper_super_calls',
-    problemMessage:
-        '[proper_super_calls] Super lifecycle method called in wrong order. In State classes, super.initState() must be called first, and super.dispose() must be called last. {v5}',
+    'proper_super_calls',
+    '[proper_super_calls] Super lifecycle method called in wrong order. In State classes, super.initState() must be called first, and super.dispose() must be called last. {v5}',
     correctionMessage:
         'super.initState() must be first; super.dispose() must be last. Verify the change works correctly with existing tests and add coverage for the new behavior.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodDeclaration((MethodDeclaration node) {
+    context.addMethodDeclaration((MethodDeclaration node) {
       final String methodName = node.name.lexeme;
 
       // Only check initState and dispose
@@ -903,7 +884,7 @@ class ProperSuperCallsRule extends SaropaLintRule {
 /// sealed class MyService { }  // Restricted to this library
 /// ```
 class AvoidUnmarkedPublicClassRule extends SaropaLintRule {
-  const AvoidUnmarkedPublicClassRule() : super(code: _code);
+  AvoidUnmarkedPublicClassRule() : super(code: _code);
 
   /// Style/consistency. Large counts acceptable in legacy code.
   @override
@@ -913,21 +894,19 @@ class AvoidUnmarkedPublicClassRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_unmarked_public_class',
-    problemMessage:
-        '[avoid_unmarked_public_class] Public class lacks an explicit class modifier. Dart 3.0 introduced class modifiers (base, final, interface, sealed). For API stability, public classes should declare their inheritance intent. {v3}',
+    'avoid_unmarked_public_class',
+    '[avoid_unmarked_public_class] Public class lacks an explicit class modifier. Dart 3.0 introduced class modifiers (base, final, interface, sealed). For API stability, public classes should declare their inheritance intent. {v3}',
     correctionMessage:
         'Add base, final, interface, or sealed modifier (Dart 3.0+). Verify the change works correctly with existing tests and add coverage for the new behavior.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addClassDeclaration((ClassDeclaration node) {
+    context.addClassDeclaration((ClassDeclaration node) {
       final String className = node.name.lexeme;
 
       // Skip private classes
@@ -972,7 +951,7 @@ class AvoidUnmarkedPublicClassRule extends SaropaLintRule {
 /// final class ApiService { }  // Cannot be extended
 /// ```
 class PreferFinalClassRule extends SaropaLintRule {
-  const PreferFinalClassRule() : super(code: _code);
+  PreferFinalClassRule() : super(code: _code);
 
   /// Style/consistency. Large counts acceptable in legacy code.
   @override
@@ -982,21 +961,19 @@ class PreferFinalClassRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'prefer_final_class',
-    problemMessage:
-        '[prefer_final_class] Prefer marking this class as final. Dart 3.0 introduced the final modifier to prevent subclassing. Classes that are not designed for extension must be marked final. {v4}',
+    'prefer_final_class',
+    '[prefer_final_class] Prefer marking this class as final. Dart 3.0 introduced the final modifier to prevent subclassing. Classes that are not designed for extension must be marked final. {v4}',
     correctionMessage:
         'Add final modifier if this class is not designed for extension (Dart 3.0+). Verify the change works correctly with existing tests and add coverage for the new behavior.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addClassDeclaration((ClassDeclaration node) {
+    context.addClassDeclaration((ClassDeclaration node) {
       final String className = node.name.lexeme;
 
       // Skip private classes
@@ -1042,9 +1019,6 @@ class PreferFinalClassRule extends SaropaLintRule {
       }
     });
   }
-
-  @override
-  List<Fix> getFixes() => <Fix>[_PreferFinalClassFix()];
 }
 
 /// Warns when an abstract class with only abstract members could be `interface`.
@@ -1070,7 +1044,7 @@ class PreferFinalClassRule extends SaropaLintRule {
 /// }
 /// ```
 class PreferInterfaceClassRule extends SaropaLintRule {
-  const PreferInterfaceClassRule() : super(code: _code);
+  PreferInterfaceClassRule() : super(code: _code);
 
   /// Style/consistency. Large counts acceptable in legacy code.
   @override
@@ -1080,21 +1054,19 @@ class PreferInterfaceClassRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'prefer_interface_class',
-    problemMessage:
-        '[prefer_interface_class] Abstract class with only abstract members could be interface. Dart 3.0 introduced the interface modifier for pure contracts. Abstract classes with no implementation should use interface class. {v4}',
+    'prefer_interface_class',
+    '[prefer_interface_class] Abstract class with only abstract members could be interface. Dart 3.0 introduced the interface modifier for pure contracts. Abstract classes with no implementation should use interface class. {v4}',
     correctionMessage:
         'Use interface class for pure contracts (Dart 3.0+). Verify the change works correctly with existing tests and add coverage for the new behavior.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addClassDeclaration((ClassDeclaration node) {
+    context.addClassDeclaration((ClassDeclaration node) {
       // Must be abstract
       if (node.abstractKeyword == null) return;
 
@@ -1144,9 +1116,6 @@ class PreferInterfaceClassRule extends SaropaLintRule {
       }
     });
   }
-
-  @override
-  List<Fix> getFixes() => <Fix>[_PreferInterfaceClassFix()];
 }
 
 /// Warns when an abstract class with implementation could be `base`.
@@ -1178,7 +1147,7 @@ class PreferInterfaceClassRule extends SaropaLintRule {
 /// }
 /// ```
 class PreferBaseClassRule extends SaropaLintRule {
-  const PreferBaseClassRule() : super(code: _code);
+  PreferBaseClassRule() : super(code: _code);
 
   /// Style/consistency. Large counts acceptable in legacy code.
   @override
@@ -1188,21 +1157,19 @@ class PreferBaseClassRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'prefer_base_class',
-    problemMessage:
-        '[prefer_base_class] Abstract class with shared implementation could be base. Dart 3.0 introduced the base modifier for classes meant to be extended but not implemented directly. {v4}',
+    'prefer_base_class',
+    '[prefer_base_class] Abstract class with shared implementation could be base. Dart 3.0 introduced the base modifier for classes meant to be extended but not implemented directly. {v4}',
     correctionMessage:
         'Use abstract base class to prevent direct implementation (Dart 3.0+). Verify the change works correctly with existing tests and add coverage for the new behavior.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addClassDeclaration((ClassDeclaration node) {
+    context.addClassDeclaration((ClassDeclaration node) {
       // Must be abstract
       if (node.abstractKeyword == null) return;
 
@@ -1250,137 +1217,8 @@ class PreferBaseClassRule extends SaropaLintRule {
       }
     });
   }
-
-  @override
-  List<Fix> getFixes() => <Fix>[_PreferBaseClassFix()];
 }
 
 // =============================================================================
 // QUICK FIXES
 // =============================================================================
-
-class _PreferConstStringListFix extends DartFix {
-  @override
-  void run(
-    CustomLintResolver resolver,
-    ChangeReporter reporter,
-    CustomLintContext context,
-    AnalysisError analysisError,
-    List<AnalysisError> others,
-  ) {
-    context.registry.addListLiteral((ListLiteral node) {
-      if (!analysisError.sourceRange.intersects(node.sourceRange)) return;
-
-      final changeBuilder = reporter.createChangeBuilder(
-        message: 'Add const keyword',
-        priority: 80,
-      );
-
-      changeBuilder.addDartFileEdit((builder) {
-        builder.addSimpleInsertion(node.offset, 'const ');
-      });
-    });
-  }
-}
-
-class _PreferDeclaringConstConstructorFix extends DartFix {
-  @override
-  void run(
-    CustomLintResolver resolver,
-    ChangeReporter reporter,
-    CustomLintContext context,
-    AnalysisError analysisError,
-    List<AnalysisError> others,
-  ) {
-    context.registry.addConstructorDeclaration((ConstructorDeclaration node) {
-      if (!analysisError.sourceRange.intersects(node.sourceRange)) return;
-
-      final changeBuilder = reporter.createChangeBuilder(
-        message: 'Add const keyword',
-        priority: 80,
-      );
-
-      changeBuilder.addDartFileEdit((builder) {
-        builder.addSimpleInsertion(node.offset, 'const ');
-      });
-    });
-  }
-}
-
-class _PreferFinalClassFix extends DartFix {
-  @override
-  void run(
-    CustomLintResolver resolver,
-    ChangeReporter reporter,
-    CustomLintContext context,
-    AnalysisError analysisError,
-    List<AnalysisError> others,
-  ) {
-    context.registry.addClassDeclaration((ClassDeclaration node) {
-      if (!analysisError.sourceRange.intersects(node.sourceRange)) return;
-
-      final changeBuilder = reporter.createChangeBuilder(
-        message: 'Add final modifier',
-        priority: 80,
-      );
-
-      changeBuilder.addDartFileEdit((builder) {
-        builder.addSimpleInsertion(node.classKeyword.offset, 'final ');
-      });
-    });
-  }
-}
-
-class _PreferInterfaceClassFix extends DartFix {
-  @override
-  void run(
-    CustomLintResolver resolver,
-    ChangeReporter reporter,
-    CustomLintContext context,
-    AnalysisError analysisError,
-    List<AnalysisError> others,
-  ) {
-    context.registry.addClassDeclaration((ClassDeclaration node) {
-      if (!analysisError.sourceRange.intersects(node.sourceRange)) return;
-
-      final changeBuilder = reporter.createChangeBuilder(
-        message: 'Add interface modifier',
-        priority: 80,
-      );
-
-      changeBuilder.addDartFileEdit((builder) {
-        // Insert before 'abstract' keyword if present, else before 'class'
-        final insertOffset =
-            node.abstractKeyword?.offset ?? node.classKeyword.offset;
-        builder.addSimpleInsertion(insertOffset, 'interface ');
-      });
-    });
-  }
-}
-
-class _PreferBaseClassFix extends DartFix {
-  @override
-  void run(
-    CustomLintResolver resolver,
-    ChangeReporter reporter,
-    CustomLintContext context,
-    AnalysisError analysisError,
-    List<AnalysisError> others,
-  ) {
-    context.registry.addClassDeclaration((ClassDeclaration node) {
-      if (!analysisError.sourceRange.intersects(node.sourceRange)) return;
-
-      final changeBuilder = reporter.createChangeBuilder(
-        message: 'Add base modifier',
-        priority: 80,
-      );
-
-      changeBuilder.addDartFileEdit((builder) {
-        // Insert before 'abstract' keyword if present, else before 'class'
-        final insertOffset =
-            node.abstractKeyword?.offset ?? node.classKeyword.offset;
-        builder.addSimpleInsertion(insertOffset, 'base ');
-      });
-    });
-  }
-}

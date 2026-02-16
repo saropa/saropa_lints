@@ -9,9 +9,6 @@ library;
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
 import 'package:analyzer/dart/element/type.dart';
-import 'package:analyzer/error/error.dart'
-    show AnalysisError, DiagnosticSeverity;
-import 'package:custom_lint_builder/custom_lint_builder.dart';
 
 import '../../saropa_lint_rule.dart';
 
@@ -39,7 +36,7 @@ import '../../saropa_lint_rule.dart';
 ///     .get();
 /// ```
 class AvoidFirestoreUnboundedQueryRule extends SaropaLintRule {
-  const AvoidFirestoreUnboundedQueryRule() : super(code: _code);
+  AvoidFirestoreUnboundedQueryRule() : super(code: _code);
 
   /// Significant issue. Address when count exceeds 10.
   @override
@@ -49,21 +46,19 @@ class AvoidFirestoreUnboundedQueryRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_firestore_unbounded_query',
-    problemMessage:
-        '[avoid_firestore_unbounded_query] Firestore query without limit() returns unbounded data from the entire collection. This triggers excessive bandwidth consumption, inflated Firestore read costs, slow UI rendering, and out-of-memory crashes on low-end devices when the collection grows large. {v3}',
+    'avoid_firestore_unbounded_query',
+    '[avoid_firestore_unbounded_query] Firestore query without limit() returns unbounded data from the entire collection. This triggers excessive bandwidth consumption, inflated Firestore read costs, slow UI rendering, and out-of-memory crashes on low-end devices when the collection grows large. {v3}',
     correctionMessage:
         'Add .limit(n) to cap the number of documents returned and prevent unbounded queries. Unbounded reads can result in high bills, slow apps, and out-of-memory errors.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       // Check for .get() or .snapshots() on Firestore query
       final String methodName = node.methodName.name;
       if (methodName != 'get' && methodName != 'snapshots') return;
@@ -137,7 +132,7 @@ class AvoidFirestoreUnboundedQueryRule extends SaropaLintRule {
 /// }
 /// ```
 class AvoidDatabaseInBuildRule extends SaropaLintRule {
-  const AvoidDatabaseInBuildRule() : super(code: _code);
+  AvoidDatabaseInBuildRule() : super(code: _code);
 
   /// Significant issue. Address when count exceeds 10.
   @override
@@ -147,21 +142,19 @@ class AvoidDatabaseInBuildRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_database_in_build',
-    problemMessage:
-        '[avoid_database_in_build] Running database queries inside build() causes the query to execute on every rebuild, leading to repeated database hits, slow UI, increased backend load, and degraded app performance. This can also cause inconsistent data, race conditions, and higher costs for cloud databases. {v4}',
+    'avoid_database_in_build',
+    '[avoid_database_in_build] Running database queries inside build() causes the query to execute on every rebuild, leading to repeated database hits, slow UI, increased backend load, and degraded app performance. This can also cause inconsistent data, race conditions, and higher costs for cloud databases. {v4}',
     correctionMessage:
         'Move database queries to initState(), use cached futures, or employ state management solutions to avoid repeated queries. Document query logic to ensure efficient and predictable data access.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodDeclaration((MethodDeclaration node) {
+    context.addMethodDeclaration((MethodDeclaration node) {
       if (node.name.lexeme != 'build') return;
 
       // Check for database operations in FutureBuilder/StreamBuilder
@@ -212,12 +205,13 @@ class _DatabaseInBuildVisitor extends RecursiveAstVisitor<void> {
 
     if (target != null) {
       final String targetSource = target.toSource().toLowerCase();
-      bool looksLikeDatabase =
-          _databasePatterns.any((String p) => targetSource.contains(p));
+      bool looksLikeDatabase = _databasePatterns.any(
+        (String p) => targetSource.contains(p),
+      );
 
       if (looksLikeDatabase &&
           (methodName == 'get' || methodName == 'snapshots')) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     }
 
@@ -253,7 +247,7 @@ class _DatabaseInBuildVisitor extends RecursiveAstVisitor<void> {
 /// }
 /// ```
 class AvoidSecureStorageOnWebRule extends SaropaLintRule {
-  const AvoidSecureStorageOnWebRule() : super(code: _code);
+  AvoidSecureStorageOnWebRule() : super(code: _code);
 
   /// Significant issue. Address when count exceeds 10.
   @override
@@ -263,23 +257,19 @@ class AvoidSecureStorageOnWebRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_secure_storage_on_web',
-    problemMessage:
-        '[avoid_secure_storage_on_web] flutter_secure_storage uses localStorage on web, which is not secure. Sensitive data stored in localStorage may be exposed to attackers, browser extensions, or other scripts, violating user privacy and security requirements. This can lead to credential theft, data breaches, and app store rejection. {v4}',
+    'avoid_secure_storage_on_web',
+    '[avoid_secure_storage_on_web] flutter_secure_storage uses localStorage on web, which is not secure. Sensitive data stored in localStorage may be exposed to attackers, browser extensions, or other scripts, violating user privacy and security requirements. This can lead to credential theft, data breaches, and app store rejection. {v4}',
     correctionMessage:
         'Check kIsWeb and use an alternative secure storage solution for web platforms, such as IndexedDB or encrypted cookies. Document platform-specific storage logic to ensure data security.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addInstanceCreationExpression((
-      InstanceCreationExpression node,
-    ) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final String? constructorName = node.constructorName.type.element?.name;
       if (constructorName != 'FlutterSecureStorage') return;
 
@@ -349,7 +339,7 @@ class AvoidSecureStorageOnWebRule extends SaropaLintRule {
 /// }
 /// ```
 class RequireFirebaseInitBeforeUseRule extends SaropaLintRule {
-  const RequireFirebaseInitBeforeUseRule() : super(code: _code);
+  RequireFirebaseInitBeforeUseRule() : super(code: _code);
 
   /// Each occurrence is a serious issue that should be fixed immediately.
   @override
@@ -359,13 +349,12 @@ class RequireFirebaseInitBeforeUseRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'require_firebase_init_before_use',
-    problemMessage:
-        '[require_firebase_init_before_use] Firebase services crash if accessed '
+    'require_firebase_init_before_use',
+    '[require_firebase_init_before_use] Firebase services crash if accessed '
         'before initializeApp() completes. App fails on startup. {v2}',
     correctionMessage:
         'Ensure Firebase.initializeApp() completes in main() before runApp().',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   /// Firebase service access patterns
@@ -384,12 +373,11 @@ class RequireFirebaseInitBeforeUseRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
     // Check main() function for Firebase usage without initialization
-    context.registry.addFunctionDeclaration((FunctionDeclaration node) {
+    context.addFunctionDeclaration((FunctionDeclaration node) {
       if (node.name.lexeme != 'main') return;
 
       final String mainSource = node.toSource();
@@ -405,40 +393,6 @@ class RequireFirebaseInitBeforeUseRule extends SaropaLintRule {
           return;
         }
       }
-    });
-  }
-
-  @override
-  List<Fix> getFixes() => <Fix>[_AddFirebaseInitFix()];
-}
-
-class _AddFirebaseInitFix extends DartFix {
-  @override
-  void run(
-    CustomLintResolver resolver,
-    ChangeReporter reporter,
-    CustomLintContext context,
-    AnalysisError analysisError,
-    List<AnalysisError> others,
-  ) {
-    context.registry.addFunctionDeclaration((FunctionDeclaration node) {
-      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
-      if (node.name.lexeme != 'main') return;
-
-      final FunctionBody body = node.functionExpression.body;
-      if (body is! BlockFunctionBody) return;
-
-      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
-        message: 'Add Firebase.initializeApp() call',
-        priority: 1,
-      );
-
-      changeBuilder.addDartFileEdit((builder) {
-        builder.addSimpleInsertion(
-          body.block.leftBracket.end,
-          '\n  WidgetsFlutterBinding.ensureInitialized();\n  await Firebase.initializeApp();\n',
-        );
-      });
     });
   }
 }
@@ -480,7 +434,7 @@ class _AddFirebaseInitFix extends DartFix {
 /// }
 /// ```
 class RequireDatabaseMigrationRule extends SaropaLintRule {
-  const RequireDatabaseMigrationRule() : super(code: _code);
+  RequireDatabaseMigrationRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.high;
@@ -489,21 +443,19 @@ class RequireDatabaseMigrationRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'require_database_migration',
-    problemMessage:
-        '[require_database_migration] Database models must support versioned migrations to handle schema changes safely. Without migration logic, updates to the schema can break data, cause runtime errors, and result in data loss or corruption. This is a critical reliability and maintainability issue for any persistent storage solution. {v4}',
+    'require_database_migration',
+    '[require_database_migration] Database models must support versioned migrations to handle schema changes safely. Without migration logic, updates to the schema can break data, cause runtime errors, and result in data loss or corruption. This is a critical reliability and maintainability issue for any persistent storage solution. {v4}',
     correctionMessage:
         'Implement versioned migrations for all database schema changes. Document migration steps and test upgrades to ensure data integrity and smooth user updates.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addClassDeclaration((ClassDeclaration node) {
+    context.addClassDeclaration((ClassDeclaration node) {
       final String classSource = node.toSource();
 
       // Check for Hive model patterns
@@ -520,12 +472,13 @@ class RequireDatabaseMigrationRule extends SaropaLintRule {
             !classSource.contains('schema') &&
             !classSource.contains('Schema')) {
           // Count HiveFields to estimate complexity
-          final int fieldCount =
-              RegExp(r'@HiveField\(\d+\)').allMatches(classSource).length;
+          final int fieldCount = RegExp(
+            r'@HiveField\(\d+\)',
+          ).allMatches(classSource).length;
 
           // If many fields, more likely to evolve and need migrations
           if (fieldCount >= 5) {
-            reporter.atNode(node, code);
+            reporter.atNode(node);
           }
         }
       }
@@ -540,7 +493,7 @@ class RequireDatabaseMigrationRule extends SaropaLintRule {
           final String className = node.name.lexeme;
           if (!className.contains('Migration') &&
               !className.contains('Version')) {
-            reporter.atNode(node, code);
+            reporter.atNode(node);
           }
         }
       }
@@ -587,7 +540,7 @@ class RequireDatabaseMigrationRule extends SaropaLintRule {
 /// }
 /// ```
 class RequireDatabaseIndexRule extends SaropaLintRule {
-  const RequireDatabaseIndexRule() : super(code: _code);
+  RequireDatabaseIndexRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.medium;
@@ -596,21 +549,19 @@ class RequireDatabaseIndexRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'require_database_index',
-    problemMessage:
-        '[require_database_index] Query on non-indexed field causes full table scan. Queries on non-indexed fields are slow. Add indices for fields used in where clauses, especially in large collections. {v4}',
+    'require_database_index',
+    '[require_database_index] Query on non-indexed field causes full table scan. Queries on non-indexed fields are slow. Add indices for fields used in where clauses, especially in large collections. {v4}',
     correctionMessage:
         'Add @Index() annotation to fields used in queries and filters. Verify the change works correctly with existing tests and add coverage for the new behavior.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       final String methodName = node.methodName.name;
 
       // Check for query/filter methods
@@ -690,7 +641,7 @@ class RequireDatabaseIndexRule extends SaropaLintRule {
 /// await batch.commit();
 /// ```
 class PreferTransactionForBatchRule extends SaropaLintRule {
-  const PreferTransactionForBatchRule() : super(code: _code);
+  PreferTransactionForBatchRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.medium;
@@ -699,27 +650,25 @@ class PreferTransactionForBatchRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'prefer_transaction_for_batch',
-    problemMessage:
-        '[prefer_transaction_for_batch] Multiple sequential database writes. Use transaction for atomicity. Individual writes are slower and can leave data inconsistent. Use transactions or batch writes for multiple related changes. {v3}',
+    'prefer_transaction_for_batch',
+    '[prefer_transaction_for_batch] Multiple sequential database writes. Use transaction for atomicity. Individual writes are slower and can leave data inconsistent. Use transactions or batch writes for multiple related changes. {v3}',
     correctionMessage:
         'Wrap related writes in a transaction or use batch operations. Verify the change works correctly with existing tests and add coverage for the new behavior.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodDeclaration((MethodDeclaration node) {
+    context.addMethodDeclaration((MethodDeclaration node) {
       final _DatabaseWriteCounter counter = _DatabaseWriteCounter();
       node.body.accept(counter);
 
       if (counter.hasTransaction || counter.writeCount < 3) return;
 
-      reporter.atNode(node, code);
+      reporter.atNode(node);
     });
   }
 }
@@ -832,7 +781,7 @@ class _DatabaseWriteCounter extends RecursiveAstVisitor<void> {
 /// analytics.logEvent(name: 'purchase_completed');
 /// ```
 class IncorrectFirebaseEventNameRule extends SaropaLintRule {
-  const IncorrectFirebaseEventNameRule() : super(code: _code);
+  IncorrectFirebaseEventNameRule() : super(code: _code);
 
   /// Critical issue. Invalid event names are silently dropped.
   @override
@@ -842,14 +791,13 @@ class IncorrectFirebaseEventNameRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'incorrect_firebase_event_name',
-    problemMessage:
-        '[incorrect_firebase_event_name] Invalid event name is silently dropped '
+    'incorrect_firebase_event_name',
+    '[incorrect_firebase_event_name] Invalid event name is silently dropped '
         'by Firebase Analytics. Your analytics data will be incomplete. {v2}',
     correctionMessage:
         'Event names must: start with a letter, contain only alphanumeric '
         'and underscores, be 1-40 chars, and not use reserved prefixes.',
-    errorSeverity: DiagnosticSeverity.ERROR,
+    severity: DiagnosticSeverity.ERROR,
   );
 
   /// Valid event name pattern
@@ -864,11 +812,10 @@ class IncorrectFirebaseEventNameRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       if (node.methodName.name != 'logEvent') return;
 
       // Find the 'name' argument
@@ -878,7 +825,7 @@ class IncorrectFirebaseEventNameRule extends SaropaLintRule {
           if (value is StringLiteral) {
             final String? eventName = value.stringValue;
             if (eventName != null && !_isValidEventName(eventName)) {
-              reporter.atNode(value, code);
+              reporter.atNode(value);
             }
           }
         }
@@ -916,7 +863,7 @@ class IncorrectFirebaseEventNameRule extends SaropaLintRule {
 /// #### BAD:
 /// ```dart
 /// analytics.logEvent(
-///   name: 'purchase',
+///   'purchase',
 ///   parameters: {
 ///     'item-id': '123', // Hyphens not allowed
 ///     'firebase_custom': 'value', // Reserved prefix
@@ -927,7 +874,7 @@ class IncorrectFirebaseEventNameRule extends SaropaLintRule {
 /// #### GOOD:
 /// ```dart
 /// analytics.logEvent(
-///   name: 'purchase',
+///   'purchase',
 ///   parameters: {
 ///     'item_id': '123',
 ///     'item_name': 'Widget',
@@ -935,7 +882,7 @@ class IncorrectFirebaseEventNameRule extends SaropaLintRule {
 /// );
 /// ```
 class IncorrectFirebaseParameterNameRule extends SaropaLintRule {
-  const IncorrectFirebaseParameterNameRule() : super(code: _code);
+  IncorrectFirebaseParameterNameRule() : super(code: _code);
 
   /// Critical issue. Invalid parameter names are silently dropped.
   @override
@@ -945,14 +892,13 @@ class IncorrectFirebaseParameterNameRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'incorrect_firebase_parameter_name',
-    problemMessage:
-        '[incorrect_firebase_parameter_name] Invalid parameter names are '
+    'incorrect_firebase_parameter_name',
+    '[incorrect_firebase_parameter_name] Invalid parameter names are '
         'silently dropped by Firebase. Event data will be missing fields. {v2}',
     correctionMessage:
         'Parameter names must: start with a letter, contain only alphanumeric '
         'and underscores, be 1-40 chars, and not use reserved prefixes.',
-    errorSeverity: DiagnosticSeverity.ERROR,
+    severity: DiagnosticSeverity.ERROR,
   );
 
   /// Valid parameter name pattern
@@ -967,11 +913,10 @@ class IncorrectFirebaseParameterNameRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       if (node.methodName.name != 'logEvent') return;
 
       // Find the 'parameters' argument
@@ -996,7 +941,7 @@ class IncorrectFirebaseParameterNameRule extends SaropaLintRule {
         if (key is StringLiteral) {
           final String? paramName = key.stringValue;
           if (paramName != null && !_isValidParamName(paramName)) {
-            reporter.atNode(key, code);
+            reporter.atNode(key);
           }
         }
       }
@@ -1041,7 +986,7 @@ class IncorrectFirebaseParameterNameRule extends SaropaLintRule {
 /// await batch.commit();
 /// ```
 class PreferFirestoreBatchWriteRule extends SaropaLintRule {
-  const PreferFirestoreBatchWriteRule() : super(code: _code);
+  PreferFirestoreBatchWriteRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.medium;
@@ -1050,21 +995,19 @@ class PreferFirestoreBatchWriteRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'prefer_firestore_batch_write',
-    problemMessage:
-        '[prefer_firestore_batch_write] Individual writes increase latency and billing costs. Multiple individual write operations are slower and more expensive than batch writes. Use WriteBatch for multiple related operations. {v3}',
+    'prefer_firestore_batch_write',
+    '[prefer_firestore_batch_write] Individual writes increase latency and billing costs. Multiple individual write operations are slower and more expensive than batch writes. Use WriteBatch for multiple related operations. {v3}',
     correctionMessage:
         'Use WriteBatch for multiple related write operations. Verify the change works correctly with existing tests and add coverage for the new behavior.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addBlock((Block node) {
+    context.addBlock((Block node) {
       int firestoreWriteCount = 0;
       MethodInvocation? firstWrite;
 
@@ -1094,7 +1037,7 @@ class PreferFirestoreBatchWriteRule extends SaropaLintRule {
 
       // Report if there are 3 or more consecutive writes
       if (firestoreWriteCount >= 3 && firstWrite != null) {
-        reporter.atNode(firstWrite, code);
+        reporter.atNode(firstWrite);
       }
     });
   }
@@ -1128,7 +1071,7 @@ class PreferFirestoreBatchWriteRule extends SaropaLintRule {
 /// }
 /// ```
 class AvoidFirestoreInWidgetBuildRule extends SaropaLintRule {
-  const AvoidFirestoreInWidgetBuildRule() : super(code: _code);
+  AvoidFirestoreInWidgetBuildRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.high;
@@ -1140,21 +1083,19 @@ class AvoidFirestoreInWidgetBuildRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
-    name: 'avoid_firestore_in_widget_build',
-    problemMessage:
-        '[avoid_firestore_in_widget_build] Performing Firestore operations (get, collection, doc) inside build() causes the query to run on every rebuild, leading to excessive database reads, slow UI, increased backend costs, and potential quota exhaustion. This can also cause inconsistent data, race conditions, and degraded user experience, especially in dynamic UIs. {v2}',
+    'avoid_firestore_in_widget_build',
+    '[avoid_firestore_in_widget_build] Performing Firestore operations (get, collection, doc) inside build() causes the query to run on every rebuild, leading to excessive database reads, slow UI, increased backend costs, and potential quota exhaustion. This can also cause inconsistent data, race conditions, and degraded user experience, especially in dynamic UIs. {v2}',
     correctionMessage:
         'Move Firestore queries to StreamBuilder, FutureBuilder, or state management logic outside build(). Cache results and avoid triggering database reads on every rebuild. Document query logic for maintainability and test for correct data flow.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       // Check for Firestore get or collection operations
       final String methodName = node.methodName.name;
       if (methodName != 'get' &&
@@ -1175,7 +1116,7 @@ class AvoidFirestoreInWidgetBuildRule extends SaropaLintRule {
       // Allow if inside StreamBuilder or FutureBuilder
       if (_isInsideBuilder(node)) return;
 
-      reporter.atNode(node, code);
+      reporter.atNode(node);
     });
   }
 
@@ -1227,7 +1168,7 @@ class AvoidFirestoreInWidgetBuildRule extends SaropaLintRule {
 /// final value = remoteConfig.getString('feature_key');
 /// ```
 class PreferFirebaseRemoteConfigDefaultsRule extends SaropaLintRule {
-  const PreferFirebaseRemoteConfigDefaultsRule() : super(code: _code);
+  PreferFirebaseRemoteConfigDefaultsRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.high;
@@ -1236,24 +1177,22 @@ class PreferFirebaseRemoteConfigDefaultsRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'prefer_firebase_remote_config_defaults',
-    problemMessage:
-        '[prefer_firebase_remote_config_defaults] Missing defaults cause '
+    'prefer_firebase_remote_config_defaults',
+    '[prefer_firebase_remote_config_defaults] Missing defaults cause '
         'null/zero values when fetch fails, breaking app behavior. {v3}',
     correctionMessage: 'Call setDefaults() with fallback values.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
     // Track if setDefaults is called
     bool hasSetDefaults = false;
 
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       final String methodName = node.methodName.name;
 
       if (methodName == 'setDefaults' || methodName == 'setConfigSettings') {
@@ -1277,7 +1216,7 @@ class PreferFirebaseRemoteConfigDefaultsRule extends SaropaLintRule {
         }
 
         if (!hasSetDefaults) {
-          reporter.atNode(node, code);
+          reporter.atNode(node);
         }
       }
     });
@@ -1309,7 +1248,7 @@ class PreferFirebaseRemoteConfigDefaultsRule extends SaropaLintRule {
 /// });
 /// ```
 class RequireFcmTokenRefreshHandlerRule extends SaropaLintRule {
-  const RequireFcmTokenRefreshHandlerRule() : super(code: _code);
+  RequireFcmTokenRefreshHandlerRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.high;
@@ -1318,31 +1257,29 @@ class RequireFcmTokenRefreshHandlerRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'require_fcm_token_refresh_handler',
-    problemMessage:
-        '[require_fcm_token_refresh_handler] FCM tokens expire periodically. '
+    'require_fcm_token_refresh_handler',
+    '[require_fcm_token_refresh_handler] FCM tokens expire periodically. '
         'Without onTokenRefresh handling, push notifications will stop working. {v3}',
     correctionMessage:
         'Listen to onTokenRefresh to update server with new tokens.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
     bool hasTokenRefreshHandler = false;
     MethodInvocation? getTokenCall;
 
-    context.registry.addPropertyAccess((PropertyAccess node) {
+    context.addPropertyAccess((PropertyAccess node) {
       if (node.propertyName.name == 'onTokenRefresh') {
         hasTokenRefreshHandler = true;
       }
     });
 
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       if (node.methodName.name == 'getToken') {
         final Expression? target = node.target;
         if (target == null) return;
@@ -1357,7 +1294,7 @@ class RequireFcmTokenRefreshHandlerRule extends SaropaLintRule {
     });
 
     // Use addCompilationUnit to report at the end
-    context.registry.addCompilationUnit((CompilationUnit unit) {
+    context.addCompilationUnit((CompilationUnit unit) {
       if (getTokenCall != null && !hasTokenRefreshHandler) {
         reporter.atNode(getTokenCall!, code);
       }
@@ -1393,7 +1330,7 @@ class RequireFcmTokenRefreshHandlerRule extends SaropaLintRule {
 /// }
 /// ```
 class RequireBackgroundMessageHandlerRule extends SaropaLintRule {
-  const RequireBackgroundMessageHandlerRule() : super(code: _code);
+  RequireBackgroundMessageHandlerRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.high;
@@ -1402,31 +1339,29 @@ class RequireBackgroundMessageHandlerRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'require_background_message_handler',
-    problemMessage:
-        '[require_background_message_handler] Push notifications received when '
+    'require_background_message_handler',
+    '[require_background_message_handler] Push notifications received when '
         'app is terminated are silently dropped without handler. {v3}',
     correctionMessage:
         'Add onBackgroundMessage with a top-level handler function.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
     bool hasBackgroundHandler = false;
     PropertyAccess? onMessageAccess;
 
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       if (node.methodName.name == 'onBackgroundMessage') {
         hasBackgroundHandler = true;
       }
     });
 
-    context.registry.addPropertyAccess((PropertyAccess node) {
+    context.addPropertyAccess((PropertyAccess node) {
       if (node.propertyName.name == 'onMessage') {
         final String source = node.toSource();
         if (source.contains('Messaging') || source.contains('messaging')) {
@@ -1438,7 +1373,7 @@ class RequireBackgroundMessageHandlerRule extends SaropaLintRule {
       }
     });
 
-    context.registry.addCompilationUnit((CompilationUnit unit) {
+    context.addCompilationUnit((CompilationUnit unit) {
       if (onMessageAccess != null && !hasBackgroundHandler) {
         reporter.atNode(onMessageAccess!, code);
       }
@@ -1479,7 +1414,7 @@ class RequireBackgroundMessageHandlerRule extends SaropaLintRule {
 /// }
 /// ```
 class AvoidMapMarkersInBuildRule extends SaropaLintRule {
-  const AvoidMapMarkersInBuildRule() : super(code: _code);
+  AvoidMapMarkersInBuildRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.medium;
@@ -1488,30 +1423,26 @@ class AvoidMapMarkersInBuildRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_map_markers_in_build',
-    problemMessage:
-        '[avoid_map_markers_in_build] Creating map markers in build() causes flickering. Creating markers in build() causes recreation on every rebuild, leading to flickering and performance issues. Cache markers. {v3}',
+    'avoid_map_markers_in_build',
+    '[avoid_map_markers_in_build] Creating map markers in build() causes flickering. Creating markers in build() causes recreation on every rebuild, leading to flickering and performance issues. Cache markers. {v3}',
     correctionMessage:
         'Cache markers in state and only recreate when needed. Verify the change works correctly with existing tests and add coverage for the new behavior.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addInstanceCreationExpression((
-      InstanceCreationExpression node,
-    ) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final String typeName = node.constructorName.type.name.lexeme;
       if (typeName != 'Marker') return;
 
       // Check if inside build method
       if (!_isInsideBuildMethod(node)) return;
 
-      reporter.atNode(node, code);
+      reporter.atNode(node);
     });
   }
 
@@ -1555,7 +1486,7 @@ class AvoidMapMarkersInBuildRule extends SaropaLintRule {
 /// )
 /// ```
 class RequireMapIdleCallbackRule extends SaropaLintRule {
-  const RequireMapIdleCallbackRule() : super(code: _code);
+  RequireMapIdleCallbackRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.high;
@@ -1564,21 +1495,19 @@ class RequireMapIdleCallbackRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'require_map_idle_callback',
-    problemMessage:
-        '[require_map_idle_callback] Data fetching triggered in onCameraMove fires on every frame during map pan and zoom gestures. This spams backend APIs with hundreds of redundant requests per second, causes severe performance degradation with UI jank, and wastes user bandwidth and battery on mobile devices. {v3}',
+    'require_map_idle_callback',
+    '[require_map_idle_callback] Data fetching triggered in onCameraMove fires on every frame during map pan and zoom gestures. This spams backend APIs with hundreds of redundant requests per second, causes severe performance degradation with UI jank, and wastes user bandwidth and battery on mobile devices. {v3}',
     correctionMessage:
         'Move data-fetching logic to the onCameraIdle callback, which fires once after the user stops interacting with the map, preventing API spam and frame drops.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addNamedExpression((NamedExpression node) {
+    context.addNamedExpression((NamedExpression node) {
       if (node.name.label.name != 'onCameraMove') return;
 
       // Check if the callback contains fetch/load/get operations
@@ -1593,7 +1522,7 @@ class RequireMapIdleCallbackRule extends SaropaLintRule {
           bodySource.contains('Http') ||
           bodySource.contains('api') ||
           bodySource.contains('Api')) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
   }
@@ -1629,7 +1558,7 @@ class RequireMapIdleCallbackRule extends SaropaLintRule {
 /// )
 /// ```
 class PreferMarkerClusteringRule extends SaropaLintRule {
-  const PreferMarkerClusteringRule() : super(code: _code);
+  PreferMarkerClusteringRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.medium;
@@ -1638,21 +1567,19 @@ class PreferMarkerClusteringRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'prefer_marker_clustering',
-    problemMessage:
-        '[prefer_marker_clustering] Many markers cause frame drops and memory issues. Displaying hundreds of markers individually causes performance issues. Use marker clustering to improve performance and UX. {v3}',
+    'prefer_marker_clustering',
+    '[prefer_marker_clustering] Many markers cause frame drops and memory issues. Displaying hundreds of markers individually causes performance issues. Use marker clustering to improve performance and UX. {v3}',
     correctionMessage:
         'Use marker clustering library for many markers. Verify the change works correctly with existing tests and add coverage for the new behavior.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addNamedExpression((NamedExpression node) {
+    context.addNamedExpression((NamedExpression node) {
       if (node.name.label.name != 'markers') return;
 
       // Check if using .map() to create markers from a collection
@@ -1661,7 +1588,7 @@ class PreferMarkerClusteringRule extends SaropaLintRule {
 
       // Look for patterns that suggest many markers
       if (valueSource.contains('.map(') && valueSource.contains('Marker')) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
   }
@@ -1693,7 +1620,7 @@ class PreferMarkerClusteringRule extends SaropaLintRule {
 /// **Note:** This rule checks within the same method. Cross-method detection
 /// is not possible with static analysis.
 class RequireCrashlyticsUserIdRule extends SaropaLintRule {
-  const RequireCrashlyticsUserIdRule() : super(code: _code);
+  RequireCrashlyticsUserIdRule() : super(code: _code);
 
   /// Debugging improvement - not critical but helpful.
   @override
@@ -1703,21 +1630,19 @@ class RequireCrashlyticsUserIdRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'require_crashlytics_user_id',
-    problemMessage:
-        '[require_crashlytics_user_id] Crashlytics setup without setUserIdentifier. Crashes will be anonymous. Setting a user identifier helps track crashes to specific users to improve debugging and support. Without it, crashes are anonymous. {v2}',
+    'require_crashlytics_user_id',
+    '[require_crashlytics_user_id] Crashlytics setup without setUserIdentifier. Crashes will be anonymous. Setting a user identifier helps track crashes to specific users to improve debugging and support. Without it, crashes are anonymous. {v2}',
     correctionMessage:
         'Add FirebaseCrashlytics.instance.setUserIdentifier(userId). Verify the change works correctly with existing tests and add coverage for the new behavior.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodInvocation((node) {
+    context.addMethodInvocation((node) {
       final methodName = node.methodName.name;
 
       // Check for Crashlytics configuration methods
@@ -1753,7 +1678,7 @@ class RequireCrashlyticsUserIdRule extends SaropaLintRule {
 
       // Check if setUserIdentifier is called
       if (!methodSource.contains('setUserIdentifier')) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
   }
@@ -1787,7 +1712,7 @@ class RequireCrashlyticsUserIdRule extends SaropaLintRule {
 /// **Note:** This is an INFO-level reminder. App Check activation typically
 /// happens once at app startup, not necessarily in the same file.
 class RequireFirebaseAppCheckRule extends SaropaLintRule {
-  const RequireFirebaseAppCheckRule() : super(code: _code);
+  RequireFirebaseAppCheckRule() : super(code: _code);
 
   /// Security improvement - protects backend from abuse.
   @override
@@ -1797,21 +1722,19 @@ class RequireFirebaseAppCheckRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'require_firebase_app_check',
-    problemMessage:
-        '[require_firebase_app_check] Firebase initialization without App Check activation. Firebase App Check helps protect your backend resources from abuse. Without it, your Firebase services are vulnerable to unauthorized access. {v2}',
+    'require_firebase_app_check',
+    '[require_firebase_app_check] Firebase initialization without App Check activation. Firebase App Check helps protect your backend resources from abuse. Without it, your Firebase services are vulnerable to unauthorized access. {v2}',
     correctionMessage:
         'Add FirebaseAppCheck.instance.activate() after Firebase.initializeApp(). Verify the change works correctly with existing tests and add coverage for the new behavior.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodInvocation((node) {
+    context.addMethodInvocation((node) {
       // Check for Firebase.initializeApp()
       final target = node.target;
       if (target is! SimpleIdentifier || target.name != 'Firebase') {
@@ -1838,7 +1761,7 @@ class RequireFirebaseAppCheckRule extends SaropaLintRule {
               funcSource.contains('activate')) {
             return;
           }
-          reporter.atNode(node, code);
+          reporter.atNode(node);
           return;
         }
         current = current.parent;
@@ -1853,7 +1776,7 @@ class RequireFirebaseAppCheckRule extends SaropaLintRule {
       // Check if App Check is activated
       if (!methodSource.contains('FirebaseAppCheck') ||
           !methodSource.contains('activate')) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
   }
@@ -1883,7 +1806,7 @@ class RequireFirebaseAppCheckRule extends SaropaLintRule {
 /// // Store large data in Firestore instead
 /// ```
 class AvoidStoringUserDataInAuthRule extends SaropaLintRule {
-  const AvoidStoringUserDataInAuthRule() : super(code: _code);
+  AvoidStoringUserDataInAuthRule() : super(code: _code);
 
   /// Architectural issue - misuse of custom claims.
   @override
@@ -1893,12 +1816,11 @@ class AvoidStoringUserDataInAuthRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_storing_user_data_in_auth',
-    problemMessage:
-        '[avoid_storing_user_data_in_auth] Large object in setCustomClaims. Claims are for roles, not data storage. Firebase custom claims are meant for access control, not user data storage. They\'re limited to 1000 bytes and are included in every auth token. {v2}',
+    'avoid_storing_user_data_in_auth',
+    '[avoid_storing_user_data_in_auth] Large object in setCustomClaims. Claims are for roles, not data storage. Firebase custom claims are meant for access control, not user data storage. They\'re limited to 1000 bytes and are included in every auth token. {v2}',
     correctionMessage:
         'Store user data in Firestore. Use claims only for access control (roles, permissions).',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   static const _dataTerms = [
@@ -1915,11 +1837,10 @@ class AvoidStoringUserDataInAuthRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodInvocation((node) {
+    context.addMethodInvocation((node) {
       final methodName = node.methodName.name;
 
       if (methodName != 'setCustomUserClaims' &&
@@ -1934,11 +1855,12 @@ class AvoidStoringUserDataInAuthRule extends SaropaLintRule {
           for (final element in arg.elements) {
             if (element is MapLiteralEntry) {
               final keySource = element.key.toSource().toLowerCase();
-              final hasDataKey =
-                  _dataTerms.any((term) => keySource.contains(term));
+              final hasDataKey = _dataTerms.any(
+                (term) => keySource.contains(term),
+              );
 
               if (hasDataKey) {
-                reporter.atNode(arg, code);
+                reporter.atNode(arg);
                 return;
               }
             }
@@ -1946,7 +1868,7 @@ class AvoidStoringUserDataInAuthRule extends SaropaLintRule {
 
           // Also warn if map has more than 5 entries (too much data)
           if (arg.elements.length > 5) {
-            reporter.atNode(arg, code);
+            reporter.atNode(arg);
           }
         }
       }
@@ -1983,7 +1905,7 @@ class AvoidStoringUserDataInAuthRule extends SaropaLintRule {
 /// );
 /// ```
 class PreferFirebaseAuthPersistenceRule extends SaropaLintRule {
-  const PreferFirebaseAuthPersistenceRule() : super(code: _code);
+  PreferFirebaseAuthPersistenceRule() : super(code: _code);
 
   /// Medium impact - affects user experience on web.
   @override
@@ -1993,12 +1915,11 @@ class PreferFirebaseAuthPersistenceRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'prefer_firebase_auth_persistence',
-    problemMessage:
-        '[prefer_firebase_auth_persistence] Firebase Auth on web defaults to session persistence. Prefer setting LOCAL persistence. By default, Firebase Auth on web uses session persistence, meaning users are logged out when they close the browser tab. For "remember me" functionality, you need to explicitly set persistence to LOCAL. {v2}',
+    'prefer_firebase_auth_persistence',
+    '[prefer_firebase_auth_persistence] Firebase Auth on web defaults to session persistence. Prefer setting LOCAL persistence. By default, Firebase Auth on web uses session persistence, meaning users are logged out when they close the browser tab. For "remember me" functionality, you need to explicitly set persistence to LOCAL. {v2}',
     correctionMessage:
         'Call FirebaseAuth.instance.setPersistence(Persistence.LOCAL) before sign-in for "remember me".',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   static const Set<String> _signInMethods = <String>{
@@ -2014,11 +1935,10 @@ class PreferFirebaseAuthPersistenceRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       final String methodName = node.methodName.name;
       if (!_signInMethods.contains(methodName)) return;
 
@@ -2102,7 +2022,7 @@ class PreferFirebaseAuthPersistenceRule extends SaropaLintRule {
 /// }
 /// ```
 class RequireFirebaseErrorHandlingRule extends SaropaLintRule {
-  const RequireFirebaseErrorHandlingRule() : super(code: _code);
+  RequireFirebaseErrorHandlingRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.high;
@@ -2111,13 +2031,12 @@ class RequireFirebaseErrorHandlingRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'require_firebase_error_handling',
-    problemMessage:
-        '[require_firebase_error_handling] Firebase operation without '
+    'require_firebase_error_handling',
+    '[require_firebase_error_handling] Firebase operation without '
         'error handling. Firebase calls can fail. {v2}',
     correctionMessage:
         'Wrap in try-catch or add .catchError() to handle Firebase errors.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   static const Set<String> _firebaseClasses = <String>{
@@ -2133,11 +2052,10 @@ class RequireFirebaseErrorHandlingRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addAwaitExpression((AwaitExpression node) {
+    context.addAwaitExpression((AwaitExpression node) {
       final Expression expr = node.expression;
       if (expr is! MethodInvocation) return;
 
@@ -2150,7 +2068,7 @@ class RequireFirebaseErrorHandlingRule extends SaropaLintRule {
       // Check if has .catchError
       if (_hasCatchError(expr)) return;
 
-      reporter.atNode(node, code);
+      reporter.atNode(node);
     });
   }
 
@@ -2237,7 +2155,7 @@ class RequireFirebaseErrorHandlingRule extends SaropaLintRule {
 /// }
 /// ```
 class AvoidFirebaseRealtimeInBuildRule extends SaropaLintRule {
-  const AvoidFirebaseRealtimeInBuildRule() : super(code: _code);
+  AvoidFirebaseRealtimeInBuildRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.high;
@@ -2249,13 +2167,12 @@ class AvoidFirebaseRealtimeInBuildRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
-    name: 'avoid_firebase_realtime_in_build',
-    problemMessage:
-        '[avoid_firebase_realtime_in_build] Creating Firebase stream/listener '
+    'avoid_firebase_realtime_in_build',
+    '[avoid_firebase_realtime_in_build] Creating Firebase stream/listener '
         'in build causes multiple subscriptions. {v2}',
     correctionMessage:
         'Cache the stream reference in a field and initialize in initState.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   static const Set<String> _realtimeMethods = <String>{
@@ -2272,18 +2189,17 @@ class AvoidFirebaseRealtimeInBuildRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       final String methodName = node.methodName.name;
       if (!_realtimeMethods.contains(methodName)) return;
 
       // Check if inside build method
       if (!_isInsideBuildMethod(node)) return;
 
-      reporter.atNode(node, code);
+      reporter.atNode(node);
     });
   }
 
@@ -2343,7 +2259,7 @@ class AvoidFirebaseRealtimeInBuildRule extends SaropaLintRule {
 ///     .get();
 /// ```
 class RequireFirestoreIndexRule extends SaropaLintRule {
-  const RequireFirestoreIndexRule() : super(code: _code);
+  RequireFirestoreIndexRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.high;
@@ -2352,22 +2268,20 @@ class RequireFirestoreIndexRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'require_firestore_index',
-    problemMessage:
-        '[require_firestore_index] Compound Firestore query may need a composite '
+    'require_firestore_index',
+    '[require_firestore_index] Compound Firestore query may need a composite '
         'index. Query will fail at runtime without the required index. {v2}',
     correctionMessage:
         'Create a composite index in Firebase Console or firestore.indexes.json.',
-    errorSeverity: DiagnosticSeverity.ERROR,
+    severity: DiagnosticSeverity.ERROR,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       final String methodName = node.methodName.name;
 
       // Check for get(), snapshots(), or getDocuments() on query
@@ -2433,7 +2347,7 @@ class RequireFirestoreIndexRule extends SaropaLintRule {
       }
 
       if (needsIndex) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
   }
@@ -2486,7 +2400,7 @@ class RequireFirestoreIndexRule extends SaropaLintRule {
 ///     .once();
 /// ```
 class RequireFirebaseCompositeIndexRule extends SaropaLintRule {
-  const RequireFirebaseCompositeIndexRule() : super(code: _code);
+  RequireFirebaseCompositeIndexRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.high;
@@ -2495,24 +2409,21 @@ class RequireFirebaseCompositeIndexRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'require_firebase_composite_index',
-    problemMessage:
-        '[require_firebase_composite_index] Firebase Realtime Database query '
+    'require_firebase_composite_index',
+    '[require_firebase_composite_index] Firebase Realtime Database query '
         'uses orderByChild with filtering but may lack a .indexOn rule. '
         'Without the index the SDK downloads all data and sorts client-side, '
         'causing severe performance degradation on large datasets. {v1}',
-    correctionMessage: 'Add a .indexOn rule for the ordered child key in your '
+    correctionMessage:
+        'Add a .indexOn rule for the ordered child key in your '
         'database.rules.json or Firebase Console security rules.',
-    errorSeverity: DiagnosticSeverity.ERROR,
+    severity: DiagnosticSeverity.ERROR,
   );
 
   /// Terminal methods that execute an RTDB query.
   /// Note: stream getters (onValue, onChildAdded, etc.) are property accesses,
   /// not method invocations, so they cannot be caught by addMethodInvocation.
-  static const Set<String> _terminalMethods = <String>{
-    'once',
-    'get',
-  };
+  static const Set<String> _terminalMethods = <String>{'once', 'get'};
 
   /// RTDB filter methods that benefit from an index.
   static const Set<String> _filterMethods = <String>{
@@ -2525,11 +2436,10 @@ class RequireFirebaseCompositeIndexRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       final String methodName = node.methodName.name;
 
       // Only trigger on terminal RTDB query methods
@@ -2558,7 +2468,7 @@ class RequireFirebaseCompositeIndexRule extends SaropaLintRule {
 
       // Report when we see orderByChild + filter on an RTDB reference
       if (hasRef && hasOrderByChild && hasFilter) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
   }

@@ -15,7 +15,6 @@ export 'tiers.dart' show getRulesForTier;
 const Set<String> stylisticRules = <String>{
   // === Debug/Test utility ===
   'prefer_fail_test_case', // Test hook - always fails
-
   // === Ordering & Sorting ===
   'prefer_member_ordering',
   'prefer_arguments_ordering',
@@ -27,7 +26,6 @@ const Set<String> stylisticRules = <String>{
   'enforce_parameters_ordering', // Moved from professional (opinionated)
   'enum_constants_ordering', // Moved from professional (opinionated)
   'map_keys_ordering', // Moved from professional (opinionated)
-
   // === Naming conventions ===
   'prefer_boolean_prefixes',
   'prefer_no_getter_prefix',
@@ -48,7 +46,6 @@ const Set<String> stylisticRules = <String>{
   'prefer_bloc_event_suffix', // Moved from comprehensive (opinionated)
   'prefer_bloc_state_suffix', // Moved from comprehensive (opinionated)
   'prefer_use_prefix', // Moved from comprehensive (opinionated)
-
   // === Error handling style ===
   'prefer_catch_over_on',
 
@@ -74,7 +71,6 @@ const Set<String> stylisticRules = <String>{
   'prefer_returning_shorthands', // Moved from professional (opinionated)
   'prefer_pushing_conditional_expressions', // Moved from professional (opinionated)
   'prefer_type_over_var', // Moved from professional (conflicts with prefer_var_over_explicit_type)
-
   // === Function & Parameter style ===
   'prefer_arrow_functions',
   'prefer_all_named_parameters',
@@ -103,7 +99,6 @@ const Set<String> stylisticRules = <String>{
   'unnecessary_trailing_comma', // Moved from professional (opinionated)
   'double_literal_format', // Moved from professional (opinionated)
   'format_comment_style', // Moved from pedantic (opinionated)
-
   // === Comments & Documentation ===
   'prefer_todo_format',
   'prefer_fixme_format',
@@ -111,7 +106,6 @@ const Set<String> stylisticRules = <String>{
   'prefer_period_after_doc',
   'prefer_doc_comments_over_regular',
   'prefer_no_commented_out_code', // Moved from pedantic (v4.2.0)
-
   // === Testing style ===
   'prefer_expect_over_assert_in_tests',
   // === Type argument style (conflicting, opt-in only) ===
@@ -254,7 +248,6 @@ const Set<String> essentialRules = <String>{
   'avoid_storing_context',
   'avoid_context_across_async',
   'avoid_context_after_await_in_static', // ERROR - context after await in static
-
   // Security
   'avoid_hardcoded_credentials',
   'avoid_logging_sensitive_data',
@@ -271,7 +264,6 @@ const Set<String> essentialRules = <String>{
   'require_unique_iv_per_encryption',
   'avoid_dynamic_code_loading', // OWASP M2 - supply chain
   'avoid_unverified_native_library', // OWASP M2 - supply chain
-
   // Null Safety
   'avoid_null_assertion',
   'avoid_unsafe_collection_methods',
@@ -281,7 +273,6 @@ const Set<String> essentialRules = <String>{
 
   // Parameter Safety - Hidden side effects
   'avoid_parameter_mutation', // Mutating parameters modifies caller's data
-
   // State Management - Critical (Batch 10)
   'avoid_bloc_event_mutation', // Immutability is critical
   'require_initial_state', // Runtime crash without it
@@ -292,15 +283,12 @@ const Set<String> essentialRules = <String>{
   'avoid_getx_context_outside_widget', // Unsafe context access outside widgets
   'avoid_hooks_outside_build', // Runtime error
   'avoid_conditional_hooks', // Runtime error
-
   // Forms - Critical (Batch 12)
   'require_form_key', // Forms won't work without it
   'avoid_clearing_form_on_error', // Data loss
-
   // Async
   'avoid_throw_in_finally',
   'avoid_uncaught_future_errors', // Alias: require_future_error_handling
-
   // Collections
   'avoid_duplicate_map_keys',
   'avoid_isar_enum_field',
@@ -308,7 +296,6 @@ const Set<String> essentialRules = <String>{
   // Equatable (Essential - missing fields cause equality bugs)
   'list_all_equatable_fields',
   'avoid_mutable_field_in_equatable', // Mutable fields break equality
-
   // Architecture
   'avoid_circular_dependencies',
 
@@ -325,7 +312,6 @@ const Set<String> essentialRules = <String>{
   'avoid_losing_stack_trace',
 
   'avoid_print_error', // Print for error logging loses errors in production
-
   // Collection/Loop Safety (Phase 2)
   'avoid_unreachable_for_loop',
 
@@ -343,7 +329,6 @@ const Set<String> essentialRules = <String>{
   // Scroll/List (Essential - prevent runtime errors and performance issues)
   'require_key_for_reorderable', // ERROR - reordering fails without keys
   'avoid_shrink_wrap_expensive', // WARNING - disables virtualization
-
   // Type Safety (Critical - throws runtime exceptions)
   'prefer_try_parse_for_dynamic_data',
   'avoid_double_for_money',
@@ -352,7 +337,6 @@ const Set<String> essentialRules = <String>{
   'require_vsync_mixin',
   'require_animation_controller_dispose',
   'require_animation_ticker_disposal', // Ticker must be stopped to prevent memory leaks
-
   // Resource Management (Essential - prevent hardware lock)
   'require_camera_dispose',
 
@@ -362,7 +346,6 @@ const Set<String> essentialRules = <String>{
   'require_getx_permanent_cleanup', // Get.put(permanent: true) needs cleanup
   'require_image_stream_dispose', // ImageStream listeners must be removed
   'require_sse_subscription_cancel', // SSE connections must be closed
-
   // Accessibility (Essential - critical errors)
   'avoid_hidden_interactive',
   'require_error_identification',
@@ -410,14 +393,11 @@ const Set<String> essentialRules = <String>{
   'missing_test_assertion',
   'avoid_async_callback_in_fake_async',
   'avoid_test_sleep', // WARNING - blocks test runner, use pump() instead
-
   // QR/Camera (Essential - app store compliance)
   'require_qr_permission_check',
   'require_qr_content_validation', // Security - validate scanned content
-
   // PDF (Essential - memory safety)
   'avoid_loading_full_pdf_in_memory', // OOM prevention
-
   // Lifecycle (Essential - battery/stability)
   'require_lifecycle_observer',
 
@@ -434,7 +414,6 @@ const Set<String> essentialRules = <String>{
   'provide_correct_intl_args', // ERROR - runtime crash from mismatched intl args
   'dispose_class_fields', // WARNING - memory leaks from undisposed fields
   'avoid_async_in_build', // ERROR - async build causes rendering issues
-
   // Package-specific rules (Essential - security/crash prevention)
   'require_apple_signin_nonce', // Security - replay attack prevention
   'avoid_supabase_anon_key_in_code', // Security - credential exposure
@@ -444,7 +423,6 @@ const Set<String> essentialRules = <String>{
   'require_speech_stop_on_dispose', // Resource leak - microphone
   'avoid_app_links_sensitive_params', // Security - token exposure
   'avoid_openai_key_in_code', // Security - API key exposure
-
   // Part 5 - Security Rules (Essential)
   'avoid_shared_prefs_sensitive_data',
   'require_secure_storage_for_auth',
@@ -454,7 +432,6 @@ const Set<String> essentialRules = <String>{
   'require_hive_encryption_key_secure',
   'require_type_adapter_registration', // ERROR - adapter not registered before openBox
   'avoid_hive_field_index_reuse', // ERROR - data corruption from duplicate indices
-
   // Part 5 - HTTP/Dio Rules (Essential)
   'require_dio_timeout',
   'require_dio_error_handling',
@@ -480,7 +457,6 @@ const Set<String> essentialRules = <String>{
   'avoid_yield_in_on_event', // Critical - deprecated/broken in Bloc 8.0+
   'emit_new_bloc_state_instances', // Critical - state mutation breaks equality
   'avoid_listen_in_async', // High - subscription leaks in async callbacks
-
   // Part 6 - Security Rules (Essential)
   'require_url_validation',
   'avoid_redirect_injection',
@@ -489,7 +465,6 @@ const Set<String> essentialRules = <String>{
   // Part 6 - Form Rules (Essential)
   'avoid_keyboard_overlap',
   'require_search_debounce', // Prevents request spam
-
   // Image Picker Rules (Essential - OOM prevention)
   'prefer_image_picker_max_dimensions', // WARNING - OOM on high-res cameras
 
@@ -528,8 +503,7 @@ const Set<String> essentialRules = <String>{
   'require_catch_logging', // WARNING - security event logging (OWASP A09)
   'require_intl_args_match', // ERROR - runtime crash
   'require_cache_key_determinism', // ERROR - memory bloat
-
-  'require_method_channel_error_handling', // WARNING - crash prevention
+  // TODO(migration): require_method_channel_error_handling - class not found
   'require_https_for_ios', // WARNING - ATS blocking
   'require_ios_permission_description', // WARNING - App Store rejection
   'require_ios_privacy_manifest', // WARNING - iOS 17+ requirement
@@ -550,7 +524,6 @@ const Set<String> essentialRules = <String>{
   'require_purchase_restoration', // ERROR - App Store requires restore purchases
   'require_macos_notarization_ready', // INFO - macOS distribution requirement reminder
   'require_ios_data_protection', // WARNING - file encryption for sensitive data
-
   // =========================================================================
   // Orphan Rule Assignment (v4.1.0) - Previously untiered critical/high rules
   // =========================================================================
@@ -560,34 +533,26 @@ const Set<String> essentialRules = <String>{
   'avoid_path_traversal', // ERROR - directory traversal attack
   'require_data_encryption', // ERROR - sensitive data must be encrypted
   'require_secure_password_field', // ERROR - password field security
-
   // Platform/Permissions (Critical)
   'avoid_platform_channel_on_web', // ERROR - crashes on web
-
   // Widget Lifecycle (Critical/High)
   'avoid_ref_in_build_body', // ERROR - ref.watch in wrong place
   'avoid_flashing_content', // ERROR - accessibility seizure risk
-
   // Animation (High)
   'avoid_animation_rebuild_waste', // WARNING - animation performance
   'avoid_overlapping_animations', // WARNING - animation conflicts
-
   // Navigation (High)
   'require_deep_link_fallback', // WARNING - deep link error handling
   'require_stepper_validation', // WARNING - stepper form validation
-
   // Firebase/Backend (High)
   'prefer_firebase_remote_config_defaults', // WARNING - config defaults
   'require_background_message_handler', // WARNING - FCM background
   'require_fcm_token_refresh_handler', // WARNING - token refresh
-
   // WebView (High)
   'require_websocket_message_validation', // WARNING - message validation
-
   // Data/Storage (High)
   'prefer_utc_for_storage', // WARNING - timezone consistency
   'require_database_migration', // WARNING - migration safety
-
   // UI/UX (High)
   'prefer_html_escape', // WARNING - XSS prevention
   'require_error_widget', // WARNING - error boundary
@@ -595,10 +560,8 @@ const Set<String> essentialRules = <String>{
   'require_immutable_bloc_state', // WARNING - state immutability
   'require_map_idle_callback', // WARNING - map performance
   'require_media_loading_state', // WARNING - loading indicators
-
   // Network (High)
   'require_cors_handling', // WARNING - CORS on web
-
   // NEW v4.1.6 Rules - Essential
   'avoid_print_in_release', // ERROR - print() executes in release builds
   'avoid_sensitive_in_logs', // ERROR - no sensitive data in logs
@@ -609,12 +572,10 @@ const Set<String> essentialRules = <String>{
   'avoid_hardcoded_config', // WARNING - hardcoded URLs and keys
   'avoid_mixed_environments', // ERROR - prod/dev config mismatch
   'require_late_initialization_in_init_state', // WARNING - late init in build()
-
   // NEW v4.1.7 Rules - Essential
   'require_websocket_reconnection', // WARNING - WebSocket needs reconnection
   'avoid_sensitive_data_in_clipboard', // WARNING - clipboard accessible to other apps
   'avoid_unbounded_cache_growth', // WARNING - caches without limits cause OOM
-
   // Critical disposal/state rules (auto-assigned by severity)
   'prefer_copy_with_for_state',
   'require_bloc_close',
@@ -650,11 +611,9 @@ const Set<String> essentialRules = <String>{
   'prefer_lazy_loading_images', // WARNING - large images should be lazy loaded
   'avoid_sqflite_type_mismatch', // ERROR - SQLite type mismatches cause runtime errors
   'avoid_sudo_shell_commands', // ERROR - elevated privileges are a security risk
-
   // ROADMAP ⭐ Rules - Essential (new batch)
   'avoid_context_dependency_in_callback', // WARNING - stale context in async callbacks
   'avoid_hive_synchronous_in_ui', // WARNING - sync Hive I/O blocks UI thread
-
   // ROADMAP 🚨 Rules (Essential - ERROR severity)
   'prefer_correct_package_name', // ERROR - package naming convention
   'avoid_getx_build_context_bypass', // ERROR - bypasses BuildContext
@@ -662,13 +621,10 @@ const Set<String> essentialRules = <String>{
   'avoid_retaining_disposed_widgets', // ERROR - memory leak from widget refs
   'require_secure_key_generation', // ERROR - hardcoded encryption keys
   'require_hive_web_subdirectory', // ERROR - web storage conflicts
-
   // v4.14.0 - GitHub issue rules (Essential)
   'avoid_blocking_main_thread', // WARNING - sync I/O blocks main thread
-
   // v4.15.0 - ROADMAP ⭐ Rules (Essential)
   'avoid_cached_image_unbounded_list', // WARNING - unbounded image cache in lists
-
   // v4.16.0 - ROADMAP ⭐ Rules (Essential)
   'avoid_color_only_meaning', // WARNING - WCAG 1.4.1 color-only indicators
   'avoid_excessive_rebuilds_animation', // WARNING - too many widgets in builder
@@ -700,7 +656,6 @@ const Set<String> recommendedOnlyRules = <String>{
   // BuildContext Safety (Recommended)
   // 'prefer_rethrow_over_throw_e' moved to stylisticRules (opinionated)
   'avoid_context_in_async_static', // WARNING - async static with context
-
   // Memory Management Best Practices
   'nullify_after_dispose',
   'require_auto_dispose',
@@ -728,7 +683,6 @@ const Set<String> recommendedOnlyRules = <String>{
   'avoid_refresh_without_await',
   'avoid_multiple_autofocus',
   'require_key_for_collection', // Widgets in list builders need keys
-
   // JSON/DateTime Error Handling
   'require_json_decode_try_catch',
   'avoid_datetime_parse_unvalidated',
@@ -773,7 +727,6 @@ const Set<String> recommendedOnlyRules = <String>{
   'avoid_jwt_decode_client',
   'require_logout_cleanup',
   'avoid_hardcoded_signing_config', // OWASP M7 - binary protection
-
   // Firebase/Database/Storage
   'avoid_firestore_unbounded_query',
   'avoid_database_in_build',
@@ -861,7 +814,6 @@ const Set<String> recommendedOnlyRules = <String>{
   'prefer_test_wrapper',
 
   // State Management (Batch 10)
-
   'avoid_bloc_listen_in_build',
 
   // Performance (Batch 11)
@@ -941,7 +893,6 @@ const Set<String> recommendedOnlyRules = <String>{
   'require_number_format_locale', // NumberFormat without locale varies by device
   'avoid_manual_date_formatting', // Manual date formatting is error-prone
   'require_intl_currency_format', // Manual currency formatting ignores locale
-
   // Bluetooth & Hardware (Plan Group H)
   'avoid_bluetooth_scan_without_timeout',
   'require_bluetooth_state_check',
@@ -997,7 +948,6 @@ const Set<String> recommendedOnlyRules = <String>{
   'require_openai_error_handling', // Error handling - API rate limits
   'require_svg_error_handler', // UI stability - error fallback
   'require_google_fonts_fallback', // UI stability - font fallback
-
   // Part 5 - Security Rules (Recommended)
   'require_shared_prefs_null_handling',
   'require_shared_prefs_key_constants',
@@ -1052,13 +1002,10 @@ const Set<String> recommendedOnlyRules = <String>{
   // Late Keyword Rules (Recommended - code quality)
   'prefer_late_final', // INFO - prefer late final for one-time init
   'avoid_late_for_nullable', // INFO - prefer nullable over late for optional
-
   // go_router Type Safety (Recommended - type safety)
   'prefer_go_router_extra_typed', // INFO - typed classes over Map/dynamic
-
   // Firebase Auth (Recommended - UX on web)
   'prefer_firebase_auth_persistence', // INFO - remember me on web
-
   // Test Rules (Recommended - test quality)
   'avoid_test_print_statements', // WARNING - use expect() instead
   'prefer_test_find_by_key', // INFO - prefer find.byKey over find.byType
@@ -1069,29 +1016,21 @@ const Set<String> recommendedOnlyRules = <String>{
   // Note: avoid_duplicate_test_assertions moved to Pedantic (pedantic)
   'require_error_case_tests', // Ensures error cases are tested
   'require_test_isolation', // Ensures tests do not share mutable state
-
   // Async Rules (Recommended - readability)
   'avoid_future_then_in_async', // WARNING - use await instead
-
   // Forms Rules (Recommended - UX)
   'require_text_input_type', // INFO - better keyboard for input
   'prefer_text_input_action', // INFO - better UX flow
-
   // Lifecycle Rules (Recommended - correctness)
   'require_did_update_widget_check', // WARNING - check widget changes
-
   // Equatable Rules (Recommended - immutability)
   'require_equatable_copy_with', // INFO - pattern for immutable updates
-
   // Image Rules (Recommended - performance)
   'prefer_cached_image_cache_manager', // INFO - optimize image caching
-
   // Navigation Rules (Recommended - clarity)
   'avoid_go_router_push_replacement_confusion', // WARNING - clear routing
-
   // Flutter Widget Rules (Recommended - correctness)
   'avoid_stack_without_positioned', // WARNING - layout correctness
-
   // =========================================================================
   // =========================================================================
   'require_integration_test_timeout', // WARNING - CI hang prevention
@@ -1109,14 +1048,14 @@ const Set<String> recommendedOnlyRules = <String>{
   'avoid_rebuild_on_scroll', // WARNING - memory leak
   'avoid_exception_in_constructor', // WARNING - error handling
   'require_permission_permanent_denial_handling', // WARNING - UX
+
   // Note: require_getit_registration_order, require_default_config, avoid_builder_index_out_of_bounds
   // moved to Essential (they cause crashes)
-
   'prefer_ios_safe_area', // INFO - iOS notch/Dynamic Island handling
   'avoid_ios_hardcoded_status_bar', // WARNING - device-specific issues
-  'require_ios_platform_check', // WARNING - platform-specific crashes
-  'avoid_ios_background_fetch_abuse', // WARNING - iOS background limits
-  'require_universal_link_validation', // INFO - deep link testing
+  // TODO(migration): require_ios_platform_check - class not found
+  // TODO(migration): avoid_ios_background_fetch_abuse - class not found
+  // TODO(migration): require_universal_link_validation - class not found
   'require_macos_window_size_constraints', // INFO - UX
 
   'avoid_ios_13_deprecations', // WARNING - App Store warnings
@@ -1157,7 +1096,6 @@ const Set<String> recommendedOnlyRules = <String>{
   'require_macos_sandbox_exceptions', // WARNING - sandbox entitlements documentation
   'avoid_macos_hardened_runtime_violations', // WARNING - notarization compliance
   'require_macos_app_transport_security', // WARNING - macOS ATS compliance
-
   // v2.6.0 rules (ROADMAP_NEXT)
   // 'prefer_returning_conditional_expressions' moved to stylisticRules (opinionated)
   'prefer_riverpod_family_for_params', // INFO - type-safe parameters
@@ -1167,7 +1105,6 @@ const Set<String> recommendedOnlyRules = <String>{
   'require_freezed_lint_package', // INFO - Freezed best practices
   'prefer_image_picker_multi_selection', // INFO - better UX
   'prefer_hive_value_listenable', // INFO - reactive UI
-
   // =========================================================================
   // Orphan Rule Assignment (v4.1.0) - Previously untiered medium rules
   // =========================================================================
@@ -1180,7 +1117,6 @@ const Set<String> recommendedOnlyRules = <String>{
   'avoid_opacity_misuse', // INFO - opacity performance
   'avoid_unbounded_constraints', // INFO - constraint issues
   'avoid_unconstrained_box_misuse', // INFO - UnconstrainedBox misuse
-
   // Gesture/Input (Medium)
   'avoid_double_tap_submit', // INFO - double tap prevention
   'avoid_gesture_conflict', // INFO - gesture detector conflicts
@@ -1192,12 +1128,10 @@ const Set<String> recommendedOnlyRules = <String>{
   'require_focus_indicator', // INFO - focus visibility
   'require_hover_states', // INFO - hover feedback
   'require_long_press_callback', // INFO - long press handler
-
   // Forms/Validation (Medium)
   'require_button_loading_state', // INFO - loading state on buttons
   'require_form_validation', // INFO - form validation
   'require_step_count_indicator', // INFO - stepper indicators
-
   // Testing (Medium)
   'avoid_flaky_tests', // INFO - test reliability
   'avoid_real_timer_in_widget_test', // INFO - fake timers in tests
@@ -1208,7 +1142,6 @@ const Set<String> recommendedOnlyRules = <String>{
   'require_mock_verification', // INFO - mock verification
   'require_riverpod_lint', // INFO - Riverpod linting
   'require_screen_size_tests', // INFO - responsive tests
-
   // Performance (Medium)
   'avoid_hardcoded_layout_values', // INFO - layout flexibility
   'avoid_hardcoded_text_styles', // INFO - text style theming
@@ -1224,7 +1157,6 @@ const Set<String> recommendedOnlyRules = <String>{
   'prefer_positioned_directional', // INFO - RTL support
   'prefer_sliver_app_bar', // INFO - sliver app bars
   'prefer_sliver_list', // INFO - sliver lists
-
   // State Management (Medium)
   'avoid_late_context', // INFO - late context access
   // Note: prefer_cubit_for_simple_state is in Professional tier (architecture pattern)
@@ -1238,33 +1170,26 @@ const Set<String> recommendedOnlyRules = <String>{
   // Data/Collections (Medium)
   'avoid_misused_set_literals', // INFO - set literal usage
   'move_variable_closer_to_its_usage', // INFO - variable scope
-
   // Images/Media (Medium)
   'prefer_asset_image_for_local', // INFO - local image loading
   'prefer_marker_clustering', // INFO - map marker clustering
   'require_pdf_loading_indicator', // INFO - PDF loading state
-
   // Database (Medium)
   'require_database_index', // INFO - database indexes
   'prefer_transaction_for_batch', // INFO - batch transactions
-
   // Navigation (Medium)
   'prefer_typed_route_params', // INFO - typed route parameters
   'require_refresh_indicator', // INFO - pull to refresh
   'require_scroll_controller', // INFO - scroll controller
   'require_scroll_physics', // INFO - scroll physics
-
   // Security (Medium)
   'prefer_clipboard_feedback', // INFO - clipboard feedback
   'prefer_data_masking', // INFO - sensitive data masking
-
   // Desktop/Platform (Medium)
   'require_menu_bar_for_desktop', // INFO - desktop menu bar
   'require_window_close_confirmation', // INFO - unsaved changes
-
   // Animation (Medium)
   'prefer_tween_sequence', // INFO - tween sequences
-
   // i18n (Medium)
 
   // Misc (Medium)
@@ -1276,8 +1201,7 @@ const Set<String> recommendedOnlyRules = <String>{
 
   // Additional orphans (missed in initial pass)
   'prefer_ignore_pointer', // INFO - IgnorePointer for non-interactive
-
-// cspell:ignore namespacing
+  // cspell:ignore namespacing
   // ROADMAP ⭐ Rules - Recommended
   'avoid_passing_bloc_to_bloc', // WARNING - blocs should communicate via repository
   'avoid_passing_build_context_to_blocs', // WARNING - blocs shouldn't hold context
@@ -1296,7 +1220,6 @@ const Set<String> recommendedOnlyRules = <String>{
   'prefer_route_settings_name', // INFO - named routes for debugging
   'prefer_number_format', // INFO - use NumberFormat for localized numbers
   'prefer_change_notifier_proxy_provider', // INFO - ProxyProvider for dependent notifiers
-
   // NEW v4.1.5 Rules - Recommended
   'avoid_di_in_widgets', // WARNING - DI service locator shouldn't be in widgets
   'prefer_abstraction_injection', // INFO - inject abstractions not implementations
@@ -1311,18 +1234,15 @@ const Set<String> recommendedOnlyRules = <String>{
   'avoid_sync_on_every_change', // WARNING - debounce API calls in onChanged
   'require_firebase_error_handling', // WARNING - Firebase calls need error handling
   'require_secure_storage_error_handling', // WARNING - secure storage needs error handling
-
   // NEW v4.1.6 Rules - Recommended
   'prefer_foundation_platform_check', // INFO - use defaultTargetPlatform in widgets
   'prefer_explicit_json_keys', // INFO - use @JsonKey for field mapping
-
   // NEW v4.1.7 Rules - Recommended
   'require_dialog_tests', // INFO - dialog tests need pumpAndSettle
   'require_clipboard_paste_validation', // INFO - validate clipboard paste
   'require_currency_code_with_amount', // INFO - amounts need currency
   'require_cache_expiration', // WARNING - caches need TTL
   'require_dialog_barrier_consideration', // INFO - destructive dialogs need barrierDismissible
-
   // Common warnings (auto-assigned by severity)
   'avoid_accessing_collections_by_constant_index',
   'avoid_assigning_to_static_field',
@@ -1409,7 +1329,6 @@ const Set<String> recommendedOnlyRules = <String>{
   'prefer_json_serializable', // INFO - prefer json_serializable over manual parsing
   'prefer_regex_validation', // INFO - use regex for input validation patterns
   'prefer_freezed_for_data_classes', // INFO - Freezed for immutable data classes
-
   // --- Restored orphan rules (critical impact) ---
   'avoid_bloc_emit_after_close',
   'avoid_bloc_state_mutation',
@@ -1471,16 +1390,13 @@ const Set<String> recommendedOnlyRules = <String>{
   'avoid_provider_listen_false_in_build', // INFO - stale data from listen: false
   'prefer_spring_animation', // INFO - natural physics-based animation
   'prefer_avatar_loading_placeholder', // INFO - fallback for network avatars
-
   // v4.14.0 - GitHub issue rules (Recommended)
   'require_feature_flag_type_safety', // INFO - typed feature flag accessors
   'require_timezone_display', // INFO - timezone context in time display
-
   // v4.15.0 - ROADMAP ⭐ Rules (Recommended)
   'require_analytics_error_handling', // INFO - analytics calls need try-catch
   'prefer_adaptive_icons', // INFO - use adaptive icon sizes
   'avoid_ignoring_return_values', // INFO - don't discard return values
-
   // v4.16.0 - ROADMAP ⭐ Rules (Recommended)
   'require_rtl_layout_support', // WARNING - hardcoded left/right in layouts
   'avoid_misused_test_matchers', // WARNING - raw literals as test matchers
@@ -1491,10 +1407,8 @@ const Set<String> recommendedOnlyRules = <String>{
 const Set<String> professionalOnlyRules = <String>{
   // Type Safety (moved from Essential - not crash prevention)
   'avoid_dynamic_type', // Type safety best practice
-
   // Widget Best Practices
   'prefer_widget_private_members', // Widget fields should be final/private
-
   // Architecture
   'avoid_direct_data_access_in_ui',
   'avoid_business_logic_in_ui',
@@ -1514,7 +1428,6 @@ const Set<String> professionalOnlyRules = <String>{
   'prefer_uuid_v4', // UUID v4 over v1 for privacy
   'require_https_only_test', // INFO - HTTP URLs in test files
   'avoid_hardcoded_config_test', // INFO - hardcoded config in test files
-
   // Accessibility
   'avoid_merged_semantics_hiding_info',
   'require_exclude_semantics_justification',
@@ -1602,7 +1515,6 @@ const Set<String> professionalOnlyRules = <String>{
   'prefer_bloc_test_package', // INFO - use blocTest() for Bloc testing
   'prefer_mock_verify', // INFO - verify mock interactions
   'require_error_logging', // INFO - log errors in catch blocks
-
   // Flutter Widgets - Pointer handling
   'avoid_absorb_pointer_misuse',
   'avoid_brightness_check_for_theme',
@@ -1759,7 +1671,6 @@ const Set<String> professionalOnlyRules = <String>{
   'prefer_url_strategy_for_web',
   'require_window_size_constraints',
   'prefer_ios_storekit2', // INFO - StoreKit 2 for better IAP
-
   // Gap Analysis Rules (Batch 15)
   'avoid_duplicate_string_literals',
   // Note: avoid_returning_widgets, avoid_nullable_widget_methods moved to Pedantic
@@ -1799,7 +1710,6 @@ const Set<String> professionalOnlyRules = <String>{
 
   // GraphQL (Plan Group K)
   'avoid_graphql_string_queries', // Type safety - use codegen
-
   // Image (Plan Group A)
   'prefer_image_size_constraints',
 
@@ -1927,7 +1837,6 @@ const Set<String> professionalOnlyRules = <String>{
 
   // Navigation Rules (Professional - type safety)
   'prefer_url_launcher_uri_over_string', // INFO - type-safe URI
-
   // API/Network Rules (Professional - architecture)
   'prefer_dio_over_http', // INFO - better features, interceptors
 
@@ -1972,11 +1881,9 @@ const Set<String> professionalOnlyRules = <String>{
   'require_ios_focus_mode_awareness', // INFO - Focus Mode interruption levels
   'require_ios_quick_note_awareness', // INFO - NSUserActivity for Quick Note
   'require_macos_entitlements', // INFO - macOS entitlement detection
-
   // ROADMAP ⭐ Rules - Professional
   'require_bloc_repository_injection', // INFO - DI through constructor for testability
   'avoid_freezed_for_logic_classes', // INFO - Freezed for data, not business logic
-
   // v2.6.0 rules (ROADMAP_NEXT)
   'prefer_riverpod_auto_dispose', // INFO - memory management
   'avoid_getx_global_navigation', // WARNING - testability
@@ -1994,7 +1901,6 @@ const Set<String> professionalOnlyRules = <String>{
   'require_deep_equality_collections', // WARNING - state comparison
   'avoid_equatable_datetime', // WARNING - flaky equality
   'prefer_unmodifiable_collections', // INFO - immutability
-
   // NEW v4.1.5 Rules - Professional
   'avoid_static_route_config', // WARNING - static route configs limit testability
   'avoid_firebase_realtime_in_build', // WARNING - Firebase listeners in build
@@ -2007,12 +1913,10 @@ const Set<String> professionalOnlyRules = <String>{
   'avoid_riverpod_navigation', // INFO - navigation belongs in widgets
   'require_drag_alternatives', // INFO - provide buttons for drag operations
   'require_pending_changes_indicator', // INFO - show sync status to users
-
   // NEW v4.1.6 Rules - Professional
   'require_platform_check', // INFO - platform-specific APIs need checks
   'prefer_iso8601_dates', // INFO - standard date format for APIs
   'require_structured_logging', // INFO - structured logs over concatenation
-
   // NEW v4.1.7 Rules - Professional
   'require_locale_for_text', // INFO - text formatting needs explicit locale
   'avoid_riverpod_for_network_only', // INFO - overkill for simple network access
@@ -2025,11 +1929,9 @@ const Set<String> professionalOnlyRules = <String>{
   'avoid_encryption_key_in_memory', // INFO - keys in memory can be extracted
   'prefer_lazy_singleton_registration', // INFO - eager singletons slow startup
   'require_cache_key_uniqueness', // INFO - cache keys need stable hashCode
-
   // v4.14.0 - GitHub issue rules (Professional)
   'require_log_level_for_production', // INFO - guard verbose logs for production
   'require_analytics_event_naming', // INFO - snake_case analytics events
-
   // Best practices (auto-assigned by severity)
   'avoid_adjacent_strings',
   'avoid_always_null_parameters',
@@ -2164,7 +2066,7 @@ const Set<String> professionalOnlyRules = <String>{
   'pass_optional_argument',
   'prefer_abstract_final_static_class',
   'prefer_add_all',
-// cspell:ignore addall
+  // cspell:ignore addall
   // 'prefer_addall_over_spread' moved to stylisticRules (opinionated)
   'prefer_addition_subtraction_assignments',
   // 'prefer_all_named_parameters' moved to stylisticRules (opinionated)
@@ -2404,7 +2306,6 @@ const Set<String> professionalOnlyRules = <String>{
   'require_json_schema_validation', // INFO - validate JSON against schema
   'prefer_typed_prefs_wrapper', // INFO - wrap SharedPreferences with typed accessor
   'require_geolocator_battery_awareness', // WARNING - location tracking drains battery
-
   // --- Restored orphan rules (high impact) ---
   'always_remove_getx_listener',
   'avoid_cached_isar_stream',
@@ -2446,13 +2347,11 @@ const Set<String> professionalOnlyRules = <String>{
   'avoid_max_path_risk', // INFO - deeply nested paths hit MAX_PATH on Windows
   'prefer_xdg_directory_convention', // INFO - use XDG base directories on Linux
   'require_linux_font_fallback', // INFO - platform fonts need fallback on Linux
-
   // ROADMAP ⭐ Rules - Professional (new batch)
   'avoid_datetime_comparison_without_precision', // INFO - DateTime == fails on microseconds
   'avoid_getx_static_get', // WARNING - Get.find() hides dependencies
   'require_navigation_result_handling', // INFO - Navigator.push result ignored
   'require_semantic_colors', // INFO - name colors by purpose not appearance
-
   // v4.15.0 - ROADMAP ⭐ Rules (Professional)
   'prefer_semantics_container', // INFO - Semantics needs container: true for groups
   'avoid_image_picker_quick_succession', // WARNING - pickImage without debounce guard
@@ -2471,7 +2370,6 @@ const Set<String> professionalOnlyRules = <String>{
   'prefer_infinite_scroll_preload', // INFO - preload at 80% scroll
   'prefer_use_callback', // INFO - memoize callbacks in HookWidget
   'require_stepper_state_management', // INFO - preserve Stepper form state
-
   // v4.15.0 - ROADMAP ⭐ Rules (Professional) - batch 2
   'prefer_optimistic_updates', // INFO - setState before await, not after
   'avoid_full_sync_on_every_launch', // WARNING - use delta sync not getAll
@@ -2503,7 +2401,6 @@ const Set<String> comprehensiveOnlyRules = <String>{
   'prefer_cached_paint_objects', // paint object reuse
   'avoid_excessive_widget_depth', // widget tree depth
   'avoid_image_rebuild_on_scroll', // scroll performance
-
   // Strict immutability patterns (moved from Professional)
   'prefer_immutable_provider_arguments',
   'prefer_immutable_bloc_events',
@@ -2534,7 +2431,6 @@ const Set<String> comprehensiveOnlyRules = <String>{
   'prefer_test_variant',
   'require_accessibility_tests',
   'prefer_fake_platform', // platform fakes in tests
-
   // Animation polish (moved from Professional)
   'require_staggered_animation_delays',
 
@@ -2550,7 +2446,6 @@ const Set<String> comprehensiveOnlyRules = <String>{
   'prefer_element_rebuild', // conditional returns destroy Elements
   'avoid_finalizer_misuse', // Finalizers add GC overhead
   'require_test_documentation', // complex tests need comments
-
   // --- Restored orphan rules (medium + low impact) ---
   'avoid_cached_image_in_build',
   'avoid_dio_without_base_url',
@@ -2620,24 +2515,19 @@ const Set<String> pedanticOnlyRules = <String>{
   // File length (very strict thresholds - 200 lines for production, 400 for tests)
   'prefer_small_length_files', // 200 line limit
   'prefer_small_length_test_files', // 400 line limit for tests
-
   // Architecture preferences (very opinionated)
   'prefer_feature_folder_structure', // folder organization preference
   'prefer_custom_single_child_layout', // CustomSingleChildLayout for positioning
-
   // Micro-optimizations (diminishing returns)
   'avoid_object_creation_in_hot_loops', // loop allocation pedantry
   'prefer_specific_numeric_types', // int vs num pedantry
-
   // Documentation pedantry
   // 'format_comment_style' moved to stylisticRules (opinionated)
   'prefer_providing_intl_description', // i18n descriptions
   'prefer_providing_intl_examples', // i18n examples
-
   // Very strict patterns
   'avoid_returning_widgets', // no widget helper methods
   'avoid_nullable_widget_methods', // no nullable widget returns
-
   // Test pedantry
   'avoid_duplicate_test_assertions', // no repeated assertions
 };
@@ -2716,12 +2606,11 @@ const Set<String> iosPlatformRules = <String>{
   'require_ios_data_protection',
   'require_ios_keychain_for_credentials',
   'avoid_long_running_isolates', // iOS kills isolates after 30s
-
   // Recommended
   'prefer_ios_safe_area',
   'avoid_ios_hardcoded_status_bar',
-  'require_ios_platform_check',
-  'avoid_ios_background_fetch_abuse',
+  // TODO(migration): require_ios_platform_check - class not found
+  // TODO(migration): avoid_ios_background_fetch_abuse - class not found
   'avoid_ios_13_deprecations',
   'avoid_ios_simulator_only_code',
   'require_ios_minimum_version_check',
@@ -2912,15 +2801,15 @@ const Set<String> _desktopPlatformRules = <String>{
 /// Each platform's effective rules include the platform-specific set plus
 /// any shared sets (Apple, desktop) that apply.
 Map<String, Set<String>> get platformRuleSets => {
-      'ios': iosPlatformRules.union(_applePlatformRules),
-      'android': androidPlatformRules,
-      'macos': macosPlatformRules
-          .union(_applePlatformRules)
-          .union(_desktopPlatformRules),
-      'web': webPlatformRules,
-      'windows': windowsPlatformRules.union(_desktopPlatformRules),
-      'linux': linuxPlatformRules.union(_desktopPlatformRules),
-    };
+  'ios': iosPlatformRules.union(_applePlatformRules),
+  'android': androidPlatformRules,
+  'macos': macosPlatformRules
+      .union(_applePlatformRules)
+      .union(_desktopPlatformRules),
+  'web': webPlatformRules,
+  'windows': windowsPlatformRules.union(_desktopPlatformRules),
+  'linux': linuxPlatformRules.union(_desktopPlatformRules),
+};
 
 /// All supported platform names.
 const List<String> allPlatforms = <String>[
@@ -2956,13 +2845,17 @@ const Map<String, bool> defaultPlatforms = <String, bool>{
 ///
 /// Rules not in any platform set are never affected.
 Set<String> getRulesDisabledByPlatforms(Map<String, bool> platforms) {
-  final disabledPlatforms =
-      platforms.entries.where((e) => !e.value).map((e) => e.key).toSet();
+  final disabledPlatforms = platforms.entries
+      .where((e) => !e.value)
+      .map((e) => e.key)
+      .toSet();
 
   if (disabledPlatforms.isEmpty) return const <String>{};
 
-  final enabledPlatforms =
-      platforms.entries.where((e) => e.value).map((e) => e.key).toSet();
+  final enabledPlatforms = platforms.entries
+      .where((e) => e.value)
+      .map((e) => e.key)
+      .toSet();
 
   final Set<String> rulesToDisable = <String>{};
   final sets = platformRuleSets;
@@ -3424,28 +3317,28 @@ const Set<String> flamePackageRules = <String>{
 /// any shared sets (database) that apply. A rule is disabled only when
 /// ALL packages that contain it are disabled.
 Map<String, Set<String>> get packageRuleSets => {
-      'bloc': blocPackageRules,
-      'provider': providerPackageRules,
-      'riverpod': riverpodPackageRules,
-      'getx': getxPackageRules,
-      'flutter_hooks': flutterHooksPackageRules,
-      'equatable': equatablePackageRules,
-      'freezed': freezedPackageRules,
-      'firebase': firebasePackageRules.union(_databaseSharedRules),
-      'isar': isarPackageRules.union(_databaseSharedRules),
-      'hive': hivePackageRules.union(_databaseSharedRules),
-      'shared_preferences': sharedPreferencesPackageRules,
-      'sqflite': sqflitePackageRules.union(_databaseSharedRules),
-      'dio': dioPackageRules,
-      'graphql': graphqlPackageRules,
-      'supabase': supabasePackageRules,
-      'get_it': getItPackageRules,
-      'workmanager': workmanagerPackageRules,
-      'url_launcher': urlLauncherPackageRules,
-      'geolocator': geolocatorPackageRules,
-      'qr_scanner': qrScannerPackageRules,
-      'flame': flamePackageRules,
-    };
+  'bloc': blocPackageRules,
+  'provider': providerPackageRules,
+  'riverpod': riverpodPackageRules,
+  'getx': getxPackageRules,
+  'flutter_hooks': flutterHooksPackageRules,
+  'equatable': equatablePackageRules,
+  'freezed': freezedPackageRules,
+  'firebase': firebasePackageRules.union(_databaseSharedRules),
+  'isar': isarPackageRules.union(_databaseSharedRules),
+  'hive': hivePackageRules.union(_databaseSharedRules),
+  'shared_preferences': sharedPreferencesPackageRules,
+  'sqflite': sqflitePackageRules.union(_databaseSharedRules),
+  'dio': dioPackageRules,
+  'graphql': graphqlPackageRules,
+  'supabase': supabasePackageRules,
+  'get_it': getItPackageRules,
+  'workmanager': workmanagerPackageRules,
+  'url_launcher': urlLauncherPackageRules,
+  'geolocator': geolocatorPackageRules,
+  'qr_scanner': qrScannerPackageRules,
+  'flame': flamePackageRules,
+};
 
 /// All supported package names.
 const List<String> allPackages = <String>[
@@ -3511,13 +3404,17 @@ const Map<String, bool> defaultPackages = <String, bool>{
 ///
 /// Rules not in any package set are never affected.
 Set<String> getRulesDisabledByPackages(Map<String, bool> packages) {
-  final disabledPackages =
-      packages.entries.where((e) => !e.value).map((e) => e.key).toSet();
+  final disabledPackages = packages.entries
+      .where((e) => !e.value)
+      .map((e) => e.key)
+      .toSet();
 
   if (disabledPackages.isEmpty) return const <String>{};
 
-  final enabledPackages =
-      packages.entries.where((e) => e.value).map((e) => e.key).toSet();
+  final enabledPackages = packages.entries
+      .where((e) => e.value)
+      .map((e) => e.key)
+      .toSet();
 
   final Set<String> rulesToDisable = <String>{};
   final sets = packageRuleSets;

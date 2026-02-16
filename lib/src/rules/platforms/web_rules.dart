@@ -22,8 +22,6 @@
 library;
 
 import 'package:analyzer/dart/ast/ast.dart';
-import 'package:analyzer/error/error.dart' show DiagnosticSeverity;
-import 'package:custom_lint_builder/custom_lint_builder.dart';
 
 import '../../saropa_lint_rule.dart';
 
@@ -59,7 +57,7 @@ import '../../saropa_lint_rule.dart';
 ///     : MethodChannel('my_channel');
 /// ```
 class AvoidPlatformChannelOnWebRule extends SaropaLintRule {
-  const AvoidPlatformChannelOnWebRule() : super(code: _code);
+  AvoidPlatformChannelOnWebRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.critical;
@@ -68,22 +66,19 @@ class AvoidPlatformChannelOnWebRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_platform_channel_on_web',
-    problemMessage: '[avoid_platform_channel_on_web] MethodChannel throws '
+    'avoid_platform_channel_on_web',
+    '[avoid_platform_channel_on_web] MethodChannel throws '
         'MissingPluginException on web, crashing the application. {v4}',
     correctionMessage: 'Wrap with kIsWeb check or use conditional imports.',
-    errorSeverity: DiagnosticSeverity.ERROR,
+    severity: DiagnosticSeverity.ERROR,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addInstanceCreationExpression((
-      InstanceCreationExpression node,
-    ) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final String typeName = node.constructorName.type.name.lexeme;
       if (typeName != 'MethodChannel' &&
           typeName != 'EventChannel' &&
@@ -152,7 +147,7 @@ class AvoidPlatformChannelOnWebRule extends SaropaLintRule {
 /// // Or use a CORS proxy in development
 /// ```
 class RequireCorsHandlingRule extends SaropaLintRule {
-  const RequireCorsHandlingRule() : super(code: _code);
+  RequireCorsHandlingRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.high;
@@ -161,24 +156,22 @@ class RequireCorsHandlingRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'require_cors_handling',
-    problemMessage:
-        '[require_cors_handling] HTTP calls from a Flutter web app fail silently without proper CORS headers from the server. The browser blocks cross-origin requests by default, causing network errors that prevent data loading, authentication, and API communication. Users see blank screens or broken functionality with no clear error message. {v3}',
+    'require_cors_handling',
+    '[require_cors_handling] HTTP calls from a Flutter web app fail silently without proper CORS headers from the server. The browser blocks cross-origin requests by default, causing network errors that prevent data loading, authentication, and API communication. Users see blank screens or broken functionality with no clear error message. {v3}',
     correctionMessage:
         'Configure the server to return Access-Control-Allow-Origin headers for your app domain, or route requests through a CORS proxy during development.',
-    errorSeverity: DiagnosticSeverity.ERROR,
+    severity: DiagnosticSeverity.ERROR,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
     // This is a web-specific concern - check file path or conditionally run
-    final String path = resolver.path;
+    final String path = context.filePath;
 
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       final String methodName = node.methodName.name;
 
       // Check for HTTP method calls
@@ -205,7 +198,7 @@ class RequireCorsHandlingRule extends SaropaLintRule {
         if (!source.contains('cors') &&
             !source.contains('CORS') &&
             !source.contains('Access-Control')) {
-          reporter.atNode(node, code);
+          reporter.atNode(node);
         }
       }
     });
@@ -237,7 +230,7 @@ class RequireCorsHandlingRule extends SaropaLintRule {
 /// charts.LineChart(...)
 /// ```
 class PreferDeferredLoadingWebRule extends SaropaLintRule {
-  const PreferDeferredLoadingWebRule() : super(code: _code);
+  PreferDeferredLoadingWebRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.medium;
@@ -246,12 +239,11 @@ class PreferDeferredLoadingWebRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'prefer_deferred_loading_web',
-    problemMessage:
-        '[prefer_deferred_loading_web] Large package imported eagerly increases initial bundle size. Web apps should defer loading large libraries to improve initial load time. Use deferred loading for heavy packages. {v4}',
+    'prefer_deferred_loading_web',
+    '[prefer_deferred_loading_web] Large package imported eagerly increases initial bundle size. Web apps should defer loading large libraries to improve initial load time. Use deferred loading for heavy packages. {v4}',
     correctionMessage:
         'Use "deferred as" import to reduce initial load time. Verify the change works correctly with existing tests and add coverage for the new behavior.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   // Packages that are typically large and should be deferred on web
@@ -269,11 +261,10 @@ class PreferDeferredLoadingWebRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addImportDirective((ImportDirective node) {
+    context.addImportDirective((ImportDirective node) {
       final String? uri = node.uri.stringValue;
       if (uri == null) return;
 
@@ -290,7 +281,7 @@ class PreferDeferredLoadingWebRule extends SaropaLintRule {
 
       // Check if deferred
       if (node.deferredKeyword == null) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
   }
@@ -323,7 +314,7 @@ class PreferDeferredLoadingWebRule extends SaropaLintRule {
 ///   if (dart.library.html) 'dart:html';
 /// ```
 class AvoidWebOnlyDependenciesRule extends SaropaLintRule {
-  const AvoidWebOnlyDependenciesRule() : super(code: _code);
+  AvoidWebOnlyDependenciesRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.critical;
@@ -332,12 +323,11 @@ class AvoidWebOnlyDependenciesRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_web_only_dependencies',
-    problemMessage:
-        '[avoid_web_only_dependencies] Importing web-only libraries such as dart:html, dart:js, or dart:indexed_db in a Flutter or Dart app that targets mobile or desktop platforms will cause the app to crash with UnsupportedError at startup. This makes the app completely unusable for non-web users and can result in poor user experience, negative reviews, and lost users. Web-only dependencies must be isolated to web-specific code. {v3}',
+    'avoid_web_only_dependencies',
+    '[avoid_web_only_dependencies] Importing web-only libraries such as dart:html, dart:js, or dart:indexed_db in a Flutter or Dart app that targets mobile or desktop platforms will cause the app to crash with UnsupportedError at startup. This makes the app completely unusable for non-web users and can result in poor user experience, negative reviews, and lost users. Web-only dependencies must be isolated to web-specific code. {v3}',
     correctionMessage:
         'Use conditional imports or platform-agnostic alternatives to ensure your app runs on all supported platforms. Refactor code to isolate web-only dependencies behind platform checks or abstractions, and test your app on all target platforms to catch unsupported imports before release.',
-    errorSeverity: DiagnosticSeverity.ERROR,
+    severity: DiagnosticSeverity.ERROR,
   );
 
   static const Set<String> _webOnlyImports = {
@@ -352,11 +342,10 @@ class AvoidWebOnlyDependenciesRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addImportDirective((ImportDirective node) {
+    context.addImportDirective((ImportDirective node) {
       final String? uri = node.uri.stringValue;
       if (uri == null) return;
 
@@ -365,7 +354,7 @@ class AvoidWebOnlyDependenciesRule extends SaropaLintRule {
         if (node.configurations.isNotEmpty) {
           return; // Conditional import is fine
         }
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
   }
@@ -400,7 +389,7 @@ class AvoidWebOnlyDependenciesRule extends SaropaLintRule {
 /// }
 /// ```
 class PreferUrlStrategyForWebRule extends SaropaLintRule {
-  const PreferUrlStrategyForWebRule() : super(code: _code);
+  PreferUrlStrategyForWebRule() : super(code: _code);
 
   /// Hash URLs hurt SEO and look unprofessional.
   /// App works but may rank lower in search results.
@@ -414,21 +403,19 @@ class PreferUrlStrategyForWebRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
-    name: 'prefer_url_strategy_for_web',
-    problemMessage:
-        '[prefer_url_strategy_for_web] Flutter web defaults to hash-based URLs (e.g. /#/page) which are unfriendly to search engines, break social media link previews, and look unprofessional. Path-based URLs (/page) enable proper SEO indexing, shareable deep links, and server-side routing support. {v2}',
+    'prefer_url_strategy_for_web',
+    '[prefer_url_strategy_for_web] Flutter web defaults to hash-based URLs (e.g. /#/page) which are unfriendly to search engines, break social media link previews, and look unprofessional. Path-based URLs (/page) enable proper SEO indexing, shareable deep links, and server-side routing support. {v2}',
     correctionMessage:
         'Call usePathUrlStrategy() before runApp() in main(), or configure url_strategy in your router package to produce clean path-based URLs.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    final String path = resolver.source.fullName;
+    final String path = context.filePath;
 
     // Only check web-related files or main.dart
     if (!path.endsWith('main.dart') &&
@@ -437,7 +424,7 @@ class PreferUrlStrategyForWebRule extends SaropaLintRule {
       return;
     }
 
-    context.registry.addFunctionDeclaration((FunctionDeclaration node) {
+    context.addFunctionDeclaration((FunctionDeclaration node) {
       if (node.name.lexeme != 'main') return;
 
       final String mainSource = node.toSource();
@@ -487,7 +474,7 @@ class PreferUrlStrategyForWebRule extends SaropaLintRule {
 /// **Note:** This is an INFO-level reminder. Not all web code is
 /// renderer-dependent.
 class RequireWebRendererAwarenessRule extends SaropaLintRule {
-  const RequireWebRendererAwarenessRule() : super(code: _code);
+  RequireWebRendererAwarenessRule() : super(code: _code);
 
   /// Platform compatibility issue.
   @override
@@ -500,21 +487,19 @@ class RequireWebRendererAwarenessRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
-    name: 'require_web_renderer_awareness',
-    problemMessage:
-        '[require_web_renderer_awareness] kIsWeb check without renderer consideration. Behavior may vary. Flutter web has different renderers (HTML, CanvasKit, Skia) with different capabilities. Code assuming one renderer may fail on others. {v3}',
+    'require_web_renderer_awareness',
+    '[require_web_renderer_awareness] kIsWeb check without renderer consideration. Behavior may vary. Flutter web has different renderers (HTML, CanvasKit, Skia) with different capabilities. Code assuming one renderer may fail on others. {v3}',
     correctionMessage:
         'Check if the web-specific code depends on HTML DOM access (HTML renderer only) or canvas features (CanvasKit only). Use dart:js_interop or conditional imports for renderer-specific behavior.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addIfStatement((node) {
+    context.addIfStatement((node) {
       // Check if condition uses kIsWeb
       final conditionSource = node.expression.toSource();
       if (!conditionSource.contains('kIsWeb')) {

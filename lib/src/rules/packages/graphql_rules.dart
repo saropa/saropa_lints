@@ -1,6 +1,4 @@
 import 'package:analyzer/dart/ast/ast.dart';
-import 'package:analyzer/error/error.dart' show DiagnosticSeverity;
-import 'package:custom_lint_builder/custom_lint_builder.dart';
 import 'package:saropa_lints/src/saropa_lint_rule.dart';
 
 /// Warns when GraphQL queries are written as raw string literals.
@@ -38,7 +36,7 @@ import 'package:saropa_lints/src/saropa_lint_rule.dart';
 /// final result = await client.query(Options$Query$GetUsers());
 /// ```
 class AvoidGraphqlStringQueriesRule extends SaropaLintRule {
-  const AvoidGraphqlStringQueriesRule() : super(code: _code);
+  AvoidGraphqlStringQueriesRule() : super(code: _code);
 
   /// Medium impact - maintainability and type safety issue.
   @override
@@ -48,22 +46,20 @@ class AvoidGraphqlStringQueriesRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_graphql_string_queries',
-    problemMessage:
-        '[avoid_graphql_string_queries] Raw GraphQL string queries lack type safety and compile-time validation. Raw GraphQL string queries are error-prone, lack type safety, and cannot be validated at compile time. Use code generation tools like graphql_codegen or artemis to generate type-safe query objects. {v2}',
+    'avoid_graphql_string_queries',
+    '[avoid_graphql_string_queries] Raw GraphQL string queries lack type safety and compile-time validation. Raw GraphQL string queries are error-prone, lack type safety, and cannot be validated at compile time. Use code generation tools like graphql_codegen or artemis to generate type-safe query objects. {v2}',
     correctionMessage:
         'Use graphql_codegen or artemis to generate type-safe query classes from .graphql files.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
     // Check for gql() function calls with string literals
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       final String methodName = node.methodName.name;
 
       // Check for gql() or parseString() calls (common GraphQL parsing functions)
@@ -81,14 +77,12 @@ class AvoidGraphqlStringQueriesRule extends SaropaLintRule {
 
       // Check if it's a string literal (simple, multiline, or adjacent)
       if (_isStringLiteral(firstArg)) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
 
     // Also check for InstanceCreationExpression with document parameter
-    context.registry.addInstanceCreationExpression((
-      InstanceCreationExpression node,
-    ) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final String typeName = node.constructorName.type.name.lexeme;
 
       // Check for common GraphQL options classes
@@ -109,7 +103,7 @@ class AvoidGraphqlStringQueriesRule extends SaropaLintRule {
               // Check if gql() has a string literal
               final NodeList<Expression> gqlArgs = value.argumentList.arguments;
               if (gqlArgs.isNotEmpty && _isStringLiteral(gqlArgs.first)) {
-                reporter.atNode(arg, code);
+                reporter.atNode(arg);
               }
             }
           }

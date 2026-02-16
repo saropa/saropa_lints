@@ -2,10 +2,6 @@
 
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/token.dart';
-import 'package:analyzer/error/error.dart'
-    show AnalysisError, DiagnosticSeverity;
-import 'package:analyzer/source/source_range.dart';
-import 'package:custom_lint_builder/custom_lint_builder.dart';
 
 import '../saropa_lint_rule.dart';
 
@@ -27,7 +23,7 @@ import '../saropa_lint_rule.dart';
 /// }
 /// ```
 class AvoidBottomTypeInPatternsRule extends SaropaLintRule {
-  const AvoidBottomTypeInPatternsRule() : super(code: _code);
+  AvoidBottomTypeInPatternsRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -37,33 +33,31 @@ class AvoidBottomTypeInPatternsRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_bottom_type_in_patterns',
-    problemMessage:
-        '[avoid_bottom_type_in_patterns] Pattern uses a bottom type (void, Never, or Null) that either never matches any value or only matches null. This creates dead code in switch cases and if-case expressions, silently hiding logic errors. {v4}',
+    'avoid_bottom_type_in_patterns',
+    '[avoid_bottom_type_in_patterns] Pattern uses a bottom type (void, Never, or Null) that either never matches any value or only matches null. This creates dead code in switch cases and if-case expressions, silently hiding logic errors. {v4}',
     correctionMessage:
         'Replace the bottom type with the actual expected type, or use Object? if matching any value including null.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   static const Set<String> _bottomTypes = <String>{'void', 'Never', 'Null'};
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addDeclaredVariablePattern((DeclaredVariablePattern node) {
+    context.addDeclaredVariablePattern((DeclaredVariablePattern node) {
       final TypeAnnotation? type = node.type;
       if (type is NamedType) {
         final String typeName = type.name.lexeme;
         if (_bottomTypes.contains(typeName)) {
-          reporter.atNode(type, code);
+          reporter.atNode(type);
         }
       }
     });
 
-    context.registry.addObjectPattern((ObjectPattern node) {
+    context.addObjectPattern((ObjectPattern node) {
       final String typeName = node.type.name.lexeme;
       if (_bottomTypes.contains(typeName)) {
         reporter.atNode(node.type, code);
@@ -86,7 +80,7 @@ class AvoidBottomTypeInPatternsRule extends SaropaLintRule {
 /// (Never, int) badRecord; // Never field
 /// ```
 class AvoidBottomTypeInRecordsRule extends SaropaLintRule {
-  const AvoidBottomTypeInRecordsRule() : super(code: _code);
+  AvoidBottomTypeInRecordsRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -96,23 +90,21 @@ class AvoidBottomTypeInRecordsRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_bottom_type_in_records',
-    problemMessage:
-        '[avoid_bottom_type_in_records] Record field uses void/Never/Null which cannot hold useful values. Record fields with bottom types are usually mistakes. Record contains bottom types (void, Never, Null). {v4}',
+    'avoid_bottom_type_in_records',
+    '[avoid_bottom_type_in_records] Record field uses void/Never/Null which cannot hold useful values. Record fields with bottom types are usually mistakes. Record contains bottom types (void, Never, Null). {v4}',
     correctionMessage:
         'Replace with a meaningful type. Use dynamic or Object? if any type is needed. Verify the change works correctly with existing tests and add coverage for the new behavior.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   static const Set<String> _bottomTypes = <String>{'void', 'Never', 'Null'};
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addRecordTypeAnnotation((RecordTypeAnnotation node) {
+    context.addRecordTypeAnnotation((RecordTypeAnnotation node) {
       // Check positional fields
       for (final RecordTypeAnnotationPositionalField field
           in node.positionalFields) {
@@ -120,7 +112,7 @@ class AvoidBottomTypeInRecordsRule extends SaropaLintRule {
         if (type is NamedType) {
           final String typeName = type.name.lexeme;
           if (_bottomTypes.contains(typeName)) {
-            reporter.atNode(type, code);
+            reporter.atNode(type);
           }
         }
       }
@@ -133,7 +125,7 @@ class AvoidBottomTypeInRecordsRule extends SaropaLintRule {
           if (type is NamedType) {
             final String typeName = type.name.lexeme;
             if (_bottomTypes.contains(typeName)) {
-              reporter.atNode(type, code);
+              reporter.atNode(type);
             }
           }
         }
@@ -161,7 +153,7 @@ class AvoidBottomTypeInRecordsRule extends SaropaLintRule {
 /// final Point(x: horizontal, y: vertical) = point;
 /// ```
 class AvoidExplicitPatternFieldNameRule extends SaropaLintRule {
-  const AvoidExplicitPatternFieldNameRule() : super(code: _code);
+  AvoidExplicitPatternFieldNameRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -171,22 +163,20 @@ class AvoidExplicitPatternFieldNameRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_explicit_pattern_field_name',
-    problemMessage:
-        '[avoid_explicit_pattern_field_name] Explicit pattern field name matches variable name. Explicit field names are used in pattern matching when they match the variable name. This pattern matching usage can cause unexpected behavior or miss important type information. {v3}',
+    'avoid_explicit_pattern_field_name',
+    '[avoid_explicit_pattern_field_name] Explicit pattern field name matches variable name. Explicit field names are used in pattern matching when they match the variable name. This pattern matching usage can cause unexpected behavior or miss important type information. {v3}',
     correctionMessage:
         'Use shorthand syntax: `:fieldName` instead of. Verify the change works correctly with existing tests and add coverage for the new behavior.'
         '`fieldName: fieldName`.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addPatternField((PatternField node) {
+    context.addPatternField((PatternField node) {
       final String? fieldName = node.name?.name?.lexeme;
       final DartPattern pattern = node.pattern;
 
@@ -196,47 +186,7 @@ class AvoidExplicitPatternFieldNameRule extends SaropaLintRule {
       if (pattern is DeclaredVariablePattern) {
         final String varName = pattern.name.lexeme;
         if (fieldName == varName) {
-          reporter.atNode(node, code);
-        }
-      }
-    });
-  }
-
-  @override
-  List<Fix> getFixes() => <Fix>[_UseShorthandPatternFieldFix()];
-}
-
-class _UseShorthandPatternFieldFix extends DartFix {
-  @override
-  void run(
-    CustomLintResolver resolver,
-    ChangeReporter reporter,
-    CustomLintContext context,
-    AnalysisError analysisError,
-    List<AnalysisError> others,
-  ) {
-    context.registry.addPatternField((PatternField node) {
-      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
-
-      final String? fieldName = node.name?.name?.lexeme;
-      final DartPattern pattern = node.pattern;
-      if (fieldName == null) return;
-
-      if (pattern is DeclaredVariablePattern) {
-        final String varName = pattern.name.lexeme;
-        if (fieldName == varName) {
-          final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
-            message: 'Use shorthand :$fieldName',
-            priority: 1,
-          );
-
-          changeBuilder.addDartFileEdit((builder) {
-            // Replace "fieldName: fieldName" with ":fieldName"
-            builder.addSimpleReplacement(
-              SourceRange(node.offset, node.length),
-              ':$fieldName',
-            );
-          });
+          reporter.atNode(node);
         }
       }
     });
@@ -268,7 +218,7 @@ class _UseShorthandPatternFieldFix extends DartFix {
 /// }
 /// ```
 class AvoidExtensionsOnRecordsRule extends SaropaLintRule {
-  const AvoidExtensionsOnRecordsRule() : super(code: _code);
+  AvoidExtensionsOnRecordsRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -278,27 +228,25 @@ class AvoidExtensionsOnRecordsRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_extensions_on_records',
-    problemMessage:
-        '[avoid_extensions_on_records] Extension on record type. Records lack identity for extension discovery. This pattern matching usage can cause unexpected behavior or miss important type information. {v4}',
+    'avoid_extensions_on_records',
+    '[avoid_extensions_on_records] Extension on record type. Records lack identity for extension discovery. This pattern matching usage can cause unexpected behavior or miss important type information. {v4}',
     correctionMessage:
         'Create a class with named fields and methods, or use a typedef with extension. Verify the change works correctly with existing tests and add coverage for the new behavior.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addExtensionDeclaration((ExtensionDeclaration node) {
+    context.addExtensionDeclaration((ExtensionDeclaration node) {
       final ExtensionOnClause? onClause = node.onClause;
       if (onClause == null) return;
 
       final TypeAnnotation extendedType = onClause.extendedType;
       if (extendedType is RecordTypeAnnotation) {
-        reporter.atNode(extendedType, code);
+        reporter.atNode(extendedType);
       }
     });
   }
@@ -322,7 +270,7 @@ class AvoidExtensionsOnRecordsRule extends SaropaLintRule {
 /// (int, StringCallback) record = (1, print);
 /// ```
 class AvoidFunctionTypeInRecordsRule extends SaropaLintRule {
-  const AvoidFunctionTypeInRecordsRule() : super(code: _code);
+  AvoidFunctionTypeInRecordsRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -332,21 +280,19 @@ class AvoidFunctionTypeInRecordsRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_function_type_in_records',
-    problemMessage:
-        '[avoid_function_type_in_records] Inline function type in record reduces readability. Function types in records are hard to read and maintain. Use a typedef instead. This pattern matching usage can cause unexpected behavior or miss important type information. {v5}',
+    'avoid_function_type_in_records',
+    '[avoid_function_type_in_records] Inline function type in record reduces readability. Function types in records are hard to read and maintain. Use a typedef instead. This pattern matching usage can cause unexpected behavior or miss important type information. {v5}',
     correctionMessage:
         'Create typedef: typedef MyCallback = void Function(String); then use (int, MyCallback).',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addRecordTypeAnnotation((RecordTypeAnnotation node) {
+    context.addRecordTypeAnnotation((RecordTypeAnnotation node) {
       // Check positional fields
       for (final RecordTypeAnnotationPositionalField field
           in node.positionalFields) {
@@ -383,7 +329,7 @@ class AvoidFunctionTypeInRecordsRule extends SaropaLintRule {
 /// }
 /// ```
 class AvoidKeywordsInWildcardPatternRule extends SaropaLintRule {
-  const AvoidKeywordsInWildcardPatternRule() : super(code: _code);
+  AvoidKeywordsInWildcardPatternRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -393,12 +339,11 @@ class AvoidKeywordsInWildcardPatternRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_keywords_in_wildcard_pattern',
-    problemMessage:
-        '[avoid_keywords_in_wildcard_pattern] Pattern variable uses a Dart keyword. Using keywords in wildcard patterns can be confusing. This pattern matching usage can cause unexpected behavior or miss important type information. {v4}',
+    'avoid_keywords_in_wildcard_pattern',
+    '[avoid_keywords_in_wildcard_pattern] Pattern variable uses a Dart keyword. Using keywords in wildcard patterns can be confusing. This pattern matching usage can cause unexpected behavior or miss important type information. {v4}',
     correctionMessage:
         'Use a different variable name. Verify the change works correctly with existing tests and add coverage for the new behavior.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   static const Set<String> _keywords = <String>{
@@ -473,11 +418,10 @@ class AvoidKeywordsInWildcardPatternRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addDeclaredVariablePattern((DeclaredVariablePattern node) {
+    context.addDeclaredVariablePattern((DeclaredVariablePattern node) {
       final String name = node.name.lexeme;
       if (_keywords.contains(name)) {
         reporter.atToken(node.name, code);
@@ -496,7 +440,7 @@ class AvoidKeywordsInWildcardPatternRule extends SaropaLintRule {
 /// ### Configuration
 /// Default maximum: 5 fields
 class AvoidLongRecordsRule extends SaropaLintRule {
-  const AvoidLongRecordsRule() : super(code: _code);
+  AvoidLongRecordsRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -508,21 +452,19 @@ class AvoidLongRecordsRule extends SaropaLintRule {
   static const int _maxFields = 5;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_long_records',
-    problemMessage:
-        '[avoid_long_records] Record has more than $_maxFields fields, reducing readability. Records with excessive fields lose their clarity advantage over classes and become harder to destructure, understand, and maintain. {v3}',
+    'avoid_long_records',
+    '[avoid_long_records] Record has more than $_maxFields fields, reducing readability. Records with excessive fields lose their clarity advantage over classes and become harder to destructure, understand, and maintain. {v3}',
     correctionMessage:
         'Use a class to improve readability. Verify the change works correctly with existing tests and add coverage for the new behavior.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addRecordTypeAnnotation((RecordTypeAnnotation node) {
+    context.addRecordTypeAnnotation((RecordTypeAnnotation node) {
       int fieldCount = node.positionalFields.length;
 
       final RecordTypeAnnotationNamedFields? namedFields = node.namedFields;
@@ -531,13 +473,13 @@ class AvoidLongRecordsRule extends SaropaLintRule {
       }
 
       if (fieldCount > _maxFields) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
 
-    context.registry.addRecordLiteral((RecordLiteral node) {
+    context.addRecordLiteral((RecordLiteral node) {
       if (node.fields.length > _maxFields) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
   }
@@ -561,7 +503,7 @@ class AvoidLongRecordsRule extends SaropaLintRule {
 /// (int, String) pair;  // All positional
 /// ```
 class AvoidMixingNamedAndPositionalFieldsRule extends SaropaLintRule {
-  const AvoidMixingNamedAndPositionalFieldsRule() : super(code: _code);
+  AvoidMixingNamedAndPositionalFieldsRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -571,31 +513,29 @@ class AvoidMixingNamedAndPositionalFieldsRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_mixing_named_and_positional_fields',
-    problemMessage:
-        '[avoid_mixing_named_and_positional_fields] Record mixes named and positional fields. Mixing named and positional fields in records reduces readability. This pattern matching usage can cause unexpected behavior or miss important type information. {v4}',
+    'avoid_mixing_named_and_positional_fields',
+    '[avoid_mixing_named_and_positional_fields] Record mixes named and positional fields. Mixing named and positional fields in records reduces readability. This pattern matching usage can cause unexpected behavior or miss important type information. {v4}',
     correctionMessage:
         'Use either all named or all positional fields. Verify the change works correctly with existing tests and add coverage for the new behavior.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addRecordTypeAnnotation((RecordTypeAnnotation node) {
+    context.addRecordTypeAnnotation((RecordTypeAnnotation node) {
       final bool hasPositional = node.positionalFields.isNotEmpty;
       final bool hasNamed =
           node.namedFields != null && node.namedFields!.fields.isNotEmpty;
 
       if (hasPositional && hasNamed) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
 
-    context.registry.addRecordLiteral((RecordLiteral node) {
+    context.addRecordLiteral((RecordLiteral node) {
       bool hasPositional = false;
       bool hasNamed = false;
 
@@ -608,7 +548,7 @@ class AvoidMixingNamedAndPositionalFieldsRule extends SaropaLintRule {
       }
 
       if (hasPositional && hasNamed) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
   }
@@ -630,7 +570,7 @@ class AvoidMixingNamedAndPositionalFieldsRule extends SaropaLintRule {
 /// class MyRecord { int a; String b; bool c; }
 /// ```
 class AvoidNestedRecordsRule extends SaropaLintRule {
-  const AvoidNestedRecordsRule() : super(code: _code);
+  AvoidNestedRecordsRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -640,28 +580,26 @@ class AvoidNestedRecordsRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_nested_records',
-    problemMessage:
-        '[avoid_nested_records] Nested record type creates deeply coupled structure that is difficult to read, maintain, and refactor. '
+    'avoid_nested_records',
+    '[avoid_nested_records] Nested record type creates deeply coupled structure that is difficult to read, maintain, and refactor. '
         'Inner record positions become ambiguous (e.g., value.\$1.\$2), and changes to the inner record layout silently break all access sites without a compile-time error in many cases. {v5}',
     correctionMessage:
         'Flatten the nested record into a single record with more fields, or extract the inner record into a named typedef or class. '
         'Named types provide better documentation, enable IDE navigation, and make the structure easier to evolve without breaking callers.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addRecordTypeAnnotation((RecordTypeAnnotation node) {
+    context.addRecordTypeAnnotation((RecordTypeAnnotation node) {
       // Check if any positional field is a record
       for (final RecordTypeAnnotationPositionalField field
           in node.positionalFields) {
         if (field.type is RecordTypeAnnotation) {
-          reporter.atNode(node, code);
+          reporter.atNode(node);
           return;
         }
       }
@@ -671,7 +609,7 @@ class AvoidNestedRecordsRule extends SaropaLintRule {
       if (namedFields != null) {
         for (final RecordTypeAnnotationNamedField field in namedFields.fields) {
           if (field.type is RecordTypeAnnotation) {
-            reporter.atNode(node, code);
+            reporter.atNode(node);
             return;
           }
         }
@@ -694,7 +632,7 @@ class AvoidNestedRecordsRule extends SaropaLintRule {
 /// int value = 42;
 /// ```
 class AvoidOneFieldRecordsRule extends SaropaLintRule {
-  const AvoidOneFieldRecordsRule() : super(code: _code);
+  AvoidOneFieldRecordsRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -704,27 +642,25 @@ class AvoidOneFieldRecordsRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_one_field_records',
-    problemMessage:
-        '[avoid_one_field_records] Single-field record adds unnecessary wrapping overhead; the value type alone is simpler and equally expressive. '
+    'avoid_one_field_records',
+    '[avoid_one_field_records] Single-field record adds unnecessary wrapping overhead; the value type alone is simpler and equally expressive. '
         'The extra parentheses and trailing comma add syntactic noise, and the field can only be accessed via positional notation (\$1), which obscures intent compared to a plain variable. {v5}',
     correctionMessage:
         'Replace the single-field record with the underlying value type directly (e.g., use int instead of (int,)). '
         'If you need a distinct type for documentation or type safety, consider a typedef or an extension type, which provide naming without runtime overhead.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addRecordTypeAnnotation((RecordTypeAnnotation node) {
+    context.addRecordTypeAnnotation((RecordTypeAnnotation node) {
       final int namedCount = node.namedFields?.fields.length ?? 0;
       final int fieldCount = node.positionalFields.length + namedCount;
       if (fieldCount == 1) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
   }
@@ -746,26 +682,24 @@ class AvoidOneFieldRecordsRule extends SaropaLintRule {
 /// print(number);
 /// ```
 class AvoidPositionalRecordFieldAccessRule extends SaropaLintRule {
-  const AvoidPositionalRecordFieldAccessRule() : super(code: _code);
+  AvoidPositionalRecordFieldAccessRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
-    name: 'avoid_positional_record_field_access',
-    problemMessage:
-        '[avoid_positional_record_field_access] Positional record field access (\$1, \$2) is cryptic and forces readers to count positions to understand the code. '
+    'avoid_positional_record_field_access',
+    '[avoid_positional_record_field_access] Positional record field access (\$1, \$2) is cryptic and forces readers to count positions to understand the code. '
         'As records grow, positional access becomes increasingly error-prone and makes refactoring dangerous, since reordering fields silently changes which value each accessor returns. {v5}',
     correctionMessage:
         'Use destructuring to bind record fields to named variables (e.g., final (name, age) = record;) or switch to named record fields (e.g., ({String name, int age})). '
         'Named access is self-documenting and resilient to field reordering.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addPropertyAccess((PropertyAccess node) {
+    context.addPropertyAccess((PropertyAccess node) {
       final String propertyName = node.propertyName.name;
       // Check for $1, $2, $3, etc.
       if (RegExp(r'^\$\d+$').hasMatch(propertyName)) {
@@ -795,7 +729,7 @@ class AvoidPositionalRecordFieldAccessRule extends SaropaLintRule {
 /// final (int, String) = record; // No names needed
 /// ```
 class AvoidRedundantPositionalFieldNameRule extends SaropaLintRule {
-  const AvoidRedundantPositionalFieldNameRule() : super(code: _code);
+  AvoidRedundantPositionalFieldNameRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -805,21 +739,19 @@ class AvoidRedundantPositionalFieldNameRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_redundant_positional_field_name',
-    problemMessage:
-        '[avoid_redundant_positional_field_name] Positional record field uses redundant default name. Positional record field has an explicit name that matches the default positional field name pattern (\$1, \$2, etc.). {v4}',
+    'avoid_redundant_positional_field_name',
+    '[avoid_redundant_positional_field_name] Positional record field uses redundant default name. Positional record field has an explicit name that matches the default positional field name pattern (\$1, \$2, etc.). {v4}',
     correctionMessage:
         'Use a meaningful name or omit the name entirely. Verify the change works correctly with existing tests and add coverage for the new behavior.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addRecordTypeAnnotation((RecordTypeAnnotation node) {
+    context.addRecordTypeAnnotation((RecordTypeAnnotation node) {
       int position = 1;
       for (final RecordTypeAnnotationPositionalField field
           in node.positionalFields) {
@@ -828,7 +760,7 @@ class AvoidRedundantPositionalFieldNameRule extends SaropaLintRule {
           final String name = nameToken.lexeme;
           // Check if using default positional name like $1, $2, etc.
           if (name == '\$$position') {
-            reporter.atToken(nameToken, code);
+            reporter.atToken(nameToken);
           }
         }
         position++;
@@ -856,7 +788,7 @@ class AvoidRedundantPositionalFieldNameRule extends SaropaLintRule {
 /// print(name);
 /// ```
 class AvoidSingleFieldDestructuringRule extends SaropaLintRule {
-  const AvoidSingleFieldDestructuringRule() : super(code: _code);
+  AvoidSingleFieldDestructuringRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -866,38 +798,34 @@ class AvoidSingleFieldDestructuringRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_single_field_destructuring',
-    problemMessage:
-        '[avoid_single_field_destructuring] Single-field destructuring adds syntactic overhead without the readability benefit of multi-field destructuring. '
+    'avoid_single_field_destructuring',
+    '[avoid_single_field_destructuring] Single-field destructuring adds syntactic overhead without the readability benefit of multi-field destructuring. '
         'The pattern syntax (e.g., final (:name) = obj;) is unfamiliar to many Dart developers and introduces unnecessary complexity when accessing just one property. {v5}',
     correctionMessage:
         'Use direct property access instead (e.g., final name = obj.name;). Destructuring is most valuable when extracting multiple fields at once. '
         'For a single field, direct access is simpler, more widely understood, and produces equivalent compiled code.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addPatternVariableDeclaration((
-      PatternVariableDeclaration node,
-    ) {
+    context.addPatternVariableDeclaration((PatternVariableDeclaration node) {
       final DartPattern pattern = node.pattern;
 
       // Check if it's an object pattern with only one field
       if (pattern is ObjectPattern) {
         if (pattern.fields.length == 1) {
-          reporter.atNode(node, code);
+          reporter.atNode(node);
         }
       }
 
       // Check if it's a record pattern with only one field
       if (pattern is RecordPattern) {
         if (pattern.fields.length == 1) {
-          reporter.atNode(node, code);
+          reporter.atNode(node);
         }
       }
     });
@@ -923,7 +851,7 @@ class AvoidSingleFieldDestructuringRule extends SaropaLintRule {
 /// User getUser() => ...;
 /// ```
 class MoveRecordsToTypedefsRule extends SaropaLintRule {
-  const MoveRecordsToTypedefsRule() : super(code: _code);
+  MoveRecordsToTypedefsRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -935,21 +863,19 @@ class MoveRecordsToTypedefsRule extends SaropaLintRule {
   static const int _maxInlineFields = 3;
 
   static const LintCode _code = LintCode(
-    name: 'move_records_to_typedefs',
-    problemMessage:
-        '[move_records_to_typedefs] Inline record with >$_maxInlineFields fields reduces readability. Complex record types are easier to read as typedefs. This pattern matching usage can cause unexpected behavior or miss important type information. {v5}',
+    'move_records_to_typedefs',
+    '[move_records_to_typedefs] Inline record with >$_maxInlineFields fields reduces readability. Complex record types are easier to read as typedefs. This pattern matching usage can cause unexpected behavior or miss important type information. {v5}',
     correctionMessage:
         'Extract to a typedef for reuse and documentation. Verify the change works correctly with existing tests and add coverage for the new behavior.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addRecordTypeAnnotation((RecordTypeAnnotation node) {
+    context.addRecordTypeAnnotation((RecordTypeAnnotation node) {
       // Skip if already in a typedef
       AstNode? parent = node.parent;
       while (parent != null) {
@@ -961,7 +887,7 @@ class MoveRecordsToTypedefsRule extends SaropaLintRule {
           node.positionalFields.length + (node.namedFields?.fields.length ?? 0);
 
       if (fieldCount > _maxInlineFields) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
   }
@@ -985,24 +911,22 @@ class MoveRecordsToTypedefsRule extends SaropaLintRule {
 /// if (obj case User(age: a, name: n)) { } // Alphabetical
 /// ```
 class PatternFieldsOrderingRule extends SaropaLintRule {
-  const PatternFieldsOrderingRule() : super(code: _code);
+  PatternFieldsOrderingRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
-    name: 'prefer_sorted_pattern_fields',
-    problemMessage:
-        '[prefer_sorted_pattern_fields] Unsorted pattern fields slow code review and make refactoring error-prone. Alphabetical ordering provides a predictable scanning path, reduces merge conflicts when multiple developers modify the same pattern, and makes it easier to spot missing or duplicate fields at a glance. {v5}',
+    'prefer_sorted_pattern_fields',
+    '[prefer_sorted_pattern_fields] Unsorted pattern fields slow code review and make refactoring error-prone. Alphabetical ordering provides a predictable scanning path, reduces merge conflicts when multiple developers modify the same pattern, and makes it easier to spot missing or duplicate fields at a glance. {v5}',
     correctionMessage:
         'Reorder the pattern fields in alphabetical order. The quick fix can sort them automatically while preserving comments.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addObjectPattern((ObjectPattern node) {
+    context.addObjectPattern((ObjectPattern node) {
       final List<String> fieldNames = <String>[];
 
       for (final PatternField field in node.fields) {
@@ -1018,7 +942,7 @@ class PatternFieldsOrderingRule extends SaropaLintRule {
       // Check if fields are sorted
       for (int i = 1; i < fieldNames.length; i++) {
         if (fieldNames[i].compareTo(fieldNames[i - 1]) < 0) {
-          reporter.atNode(node, code);
+          reporter.atNode(node);
           return;
         }
       }
@@ -1046,7 +970,7 @@ class PatternFieldsOrderingRule extends SaropaLintRule {
 /// if (value case final x?) { } // When you need the binding, use final
 /// ```
 class PreferSimplerPatternsNullCheckRule extends SaropaLintRule {
-  const PreferSimplerPatternsNullCheckRule() : super(code: _code);
+  PreferSimplerPatternsNullCheckRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -1056,28 +980,26 @@ class PreferSimplerPatternsNullCheckRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'prefer_simpler_patterns_null_check',
-    problemMessage:
-        '[prefer_simpler_patterns_null_check] Verbose null check pattern reduces readability. Use simpler patterns when possible. Pattern null checks can be simplified. This pattern matching usage can cause unexpected behavior or miss important type information. {v5}',
+    'prefer_simpler_patterns_null_check',
+    '[prefer_simpler_patterns_null_check] Verbose null check pattern reduces readability. Use simpler patterns when possible. Pattern null checks can be simplified. This pattern matching usage can cause unexpected behavior or miss important type information. {v5}',
     correctionMessage:
         'Use != null or final instead of var for null checks. Verify the change works correctly with existing tests and add coverage for the new behavior.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addNullCheckPattern((NullCheckPattern node) {
+    context.addNullCheckPattern((NullCheckPattern node) {
       final DartPattern pattern = node.pattern;
 
       // Check for var x? pattern
       if (pattern is DeclaredVariablePattern) {
         final Token? keyword = pattern.keyword;
         if (keyword != null && keyword.lexeme == 'var') {
-          reporter.atNode(node, code);
+          reporter.atNode(node);
         }
       }
     });
@@ -1104,7 +1026,7 @@ class PreferSimplerPatternsNullCheckRule extends SaropaLintRule {
 /// print(first);
 /// ```
 class PreferWildcardPatternRule extends SaropaLintRule {
-  const PreferWildcardPatternRule() : super(code: _code);
+  PreferWildcardPatternRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -1114,25 +1036,23 @@ class PreferWildcardPatternRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'prefer_wildcard_pattern',
-    problemMessage:
-        '[prefer_wildcard_pattern] Unused pattern variable should use wildcard (_). If a variable is declared but never used, use _ instead. This pattern matching usage can cause unexpected behavior or miss important type information. {v4}',
+    'prefer_wildcard_pattern',
+    '[prefer_wildcard_pattern] Unused pattern variable should use wildcard (_). If a variable is declared but never used, use _ instead. This pattern matching usage can cause unexpected behavior or miss important type information. {v4}',
     correctionMessage:
         'Replace with _ if the value is not used. Verify the change works correctly with existing tests and add coverage for the new behavior.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
     // This rule needs to track variable usage which is complex
     // For now, just check for obviously unused pattern variables
     // that follow common unused naming patterns
 
-    context.registry.addDeclaredVariablePattern((DeclaredVariablePattern node) {
+    context.addDeclaredVariablePattern((DeclaredVariablePattern node) {
       final String name = node.name.lexeme;
 
       // Check for common "unused" naming patterns
@@ -1165,7 +1085,7 @@ class PreferWildcardPatternRule extends SaropaLintRule {
 /// typedef Person = ({int age, String name}); // Alphabetical
 /// ```
 class RecordFieldsOrderingRule extends SaropaLintRule {
-  const RecordFieldsOrderingRule() : super(code: _code);
+  RecordFieldsOrderingRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -1175,21 +1095,19 @@ class RecordFieldsOrderingRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'prefer_sorted_record_fields',
-    problemMessage:
-        '[prefer_sorted_record_fields] Unsorted record fields slow code review and make refactoring error-prone. Alphabetical ordering provides a predictable scanning path, reduces merge conflicts when multiple developers modify the same record definition, and makes it easier to spot duplicate or missing fields. {v6}',
+    'prefer_sorted_record_fields',
+    '[prefer_sorted_record_fields] Unsorted record fields slow code review and make refactoring error-prone. Alphabetical ordering provides a predictable scanning path, reduces merge conflicts when multiple developers modify the same record definition, and makes it easier to spot duplicate or missing fields. {v6}',
     correctionMessage:
         'Reorder the record fields in alphabetical order. The quick fix can sort them automatically while preserving type annotations.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addRecordTypeAnnotation((RecordTypeAnnotation node) {
+    context.addRecordTypeAnnotation((RecordTypeAnnotation node) {
       final List<String> namedFieldNames = <String>[];
 
       for (final RecordTypeAnnotationNamedField field
@@ -1200,7 +1118,7 @@ class RecordFieldsOrderingRule extends SaropaLintRule {
       // Check if named fields are sorted
       for (int i = 1; i < namedFieldNames.length; i++) {
         if (namedFieldNames[i].compareTo(namedFieldNames[i - 1]) < 0) {
-          reporter.atNode(node, code);
+          reporter.atNode(node);
           return;
         }
       }
@@ -1231,25 +1149,23 @@ class RecordFieldsOrderingRule extends SaropaLintRule {
 /// print(third);
 /// ```
 class PreferPatternDestructuringRule extends SaropaLintRule {
-  const PreferPatternDestructuringRule() : super(code: _code);
+  PreferPatternDestructuringRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
-    name: 'prefer_pattern_destructuring',
-    problemMessage:
-        '[prefer_pattern_destructuring] Multiple positional record field accesses could use destructuring. When accessing multiple positional fields from the same record variable, pattern destructuring is clearer and more idiomatic (Dart 3.0+). {v2}',
+    'prefer_pattern_destructuring',
+    '[prefer_pattern_destructuring] Multiple positional record field accesses could use destructuring. When accessing multiple positional fields from the same record variable, pattern destructuring is clearer and more idiomatic (Dart 3.0+). {v2}',
     correctionMessage:
         'Use pattern destructuring: final (a, b) = record; (Dart 3.0+). Verify the change works correctly with existing tests and add coverage for the new behavior.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
     // Track record accesses within each block/function scope
-    context.registry.addBlock((Block node) {
+    context.addBlock((Block node) {
       _checkBlock(node, reporter);
     });
   }

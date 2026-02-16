@@ -2,10 +2,6 @@
 
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/token.dart';
-import 'package:analyzer/error/error.dart'
-    show AnalysisError, DiagnosticSeverity;
-import 'package:analyzer/source/source_range.dart';
-import 'package:custom_lint_builder/custom_lint_builder.dart';
 
 import '../saropa_lint_rule.dart';
 
@@ -39,7 +35,7 @@ import '../saropa_lint_rule.dart';
 /// }
 /// ```
 class NewlineBeforeCaseRule extends SaropaLintRule {
-  const NewlineBeforeCaseRule() : super(code: _code);
+  NewlineBeforeCaseRule() : super(code: _code);
 
   /// Style/consistency. Large counts acceptable in legacy code.
   @override
@@ -49,21 +45,19 @@ class NewlineBeforeCaseRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'prefer_blank_line_before_case',
-    problemMessage:
-        '[prefer_blank_line_before_case] Adding blank lines before case clauses is a formatting preference with no impact on code behavior or performance. Enable via the stylistic tier. {v4}',
+    'prefer_blank_line_before_case',
+    '[prefer_blank_line_before_case] Adding blank lines before case clauses is a formatting preference with no impact on code behavior or performance. Enable via the stylistic tier. {v4}',
     correctionMessage:
         'Add blank line before this case. Verify the change works correctly with existing tests and add coverage for the new behavior.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addSwitchStatement((SwitchStatement node) {
+    context.addSwitchStatement((SwitchStatement node) {
       final NodeList<SwitchMember> members = node.members;
 
       for (int i = 1; i < members.length; i++) {
@@ -75,10 +69,12 @@ class NewlineBeforeCaseRule extends SaropaLintRule {
 
         // Check if there's a blank line before current case
         final CompilationUnit unit = node.root as CompilationUnit;
-        final int prevEndLine =
-            unit.lineInfo.getLocation(previous.end).lineNumber;
-        final int currStartLine =
-            unit.lineInfo.getLocation(current.offset).lineNumber;
+        final int prevEndLine = unit.lineInfo
+            .getLocation(previous.end)
+            .lineNumber;
+        final int currStartLine = unit.lineInfo
+            .getLocation(current.offset)
+            .lineNumber;
 
         if (currStartLine - prevEndLine < 2) {
           // Use beginToken to handle SwitchCase, SwitchDefault, and SwitchPatternCase
@@ -118,7 +114,7 @@ class NewlineBeforeCaseRule extends SaropaLintRule {
 /// }
 /// ```
 class NewlineBeforeConstructorRule extends SaropaLintRule {
-  const NewlineBeforeConstructorRule() : super(code: _code);
+  NewlineBeforeConstructorRule() : super(code: _code);
 
   /// Style/consistency. Large counts acceptable in legacy code.
   @override
@@ -128,21 +124,19 @@ class NewlineBeforeConstructorRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'prefer_blank_line_before_constructor',
-    problemMessage:
-        '[prefer_blank_line_before_constructor] Adding blank lines before constructors is a formatting preference with no impact on code behavior or performance. Enable via the stylistic tier. {v4}',
+    'prefer_blank_line_before_constructor',
+    '[prefer_blank_line_before_constructor] Adding blank lines before constructors is a formatting preference with no impact on code behavior or performance. Enable via the stylistic tier. {v4}',
     correctionMessage:
         'Add blank line to improve readability. Verify the change works correctly with existing tests and add coverage for the new behavior.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addClassDeclaration((ClassDeclaration node) {
+    context.addClassDeclaration((ClassDeclaration node) {
       _checkMembers(node.members, node.root as CompilationUnit, reporter);
     });
   }
@@ -160,16 +154,18 @@ class NewlineBeforeConstructorRule extends SaropaLintRule {
       if (current is! ConstructorDeclaration) continue;
 
       // Get line numbers
-      final int prevEndLine =
-          unit.lineInfo.getLocation(previous.end).lineNumber;
-      final int currStartLine =
-          unit.lineInfo.getLocation(current.offset).lineNumber;
+      final int prevEndLine = unit.lineInfo
+          .getLocation(previous.end)
+          .lineNumber;
+      final int currStartLine = unit.lineInfo
+          .getLocation(current.offset)
+          .lineNumber;
 
       // Should have at least one blank line
       if (currStartLine - prevEndLine < 2) {
         final Token? nameToken = current.name;
         if (nameToken != null) {
-          reporter.atToken(nameToken, code);
+          reporter.atToken(nameToken);
         } else {
           reporter.atNode(current.returnType, code);
         }
@@ -207,7 +203,7 @@ class NewlineBeforeConstructorRule extends SaropaLintRule {
 /// }
 /// ```
 class NewlineBeforeMethodRule extends SaropaLintRule {
-  const NewlineBeforeMethodRule() : super(code: _code);
+  NewlineBeforeMethodRule() : super(code: _code);
 
   /// Style/consistency. Large counts acceptable in legacy code.
   @override
@@ -217,29 +213,27 @@ class NewlineBeforeMethodRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'prefer_blank_line_before_method',
-    problemMessage:
-        '[prefer_blank_line_before_method] Adding blank lines before methods is a formatting preference with no impact on code behavior or performance. Enable via the stylistic tier. {v4}',
+    'prefer_blank_line_before_method',
+    '[prefer_blank_line_before_method] Adding blank lines before methods is a formatting preference with no impact on code behavior or performance. Enable via the stylistic tier. {v4}',
     correctionMessage:
         'Add blank line to improve readability. Verify the change works correctly with existing tests and add coverage for the new behavior.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addClassDeclaration((ClassDeclaration node) {
+    context.addClassDeclaration((ClassDeclaration node) {
       _checkMembers(node.members, node.root as CompilationUnit, reporter);
     });
 
-    context.registry.addMixinDeclaration((MixinDeclaration node) {
+    context.addMixinDeclaration((MixinDeclaration node) {
       _checkMembers(node.members, node.root as CompilationUnit, reporter);
     });
 
-    context.registry.addEnumDeclaration((EnumDeclaration node) {
+    context.addEnumDeclaration((EnumDeclaration node) {
       _checkMembers(node.members, node.root as CompilationUnit, reporter);
     });
   }
@@ -257,10 +251,12 @@ class NewlineBeforeMethodRule extends SaropaLintRule {
       if (current is! MethodDeclaration) continue;
 
       // Get line numbers
-      final int prevEndLine =
-          unit.lineInfo.getLocation(previous.end).lineNumber;
-      final int currStartLine =
-          unit.lineInfo.getLocation(current.offset).lineNumber;
+      final int prevEndLine = unit.lineInfo
+          .getLocation(previous.end)
+          .lineNumber;
+      final int currStartLine = unit.lineInfo
+          .getLocation(current.offset)
+          .lineNumber;
 
       // Should have at least one blank line
       if (currStartLine - prevEndLine < 2) {
@@ -281,7 +277,7 @@ class NewlineBeforeMethodRule extends SaropaLintRule {
 /// Adding a blank line before return statements can improve readability
 /// by visually separating the return from the preceding logic.
 class NewlineBeforeReturnRule extends SaropaLintRule {
-  const NewlineBeforeReturnRule() : super(code: _code);
+  NewlineBeforeReturnRule() : super(code: _code);
 
   /// Style/consistency. Large counts acceptable in legacy code.
   @override
@@ -291,21 +287,19 @@ class NewlineBeforeReturnRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'prefer_blank_line_before_return',
-    problemMessage:
-        '[prefer_blank_line_before_return] Adding blank lines before return statements is a formatting preference with no impact on code behavior or performance. Enable via the stylistic tier. {v5}',
+    'prefer_blank_line_before_return',
+    '[prefer_blank_line_before_return] Adding blank lines before return statements is a formatting preference with no impact on code behavior or performance. Enable via the stylistic tier. {v5}',
     correctionMessage:
         'Insert a blank line before return for readability. Verify the change works correctly with existing tests and add coverage for the new behavior.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addReturnStatement((ReturnStatement node) {
+    context.addReturnStatement((ReturnStatement node) {
       final AstNode? parent = node.parent;
       if (parent is! Block) return;
 
@@ -317,41 +311,16 @@ class NewlineBeforeReturnRule extends SaropaLintRule {
 
       // Check if previous statement ends on the line immediately before
       final Statement previous = statements[index - 1];
-      final int prevEndLine =
-          resolver.lineInfo.getLocation(previous.end).lineNumber;
-      final int returnStartLine =
-          resolver.lineInfo.getLocation(node.offset).lineNumber;
+      final int prevEndLine = context.lineInfo
+          .getLocation(previous.end)
+          .lineNumber;
+      final int returnStartLine = context.lineInfo
+          .getLocation(node.offset)
+          .lineNumber;
 
       if (returnStartLine - prevEndLine < 2) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
-    });
-  }
-
-  @override
-  List<Fix> getFixes() => <Fix>[_AddBlankLineBeforeReturnFix()];
-}
-
-class _AddBlankLineBeforeReturnFix extends DartFix {
-  @override
-  void run(
-    CustomLintResolver resolver,
-    ChangeReporter reporter,
-    CustomLintContext context,
-    AnalysisError analysisError,
-    List<AnalysisError> others,
-  ) {
-    context.registry.addReturnStatement((ReturnStatement node) {
-      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
-
-      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
-        message: 'Add blank line before return',
-        priority: 1,
-      );
-
-      changeBuilder.addDartFileEdit((builder) {
-        builder.addSimpleInsertion(node.offset, '\n');
-      });
     });
   }
 }
@@ -386,7 +355,7 @@ class _AddBlankLineBeforeReturnFix extends DartFix {
 /// ];
 /// ```
 class PreferTrailingCommaRule extends SaropaLintRule {
-  const PreferTrailingCommaRule() : super(code: _code);
+  PreferTrailingCommaRule() : super(code: _code);
 
   /// Style/consistency. Large counts acceptable in legacy code.
   @override
@@ -396,33 +365,31 @@ class PreferTrailingCommaRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'prefer_trailing_comma',
-    problemMessage:
-        '[prefer_trailing_comma] Adding trailing commas in multi-line constructs is a formatting preference that affects diff readability. No performance or correctness impact. Enable via the stylistic tier. {v4}',
+    'prefer_trailing_comma',
+    '[prefer_trailing_comma] Adding trailing commas in multi-line constructs is a formatting preference that affects diff readability. No performance or correctness impact. Enable via the stylistic tier. {v4}',
     correctionMessage:
         'Add a trailing comma. Verify the change works correctly with existing tests and add coverage for the new behavior.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addArgumentList((ArgumentList node) {
+    context.addArgumentList((ArgumentList node) {
       _checkTrailingComma(node.arguments, node.rightParenthesis, reporter);
     });
 
-    context.registry.addListLiteral((ListLiteral node) {
+    context.addListLiteral((ListLiteral node) {
       _checkTrailingComma(node.elements, node.rightBracket, reporter);
     });
 
-    context.registry.addSetOrMapLiteral((SetOrMapLiteral node) {
+    context.addSetOrMapLiteral((SetOrMapLiteral node) {
       _checkTrailingComma(node.elements, node.rightBracket, reporter);
     });
 
-    context.registry.addFormalParameterList((FormalParameterList node) {
+    context.addFormalParameterList((FormalParameterList node) {
       _checkTrailingComma(node.parameters, node.rightParenthesis, reporter);
     });
   }
@@ -459,65 +426,9 @@ class PreferTrailingCommaRule extends SaropaLintRule {
 
       if (!hasTrailingComma && elements.length >= 2) {
         // Only report if it looks like a multi-line construct
-        reporter.atNode(last, code);
+        reporter.atNode(last);
       }
     }
-  }
-
-  @override
-  List<Fix> getFixes() => <Fix>[_AddTrailingCommaFix()];
-}
-
-class _AddTrailingCommaFix extends DartFix {
-  @override
-  void run(
-    CustomLintResolver resolver,
-    ChangeReporter reporter,
-    CustomLintContext context,
-    AnalysisError analysisError,
-    List<AnalysisError> others,
-  ) {
-    context.registry.addListLiteral((ListLiteral node) {
-      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
-      if (node.elements.isEmpty) return;
-
-      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
-        message: 'Add trailing comma',
-        priority: 1,
-      );
-
-      changeBuilder.addDartFileEdit((builder) {
-        builder.addSimpleInsertion(node.elements.last.end, ',');
-      });
-    });
-
-    context.registry.addSetOrMapLiteral((SetOrMapLiteral node) {
-      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
-      if (node.elements.isEmpty) return;
-
-      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
-        message: 'Add trailing comma',
-        priority: 1,
-      );
-
-      changeBuilder.addDartFileEdit((builder) {
-        builder.addSimpleInsertion(node.elements.last.end, ',');
-      });
-    });
-
-    context.registry.addArgumentList((ArgumentList node) {
-      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
-      if (node.arguments.isEmpty) return;
-
-      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
-        message: 'Add trailing comma',
-        priority: 1,
-      );
-
-      changeBuilder.addDartFileEdit((builder) {
-        builder.addSimpleInsertion(node.arguments.last.end, ',');
-      });
-    });
   }
 }
 
@@ -550,7 +461,7 @@ class _AddTrailingCommaFix extends DartFix {
 /// ];
 /// ```
 class UnnecessaryTrailingCommaRule extends SaropaLintRule {
-  const UnnecessaryTrailingCommaRule() : super(code: _code);
+  UnnecessaryTrailingCommaRule() : super(code: _code);
 
   /// Style/consistency. Large counts acceptable in legacy code.
   @override
@@ -560,25 +471,23 @@ class UnnecessaryTrailingCommaRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'unnecessary_trailing_comma',
-    problemMessage:
-        '[unnecessary_trailing_comma] Removing trailing commas in single-line constructs is a formatting preference. No impact on code behavior or performance. Enable via the stylistic tier. {v4}',
+    'unnecessary_trailing_comma',
+    '[unnecessary_trailing_comma] Removing trailing commas in single-line constructs is a formatting preference. No impact on code behavior or performance. Enable via the stylistic tier. {v4}',
     correctionMessage:
         'Remove trailing comma or keep on single line. Verify the change works correctly with existing tests and add coverage for the new behavior.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addListLiteral((ListLiteral node) {
+    context.addListLiteral((ListLiteral node) {
       _checkTrailingComma(node.elements, node.rightBracket, reporter);
     });
 
-    context.registry.addSetOrMapLiteral((SetOrMapLiteral node) {
+    context.addSetOrMapLiteral((SetOrMapLiteral node) {
       _checkTrailingComma(node.elements, node.rightBracket, reporter);
     });
   }
@@ -595,60 +504,8 @@ class UnnecessaryTrailingCommaRule extends SaropaLintRule {
     final Token? nextToken = element.endToken.next;
     if (nextToken != null && nextToken.type == TokenType.COMMA) {
       // Single element with trailing comma
-      reporter.atToken(nextToken, code);
+      reporter.atToken(nextToken);
     }
-  }
-
-  @override
-  List<Fix> getFixes() => <Fix>[_RemoveTrailingCommaFix()];
-}
-
-class _RemoveTrailingCommaFix extends DartFix {
-  @override
-  void run(
-    CustomLintResolver resolver,
-    ChangeReporter reporter,
-    CustomLintContext context,
-    AnalysisError analysisError,
-    List<AnalysisError> others,
-  ) {
-    context.registry.addListLiteral((ListLiteral node) {
-      if (node.elements.length != 1) return;
-      final Token? commaToken = node.elements.first.endToken.next;
-      if (commaToken == null || commaToken.type != TokenType.COMMA) return;
-      if (!SourceRange(commaToken.offset, commaToken.length)
-          .intersects(analysisError.sourceRange)) {
-        return;
-      }
-
-      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
-        message: 'Remove trailing comma',
-        priority: 1,
-      );
-
-      changeBuilder.addDartFileEdit((builder) {
-        builder.addDeletion(SourceRange(commaToken.offset, commaToken.length));
-      });
-    });
-
-    context.registry.addSetOrMapLiteral((SetOrMapLiteral node) {
-      if (node.elements.length != 1) return;
-      final Token? commaToken = node.elements.first.endToken.next;
-      if (commaToken == null || commaToken.type != TokenType.COMMA) return;
-      if (!SourceRange(commaToken.offset, commaToken.length)
-          .intersects(analysisError.sourceRange)) {
-        return;
-      }
-
-      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
-        message: 'Remove trailing comma',
-        priority: 1,
-      );
-
-      changeBuilder.addDartFileEdit((builder) {
-        builder.addDeletion(SourceRange(commaToken.offset, commaToken.length));
-      });
-    });
   }
 }
 
@@ -676,7 +533,7 @@ class _RemoveTrailingCommaFix extends DartFix {
 /// // TODO: Fix this.
 /// ```
 class FormatCommentFormattingRule extends SaropaLintRule {
-  const FormatCommentFormattingRule() : super(code: _code);
+  FormatCommentFormattingRule() : super(code: _code);
 
   /// Style/consistency. Large counts acceptable in legacy code.
   @override
@@ -686,12 +543,11 @@ class FormatCommentFormattingRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'format_comment_style',
-    problemMessage:
-        '[format_comment_style] Enforcing specific comment formatting conventions is a stylistic preference. Comment format has no impact on code behavior or performance. Enable via the stylistic tier. {v3}',
+    'format_comment_style',
+    '[format_comment_style] Enforcing specific comment formatting conventions is a stylistic preference. Comment format has no impact on code behavior or performance. Enable via the stylistic tier. {v3}',
     correctionMessage:
         'Start with capital letter and end with punctuation. Verify the change works correctly with existing tests and add coverage for the new behavior.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   /// Annotation markers that have their own formatting conventions.
@@ -705,12 +561,11 @@ class FormatCommentFormattingRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
     // Comments are not part of the AST, so we need to check tokens
-    context.registry.addCompilationUnit((CompilationUnit node) {
+    context.addCompilationUnit((CompilationUnit node) {
       Token? token = node.beginToken;
       while (token != null && token != node.endToken) {
         _checkPrecedingComments(token, reporter);
@@ -748,7 +603,7 @@ class FormatCommentFormattingRule extends SaropaLintRule {
             _lowercaseStart.hasMatch(content) &&
             !content.startsWith('http') &&
             !content.contains('://')) {
-          reporter.atToken(comment, code);
+          reporter.atToken(comment);
         }
       }
 
@@ -787,7 +642,7 @@ class FormatCommentFormattingRule extends SaropaLintRule {
 ///
 /// Formerly: `enforce_member_ordering`
 class MemberOrderingFormattingRule extends SaropaLintRule {
-  const MemberOrderingFormattingRule() : super(code: _code);
+  MemberOrderingFormattingRule() : super(code: _code);
 
   /// Style/consistency. Large counts acceptable in legacy code.
   @override
@@ -797,32 +652,32 @@ class MemberOrderingFormattingRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   @override
-  List<String> get configAliases =>
-      const <String>['enforce_member_ordering', 'member_ordering'];
+  List<String> get configAliases => const <String>[
+    'enforce_member_ordering',
+    'member_ordering',
+  ];
 
   static const LintCode _code = LintCode(
-    name: 'prefer_member_ordering',
-    problemMessage:
-        '[prefer_member_ordering] Class members are not in conventional order. Members must be ordered: fields, constructors, methods. {v4}',
+    'prefer_member_ordering',
+    '[prefer_member_ordering] Class members are not in conventional order. Members must be ordered: fields, constructors, methods. {v4}',
     correctionMessage:
         'Reorder class members to follow the conventional layout: static fields, instance fields, constructors, then methods.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addClassDeclaration((ClassDeclaration node) {
+    context.addClassDeclaration((ClassDeclaration node) {
       int lastCategory = -1;
 
       for (final ClassMember member in node.members) {
         final int category = _getMemberCategory(member);
 
         if (category < lastCategory) {
-          reporter.atNode(member, code);
+          reporter.atNode(member);
         }
 
         if (category > lastCategory) {
@@ -867,7 +722,7 @@ class MemberOrderingFormattingRule extends SaropaLintRule {
 /// void foo(int count, {String? name}) {}
 /// ```
 class ParametersOrderingConventionRule extends SaropaLintRule {
-  const ParametersOrderingConventionRule() : super(code: _code);
+  ParametersOrderingConventionRule() : super(code: _code);
 
   /// Style/consistency. Large counts acceptable in legacy code.
   @override
@@ -881,31 +736,31 @@ class ParametersOrderingConventionRule extends SaropaLintRule {
   List<String> get configAliases => const <String>['parameters_ordering'];
 
   static const LintCode _code = LintCode(
-    name: 'enforce_parameters_ordering',
-    problemMessage:
-        '[enforce_parameters_ordering] Ordering parameters in a specific sequence is a convention preference. Parameter order does not affect performance or compiled output. Enable via the stylistic tier. {v3}',
+    'enforce_parameters_ordering',
+    '[enforce_parameters_ordering] Ordering parameters in a specific sequence is a convention preference. Parameter order does not affect performance or compiled output. Enable via the stylistic tier. {v3}',
     correctionMessage:
         'Order: required positional, optional positional, named. Verify the change works correctly with existing tests and add coverage for the new behavior.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addFunctionDeclaration((FunctionDeclaration node) {
+    context.addFunctionDeclaration((FunctionDeclaration node) {
       _checkParameters(node.functionExpression.parameters, reporter);
     });
 
-    context.registry.addMethodDeclaration((MethodDeclaration node) {
+    context.addMethodDeclaration((MethodDeclaration node) {
       _checkParameters(node.parameters, reporter);
     });
   }
 
   void _checkParameters(
-      FormalParameterList? params, SaropaDiagnosticReporter reporter) {
+    FormalParameterList? params,
+    SaropaDiagnosticReporter reporter,
+  ) {
     if (params == null) return;
 
     int lastCategory = -1;
@@ -913,7 +768,7 @@ class ParametersOrderingConventionRule extends SaropaLintRule {
       final int category = _getParamCategory(param);
 
       if (category < lastCategory) {
-        reporter.atNode(param, code);
+        reporter.atNode(param);
       }
 
       if (category > lastCategory) {
@@ -963,7 +818,7 @@ class ParametersOrderingConventionRule extends SaropaLintRule {
 /// }
 /// ```
 class EnumConstantsOrderingRule extends SaropaLintRule {
-  const EnumConstantsOrderingRule() : super(code: _code);
+  EnumConstantsOrderingRule() : super(code: _code);
 
   /// Style/consistency. Large counts acceptable in legacy code.
   @override
@@ -973,21 +828,19 @@ class EnumConstantsOrderingRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'enum_constants_ordering',
-    problemMessage:
-        '[enum_constants_ordering] Ordering enum constants alphabetically is a stylistic preference. Enum constant order does not affect runtime behavior or performance. Enable via the stylistic tier. {v2}',
+    'enum_constants_ordering',
+    '[enum_constants_ordering] Ordering enum constants alphabetically is a stylistic preference. Enum constant order does not affect runtime behavior or performance. Enable via the stylistic tier. {v2}',
     correctionMessage:
         'Prefer ordering enum constants alphabetically. Verify the change works correctly with existing tests and add coverage for the new behavior.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addEnumDeclaration((EnumDeclaration node) {
+    context.addEnumDeclaration((EnumDeclaration node) {
       final List<EnumConstantDeclaration> constants = node.constants.toList();
       if (constants.length < 2) return;
 
@@ -998,7 +851,7 @@ class EnumConstantsOrderingRule extends SaropaLintRule {
         if (previousName != null &&
             currentName.toLowerCase().compareTo(previousName.toLowerCase()) <
                 0) {
-          reporter.atNode(node, code);
+          reporter.atNode(node);
           return; // Only report once per enum
         }
         previousName = currentName;

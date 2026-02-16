@@ -8,8 +8,6 @@ library;
 
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
-import 'package:analyzer/error/error.dart' show DiagnosticSeverity;
-import 'package:custom_lint_builder/custom_lint_builder.dart';
 
 import '../../saropa_lint_rule.dart';
 
@@ -38,7 +36,7 @@ import '../../saropa_lint_rule.dart';
 /// }
 /// ```
 class AvoidCreatingVectorInUpdateRule extends SaropaLintRule {
-  const AvoidCreatingVectorInUpdateRule() : super(code: _code);
+  AvoidCreatingVectorInUpdateRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.high;
@@ -47,12 +45,11 @@ class AvoidCreatingVectorInUpdateRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_creating_vector_in_update',
-    problemMessage:
-        '[avoid_creating_vector_in_update] Creating new Vector objects (Vector2, Vector3, etc.) inside update() causes frequent garbage collection (GC) churn every frame, leading to performance degradation, frame drops, and increased CPU usage. In real-time games, this can cause stuttering, input lag, and poor user experience, especially on lower-end devices. {v2}',
+    'avoid_creating_vector_in_update',
+    '[avoid_creating_vector_in_update] Creating new Vector objects (Vector2, Vector3, etc.) inside update() causes frequent garbage collection (GC) churn every frame, leading to performance degradation, frame drops, and increased CPU usage. In real-time games, this can cause stuttering, input lag, and poor user experience, especially on lower-end devices. {v2}',
     correctionMessage:
         'Cache reusable vectors as static final or instance fields, and reuse them in update() instead of creating new objects each frame. Profile memory usage and GC activity to ensure smooth performance. Document vector reuse strategy for maintainability.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   static const Set<String> _vectorTypes = <String>{
@@ -66,11 +63,10 @@ class AvoidCreatingVectorInUpdateRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodDeclaration((MethodDeclaration node) {
+    context.addMethodDeclaration((MethodDeclaration node) {
       // Only check update methods
       if (node.name.lexeme != 'update') return;
 
@@ -89,13 +85,14 @@ class _VectorVisitor extends RecursiveAstVisitor<void> {
 
   @override
   void visitInstanceCreationExpression(InstanceCreationExpression node) {
-    final String typeName = node.constructorName.type.element?.name ??
+    final String typeName =
+        node.constructorName.type.element?.name ??
         node.constructorName.type.name2.lexeme;
 
     if (vectorTypes.contains(typeName)) {
       // Skip const vectors - they're properly reused
       if (node.keyword?.lexeme != 'const') {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     }
     super.visitInstanceCreationExpression(node);
@@ -133,7 +130,7 @@ class _VectorVisitor extends RecursiveAstVisitor<void> {
 /// }
 /// ```
 class AvoidRedundantAsyncOnLoadRule extends SaropaLintRule {
-  const AvoidRedundantAsyncOnLoadRule() : super(code: _code);
+  AvoidRedundantAsyncOnLoadRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.low;
@@ -142,21 +139,19 @@ class AvoidRedundantAsyncOnLoadRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_redundant_async_on_load',
-    problemMessage:
-        '[avoid_redundant_async_on_load] async onLoad() without await adds unnecessary overhead. OnLoad() is async but doesn\'t contain any await. {v2}',
+    'avoid_redundant_async_on_load',
+    '[avoid_redundant_async_on_load] async onLoad() without await adds unnecessary overhead. OnLoad() is async but doesn\'t contain any await. {v2}',
     correctionMessage:
         'Remove async keyword or add await statements. Verify the change works correctly with existing tests and add coverage for the new behavior.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodDeclaration((MethodDeclaration node) {
+    context.addMethodDeclaration((MethodDeclaration node) {
       // Only check onLoad methods
       if (node.name.lexeme != 'onLoad') return;
 
@@ -165,12 +160,16 @@ class AvoidRedundantAsyncOnLoadRule extends SaropaLintRule {
 
       // Check if body contains await
       bool hasAwait = false;
-      node.body.visitChildren(_AwaitVisitor(onAwait: () {
-        hasAwait = true;
-      }));
+      node.body.visitChildren(
+        _AwaitVisitor(
+          onAwait: () {
+            hasAwait = true;
+          },
+        ),
+      );
 
       if (!hasAwait) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
   }

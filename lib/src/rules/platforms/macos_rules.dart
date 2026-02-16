@@ -25,8 +25,6 @@
 library;
 
 import 'package:analyzer/dart/ast/ast.dart';
-import 'package:analyzer/error/error.dart' show DiagnosticSeverity;
-import 'package:custom_lint_builder/custom_lint_builder.dart';
 
 import '../../saropa_lint_rule.dart';
 
@@ -87,7 +85,7 @@ import '../../saropa_lint_rule.dart';
 /// @see [PlatformMenuBar class](https://api.flutter.dev/flutter/widgets/PlatformMenuBar-class.html)
 class PreferMacosMenuBarIntegrationRule extends SaropaLintRule {
   /// Creates a new instance of [PreferMacosMenuBarIntegrationRule].
-  const PreferMacosMenuBarIntegrationRule() : super(code: _code);
+  PreferMacosMenuBarIntegrationRule() : super(code: _code);
 
   /// Missing menu bar is a UX issue, not critical.
   @override
@@ -97,23 +95,22 @@ class PreferMacosMenuBarIntegrationRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'prefer_macos_menu_bar_integration',
-    problemMessage:
-        '[prefer_macos_menu_bar_integration] macOS apps should use PlatformMenuBar for native menu integration. macOS apps should integrate with the system menu bar for a native experience. PlatformMenuBar provides this integration in Flutter. {v2}',
+    'prefer_macos_menu_bar_integration',
+    '[prefer_macos_menu_bar_integration] macOS apps should use PlatformMenuBar for native menu integration. macOS apps should integrate with the system menu bar for a native experience. PlatformMenuBar provides this integration in Flutter. {v2}',
     correctionMessage:
         'Add PlatformMenuBar with standard macOS menus (File, Edit, View, etc.). Verify the change works correctly with existing tests and add coverage for the new behavior.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
     // First, check if this appears to be a macOS app
-    final String fileSource = resolver.source.contents.data;
-    final bool isMacosApp = fileSource.contains('Platform.isMacOS') ||
+    final String fileSource = context.fileContent;
+    final bool isMacosApp =
+        fileSource.contains('Platform.isMacOS') ||
         fileSource.contains('TargetPlatform.macOS') ||
         fileSource.contains('window_manager') ||
         fileSource.contains('WindowManager');
@@ -130,10 +127,9 @@ class PreferMacosMenuBarIntegrationRule extends SaropaLintRule {
     }
 
     // Find MaterialApp or CupertinoApp and report
-    context.registry
-        .addInstanceCreationExpression((InstanceCreationExpression node) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
       if (node.typeName == 'MaterialApp' || node.typeName == 'CupertinoApp') {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
   }
@@ -189,7 +185,7 @@ class PreferMacosMenuBarIntegrationRule extends SaropaLintRule {
 /// @see [Shortcuts class](https://api.flutter.dev/flutter/widgets/Shortcuts-class.html)
 class PreferMacosKeyboardShortcutsRule extends SaropaLintRule {
   /// Creates a new instance of [PreferMacosKeyboardShortcutsRule].
-  const PreferMacosKeyboardShortcutsRule() : super(code: _code);
+  PreferMacosKeyboardShortcutsRule() : super(code: _code);
 
   /// Missing shortcuts is a UX issue, not critical.
   @override
@@ -199,23 +195,22 @@ class PreferMacosKeyboardShortcutsRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'prefer_macos_keyboard_shortcuts',
-    problemMessage:
-        '[prefer_macos_keyboard_shortcuts] macOS apps should implement standard keyboard shortcuts. macOS users expect standard keyboard shortcuts like Cmd+S (Save), Cmd+Z (Undo), Cmd+C/V/X (Copy/Paste/Cut). Flutter provides Shortcuts and CallbackShortcuts widgets to implement these. {v2}',
+    'prefer_macos_keyboard_shortcuts',
+    '[prefer_macos_keyboard_shortcuts] macOS apps should implement standard keyboard shortcuts. macOS users expect standard keyboard shortcuts like Cmd+S (Save), Cmd+Z (Undo), Cmd+C/V/X (Copy/Paste/Cut). Flutter provides Shortcuts and CallbackShortcuts widgets to implement these. {v2}',
     correctionMessage:
         'Use Shortcuts widget with common macOS shortcuts (Cmd+S, Cmd+Z, etc.). Verify the change works correctly with existing tests and add coverage for the new behavior.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
     // First, check if this appears to be a macOS app
-    final String fileSource = resolver.source.contents.data;
-    final bool isMacosApp = fileSource.contains('Platform.isMacOS') ||
+    final String fileSource = context.fileContent;
+    final bool isMacosApp =
+        fileSource.contains('Platform.isMacOS') ||
         fileSource.contains('TargetPlatform.macOS') ||
         fileSource.contains('window_manager') ||
         fileSource.contains('WindowManager');
@@ -225,7 +220,8 @@ class PreferMacosKeyboardShortcutsRule extends SaropaLintRule {
     }
 
     // Check if Shortcuts widget is used anywhere in the file
-    final bool hasShortcuts = fileSource.contains('Shortcuts') ||
+    final bool hasShortcuts =
+        fileSource.contains('Shortcuts') ||
         fileSource.contains('CallbackShortcuts') ||
         fileSource.contains('LogicalKeySet');
 
@@ -234,10 +230,9 @@ class PreferMacosKeyboardShortcutsRule extends SaropaLintRule {
     }
 
     // Find MaterialApp or CupertinoApp and report
-    context.registry
-        .addInstanceCreationExpression((InstanceCreationExpression node) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
       if (node.typeName == 'MaterialApp' || node.typeName == 'CupertinoApp') {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
   }
@@ -285,7 +280,7 @@ class PreferMacosKeyboardShortcutsRule extends SaropaLintRule {
 /// @see [window_manager package](https://pub.dev/packages/window_manager)
 class RequireMacosWindowSizeConstraintsRule extends SaropaLintRule {
   /// Creates a new instance of [RequireMacosWindowSizeConstraintsRule].
-  const RequireMacosWindowSizeConstraintsRule() : super(code: _code);
+  RequireMacosWindowSizeConstraintsRule() : super(code: _code);
 
   /// Missing constraints affects UX but isn't critical.
   @override
@@ -295,24 +290,23 @@ class RequireMacosWindowSizeConstraintsRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'require_macos_window_size_constraints',
-    problemMessage:
-        '[require_macos_window_size_constraints] macOS app without window size constraints may resize to unusable '
+    'require_macos_window_size_constraints',
+    '[require_macos_window_size_constraints] macOS app without window size constraints may resize to unusable '
         'dimensions. {v2}',
     correctionMessage:
         'Use window_manager package to set minimum/maximum window size.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
     // First, check if this appears to be a macOS app
-    final String fileSource = resolver.source.contents.data;
-    final bool isMacosApp = fileSource.contains('Platform.isMacOS') ||
+    final String fileSource = context.fileContent;
+    final bool isMacosApp =
+        fileSource.contains('Platform.isMacOS') ||
         fileSource.contains('TargetPlatform.macOS') ||
         fileSource.contains('window_manager');
 
@@ -321,7 +315,8 @@ class RequireMacosWindowSizeConstraintsRule extends SaropaLintRule {
     }
 
     // Check for window size constraint patterns
-    final bool hasConstraints = fileSource.contains('setMinimumSize') ||
+    final bool hasConstraints =
+        fileSource.contains('setMinimumSize') ||
         fileSource.contains('setMaximumSize') ||
         fileSource.contains('minimumSize') ||
         fileSource.contains('WindowOptions');
@@ -331,9 +326,9 @@ class RequireMacosWindowSizeConstraintsRule extends SaropaLintRule {
     }
 
     // Find main function and report
-    context.registry.addFunctionDeclaration((FunctionDeclaration node) {
+    context.addFunctionDeclaration((FunctionDeclaration node) {
       if (node.name.lexeme == 'main') {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
   }
@@ -378,7 +373,7 @@ class RequireMacosWindowSizeConstraintsRule extends SaropaLintRule {
 /// @see [file_picker](https://pub.dev/packages/file_picker)
 class RequireMacosFileAccessIntentRule extends SaropaLintRule {
   /// Creates a new instance of [RequireMacosFileAccessIntentRule].
-  const RequireMacosFileAccessIntentRule() : super(code: _code);
+  RequireMacosFileAccessIntentRule() : super(code: _code);
 
   /// Sandbox violations cause silent failures.
   @override
@@ -388,14 +383,13 @@ class RequireMacosFileAccessIntentRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'require_macos_file_access_intent',
-    problemMessage:
-        '[require_macos_file_access_intent] Direct file path access detected. macOS sandboxed apps require '
+    'require_macos_file_access_intent',
+    '[require_macos_file_access_intent] Direct file path access detected. macOS sandboxed apps require '
         'user intent (file picker, drag-drop) for file access. {v2}',
     correctionMessage:
         'Use FilePicker or drag-and-drop for user-selected files. '
         'Or add appropriate entitlements for specific directories.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   /// User home directory patterns that indicate potential sandbox issues.
@@ -413,22 +407,21 @@ class RequireMacosFileAccessIntentRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addSimpleStringLiteral((SimpleStringLiteral node) {
+    context.addSimpleStringLiteral((SimpleStringLiteral node) {
       final String value = node.value;
 
       // Skip if in test file
-      final String filePath = resolver.source.fullName;
+      final String filePath = context.filePath;
       if (filePath.contains('_test.dart') || filePath.contains('/test/')) {
         return;
       }
 
       for (final String pattern in _userPathPatterns) {
         if (value.contains(pattern)) {
-          reporter.atNode(node, code);
+          reporter.atNode(node);
           return;
         }
       }
@@ -461,7 +454,7 @@ class RequireMacosFileAccessIntentRule extends SaropaLintRule {
 /// @see [Security Framework](https://developer.apple.com/documentation/security)
 class AvoidMacosDeprecatedSecurityApisRule extends SaropaLintRule {
   /// Creates a new instance of [AvoidMacosDeprecatedSecurityApisRule].
-  const AvoidMacosDeprecatedSecurityApisRule() : super(code: _code);
+  AvoidMacosDeprecatedSecurityApisRule() : super(code: _code);
 
   /// Deprecated APIs may cause notarization issues.
   @override
@@ -471,12 +464,11 @@ class AvoidMacosDeprecatedSecurityApisRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_macos_deprecated_security_apis',
-    problemMessage:
-        '[avoid_macos_deprecated_security_apis] Deprecated macOS Security API detected. Use modern equivalents. macOS Security framework has deprecated several APIs that may cause issues with notarization or future macOS versions. {v2}',
+    'avoid_macos_deprecated_security_apis',
+    '[avoid_macos_deprecated_security_apis] Deprecated macOS Security API detected. Use modern equivalents. macOS Security framework has deprecated several APIs that may cause issues with notarization or future macOS versions. {v2}',
     correctionMessage:
         'Replace deprecated Keychain APIs with SecItem* functions. Verify the change works correctly with existing tests and add coverage for the new behavior.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   /// Deprecated Security framework APIs.
@@ -493,26 +485,25 @@ class AvoidMacosDeprecatedSecurityApisRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addSimpleStringLiteral((SimpleStringLiteral node) {
+    context.addSimpleStringLiteral((SimpleStringLiteral node) {
       final String value = node.value;
 
       for (final String api in _deprecatedSecurityApis) {
         if (value.contains(api)) {
-          reporter.atNode(node, code);
+          reporter.atNode(node);
           return;
         }
       }
     });
 
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       final String methodName = node.methodName.name;
 
       if (_deprecatedSecurityApis.contains(methodName)) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
   }
@@ -547,7 +538,7 @@ class AvoidMacosDeprecatedSecurityApisRule extends SaropaLintRule {
 /// @see [Hardened Runtime](https://developer.apple.com/documentation/security/hardened_runtime)
 class RequireMacosHardenedRuntimeRule extends SaropaLintRule {
   /// Creates a new instance of [RequireMacosHardenedRuntimeRule].
-  const RequireMacosHardenedRuntimeRule() : super(code: _code);
+  RequireMacosHardenedRuntimeRule() : super(code: _code);
 
   /// Hardened Runtime issues block notarization.
   @override
@@ -557,13 +548,12 @@ class RequireMacosHardenedRuntimeRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'require_macos_hardened_runtime',
-    problemMessage:
-        '[require_macos_hardened_runtime] Operation detected that may require Hardened Runtime entitlement. '
+    'require_macos_hardened_runtime',
+    '[require_macos_hardened_runtime] Operation detected that may require Hardened Runtime entitlement. '
         'Ensure proper entitlements are configured for notarization. {v2}',
     correctionMessage:
         'Add required entitlements in macos/Runner/Release.entitlements.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   /// Operations requiring Hardened Runtime entitlements.
@@ -579,13 +569,12 @@ class RequireMacosHardenedRuntimeRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
     bool hasReported = false;
 
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       if (hasReported) return;
 
       final Expression? target = node.target;
@@ -595,7 +584,7 @@ class RequireMacosHardenedRuntimeRule extends SaropaLintRule {
         final String targetSource = target.toSource();
         for (final String op in _sensitiveOperations) {
           if (targetSource.contains(op)) {
-            reporter.atNode(node, code);
+            reporter.atNode(node);
             hasReported = true;
             return;
           }
@@ -603,15 +592,14 @@ class RequireMacosHardenedRuntimeRule extends SaropaLintRule {
       }
     });
 
-    context.registry
-        .addInstanceCreationExpression((InstanceCreationExpression node) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
       if (hasReported) return;
 
       final String typeName = node.typeName;
 
       for (final String op in _sensitiveOperations) {
         if (typeName.contains(op)) {
-          reporter.atNode(node, code);
+          reporter.atNode(node);
           hasReported = true;
           return;
         }
@@ -654,7 +642,7 @@ class RequireMacosHardenedRuntimeRule extends SaropaLintRule {
 /// @see [Mac Catalyst](https://developer.apple.com/documentation/uikit/mac_catalyst)
 class AvoidMacosCatalystUnsupportedApisRule extends SaropaLintRule {
   /// Creates a new instance of [AvoidMacosCatalystUnsupportedApisRule].
-  const AvoidMacosCatalystUnsupportedApisRule() : super(code: _code);
+  AvoidMacosCatalystUnsupportedApisRule() : super(code: _code);
 
   /// Unsupported APIs crash on Mac Catalyst.
   @override
@@ -664,13 +652,12 @@ class AvoidMacosCatalystUnsupportedApisRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_macos_catalyst_unsupported_apis',
-    problemMessage:
-        '[avoid_macos_catalyst_unsupported_apis] API detected that is not available on Mac Catalyst. '
+    'avoid_macos_catalyst_unsupported_apis',
+    '[avoid_macos_catalyst_unsupported_apis] API detected that is not available on Mac Catalyst. '
         'Add platform check if supporting Mac Catalyst. {v2}',
     correctionMessage:
         'Wrap with Platform.isMacOS check or use kIsWeb/defaultTargetPlatform.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   /// APIs unavailable on Mac Catalyst.
@@ -696,30 +683,28 @@ class AvoidMacosCatalystUnsupportedApisRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry
-        .addInstanceCreationExpression((InstanceCreationExpression node) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final String typeName = node.typeName;
 
       for (final String api in _unsupportedApis) {
         if (typeName.contains(api)) {
-          reporter.atNode(node, code);
+          reporter.atNode(node);
           return;
         }
       }
     });
 
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       final Expression? target = node.target;
 
       if (target != null) {
         final String targetSource = target.toSource();
         for (final String api in _unsupportedApis) {
           if (targetSource.contains(api)) {
-            reporter.atNode(node, code);
+            reporter.atNode(node);
             return;
           }
         }
@@ -736,7 +721,7 @@ class AvoidMacosCatalystUnsupportedApisRule extends SaropaLintRule {
 /// app launches. Apps should implement NSWindowRestoration or equivalent.
 class RequireMacosWindowRestorationRule extends SaropaLintRule {
   /// Creates a new instance of [RequireMacosWindowRestorationRule].
-  const RequireMacosWindowRestorationRule() : super(code: _code);
+  RequireMacosWindowRestorationRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.low;
@@ -745,23 +730,21 @@ class RequireMacosWindowRestorationRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'require_macos_window_restoration',
-    problemMessage:
-        '[require_macos_window_restoration] macOS window configuration detected. Consider implementing window '
+    'require_macos_window_restoration',
+    '[require_macos_window_restoration] macOS window configuration detected. Consider implementing window '
         'state restoration for better UX. {v2}',
     correctionMessage:
         'Save and restore window position/size using SharedPreferences '
         'or window_manager package.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    final String fileSource = resolver.source.contents.data;
+    final String fileSource = context.fileContent;
 
     // Skip if restoration is implemented
     if (fileSource.contains('windowPosition') ||
@@ -771,12 +754,12 @@ class RequireMacosWindowRestorationRule extends SaropaLintRule {
       return;
     }
 
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       final Expression? target = node.target;
       if (target != null && target.toSource().contains('windowManager')) {
         final String methodName = node.methodName.name;
         if (methodName == 'setSize' || methodName == 'setPosition') {
-          reporter.atNode(node, code);
+          reporter.atNode(node);
         }
       }
     });
@@ -791,7 +774,7 @@ class RequireMacosWindowRestorationRule extends SaropaLintRule {
 /// Apps should use scoped file access (NSOpenPanel) when possible.
 class AvoidMacosFullDiskAccessRule extends SaropaLintRule {
   /// Creates a new instance of [AvoidMacosFullDiskAccessRule].
-  const AvoidMacosFullDiskAccessRule() : super(code: _code);
+  AvoidMacosFullDiskAccessRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.medium;
@@ -800,14 +783,13 @@ class AvoidMacosFullDiskAccessRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_macos_full_disk_access',
-    problemMessage:
-        '[avoid_macos_full_disk_access] Accessing protected paths detected. Consider using NSOpenPanel '
+    'avoid_macos_full_disk_access',
+    '[avoid_macos_full_disk_access] Accessing protected paths detected. Consider using NSOpenPanel '
         'for user-selected file access instead of Full Disk Access. {v2}',
     correctionMessage:
         'Use file_picker or NSOpenPanel to let users choose files '
         'instead of requiring Full Disk Access.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   static const Set<String> _protectedPaths = {
@@ -822,15 +804,14 @@ class AvoidMacosFullDiskAccessRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addSimpleStringLiteral((SimpleStringLiteral node) {
+    context.addSimpleStringLiteral((SimpleStringLiteral node) {
       final String value = node.value;
       for (final String path in _protectedPaths) {
         if (value.startsWith(path)) {
-          reporter.atNode(node, code);
+          reporter.atNode(node);
           return;
         }
       }
@@ -853,7 +834,7 @@ class AvoidMacosFullDiskAccessRule extends SaropaLintRule {
 /// - com.apple.security.device.camera
 class RequireMacosSandboxEntitlementsRule extends SaropaLintRule {
   /// Creates a new instance of [RequireMacosSandboxEntitlementsRule].
-  const RequireMacosSandboxEntitlementsRule() : super(code: _code);
+  RequireMacosSandboxEntitlementsRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.high;
@@ -862,24 +843,22 @@ class RequireMacosSandboxEntitlementsRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'require_macos_sandbox_entitlements',
-    problemMessage:
-        '[require_macos_sandbox_entitlements] Feature requiring macOS sandbox entitlement detected. '
+    'require_macos_sandbox_entitlements',
+    '[require_macos_sandbox_entitlements] Feature requiring macOS sandbox entitlement detected. '
         'Ensure entitlements file includes required permissions. {v2}',
     correctionMessage:
         'Add required entitlements to macOS/Runner/Release.entitlements.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
     bool hasReported = false;
 
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       if (hasReported) return;
 
       final String methodName = node.methodName.name;
@@ -892,7 +871,7 @@ class RequireMacosSandboxEntitlementsRule extends SaropaLintRule {
         if (target != null &&
             (target.toSource().contains('http') ||
                 target.toSource().contains('dio'))) {
-          reporter.atNode(node, code);
+          reporter.atNode(node);
           hasReported = true;
         }
       }
@@ -932,7 +911,7 @@ class RequireMacosSandboxEntitlementsRule extends SaropaLintRule {
 /// @see [App Sandbox](https://developer.apple.com/documentation/security/app_sandbox)
 class RequireMacosSandboxExceptionsRule extends SaropaLintRule {
   /// Creates a new instance of [RequireMacosSandboxExceptionsRule].
-  const RequireMacosSandboxExceptionsRule() : super(code: _code);
+  RequireMacosSandboxExceptionsRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.high;
@@ -941,22 +920,20 @@ class RequireMacosSandboxExceptionsRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'require_macos_sandbox_exceptions',
-    problemMessage:
-        '[require_macos_sandbox_exceptions] Feature requiring macOS sandbox entitlement detected. '
+    'require_macos_sandbox_exceptions',
+    '[require_macos_sandbox_exceptions] Feature requiring macOS sandbox entitlement detected. '
         'App Store apps must declare entitlements. {v2}',
     correctionMessage:
         'Add the required entitlement to macos/Runner/Release.entitlements.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    final String fileSource = resolver.source.contents.data;
+    final String fileSource = context.fileContent;
 
     // Skip if not desktop-related
     if (!fileSource.contains('Platform.isMacOS') &&
@@ -965,7 +942,7 @@ class RequireMacosSandboxExceptionsRule extends SaropaLintRule {
       return;
     }
 
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       final String methodName = node.methodName.name;
 
       // Detect network calls
@@ -976,7 +953,7 @@ class RequireMacosSandboxExceptionsRule extends SaropaLintRule {
           if (targetSource.contains('http') ||
               targetSource.contains('Http') ||
               targetSource.contains('Dio')) {
-            reporter.atNode(node, code);
+            reporter.atNode(node);
           }
         }
       }
@@ -985,7 +962,7 @@ class RequireMacosSandboxExceptionsRule extends SaropaLintRule {
       if (methodName.contains('Camera') ||
           methodName.contains('Microphone') ||
           methodName.contains('startRecording')) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
   }
@@ -1021,7 +998,7 @@ class RequireMacosSandboxExceptionsRule extends SaropaLintRule {
 /// @see [Hardened Runtime](https://developer.apple.com/documentation/security/hardened_runtime)
 class AvoidMacosHardenedRuntimeViolationsRule extends SaropaLintRule {
   /// Creates a new instance of [AvoidMacosHardenedRuntimeViolationsRule].
-  const AvoidMacosHardenedRuntimeViolationsRule() : super(code: _code);
+  AvoidMacosHardenedRuntimeViolationsRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.critical;
@@ -1030,23 +1007,21 @@ class AvoidMacosHardenedRuntimeViolationsRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_macos_hardened_runtime_violations',
-    problemMessage:
-        '[avoid_macos_hardened_runtime_violations] Pattern detected that may violate macOS Hardened Runtime. '
+    'avoid_macos_hardened_runtime_violations',
+    '[avoid_macos_hardened_runtime_violations] Pattern detected that may violate macOS Hardened Runtime. '
         'Apps must pass notarization for distribution. {v2}',
     correctionMessage:
         'Avoid loading unsigned dynamic libraries or using JIT compilation '
         'without the appropriate entitlement.',
-    errorSeverity: DiagnosticSeverity.ERROR,
+    severity: DiagnosticSeverity.ERROR,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       final String methodName = node.methodName.name;
 
       // Detect dynamic library loading with paths
@@ -1054,12 +1029,13 @@ class AvoidMacosHardenedRuntimeViolationsRule extends SaropaLintRule {
         final Expression? target = node.target;
         if (target != null && target.toSource() == 'DynamicLibrary') {
           // Check if path is absolute
-          final List<Expression> args =
-              node.argumentList.arguments.whereType<Expression>().toList();
+          final List<Expression> args = node.argumentList.arguments
+              .whereType<Expression>()
+              .toList();
           if (args.isNotEmpty) {
             final String pathArg = args.first.toSource();
             if (pathArg.contains('/') && !pathArg.contains('Frameworks')) {
-              reporter.atNode(node, code);
+              reporter.atNode(node);
             }
           }
         }
@@ -1095,7 +1071,7 @@ class AvoidMacosHardenedRuntimeViolationsRule extends SaropaLintRule {
 /// @see [App Transport Security](https://developer.apple.com/documentation/security/preventing_insecure_network_connections)
 class RequireMacosAppTransportSecurityRule extends SaropaLintRule {
   /// Creates a new instance of [RequireMacosAppTransportSecurityRule].
-  const RequireMacosAppTransportSecurityRule() : super(code: _code);
+  RequireMacosAppTransportSecurityRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.high;
@@ -1104,23 +1080,21 @@ class RequireMacosAppTransportSecurityRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'require_macos_app_transport_security',
-    problemMessage:
-        '[require_macos_app_transport_security] HTTP URL detected. macOS enforces App Transport Security. '
+    'require_macos_app_transport_security',
+    '[require_macos_app_transport_security] HTTP URL detected. macOS enforces App Transport Security. '
         'Use HTTPS or declare exception in Info.plist. {v2}',
     correctionMessage:
         'Change to HTTPS or add NSAppTransportSecurity exception '
         'in macos/Runner/Info.plist.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    final String fileSource = resolver.source.contents.data;
+    final String fileSource = context.fileContent;
 
     // Skip if not desktop-related
     if (!fileSource.contains('Platform.isMacOS') &&
@@ -1128,13 +1102,13 @@ class RequireMacosAppTransportSecurityRule extends SaropaLintRule {
       return;
     }
 
-    context.registry.addSimpleStringLiteral((SimpleStringLiteral node) {
+    context.addSimpleStringLiteral((SimpleStringLiteral node) {
       final String value = node.value;
 
       if (value.startsWith('http://') &&
           !value.startsWith('http://localhost') &&
           !value.startsWith('http://127.0.0.1')) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
   }
@@ -1170,7 +1144,7 @@ class RequireMacosAppTransportSecurityRule extends SaropaLintRule {
 /// @see [Notarizing macOS Software](https://developer.apple.com/documentation/security/notarizing_macos_software_before_distribution)
 class RequireMacosNotarizationReadyRule extends SaropaLintRule {
   /// Creates a new instance of [RequireMacosNotarizationReadyRule].
-  const RequireMacosNotarizationReadyRule() : super(code: _code);
+  RequireMacosNotarizationReadyRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.high;
@@ -1179,26 +1153,24 @@ class RequireMacosNotarizationReadyRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'require_macos_notarization_ready',
-    problemMessage:
-        '[require_macos_notarization_ready] macOS app detected. Ensure notarization is configured for distribution. '
+    'require_macos_notarization_ready',
+    '[require_macos_notarization_ready] macOS app detected. Ensure notarization is configured for distribution. '
         'Apps without notarization show security warnings. {v2}',
     correctionMessage:
         'Configure code signing, enable Hardened Runtime, and notarize '
         'the app before distribution.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    final String fileSource = resolver.source.contents.data;
+    final String fileSource = context.fileContent;
 
     // Only check main.dart for macOS apps
-    final String filePath = resolver.source.fullName;
+    final String filePath = context.filePath;
     if (!filePath.endsWith('main.dart')) {
       return;
     }
@@ -1209,7 +1181,7 @@ class RequireMacosNotarizationReadyRule extends SaropaLintRule {
     }
 
     // Only report once at the start of main
-    context.registry.addFunctionDeclaration((FunctionDeclaration node) {
+    context.addFunctionDeclaration((FunctionDeclaration node) {
       if (node.name.lexeme == 'main') {
         // Check for comment about notarization
         final String surroundingSource = fileSource.substring(
@@ -1218,7 +1190,7 @@ class RequireMacosNotarizationReadyRule extends SaropaLintRule {
         );
         if (!surroundingSource.contains('notariz') &&
             !surroundingSource.contains('code sign')) {
-          reporter.atNode(node, code);
+          reporter.atNode(node);
         }
       }
     });
@@ -1251,7 +1223,7 @@ class RequireMacosNotarizationReadyRule extends SaropaLintRule {
 /// @see [Entitlements](https://developer.apple.com/documentation/bundleresources/entitlements)
 class RequireMacosEntitlementsRule extends SaropaLintRule {
   /// Creates a new instance of [RequireMacosEntitlementsRule].
-  const RequireMacosEntitlementsRule() : super(code: _code);
+  RequireMacosEntitlementsRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.high;
@@ -1260,23 +1232,21 @@ class RequireMacosEntitlementsRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'require_macos_entitlements',
-    problemMessage:
-        '[require_macos_entitlements] Feature detected that requires macOS entitlement. '
+    'require_macos_entitlements',
+    '[require_macos_entitlements] Feature detected that requires macOS entitlement. '
         'Sandboxed apps crash without proper entitlements. {v2}',
     correctionMessage:
         'Add the required entitlement to macos/Runner/Release.entitlements '
         'and macos/Runner/DebugProfile.entitlements.',
-    errorSeverity: DiagnosticSeverity.ERROR,
+    severity: DiagnosticSeverity.ERROR,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    final String fileSource = resolver.source.contents.data;
+    final String fileSource = context.fileContent;
 
     // Skip if not desktop-related
     if (!fileSource.contains('Platform.isMacOS') &&
@@ -1285,21 +1255,21 @@ class RequireMacosEntitlementsRule extends SaropaLintRule {
       return;
     }
 
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       final String methodName = node.methodName.name;
       final String nodeSource = node.toSource().toLowerCase();
 
       // Detect USB access
       if (methodName == 'getDevices' || methodName == 'openDevice') {
         if (nodeSource.contains('usb')) {
-          reporter.atNode(node, code);
+          reporter.atNode(node);
         }
       }
 
       // Detect Bluetooth
       if (methodName == 'startScan' || methodName == 'connect') {
         if (nodeSource.contains('bluetooth') || nodeSource.contains('ble')) {
-          reporter.atNode(node, code);
+          reporter.atNode(node);
         }
       }
     });

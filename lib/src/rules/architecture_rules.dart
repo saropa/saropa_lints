@@ -7,9 +7,6 @@
 library;
 
 import 'package:analyzer/dart/ast/ast.dart';
-import 'package:analyzer/error/error.dart'
-    show AnalysisError, DiagnosticSeverity;
-import 'package:custom_lint_builder/custom_lint_builder.dart';
 
 import '../saropa_lint_rule.dart';
 
@@ -34,7 +31,7 @@ import '../saropa_lint_rule.dart';
 /// }
 /// ```
 class AvoidDirectDataAccessInUiRule extends SaropaLintRule {
-  const AvoidDirectDataAccessInUiRule() : super(code: _code);
+  AvoidDirectDataAccessInUiRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -44,12 +41,11 @@ class AvoidDirectDataAccessInUiRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_direct_data_access_in_ui',
-    problemMessage:
-        '[avoid_direct_data_access_in_ui] Widget class declares a field typed as Repository, DataSource, ApiClient, or similar data-layer class, creating a direct coupling between the UI and data implementation. This bypasses the domain/business logic layer, making the widget untestable in isolation, difficult to refactor when data sources change, and prone to leaking data concerns into the presentation layer. {v5}',
+    'avoid_direct_data_access_in_ui',
+    '[avoid_direct_data_access_in_ui] Widget class declares a field typed as Repository, DataSource, ApiClient, or similar data-layer class, creating a direct coupling between the UI and data implementation. This bypasses the domain/business logic layer, making the widget untestable in isolation, difficult to refactor when data sources change, and prone to leaking data concerns into the presentation layer. {v5}',
     correctionMessage:
         'Inject a ViewModel, Cubit, or Controller that wraps the data layer and exposes only presentation-ready state.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   static const Set<String> _dataLayerPatterns = <String>{
@@ -64,11 +60,10 @@ class AvoidDirectDataAccessInUiRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addClassDeclaration((ClassDeclaration node) {
+    context.addClassDeclaration((ClassDeclaration node) {
       // Check if this is a UI class (Widget or State)
       final ExtendsClause? extendsClause = node.extendsClause;
       if (extendsClause == null) return;
@@ -85,7 +80,7 @@ class AvoidDirectDataAccessInUiRule extends SaropaLintRule {
           if (typeName != null) {
             for (final String pattern in _dataLayerPatterns) {
               if (typeName.contains(pattern)) {
-                reporter.atNode(member, code);
+                reporter.atNode(member);
                 break;
               }
             }
@@ -125,7 +120,7 @@ class AvoidDirectDataAccessInUiRule extends SaropaLintRule {
 /// }
 /// ```
 class AvoidBusinessLogicInUiRule extends SaropaLintRule {
-  const AvoidBusinessLogicInUiRule() : super(code: _code);
+  AvoidBusinessLogicInUiRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -135,12 +130,11 @@ class AvoidBusinessLogicInUiRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_business_logic_in_ui',
-    problemMessage:
-        '[avoid_business_logic_in_ui] Widget class contains methods named with calculation or transformation verbs (calculate, compute, validate, process, etc.), indicating business logic embedded in the UI layer. This violates separation of concerns, making the logic impossible to reuse across screens, untestable without widget infrastructure, and tightly coupled to Flutter framework classes. {v5}',
+    'avoid_business_logic_in_ui',
+    '[avoid_business_logic_in_ui] Widget class contains methods named with calculation or transformation verbs (calculate, compute, validate, process, etc.), indicating business logic embedded in the UI layer. This violates separation of concerns, making the logic impossible to reuse across screens, untestable without widget infrastructure, and tightly coupled to Flutter framework classes. {v5}',
     correctionMessage:
         'Move calculations and business rules to a domain or service layer class that can be tested and reused independently.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   static const Set<String> _businessLogicIndicators = <String>{
@@ -159,11 +153,10 @@ class AvoidBusinessLogicInUiRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addClassDeclaration((ClassDeclaration node) {
+    context.addClassDeclaration((ClassDeclaration node) {
       // Check if this is a UI class
       final ExtendsClause? extendsClause = node.extendsClause;
       if (extendsClause == null) return;
@@ -187,7 +180,7 @@ class AvoidBusinessLogicInUiRule extends SaropaLintRule {
 
           for (final String indicator in _businessLogicIndicators) {
             if (methodName.contains(indicator)) {
-              reporter.atNode(member, code);
+              reporter.atNode(member);
               break;
             }
           }
@@ -221,7 +214,7 @@ class AvoidBusinessLogicInUiRule extends SaropaLintRule {
 /// class OrderService { IUserService users; }
 /// ```
 class AvoidCircularDependenciesRule extends SaropaLintRule {
-  const AvoidCircularDependenciesRule() : super(code: _code);
+  AvoidCircularDependenciesRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -231,21 +224,19 @@ class AvoidCircularDependenciesRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_circular_dependencies',
-    problemMessage:
-        '[avoid_circular_dependencies] Service class constructor depends on another service of the same architectural layer (both end with Service, Repository, Controller, etc.). This creates circular dependency chains that break initialization order, prevent unit testing with mocks, and produce tightly coupled modules that cannot be modified or deployed independently. {v5}',
+    'avoid_circular_dependencies',
+    '[avoid_circular_dependencies] Service class constructor depends on another service of the same architectural layer (both end with Service, Repository, Controller, etc.). This creates circular dependency chains that break initialization order, prevent unit testing with mocks, and produce tightly coupled modules that cannot be modified or deployed independently. {v5}',
     correctionMessage:
         'Extract shared logic to a new service, define interfaces for cross-service contracts, or communicate via an event bus.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addClassDeclaration((ClassDeclaration node) {
+    context.addClassDeclaration((ClassDeclaration node) {
       final String className = node.name.lexeme;
 
       // Check constructor parameters for same-package service dependencies
@@ -264,7 +255,7 @@ class AvoidCircularDependenciesRule extends SaropaLintRule {
 
             if (paramType != null &&
                 _isSameLayerDependency(className, paramType)) {
-              reporter.atNode(param, code);
+              reporter.atNode(param);
             }
           }
         }
@@ -312,7 +303,7 @@ class AvoidCircularDependenciesRule extends SaropaLintRule {
 /// class CacheManager { ... }
 /// ```
 class AvoidGodClassRule extends SaropaLintRule {
-  const AvoidGodClassRule() : super(code: _code);
+  AvoidGodClassRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -322,12 +313,11 @@ class AvoidGodClassRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_god_class',
-    problemMessage:
-        '[avoid_god_class] Class declares more than 15 fields or 20 methods, violating the Single Responsibility Principle. God classes accumulate unrelated responsibilities, making them difficult to understand, test, and maintain. Changes to one responsibility risk breaking others, and the class becomes a merge-conflict magnet as multiple developers modify it concurrently. {v5}',
+    'avoid_god_class',
+    '[avoid_god_class] Class declares more than 15 fields or 20 methods, violating the Single Responsibility Principle. God classes accumulate unrelated responsibilities, making them difficult to understand, test, and maintain. Changes to one responsibility risk breaking others, and the class becomes a merge-conflict magnet as multiple developers modify it concurrently. {v5}',
     correctionMessage:
         'Extract cohesive groups of related fields and methods into focused helper or delegate classes with clear responsibilities.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   static const int _maxFields = 15;
@@ -335,11 +325,10 @@ class AvoidGodClassRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addClassDeclaration((ClassDeclaration node) {
+    context.addClassDeclaration((ClassDeclaration node) {
       int fieldCount = 0;
       int methodCount = 0;
 
@@ -354,7 +343,7 @@ class AvoidGodClassRule extends SaropaLintRule {
       }
 
       if (fieldCount > _maxFields || methodCount > _maxMethods) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
   }
@@ -385,7 +374,7 @@ class AvoidGodClassRule extends SaropaLintRule {
 /// }
 /// ```
 class AvoidUiInDomainLayerRule extends SaropaLintRule {
-  const AvoidUiInDomainLayerRule() : super(code: _code);
+  AvoidUiInDomainLayerRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -395,12 +384,11 @@ class AvoidUiInDomainLayerRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_ui_in_domain_layer',
-    problemMessage:
-        '[avoid_ui_in_domain_layer] Domain-layer file (models, entities, or domain directory) references Flutter UI types such as Widget, BuildContext, Color, or TextStyle. This couples domain logic to the Flutter framework, preventing code reuse in non-Flutter contexts (CLI tools, server-side Dart, packages), breaking testability without widget infrastructure, and violating clean architecture boundaries. {v5}',
+    'avoid_ui_in_domain_layer',
+    '[avoid_ui_in_domain_layer] Domain-layer file (models, entities, or domain directory) references Flutter UI types such as Widget, BuildContext, Color, or TextStyle. This couples domain logic to the Flutter framework, preventing code reuse in non-Flutter contexts (CLI tools, server-side Dart, packages), breaking testability without widget infrastructure, and violating clean architecture boundaries. {v5}',
     correctionMessage:
         'Remove Flutter/UI imports from domain models and services, and move presentation concerns to the UI layer.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   static const Set<String> _uiTypes = <String>{
@@ -415,26 +403,26 @@ class AvoidUiInDomainLayerRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
     // Check if file is in domain layer (heuristic based on path)
-    final String path = resolver.source.fullName;
+    final String path = context.filePath;
 
-    final bool isDomainLayer = path.contains('/domain/') ||
+    final bool isDomainLayer =
+        path.contains('/domain/') ||
         path.contains('/models/') ||
         path.contains('/entities/');
 
     if (!isDomainLayer) return;
 
-    context.registry.addMethodDeclaration((MethodDeclaration node) {
+    context.addMethodDeclaration((MethodDeclaration node) {
       // Check return type
       final String? returnType = node.returnType?.toSource();
       if (returnType != null) {
         for (final String uiType in _uiTypes) {
           if (returnType.contains(uiType)) {
-            reporter.atNode(node, code);
+            reporter.atNode(node);
             return;
           }
         }
@@ -450,7 +438,7 @@ class AvoidUiInDomainLayerRule extends SaropaLintRule {
         if (paramType != null) {
           for (final String uiType in _uiTypes) {
             if (paramType.contains(uiType)) {
-              reporter.atNode(param, code);
+              reporter.atNode(param);
               return;
             }
           }
@@ -479,7 +467,7 @@ class AvoidUiInDomainLayerRule extends SaropaLintRule {
 /// // Or use dependency injection
 /// ```
 class AvoidCrossFeatureDependenciesRule extends SaropaLintRule {
-  const AvoidCrossFeatureDependenciesRule() : super(code: _code);
+  AvoidCrossFeatureDependenciesRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -489,21 +477,19 @@ class AvoidCrossFeatureDependenciesRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_cross_feature_dependencies',
-    problemMessage:
-        '[avoid_cross_feature_dependencies] File inside a feature module imports from a different feature module directory, creating a direct cross-feature dependency. This breaks feature isolation, prevents independent development and testing of features, and makes it impossible to extract or remove a feature without cascading changes across the codebase. Cross-feature coupling also increases merge conflicts and deployment risks. {v5}',
+    'avoid_cross_feature_dependencies',
+    '[avoid_cross_feature_dependencies] File inside a feature module imports from a different feature module directory, creating a direct cross-feature dependency. This breaks feature isolation, prevents independent development and testing of features, and makes it impossible to extract or remove a feature without cascading changes across the codebase. Cross-feature coupling also increases merge conflicts and deployment risks. {v5}',
     correctionMessage:
         'Move shared code to a core or shared layer, or use dependency injection to decouple features from each other.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    final String currentPath = resolver.source.fullName;
+    final String currentPath = context.filePath;
 
     // Extract current feature name
     final RegExp featurePattern = RegExp(r'/features/([^/]+)/');
@@ -512,7 +498,7 @@ class AvoidCrossFeatureDependenciesRule extends SaropaLintRule {
 
     final String currentFeature = currentMatch.group(1)!;
 
-    context.registry.addImportDirective((ImportDirective node) {
+    context.addImportDirective((ImportDirective node) {
       final String importPath = node.uri.stringValue ?? '';
 
       // Check if importing from another feature
@@ -520,7 +506,7 @@ class AvoidCrossFeatureDependenciesRule extends SaropaLintRule {
       if (importMatch != null) {
         final String importedFeature = importMatch.group(1)!;
         if (importedFeature != currentFeature) {
-          reporter.atNode(node, code);
+          reporter.atNode(node);
         }
       }
     });
@@ -554,7 +540,7 @@ class AvoidCrossFeatureDependenciesRule extends SaropaLintRule {
 /// getIt.registerSingleton(UserService(ApiClient()));
 /// ```
 class AvoidSingletonPatternRule extends SaropaLintRule {
-  const AvoidSingletonPatternRule() : super(code: _code);
+  AvoidSingletonPatternRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -564,21 +550,19 @@ class AvoidSingletonPatternRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_singleton_pattern',
-    problemMessage:
-        '[avoid_singleton_pattern] Class uses the singleton pattern (static instance field, factory constructor, and private constructor). Singletons hide dependencies, prevent mocking in unit tests, make it impossible to run tests in parallel with isolated state, and create implicit global state that is difficult to reason about and reset between test cases. {v5}',
+    'avoid_singleton_pattern',
+    '[avoid_singleton_pattern] Class uses the singleton pattern (static instance field, factory constructor, and private constructor). Singletons hide dependencies, prevent mocking in unit tests, make it impossible to run tests in parallel with isolated state, and create implicit global state that is difficult to reason about and reset between test cases. {v5}',
     correctionMessage:
         'Use a DI container (e.g., getIt.registerSingleton(MyService())) and inject the instance where needed for testability.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addClassDeclaration((ClassDeclaration node) {
+    context.addClassDeclaration((ClassDeclaration node) {
       bool hasStaticInstance = false;
       bool hasFactoryConstructor = false;
       bool hasPrivateConstructor = false;
@@ -606,7 +590,7 @@ class AvoidSingletonPatternRule extends SaropaLintRule {
 
       // Singleton pattern detected
       if (hasStaticInstance && hasFactoryConstructor && hasPrivateConstructor) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
   }
@@ -637,7 +621,7 @@ class AvoidSingletonPatternRule extends SaropaLintRule {
 /// );
 /// ```
 class AvoidTouchOnlyGesturesRule extends SaropaLintRule {
-  const AvoidTouchOnlyGesturesRule() : super(code: _code);
+  AvoidTouchOnlyGesturesRule() : super(code: _code);
 
   /// Accessibility issue on desktop/web platforms.
   @override
@@ -647,24 +631,18 @@ class AvoidTouchOnlyGesturesRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_touch_only_gestures',
-    problemMessage:
-        '[avoid_touch_only_gestures] GestureDetector with only onTap. Missing desktop/web interactions. Desktop and web apps support secondary click (right-click) and hover. Touch-only gesture handlers reduce accessibility on these platforms. {v4}',
+    'avoid_touch_only_gestures',
+    '[avoid_touch_only_gestures] GestureDetector with only onTap. Missing desktop/web interactions. Desktop and web apps support secondary click (right-click) and hover. Touch-only gesture handlers reduce accessibility on these platforms. {v4}',
     correctionMessage:
         'Add onSecondaryTap for right-click context menus and onLongPress as a mobile fallback for desktop interactions.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
-
-  @override
-  List<Fix> get customFixes => [_AddLongPressFix()];
-
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addInstanceCreationExpression((node) {
+    context.addInstanceCreationExpression((node) {
       final typeName = node.constructorName.type.name.lexeme;
 
       if (typeName != 'GestureDetector' && typeName != 'InkWell') {
@@ -692,41 +670,6 @@ class AvoidTouchOnlyGesturesRule extends SaropaLintRule {
       if (hasOnTap && !hasSecondaryOrHover) {
         reporter.atNode(node.constructorName, code);
       }
-    });
-  }
-}
-
-class _AddLongPressFix extends DartFix {
-  @override
-  void run(
-    CustomLintResolver resolver,
-    ChangeReporter reporter,
-    CustomLintContext context,
-    AnalysisError analysisError,
-    List<AnalysisError> others,
-  ) {
-    context.registry.addInstanceCreationExpression((
-      InstanceCreationExpression node,
-    ) {
-      if (!node.constructorName.sourceRange
-          .intersects(analysisError.sourceRange)) {
-        return;
-      }
-
-      final NodeList<Expression> args = node.argumentList.arguments;
-      if (args.isEmpty) return;
-
-      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
-        message: 'Add onLongPress callback',
-        priority: 1,
-      );
-
-      changeBuilder.addDartFileEdit((builder) {
-        builder.addSimpleInsertion(
-          args.last.end,
-          ',\nonLongPress: () { /* TODO: Handle long press */ }',
-        );
-      });
     });
   }
 }
@@ -762,7 +705,7 @@ class _AddLongPressFix extends DartFix {
 /// // Both depend on shared module, no cycle
 /// ```
 class AvoidCircularImportsRule extends SaropaLintRule {
-  const AvoidCircularImportsRule() : super(code: _code);
+  AvoidCircularImportsRule() : super(code: _code);
 
   /// Architecture issue. Circular dependencies break modularity.
   @override
@@ -772,14 +715,13 @@ class AvoidCircularImportsRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_circular_imports',
-    problemMessage:
-        '[avoid_circular_imports] Circular import detected. This file is part '
+    'avoid_circular_imports',
+    '[avoid_circular_imports] Circular import detected. This file is part '
         'of an import cycle. {v2}',
     correctionMessage:
         'Extract shared types to a separate file that both modules can import, '
         'or use dependency injection to break the cycle.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
@@ -787,11 +729,10 @@ class AvoidCircularImportsRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    final filePath = resolver.source.fullName;
+    final filePath = context.filePath;
 
     // Build import graph if not already built
     // Note: In production, this would be triggered once at analysis start
@@ -803,7 +744,7 @@ class AvoidCircularImportsRule extends SaropaLintRule {
     if (cycles.isEmpty) return;
 
     // Report on import directives that are part of cycles
-    context.registry.addImportDirective((ImportDirective node) {
+    context.addImportDirective((ImportDirective node) {
       final importUri = node.uri.stringValue;
       if (importUri == null) return;
 
@@ -816,14 +757,13 @@ class AvoidCircularImportsRule extends SaropaLintRule {
           reporter.atNode(
             node,
             LintCode(
-              name: 'avoid_circular_imports',
-              problemMessage:
-                  '[avoid_circular_imports] Circular import detected: '
+              'avoid_circular_imports',
+              '[avoid_circular_imports] Circular import detected: '
                   '${_formatCycle(cycle)}',
               correctionMessage:
                   'Extract shared types to break the cycle, or use dependency '
                   'injection.',
-              errorSeverity: DiagnosticSeverity.WARNING,
+              severity: DiagnosticSeverity.WARNING,
             ),
           );
           break;

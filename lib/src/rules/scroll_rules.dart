@@ -8,9 +8,6 @@ library;
 
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
-import 'package:analyzer/error/error.dart'
-    show AnalysisError, DiagnosticSeverity;
-import 'package:custom_lint_builder/custom_lint_builder.dart';
 
 import '../saropa_lint_rule.dart';
 
@@ -44,7 +41,7 @@ import '../saropa_lint_rule.dart';
 /// )
 /// ```
 class AvoidShrinkWrapInScrollViewRule extends SaropaLintRule {
-  const AvoidShrinkWrapInScrollViewRule() : super(code: _code);
+  AvoidShrinkWrapInScrollViewRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.high;
@@ -53,12 +50,11 @@ class AvoidShrinkWrapInScrollViewRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_shrinkwrap_in_scrollview',
-    problemMessage:
-        '[avoid_shrinkwrap_in_scrollview] shrinkWrap: true on a scrollable list disables virtualization, forcing Flutter to lay out and render every child widget immediately regardless of visibility. This causes severe jank, high memory usage, and slow initial rendering for lists with more than a few dozen items, degrading the user experience. {v6}',
+    'avoid_shrinkwrap_in_scrollview',
+    '[avoid_shrinkwrap_in_scrollview] shrinkWrap: true on a scrollable list disables virtualization, forcing Flutter to lay out and render every child widget immediately regardless of visibility. This causes severe jank, high memory usage, and slow initial rendering for lists with more than a few dozen items, degrading the user experience. {v6}',
     correctionMessage:
         'Use CustomScrollView with SliverList for nested scrollables, or add NeverScrollableScrollPhysics() and let the parent scrollable manage scrolling behavior.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   static const Set<String> _scrollableTypes = <String>{
@@ -70,12 +66,11 @@ class AvoidShrinkWrapInScrollViewRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
     // Look for shrinkWrap: true arguments directly
-    context.registry.addNamedExpression((NamedExpression node) {
+    context.addNamedExpression((NamedExpression node) {
       if (node.name.label.name != 'shrinkWrap') return;
 
       final Expression value = node.expression;
@@ -91,7 +86,7 @@ class AvoidShrinkWrapInScrollViewRule extends SaropaLintRule {
 
       // Check if that scrollable is inside another scrollable
       if (_isInsideScrollable(scrollableWidget)) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
   }
@@ -189,7 +184,7 @@ class AvoidShrinkWrapInScrollViewRule extends SaropaLintRule {
 /// )
 /// ```
 class AvoidNestedScrollablesConflictRule extends SaropaLintRule {
-  const AvoidNestedScrollablesConflictRule() : super(code: _code);
+  AvoidNestedScrollablesConflictRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.medium;
@@ -198,12 +193,11 @@ class AvoidNestedScrollablesConflictRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_nested_scrollables_conflict',
-    problemMessage:
-        '[avoid_nested_scrollables_conflict] Nested scrollable without explicit physics causes gesture conflicts. Nested scrollable widgets cause gesture conflicts. The inner scrollable must have NeverScrollableScrollPhysics to let the outer one handle scrolling. {v3}',
+    'avoid_nested_scrollables_conflict',
+    '[avoid_nested_scrollables_conflict] Nested scrollable without explicit physics causes gesture conflicts. Nested scrollable widgets cause gesture conflicts. The inner scrollable must have NeverScrollableScrollPhysics to let the outer one handle scrolling. {v3}',
     correctionMessage:
         'Add physics: NeverScrollableScrollPhysics() to inner scrollable. Verify the change works correctly with existing tests and add coverage for the new behavior.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   static const Set<String> _scrollableTypes = <String>{
@@ -216,14 +210,14 @@ class AvoidNestedScrollablesConflictRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodDeclaration((MethodDeclaration node) {
+    context.addMethodDeclaration((MethodDeclaration node) {
       if (node.name.lexeme != 'build') return;
       node.body.visitChildren(
-          _NestedScrollableVisitor(reporter, code, _scrollableTypes));
+        _NestedScrollableVisitor(reporter, code, _scrollableTypes),
+      );
     });
   }
 }
@@ -238,7 +232,10 @@ class _NestedScrollableVisitor extends RecursiveAstVisitor<void> {
   @override
   void visitInstanceCreationExpression(InstanceCreationExpression node) {
     _checkScrollable(
-        node, node.constructorName.type.name2.lexeme, node.argumentList);
+      node,
+      node.constructorName.type.name2.lexeme,
+      node.argumentList,
+    );
     super.visitInstanceCreationExpression(node);
   }
 
@@ -265,7 +262,7 @@ class _NestedScrollableVisitor extends RecursiveAstVisitor<void> {
     }
 
     if (!hasPhysics) {
-      reporter.atNode(node, code);
+      reporter.atNode(node);
     }
   }
 
@@ -311,7 +308,7 @@ class _NestedScrollableVisitor extends RecursiveAstVisitor<void> {
 /// )
 /// ```
 class AvoidListViewChildrenForLargeListsRule extends SaropaLintRule {
-  const AvoidListViewChildrenForLargeListsRule() : super(code: _code);
+  AvoidListViewChildrenForLargeListsRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.medium;
@@ -320,24 +317,21 @@ class AvoidListViewChildrenForLargeListsRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_listview_children_for_large_lists',
-    problemMessage:
-        '[avoid_listview_children_for_large_lists] ListView with many children loads all items. Use ListView.builder. ListView(children: [..]) builds all children immediately. For lists with more than 20 items, use ListView.builder to improve performance through virtualization. {v2}',
+    'avoid_listview_children_for_large_lists',
+    '[avoid_listview_children_for_large_lists] ListView with many children loads all items. Use ListView.builder. ListView(children: [..]) builds all children immediately. For lists with more than 20 items, use ListView.builder to improve performance through virtualization. {v2}',
     correctionMessage:
         'Replace ListView(children: [..]) with ListView.builder to improve performance. Verify the change works correctly with existing tests and add coverage for the new behavior.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   static const int _maxChildrenCount = 20;
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry
-        .addInstanceCreationExpression((InstanceCreationExpression node) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final String typeName = node.constructorName.type.name2.lexeme;
 
       if (typeName != 'ListView' && typeName != 'GridView') return;
@@ -384,7 +378,7 @@ class AvoidListViewChildrenForLargeListsRule extends SaropaLintRule {
 /// // Or use a Drawer for additional navigation
 /// ```
 class AvoidExcessiveBottomNavItemsRule extends SaropaLintRule {
-  const AvoidExcessiveBottomNavItemsRule() : super(code: _code);
+  AvoidExcessiveBottomNavItemsRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.low;
@@ -393,12 +387,11 @@ class AvoidExcessiveBottomNavItemsRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_excessive_bottom_nav_items',
-    problemMessage:
-        '[avoid_excessive_bottom_nav_items] BottomNavigationBar with more than 5 items crowds the UI. More than 5 bottom navigation items crowds the UI and makes tap targets too small for comfortable use. {v3}',
+    'avoid_excessive_bottom_nav_items',
+    '[avoid_excessive_bottom_nav_items] BottomNavigationBar with more than 5 items crowds the UI. More than 5 bottom navigation items crowds the UI and makes tap targets too small for comfortable use. {v3}',
     correctionMessage:
         'Limit to 5 items or use a navigation drawer for additional options. Verify the change works correctly with existing tests and add coverage for the new behavior.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   static const int _maxItems = 5;
@@ -410,12 +403,11 @@ class AvoidExcessiveBottomNavItemsRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
     // Look for items/destinations arguments directly
-    context.registry.addNamedExpression((NamedExpression node) {
+    context.addNamedExpression((NamedExpression node) {
       final String argName = node.name.label.name;
       if (argName != 'items' && argName != 'destinations') return;
 
@@ -425,7 +417,7 @@ class AvoidExcessiveBottomNavItemsRule extends SaropaLintRule {
 
       // Check if this is on a nav bar widget
       if (_isOnNavBar(node)) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
   }
@@ -464,7 +456,7 @@ class AvoidExcessiveBottomNavItemsRule extends SaropaLintRule {
 /// TabBar(tabs: [tab1, tab2]);
 /// ```
 class RequireTabControllerLengthSyncRule extends SaropaLintRule {
-  const RequireTabControllerLengthSyncRule() : super(code: _code);
+  RequireTabControllerLengthSyncRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.critical;
@@ -473,21 +465,19 @@ class RequireTabControllerLengthSyncRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'require_tab_controller_length_sync',
-    problemMessage:
-        '[require_tab_controller_length_sync] TabController length mismatch '
+    'require_tab_controller_length_sync',
+    '[require_tab_controller_length_sync] TabController length mismatch '
         'throws RangeError when switching tabs, crashing the app. {v2}',
     correctionMessage: 'Ensure TabController length equals the number of tabs.',
-    errorSeverity: DiagnosticSeverity.ERROR,
+    severity: DiagnosticSeverity.ERROR,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addClassDeclaration((ClassDeclaration node) {
+    context.addClassDeclaration((ClassDeclaration node) {
       // Check if extends State<T>
       final ExtendsClause? extendsClause = node.extendsClause;
       if (extendsClause == null) return;
@@ -503,31 +493,36 @@ class RequireTabControllerLengthSyncRule extends SaropaLintRule {
       final String classSource = node.toSource();
 
       // Look for TabController(length: N)
-      final RegExp controllerPattern =
-          RegExp(r'TabController\s*\(\s*length\s*:\s*(\d+)');
+      final RegExp controllerPattern = RegExp(
+        r'TabController\s*\(\s*length\s*:\s*(\d+)',
+      );
       final Match? controllerMatch = controllerPattern.firstMatch(classSource);
       if (controllerMatch != null) {
         controllerLength = int.tryParse(controllerMatch.group(1) ?? '');
       }
 
       // Look for TabBar(tabs: [...])
-      final RegExp tabBarPattern =
-          RegExp(r'TabBar\s*\([^)]*tabs\s*:\s*\[([^\]]*)\]');
+      final RegExp tabBarPattern = RegExp(
+        r'TabBar\s*\([^)]*tabs\s*:\s*\[([^\]]*)\]',
+      );
       final Match? tabBarMatch = tabBarPattern.firstMatch(classSource);
       if (tabBarMatch != null) {
         // Count commas + 1 for number of items
         final String tabsContent = tabBarMatch.group(1) ?? '';
         if (tabsContent.trim().isNotEmpty) {
-          tabBarTabCount =
-              tabsContent.split(',').where((s) => s.trim().isNotEmpty).length;
+          tabBarTabCount = tabsContent
+              .split(',')
+              .where((s) => s.trim().isNotEmpty)
+              .length;
         } else {
           tabBarTabCount = 0;
         }
       }
 
       // Look for TabBarView(children: [...])
-      final RegExp tabBarViewPattern =
-          RegExp(r'TabBarView\s*\([^)]*children\s*:\s*\[([^\]]*)\]');
+      final RegExp tabBarViewPattern = RegExp(
+        r'TabBarView\s*\([^)]*children\s*:\s*\[([^\]]*)\]',
+      );
       final Match? tabBarViewMatch = tabBarViewPattern.firstMatch(classSource);
       if (tabBarViewMatch != null) {
         final String childrenContent = tabBarViewMatch.group(1) ?? '';
@@ -544,11 +539,11 @@ class RequireTabControllerLengthSyncRule extends SaropaLintRule {
       // Check for mismatches
       if (controllerLength != null) {
         if (tabBarTabCount != null && controllerLength != tabBarTabCount) {
-          reporter.atNode(node, code);
+          reporter.atNode(node);
         }
         if (tabBarViewChildCount != null &&
             controllerLength != tabBarViewChildCount) {
-          reporter.atNode(node, code);
+          reporter.atNode(node);
         }
       }
     });
@@ -582,7 +577,7 @@ class RequireTabControllerLengthSyncRule extends SaropaLintRule {
 /// )
 /// ```
 class AvoidRefreshWithoutAwaitRule extends SaropaLintRule {
-  const AvoidRefreshWithoutAwaitRule() : super(code: _code);
+  AvoidRefreshWithoutAwaitRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.high;
@@ -591,22 +586,19 @@ class AvoidRefreshWithoutAwaitRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_refresh_without_await',
-    problemMessage:
-        '[avoid_refresh_without_await] RefreshIndicator onRefresh callback must return a Future that completes when data loading finishes. Without awaiting async operations, the refresh spinner dismisses immediately while data is still loading, leaving users confused about whether the refresh succeeded or failed and showing stale content. {v4}',
+    'avoid_refresh_without_await',
+    '[avoid_refresh_without_await] RefreshIndicator onRefresh callback must return a Future that completes when data loading finishes. Without awaiting async operations, the refresh spinner dismisses immediately while data is still loading, leaving users confused about whether the refresh succeeded or failed and showing stale content. {v4}',
     correctionMessage:
         'Make the onRefresh callback async and await all asynchronous data-fetching operations so the refresh indicator stays visible until loading completes.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry
-        .addInstanceCreationExpression((InstanceCreationExpression node) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final String typeName = node.constructorName.type.name2.lexeme;
 
       if (typeName != 'RefreshIndicator') return;
@@ -619,16 +611,13 @@ class AvoidRefreshWithoutAwaitRule extends SaropaLintRule {
             // Check if it's async
             final bool isAsync = value.body.isAsynchronous;
             if (!isAsync) {
-              reporter.atNode(arg, code);
+              reporter.atNode(arg);
             }
           }
         }
       }
     });
   }
-
-  @override
-  List<Fix> getFixes() => <Fix>[_AvoidRefreshWithoutAwaitFix()];
 }
 
 /// Warns when multiple widgets have autofocus: true.
@@ -660,7 +649,7 @@ class AvoidRefreshWithoutAwaitRule extends SaropaLintRule {
 /// )
 /// ```
 class AvoidMultipleAutofocusRule extends SaropaLintRule {
-  const AvoidMultipleAutofocusRule() : super(code: _code);
+  AvoidMultipleAutofocusRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.medium;
@@ -669,21 +658,19 @@ class AvoidMultipleAutofocusRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_multiple_autofocus',
-    problemMessage:
-        '[avoid_multiple_autofocus] Multiple widgets with autofocus: true causes unpredictable behavior. Only one widget can have autofocus at a time. Multiple autofocus widgets cause unpredictable focus behavior. {v2}',
+    'avoid_multiple_autofocus',
+    '[avoid_multiple_autofocus] Multiple widgets with autofocus: true causes unpredictable behavior. Only one widget can have autofocus at a time. Multiple autofocus widgets cause unpredictable focus behavior. {v2}',
     correctionMessage:
         'Only one widget must have autofocus: true. Verify the change works correctly with existing tests and add coverage for the new behavior.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodDeclaration((MethodDeclaration node) {
+    context.addMethodDeclaration((MethodDeclaration node) {
       if (node.name.lexeme != 'build') return;
 
       final String? returnType = node.returnType?.toSource();
@@ -746,7 +733,7 @@ class _AutofocusVisitor extends RecursiveAstVisitor<void> {
 /// );
 /// ```
 class RequireRefreshIndicatorOnListsRule extends SaropaLintRule {
-  const RequireRefreshIndicatorOnListsRule() : super(code: _code);
+  RequireRefreshIndicatorOnListsRule() : super(code: _code);
 
   /// UX improvement - standard mobile pattern.
   @override
@@ -756,21 +743,19 @@ class RequireRefreshIndicatorOnListsRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'require_refresh_indicator_on_lists',
-    problemMessage:
-        '[require_refresh_indicator_on_lists] ListView without RefreshIndicator. Users can\'t pull to refresh. Pull-to-refresh is a standard mobile UX pattern. Lists with dynamic content should support manual refresh. {v3}',
+    'require_refresh_indicator_on_lists',
+    '[require_refresh_indicator_on_lists] ListView without RefreshIndicator. Users can\'t pull to refresh. Pull-to-refresh is a standard mobile UX pattern. Lists with dynamic content should support manual refresh. {v3}',
     correctionMessage:
         'Wrap with RefreshIndicator for pull-to-refresh support. Verify the change works correctly with existing tests and add coverage for the new behavior.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addInstanceCreationExpression((node) {
+    context.addInstanceCreationExpression((node) {
       final typeName = node.constructorName.type.name.lexeme;
 
       if (!typeName.contains('ListView') && !typeName.contains('GridView')) {
@@ -836,7 +821,7 @@ class RequireRefreshIndicatorOnListsRule extends SaropaLintRule {
 /// // Or use a SliverList in a CustomScrollView
 /// ```
 class AvoidShrinkWrapExpensiveRule extends SaropaLintRule {
-  const AvoidShrinkWrapExpensiveRule() : super(code: _code);
+  AvoidShrinkWrapExpensiveRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.high;
@@ -845,12 +830,11 @@ class AvoidShrinkWrapExpensiveRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_shrink_wrap_expensive',
-    problemMessage:
-        '[avoid_shrink_wrap_expensive] shrinkWrap: true disables list virtualization, forcing Flutter to measure and lay out every item upfront instead of lazily building only visible items. For lists with many children, this causes slow initial rendering, high memory consumption, and jank during scrolling as the framework processes the entire list eagerly. {v5}',
+    'avoid_shrink_wrap_expensive',
+    '[avoid_shrink_wrap_expensive] shrinkWrap: true disables list virtualization, forcing Flutter to measure and lay out every item upfront instead of lazily building only visible items. For lists with many children, this causes slow initial rendering, high memory consumption, and jank during scrolling as the framework processes the entire list eagerly. {v5}',
     correctionMessage:
         'Use a fixed-height parent container, replace with CustomScrollView and Slivers, or reconsider the layout to avoid disabling list virtualization.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   static const Set<String> _scrollableTypes = <String>{
@@ -861,11 +845,10 @@ class AvoidShrinkWrapExpensiveRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addNamedExpression((NamedExpression node) {
+    context.addNamedExpression((NamedExpression node) {
       if (node.name.label.name != 'shrinkWrap') return;
 
       final Expression value = node.expression;
@@ -879,7 +862,7 @@ class AvoidShrinkWrapExpensiveRule extends SaropaLintRule {
       // for nested non-scrolling lists inside another scrollable
       if (_hasNeverScrollablePhysics(scrollableNode)) return;
 
-      reporter.atNode(node, code);
+      reporter.atNode(node);
     });
   }
 
@@ -948,7 +931,7 @@ class AvoidShrinkWrapExpensiveRule extends SaropaLintRule {
 /// )
 /// ```
 class PreferItemExtentRule extends SaropaLintRule {
-  const PreferItemExtentRule() : super(code: _code);
+  PreferItemExtentRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.medium;
@@ -957,22 +940,19 @@ class PreferItemExtentRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'prefer_item_extent',
-    problemMessage:
-        '[prefer_item_extent] ListView without itemExtent recalculates layout on every scroll. When all items have the same height, specifying itemExtent improves scroll performance by avoiding per-item layout calculations. {v3}',
+    'prefer_item_extent',
+    '[prefer_item_extent] ListView without itemExtent recalculates layout on every scroll. When all items have the same height, specifying itemExtent improves scroll performance by avoiding per-item layout calculations. {v3}',
     correctionMessage:
         'Add itemExtent parameter if all items have the same height. Verify the change works correctly with existing tests and add coverage for the new behavior.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry
-        .addInstanceCreationExpression((InstanceCreationExpression node) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final String typeName = node.constructorName.type.name2.lexeme;
 
       if (typeName != 'ListView') return;
@@ -1000,9 +980,6 @@ class PreferItemExtentRule extends SaropaLintRule {
       }
     });
   }
-
-  @override
-  List<Fix> getFixes() => <Fix>[_PreferItemExtentFix()];
 }
 
 /// Warns when ListView doesn't use prototypeItem for consistent sizing.
@@ -1029,7 +1006,7 @@ class PreferItemExtentRule extends SaropaLintRule {
 /// )
 /// ```
 class PreferPrototypeItemRule extends SaropaLintRule {
-  const PreferPrototypeItemRule() : super(code: _code);
+  PreferPrototypeItemRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.medium;
@@ -1038,22 +1015,19 @@ class PreferPrototypeItemRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'prefer_prototype_item',
-    problemMessage:
-        '[prefer_prototype_item] ListView.builder without prototypeItem measures each child separately. prototypeItem allows Flutter to determine item sizes from a single prototype widget, which is more efficient than calculating each item. {v3}',
+    'prefer_prototype_item',
+    '[prefer_prototype_item] ListView.builder without prototypeItem measures each child separately. prototypeItem allows Flutter to determine item sizes from a single prototype widget, which is more efficient than calculating each item. {v3}',
     correctionMessage:
         'Add prototypeItem parameter if items have consistent dimensions. Verify the change works correctly with existing tests and add coverage for the new behavior.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry
-        .addInstanceCreationExpression((InstanceCreationExpression node) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final String typeName = node.constructorName.type.name2.lexeme;
 
       if (typeName != 'ListView') return;
@@ -1079,9 +1053,6 @@ class PreferPrototypeItemRule extends SaropaLintRule {
       }
     });
   }
-
-  @override
-  List<Fix> getFixes() => <Fix>[_PreferPrototypeItemFix()];
 }
 
 /// Warns when ReorderableListView items don't have keys.
@@ -1113,7 +1084,7 @@ class PreferPrototypeItemRule extends SaropaLintRule {
 /// )
 /// ```
 class RequireKeyForReorderableRule extends SaropaLintRule {
-  const RequireKeyForReorderableRule() : super(code: _code);
+  RequireKeyForReorderableRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.critical;
@@ -1122,12 +1093,11 @@ class RequireKeyForReorderableRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'require_key_for_reorderable',
-    problemMessage:
-        '[require_key_for_reorderable] Without unique keys, reordering fails '
+    'require_key_for_reorderable',
+    '[require_key_for_reorderable] Without unique keys, reordering fails '
         'silently or shows wrong items after drag-and-drop. {v3}',
     correctionMessage: 'Add a key parameter (e.g., ValueKey) to each item.',
-    errorSeverity: DiagnosticSeverity.ERROR,
+    severity: DiagnosticSeverity.ERROR,
   );
 
   static const Set<String> _reorderableTypes = <String>{
@@ -1137,12 +1107,10 @@ class RequireKeyForReorderableRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry
-        .addInstanceCreationExpression((InstanceCreationExpression node) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final String typeName = node.constructorName.type.name2.lexeme;
 
       if (!_reorderableTypes.contains(typeName)) return;
@@ -1163,12 +1131,14 @@ class RequireKeyForReorderableRule extends SaropaLintRule {
   }
 
   void _checkChildrenForKeys(
-      Expression childrenExpr, SaropaDiagnosticReporter reporter) {
+    Expression childrenExpr,
+    SaropaDiagnosticReporter reporter,
+  ) {
     if (childrenExpr is ListLiteral) {
       for (final CollectionElement element in childrenExpr.elements) {
         if (element is InstanceCreationExpression) {
           if (!_hasKeyArgument(element.argumentList)) {
-            reporter.atNode(element, code);
+            reporter.atNode(element);
           }
         }
       }
@@ -1186,7 +1156,9 @@ class RequireKeyForReorderableRule extends SaropaLintRule {
   }
 
   void _checkMapCallback(
-      MethodInvocation mapInvocation, SaropaDiagnosticReporter reporter) {
+    MethodInvocation mapInvocation,
+    SaropaDiagnosticReporter reporter,
+  ) {
     if (mapInvocation.argumentList.arguments.isNotEmpty) {
       final Expression callback = mapInvocation.argumentList.arguments.first;
       if (callback is FunctionExpression) {
@@ -1196,19 +1168,23 @@ class RequireKeyForReorderableRule extends SaropaLintRule {
   }
 
   void _checkItemBuilderForKeys(
-      Expression builderExpr, SaropaDiagnosticReporter reporter) {
+    Expression builderExpr,
+    SaropaDiagnosticReporter reporter,
+  ) {
     if (builderExpr is FunctionExpression) {
       _checkBuilderBodyForKey(builderExpr.body, reporter);
     }
   }
 
   void _checkBuilderBodyForKey(
-      FunctionBody body, SaropaDiagnosticReporter reporter) {
+    FunctionBody body,
+    SaropaDiagnosticReporter reporter,
+  ) {
     if (body is ExpressionFunctionBody) {
       final Expression expr = body.expression;
       if (expr is InstanceCreationExpression) {
         if (!_hasKeyArgument(expr.argumentList)) {
-          reporter.atNode(expr, code);
+          reporter.atNode(expr);
         }
       }
     } else if (body is BlockFunctionBody) {
@@ -1224,9 +1200,6 @@ class RequireKeyForReorderableRule extends SaropaLintRule {
     }
     return false;
   }
-
-  @override
-  List<Fix> getFixes() => <Fix>[_RequireKeyForReorderableFix()];
 }
 
 class _ReturnKeyVisitor extends RecursiveAstVisitor<void> {
@@ -1247,7 +1220,7 @@ class _ReturnKeyVisitor extends RecursiveAstVisitor<void> {
         }
       }
       if (!hasKey) {
-        reporter.atNode(expr, code);
+        reporter.atNode(expr);
       }
     }
     super.visitReturnStatement(node);
@@ -1279,7 +1252,7 @@ class _ReturnKeyVisitor extends RecursiveAstVisitor<void> {
 /// )
 /// ```
 class RequireAddAutomaticKeepAlivesOffRule extends SaropaLintRule {
-  const RequireAddAutomaticKeepAlivesOffRule() : super(code: _code);
+  RequireAddAutomaticKeepAlivesOffRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.medium;
@@ -1288,30 +1261,24 @@ class RequireAddAutomaticKeepAlivesOffRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'require_add_automatic_keep_alives_off',
-    problemMessage:
-        '[require_add_automatic_keep_alives_off] Long lists with addAutomaticKeepAlives: true (default) can cause memory issues. addAutomaticKeepAlives: true (the default) keeps list items alive in memory even when scrolled off-screen. For long lists, this can cause excessive memory usage. Set it to false to improve memory efficiency. {v3}',
+    'require_add_automatic_keep_alives_off',
+    '[require_add_automatic_keep_alives_off] Long lists with addAutomaticKeepAlives: true (default) can cause memory issues. addAutomaticKeepAlives: true (the default) keeps list items alive in memory even when scrolled off-screen. For long lists, this can cause excessive memory usage. Set it to false to improve memory efficiency. {v3}',
     correctionMessage:
         'Add addAutomaticKeepAlives: false to improve memory efficiency. Verify the change works correctly with existing tests and add coverage for the new behavior.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
-  static const Set<String> _listTypes = <String>{
-    'ListView',
-    'GridView',
-  };
+  static const Set<String> _listTypes = <String>{'ListView', 'GridView'};
 
   /// Threshold for considering a list "long"
   static const int _longListThreshold = 50;
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry
-        .addInstanceCreationExpression((InstanceCreationExpression node) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final String typeName = node.constructorName.type.name2.lexeme;
 
       if (!_listTypes.contains(typeName)) return;
@@ -1347,163 +1314,11 @@ class RequireAddAutomaticKeepAlivesOffRule extends SaropaLintRule {
       }
     });
   }
-
-  @override
-  List<Fix> getFixes() => <Fix>[_RequireAddAutomaticKeepAlivesOffFix()];
 }
 
 // =============================================================================
 // QUICK FIXES
 // =============================================================================
-
-class _AvoidRefreshWithoutAwaitFix extends DartFix {
-  @override
-  void run(
-    CustomLintResolver resolver,
-    ChangeReporter reporter,
-    CustomLintContext context,
-    AnalysisError analysisError,
-    List<AnalysisError> others,
-  ) {
-    context.registry.addNamedExpression((NamedExpression node) {
-      if (!analysisError.sourceRange.intersects(node.sourceRange)) return;
-      if (node.name.label.name != 'onRefresh') return;
-
-      final Expression value = node.expression;
-      if (value is! FunctionExpression) return;
-
-      final changeBuilder = reporter.createChangeBuilder(
-        message: 'Make callback async',
-        priority: 80,
-      );
-
-      changeBuilder.addDartFileEdit((builder) {
-        // Insert 'async ' before the function body
-        final body = value.body;
-        builder.addSimpleInsertion(body.offset, 'async ');
-      });
-    });
-  }
-}
-
-class _PreferItemExtentFix extends DartFix {
-  @override
-  void run(
-    CustomLintResolver resolver,
-    ChangeReporter reporter,
-    CustomLintContext context,
-    AnalysisError analysisError,
-    List<AnalysisError> others,
-  ) {
-    context.registry
-        .addInstanceCreationExpression((InstanceCreationExpression node) {
-      if (!analysisError.sourceRange.intersects(node.sourceRange)) return;
-
-      final changeBuilder = reporter.createChangeBuilder(
-        message: 'Add itemExtent parameter',
-        priority: 80,
-      );
-
-      changeBuilder.addDartFileEdit((builder) {
-        // Find the end of argument list before the closing paren
-        final args = node.argumentList;
-        final insertOffset = args.rightParenthesis.offset;
-        // Add comma if there are existing arguments
-        final prefix = args.arguments.isNotEmpty ? ', ' : '';
-        builder.addSimpleInsertion(insertOffset,
-            '${prefix}itemExtent: 56.0 /* TODO: adjust height */');
-      });
-    });
-  }
-}
-
-class _PreferPrototypeItemFix extends DartFix {
-  @override
-  void run(
-    CustomLintResolver resolver,
-    ChangeReporter reporter,
-    CustomLintContext context,
-    AnalysisError analysisError,
-    List<AnalysisError> others,
-  ) {
-    context.registry
-        .addInstanceCreationExpression((InstanceCreationExpression node) {
-      if (!analysisError.sourceRange.intersects(node.sourceRange)) return;
-
-      final changeBuilder = reporter.createChangeBuilder(
-        message: 'Add prototypeItem parameter',
-        priority: 80,
-      );
-
-      changeBuilder.addDartFileEdit((builder) {
-        final args = node.argumentList;
-        final insertOffset = args.rightParenthesis.offset;
-        final prefix = args.arguments.isNotEmpty ? ', ' : '';
-        builder.addSimpleInsertion(insertOffset,
-            '${prefix}prototypeItem: const SizedBox(height: 56) /* TODO: adjust */');
-      });
-    });
-  }
-}
-
-class _RequireKeyForReorderableFix extends DartFix {
-  @override
-  void run(
-    CustomLintResolver resolver,
-    ChangeReporter reporter,
-    CustomLintContext context,
-    AnalysisError analysisError,
-    List<AnalysisError> others,
-  ) {
-    context.registry
-        .addInstanceCreationExpression((InstanceCreationExpression node) {
-      if (!analysisError.sourceRange.intersects(node.sourceRange)) return;
-
-      final changeBuilder = reporter.createChangeBuilder(
-        message: 'Add key parameter',
-        priority: 80,
-      );
-
-      changeBuilder.addDartFileEdit((builder) {
-        final args = node.argumentList;
-        // Insert key as first argument
-        final insertOffset = args.leftParenthesis.offset + 1;
-        final suffix = args.arguments.isNotEmpty ? ', ' : '';
-        builder.addSimpleInsertion(
-            insertOffset, 'key: ValueKey(/* TODO: unique id */)$suffix');
-      });
-    });
-  }
-}
-
-class _RequireAddAutomaticKeepAlivesOffFix extends DartFix {
-  @override
-  void run(
-    CustomLintResolver resolver,
-    ChangeReporter reporter,
-    CustomLintContext context,
-    AnalysisError analysisError,
-    List<AnalysisError> others,
-  ) {
-    context.registry
-        .addInstanceCreationExpression((InstanceCreationExpression node) {
-      if (!analysisError.sourceRange.intersects(node.sourceRange)) return;
-
-      final changeBuilder = reporter.createChangeBuilder(
-        message: 'Add addAutomaticKeepAlives: false',
-        priority: 80,
-      );
-
-      changeBuilder.addDartFileEdit((builder) {
-        final args = node.argumentList;
-        final insertOffset = args.rightParenthesis.offset;
-        final prefix = args.arguments.isNotEmpty ? ', ' : '';
-        builder.addSimpleInsertion(
-            insertOffset, '${prefix}addAutomaticKeepAlives: false');
-      });
-    });
-  }
-}
 
 // =============================================================================
 // prefer_sliverfillremaining_for_empty
@@ -1538,7 +1353,7 @@ class _RequireAddAutomaticKeepAlivesOffFix extends DartFix {
 /// )
 /// ```
 class PreferSliverFillRemainingForEmptyRule extends SaropaLintRule {
-  const PreferSliverFillRemainingForEmptyRule() : super(code: _code);
+  PreferSliverFillRemainingForEmptyRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.medium;
@@ -1547,9 +1362,8 @@ class PreferSliverFillRemainingForEmptyRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'prefer_sliverfillremaining_for_empty',
-    problemMessage:
-        '[prefer_sliverfillremaining_for_empty] Empty state widget in '
+    'prefer_sliverfillremaining_for_empty',
+    '[prefer_sliverfillremaining_for_empty] Empty state widget in '
         'CustomScrollView uses SliverToBoxAdapter instead of '
         'SliverFillRemaining. The empty state content will sit at the top '
         'of the scroll area rather than being centered in the viewport. '
@@ -1558,7 +1372,7 @@ class PreferSliverFillRemainingForEmptyRule extends SaropaLintRule {
     correctionMessage:
         'Wrap empty state content in SliverFillRemaining instead of '
         'SliverToBoxAdapter for proper vertical centering.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   /// Keywords in child content that suggest an empty state.
@@ -1573,13 +1387,10 @@ class PreferSliverFillRemainingForEmptyRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addInstanceCreationExpression((
-      InstanceCreationExpression node,
-    ) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final String typeName = node.constructorName.type.name.lexeme;
       if (typeName != 'SliverToBoxAdapter') return;
 
@@ -1629,41 +1440,6 @@ class PreferSliverFillRemainingForEmptyRule extends SaropaLintRule {
       }
     });
   }
-
-  @override
-  List<Fix> getFixes() => [_ReplaceSliverToBoxAdapterFix()];
-}
-
-class _ReplaceSliverToBoxAdapterFix extends DartFix {
-  @override
-  void run(
-    CustomLintResolver resolver,
-    ChangeReporter reporter,
-    CustomLintContext context,
-    AnalysisError analysisError,
-    List<AnalysisError> others,
-  ) {
-    context.registry.addInstanceCreationExpression((
-      InstanceCreationExpression node,
-    ) {
-      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
-
-      final String typeName = node.constructorName.type.name.lexeme;
-      if (typeName != 'SliverToBoxAdapter') return;
-
-      final changeBuilder = reporter.createChangeBuilder(
-        message: 'Replace with SliverFillRemaining',
-        priority: 80,
-      );
-
-      changeBuilder.addDartFileEdit((builder) {
-        builder.addSimpleReplacement(
-          node.constructorName.type.name.sourceRange,
-          'SliverFillRemaining',
-        );
-      });
-    });
-  }
 }
 
 // =============================================================================
@@ -1701,7 +1477,7 @@ class _ReplaceSliverToBoxAdapterFix extends DartFix {
 /// });
 /// ```
 class AvoidInfiniteScrollDuplicateRequestsRule extends SaropaLintRule {
-  const AvoidInfiniteScrollDuplicateRequestsRule() : super(code: _code);
+  AvoidInfiniteScrollDuplicateRequestsRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.high;
@@ -1710,9 +1486,8 @@ class AvoidInfiniteScrollDuplicateRequestsRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_infinite_scroll_duplicate_requests',
-    problemMessage:
-        '[avoid_infinite_scroll_duplicate_requests] Scroll listener triggers '
+    'avoid_infinite_scroll_duplicate_requests',
+    '[avoid_infinite_scroll_duplicate_requests] Scroll listener triggers '
         'data loading without a loading guard. When the user scrolls to the '
         'bottom, this fires multiple simultaneous requests because the '
         'listener fires continuously while at max extent. This wastes '
@@ -1721,16 +1496,15 @@ class AvoidInfiniteScrollDuplicateRequestsRule extends SaropaLintRule {
     correctionMessage:
         'Add an isLoading/isFetching guard check before calling the load '
         'function in your scroll listener.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       if (node.methodName.name != 'addListener') return;
 
       // Check if this is a scroll controller listener
@@ -1760,7 +1534,7 @@ class AvoidInfiniteScrollDuplicateRequestsRule extends SaropaLintRule {
         return; // Has loading guard, OK
       }
 
-      reporter.atNode(node, code);
+      reporter.atNode(node);
     });
   }
 }
@@ -1792,7 +1566,7 @@ class AvoidInfiniteScrollDuplicateRequestsRule extends SaropaLintRule {
 /// }
 /// ```
 class PreferInfiniteScrollPreloadRule extends SaropaLintRule {
-  const PreferInfiniteScrollPreloadRule() : super(code: _code);
+  PreferInfiniteScrollPreloadRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.medium;
@@ -1801,27 +1575,26 @@ class PreferInfiniteScrollPreloadRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'prefer_infinite_scroll_preload',
-    problemMessage:
-        '[prefer_infinite_scroll_preload] Infinite scroll loads next page '
+    'prefer_infinite_scroll_preload',
+    '[prefer_infinite_scroll_preload] Infinite scroll loads next page '
         'only at 100%% scroll extent. Users see a loading spinner and must '
         'wait for content. Preload the next page at 70-80%% scroll progress '
         'so data arrives before the user reaches the end. This creates a '
         'seamless experience without visible pauses. Use '
         'position.pixels >= position.maxScrollExtent * 0.8 as threshold. {v1}',
-    correctionMessage: 'Trigger loading at 70-80%% scroll extent (e.g., '
+    correctionMessage:
+        'Trigger loading at 70-80%% scroll extent (e.g., '
         'position.pixels >= position.maxScrollExtent * 0.8) instead of '
         'waiting for the exact bottom.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addBinaryExpression((BinaryExpression node) {
+    context.addBinaryExpression((BinaryExpression node) {
       final String source = node.toSource();
 
       // Detect exact equality check with maxScrollExtent
@@ -1853,7 +1626,7 @@ class PreferInfiniteScrollPreloadRule extends SaropaLintRule {
           if (bodySource.contains('addListener') ||
               bodySource.contains('onNotification') ||
               bodySource.contains('ScrollNotification')) {
-            reporter.atNode(node, code);
+            reporter.atNode(node);
             return;
           }
           break;

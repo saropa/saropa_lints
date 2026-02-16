@@ -2,6 +2,10 @@
 
 Plan for migrating saropa_lints from `custom_lint` to the native Dart 3.10+ analyzer plugin system.
 
+**Branch**: `native-plugin-migration`
+**Rollback tag**: `v4-final` (at v4.15.1)
+**Target version**: `5.0.0`
+
 ## Rationale
 
 Dart 3.10 introduced a first-party analyzer plugin system that offers:
@@ -10,493 +14,380 @@ Dart 3.10 introduced a first-party analyzer plugin system that offers:
 - Better IDE performance (no separate isolate)
 - No additional runtime command needed
 
-**Primary motivation**: Current `custom_lint` implementation is slow. Native plugin addresses the root cause by eliminating isolate overhead and integrating directly with the analyzer.
+**Primary motivation**: Quick fixes from `custom_lint` plugins **never appear in VS Code**. The Dart Analysis Server (DAS) never forwards `edit.getFixes` requests to old-protocol plugins. Dart SDK #61491 was fixed only for the native plugin system. This is the root cause and can only be solved by migrating.
+
+**Secondary motivation**: Current `custom_lint` implementation is slow. Native plugin eliminates isolate overhead and integrates directly with the analyzer.
 
 **Trade-offs**:
-- Breaking change for existing users
-- Less mature ecosystem than custom_lint
-- Different configuration format
-- May lose some advanced features
+- Breaking change for existing users (v4 -> v5)
+- Dependencies cannot coexist (`custom_lint_builder` requires `analyzer: ^8.0.0`, `analysis_server_plugin` v0.3.8 requires `analyzer: 10.0.2`)
+- Different configuration format (`plugins:` instead of `custom_lint:`)
 
-## Relationship to Other Components
-
-```
-┌─────────────────────────────────────────────────────────────┐
-│                    saropa_lints Architecture                │
-├─────────────────────────────────────────────────────────────┤
-│                                                             │
-│  Per-File Analysis (IDE integration)                        │
-│  ┌─────────────────┐         ┌─────────────────┐           │
-│  │ Current         │ ──────► │ Native          │           │
-│  │ (custom_lint)   │ replace │ (analyzer plugin)│           │
-│  │ • Slow          │         │ • Fast          │           │
-│  │ • Works         │         │ • Same features │           │
-│  └─────────────────┘         └─────────────────┘           │
-│           │                           │                     │
-│           └───────────┬───────────────┘                     │
-│                       ▼                                     │
-│              ┌─────────────────┐                            │
-│              │ Shared Rules    │                            │
-│              │ (detection logic)│                            │
-│              └─────────────────┘                            │
-│                                                             │
-│  Cross-File Analysis (terminal/CI only)                     │
-│  ┌─────────────────┐                                        │
-│  │ CLI             │  Separate tool, complements both       │
-│  │ • unused-files  │  See: ROADMAP_CLI.md                   │
-│  │ • circular-deps │                                        │
-│  └─────────────────┘                                        │
-│                                                             │
-└─────────────────────────────────────────────────────────────┘
-```
-
-**Key points:**
-- Native **replaces** Current (same 1,677 rules, faster engine)
-- CLI is **separate** (cross-file analysis neither engine can do)
-- Both Native and CLI can coexist
-
-## Reporting Capabilities
-
-| Output | Current (custom_lint) | Native | Notes |
-|--------|----------------------|--------|-------|
-| IDE "PROBLEMS" panel | Yes | Yes (faster) | Same UX |
-| Editor squiggles | Yes | Yes (faster) | Same UX |
-| Quick fixes | Yes | Yes | API differs |
-| `dart analyze` | No | Yes | Major benefit |
-| `dart fix --apply` | No | Yes | Major benefit |
-| Terminal output | `dart run custom_lint` | `dart analyze` | Simpler |
-
-## Current Architecture
+## Current Architecture (v4.x - custom_lint)
 
 | Component | Implementation | Files |
 |-----------|---------------|-------|
-| Plugin entry | `PluginBase` | `lib/saropa_lints.dart` |
-| Base classes | `DartLintRule`, `SaropaLintRule` | `lib/src/saropa_lint_rule.dart` |
-| Rule registration | `getLintRules()` | `lib/src/rules/all_rules.dart` |
-| Configuration | `analysis_options.yaml` custom_lint format | User's project |
-| Quick fixes | `DartFix` | Various `*_rules.dart` files |
+| Plugin entry | `createPlugin()` returning `PluginBase` | `lib/saropa_lints.dart` |
+| Base class | `SaropaLintRule extends DartLintRule` | `lib/src/saropa_lint_rule.dart` |
+| Rule registration | `_allRuleFactories` list | `lib/saropa_lints.dart` |
+| Configuration | `custom_lint:` section in `analysis_options.yaml` | User's project |
+| Quick fixes | `DartFix` subclasses | Various `*_rules.dart` files |
+| Reporter | `SaropaDiagnosticReporter` wrapping `DiagnosticReporter` | `lib/src/saropa_lint_rule.dart` |
 
-**Stats**: 1,677 rules, 213 quick fixes, 5 tiers
+**Stats**: 1,677+ rules, 213 quick fixes, 5 tiers
 
-## Target Architecture
+## Target Architecture (v5.x - native plugin)
 
-| Component | New Implementation | Notes |
-|-----------|-------------------|-------|
-| Plugin entry | Extends `Plugin` | `lib/saropa_lints_plugin.dart` |
-| Base classes | `AnalysisRule`, `MultiAnalysisRule` | From `analysis_server_plugin` |
-| Rule registration | `register(PluginRegistry)` | Different pattern |
-| Configuration | `analysis_options.yaml` plugins format | Standard format |
-| Quick fixes | New fix classes | API changes |
+| Component | Implementation | Files |
+|-----------|---------------|-------|
+| Plugin entry | `final plugin` top-level variable | `lib/main.dart` |
+| Base class | `SaropaAnalysisRule extends AnalysisRule` | `lib/src/native/saropa_analysis_rule.dart` |
+| Rule registration | `registry.registerLintRule(rule)` in `Plugin.register()` | `lib/main.dart` |
+| Configuration | Top-level `plugins:` section in `analysis_options.yaml` | User's project |
+| Quick fixes | `ResolvedCorrectionProducer` + `registerFixForRule()` | TBD |
+| Reporter | `SaropaDiagnosticReporter` wrapping `AnalysisRule.reportAtNode()` | `lib/src/native/saropa_reporter.dart` |
 
-## API Changes Reference
+## API Changes Reference (Verified)
 
-Based on [Dart SDK documentation](https://dart.dev/tools/analyzer-plugins):
+| custom_lint (v4) | Native Plugin (v5) | Notes |
+|------------------|-------------------|-------|
+| `SaropaLintRule extends DartLintRule` | `SaropaAnalysisRule extends AnalysisRule` | Different base class |
+| `LintCode(name: 'x', problemMessage: 'y')` | `LintCode('x', 'y')` | Positional name/message |
+| `errorSeverity: DiagnosticSeverity.WARNING` | `severity: DiagnosticSeverity.WARNING` | Parameter renamed |
+| `context.registry.addMethodInvocation((node) {...})` | `context.addMethodInvocation((node) {...})` | Drop `.registry` |
+| `reporter.atNode(node, code)` | `reporter.atNode(node)` | Code is implicit from rule |
+| `CustomLintResolver resolver` | Removed from signature | Not needed |
+| `CustomLintContext context` | `SaropaContext context` | Wraps `RuleVisitorRegistry` |
+| `DartFix` | `ResolvedCorrectionProducer` | Different fix pattern |
+| `NodeLintRegistry` | `RuleVisitorRegistry` | 144 `addXxx` methods |
+| `PluginBase` (class) | `Plugin` (class) | Different lifecycle |
+| `createPlugin()` function | `final plugin` variable | Entry point convention |
 
-| custom_lint | Native Plugin |
-|-------------|---------------|
-| `LintCode` | `DiagnosticCode` |
-| `LintRule` | `AnalysisRule`, `MultiAnalysisRule` |
-| `NodeLintRegistry` | `RuleVisitorRegistry` |
-| `LinterContext` | `RuleContext`, `RuleContextUnit` |
-| `DartFix` | New fix class pattern |
-| `ErrorReporter` | Different reporting API |
-
-## Migration Phases
-
-### Phase 0: Preparation
-
-**Goal**: Understand new system, create compatibility layer
-
-#### 0.1 Research & Documentation
-
-- [ ] Study `analysis_server_plugin` source code
-- [ ] Document all API differences
-- [ ] Identify features that may not migrate (tier system, rule ordering)
-- [ ] Create test project with new plugin system
-
-#### 0.2 Compatibility Assessment
-
-Evaluate each saropa_lints feature:
-
-| Feature | Migratable | Notes |
-|---------|------------|-------|
-| Basic lint rules | Yes | Core functionality |
-| Quick fixes | Yes | Different API |
-| Tier system | Unknown | May need custom config |
-| Rule ordering by cost | Unknown | Performance optimization |
-| Content pre-filtering | Unknown | `shouldAnalyze()` pattern |
-| ProjectContext caching | Yes | Can keep internal caching |
-| Baseline suppression | Partial | Native has different ignore system |
-
-#### 0.3 Coexistence Strategy
-
-Native and Current can coexist during migration using shared rule logic:
-
-```
-lib/
-├── src/
-│   ├── rules/
-│   │   └── core/                    # Shared detection logic (no framework deps)
-│   │       ├── avoid_print.dart     # Pure detection: shouldReport(node) → bool
-│   │       └── ...
-│   │
-│   ├── adapters/
-│   │   ├── custom_lint/             # custom_lint wrappers
-│   │   │   └── avoid_print_rule.dart
-│   │   └── native/                  # native plugin wrappers
-│   │       └── avoid_print_rule.dart
-│   │
-│   └── saropa_lint_rule.dart        # Shared base (detection logic only)
-│
-├── saropa_lints.dart                # custom_lint entry (current)
-└── saropa_lints_plugin.dart         # native entry (new)
-```
-
-**Benefits:**
-- Users choose: `dart run custom_lint` OR `dart analyze`
-- Gradual migration with subset of rules in Native
-- Bug fixes apply to both adapters
-- Eventually deprecate custom_lint adapter
-
-#### 0.4 Decision Point
-
-After Phase 0, decide:
-- **Proceed**: Migration is feasible with acceptable trade-offs
-- **Wait**: New system needs more maturity
-- **Hybrid**: Maintain both using shared rule logic (recommended for gradual rollout)
-
----
-
-### Phase 1: Infrastructure
-
-**Goal**: New plugin entry point and base classes
-
-#### 1.1 Create Plugin Entry Point
-
-New file: `lib/saropa_lints_plugin.dart`
+### LintCode Migration
 
 ```dart
-import 'package:analysis_server_plugin/plugin.dart';
+// BEFORE (custom_lint v4):
+static const LintCode _code = LintCode(
+  name: 'avoid_debug_print',
+  problemMessage: '[avoid_debug_print] Description here...',
+  correctionMessage: 'How to fix.',
+  errorSeverity: DiagnosticSeverity.WARNING,
+);
 
-final plugin = SaropaLintsPlugin();
-
-class SaropaLintsPlugin extends Plugin {
-  @override
-  void register(PluginRegistry registry) {
-    // Register all rules
-    for (final rule in allRules) {
-      registry.registerRule(rule);
-    }
-
-    // Register fixes
-    for (final fix in allFixes) {
-      registry.registerFix(fix);
-    }
-  }
-}
+// AFTER (native v5):
+static const _code = LintCode(
+  'avoid_debug_print',
+  '[avoid_debug_print] Description here...',
+  correctionMessage: 'How to fix.',
+  severity: DiagnosticSeverity.WARNING,
+);
 ```
 
-#### 1.2 Create New Base Classes
-
-Abstract the differences to minimize rule changes:
+### Rule Migration
 
 ```dart
-// lib/src/native/saropa_analysis_rule.dart
-
-import 'package:analysis_server_plugin/analysis_server_plugin.dart';
-
-/// Base class for saropa_lints rules using native plugin system.
-abstract class SaropaAnalysisRule extends AnalysisRule {
-  SaropaAnalysisRule({
-    required this.code,
-  });
-
-  final DiagnosticCode code;
+// BEFORE (custom_lint v4):
+class AvoidDebugPrintRule extends SaropaLintRule {
+  const AvoidDebugPrintRule() : super(code: _code);
 
   @override
-  void registerNodeProcessors(
-    RuleVisitorRegistry registry,
-    RuleContext context,
-  ) {
-    // Subclasses implement this
-  }
-}
-```
-
-#### 1.3 Create Migration Helpers
-
-Utility to help migrate existing rules:
-
-```dart
-// Helper to convert LintCode to DiagnosticCode
-DiagnosticCode convertCode(LintCode oldCode) {
-  return DiagnosticCode(
-    name: oldCode.name,
-    problemMessage: oldCode.problemMessage,
-    correctionMessage: oldCode.correctionMessage,
-    // Map severity
-  );
-}
-```
-
-#### Deliverables
-- [ ] `lib/saropa_lints_plugin.dart` - New plugin entry
-- [ ] `lib/src/native/saropa_analysis_rule.dart` - New base class
-- [ ] `lib/src/native/saropa_analysis_fix.dart` - New fix base class
-- [ ] Migration helper utilities
-- [ ] Test with 5-10 simple rules
-
----
-
-### Phase 2: Rule Migration
-
-**Goal**: Migrate all 1,677 rules
-
-#### 2.1 Migration Strategy
-
-Migrate rules in batches by category:
-
-| Priority | Category | Count | Complexity |
-|----------|----------|-------|------------|
-| 1 | Core Dart rules | ~200 | Low |
-| 2 | Flutter rules | ~300 | Low |
-| 3 | Security rules | ~150 | Medium |
-| 4 | Accessibility rules | ~100 | Low |
-| 5 | Package-specific (Riverpod, Bloc, etc.) | ~500 | Medium |
-| 6 | Performance rules | ~200 | Medium |
-| 7 | Architecture rules | ~200 | High |
-
-#### 2.2 Rule Migration Template
-
-Before (custom_lint):
-```dart
-class AvoidPrint extends DartLintRule {
-  AvoidPrint() : super(code: _code);
-
-  static const _code = LintCode(
-    name: 'avoid_print',
-    problemMessage: 'Avoid using print in production code.',
-    correctionMessage: 'Use a logger instead.',
-    errorSeverity: ErrorSeverity.WARNING,
-  );
-
-  @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addMethodInvocation((node) {
-      if (node.methodName.name == 'print') {
+      if (node.methodName.name == 'debugPrint') {
         reporter.atNode(node, code);
       }
     });
   }
 }
-```
 
-After (native plugin):
-```dart
-class AvoidPrint extends SaropaAnalysisRule {
-  AvoidPrint() : super(
-    code: DiagnosticCode(
-      name: 'avoid_print',
-      problemMessage: 'Avoid using print in production code.',
-      correctionMessage: 'Use a logger instead.',
-      // Severity mapping TBD
-    ),
-  );
+// AFTER (native v5):
+class AvoidDebugPrintNativeRule extends SaropaAnalysisRule {
+  AvoidDebugPrintNativeRule() : super(code: _code);
 
   @override
-  void registerNodeProcessors(
-    RuleVisitorRegistry registry,
-    RuleContext context,
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
   ) {
-    registry.addMethodInvocation(this, (node) {
-      if (node.methodName.name == 'print') {
-        context.reportDiagnostic(Diagnostic(code, node));
+    context.addMethodInvocation((node) {
+      if (node.methodName.name == 'debugPrint') {
+        reporter.atNode(node);
       }
     });
   }
 }
 ```
 
-#### 2.3 Automated Migration Script
+### Consumer Configuration Migration
 
-Create script to automate mechanical changes:
+```yaml
+# BEFORE (custom_lint v4):
+custom_lint:
+  rules:
+    - avoid_debug_print
+    - require_dispose: false
 
-```bash
-dart run scripts/migrate_rules.dart --input lib/src/rules/ --output lib/src/native_rules/
+# AFTER (native v5):
+plugins:
+  saropa_lints: ^5.0.0
+    diagnostics:
+      avoid_debug_print: true
+      require_dispose: false
 ```
 
-Script handles:
-- Import changes
-- Base class changes
-- `LintCode` → `DiagnosticCode`
-- `context.registry` → `registry`
-- `reporter.atNode` → `context.reportDiagnostic`
+## Compatibility Layer Architecture
 
-Manual review needed for:
-- Complex fix implementations
-- Rules using `CustomLintResolver` features
-- Rules with custom `shouldAnalyze()` logic
+The migration uses a compatibility layer that preserves the callback-based
+`runWithReporter()` pattern, so existing rule logic requires minimal changes.
 
-#### Deliverables
-- [ ] Migration script
-- [ ] Migrate core Dart rules (batch 1)
-- [ ] Migrate Flutter rules (batch 2)
-- [ ] Migrate remaining categories (batches 3-7)
-- [ ] Update all_rules.dart for new registration
+cspell:disable
+```
+┌─────────────────────────────────────────────────────────┐
+│           Native Analyzer Plugin System                  │
+│  ┌─────────────┐  ┌──────────────────┐  ┌───────────┐  │
+│  │ AnalysisRule │  │ RuleVisitorReg.  │  │ RuleContext│  │
+│  │ reportAtNode │  │ addXxx(rule,vis) │  │ content   │  │
+│  └──────┬──────┘  └────────┬─────────┘  └─────┬─────┘  │
+├─────────┼──────────────────┼───────────────────┼────────┤
+│  Compatibility Layer (lib/src/native/)                    │
+│  ┌──────┴──────┐  ┌────────┴─────────┐  ┌─────┴─────┐  │
+│  │ SaropaAnalys│  │ SaropaContext    │  │CompatVis. │  │
+│  │ Rule        │  │ addXxx(callback) │──│ onXxx     │  │
+│  │ runWithRep()│  │ fileContent      │  │ visitXxx  │  │
+│  └──────┬──────┘  └────────┬─────────┘  └───────────┘  │
+│  ┌──────┴──────┐           │                             │
+│  │ SaropaRepr. │           │                             │
+│  │ atNode(node)│           │                             │
+│  │ atToken()   │           │                             │
+│  └─────────────┘           │                             │
+├────────────────────────────┼────────────────────────────┤
+│  Existing Rule Logic       │                             │
+│  ┌─────────────────────────┴──────────────────────────┐ │
+│  │ context.addMethodInvocation((node) {               │ │
+│  │   if (condition) reporter.atNode(node);            │ │
+│  │ });                                                 │ │
+│  └─────────────────────────────────────────────────────┘ │
+└─────────────────────────────────────────────────────────┘
+```
+
+**Files:**
+
+| File | Purpose | Lines |
+|------|---------|-------|
+| `saropa_analysis_rule.dart` | Base class extending `AnalysisRule`, preserves `runWithReporter()` | ~90 |
+| `saropa_context.dart` | Wraps `RuleVisitorRegistry` with 80 callback-based `addXxx()` methods | ~480 |
+| `saropa_reporter.dart` | Wraps `AnalysisRule.reportAtNode()` with `atNode()`/`atToken()`/`atOffset()` | ~55 |
+| `compat_visitor.dart` | `SimpleAstVisitor` bridge with 80 node type callbacks | ~270 |
+
+## Migration Phases
+
+### Phase 0: Research & Decision - DONE
+
+- [x] Study `analysis_server_plugin` source code
+- [x] Document all API differences (see table above)
+- [x] Identify dependency incompatibility (cannot coexist - clean break required)
+- [x] Confirm fix API is stable (`ResolvedCorrectionProducer`, `FixKind`, `CorrectionApplicability`)
+- [x] Confirm tier system maps to `diagnostics:` configuration
+- [x] Confirm `register(PluginRegistry)` provides init lifecycle
+
+**Decision**: Proceed with in-place migration (same package, breaking v5.0.0 release).
 
 ---
 
-### Phase 3: Quick Fix Migration
+### Phase 1: Infrastructure - DONE
 
-**Goal**: Migrate all 213 quick fixes
+- [x] Create feature branch `native-plugin-migration`
+- [x] Tag `v4-final` at v4.15.1 for rollback
+- [x] Swap dependencies: remove `custom_lint_builder`, add `analysis_server_plugin: ^0.3.0`
+- [x] Bump SDK to `>=3.10.0`, version to `5.0.0-dev.1`
+- [x] Create compatibility layer (4 files in `lib/src/native/`)
+- [x] Create plugin entry point (`lib/main.dart`)
+- [x] Migrate 2 proof-of-concept rules (AvoidDebugPrint, AvoidEmptySetState)
+- [x] Verify: `dart pub get` succeeds, `dart analyze lib/src/native/ lib/main.dart` = zero issues
 
-#### 3.1 New Fix Pattern
+**Resolved to**: `analysis_server_plugin 0.3.3` with `analyzer 8.4.0`
 
-Before (custom_lint):
+---
+
+### Phase 2: Quick Fix Infrastructure - TODO
+
+**Goal**: Bridge `ResolvedCorrectionProducer` for existing fix patterns
+
+#### 2.1 Fix Bridge
+
+Create `lib/src/native/saropa_fix.dart`:
+
 ```dart
-class _AvoidPrintFix extends DartFix {
+abstract class SaropaFix extends ResolvedCorrectionProducer {
   @override
-  void run(
-    CustomLintResolver resolver,
-    ChangeReporter reporter,
-    CustomLintContext context,
-    AnalysisError analysisError,
-    List<AnalysisError> others,
-  ) {
-    context.registry.addMethodInvocation((node) {
-      if (!analysisError.sourceRange.intersects(node.sourceRange)) return;
+  FixKind get fixKind;
 
-      final changeBuilder = reporter.createChangeBuilder(
-        message: 'Replace with logger',
-        priority: 80,
-      );
+  @override
+  CorrectionApplicability get applicability =>
+    CorrectionApplicability.singleLocation;
 
-      changeBuilder.addDartFileEdit((builder) {
-        builder.addSimpleReplacement(
-          node.sourceRange,
-          'logger.info(${node.argumentList})',
-        );
-      });
-    });
+  @override
+  Future<void> compute(ChangeBuilder builder) async {
+    // Subclasses implement fix logic
   }
 }
 ```
 
-After (native plugin):
+Register fixes with:
 ```dart
-// API TBD - need to research native fix registration
+registry.registerFixForRule(rule.code, (context) => MyFix(context));
 ```
 
-#### 3.2 Fix Registration
+#### 2.2 PoC Fix
 
-Native plugin fix registration differs from custom_lint. Need to research:
-- How fixes are associated with rules
-- Fix priority system
-- Multi-fix support
+Migrate `_CommentOutDebugPrintFix` as proof-of-concept.
 
 #### Deliverables
-- [ ] Document new fix API
-- [ ] Create fix base class
-- [ ] Migrate all 213 fixes
-- [ ] Test fix application with `dart fix`
+- [ ] `lib/src/native/saropa_fix.dart` - Fix base class
+- [ ] Migrate 1-2 proof-of-concept fixes
+- [ ] Verify quick fixes appear in VS Code (the whole reason for this migration)
 
 ---
 
-### Phase 4: Configuration Migration
+### Phase 3: Reporter Features - TODO
 
-**Goal**: New configuration format and tier system
+**Goal**: Add back saropa features to `SaropaDiagnosticReporter`
 
-#### 4.1 New Configuration Format
+Currently the reporter is minimal (Phase 1). Add back:
 
-custom_lint format:
+| Feature | Priority | Notes |
+|---------|----------|-------|
+| Ignore comment checking (`IgnoreUtils`) | High | Already works with pure `analyzer` imports |
+| Baseline suppression (`BaselineManager`) | Medium | Needs import cleanup from custom_lint deps |
+| Impact tracking (`ImpactTracker`) | Low | Analytics feature |
+| Progress tracking (`ProgressTracker`) | Low | Analytics feature |
+| Severity overrides | Medium | Via `diagnostics:` config in `analysis_options.yaml` |
+
+#### Deliverables
+- [ ] Add ignore comment checking to reporter
+- [ ] Add baseline suppression
+- [ ] Add severity override support
+- [ ] Add impact/progress tracking
+
+---
+
+### Phase 4: Bulk Rule Migration - TODO
+
+**Goal**: Migrate all 1,677+ rules using the compatibility layer
+
+#### 4.1 Migration per Rule (Mechanical Changes)
+
+Each rule needs these changes:
+1. `extends SaropaLintRule` -> `extends SaropaAnalysisRule`
+2. `LintCode(name: 'x', problemMessage: 'y', errorSeverity: s)` -> `LintCode('x', 'y', severity: s)`
+3. Drop `resolver` parameter from `runWithReporter`
+4. `context.registry.addXxx(` -> `context.addXxx(`
+5. `reporter.atNode(node, code)` -> `reporter.atNode(node)`
+6. Remove `custom_lint_builder` imports, add native imports
+
+#### 4.2 Batch Strategy
+
+| Batch | Category | Count | Complexity |
+|-------|----------|-------|------------|
+| 1 | Core Dart rules | ~200 | Low (simple patterns) |
+| 2 | Flutter widget rules | ~300 | Low (MethodInvocation/InstanceCreation) |
+| 3 | Security rules | ~150 | Medium (string analysis) |
+| 4 | Accessibility rules | ~100 | Low (widget patterns) |
+| 5 | Package-specific (Riverpod, Bloc, etc.) | ~500 | Medium (package detection) |
+| 6 | Performance/Architecture rules | ~400 | Medium-High (cross-node analysis) |
+
+#### 4.3 Automated Migration Script
+
+Create `scripts/migrate_to_native.dart` to handle mechanical transformations:
+- Import rewrites
+- LintCode constructor migration
+- `runWithReporter` signature change
+- `context.registry.` -> `context.` prefix removal
+- `reporter.atNode(node, code)` -> `reporter.atNode(node)` argument removal
+
+Manual review needed for:
+- Rules using `CustomLintResolver` features
+- Rules with custom `shouldAnalyze()` / content pre-filtering
+- Complex fix implementations
+- Rules accessing `ProjectContext` features that need adaptation
+
+#### Deliverables
+- [ ] Migration script (`scripts/migrate_to_native.dart`)
+- [ ] Migrate and verify batch 1 (core rules)
+- [ ] Migrate and verify batches 2-6
+- [ ] Update `lib/main.dart` to register all migrated rules
+- [ ] Remove old `lib/saropa_lints.dart` custom_lint entry point
+- [ ] Remove `custom_lint_builder` dependency entirely
+
+---
+
+### Phase 5: Configuration & Tier System - TODO
+
+**Goal**: New configuration format and tier presets
+
+#### 5.1 Preset Files
+
+Create preset configs in `lib/presets/`:
+
 ```yaml
-custom_lint:
-  rules:
-    - avoid_print
-    - require_dispose: false
+# lib/presets/recommended.yaml
+plugins:
+  saropa_lints:
+    diagnostics:
+      avoid_debug_print: warning
+      avoid_empty_set_state: warning
+      # ... all recommended-tier rules
 ```
 
-Native plugin format:
-```yaml
-analyzer:
-  plugins:
-    - saropa_lints
-
-linter:
-  rules:
-    avoid_print: true
-    require_dispose: false
-```
-
-#### 4.2 Tier System Migration
-
-Options:
-1. **Presets**: Create preset packages (`saropa_lints_essential`, `saropa_lints_recommended`, etc.)
-2. **Single package with presets**: Include preset configs in main package
-3. **Drop tiers**: Let users configure individually
-
-Recommendation: Option 2 - Include preset analysis_options files:
-
-```yaml
-# In user's analysis_options.yaml
-include: package:saropa_lints/presets/recommended.yaml
-```
-
-#### 4.3 Init Command Update
+#### 5.2 Init Command Update
 
 Update `bin/init.dart` to generate new format:
 
 ```bash
 dart run saropa_lints:init --tier recommended
-# Generates analysis_options.yaml with new format
+# Generates analysis_options.yaml with plugins: section
 ```
 
 #### Deliverables
-- [ ] Preset configuration files
-- [ ] Update init command
-- [ ] Migration guide for existing users
-- [ ] Update documentation
+- [ ] Preset configuration files for each tier
+- [ ] Update init command for new format
+- [ ] Migration guide for v4 -> v5 users
 
 ---
 
-### Phase 5: Testing & Release
+### Phase 6: Testing & Release - TODO
 
 **Goal**: Comprehensive testing and release
 
-#### 5.1 Testing Strategy
+#### 6.1 Testing
 
 | Test Type | Coverage |
 |-----------|----------|
-| Unit tests | All migrated rules |
-| Integration tests | Plugin loading, rule execution |
-| Regression tests | Compare results with custom_lint version |
-| Performance tests | Analyze large projects |
-| IDE tests | VS Code, IntelliJ integration |
+| Unit tests | All migrated rules detect correctly |
+| Quick fix tests | Fixes appear in VS Code, apply correctly |
+| Integration tests | Plugin loads, registers rules, analyzes files |
+| Regression tests | Compare output with v4 on same codebase |
+| Performance tests | Benchmark against custom_lint on large projects |
+| IDE tests | VS Code squiggles, Problems panel, quick fixes |
 
-#### 5.2 Beta Release
+#### 6.2 Release Plan
 
-1. Release as `saropa_lints: ^3.0.0-beta.1`
-2. Requires Dart SDK `>=3.10.0`
-3. Document breaking changes
-4. Gather feedback
-
-#### 5.3 Stable Release
-
-1. Address beta feedback
-2. Release `saropa_lints: ^3.0.0`
-3. Deprecate 2.x branch
-4. Maintain security fixes for 2.x during transition period
+1. `5.0.0-dev.1` - Current state (infrastructure + PoC)
+2. `5.0.0-beta.1` - All rules migrated, basic quick fixes
+3. `5.0.0-beta.2` - All quick fixes, reporter features
+4. `5.0.0` - Stable release after beta feedback
+5. Maintain `4.x` security fixes during transition
 
 #### Deliverables
-- [ ] Comprehensive test suite
-- [ ] Beta release
-- [ ] Migration guide
+- [ ] Test suite covering all migrated rules
+- [ ] Beta releases for feedback
+- [ ] Migration guide (`MIGRATION_V5.md`)
 - [ ] Stable release
-- [ ] 2.x deprecation plan
+- [ ] Deprecation notice for v4
 
 ---
 
@@ -504,49 +395,73 @@ dart run saropa_lints:init --tier recommended
 
 | Risk | Likelihood | Impact | Mitigation |
 |------|------------|--------|------------|
-| API instability | Low | High | Dart 3.10.8 is stable; monitor SDK releases |
-| Feature loss | Medium | Medium | Document limitations, provide alternatives |
-| Performance regression | Low | Medium | Benchmark early, optimize |
-| User migration friction | High | Medium | Comprehensive migration guide |
-| Maintenance burden | Medium | High | Use shared rule logic; drop custom_lint after stable |
+| API instability | Low | High | Using `^0.3.0` constraint, resolved to 0.3.3 with analyzer 8.4.0 |
+| Quick fixes still don't work | Low | Critical | This is the primary motivation; verify in Phase 2 |
+| Feature loss (baseline, impact) | Medium | Medium | Compatibility layer preserves reporter; re-add features in Phase 3 |
+| Performance regression | Low | Medium | Native should be faster; benchmark in Phase 6 |
+| User migration friction | High | Medium | Comprehensive migration guide, preset configs |
+| `analyzer` version conflicts | Medium | High | Consumer may pin different analyzer version |
 
-## Decision Criteria
+## Verified Facts
 
-**Proceed with migration when**:
-- [ ] Phase 0 research confirms API compatibility
-- [ ] Test project validates core rule patterns work
-- [ ] Performance benchmarks show improvement over custom_lint
-- [ ] Critical features (quick fixes, tier system) have viable paths
+- `analysis_server_plugin` 0.3.3 resolves with `analyzer` 8.4.0
+- `SimpleAstVisitor` has 179 visit methods (no `visitFormalParameter`, `visitStringLiteral`, `visitFunctionBody`)
+- `RuleVisitorRegistry` has 144 `addXxx(AbstractAnalysisRule, AstVisitor)` methods
+- `LintCode` constructor: `const LintCode(String name, String problemMessage, {correctionMessage, severity = DiagnosticSeverity.INFO})`
+- `AnalysisRule` has `reportAtNode()`, `reportAtToken()`, `reportAtOffset()` - code is implicit from `diagnosticCode`
+- `PluginRegistry` has `registerLintRule()`, `registerWarningRule()`, `registerFixForRule(LintCode, ProducerGenerator)`
+- `IgnoreUtils` only depends on `analyzer` (no custom_lint imports) - can be reused directly
+- Plugin entry point: `lib/main.dart` with `final plugin = MyPlugin()` top-level variable
+- Consumer config: top-level `plugins:` section in `analysis_options.yaml`
 
-**Pause if**:
-- Critical features cannot be implemented
-- Performance is worse than custom_lint
-- API changes significantly in upcoming Dart releases
+## File Index
+
+### New Files (Phase 1)
+
+| File | Status | Purpose |
+|------|--------|---------|
+| `lib/main.dart` | Done | Plugin entry point |
+| `lib/src/native/saropa_analysis_rule.dart` | Done | Base class preserving `runWithReporter()` |
+| `lib/src/native/saropa_context.dart` | Done | Registry wrapper (80 callback methods) |
+| `lib/src/native/saropa_reporter.dart` | Done | Reporter wrapper (minimal Phase 1) |
+| `lib/src/native/compat_visitor.dart` | Done | SimpleAstVisitor bridge (80 node types) |
+| `lib/src/native/poc_rules.dart` | Done | 2 migrated PoC rules |
+
+### Modified Files
+
+| File | Change |
+|------|--------|
+| `pubspec.yaml` | Swapped deps, bumped SDK/version |
+
+### Files to Remove (Phase 4)
+
+| File | Reason |
+|------|--------|
+| `lib/saropa_lints.dart` | Old custom_lint entry point |
+| `lib/custom_lint_client.dart` | Old custom_lint client |
 
 ## References
 
 - [Dart Analyzer Plugins](https://dart.dev/tools/analyzer-plugins)
 - [GitHub #53402 - New analyzer plugin system](https://github.com/dart-lang/sdk/issues/53402)
+- [GitHub #61491 - Quick fixes not forwarded to old plugins](https://github.com/dart-lang/sdk/issues/61491)
 - [analysis_server_plugin package](https://github.com/dart-lang/sdk/tree/main/pkg/analysis_server_plugin)
-- [Migration blog post](https://leancode.co/blog/migrating-to-dart-analyzer-plugin-system)
 - [Writing rules guide](https://github.com/dart-lang/sdk/blob/main/pkg/analysis_server_plugin/doc/writing_rules.md)
+- [Migration blog post](https://leancode.co/blog/migrating-to-dart-analyzer-plugin-system)
 
 ---
 
-## Appendix: Feature Comparison
+## Appendix: Reporting Capabilities
 
-| Feature | custom_lint | Native Plugin | Notes |
-|---------|-------------|---------------|-------|
-| Lint rules | Yes | Yes | API differs |
-| Quick fixes | Yes | Yes | API differs |
-| Assists | No | Yes | New capability |
-| `dart analyze` integration | No | Yes | Major benefit |
-| `dart fix` integration | No | Yes | Major benefit |
-| IDE integration | Via plugin | Native | Better performance |
-| Hot reload during development | Yes | Unknown | custom_lint advantage |
-| Debugger support | Yes | Unknown | custom_lint advantage |
-| Configuration | custom_lint section | plugins section | Different format |
+| Output | v4 (custom_lint) | v5 (native) | Notes |
+|--------|------------------|-------------|-------|
+| IDE "PROBLEMS" panel | Yes | Yes (faster) | Same UX |
+| Editor squiggles | Yes | Yes (faster) | Same UX |
+| Quick fixes (lightbulb) | **Broken** (never appears) | Yes | Primary motivation |
+| `dart analyze` | No | Yes | Major benefit |
+| `dart fix --apply` | No | Yes | Major benefit |
+| Terminal output | `dart run custom_lint` | `dart analyze` | Simpler |
 
 ---
 
-_Last updated: 2026-01-28_
+_Last updated: 2026-02-16_

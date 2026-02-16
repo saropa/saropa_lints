@@ -4,9 +4,6 @@ import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/token.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
 import 'package:analyzer/dart/element/type.dart';
-import 'package:analyzer/error/error.dart'
-    show AnalysisError, DiagnosticSeverity;
-import 'package:custom_lint_builder/custom_lint_builder.dart';
 
 import '../saropa_lint_rule.dart';
 
@@ -31,7 +28,7 @@ import '../saropa_lint_rule.dart';
 ///
 /// **Quick fix available:** Replaces `&` with `&&` or `|` with `||`.
 class AvoidBitwiseOperatorsWithBooleansRule extends SaropaLintRule {
-  const AvoidBitwiseOperatorsWithBooleansRule() : super(code: _code);
+  AvoidBitwiseOperatorsWithBooleansRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -41,21 +38,19 @@ class AvoidBitwiseOperatorsWithBooleansRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.high;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_bitwise_operators_with_booleans',
-    problemMessage:
-        '[avoid_bitwise_operators_with_booleans] Bitwise operator on boolean. Unlike &&/||, this does not short-circuit. Using & or | with booleans is likely a mistake; use && or || instead. Bitwise operators don\'t short-circuit and can cause unexpected behavior. {v4}',
+    'avoid_bitwise_operators_with_booleans',
+    '[avoid_bitwise_operators_with_booleans] Bitwise operator on boolean. Unlike &&/||, this does not short-circuit. Using & or | with booleans is likely a mistake; use && or || instead. Bitwise operators don\'t short-circuit and can cause unexpected behavior. {v4}',
     correctionMessage:
         'Use && instead of & and || instead of | for boolean logic. Verify the change works correctly with existing tests and add coverage for the new behavior.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addBinaryExpression((BinaryExpression node) {
+    context.addBinaryExpression((BinaryExpression node) {
       final TokenType op = node.operator.type;
 
       // Only check & and |
@@ -69,13 +64,10 @@ class AvoidBitwiseOperatorsWithBooleansRule extends SaropaLintRule {
       final bool rightIsBool = rightType?.getDisplayString() == 'bool';
 
       if (leftIsBool || rightIsBool) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
   }
-
-  @override
-  List<Fix> getFixes() => <Fix>[_ReplaceBitwiseWithLogicalFix()];
 }
 
 /// Warns when cascade is used after if-null operator without parentheses.
@@ -99,7 +91,7 @@ class AvoidBitwiseOperatorsWithBooleansRule extends SaropaLintRule {
 ///
 /// **Quick fix available:** Adds a comment to flag for manual review.
 class AvoidCascadeAfterIfNullRule extends SaropaLintRule {
-  const AvoidCascadeAfterIfNullRule() : super(code: _code);
+  AvoidCascadeAfterIfNullRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -109,32 +101,27 @@ class AvoidCascadeAfterIfNullRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_cascade_after_if_null',
-    problemMessage:
-        '[avoid_cascade_after_if_null] Cascade after ?? may have unexpected precedence. Using cascade after ?? without parentheses can lead to unexpected behavior because ?? has lower precedence than cascade. {v5}',
+    'avoid_cascade_after_if_null',
+    '[avoid_cascade_after_if_null] Cascade after ?? may have unexpected precedence. Using cascade after ?? without parentheses can lead to unexpected behavior because ?? has lower precedence than cascade. {v5}',
     correctionMessage:
         'Wrap the ?? expression in parentheses: (a ?? b).cascade. Verify the change works correctly with existing tests and add coverage for the new behavior.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addCascadeExpression((CascadeExpression node) {
+    context.addCascadeExpression((CascadeExpression node) {
       // Check if the target of the cascade is a binary expression with ??
       final Expression target = node.target;
       if (target is BinaryExpression &&
           target.operator.type == TokenType.QUESTION_QUESTION) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
   }
-
-  @override
-  List<Fix> getFixes() => <Fix>[_AddHackForCascadeAfterIfNullFix()];
 }
 
 /// Warns when arithmetic expressions are too complex.
@@ -158,7 +145,7 @@ class AvoidCascadeAfterIfNullRule extends SaropaLintRule {
 /// final result = product + quotient - e % f + g * h;
 /// ```
 class AvoidComplexArithmeticExpressionsRule extends SaropaLintRule {
-  const AvoidComplexArithmeticExpressionsRule() : super(code: _code);
+  AvoidComplexArithmeticExpressionsRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -170,12 +157,11 @@ class AvoidComplexArithmeticExpressionsRule extends SaropaLintRule {
   static const int _maxOperators = 4;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_complex_arithmetic_expressions',
-    problemMessage:
-        '[avoid_complex_arithmetic_expressions] Arithmetic expression has more than $_maxOperators operators. Complex arithmetic expressions are hard to understand and maintain. Extract parts into named variables. {v4}',
+    'avoid_complex_arithmetic_expressions',
+    '[avoid_complex_arithmetic_expressions] Arithmetic expression has more than $_maxOperators operators. Complex arithmetic expressions are hard to understand and maintain. Extract parts into named variables. {v4}',
     correctionMessage:
         'Extract parts into named variables for clarity. Verify the change works correctly with existing tests and add coverage for the new behavior.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   static const Set<String> _arithmeticOperators = <String>{
@@ -189,17 +175,16 @@ class AvoidComplexArithmeticExpressionsRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addBinaryExpression((BinaryExpression node) {
+    context.addBinaryExpression((BinaryExpression node) {
       // Only check top-level arithmetic expressions
       if (node.parent is BinaryExpression) return;
 
       final int count = _countArithmeticOperators(node);
       if (count > _maxOperators) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
   }
@@ -240,7 +225,7 @@ class AvoidComplexArithmeticExpressionsRule extends SaropaLintRule {
 /// if (isFirstCondition || isSecondCondition || e && f) { ... }
 /// ```
 class AvoidComplexConditionsRule extends SaropaLintRule {
-  const AvoidComplexConditionsRule() : super(code: _code);
+  AvoidComplexConditionsRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -252,35 +237,33 @@ class AvoidComplexConditionsRule extends SaropaLintRule {
   static const int _maxOperators = 3;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_complex_conditions',
-    problemMessage:
-        '[avoid_complex_conditions] Condition has more than $_maxOperators logical operators. Complex conditions with many logical operators are hard to understand. Extract parts into named boolean variables. {v3}',
+    'avoid_complex_conditions',
+    '[avoid_complex_conditions] Condition has more than $_maxOperators logical operators. Complex conditions with many logical operators are hard to understand. Extract parts into named boolean variables. {v3}',
     correctionMessage:
         'Extract parts into named boolean variables. Verify the change works correctly with existing tests and add coverage for the new behavior.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addIfStatement((IfStatement node) {
+    context.addIfStatement((IfStatement node) {
       final int count = _countLogicalOperators(node.expression);
       if (count > _maxOperators) {
         reporter.atNode(node.expression, code);
       }
     });
 
-    context.registry.addWhileStatement((WhileStatement node) {
+    context.addWhileStatement((WhileStatement node) {
       final int count = _countLogicalOperators(node.condition);
       if (count > _maxOperators) {
         reporter.atNode(node.condition, code);
       }
     });
 
-    context.registry.addConditionalExpression((ConditionalExpression node) {
+    context.addConditionalExpression((ConditionalExpression node) {
       final int count = _countLogicalOperators(node.condition);
       if (count > _maxOperators) {
         reporter.atNode(node.condition, code);
@@ -330,7 +313,7 @@ class AvoidComplexConditionsRule extends SaropaLintRule {
 ///
 /// **Quick fix available:** Adds a comment to flag for manual review.
 class AvoidDuplicateCascadesRule extends SaropaLintRule {
-  const AvoidDuplicateCascadesRule() : super(code: _code);
+  AvoidDuplicateCascadesRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -340,37 +323,32 @@ class AvoidDuplicateCascadesRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_duplicate_cascades',
-    problemMessage:
-        '[avoid_duplicate_cascades] Duplicate cascade operation detected on the same target. Identical cascade members are likely copy-paste errors that produce redundant side effects and increase maintenance risk. {v4}',
+    'avoid_duplicate_cascades',
+    '[avoid_duplicate_cascades] Duplicate cascade operation detected on the same target. Identical cascade members are likely copy-paste errors that produce redundant side effects and increase maintenance risk. {v4}',
     correctionMessage:
         'Remove the duplicate or verify this is intentional. Verify the change works correctly with existing tests and add coverage for the new behavior.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addCascadeExpression((CascadeExpression node) {
+    context.addCascadeExpression((CascadeExpression node) {
       final List<Expression> sections = node.cascadeSections;
       final Set<String> seenOperations = <String>{};
 
       for (final Expression section in sections) {
         final String source = section.toSource();
         if (seenOperations.contains(source)) {
-          reporter.atNode(section, code);
+          reporter.atNode(section);
         } else {
           seenOperations.add(source);
         }
       }
     });
   }
-
-  @override
-  List<Fix> getFixes() => <Fix>[_AddHackForDuplicateCascadeFix()];
 }
 
 /// Warns when an expression has excessive complexity.
@@ -393,7 +371,7 @@ class AvoidDuplicateCascadesRule extends SaropaLintRule {
 /// if (condition1 || condition2) { }
 /// ```
 class AvoidExcessiveExpressionsRule extends SaropaLintRule {
-  const AvoidExcessiveExpressionsRule() : super(code: _code);
+  AvoidExcessiveExpressionsRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -405,27 +383,25 @@ class AvoidExcessiveExpressionsRule extends SaropaLintRule {
   static const int _maxOperators = 5;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_excessive_expressions',
-    problemMessage:
-        '[avoid_excessive_expressions] Expression has excessive complexity (>$_maxOperators operators). Complex expressions are hard to read and maintain. This excessive complexity makes the code harder to understand, test, and maintain. {v4}',
+    'avoid_excessive_expressions',
+    '[avoid_excessive_expressions] Expression has excessive complexity (>$_maxOperators operators). Complex expressions are hard to read and maintain. This excessive complexity makes the code harder to understand, test, and maintain. {v4}',
     correctionMessage:
         'Break into smaller expressions with named variables. Verify the change works correctly with existing tests and add coverage for the new behavior.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addBinaryExpression((BinaryExpression node) {
+    context.addBinaryExpression((BinaryExpression node) {
       // Only check top-level binary expressions
       if (node.parent is BinaryExpression) return;
 
       final int operatorCount = _countOperators(node);
       if (operatorCount > _maxOperators) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
   }
@@ -470,7 +446,7 @@ class AvoidExcessiveExpressionsRule extends SaropaLintRule {
 /// }
 /// ```
 class AvoidImmediatelyInvokedFunctionsRule extends SaropaLintRule {
-  const AvoidImmediatelyInvokedFunctionsRule() : super(code: _code);
+  AvoidImmediatelyInvokedFunctionsRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -480,35 +456,34 @@ class AvoidImmediatelyInvokedFunctionsRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_immediately_invoked_functions',
-    problemMessage:
-        '[avoid_immediately_invoked_functions] Function is immediately invoked after definition. Immediately invoked function expressions (IIFE) can be confusing and usually indicate the code must be refactored. {v4}',
+    'avoid_immediately_invoked_functions',
+    '[avoid_immediately_invoked_functions] Function is immediately invoked after definition. Immediately invoked function expressions (IIFE) can be confusing and usually indicate the code must be refactored. {v4}',
     correctionMessage:
         'Extract the logic inline or to a named function. Verify the change works correctly with existing tests and add coverage for the new behavior.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry
-        .addFunctionExpressionInvocation((FunctionExpressionInvocation node) {
+    context.addFunctionExpressionInvocation((
+      FunctionExpressionInvocation node,
+    ) {
       final Expression function = node.function;
 
       // Check for (expression)() pattern
       if (function is ParenthesizedExpression) {
         final Expression inner = function.expression;
         if (inner is FunctionExpression) {
-          reporter.atNode(node, code);
+          reporter.atNode(node);
         }
       }
 
       // Check for direct function expression invocation
       if (function is FunctionExpression) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
   }
@@ -518,7 +493,7 @@ class AvoidImmediatelyInvokedFunctionsRule extends SaropaLintRule {
 ///
 /// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v5
 class AvoidNestedShorthandsRule extends SaropaLintRule {
-  const AvoidNestedShorthandsRule() : super(code: _code);
+  AvoidNestedShorthandsRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -528,44 +503,42 @@ class AvoidNestedShorthandsRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_nested_shorthands',
-    problemMessage:
-        '[avoid_nested_shorthands] Deeply nested shorthand syntax (e.g., cascades inside ternaries inside null-aware operators) reduces readability and makes expressions difficult to understand at a glance. Each nesting level multiplies cognitive load, increasing the risk of logic errors during code review and maintenance. {v5}',
+    'avoid_nested_shorthands',
+    '[avoid_nested_shorthands] Deeply nested shorthand syntax (e.g., cascades inside ternaries inside null-aware operators) reduces readability and makes expressions difficult to understand at a glance. Each nesting level multiplies cognitive load, increasing the risk of logic errors during code review and maintenance. {v5}',
     correctionMessage:
         'Extract nested expressions into named local variables or helper methods. Each intermediate value should have a descriptive name that communicates its purpose, making the overall logic easier to follow, test, and debug.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addConditionalExpression((ConditionalExpression node) {
+    context.addConditionalExpression((ConditionalExpression node) {
       // Check for nested ternary operators
       if (node.thenExpression is ConditionalExpression ||
           node.elseExpression is ConditionalExpression) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
 
-    context.registry.addCascadeExpression((CascadeExpression node) {
+    context.addCascadeExpression((CascadeExpression node) {
       // Check for nested cascades
       for (final Expression section in node.cascadeSections) {
         if (section is CascadeExpression) {
-          reporter.atNode(section, code);
+          reporter.atNode(section);
         }
       }
     });
 
-    context.registry.addBinaryExpression((BinaryExpression node) {
+    context.addBinaryExpression((BinaryExpression node) {
       // Check for nested null-aware operators
       if (node.operator.lexeme == '??') {
         if (node.rightOperand is BinaryExpression) {
           final BinaryExpression right = node.rightOperand as BinaryExpression;
           if (right.operator.lexeme == '??') {
-            reporter.atNode(node, code);
+            reporter.atNode(node);
           }
         }
       }
@@ -591,7 +564,7 @@ class AvoidNestedShorthandsRule extends SaropaLintRule {
 /// c = 0;
 /// ```
 class AvoidMultiAssignmentRule extends SaropaLintRule {
-  const AvoidMultiAssignmentRule() : super(code: _code);
+  AvoidMultiAssignmentRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -601,24 +574,22 @@ class AvoidMultiAssignmentRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_multi_assignment',
-    problemMessage:
-        '[avoid_multi_assignment] Multiple chained assignments detected. Chained assignments reduce readability and can be confusing. This excessive complexity makes the code harder to understand, test, and maintain. {v4}',
+    'avoid_multi_assignment',
+    '[avoid_multi_assignment] Multiple chained assignments detected. Chained assignments reduce readability and can be confusing. This excessive complexity makes the code harder to understand, test, and maintain. {v4}',
     correctionMessage:
         'Split into separate assignment statements. Verify the change works correctly with existing tests and add coverage for the new behavior.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addAssignmentExpression((AssignmentExpression node) {
+    context.addAssignmentExpression((AssignmentExpression node) {
       // Check if the right side is also an assignment
       if (node.rightHandSide is AssignmentExpression) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
   }
@@ -633,34 +604,32 @@ class AvoidMultiAssignmentRule extends SaropaLintRule {
 /// Prefer having the variable on the left side of comparisons for readability.
 /// Example: Prefer `x == 5` over `5 == x`.
 class BinaryExpressionOperandOrderRule extends SaropaLintRule {
-  const BinaryExpressionOperandOrderRule() : super(code: _code);
+  BinaryExpressionOperandOrderRule() : super(code: _code);
 
   /// Stylistic preference only. No performance or correctness benefit.
   @override
   LintImpact get impact => LintImpact.opinionated;
 
   static const LintCode _code = LintCode(
-    name: 'binary_expression_operand_order',
-    problemMessage:
-        '[binary_expression_operand_order] Preferring a specific operand order in binary expressions is a stylistic convention. Both orderings produce equivalent compiled code. Enable via the stylistic tier. {v3}',
+    'binary_expression_operand_order',
+    '[binary_expression_operand_order] Preferring a specific operand order in binary expressions is a stylistic convention. Both orderings produce equivalent compiled code. Enable via the stylistic tier. {v3}',
     correctionMessage:
         'Place the variable or expression on the left side and the constant on the right (e.g., "status == 200" instead of "200 == status") to match natural language order and improve readability.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addBinaryExpression((BinaryExpression node) {
+    context.addBinaryExpression((BinaryExpression node) {
       // Check for comparison operators
       final TokenType op = node.operator.type;
       if (op == TokenType.EQ_EQ || op == TokenType.BANG_EQ) {
         // If left is literal and right is identifier, suggest swap
         if (node.leftOperand is Literal && node.rightOperand is Identifier) {
-          reporter.atNode(node, code);
+          reporter.atNode(node);
         }
       }
     });
@@ -674,7 +643,7 @@ class BinaryExpressionOperandOrderRule extends SaropaLintRule {
 /// Repeated expressions can be error-prone and inefficient. Consider
 /// extracting them to a local variable.
 class PreferMovingToVariableRule extends SaropaLintRule {
-  const PreferMovingToVariableRule() : super(code: _code);
+  PreferMovingToVariableRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -684,21 +653,19 @@ class PreferMovingToVariableRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'prefer_moving_to_variable',
-    problemMessage:
-        '[prefer_moving_to_variable] Expression repeated multiple times within the same scope. Repeated expressions waste CPU recalculating the same value, make code harder to maintain when the logic changes, and increase the chance of typos creating subtle bugs. {v4}',
+    'prefer_moving_to_variable',
+    '[prefer_moving_to_variable] Expression repeated multiple times within the same scope. Repeated expressions waste CPU recalculating the same value, make code harder to maintain when the logic changes, and increase the chance of typos creating subtle bugs. {v4}',
     correctionMessage:
         'Extract the repeated expression into a descriptive local variable calculated once and reused. This improves performance, makes the code DRY (Don\'t Repeat Yourself), and ensures consistency if the expression value is used multiple times.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addBlock((Block node) {
+    context.addBlock((Block node) {
       final Map<String, List<Expression>> expressions =
           <String, List<Expression>>{};
 
@@ -761,7 +728,7 @@ class _ExpressionCollector extends RecursiveAstVisitor<void> {
 /// final y = (a * b) ?? c;
 /// ```
 class PreferParenthesesWithIfNullRule extends SaropaLintRule {
-  const PreferParenthesesWithIfNullRule() : super(code: _code);
+  PreferParenthesesWithIfNullRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -771,21 +738,19 @@ class PreferParenthesesWithIfNullRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'prefer_parentheses_with_if_null',
-    problemMessage:
-        '[prefer_parentheses_with_if_null] Add parentheses to clarify if-null expression precedence. If-null operator (??) is used without parentheses in potentially ambiguous expressions. This excessive complexity makes the code harder to understand, test, and maintain. {v4}',
+    'prefer_parentheses_with_if_null',
+    '[prefer_parentheses_with_if_null] Add parentheses to clarify if-null expression precedence. If-null operator (??) is used without parentheses in potentially ambiguous expressions. This excessive complexity makes the code harder to understand, test, and maintain. {v4}',
     correctionMessage:
         'Wrap operands in parentheses for clarity. Verify the change works correctly with existing tests and add coverage for the new behavior.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addBinaryExpression((BinaryExpression node) {
+    context.addBinaryExpression((BinaryExpression node) {
       if (node.operator.lexeme != '??') return;
 
       // Check if either operand is a binary expression without parentheses
@@ -802,7 +767,7 @@ class PreferParenthesesWithIfNullRule extends SaropaLintRule {
             op != '<' &&
             op != '>=' &&
             op != '<=') {
-          reporter.atNode(node, code);
+          reporter.atNode(node);
           return;
         }
       }
@@ -811,97 +776,9 @@ class PreferParenthesesWithIfNullRule extends SaropaLintRule {
       if (right is BinaryExpression) {
         final String op = right.operator.lexeme;
         if (op == '+' || op == '-' || op == '*' || op == '/') {
-          reporter.atNode(node, code);
+          reporter.atNode(node);
         }
       }
-    });
-  }
-}
-
-class _ReplaceBitwiseWithLogicalFix extends DartFix {
-  @override
-  void run(
-    CustomLintResolver resolver,
-    ChangeReporter reporter,
-    CustomLintContext context,
-    AnalysisError analysisError,
-    List<AnalysisError> others,
-  ) {
-    context.registry.addBinaryExpression((BinaryExpression node) {
-      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
-
-      final TokenType op = node.operator.type;
-      if (op != TokenType.AMPERSAND && op != TokenType.BAR) return;
-
-      final String newOp = op == TokenType.AMPERSAND ? '&&' : '||';
-      final String left = node.leftOperand.toSource();
-      final String right = node.rightOperand.toSource();
-
-      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
-        message: 'Replace with $newOp',
-        priority: 1,
-      );
-
-      changeBuilder.addDartFileEdit((builder) {
-        builder.addSimpleReplacement(
-          node.sourceRange,
-          '$left $newOp $right',
-        );
-      });
-    });
-  }
-}
-
-class _AddHackForCascadeAfterIfNullFix extends DartFix {
-  @override
-  void run(
-    CustomLintResolver resolver,
-    ChangeReporter reporter,
-    CustomLintContext context,
-    AnalysisError analysisError,
-    List<AnalysisError> others,
-  ) {
-    context.registry.addCascadeExpression((CascadeExpression node) {
-      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
-
-      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
-        message: 'Add HACK comment for cascade precedence',
-        priority: 1,
-      );
-
-      changeBuilder.addDartFileEdit((builder) {
-        builder.addSimpleInsertion(
-          node.offset,
-          '// HACK: wrap ?? expression in parentheses\n',
-        );
-      });
-    });
-  }
-}
-
-class _AddHackForDuplicateCascadeFix extends DartFix {
-  @override
-  void run(
-    CustomLintResolver resolver,
-    ChangeReporter reporter,
-    CustomLintContext context,
-    AnalysisError analysisError,
-    List<AnalysisError> others,
-  ) {
-    context.registry.addCascadeExpression((CascadeExpression node) {
-      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
-
-      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
-        message: 'Add HACK comment for duplicate cascade',
-        priority: 1,
-      );
-
-      changeBuilder.addDartFileEdit((builder) {
-        builder.addSimpleInsertion(
-          node.offset,
-          '// HACK: duplicate cascade - remove or verify intentional\n',
-        );
-      });
     });
   }
 }

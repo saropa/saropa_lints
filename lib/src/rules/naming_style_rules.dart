@@ -3,10 +3,6 @@
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/token.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
-import 'package:analyzer/error/error.dart'
-    show AnalysisError, DiagnosticSeverity;
-import 'package:analyzer/source/source_range.dart';
-import 'package:custom_lint_builder/custom_lint_builder.dart';
 
 import '../comment_utils.dart';
 import '../saropa_lint_rule.dart';
@@ -17,7 +13,7 @@ import '../saropa_lint_rule.dart';
 ///
 /// Formerly: `avoid_getter_prefix`
 class AvoidGetterPrefixRule extends SaropaLintRule {
-  const AvoidGetterPrefixRule() : super(code: _code);
+  AvoidGetterPrefixRule() : super(code: _code);
 
   /// Style/consistency. Large counts acceptable in legacy code.
   @override
@@ -30,21 +26,19 @@ class AvoidGetterPrefixRule extends SaropaLintRule {
   List<String> get configAliases => const <String>['avoid_getter_prefix'];
 
   static const LintCode _code = LintCode(
-    name: 'prefer_no_getter_prefix',
-    problemMessage:
-        "[prefer_no_getter_prefix] Getter with 'get' prefix is redundant. Dart convention omits it. Formerly: avoid_getter_prefix. A getter name starts with \'get\'. {v2}",
+    'prefer_no_getter_prefix',
+    "[prefer_no_getter_prefix] Getter with 'get' prefix is redundant. Dart convention omits it. Formerly: avoid_getter_prefix. A getter name starts with \'get\'. {v2}",
     correctionMessage:
         "Remove the 'get' prefix from the getter name. For example, rename getName to name, or getValue to value.",
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodDeclaration((MethodDeclaration node) {
+    context.addMethodDeclaration((MethodDeclaration node) {
       if (!node.isGetter) return;
 
       final String name = node.name.lexeme;
@@ -80,7 +74,7 @@ class AvoidGetterPrefixRule extends SaropaLintRule {
 /// final text = 'Hello World';
 /// ```
 class AvoidNonAsciiSymbolsRule extends SaropaLintRule {
-  const AvoidNonAsciiSymbolsRule() : super(code: _code);
+  AvoidNonAsciiSymbolsRule() : super(code: _code);
 
   /// Style/consistency. Large counts acceptable in legacy code.
   @override
@@ -90,27 +84,25 @@ class AvoidNonAsciiSymbolsRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_non_ascii_symbols',
-    problemMessage:
-        '[avoid_non_ascii_symbols] String contains non-ASCII characters. Non-ASCII characters can cause encoding issues and may be hard to distinguish visually (e.g., different types of spaces). {v4}',
+    'avoid_non_ascii_symbols',
+    '[avoid_non_ascii_symbols] String contains non-ASCII characters. Non-ASCII characters can cause encoding issues and may be hard to distinguish visually (e.g., different types of spaces). {v4}',
     correctionMessage:
         'Replace non-ASCII characters with ASCII equivalents or Unicode escape sequences (e.g., \\u00E9 for e-acute).',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addSimpleStringLiteral((SimpleStringLiteral node) {
+    context.addSimpleStringLiteral((SimpleStringLiteral node) {
       final String value = node.value;
       for (int i = 0; i < value.length; i++) {
         final int codeUnit = value.codeUnitAt(i);
         // Check for non-ASCII (outside 0-127 range)
         if (codeUnit > 127) {
-          reporter.atNode(node, code);
+          reporter.atNode(node);
           return;
         }
       }
@@ -155,7 +147,7 @@ class AvoidNonAsciiSymbolsRule extends SaropaLintRule {
 ///
 /// Formerly: `capitalize_comment_start`
 class FormatCommentRule extends SaropaLintRule {
-  const FormatCommentRule() : super(code: _code);
+  FormatCommentRule() : super(code: _code);
 
   /// Style/consistency. Large counts acceptable in legacy code.
   @override
@@ -168,21 +160,19 @@ class FormatCommentRule extends SaropaLintRule {
   List<String> get configAliases => const <String>['capitalize_comment_start'];
 
   static const LintCode _code = LintCode(
-    name: 'prefer_capitalized_comment_start',
-    problemMessage:
-        '[prefer_capitalized_comment_start] Comment should start with capital letter. Prose comments should start with a capital letter for readability. Commented-out code and continuation comments are automatically detected and skipped. {v4}',
+    'prefer_capitalized_comment_start',
+    '[prefer_capitalized_comment_start] Comment should start with capital letter. Prose comments should start with a capital letter for readability. Commented-out code and continuation comments are automatically detected and skipped. {v4}',
     correctionMessage:
         'Capitalize the first letter of the comment text. Prose comments that start with lowercase letters reduce readability.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addCompilationUnit((CompilationUnit unit) {
+    context.addCompilationUnit((CompilationUnit unit) {
       final lineInfo = unit.lineInfo;
       Token? token = unit.beginToken;
 
@@ -192,8 +182,9 @@ class FormatCommentRule extends SaropaLintRule {
 
         while (commentToken != null) {
           final String lexeme = commentToken.lexeme;
-          final int currentLine =
-              lineInfo.getLocation(commentToken.offset).lineNumber;
+          final int currentLine = lineInfo
+              .getLocation(commentToken.offset)
+              .lineNumber;
 
           // Only check single-line comments (not doc comments)
           if (lexeme.startsWith('//') && !lexeme.startsWith('///')) {
@@ -227,7 +218,7 @@ class FormatCommentRule extends SaropaLintRule {
                 commentToken = commentToken.next;
                 continue;
               }
-              reporter.atToken(commentToken, code);
+              reporter.atToken(commentToken);
             }
           }
 
@@ -239,75 +230,9 @@ class FormatCommentRule extends SaropaLintRule {
       }
     });
   }
-
-  @override
-  List<Fix> getFixes() => <Fix>[_CapitalizeCommentFix()];
 }
 
 /// Quick fix that capitalizes the first letter of a comment.
-class _CapitalizeCommentFix extends DartFix {
-  @override
-  void run(
-    CustomLintResolver resolver,
-    ChangeReporter reporter,
-    CustomLintContext context,
-    AnalysisError analysisError,
-    List<AnalysisError> others,
-  ) {
-    context.registry.addCompilationUnit((CompilationUnit unit) {
-      Token? token = unit.beginToken;
-
-      while (token != null && !token.isEof) {
-        Token? commentToken = token.precedingComments;
-
-        while (commentToken != null) {
-          // Check if this comment matches the error location
-          if (commentToken.offset == analysisError.offset) {
-            final String lexeme = commentToken.lexeme;
-
-            // Find the first letter position after //
-            final int slashEnd = lexeme.indexOf('//') + 2;
-            int firstLetterIndex = slashEnd;
-
-            // Skip whitespace after //
-            while (firstLetterIndex < lexeme.length &&
-                lexeme[firstLetterIndex] == ' ') {
-              firstLetterIndex++;
-            }
-
-            if (firstLetterIndex < lexeme.length) {
-              final String firstChar = lexeme[firstLetterIndex];
-              final String capitalizedChar = firstChar.toUpperCase();
-
-              if (firstChar != capitalizedChar) {
-                final ChangeBuilder changeBuilder =
-                    reporter.createChangeBuilder(
-                  message: 'Capitalize comment',
-                  priority: 1,
-                );
-
-                changeBuilder.addDartFileEdit((builder) {
-                  builder.addSimpleReplacement(
-                    SourceRange(
-                      commentToken!.offset + firstLetterIndex,
-                      1,
-                    ),
-                    capitalizedChar,
-                  );
-                });
-              }
-            }
-            return;
-          }
-
-          commentToken = commentToken.next;
-        }
-
-        token = token.next;
-      }
-    });
-  }
-}
 
 /// Warns when class names don't match expected patterns.
 ///
@@ -327,7 +252,7 @@ class _CapitalizeCommentFix extends DartFix {
 /// class UserWidget extends StatelessWidget { }
 /// ```
 class MatchClassNamePatternRule extends SaropaLintRule {
-  const MatchClassNamePatternRule() : super(code: _code);
+  MatchClassNamePatternRule() : super(code: _code);
 
   /// Style/consistency. Large counts acceptable in legacy code.
   @override
@@ -337,21 +262,19 @@ class MatchClassNamePatternRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'match_class_name_pattern',
-    problemMessage:
-        '[match_class_name_pattern] Class name does not follow expected pattern. Class names should follow naming conventions for their purpose. {v4}',
+    'match_class_name_pattern',
+    '[match_class_name_pattern] Class name does not follow expected pattern. Class names should follow naming conventions for their purpose. {v4}',
     correctionMessage:
         'Rename the class to follow Dart naming conventions. Use UpperCamelCase and include a suffix matching its purpose (e.g., Widget, State, Screen).',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addClassDeclaration((ClassDeclaration node) {
+    context.addClassDeclaration((ClassDeclaration node) {
       final String name = node.name.lexeme;
 
       // Skip private classes
@@ -422,7 +345,7 @@ class MatchClassNamePatternRule extends SaropaLintRule {
 /// int get count => _count;
 /// ```
 class MatchGetterSetterFieldNamesRule extends SaropaLintRule {
-  const MatchGetterSetterFieldNamesRule() : super(code: _code);
+  MatchGetterSetterFieldNamesRule() : super(code: _code);
 
   /// Style/consistency. Large counts acceptable in legacy code.
   @override
@@ -432,21 +355,19 @@ class MatchGetterSetterFieldNamesRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'match_getter_setter_field_names',
-    problemMessage:
-        '[match_getter_setter_field_names] Getter/setter name should match the backing field. Getter/setter must have the same name as the backing field (without underscore). {v4}',
+    'match_getter_setter_field_names',
+    '[match_getter_setter_field_names] Getter/setter name should match the backing field. Getter/setter must have the same name as the backing field (without underscore). {v4}',
     correctionMessage:
         'Rename the getter or setter to match the backing field name without the leading underscore. For example, _count must have getter count, not total.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addClassDeclaration((ClassDeclaration node) {
+    context.addClassDeclaration((ClassDeclaration node) {
       // Collect private field names
       final Set<String> privateFields = <String>{};
       for (final ClassMember member in node.members) {
@@ -507,7 +428,7 @@ class MatchGetterSetterFieldNamesRule extends SaropaLintRule {
 /// test/src/utils/helper_test.dart
 /// ```
 class MatchLibFolderStructureRule extends SaropaLintRule {
-  const MatchLibFolderStructureRule() : super(code: _code);
+  MatchLibFolderStructureRule() : super(code: _code);
 
   /// Style/consistency. Large counts acceptable in legacy code.
   @override
@@ -517,22 +438,20 @@ class MatchLibFolderStructureRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'match_lib_folder_structure',
-    problemMessage:
-        '[match_lib_folder_structure] Test file location should mirror lib folder structure. This naming violation reduces readability and makes the codebase harder for teams to navigate. {v4}',
+    'match_lib_folder_structure',
+    '[match_lib_folder_structure] Test file location should mirror lib folder structure. This naming violation reduces readability and makes the codebase harder for teams to navigate. {v4}',
     correctionMessage:
         'Move the test file so its path mirrors the lib folder structure. For example, lib/src/utils/helper.dart must have test/src/utils/helper_test.dart.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addCompilationUnit((CompilationUnit node) {
-      final String path = resolver.path;
+    context.addCompilationUnit((CompilationUnit node) {
+      final String path = context.filePath;
 
       // Only check test files
       if (!path.contains('/test/') && !path.contains('\\test\\')) return;
@@ -558,7 +477,7 @@ class MatchLibFolderStructureRule extends SaropaLintRule {
 ///
 /// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v5
 class MatchPositionalFieldNamesOnAssignmentRule extends SaropaLintRule {
-  const MatchPositionalFieldNamesOnAssignmentRule() : super(code: _code);
+  MatchPositionalFieldNamesOnAssignmentRule() : super(code: _code);
 
   /// Style/consistency. Large counts acceptable in legacy code.
   @override
@@ -568,29 +487,26 @@ class MatchPositionalFieldNamesOnAssignmentRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'match_positional_field_names_on_assignment',
-    problemMessage:
-        '[match_positional_field_names_on_assignment] Positional field name should match the variable being assigned. This naming violation reduces readability and makes the codebase harder for teams to navigate. {v5}',
+    'match_positional_field_names_on_assignment',
+    '[match_positional_field_names_on_assignment] Positional field name should match the variable being assigned. This naming violation reduces readability and makes the codebase harder for teams to navigate. {v5}',
     correctionMessage:
         'Rename the positional field to match the variable it is assigned to. Mismatched names cause confusion when reading destructured assignments.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addPatternAssignment((PatternAssignment node) {
+    context.addPatternAssignment((PatternAssignment node) {
       final DartPattern pattern = node.pattern;
       if (pattern is RecordPattern) {
         _checkRecordPattern(pattern, reporter);
       }
     });
 
-    context.registry
-        .addPatternVariableDeclaration((PatternVariableDeclaration node) {
+    context.addPatternVariableDeclaration((PatternVariableDeclaration node) {
       final DartPattern pattern = node.pattern;
       if (pattern is RecordPattern) {
         _checkRecordPattern(pattern, reporter);
@@ -599,7 +515,9 @@ class MatchPositionalFieldNamesOnAssignmentRule extends SaropaLintRule {
   }
 
   void _checkRecordPattern(
-      RecordPattern pattern, SaropaDiagnosticReporter reporter) {
+    RecordPattern pattern,
+    SaropaDiagnosticReporter reporter,
+  ) {
     for (final PatternField field in pattern.fields) {
       final PatternFieldName? fieldName = field.name;
       if (fieldName == null) continue;
@@ -611,7 +529,7 @@ class MatchPositionalFieldNamesOnAssignmentRule extends SaropaLintRule {
       if (fieldPattern is DeclaredVariablePattern) {
         final String varName = fieldPattern.name.lexeme;
         if (name != varName && !name.startsWith(r'$')) {
-          reporter.atNode(field, code);
+          reporter.atNode(field);
         }
       }
     }
@@ -646,7 +564,7 @@ class MatchPositionalFieldNamesOnAssignmentRule extends SaropaLintRule {
 /// }
 /// ```
 class PreferBooleanPrefixesRule extends SaropaLintRule {
-  const PreferBooleanPrefixesRule() : super(code: _code);
+  PreferBooleanPrefixesRule() : super(code: _code);
 
   /// Style/consistency. Large counts acceptable in legacy code.
   @override
@@ -656,12 +574,11 @@ class PreferBooleanPrefixesRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'prefer_boolean_prefixes',
-    problemMessage:
-        '[prefer_boolean_prefixes] Boolean variable must have a prefix (is/has/can/should/will/did). This rule only checks class fields and top-level variables, not local variables inside functions/methods. Local variables are implementation details and don\'t need strict naming conventions. {v7}',
+    'prefer_boolean_prefixes',
+    '[prefer_boolean_prefixes] Boolean variable must have a prefix (is/has/can/should/will/did). This rule only checks class fields and top-level variables, not local variables inside functions/methods. Local variables are implementation details and don\'t need strict naming conventions. {v7}',
     correctionMessage:
         'Rename this boolean field to use a standard prefix (is, has, can, should, will, did) or suffix (Enabled, Active, Visible). Example: enabled becomes isEnabled.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   static const List<String> _validPrefixes = <String>[
@@ -738,12 +655,11 @@ class PreferBooleanPrefixesRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
     // Only check field declarations (class members)
-    context.registry.addFieldDeclaration((FieldDeclaration node) {
+    context.addFieldDeclaration((FieldDeclaration node) {
       final TypeAnnotation? type = node.fields.type;
       if (type is! NamedType) return;
       if (type.name.lexeme != 'bool') return;
@@ -751,29 +667,30 @@ class PreferBooleanPrefixesRule extends SaropaLintRule {
       for (final VariableDeclaration variable in node.fields.variables) {
         final String name = variable.name.lexeme;
         // Strip leading underscore for checking
-        final String checkName =
-            name.startsWith('_') ? name.substring(1) : name;
+        final String checkName = name.startsWith('_')
+            ? name.substring(1)
+            : name;
 
         if (!_hasValidBooleanName(checkName)) {
-          reporter.atNode(variable, code);
+          reporter.atNode(variable);
         }
       }
     });
 
     // Also check top-level variables
-    context.registry
-        .addTopLevelVariableDeclaration((TopLevelVariableDeclaration node) {
+    context.addTopLevelVariableDeclaration((TopLevelVariableDeclaration node) {
       final TypeAnnotation? type = node.variables.type;
       if (type is! NamedType) return;
       if (type.name.lexeme != 'bool') return;
 
       for (final VariableDeclaration variable in node.variables.variables) {
         final String name = variable.name.lexeme;
-        final String checkName =
-            name.startsWith('_') ? name.substring(1) : name;
+        final String checkName = name.startsWith('_')
+            ? name.substring(1)
+            : name;
 
         if (!_hasValidBooleanName(checkName)) {
-          reporter.atNode(variable, code);
+          reporter.atNode(variable);
         }
       }
     });
@@ -784,9 +701,7 @@ class PreferBooleanPrefixesRule extends SaropaLintRule {
   /// These are standard Flutter naming conventions that would be
   /// unnecessarily pedantic to flag:
   /// - `value`: Used by Checkbox, Switch, ToggleButton, Radio widgets
-  static const Set<String> _allowedExactNames = <String>{
-    'value',
-  };
+  static const Set<String> _allowedExactNames = <String>{'value'};
 
   bool _hasValidBooleanName(String name) {
     return _allowedExactNames.contains(name) ||
@@ -847,7 +762,7 @@ class PreferBooleanPrefixesRule extends SaropaLintRule {
 /// }
 /// ```
 class PreferBooleanPrefixesForLocalsRule extends SaropaLintRule {
-  const PreferBooleanPrefixesForLocalsRule() : super(code: _code);
+  PreferBooleanPrefixesForLocalsRule() : super(code: _code);
 
   /// Style/consistency. Large counts acceptable in legacy code.
   @override
@@ -857,12 +772,11 @@ class PreferBooleanPrefixesForLocalsRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'prefer_boolean_prefixes_for_locals',
-    problemMessage:
-        '[prefer_boolean_prefixes_for_locals] Prefixing boolean local variables with is/has/can/should is a naming convention with no impact on code behavior or performance. Enable via the stylistic tier. {v4}',
+    'prefer_boolean_prefixes_for_locals',
+    '[prefer_boolean_prefixes_for_locals] Prefixing boolean local variables with is/has/can/should is a naming convention with no impact on code behavior or performance. Enable via the stylistic tier. {v4}',
     correctionMessage:
         'Rename this local boolean variable to use a standard prefix (is, has, can, should, will, did) or suffix (Enabled, Active, Visible). Example: status becomes isActive.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   static const List<String> _validPrefixes = <String>[
@@ -939,12 +853,12 @@ class PreferBooleanPrefixesForLocalsRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry
-        .addVariableDeclarationStatement((VariableDeclarationStatement node) {
+    context.addVariableDeclarationStatement((
+      VariableDeclarationStatement node,
+    ) {
       final TypeAnnotation? type = node.variables.type;
       if (type is! NamedType) return;
       if (type.name.lexeme != 'bool') return;
@@ -952,11 +866,12 @@ class PreferBooleanPrefixesForLocalsRule extends SaropaLintRule {
       for (final VariableDeclaration variable in node.variables.variables) {
         final String name = variable.name.lexeme;
         // Strip leading underscore for checking
-        final String checkName =
-            name.startsWith('_') ? name.substring(1) : name;
+        final String checkName = name.startsWith('_')
+            ? name.substring(1)
+            : name;
 
         if (!_hasValidBooleanName(checkName)) {
-          reporter.atNode(variable, code);
+          reporter.atNode(variable);
         }
       }
     });
@@ -967,9 +882,7 @@ class PreferBooleanPrefixesForLocalsRule extends SaropaLintRule {
   /// These are standard Flutter naming conventions that would be
   /// unnecessarily pedantic to flag:
   /// - `value`: Used by Checkbox, Switch, ToggleButton, Radio widgets
-  static const Set<String> _allowedExactNames = <String>{
-    'value',
-  };
+  static const Set<String> _allowedExactNames = <String>{'value'};
 
   bool _hasValidBooleanName(String name) {
     return _allowedExactNames.contains(name) ||
@@ -1023,7 +936,7 @@ class PreferBooleanPrefixesForLocalsRule extends SaropaLintRule {
 /// MyWidget({required bool isEnabled}) { ... }
 /// ```
 class PreferBooleanPrefixesForParamsRule extends SaropaLintRule {
-  const PreferBooleanPrefixesForParamsRule() : super(code: _code);
+  PreferBooleanPrefixesForParamsRule() : super(code: _code);
 
   /// Style/consistency. Large counts acceptable in legacy code.
   @override
@@ -1033,12 +946,11 @@ class PreferBooleanPrefixesForParamsRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'prefer_boolean_prefixes_for_params',
-    problemMessage:
-        '[prefer_boolean_prefixes_for_params] Prefixing boolean parameters with is/has/can/should is a naming convention with no impact on code behavior or performance. Enable via the stylistic tier. {v4}',
+    'prefer_boolean_prefixes_for_params',
+    '[prefer_boolean_prefixes_for_params] Prefixing boolean parameters with is/has/can/should is a naming convention with no impact on code behavior or performance. Enable via the stylistic tier. {v4}',
     correctionMessage:
         'Rename this boolean parameter to use a standard prefix (is, has, can, should, will, did) or suffix (Enabled, Active, Visible). Example: visible becomes isVisible.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   static const List<String> _validPrefixes = <String>[
@@ -1115,28 +1027,29 @@ class PreferBooleanPrefixesForParamsRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
     // Check function declarations
-    context.registry.addFunctionDeclaration((FunctionDeclaration node) {
+    context.addFunctionDeclaration((FunctionDeclaration node) {
       _checkParameters(node.functionExpression.parameters, reporter);
     });
 
     // Check method declarations
-    context.registry.addMethodDeclaration((MethodDeclaration node) {
+    context.addMethodDeclaration((MethodDeclaration node) {
       _checkParameters(node.parameters, reporter);
     });
 
     // Check constructor declarations
-    context.registry.addConstructorDeclaration((ConstructorDeclaration node) {
+    context.addConstructorDeclaration((ConstructorDeclaration node) {
       _checkParameters(node.parameters, reporter);
     });
   }
 
   void _checkParameters(
-      FormalParameterList? parameters, SaropaDiagnosticReporter reporter) {
+    FormalParameterList? parameters,
+    SaropaDiagnosticReporter reporter,
+  ) {
     if (parameters == null) return;
 
     for (final FormalParameter param in parameters.parameters) {
@@ -1145,7 +1058,9 @@ class PreferBooleanPrefixesForParamsRule extends SaropaLintRule {
   }
 
   void _checkParameter(
-      FormalParameter param, SaropaDiagnosticReporter reporter) {
+    FormalParameter param,
+    SaropaDiagnosticReporter reporter,
+  ) {
     TypeAnnotation? typeAnnotation;
     String? paramName;
     Token? nameToken;
@@ -1180,11 +1095,12 @@ class PreferBooleanPrefixesForParamsRule extends SaropaLintRule {
     if (typeAnnotation is! NamedType) return;
     if (typeAnnotation.name.lexeme != 'bool') return;
 
-    final String checkName =
-        paramName.startsWith('_') ? paramName.substring(1) : paramName;
+    final String checkName = paramName.startsWith('_')
+        ? paramName.substring(1)
+        : paramName;
 
     if (!_hasValidBooleanName(checkName)) {
-      reporter.atToken(nameToken, code);
+      reporter.atToken(nameToken);
     }
   }
 
@@ -1193,9 +1109,7 @@ class PreferBooleanPrefixesForParamsRule extends SaropaLintRule {
   /// These are standard Flutter naming conventions that would be
   /// unnecessarily pedantic to flag:
   /// - `value`: Used by Checkbox, Switch, ToggleButton, Radio widgets
-  static const Set<String> _allowedExactNames = <String>{
-    'value',
-  };
+  static const Set<String> _allowedExactNames = <String>{'value'};
 
   bool _hasValidBooleanName(String name) {
     return _allowedExactNames.contains(name) ||
@@ -1234,7 +1148,7 @@ class PreferBooleanPrefixesForParamsRule extends SaropaLintRule {
 ///
 /// **Stylistic rule (opt-in only).** Naming convention with no performance or correctness impact.
 class PreferCorrectCallbackFieldNameRule extends SaropaLintRule {
-  const PreferCorrectCallbackFieldNameRule() : super(code: _code);
+  PreferCorrectCallbackFieldNameRule() : super(code: _code);
 
   /// Style/consistency. Large counts acceptable in legacy code.
   @override
@@ -1244,27 +1158,26 @@ class PreferCorrectCallbackFieldNameRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'prefer_correct_callback_field_name',
-    problemMessage:
-        '[prefer_correct_callback_field_name] Using onXxx naming for callback fields is a Dart API convention. Callback naming does not affect code behavior or performance. Enable via the stylistic tier. {v5}',
+    'prefer_correct_callback_field_name',
+    '[prefer_correct_callback_field_name] Using onXxx naming for callback fields is a Dart API convention. Callback naming does not affect code behavior or performance. Enable via the stylistic tier. {v5}',
     correctionMessage:
         "Rename callback fields to use the 'on' prefix following Flutter convention. For example, callback becomes onCallback and tapHandler becomes onTap.",
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addFieldDeclaration((FieldDeclaration node) {
+    context.addFieldDeclaration((FieldDeclaration node) {
       final TypeAnnotation? typeAnnotation = node.fields.type;
       if (typeAnnotation == null) return;
 
       // Check if this is a callback type (Function or VoidCallback or similar)
       final String typeStr = typeAnnotation.toSource();
-      final bool isCallback = typeStr.contains('Function') ||
+      final bool isCallback =
+          typeStr.contains('Function') ||
           typeStr.contains('Callback') ||
           typeStr.contains('ValueChanged') ||
           typeStr.contains('ValueGetter') ||
@@ -1289,7 +1202,7 @@ class PreferCorrectCallbackFieldNameRule extends SaropaLintRule {
     });
 
     // Also check constructor parameters
-    context.registry.addConstructorDeclaration((ConstructorDeclaration node) {
+    context.addConstructorDeclaration((ConstructorDeclaration node) {
       for (final FormalParameter param in node.parameters.parameters) {
         TypeAnnotation? typeAnnotation;
         String? paramName;
@@ -1308,7 +1221,8 @@ class PreferCorrectCallbackFieldNameRule extends SaropaLintRule {
         if (typeAnnotation == null || paramName == null) continue;
 
         final String typeStr = typeAnnotation.toSource();
-        final bool isCallback = typeStr.contains('Function') ||
+        final bool isCallback =
+            typeStr.contains('Function') ||
             typeStr.contains('Callback') ||
             typeStr.contains('ValueChanged') ||
             typeStr.contains('ValueGetter') ||
@@ -1365,7 +1279,7 @@ class PreferCorrectCallbackFieldNameRule extends SaropaLintRule {
 /// }
 /// ```
 class PreferCorrectErrorNameRule extends SaropaLintRule {
-  const PreferCorrectErrorNameRule() : super(code: _code);
+  PreferCorrectErrorNameRule() : super(code: _code);
 
   /// Style/consistency. Large counts acceptable in legacy code.
   @override
@@ -1375,12 +1289,11 @@ class PreferCorrectErrorNameRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'prefer_correct_error_name',
-    problemMessage:
-        '[prefer_correct_error_name] Catch parameter uses nonstandard name. Use "e" or "error" for consistency and readability. Consistent naming of catch parameters improves readability. {v4}',
+    'prefer_correct_error_name',
+    '[prefer_correct_error_name] Catch parameter uses nonstandard name. Use "e" or "error" for consistency and readability. Consistent naming of catch parameters improves readability. {v4}',
     correctionMessage:
         'Rename the catch parameter to "e" or "error" for consistency. Example: catch (e) { } or catch (error) { }.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   static const Set<String> _validNames = <String>{
@@ -1394,11 +1307,10 @@ class PreferCorrectErrorNameRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addCatchClause((CatchClause node) {
+    context.addCatchClause((CatchClause node) {
       final CatchClauseParameter? exceptionParam = node.exceptionParameter;
       if (exceptionParam == null) return;
 
@@ -1431,18 +1343,17 @@ class PreferCorrectErrorNameRule extends SaropaLintRule {
 /// void _onTap() { }
 /// ```
 class PreferCorrectHandlerNameRule extends SaropaLintRule {
-  const PreferCorrectHandlerNameRule() : super(code: _code);
+  PreferCorrectHandlerNameRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.opinionated;
 
   static const LintCode _code = LintCode(
-    name: 'prefer_correct_handler_name',
-    problemMessage:
-        '[prefer_correct_handler_name] Using handleXxx or onXxx naming for handler methods is a convention. Handler naming does not affect code behavior or performance. Enable via the stylistic tier. {v3}',
+    'prefer_correct_handler_name',
+    '[prefer_correct_handler_name] Using handleXxx or onXxx naming for handler methods is a convention. Handler naming does not affect code behavior or performance. Enable via the stylistic tier. {v3}',
     correctionMessage:
         'Rename the event handler method to start with "on" or "_on" prefix. For example, buttonPressed becomes onButtonPressed.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   static const Set<String> _handlerSuffixes = <String>{
@@ -1468,11 +1379,10 @@ class PreferCorrectHandlerNameRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodDeclaration((MethodDeclaration node) {
+    context.addMethodDeclaration((MethodDeclaration node) {
       final String name = node.name.lexeme;
 
       // Check if name ends with handler suffix but doesn't start with on
@@ -1511,7 +1421,7 @@ class PreferCorrectHandlerNameRule extends SaropaLintRule {
 /// String userName = '';
 /// ```
 class PreferCorrectIdentifierLengthRule extends SaropaLintRule {
-  const PreferCorrectIdentifierLengthRule() : super(code: _code);
+  PreferCorrectIdentifierLengthRule() : super(code: _code);
 
   /// Style/consistency. Large counts acceptable in legacy code.
   @override
@@ -1521,12 +1431,11 @@ class PreferCorrectIdentifierLengthRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'prefer_correct_identifier_length',
-    problemMessage:
-        '[prefer_correct_identifier_length] Very short (1-2 char) or very long (>30 char) identifiers measurably impact code comprehension speed. Optimal readability is achieved with 8-20 character names. {v6}',
+    'prefer_correct_identifier_length',
+    '[prefer_correct_identifier_length] Very short (1-2 char) or very long (>30 char) identifiers measurably impact code comprehension speed. Optimal readability is achieved with 8-20 character names. {v6}',
     correctionMessage:
         'Use names between 2 and 40 characters long. Single-character names (except i, j, k, x, y, z, e, n) reduce readability; overly long names hinder scanning.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   // Common acceptable short names
@@ -1556,15 +1465,14 @@ class PreferCorrectIdentifierLengthRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addVariableDeclaration((VariableDeclaration node) {
+    context.addVariableDeclaration((VariableDeclaration node) {
       _checkIdentifier(node.name.lexeme, node, reporter);
     });
 
-    context.registry.addFormalParameter((FormalParameter node) {
+    context.addFormalParameter((FormalParameter node) {
       final String? name = node.name?.lexeme;
       if (name != null) {
         _checkIdentifier(name, node, reporter);
@@ -1573,7 +1481,10 @@ class PreferCorrectIdentifierLengthRule extends SaropaLintRule {
   }
 
   void _checkIdentifier(
-      String name, AstNode node, SaropaDiagnosticReporter reporter) {
+    String name,
+    AstNode node,
+    SaropaDiagnosticReporter reporter,
+  ) {
     // Skip private names (start with _)
     final String publicName = name.startsWith('_') ? name.substring(1) : name;
 
@@ -1582,13 +1493,13 @@ class PreferCorrectIdentifierLengthRule extends SaropaLintRule {
     // Check minimum length
     if (publicName.length < _minLength &&
         !_allowedShortNames.contains(publicName)) {
-      reporter.atNode(node, code);
+      reporter.atNode(node);
       return;
     }
 
     // Check maximum length
     if (publicName.length > _maxLength) {
-      reporter.atNode(node, code);
+      reporter.atNode(node);
     }
   }
 }
@@ -1615,7 +1526,7 @@ class PreferCorrectIdentifierLengthRule extends SaropaLintRule {
 /// set count(int value) => _count = value;
 /// ```
 class PreferCorrectSetterParameterNameRule extends SaropaLintRule {
-  const PreferCorrectSetterParameterNameRule() : super(code: _code);
+  PreferCorrectSetterParameterNameRule() : super(code: _code);
 
   /// Style/consistency. Large counts acceptable in legacy code.
   @override
@@ -1625,21 +1536,19 @@ class PreferCorrectSetterParameterNameRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'prefer_correct_setter_parameter_name',
-    problemMessage:
-        '[prefer_correct_setter_parameter_name] Using value as the setter parameter name is a Dart convention. The parameter name does not affect setter behavior or performance. Enable via the stylistic tier. {v4}',
+    'prefer_correct_setter_parameter_name',
+    '[prefer_correct_setter_parameter_name] Using value as the setter parameter name is a Dart convention. The parameter name does not affect setter behavior or performance. Enable via the stylistic tier. {v4}',
     correctionMessage:
         'Rename the setter parameter to "value" for consistency with Dart conventions. Example: set name(String value) => _name = value;',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodDeclaration((MethodDeclaration node) {
+    context.addMethodDeclaration((MethodDeclaration node) {
       if (!node.isSetter) return;
 
       final FormalParameterList? params = node.parameters;
@@ -1658,7 +1567,7 @@ class PreferCorrectSetterParameterNameRule extends SaropaLintRule {
       }
 
       if (paramName != null && paramName != 'value' && paramName != '_') {
-        reporter.atNode(param, code);
+        reporter.atNode(param);
       }
     });
   }
@@ -1682,7 +1591,7 @@ class PreferCorrectSetterParameterNameRule extends SaropaLintRule {
 /// typedef Callback = void Function(String message, int count);
 /// ```
 class PreferExplicitParameterNamesRule extends SaropaLintRule {
-  const PreferExplicitParameterNamesRule() : super(code: _code);
+  PreferExplicitParameterNamesRule() : super(code: _code);
 
   /// Style/consistency. Large counts acceptable in legacy code.
   @override
@@ -1692,28 +1601,26 @@ class PreferExplicitParameterNamesRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'prefer_explicit_parameter_names',
-    problemMessage:
-        '[prefer_explicit_parameter_names] Function type parameters must have descriptive names. Unnamed parameters lose intent and force callers to guess what each positional argument represents. {v4}',
+    'prefer_explicit_parameter_names',
+    '[prefer_explicit_parameter_names] Function type parameters must have descriptive names. Unnamed parameters lose intent and force callers to guess what each positional argument represents. {v4}',
     correctionMessage:
         'Add descriptive names to function type parameters. Unnamed parameters lose intent: void Function(String) becomes void Function(String message).',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addGenericFunctionType((GenericFunctionType node) {
+    context.addGenericFunctionType((GenericFunctionType node) {
       final FormalParameterList params = node.parameters;
       if (params.parameters.isEmpty) return;
 
       for (final FormalParameter param in params.parameters) {
         if (param is SimpleFormalParameter) {
           if (param.name == null && param.type != null) {
-            reporter.atNode(param, code);
+            reporter.atNode(param);
           }
         }
       }
@@ -1730,7 +1637,7 @@ class PreferExplicitParameterNamesRule extends SaropaLintRule {
 /// By convention, the file name should match the main class or type defined
 /// in the file to make it easier to locate code.
 class PreferMatchFileNameRule extends SaropaLintRule {
-  const PreferMatchFileNameRule() : super(code: _code);
+  PreferMatchFileNameRule() : super(code: _code);
 
   /// Style/consistency. Large counts acceptable in legacy code.
   @override
@@ -1740,22 +1647,20 @@ class PreferMatchFileNameRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'prefer_match_file_name',
-    problemMessage:
-        '[prefer_match_file_name] When the primary class name does not match the file name, developers cannot use IDE file search to find declarations. This measurably slows navigation in large codebases. {v5}',
+    'prefer_match_file_name',
+    '[prefer_match_file_name] When the primary class name does not match the file name, developers cannot use IDE file search to find declarations. This measurably slows navigation in large codebases. {v5}',
     correctionMessage:
         'Rename either the file or the primary class so they match. For example, user_service.dart should contain class UserService.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addCompilationUnit((CompilationUnit node) {
-      final String filePath = resolver.source.uri.path;
+    context.addCompilationUnit((CompilationUnit node) {
+      final String filePath = context.filePath;
       final String fileName = filePath.split('/').last.replaceAll('.dart', '');
       final String expectedClassName = _snakeToPascal(fileName);
 
@@ -1800,7 +1705,7 @@ class PreferMatchFileNameRule extends SaropaLintRule {
 /// const maxRetriesCount = 3; // Descriptive name
 /// ```
 class PreferPrefixedGlobalConstantsRule extends SaropaLintRule {
-  const PreferPrefixedGlobalConstantsRule() : super(code: _code);
+  PreferPrefixedGlobalConstantsRule() : super(code: _code);
 
   /// Style/consistency. Large counts acceptable in legacy code.
   @override
@@ -1810,23 +1715,19 @@ class PreferPrefixedGlobalConstantsRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'prefer_prefixed_global_constants',
-    problemMessage:
-        '[prefer_prefixed_global_constants] Global constant must have a descriptive prefix. Global constants must be prefixed with \'k\' or similar. {v5}',
+    'prefer_prefixed_global_constants',
+    '[prefer_prefixed_global_constants] Global constant must have a descriptive prefix. Global constants must be prefixed with \'k\' or similar. {v5}',
     correctionMessage:
         'Prefix the global constant with "k" (e.g., kMaxRetries) or use a longer descriptive name to distinguish it from local variables.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addTopLevelVariableDeclaration((
-      TopLevelVariableDeclaration node,
-    ) {
+    context.addTopLevelVariableDeclaration((TopLevelVariableDeclaration node) {
       final VariableDeclarationList variables = node.variables;
       if (!variables.isConst) return;
 
@@ -1869,7 +1770,7 @@ class PreferPrefixedGlobalConstantsRule extends SaropaLintRule {
 ///
 /// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v4
 class TagNameRule extends SaropaLintRule {
-  const TagNameRule() : super(code: _code);
+  TagNameRule() : super(code: _code);
 
   /// Style/consistency. Large counts acceptable in legacy code.
   @override
@@ -1880,21 +1781,19 @@ class TagNameRule extends SaropaLintRule {
 
   /// Alias: prefer_kebab_tag
   static const LintCode _code = LintCode(
-    name: 'prefer_kebab_tag_name',
-    problemMessage:
-        '[prefer_kebab_tag_name] Tag name should follow naming conventions. Widget tag names don\'t follow conventions. This naming violation reduces readability and makes the codebase harder for teams to navigate. {v4}',
+    'prefer_kebab_tag_name',
+    '[prefer_kebab_tag_name] Tag name should follow naming conventions. Widget tag names don\'t follow conventions. This naming violation reduces readability and makes the codebase harder for teams to navigate. {v4}',
     correctionMessage:
         'Use kebab-case (lowercase with hyphens) for tag names. Tag names must start with a lowercase letter and contain only lowercase letters, digits, and hyphens.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       // Check for Element.tag() or similar
       final String methodName = node.methodName.name;
       if (methodName != 'tag' && methodName != 'createElement') return;
@@ -1910,7 +1809,7 @@ class TagNameRule extends SaropaLintRule {
 
       // Check for valid tag name (lowercase, hyphens allowed)
       if (!RegExp(r'^[a-z][a-z0-9-]*$').hasMatch(tagName)) {
-        reporter.atNode(firstArg, code);
+        reporter.atNode(firstArg);
       }
     });
   }
@@ -1940,7 +1839,7 @@ class TagNameRule extends SaropaLintRule {
 /// }
 /// ```
 class PreferNamedExtensionsRule extends SaropaLintRule {
-  const PreferNamedExtensionsRule() : super(code: _code);
+  PreferNamedExtensionsRule() : super(code: _code);
 
   /// Style/consistency. Large counts acceptable in legacy code.
   @override
@@ -1950,23 +1849,21 @@ class PreferNamedExtensionsRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'prefer_named_extensions',
-    problemMessage:
-        '[prefer_named_extensions] Anonymous extension must be named. This naming violation reduces readability and makes the codebase harder for teams to navigate. {v5}',
+    'prefer_named_extensions',
+    '[prefer_named_extensions] Anonymous extension must be named. This naming violation reduces readability and makes the codebase harder for teams to navigate. {v5}',
     correctionMessage:
         'Add a name to the extension to improve debugging and documentation. Verify the change works correctly with existing tests and add coverage for the new behavior.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addExtensionDeclaration((ExtensionDeclaration node) {
+    context.addExtensionDeclaration((ExtensionDeclaration node) {
       if (node.name == null) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
   }
@@ -1993,7 +1890,7 @@ class PreferNamedExtensionsRule extends SaropaLintRule {
 /// StringCallback onProgress;
 /// ```
 class PreferTypedefForCallbacksRule extends SaropaLintRule {
-  const PreferTypedefForCallbacksRule() : super(code: _code);
+  PreferTypedefForCallbacksRule() : super(code: _code);
 
   /// Style/consistency. Large counts acceptable in legacy code.
   @override
@@ -2003,25 +1900,23 @@ class PreferTypedefForCallbacksRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'prefer_typedef_for_callbacks',
-    problemMessage:
-        '[prefer_typedef_for_callbacks] Use typedef for repeated function types. Duplicate inline function types reduce readability and make signature changes error-prone across the codebase. {v5}',
+    'prefer_typedef_for_callbacks',
+    '[prefer_typedef_for_callbacks] Use typedef for repeated function types. Duplicate inline function types reduce readability and make signature changes error-prone across the codebase. {v5}',
     correctionMessage:
         'Create a typedef for this function type to improve readability. Verify the change works correctly with existing tests and add coverage for the new behavior.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
     // Track function type signatures to find repeats
     final Map<String, List<GenericFunctionType>> signatures =
         <String, List<GenericFunctionType>>{};
 
-    context.registry.addGenericFunctionType((GenericFunctionType node) {
+    context.addGenericFunctionType((GenericFunctionType node) {
       final String signature = node.toSource();
       signatures
           .putIfAbsent(signature, () => <GenericFunctionType>[])
@@ -2029,7 +1924,7 @@ class PreferTypedefForCallbacksRule extends SaropaLintRule {
     });
 
     // After traversal, check for repeats (using compilation unit end)
-    context.registry.addCompilationUnit((CompilationUnit unit) {
+    context.addCompilationUnit((CompilationUnit unit) {
       for (final MapEntry<String, List<GenericFunctionType>> entry
           in signatures.entries) {
         if (entry.value.length >= 3) {
@@ -2069,7 +1964,7 @@ class PreferTypedefForCallbacksRule extends SaropaLintRule {
 /// }
 /// ```
 class PreferEnhancedEnumsRule extends SaropaLintRule {
-  const PreferEnhancedEnumsRule() : super(code: _code);
+  PreferEnhancedEnumsRule() : super(code: _code);
 
   /// Style/consistency. Large counts acceptable in legacy code.
   @override
@@ -2079,29 +1974,27 @@ class PreferEnhancedEnumsRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'prefer_enhanced_enums',
-    problemMessage:
-        '[prefer_enhanced_enums] Use enhanced enum instead of extension. An enum could use enhanced enum features instead of extensions. {v4}',
+    'prefer_enhanced_enums',
+    '[prefer_enhanced_enums] Use enhanced enum instead of extension. An enum could use enhanced enum features instead of extensions. {v4}',
     correctionMessage:
         'Move extension members into the enum itself. Verify the change works correctly with existing tests and add coverage for the new behavior.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
     // Collect enum names
     final Set<String> enumNames = <String>{};
 
-    context.registry.addEnumDeclaration((EnumDeclaration node) {
+    context.addEnumDeclaration((EnumDeclaration node) {
       enumNames.add(node.name.lexeme);
     });
 
     // Check for extensions on enums
-    context.registry.addExtensionDeclaration((ExtensionDeclaration node) {
+    context.addExtensionDeclaration((ExtensionDeclaration node) {
       final ExtensionOnClause? onClause = node.onClause;
       if (onClause == null) return;
 
@@ -2109,7 +2002,7 @@ class PreferEnhancedEnumsRule extends SaropaLintRule {
       if (extendedType is NamedType) {
         final String typeName = extendedType.name.lexeme;
         if (enumNames.contains(typeName)) {
-          reporter.atNode(node, code);
+          reporter.atNode(node);
         }
       }
     });
@@ -2141,25 +2034,23 @@ class PreferEnhancedEnumsRule extends SaropaLintRule {
 /// list.map((_) => 42);
 /// ```
 class PreferWildcardForUnusedParamRule extends SaropaLintRule {
-  const PreferWildcardForUnusedParamRule() : super(code: _code);
+  PreferWildcardForUnusedParamRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
-    name: 'prefer_wildcard_for_unused_param',
-    problemMessage:
-        '[prefer_wildcard_for_unused_param] Unused parameter obscures intent and signals incomplete API design. Replacing it with a _ wildcard (Dart 3.7+) makes the function signature self-documenting, communicating that the parameter exists for interface conformance but is intentionally ignored in this implementation. {v4}',
+    'prefer_wildcard_for_unused_param',
+    '[prefer_wildcard_for_unused_param] Unused parameter obscures intent and signals incomplete API design. Replacing it with a _ wildcard (Dart 3.7+) makes the function signature self-documenting, communicating that the parameter exists for interface conformance but is intentionally ignored in this implementation. {v4}',
     correctionMessage:
         'Replace the parameter with _ to make the function signature self-documenting and signal that the value is intentionally unused.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
     // Check function declarations
-    context.registry.addFunctionDeclaration((FunctionDeclaration node) {
+    context.addFunctionDeclaration((FunctionDeclaration node) {
       final FormalParameterList? params = node.functionExpression.parameters;
       if (params == null) return;
 
@@ -2168,7 +2059,7 @@ class PreferWildcardForUnusedParamRule extends SaropaLintRule {
     });
 
     // Check method declarations
-    context.registry.addMethodDeclaration((MethodDeclaration node) {
+    context.addMethodDeclaration((MethodDeclaration node) {
       final FormalParameterList? params = node.parameters;
       if (params == null) return;
 
@@ -2176,7 +2067,7 @@ class PreferWildcardForUnusedParamRule extends SaropaLintRule {
     });
 
     // Check function expressions (lambdas, callbacks)
-    context.registry.addFunctionExpression((FunctionExpression node) {
+    context.addFunctionExpression((FunctionExpression node) {
       // Skip if it's part of a function declaration (handled above)
       if (node.parent is FunctionDeclaration) return;
 
@@ -2213,7 +2104,7 @@ class PreferWildcardForUnusedParamRule extends SaropaLintRule {
       final bool isUsed = _isIdentifierUsedInBody(name, body);
 
       if (!isUsed) {
-        reporter.atToken(nameToken, code);
+        reporter.atToken(nameToken);
       }
     }
   }
@@ -2222,55 +2113,6 @@ class PreferWildcardForUnusedParamRule extends SaropaLintRule {
     final _IdentifierUsageVisitor visitor = _IdentifierUsageVisitor(name);
     body.accept(visitor);
     return visitor.isUsed;
-  }
-
-  @override
-  List<Fix> getFixes() => <Fix>[_ReplaceWithWildcardFix()];
-}
-
-class _ReplaceWithWildcardFix extends DartFix {
-  @override
-  void run(
-    CustomLintResolver resolver,
-    ChangeReporter reporter,
-    CustomLintContext context,
-    AnalysisError analysisError,
-    List<AnalysisError> others,
-  ) {
-    // Handle all parameter types
-    void handleParam(FormalParameter param) {
-      final Token? nameToken = param.name;
-      if (nameToken == null) return;
-      if (!SourceRange(nameToken.offset, nameToken.length)
-          .intersects(analysisError.sourceRange)) {
-        return;
-      }
-
-      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
-        message: 'Replace with _',
-        priority: 1,
-      );
-
-      changeBuilder.addDartFileEdit((builder) {
-        builder.addSimpleReplacement(
-          SourceRange(nameToken.offset, nameToken.length),
-          '_',
-        );
-      });
-    }
-
-    context.registry.addSimpleFormalParameter((SimpleFormalParameter node) {
-      handleParam(node);
-    });
-
-    context.registry.addDefaultFormalParameter((DefaultFormalParameter node) {
-      handleParam(node.parameter);
-    });
-
-    context.registry
-        .addFunctionTypedFormalParameter((FunctionTypedFormalParameter node) {
-      handleParam(node);
-    });
   }
 }
 
@@ -2304,7 +2146,7 @@ class _ReplaceWithWildcardFix extends DartFix {
 /// library;                 // OK - unnamed library (Dart 2.19+)
 /// ```
 class PreferCorrectPackageNameRule extends SaropaLintRule {
-  const PreferCorrectPackageNameRule() : super(code: _code);
+  PreferCorrectPackageNameRule() : super(code: _code);
 
   /// Invalid names break pub publish, import resolution, and tooling.
   @override
@@ -2318,9 +2160,8 @@ class PreferCorrectPackageNameRule extends SaropaLintRule {
   static final RegExp _validPackageName = RegExp(r'^[a-z][a-z0-9_]*$');
 
   static const LintCode _code = LintCode(
-    name: 'prefer_correct_package_name',
-    problemMessage:
-        '[prefer_correct_package_name] Library directive name does not follow '
+    'prefer_correct_package_name',
+    '[prefer_correct_package_name] Library directive name does not follow '
         'Dart naming conventions. Library and package names must use '
         'lowercase_with_underscores format: start with a lowercase letter, '
         'use only lowercase letters, digits, and underscores. Names with '
@@ -2329,16 +2170,15 @@ class PreferCorrectPackageNameRule extends SaropaLintRule {
     correctionMessage:
         'Rename the library to use lowercase_with_underscores format '
         '(e.g., "my_package" instead of "MyPackage" or "my-package").',
-    errorSeverity: DiagnosticSeverity.ERROR,
+    severity: DiagnosticSeverity.ERROR,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addLibraryDirective((LibraryDirective node) {
+    context.addLibraryDirective((LibraryDirective node) {
       final LibraryIdentifier? name = node.name2;
       if (name == null) return; // `library;` without name is valid
 
@@ -2346,7 +2186,7 @@ class PreferCorrectPackageNameRule extends SaropaLintRule {
       if (libraryName.isEmpty) return;
 
       if (!_validPackageName.hasMatch(libraryName)) {
-        reporter.atNode(name, code);
+        reporter.atNode(name);
       }
     });
   }

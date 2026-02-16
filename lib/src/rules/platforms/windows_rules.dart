@@ -22,9 +22,6 @@
 library;
 
 import 'package:analyzer/dart/ast/ast.dart';
-import 'package:analyzer/error/error.dart'
-    show AnalysisError, DiagnosticSeverity;
-import 'package:custom_lint_builder/custom_lint_builder.dart';
 
 import '../../saropa_lint_rule.dart';
 
@@ -95,7 +92,7 @@ bool _containsPathPattern(String source) {
 /// ```
 class AvoidHardcodedDriveLettersRule extends SaropaLintRule {
   /// Creates a new instance of [AvoidHardcodedDriveLettersRule].
-  const AvoidHardcodedDriveLettersRule() : super(code: _code);
+  AvoidHardcodedDriveLettersRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.medium;
@@ -104,28 +101,27 @@ class AvoidHardcodedDriveLettersRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_hardcoded_drive_letters',
-    problemMessage:
-        '[avoid_hardcoded_drive_letters] Hardcoded Windows drive letter path '
+    'avoid_hardcoded_drive_letters',
+    '[avoid_hardcoded_drive_letters] Hardcoded Windows drive letter path '
         'detected. This breaks on other drives, users, or platforms. {v3}',
-    correctionMessage: 'Use path_provider (getApplicationSupportDirectory) or '
+    correctionMessage:
+        'Use path_provider (getApplicationSupportDirectory) or '
         "Platform.environment['APPDATA'] instead.",
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addSimpleStringLiteral((SimpleStringLiteral node) {
+    context.addSimpleStringLiteral((SimpleStringLiteral node) {
       final String value = node.value;
       if (value.length < 3) return;
 
       // Match patterns like C:\, D:\, C:/, D:/
       if (_isDriveLetterPath(value)) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
   }
@@ -135,7 +131,8 @@ class AvoidHardcodedDriveLettersRule extends SaropaLintRule {
     final int firstChar = value.codeUnitAt(0);
 
     // Check for A-Z or a-z
-    final bool isLetter = (firstChar >= 0x41 && firstChar <= 0x5A) || // A-Z
+    final bool isLetter =
+        (firstChar >= 0x41 && firstChar <= 0x5A) || // A-Z
         (firstChar >= 0x61 && firstChar <= 0x7A); // a-z
 
     if (!isLetter) return false;
@@ -176,7 +173,7 @@ class AvoidHardcodedDriveLettersRule extends SaropaLintRule {
 /// ```
 class AvoidForwardSlashPathAssumptionRule extends SaropaLintRule {
   /// Creates a new instance of [AvoidForwardSlashPathAssumptionRule].
-  const AvoidForwardSlashPathAssumptionRule() : super(code: _code);
+  AvoidForwardSlashPathAssumptionRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.medium;
@@ -185,21 +182,20 @@ class AvoidForwardSlashPathAssumptionRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_forward_slash_path_assumption',
-    problemMessage: '[avoid_forward_slash_path_assumption] Path built with "/" '
+    'avoid_forward_slash_path_assumption',
+    '[avoid_forward_slash_path_assumption] Path built with "/" '
         'concatenation. This is not idiomatic on Windows. {v3}',
     correctionMessage:
         "Use path.join() from the 'path' package for cross-platform paths.",
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addBinaryExpression((BinaryExpression node) {
+    context.addBinaryExpression((BinaryExpression node) {
       // Look for string + '/' + string pattern (path concatenation)
       if (node.operator.type.lexeme != '+') return;
 
@@ -209,12 +205,12 @@ class AvoidForwardSlashPathAssumptionRule extends SaropaLintRule {
 
       // Check if left side looks like a path variable
       if (_containsPathPattern(node.leftOperand.toSource())) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
 
     // Also detect string interpolation: '$dir/$file'
-    context.registry.addStringInterpolation((StringInterpolation node) {
+    context.addStringInterpolation((StringInterpolation node) {
       final NodeList<InterpolationElement> elements = node.elements;
       if (elements.length < 3) return;
 
@@ -227,7 +223,7 @@ class AvoidForwardSlashPathAssumptionRule extends SaropaLintRule {
         final InterpolationElement prev = elements[i - 1];
         if (prev is InterpolationExpression) {
           if (_containsPathPattern(prev.expression.toSource())) {
-            reporter.atNode(node, code);
+            reporter.atNode(node);
             return;
           }
         }
@@ -269,7 +265,7 @@ class AvoidForwardSlashPathAssumptionRule extends SaropaLintRule {
 /// **Quick fix available:** Wraps both operands with `.toLowerCase()`.
 class AvoidCaseSensitivePathComparisonRule extends SaropaLintRule {
   /// Creates a new instance of [AvoidCaseSensitivePathComparisonRule].
-  const AvoidCaseSensitivePathComparisonRule() : super(code: _code);
+  AvoidCaseSensitivePathComparisonRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.medium;
@@ -278,23 +274,21 @@ class AvoidCaseSensitivePathComparisonRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_case_sensitive_path_comparison',
-    problemMessage:
-        '[avoid_case_sensitive_path_comparison] File path compared without '
+    'avoid_case_sensitive_path_comparison',
+    '[avoid_case_sensitive_path_comparison] File path compared without '
         'case normalization. Windows filesystem is case-insensitive. {v3}',
     correctionMessage:
         'Use .toLowerCase() on both sides or path.equals() from the '
         "'path' package for case-insensitive comparison.",
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addBinaryExpression((BinaryExpression node) {
+    context.addBinaryExpression((BinaryExpression node) {
       // Only check equality comparisons
       final String op = node.operator.type.lexeme;
       if (op != '==' && op != '!=') return;
@@ -316,46 +310,13 @@ class AvoidCaseSensitivePathComparisonRule extends SaropaLintRule {
         return;
       }
 
-      reporter.atNode(node, code);
+      reporter.atNode(node);
     });
   }
-
-  @override
-  List<Fix> getFixes() => <Fix>[_CaseInsensitivePathFix()];
 }
 
 /// Quick fix that wraps both operands of a path comparison with
 /// `.toLowerCase()` to make the comparison case-insensitive.
-class _CaseInsensitivePathFix extends DartFix {
-  @override
-  void run(
-    CustomLintResolver resolver,
-    ChangeReporter reporter,
-    CustomLintContext context,
-    AnalysisError analysisError,
-    List<AnalysisError> others,
-  ) {
-    context.registry.addBinaryExpression((BinaryExpression node) {
-      if (!analysisError.sourceRange.intersects(node.sourceRange)) return;
-
-      final String leftSource = node.leftOperand.toSource();
-      final String rightSource = node.rightOperand.toSource();
-      final String op = node.operator.type.lexeme;
-
-      final changeBuilder = reporter.createChangeBuilder(
-        message: 'Add .toLowerCase() to both sides',
-        priority: 80,
-      );
-
-      changeBuilder.addDartFileEdit((builder) {
-        builder.addSimpleReplacement(
-          node.sourceRange,
-          '$leftSource.toLowerCase() $op $rightSource.toLowerCase()',
-        );
-      });
-    });
-  }
-}
 
 // =============================================================================
 // require_windows_single_instance_check
@@ -394,7 +355,7 @@ class _CaseInsensitivePathFix extends DartFix {
 /// ```
 class RequireWindowsSingleInstanceCheckRule extends SaropaLintRule {
   /// Creates a new instance of [RequireWindowsSingleInstanceCheckRule].
-  const RequireWindowsSingleInstanceCheckRule() : super(code: _code);
+  RequireWindowsSingleInstanceCheckRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.low;
@@ -403,23 +364,21 @@ class RequireWindowsSingleInstanceCheckRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'require_windows_single_instance_check',
-    problemMessage:
-        '[require_windows_single_instance_check] runApp() called without '
+    'require_windows_single_instance_check',
+    '[require_windows_single_instance_check] runApp() called without '
         'single-instance check. Users may open duplicate windows. {v3}',
     correctionMessage:
         'Add single-instance enforcement using windows_single_instance '
         'package or a mutex/named pipe check before runApp().',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addFunctionDeclaration((FunctionDeclaration node) {
+    context.addFunctionDeclaration((FunctionDeclaration node) {
       // Only check the main() function
       if (node.name.lexeme != 'main') return;
 
@@ -449,7 +408,7 @@ class RequireWindowsSingleInstanceCheckRule extends SaropaLintRule {
         return; // Not clearly a Windows-targeted main
       }
 
-      reporter.atNode(node, code);
+      reporter.atNode(node);
     });
   }
 }
@@ -486,7 +445,7 @@ class RequireWindowsSingleInstanceCheckRule extends SaropaLintRule {
 /// ```
 class AvoidMaxPathRiskRule extends SaropaLintRule {
   /// Creates a new instance of [AvoidMaxPathRiskRule].
-  const AvoidMaxPathRiskRule() : super(code: _code);
+  AvoidMaxPathRiskRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.low;
@@ -495,14 +454,13 @@ class AvoidMaxPathRiskRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_max_path_risk',
-    problemMessage:
-        '[avoid_max_path_risk] Deeply nested path construction detected. '
+    'avoid_max_path_risk',
+    '[avoid_max_path_risk] Deeply nested path construction detected. '
         "This may exceed Windows' 260-character MAX_PATH limit. {v3}",
     correctionMessage:
         'Flatten the directory structure or enable long path support '
         '(LongPathsEnabled registry key).',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   /// Minimum number of path.join arguments to trigger the warning.
@@ -513,12 +471,11 @@ class AvoidMaxPathRiskRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
     // Detect path.join() with too many segments
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       final String methodName = node.methodName.name;
       if (methodName != 'join') return;
 
@@ -534,12 +491,12 @@ class AvoidMaxPathRiskRule extends SaropaLintRule {
       }
 
       if (node.argumentList.arguments.length >= _maxJoinSegments) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
 
     // Detect string literals with many path separators
-    context.registry.addSimpleStringLiteral((SimpleStringLiteral node) {
+    context.addSimpleStringLiteral((SimpleStringLiteral node) {
       final String value = node.value;
       if (value.length < 20) return;
 
@@ -550,7 +507,7 @@ class AvoidMaxPathRiskRule extends SaropaLintRule {
       }
 
       if (separatorCount >= _maxLiteralSegments) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
   }

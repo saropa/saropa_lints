@@ -4,10 +4,6 @@ import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/token.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
 import 'package:analyzer/dart/element/type.dart';
-import 'package:analyzer/error/error.dart'
-    show AnalysisError, DiagnosticSeverity;
-import 'package:analyzer/source/source_range.dart';
-import 'package:custom_lint_builder/custom_lint_builder.dart';
 
 import '../saropa_lint_rule.dart';
 
@@ -19,7 +15,7 @@ import '../saropa_lint_rule.dart';
 ///
 /// **Quick fix available:** Adds a comment to flag for manual review.
 class AvoidFutureIgnoreRule extends SaropaLintRule {
-  const AvoidFutureIgnoreRule() : super(code: _code);
+  AvoidFutureIgnoreRule() : super(code: _code);
 
   /// Significant issue. Address when count exceeds 10.
   @override
@@ -29,21 +25,19 @@ class AvoidFutureIgnoreRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.high;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_future_ignore',
-    problemMessage:
-        '[avoid_future_ignore] Calling Future.ignore() discards all errors and exceptions from the Future, causing failures to go unnoticed. This can result in silent bugs, missed exceptions, and unreliable app behavior, especially in production where error reporting is critical. {v6}',
+    'avoid_future_ignore',
+    '[avoid_future_ignore] Calling Future.ignore() discards all errors and exceptions from the Future, causing failures to go unnoticed. This can result in silent bugs, missed exceptions, and unreliable app behavior, especially in production where error reporting is critical. {v6}',
     correctionMessage:
         'Use await to handle the Future, unawaited() if you intentionally ignore it, or add .catchError() to log or handle errors. Never ignore errors in production code.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       if (node.methodName.name != 'ignore') return;
 
       // Check if this is likely called on a Future
@@ -55,14 +49,11 @@ class AvoidFutureIgnoreRule extends SaropaLintRule {
       if (type != null) {
         final String typeName = type.getDisplayString();
         if (typeName.startsWith('Future')) {
-          reporter.atNode(node, code);
+          reporter.atNode(node);
         }
       }
     });
   }
-
-  @override
-  List<Fix> getFixes() => <Fix>[_AddHackForFutureIgnoreFix()];
 }
 
 /// Warns when calling toString() or using string interpolation on a Future.
@@ -73,7 +64,7 @@ class AvoidFutureIgnoreRule extends SaropaLintRule {
 ///
 /// **Quick fix available:** Adds a comment to flag for manual review.
 class AvoidFutureToStringRule extends SaropaLintRule {
-  const AvoidFutureToStringRule() : super(code: _code);
+  AvoidFutureToStringRule() : super(code: _code);
 
   /// Significant issue. Address when count exceeds 10.
   @override
@@ -83,21 +74,19 @@ class AvoidFutureToStringRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.high;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_future_tostring',
-    problemMessage:
-        "[avoid_future_tostring] Future.toString() returns 'Instance of Future', not the resolved value. Logs show useless output, error messages fail to include actual data, and debugging async code becomes nearly impossible. {v7}",
+    'avoid_future_tostring',
+    "[avoid_future_tostring] Future.toString() returns 'Instance of Future', not the resolved value. Logs show useless output, error messages fail to include actual data, and debugging async code becomes nearly impossible. {v7}",
     correctionMessage:
         'Use await to get the resolved value first: (await future).toString(). Only call toString() after the Future has completed to log meaningful information.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       if (node.methodName.name != 'toString') return;
 
       final Expression? target = node.target;
@@ -107,25 +96,22 @@ class AvoidFutureToStringRule extends SaropaLintRule {
       if (type != null) {
         final String typeName = type.getDisplayString();
         if (typeName.startsWith('Future')) {
-          reporter.atNode(node, code);
+          reporter.atNode(node);
         }
       }
     });
 
-    context.registry.addInterpolationExpression((InterpolationExpression node) {
+    context.addInterpolationExpression((InterpolationExpression node) {
       final Expression expr = node.expression;
       final DartType? type = expr.staticType;
       if (type != null) {
         final String typeName = type.getDisplayString();
         if (typeName.startsWith('Future')) {
-          reporter.atNode(node, code);
+          reporter.atNode(node);
         }
       }
     });
   }
-
-  @override
-  List<Fix> getFixes() => <Fix>[_AddHackForFutureToStringFix()];
 }
 
 /// Warns when `Future<Future<T>>` is used (nested futures).
@@ -146,7 +132,7 @@ class AvoidFutureToStringRule extends SaropaLintRule {
 ///
 /// **Quick fix available:** Adds a comment to flag for manual review.
 class AvoidNestedFuturesRule extends SaropaLintRule {
-  const AvoidNestedFuturesRule() : super(code: _code);
+  AvoidNestedFuturesRule() : super(code: _code);
 
   /// Significant issue. Address when count exceeds 10.
   @override
@@ -156,35 +142,30 @@ class AvoidNestedFuturesRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_nested_futures',
-    problemMessage:
-        '[avoid_nested_futures] Future<Future<T>> detected. Outer Future resolves to inner Future, not value - requires double await. Consequence: This pattern makes code harder to read, maintain, and debug, and can introduce subtle async bugs and runtime errors. {v4}',
+    'avoid_nested_futures',
+    '[avoid_nested_futures] Future<Future<T>> detected. Outer Future resolves to inner Future, not value - requires double await. Consequence: This pattern makes code harder to read, maintain, and debug, and can introduce subtle async bugs and runtime errors. {v4}',
     correctionMessage:
         'Flatten to Future<T>. If returning async result, just return it directly without wrapping.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addNamedType((NamedType node) {
+    context.addNamedType((NamedType node) {
       if (node.name.lexeme == 'Future') {
         final TypeArgumentList? typeArgs = node.typeArguments;
         if (typeArgs != null && typeArgs.arguments.isNotEmpty) {
           final TypeAnnotation innerType = typeArgs.arguments.first;
           if (innerType is NamedType && innerType.name.lexeme == 'Future') {
-            reporter.atNode(node, code);
+            reporter.atNode(node);
           }
         }
       }
     });
   }
-
-  @override
-  List<Fix> getFixes() => <Fix>[_AddHackForNestedFuturesFix()];
 }
 
 /// Warns when `Stream<Future<T>>` or `Future<Stream<T>>` is used.
@@ -205,7 +186,7 @@ class AvoidNestedFuturesRule extends SaropaLintRule {
 ///
 /// **Quick fix available:** Adds a comment to flag for manual review.
 class AvoidNestedStreamsAndFuturesRule extends SaropaLintRule {
-  const AvoidNestedStreamsAndFuturesRule() : super(code: _code);
+  AvoidNestedStreamsAndFuturesRule() : super(code: _code);
 
   /// Significant issue. Address when count exceeds 10.
   @override
@@ -215,21 +196,19 @@ class AvoidNestedStreamsAndFuturesRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_nested_streams_and_futures',
-    problemMessage:
-        '[avoid_nested_streams_and_futures] Stream<Future<T>> or Future<Stream<T>> detected. Complex to consume - each item needs await or stream needs await. This increases cognitive load and can lead to memory leaks, unclosed stream subscriptions, or missed events. {v4}',
+    'avoid_nested_streams_and_futures',
+    '[avoid_nested_streams_and_futures] Stream<Future<T>> or Future<Stream<T>> detected. Complex to consume - each item needs await or stream needs await. This increases cognitive load and can lead to memory leaks, unclosed stream subscriptions, or missed events. {v4}',
     correctionMessage:
         'Flatten the nested type by using an async* generator function or Stream.asyncMap() to produce a simpler type.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addNamedType((NamedType node) {
+    context.addNamedType((NamedType node) {
       final String outerType = node.name.lexeme;
       if (outerType != 'Stream' && outerType != 'Future') return;
 
@@ -246,13 +225,10 @@ class AvoidNestedStreamsAndFuturesRule extends SaropaLintRule {
 
       // Only flag Stream<Future>, Future<Stream>, Stream<Stream>
       if (innerTypeName == 'Stream' || innerTypeName == 'Future') {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
   }
-
-  @override
-  List<Fix> getFixes() => <Fix>[_AddHackForNestedStreamsAndFuturesFix()];
 }
 
 /// Warns when an async function is passed where a sync function is expected.
@@ -266,7 +242,7 @@ class AvoidNestedStreamsAndFuturesRule extends SaropaLintRule {
 ///
 /// **Quick fix available:** Adds a comment to flag for manual review.
 class AvoidPassingAsyncWhenSyncExpectedRule extends SaropaLintRule {
-  const AvoidPassingAsyncWhenSyncExpectedRule() : super(code: _code);
+  AvoidPassingAsyncWhenSyncExpectedRule() : super(code: _code);
 
   /// Significant issue. Address when count exceeds 10.
   @override
@@ -279,12 +255,11 @@ class AvoidPassingAsyncWhenSyncExpectedRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.test};
 
   static const LintCode _code = LintCode(
-    name: 'avoid_passing_async_when_sync_expected',
-    problemMessage:
-        '[avoid_passing_async_when_sync_expected] Async callback passed to a sync-only method such as forEach, map, or where. The returned Future is silently discarded, which means any errors thrown inside the callback are lost and never reported. This makes debugging extremely difficult and can hide critical failures in your application logic. {v4}',
+    'avoid_passing_async_when_sync_expected',
+    '[avoid_passing_async_when_sync_expected] Async callback passed to a sync-only method such as forEach, map, or where. The returned Future is silently discarded, which means any errors thrown inside the callback are lost and never reported. This makes debugging extremely difficult and can hide critical failures in your application logic. {v4}',
     correctionMessage:
         'Use Future.wait() with map(), or for-loop with await, instead of forEach/where/etc.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   /// Methods known to NOT handle async callbacks properly.
@@ -304,11 +279,10 @@ class AvoidPassingAsyncWhenSyncExpectedRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addFunctionExpression((FunctionExpression node) {
+    context.addFunctionExpression((FunctionExpression node) {
       // Check if function is async
       if (!node.body.isAsynchronous) return;
 
@@ -322,14 +296,11 @@ class AvoidPassingAsyncWhenSyncExpectedRule extends SaropaLintRule {
       if (grandparent is MethodInvocation) {
         final String methodName = grandparent.methodName.name;
         if (_syncOnlyMethods.contains(methodName)) {
-          reporter.atNode(node, code);
+          reporter.atNode(node);
         }
       }
     });
   }
-
-  @override
-  List<Fix> getFixes() => <Fix>[_AddHackForAsyncWhenSyncExpectedFix()];
 }
 
 /// Warns when async is used but no await is present in the function body.
@@ -356,7 +327,7 @@ class AvoidPassingAsyncWhenSyncExpectedRule extends SaropaLintRule {
 /// }
 /// ```
 class AvoidRedundantAsyncRule extends SaropaLintRule {
-  const AvoidRedundantAsyncRule() : super(code: _code);
+  AvoidRedundantAsyncRule() : super(code: _code);
 
   /// Significant issue. Address when count exceeds 10.
   @override
@@ -366,43 +337,41 @@ class AvoidRedundantAsyncRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_redundant_async',
-    problemMessage:
-        '[avoid_redundant_async] Declaring a function async without using await adds unnecessary Future wrapping and microtask scheduling overhead. This can make code harder to read, debug, and maintain, and may introduce subtle timing bugs. {v7}',
+    'avoid_redundant_async',
+    '[avoid_redundant_async] Declaring a function async without using await adds unnecessary Future wrapping and microtask scheduling overhead. This can make code harder to read, debug, and maintain, and may introduce subtle timing bugs. {v7}',
     correctionMessage:
         'Remove the async keyword if not needed, or add await if asynchronous behavior is required. Keep code clean and efficient.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addFunctionDeclaration((FunctionDeclaration node) {
+    context.addFunctionDeclaration((FunctionDeclaration node) {
       _checkAsyncBody(node.functionExpression.body, node, reporter);
     });
 
-    context.registry.addMethodDeclaration((MethodDeclaration node) {
+    context.addMethodDeclaration((MethodDeclaration node) {
       _checkAsyncBody(node.body, node, reporter);
     });
   }
 
   void _checkAsyncBody(
-      FunctionBody body, AstNode node, SaropaDiagnosticReporter reporter) {
+    FunctionBody body,
+    AstNode node,
+    SaropaDiagnosticReporter reporter,
+  ) {
     // Only check async functions (not async*)
     if (body.isAsynchronous && !body.isGenerator) {
       // Check if body contains any await expressions
       final bool hasAwait = _containsAwait(body);
       if (!hasAwait) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     }
   }
-
-  @override
-  List<Fix> getFixes() => <Fix>[_AvoidRedundantAsyncFix()];
 
   bool _containsAwait(AstNode node) {
     bool found = false;
@@ -427,37 +396,6 @@ class _AwaitFinder extends RecursiveAstVisitor<void> {
   }
 }
 
-class _AvoidRedundantAsyncFix extends DartFix {
-  @override
-  void run(
-    CustomLintResolver resolver,
-    ChangeReporter reporter,
-    CustomLintContext context,
-    AnalysisError analysisError,
-    List<AnalysisError> others,
-  ) {
-    context.registry.addFunctionBody((FunctionBody node) {
-      if (!analysisError.sourceRange.intersects(node.sourceRange)) return;
-      if (!node.isAsynchronous) return;
-
-      final changeBuilder = reporter.createChangeBuilder(
-        message: 'Remove async keyword',
-        priority: 80,
-      );
-
-      changeBuilder.addDartFileEdit((builder) {
-        final keyword = node.keyword;
-        if (keyword != null && keyword.lexeme == 'async') {
-          // Remove 'async ' (including the trailing space)
-          builder.addDeletion(
-            SourceRange(keyword.offset, keyword.length + 1),
-          );
-        }
-      });
-    });
-  }
-}
-
 // cspell:ignore tolist
 
 /// Warns when a Stream is converted to String via toString().
@@ -473,7 +411,7 @@ class _AvoidRedundantAsyncFix extends DartFix {
 ///
 /// **Quick fix available:** Adds a comment to flag for manual review.
 class AvoidStreamToStringRule extends SaropaLintRule {
-  const AvoidStreamToStringRule() : super(code: _code);
+  AvoidStreamToStringRule() : super(code: _code);
 
   /// Significant issue. Address when count exceeds 10.
   @override
@@ -484,21 +422,19 @@ class AvoidStreamToStringRule extends SaropaLintRule {
 
   // cspell:ignore tostring
   static const LintCode _code = LintCode(
-    name: 'avoid_stream_tostring',
-    problemMessage:
-        "[avoid_stream_tostring] Calling toString() on a Stream returns only the type name (e.g., 'Instance of Stream'), not the actual stream data. This leads to data loss and can mislead developers or users expecting meaningful output. {v5}",
+    'avoid_stream_tostring',
+    "[avoid_stream_tostring] Calling toString() on a Stream returns only the type name (e.g., 'Instance of Stream'), not the actual stream data. This leads to data loss and can mislead developers or users expecting meaningful output. {v5}",
     correctionMessage:
         'Use await stream.toList() to collect all values, or listen() to process stream data. Never rely on toString() for stream contents.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       if (node.methodName.name != 'toString') return;
 
       final Expression? target = node.target;
@@ -510,14 +446,11 @@ class AvoidStreamToStringRule extends SaropaLintRule {
       if (type != null) {
         final String typeName = type.getDisplayString();
         if (typeName.startsWith('Stream')) {
-          reporter.atNode(node, code);
+          reporter.atNode(node);
         }
       }
     });
   }
-
-  @override
-  List<Fix> getFixes() => <Fix>[_AddHackForStreamToStringFix()];
 }
 
 /// Warns when .listen() result is not assigned to a variable.
@@ -528,7 +461,7 @@ class AvoidStreamToStringRule extends SaropaLintRule {
 ///
 /// **Quick fix available:** Adds a comment to flag for manual review.
 class AvoidUnassignedStreamSubscriptionsRule extends SaropaLintRule {
-  const AvoidUnassignedStreamSubscriptionsRule() : super(code: _code);
+  AvoidUnassignedStreamSubscriptionsRule() : super(code: _code);
 
   /// Significant issue. Address when count exceeds 10.
   @override
@@ -538,21 +471,19 @@ class AvoidUnassignedStreamSubscriptionsRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.high;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_unassigned_stream_subscriptions',
-    problemMessage:
-        '[avoid_unassigned_stream_subscriptions] Stream subscription created by listen() is not assigned to a variable. Without a reference to the StreamSubscription, you cannot cancel it during dispose, which causes memory leaks, prevents garbage collection, and allows callbacks to fire after the StatefulWidget has been destroyed and unmounted from the widget tree. {v5}',
+    'avoid_unassigned_stream_subscriptions',
+    '[avoid_unassigned_stream_subscriptions] Stream subscription created by listen() is not assigned to a variable. Without a reference to the StreamSubscription, you cannot cancel it during dispose, which causes memory leaks, prevents garbage collection, and allows callbacks to fire after the StatefulWidget has been destroyed and unmounted from the widget tree. {v5}',
     correctionMessage:
         'Assign to variable: final sub = stream.listen(...); then sub.cancel() in dispose.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       if (node.methodName.name != 'listen') return;
 
       // Check if the target is a Stream
@@ -573,13 +504,10 @@ class AvoidUnassignedStreamSubscriptionsRule extends SaropaLintRule {
 
       // Check if it's an expression statement (not assigned)
       if (parent is ExpressionStatement) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
   }
-
-  @override
-  List<Fix> getFixes() => <Fix>[_AddHackForUnassignedSubscriptionFix()];
 }
 
 /// Warns when .then() is used instead of async/await in async functions.
@@ -592,7 +520,7 @@ class AvoidUnassignedStreamSubscriptionsRule extends SaropaLintRule {
 /// Only flags .then() when used inside an async function where await
 /// could be used instead.
 class PreferAsyncAwaitRule extends SaropaLintRule {
-  const PreferAsyncAwaitRule() : super(code: _code);
+  PreferAsyncAwaitRule() : super(code: _code);
 
   /// Significant issue. Address when count exceeds 10.
   @override
@@ -602,21 +530,19 @@ class PreferAsyncAwaitRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'prefer_async_await',
-    problemMessage:
-        "[prefer_async_await] Using .then() inside an async function can hide errors in nested callbacks and makes code harder to debug, trace, and maintain. This can lead to missed exceptions and subtle bugs in complex async flows. {v6}",
+    'prefer_async_await',
+    "[prefer_async_await] Using .then() inside an async function can hide errors in nested callbacks and makes code harder to debug, trace, and maintain. This can lead to missed exceptions and subtle bugs in complex async flows. {v6}",
     correctionMessage:
         'Refactor to use async/await syntax for clearer error handling and more readable code.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       if (node.methodName.name != 'then') return;
 
       // Only flag if inside an async function where await could be used
@@ -644,7 +570,7 @@ class PreferAsyncAwaitRule extends SaropaLintRule {
 ///
 /// Alias: prefer_await_completion, inline_await, extract_await, await_variable
 class PreferAssigningAwaitExpressionsRule extends SaropaLintRule {
-  const PreferAssigningAwaitExpressionsRule() : super(code: _code);
+  PreferAssigningAwaitExpressionsRule() : super(code: _code);
 
   /// Significant issue. Address when count exceeds 10.
   @override
@@ -654,21 +580,19 @@ class PreferAssigningAwaitExpressionsRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'prefer_assigning_await_expressions',
-    problemMessage:
-        '[prefer_assigning_await_expressions] Inline await expression. Harder to debug and inspect intermediate values. Consequence: Extracting to a variable improves readability, makes debugging easier, and helps catch errors sooner. {v5}',
+    'prefer_assigning_await_expressions',
+    '[prefer_assigning_await_expressions] Inline await expression. Harder to debug and inspect intermediate values. Consequence: Extracting to a variable improves readability, makes debugging easier, and helps catch errors sooner. {v5}',
     correctionMessage:
         'Extract the await expression to a named variable: final result = await fetch(); then use result in subsequent code.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addAwaitExpression((AwaitExpression node) {
+    context.addAwaitExpression((AwaitExpression node) {
       final AstNode? parent = node.parent;
 
       // OK if direct child of variable declaration or assignment
@@ -693,7 +617,7 @@ class PreferAssigningAwaitExpressionsRule extends SaropaLintRule {
           parent is MethodInvocation ||
           parent is BinaryExpression ||
           parent is ConditionalExpression) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
   }
@@ -720,7 +644,7 @@ class PreferAssigningAwaitExpressionsRule extends SaropaLintRule {
 /// await Future.delayed(Duration(seconds: 2));
 /// ```
 class PreferCommentingFutureDelayedRule extends SaropaLintRule {
-  const PreferCommentingFutureDelayedRule() : super(code: _code);
+  PreferCommentingFutureDelayedRule() : super(code: _code);
 
   /// Significant issue. Address when count exceeds 10.
   @override
@@ -730,21 +654,19 @@ class PreferCommentingFutureDelayedRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'prefer_commenting_future_delayed',
-    problemMessage:
-        '[prefer_commenting_future_delayed] Unexplained delay is a code smell '
+    'prefer_commenting_future_delayed',
+    '[prefer_commenting_future_delayed] Unexplained delay is a code smell '
         'that often hides race conditions or timing bugs. {v4}',
     correctionMessage: 'Add a comment before the delay explaining its purpose.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       // Check for Future.delayed
       final Expression? target = node.target;
       if (target is! SimpleIdentifier) return;
@@ -757,7 +679,7 @@ class PreferCommentingFutureDelayedRule extends SaropaLintRule {
       final bool hasComment = firstToken.precedingComments != null;
 
       if (!hasComment) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
   }
@@ -769,24 +691,22 @@ class PreferCommentingFutureDelayedRule extends SaropaLintRule {
 ///
 /// Alias: async_return_type, future_return_type, explicit_future_type
 class PreferCorrectFutureReturnTypeRule extends SaropaLintRule {
-  const PreferCorrectFutureReturnTypeRule() : super(code: _code);
+  PreferCorrectFutureReturnTypeRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
-    name: 'prefer_correct_future_return_type',
-    problemMessage:
-        '[prefer_correct_future_return_type] Missing Future return type causes '
+    'prefer_correct_future_return_type',
+    '[prefer_correct_future_return_type] Missing Future return type causes '
         'callers to handle dynamic, losing type safety and IDE support. {v3}',
     correctionMessage: 'Add explicit Future<T> return type.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addFunctionDeclaration((FunctionDeclaration node) {
+    context.addFunctionDeclaration((FunctionDeclaration node) {
       _checkAsyncFunction(
         node.functionExpression.body,
         node.returnType,
@@ -795,7 +715,7 @@ class PreferCorrectFutureReturnTypeRule extends SaropaLintRule {
       );
     });
 
-    context.registry.addMethodDeclaration((MethodDeclaration node) {
+    context.addMethodDeclaration((MethodDeclaration node) {
       _checkAsyncFunction(node.body, node.returnType, node.name, reporter);
     });
   }
@@ -810,13 +730,13 @@ class PreferCorrectFutureReturnTypeRule extends SaropaLintRule {
     if (body.star != null) return; // async* is Stream
 
     if (returnType == null) {
-      reporter.atToken(nameToken, code);
+      reporter.atToken(nameToken);
       return;
     }
 
     final String typeStr = returnType.toSource();
     if (!typeStr.startsWith('Future')) {
-      reporter.atNode(returnType, code);
+      reporter.atNode(returnType);
     }
   }
 }
@@ -827,7 +747,7 @@ class PreferCorrectFutureReturnTypeRule extends SaropaLintRule {
 ///
 /// Alias: async_star_return_type, stream_return_type, explicit_stream_type
 class PreferCorrectStreamReturnTypeRule extends SaropaLintRule {
-  const PreferCorrectStreamReturnTypeRule() : super(code: _code);
+  PreferCorrectStreamReturnTypeRule() : super(code: _code);
 
   /// Significant issue. Address when count exceeds 10.
   @override
@@ -837,21 +757,19 @@ class PreferCorrectStreamReturnTypeRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'prefer_correct_stream_return_type',
-    problemMessage:
-        '[prefer_correct_stream_return_type] Missing Stream return type causes '
+    'prefer_correct_stream_return_type',
+    '[prefer_correct_stream_return_type] Missing Stream return type causes '
         'listeners to receive dynamic, losing type safety and IDE support. {v5}',
     correctionMessage: 'Add explicit Stream<T> return type.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addFunctionDeclaration((FunctionDeclaration node) {
+    context.addFunctionDeclaration((FunctionDeclaration node) {
       _checkAsyncStarFunction(
         node.functionExpression.body,
         node.returnType,
@@ -860,7 +778,7 @@ class PreferCorrectStreamReturnTypeRule extends SaropaLintRule {
       );
     });
 
-    context.registry.addMethodDeclaration((MethodDeclaration node) {
+    context.addMethodDeclaration((MethodDeclaration node) {
       _checkAsyncStarFunction(node.body, node.returnType, node.name, reporter);
     });
   }
@@ -875,13 +793,13 @@ class PreferCorrectStreamReturnTypeRule extends SaropaLintRule {
     if (body.star == null) return; // Must be async*
 
     if (returnType == null) {
-      reporter.atToken(nameToken, code);
+      reporter.atToken(nameToken);
       return;
     }
 
     final String typeStr = returnType.toSource();
     if (!typeStr.startsWith('Stream')) {
-      reporter.atNode(returnType, code);
+      reporter.atNode(returnType);
     }
   }
 }
@@ -890,7 +808,7 @@ class PreferCorrectStreamReturnTypeRule extends SaropaLintRule {
 ///
 /// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v5
 class PreferSpecifyingFutureValueTypeRule extends SaropaLintRule {
-  const PreferSpecifyingFutureValueTypeRule() : super(code: _code);
+  PreferSpecifyingFutureValueTypeRule() : super(code: _code);
 
   /// Significant issue. Address when count exceeds 10.
   @override
@@ -900,22 +818,19 @@ class PreferSpecifyingFutureValueTypeRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'prefer_specifying_future_value_type',
-    problemMessage:
-        '[prefer_specifying_future_value_type] Calling Future.value() without specifying a type returns Future<dynamic>, which loses compile-time safety. This can lead to type errors, runtime bugs, and code that is harder to maintain and refactor. {v5}',
+    'prefer_specifying_future_value_type',
+    '[prefer_specifying_future_value_type] Calling Future.value() without specifying a type returns Future<dynamic>, which loses compile-time safety. This can lead to type errors, runtime bugs, and code that is harder to maintain and refactor. {v5}',
     correctionMessage:
         'Always specify the value type explicitly: Future<Type>.value(...). This improves type safety and code clarity.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry
-        .addInstanceCreationExpression((InstanceCreationExpression node) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final ConstructorName constructorName = node.constructorName;
       final NamedType type = constructorName.type;
 
@@ -925,7 +840,7 @@ class PreferSpecifyingFutureValueTypeRule extends SaropaLintRule {
 
       // Check if type arguments are specified
       if (type.typeArguments == null) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
   }
@@ -958,7 +873,7 @@ class PreferSpecifyingFutureValueTypeRule extends SaropaLintRule {
 ///
 /// **Quick fix available:** Adds `await` before the returned expression.
 class PreferReturnAwaitRule extends SaropaLintRule {
-  const PreferReturnAwaitRule() : super(code: _code);
+  PreferReturnAwaitRule() : super(code: _code);
 
   /// Significant issue. Address when count exceeds 10.
   @override
@@ -968,21 +883,19 @@ class PreferReturnAwaitRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.high;
 
   static const LintCode _code = LintCode(
-    name: 'prefer_return_await',
-    problemMessage:
-        '[prefer_return_await] Returning a Future directly from an async function skips error propagation and stack trace preservation, making debugging harder. This can hide the source of exceptions and complicate error handling. {v6}',
+    'prefer_return_await',
+    '[prefer_return_await] Returning a Future directly from an async function skips error propagation and stack trace preservation, making debugging harder. This can hide the source of exceptions and complicate error handling. {v6}',
     correctionMessage:
         'Use return await to ensure errors are properly propagated and stack traces are preserved in async functions.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addReturnStatement((ReturnStatement node) {
+    context.addReturnStatement((ReturnStatement node) {
       final Expression? expression = node.expression;
       if (expression == null) return;
 
@@ -1001,7 +914,7 @@ class PreferReturnAwaitRule extends SaropaLintRule {
 
       final String typeName = returnType.getDisplayString();
       if (typeName.startsWith('Future<') || typeName == 'Future<dynamic>') {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
   }
@@ -1013,226 +926,6 @@ class PreferReturnAwaitRule extends SaropaLintRule {
       current = current.parent;
     }
     return null;
-  }
-
-  @override
-  List<Fix> getFixes() => <Fix>[_AddAwaitFix()];
-}
-
-class _AddAwaitFix extends DartFix {
-  @override
-  void run(
-    CustomLintResolver resolver,
-    ChangeReporter reporter,
-    CustomLintContext context,
-    AnalysisError analysisError,
-    List<AnalysisError> others,
-  ) {
-    context.registry.addReturnStatement((ReturnStatement node) {
-      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
-
-      final Expression? expression = node.expression;
-      if (expression == null) return;
-      if (expression is AwaitExpression) return;
-
-      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
-        message: 'Add await',
-        priority: 1,
-      );
-
-      changeBuilder.addDartFileEdit((builder) {
-        builder.addSimpleInsertion(expression.offset, 'await ');
-      });
-    });
-  }
-}
-
-class _AddHackForFutureIgnoreFix extends DartFix {
-  @override
-  void run(
-    CustomLintResolver resolver,
-    ChangeReporter reporter,
-    CustomLintContext context,
-    AnalysisError analysisError,
-    List<AnalysisError> others,
-  ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
-      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
-
-      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
-        message: 'Add HACK comment for Future.ignore()',
-        priority: 1,
-      );
-
-      changeBuilder.addDartFileEdit((builder) {
-        builder.addSimpleInsertion(
-          node.offset,
-          '// HACK: handle this Future properly with await or unawaited()\n',
-        );
-      });
-    });
-  }
-}
-
-class _AddHackForFutureToStringFix extends DartFix {
-  @override
-  void run(
-    CustomLintResolver resolver,
-    ChangeReporter reporter,
-    CustomLintContext context,
-    AnalysisError analysisError,
-    List<AnalysisError> others,
-  ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
-      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
-
-      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
-        message: 'Add HACK comment for Future.toString()',
-        priority: 1,
-      );
-
-      changeBuilder.addDartFileEdit((builder) {
-        builder.addSimpleInsertion(
-          node.offset,
-          '// HACK: await the Future before converting to string\n',
-        );
-      });
-    });
-  }
-}
-
-class _AddHackForNestedFuturesFix extends DartFix {
-  @override
-  void run(
-    CustomLintResolver resolver,
-    ChangeReporter reporter,
-    CustomLintContext context,
-    AnalysisError analysisError,
-    List<AnalysisError> others,
-  ) {
-    context.registry.addNamedType((NamedType node) {
-      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
-
-      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
-        message: 'Add HACK comment for nested Future',
-        priority: 1,
-      );
-
-      changeBuilder.addDartFileEdit((builder) {
-        builder.addSimpleInsertion(
-          node.offset,
-          '/* HACK: flatten nested Future */ ',
-        );
-      });
-    });
-  }
-}
-
-class _AddHackForNestedStreamsAndFuturesFix extends DartFix {
-  @override
-  void run(
-    CustomLintResolver resolver,
-    ChangeReporter reporter,
-    CustomLintContext context,
-    AnalysisError analysisError,
-    List<AnalysisError> others,
-  ) {
-    context.registry.addNamedType((NamedType node) {
-      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
-
-      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
-        message: 'Add HACK comment for nested Stream/Future',
-        priority: 1,
-      );
-
-      changeBuilder.addDartFileEdit((builder) {
-        builder.addSimpleInsertion(
-          node.offset,
-          '/* HACK: avoid mixing Stream and Future */ ',
-        );
-      });
-    });
-  }
-}
-
-class _AddHackForAsyncWhenSyncExpectedFix extends DartFix {
-  @override
-  void run(
-    CustomLintResolver resolver,
-    ChangeReporter reporter,
-    CustomLintContext context,
-    AnalysisError analysisError,
-    List<AnalysisError> others,
-  ) {
-    context.registry.addFunctionExpression((FunctionExpression node) {
-      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
-
-      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
-        message: 'Add HACK comment for async callback',
-        priority: 1,
-      );
-
-      changeBuilder.addDartFileEdit((builder) {
-        builder.addSimpleInsertion(
-          node.offset,
-          '/* HACK: async callback - ensure caller handles Future */ ',
-        );
-      });
-    });
-  }
-}
-
-class _AddHackForStreamToStringFix extends DartFix {
-  @override
-  void run(
-    CustomLintResolver resolver,
-    ChangeReporter reporter,
-    CustomLintContext context,
-    AnalysisError analysisError,
-    List<AnalysisError> others,
-  ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
-      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
-
-      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
-        message: 'Add HACK comment for Stream.toString()',
-        priority: 1,
-      );
-
-      changeBuilder.addDartFileEdit((builder) {
-        builder.addSimpleInsertion(
-          node.offset,
-          '// HACK: use stream.toList() or iterate instead of toString()\n',
-        );
-      });
-    });
-  }
-}
-
-class _AddHackForUnassignedSubscriptionFix extends DartFix {
-  @override
-  void run(
-    CustomLintResolver resolver,
-    ChangeReporter reporter,
-    CustomLintContext context,
-    AnalysisError analysisError,
-    List<AnalysisError> others,
-  ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
-      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
-
-      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
-        message: 'Add HACK comment for unassigned subscription',
-        priority: 1,
-      );
-
-      changeBuilder.addDartFileEdit((builder) {
-        builder.addSimpleInsertion(
-          node.offset,
-          '// HACK: assign subscription to cancel later\n',
-        );
-      });
-    });
   }
 }
 
@@ -1314,7 +1007,7 @@ class _AddHackForUnassignedSubscriptionFix extends DartFix {
 /// - `VoidCallback` → `Future<void> Function()`
 /// - `VoidCallback?` → `Future<void> Function()?`
 class PreferAsyncCallbackRule extends SaropaLintRule {
-  const PreferAsyncCallbackRule() : super(code: _code);
+  PreferAsyncCallbackRule() : super(code: _code);
 
   /// Significant issue. Address when count exceeds 10.
   @override
@@ -1324,13 +1017,12 @@ class PreferAsyncCallbackRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'prefer_async_callback',
-    problemMessage:
-        '[prefer_async_callback] VoidCallback discards Futures silently. Errors will be swallowed and '
+    'prefer_async_callback',
+    '[prefer_async_callback] VoidCallback discards Futures silently. Errors will be swallowed and '
         'callers cannot await completion. {v4}',
     correctionMessage:
         'Use Future<void> Function() to allow proper async handling.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
@@ -1437,12 +1129,11 @@ class PreferAsyncCallbackRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
     // Check field declarations
-    context.registry.addFieldDeclaration((FieldDeclaration node) {
+    context.addFieldDeclaration((FieldDeclaration node) {
       final VariableDeclarationList fields = node.fields;
       final TypeAnnotation? type = fields.type;
 
@@ -1458,7 +1149,7 @@ class PreferAsyncCallbackRule extends SaropaLintRule {
     });
 
     // Check parameter declarations (in constructors and functions)
-    context.registry.addSimpleFormalParameter((SimpleFormalParameter node) {
+    context.addSimpleFormalParameter((SimpleFormalParameter node) {
       final TypeAnnotation? type = node.type;
       if (!_isVoidCallback(type)) return;
 
@@ -1471,51 +1162,18 @@ class PreferAsyncCallbackRule extends SaropaLintRule {
       }
     });
   }
-
-  @override
-  List<Fix> getFixes() => <Fix>[_ChangeToFutureVoidFunctionFix()];
 }
 
 /// Quick fix that replaces `VoidCallback` with `Future<void> Function()`.
 ///
 /// This fix is applied when the lint detects a VoidCallback used for a
 /// callback name that suggests async behavior (e.g., onSubmit, onDelete).
-class _ChangeToFutureVoidFunctionFix extends DartFix {
-  @override
-  void run(
-    CustomLintResolver resolver,
-    ChangeReporter reporter,
-    CustomLintContext context,
-    AnalysisError analysisError,
-    List<AnalysisError> others,
-  ) {
-    context.registry.addNamedType((NamedType node) {
-      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
-
-      final String source = node.toSource();
-      if (source != 'VoidCallback' && source != 'VoidCallback?') return;
-
-      final bool isNullable = node.question != null;
-      final String replacement =
-          isNullable ? 'Future<void> Function()?' : 'Future<void> Function()';
-
-      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
-        message: 'Change to Future<void> Function()',
-        priority: 1,
-      );
-
-      changeBuilder.addDartFileEdit((builder) {
-        builder.addSimpleReplacement(node.sourceRange, replacement);
-      });
-    });
-  }
-}
 
 /// Enforces using explicit Future-returning callbacks instead of AsyncCallback.
 ///
 /// Since: v1.7.5 | Updated: v4.13.0 | Rule version: v3
 class PreferFutureVoidFunctionOverAsyncCallbackRule extends SaropaLintRule {
-  const PreferFutureVoidFunctionOverAsyncCallbackRule() : super(code: _code);
+  PreferFutureVoidFunctionOverAsyncCallbackRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.opinionated;
@@ -1524,60 +1182,23 @@ class PreferFutureVoidFunctionOverAsyncCallbackRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'prefer_future_void_function_over_async_callback',
-    problemMessage:
-        '[prefer_future_void_function_over_async_callback] Prefer explicit Future<void> Function() instead of AsyncCallback. Enforces using explicit Future-returning callbacks instead of AsyncCallback. {v3}',
+    'prefer_future_void_function_over_async_callback',
+    '[prefer_future_void_function_over_async_callback] Prefer explicit Future<void> Function() instead of AsyncCallback. Enforces using explicit Future-returning callbacks instead of AsyncCallback. {v3}',
     correctionMessage:
         'Use Future<void> Function() instead of AsyncCallback to keep the signature framework-agnostic and self-documenting.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addNamedType((NamedType node) {
+    context.addNamedType((NamedType node) {
       final String source = node.toSource();
       if (source == 'AsyncCallback' || source == 'AsyncCallback?') {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
-    });
-  }
-
-  @override
-  List<Fix> getFixes() =>
-      <Fix>[_ReplaceAsyncCallbackWithFutureVoidFunctionFix()];
-}
-
-class _ReplaceAsyncCallbackWithFutureVoidFunctionFix extends DartFix {
-  @override
-  void run(
-    CustomLintResolver resolver,
-    ChangeReporter reporter,
-    CustomLintContext context,
-    AnalysisError analysisError,
-    List<AnalysisError> others,
-  ) {
-    context.registry.addNamedType((NamedType node) {
-      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
-
-      final String source = node.toSource();
-      if (source != 'AsyncCallback' && source != 'AsyncCallback?') return;
-
-      final bool isNullable = node.question != null;
-      final String replacement =
-          isNullable ? 'Future<void> Function()?' : 'Future<void> Function()';
-
-      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
-        message: 'Change to Future<void> Function()',
-        priority: 1,
-      );
-
-      changeBuilder.addDartFileEdit((builder) {
-        builder.addSimpleReplacement(node.sourceRange, replacement);
-      });
     });
   }
 }
@@ -1607,7 +1228,7 @@ class _ReplaceAsyncCallbackWithFutureVoidFunctionFix extends DartFix {
 /// }
 /// ```
 class AvoidDialogContextAfterAsyncRule extends SaropaLintRule {
-  const AvoidDialogContextAfterAsyncRule() : super(code: _code);
+  AvoidDialogContextAfterAsyncRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.critical;
@@ -1616,21 +1237,19 @@ class AvoidDialogContextAfterAsyncRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_dialog_context_after_async',
-    problemMessage:
-        '[avoid_dialog_context_after_async] If you call Navigator.pop() or use BuildContext after an await, the widget may have been disposed, causing a "Looking up deactivated widget" crash. This leads to app instability and poor user experience. {v5}',
+    'avoid_dialog_context_after_async',
+    '[avoid_dialog_context_after_async] If you call Navigator.pop() or use BuildContext after an await, the widget may have been disposed, causing a "Looking up deactivated widget" crash. This leads to app instability and poor user experience. {v5}',
     correctionMessage:
         'Always check if (context.mounted) before using BuildContext or Navigator.pop() after an await to prevent crashes.',
-    errorSeverity: DiagnosticSeverity.ERROR,
+    severity: DiagnosticSeverity.ERROR,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       // Check for Navigator.pop or Navigator.of(context).pop
       final String methodName = node.methodName.name;
       if (methodName != 'pop' && methodName != 'maybePop') return;
@@ -1657,7 +1276,7 @@ class AvoidDialogContextAfterAsyncRule extends SaropaLintRule {
       final bool hasMountedCheck = _hasMountedCheckBefore(body, node);
       if (hasMountedCheck) return;
 
-      reporter.atNode(node, code);
+      reporter.atNode(node);
     });
   }
 
@@ -1674,14 +1293,20 @@ class AvoidDialogContextAfterAsyncRule extends SaropaLintRule {
     bool foundAwait = false;
     bool reachedTarget = false;
 
-    body.visitChildren(_AwaitBeforeChecker((AwaitExpression awaitNode) {
-      if (reachedTarget) return;
-      if (awaitNode.offset < target.offset) {
-        foundAwait = true;
-      }
-    }, () {
-      reachedTarget = true;
-    }, target));
+    body.visitChildren(
+      _AwaitBeforeChecker(
+        (AwaitExpression awaitNode) {
+          if (reachedTarget) return;
+          if (awaitNode.offset < target.offset) {
+            foundAwait = true;
+          }
+        },
+        () {
+          reachedTarget = true;
+        },
+        target,
+      ),
+    );
 
     return foundAwait;
   }
@@ -1767,7 +1392,7 @@ class _AwaitBeforeChecker extends RecursiveAstVisitor<void> {
 /// }
 /// ```
 class CheckMountedAfterAsyncRule extends SaropaLintRule {
-  const CheckMountedAfterAsyncRule() : super(code: _code);
+  CheckMountedAfterAsyncRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.critical;
@@ -1776,22 +1401,20 @@ class CheckMountedAfterAsyncRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'check_mounted_after_async',
-    problemMessage:
-        '[check_mounted_after_async] setState() after await without mounted check. '
+    'check_mounted_after_async',
+    '[check_mounted_after_async] setState() after await without mounted check. '
         'State may be disposed during async gap, causing "setState() called after dispose()" crash. {v5}',
     correctionMessage:
         'Add if (mounted) { setState(...) } or if (!mounted) return; before the call.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       final String methodName = node.methodName.name;
 
       // Check for setState or context-using methods
@@ -1813,7 +1436,7 @@ class CheckMountedAfterAsyncRule extends SaropaLintRule {
       // Check for mounted check
       if (_hasMountedGuard(body, node)) return;
 
-      reporter.atNode(node, code);
+      reporter.atNode(node);
     });
   }
 
@@ -1830,16 +1453,22 @@ class CheckMountedAfterAsyncRule extends SaropaLintRule {
     bool foundAwait = false;
     bool reachedTarget = false;
 
-    body.visitChildren(_AwaitBeforeChecker((AwaitExpression awaitNode) {
-      if (reachedTarget) return;
-      if (awaitNode.offset < target.offset) {
-        // Skip the target's own await (e.g., `await showDialog(...)`)
-        if (awaitNode.expression == target) return;
-        foundAwait = true;
-      }
-    }, () {
-      reachedTarget = true;
-    }, target));
+    body.visitChildren(
+      _AwaitBeforeChecker(
+        (AwaitExpression awaitNode) {
+          if (reachedTarget) return;
+          if (awaitNode.offset < target.offset) {
+            // Skip the target's own await (e.g., `await showDialog(...)`)
+            if (awaitNode.expression == target) return;
+            foundAwait = true;
+          }
+        },
+        () {
+          reachedTarget = true;
+        },
+        target,
+      ),
+    );
 
     return foundAwait;
   }
@@ -1917,12 +1546,14 @@ class CheckMountedAfterAsyncRule extends SaropaLintRule {
   /// [startOffset] and [endOffset].
   bool _hasAwaitInRange(AstNode body, int startOffset, int endOffset) {
     bool found = false;
-    body.visitChildren(_AwaitRangeChecker((AwaitExpression awaitNode) {
-      if (found) return;
-      if (awaitNode.offset >= startOffset && awaitNode.offset < endOffset) {
-        found = true;
-      }
-    }));
+    body.visitChildren(
+      _AwaitRangeChecker((AwaitExpression awaitNode) {
+        if (found) return;
+        if (awaitNode.offset >= startOffset && awaitNode.offset < endOffset) {
+          found = true;
+        }
+      }),
+    );
     return found;
   }
 }
@@ -1969,7 +1600,7 @@ class _AwaitRangeChecker extends RecursiveAstVisitor<void> {
 /// });
 /// ```
 class RequireWebsocketMessageValidationRule extends SaropaLintRule {
-  const RequireWebsocketMessageValidationRule() : super(code: _code);
+  RequireWebsocketMessageValidationRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.high;
@@ -1978,22 +1609,20 @@ class RequireWebsocketMessageValidationRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'require_websocket_message_validation',
-    problemMessage:
-        '[require_websocket_message_validation] Unvalidated WebSocket messages '
+    'require_websocket_message_validation',
+    '[require_websocket_message_validation] Unvalidated WebSocket messages '
         'crash when malformed data arrives, or enable injection attacks. {v3}',
     correctionMessage:
         'Add try-catch and type checking for WebSocket messages.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       // Check for WebSocketChannel stream listen
       if (node.methodName.name != 'listen') return;
 
@@ -2020,7 +1649,8 @@ class RequireWebsocketMessageValidationRule extends SaropaLintRule {
       final String bodySource = body.toSource();
 
       // Check for validation patterns
-      final bool hasValidation = bodySource.contains('try') ||
+      final bool hasValidation =
+          bodySource.contains('try') ||
           bodySource.contains('catch') ||
           bodySource.contains('is Map') ||
           bodySource.contains('is List') ||
@@ -2030,7 +1660,7 @@ class RequireWebsocketMessageValidationRule extends SaropaLintRule {
           bodySource.contains('if (');
 
       if (!hasValidation) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
   }
@@ -2058,7 +1688,7 @@ class RequireWebsocketMessageValidationRule extends SaropaLintRule {
 /// }
 /// ```
 class RequireFeatureFlagDefaultRule extends SaropaLintRule {
-  const RequireFeatureFlagDefaultRule() : super(code: _code);
+  RequireFeatureFlagDefaultRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.high;
@@ -2067,22 +1697,20 @@ class RequireFeatureFlagDefaultRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'require_feature_flag_default',
-    problemMessage:
-        '[require_feature_flag_default] Missing default causes null/zero when '
+    'require_feature_flag_default',
+    '[require_feature_flag_default] Missing default causes null/zero when '
         'remote config fetch fails, breaking expected feature behavior. {v3}',
     correctionMessage:
         'Use ?? operator or provide default in getBool/getString.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       // Check for RemoteConfig get methods
       final String methodName = node.methodName.name;
       if (!methodName.startsWith('get')) return;
@@ -2113,7 +1741,7 @@ class RequireFeatureFlagDefaultRule extends SaropaLintRule {
       // OK if assigned to a variable with default
       if (parent is VariableDeclaration) return;
 
-      reporter.atNode(node, code);
+      reporter.atNode(node);
     });
   }
 }
@@ -2159,7 +1787,7 @@ class RequireFeatureFlagDefaultRule extends SaropaLintRule {
 /// prefs.setString('lastSync', DateTime.now().toUtc().toIso8601String());
 /// ```
 class PreferUtcForStorageRule extends SaropaLintRule {
-  const PreferUtcForStorageRule() : super(code: _code);
+  PreferUtcForStorageRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.high;
@@ -2172,12 +1800,11 @@ class PreferUtcForStorageRule extends SaropaLintRule {
   // name and type provide efficient filtering without missing real violations.
 
   static const LintCode _code = LintCode(
-    name: 'prefer_utc_for_storage',
-    problemMessage:
-        '[prefer_utc_for_storage] Local time stored without UTC conversion '
+    'prefer_utc_for_storage',
+    '[prefer_utc_for_storage] Local time stored without UTC conversion '
         'causes incorrect values when restored in different timezones. {v4}',
     correctionMessage: 'Call .toUtc() before storing DateTime values.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   // Storage and serialization patterns that indicate DateTime persistence.
@@ -2213,11 +1840,10 @@ class PreferUtcForStorageRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       // Check for DateTime serialization methods commonly used for storage.
       // Excludes toString() - it's rarely used for actual storage and mostly
       // appears in logging/debugging, which would generate false positives.
@@ -2250,7 +1876,7 @@ class PreferUtcForStorageRule extends SaropaLintRule {
         final String source = current.toSource();
         for (final pattern in _storagePatterns) {
           if (pattern.hasMatch(source)) {
-            reporter.atNode(node, code);
+            reporter.atNode(node);
             return;
           }
         }
@@ -2258,40 +1884,10 @@ class PreferUtcForStorageRule extends SaropaLintRule {
       }
     });
   }
-
-  @override
-  List<Fix> getFixes() => <Fix>[_AddToUtcFix()];
 }
 
 /// Quick fix for [PreferUtcForStorageRule] that inserts `.toUtc()` before
 /// the serialization method call.
-class _AddToUtcFix extends DartFix {
-  @override
-  void run(
-    CustomLintResolver resolver,
-    ChangeReporter reporter,
-    CustomLintContext context,
-    AnalysisError analysisError,
-    List<AnalysisError> others,
-  ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
-      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
-
-      final Expression? target = node.target;
-      if (target == null) return;
-
-      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
-        message: 'Add .toUtc() before serialization',
-        priority: 1,
-      );
-
-      changeBuilder.addDartFileEdit((builder) {
-        // Insert .toUtc() after the DateTime expression, before the method call
-        builder.addSimpleInsertion(target.end, '.toUtc()');
-      });
-    });
-  }
-}
 
 /// Warns when location request is made without a timeout.
 ///
@@ -2312,7 +1908,7 @@ class _AddToUtcFix extends DartFix {
 /// );
 /// ```
 class RequireLocationTimeoutRule extends SaropaLintRule {
-  const RequireLocationTimeoutRule() : super(code: _code);
+  RequireLocationTimeoutRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.high;
@@ -2321,13 +1917,12 @@ class RequireLocationTimeoutRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'require_location_timeout',
-    problemMessage:
-        '[require_location_timeout] Location request without timeout can hang '
+    'require_location_timeout',
+    '[require_location_timeout] Location request without timeout can hang '
         'indefinitely if GPS is unavailable, freezing the app. {v3}',
     correctionMessage:
         'Add timeLimit or timeout parameter to location request.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   /// Methods that actually request GPS coordinates.
@@ -2354,11 +1949,10 @@ class RequireLocationTimeoutRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       final String methodName = node.methodName.name;
       if (!_gpsRequestMethods.contains(methodName)) return;
 
@@ -2375,7 +1969,7 @@ class RequireLocationTimeoutRule extends SaropaLintRule {
       // Check for chained .timeout() on the returned Future
       if (_hasChainedTimeout(node)) return;
 
-      reporter.atNode(node, code);
+      reporter.atNode(node);
     });
   }
 
@@ -2452,7 +2046,7 @@ class RequireLocationTimeoutRule extends SaropaLintRule {
 /// }
 /// ```
 class AvoidStreamInBuildRule extends SaropaLintRule {
-  const AvoidStreamInBuildRule() : super(code: _code);
+  AvoidStreamInBuildRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.critical;
@@ -2461,23 +2055,19 @@ class AvoidStreamInBuildRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_stream_in_build',
-    problemMessage:
-        "[avoid_stream_in_build] Creating a Stream or StreamController inside a widget's build() method causes a new stream instance to be created on every rebuild of that widget. This leads to multiple overlapping subscriptions, memory leaks, and lost or duplicated events, making the widget's state unpredictable and difficult to debug. Always manage streams as persistent fields in the State class, not as local variables in build(). See https://docs.flutter.dev/cookbook/networking/web-sockets#using-streambuilder. {v2}",
+    'avoid_stream_in_build',
+    "[avoid_stream_in_build] Creating a Stream or StreamController inside a widget's build() method causes a new stream instance to be created on every rebuild of that widget. This leads to multiple overlapping subscriptions, memory leaks, and lost or duplicated events, making the widget's state unpredictable and difficult to debug. Always manage streams as persistent fields in the State class, not as local variables in build(). See https://docs.flutter.dev/cookbook/networking/web-sockets#using-streambuilder. {v2}",
     correctionMessage:
         'Move all Stream and StreamController creation out of the build() method and into the State class, typically initializing them in initState() and disposing them in dispose(). This ensures a single, consistent stream lifecycle per widget instance and prevents memory leaks or event loss. See https://docs.flutter.dev/cookbook/networking/web-sockets#using-streambuilder for recommended patterns.',
-    errorSeverity: DiagnosticSeverity.ERROR,
+    severity: DiagnosticSeverity.ERROR,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addInstanceCreationExpression((
-      InstanceCreationExpression node,
-    ) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final String typeName = node.constructorName.type.name.lexeme;
       if (typeName != 'StreamController') return;
 
@@ -2485,7 +2075,7 @@ class AvoidStreamInBuildRule extends SaropaLintRule {
       AstNode? current = node.parent;
       while (current != null) {
         if (current is MethodDeclaration && current.name.lexeme == 'build') {
-          reporter.atNode(node, code);
+          reporter.atNode(node);
           return;
         }
         current = current.parent;
@@ -2531,7 +2121,7 @@ class AvoidStreamInBuildRule extends SaropaLintRule {
 ///
 /// **Quick fix available:** Adds `controller.close()` call to dispose/close method.
 class RequireStreamControllerCloseRule extends SaropaLintRule {
-  const RequireStreamControllerCloseRule() : super(code: _code);
+  RequireStreamControllerCloseRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.critical;
@@ -2540,21 +2130,19 @@ class RequireStreamControllerCloseRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'require_stream_controller_close',
-    problemMessage:
-        '[require_stream_controller_close] Failing to close a StreamController in the dispose() method leaves the stream open, causing memory leaks, connection handle exhaustion, and potential app crashes. Unclosed streams can accumulate events and listeners, degrading performance and making debugging difficult. Proper closure is essential for robust, production-quality Flutter apps. {v5}',
+    'require_stream_controller_close',
+    '[require_stream_controller_close] Failing to close a StreamController in the dispose() method leaves the stream open, causing memory leaks, connection handle exhaustion, and potential app crashes. Unclosed streams can accumulate events and listeners, degrading performance and making debugging difficult. Proper closure is essential for robust, production-quality Flutter apps. {v5}',
     correctionMessage:
         'Call controller.close() in dispose() before super.dispose(). For wrapper types (e.g., IsarStreamController), calling wrapper.dispose() is also acceptable if the wrapper internally closes its StreamController.',
-    errorSeverity: DiagnosticSeverity.ERROR,
+    severity: DiagnosticSeverity.ERROR,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addClassDeclaration((ClassDeclaration node) {
+    context.addClassDeclaration((ClassDeclaration node) {
       // Find StreamController fields, tracking if they are exact types or
       // wrappers. Record format: (variable, isExactStreamControllerType)
       final List<(VariableDeclaration, bool)> controllers =
@@ -2566,7 +2154,8 @@ class RequireStreamControllerCloseRule extends SaropaLintRule {
           if (typeStr != null &&
               (typeStr.startsWith('StreamController') ||
                   typeStr.startsWith('StreamController?'))) {
-            final bool isExactType = typeStr == 'StreamController' ||
+            final bool isExactType =
+                typeStr == 'StreamController' ||
                 typeStr.startsWith('StreamController<') ||
                 typeStr.startsWith('StreamController?');
             for (final variable in member.fields.variables) {
@@ -2600,100 +2189,21 @@ class RequireStreamControllerCloseRule extends SaropaLintRule {
         if (isExactType) {
           // Exact StreamController requires .close()
           if (!hasClose) {
-            reporter.atNode(controller, code);
+            reporter.atNode(controller);
           }
         } else {
           // Wrapper type (e.g., IsarStreamController) accepts .close() OR
           // .dispose() since wrappers typically close internally
           if (!hasClose && !hasDispose) {
-            reporter.atNode(controller, code);
+            reporter.atNode(controller);
           }
         }
       }
     });
   }
-
-  @override
-  List<Fix> getFixes() => <Fix>[_AddStreamControllerCloseFix()];
 }
 
 /// Quick fix that adds `.close()` call to the dispose/close method.
-class _AddStreamControllerCloseFix extends DartFix {
-  @override
-  void run(
-    CustomLintResolver resolver,
-    ChangeReporter reporter,
-    CustomLintContext context,
-    AnalysisError analysisError,
-    List<AnalysisError> others,
-  ) {
-    context.registry.addVariableDeclaration((VariableDeclaration node) {
-      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
-
-      final String fieldName = node.name.lexeme;
-
-      // Find the containing class
-      AstNode? current = node.parent;
-      while (current != null && current is! ClassDeclaration) {
-        current = current.parent;
-      }
-      if (current is! ClassDeclaration) return;
-
-      final ClassDeclaration classNode = current;
-
-      // Find dispose() or close() method
-      MethodDeclaration? cleanupMethod;
-      for (final member in classNode.members) {
-        if (member is MethodDeclaration) {
-          final name = member.name.lexeme;
-          if (name == 'dispose' || name == 'close') {
-            cleanupMethod = member;
-            break;
-          }
-        }
-      }
-
-      if (cleanupMethod == null) return;
-
-      final FunctionBody body = cleanupMethod.body;
-      if (body is! BlockFunctionBody) return;
-
-      final Block block = body.block;
-      final List<Statement> statements = block.statements;
-
-      // Find insertion point: before super.dispose() or at end
-      int insertOffset = block.rightBracket.offset;
-      String prefix = '\n    ';
-
-      for (final statement in statements) {
-        if (statement is ExpressionStatement) {
-          final expr = statement.expression;
-          if (expr is MethodInvocation) {
-            final target = expr.target;
-            if (target is SuperExpression &&
-                expr.methodName.name == 'dispose') {
-              insertOffset = statement.offset;
-              prefix = '';
-              break;
-            }
-          }
-        }
-      }
-
-      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
-        message: 'Add $fieldName.close() to ${cleanupMethod.name.lexeme}()',
-        priority: 80,
-      );
-
-      changeBuilder.addDartFileEdit((builder) {
-        builder.addSimpleInsertion(
-          insertOffset,
-          '$prefix$fieldName.close();\n    ',
-        );
-      });
-    });
-  }
-}
 
 /// Warns when multiple listeners are added to a non-broadcast stream.
 ///
@@ -2715,7 +2225,7 @@ class _AddStreamControllerCloseFix extends DartFix {
 /// stream.listen((data) => handleB(data)); // OK
 /// ```
 class AvoidMultipleStreamListenersRule extends SaropaLintRule {
-  const AvoidMultipleStreamListenersRule() : super(code: _code);
+  AvoidMultipleStreamListenersRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.high;
@@ -2724,21 +2234,19 @@ class AvoidMultipleStreamListenersRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_multiple_stream_listeners',
-    problemMessage:
-        '[avoid_multiple_stream_listeners] Multiple listen() calls detected on the same non-broadcast stream. Single-subscription streams only allow one active listener at a time. Adding a second listener throws a StateError at runtime, which crashes your app and makes the stream connection unusable for all subscribers. {v2}',
+    'avoid_multiple_stream_listeners',
+    '[avoid_multiple_stream_listeners] Multiple listen() calls detected on the same non-broadcast stream. Single-subscription streams only allow one active listener at a time. Adding a second listener throws a StateError at runtime, which crashes your app and makes the stream connection unusable for all subscribers. {v2}',
     correctionMessage:
         'Convert the stream to a broadcast stream using .asBroadcastStream(), or ensure only one listener is attached.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addBlock((Block node) {
+    context.addBlock((Block node) {
       // Track stream.listen calls by target
       final Map<String, List<MethodInvocation>> listenCalls =
           <String, List<MethodInvocation>>{};
@@ -2798,7 +2306,7 @@ class AvoidMultipleStreamListenersRule extends SaropaLintRule {
 /// );
 /// ```
 class RequireStreamErrorHandlingRule extends SaropaLintRule {
-  const RequireStreamErrorHandlingRule() : super(code: _code);
+  RequireStreamErrorHandlingRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.high;
@@ -2807,21 +2315,19 @@ class RequireStreamErrorHandlingRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'require_stream_error_handling',
-    problemMessage:
-        '[require_stream_error_handling] Stream.listen() is called without providing an onError callback or wrapping the stream in a try-catch. Unhandled stream errors propagate as uncaught exceptions, which crash your app in production and terminate the stream connection permanently, preventing any further data from being received. {v2}',
+    'require_stream_error_handling',
+    '[require_stream_error_handling] Stream.listen() is called without providing an onError callback or wrapping the stream in a try-catch. Unhandled stream errors propagate as uncaught exceptions, which crash your app in production and terminate the stream connection permanently, preventing any further data from being received. {v2}',
     correctionMessage:
         'Add an onError callback to your stream.listen() to handle errors gracefully and prevent crashes.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       if (node.methodName.name != 'listen') return;
 
       // Check if target is a stream
@@ -2848,7 +2354,7 @@ class RequireStreamErrorHandlingRule extends SaropaLintRule {
       }
 
       if (!hasOnError) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
   }
@@ -2871,7 +2377,7 @@ class RequireStreamErrorHandlingRule extends SaropaLintRule {
 ///     .timeout(Duration(seconds: 30));
 /// ```
 class RequireFutureTimeoutRule extends SaropaLintRule {
-  const RequireFutureTimeoutRule() : super(code: _code);
+  RequireFutureTimeoutRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.high;
@@ -2880,12 +2386,11 @@ class RequireFutureTimeoutRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'require_future_timeout',
-    problemMessage:
-        '[require_future_timeout] Executing a long-running Future (such as network or I/O operations) without a timeout can cause your app to hang indefinitely if the operation never completes. This can freeze the UI and degrade user experience. {v3}',
+    'require_future_timeout',
+    '[require_future_timeout] Executing a long-running Future (such as network or I/O operations) without a timeout can cause your app to hang indefinitely if the operation never completes. This can freeze the UI and degrade user experience. {v3}',
     correctionMessage:
         'Always add .timeout(Duration(...)) to long-running Futures to ensure your app remains responsive and can handle failures gracefully.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   // Methods that typically involve network or I/O
@@ -2905,11 +2410,10 @@ class RequireFutureTimeoutRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addAwaitExpression((AwaitExpression node) {
+    context.addAwaitExpression((AwaitExpression node) {
       final Expression expr = node.expression;
       if (expr is! MethodInvocation) return;
 
@@ -2936,7 +2440,7 @@ class RequireFutureTimeoutRule extends SaropaLintRule {
         parent = parent.parent;
       }
 
-      reporter.atNode(node, code);
+      reporter.atNode(node);
     });
   }
 }
@@ -2976,7 +2480,7 @@ class RequireFutureTimeoutRule extends SaropaLintRule {
 /// ]);
 /// ```
 class RequireFutureWaitErrorHandlingRule extends SaropaLintRule {
-  const RequireFutureWaitErrorHandlingRule() : super(code: _code);
+  RequireFutureWaitErrorHandlingRule() : super(code: _code);
 
   /// Error handling - partial results lost on failure.
   @override
@@ -2986,21 +2490,19 @@ class RequireFutureWaitErrorHandlingRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'require_future_wait_error_handling',
-    problemMessage:
-        '[require_future_wait_error_handling] Future.wait without eagerError: false. Partial results lost on failure. When one Future in Future.wait fails, all results are lost by default. Use eagerError: false to get partial results on failure. {v2}',
+    'require_future_wait_error_handling',
+    '[require_future_wait_error_handling] Future.wait without eagerError: false. Partial results lost on failure. When one Future in Future.wait fails, all results are lost by default. Use eagerError: false to get partial results on failure. {v2}',
     correctionMessage:
         'Add eagerError: false or wrap individual futures with catchError. Verify the change works correctly with existing tests and add coverage for the new behavior.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       final Expression? target = node.target;
       if (target is! SimpleIdentifier || target.name != 'Future') return;
 
@@ -3016,7 +2518,7 @@ class RequireFutureWaitErrorHandlingRule extends SaropaLintRule {
       }
 
       if (!hasEagerError) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
   }
@@ -3045,7 +2547,7 @@ class RequireFutureWaitErrorHandlingRule extends SaropaLintRule {
 /// );
 /// ```
 class RequireStreamOnDoneRule extends SaropaLintRule {
-  const RequireStreamOnDoneRule() : super(code: _code);
+  RequireStreamOnDoneRule() : super(code: _code);
 
   /// Resource cleanup and UX issue.
   @override
@@ -3055,21 +2557,19 @@ class RequireStreamOnDoneRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.high;
 
   static const LintCode _code = LintCode(
-    name: 'require_stream_on_done',
-    problemMessage:
-        '[require_stream_on_done] Stream.listen() is called without an onDone handler. When the stream completes, you will not be notified, which can lead to missed cleanup or UI updates. {v2}',
+    'require_stream_on_done',
+    '[require_stream_on_done] Stream.listen() is called without an onDone handler. When the stream completes, you will not be notified, which can lead to missed cleanup or UI updates. {v2}',
     correctionMessage:
         'Add an onDone callback to handle stream completion and perform necessary cleanup or state updates.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       if (node.methodName.name != 'listen') return;
 
       // Check if target is a stream
@@ -3128,7 +2628,7 @@ class RequireStreamOnDoneRule extends SaropaLintRule {
 /// }
 /// ```
 class RequireCompleterErrorHandlingRule extends SaropaLintRule {
-  const RequireCompleterErrorHandlingRule() : super(code: _code);
+  RequireCompleterErrorHandlingRule() : super(code: _code);
 
   /// Bug - futures may hang indefinitely.
   @override
@@ -3138,21 +2638,19 @@ class RequireCompleterErrorHandlingRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'require_completer_error_handling',
-    problemMessage:
-        '[require_completer_error_handling] Using a Completer in a try-catch block without calling completeError in the catch block can cause the Future to hang forever if an error occurs. This leads to memory leaks, dangling stream subscriptions, and unclosed connection handles that degrade app stability over time. {v3}',
+    'require_completer_error_handling',
+    '[require_completer_error_handling] Using a Completer in a try-catch block without calling completeError in the catch block can cause the Future to hang forever if an error occurs. This leads to memory leaks, dangling stream subscriptions, and unclosed connection handles that degrade app stability over time. {v3}',
     correctionMessage:
         'Always call completer.completeError(e) in the catch block to ensure the Future completes with an error and does not hang.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addInstanceCreationExpression((node) {
+    context.addInstanceCreationExpression((node) {
       final typeName = node.constructorName.type.name.lexeme;
       if (typeName != 'Completer') return;
 
@@ -3179,7 +2677,7 @@ class RequireCompleterErrorHandlingRule extends SaropaLintRule {
 
       // Check if completeError is called
       if (!methodSource.contains('completeError')) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
   }
@@ -3227,7 +2725,7 @@ class RequireCompleterErrorHandlingRule extends SaropaLintRule {
 /// }
 /// ```
 class AvoidStreamSubscriptionInFieldRule extends SaropaLintRule {
-  const AvoidStreamSubscriptionInFieldRule() : super(code: _code);
+  AvoidStreamSubscriptionInFieldRule() : super(code: _code);
 
   /// Critical - memory leaks and callbacks after disposal.
   @override
@@ -3240,21 +2738,19 @@ class AvoidStreamSubscriptionInFieldRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
-    name: 'avoid_stream_subscription_in_field',
-    problemMessage:
-        '[avoid_stream_subscription_in_field] If a StreamSubscription is stored as a field in a State class but not properly canceled in dispose(), the subscription will continue to receive events even after the widget is removed from the widget tree. This can cause memory leaks, unexpected UI updates, and subtle bugs, especially in dynamic lists or navigation flows where widgets are frequently created and destroyed. Always cancel subscriptions in the correct State object’s dispose() method. See https://docs.flutter.dev/perf/memory#dispose-resources. {v4}',
+    'avoid_stream_subscription_in_field',
+    '[avoid_stream_subscription_in_field] If a StreamSubscription is stored as a field in a State class but not properly canceled in dispose(), the subscription will continue to receive events even after the widget is removed from the widget tree. This can cause memory leaks, unexpected UI updates, and subtle bugs, especially in dynamic lists or navigation flows where widgets are frequently created and destroyed. Always cancel subscriptions in the correct State object’s dispose() method. See https://docs.flutter.dev/perf/memory#dispose-resources. {v4}',
     correctionMessage:
         'In every State class that owns a StreamSubscription field, call subscription.cancel() in the dispose() method before calling super.dispose(). This ensures the subscription is cleaned up when the widget is removed, preventing leaks and unwanted callbacks. See https://docs.flutter.dev/perf/memory#dispose-resources for more information.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       if (node.methodName.name != 'listen') return;
 
       // Check if the target is a Stream
@@ -3282,7 +2778,7 @@ class AvoidStreamSubscriptionInFieldRule extends SaropaLintRule {
               return;
             }
             // If stored to a non-subscription field (like _ or void), it's bad
-            reporter.atNode(node, code);
+            reporter.atNode(node);
             return;
           }
         }
@@ -3331,7 +2827,7 @@ class AvoidStreamSubscriptionInFieldRule extends SaropaLintRule {
       while (current != null) {
         if (current is ExpressionStatement) {
           // This is a bare stream.listen() call without assignment
-          reporter.atNode(node, code);
+          reporter.atNode(node);
           return;
         }
         if (current is VariableDeclaration ||
@@ -3345,36 +2841,6 @@ class AvoidStreamSubscriptionInFieldRule extends SaropaLintRule {
         }
         current = current.parent;
       }
-    });
-  }
-
-  @override
-  List<Fix> getFixes() => <Fix>[_AddStreamSubscriptionStorageFix()];
-}
-
-class _AddStreamSubscriptionStorageFix extends DartFix {
-  @override
-  void run(
-    CustomLintResolver resolver,
-    ChangeReporter reporter,
-    CustomLintContext context,
-    AnalysisError analysisError,
-    List<AnalysisError> others,
-  ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
-      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
-
-      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
-        message: 'Add HACK comment for unassigned stream subscription',
-        priority: 1,
-      );
-
-      changeBuilder.addDartFileEdit((builder) {
-        builder.addSimpleInsertion(
-          node.offset,
-          '// HACK: Store this subscription in a field and cancel in dispose()\n',
-        );
-      });
     });
   }
 }
@@ -3405,7 +2871,7 @@ class _AddStreamSubscriptionStorageFix extends DartFix {
 /// }
 /// ```
 class AvoidFutureThenInAsyncRule extends SaropaLintRule {
-  const AvoidFutureThenInAsyncRule() : super(code: _code);
+  AvoidFutureThenInAsyncRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -3415,21 +2881,19 @@ class AvoidFutureThenInAsyncRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_future_then_in_async',
-    problemMessage:
-        '[avoid_future_then_in_async] Using .then() inside async function. Prefer await for consistency. Using .then() inside an async function mixes two async patterns. Prefer await for cleaner, more readable code. {v2}',
+    'avoid_future_then_in_async',
+    '[avoid_future_then_in_async] Using .then() inside async function. Prefer await for consistency. Using .then() inside an async function mixes two async patterns. Prefer await for cleaner, more readable code. {v2}',
     correctionMessage:
         'Use await instead of .then() for cleaner async code. Verify the change works correctly with existing tests and add coverage for the new behavior.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       if (node.methodName.name != 'then') return;
 
       // Check if we're inside an async function
@@ -3502,7 +2966,7 @@ class AvoidFutureThenInAsyncRule extends SaropaLintRule {
 /// someAsyncOperation().ignore(); // OK - explicitly fire-and-forget
 /// ```
 class AvoidUnawaitedFutureRule extends SaropaLintRule {
-  const AvoidUnawaitedFutureRule() : super(code: _code);
+  AvoidUnawaitedFutureRule() : super(code: _code);
 
   /// Significant issue. Address when count exceeds 10.
   @override
@@ -3512,21 +2976,19 @@ class AvoidUnawaitedFutureRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.high;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_unawaited_future',
-    problemMessage:
-        '[avoid_unawaited_future] Not awaiting a Future means any errors or exceptions it throws may be silently lost, leading to missed bugs and unreliable app behavior. This is especially risky in production code where error reporting is critical. {v3}',
+    'avoid_unawaited_future',
+    '[avoid_unawaited_future] Not awaiting a Future means any errors or exceptions it throws may be silently lost, leading to missed bugs and unreliable app behavior. This is especially risky in production code where error reporting is critical. {v3}',
     correctionMessage:
         'Always use await or unawaited() to explicitly handle Futures and ensure errors are not lost.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addExpressionStatement((ExpressionStatement node) {
+    context.addExpressionStatement((ExpressionStatement node) {
       final Expression expr = node.expression;
 
       // Check if this is a method invocation that returns a Future
@@ -3544,7 +3006,7 @@ class AvoidUnawaitedFutureRule extends SaropaLintRule {
               if (_isSafeFireAndForget(expr, node)) {
                 return;
               }
-              reporter.atNode(expr, code);
+              reporter.atNode(expr);
             }
           }
         }
@@ -3556,7 +3018,7 @@ class AvoidUnawaitedFutureRule extends SaropaLintRule {
         if (returnType != null) {
           final String typeName = returnType.getDisplayString();
           if (typeName.startsWith('Future<') || typeName == 'Future') {
-            reporter.atNode(expr, code);
+            reporter.atNode(expr);
           }
         }
       }
@@ -3722,7 +3184,7 @@ class AvoidUnawaitedFutureRule extends SaropaLintRule {
 /// **Note:** Only applies when futures are independent. If one depends on
 /// the result of another, sequential awaits are correct.
 class PreferFutureWaitRule extends SaropaLintRule {
-  const PreferFutureWaitRule() : super(code: _code);
+  PreferFutureWaitRule() : super(code: _code);
 
   /// Performance improvement. Can significantly speed up data loading.
   @override
@@ -3732,13 +3194,12 @@ class PreferFutureWaitRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'prefer_future_wait',
-    problemMessage:
-        '[prefer_future_wait] Sequential awaits could run in parallel with Future.wait. {v2}',
+    'prefer_future_wait',
+    '[prefer_future_wait] Sequential awaits could run in parallel with Future.wait. {v2}',
     correctionMessage:
         'Use Future.wait([future1, future2]) to run independent futures '
         'concurrently, or (future1, future2).wait in Dart 3.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   /// Minimum number of sequential awaits to trigger the warning.
@@ -3746,11 +3207,10 @@ class PreferFutureWaitRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addBlockFunctionBody((BlockFunctionBody body) {
+    context.addBlockFunctionBody((BlockFunctionBody body) {
       // Check if function is async
       if (body.keyword?.keyword != Keyword.ASYNC) return;
 
@@ -3779,8 +3239,9 @@ class PreferFutureWaitRule extends SaropaLintRule {
           if (initializer is AwaitExpression) {
             // Check if this await uses any previously declared variables
             final usedVars = _getUsedVariables(initializer);
-            final dependsOnPrevious =
-                usedVars.any((v) => usedVariables.contains(v));
+            final dependsOnPrevious = usedVars.any(
+              (v) => usedVariables.contains(v),
+            );
 
             if (dependsOnPrevious) {
               // This await depends on a previous result, break the chain
@@ -3870,7 +3331,7 @@ class _VariableCollector extends RecursiveAstVisitor<void> {
 /// });
 /// ```
 class PreferStreamDistinctRule extends SaropaLintRule {
-  const PreferStreamDistinctRule() : super(code: _code);
+  PreferStreamDistinctRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.medium;
@@ -3879,22 +3340,20 @@ class PreferStreamDistinctRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'prefer_stream_distinct',
-    problemMessage:
-        '[prefer_stream_distinct] Stream.listen() without .distinct() may '
+    'prefer_stream_distinct',
+    '[prefer_stream_distinct] Stream.listen() without .distinct() may '
         'process duplicate values unnecessarily. {v3}',
     correctionMessage:
         'Add .distinct() before .listen() to skip duplicate consecutive values.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       if (node.methodName.name != 'listen') return;
 
       final targetType = node.target?.staticType;
@@ -3913,7 +3372,7 @@ class PreferStreamDistinctRule extends SaropaLintRule {
 
       // Check if this is inside a setState callback (UI context)
       if (_hasSetStateInListener(node)) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
   }
@@ -3969,7 +3428,7 @@ class PreferStreamDistinctRule extends SaropaLintRule {
 /// stream.listen((data) => log(data)); // Works!
 /// ```
 class PreferBroadcastStreamRule extends SaropaLintRule {
-  const PreferBroadcastStreamRule() : super(code: _code);
+  PreferBroadcastStreamRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.medium;
@@ -3978,28 +3437,28 @@ class PreferBroadcastStreamRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'prefer_broadcast_stream',
-    problemMessage:
-        '[prefer_broadcast_stream] Stream from StreamController is single-subscription. '
+    'prefer_broadcast_stream',
+    '[prefer_broadcast_stream] Stream from StreamController is single-subscription. '
         'Multiple listeners will cause an error. {v2}',
     correctionMessage:
         'Use .asBroadcastStream() or StreamController.broadcast().',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
     // Track streams that are accessed multiple times
-    context.registry.addCompilationUnit((CompilationUnit unit) {
+    context.addCompilationUnit((CompilationUnit unit) {
       final streamAccesses = <String, List<AstNode>>{};
 
-      unit.visitChildren(_StreamAccessVisitor((name, node) {
-        streamAccesses.putIfAbsent(name, () => []).add(node);
-      }));
+      unit.visitChildren(
+        _StreamAccessVisitor((name, node) {
+          streamAccesses.putIfAbsent(name, () => []).add(node);
+        }),
+      );
 
       // Report streams accessed more than once
       for (final entry in streamAccesses.entries) {
@@ -4070,7 +3529,7 @@ class _StreamAccessVisitor extends RecursiveAstVisitor<void> {
 /// }
 /// ```
 class AvoidFutureInBuildRule extends SaropaLintRule {
-  const AvoidFutureInBuildRule() : super(code: _code);
+  AvoidFutureInBuildRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.high;
@@ -4079,22 +3538,20 @@ class AvoidFutureInBuildRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_future_in_build',
-    problemMessage:
-        '[avoid_future_in_build] Creating Future in build() causes repeated '
+    'avoid_future_in_build',
+    '[avoid_future_in_build] Creating Future in build() causes repeated '
         'async calls on every rebuild. {v2}',
     correctionMessage:
         'Create the Future in initState() and store it in a field.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodDeclaration((MethodDeclaration node) {
+    context.addMethodDeclaration((MethodDeclaration node) {
       if (node.name.lexeme != 'build') return;
 
       // Check if this is a widget's build method
@@ -4103,9 +3560,11 @@ class AvoidFutureInBuildRule extends SaropaLintRule {
       if (!_isWidgetClass(classDecl)) return;
 
       // Look for async function calls in build
-      node.body.visitChildren(_FutureCreationVisitor((asyncNode) {
-        reporter.atNode(asyncNode, code);
-      }));
+      node.body.visitChildren(
+        _FutureCreationVisitor((asyncNode) {
+          reporter.atNode(asyncNode);
+        }),
+      );
     });
   }
 
@@ -4174,7 +3633,7 @@ class _FutureCreationVisitor extends RecursiveAstVisitor<void> {
 /// }
 /// ```
 class RequireMountedCheckAfterAwaitRule extends SaropaLintRule {
-  const RequireMountedCheckAfterAwaitRule() : super(code: _code);
+  RequireMountedCheckAfterAwaitRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.critical;
@@ -4183,22 +3642,20 @@ class RequireMountedCheckAfterAwaitRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'require_mounted_check_after_await',
-    problemMessage:
-        '[require_mounted_check_after_await] setState called after await '
+    'require_mounted_check_after_await',
+    '[require_mounted_check_after_await] setState called after await '
         'without mounted check. Widget may have been disposed. {v2}',
     correctionMessage:
         'Add "if (!mounted) return;" before setState after await.',
-    errorSeverity: DiagnosticSeverity.ERROR,
+    severity: DiagnosticSeverity.ERROR,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodDeclaration((MethodDeclaration node) {
+    context.addMethodDeclaration((MethodDeclaration node) {
       if (!node.body.isAsynchronous) return;
 
       // Check if in a State class
@@ -4246,7 +3703,7 @@ class _MountedCheckVisitor extends RecursiveAstVisitor<void> {
   void visitMethodInvocation(MethodInvocation node) {
     if (node.methodName.name == 'setState' && _sawAwait && !_hasMountedCheck) {
       if (!_hasAncestorMountedCheck(node)) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     }
     super.visitMethodInvocation(node);
@@ -4294,7 +3751,7 @@ class _MountedCheckVisitor extends RecursiveAstVisitor<void> {
 /// }
 /// ```
 class AvoidAsyncInBuildRule extends SaropaLintRule {
-  const AvoidAsyncInBuildRule() : super(code: _code);
+  AvoidAsyncInBuildRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.critical;
@@ -4303,21 +3760,19 @@ class AvoidAsyncInBuildRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_async_in_build',
-    problemMessage:
-        '[avoid_async_in_build] Build method should never be async. '
+    'avoid_async_in_build',
+    '[avoid_async_in_build] Build method should never be async. '
         'This will cause rendering issues. {v2}',
     correctionMessage: 'Use FutureBuilder or fetch data in initState instead.',
-    errorSeverity: DiagnosticSeverity.ERROR,
+    severity: DiagnosticSeverity.ERROR,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodDeclaration((MethodDeclaration node) {
+    context.addMethodDeclaration((MethodDeclaration node) {
       if (node.name.lexeme != 'build') return;
 
       if (node.body.isAsynchronous) {
@@ -4370,7 +3825,7 @@ class AvoidAsyncInBuildRule extends SaropaLintRule {
 /// }
 /// ```
 class PreferAsyncInitStateRule extends SaropaLintRule {
-  const PreferAsyncInitStateRule() : super(code: _code);
+  PreferAsyncInitStateRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.medium;
@@ -4379,28 +3834,28 @@ class PreferAsyncInitStateRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'prefer_async_init_state',
-    problemMessage:
-        '[prefer_async_init_state] Using .then().setState() pattern in initState. '
+    'prefer_async_init_state',
+    '[prefer_async_init_state] Using .then().setState() pattern in initState. '
         'Store the Future in a field and use FutureBuilder to manage loading states declaratively. {v2}',
     correctionMessage:
         'Store the Future in a field and use FutureBuilder in build().',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodDeclaration((MethodDeclaration node) {
+    context.addMethodDeclaration((MethodDeclaration node) {
       if (node.name.lexeme != 'initState') return;
 
       // Look for .then() calls with setState
-      node.body.visitChildren(_ThenSetStateVisitor((thenNode) {
-        reporter.atNode(thenNode, code);
-      }));
+      node.body.visitChildren(
+        _ThenSetStateVisitor((thenNode) {
+          reporter.atNode(thenNode);
+        }),
+      );
     });
   }
 }
@@ -4458,7 +3913,7 @@ class _ThenSetStateVisitor extends RecursiveAstVisitor<void> {
 /// }
 /// ```
 class RequireNetworkStatusCheckRule extends SaropaLintRule {
-  const RequireNetworkStatusCheckRule() : super(code: _code);
+  RequireNetworkStatusCheckRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.medium;
@@ -4467,29 +3922,28 @@ class RequireNetworkStatusCheckRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'require_network_status_check',
-    problemMessage:
-        '[require_network_status_check] `[HEURISTIC]` Network call without '
+    'require_network_status_check',
+    '[require_network_status_check] `[HEURISTIC]` Network call without '
         'connectivity check. Verify network status before making requests to avoid silent failures. {v2}',
     correctionMessage:
         'Check Connectivity().checkConnectivity() before making requests.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodDeclaration((MethodDeclaration node) {
+    context.addMethodDeclaration((MethodDeclaration node) {
       // Only check async methods
       if (!node.body.isAsynchronous) return;
 
       final bodySource = node.body.toSource();
 
       // Check for network calls
-      final hasNetworkCall = bodySource.contains('http.get') ||
+      final hasNetworkCall =
+          bodySource.contains('http.get') ||
           bodySource.contains('http.post') ||
           bodySource.contains('http.put') ||
           bodySource.contains('http.delete') ||
@@ -4502,7 +3956,8 @@ class RequireNetworkStatusCheckRule extends SaropaLintRule {
       if (!hasNetworkCall) return;
 
       // Check for connectivity check
-      final hasConnectivityCheck = bodySource.contains('Connectivity') ||
+      final hasConnectivityCheck =
+          bodySource.contains('Connectivity') ||
           bodySource.contains('checkConnectivity') ||
           bodySource.contains('ConnectivityResult') ||
           bodySource.contains('isConnected') ||
@@ -4510,7 +3965,7 @@ class RequireNetworkStatusCheckRule extends SaropaLintRule {
           bodySource.contains('networkStatus');
 
       if (!hasConnectivityCheck) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
   }
@@ -4547,7 +4002,7 @@ class RequireNetworkStatusCheckRule extends SaropaLintRule {
 /// // Or sync when user stops typing or leaves screen
 /// ```
 class AvoidSyncOnEveryChangeRule extends SaropaLintRule {
-  const AvoidSyncOnEveryChangeRule() : super(code: _code);
+  AvoidSyncOnEveryChangeRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.medium;
@@ -4559,24 +4014,20 @@ class AvoidSyncOnEveryChangeRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
-    name: 'avoid_sync_on_every_change',
-    problemMessage:
-        '[avoid_sync_on_every_change] `[HEURISTIC]` API call in onChanged '
+    'avoid_sync_on_every_change',
+    '[avoid_sync_on_every_change] `[HEURISTIC]` API call in onChanged '
         'callback may fire on every keystroke. Add a debounce timer to batch rapid inputs before syncing. {v2}',
     correctionMessage:
         'Use a debouncer or batch changes before syncing to server.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addInstanceCreationExpression((
-      InstanceCreationExpression node,
-    ) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final String constructorName = node.constructorName.type.name2.lexeme;
       if (constructorName != 'TextField' &&
           constructorName != 'TextFormField') {
@@ -4602,7 +4053,7 @@ class AvoidSyncOnEveryChangeRule extends SaropaLintRule {
                 !callbackSource.contains('Debouncer') &&
                 !callbackSource.contains('throttle') &&
                 !callbackSource.contains('Timer')) {
-              reporter.atNode(arg, code);
+              reporter.atNode(arg);
             }
           }
         }
@@ -4643,7 +4094,7 @@ class AvoidSyncOnEveryChangeRule extends SaropaLintRule {
 /// if (pendingCount > 0) Text('Saving $pendingCount changes...')
 /// ```
 class RequirePendingChangesIndicatorRule extends SaropaLintRule {
-  const RequirePendingChangesIndicatorRule() : super(code: _code);
+  RequirePendingChangesIndicatorRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.low;
@@ -4652,26 +4103,25 @@ class RequirePendingChangesIndicatorRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'require_pending_changes_indicator',
-    problemMessage:
-        '[require_pending_changes_indicator] `[HEURISTIC]` Pending changes '
+    'require_pending_changes_indicator',
+    '[require_pending_changes_indicator] `[HEURISTIC]` Pending changes '
         'collection without UI notification. Users cannot see sync status. {v2}',
     correctionMessage:
         'Call notifyListeners() or setState() when pending changes update.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodDeclaration((MethodDeclaration node) {
+    context.addMethodDeclaration((MethodDeclaration node) {
       final bodySource = node.body.toSource();
 
       // Check for pending changes pattern
-      final hasPendingPattern = bodySource.contains('_pending') ||
+      final hasPendingPattern =
+          bodySource.contains('_pending') ||
           bodySource.contains('pending.add') ||
           bodySource.contains('_queue.add') ||
           bodySource.contains('_unsaved') ||
@@ -4680,14 +4130,15 @@ class RequirePendingChangesIndicatorRule extends SaropaLintRule {
       if (!hasPendingPattern) return;
 
       // Check for notification
-      final hasNotification = bodySource.contains('notifyListeners') ||
+      final hasNotification =
+          bodySource.contains('notifyListeners') ||
           bodySource.contains('setState') ||
           bodySource.contains('emit(') ||
           bodySource.contains('add(') || // Stream add
           bodySource.contains('state =');
 
       if (!hasNotification) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
   }
@@ -4733,7 +4184,7 @@ class RequirePendingChangesIndicatorRule extends SaropaLintRule {
 /// _controller = StreamController<int>.broadcast(sync: true);
 /// ```
 class AvoidStreamSyncEventsRule extends SaropaLintRule {
-  const AvoidStreamSyncEventsRule() : super(code: _code);
+  AvoidStreamSyncEventsRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.medium;
@@ -4742,23 +4193,21 @@ class AvoidStreamSyncEventsRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_stream_sync_events',
-    problemMessage:
-        '[avoid_stream_sync_events] Stream event added synchronously right '
+    'avoid_stream_sync_events',
+    '[avoid_stream_sync_events] Stream event added synchronously right '
         'after controller creation. Listeners may not be attached yet. {v2}',
     correctionMessage:
         'Use scheduleMicrotask() or Future.microtask() to delay first event, '
         'or use StreamController(sync: true) if synchronous delivery is intended.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       final String methodName = node.methodName.name;
 
       // Check for stream add methods
@@ -4812,7 +4261,7 @@ class AvoidStreamSyncEventsRule extends SaropaLintRule {
       // Check if StreamController creation is within last 200 chars (rough heuristic)
       final int controllerIndex = beforeAdd.lastIndexOf('StreamController');
       if (controllerIndex != -1 && (beforeAdd.length - controllerIndex) < 200) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
   }
@@ -4863,7 +4312,7 @@ class AvoidStreamSyncEventsRule extends SaropaLintRule {
 /// ).wait;
 /// ```
 class AvoidSequentialAwaitsRule extends SaropaLintRule {
-  const AvoidSequentialAwaitsRule() : super(code: _code);
+  AvoidSequentialAwaitsRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.medium;
@@ -4872,22 +4321,20 @@ class AvoidSequentialAwaitsRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_sequential_awaits',
-    problemMessage:
-        '[avoid_sequential_awaits] Multiple sequential awaits on independent '
+    'avoid_sequential_awaits',
+    '[avoid_sequential_awaits] Multiple sequential awaits on independent '
         'operations. Total time is sum of all; could run in parallel. {v2}',
     correctionMessage:
         'Use Future.wait([...]) to run independent futures concurrently.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addFunctionBody((FunctionBody body) {
+    context.addFunctionBody((FunctionBody body) {
       if (body is! BlockFunctionBody) return;
 
       // Find all await expressions in the body
@@ -4907,7 +4354,7 @@ class AvoidSequentialAwaitsRule extends SaropaLintRule {
 
         // Check if they look independent (don't use each other's results)
         if (_areIndependentAwaits(first, second, third, body)) {
-          reporter.atNode(second, code);
+          reporter.atNode(second);
           break; // Only report once per function
         }
       }

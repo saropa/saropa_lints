@@ -4,15 +4,11 @@ import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/token.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
 import 'package:analyzer/dart/element/type.dart';
-import 'package:analyzer/error/error.dart'
-    show AnalysisError, DiagnosticSeverity;
-import 'package:analyzer/source/source_range.dart';
-import 'package:custom_lint_builder/custom_lint_builder.dart';
 
 import '../saropa_lint_rule.dart';
 
 class AvoidExpandedAsSpacerRule extends SaropaLintRule {
-  const AvoidExpandedAsSpacerRule() : super(code: _code);
+  AvoidExpandedAsSpacerRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -25,22 +21,19 @@ class AvoidExpandedAsSpacerRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
-    name: 'avoid_expanded_as_spacer',
-    problemMessage:
-        '[avoid_expanded_as_spacer] Use Spacer() instead of Expanded with empty child. This layout configuration can trigger RenderFlex overflow errors or unexpected visual behavior at runtime. {v6}',
+    'avoid_expanded_as_spacer',
+    '[avoid_expanded_as_spacer] Use Spacer() instead of Expanded with empty child. This layout configuration can trigger RenderFlex overflow errors or unexpected visual behavior at runtime. {v6}',
     correctionMessage:
         'Replace Expanded(child: SizedBox/Container()) with Spacer(). Test on multiple screen sizes to verify the layout adapts correctly.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry
-        .addInstanceCreationExpression((InstanceCreationExpression node) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final String constructorName = node.constructorName.type.name.lexeme;
       if (constructorName != 'Expanded') return;
 
@@ -59,7 +52,7 @@ class AvoidExpandedAsSpacerRule extends SaropaLintRule {
                     e is NamedExpression && e.name.label.name == 'child',
               );
               if (!hasChild) {
-                reporter.atNode(node, code);
+                reporter.atNode(node);
               }
             }
           }
@@ -94,7 +87,7 @@ class AvoidExpandedAsSpacerRule extends SaropaLintRule {
 /// )
 /// ```
 class AvoidFlexibleOutsideFlexRule extends SaropaLintRule {
-  const AvoidFlexibleOutsideFlexRule() : super(code: _code);
+  AvoidFlexibleOutsideFlexRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -107,12 +100,11 @@ class AvoidFlexibleOutsideFlexRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
-    name: 'avoid_flexible_outside_flex',
-    problemMessage:
-        '[avoid_flexible_outside_flex] The Flexible or Expanded widget is being used outside of a Row, Column, or Flex parent. This breaks layout expectations and can cause runtime errors or unexpected UI behavior, as Flexible/Expanded are only designed to work within Flex-based widgets. Using them elsewhere will not provide the intended flexible sizing and may result in layout exceptions. {v6}',
+    'avoid_flexible_outside_flex',
+    '[avoid_flexible_outside_flex] The Flexible or Expanded widget is being used outside of a Row, Column, or Flex parent. This breaks layout expectations and can cause runtime errors or unexpected UI behavior, as Flexible/Expanded are only designed to work within Flex-based widgets. Using them elsewhere will not provide the intended flexible sizing and may result in layout exceptions. {v6}',
     correctionMessage:
         'Wrap Flexible or Expanded widgets only inside Row, Column, or Flex parents. Refactor your widget tree so that Flexible/Expanded are direct children of a Flex-based widget, ensuring proper layout behavior and avoiding runtime errors. See Flutter documentation on Flex widgets for correct usage patterns.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   static const Set<String> _flexibleWidgets = <String>{'Flexible', 'Expanded'};
@@ -120,13 +112,10 @@ class AvoidFlexibleOutsideFlexRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addInstanceCreationExpression((
-      InstanceCreationExpression node,
-    ) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final String? constructorName = node.constructorName.type.element?.name;
       if (constructorName == null ||
           !_flexibleWidgets.contains(constructorName)) {
@@ -142,14 +131,14 @@ class AvoidFlexibleOutsideFlexRule extends SaropaLintRule {
             return; // Found valid Flex parent
           }
           // Found another widget that's not a Flex, warn
-          reporter.atNode(node, code);
+          reporter.atNode(node);
           return;
         }
         current = current.parent;
       }
 
       // Reached top without finding Flex parent
-      reporter.atNode(node, code);
+      reporter.atNode(node);
     });
   }
 }
@@ -175,7 +164,7 @@ class AvoidFlexibleOutsideFlexRule extends SaropaLintRule {
 /// )
 /// ```
 class AvoidMisnamedPaddingRule extends SaropaLintRule {
-  const AvoidMisnamedPaddingRule() : super(code: _code);
+  AvoidMisnamedPaddingRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -188,21 +177,19 @@ class AvoidMisnamedPaddingRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
-    name: 'avoid_misnamed_padding',
-    problemMessage:
-        '[avoid_misnamed_padding] A parameter or field named "padding" is being used to provide margin (spacing outside a widget) rather than actual padding (spacing inside a widget). This can confuse maintainers and lead to incorrect UI adjustments, as padding and margin serve distinct layout purposes in Flutter. {v2}',
+    'avoid_misnamed_padding',
+    '[avoid_misnamed_padding] A parameter or field named "padding" is being used to provide margin (spacing outside a widget) rather than actual padding (spacing inside a widget). This can confuse maintainers and lead to incorrect UI adjustments, as padding and margin serve distinct layout purposes in Flutter. {v2}',
     correctionMessage:
         'Rename the parameter or field to "margin" if it is used to control space outside the widget, or refactor the code to use it for true padding (space inside the widget). Ensure naming accurately reflects the widget’s layout intent to improve code clarity and maintainability. See Flutter layout documentation for guidance.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addClassDeclaration((ClassDeclaration node) {
+    context.addClassDeclaration((ClassDeclaration node) {
       // Check if class extends StatelessWidget or StatefulWidget
       if (!_isWidgetClass(node)) {
         return;
@@ -314,15 +301,14 @@ class _PaddingMisuseVisitor extends RecursiveAstVisitor<void> {
 /// )
 /// ```
 class AvoidShrinkWrapInListsRule extends SaropaLintRule {
-  const AvoidShrinkWrapInListsRule() : super(code: _code);
+  AvoidShrinkWrapInListsRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
-    name: 'avoid_shrink_wrap_in_lists',
-    problemMessage:
-        "[avoid_shrink_wrap_in_lists] Using 'shrinkWrap: true' inside a nested scrollable (such as a ListView within another scrollable) can cause significant performance issues. It forces the inner list to compute the size of all its children, leading to poor scroll performance and increased memory usage, especially with large or dynamic lists. {v4}",
+    'avoid_shrink_wrap_in_lists',
+    "[avoid_shrink_wrap_in_lists] Using 'shrinkWrap: true' inside a nested scrollable (such as a ListView within another scrollable) can cause significant performance issues. It forces the inner list to compute the size of all its children, leading to poor scroll performance and increased memory usage, especially with large or dynamic lists. {v4}",
     correctionMessage:
         'Avoid using shrinkWrap: true in nested scrollables. Instead, provide a fixed height for the inner list using SizedBox, or use Expanded/Flexible within a Flex parent. This ensures efficient rendering and smooth scrolling. See Flutter documentation for guidance on nested scrollables and performance best practices.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   static const Set<String> _scrollableWidgets = <String>{
@@ -334,12 +320,10 @@ class AvoidShrinkWrapInListsRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry
-        .addInstanceCreationExpression((InstanceCreationExpression node) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final String? constructorName = node.constructorName.type.element?.name;
       if (constructorName == null) return;
 
@@ -359,7 +343,7 @@ class AvoidShrinkWrapInListsRule extends SaropaLintRule {
                   parent.constructorName.type.element?.name;
               if (parentConstructor != null &&
                   _scrollableWidgets.contains(parentConstructor)) {
-                reporter.atNode(arg, code);
+                reporter.atNode(arg);
                 return;
               }
             }
@@ -385,7 +369,7 @@ class AvoidShrinkWrapInListsRule extends SaropaLintRule {
 /// Text('Hello')  // or use Align/Center if alignment needed
 /// ```
 class AvoidSingleChildColumnRowRule extends SaropaLintRule {
-  const AvoidSingleChildColumnRowRule() : super(code: _code);
+  AvoidSingleChildColumnRowRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -398,22 +382,19 @@ class AvoidSingleChildColumnRowRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
-    name: 'avoid_single_child_column_row',
-    problemMessage:
-        '[avoid_single_child_column_row] Column/Row with single child is unnecessary. A Column or Row has only a single child. This layout configuration can trigger RenderFlex overflow errors or unexpected visual behavior at runtime. {v5}',
+    'avoid_single_child_column_row',
+    '[avoid_single_child_column_row] Column/Row with single child is unnecessary. A Column or Row has only a single child. This layout configuration can trigger RenderFlex overflow errors or unexpected visual behavior at runtime. {v5}',
     correctionMessage:
         'Use the child directly or Align/Center for alignment. Test on multiple screen sizes to verify the layout adapts correctly.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry
-        .addInstanceCreationExpression((InstanceCreationExpression node) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final String constructorName = node.constructorName.type.name.lexeme;
       if (constructorName != 'Column' && constructorName != 'Row') return;
 
@@ -472,7 +453,7 @@ class AvoidSingleChildColumnRowRule extends SaropaLintRule {
 /// }
 /// ```
 class AvoidWrappingInPaddingRule extends SaropaLintRule {
-  const AvoidWrappingInPaddingRule() : super(code: _code);
+  AvoidWrappingInPaddingRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -485,12 +466,11 @@ class AvoidWrappingInPaddingRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
-    name: 'avoid_wrapping_in_padding',
-    problemMessage:
-        '[avoid_wrapping_in_padding] Widget has its own padding property, avoid wrapping in Padding. This layout configuration can trigger RenderFlex overflow errors or unexpected visual behavior at runtime. {v6}',
+    'avoid_wrapping_in_padding',
+    '[avoid_wrapping_in_padding] Widget has its own padding property, avoid wrapping in Padding. This layout configuration can trigger RenderFlex overflow errors or unexpected visual behavior at runtime. {v6}',
     correctionMessage:
         'Use the padding property of the child widget instead. Test on multiple screen sizes to verify the layout adapts correctly.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   static const Set<String> _widgetsWithPadding = <String>{
@@ -512,12 +492,10 @@ class AvoidWrappingInPaddingRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry
-        .addInstanceCreationExpression((InstanceCreationExpression node) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final String typeName = node.constructorName.type.name.lexeme;
       if (typeName != 'Padding') return;
 
@@ -528,7 +506,7 @@ class AvoidWrappingInPaddingRule extends SaropaLintRule {
           if (childExpr is InstanceCreationExpression) {
             final String childType = childExpr.constructorName.type.name.lexeme;
             if (_widgetsWithPadding.contains(childType)) {
-              reporter.atNode(node, code);
+              reporter.atNode(node);
             }
           }
         }
@@ -561,24 +539,22 @@ class AvoidWrappingInPaddingRule extends SaropaLintRule {
 /// }
 /// ```
 class CheckForEqualsInRenderObjectSettersRule extends SaropaLintRule {
-  const CheckForEqualsInRenderObjectSettersRule() : super(code: _code);
+  CheckForEqualsInRenderObjectSettersRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
-    name: 'check_for_equals_in_render_object_setters',
-    problemMessage:
-        '[check_for_equals_in_render_object_setters] RenderObject setter should check equality before updating. RenderObject property setters should check if the new value equals the old value before updating and marking needs layout/paint. {v5}',
+    'check_for_equals_in_render_object_setters',
+    '[check_for_equals_in_render_object_setters] RenderObject setter should check equality before updating. RenderObject property setters should check if the new value equals the old value before updating and marking needs layout/paint. {v5}',
     correctionMessage:
         'Add equality check: if (_field == value) return; before assignment. Test on multiple screen sizes to verify the layout adapts correctly.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addClassDeclaration((ClassDeclaration node) {
+    context.addClassDeclaration((ClassDeclaration node) {
       // Check if this class extends RenderObject or similar
       final ExtendsClause? extendsClause = node.extendsClause;
       if (extendsClause == null) return;
@@ -601,7 +577,9 @@ class CheckForEqualsInRenderObjectSettersRule extends SaropaLintRule {
   }
 
   void _checkSetter(
-      MethodDeclaration setter, SaropaDiagnosticReporter reporter) {
+    MethodDeclaration setter,
+    SaropaDiagnosticReporter reporter,
+  ) {
     final FunctionBody body = setter.body;
 
     // Check if setter has markNeeds* call
@@ -617,7 +595,7 @@ class CheckForEqualsInRenderObjectSettersRule extends SaropaLintRule {
 
     // If it has markNeeds but no equality check, warn
     if (hasMarkNeeds && !hasEqualityCheck) {
-      reporter.atNode(setter, code);
+      reporter.atNode(setter);
     }
   }
 }
@@ -702,7 +680,7 @@ class _RenderObjectSetterVisitor extends RecursiveAstVisitor<void> {
 /// }
 /// ```
 class ConsistentUpdateRenderObjectRule extends SaropaLintRule {
-  const ConsistentUpdateRenderObjectRule() : super(code: _code);
+  ConsistentUpdateRenderObjectRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -715,12 +693,11 @@ class ConsistentUpdateRenderObjectRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
-    name: 'consistent_update_render_object',
-    problemMessage:
-        '[consistent_update_render_object] updateRenderObject may be missing property updates from createRenderObject. When a RenderObjectWidget creates a RenderObject with properties, the updateRenderObject method should update all those same properties. {v4}',
+    'consistent_update_render_object',
+    '[consistent_update_render_object] updateRenderObject may be missing property updates from createRenderObject. When a RenderObjectWidget creates a RenderObject with properties, the updateRenderObject method should update all those same properties. {v4}',
     correctionMessage:
         'Ensure all properties set in createRenderObject are also updated in updateRenderObject.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   static const Set<String> _renderObjectWidgetBases = <String>{
@@ -732,11 +709,10 @@ class ConsistentUpdateRenderObjectRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addClassDeclaration((ClassDeclaration node) {
+    context.addClassDeclaration((ClassDeclaration node) {
       // Check if this is a RenderObjectWidget subclass
       final ExtendsClause? extendsClause = node.extendsClause;
       if (extendsClause == null) return;
@@ -776,7 +752,7 @@ class ConsistentUpdateRenderObjectRule extends SaropaLintRule {
 
       // If updateRenderObject is missing, warn
       if (updateMethod == null) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
         return;
       }
 
@@ -789,10 +765,11 @@ class ConsistentUpdateRenderObjectRule extends SaropaLintRule {
       );
 
       // Check if any createRenderObject properties are missing in updateRenderObject
-      final Set<String> missingProperties =
-          createProperties.difference(updateProperties);
+      final Set<String> missingProperties = createProperties.difference(
+        updateProperties,
+      );
       if (missingProperties.isNotEmpty) {
-        reporter.atNode(updateMethod, code);
+        reporter.atNode(updateMethod);
       }
     });
   }
@@ -830,7 +807,7 @@ class _PropertyAssignmentFinder extends RecursiveAstVisitor<void> {
 /// const BorderRadius.all(Radius.circular(8))
 /// ```
 class PreferConstBorderRadiusRule extends SaropaLintRule {
-  const PreferConstBorderRadiusRule() : super(code: _code);
+  PreferConstBorderRadiusRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -843,21 +820,19 @@ class PreferConstBorderRadiusRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
-    name: 'prefer_const_border_radius',
-    problemMessage:
-        '[prefer_const_border_radius] Prefer const BorderRadius.all for constant border radius. Non-const BorderRadius constructors are used. This layout configuration can trigger RenderFlex overflow errors or unexpected visual behavior at runtime. {v6}',
+    'prefer_const_border_radius',
+    '[prefer_const_border_radius] Prefer const BorderRadius.all for constant border radius. Non-const BorderRadius constructors are used. This layout configuration can trigger RenderFlex overflow errors or unexpected visual behavior at runtime. {v6}',
     correctionMessage:
         'Use const BorderRadius.all(Radius.circular(x)) instead. Test on multiple screen sizes to verify the layout adapts correctly.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       // Check for BorderRadius.circular
       final Expression? target = node.target;
       if (target is! SimpleIdentifier) return;
@@ -879,7 +854,7 @@ class PreferConstBorderRadiusRule extends SaropaLintRule {
         current = current.parent;
       }
 
-      reporter.atNode(node, code);
+      reporter.atNode(node);
     });
   }
 }
@@ -902,25 +877,22 @@ class PreferConstBorderRadiusRule extends SaropaLintRule {
 /// EdgeInsets.symmetric(horizontal: 8)
 /// ```
 class PreferCorrectEdgeInsetsConstructorRule extends SaropaLintRule {
-  const PreferCorrectEdgeInsetsConstructorRule() : super(code: _code);
+  PreferCorrectEdgeInsetsConstructorRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
-    name: 'prefer_correct_edge_insets_constructor',
-    problemMessage:
-        '[prefer_correct_edge_insets_constructor] EdgeInsets constructor is more verbose than necessary when all values are equal or symmetric. Use .all() or .symmetric() to improve readability and communicate intent more clearly. {v5}',
+    'prefer_correct_edge_insets_constructor',
+    '[prefer_correct_edge_insets_constructor] EdgeInsets constructor is more verbose than necessary when all values are equal or symmetric. Use .all() or .symmetric() to improve readability and communicate intent more clearly. {v5}',
     correctionMessage:
         'Use .all() for equal values or .symmetric() for symmetric values. Test on multiple screen sizes to verify the layout adapts correctly.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry
-        .addInstanceCreationExpression((InstanceCreationExpression node) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final String typeName = node.constructorName.type.name.lexeme;
       if (typeName != 'EdgeInsets') return;
 
@@ -935,26 +907,31 @@ class PreferCorrectEdgeInsetsConstructorRule extends SaropaLintRule {
   }
 
   void _checkFromLTRB(
-      InstanceCreationExpression node, SaropaDiagnosticReporter reporter) {
+    InstanceCreationExpression node,
+    SaropaDiagnosticReporter reporter,
+  ) {
     final NodeList<Expression> args = node.argumentList.arguments;
     if (args.length != 4) return;
 
     // Get all values as strings
-    final List<String> values =
-        args.map((Expression e) => e.toSource()).toList();
+    final List<String> values = args
+        .map((Expression e) => e.toSource())
+        .toList();
 
     // Check if all values are the same (could use .all)
     if (values.toSet().length == 1) {
-      reporter.atNode(node, code);
+      reporter.atNode(node);
     }
     // Check if left==right and top==bottom (could use .symmetric)
     else if (values[0] == values[2] && values[1] == values[3]) {
-      reporter.atNode(node, code);
+      reporter.atNode(node);
     }
   }
 
   void _checkOnly(
-      InstanceCreationExpression node, SaropaDiagnosticReporter reporter) {
+    InstanceCreationExpression node,
+    SaropaDiagnosticReporter reporter,
+  ) {
     final NodeList<Expression> args = node.argumentList.arguments;
 
     // Extract named arguments
@@ -977,11 +954,14 @@ class PreferCorrectEdgeInsetsConstructorRule extends SaropaLintRule {
     }
 
     // Check if all present values are the same (could use .all)
-    final List<String?> presentValues = <String?>[left, right, top, bottom]
-        .where((String? v) => v != null)
-        .toList();
+    final List<String?> presentValues = <String?>[
+      left,
+      right,
+      top,
+      bottom,
+    ].where((String? v) => v != null).toList();
     if (presentValues.length == 4 && presentValues.toSet().length == 1) {
-      reporter.atNode(node, code);
+      reporter.atNode(node);
     }
     // Check for symmetric patterns
     else if (left != null &&
@@ -989,13 +969,13 @@ class PreferCorrectEdgeInsetsConstructorRule extends SaropaLintRule {
         left == right &&
         top == null &&
         bottom == null) {
-      reporter.atNode(node, code);
+      reporter.atNode(node);
     } else if (top != null &&
         bottom != null &&
         top == bottom &&
         left == null &&
         right == null) {
-      reporter.atNode(node, code);
+      reporter.atNode(node);
     }
   }
 }
@@ -1021,7 +1001,7 @@ class PreferCorrectEdgeInsetsConstructorRule extends SaropaLintRule {
 /// )
 /// ```
 class PreferSliverPrefixRule extends SaropaLintRule {
-  const PreferSliverPrefixRule() : super(code: _code);
+  PreferSliverPrefixRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -1034,12 +1014,11 @@ class PreferSliverPrefixRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
-    name: 'prefer_sliver_prefix',
-    problemMessage:
-        '[prefer_sliver_prefix] Prefixing sliver widget class names with Sliver is a naming convention. It does not affect widget behavior or performance. Enable via the stylistic tier. {v5}',
+    'prefer_sliver_prefix',
+    '[prefer_sliver_prefix] Prefixing sliver widget class names with Sliver is a naming convention. It does not affect widget behavior or performance. Enable via the stylistic tier. {v5}',
     correctionMessage:
         'Rename the class to start with "Sliver" (e.g., SliverHeader instead of Header) to communicate its sliver layout protocol.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   static const Set<String> _sliverBaseClasses = <String>{
@@ -1057,11 +1036,10 @@ class PreferSliverPrefixRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addClassDeclaration((ClassDeclaration node) {
+    context.addClassDeclaration((ClassDeclaration node) {
       final String className = node.name.lexeme;
 
       // Skip if already has Sliver prefix
@@ -1073,7 +1051,7 @@ class PreferSliverPrefixRule extends SaropaLintRule {
         final String superclass = extendsClause.superclass.name.lexeme;
         if (_sliverBaseClasses.contains(superclass) ||
             superclass.startsWith('Sliver')) {
-          reporter.atNode(node, code);
+          reporter.atNode(node);
           return;
         }
       }
@@ -1085,7 +1063,7 @@ class PreferSliverPrefixRule extends SaropaLintRule {
           final String interfaceName = interface.name.lexeme;
           if (_sliverBaseClasses.contains(interfaceName) ||
               interfaceName.startsWith('Sliver')) {
-            reporter.atNode(node, code);
+            reporter.atNode(node);
             return;
           }
         }
@@ -1098,7 +1076,7 @@ class PreferSliverPrefixRule extends SaropaLintRule {
           final String mixinName = mixin.name.lexeme;
           if (_sliverBaseClasses.contains(mixinName) ||
               mixinName.startsWith('Sliver')) {
-            reporter.atNode(node, code);
+            reporter.atNode(node);
             return;
           }
         }
@@ -1125,25 +1103,22 @@ class PreferSliverPrefixRule extends SaropaLintRule {
 /// )
 /// ```
 class PreferUsingListViewRule extends SaropaLintRule {
-  const PreferUsingListViewRule() : super(code: _code);
+  PreferUsingListViewRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
-    name: 'prefer_using_list_view',
-    problemMessage:
-        '[prefer_using_list_view] Column inside SingleChildScrollView. A "Column" is being used inside a "SingleChildScrollView" Flutter to pre-render the entire list, bypassing "Lazy Loading" optimizations. This layout configuration can also trigger RenderFlex overflow errors or unexpected visual behavior at runtime. {v6}',
+    'prefer_using_list_view',
+    '[prefer_using_list_view] Column inside SingleChildScrollView. A "Column" is being used inside a "SingleChildScrollView" Flutter to pre-render the entire list, bypassing "Lazy Loading" optimizations. This layout configuration can also trigger RenderFlex overflow errors or unexpected visual behavior at runtime. {v6}',
     correctionMessage:
         'Refactor this layout into a single "ListView" to leverage viewport-based optimizations and memory management. To maintain the layout logic of a "Column" with a "spacing" property, use the "ListView.separated" constructor; this allows you to define a "separatorBuilder" that injects consistent spacing only between elements, effectively replacing manual "SizedBox" additions or the "spacing" attribute. Ensure the new "ListView" is wrapped in a "Flexible" or "Expanded" widget if it resides within a "Flex" container to avoid unbounded height errors. This transition ensures that off-screen items are lazily loaded and disposed of, preventing "RenderFlex" overflows and significantly improving scrolling performance on resource-constrained devices.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry
-        .addInstanceCreationExpression((InstanceCreationExpression node) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final String typeName = node.constructorName.type.name.lexeme;
       if (typeName != 'SingleChildScrollView') return;
 
@@ -1152,7 +1127,7 @@ class PreferUsingListViewRule extends SaropaLintRule {
         if (arg is NamedExpression && arg.name.label.name == 'child') {
           final Expression childExpr = arg.expression;
           if (_isColumnOrRow(childExpr)) {
-            reporter.atNode(node, code);
+            reporter.atNode(node);
             return;
           }
         }
@@ -1193,7 +1168,7 @@ class PreferUsingListViewRule extends SaropaLintRule {
 /// }
 /// ```
 class AvoidBorderAllRule extends SaropaLintRule {
-  const AvoidBorderAllRule() : super(code: _code);
+  AvoidBorderAllRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -1206,28 +1181,26 @@ class AvoidBorderAllRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
-    name: 'avoid_border_all',
-    problemMessage:
-        '[avoid_border_all] Prefer Border.fromBorderSide for const borders. This layout configuration can trigger RenderFlex overflow errors or unexpected visual behavior at runtime. {v6}',
+    'avoid_border_all',
+    '[avoid_border_all] Prefer Border.fromBorderSide for const borders. This layout configuration can trigger RenderFlex overflow errors or unexpected visual behavior at runtime. {v6}',
     correctionMessage:
         'Use const Border.fromBorderSide(BorderSide(..)) instead. Test on multiple screen sizes to verify the layout adapts correctly.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       // Check for Border.all
       final Expression? target = node.target;
       if (target is! SimpleIdentifier) return;
       if (target.name != 'Border') return;
       if (node.methodName.name != 'all') return;
 
-      reporter.atNode(node, code);
+      reporter.atNode(node);
     });
   }
 }
@@ -1268,7 +1241,7 @@ class AvoidBorderAllRule extends SaropaLintRule {
 /// );
 /// ```
 class AvoidDeeplyNestedWidgetsRule extends SaropaLintRule {
-  const AvoidDeeplyNestedWidgetsRule() : super(code: _code);
+  AvoidDeeplyNestedWidgetsRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -1281,28 +1254,29 @@ class AvoidDeeplyNestedWidgetsRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
-    name: 'avoid_deeply_nested_widgets',
-    problemMessage:
-        '[avoid_deeply_nested_widgets] Widget tree is too deeply nested, exceeding the recommended nesting depth. Deep nesting reduces build method readability and increases the risk of layout overflow errors at runtime. {v6}',
+    'avoid_deeply_nested_widgets',
+    '[avoid_deeply_nested_widgets] Widget tree is too deeply nested, exceeding the recommended nesting depth. Deep nesting reduces build method readability and increases the risk of layout overflow errors at runtime. {v6}',
     correctionMessage:
         'Extract subtrees into separate widgets to improve readability. Test on multiple screen sizes to verify the layout adapts correctly.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   static const int _maxDepth = 8;
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodDeclaration((MethodDeclaration node) {
+    context.addMethodDeclaration((MethodDeclaration node) {
       if (node.name.lexeme != 'build') return;
 
       // Find nested widget depth
-      final _WidgetDepthVisitor visitor =
-          _WidgetDepthVisitor(_maxDepth, reporter, code);
+      final _WidgetDepthVisitor visitor = _WidgetDepthVisitor(
+        _maxDepth,
+        reporter,
+        code,
+      );
       node.body.accept(visitor);
     });
   }
@@ -1337,7 +1311,7 @@ class _WidgetDepthVisitor extends RecursiveAstVisitor<void> {
       _currentDepth++;
 
       if (_currentDepth > maxDepth && !_reported) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
         _reported = true;
       }
 
@@ -1385,24 +1359,22 @@ class _WidgetDepthVisitor extends RecursiveAstVisitor<void> {
 /// }
 /// ```
 class PreferConstWidgetsInListsRule extends SaropaLintRule {
-  const PreferConstWidgetsInListsRule() : super(code: _code);
+  PreferConstWidgetsInListsRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
-    name: 'prefer_const_widgets_in_lists',
-    problemMessage:
-        '[prefer_const_widgets_in_lists] Widget list recreated on every rebuild. If elements are constant, the entire list can be const. This layout configuration can trigger RenderFlex overflow errors or unexpected visual behavior at runtime. {v4}',
+    'prefer_const_widgets_in_lists',
+    '[prefer_const_widgets_in_lists] Widget list recreated on every rebuild. If elements are constant, the entire list can be const. This layout configuration can trigger RenderFlex overflow errors or unexpected visual behavior at runtime. {v4}',
     correctionMessage:
         'Add const keyword: const [Text("a"), Text("b")]. Test on multiple screen sizes to verify the layout adapts correctly.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addListLiteral((ListLiteral node) {
+    context.addListLiteral((ListLiteral node) {
       // Skip if already explicitly const
       if (node.constKeyword != null) return;
 
@@ -1434,7 +1406,7 @@ class PreferConstWidgetsInListsRule extends SaropaLintRule {
       }
 
       if (hasWidgets && allPotentiallyConst && node.elements.isNotEmpty) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
   }
@@ -1543,25 +1515,22 @@ class PreferConstWidgetsInListsRule extends SaropaLintRule {
 /// }
 /// ```
 class AvoidListViewWithoutItemExtentRule extends SaropaLintRule {
-  const AvoidListViewWithoutItemExtentRule() : super(code: _code);
+  AvoidListViewWithoutItemExtentRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
-    name: 'avoid_listview_without_item_extent',
-    problemMessage:
-        '[avoid_listview_without_item_extent] ListView.builder should specify itemExtent to improve scroll performance. This layout configuration can trigger RenderFlex overflow errors or unexpected visual behavior at runtime. {v5}',
+    'avoid_listview_without_item_extent',
+    '[avoid_listview_without_item_extent] ListView.builder should specify itemExtent to improve scroll performance. This layout configuration can trigger RenderFlex overflow errors or unexpected visual behavior at runtime. {v5}',
     correctionMessage:
         'Add itemExtent or prototypeItem parameter. Test on multiple screen sizes to verify the layout adapts correctly.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry
-        .addInstanceCreationExpression((InstanceCreationExpression node) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final String typeName = node.constructorName.type.name.lexeme;
       final String? constructorName = node.constructorName.name?.name;
 
@@ -1607,7 +1576,7 @@ class AvoidListViewWithoutItemExtentRule extends SaropaLintRule {
 /// }
 /// ```
 class PreferSliverListDelegateRule extends SaropaLintRule {
-  const PreferSliverListDelegateRule() : super(code: _code);
+  PreferSliverListDelegateRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -1620,22 +1589,19 @@ class PreferSliverListDelegateRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
-    name: 'prefer_sliver_list_delegate',
-    problemMessage:
-        '[prefer_sliver_list_delegate] Use SliverChildBuilderDelegate to improve performance with large lists. This layout configuration can trigger RenderFlex overflow errors or unexpected visual behavior at runtime. {v6}',
+    'prefer_sliver_list_delegate',
+    '[prefer_sliver_list_delegate] Use SliverChildBuilderDelegate to improve performance with large lists. This layout configuration can trigger RenderFlex overflow errors or unexpected visual behavior at runtime. {v6}',
     correctionMessage:
         'Replace SliverChildListDelegate with SliverChildBuilderDelegate. Test on multiple screen sizes to verify the layout adapts correctly.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry
-        .addInstanceCreationExpression((InstanceCreationExpression node) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final String typeName = node.constructorName.type.name.lexeme;
 
       if (typeName == 'SliverChildListDelegate') {
@@ -1678,7 +1644,7 @@ class PreferSliverListDelegateRule extends SaropaLintRule {
 /// )
 /// ```
 class AvoidLayoutBuilderMisuseRule extends SaropaLintRule {
-  const AvoidLayoutBuilderMisuseRule() : super(code: _code);
+  AvoidLayoutBuilderMisuseRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -1691,22 +1657,19 @@ class AvoidLayoutBuilderMisuseRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
-    name: 'avoid_layout_builder_misuse',
-    problemMessage:
-        '[avoid_layout_builder_misuse] LayoutBuilder should use constraints in its builder. LayoutBuilder is used inefficiently. This layout configuration can trigger RenderFlex overflow errors or unexpected visual behavior at runtime. {v6}',
+    'avoid_layout_builder_misuse',
+    '[avoid_layout_builder_misuse] LayoutBuilder should use constraints in its builder. LayoutBuilder is used inefficiently. This layout configuration can trigger RenderFlex overflow errors or unexpected visual behavior at runtime. {v6}',
     correctionMessage:
         'Ensure the builder actually uses the constraints parameter. Test on multiple screen sizes to verify the layout adapts correctly.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry
-        .addInstanceCreationExpression((InstanceCreationExpression node) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final String typeName = node.constructorName.type.name.lexeme;
 
       if (typeName == 'LayoutBuilder') {
@@ -1722,8 +1685,9 @@ class AvoidLayoutBuilderMisuseRule extends SaropaLintRule {
                     !constraintsName.startsWith('_')) {
                   // Check if constraints is used in body
                   final Set<String> usedIds = <String>{};
-                  builderExpr.body
-                      .visitChildren(_SimpleIdentifierCollector(usedIds));
+                  builderExpr.body.visitChildren(
+                    _SimpleIdentifierCollector(usedIds),
+                  );
                   if (!usedIds.contains(constraintsName)) {
                     reporter.atNode(node.constructorName, code);
                   }
@@ -1768,7 +1732,7 @@ class _SimpleIdentifierCollector extends RecursiveAstVisitor<void> {
 /// )
 /// ```
 class AvoidRepaintBoundaryMisuseRule extends SaropaLintRule {
-  const AvoidRepaintBoundaryMisuseRule() : super(code: _code);
+  AvoidRepaintBoundaryMisuseRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -1781,22 +1745,19 @@ class AvoidRepaintBoundaryMisuseRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
-    name: 'avoid_repaint_boundary_misuse',
-    problemMessage:
-        '[avoid_repaint_boundary_misuse] RepaintBoundary around const/static content provides no benefit. RepaintBoundary is used around static content. This layout configuration can trigger RenderFlex overflow errors or unexpected visual behavior at runtime. {v6}',
+    'avoid_repaint_boundary_misuse',
+    '[avoid_repaint_boundary_misuse] RepaintBoundary around const/static content provides no benefit. RepaintBoundary is used around static content. This layout configuration can trigger RenderFlex overflow errors or unexpected visual behavior at runtime. {v6}',
     correctionMessage:
         'Use RepaintBoundary for frequently repainting content. Test on multiple screen sizes to verify the layout adapts correctly.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry
-        .addInstanceCreationExpression((InstanceCreationExpression node) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final String typeName = node.constructorName.type.name.lexeme;
 
       if (typeName == 'RepaintBoundary') {
@@ -1841,7 +1802,7 @@ class AvoidRepaintBoundaryMisuseRule extends SaropaLintRule {
 /// )
 /// ```
 class AvoidSingleChildScrollViewWithColumnRule extends SaropaLintRule {
-  const AvoidSingleChildScrollViewWithColumnRule() : super(code: _code);
+  AvoidSingleChildScrollViewWithColumnRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -1855,22 +1816,19 @@ class AvoidSingleChildScrollViewWithColumnRule extends SaropaLintRule {
 
   // cspell:ignore singlechildscrollview
   static const LintCode _code = LintCode(
-    name: 'avoid_singlechildscrollview_with_column',
-    problemMessage:
-        '[avoid_singlechildscrollview_with_column] SingleChildScrollView with Column may cause layout issues. SingleChildScrollView wraps a Column with Expanded children. This layout configuration can trigger RenderFlex overflow errors or unexpected visual behavior at runtime. {v6}',
+    'avoid_singlechildscrollview_with_column',
+    '[avoid_singlechildscrollview_with_column] SingleChildScrollView with Column may cause layout issues. SingleChildScrollView wraps a Column with Expanded children. This layout configuration can trigger RenderFlex overflow errors or unexpected visual behavior at runtime. {v6}',
     correctionMessage:
         'Use ListView instead, or remove Expanded/Flexible children. Test on multiple screen sizes to verify the layout adapts correctly.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry
-        .addInstanceCreationExpression((InstanceCreationExpression node) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final String typeName = node.constructorName.type.name.lexeme;
 
       if (typeName == 'SingleChildScrollView') {
@@ -1928,7 +1886,7 @@ class AvoidSingleChildScrollViewWithColumnRule extends SaropaLintRule {
 /// CachedNetworkImage(imageUrl: 'https://example.com/image.png')
 /// ```
 class AvoidGestureDetectorInScrollViewRule extends SaropaLintRule {
-  const AvoidGestureDetectorInScrollViewRule() : super(code: _code);
+  AvoidGestureDetectorInScrollViewRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -1941,12 +1899,11 @@ class AvoidGestureDetectorInScrollViewRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
-    name: 'avoid_gesture_detector_in_scrollview',
-    problemMessage:
-        '[avoid_gesture_detector_in_scrollview] GestureDetector around scrollable can cause gesture conflicts. This layout configuration can trigger RenderFlex overflow errors or unexpected visual behavior at runtime. {v6}',
+    'avoid_gesture_detector_in_scrollview',
+    '[avoid_gesture_detector_in_scrollview] GestureDetector around scrollable can cause gesture conflicts. This layout configuration can trigger RenderFlex overflow errors or unexpected visual behavior at runtime. {v6}',
     correctionMessage:
         'Move GestureDetector to individual items inside the scrollable. Test on multiple screen sizes to verify the layout adapts correctly.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   static const Set<String> _scrollableWidgets = <String>{
@@ -1960,12 +1917,10 @@ class AvoidGestureDetectorInScrollViewRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry
-        .addInstanceCreationExpression((InstanceCreationExpression node) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final String typeName = node.constructorName.type.name.lexeme;
 
       if (typeName == 'GestureDetector' || typeName == 'InkWell') {
@@ -2005,7 +1960,7 @@ class AvoidGestureDetectorInScrollViewRule extends SaropaLintRule {
 /// )
 /// ```
 class PreferOpacityWidgetRule extends SaropaLintRule {
-  const PreferOpacityWidgetRule() : super(code: _code);
+  PreferOpacityWidgetRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -2018,21 +1973,19 @@ class PreferOpacityWidgetRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
-    name: 'prefer_opacity_widget',
-    problemMessage:
-        '[prefer_opacity_widget] Use Opacity widget for complex child widgets. StatefulWidget is created inline in a list builder. This layout configuration can trigger RenderFlex overflow errors or unexpected visual behavior at runtime. {v6}',
+    'prefer_opacity_widget',
+    '[prefer_opacity_widget] Use Opacity widget for complex child widgets. StatefulWidget is created inline in a list builder. This layout configuration can trigger RenderFlex overflow errors or unexpected visual behavior at runtime. {v6}',
     correctionMessage:
         'Opacity widget can optimize rendering of transparent content. Test on multiple screen sizes to verify the layout adapts correctly.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       if (node.methodName.name == 'withOpacity' ||
           node.methodName.name == 'withAlpha') {
         // Check if this is part of a color argument to a container-like widget
@@ -2046,7 +1999,7 @@ class PreferOpacityWidgetRule extends SaropaLintRule {
               // Check if it has a child that might be expensive
               for (final Expression arg in grandparent.argumentList.arguments) {
                 if (arg is NamedExpression && arg.name.label.name == 'child') {
-                  reporter.atNode(node, code);
+                  reporter.atNode(node);
                   break;
                 }
               }
@@ -2082,7 +2035,7 @@ class PreferOpacityWidgetRule extends SaropaLintRule {
 /// }
 /// ```
 class PreferSizedBoxForWhitespaceRule extends SaropaLintRule {
-  const PreferSizedBoxForWhitespaceRule() : super(code: _code);
+  PreferSizedBoxForWhitespaceRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -2095,22 +2048,19 @@ class PreferSizedBoxForWhitespaceRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
-    name: 'prefer_sized_box_for_whitespace',
-    problemMessage:
-        '[prefer_sized_box_for_whitespace] Container creates unnecessary intermediate widgets (DecoratedBox, ConstrainedBox) when used only for whitespace. SizedBox is a single lightweight widget with fewer allocations and faster layout. {v3}',
+    'prefer_sized_box_for_whitespace',
+    '[prefer_sized_box_for_whitespace] Container creates unnecessary intermediate widgets (DecoratedBox, ConstrainedBox) when used only for whitespace. SizedBox is a single lightweight widget with fewer allocations and faster layout. {v3}',
     correctionMessage:
         'SizedBox is more efficient for spacing. Use SizedBox(width:) or SizedBox(height:).',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry
-        .addInstanceCreationExpression((InstanceCreationExpression node) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final String typeName = node.constructorName.type.name.lexeme;
       if (typeName != 'Container') return;
 
@@ -2142,93 +2092,9 @@ class PreferSizedBoxForWhitespaceRule extends SaropaLintRule {
 
       // Warn if Container only has width/height and no other properties
       if ((hasWidth || hasHeight) && !hasOtherArgs) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
-  }
-
-  @override
-  List<Fix> getFixes() => <Fix>[_ReplaceContainerWithSizedBoxFix()];
-}
-
-class _ReplaceContainerWithSizedBoxFix extends DartFix {
-  @override
-  void run(
-    CustomLintResolver resolver,
-    ChangeReporter reporter,
-    CustomLintContext context,
-    AnalysisError analysisError,
-    List<AnalysisError> others,
-  ) {
-    context.registry
-        .addInstanceCreationExpression((InstanceCreationExpression node) {
-      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
-
-      final String typeName = node.constructorName.type.name.lexeme;
-      if (typeName != 'Container') return;
-
-      // Extract width and height values
-      String? widthValue;
-      String? heightValue;
-      String? keyValue;
-
-      for (final Expression arg in node.argumentList.arguments) {
-        if (arg is NamedExpression) {
-          final String name = arg.name.label.name;
-          if (name == 'width') {
-            widthValue = arg.expression.toSource();
-          } else if (name == 'height') {
-            heightValue = arg.expression.toSource();
-          } else if (name == 'key') {
-            keyValue = arg.expression.toSource();
-          }
-        }
-      }
-
-      // Determine if we should use const
-      final bool hasConst =
-          node.keyword?.lexeme == 'const' || _isInConstContext(node);
-      final String constPrefix = hasConst ? 'const ' : '';
-
-      // Build replacement
-      final StringBuffer replacement = StringBuffer();
-      replacement.write('${constPrefix}SizedBox(');
-
-      final List<String> args = <String>[];
-      if (keyValue != null) args.add('key: $keyValue');
-      if (widthValue != null) args.add('width: $widthValue');
-      if (heightValue != null) args.add('height: $heightValue');
-      replacement.write(args.join(', '));
-      replacement.write(')');
-
-      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
-        message: 'Replace with SizedBox',
-        priority: 1,
-      );
-
-      changeBuilder.addDartFileEdit((builder) {
-        builder.addSimpleReplacement(
-          node.sourceRange,
-          replacement.toString(),
-        );
-      });
-    });
-  }
-
-  bool _isInConstContext(AstNode node) {
-    AstNode? current = node.parent;
-    while (current != null) {
-      if (current is ListLiteral && current.constKeyword != null) return true;
-      if (current is SetOrMapLiteral && current.constKeyword != null) {
-        return true;
-      }
-      if (current is InstanceCreationExpression &&
-          current.keyword?.lexeme == 'const') {
-        return true;
-      }
-      current = current.parent;
-    }
-    return false;
   }
 }
 
@@ -2257,7 +2123,7 @@ class _ReplaceContainerWithSizedBoxFix extends DartFix {
 /// )
 /// ```
 class AvoidNestedScaffoldsRule extends SaropaLintRule {
-  const AvoidNestedScaffoldsRule() : super(code: _code);
+  AvoidNestedScaffoldsRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -2270,22 +2136,19 @@ class AvoidNestedScaffoldsRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
-    name: 'avoid_nested_scaffolds',
-    problemMessage:
-        '[avoid_nested_scaffolds] Nested Scaffold widget detected inside another Scaffold. This creates duplicate app bars, floating action buttons, and bottom navigation, leading to broken layout, gesture conflicts, and a confusing user experience. {v5}',
+    'avoid_nested_scaffolds',
+    '[avoid_nested_scaffolds] Nested Scaffold widget detected inside another Scaffold. This creates duplicate app bars, floating action buttons, and bottom navigation, leading to broken layout, gesture conflicts, and a confusing user experience. {v5}',
     correctionMessage:
         'Remove the inner Scaffold and use its body content directly. Share app bars and bottom navigation from the outer Scaffold.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry
-        .addInstanceCreationExpression((InstanceCreationExpression node) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final String typeName = node.constructorName.type.name.lexeme;
       if (typeName != 'Scaffold') return;
 
@@ -2335,7 +2198,7 @@ class AvoidNestedScaffoldsRule extends SaropaLintRule {
 /// )
 /// ```
 class PreferListViewBuilderRule extends SaropaLintRule {
-  const PreferListViewBuilderRule() : super(code: _code);
+  PreferListViewBuilderRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -2348,24 +2211,21 @@ class PreferListViewBuilderRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
-    name: 'prefer_listview_builder',
-    problemMessage:
-        '[prefer_listview_builder] Use ListView.builder to improve performance. This layout configuration can trigger RenderFlex overflow errors or unexpected visual behavior at runtime. {v3}',
+    'prefer_listview_builder',
+    '[prefer_listview_builder] Use ListView.builder to improve performance. This layout configuration can trigger RenderFlex overflow errors or unexpected visual behavior at runtime. {v3}',
     correctionMessage:
         'Replace ListView(children:) with ListView.builder. Test on multiple screen sizes to verify the layout adapts correctly.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   static const int _childThreshold = 10;
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry
-        .addInstanceCreationExpression((InstanceCreationExpression node) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final String typeName = node.constructorName.type.name.lexeme;
       if (typeName != 'ListView') return;
       if (node.constructorName.name != null) return; // Skip named constructors
@@ -2411,27 +2271,24 @@ class PreferListViewBuilderRule extends SaropaLintRule {
 /// FadeTransition(opacity: _ctrl, child: child)
 /// ```
 class AvoidSizedBoxExpandRule extends SaropaLintRule {
-  const AvoidSizedBoxExpandRule() : super(code: _code);
+  AvoidSizedBoxExpandRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
-    name: 'avoid_sized_box_expand',
-    problemMessage:
-        '[avoid_sized_box_expand] SizedBox.expand() fills all available space unconditionally, causing unpredictable layout overflow in constrained parents. '
+    'avoid_sized_box_expand',
+    '[avoid_sized_box_expand] SizedBox.expand() fills all available space unconditionally, causing unpredictable layout overflow in constrained parents. '
         'Inside a Column, Row, or other flex widget without explicit constraints, expand() can trigger unbounded height/width errors or silently push sibling widgets off-screen. {v3}',
     correctionMessage:
         'Use SizedBox with explicit width and height values for predictable sizing, or use Expanded/Flexible inside flex widgets to share space proportionally. '
         'If you need to fill available space, use LayoutBuilder to measure constraints before deciding dimensions.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry
-        .addInstanceCreationExpression((InstanceCreationExpression node) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final String typeName = node.constructorName.type.name.lexeme;
       if (typeName != 'SizedBox') return;
 
@@ -2498,7 +2355,7 @@ class AvoidSizedBoxExpandRule extends SaropaLintRule {
 /// )
 /// ```
 class PreferSpacingOverSizedBoxRule extends SaropaLintRule {
-  const PreferSpacingOverSizedBoxRule() : super(code: _code);
+  PreferSpacingOverSizedBoxRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -2511,28 +2368,21 @@ class PreferSpacingOverSizedBoxRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
-    name: 'prefer_spacing_over_sizedbox',
-    problemMessage:
-        '[prefer_spacing_over_sizedbox] Using SizedBox for gaps instead of the spacing parameter is a stylistic API choice. Both achieve the same layout with no performance difference. Enable via the stylistic tier. {v4}',
+    'prefer_spacing_over_sizedbox',
+    '[prefer_spacing_over_sizedbox] Using SizedBox for gaps instead of the spacing parameter is a stylistic API choice. Both achieve the same layout with no performance difference. Enable via the stylistic tier. {v4}',
     correctionMessage:
         'Remove spacer children and add spacing: <value> to the. Test on multiple screen sizes to verify the layout adapts correctly.'
         'Row/Column constructor.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   static const Set<String> _flexWidgets = <String>{'Row', 'Column'};
-
-  @override
-  List<Fix> getFixes() => <Fix>[_PreferSpacingOverSizedBoxFix()];
-
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry
-        .addInstanceCreationExpression((InstanceCreationExpression node) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final String typeName = node.constructorName.type.name.lexeme;
       if (!_flexWidgets.contains(typeName)) return;
 
@@ -2640,101 +2490,6 @@ class PreferSpacingOverSizedBoxRule extends SaropaLintRule {
 
     return null;
   }
-
-  /// Extracts the spacing value source text from a spacer expression.
-  static String? _getSpacingValue(Expression expr, String parentType) {
-    if (expr is! InstanceCreationExpression) return null;
-
-    final String name = expr.constructorName.type.name.lexeme;
-    if (name != 'SizedBox') return null;
-
-    final String expectedArg = parentType == 'Column' ? 'height' : 'width';
-
-    for (final Expression arg in expr.argumentList.arguments) {
-      if (arg is NamedExpression && arg.name.label.name == expectedArg) {
-        return arg.expression.toSource();
-      }
-    }
-    return null;
-  }
-}
-
-class _PreferSpacingOverSizedBoxFix extends DartFix {
-  @override
-  void run(
-    CustomLintResolver resolver,
-    ChangeReporter reporter,
-    CustomLintContext context,
-    AnalysisError analysisError,
-    List<AnalysisError> others,
-  ) {
-    context.registry
-        .addInstanceCreationExpression((InstanceCreationExpression node) {
-      if (!analysisError.sourceRange.intersects(node.sourceRange)) return;
-
-      final String typeName = node.constructorName.type.name.lexeme;
-      if (!PreferSpacingOverSizedBoxRule._flexWidgets.contains(typeName)) {
-        return;
-      }
-
-      final ListLiteral? childrenList =
-          PreferSpacingOverSizedBoxRule._getChildrenList(node);
-      if (childrenList == null) return;
-
-      final List<CollectionElement> elements = childrenList.elements;
-      if (elements.length < 3) return;
-
-      // Get spacing value from first spacer (index 1)
-      final Expression firstSpacer = elements[1] as Expression;
-      final String? spacingValue =
-          PreferSpacingOverSizedBoxRule._getSpacingValue(
-        firstSpacer,
-        typeName,
-      );
-
-      // Only auto-fix SizedBox spacers where we can extract the value
-      if (spacingValue == null) return;
-
-      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
-        message: 'Use spacing: $spacingValue parameter',
-        priority: 80,
-      );
-
-      changeBuilder.addDartFileEdit((builder) {
-        // Add spacing parameter after the constructor name
-        builder.addSimpleInsertion(
-          node.constructorName.end,
-          '(spacing: $spacingValue,',
-        );
-
-        // Remove the opening paren that was already there
-        builder.addDeletion(
-          SourceRange(node.argumentList.offset, 1),
-        );
-
-        // Remove spacer children (odd-indexed elements)
-        for (int i = elements.length - 2; i >= 1; i -= 2) {
-          final int start = _getRemovalStart(elements, i);
-          final int end = _getRemovalEnd(elements, i);
-          builder.addDeletion(SourceRange(start, end - start));
-        }
-      });
-    });
-  }
-
-  /// Gets the start offset for removing a spacer, including leading comma
-  /// and whitespace.
-  int _getRemovalStart(List<CollectionElement> elements, int index) {
-    // Remove from end of previous element (after the comma)
-    final CollectionElement prev = elements[index - 1];
-    return prev.end;
-  }
-
-  /// Gets the end offset for removing a spacer, including trailing comma.
-  int _getRemovalEnd(List<CollectionElement> elements, int index) {
-    final CollectionElement next = elements[index + 1];
-    return next.offset;
-  }
 }
 
 /// Warns when Material 2 is explicitly enabled via useMaterial3: false.
@@ -2765,7 +2520,7 @@ class _PreferSpacingOverSizedBoxFix extends DartFix {
 /// )
 /// ```
 class AvoidNestedScrollablesRule extends SaropaLintRule {
-  const AvoidNestedScrollablesRule() : super(code: _code);
+  AvoidNestedScrollablesRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -2778,12 +2533,11 @@ class AvoidNestedScrollablesRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
-    name: 'avoid_nested_scrollables',
-    problemMessage:
-        '[avoid_nested_scrollables] Nested scrollable widgets can cause scroll conflicts. This layout configuration can trigger RenderFlex overflow errors or unexpected visual behavior at runtime. {v2}',
+    'avoid_nested_scrollables',
+    '[avoid_nested_scrollables] Nested scrollable widgets can cause scroll conflicts. This layout configuration can trigger RenderFlex overflow errors or unexpected visual behavior at runtime. {v2}',
     correctionMessage:
         'Use NestedScrollView, or add shrinkWrap: true and NeverScrollableScrollPhysics().',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   static const Set<String> _scrollableWidgets = <String>{
@@ -2796,13 +2550,10 @@ class AvoidNestedScrollablesRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addInstanceCreationExpression((
-      InstanceCreationExpression node,
-    ) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final String typeName = node.constructorName.type.name.lexeme;
       if (!_scrollableWidgets.contains(typeName)) return;
 
@@ -2875,7 +2626,7 @@ class AvoidNestedScrollablesRule extends SaropaLintRule {
 /// Container(margin: EdgeInsets.only(left: context.spacing.large));
 /// ```
 class AvoidHardcodedLayoutValuesRule extends SaropaLintRule {
-  const AvoidHardcodedLayoutValuesRule() : super(code: _code);
+  AvoidHardcodedLayoutValuesRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -2888,14 +2639,13 @@ class AvoidHardcodedLayoutValuesRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
-    name: 'avoid_hardcoded_layout_values',
-    problemMessage:
-        '[avoid_hardcoded_layout_values] Hardcoded numeric value in layout widget prevents responsive adaptation across screen sizes and text scales. '
+    'avoid_hardcoded_layout_values',
+    '[avoid_hardcoded_layout_values] Hardcoded numeric value in layout widget prevents responsive adaptation across screen sizes and text scales. '
         'Fixed pixel values that look correct on one device may cause overflow, clipping, or wasted space on devices with different screen densities, orientations, or accessibility font size settings. {v6}',
     correctionMessage:
         'Extract layout values to named constants in a spacing/dimension system (e.g., AppSpacing.medium, AppDimensions.buttonHeight) or use MediaQuery-based calculations for responsive sizing. '
         'Named constants centralize layout decisions and enable consistent updates across the entire app.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   /// Layout widgets where we check for hardcoded values
@@ -2928,13 +2678,10 @@ class AvoidHardcodedLayoutValuesRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addInstanceCreationExpression((
-      InstanceCreationExpression node,
-    ) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final String typeName = node.constructorName.type.name.lexeme;
       if (!_layoutWidgets.contains(typeName)) return;
 
@@ -2949,9 +2696,7 @@ class AvoidHardcodedLayoutValuesRule extends SaropaLintRule {
     });
 
     // Also check EdgeInsets constructors
-    context.registry.addInstanceCreationExpression((
-      InstanceCreationExpression node,
-    ) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final String typeName = node.constructorName.type.name.lexeme;
       if (typeName != 'EdgeInsets') return;
 
@@ -2966,18 +2711,20 @@ class AvoidHardcodedLayoutValuesRule extends SaropaLintRule {
   }
 
   void _checkForHardcodedValue(
-      Expression expr, SaropaDiagnosticReporter reporter) {
+    Expression expr,
+    SaropaDiagnosticReporter reporter,
+  ) {
     if (expr is IntegerLiteral) {
       final int? value = expr.value;
       if (value != null && !_acceptableValues.contains(value) && value > 4) {
-        reporter.atNode(expr, code);
+        reporter.atNode(expr);
       }
     } else if (expr is DoubleLiteral) {
       final double value = expr.value;
       if (value > 4.0 && value != value.roundToDouble()) {
-        reporter.atNode(expr, code);
+        reporter.atNode(expr);
       } else if (value > 4.0) {
-        reporter.atNode(expr, code);
+        reporter.atNode(expr);
       }
     }
   }
@@ -3012,7 +2759,7 @@ class AvoidHardcodedLayoutValuesRule extends SaropaLintRule {
 /// )
 /// ```
 class PreferIgnorePointerRule extends SaropaLintRule {
-  const PreferIgnorePointerRule() : super(code: _code);
+  PreferIgnorePointerRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -3025,23 +2772,19 @@ class PreferIgnorePointerRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
-    name: 'prefer_ignore_pointer',
-    problemMessage:
-        '[prefer_ignore_pointer] AbsorbPointer blocks underlying widgets - is IgnorePointer better? - AbsorbPointer: Absorbs events and prevents them from reaching widgets behind it. Use when you need to block underlying interactions. - IgnorePointer: Lets events pass through completely. Use when you just want to disable this widget\'s interaction. {v4}',
+    'prefer_ignore_pointer',
+    '[prefer_ignore_pointer] AbsorbPointer blocks underlying widgets - is IgnorePointer better? - AbsorbPointer: Absorbs events and prevents them from reaching widgets behind it. Use when you need to block underlying interactions. - IgnorePointer: Lets events pass through completely. Use when you just want to disable this widget\'s interaction. {v4}',
     correctionMessage:
         'Use IgnorePointer if you don\'t need to block background interactions. Test on multiple screen sizes to verify the layout adapts correctly.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addInstanceCreationExpression((
-      InstanceCreationExpression node,
-    ) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final String typeName = node.constructorName.type.name.lexeme;
       if (typeName == 'AbsorbPointer') {
         reporter.atNode(node.constructorName, code);
@@ -3074,7 +2817,7 @@ class PreferIgnorePointerRule extends SaropaLintRule {
 /// )
 /// ```
 class PreferPageStorageKeyRule extends SaropaLintRule {
-  const PreferPageStorageKeyRule() : super(code: _code);
+  PreferPageStorageKeyRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -3087,12 +2830,11 @@ class PreferPageStorageKeyRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
-    name: 'prefer_page_storage_key',
-    problemMessage:
-        '[prefer_page_storage_key] Use PageStorageKey to preserve scroll position. This layout configuration can trigger RenderFlex overflow errors or unexpected visual behavior at runtime. {v5}',
+    'prefer_page_storage_key',
+    '[prefer_page_storage_key] Use PageStorageKey to preserve scroll position. This layout configuration can trigger RenderFlex overflow errors or unexpected visual behavior at runtime. {v5}',
     correctionMessage:
         'Add key: PageStorageKey("unique_key") to the scrollable. Test on multiple screen sizes to verify the layout adapts correctly.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   static const Set<String> _scrollableWidgets = <String>{
@@ -3104,13 +2846,10 @@ class PreferPageStorageKeyRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addInstanceCreationExpression((
-      InstanceCreationExpression node,
-    ) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final String typeName = node.constructorName.type.name.lexeme;
       if (!_scrollableWidgets.contains(typeName)) return;
 
@@ -3161,7 +2900,7 @@ class PreferPageStorageKeyRule extends SaropaLintRule {
 /// )
 /// ```
 class RequireScrollPhysicsRule extends SaropaLintRule {
-  const RequireScrollPhysicsRule() : super(code: _code);
+  RequireScrollPhysicsRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -3174,12 +2913,11 @@ class RequireScrollPhysicsRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
-    name: 'require_scroll_physics',
-    problemMessage:
-        '[require_scroll_physics] Scrollable widget should specify scroll physics. This layout configuration can trigger RenderFlex overflow errors or unexpected visual behavior at runtime. {v5}',
+    'require_scroll_physics',
+    '[require_scroll_physics] Scrollable widget should specify scroll physics. This layout configuration can trigger RenderFlex overflow errors or unexpected visual behavior at runtime. {v5}',
     correctionMessage:
         'Add physics: BouncingScrollPhysics() or ClampingScrollPhysics(). Test on multiple screen sizes to verify the layout adapts correctly.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   static const Set<String> _scrollableWidgets = <String>{
@@ -3192,13 +2930,10 @@ class RequireScrollPhysicsRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addInstanceCreationExpression((
-      InstanceCreationExpression node,
-    ) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final String typeName = node.constructorName.type.name.lexeme;
       if (!_scrollableWidgets.contains(typeName)) return;
 
@@ -3244,7 +2979,7 @@ class RequireScrollPhysicsRule extends SaropaLintRule {
 /// )
 /// ```
 class PreferSliverListRule extends SaropaLintRule {
-  const PreferSliverListRule() : super(code: _code);
+  PreferSliverListRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -3257,23 +2992,19 @@ class PreferSliverListRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
-    name: 'prefer_sliver_list',
-    problemMessage:
-        '[prefer_sliver_list] Use SliverList instead of ListView inside CustomScrollView. Using ListView inside CustomScrollView creates nested scrollables. Use SliverList for proper sliver composition. {v6}',
+    'prefer_sliver_list',
+    '[prefer_sliver_list] Use SliverList instead of ListView inside CustomScrollView. Using ListView inside CustomScrollView creates nested scrollables. Use SliverList for proper sliver composition. {v6}',
     correctionMessage:
         'Replace ListView with SliverList for proper sliver composition. Test on multiple screen sizes to verify the layout adapts correctly.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addInstanceCreationExpression((
-      InstanceCreationExpression node,
-    ) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final String typeName = node.constructorName.type.name.lexeme;
       if (typeName != 'ListView' && typeName != 'GridView') return;
 
@@ -3325,7 +3056,7 @@ class PreferSliverListRule extends SaropaLintRule {
 /// }
 /// ```
 class PreferKeepAliveRule extends SaropaLintRule {
-  const PreferKeepAliveRule() : super(code: _code);
+  PreferKeepAliveRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -3338,21 +3069,19 @@ class PreferKeepAliveRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
-    name: 'prefer_keep_alive',
-    problemMessage:
-        '[prefer_keep_alive] Use AutomaticKeepAliveClientMixin to preserve state. Without AutomaticKeepAliveClientMixin, tab content is rebuilt when switching tabs, losing scroll position and state. {v5}',
+    'prefer_keep_alive',
+    '[prefer_keep_alive] Use AutomaticKeepAliveClientMixin to preserve state. Without AutomaticKeepAliveClientMixin, tab content is rebuilt when switching tabs, losing scroll position and state. {v5}',
     correctionMessage:
         'Add "with AutomaticKeepAliveClientMixin" to preserve state in tabs. Test on multiple screen sizes to verify the layout adapts correctly.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addClassDeclaration((ClassDeclaration node) {
+    context.addClassDeclaration((ClassDeclaration node) {
       // Check if it's a State class
       final ExtendsClause? extendsClause = node.extendsClause;
       if (extendsClause == null) return;
@@ -3410,7 +3139,7 @@ class PreferKeepAliveRule extends SaropaLintRule {
 /// )
 /// ```
 class PreferWrapOverOverflowRule extends SaropaLintRule {
-  const PreferWrapOverOverflowRule() : super(code: _code);
+  PreferWrapOverOverflowRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -3423,23 +3152,19 @@ class PreferWrapOverOverflowRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
-    name: 'prefer_wrap_over_overflow',
-    problemMessage:
-        '[prefer_wrap_over_overflow] Row with many children may overflow - Use Wrap. DefaultTextStyle provides consistent typography without repeating styles. Text widgets are not wrapped with DefaultTextStyle. {v5}',
+    'prefer_wrap_over_overflow',
+    '[prefer_wrap_over_overflow] Row with many children may overflow - Use Wrap. DefaultTextStyle provides consistent typography without repeating styles. Text widgets are not wrapped with DefaultTextStyle. {v5}',
     correctionMessage:
         'Replace Row with Wrap for automatic wrapping. Test on multiple screen sizes to verify the layout adapts correctly.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addInstanceCreationExpression((
-      InstanceCreationExpression node,
-    ) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final String typeName = node.constructorName.type.name.lexeme;
       if (typeName != 'Row') return;
 
@@ -3492,7 +3217,7 @@ class PreferWrapOverOverflowRule extends SaropaLintRule {
 /// Image.asset('assets/logo.png')
 /// ```
 class AvoidLayoutBuilderInScrollableRule extends SaropaLintRule {
-  const AvoidLayoutBuilderInScrollableRule() : super(code: _code);
+  AvoidLayoutBuilderInScrollableRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -3505,12 +3230,11 @@ class AvoidLayoutBuilderInScrollableRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
-    name: 'avoid_layout_builder_in_scrollable',
-    problemMessage:
-        '[avoid_layout_builder_in_scrollable] LayoutBuilder inside scrollable causes performance issues. This layout configuration can trigger RenderFlex overflow errors or unexpected visual behavior at runtime. {v6}',
+    'avoid_layout_builder_in_scrollable',
+    '[avoid_layout_builder_in_scrollable] LayoutBuilder inside scrollable causes performance issues. This layout configuration can trigger RenderFlex overflow errors or unexpected visual behavior at runtime. {v6}',
     correctionMessage:
         'Move LayoutBuilder outside the scrollable widget. Test on multiple screen sizes to verify the layout adapts correctly.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   static const Set<String> _scrollableWidgets = <String>{
@@ -3522,13 +3246,10 @@ class AvoidLayoutBuilderInScrollableRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addInstanceCreationExpression((
-      InstanceCreationExpression node,
-    ) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final String typeName = node.constructorName.type.name.lexeme;
       if (typeName != 'LayoutBuilder') return;
 
@@ -3574,7 +3295,7 @@ class AvoidLayoutBuilderInScrollableRule extends SaropaLintRule {
 /// )
 /// ```
 class PreferIntrinsicDimensionsRule extends SaropaLintRule {
-  const PreferIntrinsicDimensionsRule() : super(code: _code);
+  PreferIntrinsicDimensionsRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -3587,23 +3308,19 @@ class PreferIntrinsicDimensionsRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
-    name: 'prefer_intrinsic_dimensions',
-    problemMessage:
-        '[prefer_intrinsic_dimensions] Use IntrinsicWidth/Height for content-based sizing. IntrinsicWidth/Height can help with sizing widgets to their content. IntrinsicWidth/Height could improve layout. {v5}',
+    'prefer_intrinsic_dimensions',
+    '[prefer_intrinsic_dimensions] Use IntrinsicWidth/Height for content-based sizing. IntrinsicWidth/Height can help with sizing widgets to their content. IntrinsicWidth/Height could improve layout. {v5}',
     correctionMessage:
         'Wrap with IntrinsicWidth or IntrinsicHeight. Test on multiple screen sizes to verify the layout adapts correctly.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addInstanceCreationExpression((
-      InstanceCreationExpression node,
-    ) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final String typeName = node.constructorName.type.name.lexeme;
       if (typeName != 'Column') return;
 
@@ -3667,7 +3384,7 @@ class PreferIntrinsicDimensionsRule extends SaropaLintRule {
 /// )
 /// ```
 class AvoidUnboundedConstraintsRule extends SaropaLintRule {
-  const AvoidUnboundedConstraintsRule() : super(code: _code);
+  AvoidUnboundedConstraintsRule() : super(code: _code);
 
   /// Crash path — Expanded/Flexible in unbounded scroll axis throws
   /// RenderFlex overflow. Even 10+ violations need immediate attention.
@@ -3681,23 +3398,19 @@ class AvoidUnboundedConstraintsRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
-    name: 'avoid_unbounded_constraints',
-    problemMessage:
-        '[avoid_unbounded_constraints] Column/Row in SingleChildScrollView may have unbounded constraints. Expanded/Flexible children in an unbounded scroll axis throw RenderFlex overflow errors at runtime. Crash path — Expanded/Flexible in unbounded scroll axis throws RenderFlex overflow. Even 10+ violations need immediate attention. {v8}',
+    'avoid_unbounded_constraints',
+    '[avoid_unbounded_constraints] Column/Row in SingleChildScrollView may have unbounded constraints. Expanded/Flexible children in an unbounded scroll axis throw RenderFlex overflow errors at runtime. Crash path — Expanded/Flexible in unbounded scroll axis throws RenderFlex overflow. Even 10+ violations need immediate attention. {v8}',
     correctionMessage:
         'Wrap with ConstrainedBox or avoid Expanded/Flexible children. Test on multiple screen sizes to verify the layout adapts correctly.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addInstanceCreationExpression((
-      InstanceCreationExpression node,
-    ) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final String typeName = node.constructorName.type.name.lexeme;
       if (typeName != 'Column' && typeName != 'Row') return;
 
@@ -3742,9 +3455,7 @@ class AvoidUnboundedConstraintsRule extends SaropaLintRule {
   }
 
   /// Whether SingleChildScrollView has scrollDirection: Axis.horizontal.
-  static bool _hasHorizontalScrollDirection(
-    InstanceCreationExpression node,
-  ) {
+  static bool _hasHorizontalScrollDirection(InstanceCreationExpression node) {
     for (final Expression arg in node.argumentList.arguments) {
       if (arg is NamedExpression && arg.name.label.name == 'scrollDirection') {
         return arg.expression.toSource().contains('horizontal');
@@ -3755,9 +3466,7 @@ class AvoidUnboundedConstraintsRule extends SaropaLintRule {
 
   /// Checks only direct children for Expanded/Flexible, not nested
   /// descendants which have their own constraint context.
-  static bool _hasDirectExpandedOrFlexible(
-    InstanceCreationExpression node,
-  ) {
+  static bool _hasDirectExpandedOrFlexible(InstanceCreationExpression node) {
     for (final Expression arg in node.argumentList.arguments) {
       if (arg is NamedExpression && arg.name.label.name == 'children') {
         final Expression childrenExpr = arg.expression;
@@ -3835,7 +3544,7 @@ class _ScrollAncestorInfo {
 /// )
 /// ```
 class PreferFractionalSizingRule extends SaropaLintRule {
-  const PreferFractionalSizingRule() : super(code: _code);
+  PreferFractionalSizingRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -3848,21 +3557,19 @@ class PreferFractionalSizingRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
-    name: 'prefer_fractional_sizing',
-    problemMessage:
-        '[prefer_fractional_sizing] Use FractionallySizedBox for percentage-based sizing. FractionallySizedBox is cleaner for percentage-based layouts. Percentage-based sizing uses hardcoded calculations. {v5}',
+    'prefer_fractional_sizing',
+    '[prefer_fractional_sizing] Use FractionallySizedBox for percentage-based sizing. FractionallySizedBox is cleaner for percentage-based layouts. Percentage-based sizing uses hardcoded calculations. {v5}',
     correctionMessage:
         'Replace MediaQuery.size multiplication with FractionallySizedBox. Test on multiple screen sizes to verify the layout adapts correctly.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addBinaryExpression((BinaryExpression node) {
+    context.addBinaryExpression((BinaryExpression node) {
       // Check for multiplication with a fraction
       if (node.operator.lexeme != '*') return;
 
@@ -3888,7 +3595,7 @@ class PreferFractionalSizingRule extends SaropaLintRule {
       // parent constraints (e.g. inside a horizontal ScrollView).
       if (_isInsideCollectionContext(node)) return;
 
-      reporter.atNode(node, code);
+      reporter.atNode(node);
     });
   }
 
@@ -3943,26 +3650,22 @@ class PreferFractionalSizingRule extends SaropaLintRule {
 /// )
 /// ```
 class AvoidUnconstrainedBoxMisuseRule extends SaropaLintRule {
-  const AvoidUnconstrainedBoxMisuseRule() : super(code: _code);
+  AvoidUnconstrainedBoxMisuseRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
-    name: 'avoid_unconstrained_box_misuse',
-    problemMessage:
-        '[avoid_unconstrained_box_misuse] UnconstrainedBox in constrained parent may cause overflow. UnconstrainedBox removes constraints which can cause overflow. UnconstrainedBox is used improperly causing overflow. {v5}',
+    'avoid_unconstrained_box_misuse',
+    '[avoid_unconstrained_box_misuse] UnconstrainedBox in constrained parent may cause overflow. UnconstrainedBox removes constraints which can cause overflow. UnconstrainedBox is used improperly causing overflow. {v5}',
     correctionMessage:
         'Use FittedBox or OverflowBox instead. Test on multiple screen sizes to verify the layout adapts correctly.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addInstanceCreationExpression((
-      InstanceCreationExpression node,
-    ) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final String typeName = node.constructorName.type.name.lexeme;
       if (typeName != 'UnconstrainedBox') return;
 
@@ -4012,7 +3715,7 @@ class AvoidUnconstrainedBoxMisuseRule extends SaropaLintRule {
 /// )
 /// ```
 class PreferSliverAppBarRule extends SaropaLintRule {
-  const PreferSliverAppBarRule() : super(code: _code);
+  PreferSliverAppBarRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -4025,23 +3728,19 @@ class PreferSliverAppBarRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
-    name: 'prefer_sliver_app_bar',
-    problemMessage:
-        '[prefer_sliver_app_bar] Use SliverAppBar inside CustomScrollView, not AppBar. SliverAppBar integrates with CustomScrollView for scroll-based effects like collapsing, floating, and pinning. {v5}',
+    'prefer_sliver_app_bar',
+    '[prefer_sliver_app_bar] Use SliverAppBar inside CustomScrollView, not AppBar. SliverAppBar integrates with CustomScrollView for scroll-based effects like collapsing, floating, and pinning. {v5}',
     correctionMessage:
         'Replace AppBar with SliverAppBar for scroll effects. Test on multiple screen sizes to verify the layout adapts correctly.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addInstanceCreationExpression((
-      InstanceCreationExpression node,
-    ) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final String typeName = node.constructorName.type.name.lexeme;
       if (typeName != 'AppBar') return;
 
@@ -4085,7 +3784,7 @@ class PreferSliverAppBarRule extends SaropaLintRule {
 /// )
 /// ```
 class AvoidOpacityMisuseRule extends SaropaLintRule {
-  const AvoidOpacityMisuseRule() : super(code: _code);
+  AvoidOpacityMisuseRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -4098,23 +3797,19 @@ class AvoidOpacityMisuseRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
-    name: 'avoid_opacity_misuse',
-    problemMessage:
-        '[avoid_opacity_misuse] Use AnimatedOpacity for opacity animations. Opacity is used for animations instead of AnimatedOpacity. This layout configuration can trigger RenderFlex overflow errors or unexpected visual behavior at runtime. {v6}',
+    'avoid_opacity_misuse',
+    '[avoid_opacity_misuse] Use AnimatedOpacity for opacity animations. Opacity is used for animations instead of AnimatedOpacity. This layout configuration can trigger RenderFlex overflow errors or unexpected visual behavior at runtime. {v6}',
     correctionMessage:
         'Replace Opacity with AnimatedOpacity for smoother animations. Test on multiple screen sizes to verify the layout adapts correctly.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addInstanceCreationExpression((
-      InstanceCreationExpression node,
-    ) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final String typeName = node.constructorName.type.name.lexeme;
       if (typeName != 'Opacity') return;
 
@@ -4156,7 +3851,7 @@ class AvoidOpacityMisuseRule extends SaropaLintRule {
 /// )
 /// ```
 class PreferClipBehaviorRule extends SaropaLintRule {
-  const PreferClipBehaviorRule() : super(code: _code);
+  PreferClipBehaviorRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -4169,12 +3864,11 @@ class PreferClipBehaviorRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
-    name: 'prefer_clip_behavior',
-    problemMessage:
-        '[prefer_clip_behavior] Widget does not specify clipBehavior explicitly. Default clipping wastes rendering performance when no overflow occurs, and obscures whether overflow is intentionally allowed or prevented. {v4}',
+    'prefer_clip_behavior',
+    '[prefer_clip_behavior] Widget does not specify clipBehavior explicitly. Default clipping wastes rendering performance when no overflow occurs, and obscures whether overflow is intentionally allowed or prevented. {v4}',
     correctionMessage:
         'Add clipBehavior: Clip.none or Clip.hardEdge. Test on multiple screen sizes to verify the layout adapts correctly.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   static const Set<String> _clippableWidgets = <String>{
@@ -4187,13 +3881,10 @@ class PreferClipBehaviorRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addInstanceCreationExpression((
-      InstanceCreationExpression node,
-    ) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final String typeName = node.constructorName.type.name.lexeme;
       if (!_clippableWidgets.contains(typeName)) return;
 
@@ -4235,26 +3926,22 @@ class PreferClipBehaviorRule extends SaropaLintRule {
 /// )
 /// ```
 class RequireScrollControllerRule extends SaropaLintRule {
-  const RequireScrollControllerRule() : super(code: _code);
+  RequireScrollControllerRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
-    name: 'require_scroll_controller',
-    problemMessage:
-        '[require_scroll_controller] Add ScrollController for scroll tracking. ScrollController is needed for infinite scroll and scroll position tracking. Scrollable lists must have a ScrollController. {v3}',
+    'require_scroll_controller',
+    '[require_scroll_controller] Add ScrollController for scroll tracking. ScrollController is needed for infinite scroll and scroll position tracking. Scrollable lists must have a ScrollController. {v3}',
     correctionMessage:
         'Add controller: _scrollController for infinite scroll. Test on multiple screen sizes to verify the layout adapts correctly.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addInstanceCreationExpression((
-      InstanceCreationExpression node,
-    ) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final String typeName = node.constructorName.type.name.lexeme;
       final String? constructorName = node.constructorName.name?.name;
 
@@ -4300,7 +3987,7 @@ class RequireScrollControllerRule extends SaropaLintRule {
 /// )
 /// ```
 class PreferPositionedDirectionalRule extends SaropaLintRule {
-  const PreferPositionedDirectionalRule() : super(code: _code);
+  PreferPositionedDirectionalRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -4313,23 +4000,19 @@ class PreferPositionedDirectionalRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
-    name: 'prefer_positioned_directional',
-    problemMessage:
-        '[prefer_positioned_directional] Use PositionedDirectional for RTL support. PositionedDirectional respects text direction for RTL languages. Positioned is used instead of PositionedDirectional. {v3}',
+    'prefer_positioned_directional',
+    '[prefer_positioned_directional] Use PositionedDirectional for RTL support. PositionedDirectional respects text direction for RTL languages. Positioned is used instead of PositionedDirectional. {v3}',
     correctionMessage:
         'Replace Positioned with PositionedDirectional. Test on multiple screen sizes to verify the layout adapts correctly.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addInstanceCreationExpression((
-      InstanceCreationExpression node,
-    ) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final String typeName = node.constructorName.type.name.lexeme;
       if (typeName != 'Positioned') return;
 
@@ -4384,7 +4067,7 @@ class PreferPositionedDirectionalRule extends SaropaLintRule {
 /// )
 /// ```
 class AvoidShrinkWrapInScrollRule extends SaropaLintRule {
-  const AvoidShrinkWrapInScrollRule() : super(code: _code);
+  AvoidShrinkWrapInScrollRule() : super(code: _code);
 
   /// Stylistic preference. Large counts are acceptable.
   @override
@@ -4397,12 +4080,11 @@ class AvoidShrinkWrapInScrollRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
-    name: 'avoid_shrink_wrap_in_scroll',
-    problemMessage:
-        '[avoid_shrink_wrap_in_scroll] shrinkWrap: true causes O(n) layout cost and defeats lazy loading. shrinkWrap: true causes O(n) layout cost and defeats lazy loading. However, shrinkWrap is sometimes required (e.g. ListView inside a Column) and is safe when paired with NeverScrollableScrollPhysics and a small bounded itemCount. This is a stylistic preference for Slivers over shrinkWrap — see avoid_shrinkwrap_in_scrollview for the context-aware rule that targets the genuinely dangerous nested-scrollable case. {v6}',
+    'avoid_shrink_wrap_in_scroll',
+    '[avoid_shrink_wrap_in_scroll] shrinkWrap: true causes O(n) layout cost and defeats lazy loading. shrinkWrap: true causes O(n) layout cost and defeats lazy loading. However, shrinkWrap is sometimes required (e.g. ListView inside a Column) and is safe when paired with NeverScrollableScrollPhysics and a small bounded itemCount. This is a stylistic preference for Slivers over shrinkWrap — see avoid_shrinkwrap_in_scrollview for the context-aware rule that targets the genuinely dangerous nested-scrollable case. {v6}',
     correctionMessage:
         'Use CustomScrollView with Slivers for efficient lazy loading. If this ListView is inside a Column/Row with a small bounded itemCount and NeverScrollableScrollPhysics, shrinkWrap: true is acceptable.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   static const Set<String> _scrollableWidgets = <String>{
@@ -4414,13 +4096,10 @@ class AvoidShrinkWrapInScrollRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addInstanceCreationExpression((
-      InstanceCreationExpression node,
-    ) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final String typeName = node.constructorName.type.name.lexeme;
 
       // Only check scrollable widgets
@@ -4477,7 +4156,7 @@ class AvoidShrinkWrapInScrollRule extends SaropaLintRule {
 /// }
 /// ```
 class AvoidDeepWidgetNestingRule extends SaropaLintRule {
-  const AvoidDeepWidgetNestingRule() : super(code: _code);
+  AvoidDeepWidgetNestingRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -4490,30 +4169,31 @@ class AvoidDeepWidgetNestingRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
-    name: 'avoid_deep_widget_nesting',
-    problemMessage:
-        '[avoid_deep_widget_nesting] Widget tree exceeds 15 levels of nesting. Deeply nested widget trees are hard to read, maintain, and debug. They often indicate a need to extract widgets into separate components. {v5}',
+    'avoid_deep_widget_nesting',
+    '[avoid_deep_widget_nesting] Widget tree exceeds 15 levels of nesting. Deeply nested widget trees are hard to read, maintain, and debug. They often indicate a need to extract widgets into separate components. {v5}',
     correctionMessage:
         'Extract nested widgets into separate methods or widget classes. Test on multiple screen sizes to verify the layout adapts correctly.'
         'for better readability and maintainability.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   static const int _maxDepth = 15;
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodDeclaration((MethodDeclaration node) {
+    context.addMethodDeclaration((MethodDeclaration node) {
       // Only check build methods
       if (node.name.lexeme != 'build') return;
 
       // Visit the body to find deep nesting (uses existing _WidgetDepthVisitor)
-      final _WidgetDepthVisitor visitor =
-          _WidgetDepthVisitor(_maxDepth, reporter, code);
+      final _WidgetDepthVisitor visitor = _WidgetDepthVisitor(
+        _maxDepth,
+        reporter,
+        code,
+      );
       node.body.accept(visitor);
     });
   }
@@ -4567,7 +4247,7 @@ class AvoidDeepWidgetNestingRule extends SaropaLintRule {
 /// )
 /// ```
 class PreferSafeAreaAwareRule extends SaropaLintRule {
-  const PreferSafeAreaAwareRule() : super(code: _code);
+  PreferSafeAreaAwareRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -4580,24 +4260,20 @@ class PreferSafeAreaAwareRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
-    name: 'prefer_safe_area_aware',
-    problemMessage:
-        '[prefer_safe_area_aware] Content may overlap device notch or system UI. This layout configuration can trigger RenderFlex overflow errors or unexpected visual behavior at runtime. {v4}',
+    'prefer_safe_area_aware',
+    '[prefer_safe_area_aware] Content may overlap device notch or system UI. This layout configuration can trigger RenderFlex overflow errors or unexpected visual behavior at runtime. {v4}',
     correctionMessage:
         'Wrap body content in SafeArea, or use AppBar which handles it. Test on multiple screen sizes to verify the layout adapts correctly.'
         'automatically.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addInstanceCreationExpression((
-      InstanceCreationExpression node,
-    ) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final String typeName = node.constructorName.type.name.lexeme;
       if (typeName != 'Scaffold') return;
 
@@ -4685,7 +4361,7 @@ class PreferSafeAreaAwareRule extends SaropaLintRule {
 /// Expanded(child: content);
 /// ```
 class AvoidFixedDimensionsRule extends SaropaLintRule {
-  const AvoidFixedDimensionsRule() : super(code: _code);
+  AvoidFixedDimensionsRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -4698,12 +4374,11 @@ class AvoidFixedDimensionsRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
-    name: 'avoid_fixed_dimensions',
-    problemMessage:
-        '[avoid_fixed_dimensions] Fixed pixel dimensions may not work on all screen sizes. Fixed pixel dimensions break on different screen sizes. Use responsive sizing with Flexible, Expanded, FractionallySizedBox, or constraints. {v4}',
+    'avoid_fixed_dimensions',
+    '[avoid_fixed_dimensions] Fixed pixel dimensions may not work on all screen sizes. Fixed pixel dimensions break on different screen sizes. Use responsive sizing with Flexible, Expanded, FractionallySizedBox, or constraints. {v4}',
     correctionMessage:
         'Use responsive sizing (Flexible, Expanded, FractionallySizedBox, or LayoutBuilder).',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   /// Threshold above which fixed dimensions are considered problematic.
@@ -4712,13 +4387,10 @@ class AvoidFixedDimensionsRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addInstanceCreationExpression((
-      InstanceCreationExpression node,
-    ) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final String? typeName = node.constructorName.type.element?.name;
       if (typeName != 'SizedBox' && typeName != 'Container') return;
 
@@ -4776,7 +4448,7 @@ class AvoidFixedDimensionsRule extends SaropaLintRule {
 /// Icon(Icons.home, color: Theme.of(context).colorScheme.onSurface)
 /// ```
 class AvoidAbsorbPointerMisuseRule extends SaropaLintRule {
-  const AvoidAbsorbPointerMisuseRule() : super(code: _code);
+  AvoidAbsorbPointerMisuseRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -4789,23 +4461,19 @@ class AvoidAbsorbPointerMisuseRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
-    name: 'avoid_absorb_pointer_misuse',
-    problemMessage:
-        '[avoid_absorb_pointer_misuse] AbsorbPointer blocks ALL touch events. Prefer IgnorePointer instead. This layout configuration can trigger RenderFlex overflow errors or unexpected visual behavior at runtime. {v3}',
+    'avoid_absorb_pointer_misuse',
+    '[avoid_absorb_pointer_misuse] AbsorbPointer blocks ALL touch events. Prefer IgnorePointer instead. This layout configuration can trigger RenderFlex overflow errors or unexpected visual behavior at runtime. {v3}',
     correctionMessage:
         'IgnorePointer lets events pass through; AbsorbPointer stops them completely. Test on multiple screen sizes to verify the layout adapts correctly.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addInstanceCreationExpression((
-      InstanceCreationExpression node,
-    ) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final String typeName = node.constructorName.type.name.lexeme;
       if (typeName != 'AbsorbPointer') return;
 
@@ -4835,7 +4503,7 @@ class AvoidAbsorbPointerMisuseRule extends SaropaLintRule {
 /// final bgColor = Theme.of(context).colorScheme.surface;
 /// ```
 class RequireOverflowBoxRationaleRule extends SaropaLintRule {
-  const RequireOverflowBoxRationaleRule() : super(code: _code);
+  RequireOverflowBoxRationaleRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -4848,23 +4516,19 @@ class RequireOverflowBoxRationaleRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
-    name: 'require_overflow_box_rationale',
-    problemMessage:
-        '[require_overflow_box_rationale] OverflowBox used without comment explaining why overflow is needed. This layout configuration can trigger RenderFlex overflow errors or unexpected visual behavior at runtime. {v2}',
+    'require_overflow_box_rationale',
+    '[require_overflow_box_rationale] OverflowBox used without comment explaining why overflow is needed. This layout configuration can trigger RenderFlex overflow errors or unexpected visual behavior at runtime. {v2}',
     correctionMessage:
         'Add a comment above OverflowBox explaining the intentional overflow. Test on multiple screen sizes to verify the layout adapts correctly.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addInstanceCreationExpression((
-      InstanceCreationExpression node,
-    ) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final String typeName = node.constructorName.type.name.lexeme;
 
       if (typeName != 'OverflowBox' && typeName != 'SizedOverflowBox') {
@@ -4893,38 +4557,6 @@ class RequireOverflowBoxRationaleRule extends SaropaLintRule {
       }
 
       reporter.atNode(node.constructorName, code);
-    });
-  }
-
-  @override
-  List<Fix> getFixes() => <Fix>[_AddOverflowBoxCommentFix()];
-}
-
-class _AddOverflowBoxCommentFix extends DartFix {
-  @override
-  void run(
-    CustomLintResolver resolver,
-    ChangeReporter reporter,
-    CustomLintContext context,
-    AnalysisError analysisError,
-    List<AnalysisError> others,
-  ) {
-    context.registry.addInstanceCreationExpression((
-      InstanceCreationExpression node,
-    ) {
-      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
-
-      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
-        message: 'Add HACK comment explaining overflow',
-        priority: 1,
-      );
-
-      changeBuilder.addDartFileEdit((builder) {
-        builder.addSimpleInsertion(
-          node.offset,
-          '// HACK: Explain why OverflowBox is needed here\n',
-        );
-      });
     });
   }
 }
@@ -4957,7 +4589,7 @@ class _AddOverflowBoxCommentFix extends DartFix {
 /// )
 /// ```
 class AvoidUnconstrainedImagesRule extends SaropaLintRule {
-  const AvoidUnconstrainedImagesRule() : super(code: _code);
+  AvoidUnconstrainedImagesRule() : super(code: _code);
 
   /// Layout shifts affect user experience and CLS scores.
   @override
@@ -4970,17 +4602,14 @@ class AvoidUnconstrainedImagesRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
-    name: 'avoid_unconstrained_images',
-    problemMessage:
-        '[avoid_unconstrained_images] Image without sizing constraints causes layout shifts on load. This layout configuration can trigger RenderFlex overflow errors or unexpected visual behavior at runtime. {v2}',
+    'avoid_unconstrained_images',
+    '[avoid_unconstrained_images] Image without sizing constraints causes layout shifts on load. This layout configuration can trigger RenderFlex overflow errors or unexpected visual behavior at runtime. {v2}',
     correctionMessage:
         'Add width/height, wrap in SizedBox, or use AspectRatio parent. Test on multiple screen sizes to verify the layout adapts correctly.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
-  static const Set<String> _imageTypes = <String>{
-    'Image',
-  };
+  static const Set<String> _imageTypes = <String>{'Image'};
 
   static const Set<String> _imageFactories = <String>{
     'network',
@@ -5003,13 +4632,10 @@ class AvoidUnconstrainedImagesRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addInstanceCreationExpression((
-      InstanceCreationExpression node,
-    ) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final String typeName = node.constructorName.type.name.lexeme;
 
       if (!_imageTypes.contains(typeName)) return;
@@ -5043,7 +4669,7 @@ class AvoidUnconstrainedImagesRule extends SaropaLintRule {
     });
 
     // Also check Image.network(), Image.asset() etc via method invocation
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       final Expression? target = node.target;
       if (target is! SimpleIdentifier) return;
       if (target.name != 'Image') return;
@@ -5068,7 +4694,7 @@ class AvoidUnconstrainedImagesRule extends SaropaLintRule {
       // Check for constraining parent
       if (_hasConstrainingParent(node)) return;
 
-      reporter.atNode(node, code);
+      reporter.atNode(node);
     });
   }
 
@@ -5126,7 +4752,7 @@ class AvoidUnconstrainedImagesRule extends SaropaLintRule {
 ///
 /// **Quick fix available:** Replaces with `SizedBox.square(dimension: X)`.
 class PreferSizedBoxSquareRule extends SaropaLintRule {
-  const PreferSizedBoxSquareRule() : super(code: _code);
+  PreferSizedBoxSquareRule() : super(code: _code);
 
   /// Style preference. Large counts acceptable.
   @override
@@ -5139,22 +4765,19 @@ class PreferSizedBoxSquareRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
-    name: 'prefer_sized_box_square',
-    problemMessage:
-        '[prefer_sized_box_square] Using SizedBox(width: x, height: x) instead of SizedBox.square(dimension: x) is a stylistic choice — same widget at runtime, no performance benefit. Enable via the stylistic tier. {v3}',
+    'prefer_sized_box_square',
+    '[prefer_sized_box_square] Using SizedBox(width: x, height: x) instead of SizedBox.square(dimension: x) is a stylistic choice — same widget at runtime, no performance benefit. Enable via the stylistic tier. {v3}',
     correctionMessage:
         'Replace with SizedBox.square(dimension: X) for clearer intent. Test on multiple screen sizes to verify the layout adapts correctly.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry
-        .addInstanceCreationExpression((InstanceCreationExpression node) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
       // Only check SizedBox constructors (not SizedBox.square, etc.)
       final ConstructorName constructorName = node.constructorName;
       final String typeName = constructorName.type.name.lexeme;
@@ -5182,94 +4805,9 @@ class PreferSizedBoxSquareRule extends SaropaLintRule {
 
       // Check if they are identical
       if (widthSource == heightSource) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
-  }
-
-  @override
-  List<Fix> getFixes() => <Fix>[_PreferSizedBoxSquareFix()];
-}
-
-class _PreferSizedBoxSquareFix extends DartFix {
-  @override
-  void run(
-    CustomLintResolver resolver,
-    ChangeReporter reporter,
-    CustomLintContext context,
-    AnalysisError analysisError,
-    List<AnalysisError> others,
-  ) {
-    context.registry
-        .addInstanceCreationExpression((InstanceCreationExpression node) {
-      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
-
-      final ConstructorName constructorName = node.constructorName;
-      final String typeName = constructorName.type.name.lexeme;
-      if (typeName != 'SizedBox') return;
-      if (constructorName.name != null) return;
-
-      String? dimensionSource;
-      String? keySource;
-
-      for (final Expression arg in node.argumentList.arguments) {
-        if (arg is NamedExpression) {
-          final String name = arg.name.label.name;
-          if (name == 'width') {
-            dimensionSource = arg.expression.toSource();
-          } else if (name == 'key') {
-            keySource = arg.expression.toSource();
-          }
-        }
-      }
-
-      if (dimensionSource == null) return;
-
-      // Check for const context
-      final bool hasConst =
-          node.keyword?.lexeme == 'const' || _isInConstContext(node);
-      final String constPrefix = hasConst ? 'const ' : '';
-
-      // Build replacement
-      final StringBuffer replacement = StringBuffer();
-      replacement.write('${constPrefix}SizedBox.square(');
-
-      final List<String> args = <String>[];
-      if (keySource != null) args.add('key: $keySource');
-      args.add('dimension: $dimensionSource');
-      replacement.write(args.join(', '));
-      replacement.write(')');
-
-      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
-        message: 'Replace with SizedBox.square',
-        priority: 1,
-      );
-
-      changeBuilder.addDartFileEdit((builder) {
-        builder.addSimpleReplacement(
-          node.sourceRange,
-          replacement.toString(),
-        );
-      });
-    });
-  }
-
-  bool _isInConstContext(AstNode node) {
-    AstNode? current = node.parent;
-    while (current != null) {
-      if (current is InstanceCreationExpression &&
-          current.keyword?.lexeme == 'const') {
-        return true;
-      }
-      if (current is ListLiteral && current.constKeyword != null) {
-        return true;
-      }
-      if (current is SetOrMapLiteral && current.constKeyword != null) {
-        return true;
-      }
-      current = current.parent;
-    }
-    return false;
   }
 }
 
@@ -5299,7 +4837,7 @@ class _PreferSizedBoxSquareFix extends DartFix {
 ///
 /// **Quick fix available:** Replaces with `Center(child: ...)`.
 class PreferCenterOverAlignRule extends SaropaLintRule {
-  const PreferCenterOverAlignRule() : super(code: _code);
+  PreferCenterOverAlignRule() : super(code: _code);
 
   /// Style preference. Large counts acceptable.
   @override
@@ -5312,22 +4850,19 @@ class PreferCenterOverAlignRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
-    name: 'prefer_center_over_align',
-    problemMessage:
-        '[prefer_center_over_align] Center is identical to Align(alignment: Alignment.center) at runtime — same class, same behavior. Purely stylistic preference with no performance benefit. Enable via the stylistic tier. {v3}',
+    'prefer_center_over_align',
+    '[prefer_center_over_align] Center is identical to Align(alignment: Alignment.center) at runtime — same class, same behavior. Purely stylistic preference with no performance benefit. Enable via the stylistic tier. {v3}',
     correctionMessage:
         'Replace with Center(child: ..) for clearer intent. Test on multiple screen sizes to verify the layout adapts correctly.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry
-        .addInstanceCreationExpression((InstanceCreationExpression node) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final String typeName = node.constructorName.type.name.lexeme;
       if (typeName != 'Align') return;
 
@@ -5338,106 +4873,13 @@ class PreferCenterOverAlignRule extends SaropaLintRule {
           if (name == 'alignment') {
             final String alignmentSource = arg.expression.toSource();
             if (alignmentSource == 'Alignment.center') {
-              reporter.atNode(node, code);
+              reporter.atNode(node);
               return;
             }
           }
         }
       }
     });
-  }
-
-  @override
-  List<Fix> getFixes() => <Fix>[_PreferCenterOverAlignFix()];
-}
-
-class _PreferCenterOverAlignFix extends DartFix {
-  @override
-  void run(
-    CustomLintResolver resolver,
-    ChangeReporter reporter,
-    CustomLintContext context,
-    AnalysisError analysisError,
-    List<AnalysisError> others,
-  ) {
-    context.registry
-        .addInstanceCreationExpression((InstanceCreationExpression node) {
-      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
-
-      final String typeName = node.constructorName.type.name.lexeme;
-      if (typeName != 'Align') return;
-
-      String? childSource;
-      String? keySource;
-      String? widthFactorSource;
-      String? heightFactorSource;
-
-      for (final Expression arg in node.argumentList.arguments) {
-        if (arg is NamedExpression) {
-          final String name = arg.name.label.name;
-          if (name == 'child') {
-            childSource = arg.expression.toSource();
-          } else if (name == 'key') {
-            keySource = arg.expression.toSource();
-          } else if (name == 'widthFactor') {
-            widthFactorSource = arg.expression.toSource();
-          } else if (name == 'heightFactor') {
-            heightFactorSource = arg.expression.toSource();
-          }
-        }
-      }
-
-      // Check for const context
-      final bool hasConst =
-          node.keyword?.lexeme == 'const' || _isInConstContext(node);
-      final String constPrefix = hasConst ? 'const ' : '';
-
-      // Build replacement
-      final StringBuffer replacement = StringBuffer();
-      replacement.write('${constPrefix}Center(');
-
-      final List<String> args = <String>[];
-      if (keySource != null) args.add('key: $keySource');
-      if (widthFactorSource != null) {
-        args.add('widthFactor: $widthFactorSource');
-      }
-      if (heightFactorSource != null) {
-        args.add('heightFactor: $heightFactorSource');
-      }
-      if (childSource != null) args.add('child: $childSource');
-      replacement.write(args.join(', '));
-      replacement.write(')');
-
-      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
-        message: 'Replace with Center',
-        priority: 1,
-      );
-
-      changeBuilder.addDartFileEdit((builder) {
-        builder.addSimpleReplacement(
-          node.sourceRange,
-          replacement.toString(),
-        );
-      });
-    });
-  }
-
-  bool _isInConstContext(AstNode node) {
-    AstNode? current = node.parent;
-    while (current != null) {
-      if (current is InstanceCreationExpression &&
-          current.keyword?.lexeme == 'const') {
-        return true;
-      }
-      if (current is ListLiteral && current.constKeyword != null) {
-        return true;
-      }
-      if (current is SetOrMapLiteral && current.constKeyword != null) {
-        return true;
-      }
-      current = current.parent;
-    }
-    return false;
   }
 }
 
@@ -5468,7 +4910,7 @@ class _PreferCenterOverAlignFix extends DartFix {
 ///
 /// **Quick fix available:** Replaces with `Align(alignment: ..., child: ...)`.
 class PreferAlignOverContainerRule extends SaropaLintRule {
-  const PreferAlignOverContainerRule() : super(code: _code);
+  PreferAlignOverContainerRule() : super(code: _code);
 
   /// Style preference. Large counts acceptable.
   @override
@@ -5481,22 +4923,19 @@ class PreferAlignOverContainerRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
-    name: 'prefer_align_over_container',
-    problemMessage:
-        '[prefer_align_over_container] Container with only alignment creates unnecessary intermediate widgets. Align is a single-purpose widget with fewer allocations and faster layout computation. {v4}',
+    'prefer_align_over_container',
+    '[prefer_align_over_container] Container with only alignment creates unnecessary intermediate widgets. Align is a single-purpose widget with fewer allocations and faster layout computation. {v4}',
     correctionMessage:
         'Replace with Align(alignment: .., child: ..) for clearer intent. Test on multiple screen sizes to verify the layout adapts correctly.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry
-        .addInstanceCreationExpression((InstanceCreationExpression node) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final String typeName = node.constructorName.type.name.lexeme;
       if (typeName != 'Container') return;
 
@@ -5523,96 +4962,9 @@ class PreferAlignOverContainerRule extends SaropaLintRule {
 
       // Report if Container only has alignment (+ optional key and child)
       if (hasAlignment && !hasOtherArgs) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
-  }
-
-  @override
-  List<Fix> getFixes() => <Fix>[_PreferAlignOverContainerFix()];
-}
-
-class _PreferAlignOverContainerFix extends DartFix {
-  @override
-  void run(
-    CustomLintResolver resolver,
-    ChangeReporter reporter,
-    CustomLintContext context,
-    AnalysisError analysisError,
-    List<AnalysisError> others,
-  ) {
-    context.registry
-        .addInstanceCreationExpression((InstanceCreationExpression node) {
-      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
-
-      final String typeName = node.constructorName.type.name.lexeme;
-      if (typeName != 'Container') return;
-
-      String? alignmentSource;
-      String? childSource;
-      String? keySource;
-
-      for (final Expression arg in node.argumentList.arguments) {
-        if (arg is NamedExpression) {
-          final String name = arg.name.label.name;
-          if (name == 'alignment') {
-            alignmentSource = arg.expression.toSource();
-          } else if (name == 'child') {
-            childSource = arg.expression.toSource();
-          } else if (name == 'key') {
-            keySource = arg.expression.toSource();
-          }
-        }
-      }
-
-      if (alignmentSource == null) return;
-
-      // Check for const context
-      final bool hasConst =
-          node.keyword?.lexeme == 'const' || _isInConstContext(node);
-      final String constPrefix = hasConst ? 'const ' : '';
-
-      // Build replacement
-      final StringBuffer replacement = StringBuffer();
-      replacement.write('${constPrefix}Align(');
-
-      final List<String> args = <String>[];
-      if (keySource != null) args.add('key: $keySource');
-      args.add('alignment: $alignmentSource');
-      if (childSource != null) args.add('child: $childSource');
-      replacement.write(args.join(', '));
-      replacement.write(')');
-
-      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
-        message: 'Replace with Align',
-        priority: 1,
-      );
-
-      changeBuilder.addDartFileEdit((builder) {
-        builder.addSimpleReplacement(
-          node.sourceRange,
-          replacement.toString(),
-        );
-      });
-    });
-  }
-
-  bool _isInConstContext(AstNode node) {
-    AstNode? current = node.parent;
-    while (current != null) {
-      if (current is InstanceCreationExpression &&
-          current.keyword?.lexeme == 'const') {
-        return true;
-      }
-      if (current is ListLiteral && current.constKeyword != null) {
-        return true;
-      }
-      if (current is SetOrMapLiteral && current.constKeyword != null) {
-        return true;
-      }
-      current = current.parent;
-    }
-    return false;
   }
 }
 
@@ -5643,7 +4995,7 @@ class _PreferAlignOverContainerFix extends DartFix {
 ///
 /// **Quick fix available:** Replaces with `Padding(padding: ..., child: ...)`.
 class PreferPaddingOverContainerRule extends SaropaLintRule {
-  const PreferPaddingOverContainerRule() : super(code: _code);
+  PreferPaddingOverContainerRule() : super(code: _code);
 
   /// Style preference. Large counts acceptable.
   @override
@@ -5656,22 +5008,19 @@ class PreferPaddingOverContainerRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
-    name: 'prefer_padding_over_container',
-    problemMessage:
-        '[prefer_padding_over_container] Container with only padding creates unnecessary intermediate widgets (DecoratedBox, ConstrainedBox). Padding is a single-purpose widget with fewer allocations and faster layout. {v4}',
+    'prefer_padding_over_container',
+    '[prefer_padding_over_container] Container with only padding creates unnecessary intermediate widgets (DecoratedBox, ConstrainedBox). Padding is a single-purpose widget with fewer allocations and faster layout. {v4}',
     correctionMessage:
         'Replace with Padding(padding: .., child: ..) for clearer intent. Test on multiple screen sizes to verify the layout adapts correctly.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry
-        .addInstanceCreationExpression((InstanceCreationExpression node) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final String typeName = node.constructorName.type.name.lexeme;
       if (typeName != 'Container') return;
 
@@ -5698,96 +5047,9 @@ class PreferPaddingOverContainerRule extends SaropaLintRule {
 
       // Report if Container only has padding (+ optional key and child)
       if (hasPadding && !hasOtherArgs) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
-  }
-
-  @override
-  List<Fix> getFixes() => <Fix>[_PreferPaddingOverContainerFix()];
-}
-
-class _PreferPaddingOverContainerFix extends DartFix {
-  @override
-  void run(
-    CustomLintResolver resolver,
-    ChangeReporter reporter,
-    CustomLintContext context,
-    AnalysisError analysisError,
-    List<AnalysisError> others,
-  ) {
-    context.registry
-        .addInstanceCreationExpression((InstanceCreationExpression node) {
-      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
-
-      final String typeName = node.constructorName.type.name.lexeme;
-      if (typeName != 'Container') return;
-
-      String? paddingSource;
-      String? childSource;
-      String? keySource;
-
-      for (final Expression arg in node.argumentList.arguments) {
-        if (arg is NamedExpression) {
-          final String name = arg.name.label.name;
-          if (name == 'padding') {
-            paddingSource = arg.expression.toSource();
-          } else if (name == 'child') {
-            childSource = arg.expression.toSource();
-          } else if (name == 'key') {
-            keySource = arg.expression.toSource();
-          }
-        }
-      }
-
-      if (paddingSource == null) return;
-
-      // Check for const context
-      final bool hasConst =
-          node.keyword?.lexeme == 'const' || _isInConstContext(node);
-      final String constPrefix = hasConst ? 'const ' : '';
-
-      // Build replacement
-      final StringBuffer replacement = StringBuffer();
-      replacement.write('${constPrefix}Padding(');
-
-      final List<String> args = <String>[];
-      if (keySource != null) args.add('key: $keySource');
-      args.add('padding: $paddingSource');
-      if (childSource != null) args.add('child: $childSource');
-      replacement.write(args.join(', '));
-      replacement.write(')');
-
-      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
-        message: 'Replace with Padding',
-        priority: 1,
-      );
-
-      changeBuilder.addDartFileEdit((builder) {
-        builder.addSimpleReplacement(
-          node.sourceRange,
-          replacement.toString(),
-        );
-      });
-    });
-  }
-
-  bool _isInConstContext(AstNode node) {
-    AstNode? current = node.parent;
-    while (current != null) {
-      if (current is InstanceCreationExpression &&
-          current.keyword?.lexeme == 'const') {
-        return true;
-      }
-      if (current is ListLiteral && current.constKeyword != null) {
-        return true;
-      }
-      if (current is SetOrMapLiteral && current.constKeyword != null) {
-        return true;
-      }
-      current = current.parent;
-    }
-    return false;
   }
 }
 
@@ -5816,7 +5078,7 @@ class _PreferPaddingOverContainerFix extends DartFix {
 ///
 /// **Quick fix available:** Replaces with `ConstrainedBox(constraints: ..., child: ...)`.
 class PreferConstrainedBoxOverContainerRule extends SaropaLintRule {
-  const PreferConstrainedBoxOverContainerRule() : super(code: _code);
+  PreferConstrainedBoxOverContainerRule() : super(code: _code);
 
   /// Style preference. Large counts acceptable.
   @override
@@ -5829,22 +5091,19 @@ class PreferConstrainedBoxOverContainerRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
-    name: 'prefer_constrained_box_over_container',
-    problemMessage:
-        '[prefer_constrained_box_over_container] Container with only constraints should use ConstrainedBox instead. Use ConstrainedBox widget when Container is only used for constraints. This makes the intent clearer and is more efficient. {v3}',
+    'prefer_constrained_box_over_container',
+    '[prefer_constrained_box_over_container] Container with only constraints should use ConstrainedBox instead. Use ConstrainedBox widget when Container is only used for constraints. This makes the intent clearer and is more efficient. {v3}',
     correctionMessage:
         'Replace with ConstrainedBox(constraints: ..) for clearer intent. Test on multiple screen sizes to verify the layout adapts correctly.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry
-        .addInstanceCreationExpression((InstanceCreationExpression node) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final String typeName = node.constructorName.type.name.lexeme;
       if (typeName != 'Container') return;
 
@@ -5871,96 +5130,9 @@ class PreferConstrainedBoxOverContainerRule extends SaropaLintRule {
 
       // Report if Container only has constraints (+ optional key and child)
       if (hasConstraints && !hasOtherArgs) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
-  }
-
-  @override
-  List<Fix> getFixes() => <Fix>[_PreferConstrainedBoxOverContainerFix()];
-}
-
-class _PreferConstrainedBoxOverContainerFix extends DartFix {
-  @override
-  void run(
-    CustomLintResolver resolver,
-    ChangeReporter reporter,
-    CustomLintContext context,
-    AnalysisError analysisError,
-    List<AnalysisError> others,
-  ) {
-    context.registry
-        .addInstanceCreationExpression((InstanceCreationExpression node) {
-      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
-
-      final String typeName = node.constructorName.type.name.lexeme;
-      if (typeName != 'Container') return;
-
-      String? constraintsSource;
-      String? childSource;
-      String? keySource;
-
-      for (final Expression arg in node.argumentList.arguments) {
-        if (arg is NamedExpression) {
-          final String name = arg.name.label.name;
-          if (name == 'constraints') {
-            constraintsSource = arg.expression.toSource();
-          } else if (name == 'child') {
-            childSource = arg.expression.toSource();
-          } else if (name == 'key') {
-            keySource = arg.expression.toSource();
-          }
-        }
-      }
-
-      if (constraintsSource == null) return;
-
-      // Check for const context
-      final bool hasConst =
-          node.keyword?.lexeme == 'const' || _isInConstContext(node);
-      final String constPrefix = hasConst ? 'const ' : '';
-
-      // Build replacement
-      final StringBuffer replacement = StringBuffer();
-      replacement.write('${constPrefix}ConstrainedBox(');
-
-      final List<String> args = <String>[];
-      if (keySource != null) args.add('key: $keySource');
-      args.add('constraints: $constraintsSource');
-      if (childSource != null) args.add('child: $childSource');
-      replacement.write(args.join(', '));
-      replacement.write(')');
-
-      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
-        message: 'Replace with ConstrainedBox',
-        priority: 1,
-      );
-
-      changeBuilder.addDartFileEdit((builder) {
-        builder.addSimpleReplacement(
-          node.sourceRange,
-          replacement.toString(),
-        );
-      });
-    });
-  }
-
-  bool _isInConstContext(AstNode node) {
-    AstNode? current = node.parent;
-    while (current != null) {
-      if (current is InstanceCreationExpression &&
-          current.keyword?.lexeme == 'const') {
-        return true;
-      }
-      if (current is ListLiteral && current.constKeyword != null) {
-        return true;
-      }
-      if (current is SetOrMapLiteral && current.constKeyword != null) {
-        return true;
-      }
-      current = current.parent;
-    }
-    return false;
   }
 }
 
@@ -5989,7 +5161,7 @@ class _PreferConstrainedBoxOverContainerFix extends DartFix {
 /// )
 /// ```
 class PreferTransformOverContainerRule extends SaropaLintRule {
-  const PreferTransformOverContainerRule() : super(code: _code);
+  PreferTransformOverContainerRule() : super(code: _code);
 
   /// Code quality improvement.
   @override
@@ -6002,22 +5174,19 @@ class PreferTransformOverContainerRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
-    name: 'prefer_transform_over_container',
-    problemMessage:
-        '[prefer_transform_over_container] Container with only transform must be a Transform. When Container only has a transform property, use Transform widget instead to improve semantics and performance. {v2}',
+    'prefer_transform_over_container',
+    '[prefer_transform_over_container] Container with only transform must be a Transform. When Container only has a transform property, use Transform widget instead to improve semantics and performance. {v2}',
     correctionMessage:
         'Use Transform widget for transform-only containers. Test on multiple screen sizes to verify the layout adapts correctly.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry
-        .addInstanceCreationExpression((InstanceCreationExpression node) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final String typeName = node.constructorName.type.name.lexeme;
       if (typeName != 'Container') return;
 
@@ -6039,7 +5208,7 @@ class PreferTransformOverContainerRule extends SaropaLintRule {
       }
 
       if (hasTransform && !hasOtherProperties) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
   }
@@ -6071,7 +5240,7 @@ class PreferTransformOverContainerRule extends SaropaLintRule {
 /// )
 /// ```
 class RequirePhysicsForNestedScrollRule extends SaropaLintRule {
-  const RequirePhysicsForNestedScrollRule() : super(code: _code);
+  RequirePhysicsForNestedScrollRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.medium;
@@ -6083,12 +5252,11 @@ class RequirePhysicsForNestedScrollRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
-    name: 'require_physics_for_nested_scroll',
-    problemMessage:
-        '[require_physics_for_nested_scroll] Nested scrollable widget lacks NeverScrollableScrollPhysics, causing competing scroll gestures between parent and child. This produces unpredictable scroll behavior, jank, and a confusing user experience where swipes affect the wrong scrollable. {v3}',
+    'require_physics_for_nested_scroll',
+    '[require_physics_for_nested_scroll] Nested scrollable widget lacks NeverScrollableScrollPhysics, causing competing scroll gestures between parent and child. This produces unpredictable scroll behavior, jank, and a confusing user experience where swipes affect the wrong scrollable. {v3}',
     correctionMessage:
         'Add physics: NeverScrollableScrollPhysics() to the inner scrollable so only the parent scrollable responds to user gestures.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   static const Set<String> _scrollableTypes = <String>{
@@ -6101,12 +5269,10 @@ class RequirePhysicsForNestedScrollRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry
-        .addInstanceCreationExpression((InstanceCreationExpression node) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final typeName = node.constructorName.type.name.lexeme;
       if (!_scrollableTypes.contains(typeName)) return;
 
@@ -6172,7 +5338,7 @@ class RequirePhysicsForNestedScrollRule extends SaropaLintRule {
 /// )
 /// ```
 class AvoidStackWithoutPositionedRule extends SaropaLintRule {
-  const AvoidStackWithoutPositionedRule() : super(code: _code);
+  AvoidStackWithoutPositionedRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -6185,12 +5351,11 @@ class AvoidStackWithoutPositionedRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
-    name: 'avoid_stack_without_positioned',
-    problemMessage:
-        '[avoid_stack_without_positioned] Stack child without Positioned. Layout may be unexpected. Non-first Stack children without explicit positioning use the Stack\'s default alignment, which may produce unexpected overlap. The first child is skipped because it typically defines the Stack\'s base size. {v2}',
+    'avoid_stack_without_positioned',
+    '[avoid_stack_without_positioned] Stack child without Positioned. Layout may be unexpected. Non-first Stack children without explicit positioning use the Stack\'s default alignment, which may produce unexpected overlap. The first child is skipped because it typically defines the Stack\'s base size. {v2}',
     correctionMessage:
         'Wrap child in Positioned to explicitly control its position. Test on multiple screen sizes to verify the layout adapts correctly.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   static const Set<String> _positionedTypes = <String>{
@@ -6203,13 +5368,10 @@ class AvoidStackWithoutPositionedRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addInstanceCreationExpression((
-      InstanceCreationExpression node,
-    ) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final String typeName = node.constructorName.type.name.lexeme;
       if (typeName != 'Stack') return;
 
@@ -6255,7 +5417,7 @@ class AvoidStackWithoutPositionedRule extends SaropaLintRule {
       return;
     }
 
-    reporter.atNode(child, code);
+    reporter.atNode(child);
   }
 }
 
@@ -6352,7 +5514,7 @@ class AvoidStackWithoutPositionedRule extends SaropaLintRule {
 /// definitions. This makes the flex behavior explicit and avoids crashes
 /// when the widget is wrapped with Padding, GestureDetector, etc.
 class AvoidExpandedOutsideFlexRule extends SaropaLintRule {
-  const AvoidExpandedOutsideFlexRule() : super(code: _code);
+  AvoidExpandedOutsideFlexRule() : super(code: _code);
 
   /// Expanded/Flexible outside Flex causes runtime crash.
   @override
@@ -6365,9 +5527,8 @@ class AvoidExpandedOutsideFlexRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
-    name: 'avoid_expanded_outside_flex',
-    problemMessage:
-        '[avoid_expanded_outside_flex] Expanded, Flexible, and Spacer set '
+    'avoid_expanded_outside_flex',
+    '[avoid_expanded_outside_flex] Expanded, Flexible, and Spacer set '
         'FlexParentData on their child, which only RenderFlex (Row, Column, '
         'Flex) can read during layout. Placing them inside any other parent '
         '— Stack, Center, Padding, LimitedBox, SizedBox, etc. — throws an '
@@ -6380,14 +5541,10 @@ class AvoidExpandedOutsideFlexRule extends SaropaLintRule {
         'Column, or Flex. If a reusable widget needs to expand, remove '
         'Expanded from its build() method and let the caller wrap it at '
         'the call site where the Flex parent is visible.',
-    errorSeverity: DiagnosticSeverity.ERROR,
+    severity: DiagnosticSeverity.ERROR,
   );
 
-  static const Set<String> _flexTypes = <String>{
-    'Row',
-    'Column',
-    'Flex',
-  };
+  static const Set<String> _flexTypes = <String>{'Row', 'Column', 'Flex'};
 
   static const Set<String> _flexChildTypes = <String>{
     'Expanded',
@@ -6397,13 +5554,10 @@ class AvoidExpandedOutsideFlexRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addInstanceCreationExpression((
-      InstanceCreationExpression node,
-    ) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final String typeName = node.constructorName.type.name.lexeme;
       if (!_flexChildTypes.contains(typeName)) return;
 
@@ -6557,7 +5711,7 @@ class AvoidExpandedOutsideFlexRule extends SaropaLintRule {
 /// Use `// ignore: prefer_expanded_at_call_site` if the widget is intentionally
 /// designed to always be a direct Flex child and will never be wrapped.
 class PreferExpandedAtCallSiteRule extends SaropaLintRule {
-  const PreferExpandedAtCallSiteRule() : super(code: _code);
+  PreferExpandedAtCallSiteRule() : super(code: _code);
 
   /// Expanded/Flexible/Spacer in build() causes runtime crash if misused.
   @override
@@ -6570,14 +5724,13 @@ class PreferExpandedAtCallSiteRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => <FileType>{FileType.widget};
 
   static const LintCode _code = LintCode(
-    name: 'prefer_expanded_at_call_site',
-    problemMessage:
-        '[prefer_expanded_at_call_site] Expanded/Flexible/Spacer returned from build() forces flex layout on all callers, breaking reuse in non-flex contexts. '
+    'prefer_expanded_at_call_site',
+    '[prefer_expanded_at_call_site] Expanded/Flexible/Spacer returned from build() forces flex layout on all callers, breaking reuse in non-flex contexts. '
         'If this widget is placed inside a Stack, SingleChildScrollView, or any non-flex parent, the Expanded wrapper triggers a runtime ParentDataWidget error and crashes the app. {v4}',
     correctionMessage:
         'Return the child widget directly and let the caller wrap with Expanded or Flexible as needed. '
         'This keeps the widget reusable in any layout context (Row, Column, Stack, etc.) and follows the principle of letting the parent control how its children are sized and positioned.',
-    errorSeverity: DiagnosticSeverity.ERROR,
+    severity: DiagnosticSeverity.ERROR,
   );
 
   static const Set<String> _flexChildTypes = <String>{
@@ -6585,17 +5738,12 @@ class PreferExpandedAtCallSiteRule extends SaropaLintRule {
     'Flexible',
     'Spacer',
   };
-
-  @override
-  List<Fix> getFixes() => <Fix>[_PreferExpandedAtCallSiteFix()];
-
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodDeclaration((MethodDeclaration node) {
+    context.addMethodDeclaration((MethodDeclaration node) {
       // Only check build() methods
       if (node.name.lexeme != 'build') return;
 
@@ -6670,52 +5818,6 @@ class PreferExpandedAtCallSiteRule extends SaropaLintRule {
 ///
 /// Unwraps the Expanded/Flexible and returns the child directly.
 /// For Spacer (no child argument), no fix is offered.
-class _PreferExpandedAtCallSiteFix extends DartFix {
-  @override
-  void run(
-    CustomLintResolver resolver,
-    ChangeReporter reporter,
-    CustomLintContext context,
-    AnalysisError analysisError,
-    List<AnalysisError> others,
-  ) {
-    context.registry.addInstanceCreationExpression((
-      InstanceCreationExpression node,
-    ) {
-      if (!analysisError.sourceRange.intersects(
-        node.constructorName.sourceRange,
-      )) {
-        return;
-      }
-
-      final Expression? childExpr = _extractChild(node);
-      if (childExpr == null) return;
-
-      final String typeName = node.constructorName.type.name.lexeme;
-      final changeBuilder = reporter.createChangeBuilder(
-        message: 'Unwrap $typeName — return child directly',
-        priority: 80,
-      );
-
-      changeBuilder.addDartFileEdit((builder) {
-        builder.addSimpleReplacement(
-          node.sourceRange,
-          childExpr.toSource(),
-        );
-      });
-    });
-  }
-
-  /// Extracts the `child` argument expression from a constructor call.
-  Expression? _extractChild(InstanceCreationExpression node) {
-    for (final Expression arg in node.argumentList.arguments) {
-      if (arg is NamedExpression && arg.name.label.name == 'child') {
-        return arg.expression;
-      }
-    }
-    return null;
-  }
-}
 
 // =============================================================================
 // NEW RULES v2.3.11
@@ -6758,7 +5860,7 @@ class _PreferExpandedAtCallSiteFix extends DartFix {
 /// you've ensured the lists are synchronized. The lint cannot detect cross-method
 /// relationships like `List.generate(otherList.length, ...)`.
 class AvoidBuilderIndexOutOfBoundsRule extends SaropaLintRule {
-  const AvoidBuilderIndexOutOfBoundsRule() : super(code: _code);
+  AvoidBuilderIndexOutOfBoundsRule() : super(code: _code);
 
   /// Index out of bounds crashes the app.
   @override
@@ -6771,12 +5873,11 @@ class AvoidBuilderIndexOutOfBoundsRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
-    name: 'avoid_builder_index_out_of_bounds',
-    problemMessage:
-        '[avoid_builder_index_out_of_bounds] itemBuilder accesses list without bounds check. If the index is out of bounds due to list changes, this will cause runtime exceptions, app crashes, and unpredictable UI behavior. This is a common source of production bugs in dynamic lists and can lead to negative user reviews. {v6}',
+    'avoid_builder_index_out_of_bounds',
+    '[avoid_builder_index_out_of_bounds] itemBuilder accesses list without bounds check. If the index is out of bounds due to list changes, this will cause runtime exceptions, app crashes, and unpredictable UI behavior. This is a common source of production bugs in dynamic lists and can lead to negative user reviews. {v6}',
     correctionMessage:
         'Add bounds check: if (index >= items.length) return a fallback widget or null. Always validate index before accessing list elements in itemBuilder. Add tests for edge cases and dynamic list updates.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   // Matches: items[index], data[i], _list[index], widget.items[index]
@@ -6787,11 +5888,10 @@ class AvoidBuilderIndexOutOfBoundsRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addNamedExpression((NamedExpression node) {
+    context.addNamedExpression((NamedExpression node) {
       if (node.name.label.name != 'itemBuilder') return;
 
       final Expression builderExpr = node.expression;
@@ -6801,8 +5901,9 @@ class AvoidBuilderIndexOutOfBoundsRule extends SaropaLintRule {
       final String bodySource = body.toSource();
 
       // Extract all list variables being accessed with [index] or [i]
-      final Iterable<RegExpMatch> matches =
-          _indexAccessPattern.allMatches(bodySource);
+      final Iterable<RegExpMatch> matches = _indexAccessPattern.allMatches(
+        bodySource,
+      );
       if (matches.isEmpty) return;
 
       // Get unique list names being accessed
@@ -6822,7 +5923,7 @@ class AvoidBuilderIndexOutOfBoundsRule extends SaropaLintRule {
         if (itemCountBoundLists.contains(listName)) continue;
 
         if (!_hasBoundsCheckForList(bodySource, listName)) {
-          reporter.atNode(node, code);
+          reporter.atNode(node);
           return; // Report once per itemBuilder
         }
       }
@@ -6840,14 +5941,16 @@ class AvoidBuilderIndexOutOfBoundsRule extends SaropaLintRule {
   bool _hasBoundsCheckForList(String bodySource, String listName) {
     // Check for: listName.length with comparison
     // Patterns: index >= list.length, index < list.length, list.length > index
-    final bool hasLengthCheck = bodySource.contains('$listName.length') &&
+    final bool hasLengthCheck =
+        bodySource.contains('$listName.length') &&
         (bodySource.contains('>=') ||
             bodySource.contains('>') ||
             bodySource.contains('<') ||
             bodySource.contains('<='));
 
     // Check for: listName.isEmpty or listName.isNotEmpty
-    final bool hasEmptyCheck = bodySource.contains('$listName.isEmpty') ||
+    final bool hasEmptyCheck =
+        bodySource.contains('$listName.isEmpty') ||
         bodySource.contains('$listName.isNotEmpty');
 
     return hasLengthCheck || hasEmptyCheck;
@@ -6912,7 +6015,7 @@ class AvoidBuilderIndexOutOfBoundsRule extends SaropaLintRule {
 /// }
 /// ```
 class PreferCustomSingleChildLayoutRule extends SaropaLintRule {
-  const PreferCustomSingleChildLayoutRule() : super(code: _code);
+  PreferCustomSingleChildLayoutRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.low;
@@ -6924,12 +6027,11 @@ class PreferCustomSingleChildLayoutRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
-    name: 'prefer_custom_single_child_layout',
-    problemMessage:
-        '[prefer_custom_single_child_layout] Deeply nested positioning widgets. Prefer CustomSingleChildLayout. This layout configuration can trigger RenderFlex overflow errors or unexpected visual behavior at runtime. {v2}',
+    'prefer_custom_single_child_layout',
+    '[prefer_custom_single_child_layout] Deeply nested positioning widgets. Prefer CustomSingleChildLayout. This layout configuration can trigger RenderFlex overflow errors or unexpected visual behavior at runtime. {v2}',
     correctionMessage:
         'Use CustomSingleChildLayout with a delegate for complex single-child positioning.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   static const Set<String> _positioningWidgets = {
@@ -6944,12 +6046,10 @@ class PreferCustomSingleChildLayoutRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry
-        .addInstanceCreationExpression((InstanceCreationExpression node) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final String widgetName = node.constructorName.type.name2.lexeme;
 
       if (!_positioningWidgets.contains(widgetName)) return;
@@ -6968,7 +6068,7 @@ class PreferCustomSingleChildLayoutRule extends SaropaLintRule {
       }
 
       if (depth >= _nestingThreshold) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
   }
@@ -7152,7 +6252,7 @@ bool _isSubtypeOfAny(DartType? type, Set<String> targetNames) {
 /// Table(children: [TableRow(children: [TableCell(child: Text('x'))])])
 /// ```
 class AvoidTableCellOutsideTableRule extends SaropaLintRule {
-  const AvoidTableCellOutsideTableRule() : super(code: _code);
+  AvoidTableCellOutsideTableRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.critical;
@@ -7164,24 +6264,20 @@ class AvoidTableCellOutsideTableRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
-    name: 'avoid_table_cell_outside_table',
-    problemMessage:
-        '[avoid_table_cell_outside_table] TableCell used outside of a '
+    'avoid_table_cell_outside_table',
+    '[avoid_table_cell_outside_table] TableCell used outside of a '
         'Table widget. This causes a ParentData crash at runtime. {v4}',
     correctionMessage:
         'Place TableCell inside a TableRow within a Table widget.',
-    errorSeverity: DiagnosticSeverity.ERROR,
+    severity: DiagnosticSeverity.ERROR,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addInstanceCreationExpression((
-      InstanceCreationExpression node,
-    ) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final String typeName = node.constructorName.type.name.lexeme;
       if (typeName != 'TableCell') return;
 
@@ -7222,7 +6318,7 @@ class AvoidTableCellOutsideTableRule extends SaropaLintRule {
 /// Stack(children: [Positioned(top: 10, child: Text('x'))])
 /// ```
 class AvoidPositionedOutsideStackRule extends SaropaLintRule {
-  const AvoidPositionedOutsideStackRule() : super(code: _code);
+  AvoidPositionedOutsideStackRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.critical;
@@ -7234,13 +6330,12 @@ class AvoidPositionedOutsideStackRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
-    name: 'avoid_positioned_outside_stack',
-    problemMessage:
-        '[avoid_positioned_outside_stack] Positioned widget used outside '
+    'avoid_positioned_outside_stack',
+    '[avoid_positioned_outside_stack] Positioned widget used outside '
         'of a Stack. This causes a ParentData crash at runtime. {v5}',
     correctionMessage:
         'Place Positioned widgets only inside a Stack or Stack subclass.',
-    errorSeverity: DiagnosticSeverity.ERROR,
+    severity: DiagnosticSeverity.ERROR,
   );
 
   static const Set<String> _positionedTypes = <String>{
@@ -7251,13 +6346,10 @@ class AvoidPositionedOutsideStackRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addInstanceCreationExpression((
-      InstanceCreationExpression node,
-    ) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final String typeName = node.constructorName.type.name.lexeme;
       if (!_positionedTypes.contains(typeName)) return;
 
@@ -7296,7 +6388,7 @@ class AvoidPositionedOutsideStackRule extends SaropaLintRule {
 /// Wrap(children: [Text('a'), SizedBox(width: 8), Text('b')])
 /// ```
 class AvoidSpacerInWrapRule extends SaropaLintRule {
-  const AvoidSpacerInWrapRule() : super(code: _code);
+  AvoidSpacerInWrapRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.critical;
@@ -7308,12 +6400,11 @@ class AvoidSpacerInWrapRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
-    name: 'avoid_spacer_in_wrap',
-    problemMessage:
-        '[avoid_spacer_in_wrap] Spacer/Expanded inside Wrap causes a '
+    'avoid_spacer_in_wrap',
+    '[avoid_spacer_in_wrap] Spacer/Expanded inside Wrap causes a '
         'flex paradox crash. Wrap does not support flex-based sizing. {v3}',
     correctionMessage: 'Use SizedBox or Padding for spacing inside Wrap.',
-    errorSeverity: DiagnosticSeverity.ERROR,
+    severity: DiagnosticSeverity.ERROR,
   );
 
   static const Set<String> _triggerWidgets = <String>{
@@ -7330,13 +6421,10 @@ class AvoidSpacerInWrapRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addInstanceCreationExpression((
-      InstanceCreationExpression node,
-    ) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final String typeName = node.constructorName.type.name.lexeme;
       if (!_triggerWidgets.contains(typeName)) return;
 
@@ -7378,7 +6466,7 @@ class AvoidSpacerInWrapRule extends SaropaLintRule {
 /// SizedBox(height: 200, child: ListView(...))
 /// ```
 class AvoidScrollableInIntrinsicRule extends SaropaLintRule {
-  const AvoidScrollableInIntrinsicRule() : super(code: _code);
+  AvoidScrollableInIntrinsicRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.critical;
@@ -7390,13 +6478,14 @@ class AvoidScrollableInIntrinsicRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
-    name: 'avoid_scrollable_in_intrinsic',
-    problemMessage: '[avoid_scrollable_in_intrinsic] Scrollable widget inside '
+    'avoid_scrollable_in_intrinsic',
+    '[avoid_scrollable_in_intrinsic] Scrollable widget inside '
         'IntrinsicHeight/IntrinsicWidth causes a geometry loop crash. '
         'Scrollables have no natural size. {v2}',
-    correctionMessage: 'Use SizedBox with explicit dimensions instead of '
+    correctionMessage:
+        'Use SizedBox with explicit dimensions instead of '
         'IntrinsicHeight/IntrinsicWidth around scrollable widgets.',
-    errorSeverity: DiagnosticSeverity.ERROR,
+    severity: DiagnosticSeverity.ERROR,
   );
 
   static const Set<String> _scrollableTypes = <String>{
@@ -7414,20 +6503,14 @@ class AvoidScrollableInIntrinsicRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addInstanceCreationExpression((
-      InstanceCreationExpression node,
-    ) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final String typeName = node.constructorName.type.name.lexeme;
       if (!_scrollableTypes.contains(typeName)) return;
 
-      final result = _findWidgetAncestor(
-        node,
-        targetParents: _intrinsicTypes,
-      );
+      final result = _findWidgetAncestor(node, targetParents: _intrinsicTypes);
 
       // Here, finding the target parent means BAD (scrollable inside intrinsic).
       if (result == _AncestorResult.found) {
@@ -7468,7 +6551,7 @@ class AvoidScrollableInIntrinsicRule extends SaropaLintRule {
 /// )
 /// ```
 class RequireBaselineTextBaselineRule extends SaropaLintRule {
-  const RequireBaselineTextBaselineRule() : super(code: _code);
+  RequireBaselineTextBaselineRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.critical;
@@ -7480,27 +6563,23 @@ class RequireBaselineTextBaselineRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
-    name: 'require_baseline_text_baseline',
-    problemMessage:
-        '[require_baseline_text_baseline] CrossAxisAlignment.baseline '
+    'require_baseline_text_baseline',
+    '[require_baseline_text_baseline] CrossAxisAlignment.baseline '
         'requires a textBaseline property. Omitting it causes an '
         'assertion failure at runtime. {v2}',
     correctionMessage:
         'Add textBaseline: TextBaseline.alphabetic (or .ideographic).',
-    errorSeverity: DiagnosticSeverity.ERROR,
+    severity: DiagnosticSeverity.ERROR,
   );
 
   static const Set<String> _targetWidgets = <String>{'Row', 'Column', 'Flex'};
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addInstanceCreationExpression((
-      InstanceCreationExpression node,
-    ) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final String typeName = node.constructorName.type.name.lexeme;
       if (!_targetWidgets.contains(typeName)) return;
 
@@ -7521,45 +6600,6 @@ class RequireBaselineTextBaselineRule extends SaropaLintRule {
       if (hasBaseline && !hasTextBaseline) {
         reporter.atNode(node.constructorName, code);
       }
-    });
-  }
-
-  @override
-  List<Fix> getFixes() => <Fix>[_RequireBaselineTextBaselineFix()];
-}
-
-class _RequireBaselineTextBaselineFix extends DartFix {
-  @override
-  void run(
-    CustomLintResolver resolver,
-    ChangeReporter reporter,
-    CustomLintContext context,
-    AnalysisError analysisError,
-    List<AnalysisError> others,
-  ) {
-    context.registry.addInstanceCreationExpression((
-      InstanceCreationExpression node,
-    ) {
-      if (!analysisError.sourceRange.intersects(node.sourceRange)) return;
-
-      final changeBuilder = reporter.createChangeBuilder(
-        message: 'Add textBaseline: TextBaseline.alphabetic',
-        priority: 80,
-      );
-
-      changeBuilder.addDartFileEdit((builder) {
-        // Insert textBaseline parameter after crossAxisAlignment
-        for (final Expression arg in node.argumentList.arguments) {
-          if (arg is NamedExpression &&
-              arg.name.label.name == 'crossAxisAlignment') {
-            builder.addSimpleInsertion(
-              arg.end,
-              ', textBaseline: TextBaseline.alphabetic',
-            );
-            return;
-          }
-        }
-      });
     });
   }
 }
@@ -7595,7 +6635,7 @@ class _RequireBaselineTextBaselineFix extends DartFix {
 /// )
 /// ```
 class AvoidUnconstrainedDialogColumnRule extends SaropaLintRule {
-  const AvoidUnconstrainedDialogColumnRule() : super(code: _code);
+  AvoidUnconstrainedDialogColumnRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.high;
@@ -7607,13 +6647,12 @@ class AvoidUnconstrainedDialogColumnRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
-    name: 'avoid_unconstrained_dialog_column',
-    problemMessage:
-        '[avoid_unconstrained_dialog_column] Column inside a dialog '
+    'avoid_unconstrained_dialog_column',
+    '[avoid_unconstrained_dialog_column] Column inside a dialog '
         'without mainAxisSize: MainAxisSize.min can overflow and push '
         'buttons off-screen. {v2}',
     correctionMessage: 'Add mainAxisSize: MainAxisSize.min to the Column.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   static const Set<String> _dialogTypes = <String>{
@@ -7623,13 +6662,10 @@ class AvoidUnconstrainedDialogColumnRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addInstanceCreationExpression((
-      InstanceCreationExpression node,
-    ) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final String typeName = node.constructorName.type.name.lexeme;
       if (typeName != 'Column') return;
 
@@ -7641,49 +6677,11 @@ class AvoidUnconstrainedDialogColumnRule extends SaropaLintRule {
       }
 
       // Walk up to find dialog parent.
-      final result = _findWidgetAncestor(
-        node,
-        targetParents: _dialogTypes,
-      );
+      final result = _findWidgetAncestor(node, targetParents: _dialogTypes);
 
       if (result == _AncestorResult.found) {
         reporter.atNode(node.constructorName, code);
       }
-    });
-  }
-
-  @override
-  List<Fix> getFixes() => <Fix>[_AvoidUnconstrainedDialogColumnFix()];
-}
-
-class _AvoidUnconstrainedDialogColumnFix extends DartFix {
-  @override
-  void run(
-    CustomLintResolver resolver,
-    ChangeReporter reporter,
-    CustomLintContext context,
-    AnalysisError analysisError,
-    List<AnalysisError> others,
-  ) {
-    context.registry.addInstanceCreationExpression((
-      InstanceCreationExpression node,
-    ) {
-      if (!analysisError.sourceRange.intersects(node.sourceRange)) return;
-      if (node.constructorName.type.name.lexeme != 'Column') return;
-
-      final changeBuilder = reporter.createChangeBuilder(
-        message: 'Add mainAxisSize: MainAxisSize.min',
-        priority: 80,
-      );
-
-      changeBuilder.addDartFileEdit((builder) {
-        // Insert as first named argument after opening parenthesis.
-        final int insertOffset = node.argumentList.leftParenthesis.end;
-        builder.addSimpleInsertion(
-          insertOffset,
-          'mainAxisSize: MainAxisSize.min, ',
-        );
-      });
     });
   }
 }
@@ -7726,7 +6724,7 @@ const Set<String> _constraintWrappers = <String>{
 /// Column(children: [Text('header'), Expanded(child: ListView(...))])
 /// ```
 class AvoidUnboundedListviewInColumnRule extends SaropaLintRule {
-  const AvoidUnboundedListviewInColumnRule() : super(code: _code);
+  AvoidUnboundedListviewInColumnRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.critical;
@@ -7738,15 +6736,14 @@ class AvoidUnboundedListviewInColumnRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
-    name: 'avoid_unbounded_listview_in_column',
-    problemMessage:
-        '[avoid_unbounded_listview_in_column] Scrollable widget inside '
+    'avoid_unbounded_listview_in_column',
+    '[avoid_unbounded_listview_in_column] Scrollable widget inside '
         'a Column without Expanded/Flexible causes an unbounded '
         'constraints crash. {v3}',
     correctionMessage:
         'Wrap the scrollable widget in Expanded or Flexible, or use '
         'shrinkWrap: true (with performance cost).',
-    errorSeverity: DiagnosticSeverity.ERROR,
+    severity: DiagnosticSeverity.ERROR,
   );
 
   static const Set<String> _scrollableTypes = <String>{
@@ -7757,13 +6754,10 @@ class AvoidUnboundedListviewInColumnRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addInstanceCreationExpression((
-      InstanceCreationExpression node,
-    ) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final String typeName = node.constructorName.type.name.lexeme;
       if (!_scrollableTypes.contains(typeName)) return;
 
@@ -7822,9 +6816,6 @@ class AvoidUnboundedListviewInColumnRule extends SaropaLintRule {
     });
   }
 
-  @override
-  List<Fix> getFixes() => <Fix>[_WrapInExpandedFix('scrollable widget')];
-
   static bool _hasShrinkWrap(InstanceCreationExpression node) {
     for (final Expression arg in node.argumentList.arguments) {
       if (arg is NamedExpression && arg.name.label.name == 'shrinkWrap') {
@@ -7859,7 +6850,7 @@ class AvoidUnboundedListviewInColumnRule extends SaropaLintRule {
 /// Row(children: [Icon(Icons.search), Expanded(child: TextField())])
 /// ```
 class AvoidTextfieldInRowRule extends SaropaLintRule {
-  const AvoidTextfieldInRowRule() : super(code: _code);
+  AvoidTextfieldInRowRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.critical;
@@ -7871,14 +6862,13 @@ class AvoidTextfieldInRowRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
-    name: 'avoid_textfield_in_row',
-    problemMessage:
-        '[avoid_textfield_in_row] TextField/TextFormField inside a Row '
+    'avoid_textfield_in_row',
+    '[avoid_textfield_in_row] TextField/TextFormField inside a Row '
         'without width constraints causes an unbounded width crash. {v3}',
     correctionMessage:
         'Wrap the TextField in Expanded, Flexible, or a fixed-width '
         'SizedBox.',
-    errorSeverity: DiagnosticSeverity.ERROR,
+    severity: DiagnosticSeverity.ERROR,
   );
 
   static const Set<String> _textFieldTypes = <String>{
@@ -7888,13 +6878,10 @@ class AvoidTextfieldInRowRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addInstanceCreationExpression((
-      InstanceCreationExpression node,
-    ) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final String typeName = node.constructorName.type.name.lexeme;
       if (!_textFieldTypes.contains(typeName)) return;
 
@@ -7949,9 +6936,6 @@ class AvoidTextfieldInRowRule extends SaropaLintRule {
       }
     });
   }
-
-  @override
-  List<Fix> getFixes() => <Fix>[_WrapInExpandedFix('TextField')];
 }
 
 // =========================================================================
@@ -7978,7 +6962,7 @@ class AvoidTextfieldInRowRule extends SaropaLintRule {
 /// Scaffold(body: SingleChildScrollView(child: Column(children: [...])))
 /// ```
 class AvoidFixedSizeInScaffoldBodyRule extends SaropaLintRule {
-  const AvoidFixedSizeInScaffoldBodyRule() : super(code: _code);
+  AvoidFixedSizeInScaffoldBodyRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.high;
@@ -7990,15 +6974,14 @@ class AvoidFixedSizeInScaffoldBodyRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
-    name: 'avoid_fixed_size_in_scaffold_body',
-    problemMessage:
-        '[avoid_fixed_size_in_scaffold_body] Scaffold body has a Column '
+    'avoid_fixed_size_in_scaffold_body',
+    '[avoid_fixed_size_in_scaffold_body] Scaffold body has a Column '
         'with text input fields but no ScrollView. The keyboard will '
         'cause overflow. {v2}',
     correctionMessage:
         'Wrap the Column in SingleChildScrollView to handle keyboard '
         'resize.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   static const Set<String> _textInputTypes = <String>{
@@ -8008,13 +6991,10 @@ class AvoidFixedSizeInScaffoldBodyRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addInstanceCreationExpression((
-      InstanceCreationExpression node,
-    ) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final String typeName = node.constructorName.type.name.lexeme;
       if (typeName != 'Scaffold') return;
 
@@ -8068,33 +7048,3 @@ class _TextInputFinder extends RecursiveAstVisitor<void> {
 // =========================================================================
 
 /// Shared quick fix that wraps a widget in `Expanded(child: ...)`.
-class _WrapInExpandedFix extends DartFix {
-  _WrapInExpandedFix(this._widgetDescription);
-
-  final String _widgetDescription;
-
-  @override
-  void run(
-    CustomLintResolver resolver,
-    ChangeReporter reporter,
-    CustomLintContext context,
-    AnalysisError analysisError,
-    List<AnalysisError> others,
-  ) {
-    context.registry.addInstanceCreationExpression((
-      InstanceCreationExpression node,
-    ) {
-      if (!analysisError.sourceRange.intersects(node.sourceRange)) return;
-
-      final changeBuilder = reporter.createChangeBuilder(
-        message: 'Wrap $_widgetDescription in Expanded',
-        priority: 80,
-      );
-
-      changeBuilder.addDartFileEdit((builder) {
-        builder.addSimpleInsertion(node.offset, 'Expanded(child: ');
-        builder.addSimpleInsertion(node.end, ')');
-      });
-    });
-  }
-}

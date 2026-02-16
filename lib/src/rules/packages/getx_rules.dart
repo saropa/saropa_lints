@@ -8,9 +8,6 @@ library;
 
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
-import 'package:analyzer/error/error.dart'
-    show AnalysisError, DiagnosticSeverity;
-import 'package:custom_lint_builder/custom_lint_builder.dart';
 
 import '../../saropa_lint_rule.dart';
 
@@ -62,7 +59,7 @@ import '../../saropa_lint_rule.dart';
 /// }
 /// ```
 class RequireGetxWorkerDisposeRule extends SaropaLintRule {
-  const RequireGetxWorkerDisposeRule() : super(code: _code);
+  RequireGetxWorkerDisposeRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.high;
@@ -74,21 +71,19 @@ class RequireGetxWorkerDisposeRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
-    name: 'require_getx_worker_dispose',
-    problemMessage:
-        '[require_getx_worker_dispose] GetX Worker field has no corresponding dispose() call in onClose(). Without disposing the Worker, its internal stream subscription remains active after the GetxController is destroyed. This creates a memory leak where the Worker, its closure, and all captured references are retained in memory indefinitely. {v2}',
+    'require_getx_worker_dispose',
+    '[require_getx_worker_dispose] GetX Worker field has no corresponding dispose() call in onClose(). Without disposing the Worker, its internal stream subscription remains active after the GetxController is destroyed. This creates a memory leak where the Worker, its closure, and all captured references are retained in memory indefinitely. {v2}',
     correctionMessage:
         'Call worker.dispose() inside the onClose() method before calling super.onClose() to properly clean up the Worker stream subscription and prevent memory leaks.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addClassDeclaration((ClassDeclaration node) {
+    context.addClassDeclaration((ClassDeclaration node) {
       // Check if class extends GetxController or GetxService
       final ExtendsClause? extendsClause = node.extendsClause;
       if (extendsClause == null) return;
@@ -131,7 +126,8 @@ class RequireGetxWorkerDisposeRule extends SaropaLintRule {
 
       // Report workers not disposed in onClose
       for (final String fieldName in workerFields) {
-        final bool isDisposed = onCloseBody != null &&
+        final bool isDisposed =
+            onCloseBody != null &&
             (onCloseBody.contains('$fieldName.dispose()') ||
                 onCloseBody.contains('$fieldName?.dispose()'));
 
@@ -141,7 +137,7 @@ class RequireGetxWorkerDisposeRule extends SaropaLintRule {
               for (final VariableDeclaration variable
                   in member.fields.variables) {
                 if (variable.name.lexeme == fieldName) {
-                  reporter.atNode(variable, code);
+                  reporter.atNode(variable);
                 }
               }
             }
@@ -195,7 +191,7 @@ class RequireGetxWorkerDisposeRule extends SaropaLintRule {
 /// Get.put(GlobalConfig(), permanent: true);
 /// ```
 class RequireGetxPermanentCleanupRule extends SaropaLintRule {
-  const RequireGetxPermanentCleanupRule() : super(code: _code);
+  RequireGetxPermanentCleanupRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.high;
@@ -204,12 +200,11 @@ class RequireGetxPermanentCleanupRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'require_getx_permanent_cleanup',
-    problemMessage:
-        '[require_getx_permanent_cleanup] Get.put(permanent: true) registers a navigation, scroll, or animation controller that will never be automatically deleted. This can cause memory leaks if you do not manually clean up. Instances registered as permanent remain in memory for the lifetime of the app unless explicitly deleted. This is especially risky for feature-specific or page-scoped controllers that may not always be needed. {v3}',
+    'require_getx_permanent_cleanup',
+    '[require_getx_permanent_cleanup] Get.put(permanent: true) registers a navigation, scroll, or animation controller that will never be automatically deleted. This can cause memory leaks if you do not manually clean up. Instances registered as permanent remain in memory for the lifetime of the app unless explicitly deleted. This is especially risky for feature-specific or page-scoped controllers that may not always be needed. {v3}',
     correctionMessage:
         'Always call Get.delete<T>() when the navigation, animation, or page controller is no longer needed, such as during logout or app shutdown. If the instance must remain for the entire app lifetime, document the reason with a code comment or ignore. Avoid using permanent: true for feature-specific controllers unless absolutely necessary.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   // Cached regex for performance - extracts type from constructor call
@@ -217,11 +212,10 @@ class RequireGetxPermanentCleanupRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       // Check for Get.put()
       final Expression? target = node.target;
       if (target is! SimpleIdentifier || target.name != 'Get') return;
@@ -255,7 +249,7 @@ class RequireGetxPermanentCleanupRule extends SaropaLintRule {
 
       if (enclosingClass == null) {
         // Top-level permanent put - warn
-        reporter.atNode(node, code);
+        reporter.atNode(node);
         return;
       }
 
@@ -275,13 +269,14 @@ class RequireGetxPermanentCleanupRule extends SaropaLintRule {
 
       // Check if class has Get.delete() for this type
       final String classSource = enclosingClass.toSource();
-      final bool hasDelete = classSource.contains('Get.delete') ||
+      final bool hasDelete =
+          classSource.contains('Get.delete') ||
           classSource.contains('Get.deleteAll') ||
           (controllerType != null &&
               classSource.contains('Get.delete<$controllerType>'));
 
       if (!hasDelete) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
   }
@@ -342,7 +337,7 @@ class RequireGetxPermanentCleanupRule extends SaropaLintRule {
 /// });
 /// ```
 class AvoidGetxContextOutsideWidgetRule extends SaropaLintRule {
-  const AvoidGetxContextOutsideWidgetRule() : super(code: _code);
+  AvoidGetxContextOutsideWidgetRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.high;
@@ -354,13 +349,12 @@ class AvoidGetxContextOutsideWidgetRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
-    name: 'avoid_getx_context_outside_widget',
-    problemMessage:
-        '[avoid_getx_context_outside_widget] Get.context or Get.overlayContext used outside widget class. '
+    'avoid_getx_context_outside_widget',
+    '[avoid_getx_context_outside_widget] Get.context or Get.overlayContext used outside widget class. '
         'This is unsafe and may cause crashes. {v2}',
     correctionMessage:
         'Use GetX navigation methods (Get.to, Get.snackbar, etc.) or pass context explicitly.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   /// GetX context access patterns that should only be used in widgets
@@ -381,11 +375,10 @@ class AvoidGetxContextOutsideWidgetRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addPropertyAccess((PropertyAccess node) {
+    context.addPropertyAccess((PropertyAccess node) {
       final String propertyName = node.propertyName.name;
 
       // Check if accessing Get.context or Get.overlayContext
@@ -396,12 +389,12 @@ class AvoidGetxContextOutsideWidgetRule extends SaropaLintRule {
       if (target.name != 'Get') return;
 
       // Check if this is inside a widget class
-      final ClassDeclaration? enclosingClass =
-          node.thisOrAncestorOfType<ClassDeclaration>();
+      final ClassDeclaration? enclosingClass = node
+          .thisOrAncestorOfType<ClassDeclaration>();
 
       if (enclosingClass == null) {
         // Top-level or function scope - not in a widget
-        reporter.atNode(node, code);
+        reporter.atNode(node);
         return;
       }
 
@@ -409,18 +402,18 @@ class AvoidGetxContextOutsideWidgetRule extends SaropaLintRule {
       final ExtendsClause? extendsClause = enclosingClass.extendsClause;
       if (extendsClause == null) {
         // No extends clause - not a widget
-        reporter.atNode(node, code);
+        reporter.atNode(node);
         return;
       }
 
       final String superName = extendsClause.superclass.name.lexeme;
       if (!_isWidgetClass(superName)) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
 
     // Also check for Get.context in prefixed identifier form
-    context.registry.addPrefixedIdentifier((PrefixedIdentifier node) {
+    context.addPrefixedIdentifier((PrefixedIdentifier node) {
       final String identifierName = node.identifier.name;
 
       // Check if accessing Get.context or Get.overlayContext
@@ -430,12 +423,12 @@ class AvoidGetxContextOutsideWidgetRule extends SaropaLintRule {
       if (prefix != 'Get') return;
 
       // Check if this is inside a widget class
-      final ClassDeclaration? enclosingClass =
-          node.thisOrAncestorOfType<ClassDeclaration>();
+      final ClassDeclaration? enclosingClass = node
+          .thisOrAncestorOfType<ClassDeclaration>();
 
       if (enclosingClass == null) {
         // Top-level or function scope - not in a widget
-        reporter.atNode(node, code);
+        reporter.atNode(node);
         return;
       }
 
@@ -443,13 +436,13 @@ class AvoidGetxContextOutsideWidgetRule extends SaropaLintRule {
       final ExtendsClause? extendsClause = enclosingClass.extendsClause;
       if (extendsClause == null) {
         // No extends clause - not a widget
-        reporter.atNode(node, code);
+        reporter.atNode(node);
         return;
       }
 
       final String superName = extendsClause.superclass.name.lexeme;
       if (!_isWidgetClass(superName)) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
   }
@@ -496,7 +489,7 @@ class AvoidGetxContextOutsideWidgetRule extends SaropaLintRule {
 /// // Or use GoRouter, AutoRoute, etc.
 /// ```
 class AvoidGetxGlobalNavigationRule extends SaropaLintRule {
-  const AvoidGetxGlobalNavigationRule() : super(code: _code);
+  AvoidGetxGlobalNavigationRule() : super(code: _code);
 
   /// Testability and navigation predictability issues.
   @override
@@ -506,12 +499,11 @@ class AvoidGetxGlobalNavigationRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_getx_global_navigation',
-    problemMessage:
-        '[avoid_getx_global_navigation] GetX global navigation (Get.to, Get.off) bypasses widget context. GetX navigation methods bypass the widget tree\'s context, making testing and navigation state management difficult. {v2}',
+    'avoid_getx_global_navigation',
+    '[avoid_getx_global_navigation] GetX global navigation (Get.to, Get.off) bypasses widget context. GetX navigation methods bypass the widget tree\'s context, making testing and navigation state management difficult. {v2}',
     correctionMessage:
         'Use Navigator.of(context) or a typed routing solution like GoRouter. Verify the change works correctly with existing tests and add coverage for the new behavior.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   /// Navigation methods that use global context.
@@ -531,11 +523,10 @@ class AvoidGetxGlobalNavigationRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       final String methodName = node.methodName.name;
       if (!_globalNavMethods.contains(methodName)) return;
 
@@ -544,7 +535,7 @@ class AvoidGetxGlobalNavigationRule extends SaropaLintRule {
       if (target is! SimpleIdentifier) return;
       if (target.name != 'Get') return;
 
-      reporter.atNode(node, code);
+      reporter.atNode(node);
     });
   }
 }
@@ -563,7 +554,7 @@ class AvoidGetxGlobalNavigationRule extends SaropaLintRule {
 /// **BAD:**
 /// ```dart
 /// GetPage(
-///   name: '/home',
+///   '/home',
 ///   page: () => HomePage(),
 ///   // Missing binding!
 /// )
@@ -572,13 +563,13 @@ class AvoidGetxGlobalNavigationRule extends SaropaLintRule {
 /// **GOOD:**
 /// ```dart
 /// GetPage(
-///   name: '/home',
+///   '/home',
 ///   page: () => HomePage(),
 ///   binding: HomeBinding(),
 /// )
 /// ```
 class RequireGetxBindingRoutesRule extends SaropaLintRule {
-  const RequireGetxBindingRoutesRule() : super(code: _code);
+  RequireGetxBindingRoutesRule() : super(code: _code);
 
   /// DI and lifecycle management consistency.
   @override
@@ -588,23 +579,19 @@ class RequireGetxBindingRoutesRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'require_getx_binding_routes',
-    problemMessage:
-        '[require_getx_binding_routes] GetPage without binding parameter. GetPage without a binding forces manual controller creation and lifecycle management in widgets. GetX routes should use Bindings for dependency injection. {v2}',
+    'require_getx_binding_routes',
+    '[require_getx_binding_routes] GetPage without binding parameter. GetPage without a binding forces manual controller creation and lifecycle management in widgets. GetX routes should use Bindings for dependency injection. {v2}',
     correctionMessage:
         'Add binding: YourBinding() for proper DI lifecycle. Verify the change works correctly with existing tests and add coverage for the new behavior.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addInstanceCreationExpression((
-      InstanceCreationExpression node,
-    ) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final String typeName = node.constructorName.type.name.lexeme;
       if (typeName != 'GetPage') return;
 
@@ -623,7 +610,7 @@ class RequireGetxBindingRoutesRule extends SaropaLintRule {
       }
 
       if (!hasBinding) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
   }
@@ -662,7 +649,7 @@ class RequireGetxBindingRoutesRule extends SaropaLintRule {
 /// }
 /// ```
 class AvoidGetxDialogSnackbarInControllerRule extends SaropaLintRule {
-  const AvoidGetxDialogSnackbarInControllerRule() : super(code: _code);
+  AvoidGetxDialogSnackbarInControllerRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.high;
@@ -671,13 +658,12 @@ class AvoidGetxDialogSnackbarInControllerRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_getx_dialog_snackbar_in_controller',
-    problemMessage:
-        '[avoid_getx_dialog_snackbar_in_controller] Get.snackbar/dialog in '
+    'avoid_getx_dialog_snackbar_in_controller',
+    '[avoid_getx_dialog_snackbar_in_controller] Get.snackbar/dialog in '
         'controller couples UI to business logic and prevents testing. {v2}',
     correctionMessage:
         'Use reactive state or events to trigger UI feedback instead.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   static const Set<String> _uiMethods = <String>{
@@ -691,11 +677,10 @@ class AvoidGetxDialogSnackbarInControllerRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       // Check if it's Get.snackbar, Get.dialog, etc.
       final Expression? target = node.target;
       if (target is! SimpleIdentifier || target.name != 'Get') return;
@@ -705,7 +690,7 @@ class AvoidGetxDialogSnackbarInControllerRule extends SaropaLintRule {
 
       // Check if inside a GetxController
       if (_isInsideGetxController(node)) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
   }
@@ -752,7 +737,7 @@ class AvoidGetxDialogSnackbarInControllerRule extends SaropaLintRule {
 /// }
 /// ```
 class RequireGetxLazyPutRule extends SaropaLintRule {
-  const RequireGetxLazyPutRule() : super(code: _code);
+  RequireGetxLazyPutRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.medium;
@@ -761,22 +746,20 @@ class RequireGetxLazyPutRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'require_getx_lazy_put',
-    problemMessage:
-        '[require_getx_lazy_put] Consider using Get.lazyPut() for controllers '
+    'require_getx_lazy_put',
+    '[require_getx_lazy_put] Consider using Get.lazyPut() for controllers '
         'that may not be needed immediately. This improves startup performance. {v2}',
     correctionMessage:
         'Use Get.lazyPut(() => Controller()) instead of Get.put(Controller()).',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       // Check for Get.put
       final Expression? target = node.target;
       if (target is! SimpleIdentifier || target.name != 'Get') return;
@@ -785,7 +768,7 @@ class RequireGetxLazyPutRule extends SaropaLintRule {
 
       // Check if this is in main() or a global initialization context
       if (_isInGlobalContext(node)) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
   }
@@ -849,7 +832,7 @@ class RequireGetxLazyPutRule extends SaropaLintRule {
 /// }
 /// ```
 class AvoidGetFindInBuildRule extends SaropaLintRule {
-  const AvoidGetFindInBuildRule() : super(code: _code);
+  AvoidGetFindInBuildRule() : super(code: _code);
 
   /// Significant issue. Address when count exceeds 10.
   @override
@@ -860,21 +843,19 @@ class AvoidGetFindInBuildRule extends SaropaLintRule {
 
   /// Alias: avoid_get_find_in_build_method
   static const LintCode _code = LintCode(
-    name: 'avoid_get_find_in_build',
-    problemMessage:
-        '[avoid_get_find_in_build] Calling Get.find() inside the build method is inefficient and can cause unnecessary object creation and performance issues. This leads to wasted memory allocations on every rebuild and makes your app less responsive. {v3}',
+    'avoid_get_find_in_build',
+    '[avoid_get_find_in_build] Calling Get.find() inside the build method is inefficient and can cause unnecessary object creation and performance issues. This leads to wasted memory allocations on every rebuild and makes your app less responsive. {v3}',
     correctionMessage:
         'Use GetBuilder<T> or Obx for reactive updates with GetX, and avoid calling Get.find() in build() to improve performance.',
-    errorSeverity: DiagnosticSeverity.ERROR,
+    severity: DiagnosticSeverity.ERROR,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodDeclaration((MethodDeclaration node) {
+    context.addMethodDeclaration((MethodDeclaration node) {
       if (node.name.lexeme != 'build') return;
 
       node.body.visitChildren(_GetFindVisitor(reporter, code));
@@ -898,7 +879,7 @@ class _GetFindVisitor extends RecursiveAstVisitor<void> {
 
     final Expression? target = node.target;
     if (target is SimpleIdentifier && target.name == 'Get') {
-      reporter.atNode(node, code);
+      reporter.atNode(node);
     }
 
     super.visitMethodInvocation(node);
@@ -942,7 +923,7 @@ class _GetFindVisitor extends RecursiveAstVisitor<void> {
 /// }
 /// ```
 class RequireGetxControllerDisposeRule extends SaropaLintRule {
-  const RequireGetxControllerDisposeRule() : super(code: _code);
+  RequireGetxControllerDisposeRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.high;
@@ -954,12 +935,11 @@ class RequireGetxControllerDisposeRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
-    name: 'require_getx_controller_dispose',
-    problemMessage:
-        '[require_getx_controller_dispose] GetxController holds TextEditingController or StreamSubscription fields but does not override onClose() to dispose them. Undisposed controllers and subscriptions leak native resources and continue processing events after the screen is removed, causing crashes. {v3}',
+    'require_getx_controller_dispose',
+    '[require_getx_controller_dispose] GetxController holds TextEditingController or StreamSubscription fields but does not override onClose() to dispose them. Undisposed controllers and subscriptions leak native resources and continue processing events after the screen is removed, causing crashes. {v3}',
     correctionMessage:
         'Override onClose() to dispose TextEditingController, ScrollController, and cancel StreamSubscription fields before calling super.onClose().',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   static const Set<String> _disposableTypes = <String>{
@@ -976,11 +956,10 @@ class RequireGetxControllerDisposeRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addClassDeclaration((ClassDeclaration node) {
+    context.addClassDeclaration((ClassDeclaration node) {
       final ExtendsClause? extendsClause = node.extendsClause;
       if (extendsClause == null) return;
 
@@ -1019,41 +998,9 @@ class RequireGetxControllerDisposeRule extends SaropaLintRule {
       }
     });
   }
-
-  @override
-  List<Fix> getFixes() => <Fix>[_AddOnCloseFix()];
 }
 
 /// Quick fix that adds an onClose() method skeleton to a GetxController.
-class _AddOnCloseFix extends DartFix {
-  @override
-  void run(
-    CustomLintResolver resolver,
-    ChangeReporter reporter,
-    CustomLintContext context,
-    AnalysisError analysisError,
-    List<AnalysisError> others,
-  ) {
-    context.registry.addClassDeclaration((ClassDeclaration node) {
-      if (!node.name.sourceRange.intersects(analysisError.sourceRange)) return;
-
-      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
-        message: 'Add onClose() method',
-        priority: 1,
-      );
-
-      changeBuilder.addDartFileEdit((builder) {
-        // Find position to insert (before closing brace)
-        final int insertOffset = node.rightBracket.offset;
-
-        builder.addSimpleInsertion(
-          insertOffset,
-          '\n\n  @override\n  void onClose() {\n    // HACK: Dispose resources here\n    super.onClose();\n  }\n',
-        );
-      });
-    });
-  }
-}
 
 /// Warns when .obs is used outside a GetxController.
 ///
@@ -1085,7 +1032,7 @@ class _AddOnCloseFix extends DartFix {
 /// }
 /// ```
 class AvoidObsOutsideControllerRule extends SaropaLintRule {
-  const AvoidObsOutsideControllerRule() : super(code: _code);
+  AvoidObsOutsideControllerRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.high;
@@ -1094,12 +1041,11 @@ class AvoidObsOutsideControllerRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_obs_outside_controller',
-    problemMessage:
-        '[avoid_obs_outside_controller] .obs used outside a Getx stream controller (GetxController or GetxService) creates observables without proper lifecycle management. These observables cause memory leaks because they are never disposed when the widget tree rebuilds. {v3}',
+    'avoid_obs_outside_controller',
+    '[avoid_obs_outside_controller] .obs used outside a Getx stream controller (GetxController or GetxService) creates observables without proper lifecycle management. These observables cause memory leaks because they are never disposed when the widget tree rebuilds. {v3}',
     correctionMessage:
         'Move observable state into a GetxController or GetxService, where onClose() automatically disposes Rx stream subscriptions and prevents memory leaks.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   /// GetX controller class names that are allowed to use .obs
@@ -1113,14 +1059,13 @@ class AvoidObsOutsideControllerRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
     // Check for .obs in field declarations (most common case)
-    context.registry.addFieldDeclaration((FieldDeclaration node) {
-      final ClassDeclaration? classDecl =
-          node.thisOrAncestorOfType<ClassDeclaration>();
+    context.addFieldDeclaration((FieldDeclaration node) {
+      final ClassDeclaration? classDecl = node
+          .thisOrAncestorOfType<ClassDeclaration>();
       if (classDecl == null) return;
 
       // Check if this class extends a GetX controller type
@@ -1130,7 +1075,7 @@ class AvoidObsOutsideControllerRule extends SaropaLintRule {
       for (final VariableDeclaration variable in node.fields.variables) {
         final Expression? init = variable.initializer;
         if (init != null && init.toSource().endsWith('.obs')) {
-          reporter.atNode(variable, code);
+          reporter.atNode(variable);
         }
       }
     });
@@ -1187,7 +1132,7 @@ class AvoidObsOutsideControllerRule extends SaropaLintRule {
 /// }
 /// ```
 class ProperGetxSuperCallsRule extends SaropaLintRule {
-  const ProperGetxSuperCallsRule() : super(code: _code);
+  ProperGetxSuperCallsRule() : super(code: _code);
 
   /// Critical - broken lifecycle management.
   @override
@@ -1197,12 +1142,11 @@ class ProperGetxSuperCallsRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'proper_getx_super_calls',
-    problemMessage:
-        '[proper_getx_super_calls] Omitting a call to super in GetxController lifecycle methods (onInit, onReady, onClose) breaks the controller lifecycle, causing incomplete initialization, missed cleanup, and unpredictable behavior. This can lead to memory leaks, resource retention, and subtle bugs that are hard to diagnose. {v2}',
+    'proper_getx_super_calls',
+    '[proper_getx_super_calls] Omitting a call to super in GetxController lifecycle methods (onInit, onReady, onClose) breaks the controller lifecycle, causing incomplete initialization, missed cleanup, and unpredictable behavior. This can lead to memory leaks, resource retention, and subtle bugs that are hard to diagnose. {v2}',
     correctionMessage:
         'Always call the corresponding super method (e.g., super.onInit(), super.onClose()) in GetxController lifecycle overrides. Place super.onInit() at the start and super.onClose() at the end to ensure proper initialization and cleanup.',
-    errorSeverity: DiagnosticSeverity.ERROR,
+    severity: DiagnosticSeverity.ERROR,
   );
 
   static const Set<String> _lifecycleMethods = <String>{
@@ -1213,11 +1157,10 @@ class ProperGetxSuperCallsRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodDeclaration((MethodDeclaration node) {
+    context.addMethodDeclaration((MethodDeclaration node) {
       final String methodName = node.name.lexeme;
       if (!_lifecycleMethods.contains(methodName)) return;
 
@@ -1240,7 +1183,7 @@ class ProperGetxSuperCallsRule extends SaropaLintRule {
       body.accept(visitor);
 
       if (!visitor.hasSuperCall) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
   }
@@ -1298,7 +1241,7 @@ class _SuperCallVisitor extends RecursiveAstVisitor<void> {
 /// }
 /// ```
 class AlwaysRemoveGetxListenerRule extends SaropaLintRule {
-  const AlwaysRemoveGetxListenerRule() : super(code: _code);
+  AlwaysRemoveGetxListenerRule() : super(code: _code);
 
   /// High impact - memory leak prevention.
   @override
@@ -1308,13 +1251,12 @@ class AlwaysRemoveGetxListenerRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'always_remove_getx_listener',
-    problemMessage:
-        '[always_remove_getx_listener] GetX worker is not assigned to a variable for cleanup. '
+    'always_remove_getx_listener',
+    '[always_remove_getx_listener] GetX worker is not assigned to a variable for cleanup. '
         'This will cause a memory leak. {v2}',
     correctionMessage:
         'Assign the worker to a variable and call dispose() in onClose().',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   static const Set<String> _workerMethods = <String>{
@@ -1327,11 +1269,10 @@ class AlwaysRemoveGetxListenerRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       final String methodName = node.methodName.name;
       if (!_workerMethods.contains(methodName)) return;
 
@@ -1339,7 +1280,7 @@ class AlwaysRemoveGetxListenerRule extends SaropaLintRule {
       final AstNode? parent = node.parent;
       if (parent is ExpressionStatement) {
         // Not assigned - potential leak
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
   }
@@ -1373,7 +1314,7 @@ class AlwaysRemoveGetxListenerRule extends SaropaLintRule {
 /// }
 /// ```
 class AvoidGetxRxInsideBuildRule extends SaropaLintRule {
-  const AvoidGetxRxInsideBuildRule() : super(code: _code);
+  AvoidGetxRxInsideBuildRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.high;
@@ -1382,21 +1323,19 @@ class AvoidGetxRxInsideBuildRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_getx_rx_inside_build',
-    problemMessage:
-        '[avoid_getx_rx_inside_build] Creating .obs reactive variables inside build() allocates a new Rx instance on every rebuild. Each instance leaks because it is never disposed, and the widget observes a fresh variable each time, losing all previous state and accumulating orphaned subscriptions. {v4}',
+    'avoid_getx_rx_inside_build',
+    '[avoid_getx_rx_inside_build] Creating .obs reactive variables inside build() allocates a new Rx instance on every rebuild. Each instance leaks because it is never disposed, and the widget observes a fresh variable each time, losing all previous state and accumulating orphaned subscriptions. {v4}',
     correctionMessage:
         'Move reactive .obs variables into a GetxController and access them via GetBuilder or Obx to preserve state across rebuilds.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodDeclaration((MethodDeclaration node) {
+    context.addMethodDeclaration((MethodDeclaration node) {
       if (node.name.lexeme != 'build') return;
 
       // Visit method body for .obs usage
@@ -1414,7 +1353,7 @@ class _ObsVisitor extends RecursiveAstVisitor<void> {
   @override
   void visitPropertyAccess(PropertyAccess node) {
     if (node.propertyName.name == 'obs') {
-      reporter.atNode(node, code);
+      reporter.atNode(node);
     }
     super.visitPropertyAccess(node);
   }
@@ -1422,7 +1361,7 @@ class _ObsVisitor extends RecursiveAstVisitor<void> {
   @override
   void visitPrefixedIdentifier(PrefixedIdentifier node) {
     if (node.identifier.name == 'obs') {
-      reporter.atNode(node, code);
+      reporter.atNode(node);
     }
     super.visitPrefixedIdentifier(node);
   }
@@ -1445,7 +1384,7 @@ class _ObsVisitor extends RecursiveAstVisitor<void> {
 /// count(5); // Or use callable syntax
 /// ```
 class AvoidMutableRxVariablesRule extends SaropaLintRule {
-  const AvoidMutableRxVariablesRule() : super(code: _code);
+  AvoidMutableRxVariablesRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.high;
@@ -1454,34 +1393,32 @@ class AvoidMutableRxVariablesRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_mutable_rx_variables',
-    problemMessage:
-        '[avoid_mutable_rx_variables] Reassigning an Rx variable with = replaces the entire reactive wrapper, breaking all existing Obx listeners that still reference the old instance. The build method stops receiving updates because child widgets observe a stale object, leading to a frozen interface that appears unresponsive. {v4}',
+    'avoid_mutable_rx_variables',
+    '[avoid_mutable_rx_variables] Reassigning an Rx variable with = replaces the entire reactive wrapper, breaking all existing Obx listeners that still reference the old instance. The build method stops receiving updates because child widgets observe a stale object, leading to a frozen interface that appears unresponsive. {v4}',
     correctionMessage:
         'Use .value = or callable syntax to update the Rx variable without replacing the reactive wrapper that Obx listeners depend on.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addAssignmentExpression((AssignmentExpression node) {
+    context.addAssignmentExpression((AssignmentExpression node) {
       // Check if right side is .obs call
       final Expression right = node.rightHandSide;
       if (right is PropertyAccess && right.propertyName.name == 'obs') {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
       if (right is PrefixedIdentifier && right.identifier.name == 'obs') {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
       // Check for direct Rx constructor
       if (right is InstanceCreationExpression) {
         final String? typeName = right.constructorName.type.element?.name;
         if (typeName != null && _rxTypes.contains(typeName)) {
-          reporter.atNode(node, code);
+          reporter.atNode(node);
         }
       }
     });
@@ -1539,7 +1476,7 @@ class AvoidMutableRxVariablesRule extends SaropaLintRule {
 /// }
 /// ```
 class DisposeGetxFieldsRule extends SaropaLintRule {
-  const DisposeGetxFieldsRule() : super(code: _code);
+  DisposeGetxFieldsRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.high;
@@ -1551,21 +1488,19 @@ class DisposeGetxFieldsRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
-    name: 'dispose_getx_fields',
-    problemMessage:
-        '[dispose_getx_fields] Undisposed Worker keeps timer running after '
+    'dispose_getx_fields',
+    '[dispose_getx_fields] Undisposed Worker keeps timer running after '
         'GetxController closes, causing memory leaks and stale updates. {v2}',
     correctionMessage: 'Call dispose() on Worker fields in onClose().',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addClassDeclaration((ClassDeclaration node) {
+    context.addClassDeclaration((ClassDeclaration node) {
       // Check if class extends GetxController
       final ExtendsClause? extendsClause = node.extendsClause;
       if (extendsClause == null) return;
@@ -1597,21 +1532,23 @@ class DisposeGetxFieldsRule extends SaropaLintRule {
         if (member is MethodDeclaration && member.name.lexeme == 'onClose') {
           hasOnClose = true;
           // Check for dispose calls
-          member.body.visitChildren(_DisposeVisitor(
-            onDispose: (String fieldName) {
-              disposedFields.add(fieldName);
-            },
-          ));
+          member.body.visitChildren(
+            _DisposeVisitor(
+              onDispose: (String fieldName) {
+                disposedFields.add(fieldName);
+              },
+            ),
+          );
         }
       }
 
       // Report if no onClose or missing dispose calls
       if (!hasOnClose && workerFields.isNotEmpty) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       } else {
         for (final String field in workerFields) {
           if (!disposedFields.contains(field)) {
-            reporter.atNode(node, code);
+            reporter.atNode(node);
             break;
           }
         }
@@ -1658,7 +1595,7 @@ class _DisposeVisitor extends RecursiveAstVisitor<void> {
 /// }
 /// ```
 class PreferGetxBuilderRule extends SaropaLintRule {
-  const PreferGetxBuilderRule() : super(code: _code);
+  PreferGetxBuilderRule() : super(code: _code);
 
   /// Accessing .obs without Obx won't trigger UI rebuilds.
   @override
@@ -1668,21 +1605,19 @@ class PreferGetxBuilderRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'prefer_getx_builder',
-    problemMessage:
-        '[prefer_getx_builder] .obs value accessed outside Obx or GetX builder. The UI will display stale data because reactive variable changes are silently ignored without an observable wrapper that triggers widget rebuilds. {v2}',
+    'prefer_getx_builder',
+    '[prefer_getx_builder] .obs value accessed outside Obx or GetX builder. The UI will display stale data because reactive variable changes are silently ignored without an observable wrapper that triggers widget rebuilds. {v2}',
     correctionMessage:
         'Wrap in Obx(() => ..) to enable reactive updates. Verify the change works correctly with existing tests and add coverage for the new behavior.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addPropertyAccess((PropertyAccess node) {
+    context.addPropertyAccess((PropertyAccess node) {
       if (node.propertyName.name != 'value') return;
 
       // Check if target ends with .obs pattern
@@ -1723,7 +1658,7 @@ class PreferGetxBuilderRule extends SaropaLintRule {
       }
 
       if (insideBuild && !insideObx) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
   }
@@ -1759,7 +1694,7 @@ class PreferGetxBuilderRule extends SaropaLintRule {
 /// GetPage(name: '/my', page: () => MyPage(), binding: MyBinding());
 /// ```
 class RequireGetxBindingRule extends SaropaLintRule {
-  const RequireGetxBindingRule() : super(code: _code);
+  RequireGetxBindingRule() : super(code: _code);
 
   /// Architecture issue - improper dependency management.
   @override
@@ -1769,21 +1704,19 @@ class RequireGetxBindingRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'require_getx_binding',
-    problemMessage:
-        '[require_getx_binding] Get.put() in widget. Use Bindings for lifecycle management. GetX controllers must be registered via Bindings for proper lifecycle management and dependency injection. {v2}',
+    'require_getx_binding',
+    '[require_getx_binding] Get.put() in widget. Use Bindings for lifecycle management. GetX controllers must be registered via Bindings for proper lifecycle management and dependency injection. {v2}',
     correctionMessage:
         'Create a Binding class and register via GetPage binding parameter. Verify the change works correctly with existing tests and add coverage for the new behavior.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       // Check for Get.put() or Get.find()
       final Expression? target = node.target;
       if (target is! SimpleIdentifier || target.name != 'Get') return;
@@ -1794,7 +1727,7 @@ class RequireGetxBindingRule extends SaropaLintRule {
       AstNode? current = node.parent;
       while (current != null) {
         if (current is MethodDeclaration && current.name.lexeme == 'build') {
-          reporter.atNode(node, code);
+          reporter.atNode(node);
           return;
         }
         current = current.parent;
@@ -1836,7 +1769,7 @@ class RequireGetxBindingRule extends SaropaLintRule {
 /// }
 /// ```
 class AvoidGetxGlobalStateRule extends SaropaLintRule {
-  const AvoidGetxGlobalStateRule() : super(code: _code);
+  AvoidGetxGlobalStateRule() : super(code: _code);
 
   /// Testing difficulty.
   @override
@@ -1846,21 +1779,19 @@ class AvoidGetxGlobalStateRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_getx_global_state',
-    problemMessage:
-        '[avoid_getx_global_state] Global GetX state (Get.put/Get.find) makes testing difficult. Using Get.put() for global state makes testing difficult and creates implicit dependencies. Prefer reactive state with GetBuilder. {v2}',
+    'avoid_getx_global_state',
+    '[avoid_getx_global_state] Global GetX state (Get.put/Get.find) makes testing difficult. Using Get.put() for global state makes testing difficult and creates implicit dependencies. Prefer reactive state with GetBuilder. {v2}',
     correctionMessage:
         'Use GetBuilder with init: parameter, or inject controller via constructor. Verify the change works correctly with existing tests and add coverage for the new behavior.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       final methodName = node.methodName.name;
 
       // Check for Get.put() and Get.find()
@@ -1874,11 +1805,11 @@ class AvoidGetxGlobalStateRule extends SaropaLintRule {
       AstNode? current = node.parent;
       while (current != null) {
         if (current is FunctionDeclaration && current.name.lexeme == 'main') {
-          reporter.atNode(node, code);
+          reporter.atNode(node);
           return;
         }
         if (current is FieldDeclaration) {
-          reporter.atNode(node, code);
+          reporter.atNode(node);
           return;
         }
         current = current.parent;
@@ -1915,7 +1846,7 @@ class AvoidGetxGlobalStateRule extends SaropaLintRule {
 /// // Inject NavigationService for testability
 /// ```
 class AvoidGetxStaticContextRule extends SaropaLintRule {
-  const AvoidGetxStaticContextRule() : super(code: _code);
+  AvoidGetxStaticContextRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.medium;
@@ -1924,12 +1855,11 @@ class AvoidGetxStaticContextRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_getx_static_context',
-    problemMessage:
-        '[avoid_getx_static_context] GetX static context method used. Hard to unit test. Get.offNamed and Get.dialog use static context internally which cannot be unit tested. Prefer abstraction for testability. {v2}',
+    'avoid_getx_static_context',
+    '[avoid_getx_static_context] GetX static context method used. Hard to unit test. Get.offNamed and Get.dialog use static context internally which cannot be unit tested. Prefer abstraction for testability. {v2}',
     correctionMessage:
         'Wrap GetX navigation in a service class for testability. Verify the change works correctly with existing tests and add coverage for the new behavior.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   static const Set<String> _staticContextMethods = {
@@ -1946,18 +1876,17 @@ class AvoidGetxStaticContextRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       final String methodName = node.methodName.name;
       if (!_staticContextMethods.contains(methodName)) return;
 
       // Check if called on Get
       final Expression? target = node.target;
       if (target is SimpleIdentifier && target.name == 'Get') {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
   }
@@ -1994,7 +1923,7 @@ class AvoidGetxStaticContextRule extends SaropaLintRule {
 /// }
 /// ```
 class AvoidTightCouplingWithGetxRule extends SaropaLintRule {
-  const AvoidTightCouplingWithGetxRule() : super(code: _code);
+  AvoidTightCouplingWithGetxRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.low;
@@ -2003,23 +1932,21 @@ class AvoidTightCouplingWithGetxRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_tight_coupling_with_getx',
-    problemMessage:
-        '[avoid_tight_coupling_with_getx] Class with 5+ GetX usages becomes tightly coupled and difficult to unit test. Using GetX for everything leads to tight coupling and hard-to-test code. Use only necessary features. {v2}',
+    'avoid_tight_coupling_with_getx',
+    '[avoid_tight_coupling_with_getx] Class with 5+ GetX usages becomes tightly coupled and difficult to unit test. Using GetX for everything leads to tight coupling and hard-to-test code. Use only necessary features. {v2}',
     correctionMessage:
         'Use direct dependency injection for core logic. Reserve GetX for UI bindings. Verify the change works correctly with existing tests and add coverage for the new behavior.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   static const int _maxGetxUsagesPerClass = 5;
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addClassDeclaration((ClassDeclaration node) {
+    context.addClassDeclaration((ClassDeclaration node) {
       final String classSource = node.toSource();
 
       // Count GetX-specific patterns
@@ -2038,7 +1965,7 @@ class AvoidTightCouplingWithGetxRule extends SaropaLintRule {
       getxUsages += RegExp(r'\.obs\b').allMatches(classSource).length;
 
       if (getxUsages > _maxGetxUsagesPerClass) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
   }
@@ -2080,7 +2007,7 @@ class AvoidTightCouplingWithGetxRule extends SaropaLintRule {
 /// }
 /// ```
 class AvoidGetxStaticGetRule extends SaropaLintRule {
-  const AvoidGetxStaticGetRule() : super(code: _code);
+  AvoidGetxStaticGetRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.high;
@@ -2089,59 +2016,26 @@ class AvoidGetxStaticGetRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_getx_static_get',
-    problemMessage:
-        '[avoid_getx_static_get] Get.find<T>() is a static service locator call that creates a hidden dependency on the global GetX container. This pattern makes the class impossible to unit test in isolation because there is no way to substitute a mock without initializing the full GetX dependency graph. It also obscures the true dependency count of the class, making it harder to detect god-object violations and architectural boundary breaches. {v2}',
+    'avoid_getx_static_get',
+    '[avoid_getx_static_get] Get.find<T>() is a static service locator call that creates a hidden dependency on the global GetX container. This pattern makes the class impossible to unit test in isolation because there is no way to substitute a mock without initializing the full GetX dependency graph. It also obscures the true dependency count of the class, making it harder to detect god-object violations and architectural boundary breaches. {v2}',
     correctionMessage:
         'Accept the dependency as a constructor parameter instead of looking it up with Get.find(). This makes the dependency explicit, testable, and visible to static analysis.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       if (node.methodName.name != 'find') return;
 
       final Expression? target = node.target;
       if (target is! SimpleIdentifier) return;
       if (target.name != 'Get') return;
 
-      reporter.atNode(node, code);
-    });
-  }
-
-  @override
-  List<Fix> getFixes() => <Fix>[_AddGetxConstructorInjectionCommentFix()];
-}
-
-class _AddGetxConstructorInjectionCommentFix extends DartFix {
-  @override
-  void run(
-    CustomLintResolver resolver,
-    ChangeReporter reporter,
-    CustomLintContext context,
-    AnalysisError analysisError,
-    List<AnalysisError> others,
-  ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
-      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
-      if (node.methodName.name != 'find') return;
-
-      final changeBuilder = reporter.createChangeBuilder(
-        message: 'Add TODO: use constructor injection instead of Get.find()',
-        priority: 1,
-      );
-
-      changeBuilder.addDartFileEdit((builder) {
-        builder.addSimpleInsertion(
-          node.offset,
-          '/* TODO: replace Get.find() with constructor injection */ ',
-        );
-      });
+      reporter.atNode(node);
     });
   }
 }
@@ -2178,7 +2072,7 @@ class _AddGetxConstructorInjectionCommentFix extends DartFix {
 /// }
 /// ```
 class AvoidGetxBuildContextBypassRule extends SaropaLintRule {
-  const AvoidGetxBuildContextBypassRule() : super(code: _code);
+  AvoidGetxBuildContextBypassRule() : super(code: _code);
 
   /// Using Get.context hides widget tree dependencies and breaks testability.
   @override
@@ -2188,9 +2082,8 @@ class AvoidGetxBuildContextBypassRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_getx_build_context_bypass',
-    problemMessage:
-        '[avoid_getx_build_context_bypass] Get.context or Get.overlayContext '
+    'avoid_getx_build_context_bypass',
+    '[avoid_getx_build_context_bypass] Get.context or Get.overlayContext '
         'bypasses Flutter\'s BuildContext propagation. This hides widget tree '
         'dependencies, makes code untestable without GetX runtime, and '
         'circumvents Flutter\'s fundamental context-based service location '
@@ -2200,23 +2093,22 @@ class AvoidGetxBuildContextBypassRule extends SaropaLintRule {
         'Pass BuildContext explicitly as a parameter to the method, or use '
         'GetX navigation methods (Get.to, Get.snackbar) that manage context '
         'internally.',
-    errorSeverity: DiagnosticSeverity.ERROR,
+    severity: DiagnosticSeverity.ERROR,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addPrefixedIdentifier((PrefixedIdentifier node) {
+    context.addPrefixedIdentifier((PrefixedIdentifier node) {
       // Check for Get.context or Get.overlayContext
       if (node.prefix.name != 'Get') return;
 
       final String property = node.identifier.name;
       if (property != 'context' && property != 'overlayContext') return;
 
-      reporter.atNode(node, code);
+      reporter.atNode(node);
     });
   }
 }

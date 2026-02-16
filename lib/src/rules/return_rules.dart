@@ -3,10 +3,6 @@
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/token.dart';
 import 'package:analyzer/dart/element/type.dart';
-import 'package:analyzer/error/error.dart'
-    show AnalysisError, DiagnosticSeverity;
-import 'package:analyzer/source/source_range.dart';
-import 'package:custom_lint_builder/custom_lint_builder.dart';
 
 import '../saropa_lint_rule.dart';
 
@@ -25,7 +21,7 @@ import '../saropa_lint_rule.dart';
 /// return list;
 /// ```
 class AvoidReturningCascadesRule extends SaropaLintRule {
-  const AvoidReturningCascadesRule() : super(code: _code);
+  AvoidReturningCascadesRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -35,24 +31,22 @@ class AvoidReturningCascadesRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_returning_cascades',
-    problemMessage:
-        '[avoid_returning_cascades] Return statement contains a cascade expression (..operator), which obscures the actual return value and can confuse readers about whether the returned object is the cascade target or the result of the last cascade operation. Separating the cascade from the return makes the control flow explicit and easier to debug. {v4}',
+    'avoid_returning_cascades',
+    '[avoid_returning_cascades] Return statement contains a cascade expression (..operator), which obscures the actual return value and can confuse readers about whether the returned object is the cascade target or the result of the last cascade operation. Separating the cascade from the return makes the control flow explicit and easier to debug. {v4}',
     correctionMessage:
         'Assign the cascade result to a variable first, then return the variable on a separate line.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addReturnStatement((ReturnStatement node) {
+    context.addReturnStatement((ReturnStatement node) {
       final Expression? expression = node.expression;
       if (expression is CascadeExpression) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
   }
@@ -81,7 +75,7 @@ class AvoidReturningCascadesRule extends SaropaLintRule {
 /// }
 /// ```
 class AvoidReturningVoidRule extends SaropaLintRule {
-  const AvoidReturningVoidRule() : super(code: _code);
+  AvoidReturningVoidRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -91,23 +85,21 @@ class AvoidReturningVoidRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_returning_void',
-    problemMessage:
-        '[avoid_returning_void] Explicit void return is redundant and can mask accidental side-effect returns. '
+    'avoid_returning_void',
+    '[avoid_returning_void] Explicit void return is redundant and can mask accidental side-effect returns. '
         'Writing return at the end of a void function adds visual noise without changing behavior, and in rare cases may hide a mistaken attempt to return a value from a void-typed function. {v6}',
     correctionMessage:
         'Remove the explicit return statement entirely, since void functions implicitly return at the end of their body. '
         'If you need early exit, use a bare return without a value. If you intended to return a result, change the function return type to match.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addReturnStatement((ReturnStatement node) {
+    context.addReturnStatement((ReturnStatement node) {
       final Expression? expression = node.expression;
       if (expression == null) return;
 
@@ -117,7 +109,7 @@ class AvoidReturningVoidRule extends SaropaLintRule {
         // Check if the method returns void
         final DartType? returnType = expression.staticType;
         if (returnType != null && returnType is VoidType) {
-          reporter.atNode(node, code);
+          reporter.atNode(node);
         }
       }
     });
@@ -147,7 +139,7 @@ class AvoidReturningVoidRule extends SaropaLintRule {
 ///
 /// **Quick fix available:** Removes the unnecessary return.
 class AvoidUnnecessaryReturnRule extends SaropaLintRule {
-  const AvoidUnnecessaryReturnRule() : super(code: _code);
+  AvoidUnnecessaryReturnRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -157,30 +149,24 @@ class AvoidUnnecessaryReturnRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_unnecessary_return',
-    problemMessage:
-        '[avoid_unnecessary_return] Unnecessary return statement at end of void function. This return pattern causes unexpected control flow and makes function behavior harder to predict. {v5}',
+    'avoid_unnecessary_return',
+    '[avoid_unnecessary_return] Unnecessary return statement at end of void function. This return pattern causes unexpected control flow and makes function behavior harder to predict. {v5}',
     correctionMessage:
         'Remove the redundant return statement. Verify the change works correctly with existing tests and add coverage for the new behavior.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodDeclaration((MethodDeclaration node) {
+    context.addMethodDeclaration((MethodDeclaration node) {
       _checkFunction(node.body, node.returnType, reporter);
     });
 
-    context.registry.addFunctionDeclaration((FunctionDeclaration node) {
-      _checkFunction(
-        node.functionExpression.body,
-        node.returnType,
-        reporter,
-      );
+    context.addFunctionDeclaration((FunctionDeclaration node) {
+      _checkFunction(node.functionExpression.body, node.returnType, reporter);
     });
   }
 
@@ -202,37 +188,8 @@ class AvoidUnnecessaryReturnRule extends SaropaLintRule {
 
     // Check if last statement is a bare return
     if (lastStatement is ReturnStatement && lastStatement.expression == null) {
-      reporter.atNode(lastStatement, code);
+      reporter.atNode(lastStatement);
     }
-  }
-
-  @override
-  List<Fix> getFixes() => <Fix>[_RemoveUnnecessaryReturnFix()];
-}
-
-class _RemoveUnnecessaryReturnFix extends DartFix {
-  @override
-  void run(
-    CustomLintResolver resolver,
-    ChangeReporter reporter,
-    CustomLintContext context,
-    AnalysisError analysisError,
-    List<AnalysisError> others,
-  ) {
-    context.registry.addReturnStatement((ReturnStatement node) {
-      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
-      if (node.expression != null) return;
-
-      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
-        message: 'Remove unnecessary return',
-        priority: 1,
-      );
-
-      changeBuilder.addDartFileEdit((builder) {
-        // Delete the entire statement including trailing newline if present
-        builder.addDeletion(SourceRange(node.offset, node.length));
-      });
-    });
   }
 }
 
@@ -259,7 +216,7 @@ class _RemoveUnnecessaryReturnFix extends DartFix {
 ///
 /// **Quick fix available:** Inlines the expression into the return statement.
 class PreferImmediateReturnRule extends SaropaLintRule {
-  const PreferImmediateReturnRule() : super(code: _code);
+  PreferImmediateReturnRule() : super(code: _code);
 
   /// Stylistic preference only. No performance or correctness benefit.
   @override
@@ -269,21 +226,19 @@ class PreferImmediateReturnRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'prefer_immediate_return',
-    problemMessage:
-        '[prefer_immediate_return] Returning an expression directly instead of assigning to a variable first is a stylistic preference. Both produce the same compiled output. Enable via the stylistic tier. {v6}',
+    'prefer_immediate_return',
+    '[prefer_immediate_return] Returning an expression directly instead of assigning to a variable first is a stylistic preference. Both produce the same compiled output. Enable via the stylistic tier. {v6}',
     correctionMessage:
         'Return the expression directly instead of storing in a variable. Verify the change works correctly with existing tests and add coverage for the new behavior.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addBlock((Block node) {
+    context.addBlock((Block node) {
       final List<Statement> statements = node.statements;
       if (statements.length < 2) return;
 
@@ -307,54 +262,8 @@ class PreferImmediateReturnRule extends SaropaLintRule {
 
       final VariableDeclaration decl = declList.variables.first;
       if (decl.name.lexeme == returnExpr.name && decl.initializer != null) {
-        reporter.atNode(secondLast, code);
+        reporter.atNode(secondLast);
       }
-    });
-  }
-
-  @override
-  List<Fix> getFixes() => <Fix>[_InlineImmediateReturnFix()];
-}
-
-class _InlineImmediateReturnFix extends DartFix {
-  @override
-  void run(
-    CustomLintResolver resolver,
-    ChangeReporter reporter,
-    CustomLintContext context,
-    AnalysisError analysisError,
-    List<AnalysisError> others,
-  ) {
-    context.registry.addBlock((Block node) {
-      final List<Statement> statements = node.statements;
-      if (statements.length < 2) return;
-
-      final Statement secondLast = statements[statements.length - 2];
-      final Statement last = statements[statements.length - 1];
-
-      if (secondLast is! VariableDeclarationStatement) return;
-      if (!secondLast.sourceRange.intersects(analysisError.sourceRange)) return;
-      if (last is! ReturnStatement) return;
-
-      final VariableDeclarationList declList = secondLast.variables;
-      if (declList.variables.length != 1) return;
-
-      final VariableDeclaration decl = declList.variables.first;
-      final Expression? initializer = decl.initializer;
-      if (initializer == null) return;
-
-      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
-        message: 'Return expression directly',
-        priority: 1,
-      );
-
-      changeBuilder.addDartFileEdit((builder) {
-        // Replace both statements with a single return
-        builder.addSimpleReplacement(
-          SourceRange(secondLast.offset, last.end - secondLast.offset),
-          'return ${initializer.toSource()};',
-        );
-      });
     });
   }
 }
@@ -383,7 +292,7 @@ class _InlineImmediateReturnFix extends DartFix {
 ///
 /// **Quick fix available:** Converts to expression body with =>.
 class PreferReturningShorthandsRule extends SaropaLintRule {
-  const PreferReturningShorthandsRule() : super(code: _code);
+  PreferReturningShorthandsRule() : super(code: _code);
 
   /// Stylistic preference only. No performance or correctness benefit.
   @override
@@ -393,31 +302,32 @@ class PreferReturningShorthandsRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'prefer_returning_shorthands',
-    problemMessage:
-        '[prefer_returning_shorthands] Simplifying return expressions to shorter forms is a code style preference. Both produce equivalent compiled output with no performance impact. Enable via the stylistic tier. {v5}',
+    'prefer_returning_shorthands',
+    '[prefer_returning_shorthands] Simplifying return expressions to shorter forms is a code style preference. Both produce equivalent compiled output with no performance impact. Enable via the stylistic tier. {v5}',
     correctionMessage:
         'Convert to expression body with =>. Verify the change works correctly with existing tests and add coverage for the new behavior.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodDeclaration((MethodDeclaration node) {
+    context.addMethodDeclaration((MethodDeclaration node) {
       _checkBody(node.body, node.name, reporter);
     });
 
-    context.registry.addFunctionDeclaration((FunctionDeclaration node) {
+    context.addFunctionDeclaration((FunctionDeclaration node) {
       _checkBody(node.functionExpression.body, node.name, reporter);
     });
   }
 
   void _checkBody(
-      FunctionBody body, Token nameToken, SaropaDiagnosticReporter reporter) {
+    FunctionBody body,
+    Token nameToken,
+    SaropaDiagnosticReporter reporter,
+  ) {
     if (body is! BlockFunctionBody) return;
 
     final Block block = body.block;
@@ -426,56 +336,7 @@ class PreferReturningShorthandsRule extends SaropaLintRule {
     final Statement stmt = block.statements.first;
     if (stmt is ReturnStatement && stmt.expression != null) {
       // Single return statement - could use arrow
-      reporter.atToken(nameToken, code);
+      reporter.atToken(nameToken);
     }
-  }
-
-  @override
-  List<Fix> getFixes() => <Fix>[_ConvertToArrowSyntaxFix()];
-}
-
-class _ConvertToArrowSyntaxFix extends DartFix {
-  @override
-  void run(
-    CustomLintResolver resolver,
-    ChangeReporter reporter,
-    CustomLintContext context,
-    AnalysisError analysisError,
-    List<AnalysisError> others,
-  ) {
-    context.registry.addMethodDeclaration((MethodDeclaration node) {
-      if (!node.name.sourceRange.intersects(analysisError.sourceRange)) return;
-      _applyFix(node.body, reporter);
-    });
-
-    context.registry.addFunctionDeclaration((FunctionDeclaration node) {
-      if (!node.name.sourceRange.intersects(analysisError.sourceRange)) return;
-      _applyFix(node.functionExpression.body, reporter);
-    });
-  }
-
-  void _applyFix(FunctionBody body, ChangeReporter reporter) {
-    if (body is! BlockFunctionBody) return;
-
-    final Block block = body.block;
-    if (block.statements.length != 1) return;
-
-    final Statement stmt = block.statements.first;
-    if (stmt is! ReturnStatement || stmt.expression == null) return;
-
-    final Expression expr = stmt.expression!;
-
-    final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
-      message: 'Convert to arrow syntax',
-      priority: 1,
-    );
-
-    changeBuilder.addDartFileEdit((builder) {
-      // Replace the entire body (from { to }) with => expression;
-      builder.addSimpleReplacement(
-        SourceRange(body.offset, body.length),
-        '=> ${expr.toSource()};',
-      );
-    });
   }
 }

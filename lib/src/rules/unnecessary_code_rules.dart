@@ -3,11 +3,6 @@
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/token.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
-import 'package:analyzer/error/error.dart'
-    show AnalysisError, DiagnosticSeverity;
-import 'package:analyzer/source/source_range.dart';
-import 'package:custom_lint_builder/custom_lint_builder.dart';
-
 import '../saropa_lint_rule.dart';
 
 /// Warns when an empty spread is used.
@@ -26,7 +21,7 @@ import '../saropa_lint_rule.dart';
 ///
 /// **Quick fix available:** Comments out the empty spread.
 class AvoidEmptySpreadRule extends SaropaLintRule {
-  const AvoidEmptySpreadRule() : super(code: _code);
+  AvoidEmptySpreadRule() : super(code: _code);
 
   /// Style/consistency. Large counts acceptable in legacy code.
   @override
@@ -36,57 +31,25 @@ class AvoidEmptySpreadRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_empty_spread',
-    problemMessage:
-        '[avoid_empty_spread] Empty spread operator (...[] or ...{}) adds nothing to your collection and may confuse readers. This is often a leftover from refactoring or copy-paste and serves no purpose. {v4}',
+    'avoid_empty_spread',
+    '[avoid_empty_spread] Empty spread operator (...[] or ...{}) adds nothing to your collection and may confuse readers. This is often a leftover from refactoring or copy-paste and serves no purpose. {v4}',
     correctionMessage:
         'Remove the empty spread from your collection literal. Only use spreads when they add elements. Clean up any unnecessary or misleading spread operators for clarity.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addSpreadElement((SpreadElement node) {
+    context.addSpreadElement((SpreadElement node) {
       final Expression expression = node.expression;
       if (expression is ListLiteral && expression.elements.isEmpty) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       } else if (expression is SetOrMapLiteral && expression.elements.isEmpty) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
-    });
-  }
-
-  @override
-  List<Fix> getFixes() => <Fix>[_CommentOutEmptySpreadFix()];
-}
-
-class _CommentOutEmptySpreadFix extends DartFix {
-  @override
-  void run(
-    CustomLintResolver resolver,
-    ChangeReporter reporter,
-    CustomLintContext context,
-    AnalysisError analysisError,
-    List<AnalysisError> others,
-  ) {
-    context.registry.addSpreadElement((SpreadElement node) {
-      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
-
-      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
-        message: 'Comment out empty spread',
-        priority: 1,
-      );
-
-      changeBuilder.addDartFileEdit((builder) {
-        builder.addSimpleReplacement(
-          SourceRange(node.offset, node.length),
-          '/* ${node.toSource()} */',
-        );
-      });
     });
   }
 }
@@ -116,7 +79,7 @@ class _CommentOutEmptySpreadFix extends DartFix {
 /// }
 /// ```
 class AvoidUnnecessaryBlockRule extends SaropaLintRule {
-  const AvoidUnnecessaryBlockRule() : super(code: _code);
+  AvoidUnnecessaryBlockRule() : super(code: _code);
 
   /// Style/consistency. Large counts acceptable in legacy code.
   @override
@@ -129,26 +92,24 @@ class AvoidUnnecessaryBlockRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.bloc};
 
   static const LintCode _code = LintCode(
-    name: 'avoid_unnecessary_block',
-    problemMessage:
-        '[avoid_unnecessary_block] Unnecessary nested code blocks add clutter and reduce readability. They rarely serve a purpose and are often left from copy-paste or refactoring. {v4}',
+    'avoid_unnecessary_block',
+    '[avoid_unnecessary_block] Unnecessary nested code blocks add clutter and reduce readability. They rarely serve a purpose and are often left from copy-paste or refactoring. {v4}',
     correctionMessage:
         'Remove extra braces from nested blocks that do not introduce a new scope. Only use additional blocks when needed for variable scope or clarity.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addBlock((Block node) {
+    context.addBlock((Block node) {
       for (final Statement statement in node.statements) {
         if (statement is Block) {
           // A block directly inside another block is unnecessary
           // unless it's for scoping (which we can't easily detect)
-          reporter.atNode(statement, code);
+          reporter.atNode(statement);
         }
       }
     });
@@ -177,7 +138,7 @@ class AvoidUnnecessaryBlockRule extends SaropaLintRule {
 ///
 /// **Quick fix available:** Replaces `target.call(args)` with `target(args)`.
 class AvoidUnnecessaryCallRule extends SaropaLintRule {
-  const AvoidUnnecessaryCallRule() : super(code: _code);
+  AvoidUnnecessaryCallRule() : super(code: _code);
 
   /// Style/consistency. Large counts acceptable in legacy code.
   @override
@@ -187,21 +148,19 @@ class AvoidUnnecessaryCallRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_unnecessary_call',
-    problemMessage:
-        '[avoid_unnecessary_call] Using .call() on a function or callable is redundant. Dart automatically calls .call() when you use (). {v4}',
+    'avoid_unnecessary_call',
+    '[avoid_unnecessary_call] Using .call() on a function or callable is redundant. Dart automatically calls .call() when you use (). {v4}',
     correctionMessage:
         'Replace fn.call() with fn(). Use the () operator for clarity and idiomatic Dart.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       if (node.methodName.name == 'call') {
         // Check if it's likely a function call
         final Expression? target = node.target;
@@ -209,45 +168,6 @@ class AvoidUnnecessaryCallRule extends SaropaLintRule {
           reporter.atNode(node.methodName, code);
         }
       }
-    });
-  }
-
-  @override
-  List<Fix> getFixes() => <Fix>[_RemoveUnnecessaryCallFix()];
-}
-
-class _RemoveUnnecessaryCallFix extends DartFix {
-  @override
-  void run(
-    CustomLintResolver resolver,
-    ChangeReporter reporter,
-    CustomLintContext context,
-    AnalysisError analysisError,
-    List<AnalysisError> others,
-  ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
-      if (node.methodName.name != 'call') return;
-      if (!node.methodName.sourceRange.intersects(analysisError.sourceRange)) {
-        return;
-      }
-
-      final Expression? target = node.target;
-      if (target == null) return;
-
-      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
-        message: 'Remove .call()',
-        priority: 1,
-      );
-
-      changeBuilder.addDartFileEdit((builder) {
-        // Replace "target.call(args)" with "target(args)"
-        final String targetSource = target.toSource();
-        final String argsSource = node.argumentList.toSource();
-        builder.addSimpleReplacement(
-          SourceRange(node.offset, node.length),
-          '$targetSource$argsSource',
-        );
-      });
     });
   }
 }
@@ -274,7 +194,7 @@ class _RemoveUnnecessaryCallFix extends DartFix {
 ///
 /// **Quick fix available:** Comments out the unnecessary constructor.
 class AvoidUnnecessaryConstructorRule extends SaropaLintRule {
-  const AvoidUnnecessaryConstructorRule() : super(code: _code);
+  AvoidUnnecessaryConstructorRule() : super(code: _code);
 
   /// Style/consistency. Large counts acceptable in legacy code.
   @override
@@ -284,21 +204,19 @@ class AvoidUnnecessaryConstructorRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_unnecessary_constructor',
-    problemMessage:
-        '[avoid_unnecessary_constructor] Empty constructors are redundant—Dart provides a default constructor automatically. Leaving them in adds noise and may confuse readers. {v5}',
+    'avoid_unnecessary_constructor',
+    '[avoid_unnecessary_constructor] Empty constructors are redundant—Dart provides a default constructor automatically. Leaving them in adds noise and may confuse readers. {v5}',
     correctionMessage:
         'Remove empty constructors with no parameters, initializers, or body. Let Dart provide the default constructor.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addConstructorDeclaration((ConstructorDeclaration node) {
+    context.addConstructorDeclaration((ConstructorDeclaration node) {
       // Only check unnamed constructors
       if (node.name != null) return;
 
@@ -322,37 +240,7 @@ class AvoidUnnecessaryConstructorRule extends SaropaLintRule {
       if (node.factoryKeyword != null) return;
 
       // This is an empty constructor
-      reporter.atNode(node, code);
-    });
-  }
-
-  @override
-  List<Fix> getFixes() => <Fix>[_CommentOutUnnecessaryConstructorFix()];
-}
-
-class _CommentOutUnnecessaryConstructorFix extends DartFix {
-  @override
-  void run(
-    CustomLintResolver resolver,
-    ChangeReporter reporter,
-    CustomLintContext context,
-    AnalysisError analysisError,
-    List<AnalysisError> others,
-  ) {
-    context.registry.addConstructorDeclaration((ConstructorDeclaration node) {
-      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
-
-      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
-        message: 'Comment out unnecessary constructor',
-        priority: 1,
-      );
-
-      changeBuilder.addDartFileEdit((builder) {
-        builder.addSimpleReplacement(
-          SourceRange(node.offset, node.length),
-          '// ${node.toSource()}',
-        );
-      });
+      reporter.atNode(node);
     });
   }
 }
@@ -385,7 +273,7 @@ class _CommentOutUnnecessaryConstructorFix extends DartFix {
 /// }
 /// ```
 class AvoidUnnecessaryEnumArgumentsRule extends SaropaLintRule {
-  const AvoidUnnecessaryEnumArgumentsRule() : super(code: _code);
+  AvoidUnnecessaryEnumArgumentsRule() : super(code: _code);
 
   /// Style/consistency. Large counts acceptable in legacy code.
   @override
@@ -395,21 +283,19 @@ class AvoidUnnecessaryEnumArgumentsRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_unnecessary_enum_arguments',
-    problemMessage:
-        '[avoid_unnecessary_enum_arguments] Providing an argument to an enum constructor that matches the default value is unnecessary and can make the code harder to read. It may also mislead readers into thinking the value is intentionally different from the default. {v4}',
+    'avoid_unnecessary_enum_arguments',
+    '[avoid_unnecessary_enum_arguments] Providing an argument to an enum constructor that matches the default value is unnecessary and can make the code harder to read. It may also mislead readers into thinking the value is intentionally different from the default. {v4}',
     correctionMessage:
         'Remove arguments from enum constructors when they match the default value. This makes your code more concise and avoids confusion about the intent of the value.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addEnumConstantDeclaration((EnumConstantDeclaration node) {
+    context.addEnumConstantDeclaration((EnumConstantDeclaration node) {
       final ArgumentList? args = node.arguments?.argumentList;
       if (args == null || args.arguments.isEmpty) return;
 
@@ -417,13 +303,13 @@ class AvoidUnnecessaryEnumArgumentsRule extends SaropaLintRule {
       for (final Expression arg in args.arguments) {
         if (arg is BooleanLiteral && !arg.value) {
           // false is often a default
-          reporter.atNode(arg, code);
+          reporter.atNode(arg);
         } else if (arg is IntegerLiteral && arg.value == 0) {
           // 0 is often a default
-          reporter.atNode(arg, code);
+          reporter.atNode(arg);
         } else if (arg is NullLiteral) {
           // null arguments are usually unnecessary
-          reporter.atNode(arg, code);
+          reporter.atNode(arg);
         }
       }
     });
@@ -434,7 +320,7 @@ class AvoidUnnecessaryEnumArgumentsRule extends SaropaLintRule {
 ///
 /// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v4
 class AvoidUnnecessaryEnumPrefixRule extends SaropaLintRule {
-  const AvoidUnnecessaryEnumPrefixRule() : super(code: _code);
+  AvoidUnnecessaryEnumPrefixRule() : super(code: _code);
 
   /// Style/consistency. Large counts acceptable in legacy code.
   @override
@@ -444,101 +330,24 @@ class AvoidUnnecessaryEnumPrefixRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_unnecessary_enum_prefix',
-    problemMessage:
-        '[avoid_unnecessary_enum_prefix] Using the enum type name as a prefix when referencing enum values inside the enum declaration is redundant. Dart allows you to reference enum values directly within the enum, and including the prefix adds unnecessary verbosity. {v4}',
+    'avoid_unnecessary_enum_prefix',
+    '[avoid_unnecessary_enum_prefix] Using the enum type name as a prefix when referencing enum values inside the enum declaration is redundant. Dart allows you to reference enum values directly within the enum, and including the prefix adds unnecessary verbosity. {v4}',
     correctionMessage:
         'Remove the enum type name prefix when referencing enum values inside the enum declaration. Use the value name directly for clarity and conciseness.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addEnumDeclaration((EnumDeclaration node) {
+    context.addEnumDeclaration((EnumDeclaration node) {
       final String enumName = node.name.lexeme;
 
       // Visit all expressions inside the enum
       node.accept(_EnumPrefixVisitor(enumName, reporter, code));
     });
-  }
-
-  @override
-  List<Fix> getFixes() => <Fix>[_RemoveEnumPrefixFix()];
-}
-
-class _RemoveEnumPrefixFix extends DartFix {
-  @override
-  void run(
-    CustomLintResolver resolver,
-    ChangeReporter reporter,
-    CustomLintContext context,
-    AnalysisError analysisError,
-    List<AnalysisError> others,
-  ) {
-    context.registry.addEnumDeclaration((EnumDeclaration node) {
-      final String enumName = node.name.lexeme;
-
-      node.accept(
-        _EnumPrefixFixVisitor(
-          enumName: enumName,
-          reporter: reporter,
-          analysisError: analysisError,
-        ),
-      );
-    });
-  }
-}
-
-class _EnumPrefixFixVisitor extends RecursiveAstVisitor<void> {
-  _EnumPrefixFixVisitor({
-    required this.enumName,
-    required this.reporter,
-    required this.analysisError,
-  });
-
-  final String enumName;
-  final ChangeReporter reporter;
-  final AnalysisError analysisError;
-
-  void _applyFix(PrefixedIdentifier node) {
-    final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
-      message: 'Remove enum prefix',
-      priority: 1,
-    );
-
-    changeBuilder.addDartFileEdit((builder) {
-      // Replace "EnumName.value" with just "value"
-      builder.addSimpleReplacement(
-        SourceRange(node.offset, node.length),
-        node.identifier.name,
-      );
-    });
-  }
-
-  @override
-  void visitPrefixedIdentifier(PrefixedIdentifier node) {
-    if (node.prefix.name == enumName &&
-        analysisError.offset == node.offset &&
-        analysisError.length == node.length) {
-      _applyFix(node);
-    }
-    super.visitPrefixedIdentifier(node);
-  }
-
-  @override
-  void visitConstantPattern(ConstantPattern node) {
-    final Expression expr = node.expression;
-    if (expr is PrefixedIdentifier &&
-        expr.prefix.name == enumName &&
-        analysisError.offset == expr.offset &&
-        analysisError.length == expr.length) {
-      _applyFix(expr);
-    }
-    super.visitConstantPattern(node);
   }
 }
 
@@ -552,7 +361,7 @@ class _EnumPrefixVisitor extends RecursiveAstVisitor<void> {
   @override
   void visitPrefixedIdentifier(PrefixedIdentifier node) {
     if (node.prefix.name == enumName) {
-      reporter.atNode(node, code);
+      reporter.atNode(node);
     }
     super.visitPrefixedIdentifier(node);
   }
@@ -578,7 +387,7 @@ class _EnumPrefixVisitor extends RecursiveAstVisitor<void> {
 ///
 /// **Quick fix available:** Removes the `extends Object` clause.
 class AvoidUnnecessaryExtendsRule extends SaropaLintRule {
-  const AvoidUnnecessaryExtendsRule() : super(code: _code);
+  AvoidUnnecessaryExtendsRule() : super(code: _code);
 
   /// Style/consistency. Large counts acceptable in legacy code.
   @override
@@ -588,64 +397,26 @@ class AvoidUnnecessaryExtendsRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_unnecessary_extends',
-    problemMessage:
-        '[avoid_unnecessary_extends] All Dart classes implicitly extend Object, so explicitly writing extends Object is unnecessary and adds clutter to your class declaration. This can confuse readers and is never required. {v4}',
+    'avoid_unnecessary_extends',
+    '[avoid_unnecessary_extends] All Dart classes implicitly extend Object, so explicitly writing extends Object is unnecessary and adds clutter to your class declaration. This can confuse readers and is never required. {v4}',
     correctionMessage:
         'Remove the extends Object clause from your class declaration. Dart will automatically inherit from Object, so this is always implied.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addClassDeclaration((ClassDeclaration node) {
+    context.addClassDeclaration((ClassDeclaration node) {
       final ExtendsClause? extendsClause = node.extendsClause;
       if (extendsClause == null) return;
 
       final String superclass = extendsClause.superclass.name.lexeme;
       if (superclass == 'Object') {
-        reporter.atNode(extendsClause, code);
+        reporter.atNode(extendsClause);
       }
-    });
-  }
-
-  @override
-  List<Fix> getFixes() => <Fix>[_RemoveExtendsObjectFix()];
-}
-
-class _RemoveExtendsObjectFix extends DartFix {
-  @override
-  void run(
-    CustomLintResolver resolver,
-    ChangeReporter reporter,
-    CustomLintContext context,
-    AnalysisError analysisError,
-    List<AnalysisError> others,
-  ) {
-    context.registry.addClassDeclaration((ClassDeclaration node) {
-      final ExtendsClause? extendsClause = node.extendsClause;
-      if (extendsClause == null) return;
-      if (!extendsClause.sourceRange.intersects(analysisError.sourceRange)) {
-        return;
-      }
-
-      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
-        message: 'Remove extends Object',
-        priority: 1,
-      );
-
-      changeBuilder.addDartFileEdit((builder) {
-        // Find the end of the previous element (type parameters or class name)
-        final int previousEnd = node.typeParameters?.end ?? node.name.end;
-        // Delete from end of previous element to end of extends clause
-        builder.addDeletion(
-          SourceRange(previousEnd, extendsClause.end - previousEnd),
-        );
-      });
     });
   }
 }
@@ -676,7 +447,7 @@ class _RemoveExtendsObjectFix extends DartFix {
 /// }
 /// ```
 class AvoidUnnecessaryGetterRule extends SaropaLintRule {
-  const AvoidUnnecessaryGetterRule() : super(code: _code);
+  AvoidUnnecessaryGetterRule() : super(code: _code);
 
   /// Style/consistency. Large counts acceptable in legacy code.
   @override
@@ -686,21 +457,19 @@ class AvoidUnnecessaryGetterRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_unnecessary_getter',
-    problemMessage:
-        '[avoid_unnecessary_getter] Getter just returns a final field without additional logic. This unnecessary code increases cognitive load without providing functional benefit. {v6}',
+    'avoid_unnecessary_getter',
+    '[avoid_unnecessary_getter] Getter just returns a final field without additional logic. This unnecessary code increases cognitive load without providing functional benefit. {v6}',
     correctionMessage:
         'Prefer making the field public or adding meaningful logic. Verify the change works correctly with existing tests and add coverage for the new behavior.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addClassDeclaration((ClassDeclaration node) {
+    context.addClassDeclaration((ClassDeclaration node) {
       // Collect all final private fields
       final Set<String> finalPrivateFields = <String>{};
       for (final ClassMember member in node.members) {
@@ -733,7 +502,7 @@ class AvoidUnnecessaryGetterRule extends SaropaLintRule {
                 // Check if getter name matches field without underscore
                 final String getterName = member.name.lexeme;
                 if (fieldName == '_$getterName') {
-                  reporter.atNode(member, code);
+                  reporter.atNode(member);
                 }
               }
             }
@@ -751,7 +520,7 @@ class AvoidUnnecessaryGetterRule extends SaropaLintRule {
                 if (finalPrivateFields.contains(fieldName)) {
                   final String getterName = member.name.lexeme;
                   if (fieldName == '_$getterName') {
-                    reporter.atNode(member, code);
+                    reporter.atNode(member);
                   }
                 }
               }
@@ -769,7 +538,7 @@ class AvoidUnnecessaryGetterRule extends SaropaLintRule {
 ///
 /// **Quick fix available:** Replaces with `.isEmpty` or `.isNotEmpty`.
 class AvoidUnnecessaryLengthCheckRule extends SaropaLintRule {
-  const AvoidUnnecessaryLengthCheckRule() : super(code: _code);
+  AvoidUnnecessaryLengthCheckRule() : super(code: _code);
 
   /// Style/consistency. Large counts acceptable in legacy code.
   @override
@@ -779,21 +548,19 @@ class AvoidUnnecessaryLengthCheckRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_unnecessary_length_check',
-    problemMessage:
-        '[avoid_unnecessary_length_check] Use isNotEmpty instead of length comparison. Quick fix available: Replaces with .isEmpty or .isNotEmpty. {v4}',
+    'avoid_unnecessary_length_check',
+    '[avoid_unnecessary_length_check] Use isNotEmpty instead of length comparison. Quick fix available: Replaces with .isEmpty or .isNotEmpty. {v4}',
     correctionMessage:
         'Replace with .isNotEmpty or .isEmpty. Verify the change works correctly with existing tests and add coverage for the new behavior.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addBinaryExpression((BinaryExpression node) {
+    context.addBinaryExpression((BinaryExpression node) {
       final String op = node.operator.lexeme;
 
       // Check for: length > 0, length != 0, length >= 1
@@ -832,93 +599,8 @@ class AvoidUnnecessaryLengthCheckRule extends SaropaLintRule {
       }
 
       if (lengthAccess != null && (isNotEmptyPattern || isEmptyPattern)) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
-    });
-  }
-
-  bool _isLengthAccess(Expression expr) {
-    if (expr is PropertyAccess) {
-      return expr.propertyName.name == 'length';
-    }
-    return false;
-  }
-
-  @override
-  List<Fix> getFixes() => <Fix>[_UseIsEmptyOrIsNotEmptyFix()];
-}
-
-class _UseIsEmptyOrIsNotEmptyFix extends DartFix {
-  @override
-  void run(
-    CustomLintResolver resolver,
-    ChangeReporter reporter,
-    CustomLintContext context,
-    AnalysisError analysisError,
-    List<AnalysisError> others,
-  ) {
-    context.registry.addBinaryExpression((BinaryExpression node) {
-      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
-
-      final String op = node.operator.lexeme;
-      PropertyAccess? lengthAccess;
-      String replacement = '';
-
-      if (_isLengthAccess(node.leftOperand)) {
-        lengthAccess = node.leftOperand as PropertyAccess;
-        final Expression right = node.rightOperand;
-        if (right is IntegerLiteral) {
-          final int? value = right.value;
-          if (value == 0) {
-            if (op == '>' || op == '!=') {
-              replacement = '${lengthAccess.target!.toSource()}.isNotEmpty';
-            } else if (op == '==' || op == '<=') {
-              replacement = '${lengthAccess.target!.toSource()}.isEmpty';
-            }
-          } else if (value == 1) {
-            if (op == '>=') {
-              replacement = '${lengthAccess.target!.toSource()}.isNotEmpty';
-            } else if (op == '<') {
-              replacement = '${lengthAccess.target!.toSource()}.isEmpty';
-            }
-          }
-        }
-      } else if (_isLengthAccess(node.rightOperand)) {
-        lengthAccess = node.rightOperand as PropertyAccess;
-        final Expression left = node.leftOperand;
-        if (left is IntegerLiteral) {
-          final int? value = left.value;
-          if (value == 0) {
-            if (op == '<' || op == '!=') {
-              replacement = '${lengthAccess.target!.toSource()}.isNotEmpty';
-            } else if (op == '==' || op == '>=') {
-              replacement = '${lengthAccess.target!.toSource()}.isEmpty';
-            }
-          } else if (value == 1) {
-            if (op == '<=') {
-              replacement = '${lengthAccess.target!.toSource()}.isNotEmpty';
-            } else if (op == '>') {
-              replacement = '${lengthAccess.target!.toSource()}.isEmpty';
-            }
-          }
-        }
-      }
-
-      if (replacement.isEmpty) return;
-
-      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
-        message: replacement.contains('isNotEmpty')
-            ? 'Use .isNotEmpty'
-            : 'Use .isEmpty',
-        priority: 1,
-      );
-
-      changeBuilder.addDartFileEdit((builder) {
-        builder.addSimpleReplacement(
-          SourceRange(node.offset, node.length),
-          replacement,
-        );
-      });
     });
   }
 
@@ -951,7 +633,7 @@ class _UseIsEmptyOrIsNotEmptyFix extends DartFix {
 /// if (a <= b) { ... }
 /// ```
 class AvoidUnnecessaryNegationsRule extends SaropaLintRule {
-  const AvoidUnnecessaryNegationsRule() : super(code: _code);
+  AvoidUnnecessaryNegationsRule() : super(code: _code);
 
   /// Style/consistency. Large counts acceptable in legacy code.
   @override
@@ -961,21 +643,19 @@ class AvoidUnnecessaryNegationsRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_unnecessary_negations',
-    problemMessage:
-        '[avoid_unnecessary_negations] Unnecessary negation can be simplified. This unnecessary code increases cognitive load without providing functional benefit. {v5}',
+    'avoid_unnecessary_negations',
+    '[avoid_unnecessary_negations] Unnecessary negation can be simplified. This unnecessary code increases cognitive load without providing functional benefit. {v5}',
     correctionMessage:
         'Simplify by using the opposite operator or removing double negation. Verify the change works correctly with existing tests and add coverage for the new behavior.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addPrefixExpression((PrefixExpression node) {
+    context.addPrefixExpression((PrefixExpression node) {
       if (node.operator.type != TokenType.BANG) return;
 
       final Expression operand = node.operand;
@@ -983,7 +663,7 @@ class AvoidUnnecessaryNegationsRule extends SaropaLintRule {
       // Check for double negation: !!x
       if (operand is PrefixExpression &&
           operand.operator.type == TokenType.BANG) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
         return;
       }
 
@@ -999,7 +679,7 @@ class AvoidUnnecessaryNegationsRule extends SaropaLintRule {
               op == TokenType.GT ||
               op == TokenType.LT_EQ ||
               op == TokenType.GT_EQ) {
-            reporter.atNode(node, code);
+            reporter.atNode(node);
           }
         }
       }
@@ -1027,7 +707,7 @@ class AvoidUnnecessaryNegationsRule extends SaropaLintRule {
 ///
 /// **Quick fix available:** Removes the `super()` call.
 class AvoidUnnecessarySuperRule extends SaropaLintRule {
-  const AvoidUnnecessarySuperRule() : super(code: _code);
+  AvoidUnnecessarySuperRule() : super(code: _code);
 
   /// Style/consistency. Large counts acceptable in legacy code.
   @override
@@ -1037,85 +717,26 @@ class AvoidUnnecessarySuperRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_unnecessary_super',
-    problemMessage:
-        '[avoid_unnecessary_super] Unnecessary super() call with no arguments. Super call is unnecessary in constructor. This unnecessary code increases cognitive load without providing functional benefit. {v4}',
+    'avoid_unnecessary_super',
+    '[avoid_unnecessary_super] Unnecessary super() call with no arguments. Super call is unnecessary in constructor. This unnecessary code increases cognitive load without providing functional benefit. {v4}',
     correctionMessage:
         'Remove the super() call - it is implicit. Verify the change works correctly with existing tests and add coverage for the new behavior.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addConstructorDeclaration((ConstructorDeclaration node) {
+    context.addConstructorDeclaration((ConstructorDeclaration node) {
       for (final ConstructorInitializer initializer in node.initializers) {
         if (initializer is SuperConstructorInvocation) {
           // Check if super() has no arguments and no name
           if (initializer.constructorName == null &&
               initializer.argumentList.arguments.isEmpty) {
-            reporter.atNode(initializer, code);
+            reporter.atNode(initializer);
           }
-        }
-      }
-    });
-  }
-
-  @override
-  List<Fix> getFixes() => <Fix>[_RemoveUnnecessarySuperFix()];
-}
-
-class _RemoveUnnecessarySuperFix extends DartFix {
-  @override
-  void run(
-    CustomLintResolver resolver,
-    ChangeReporter reporter,
-    CustomLintContext context,
-    AnalysisError analysisError,
-    List<AnalysisError> others,
-  ) {
-    context.registry.addConstructorDeclaration((ConstructorDeclaration node) {
-      for (int i = 0; i < node.initializers.length; i++) {
-        final ConstructorInitializer initializer = node.initializers[i];
-        if (initializer is SuperConstructorInvocation) {
-          if (!initializer.sourceRange.intersects(analysisError.sourceRange)) {
-            continue;
-          }
-
-          final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
-            message: 'Remove super()',
-            priority: 1,
-          );
-
-          changeBuilder.addDartFileEdit((builder) {
-            if (node.initializers.length == 1) {
-              // Remove colon and super()
-              final int colonOffset = node.separator!.offset;
-              builder.addDeletion(
-                SourceRange(colonOffset, initializer.end - colonOffset),
-              );
-            } else if (i == 0) {
-              // First initializer, remove it and following comma
-              builder.addDeletion(
-                SourceRange(
-                  initializer.offset,
-                  node.initializers[1].offset - initializer.offset,
-                ),
-              );
-            } else {
-              // Not first, remove preceding comma and super()
-              builder.addDeletion(
-                SourceRange(
-                  node.initializers[i - 1].end,
-                  initializer.end - node.initializers[i - 1].end,
-                ),
-              );
-            }
-          });
-          return;
         }
       }
     });
@@ -1137,7 +758,7 @@ class _RemoveUnnecessarySuperFix extends DartFix {
 /// }
 /// ```
 class NoEmptyBlockRule extends SaropaLintRule {
-  const NoEmptyBlockRule() : super(code: _code);
+  NoEmptyBlockRule() : super(code: _code);
 
   /// Style/consistency. Large counts acceptable in legacy code.
   @override
@@ -1152,21 +773,19 @@ class NoEmptyBlockRule extends SaropaLintRule {
   static const String _name = 'no_empty_block';
 
   static const LintCode _code = LintCode(
-    name: _name,
-    problemMessage:
-        '[no_empty_block] An empty code block (i.e., {}) does not perform any action and may indicate incomplete code, a forgotten implementation, or a placeholder left by mistake. Empty blocks can confuse maintainers and may hide bugs or unfinished features.',
+    _name,
+    '[no_empty_block] An empty code block (i.e., {}) does not perform any action and may indicate incomplete code, a forgotten implementation, or a placeholder left by mistake. Empty blocks can confuse maintainers and may hide bugs or unfinished features.',
     correctionMessage:
         'Add meaningful implementation or a comment inside the block to clarify its purpose. If the block is intentionally left empty, use `// ignore: $_name` to suppress the lint and document why the block is empty.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addBlock((Block node) {
+    context.addBlock((Block node) {
       if (node.statements.isEmpty) {
         // Skip if the block has a comment inside
         // We check by looking at the tokens between { and }
@@ -1203,25 +822,26 @@ class NoEmptyBlockRule extends SaropaLintRule {
         }
 
         // Check for ignore comment on the same line using source content
-        if (_hasIgnoreCommentOnLine(resolver, node)) {
+        if (_hasIgnoreCommentOnLine(context, node)) {
           return;
         }
 
         // Hyphenated ignore comments handled automatically by SaropaLintRule
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
   }
 
   /// Checks if there's an ignore comment for this rule on the same line as the node.
-  bool _hasIgnoreCommentOnLine(CustomLintResolver resolver, AstNode node) {
+  bool _hasIgnoreCommentOnLine(SaropaContext context, AstNode node) {
     try {
-      final String content = resolver.source.contents.data;
+      final String content = context.fileContent;
       final List<String> lines = content.split('\n');
 
       // Check the line where the block ends (the } character)
-      final int blockEndLine =
-          resolver.lineInfo.getLocation(node.end - 1).lineNumber;
+      final int blockEndLine = context.lineInfo
+          .getLocation(node.end - 1)
+          .lineNumber;
       if (blockEndLine > 0 && blockEndLine <= lines.length) {
         final String line = lines[blockEndLine - 1];
         if (line.contains('// ignore: $_name') ||
@@ -1237,8 +857,9 @@ class NoEmptyBlockRule extends SaropaLintRule {
         statement = statement.parent;
       }
       if (statement is ExpressionStatement) {
-        final int stmtEndLine =
-            resolver.lineInfo.getLocation(statement.end - 1).lineNumber;
+        final int stmtEndLine = context.lineInfo
+            .getLocation(statement.end - 1)
+            .lineNumber;
         if (stmtEndLine > 0 && stmtEndLine <= lines.length) {
           final String line = lines[stmtEndLine - 1];
           if (line.contains('// ignore: $_name') ||
@@ -1252,40 +873,6 @@ class NoEmptyBlockRule extends SaropaLintRule {
     } catch (_) {
       return false;
     }
-  }
-
-  @override
-  List<Fix> getFixes() => <Fix>[_AddEmptyBlockCommentFix()];
-}
-
-class _AddEmptyBlockCommentFix extends DartFix {
-  @override
-  void run(
-    CustomLintResolver resolver,
-    ChangeReporter reporter,
-    CustomLintContext context,
-    AnalysisError analysisError,
-    List<AnalysisError> others,
-  ) {
-    context.registry.addBlock((Block node) {
-      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
-      if (node.statements.isNotEmpty) return;
-
-      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
-        message: 'Add explanatory comment',
-        priority: 1,
-      );
-
-      changeBuilder.addDartFileEdit((builder) {
-        // Insert comment after the opening brace with minimal indentation
-        // The formatter will adjust indentation appropriately
-        final int insertOffset = node.leftBracket.end;
-        builder.addSimpleInsertion(
-          insertOffset,
-          '\n  // HACK: Intentionally empty - explain why\n',
-        );
-      });
-    });
   }
 }
 
@@ -1303,7 +890,7 @@ class _AddEmptyBlockCommentFix extends DartFix {
 /// if (value.isEmpty) { ... }
 /// ```
 class NoEmptyStringRule extends SaropaLintRule {
-  const NoEmptyStringRule() : super(code: _code);
+  NoEmptyStringRule() : super(code: _code);
 
   /// Style/consistency. Large counts acceptable in legacy code.
   @override
@@ -1313,23 +900,21 @@ class NoEmptyStringRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'no_empty_string',
-    problemMessage:
-        '[no_empty_string] Using empty string literals ("") in your code can be ambiguous and may indicate a missing value or a placeholder. Relying on empty strings for logic can lead to subtle bugs and makes intent unclear to readers. {v6}',
+    'no_empty_string',
+    '[no_empty_string] Using empty string literals ("") in your code can be ambiguous and may indicate a missing value or a placeholder. Relying on empty strings for logic can lead to subtle bugs and makes intent unclear to readers. {v6}',
     correctionMessage:
         'Instead of using empty string literals directly, use .isEmpty or .isNotEmpty for string comparisons. This makes your intent explicit and your code more robust.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addSimpleStringLiteral((SimpleStringLiteral node) {
+    context.addSimpleStringLiteral((SimpleStringLiteral node) {
       if (node.value.isEmpty) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
   }

@@ -80,7 +80,6 @@ library;
 import 'dart:ffi';
 import 'dart:io';
 
-import 'package:custom_lint_builder/custom_lint_builder.dart' show LintRule;
 import 'package:saropa_lints/saropa_lints.dart'
     show RuleTier, SaropaLintRule, allSaropaRules;
 import 'package:saropa_lints/src/tiers.dart' as tiers;
@@ -126,8 +125,10 @@ String _getPackageVersion() {
     if (!pubspecFile.existsSync()) return 'unknown';
 
     final content = pubspecFile.readAsStringSync();
-    final match =
-        RegExp(r'^version:\s*(.+)$', multiLine: true).firstMatch(content);
+    final match = RegExp(
+      r'^version:\s*(.+)$',
+      multiLine: true,
+    ).firstMatch(content);
     return match?.group(1)?.trim() ?? 'unknown';
   } catch (_) {}
   return 'unknown';
@@ -176,10 +177,12 @@ void _writeLogFile() {
     File(logPath).writeAsStringSync(logContent);
 
     print(
-        '${_Colors.bold}Log:${_Colors.reset} ${_Colors.cyan}$logPath${_Colors.reset}');
+      '${_Colors.bold}Log:${_Colors.reset} ${_Colors.cyan}$logPath${_Colors.reset}',
+    );
   } on Exception catch (e) {
     print(
-        '${_Colors.yellow}Warning: Could not write log file: $e${_Colors.reset}');
+      '${_Colors.yellow}Warning: Could not write log file: $e${_Colors.reset}',
+    );
   }
 }
 
@@ -196,20 +199,32 @@ void _tryEnableAnsiWindows() {
   if (!Platform.isWindows) return;
   try {
     final k = DynamicLibrary.open('kernel32.dll');
-    final getStdHandle =
-        k.lookupFunction<IntPtr Function(Int32), int Function(int)>(
-            'GetStdHandle');
-    final getMode = k.lookupFunction<Int32 Function(IntPtr, Pointer<Uint32>),
-        int Function(int, Pointer<Uint32>)>('GetConsoleMode');
-    final setMode = k.lookupFunction<Int32 Function(IntPtr, Uint32),
-        int Function(int, int)>('SetConsoleMode');
-    final getHeap =
-        k.lookupFunction<IntPtr Function(), int Function()>('GetProcessHeap');
-    final alloc = k.lookupFunction<
-        Pointer<Void> Function(IntPtr, Uint32, IntPtr),
-        Pointer<Void> Function(int, int, int)>('HeapAlloc');
-    final free = k.lookupFunction<Int32 Function(IntPtr, Uint32, Pointer<Void>),
-        int Function(int, int, Pointer<Void>)>('HeapFree');
+    final getStdHandle = k
+        .lookupFunction<IntPtr Function(Int32), int Function(int)>(
+          'GetStdHandle',
+        );
+    final getMode = k
+        .lookupFunction<
+          Int32 Function(IntPtr, Pointer<Uint32>),
+          int Function(int, Pointer<Uint32>)
+        >('GetConsoleMode');
+    final setMode = k
+        .lookupFunction<Int32 Function(IntPtr, Uint32), int Function(int, int)>(
+          'SetConsoleMode',
+        );
+    final getHeap = k.lookupFunction<IntPtr Function(), int Function()>(
+      'GetProcessHeap',
+    );
+    final alloc = k
+        .lookupFunction<
+          Pointer<Void> Function(IntPtr, Uint32, IntPtr),
+          Pointer<Void> Function(int, int, int)
+        >('HeapAlloc');
+    final free = k
+        .lookupFunction<
+          Int32 Function(IntPtr, Uint32, Pointer<Void>),
+          int Function(int, int, Pointer<Void>)
+        >('HeapFree');
 
     final handle = getStdHandle(-11); // STD_OUTPUT_HANDLE
     final heap = getHeap();
@@ -219,7 +234,9 @@ void _tryEnableAnsiWindows() {
     final mode = ptr.cast<Uint32>();
     if (getMode(handle, mode) != 0) {
       setMode(
-          handle, mode.value | 0x0004); // ENABLE_VIRTUAL_TERMINAL_PROCESSING
+        handle,
+        mode.value | 0x0004,
+      ); // ENABLE_VIRTUAL_TERMINAL_PROCESSING
     }
     free(heap, 0, ptr);
   } catch (_) {
@@ -331,14 +348,14 @@ Map<String, _RuleMetadata> _getRuleMetadata() {
   if (_ruleMetadataCache != null) return _ruleMetadataCache!;
 
   _ruleMetadataCache = <String, _RuleMetadata>{};
-  for (final LintRule rule in allSaropaRules) {
-    if (rule is SaropaLintRule) {
+  for (final SaropaLintRule rule in allSaropaRules) {
+    {
       final String ruleName = rule.code.name;
       final String message = rule.code.problemMessage;
       final String correction = rule.code.correctionMessage ?? '';
 
       // Extract severity from LintCode
-      final severity = rule.code.errorSeverity.name.toUpperCase();
+      final severity = rule.code.severity.name.toUpperCase();
 
       // Get tier from tiers.dart (single source of truth)
       final RuleTier tier = _getTierFromSets(ruleName);
@@ -411,15 +428,19 @@ RuleTier _getRuleTierFromMetadata(String ruleName) {
 // ---------------------------------------------------------------------------
 
 /// Matches the `custom_lint:` section header in YAML.
-final RegExp _customLintSectionPattern =
-    RegExp(r'^custom_lint:\s*$', multiLine: true);
+final RegExp _customLintSectionPattern = RegExp(
+  r'^custom_lint:\s*$',
+  multiLine: true,
+);
 
 /// Matches any top-level YAML key (for finding section boundaries).
 final RegExp _topLevelKeyPattern = RegExp(r'^\w+:', multiLine: true);
 
 /// Matches rule entries like `- rule_name: true` or `- rule_name: false`.
-final RegExp _ruleEntryPattern =
-    RegExp(r'^\s+-\s+(\w+):\s*(true|false)', multiLine: true);
+final RegExp _ruleEntryPattern = RegExp(
+  r'^\s+-\s+(\w+):\s*(true|false)',
+  multiLine: true,
+);
 
 /// All available tiers in order of strictness.
 const List<String> tierOrder = <String>[
@@ -453,183 +474,175 @@ const Map<String, String> tierDescriptions = <String, String>{
 /// Used to generate the STYLISTIC RULES section in analysis_options_custom.yaml.
 const Map<String, List<String>> _stylisticRuleCategories =
     <String, List<String>>{
-  'Debug/Test utility': <String>[
-    'prefer_fail_test_case',
-  ],
-  'Ordering & Sorting': <String>[
-    'prefer_member_ordering',
-    'prefer_arguments_ordering',
-    'prefer_sorted_members',
-    'prefer_sorted_parameters',
-    'prefer_sorted_pattern_fields',
-    'prefer_sorted_record_fields',
-  ],
-  'Naming conventions': <String>[
-    'prefer_boolean_prefixes',
-    'prefer_no_getter_prefix',
-    'prefer_kebab_tag_name',
-    'prefer_capitalized_comment_start',
-    'prefer_descriptive_bool_names',
-    'prefer_snake_case_files',
-    'prefer_camel_case_method_names',
-    'prefer_exception_suffix',
-    'prefer_error_suffix',
-  ],
-  'Error handling style': <String>[
-    'prefer_catch_over_on',
-  ],
-  'Code style preferences': <String>[
-    'prefer_no_continue_statement',
-    'prefer_single_exit_point',
-    'prefer_wildcard_for_unused_param',
-    'prefer_rethrow_over_throw_e',
-  ],
-  'Function & Parameter style': <String>[
-    'prefer_arrow_functions',
-    'prefer_all_named_parameters',
-    'prefer_inline_callbacks',
-    'avoid_parameter_reassignment',
-  ],
-  'Widget style': <String>[
-    'avoid_shrink_wrap_in_scroll',
-    'prefer_one_widget_per_file',
-    'prefer_widget_methods_over_classes',
-    'prefer_borderradius_circular',
-    'avoid_small_text',
-  ],
-  'Class & Record style': <String>[
-    'prefer_class_over_record_return',
-    'prefer_private_underscore_prefix',
-    'prefer_explicit_this',
-  ],
-  'Formatting': <String>[
-    'prefer_trailing_comma_always',
-  ],
-  'Comments & Documentation': <String>[
-    'prefer_todo_format',
-    'prefer_fixme_format',
-    'prefer_sentence_case_comments',
-    'prefer_period_after_doc',
-    'prefer_doc_comments_over_regular',
-    'prefer_no_commented_out_code',
-  ],
-  'Testing style': <String>[
-    'prefer_expect_over_assert_in_tests',
-  ],
-  'Type argument style (conflicting - choose one)': <String>[
-    'prefer_inferred_type_arguments',
-    'prefer_explicit_type_arguments',
-  ],
-  'Import style (conflicting - choose one)': <String>[
-    'prefer_absolute_imports',
-    'prefer_flat_imports',
-    'prefer_grouped_imports',
-    'prefer_named_imports',
-    'prefer_relative_imports',
-  ],
-  'Quote style (conflicting - choose one)': <String>[
-    'prefer_double_quotes',
-    'prefer_single_quotes',
-  ],
-  'Apostrophe style (conflicting - choose one)': <String>[
-    'prefer_doc_curly_apostrophe',
-    'prefer_doc_straight_apostrophe',
-    'prefer_straight_apostrophe',
-  ],
-  'Member ordering (conflicting - choose one)': <String>[
-    'prefer_static_members_first',
-    'prefer_instance_members_first',
-    'prefer_public_members_first',
-    'prefer_private_members_first',
-  ],
-  'Opinionated prefer_* rules': <String>[
-    'prefer_addall_over_spread',
-    'prefer_async_only_when_awaiting',
-    'prefer_await_over_then',
-    'prefer_blank_line_after_declarations',
-    'prefer_blank_lines_between_members',
-    'prefer_cascade_over_chained',
-    'prefer_chained_over_cascade',
-    'prefer_clip_r_superellipse',
-    'prefer_clip_r_superellipse_clipper',
-    'prefer_collection_if_over_ternary',
-    'prefer_compact_class_members',
-    'prefer_compact_declarations',
-    'prefer_concatenation_over_interpolation',
-    'prefer_concise_variable_names',
-    'prefer_constructor_assertion',
-    'prefer_constructor_body_assignment',
-    'prefer_container_over_sizedbox',
-    'prefer_curly_apostrophe',
-    'prefer_default_enum_case',
-    'prefer_descriptive_bool_names_strict',
-    'prefer_descriptive_variable_names',
-    'prefer_dot_shorthand',
-    'prefer_dynamic_over_object',
-    'prefer_edgeinsets_only',
-    'prefer_edgeinsets_symmetric',
-    'prefer_exhaustive_enums',
-    'prefer_expanded_over_flexible',
-    'prefer_explicit_boolean_comparison',
-    'prefer_explicit_colors',
-    'prefer_explicit_null_assignment',
-    'prefer_explicit_types',
-    'prefer_factory_for_validation',
-    'prefer_fake_over_mock',
-    'prefer_fields_before_methods',
-    'prefer_flexible_over_expanded',
-    'prefer_future_void_function_over_async_callback',
-    'prefer_generic_exception',
-    'prefer_given_when_then_comments',
-    'prefer_grouped_by_purpose',
-    'prefer_grouped_expectations',
-    'prefer_guard_clauses',
-    'prefer_if_null_over_ternary',
-    'prefer_implicit_boolean_comparison',
-    'prefer_initializing_formals',
-    'prefer_interpolation_over_concatenation',
-    'prefer_keys_with_lookup',
-    'prefer_late_over_nullable',
-    'prefer_lower_camel_case_constants',
-    'prefer_map_entries_iteration',
-    'prefer_material_theme_colors',
-    'prefer_methods_before_fields',
-    'prefer_no_blank_line_before_return',
-    'prefer_no_blank_line_inside_blocks',
-    'prefer_null_aware_assignment',
-    'prefer_nullable_over_late',
-    'prefer_object_over_dynamic',
-    'prefer_on_over_catch',
-    'prefer_positive_conditions',
-    'prefer_positive_conditions_first',
-    'prefer_required_before_optional',
-    'prefer_richtext_over_text_rich',
-    'prefer_screaming_case_constants',
-    'prefer_self_documenting_tests',
-    'prefer_single_blank_line_max',
-    'prefer_single_expectation_per_test',
-    'prefer_sizedbox_over_container',
-    'prefer_specific_exceptions',
-    'prefer_spread_over_addall',
-    'prefer_super_parameters',
-    'prefer_switch_statement',
-    'prefer_sync_over_async_where_possible',
-    'prefer_ternary_over_collection_if',
-    'prefer_ternary_over_if_null',
-    'prefer_test_data_builder',
-    'prefer_test_name_descriptive',
-    'prefer_test_name_should_when',
-    'prefer_text_rich_over_richtext',
-    'prefer_then_over_await',
-    'prefer_var_over_explicit_type',
-    'prefer_wheretype_over_where_is',
-  ],
-  'Control flow & collection style': <String>[
-    'prefer_early_return',
-    'prefer_mutable_collections',
-    'prefer_record_over_equatable',
-  ],
-};
+      'Debug/Test utility': <String>['prefer_fail_test_case'],
+      'Ordering & Sorting': <String>[
+        'prefer_member_ordering',
+        'prefer_arguments_ordering',
+        'prefer_sorted_members',
+        'prefer_sorted_parameters',
+        'prefer_sorted_pattern_fields',
+        'prefer_sorted_record_fields',
+      ],
+      'Naming conventions': <String>[
+        'prefer_boolean_prefixes',
+        'prefer_no_getter_prefix',
+        'prefer_kebab_tag_name',
+        'prefer_capitalized_comment_start',
+        'prefer_descriptive_bool_names',
+        'prefer_snake_case_files',
+        'prefer_camel_case_method_names',
+        'prefer_exception_suffix',
+        'prefer_error_suffix',
+      ],
+      'Error handling style': <String>['prefer_catch_over_on'],
+      'Code style preferences': <String>[
+        'prefer_no_continue_statement',
+        'prefer_single_exit_point',
+        'prefer_wildcard_for_unused_param',
+        'prefer_rethrow_over_throw_e',
+      ],
+      'Function & Parameter style': <String>[
+        'prefer_arrow_functions',
+        'prefer_all_named_parameters',
+        'prefer_inline_callbacks',
+        'avoid_parameter_reassignment',
+      ],
+      'Widget style': <String>[
+        'avoid_shrink_wrap_in_scroll',
+        'prefer_one_widget_per_file',
+        'prefer_widget_methods_over_classes',
+        'prefer_borderradius_circular',
+        'avoid_small_text',
+      ],
+      'Class & Record style': <String>[
+        'prefer_class_over_record_return',
+        'prefer_private_underscore_prefix',
+        'prefer_explicit_this',
+      ],
+      'Formatting': <String>['prefer_trailing_comma_always'],
+      'Comments & Documentation': <String>[
+        'prefer_todo_format',
+        'prefer_fixme_format',
+        'prefer_sentence_case_comments',
+        'prefer_period_after_doc',
+        'prefer_doc_comments_over_regular',
+        'prefer_no_commented_out_code',
+      ],
+      'Testing style': <String>['prefer_expect_over_assert_in_tests'],
+      'Type argument style (conflicting - choose one)': <String>[
+        'prefer_inferred_type_arguments',
+        'prefer_explicit_type_arguments',
+      ],
+      'Import style (conflicting - choose one)': <String>[
+        'prefer_absolute_imports',
+        'prefer_flat_imports',
+        'prefer_grouped_imports',
+        'prefer_named_imports',
+        'prefer_relative_imports',
+      ],
+      'Quote style (conflicting - choose one)': <String>[
+        'prefer_double_quotes',
+        'prefer_single_quotes',
+      ],
+      'Apostrophe style (conflicting - choose one)': <String>[
+        'prefer_doc_curly_apostrophe',
+        'prefer_doc_straight_apostrophe',
+        'prefer_straight_apostrophe',
+      ],
+      'Member ordering (conflicting - choose one)': <String>[
+        'prefer_static_members_first',
+        'prefer_instance_members_first',
+        'prefer_public_members_first',
+        'prefer_private_members_first',
+      ],
+      'Opinionated prefer_* rules': <String>[
+        'prefer_addall_over_spread',
+        'prefer_async_only_when_awaiting',
+        'prefer_await_over_then',
+        'prefer_blank_line_after_declarations',
+        'prefer_blank_lines_between_members',
+        'prefer_cascade_over_chained',
+        'prefer_chained_over_cascade',
+        'prefer_clip_r_superellipse',
+        'prefer_clip_r_superellipse_clipper',
+        'prefer_collection_if_over_ternary',
+        'prefer_compact_class_members',
+        'prefer_compact_declarations',
+        'prefer_concatenation_over_interpolation',
+        'prefer_concise_variable_names',
+        'prefer_constructor_assertion',
+        'prefer_constructor_body_assignment',
+        'prefer_container_over_sizedbox',
+        'prefer_curly_apostrophe',
+        'prefer_default_enum_case',
+        'prefer_descriptive_bool_names_strict',
+        'prefer_descriptive_variable_names',
+        'prefer_dot_shorthand',
+        'prefer_dynamic_over_object',
+        'prefer_edgeinsets_only',
+        'prefer_edgeinsets_symmetric',
+        'prefer_exhaustive_enums',
+        'prefer_expanded_over_flexible',
+        'prefer_explicit_boolean_comparison',
+        'prefer_explicit_colors',
+        'prefer_explicit_null_assignment',
+        'prefer_explicit_types',
+        'prefer_factory_for_validation',
+        'prefer_fake_over_mock',
+        'prefer_fields_before_methods',
+        'prefer_flexible_over_expanded',
+        'prefer_future_void_function_over_async_callback',
+        'prefer_generic_exception',
+        'prefer_given_when_then_comments',
+        'prefer_grouped_by_purpose',
+        'prefer_grouped_expectations',
+        'prefer_guard_clauses',
+        'prefer_if_null_over_ternary',
+        'prefer_implicit_boolean_comparison',
+        'prefer_initializing_formals',
+        'prefer_interpolation_over_concatenation',
+        'prefer_keys_with_lookup',
+        'prefer_late_over_nullable',
+        'prefer_lower_camel_case_constants',
+        'prefer_map_entries_iteration',
+        'prefer_material_theme_colors',
+        'prefer_methods_before_fields',
+        'prefer_no_blank_line_before_return',
+        'prefer_no_blank_line_inside_blocks',
+        'prefer_null_aware_assignment',
+        'prefer_nullable_over_late',
+        'prefer_object_over_dynamic',
+        'prefer_on_over_catch',
+        'prefer_positive_conditions',
+        'prefer_positive_conditions_first',
+        'prefer_required_before_optional',
+        'prefer_richtext_over_text_rich',
+        'prefer_screaming_case_constants',
+        'prefer_self_documenting_tests',
+        'prefer_single_blank_line_max',
+        'prefer_single_expectation_per_test',
+        'prefer_sizedbox_over_container',
+        'prefer_specific_exceptions',
+        'prefer_spread_over_addall',
+        'prefer_super_parameters',
+        'prefer_switch_statement',
+        'prefer_sync_over_async_where_possible',
+        'prefer_ternary_over_collection_if',
+        'prefer_ternary_over_if_null',
+        'prefer_test_data_builder',
+        'prefer_test_name_descriptive',
+        'prefer_test_name_should_when',
+        'prefer_text_rich_over_richtext',
+        'prefer_then_over_await',
+        'prefer_var_over_explicit_type',
+        'prefer_wheretype_over_where_is',
+      ],
+      'Control flow & collection style': <String>[
+        'prefer_early_return',
+        'prefer_mutable_collections',
+        'prefer_record_over_equatable',
+      ],
+    };
 
 // ---------------------------------------------------------------------------
 // Tier functions - read directly from rule classes (single source of truth)
@@ -738,7 +751,8 @@ Future<void> main(List<String> args) async {
   }
 
   _logTerminal(
-      '${_Colors.bold}Tier:${_Colors.reset} ${_tierColor(tier)} (level ${tierIds[tier]})');
+    '${_Colors.bold}Tier:${_Colors.reset} ${_tierColor(tier)} (level ${tierIds[tier]})',
+  );
   _logTerminal('${_Colors.dim}${tierDescriptions[tier]}${_Colors.reset}');
   _logTerminal('');
 
@@ -798,12 +812,14 @@ Future<void> main(List<String> args) async {
     // Create the custom overrides file with a helpful header
     _createCustomOverridesFile(overridesFile);
     _logTerminal(
-        '${_Colors.green}✓ Created:${_Colors.reset} analysis_options_custom.yaml');
+      '${_Colors.green}✓ Created:${_Colors.reset} analysis_options_custom.yaml',
+    );
   }
 
   // Apply platform filtering - disable rules for disabled platforms
-  final Set<String> platformDisabledRules =
-      tiers.getRulesDisabledByPlatforms(platformSettings);
+  final Set<String> platformDisabledRules = tiers.getRulesDisabledByPlatforms(
+    platformSettings,
+  );
 
   if (platformDisabledRules.isNotEmpty) {
     finalEnabled = finalEnabled.difference(platformDisabledRules);
@@ -813,14 +829,17 @@ Future<void> main(List<String> args) async {
         .where((e) => !e.value)
         .map((e) => e.key)
         .toList();
-    _logTerminal('${_Colors.yellow}Platforms disabled:${_Colors.reset} '
-        '${disabledPlatforms.join(', ')} '
-        '${_Colors.dim}(${platformDisabledRules.length} rules affected)${_Colors.reset}');
+    _logTerminal(
+      '${_Colors.yellow}Platforms disabled:${_Colors.reset} '
+      '${disabledPlatforms.join(', ')} '
+      '${_Colors.dim}(${platformDisabledRules.length} rules affected)${_Colors.reset}',
+    );
   }
 
   // Apply package filtering - disable rules for disabled packages
-  final Set<String> packageDisabledRules =
-      tiers.getRulesDisabledByPackages(packageSettings);
+  final Set<String> packageDisabledRules = tiers.getRulesDisabledByPackages(
+    packageSettings,
+  );
 
   if (packageDisabledRules.isNotEmpty) {
     finalEnabled = finalEnabled.difference(packageDisabledRules);
@@ -830,9 +849,11 @@ Future<void> main(List<String> args) async {
         .where((e) => !e.value)
         .map((e) => e.key)
         .toList();
-    _logTerminal('${_Colors.yellow}Packages disabled:${_Colors.reset} '
-        '${disabledPackages.join(', ')} '
-        '${_Colors.dim}(${packageDisabledRules.length} rules affected)${_Colors.reset}');
+    _logTerminal(
+      '${_Colors.yellow}Packages disabled:${_Colors.reset} '
+      '${disabledPackages.join(', ')} '
+      '${_Colors.dim}(${packageDisabledRules.length} rules affected)${_Colors.reset}',
+    );
   }
 
   // Read existing config and extract user customizations
@@ -852,11 +873,13 @@ Future<void> main(List<String> args) async {
       // Warn if suspiciously many customizations (likely corrupted)
       if (userCustomizations.length > 50) {
         _logTerminal(
-            '${_Colors.red}⚠ ${userCustomizations.length} customizations found - consider --reset${_Colors.reset}');
+          '${_Colors.red}⚠ ${userCustomizations.length} customizations found - consider --reset${_Colors.reset}',
+        );
       }
     } else {
       _logTerminal(
-          '${_Colors.yellow}⚠ --reset: discarding customizations${_Colors.reset}');
+        '${_Colors.yellow}⚠ --reset: discarding customizations${_Colors.reset}',
+      );
     }
   }
 
@@ -870,12 +893,12 @@ Future<void> main(List<String> args) async {
   final Map<String, int> enabledBySeverity = {
     'ERROR': 0,
     'WARNING': 0,
-    'INFO': 0
+    'INFO': 0,
   };
   final Map<String, int> disabledBySeverity = {
     'ERROR': 0,
     'WARNING': 0,
-    'INFO': 0
+    'INFO': 0,
   };
 
   for (final rule in finalEnabled) {
@@ -897,12 +920,15 @@ Future<void> main(List<String> args) async {
   // Compact summary
   _logTerminal('');
   final totalRules = finalEnabled.length + finalDisabled.length;
-  final disabledPct =
-      totalRules > 0 ? (finalDisabled.length * 100 ~/ totalRules) : 0;
+  final disabledPct = totalRules > 0
+      ? (finalDisabled.length * 100 ~/ totalRules)
+      : 0;
   _logTerminal(
-      '${_Colors.bold}Rules:${_Colors.reset} ${_success('${finalEnabled.length} enabled')} / ${_error('${finalDisabled.length} disabled')} ${_Colors.dim}($disabledPct%)${_Colors.reset}');
+    '${_Colors.bold}Rules:${_Colors.reset} ${_success('${finalEnabled.length} enabled')} / ${_error('${finalDisabled.length} disabled')} ${_Colors.dim}($disabledPct%)${_Colors.reset}',
+  );
   _logTerminal(
-      '${_Colors.bold}Severity:${_Colors.reset} ${_Colors.red}${enabledBySeverity['ERROR']} errors${_Colors.reset} · ${_Colors.yellow}${enabledBySeverity['WARNING']} warnings${_Colors.reset} · ${_Colors.cyan}${enabledBySeverity['INFO']} info${_Colors.reset}');
+    '${_Colors.bold}Severity:${_Colors.reset} ${_Colors.red}${enabledBySeverity['ERROR']} errors${_Colors.reset} · ${_Colors.yellow}${enabledBySeverity['WARNING']} warnings${_Colors.reset} · ${_Colors.cyan}${enabledBySeverity['INFO']} info${_Colors.reset}',
+  );
 
   // Project overrides summary
   final customCount = userCustomizations.length;
@@ -917,13 +943,14 @@ Future<void> main(List<String> args) async {
       customBySeverity[severity] = (customBySeverity[severity] ?? 0) + 1;
     }
     _logTerminal(
-        '${_Colors.bold}Project Overrides${_Colors.reset} ${_Colors.dim}(analysis_options_custom.yaml):${_Colors.reset} '
-        '$customCount '
-        '${_Colors.dim}(${_Colors.reset}'
-        '${_Colors.red}${customBySeverity['ERROR']} error${_Colors.reset}, '
-        '${_Colors.yellow}${customBySeverity['WARNING']} warning${_Colors.reset}, '
-        '${_Colors.cyan}${customBySeverity['INFO']} info${_Colors.reset}'
-        '${_Colors.dim})${_Colors.reset}');
+      '${_Colors.bold}Project Overrides${_Colors.reset} ${_Colors.dim}(analysis_options_custom.yaml):${_Colors.reset} '
+      '$customCount '
+      '${_Colors.dim}(${_Colors.reset}'
+      '${_Colors.red}${customBySeverity['ERROR']} error${_Colors.reset}, '
+      '${_Colors.yellow}${customBySeverity['WARNING']} warning${_Colors.reset}, '
+      '${_Colors.cyan}${customBySeverity['INFO']} info${_Colors.reset}'
+      '${_Colors.dim})${_Colors.reset}',
+    );
   }
   _logTerminal('');
 
@@ -940,27 +967,32 @@ Future<void> main(List<String> args) async {
   );
 
   // Replace custom_lint section in existing content, preserving everything else
-  final String newContent =
-      _replaceCustomLintSection(existingContent, customLintYaml);
+  final String newContent = _replaceCustomLintSection(
+    existingContent,
+    customLintYaml,
+  );
 
   if (cliArgs.dryRun) {
     _logTerminal('${_Colors.yellow}━━━ DRY RUN ━━━${_Colors.reset}');
     _logTerminal(
-        '${_Colors.dim}Would write to: ${cliArgs.outputPath}${_Colors.reset}');
+      '${_Colors.dim}Would write to: ${cliArgs.outputPath}${_Colors.reset}',
+    );
     _logTerminal('');
 
     // Show preview of custom_lint section only
     final List<String> lines = customLintYaml.split('\n');
     const int previewLines = 100;
     _logTerminal(
-        '${_Colors.bold}Preview${_Colors.reset} ${_Colors.dim}(first $previewLines of ${lines.length} lines):${_Colors.reset}');
+      '${_Colors.bold}Preview${_Colors.reset} ${_Colors.dim}(first $previewLines of ${lines.length} lines):${_Colors.reset}',
+    );
     _logTerminal('${_Colors.dim}${'─' * 60}${_Colors.reset}');
     for (int i = 0; i < previewLines && i < lines.length; i++) {
       _logTerminal(lines[i]);
     }
     if (lines.length > previewLines) {
       _logTerminal(
-          '${_Colors.dim}... (${lines.length - previewLines} more lines)${_Colors.reset}');
+        '${_Colors.dim}... (${lines.length - previewLines} more lines)${_Colors.reset}',
+      );
     }
     return;
   }
@@ -968,7 +1000,8 @@ Future<void> main(List<String> args) async {
   // Skip writing if the file content hasn't changed
   if (newContent == existingContent) {
     _logTerminal(
-        '${_Colors.dim}✓ No changes needed: ${cliArgs.outputPath}${_Colors.reset}');
+      '${_Colors.dim}✓ No changes needed: ${cliArgs.outputPath}${_Colors.reset}',
+    );
   } else {
     // Create backup before overwriting
     try {
@@ -1003,7 +1036,8 @@ Future<void> main(List<String> args) async {
     if (response == 'y' || response == 'yes') {
       _logTerminal('');
       _logTerminal(
-          '🚀 ${_Colors.bold}Running: dart run custom_lint${_Colors.reset}');
+        '🚀 ${_Colors.bold}Running: dart run custom_lint${_Colors.reset}',
+      );
       _logTerminal('${'─' * 60}');
 
       // Run with inheritStdio for real-time output streaming
@@ -1021,15 +1055,18 @@ Future<void> main(List<String> args) async {
       if (_logTimestamp != null) {
         final logPath = 'reports/${_logTimestamp}_saropa_lints_init.log';
         _logTerminal(
-            '${_Colors.bold}Log:${_Colors.reset} ${_Colors.cyan}$logPath${_Colors.reset}');
+          '${_Colors.bold}Log:${_Colors.reset} ${_Colors.cyan}$logPath${_Colors.reset}',
+        );
       }
     }
   }
 }
 
 /// Matches the USER CUSTOMIZATIONS section header in generated YAML.
-final RegExp _userCustomizationsSectionPattern =
-    RegExp(r'USER CUSTOMIZATIONS', multiLine: true);
+final RegExp _userCustomizationsSectionPattern = RegExp(
+  r'USER CUSTOMIZATIONS',
+  multiLine: true,
+);
 
 /// Extract existing user customizations from the USER CUSTOMIZATIONS section.
 ///
@@ -1049,8 +1086,8 @@ Map<String, bool> _extractUserCustomizations(
   final Map<String, bool> customizations = <String, bool>{};
 
   // Find USER CUSTOMIZATIONS section
-  final Match? customizationsMatch =
-      _userCustomizationsSectionPattern.firstMatch(yamlContent);
+  final Match? customizationsMatch = _userCustomizationsSectionPattern
+      .firstMatch(yamlContent);
   if (customizationsMatch == null) {
     // No customizations section - file wasn't generated by this tool
     // or user hasn't made any customizations
@@ -1072,8 +1109,9 @@ Map<String, bool> _extractUserCustomizations(
       : afterHeader;
 
   // Extract rules from the customizations section only
-  for (final Match match
-      in _ruleEntryPattern.allMatches(customizationsSection)) {
+  for (final Match match in _ruleEntryPattern.allMatches(
+    customizationsSection,
+  )) {
     final String ruleName = match.group(1)!;
     final bool currentEnabled = match.group(2) == 'true';
 
@@ -1139,7 +1177,8 @@ void _createCustomOverridesFile(File file) {
   final stylisticSection = _buildStylisticSection();
   final packageSection = _buildPackageSection();
 
-  final content = '''
+  final content =
+      '''
 # ╔═══════════════════════════════════════════════════════════════════════════╗
 # ║                    SAROPA LINTS CUSTOM CONFIG                             ║
 # ║                                                                           ║
@@ -1210,10 +1249,14 @@ $packageSection$stylisticSection# ───────────────�
 void _ensureMaxIssuesSetting(File file) {
   var content = file.readAsStringSync();
 
-  final hasMaxIssues =
-      RegExp(r'^max_issues:\s*\d+', multiLine: true).hasMatch(content);
-  final hasOutput =
-      RegExp(r'^output:\s*\w+', multiLine: true).hasMatch(content);
+  final hasMaxIssues = RegExp(
+    r'^max_issues:\s*\d+',
+    multiLine: true,
+  ).hasMatch(content);
+  final hasOutput = RegExp(
+    r'^output:\s*\w+',
+    multiLine: true,
+  ).hasMatch(content);
 
   if (hasMaxIssues && hasOutput) return; // Both settings present
 
@@ -1222,7 +1265,8 @@ void _ensureMaxIssuesSetting(File file) {
     content = _addAnalysisSettingsBlock(content);
     file.writeAsStringSync(content);
     _logTerminal(
-        '${_Colors.green}✓ Added analysis settings to ${file.path}${_Colors.reset}');
+      '${_Colors.green}✓ Added analysis settings to ${file.path}${_Colors.reset}',
+    );
     return;
   }
 
@@ -1231,7 +1275,8 @@ void _ensureMaxIssuesSetting(File file) {
     content = _addOutputSetting(content);
     file.writeAsStringSync(content);
     _logTerminal(
-        '${_Colors.green}✓ Added output setting to ${file.path}${_Colors.reset}');
+      '${_Colors.green}✓ Added output setting to ${file.path}${_Colors.reset}',
+    );
   }
 }
 
@@ -1272,8 +1317,10 @@ output: both
 
 /// Add just the output setting after an existing max_issues line.
 String _addOutputSetting(String content) {
-  final maxIssuesMatch =
-      RegExp(r'^(max_issues:\s*\d+.*)\n', multiLine: true).firstMatch(content);
+  final maxIssuesMatch = RegExp(
+    r'^(max_issues:\s*\d+.*)\n',
+    multiLine: true,
+  ).firstMatch(content);
   if (maxIssuesMatch == null) return content;
 
   final insertPos = maxIssuesMatch.end;
@@ -1325,7 +1372,8 @@ platforms:
   String newContent;
   if (maxIssuesMatch != null) {
     final insertPos = maxIssuesMatch.end;
-    newContent = content.substring(0, insertPos) +
+    newContent =
+        content.substring(0, insertPos) +
         '\n' +
         settingBlock +
         content.substring(insertPos);
@@ -1333,7 +1381,8 @@ platforms:
     final headerEndMatch = RegExp(r'╚[═]+╝\n*').firstMatch(content);
     if (headerEndMatch != null) {
       final insertPos = headerEndMatch.end;
-      newContent = content.substring(0, insertPos) +
+      newContent =
+          content.substring(0, insertPos) +
           '\n' +
           settingBlock +
           content.substring(insertPos);
@@ -1344,7 +1393,8 @@ platforms:
 
   file.writeAsStringSync(newContent);
   _logTerminal(
-      '${_Colors.green}✓ Added platforms setting to ${file.path}${_Colors.reset}');
+    '${_Colors.green}✓ Added platforms setting to ${file.path}${_Colors.reset}',
+  );
 }
 
 /// Ensure packages setting exists in an existing custom config file.
@@ -1363,7 +1413,8 @@ void _ensurePackagesSetting(File file) {
       .map((p) => '  $p: ${tiers.defaultPackages[p]}')
       .join('\n');
 
-  final settingBlock = '''
+  final settingBlock =
+      '''
 # ─────────────────────────────────────────────────────────────────────────────
 # PACKAGE SETTINGS
 # ─────────────────────────────────────────────────────────────────────────────
@@ -1390,7 +1441,8 @@ $packageEntries
   String newContent;
   if (platformsEndMatch != null) {
     final insertPos = platformsEndMatch.end;
-    newContent = content.substring(0, insertPos) +
+    newContent =
+        content.substring(0, insertPos) +
         '\n' +
         settingBlock +
         content.substring(insertPos);
@@ -1399,7 +1451,8 @@ $packageEntries
     final maxIssuesMatch = RegExp(r'max_issues:\s*\d+\n*').firstMatch(content);
     if (maxIssuesMatch != null) {
       final insertPos = maxIssuesMatch.end;
-      newContent = content.substring(0, insertPos) +
+      newContent =
+          content.substring(0, insertPos) +
           '\n' +
           settingBlock +
           content.substring(insertPos);
@@ -1410,26 +1463,32 @@ $packageEntries
 
   file.writeAsStringSync(newContent);
   _logTerminal(
-      '${_Colors.green}✓ Added packages setting to ${file.path}${_Colors.reset}');
+    '${_Colors.green}✓ Added packages setting to ${file.path}${_Colors.reset}',
+  );
 }
 
 /// Builds the PACKAGE SETTINGS section for analysis_options_custom.yaml.
 String _buildPackageSection() {
   final buffer = StringBuffer();
   buffer.writeln(
-      '# ─────────────────────────────────────────────────────────────────────────────');
+    '# ─────────────────────────────────────────────────────────────────────────────',
+  );
   buffer.writeln('# PACKAGE SETTINGS');
   buffer.writeln(
-      '# ─────────────────────────────────────────────────────────────────────────────');
+    '# ─────────────────────────────────────────────────────────────────────────────',
+  );
   buffer.writeln("# Disable packages your project doesn't use.");
   buffer.writeln(
-      '# Rules specific to disabled packages will be automatically disabled.');
+    '# Rules specific to disabled packages will be automatically disabled.',
+  );
   buffer.writeln(
-      '# All packages are enabled by default for backward compatibility.');
+    '# All packages are enabled by default for backward compatibility.',
+  );
   buffer.writeln('#');
   buffer.writeln('# EXAMPLES:');
   buffer.writeln(
-      '#   - Riverpod-only project: set bloc, provider, getx to false');
+    '#   - Riverpod-only project: set bloc, provider, getx to false',
+  );
   buffer.writeln('#   - No local DB: set isar, hive, sqflite to false');
   buffer.writeln('#   - No Firebase: set firebase to false');
   buffer.writeln('');
@@ -1454,19 +1513,24 @@ String _buildStylisticSection({
 }) {
   final buffer = StringBuffer();
   buffer.writeln(
-      '# ─────────────────────────────────────────────────────────────────────────────');
+    '# ─────────────────────────────────────────────────────────────────────────────',
+  );
   buffer.writeln('# STYLISTIC RULES');
   buffer.writeln(
-      '# ─────────────────────────────────────────────────────────────────────────────');
+    '# ─────────────────────────────────────────────────────────────────────────────',
+  );
   buffer.writeln(
-      '# Opinionated formatting, ordering, and naming convention rules.');
+    '# Opinionated formatting, ordering, and naming convention rules.',
+  );
   buffer.writeln(
-      '# These are NOT included in any tier - enable the ones that match your style.');
+    '# These are NOT included in any tier - enable the ones that match your style.',
+  );
   buffer.writeln('# Set to true to enable, false to disable.');
   buffer.writeln('#');
   buffer.writeln('# NOTE: Some rules conflict (e.g., prefer_single_quotes vs');
   buffer.writeln(
-      '# prefer_double_quotes). Only enable one from each conflicting group.');
+    '# prefer_double_quotes). Only enable one from each conflicting group.',
+  );
   buffer.writeln('');
 
   final categorizedRules = <String>{};
@@ -1491,11 +1555,12 @@ String _buildStylisticSection({
   }
 
   // Add any uncategorized stylistic rules (safety net for new rules)
-  final uncategorized = tiers.stylisticRules
-      .difference(categorizedRules)
-      .difference(skipRules)
-      .toList()
-    ..sort();
+  final uncategorized =
+      tiers.stylisticRules
+          .difference(categorizedRules)
+          .difference(skipRules)
+          .toList()
+        ..sort();
 
   if (uncategorized.isNotEmpty) {
     buffer.writeln('# --- Other stylistic rules ---');
@@ -1512,12 +1577,16 @@ String _buildStylisticSection({
 }
 
 /// Regex matching the STYLISTIC RULES section header.
-final RegExp _stylisticSectionHeader =
-    RegExp(r'# STYLISTIC RULES\s*\n', multiLine: true);
+final RegExp _stylisticSectionHeader = RegExp(
+  r'# STYLISTIC RULES\s*\n',
+  multiLine: true,
+);
 
 /// Regex matching the RULE OVERRIDES section header.
-final RegExp _ruleOverridesSectionHeader =
-    RegExp(r'# RULE OVERRIDES\s*\n', multiLine: true);
+final RegExp _ruleOverridesSectionHeader = RegExp(
+  r'# RULE OVERRIDES\s*\n',
+  multiLine: true,
+);
 
 /// Ensure stylistic rules section exists and is complete in the custom
 /// config file. Adds missing rules, preserves existing true/false values.
@@ -1545,7 +1614,8 @@ void _ensureStylisticRulesSection(File file) {
 
     String newContent;
     if (overridesHeaderMatch != null) {
-      newContent = content.substring(0, overridesHeaderMatch.start) +
+      newContent =
+          content.substring(0, overridesHeaderMatch.start) +
           insertContent +
           content.substring(overridesHeaderMatch.start);
     } else {
@@ -1555,7 +1625,8 @@ void _ensureStylisticRulesSection(File file) {
 
     file.writeAsStringSync(newContent);
     _logTerminal(
-        '${_Colors.green}✓ Added stylistic rules section to ${file.path}${_Colors.reset}');
+      '${_Colors.green}✓ Added stylistic rules section to ${file.path}${_Colors.reset}',
+    );
     return;
   }
 
@@ -1570,7 +1641,8 @@ void _ensureStylisticRulesSection(File file) {
   final sectionStart = _findStylisticSectionStart(content);
   final sectionEnd = _findStylisticSectionEnd(content, sectionStart);
 
-  final newContent = content.substring(0, sectionStart) +
+  final newContent =
+      content.substring(0, sectionStart) +
       newSection +
       content.substring(sectionEnd);
 
@@ -1596,8 +1668,9 @@ int _findStylisticSectionEnd(String content, int sectionStart) {
   if (afterHeader == -1) return content.length;
 
   // Skip past the "# STYLISTIC RULES" line and its closing divider
-  final afterSectionHeader =
-      _stylisticSectionHeader.firstMatch(content.substring(afterHeader));
+  final afterSectionHeader = _stylisticSectionHeader.firstMatch(
+    content.substring(afterHeader),
+  );
   final searchFrom = afterSectionHeader != null
       ? afterHeader + afterSectionHeader.end
       : afterHeader;
@@ -1621,10 +1694,7 @@ Map<String, bool> _extractStylisticSectionValues(String content) {
   final sectionEnd = _findStylisticSectionEnd(content, sectionStart);
   final sectionContent = content.substring(sectionStart, sectionEnd);
 
-  final rulePattern = RegExp(
-    r'^([\w_]+):\s*(true|false)',
-    multiLine: true,
-  );
+  final rulePattern = RegExp(r'^([\w_]+):\s*(true|false)', multiLine: true);
 
   for (final match in rulePattern.allMatches(sectionContent)) {
     final ruleName = match.group(1)!;
@@ -1648,10 +1718,7 @@ Set<String> _extractRulesInOverridesSection(String content) {
   // (it's the last section)
   final afterSection = content.substring(sectionMatch.end);
 
-  final rulePattern = RegExp(
-    r'^([\w_]+):\s*(true|false)',
-    multiLine: true,
-  );
+  final rulePattern = RegExp(r'^([\w_]+):\s*(true|false)', multiLine: true);
 
   for (final match in rulePattern.allMatches(afterSection)) {
     rules.add(match.group(1)!);
@@ -1683,8 +1750,10 @@ Map<String, bool> _extractPlatformsFromFile(File file) {
   final content = file.readAsStringSync();
 
   // Find the platforms: section
-  final sectionMatch =
-      RegExp(r'^platforms:\s*$', multiLine: true).firstMatch(content);
+  final sectionMatch = RegExp(
+    r'^platforms:\s*$',
+    multiLine: true,
+  ).firstMatch(content);
   if (sectionMatch == null) return platforms;
 
   // Extract indented entries after platforms:
@@ -1730,8 +1799,10 @@ Map<String, bool> _extractPackagesFromFile(File file) {
   final content = file.readAsStringSync();
 
   // Find the packages: section
-  final sectionMatch =
-      RegExp(r'^packages:\s*$', multiLine: true).firstMatch(content);
+  final sectionMatch = RegExp(
+    r'^packages:\s*$',
+    multiLine: true,
+  ).firstMatch(content);
   if (sectionMatch == null) return packages;
 
   // Extract indented entries after packages:
@@ -1777,28 +1848,37 @@ String _generateCustomLintYaml({
 
   buffer.writeln('custom_lint:');
   buffer.writeln(
-      '  # ═══════════════════════════════════════════════════════════════════════');
+    '  # ═══════════════════════════════════════════════════════════════════════',
+  );
   buffer.writeln('  # SAROPA LINTS CONFIGURATION');
   buffer.writeln(
-      '  # ═══════════════════════════════════════════════════════════════════════');
-  buffer
-      .writeln('  # Regenerate with: dart run saropa_lints:init --tier $tier');
+    '  # ═══════════════════════════════════════════════════════════════════════',
+  );
   buffer.writeln(
-      '  # Tier: $tier (${enabledRules.length} of ${allRules.length} rules enabled)');
+    '  # Regenerate with: dart run saropa_lints:init --tier $tier',
+  );
   buffer.writeln(
-      '  # custom_lint enables ALL rules by default. To disable a rule, set it to false.');
-  buffer
-      .writeln('  # User customizations are preserved unless --reset is used');
+    '  # Tier: $tier (${enabledRules.length} of ${allRules.length} rules enabled)',
+  );
+  buffer.writeln(
+    '  # custom_lint enables ALL rules by default. To disable a rule, set it to false.',
+  );
+  buffer.writeln(
+    '  # User customizations are preserved unless --reset is used',
+  );
   buffer.writeln('  #');
   buffer.writeln('  # Tiers (cumulative):');
   buffer.writeln(
-      '  #   1. essential    - Critical: crashes, security, memory leaks');
+    '  #   1. essential    - Critical: crashes, security, memory leaks',
+  );
   buffer.writeln(
-      '  #   2. recommended  - Essential + accessibility, performance');
+    '  #   2. recommended  - Essential + accessibility, performance',
+  );
   buffer.writeln('  #   3. professional - Recommended + architecture, testing');
   buffer.writeln('  #   4. comprehensive - Professional + thorough coverage');
   buffer.writeln(
-      '  #   5. pedantic     - All rules (pedantic, highly opinionated)');
+    '  #   5. pedantic     - All rules (pedantic, highly opinionated)',
+  );
   buffer.writeln('  #   +  stylistic    - Opt-in only (formatting, ordering)');
   buffer.writeln('  #');
 
@@ -1813,17 +1893,21 @@ String _generateCustomLintYaml({
   }
 
   // Show package status
-  final disabledPackages =
-      packageSettings.entries.where((e) => !e.value).map((e) => e.key).toList();
+  final disabledPackages = packageSettings.entries
+      .where((e) => !e.value)
+      .map((e) => e.key)
+      .toList();
   if (disabledPackages.isNotEmpty) {
     buffer.writeln('  # Disabled packages: ${disabledPackages.join(', ')}');
     buffer.writeln('  #');
   }
 
   buffer.writeln(
-      '  # Settings (max_issues, platforms, packages) are in analysis_options_custom.yaml');
+    '  # Settings (max_issues, platforms, packages) are in analysis_options_custom.yaml',
+  );
   buffer.writeln(
-      '  # ═══════════════════════════════════════════════════════════════════════');
+    '  # ═══════════════════════════════════════════════════════════════════════',
+  );
   buffer.writeln('');
   buffer.writeln('  rules:');
 
@@ -1831,9 +1915,11 @@ String _generateCustomLintYaml({
   if (userCustomizations.isNotEmpty) {
     buffer.writeln(_sectionHeader('USER CUSTOMIZATIONS', '~'));
     buffer.writeln(
-        '    # These rules have been manually configured and will be preserved');
+      '    # These rules have been manually configured and will be preserved',
+    );
     buffer.writeln(
-        '    # when regenerating. Use --reset to discard these customizations.');
+      '    # when regenerating. Use --reset to discard these customizations.',
+    );
     buffer.writeln('');
 
     final List<String> sortedCustomizations = userCustomizations.keys.toList()
@@ -1887,7 +1973,8 @@ String _generateCustomLintYaml({
     final tierNum = _tierIndex(tierLevel) + 1;
     buffer.writeln('    #');
     buffer.writeln(
-        '    # --- TIER $tierNum: $tierName (${rules.length} rules) ---');
+      '    # --- TIER $tierNum: $tierName (${rules.length} rules) ---',
+    );
     buffer.writeln('    #');
     for (final String rule in rules) {
       final String msg = _getProblemMessage(rule);
@@ -1905,17 +1992,21 @@ String _generateCustomLintYaml({
     buffer.writeln(_sectionHeader('STYLISTIC RULES (opt-in)', '~'));
     buffer.writeln('    # Formatting, ordering, naming conventions.');
     buffer.writeln(
-        '    # Enable with: dart run saropa_lints:init --tier <tier> --stylistic');
+      '    # Enable with: dart run saropa_lints:init --tier <tier> --stylistic',
+    );
     buffer.writeln('');
 
     if (stylisticEnabled.isNotEmpty) {
       buffer.writeln('    #');
       buffer.writeln(
-          '    # ┌───────────────────────────────────────────────────────────────────────┐');
+        '    # ┌───────────────────────────────────────────────────────────────────────┐',
+      );
       buffer.writeln(
-          '    # │  ✓ ENABLED STYLISTIC (${stylisticEnabled.length} rules)${' ' * (47 - stylisticEnabled.length.toString().length)}│');
+        '    # │  ✓ ENABLED STYLISTIC (${stylisticEnabled.length} rules)${' ' * (47 - stylisticEnabled.length.toString().length)}│',
+      );
       buffer.writeln(
-          '    # └───────────────────────────────────────────────────────────────────────┘');
+        '    # └───────────────────────────────────────────────────────────────────────┘',
+      );
       buffer.writeln('    #');
       for (final String rule in stylisticEnabled) {
         final String msg = _getProblemMessage(rule);
@@ -1927,11 +2018,14 @@ String _generateCustomLintYaml({
     if (stylisticDisabled.isNotEmpty) {
       buffer.writeln('    #');
       buffer.writeln(
-          '    # ┌───────────────────────────────────────────────────────────────────────┐');
+        '    # ┌───────────────────────────────────────────────────────────────────────┐',
+      );
       buffer.writeln(
-          '    # │  ✗ DISABLED STYLISTIC (${stylisticDisabled.length} rules)${' ' * (46 - stylisticDisabled.length.toString().length)}│');
+        '    # │  ✗ DISABLED STYLISTIC (${stylisticDisabled.length} rules)${' ' * (46 - stylisticDisabled.length.toString().length)}│',
+      );
       buffer.writeln(
-          '    # └───────────────────────────────────────────────────────────────────────┘');
+        '    # └───────────────────────────────────────────────────────────────────────┘',
+      );
       buffer.writeln('    #');
       for (final String rule in stylisticDisabled) {
         final String msg = _getProblemMessage(rule);
@@ -1955,7 +2049,8 @@ String _generateCustomLintYaml({
     buffer.writeln('    # These rules are in higher tiers. To enable:');
     buffer.writeln('    #   1. Choose a higher tier with --tier <tier>');
     buffer.writeln(
-        '    #   2. Or manually set to true in USER CUSTOMIZATIONS above');
+      '    #   2. Or manually set to true in USER CUSTOMIZATIONS above',
+    );
     buffer.writeln('');
 
     // Output disabled tiers (from highest to lowest)
@@ -1973,11 +2068,14 @@ String _generateCustomLintYaml({
       final tierNum = _tierIndex(tierLevel) + 1;
       buffer.writeln('    #');
       buffer.writeln(
-          '    # ┌ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ┐');
+        '    # ┌ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ┐',
+      );
       buffer.writeln(
-          '    #   TIER $tierNum: $tierName (${rules.length} rules disabled)');
+        '    #   TIER $tierNum: $tierName (${rules.length} rules disabled)',
+      );
       buffer.writeln(
-          '    # └ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ┘');
+        '    # └ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ┘',
+      );
       buffer.writeln('    #');
       for (final String rule in rules) {
         final String msg = _getProblemMessage(rule);
@@ -2030,8 +2128,9 @@ String _replaceCustomLintSection(String existingContent, String newCustomLint) {
   }
 
   // Find custom_lint: section
-  final Match? customLintMatch =
-      _customLintSectionPattern.firstMatch(existingContent);
+  final Match? customLintMatch = _customLintSectionPattern.firstMatch(
+    existingContent,
+  );
 
   if (customLintMatch == null) {
     // No existing custom_lint section - append to end
@@ -2039,14 +2138,18 @@ String _replaceCustomLintSection(String existingContent, String newCustomLint) {
   }
 
   // Find the end of the custom_lint section (next top-level key or end of file)
-  final String beforeCustomLint =
-      existingContent.substring(0, customLintMatch.start);
-  final String afterCustomLintStart =
-      existingContent.substring(customLintMatch.end);
+  final String beforeCustomLint = existingContent.substring(
+    0,
+    customLintMatch.start,
+  );
+  final String afterCustomLintStart = existingContent.substring(
+    customLintMatch.end,
+  );
 
   // Find next top-level section (line starting with a word followed by colon, no indentation)
-  final Match? nextSection =
-      _topLevelKeyPattern.firstMatch(afterCustomLintStart);
+  final Match? nextSection = _topLevelKeyPattern.firstMatch(
+    afterCustomLintStart,
+  );
 
   final String afterCustomLint = nextSection != null
       ? afterCustomLintStart.substring(nextSection.start)

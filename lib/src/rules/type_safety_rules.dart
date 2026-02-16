@@ -8,9 +8,6 @@ library;
 
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/element/type.dart';
-import 'package:analyzer/error/error.dart'
-    show AnalysisError, DiagnosticSeverity;
-import 'package:custom_lint_builder/custom_lint_builder.dart';
 
 import '../saropa_lint_rule.dart';
 import '../type_annotation_utils.dart';
@@ -44,7 +41,7 @@ import '../type_annotation_utils.dart';
 /// }
 /// ```
 class AvoidUnsafeCastRule extends SaropaLintRule {
-  const AvoidUnsafeCastRule() : super(code: _code);
+  AvoidUnsafeCastRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -54,21 +51,19 @@ class AvoidUnsafeCastRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_unsafe_cast',
-    problemMessage:
-        '[avoid_unsafe_cast] Direct cast with "as" may throw at runtime. Direct casting with as can throw if the value is null or wrong type. Prefer is check first or use as? for nullable result. {v5}',
+    'avoid_unsafe_cast',
+    '[avoid_unsafe_cast] Direct cast with "as" may throw at runtime. Direct casting with as can throw if the value is null or wrong type. Prefer is check first or use as? for nullable result. {v5}',
     correctionMessage:
         'Use "is" check or pattern matching instead. Verify the change works correctly with existing tests and add coverage for the new behavior.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addAsExpression((AsExpression node) {
+    context.addAsExpression((AsExpression node) {
       // Skip if it's a nullable cast (as?)
       if (node.type.question != null) return;
 
@@ -79,7 +74,7 @@ class AvoidUnsafeCastRule extends SaropaLintRule {
       if (parent == null) return;
 
       // Report unsafe cast
-      reporter.atNode(node, code);
+      reporter.atNode(node);
     });
   }
 
@@ -131,7 +126,7 @@ class AvoidUnsafeCastRule extends SaropaLintRule {
 /// }
 /// ```
 class PreferConstrainedGenericsRule extends SaropaLintRule {
-  const PreferConstrainedGenericsRule() : super(code: _code);
+  PreferConstrainedGenericsRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -141,27 +136,25 @@ class PreferConstrainedGenericsRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'prefer_constrained_generics',
-    problemMessage:
-        '[prefer_constrained_generics] Generic type parameter has no constraint. Unconstrained type parameters accept any type including null, which can lead to unexpected behavior. This weakens type safety, allowing errors to reach runtime where they crash instead of being caught at compile time. {v4}',
+    'prefer_constrained_generics',
+    '[prefer_constrained_generics] Generic type parameter has no constraint. Unconstrained type parameters accept any type including null, which can lead to unexpected behavior. This weakens type safety, allowing errors to reach runtime where they crash instead of being caught at compile time. {v4}',
     correctionMessage:
         'Add extends clause to constrain the type. Verify the change works correctly with existing tests and add coverage for the new behavior.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addClassDeclaration((ClassDeclaration node) {
+    context.addClassDeclaration((ClassDeclaration node) {
       final TypeParameterList? typeParams = node.typeParameters;
       if (typeParams == null) return;
 
       for (final TypeParameter param in typeParams.typeParameters) {
         if (param.bound == null) {
-          reporter.atNode(param, code);
+          reporter.atNode(param);
         }
       }
     });
@@ -190,7 +183,7 @@ class PreferConstrainedGenericsRule extends SaropaLintRule {
 /// }
 /// ```
 class RequireCovariantDocumentationRule extends SaropaLintRule {
-  const RequireCovariantDocumentationRule() : super(code: _code);
+  RequireCovariantDocumentationRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -200,21 +193,19 @@ class RequireCovariantDocumentationRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'require_covariant_documentation',
-    problemMessage:
-        '[require_covariant_documentation] Covariant parameter must be documented. Covariant parameters weaken type safety and can cause runtime errors. They must be documented to explain why they\'re necessary. {v5}',
+    'require_covariant_documentation',
+    '[require_covariant_documentation] Covariant parameter must be documented. Covariant parameters weaken type safety and can cause runtime errors. They must be documented to explain why they\'re necessary. {v5}',
     correctionMessage:
         'Add documentation explaining why covariant is necessary. Verify the change works correctly with existing tests and add coverage for the new behavior.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodDeclaration((MethodDeclaration node) {
+    context.addMethodDeclaration((MethodDeclaration node) {
       final FormalParameterList? params = node.parameters;
       if (params == null) return;
 
@@ -225,13 +216,13 @@ class RequireCovariantDocumentationRule extends SaropaLintRule {
             // Check if method has documentation
             final Comment? doc = node.documentationComment;
             if (doc == null) {
-              reporter.atNode(param, code);
+              reporter.atNode(param);
             }
           }
         } else if (param.covariantKeyword != null) {
           final Comment? doc = node.documentationComment;
           if (doc == null) {
-            reporter.atNode(param, code);
+            reporter.atNode(param);
           }
         }
       }
@@ -264,7 +255,7 @@ class RequireCovariantDocumentationRule extends SaropaLintRule {
 /// }
 /// ```
 class RequireSafeJsonParsingRule extends SaropaLintRule {
-  const RequireSafeJsonParsingRule() : super(code: _code);
+  RequireSafeJsonParsingRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -274,12 +265,11 @@ class RequireSafeJsonParsingRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'require_safe_json_parsing',
-    problemMessage:
-        '[require_safe_json_parsing] JSON parsing may throw on missing keys. JSON parsing should handle missing or null values gracefully to avoid runtime exceptions. This weakens type safety, allowing errors to reach runtime where they crash instead of being caught at compile time. {v4}',
+    'require_safe_json_parsing',
+    '[require_safe_json_parsing] JSON parsing may throw on missing keys. JSON parsing should handle missing or null values gracefully to avoid runtime exceptions. This weakens type safety, allowing errors to reach runtime where they crash instead of being caught at compile time. {v4}',
     correctionMessage:
         'Use null-aware operators or provide defaults. Verify the change works correctly with existing tests and add coverage for the new behavior.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   /// Regex to match unsafe casts in JSON parsing.
@@ -291,11 +281,10 @@ class RequireSafeJsonParsingRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addConstructorDeclaration((ConstructorDeclaration node) {
+    context.addConstructorDeclaration((ConstructorDeclaration node) {
       // Check for fromJson factory
       final String? name = node.name?.lexeme;
       if (name != 'fromJson' && name != 'fromMap') return;
@@ -308,7 +297,7 @@ class RequireSafeJsonParsingRule extends SaropaLintRule {
       if (_unsafeCastPattern.hasMatch(bodySource)) {
         // Check if there's null handling nearby
         if (!bodySource.contains('??') && !bodySource.contains('?[')) {
-          reporter.atNode(node, code);
+          reporter.atNode(node);
         }
       }
     });
@@ -335,7 +324,7 @@ class RequireSafeJsonParsingRule extends SaropaLintRule {
 /// }
 /// ```
 class RequireNullSafeExtensionsRule extends SaropaLintRule {
-  const RequireNullSafeExtensionsRule() : super(code: _code);
+  RequireNullSafeExtensionsRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -345,21 +334,19 @@ class RequireNullSafeExtensionsRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'require_null_safe_extensions',
-    problemMessage:
-        '[require_null_safe_extensions] Extension method on a nullable type does not handle null receivers. This can cause runtime exceptions. Extension methods on nullable types should check for null. {v4}',
+    'require_null_safe_extensions',
+    '[require_null_safe_extensions] Extension method on a nullable type does not handle null receivers. This can cause runtime exceptions. Extension methods on nullable types should check for null. {v4}',
     correctionMessage:
         'Add null checks or use ?. to safely handle nullable receivers in extension methods.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addExtensionDeclaration((ExtensionDeclaration node) {
+    context.addExtensionDeclaration((ExtensionDeclaration node) {
       // Get the extended type from the extension on clause
       final ExtensionOnClause? onClause = node.onClause;
       if (onClause == null) return;
@@ -371,7 +358,7 @@ class RequireNullSafeExtensionsRule extends SaropaLintRule {
       for (final ClassMember member in node.members) {
         final String memberSource = member.toSource();
         if (memberSource.contains('this!')) {
-          reporter.atNode(member, code);
+          reporter.atNode(member);
         }
       }
     });
@@ -394,7 +381,7 @@ class RequireNullSafeExtensionsRule extends SaropaLintRule {
 /// double calculate(double a, double b) => a + b;
 /// ```
 class PreferSpecificNumericTypesRule extends SaropaLintRule {
-  const PreferSpecificNumericTypesRule() : super(code: _code);
+  PreferSpecificNumericTypesRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -404,25 +391,23 @@ class PreferSpecificNumericTypesRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'prefer_specific_numeric_types',
-    problemMessage:
-        '[prefer_specific_numeric_types] Prefer int or double over num to improve type safety. This weakens type safety, allowing errors to reach runtime where they crash instead of being caught at compile time. {v4}',
+    'prefer_specific_numeric_types',
+    '[prefer_specific_numeric_types] Prefer int or double over num to improve type safety. This weakens type safety, allowing errors to reach runtime where they crash instead of being caught at compile time. {v4}',
     correctionMessage:
         'Use int or double instead of num. Verify the change works correctly with existing tests and add coverage for the new behavior.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodDeclaration((MethodDeclaration node) {
+    context.addMethodDeclaration((MethodDeclaration node) {
       // Check return type
       final TypeAnnotation? returnType = node.returnType;
       if (returnType != null && returnType.toSource() == 'num') {
-        reporter.atNode(returnType, code);
+        reporter.atNode(returnType);
       }
 
       // Check parameters
@@ -433,7 +418,7 @@ class PreferSpecificNumericTypesRule extends SaropaLintRule {
           if (paramSource.startsWith('num ') ||
               paramSource.contains(' num ') ||
               paramSource.contains('(num ')) {
-            reporter.atNode(param, code);
+            reporter.atNode(param);
           }
         }
       }
@@ -460,7 +445,7 @@ class PreferSpecificNumericTypesRule extends SaropaLintRule {
 /// final length = user.name?.length;
 /// ```
 class AvoidNonNullAssertionRule extends SaropaLintRule {
-  const AvoidNonNullAssertionRule() : super(code: _code);
+  AvoidNonNullAssertionRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.medium;
@@ -469,25 +454,23 @@ class AvoidNonNullAssertionRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_non_null_assertion',
-    problemMessage:
-        '[avoid_non_null_assertion] Non-null assertion operator (!) throws a runtime exception if the value is null, crashing the app. '
+    'avoid_non_null_assertion',
+    '[avoid_non_null_assertion] Non-null assertion operator (!) throws a runtime exception if the value is null, crashing the app. '
         'The resulting _CastError provides no context about which variable was null or why, making production crashes from error reports and stack traces alone difficult to diagnose and reproduce. {v2}',
     correctionMessage:
         'Use null-aware operators (?., ??) or explicit null checks (if (value != null)) to handle nullability safely. '
         'When null is truly impossible due to prior validation, add an assert with a descriptive message or use a guard clause that throws a meaningful exception.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addPostfixExpression((PostfixExpression node) {
+    context.addPostfixExpression((PostfixExpression node) {
       if (node.operator.lexeme == '!') {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
   }
@@ -512,7 +495,7 @@ class AvoidNonNullAssertionRule extends SaropaLintRule {
 /// }
 /// ```
 class AvoidTypeCastsRule extends SaropaLintRule {
-  const AvoidTypeCastsRule() : super(code: _code);
+  AvoidTypeCastsRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.low;
@@ -521,22 +504,20 @@ class AvoidTypeCastsRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_type_casts',
-    problemMessage:
-        '[avoid_type_casts] Type cast with "as" may throw at runtime. Type casts with as can throw at runtime. Prefer is checks or pattern matching for safer type narrowing. {v2}',
+    'avoid_type_casts',
+    '[avoid_type_casts] Type cast with "as" may throw at runtime. Type casts with as can throw at runtime. Prefer is checks or pattern matching for safer type narrowing. {v2}',
     correctionMessage:
         'Use "is" check or pattern matching instead. Verify the change works correctly with existing tests and add coverage for the new behavior.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addAsExpression((AsExpression node) {
-      reporter.atNode(node, code);
+    context.addAsExpression((AsExpression node) {
+      reporter.atNode(node);
     });
   }
 }
@@ -558,7 +539,7 @@ class AvoidTypeCastsRule extends SaropaLintRule {
 /// FutureOr<String> getValue();
 /// ```
 class RequireFutureOrDocumentationRule extends SaropaLintRule {
-  const RequireFutureOrDocumentationRule() : super(code: _code);
+  RequireFutureOrDocumentationRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -568,21 +549,19 @@ class RequireFutureOrDocumentationRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'require_futureor_documentation',
-    problemMessage:
-        '[require_futureor_documentation] FutureOr return type must be documented. FutureOr can be confusing for API consumers and must be documented. FutureOr is used in public API without documentation. {v4}',
+    'require_futureor_documentation',
+    '[require_futureor_documentation] FutureOr return type must be documented. FutureOr can be confusing for API consumers and must be documented. FutureOr is used in public API without documentation. {v4}',
     correctionMessage:
         'Add documentation explaining when sync vs async. Verify the change works correctly with existing tests and add coverage for the new behavior.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodDeclaration((MethodDeclaration node) {
+    context.addMethodDeclaration((MethodDeclaration node) {
       final TypeAnnotation? returnType = node.returnType;
       if (returnType == null) return;
 
@@ -591,7 +570,7 @@ class RequireFutureOrDocumentationRule extends SaropaLintRule {
 
       // Check if method has documentation
       if (node.documentationComment == null) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
   }
@@ -618,7 +597,7 @@ class RequireFutureOrDocumentationRule extends SaropaLintRule {
 /// final future = Future<int>.value(1);
 /// ```
 class PreferExplicitTypeArgumentsRule extends SaropaLintRule {
-  const PreferExplicitTypeArgumentsRule() : super(code: _code);
+  PreferExplicitTypeArgumentsRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.low;
@@ -632,39 +611,35 @@ class PreferExplicitTypeArgumentsRule extends SaropaLintRule {
   // meaningful early-exit optimization for this rule.
 
   static const LintCode _code = LintCode(
-    name: 'prefer_explicit_type_arguments',
-    problemMessage:
-        '[prefer_explicit_type_arguments] Generic type without explicit type arguments. Explicit type arguments improve code clarity and prevent accidental type inference issues. Collections with types inferred from context are skipped. {v6}',
+    'prefer_explicit_type_arguments',
+    '[prefer_explicit_type_arguments] Generic type without explicit type arguments. Explicit type arguments improve code clarity and prevent accidental type inference issues. Collections with types inferred from context are skipped. {v6}',
     correctionMessage:
         'Add explicit type arguments to the generic type so that the intended types are visible without relying on inference.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addListLiteral((ListLiteral node) {
+    context.addListLiteral((ListLiteral node) {
       if (node.typeArguments == null &&
           node.elements.isEmpty &&
           !_hasInferredTypeArgs(node.staticType)) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
 
-    context.registry.addSetOrMapLiteral((SetOrMapLiteral node) {
+    context.addSetOrMapLiteral((SetOrMapLiteral node) {
       if (node.typeArguments == null &&
           node.elements.isEmpty &&
           !_hasInferredTypeArgs(node.staticType)) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
 
-    context.registry.addInstanceCreationExpression((
-      InstanceCreationExpression node,
-    ) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
       // Check for generic types without explicit args
       final TypeArgumentList? typeArgs =
           node.constructorName.type.typeArguments;
@@ -697,9 +672,6 @@ class PreferExplicitTypeArgumentsRule extends SaropaLintRule {
     return typeArgs.isNotEmpty &&
         !typeArgs.every((DartType t) => t is DynamicType);
   }
-
-  @override
-  List<Fix> getFixes() => <Fix>[_PreferExplicitTypeArgumentsFix()];
 }
 
 /// Quick fix for [PreferExplicitTypeArgumentsRule].
@@ -717,95 +689,6 @@ class PreferExplicitTypeArgumentsRule extends SaropaLintRule {
 /// separate because each has unique insertion logic (different AST node
 /// properties for the insertion point). Extracting a shared helper would
 /// require passing node-specific accessors, adding complexity without benefit.
-class _PreferExplicitTypeArgumentsFix extends DartFix {
-  @override
-  void run(
-    CustomLintResolver resolver,
-    ChangeReporter reporter,
-    CustomLintContext context,
-    AnalysisError analysisError,
-    List<AnalysisError> others,
-  ) {
-    // Fix for empty list literals
-    context.registry.addListLiteral((ListLiteral node) {
-      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
-      if (node.typeArguments != null) return;
-
-      final DartType? listType = node.staticType;
-      if (listType is! InterfaceType) return;
-
-      final List<DartType> typeArgs = listType.typeArguments;
-      if (typeArgs.isEmpty) return;
-
-      final String typeArgStr =
-          typeArgs.map((DartType t) => t.getDisplayString()).join(', ');
-
-      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
-        message: 'Add <$typeArgStr>',
-        priority: 1,
-      );
-
-      changeBuilder.addDartFileEdit((builder) {
-        builder.addSimpleInsertion(node.leftBracket.offset, '<$typeArgStr>');
-      });
-    });
-
-    // Fix for empty set/map literals
-    context.registry.addSetOrMapLiteral((SetOrMapLiteral node) {
-      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
-      if (node.typeArguments != null) return;
-
-      final DartType? type = node.staticType;
-      if (type is! InterfaceType) return;
-
-      final List<DartType> typeArgs = type.typeArguments;
-      if (typeArgs.isEmpty) return;
-
-      final String typeArgStr =
-          typeArgs.map((DartType t) => t.getDisplayString()).join(', ');
-
-      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
-        message: 'Add <$typeArgStr>',
-        priority: 1,
-      );
-
-      changeBuilder.addDartFileEdit((builder) {
-        builder.addSimpleInsertion(node.leftBracket.offset, '<$typeArgStr>');
-      });
-    });
-
-    // Fix for generic constructor calls
-    context.registry.addInstanceCreationExpression((
-      InstanceCreationExpression node,
-    ) {
-      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
-
-      final TypeArgumentList? existingTypeArgs =
-          node.constructorName.type.typeArguments;
-      if (existingTypeArgs != null) return;
-
-      final DartType? staticType = node.staticType;
-      if (staticType is! InterfaceType) return;
-
-      final List<DartType> typeArgs = staticType.typeArguments;
-      if (typeArgs.isEmpty) return;
-
-      final String typeArgStr =
-          typeArgs.map((DartType t) => t.getDisplayString()).join(', ');
-
-      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
-        message: 'Add <$typeArgStr>',
-        priority: 1,
-      );
-
-      changeBuilder.addDartFileEdit((builder) {
-        // Insert after the type name
-        final NamedType namedType = node.constructorName.type;
-        builder.addSimpleInsertion(namedType.name2.end, '<$typeArgStr>');
-      });
-    });
-  }
-}
 
 /// Detects casts between unrelated types that will always fail at runtime.
 ///
@@ -834,7 +717,7 @@ class _PreferExplicitTypeArgumentsFix extends DartFix {
 /// }
 /// ```
 class AvoidUnrelatedTypeCastsRule extends SaropaLintRule {
-  const AvoidUnrelatedTypeCastsRule() : super(code: _code);
+  AvoidUnrelatedTypeCastsRule() : super(code: _code);
 
   /// Critical issue - always-failing cast causes runtime crash.
   @override
@@ -844,12 +727,11 @@ class AvoidUnrelatedTypeCastsRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.high;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_unrelated_type_casts',
-    problemMessage:
-        '[avoid_unrelated_type_casts] Casting between unrelated types (such as String to int) will always throw a runtime error, leading to crashes and unpredictable behavior. This often indicates a logic error or misunderstanding of the type system. Always ensure types are compatible before casting to prevent runtime failures and improve code safety. {v3}',
+    'avoid_unrelated_type_casts',
+    '[avoid_unrelated_type_casts] Casting between unrelated types (such as String to int) will always throw a runtime error, leading to crashes and unpredictable behavior. This often indicates a logic error or misunderstanding of the type system. Always ensure types are compatible before casting to prevent runtime failures and improve code safety. {v3}',
     correctionMessage:
         'Before casting, use an "is" check or verify the type hierarchy to ensure the cast is valid. Refactor code to avoid unnecessary or unsafe casts and rely on type-safe patterns.',
-    errorSeverity: DiagnosticSeverity.ERROR,
+    severity: DiagnosticSeverity.ERROR,
   );
 
   /// Types that are clearly unrelated to each other (leaf types).
@@ -866,11 +748,10 @@ class AvoidUnrelatedTypeCastsRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addAsExpression((AsExpression node) {
+    context.addAsExpression((AsExpression node) {
       final Expression expression = node.expression;
       final TypeAnnotation targetType = node.type;
 
@@ -884,7 +765,7 @@ class AvoidUnrelatedTypeCastsRule extends SaropaLintRule {
       if (_leafTypes.contains(sourceTypeName) &&
           _leafTypes.contains(targetTypeName) &&
           sourceTypeName != targetTypeName) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
   }
@@ -936,7 +817,7 @@ class AvoidUnrelatedTypeCastsRule extends SaropaLintRule {
 /// final name = json.optionalString(['user', 'profile', 'name']);
 /// ```
 class AvoidDynamicJsonAccessRule extends SaropaLintRule {
-  const AvoidDynamicJsonAccessRule() : super(code: _code);
+  AvoidDynamicJsonAccessRule() : super(code: _code);
 
   /// High impact - null access causes runtime crash.
   @override
@@ -946,21 +827,19 @@ class AvoidDynamicJsonAccessRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_dynamic_json_access',
-    problemMessage:
-        '[avoid_dynamic_json_access] Chained dynamic JSON access without null checks throws NoSuchMethodError at runtime when any intermediate key is missing or null. This causes unhandled crashes in production when API responses deviate from the expected schema, with no compile-time safety net. {v6}',
+    'avoid_dynamic_json_access',
+    '[avoid_dynamic_json_access] Chained dynamic JSON access without null checks throws NoSuchMethodError at runtime when any intermediate key is missing or null. This causes unhandled crashes in production when API responses deviate from the expected schema, with no compile-time safety net. {v6}',
     correctionMessage:
         'Use null-aware operators (?.) for safe access, or validate each level exists before accessing nested properties to prevent runtime crashes.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addIndexExpression((IndexExpression node) {
+    context.addIndexExpression((IndexExpression node) {
       // Check if target is also an index expression (chained access)
       final Expression? targetExpr = node.target;
       if (targetExpr is! IndexExpression) return;
@@ -987,7 +866,7 @@ class AvoidDynamicJsonAccessRule extends SaropaLintRule {
       // Skip if wrapped in try-catch
       if (_isInsideTryCatch(node)) return;
 
-      reporter.atNode(node, code);
+      reporter.atNode(node);
     });
   }
 
@@ -1027,7 +906,7 @@ class AvoidDynamicJsonAccessRule extends SaropaLintRule {
 /// if (nameValue is String) { ... }
 /// ```
 class RequireNullSafeJsonAccessRule extends SaropaLintRule {
-  const RequireNullSafeJsonAccessRule() : super(code: _code);
+  RequireNullSafeJsonAccessRule() : super(code: _code);
 
   /// Critical issue - null access causes crash.
   @override
@@ -1037,21 +916,19 @@ class RequireNullSafeJsonAccessRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'require_null_safe_json_access',
-    problemMessage:
-        '[require_null_safe_json_access] Accessing values from a JSON map without checking for key existence or null values can throw exceptions (such as NoSuchMethodError or TypeError) if the key is missing or the value is null. This is a common source of runtime crashes and unstable code, especially when dealing with data from APIs, user input, or external sources. Null-safe access is essential for robust, production-quality Dart and Flutter applications. {v4}',
+    'require_null_safe_json_access',
+    '[require_null_safe_json_access] Accessing values from a JSON map without checking for key existence or null values can throw exceptions (such as NoSuchMethodError or TypeError) if the key is missing or the value is null. This is a common source of runtime crashes and unstable code, especially when dealing with data from APIs, user input, or external sources. Null-safe access is essential for robust, production-quality Dart and Flutter applications. {v4}',
     correctionMessage:
         'Always use null-aware operators (such as ?. or ??) or explicitly check for key existence before accessing values in a JSON map. This prevents runtime exceptions and makes your code safer and more maintainable. Audit your codebase for direct JSON map access and refactor to use null-safe patterns, especially in code that handles external or untrusted data.',
-    errorSeverity: DiagnosticSeverity.ERROR,
+    severity: DiagnosticSeverity.ERROR,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addAsExpression((AsExpression node) {
+    context.addAsExpression((AsExpression node) {
       final Expression expression = node.expression;
 
       // Check if expression is an index expression (map access)
@@ -1073,7 +950,7 @@ class RequireNullSafeJsonAccessRule extends SaropaLintRule {
       // Check if inside null check conditional
       if (_hasNullCheckGuard(node)) return;
 
-      reporter.atNode(node, code);
+      reporter.atNode(node);
     });
   }
 
@@ -1122,7 +999,7 @@ class RequireNullSafeJsonAccessRule extends SaropaLintRule {
 /// final city = user.address?.city;
 /// ```
 class AvoidDynamicJsonChainsRule extends SaropaLintRule {
-  const AvoidDynamicJsonChainsRule() : super(code: _code);
+  AvoidDynamicJsonChainsRule() : super(code: _code);
 
   /// Critical issue - deep chains are fragile and crash on missing keys.
   @override
@@ -1132,22 +1009,20 @@ class AvoidDynamicJsonChainsRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_dynamic_json_chains',
-    problemMessage:
-        '[avoid_dynamic_json_chains] Deep dynamic access throws NoSuchMethodError '
+    'avoid_dynamic_json_chains',
+    '[avoid_dynamic_json_chains] Deep dynamic access throws NoSuchMethodError '
         'or TypeError at runtime when any nested key is missing. Chaining multiple dynamic map accesses (e.g., json["a"]["b"]["c"]) is fragile and will crash if any key is missing or null. This leads to runtime exceptions, broken features, and poor user experience. Always check each level for null before accessing the next. {v3}',
     correctionMessage:
         'Break deep dynamic map accesses into separate statements with null checks at each level. Use safe navigation (?.) or explicit checks to prevent runtime errors and improve code robustness.',
-    errorSeverity: DiagnosticSeverity.ERROR,
+    severity: DiagnosticSeverity.ERROR,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addIndexExpression((IndexExpression node) {
+    context.addIndexExpression((IndexExpression node) {
       // Count chain depth
       int depth = _getChainDepth(node);
 
@@ -1157,7 +1032,7 @@ class AvoidDynamicJsonChainsRule extends SaropaLintRule {
         final AstNode? parent = node.parent;
         if (parent is IndexExpression) return; // Not outermost
 
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
   }
@@ -1209,7 +1084,7 @@ class AvoidDynamicJsonChainsRule extends SaropaLintRule {
 /// }
 /// ```
 class RequireEnumUnknownValueRule extends SaropaLintRule {
-  const RequireEnumUnknownValueRule() : super(code: _code);
+  RequireEnumUnknownValueRule() : super(code: _code);
 
   /// High impact - crashes on new API values.
   @override
@@ -1219,21 +1094,19 @@ class RequireEnumUnknownValueRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'require_enum_unknown_value',
-    problemMessage:
-        '[require_enum_unknown_value] Enum parsing without a fallback value throws an ArgumentError when the input string does not match any enum member. Backend API changes or new enum values added server-side will crash the app in production for all users until a client update is deployed. {v6}',
+    'require_enum_unknown_value',
+    '[require_enum_unknown_value] Enum parsing without a fallback value throws an ArgumentError when the input string does not match any enum member. Backend API changes or new enum values added server-side will crash the app in production for all users until a client update is deployed. {v6}',
     correctionMessage:
         'Add a fallback enum value (e.g., .unknown) using the orElse parameter, or use MyEnum.values.tryByName() to safely handle unknown values.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       final String methodName = node.methodName.name;
 
       // Check for .byName() calls on enum.values
@@ -1242,7 +1115,7 @@ class RequireEnumUnknownValueRule extends SaropaLintRule {
         if (target != null && target.toSource().contains('.values')) {
           // Check if result has fallback
           if (!_hasFallback(node)) {
-            reporter.atNode(node, code);
+            reporter.atNode(node);
           }
         }
       }
@@ -1260,7 +1133,7 @@ class RequireEnumUnknownValueRule extends SaropaLintRule {
             }
           }
           if (!hasOrElse && !_hasFallback(node)) {
-            reporter.atNode(node, code);
+            reporter.atNode(node);
           }
         }
       }
@@ -1326,7 +1199,7 @@ class RequireEnumUnknownValueRule extends SaropaLintRule {
 /// }
 /// ```
 class RequireValidatorReturnNullRule extends SaropaLintRule {
-  const RequireValidatorReturnNullRule() : super(code: _code);
+  RequireValidatorReturnNullRule() : super(code: _code);
 
   /// Critical issue - forms never validate successfully.
   @override
@@ -1336,24 +1209,20 @@ class RequireValidatorReturnNullRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'require_validator_return_null',
-    problemMessage:
-        '[require_validator_return_null] Non-null return on valid input shows '
+    'require_validator_return_null',
+    '[require_validator_return_null] Non-null return on valid input shows '
         'error message even when field is correct, confusing users. Validator functions in forms must return null for valid input. Returning a non-null value causes error messages to display even when the field is correct, leading to user frustration and broken form validation. {v3}',
     correctionMessage:
         'Always return null from validator functions when the input is valid. This ensures error messages are only shown for invalid input and provides a correct user experience.',
-    errorSeverity: DiagnosticSeverity.ERROR,
+    severity: DiagnosticSeverity.ERROR,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addInstanceCreationExpression((
-      InstanceCreationExpression node,
-    ) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final String typeName = node.constructorName.type.name.lexeme;
       if (typeName != 'TextFormField') return;
 
@@ -1383,7 +1252,8 @@ class RequireValidatorReturnNullRule extends SaropaLintRule {
     // Check for conditional with null
     // Pattern: condition ? 'error' : null
     final ternaryWithNullPattern = RegExp(
-        r"\?\s*['" + r'"' + r"][^'" + r'"' + r"]+['" + r'"' + r"]\s*:\s*null");
+      r"\?\s*['" + r'"' + r"][^'" + r'"' + r"]+['" + r'"' + r"]\s*:\s*null",
+    );
     if (ternaryWithNullPattern.hasMatch(source)) {
       return true;
     }

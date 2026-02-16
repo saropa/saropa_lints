@@ -6,10 +6,6 @@ import 'package:analyzer/dart/ast/visitor.dart';
 import 'package:analyzer/dart/element/element.dart';
 import 'package:analyzer/dart/element/nullability_suffix.dart';
 import 'package:analyzer/dart/element/type.dart';
-import 'package:analyzer/error/error.dart'
-    show AnalysisError, DiagnosticSeverity;
-import 'package:analyzer/source/source_range.dart';
-import 'package:custom_lint_builder/custom_lint_builder.dart';
 
 import '../saropa_lint_rule.dart';
 
@@ -34,7 +30,7 @@ import '../saropa_lint_rule.dart';
 ///
 /// **Quick fix available:** Adds a comment to flag for manual review.
 class AvoidCastingToExtensionTypeRule extends SaropaLintRule {
-  const AvoidCastingToExtensionTypeRule() : super(code: _code);
+  AvoidCastingToExtensionTypeRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -44,23 +40,21 @@ class AvoidCastingToExtensionTypeRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_casting_to_extension_type',
-    problemMessage:
-        '[avoid_casting_to_extension_type] Cast to extension type bypasses the constructor invariants and type safety guarantees. '
+    'avoid_casting_to_extension_type',
+    '[avoid_casting_to_extension_type] Cast to extension type bypasses the constructor invariants and type safety guarantees. '
         'Extension types are erased at runtime, so the cast always succeeds regardless of whether the value satisfies the extension type constraints, silently producing an invalid wrapper. {v5}',
     correctionMessage:
         'Use the extension type constructor (e.g., UserId(42)) instead of casting (42 as UserId). '
         'The constructor enforces any validation logic defined in the extension type and makes the type conversion explicit and self-documenting at the call site.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addAsExpression((AsExpression node) {
+    context.addAsExpression((AsExpression node) {
       // Check if target type is an extension type
       final TypeAnnotation typeAnnotation = node.type;
 
@@ -69,14 +63,11 @@ class AvoidCastingToExtensionTypeRule extends SaropaLintRule {
       if (typeAnnotation is NamedType) {
         final Element? element = typeAnnotation.element;
         if (element != null && element.toString().contains('extension type')) {
-          reporter.atNode(node, code);
+          reporter.atNode(node);
         }
       }
     });
   }
-
-  @override
-  List<Fix> getFixes() => <Fix>[_AddHackForExtensionTypeCastFix()];
 }
 
 /// Warns when using collection methods with unrelated types.
@@ -100,7 +91,7 @@ class AvoidCastingToExtensionTypeRule extends SaropaLintRule {
 ///
 /// **Quick fix available:** Adds a comment to flag for manual review.
 class AvoidCollectionMethodsWithUnrelatedTypesRule extends SaropaLintRule {
-  const AvoidCollectionMethodsWithUnrelatedTypesRule() : super(code: _code);
+  AvoidCollectionMethodsWithUnrelatedTypesRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -110,12 +101,11 @@ class AvoidCollectionMethodsWithUnrelatedTypesRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.high;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_collection_methods_with_unrelated_types',
-    problemMessage:
-        '[avoid_collection_methods_with_unrelated_types] Collection method called with unrelated type. Using contains, indexOf, remove, etc. with a type that can never match the collection\'s element type is likely a bug. {v5}',
+    'avoid_collection_methods_with_unrelated_types',
+    '[avoid_collection_methods_with_unrelated_types] Collection method called with unrelated type. Using contains, indexOf, remove, etc. with a type that can never match the collection\'s element type is likely a bug. {v5}',
     correctionMessage:
         'The argument type cannot match any element in the collection. Verify the change works correctly with existing tests and add coverage for the new behavior.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   static const Set<String> _collectionMethods = <String>{
@@ -128,11 +118,10 @@ class AvoidCollectionMethodsWithUnrelatedTypesRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       final String methodName = node.methodName.name;
       if (!_collectionMethods.contains(methodName)) return;
 
@@ -219,7 +208,7 @@ class AvoidCollectionMethodsWithUnrelatedTypesRule extends SaropaLintRule {
 /// Using dynamic bypasses the type system and can lead to runtime errors.
 /// Prefer using specific types or generics.
 class AvoidDynamicRule extends SaropaLintRule {
-  const AvoidDynamicRule() : super(code: _code);
+  AvoidDynamicRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -229,25 +218,23 @@ class AvoidDynamicRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_dynamic_type',
-    problemMessage:
-        "[avoid_dynamic_type] 'dynamic' type disables static type checking, hiding errors until runtime. "
+    'avoid_dynamic_type',
+    "[avoid_dynamic_type] 'dynamic' type disables static type checking, hiding errors until runtime. "
         "Method calls on dynamic values are never verified by the compiler, so typos, missing methods, and wrong argument types only surface as NoSuchMethodError crashes in production. {v3}",
     correctionMessage:
         "Replace 'dynamic' with a specific type, Object (for truly unknown values with explicit casts), or a generic type parameter. "
         'If the actual type varies, use a sealed class hierarchy or union type to keep the compiler involved in checking correctness.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addNamedType((NamedType node) {
+    context.addNamedType((NamedType node) {
       if (node.name.lexeme == 'dynamic') {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
   }
@@ -274,7 +261,7 @@ class AvoidDynamicRule extends SaropaLintRule {
 ///
 /// **Quick fix available:** Adds a comment to flag for manual review.
 class AvoidImplicitlyNullableExtensionTypesRule extends SaropaLintRule {
-  const AvoidImplicitlyNullableExtensionTypesRule() : super(code: _code);
+  AvoidImplicitlyNullableExtensionTypesRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -284,22 +271,19 @@ class AvoidImplicitlyNullableExtensionTypesRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_implicitly_nullable_extension_types',
-    problemMessage:
-        '[avoid_implicitly_nullable_extension_types] Extension type is implicitly nullable. Extension types that don\'t implement Object can be implicitly nullable, which may lead to unexpected behavior. {v4}',
+    'avoid_implicitly_nullable_extension_types',
+    '[avoid_implicitly_nullable_extension_types] Extension type is implicitly nullable. Extension types that don\'t implement Object can be implicitly nullable, which may lead to unexpected behavior. {v4}',
     correctionMessage:
         'Add "implements Object" to make it non-nullable. Verify the change works correctly with existing tests and add coverage for the new behavior.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry
-        .addExtensionTypeDeclaration((ExtensionTypeDeclaration node) {
+    context.addExtensionTypeDeclaration((ExtensionTypeDeclaration node) {
       final ImplementsClause? implementsClause = node.implementsClause;
 
       // Check if it implements Object
@@ -318,9 +302,6 @@ class AvoidImplicitlyNullableExtensionTypesRule extends SaropaLintRule {
       }
     });
   }
-
-  @override
-  List<Fix> getFixes() => <Fix>[_AddHackForImplicitlyNullableExtensionFix()];
 }
 
 /// Warns when interpolating a nullable value in a string.
@@ -329,7 +310,7 @@ class AvoidImplicitlyNullableExtensionTypesRule extends SaropaLintRule {
 ///
 /// **Quick fix available:** Adds a comment to flag for manual review.
 class AvoidNullableInterpolationRule extends SaropaLintRule {
-  const AvoidNullableInterpolationRule() : super(code: _code);
+  AvoidNullableInterpolationRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -339,35 +320,30 @@ class AvoidNullableInterpolationRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_nullable_interpolation',
-    problemMessage:
-        "[avoid_nullable_interpolation] Nullable value in string interpolation produces the literal text 'null' instead of a meaningful fallback. "
+    'avoid_nullable_interpolation',
+    "[avoid_nullable_interpolation] Nullable value in string interpolation produces the literal text 'null' instead of a meaningful fallback. "
         "Users may see 'Hello null' or 'Order #null' in the UI, which looks like a bug and erodes trust in the application quality and data integrity. {v5}",
     correctionMessage:
         "Add a null check before interpolation, or use the null-coalescing operator (??) to provide a sensible default (e.g., '\${name ?? \"Guest\"}'). "
         'For complex formatting, consider a helper method that handles null values with appropriate placeholder text.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addInterpolationExpression((InterpolationExpression node) {
+    context.addInterpolationExpression((InterpolationExpression node) {
       final Expression expr = node.expression;
       final DartType? type = expr.staticType;
       if (type == null) return;
 
       if (type.nullabilitySuffix == NullabilitySuffix.question) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
   }
-
-  @override
-  List<Fix> getFixes() => <Fix>[_AddHackForNullableInterpolationFix()];
 }
 
 /// Warns when nullable parameters have default values that could be non-null.
@@ -390,7 +366,7 @@ class AvoidNullableInterpolationRule extends SaropaLintRule {
 ///
 /// **Quick fix available:** Adds a comment to flag for manual review.
 class AvoidNullableParametersWithDefaultValuesRule extends SaropaLintRule {
-  const AvoidNullableParametersWithDefaultValuesRule() : super(code: _code);
+  AvoidNullableParametersWithDefaultValuesRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -400,21 +376,19 @@ class AvoidNullableParametersWithDefaultValuesRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_nullable_parameters_with_default_values',
-    problemMessage:
-        '[avoid_nullable_parameters_with_default_values] Parameter with default value must not be nullable. If a parameter has a default value, it doesn\'t need to be nullable. Quick fix available: Adds a comment to flag for manual review. {v5}',
+    'avoid_nullable_parameters_with_default_values',
+    '[avoid_nullable_parameters_with_default_values] Parameter with default value must not be nullable. If a parameter has a default value, it doesn\'t need to be nullable. Quick fix available: Adds a comment to flag for manual review. {v5}',
     correctionMessage:
         'Remove the ? from the type since it has a non-null default. Verify the change works correctly with existing tests and add coverage for the new behavior.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addDefaultFormalParameter((DefaultFormalParameter node) {
+    context.addDefaultFormalParameter((DefaultFormalParameter node) {
       final Expression? defaultValue = node.defaultValue;
       if (defaultValue == null) return;
 
@@ -430,13 +404,10 @@ class AvoidNullableParametersWithDefaultValuesRule extends SaropaLintRule {
       }
 
       if (typeAnnotation is NamedType && typeAnnotation.question != null) {
-        reporter.atNode(typeAnnotation, code);
+        reporter.atNode(typeAnnotation);
       }
     });
   }
-
-  @override
-  List<Fix> getFixes() => <Fix>[_AddHackForNullableParamWithDefaultFix()];
 }
 
 /// Warns when calling `.toString()` on a nullable value without null check.
@@ -457,7 +428,7 @@ class AvoidNullableParametersWithDefaultValuesRule extends SaropaLintRule {
 /// if (name != null) print(name);
 /// ```
 class AvoidNullableToStringRule extends SaropaLintRule {
-  const AvoidNullableToStringRule() : super(code: _code);
+  AvoidNullableToStringRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -467,21 +438,19 @@ class AvoidNullableToStringRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_nullable_tostring',
-    problemMessage:
-        '[avoid_nullable_tostring] Calling toString() on a nullable value. Calling .toString() on a nullable value without null check. This type usage can cause unexpected runtime behavior or weaken static analysis effectiveness. {v4}',
+    'avoid_nullable_tostring',
+    '[avoid_nullable_tostring] Calling toString() on a nullable value. Calling .toString() on a nullable value without null check. This type usage can cause unexpected runtime behavior or weaken static analysis effectiveness. {v4}',
     correctionMessage:
         'Check for null first or provide a default value. Verify the change works correctly with existing tests and add coverage for the new behavior.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       if (node.methodName.name != 'toString') return;
 
       // Skip null-safe calls: x?.toString() is the proper way to handle nullable
@@ -499,7 +468,7 @@ class AvoidNullableToStringRule extends SaropaLintRule {
 
       // Check if target is nullable
       if (targetType.nullabilitySuffix == NullabilitySuffix.question) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
   }
@@ -539,7 +508,7 @@ class AvoidNullableToStringRule extends SaropaLintRule {
 /// onTap: callback == null ? null : () => callback!(),
 /// ```
 class AvoidNullAssertionRule extends SaropaLintRule {
-  const AvoidNullAssertionRule() : super(code: _code);
+  AvoidNullAssertionRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -549,14 +518,13 @@ class AvoidNullAssertionRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_null_assertion',
-    problemMessage:
-        '[avoid_null_assertion] Null assertion operator (!) throws a runtime exception if the value is null, crashing the app without a meaningful error message. '
+    'avoid_null_assertion',
+    '[avoid_null_assertion] Null assertion operator (!) throws a runtime exception if the value is null, crashing the app without a meaningful error message. '
         'The resulting _CastError provides no context about which value was null or why, making production crashes difficult to diagnose from error reports alone. {v7}',
     correctionMessage:
         'Use null-safe alternatives: ?? for default values (e.g., name ?? \'Unknown\'), if-null checks for conditional logic, or ?. for optional chaining. '
         'When null is truly impossible, add an assert with a descriptive message or use a guard clause that throws a custom exception.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   /// Extension names that return `true` when value is NOT null/empty/zero.
@@ -594,11 +562,10 @@ class AvoidNullAssertionRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addPostfixExpression((PostfixExpression node) {
+    context.addPostfixExpression((PostfixExpression node) {
       // Check if this is a null assertion (!)
       if (node.operator.lexeme != '!') return;
 
@@ -608,7 +575,7 @@ class AvoidNullAssertionRule extends SaropaLintRule {
       if (_isInShortCircuitSafe(node)) return;
       if (_isAfterNullCoalescingAssignment(node)) return;
 
-      reporter.atNode(node, code);
+      reporter.atNode(node);
     });
   }
 
@@ -938,7 +905,9 @@ class AvoidNullAssertionRule extends SaropaLintRule {
   /// The key insight: if `x?.something == nonNullValue` is true, x cannot be null.
   /// Similarly, if `x!.something` didn't throw, x was not null.
   bool _isNullPropagatingGuard(
-      BinaryExpression condition, String assertedExpr) {
+    BinaryExpression condition,
+    String assertedExpr,
+  ) {
     final Expression left = condition.leftOperand;
     final Expression right = condition.rightOperand;
     final String op = condition.operator.lexeme;
@@ -1335,9 +1304,15 @@ class AvoidNullAssertionRule extends SaropaLintRule {
 
     if (condition is BinaryExpression && condition.operator.lexeme == '||') {
       return _containsNegatedHasCheck(
-              condition.leftOperand, targetBase, guardProperty) ||
+            condition.leftOperand,
+            targetBase,
+            guardProperty,
+          ) ||
           _containsNegatedHasCheck(
-              condition.rightOperand, targetBase, guardProperty);
+            condition.rightOperand,
+            targetBase,
+            guardProperty,
+          );
     }
 
     return false;
@@ -1484,9 +1459,6 @@ class AvoidNullAssertionRule extends SaropaLintRule {
 
     return false;
   }
-
-  @override
-  List<Fix> getFixes() => <Fix>[_UseNullAwareOperatorFix()];
 }
 
 /// Quick fix to convert `x!.prop` to `x?.prop` in conditions.
@@ -1500,123 +1472,6 @@ class AvoidNullAssertionRule extends SaropaLintRule {
 /// // After applying fix to condition:
 /// if (widget.items?.length == 1) { widget.items!.first }
 /// ```
-class _UseNullAwareOperatorFix extends DartFix {
-  @override
-  void run(
-    CustomLintResolver resolver,
-    ChangeReporter reporter,
-    CustomLintContext context,
-    AnalysisError analysisError,
-    List<AnalysisError> others,
-  ) {
-    context.registry.addPostfixExpression((PostfixExpression node) {
-      if (node.operator.lexeme != '!') return;
-      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
-
-      // Check if this ! is followed by property/method access (x!.prop or x!.method())
-      final AstNode? parent = node.parent;
-      if (parent is! PropertyAccess && parent is! MethodInvocation) {
-        // Not x!.something pattern - offer a different fix
-        _offerRemoveAssertionFix(reporter, node);
-        return;
-      }
-
-      // Check if we're inside a condition (if statement, ternary, etc.)
-      if (_isInCondition(node)) {
-        _offerNullAwareFix(reporter, node);
-      } else {
-        // Not in a condition - just offer to add a comment
-        _offerRemoveAssertionFix(reporter, node);
-      }
-    });
-  }
-
-  /// Checks if the node is inside a condition expression.
-  bool _isInCondition(AstNode node) {
-    AstNode? current = node.parent;
-    while (current != null) {
-      // Direct condition of if statement
-      if (current is IfStatement) {
-        return _isDescendant(node, current.expression);
-      }
-      // Direct condition of ternary
-      if (current is ConditionalExpression) {
-        return _isDescendant(node, current.condition);
-      }
-      // Condition of if element in collection
-      if (current is IfElement) {
-        return _isDescendant(node, current.expression);
-      }
-      // Part of a binary comparison (==, !=, >, <, etc.)
-      if (current is BinaryExpression) {
-        final String op = current.operator.lexeme;
-        if (op == '==' ||
-            op == '!=' ||
-            op == '>' ||
-            op == '<' ||
-            op == '>=' ||
-            op == '<=') {
-          // Could be in a condition - check if parent is condition context
-          final AstNode? grandparent = current.parent;
-          if (grandparent is IfStatement ||
-              grandparent is ConditionalExpression ||
-              grandparent is IfElement) {
-            return true;
-          }
-        }
-      }
-      current = current.parent;
-    }
-    return false;
-  }
-
-  bool _isDescendant(AstNode node, AstNode potentialAncestor) {
-    AstNode? current = node;
-    while (current != null) {
-      if (current == potentialAncestor) return true;
-      current = current.parent;
-    }
-    return false;
-  }
-
-  /// Offers to convert `x!.prop` to `x?.prop`.
-  void _offerNullAwareFix(
-    ChangeReporter reporter,
-    PostfixExpression node,
-  ) {
-    final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
-      message: 'Use null-aware operator (?.) instead',
-      priority: 1,
-    );
-
-    changeBuilder.addDartFileEdit((builder) {
-      // Replace the ! with ?
-      // The ! is the operator token of the PostfixExpression
-      builder.addSimpleReplacement(
-        node.operator.sourceRange,
-        '?',
-      );
-    });
-  }
-
-  /// Offers to add a comment acknowledging the assertion.
-  void _offerRemoveAssertionFix(
-    ChangeReporter reporter,
-    PostfixExpression node,
-  ) {
-    final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
-      message: 'Add HACK comment for null assertion',
-      priority: 2,
-    );
-
-    changeBuilder.addDartFileEdit((builder) {
-      builder.addSimpleInsertion(
-        node.offset,
-        '/* HACK: null assertion */ ',
-      );
-    });
-  }
-}
 
 /// Helper visitor to find if a target node exists within a container.
 class _NodeContainsFinder extends GeneralizingAstVisitor<void> {
@@ -1654,7 +1509,7 @@ class _NodeContainsFinder extends GeneralizingAstVisitor<void> {
 /// if (x is String) { ... }  // Useful check
 /// ```
 class AvoidUnnecessaryTypeAssertionsRule extends SaropaLintRule {
-  const AvoidUnnecessaryTypeAssertionsRule() : super(code: _code);
+  AvoidUnnecessaryTypeAssertionsRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -1664,21 +1519,19 @@ class AvoidUnnecessaryTypeAssertionsRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.high;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_unnecessary_type_assertions',
-    problemMessage:
-        '[avoid_unnecessary_type_assertions] Unnecessary type assertion. '
+    'avoid_unnecessary_type_assertions',
+    '[avoid_unnecessary_type_assertions] Unnecessary type assertion. '
         'The expression is already known to be of this type. {v2}',
     correctionMessage: 'Remove the redundant type check.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addIsExpression((IsExpression node) {
+    context.addIsExpression((IsExpression node) {
       final DartType? expressionType = node.expression.staticType;
       final DartType? testedType = node.type.type;
 
@@ -1690,7 +1543,7 @@ class AvoidUnnecessaryTypeAssertionsRule extends SaropaLintRule {
         // Positive is check - check if types are exactly equal
         // (simplified check without TypeSystem)
         if (expressionType == testedType) {
-          reporter.atNode(node, code);
+          reporter.atNode(node);
         }
         // Also check by name for common cases
         final String exprTypeName = expressionType.getDisplayString();
@@ -1698,7 +1551,7 @@ class AvoidUnnecessaryTypeAssertionsRule extends SaropaLintRule {
         if (exprTypeName == testedTypeName &&
             !testedType.isDartCoreObject &&
             testedTypeName != 'dynamic') {
-          reporter.atNode(node, code);
+          reporter.atNode(node);
         }
       }
     });
@@ -1723,7 +1576,7 @@ class AvoidUnnecessaryTypeAssertionsRule extends SaropaLintRule {
 /// final y = x as String;  // Necessary cast
 /// ```
 class AvoidUnnecessaryTypeCastsRule extends SaropaLintRule {
-  const AvoidUnnecessaryTypeCastsRule() : super(code: _code);
+  AvoidUnnecessaryTypeCastsRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -1733,20 +1586,19 @@ class AvoidUnnecessaryTypeCastsRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.high;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_unnecessary_type_casts',
-    problemMessage: '[avoid_unnecessary_type_casts] Unnecessary type cast. '
+    'avoid_unnecessary_type_casts',
+    '[avoid_unnecessary_type_casts] Unnecessary type cast. '
         'The expression is already of this type. {v2}',
     correctionMessage: 'Remove the redundant cast.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addAsExpression((AsExpression node) {
+    context.addAsExpression((AsExpression node) {
       final DartType? expressionType = node.expression.staticType;
       final DartType? castType = node.type.type;
 
@@ -1754,7 +1606,7 @@ class AvoidUnnecessaryTypeCastsRule extends SaropaLintRule {
 
       // If the expression type equals the cast type, the cast is redundant
       if (expressionType == castType) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
         return;
       }
 
@@ -1764,7 +1616,7 @@ class AvoidUnnecessaryTypeCastsRule extends SaropaLintRule {
       if (exprTypeName == castTypeName &&
           !castType.isDartCoreObject &&
           castTypeName != 'dynamic') {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
   }
@@ -1791,7 +1643,7 @@ class AvoidUnnecessaryTypeCastsRule extends SaropaLintRule {
 ///
 /// **Quick fix available:** Adds a comment to flag for manual review.
 class AvoidUnrelatedTypeAssertionsRule extends SaropaLintRule {
-  const AvoidUnrelatedTypeAssertionsRule() : super(code: _code);
+  AvoidUnrelatedTypeAssertionsRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -1801,21 +1653,19 @@ class AvoidUnrelatedTypeAssertionsRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.high;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_unrelated_type_assertions',
-    problemMessage:
-        '[avoid_unrelated_type_assertions] Type assertion can never be true. '
+    'avoid_unrelated_type_assertions',
+    '[avoid_unrelated_type_assertions] Type assertion can never be true. '
         'The types are unrelated. {v2}',
     correctionMessage: 'Remove the impossible type check or fix the types.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addIsExpression((IsExpression node) {
+    context.addIsExpression((IsExpression node) {
       final DartType? expressionType = node.expression.staticType;
       final DartType? testedType = node.type.type;
 
@@ -1843,7 +1693,7 @@ class AvoidUnrelatedTypeAssertionsRule extends SaropaLintRule {
         if (exprStr == 'num' && (testedStr == 'int' || testedStr == 'double')) {
           return; // num could be int/double
         }
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
   }
@@ -1881,7 +1731,7 @@ class AvoidUnrelatedTypeAssertionsRule extends SaropaLintRule {
 ///
 /// **Quick fix available:** Adds a comment to flag for manual review.
 class PreferCorrectTypeNameRule extends SaropaLintRule {
-  const PreferCorrectTypeNameRule() : super(code: _code);
+  PreferCorrectTypeNameRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -1891,19 +1741,17 @@ class PreferCorrectTypeNameRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'prefer_correct_type_name',
-    problemMessage:
-        '[prefer_correct_type_name] Type name is not UpperCamelCase. Nonstandard type names reduce code readability and break Dart conventions. Quick fix available: Adds a comment to flag for manual review. {v4}',
+    'prefer_correct_type_name',
+    '[prefer_correct_type_name] Type name is not UpperCamelCase. Nonstandard type names reduce code readability and break Dart conventions. Quick fix available: Adds a comment to flag for manual review. {v4}',
     correctionMessage:
         'Rename type to use UpperCamelCase. Example: MyType, UserProfile, HttpClient. Verify the change works correctly with existing tests and add coverage for the new behavior.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
     void checkName(Token nameToken) {
       final String name = nameToken.lexeme;
@@ -1913,34 +1761,33 @@ class PreferCorrectTypeNameRule extends SaropaLintRule {
       if (name.startsWith('_')) {
         final String publicPart = name.substring(1);
         if (publicPart.isNotEmpty && !_isUpperCamelCase(publicPart)) {
-          reporter.atToken(nameToken, code);
+          reporter.atToken(nameToken);
         }
         return;
       }
 
       if (!_isUpperCamelCase(name)) {
-        reporter.atToken(nameToken, code);
+        reporter.atToken(nameToken);
       }
     }
 
-    context.registry.addClassDeclaration((ClassDeclaration node) {
+    context.addClassDeclaration((ClassDeclaration node) {
       checkName(node.name);
     });
 
-    context.registry.addMixinDeclaration((MixinDeclaration node) {
+    context.addMixinDeclaration((MixinDeclaration node) {
       checkName(node.name);
     });
 
-    context.registry.addEnumDeclaration((EnumDeclaration node) {
+    context.addEnumDeclaration((EnumDeclaration node) {
       checkName(node.name);
     });
 
-    context.registry
-        .addExtensionTypeDeclaration((ExtensionTypeDeclaration node) {
+    context.addExtensionTypeDeclaration((ExtensionTypeDeclaration node) {
       checkName(node.name);
     });
 
-    context.registry.addGenericTypeAlias((GenericTypeAlias node) {
+    context.addGenericTypeAlias((GenericTypeAlias node) {
       checkName(node.name);
     });
   }
@@ -1959,9 +1806,6 @@ class PreferCorrectTypeNameRule extends SaropaLintRule {
 
     return true;
   }
-
-  @override
-  List<Fix> getFixes() => <Fix>[_AddHackForIncorrectTypeNameFix()];
 }
 
 /// Warns when using bare 'Function' type instead of specific function type.
@@ -1984,7 +1828,7 @@ class PreferCorrectTypeNameRule extends SaropaLintRule {
 /// void Function(String)? handler;
 /// ```
 class PreferExplicitFunctionTypeRule extends SaropaLintRule {
-  const PreferExplicitFunctionTypeRule() : super(code: _code);
+  PreferExplicitFunctionTypeRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -1994,26 +1838,24 @@ class PreferExplicitFunctionTypeRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'prefer_explicit_function_type',
-    problemMessage:
-        '[prefer_explicit_function_type] Use explicit function type instead of bare "Function". The bare \'Function\' type is too permissive and loses type information. Using bare \'Function\' type instead of specific function type. {v5}',
+    'prefer_explicit_function_type',
+    '[prefer_explicit_function_type] Use explicit function type instead of bare "Function". The bare \'Function\' type is too permissive and loses type information. Using bare \'Function\' type instead of specific function type. {v5}',
     correctionMessage:
         'Specify the function signature (e.g., void Function()). Verify the change works correctly with existing tests and add coverage for the new behavior.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addNamedType((NamedType node) {
+    context.addNamedType((NamedType node) {
       final String name = node.name.lexeme;
       if (name == 'Function') {
         // Check if it's the bare Function type (no type arguments)
         if (node.typeArguments == null) {
-          reporter.atNode(node, code);
+          reporter.atNode(node);
         }
       }
     });
@@ -2042,219 +1884,30 @@ class PreferExplicitFunctionTypeRule extends SaropaLintRule {
 /// final String name = 'John';
 /// ```
 class PreferTypeOverVarRule extends SaropaLintRule {
-  const PreferTypeOverVarRule() : super(code: _code);
+  PreferTypeOverVarRule() : super(code: _code);
 
   /// Stylistic preference only. Conflicts with prefer_var_over_explicit_type.
   @override
   LintImpact get impact => LintImpact.opinionated;
 
   static const LintCode _code = LintCode(
-    name: 'prefer_type_over_var',
-    problemMessage:
-        '[prefer_type_over_var] Preferring explicit type annotations over var is a style choice. Both produce identical compiled code. Conflicts with prefer_var_over_explicit_type. Enable via the stylistic tier. {v4}',
+    'prefer_type_over_var',
+    '[prefer_type_over_var] Preferring explicit type annotations over var is a style choice. Both produce identical compiled code. Conflicts with prefer_var_over_explicit_type. Enable via the stylistic tier. {v4}',
     correctionMessage:
         'Replace var with the explicit type. Verify the change works correctly with existing tests and add coverage for the new behavior.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addVariableDeclarationList((VariableDeclarationList node) {
+    context.addVariableDeclarationList((VariableDeclarationList node) {
       // Check if using var (no type annotation and not final/const)
       if (node.type == null && node.keyword?.lexeme == 'var') {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
-    });
-  }
-}
-
-class _AddHackForExtensionTypeCastFix extends DartFix {
-  @override
-  void run(
-    CustomLintResolver resolver,
-    ChangeReporter reporter,
-    CustomLintContext context,
-    AnalysisError analysisError,
-    List<AnalysisError> others,
-  ) {
-    context.registry.addAsExpression((AsExpression node) {
-      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
-
-      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
-        message: 'Add HACK comment for extension type cast',
-        priority: 1,
-      );
-
-      changeBuilder.addDartFileEdit((builder) {
-        builder.addSimpleInsertion(
-          node.offset,
-          '/* HACK: use constructor instead of cast */ ',
-        );
-      });
-    });
-  }
-}
-
-class _AddHackForImplicitlyNullableExtensionFix extends DartFix {
-  @override
-  void run(
-    CustomLintResolver resolver,
-    ChangeReporter reporter,
-    CustomLintContext context,
-    AnalysisError analysisError,
-    List<AnalysisError> others,
-  ) {
-    context.registry
-        .addExtensionTypeDeclaration((ExtensionTypeDeclaration node) {
-      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
-
-      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
-        message: 'Add implements Object',
-        priority: 1,
-      );
-
-      changeBuilder.addDartFileEdit((builder) {
-        final ImplementsClause? implementsClause = node.implementsClause;
-        if (implementsClause != null) {
-          // Add Object to existing implements clause
-          final int insertOffset = implementsClause.interfaces.last.end;
-          builder.addSimpleInsertion(insertOffset, ', Object');
-        } else {
-          // Add new implements clause after representation declaration
-          final int insertOffset = node.representation.end;
-          builder.addSimpleInsertion(insertOffset, ' implements Object');
-        }
-      });
-    });
-  }
-}
-
-class _AddHackForNullableInterpolationFix extends DartFix {
-  @override
-  void run(
-    CustomLintResolver resolver,
-    ChangeReporter reporter,
-    CustomLintContext context,
-    AnalysisError analysisError,
-    List<AnalysisError> others,
-  ) {
-    context.registry.addInterpolationExpression((InterpolationExpression node) {
-      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
-
-      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
-        message: "Add ?? '' for null safety",
-        priority: 1,
-      );
-
-      changeBuilder.addDartFileEdit((builder) {
-        final Expression expr = node.expression;
-
-        // Check if simple form ($name) or complex form (${expr})
-        final bool isSimpleForm = node.leftBracket.offset == expr.offset - 1;
-
-        if (isSimpleForm) {
-          // Simple form: $name -> ${name ?? ''}
-          builder.addSimpleReplacement(
-            node.sourceRange,
-            "\${${expr.toSource()} ?? ''}",
-          );
-        } else {
-          // Complex form: ${expr} -> ${expr ?? ''}
-          builder.addSimpleInsertion(expr.end, " ?? ''");
-        }
-      });
-    });
-  }
-}
-
-class _AddHackForNullableParamWithDefaultFix extends DartFix {
-  @override
-  void run(
-    CustomLintResolver resolver,
-    ChangeReporter reporter,
-    CustomLintContext context,
-    AnalysisError analysisError,
-    List<AnalysisError> others,
-  ) {
-    context.registry.addDefaultFormalParameter((DefaultFormalParameter node) {
-      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
-
-      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
-        message: 'Remove unnecessary ?',
-        priority: 1,
-      );
-
-      changeBuilder.addDartFileEdit((builder) {
-        // Get the type annotation to find the ? token
-        final NormalFormalParameter parameter = node.parameter;
-        TypeAnnotation? typeAnnotation;
-
-        if (parameter is SimpleFormalParameter) {
-          typeAnnotation = parameter.type;
-        }
-
-        if (typeAnnotation is NamedType) {
-          final Token? questionMark = typeAnnotation.question;
-          if (questionMark != null) {
-            // Delete just the ? character
-            builder.addDeletion(
-              SourceRange(questionMark.offset, questionMark.length),
-            );
-          }
-        }
-      });
-    });
-  }
-}
-
-class _AddHackForIncorrectTypeNameFix extends DartFix {
-  @override
-  void run(
-    CustomLintResolver resolver,
-    ChangeReporter reporter,
-    CustomLintContext context,
-    AnalysisError analysisError,
-    List<AnalysisError> others,
-  ) {
-    void addFix(AstNode node) {
-      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
-
-      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
-        message: 'Add HACK comment for incorrect type name',
-        priority: 1,
-      );
-
-      changeBuilder.addDartFileEdit((builder) {
-        builder.addSimpleInsertion(
-          node.offset,
-          '// HACK: rename to use UpperCamelCase\n',
-        );
-      });
-    }
-
-    context.registry.addClassDeclaration((ClassDeclaration node) {
-      addFix(node);
-    });
-
-    context.registry.addMixinDeclaration((MixinDeclaration node) {
-      addFix(node);
-    });
-
-    context.registry.addEnumDeclaration((EnumDeclaration node) {
-      addFix(node);
-    });
-
-    context.registry
-        .addExtensionTypeDeclaration((ExtensionTypeDeclaration node) {
-      addFix(node);
-    });
-
-    context.registry.addGenericTypeAlias((GenericTypeAlias node) {
-      addFix(node);
     });
   }
 }

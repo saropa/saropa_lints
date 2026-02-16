@@ -7,9 +7,6 @@
 library;
 
 import 'package:analyzer/dart/ast/ast.dart';
-import 'package:analyzer/error/error.dart'
-    show AnalysisError, DiagnosticSeverity;
-import 'package:custom_lint_builder/custom_lint_builder.dart';
 
 import '../../saropa_lint_rule.dart';
 
@@ -46,7 +43,7 @@ import '../../saropa_lint_rule.dart';
 /// );
 /// ```
 class RequireWorkmanagerConstraintsRule extends SaropaLintRule {
-  const RequireWorkmanagerConstraintsRule() : super(code: _code);
+  RequireWorkmanagerConstraintsRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.high;
@@ -55,12 +52,11 @@ class RequireWorkmanagerConstraintsRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'require_workmanager_constraints',
-    problemMessage:
-        '[require_workmanager_constraints] WorkManager task registered without constraints runs unconditionally regardless of network availability, battery level, or charging state. This drains battery during low-power conditions, consumes metered mobile data, and causes failed network connection requests when connectivity is unavailable, wasting battery, memory, and processing resources. {v3}',
+    'require_workmanager_constraints',
+    '[require_workmanager_constraints] WorkManager task registered without constraints runs unconditionally regardless of network availability, battery level, or charging state. This drains battery during low-power conditions, consumes metered mobile data, and causes failed network connection requests when connectivity is unavailable, wasting battery, memory, and processing resources. {v3}',
     correctionMessage:
         'Add Constraints(networkType: NetworkType.connected) and optionally requiresBatteryNotLow or requiresCharging to control when background tasks execute.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   static const Set<String> _taskMethods = <String>{
@@ -70,11 +66,10 @@ class RequireWorkmanagerConstraintsRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       final String methodName = node.methodName.name;
       if (!_taskMethods.contains(methodName)) return;
 
@@ -87,8 +82,9 @@ class RequireWorkmanagerConstraintsRule extends SaropaLintRule {
       }
 
       // Check for constraints parameter
-      final bool hasConstraints =
-          node.argumentList.arguments.any((Expression arg) {
+      final bool hasConstraints = node.argumentList.arguments.any((
+        Expression arg,
+      ) {
         if (arg is NamedExpression) {
           return arg.name.label.name == 'constraints';
         }
@@ -96,13 +92,10 @@ class RequireWorkmanagerConstraintsRule extends SaropaLintRule {
       });
 
       if (!hasConstraints) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
   }
-
-  @override
-  List<Fix> getFixes() => <Fix>[_AddConstraintsTodoFix()];
 }
 
 /// Warns when WorkManager callback does not return a result.
@@ -135,7 +128,7 @@ class RequireWorkmanagerConstraintsRule extends SaropaLintRule {
 /// });
 /// ```
 class RequireWorkmanagerResultReturnRule extends SaropaLintRule {
-  const RequireWorkmanagerResultReturnRule() : super(code: _code);
+  RequireWorkmanagerResultReturnRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.critical;
@@ -144,22 +137,20 @@ class RequireWorkmanagerResultReturnRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'require_workmanager_result_return',
-    problemMessage:
-        '[require_workmanager_result_return] Missing return value makes '
+    'require_workmanager_result_return',
+    '[require_workmanager_result_return] Missing return value makes '
         'WorkManager assume failure, triggering unnecessary retries. {v2}',
     correctionMessage:
         'Return true/false from the executeTask callback to indicate success.',
-    errorSeverity: DiagnosticSeverity.ERROR,
+    severity: DiagnosticSeverity.ERROR,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       if (node.methodName.name != 'executeTask') return;
 
       // Check if it's a Workmanager call
@@ -184,13 +175,10 @@ class RequireWorkmanagerResultReturnRule extends SaropaLintRule {
       // We use a simple heuristic: if there's no 'return' keyword followed by
       // something, the callback likely doesn't return properly
       if (!bodySource.contains('return ')) {
-        reporter.atNode(callback, code);
+        reporter.atNode(callback);
       }
     });
   }
-
-  @override
-  List<Fix> getFixes() => <Fix>[_AddReturnTodoFix()];
 }
 
 /// Warns when workmanager is needed for reliable background tasks.
@@ -227,7 +215,7 @@ class RequireWorkmanagerResultReturnRule extends SaropaLintRule {
 /// @see [workmanager package](https://pub.dev/packages/workmanager)
 class RequireWorkmanagerForBackgroundRule extends SaropaLintRule {
   /// Creates a new instance of [RequireWorkmanagerForBackgroundRule].
-  const RequireWorkmanagerForBackgroundRule() : super(code: _code);
+  RequireWorkmanagerForBackgroundRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.high;
@@ -236,23 +224,21 @@ class RequireWorkmanagerForBackgroundRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'require_workmanager_for_background',
-    problemMessage:
-        '[require_workmanager_for_background] Periodic task detected without workmanager. Dart isolates die when '
+    'require_workmanager_for_background',
+    '[require_workmanager_for_background] Periodic task detected without workmanager. Dart isolates die when '
         'app backgrounds. Use workmanager for reliable background tasks. {v2}',
     correctionMessage:
         'Replace Timer.periodic with Workmanager().registerPeriodicTask() '
         'for reliable background execution.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    final String fileSource = resolver.source.contents.data;
+    final String fileSource = context.fileContent;
 
     // Skip if workmanager is already being used
     if (fileSource.contains('Workmanager') ||
@@ -260,14 +246,14 @@ class RequireWorkmanagerForBackgroundRule extends SaropaLintRule {
       return;
     }
 
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       final String methodName = node.methodName.name;
       final Expression? target = node.target;
 
       // Detect Timer.periodic
       if (methodName == 'periodic') {
         if (target != null && target.toSource() == 'Timer') {
-          reporter.atNode(node, code);
+          reporter.atNode(node);
         }
       }
     });
@@ -277,57 +263,3 @@ class RequireWorkmanagerForBackgroundRule extends SaropaLintRule {
 // =============================================================================
 // FIX CLASSES
 // =============================================================================
-
-class _AddConstraintsTodoFix extends DartFix {
-  @override
-  void run(
-    CustomLintResolver resolver,
-    ChangeReporter reporter,
-    CustomLintContext context,
-    AnalysisError analysisError,
-    List<AnalysisError> others,
-  ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
-      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
-
-      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
-        message: 'Add HACK: Add constraints parameter',
-        priority: 1,
-      );
-
-      changeBuilder.addDartFileEdit((builder) {
-        builder.addSimpleInsertion(
-          node.offset,
-          '// HACK: Add constraints parameter to specify network/battery requirements\n',
-        );
-      });
-    });
-  }
-}
-
-class _AddReturnTodoFix extends DartFix {
-  @override
-  void run(
-    CustomLintResolver resolver,
-    ChangeReporter reporter,
-    CustomLintContext context,
-    AnalysisError analysisError,
-    List<AnalysisError> others,
-  ) {
-    context.registry.addFunctionExpression((FunctionExpression node) {
-      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
-
-      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
-        message: 'Add HACK: Return true/false from callback',
-        priority: 1,
-      );
-
-      changeBuilder.addDartFileEdit((builder) {
-        builder.addSimpleInsertion(
-          node.offset,
-          '// HACK: Ensure this callback returns true (success) or false (failure)\n',
-        );
-      });
-    });
-  }
-}

@@ -4,10 +4,6 @@ import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/token.dart';
 import 'package:analyzer/dart/element/element.dart';
 import 'package:analyzer/dart/element/type.dart';
-import 'package:analyzer/error/error.dart'
-    show AnalysisError, DiagnosticSeverity;
-import 'package:analyzer/source/source_range.dart';
-import 'package:custom_lint_builder/custom_lint_builder.dart';
 
 import '../saropa_lint_rule.dart';
 
@@ -35,7 +31,7 @@ import '../saropa_lint_rule.dart';
 ///
 /// **Quick fix available:** Adds a comment to flag for manual review.
 class AvoidCollectionEqualityChecksRule extends SaropaLintRule {
-  const AvoidCollectionEqualityChecksRule() : super(code: _code);
+  AvoidCollectionEqualityChecksRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -45,12 +41,11 @@ class AvoidCollectionEqualityChecksRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.high;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_collection_equality_checks',
-    problemMessage:
-        '[avoid_collection_equality_checks] Comparing collections with == uses reference equality. This can cause false positives/negatives, leading to logic errors and unexpected app behavior. Collections (List, Set, Map) use reference equality by default, not value equality. Use listEquals, setEquals, or mapEquals instead. {v5}',
+    'avoid_collection_equality_checks',
+    '[avoid_collection_equality_checks] Comparing collections with == uses reference equality. This can cause false positives/negatives, leading to logic errors and unexpected app behavior. Collections (List, Set, Map) use reference equality by default, not value equality. Use listEquals, setEquals, or mapEquals instead. {v5}',
     correctionMessage:
         'Use listEquals, setEquals, mapEquals, or DeepCollectionEquality. Verify the change works correctly with existing tests and add coverage for the new behavior.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   static const Set<String> _collectionTypes = <String>{
@@ -64,11 +59,10 @@ class AvoidCollectionEqualityChecksRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addBinaryExpression((BinaryExpression node) {
+    context.addBinaryExpression((BinaryExpression node) {
       if (node.operator.type != TokenType.EQ_EQ &&
           node.operator.type != TokenType.BANG_EQ) {
         return;
@@ -84,7 +78,7 @@ class AvoidCollectionEqualityChecksRule extends SaropaLintRule {
 
       // Only report if both sides are collections (actual collection comparison)
       if (_isCollectionType(leftType) && _isCollectionType(rightType)) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
   }
@@ -95,36 +89,6 @@ class AvoidCollectionEqualityChecksRule extends SaropaLintRule {
     return _collectionTypes.any(
       (String collection) => typeName.startsWith(collection),
     );
-  }
-
-  @override
-  List<Fix> getFixes() => <Fix>[_AddHackCommentForCollectionEqualityFix()];
-}
-
-class _AddHackCommentForCollectionEqualityFix extends DartFix {
-  @override
-  void run(
-    CustomLintResolver resolver,
-    ChangeReporter reporter,
-    CustomLintContext context,
-    AnalysisError analysisError,
-    List<AnalysisError> others,
-  ) {
-    context.registry.addBinaryExpression((BinaryExpression node) {
-      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
-
-      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
-        message: 'Add HACK comment for collection comparison',
-        priority: 2,
-      );
-
-      changeBuilder.addDartFileEdit((builder) {
-        builder.addSimpleInsertion(
-          node.offset,
-          '/* HACK: use listEquals/setEquals/mapEquals */ ',
-        );
-      });
-    });
   }
 }
 
@@ -144,7 +108,7 @@ class _AddHackCommentForCollectionEqualityFix extends DartFix {
 /// final map = {'a': 1, 'b': 2, 'c': 3};
 /// ```
 class AvoidDuplicateMapKeysRule extends SaropaLintRule {
-  const AvoidDuplicateMapKeysRule() : super(code: _code);
+  AvoidDuplicateMapKeysRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -154,21 +118,19 @@ class AvoidDuplicateMapKeysRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_duplicate_map_keys',
-    problemMessage:
-        '[avoid_duplicate_map_keys] Duplicate key in map literal silently overwrites the earlier value, causing data loss and unpredictable behavior. Only the last value assigned to the key will persist in the resulting map. {v4}',
+    'avoid_duplicate_map_keys',
+    '[avoid_duplicate_map_keys] Duplicate key in map literal silently overwrites the earlier value, causing data loss and unpredictable behavior. Only the last value assigned to the key will persist in the resulting map. {v4}',
     correctionMessage:
         'Remove the duplicate key entry or rename it to a unique key to preserve all intended values.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addSetOrMapLiteral((SetOrMapLiteral node) {
+    context.addSetOrMapLiteral((SetOrMapLiteral node) {
       if (!node.isMap) return;
 
       final Set<String> seenKeys = <String>{};
@@ -204,7 +166,7 @@ class AvoidDuplicateMapKeysRule extends SaropaLintRule {
 ///
 /// **Quick fix available:** Replaces with `map.containsKey(key)`.
 class AvoidMapKeysContainsRule extends SaropaLintRule {
-  const AvoidMapKeysContainsRule() : super(code: _code);
+  AvoidMapKeysContainsRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -214,70 +176,27 @@ class AvoidMapKeysContainsRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_map_keys_contains',
-    problemMessage:
-        '[avoid_map_keys_contains] Calling .keys.contains() allocates an iterable of all keys and performs a linear search, while .containsKey() uses the map hash table for O(1) lookup. This wastes memory and CPU cycles on every call. {v5}',
+    'avoid_map_keys_contains',
+    '[avoid_map_keys_contains] Calling .keys.contains() allocates an iterable of all keys and performs a linear search, while .containsKey() uses the map hash table for O(1) lookup. This wastes memory and CPU cycles on every call. {v5}',
     correctionMessage:
         'Replace map.keys.contains(key) with map.containsKey(key) to use the efficient hash-based lookup.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       if (node.methodName.name != 'contains') return;
 
       final Expression? target = node.target;
       if (target is! PropertyAccess) return;
 
       if (target.propertyName.name == 'keys') {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
-    });
-  }
-
-  @override
-  List<Fix> getFixes() => <Fix>[_UseContainsKeyFix()];
-}
-
-class _UseContainsKeyFix extends DartFix {
-  @override
-  void run(
-    CustomLintResolver resolver,
-    ChangeReporter reporter,
-    CustomLintContext context,
-    AnalysisError analysisError,
-    List<AnalysisError> others,
-  ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
-      if (node.methodName.name != 'contains') return;
-      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
-
-      final Expression? target = node.target;
-      if (target is! PropertyAccess) return;
-      if (target.propertyName.name != 'keys') return;
-
-      final Expression? mapExpr = target.target;
-      if (mapExpr == null) return;
-
-      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
-        message: 'Use containsKey()',
-        priority: 1,
-      );
-
-      changeBuilder.addDartFileEdit((builder) {
-        // Replace "map.keys.contains(key)" with "map.containsKey(key)"
-        final String mapSource = mapExpr.toSource();
-        final String argsSource = node.argumentList.toSource();
-        builder.addSimpleReplacement(
-          SourceRange(node.offset, node.length),
-          '$mapSource.containsKey$argsSource',
-        );
-      });
     });
   }
 }
@@ -304,7 +223,7 @@ class _UseContainsKeyFix extends DartFix {
 /// final set = {1, 2, 3};
 /// ```
 class AvoidUnnecessaryCollectionsRule extends SaropaLintRule {
-  const AvoidUnnecessaryCollectionsRule() : super(code: _code);
+  AvoidUnnecessaryCollectionsRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -314,32 +233,23 @@ class AvoidUnnecessaryCollectionsRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_unnecessary_collections',
-    problemMessage:
-        '[avoid_unnecessary_collections] Wrapping an existing collection literal with List.of() or Set.of() creates a redundant copy, wasting memory and adding unnecessary overhead. The literal itself already produces the correct collection type. {v4}',
+    'avoid_unnecessary_collections',
+    '[avoid_unnecessary_collections] Wrapping an existing collection literal with List.of() or Set.of() creates a redundant copy, wasting memory and adding unnecessary overhead. The literal itself already produces the correct collection type. {v4}',
     correctionMessage:
         'Remove the List.of() or Set.of() wrapper and use the collection literal directly to eliminate the extra allocation.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
-  static const Set<String> _unnecessaryMethods = <String>{
-    'of',
-    'from',
-  };
+  static const Set<String> _unnecessaryMethods = <String>{'of', 'from'};
 
-  static const Set<String> _collectionTypes = <String>{
-    'List',
-    'Set',
-    'Map',
-  };
+  static const Set<String> _collectionTypes = <String>{'List', 'Set', 'Map'};
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       final Expression? target = node.target;
       if (target is! SimpleIdentifier) return;
 
@@ -353,7 +263,7 @@ class AvoidUnnecessaryCollectionsRule extends SaropaLintRule {
           final Expression arg = args.arguments.first;
           // Check if argument is already a literal
           if (arg is ListLiteral || arg is SetOrMapLiteral) {
-            reporter.atNode(node, code);
+            reporter.atNode(node);
           }
         }
       }
@@ -386,7 +296,7 @@ class AvoidUnnecessaryCollectionsRule extends SaropaLintRule {
 /// final item = items.length > 1 ? items.last : fallback;
 /// ```
 class AvoidUnsafeCollectionMethodsRule extends SaropaLintRule {
-  const AvoidUnsafeCollectionMethodsRule() : super(code: _code);
+  AvoidUnsafeCollectionMethodsRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -396,23 +306,21 @@ class AvoidUnsafeCollectionMethodsRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.high;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_unsafe_collection_methods',
-    problemMessage:
-        '[avoid_unsafe_collection_methods] Calling .first, .last, or .single on an empty collection throws a StateError at runtime, crashing the app. This is especially dangerous when the collection comes from an API response, database query, or user input where emptiness cannot be guaranteed at compile time. {v9}',
+    'avoid_unsafe_collection_methods',
+    '[avoid_unsafe_collection_methods] Calling .first, .last, or .single on an empty collection throws a StateError at runtime, crashing the app. This is especially dangerous when the collection comes from an API response, database query, or user input where emptiness cannot be guaranteed at compile time. {v9}',
     correctionMessage:
         'Use .firstOrNull, .lastOrNull, or .singleOrNull from package:collection, or guard with an isEmpty check before accessing.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   static const Set<String> _unsafeMethods = <String>{'first', 'last', 'single'};
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addPropertyAccess((PropertyAccess node) {
+    context.addPropertyAccess((PropertyAccess node) {
       final String propertyName = node.propertyName.name;
       if (!_unsafeMethods.contains(propertyName)) return;
 
@@ -439,12 +347,12 @@ class AvoidUnsafeCollectionMethodsRule extends SaropaLintRule {
           return;
         }
 
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
 
     // Also check for prefixed identifier access like list.first
-    context.registry.addPrefixedIdentifier((PrefixedIdentifier node) {
+    context.addPrefixedIdentifier((PrefixedIdentifier node) {
       final String propertyName = node.identifier.name;
       if (!_unsafeMethods.contains(propertyName)) return;
 
@@ -468,7 +376,7 @@ class AvoidUnsafeCollectionMethodsRule extends SaropaLintRule {
           return;
         }
 
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
   }
@@ -817,66 +725,6 @@ class AvoidUnsafeCollectionMethodsRule extends SaropaLintRule {
     }
     return false;
   }
-
-  @override
-  List<Fix> getFixes() => <Fix>[_UseNullSafeCollectionMethodFix()];
-}
-
-class _UseNullSafeCollectionMethodFix extends DartFix {
-  static const Map<String, String> _replacements = <String, String>{
-    'first': 'firstOrNull',
-    'last': 'lastOrNull',
-    'single': 'singleOrNull',
-  };
-
-  @override
-  void run(
-    CustomLintResolver resolver,
-    ChangeReporter reporter,
-    CustomLintContext context,
-    AnalysisError analysisError,
-    List<AnalysisError> others,
-  ) {
-    // Handle PropertyAccess nodes (e.g., someList.first)
-    context.registry.addPropertyAccess((PropertyAccess node) {
-      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
-      final String propertyName = node.propertyName.name;
-      final String? replacement = _replacements[propertyName];
-      if (replacement == null) return;
-
-      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
-        message: 'Use .$replacement',
-        priority: 1,
-      );
-
-      changeBuilder.addDartFileEdit((builder) {
-        builder.addSimpleReplacement(
-          SourceRange(node.propertyName.offset, node.propertyName.length),
-          replacement,
-        );
-      });
-    });
-
-    // Handle PrefixedIdentifier nodes (e.g., list.first in simple cases)
-    context.registry.addPrefixedIdentifier((PrefixedIdentifier node) {
-      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
-      final String propertyName = node.identifier.name;
-      final String? replacement = _replacements[propertyName];
-      if (replacement == null) return;
-
-      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
-        message: 'Use .$replacement',
-        priority: 1,
-      );
-
-      changeBuilder.addDartFileEdit((builder) {
-        builder.addSimpleReplacement(
-          SourceRange(node.identifier.offset, node.identifier.length),
-          replacement,
-        );
-      });
-    });
-  }
 }
 
 /// Warns when reduce() is called on a potentially empty collection.
@@ -900,7 +748,7 @@ class _UseNullSafeCollectionMethodFix extends DartFix {
 /// final sum = numbers.isEmpty ? 0 : numbers.reduce((a, b) => a + b);
 /// ```
 class AvoidUnsafeReduceRule extends SaropaLintRule {
-  const AvoidUnsafeReduceRule() : super(code: _code);
+  AvoidUnsafeReduceRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -910,21 +758,19 @@ class AvoidUnsafeReduceRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.high;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_unsafe_reduce',
-    problemMessage:
-        '[avoid_unsafe_reduce] Calling reduce() on an empty collection throws a StateError at runtime, crashing the app. Unlike fold(), reduce() has no initial value and requires at least one element to operate. {v6}',
+    'avoid_unsafe_reduce',
+    '[avoid_unsafe_reduce] Calling reduce() on an empty collection throws a StateError at runtime, crashing the app. Unlike fold(), reduce() has no initial value and requires at least one element to operate. {v6}',
     correctionMessage:
         'Replace reduce() with fold() and provide an initial value, or guard the call with an isEmpty check first.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       if (node.methodName.name != 'reduce') return;
 
       // Check if target is an Iterable type
@@ -939,39 +785,8 @@ class AvoidUnsafeReduceRule extends SaropaLintRule {
           typeName.startsWith('Set') ||
           typeName.startsWith('Iterable') ||
           typeName.startsWith('Queue')) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
-    });
-  }
-
-  @override
-  List<Fix> getFixes() => <Fix>[_AddHackCommentForReduceFix()];
-}
-
-class _AddHackCommentForReduceFix extends DartFix {
-  @override
-  void run(
-    CustomLintResolver resolver,
-    ChangeReporter reporter,
-    CustomLintContext context,
-    AnalysisError analysisError,
-    List<AnalysisError> others,
-  ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
-      if (node.methodName.name != 'reduce') return;
-      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
-
-      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
-        message: 'Add HACK comment for unsafe reduce',
-        priority: 2,
-      );
-
-      changeBuilder.addDartFileEdit((builder) {
-        builder.addSimpleInsertion(
-          node.offset,
-          '/* HACK: use fold() or check empty */ ',
-        );
-      });
     });
   }
 }
@@ -1001,7 +816,7 @@ class _AddHackCommentForReduceFix extends DartFix {
 /// final item = items.firstWhere((e) => e.isActive, orElse: () => defaultItem);
 /// ```
 class AvoidUnsafeWhereMethodsRule extends SaropaLintRule {
-  const AvoidUnsafeWhereMethodsRule() : super(code: _code);
+  AvoidUnsafeWhereMethodsRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -1011,12 +826,11 @@ class AvoidUnsafeWhereMethodsRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.high;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_unsafe_where_methods',
-    problemMessage:
-        '[avoid_unsafe_where_methods] Calling firstWhere, lastWhere, or singleWhere without an orElse callback throws a StateError when no element matches the predicate. This crashes the app at runtime, especially when filtering data from external sources where matches are not guaranteed. {v4}',
+    'avoid_unsafe_where_methods',
+    '[avoid_unsafe_where_methods] Calling firstWhere, lastWhere, or singleWhere without an orElse callback throws a StateError when no element matches the predicate. This crashes the app at runtime, especially when filtering data from external sources where matches are not guaranteed. {v4}',
     correctionMessage:
         'Use firstWhereOrNull, lastWhereOrNull, or singleWhereOrNull from package:collection, or provide an orElse callback to handle the no-match case.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   static const Set<String> _unsafeMethods = <String>{
@@ -1027,11 +841,10 @@ class AvoidUnsafeWhereMethodsRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       final String methodName = node.methodName.name;
       if (!_unsafeMethods.contains(methodName)) return;
 
@@ -1058,48 +871,7 @@ class AvoidUnsafeWhereMethodsRule extends SaropaLintRule {
         }
       }
 
-      reporter.atNode(node, code);
-    });
-  }
-
-  @override
-  List<Fix> getFixes() => <Fix>[_UseWhereOrNullFix()];
-}
-
-class _UseWhereOrNullFix extends DartFix {
-  static const Map<String, String> _replacements = <String, String>{
-    'firstWhere': 'firstWhereOrNull',
-    'lastWhere': 'lastWhereOrNull',
-    'singleWhere': 'singleWhereOrNull',
-  };
-
-  @override
-  void run(
-    CustomLintResolver resolver,
-    ChangeReporter reporter,
-    CustomLintContext context,
-    AnalysisError analysisError,
-    List<AnalysisError> others,
-  ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
-      final String methodName = node.methodName.name;
-      if (!_replacements.containsKey(methodName)) return;
-      if (!analysisError.sourceRange.intersects(node.sourceRange)) return;
-
-      final String? replacement = _replacements[methodName];
-      if (replacement == null) return;
-
-      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
-        message: 'Use .$replacement',
-        priority: 1,
-      );
-
-      changeBuilder.addDartFileEdit((builder) {
-        builder.addSimpleReplacement(
-          SourceRange(node.methodName.offset, node.methodName.length),
-          replacement,
-        );
-      });
+      reporter.atNode(node);
     });
   }
 }
@@ -1124,7 +896,7 @@ class _UseWhereOrNullFix extends DartFix {
 /// final item = items.firstWhereOrNull((e) => e.isActive) ?? defaultItem;
 /// ```
 class PreferWhereOrNullRule extends SaropaLintRule {
-  const PreferWhereOrNullRule() : super(code: _code);
+  PreferWhereOrNullRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -1134,12 +906,11 @@ class PreferWhereOrNullRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.high;
 
   static const LintCode _code = LintCode(
-    name: 'prefer_where_or_null',
-    problemMessage:
-        '[prefer_where_or_null] Using firstWhere/lastWhere/singleWhere with an orElse callback is verbose and harder to read. The *OrNull variant from package:collection combined with ?? produces cleaner, more idiomatic Dart code. {v4}',
+    'prefer_where_or_null',
+    '[prefer_where_or_null] Using firstWhere/lastWhere/singleWhere with an orElse callback is verbose and harder to read. The *OrNull variant from package:collection combined with ?? produces cleaner, more idiomatic Dart code. {v4}',
     correctionMessage:
         'Replace .firstWhere(..., orElse: () => x) with .firstWhereOrNull(...) ?? x to reduce boilerplate and improve readability.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   static const Set<String> _whereMethods = <String>{
@@ -1150,11 +921,10 @@ class PreferWhereOrNullRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       final String methodName = node.methodName.name;
       if (!_whereMethods.contains(methodName)) return;
 
@@ -1188,81 +958,7 @@ class PreferWhereOrNullRule extends SaropaLintRule {
 
       if (orElseArg == null) return; // No orElse, handled by other rule
 
-      reporter.atNode(node, code);
-    });
-  }
-
-  @override
-  List<Fix> getFixes() => <Fix>[_ReplaceWithWhereOrNullFix()];
-}
-
-class _ReplaceWithWhereOrNullFix extends DartFix {
-  static const Map<String, String> _replacements = <String, String>{
-    'firstWhere': 'firstWhereOrNull',
-    'lastWhere': 'lastWhereOrNull',
-    'singleWhere': 'singleWhereOrNull',
-  };
-
-  @override
-  void run(
-    CustomLintResolver resolver,
-    ChangeReporter reporter,
-    CustomLintContext context,
-    AnalysisError analysisError,
-    List<AnalysisError> others,
-  ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
-      final String methodName = node.methodName.name;
-      if (!_replacements.containsKey(methodName)) return;
-      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
-
-      // Find orElse argument and extract its return expression
-      final NodeList<Expression> args = node.argumentList.arguments;
-      NamedExpression? orElseArg;
-      Expression? predicateArg;
-
-      for (final Expression arg in args) {
-        if (arg is NamedExpression && arg.name.label.name == 'orElse') {
-          orElseArg = arg;
-        } else if (predicateArg == null) {
-          predicateArg = arg;
-        }
-      }
-
-      if (orElseArg == null || predicateArg == null) return;
-
-      // Try to extract the return value from orElse callback
-      String? defaultValue;
-      final Expression orElseExpr = orElseArg.expression;
-      if (orElseExpr is FunctionExpression) {
-        final FunctionBody body = orElseExpr.body;
-        if (body is ExpressionFunctionBody) {
-          defaultValue = body.expression.toSource();
-        }
-      }
-
-      final String? replacement = _replacements[methodName];
-      if (replacement == null) return;
-
-      final Expression? target = node.realTarget;
-      if (target == null) return;
-
-      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
-        message: 'Use .$replacement ?? $defaultValue',
-        priority: 1,
-      );
-
-      if (defaultValue != null) {
-        changeBuilder.addDartFileEdit((builder) {
-          // Replace entire method call with: target.firstWhereOrNull(predicate) ?? defaultValue
-          final String newCode =
-              '${target.toSource()}.$replacement(${predicateArg!.toSource()}) ?? $defaultValue';
-          builder.addSimpleReplacement(
-            SourceRange(node.offset, node.length),
-            newCode,
-          );
-        });
-      }
+      reporter.atNode(node);
     });
   }
 }
@@ -1288,7 +984,7 @@ class _ReplaceWithWhereOrNullFix extends DartFix {
 /// final map = {'apple': 2, 'banana': 3, 'zebra': 1};
 /// ```
 class MapKeysOrderingRule extends SaropaLintRule {
-  const MapKeysOrderingRule() : super(code: _code);
+  MapKeysOrderingRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.opinionated;
@@ -1297,21 +993,19 @@ class MapKeysOrderingRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'map_keys_ordering',
-    problemMessage:
-        '[map_keys_ordering] Ordering map keys alphabetically is a stylistic preference for readability. Key order does not affect map behavior or performance at runtime. Enable via the stylistic tier. {v4}',
+    'map_keys_ordering',
+    '[map_keys_ordering] Ordering map keys alphabetically is a stylistic preference for readability. Key order does not affect map behavior or performance at runtime. Enable via the stylistic tier. {v4}',
     correctionMessage:
         'Reorder the map entries alphabetically by key to improve readability and make diffs easier to review.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addSetOrMapLiteral((SetOrMapLiteral node) {
+    context.addSetOrMapLiteral((SetOrMapLiteral node) {
       if (!node.isMap) return;
 
       final List<String> stringKeys = <String>[];
@@ -1331,7 +1025,7 @@ class MapKeysOrderingRule extends SaropaLintRule {
       // Check if keys are sorted
       for (int i = 1; i < stringKeys.length; i++) {
         if (stringKeys[i].compareTo(stringKeys[i - 1]) < 0) {
-          reporter.atNode(node, code);
+          reporter.atNode(node);
           return;
         }
       }
@@ -1355,7 +1049,7 @@ class MapKeysOrderingRule extends SaropaLintRule {
 /// if (list.contains(item)) { ... }
 /// ```
 class PreferContainsRule extends SaropaLintRule {
-  const PreferContainsRule() : super(code: _code);
+  PreferContainsRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -1365,86 +1059,27 @@ class PreferContainsRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'prefer_list_contains',
-    problemMessage:
-        '[prefer_list_contains] Using indexOf() with a comparison to -1 or 0 to check element presence is verbose and error-prone. The contains() method expresses intent directly, improving readability and reducing off-by-one mistakes. {v2}',
+    'prefer_list_contains',
+    '[prefer_list_contains] Using indexOf() with a comparison to -1 or 0 to check element presence is verbose and error-prone. The contains() method expresses intent directly, improving readability and reducing off-by-one mistakes. {v2}',
     correctionMessage:
         'Replace the indexOf() comparison with contains() to express the presence check directly and clearly.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addBinaryExpression((BinaryExpression node) {
+    context.addBinaryExpression((BinaryExpression node) {
       final Expression left = node.leftOperand;
       if (left is! MethodInvocation) return;
       if (left.methodName.name != 'indexOf') return;
 
       final Expression right = node.rightOperand;
       if (right is IntegerLiteral && (right.value == -1 || right.value == 0)) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
-    });
-  }
-
-  @override
-  List<Fix> getFixes() => <Fix>[_UseContainsFix()];
-}
-
-class _UseContainsFix extends DartFix {
-  @override
-  void run(
-    CustomLintResolver resolver,
-    ChangeReporter reporter,
-    CustomLintContext context,
-    AnalysisError analysisError,
-    List<AnalysisError> others,
-  ) {
-    context.registry.addBinaryExpression((BinaryExpression node) {
-      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
-
-      final Expression left = node.leftOperand;
-      if (left is! MethodInvocation) return;
-      if (left.methodName.name != 'indexOf') return;
-
-      final Expression? target = left.target;
-      if (target == null) return;
-
-      final Expression right = node.rightOperand;
-      if (right is! IntegerLiteral) return;
-
-      final String op = node.operator.lexeme;
-      final int? value = right.value;
-      final String args = left.argumentList.arguments.first.toSource();
-      String replacement;
-
-      // indexOf(x) != -1 or indexOf(x) >= 0 means "contains"
-      // indexOf(x) == -1 or indexOf(x) < 0 means "!contains"
-      if ((value == -1 && op == '!=') || (value == 0 && op == '>=')) {
-        replacement = '${target.toSource()}.contains($args)';
-      } else if ((value == -1 && op == '==') || (value == 0 && op == '<')) {
-        replacement = '!${target.toSource()}.contains($args)';
-      } else if (value == -1 && op == '>') {
-        replacement = '${target.toSource()}.contains($args)';
-      } else {
-        return;
-      }
-
-      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
-        message: 'Use .contains()',
-        priority: 1,
-      );
-
-      changeBuilder.addDartFileEdit((builder) {
-        builder.addSimpleReplacement(
-          SourceRange(node.offset, node.length),
-          replacement,
-        );
-      });
     });
   }
 }
@@ -1471,7 +1106,7 @@ class _UseContainsFix extends DartFix {
 ///
 /// **Quick fix available:** Replaces `list[0]` with `list.first`.
 class PreferFirstRule extends SaropaLintRule {
-  const PreferFirstRule() : super(code: _code);
+  PreferFirstRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.opinionated;
@@ -1480,61 +1115,23 @@ class PreferFirstRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'prefer_list_first',
-    problemMessage:
-        '[prefer_list_first] Using [0] instead of .first is a stylistic choice. The .first getter calls [0] internally — there is no performance benefit. Enable via the stylistic tier. {v3}',
+    'prefer_list_first',
+    '[prefer_list_first] Using [0] instead of .first is a stylistic choice. The .first getter calls [0] internally — there is no performance benefit. Enable via the stylistic tier. {v3}',
     correctionMessage:
         'Replace [0] with .first or .firstOrNull to clearly communicate the intent of accessing the first element.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addIndexExpression((IndexExpression node) {
+    context.addIndexExpression((IndexExpression node) {
       final Expression index = node.index;
       if (index is IntegerLiteral && index.value == 0) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
-    });
-  }
-
-  @override
-  List<Fix> getFixes() => <Fix>[_UseFirstFix()];
-}
-
-class _UseFirstFix extends DartFix {
-  @override
-  void run(
-    CustomLintResolver resolver,
-    ChangeReporter reporter,
-    CustomLintContext context,
-    AnalysisError analysisError,
-    List<AnalysisError> others,
-  ) {
-    context.registry.addIndexExpression((IndexExpression node) {
-      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
-
-      final Expression index = node.index;
-      if (index is! IntegerLiteral || index.value != 0) return;
-
-      final Expression? target = node.target;
-      if (target == null) return;
-
-      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
-        message: 'Use .first',
-        priority: 1,
-      );
-
-      changeBuilder.addDartFileEdit((builder) {
-        builder.addSimpleReplacement(
-          SourceRange(node.offset, node.length),
-          '${target.toSource()}.first',
-        );
-      });
     });
   }
 }
@@ -1560,7 +1157,7 @@ class _UseFirstFix extends DartFix {
 /// final set = Set<String>.of(names);
 /// ```
 class PreferIterableOfRule extends SaropaLintRule {
-  const PreferIterableOfRule() : super(code: _code);
+  PreferIterableOfRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -1570,12 +1167,11 @@ class PreferIterableOfRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'prefer_iterable_of',
-    problemMessage:
-        '[prefer_iterable_of] Using .from() performs a runtime cast on each element, which can silently succeed with wrong types and throw later. The .of() constructor enforces type safety at the call site, catching type mismatches immediately. {v4}',
+    'prefer_iterable_of',
+    '[prefer_iterable_of] Using .from() performs a runtime cast on each element, which can silently succeed with wrong types and throw later. The .of() constructor enforces type safety at the call site, catching type mismatches immediately. {v4}',
     correctionMessage:
         'Replace .from() with .of() to enforce compile-time type checking and prevent silent runtime cast failures.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   static const Set<String> _collectionTypes = <String>{
@@ -1587,12 +1183,10 @@ class PreferIterableOfRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry
-        .addInstanceCreationExpression((InstanceCreationExpression node) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final ConstructorName constructorName = node.constructorName;
       final String? name = constructorName.name?.name;
 
@@ -1600,7 +1194,7 @@ class PreferIterableOfRule extends SaropaLintRule {
 
       final String typeName = constructorName.type.name.lexeme;
       if (_collectionTypes.contains(typeName)) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
   }
@@ -1626,24 +1220,22 @@ class PreferIterableOfRule extends SaropaLintRule {
 /// final last = list.last;
 /// ```
 class PreferLastRule extends SaropaLintRule {
-  const PreferLastRule() : super(code: _code);
+  PreferLastRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
-    name: 'prefer_list_last',
-    problemMessage:
-        '[prefer_list_last] Using [length-1] instead of .last is a stylistic choice. The .last getter does the same indexing internally — no performance benefit. Enable via the stylistic tier. {v2}',
+    'prefer_list_last',
+    '[prefer_list_last] Using [length-1] instead of .last is a stylistic choice. The .last getter does the same indexing internally — no performance benefit. Enable via the stylistic tier. {v2}',
     correctionMessage:
         'Replace list[list.length - 1] with list.last to improve readability and reduce off-by-one error risk.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addIndexExpression((IndexExpression node) {
+    context.addIndexExpression((IndexExpression node) {
       final Expression index = node.index;
 
       // Check for pattern: length - 1
@@ -1658,7 +1250,7 @@ class PreferLastRule extends SaropaLintRule {
             final Expression lengthTarget = left.target!;
             if (indexTarget != null &&
                 indexTarget.toSource() == lengthTarget.toSource()) {
-              reporter.atNode(node, code);
+              reporter.atNode(node);
             }
           }
           // Also check for simple identifier.length pattern
@@ -1666,44 +1258,11 @@ class PreferLastRule extends SaropaLintRule {
             final Expression? indexTarget = node.target;
             if (indexTarget is SimpleIdentifier &&
                 indexTarget.name == left.prefix.name) {
-              reporter.atNode(node, code);
+              reporter.atNode(node);
             }
           }
         }
       }
-    });
-  }
-
-  @override
-  List<Fix> getFixes() => <Fix>[_UseLastFix()];
-}
-
-class _UseLastFix extends DartFix {
-  @override
-  void run(
-    CustomLintResolver resolver,
-    ChangeReporter reporter,
-    CustomLintContext context,
-    AnalysisError analysisError,
-    List<AnalysisError> others,
-  ) {
-    context.registry.addIndexExpression((IndexExpression node) {
-      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
-
-      final Expression? target = node.target;
-      if (target == null) return;
-
-      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
-        message: 'Use .last',
-        priority: 1,
-      );
-
-      changeBuilder.addDartFileEdit((builder) {
-        builder.addSimpleReplacement(
-          SourceRange(node.offset, node.length),
-          '${target.toSource()}.last',
-        );
-      });
     });
   }
 }
@@ -1725,7 +1284,7 @@ class _UseLastFix extends DartFix {
 /// list.addAll(items);
 /// ```
 class PreferAddAllRule extends SaropaLintRule {
-  const PreferAddAllRule() : super(code: _code);
+  PreferAddAllRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -1735,22 +1294,20 @@ class PreferAddAllRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'prefer_add_all',
-    problemMessage:
-        '[prefer_add_all] Looping with forEach or for-in to call add() one element at a time is verbose and slower than addAll(), which can pre-allocate capacity and copy elements in bulk. This pattern also obscures the intent of batch insertion. {v4}',
+    'prefer_add_all',
+    '[prefer_add_all] Looping with forEach or for-in to call add() one element at a time is verbose and slower than addAll(), which can pre-allocate capacity and copy elements in bulk. This pattern also obscures the intent of batch insertion. {v4}',
     correctionMessage:
         'Replace the forEach/for loop with list.addAll(items) to reduce boilerplate and enable bulk insertion optimization.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
     // Check forEach pattern: items.forEach((item) => list.add(item))
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       if (node.methodName.name != 'forEach') return;
 
       final NodeList<Expression> args = node.argumentList.arguments;
@@ -1771,7 +1328,7 @@ class PreferAddAllRule extends SaropaLintRule {
             if (addArgs.isNotEmpty && addArgs.first is SimpleIdentifier) {
               final SimpleIdentifier addArg = addArgs.first as SimpleIdentifier;
               if (addArg.name == paramName) {
-                reporter.atNode(node, code);
+                reporter.atNode(node);
               }
             }
           }
@@ -1780,7 +1337,7 @@ class PreferAddAllRule extends SaropaLintRule {
     });
 
     // Check for-in pattern: for (final item in items) { list.add(item); }
-    context.registry.addForStatement((ForStatement node) {
+    context.addForStatement((ForStatement node) {
       final ForLoopParts parts = node.forLoopParts;
       if (parts is! ForEachPartsWithDeclaration) return;
 
@@ -1801,7 +1358,7 @@ class PreferAddAllRule extends SaropaLintRule {
       if (addArgs.isNotEmpty && addArgs.first is SimpleIdentifier) {
         final SimpleIdentifier addArg = addArgs.first as SimpleIdentifier;
         if (addArg.name == loopVar) {
-          reporter.atNode(node, code);
+          reporter.atNode(node);
         }
       }
     });
@@ -1844,7 +1401,7 @@ class PreferAddAllRule extends SaropaLintRule {
 /// - `avoid_duplicate_string_elements` for string duplicates
 /// - `avoid_duplicate_object_elements` for other duplicates
 class AvoidDuplicateNumberElementsRule extends SaropaLintRule {
-  const AvoidDuplicateNumberElementsRule() : super(code: _code);
+  AvoidDuplicateNumberElementsRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -1854,33 +1411,28 @@ class AvoidDuplicateNumberElementsRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_duplicate_number_elements',
-    problemMessage:
-        '[avoid_duplicate_number_elements] Duplicate numeric element in collection literal typically indicates a copy-paste error or logic mistake. In Sets, the duplicate is silently ignored, producing a smaller collection than expected. {v2}',
+    'avoid_duplicate_number_elements',
+    '[avoid_duplicate_number_elements] Duplicate numeric element in collection literal typically indicates a copy-paste error or logic mistake. In Sets, the duplicate is silently ignored, producing a smaller collection than expected. {v2}',
     correctionMessage:
         'Remove the duplicate numeric element. If intentional (e.g., days-in-month arrays), suppress with // ignore.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addListLiteral((ListLiteral node) {
+    context.addListLiteral((ListLiteral node) {
       _checkForDuplicateNumbers(node.elements, reporter, code);
     });
 
-    context.registry.addSetOrMapLiteral((SetOrMapLiteral node) {
+    context.addSetOrMapLiteral((SetOrMapLiteral node) {
       if (node.isSet) {
         _checkForDuplicateNumbers(node.elements, reporter, code);
       }
     });
   }
-
-  @override
-  List<Fix> getFixes() => <Fix>[_RemoveDuplicateElementFix(code)];
 }
 
 /// Warns when duplicate string elements appear in collection literals.
@@ -1917,7 +1469,7 @@ class AvoidDuplicateNumberElementsRule extends SaropaLintRule {
 /// - `avoid_duplicate_number_elements` for numeric duplicates
 /// - `avoid_duplicate_object_elements` for other duplicates
 class AvoidDuplicateStringElementsRule extends SaropaLintRule {
-  const AvoidDuplicateStringElementsRule() : super(code: _code);
+  AvoidDuplicateStringElementsRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -1927,33 +1479,28 @@ class AvoidDuplicateStringElementsRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_duplicate_string_elements',
-    problemMessage:
-        '[avoid_duplicate_string_elements] Duplicate string element in collection literal typically indicates a copy-paste error or incomplete refactoring. In Sets, the duplicate is silently ignored, producing a smaller collection than expected. {v2}',
+    'avoid_duplicate_string_elements',
+    '[avoid_duplicate_string_elements] Duplicate string element in collection literal typically indicates a copy-paste error or incomplete refactoring. In Sets, the duplicate is silently ignored, producing a smaller collection than expected. {v2}',
     correctionMessage:
         'Remove the duplicate string element or verify the values are intentionally repeated. In Sets, duplicates are silently discarded.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addListLiteral((ListLiteral node) {
+    context.addListLiteral((ListLiteral node) {
       _checkForDuplicateStrings(node.elements, reporter, code);
     });
 
-    context.registry.addSetOrMapLiteral((SetOrMapLiteral node) {
+    context.addSetOrMapLiteral((SetOrMapLiteral node) {
       if (node.isSet) {
         _checkForDuplicateStrings(node.elements, reporter, code);
       }
     });
   }
-
-  @override
-  List<Fix> getFixes() => <Fix>[_RemoveDuplicateElementFix(code)];
 }
 
 /// Warns when duplicate object elements appear in collection literals.
@@ -1990,7 +1537,7 @@ class AvoidDuplicateStringElementsRule extends SaropaLintRule {
 /// - `avoid_duplicate_number_elements` for numeric duplicates
 /// - `avoid_duplicate_string_elements` for string duplicates
 class AvoidDuplicateObjectElementsRule extends SaropaLintRule {
-  const AvoidDuplicateObjectElementsRule() : super(code: _code);
+  AvoidDuplicateObjectElementsRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -2000,33 +1547,28 @@ class AvoidDuplicateObjectElementsRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_duplicate_object_elements',
-    problemMessage:
-        '[avoid_duplicate_object_elements] Duplicate object reference or literal (bool, null, identifier) in collection typically indicates a copy-paste error. In Sets, the duplicate is silently ignored, producing a smaller collection than expected. {v2}',
+    'avoid_duplicate_object_elements',
+    '[avoid_duplicate_object_elements] Duplicate object reference or literal (bool, null, identifier) in collection typically indicates a copy-paste error. In Sets, the duplicate is silently ignored, producing a smaller collection than expected. {v2}',
     correctionMessage:
         'Remove the duplicate object element or verify the references are intentionally repeated. In Sets, duplicates are silently discarded.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addListLiteral((ListLiteral node) {
+    context.addListLiteral((ListLiteral node) {
       _checkForDuplicateObjects(node.elements, reporter, code);
     });
 
-    context.registry.addSetOrMapLiteral((SetOrMapLiteral node) {
+    context.addSetOrMapLiteral((SetOrMapLiteral node) {
       if (node.isSet) {
         _checkForDuplicateObjects(node.elements, reporter, code);
       }
     });
   }
-
-  @override
-  List<Fix> getFixes() => <Fix>[_RemoveDuplicateElementFix(code)];
 }
 
 // =============================================================================
@@ -2046,7 +1588,7 @@ void _checkForDuplicateNumbers(
 
     final String source = element.toSource();
     if (seen.contains(source)) {
-      reporter.atNode(element, code);
+      reporter.atNode(element);
     } else {
       seen.add(source);
     }
@@ -2066,7 +1608,7 @@ void _checkForDuplicateStrings(
 
     final String source = element.toSource();
     if (seen.contains(source)) {
-      reporter.atNode(element, code);
+      reporter.atNode(element);
     } else {
       seen.add(source);
     }
@@ -2095,7 +1637,7 @@ void _checkForDuplicateObjects(
 
     final String source = element.toSource();
     if (seen.contains(source)) {
-      reporter.atNode(element, code);
+      reporter.atNode(element);
     } else {
       seen.add(source);
     }
@@ -2103,67 +1645,6 @@ void _checkForDuplicateObjects(
 }
 
 /// Quick fix that removes a duplicate element from a collection.
-class _RemoveDuplicateElementFix extends DartFix {
-  _RemoveDuplicateElementFix(LintCode _);
-
-  @override
-  void run(
-    CustomLintResolver resolver,
-    ChangeReporter reporter,
-    CustomLintContext context,
-    AnalysisError analysisError,
-    List<AnalysisError> others,
-  ) {
-    // Find the element to remove
-    context.registry.addListLiteral((ListLiteral node) {
-      _tryFixInElements(node.elements, analysisError, reporter);
-    });
-
-    context.registry.addSetOrMapLiteral((SetOrMapLiteral node) {
-      if (node.isSet) {
-        _tryFixInElements(node.elements, analysisError, reporter);
-      }
-    });
-  }
-
-  void _tryFixInElements(
-    NodeList<CollectionElement> elements,
-    AnalysisError analysisError,
-    ChangeReporter reporter,
-  ) {
-    for (int i = 0; i < elements.length; i++) {
-      final CollectionElement element = elements[i];
-      if (!analysisError.sourceRange.intersects(element.sourceRange)) continue;
-
-      final changeBuilder = reporter.createChangeBuilder(
-        message: 'Remove duplicate element',
-        priority: 80,
-      );
-
-      changeBuilder.addDartFileEdit((builder) {
-        // Calculate range including trailing comma and whitespace
-        int start = element.offset;
-        int end = element.end;
-
-        // If there's a comma after this element, include it
-        if (i < elements.length - 1) {
-          // Find the comma after this element
-          final nextElement = elements[i + 1];
-          end = nextElement.offset;
-          // Trim trailing whitespace from end but keep one space
-          // Actually, let's just remove up to the next element
-        } else if (i > 0) {
-          // Last element - need to remove preceding comma
-          final prevElement = elements[i - 1];
-          start = prevElement.end;
-        }
-
-        builder.addDeletion(SourceRange(start, end - start));
-      });
-      return;
-    }
-  }
-}
 
 /// Warns when a List is used for frequent contains() checks.
 ///
@@ -2185,7 +1666,7 @@ class _RemoveDuplicateElementFix extends DartFix {
 /// if (allowedItems.contains(value)) { ... }  // O(1) lookup
 /// ```
 class PreferSetForLookupRule extends SaropaLintRule {
-  const PreferSetForLookupRule() : super(code: _code);
+  PreferSetForLookupRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -2195,21 +1676,19 @@ class PreferSetForLookupRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.high;
 
   static const LintCode _code = LintCode(
-    name: 'prefer_set_for_lookup',
-    problemMessage:
-        '[prefer_set_for_lookup] Calling contains() on a List performs a linear O(n) scan through every element, while a Set uses hash-based O(1) lookup. For collections used primarily for membership testing, this causes unnecessary performance degradation. {v5}',
+    'prefer_set_for_lookup',
+    '[prefer_set_for_lookup] Calling contains() on a List performs a linear O(n) scan through every element, while a Set uses hash-based O(1) lookup. For collections used primarily for membership testing, this causes unnecessary performance degradation. {v5}',
     correctionMessage:
         'Change the collection type from List to Set to use hash-based O(1) lookup instead of linear O(n) scanning.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       if (node.methodName.name != 'contains') return;
 
       final Expression? target = node.realTarget;
@@ -2221,7 +1700,7 @@ class PreferSetForLookupRule extends SaropaLintRule {
       final String typeName = targetType.getDisplayString();
       // Only warn for List types (not Set or other collections)
       if (typeName.startsWith('List<')) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
   }
@@ -2247,7 +1726,7 @@ class PreferSetForLookupRule extends SaropaLintRule {
 /// for (int i = 0; i < 10; i += 1) { } // Also acceptable
 /// ```
 class PreferCorrectForLoopIncrementRule extends SaropaLintRule {
-  const PreferCorrectForLoopIncrementRule() : super(code: _code);
+  PreferCorrectForLoopIncrementRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.low;
@@ -2256,21 +1735,19 @@ class PreferCorrectForLoopIncrementRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'prefer_correct_for_loop_increment',
-    problemMessage:
-        '[prefer_correct_for_loop_increment] Non-standard for loop increment (e.g., i += 2, i = i + 3) reduces readability and can hide off-by-one errors. Standard i++ makes the iteration pattern immediately recognizable to all developers. {v2}',
+    'prefer_correct_for_loop_increment',
+    '[prefer_correct_for_loop_increment] Non-standard for loop increment (e.g., i += 2, i = i + 3) reduces readability and can hide off-by-one errors. Standard i++ makes the iteration pattern immediately recognizable to all developers. {v2}',
     correctionMessage:
         'Use i++ for standard iteration, or add a comment explaining why a non-standard increment step is necessary.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addForStatement((ForStatement node) {
+    context.addForStatement((ForStatement node) {
       final ForLoopParts parts = node.forLoopParts;
       if (parts is! ForParts) return;
 
@@ -2286,7 +1763,7 @@ class PreferCorrectForLoopIncrementRule extends SaropaLintRule {
             final Expression right = updater.rightHandSide;
             if (right is IntegerLiteral && right.value != 1) {
               // Non-standard increment (not by 1)
-              reporter.atNode(updater, code);
+              reporter.atNode(updater);
             }
           }
         }
@@ -2299,7 +1776,7 @@ class PreferCorrectForLoopIncrementRule extends SaropaLintRule {
                 right.operator.type == TokenType.MINUS) {
               final Expression rightOperand = right.rightOperand;
               if (rightOperand is IntegerLiteral && rightOperand.value != 1) {
-                reporter.atNode(updater, code);
+                reporter.atNode(updater);
               }
             }
           }
@@ -2330,7 +1807,7 @@ class PreferCorrectForLoopIncrementRule extends SaropaLintRule {
 /// for (int i = 10; i > 0; i--) { } // Standard descending
 /// ```
 class AvoidUnreachableForLoopRule extends SaropaLintRule {
-  const AvoidUnreachableForLoopRule() : super(code: _code);
+  AvoidUnreachableForLoopRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.high;
@@ -2339,21 +1816,19 @@ class AvoidUnreachableForLoopRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_unreachable_for_loop',
-    problemMessage:
-        '[avoid_unreachable_for_loop] For loop with impossible bounds will never execute, resulting in dead code. This often indicates a logic error, typo, or incorrect increment direction. Unreachable loops can hide bugs, confuse maintainers, and lead to missed updates or calculations. {v3}',
+    'avoid_unreachable_for_loop',
+    '[avoid_unreachable_for_loop] For loop with impossible bounds will never execute, resulting in dead code. This often indicates a logic error, typo, or incorrect increment direction. Unreachable loops can hide bugs, confuse maintainers, and lead to missed updates or calculations. {v3}',
     correctionMessage:
         'Review the loop condition and increment direction. Ensure the bounds allow the loop to execute at least once, and correct any off-by-one errors or typos. Add tests to verify loop behavior.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addForStatement((ForStatement node) {
+    context.addForStatement((ForStatement node) {
       final ForLoopParts parts = node.forLoopParts;
       if (parts is! ForParts) return;
 
@@ -2388,13 +1863,13 @@ class AvoidUnreachableForLoopRule extends SaropaLintRule {
         // i = 10; i < 5 (start > end with <)
         if ((op == TokenType.LT || op == TokenType.LT_EQ) &&
             initValue > boundValue) {
-          reporter.atNode(condition, code);
+          reporter.atNode(condition);
           return;
         }
         // i = 5; i > 10 (start < end with >)
         if ((op == TokenType.GT || op == TokenType.GT_EQ) &&
             initValue < boundValue) {
-          reporter.atNode(condition, code);
+          reporter.atNode(condition);
           return;
         }
       }
@@ -2433,11 +1908,11 @@ class AvoidUnreachableForLoopRule extends SaropaLintRule {
 
       // i < bound with decrement = infinite loop
       if ((op == TokenType.LT || op == TokenType.LT_EQ) && !isIncrementing) {
-        reporter.atNode(condition, code);
+        reporter.atNode(condition);
       }
       // i > bound with increment = infinite loop (if start < bound)
       if ((op == TokenType.GT || op == TokenType.GT_EQ) && isIncrementing) {
-        reporter.atNode(condition, code);
+        reporter.atNode(condition);
       }
     });
   }
@@ -2466,7 +1941,7 @@ class AvoidUnreachableForLoopRule extends SaropaLintRule {
 /// ];
 /// ```
 class PreferNullAwareElementsRule extends SaropaLintRule {
-  const PreferNullAwareElementsRule() : super(code: _code);
+  PreferNullAwareElementsRule() : super(code: _code);
 
   /// Code style improvement.
   @override
@@ -2476,21 +1951,19 @@ class PreferNullAwareElementsRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'prefer_null_aware_elements',
-    problemMessage:
-        '[prefer_null_aware_elements] Explicit null check with if (x != null) x in collection literals is verbose. Dart 3 supports the ?element syntax, which eliminates the boilerplate and expresses nullable inclusion more concisely. {v5}',
+    'prefer_null_aware_elements',
+    '[prefer_null_aware_elements] Explicit null check with if (x != null) x in collection literals is verbose. Dart 3 supports the ?element syntax, which eliminates the boilerplate and expresses nullable inclusion more concisely. {v5}',
     correctionMessage:
         'Replace `if (x != null) x` with `?x` to use the Dart 3 null-aware element syntax and reduce collection boilerplate.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addIfElement((node) {
+    context.addIfElement((node) {
       // Check for pattern: if (x != null) x
       final condition = node.expression;
       if (condition is! BinaryExpression) {
@@ -2522,7 +1995,7 @@ class PreferNullAwareElementsRule extends SaropaLintRule {
       }
 
       if (thenElement is SimpleIdentifier && thenElement.name == varName) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
   }
@@ -2556,7 +2029,7 @@ class PreferNullAwareElementsRule extends SaropaLintRule {
 /// names.add('extra');
 /// ```
 class PreferIterableOperationsRule extends SaropaLintRule {
-  const PreferIterableOperationsRule() : super(code: _code);
+  PreferIterableOperationsRule() : super(code: _code);
 
   /// Performance improvement for large collections.
   @override
@@ -2566,21 +2039,19 @@ class PreferIterableOperationsRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'prefer_iterable_operations',
-    problemMessage:
-        '[prefer_iterable_operations] Calling .toList() at the end of an iterable chain inside a for-in loop forces eager evaluation and allocates an intermediate list that is iterated once and then discarded. This wastes memory and CPU cycles. {v2}',
+    'prefer_iterable_operations',
+    '[prefer_iterable_operations] Calling .toList() at the end of an iterable chain inside a for-in loop forces eager evaluation and allocates an intermediate list that is iterated once and then discarded. This wastes memory and CPU cycles. {v2}',
     correctionMessage:
         'Remove .toList() to keep the iteration lazy and eliminate the unnecessary intermediate list allocation.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addForStatement((node) {
+    context.addForStatement((node) {
       final forParts = node.forLoopParts;
       if (forParts is! ForEachPartsWithDeclaration) {
         return;
@@ -2638,7 +2109,7 @@ class PreferIterableOperationsRule extends SaropaLintRule {
 /// )
 /// ```
 class RequireKeyForCollectionRule extends SaropaLintRule {
-  const RequireKeyForCollectionRule() : super(code: _code);
+  RequireKeyForCollectionRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.high;
@@ -2647,12 +2118,11 @@ class RequireKeyForCollectionRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'require_key_for_collection',
-    problemMessage:
-        '[require_key_for_collection] List items in dynamic collections (ListView, GridView, etc.) must have a Key to preserve child widget state (e.g., TextField input, animations) when the list reorders or updates. Missing keys can cause UI bugs, loss of user input, broken animations, and confusing user experiences. This is a common source of hard-to-debug Flutter widget tree issues. {v4}',
+    'require_key_for_collection',
+    '[require_key_for_collection] List items in dynamic collections (ListView, GridView, etc.) must have a Key to preserve child widget state (e.g., TextField input, animations) when the list reorders or updates. Missing keys can cause UI bugs, loss of user input, broken animations, and confusing user experiences. This is a common source of hard-to-debug Flutter widget tree issues. {v4}',
     correctionMessage:
         'Add a Key (such as ValueKey, ObjectKey, or UniqueKey) to each list item. Ensure the key is unique and stable for each item, especially when items are reordered or updated. Document key usage in your builder methods to prevent state loss.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   /// List builder widgets that need keyed children.
@@ -2675,11 +2145,10 @@ class RequireKeyForCollectionRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       final Expression? target = node.target;
       if (target is! SimpleIdentifier) return;
 
@@ -2702,9 +2171,7 @@ class RequireKeyForCollectionRule extends SaropaLintRule {
     });
 
     // Also check for ReorderableListView and AnimatedList constructors
-    context.registry.addInstanceCreationExpression((
-      InstanceCreationExpression node,
-    ) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final String? typeName = node.constructorName.type.element?.name;
       if (typeName == null) return;
 
