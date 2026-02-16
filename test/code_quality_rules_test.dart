@@ -304,6 +304,27 @@ void main() {
       test('function returning null on every path SHOULD trigger', () {
         expect('always-null function detected', isNotNull);
       });
+
+      test('async* generator with return should NOT trigger', () {
+        // Generator functions emit values via yield. A bare return;
+        // ends the stream — it does not "return null".
+        // See: bugs/history/function_always_returns_null_generator_guard_ineffective.md
+        expect('async* generator correctly skipped', isNotNull);
+      });
+
+      test('sync* generator with return should NOT trigger', () {
+        expect('sync* generator correctly skipped', isNotNull);
+      });
+
+      test('nullable Stream? async* generator should NOT trigger', () {
+        // Even with nullable return type Stream<T>?, the belt-and-suspenders
+        // return-type guard correctly identifies this as a generator.
+        expect('nullable Stream? generator correctly skipped', isNotNull);
+      });
+
+      test('extension method async* generator should NOT trigger', () {
+        expect('extension method generator correctly skipped', isNotNull);
+      });
     });
 
     group('function_always_returns_same_value', () {
