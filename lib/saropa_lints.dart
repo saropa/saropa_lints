@@ -2460,6 +2460,13 @@ final List<LintRule Function()> _allRuleFactories = <LintRule Function()>[
   PreferInfiniteScrollPreloadRule.new,
   PreferUseCallbackRule.new,
   RequireStepperStateManagementRule.new,
+
+  // v4.15.0 - ROADMAP ⭐ Rules (batch 2)
+  AvoidIgnoringReturnValuesRule.new,
+  PreferOptimisticUpdatesRule.new,
+  AvoidFullSyncOnEveryLaunchRule.new,
+  AvoidCachedImageUnboundedListRule.new,
+  RequireSessionTimeoutRule.new,
 ];
 
 // =============================================================================
