@@ -13,6 +13,10 @@ Dates are not included in version headers — [pub.dev](https://pub.dev/packages
 ---
 ## [4.14.5]
 
+### Fixed
+
+- **`avoid_unnecessary_setstate` false positive on closure callbacks**: The rule no longer flags `setState` inside deferred callbacks (`.listen()`, `Future.delayed()`, `.then()`, `addPostFrameCallback()`) defined within lifecycle methods — only direct synchronous `setState` calls are flagged
+
 ### Added
 
 - **`prefer_semantics_container`** (Professional, INFO): Warns when Semantics wraps a multi-child layout (Column, Row, etc.) without `container: true`, causing screen readers to announce children individually instead of as a group

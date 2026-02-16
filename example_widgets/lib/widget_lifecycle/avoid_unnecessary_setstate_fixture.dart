@@ -105,15 +105,76 @@
 
 import 'package:saropa_lints_example/flutter_mocks.dart';
 
-// BAD: Should trigger avoid_unnecessary_setstate
-// expect_lint: avoid_unnecessary_setstate
-class _BadClass1340 {
-  // TODO: Add method declaration that triggers avoid_unnecessary_setstate
-  void badMethod() {}
+// BAD: Direct setState in initState — runs synchronously during lifecycle
+class _bad1340__MyWidgetState extends State<MyWidget> {
+  @override
+  void initState() {
+    super.initState();
+    // expect_lint: avoid_unnecessary_setstate
+    setState(() {});
+  }
 }
 
-// GOOD: Should NOT trigger avoid_unnecessary_setstate
-class _GoodClass1340 {
-  // TODO: Add compliant method for avoid_unnecessary_setstate
-  void goodMethod() {}
+// BAD: Direct setState in didChangeDependencies
+class _bad1340b__MyWidgetState extends State<MyWidget> {
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    // expect_lint: avoid_unnecessary_setstate
+    setState(() {});
+  }
+}
+
+// GOOD: setState inside a stream listener callback — runs after lifecycle
+class _good1340__MyWidgetState extends State<MyWidget> {
+  @override
+  void initState() {
+    super.initState();
+    Stream<int>.empty().listen((_) {
+      if (mounted) setState(() {});
+    });
+  }
+}
+
+// BAD: Direct setState in dispose
+class _bad1340c__MyWidgetState extends State<MyWidget> {
+  @override
+  void dispose() {
+    // expect_lint: avoid_unnecessary_setstate
+    setState(() {});
+    super.dispose();
+  }
+}
+
+// GOOD: setState inside Future.delayed callback — runs after lifecycle
+class _good1340b__MyWidgetState extends State<MyWidget> {
+  @override
+  void initState() {
+    super.initState();
+    Future<void>.delayed(Duration(seconds: 1), () {
+      if (mounted) setState(() {});
+    });
+  }
+}
+
+// GOOD: setState inside Future.then callback — runs after lifecycle
+class _good1340c__MyWidgetState extends State<MyWidget> {
+  @override
+  void initState() {
+    super.initState();
+    Future<void>.value().then((_) {
+      if (mounted) setState(() {});
+    });
+  }
+}
+
+// GOOD: setState inside addPostFrameCallback — runs after lifecycle
+class _good1340d__MyWidgetState extends State<MyWidget> {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) setState(() {});
+    });
+  }
 }
