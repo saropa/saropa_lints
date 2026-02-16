@@ -315,37 +315,21 @@ Base class stayed as `SaropaLintRule` (now extends `AnalysisRule` directly inste
 
 ---
 
-### Phase 5: Configuration & Tier System - TODO
+### Phase 5: Configuration & Tier System - DONE
 
 **Goal**: New configuration format and tier presets
 
-#### 5.1 Preset Files
+#### Implementation
 
-Create preset configs in `lib/presets/`:
-
-```yaml
-# lib/presets/recommended.yaml
-plugins:
-  saropa_lints:
-    diagnostics:
-      avoid_debug_print: warning
-      avoid_empty_set_state: warning
-      # ... all recommended-tier rules
-```
-
-#### 5.2 Init Command Update
-
-Update `bin/init.dart` to generate new format:
-
-```bash
-dart run saropa_lints:init --tier recommended
-# Generates analysis_options.yaml with plugins: section
-```
+- Updated 5 tier preset YAML files (`lib/tiers/*.yaml`) from `custom_lint: rules:` to `plugins: saropa_lints: diagnostics:`
+- Updated `bin/init.dart` to generate native plugin format with `plugins:` section
+- Native analyzer handles `diagnostics:` configuration automatically (severity overrides, rule enable/disable)
+- Created `MIGRATION_V5.md` with complete v4 → v5 upgrade instructions
 
 #### Deliverables
-- [ ] Preset configuration files for each tier
-- [ ] Update init command for new format
-- [ ] Migration guide for v4 -> v5 users
+- [x] Preset configuration files updated to native format
+- [x] Init command generates `plugins: saropa_lints: diagnostics:` format
+- [x] Migration guide (`MIGRATION_V5.md`)
 
 ---
 
