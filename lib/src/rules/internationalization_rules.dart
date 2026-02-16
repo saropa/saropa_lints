@@ -2667,3 +2667,210 @@ class AvoidHardcodedLocaleStringsRule extends SaropaLintRule {
     });
   }
 }
+
+// =============================================================================
+// require_rtl_layout_support
+// =============================================================================
+
+/// Warns when hardcoded left/right directional values are used in layouts.
+///
+/// Since: v4.16.0 | Rule version: v1
+///
+/// Alias: rtl_support, directional_layout, rtl_layout_awareness
+///
+/// RTL (right-to-left) languages such as Arabic, Hebrew, Persian, and Urdu
+/// affect over 500 million users worldwide. Hardcoded left/right values
+/// render incorrectly for RTL languages. Use directional equivalents
+/// (start/end) that automatically adapt to the text direction.
+///
+/// This rule is broader than `require_directional_widgets` (INFO) and
+/// additionally detects `TextAlign.left/right`, `EdgeInsets.fromLTRB`,
+/// and `Alignment.*Left/*Right` prefixed identifiers.
+///
+/// **BAD:**
+/// ```dart
+/// Padding(padding: EdgeInsets.fromLTRB(16, 0, 0, 0))
+/// Text('Hello', textAlign: TextAlign.left)
+/// Align(alignment: Alignment.centerLeft)
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// Padding(padding: EdgeInsetsDirectional.only(start: 16))
+/// Text('Hello', textAlign: TextAlign.start)
+/// Align(alignment: AlignmentDirectional.centerStart)
+/// ```
+class RequireRtlLayoutSupportRule extends SaropaLintRule {
+  const RequireRtlLayoutSupportRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.widget};
+
+  static const LintCode _code = LintCode(
+    name: 'require_rtl_layout_support',
+    problemMessage:
+        '[require_rtl_layout_support] Hardcoded left/right directional value '
+        'detected. This layout will render incorrectly for RTL (right-to-left) '
+        'languages such as Arabic, Hebrew, Persian, and Urdu, affecting over '
+        '500 million users worldwide. Use directional equivalents (start/end) '
+        'that automatically adapt to the text direction, ensuring your layout '
+        'works correctly in both LTR and RTL contexts. {v1}',
+    correctionMessage: 'Replace left/right with start/end equivalents: '
+        'EdgeInsetsDirectional instead of EdgeInsets, '
+        'TextAlign.start instead of TextAlign.left, '
+        'AlignmentDirectional.centerStart instead of Alignment.centerLeft.',
+    errorSeverity: DiagnosticSeverity.WARNING,
+  );
+
+  static const Set<String> _alignmentLeftRight = <String>{
+    'centerLeft',
+    'centerRight',
+    'topLeft',
+    'topRight',
+    'bottomLeft',
+    'bottomRight',
+  };
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    // Detect EdgeInsets.fromLTRB constructor
+    context.registry.addInstanceCreationExpression((
+      InstanceCreationExpression node,
+    ) {
+      final String constructorSource = node.constructorName.toSource();
+      if (constructorSource == 'EdgeInsets.fromLTRB') {
+        reporter.atNode(node.constructorName, code);
+      }
+    });
+
+    // Detect TextAlign.left/right and Alignment.*Left/*Right
+    context.registry.addPrefixedIdentifier((PrefixedIdentifier node) {
+      final String prefix = node.prefix.name;
+      final String identifier = node.identifier.name;
+
+      // TextAlign.left or TextAlign.right
+      if (prefix == 'TextAlign' &&
+          (identifier == 'left' || identifier == 'right')) {
+        reporter.atNode(node, code);
+        return;
+      }
+
+      // Alignment.centerLeft, Alignment.topRight, etc.
+      if (prefix == 'Alignment' && _alignmentLeftRight.contains(identifier)) {
+        reporter.atNode(node, code);
+        return;
+      }
+    });
+  }
+
+  @override
+  List<Fix> getFixes() => [_RequireRtlLayoutSupportFix()];
+}
+
+/// Quick fix for [RequireRtlLayoutSupportRule].
+class _RequireRtlLayoutSupportFix extends DartFix {
+  /// Maps Alignment.*Left/*Right → AlignmentDirectional equivalents.
+  static const Map<String, String> _alignmentReplacements = <String, String>{
+    'Alignment.centerLeft': 'AlignmentDirectional.centerStart',
+    'Alignment.centerRight': 'AlignmentDirectional.centerEnd',
+    'Alignment.topLeft': 'AlignmentDirectional.topStart',
+    'Alignment.topRight': 'AlignmentDirectional.topEnd',
+    'Alignment.bottomLeft': 'AlignmentDirectional.bottomStart',
+    'Alignment.bottomRight': 'AlignmentDirectional.bottomEnd',
+  };
+
+  @override
+  void run(
+    CustomLintResolver resolver,
+    ChangeReporter reporter,
+    CustomLintContext context,
+    AnalysisError analysisError,
+    List<AnalysisError> others,
+  ) {
+    // Fix EdgeInsets.fromLTRB → EdgeInsetsDirectional.only
+    context.registry.addInstanceCreationExpression((
+      InstanceCreationExpression node,
+    ) {
+      if (!analysisError.sourceRange.intersects(node.sourceRange)) return;
+
+      final String src = node.constructorName.toSource();
+      if (src != 'EdgeInsets.fromLTRB') return;
+
+      final args = node.argumentList.arguments;
+      if (args.length != 4) return;
+
+      final changeBuilder = reporter.createChangeBuilder(
+        message: 'Convert to EdgeInsetsDirectional.only',
+        priority: 80,
+      );
+
+      changeBuilder.addDartFileEdit((builder) {
+        builder.addSimpleReplacement(
+          node.sourceRange,
+          _buildEdgeInsetsDirectional(args),
+        );
+      });
+    });
+
+    // Fix TextAlign.left/right and Alignment.*Left/*Right
+    context.registry.addPrefixedIdentifier((PrefixedIdentifier node) {
+      if (!analysisError.sourceRange.intersects(node.sourceRange)) return;
+
+      final String source = node.toSource();
+
+      // TextAlign.left → TextAlign.start, TextAlign.right → TextAlign.end
+      if (source == 'TextAlign.left' || source == 'TextAlign.right') {
+        final String replacement =
+            source == 'TextAlign.left' ? 'TextAlign.start' : 'TextAlign.end';
+        final changeBuilder = reporter.createChangeBuilder(
+          message: 'Replace with $replacement',
+          priority: 80,
+        );
+        changeBuilder.addDartFileEdit((builder) {
+          builder.addSimpleReplacement(node.sourceRange, replacement);
+        });
+        return;
+      }
+
+      // Alignment.centerLeft → AlignmentDirectional.centerStart, etc.
+      final String? replacement = _alignmentReplacements[source];
+      if (replacement != null) {
+        final changeBuilder = reporter.createChangeBuilder(
+          message: 'Replace with $replacement',
+          priority: 80,
+        );
+        changeBuilder.addDartFileEdit((builder) {
+          builder.addSimpleReplacement(node.sourceRange, replacement);
+        });
+      }
+    });
+  }
+
+  /// Builds `EdgeInsetsDirectional.only(start: L, top: T, end: R, bottom: B)`
+  /// from positional LTRB arguments, omitting zero values.
+  String _buildEdgeInsetsDirectional(NodeList<Expression> args) {
+    final String left = args[0].toSource();
+    final String top = args[1].toSource();
+    final String right = args[2].toSource();
+    final String bottom = args[3].toSource();
+
+    final List<String> named = <String>[];
+    if (left != '0' && left != '0.0') named.add('start: $left');
+    if (top != '0' && top != '0.0') named.add('top: $top');
+    if (right != '0' && right != '0.0') named.add('end: $right');
+    if (bottom != '0' && bottom != '0.0') named.add('bottom: $bottom');
+
+    if (named.isEmpty) return 'EdgeInsetsDirectional.zero';
+    return 'EdgeInsetsDirectional.only(${named.join(', ')})';
+  }
+}
