@@ -42,10 +42,7 @@ void main() {
         // - isPremiumUser
         // - proFeature
 
-        expect(
-          'Actual premium indicators are still detected',
-          isNotNull,
-        );
+        expect('Actual premium indicators are still detected', isNotNull);
       });
     });
 
@@ -81,10 +78,7 @@ void main() {
         // - Uri? get initialUri => _initialUri;
         // - Uri? get currentRouteUri => _currentUri;
 
-        expect(
-          'Simple getters returning a field are skipped',
-          isNotNull,
-        );
+        expect('Simple getters returning a field are skipped', isNotNull);
       });
 
       test('should skip lazy-loading patterns', () {
@@ -92,10 +86,7 @@ void main() {
         // - Uri? get uri => _uri ??= Uri.parse(url);
         // - Uri? get cachedUri => _cachedUri ??= parseUri();
 
-        expect(
-          'Lazy-loading with ??= operator is skipped',
-          isNotNull,
-        );
+        expect('Lazy-loading with ??= operator is skipped', isNotNull);
       });
 
       test('should skip simple method invocations', () {
@@ -104,10 +95,7 @@ void main() {
         // - Uri? get safeUri => url?.toUriSafe();
         // - Uri? uri() => _url.toUri();
 
-        expect(
-          'Simple method invocations on fields are skipped',
-          isNotNull,
-        );
+        expect('Simple method invocations on fields are skipped', isNotNull);
       });
 
       test('should skip property access patterns', () {
@@ -115,10 +103,7 @@ void main() {
         // - String? get uriScheme => _uri?.scheme;
         // - String? get uriHost => uri?.host;
 
-        expect(
-          'Null-aware property access is skipped',
-          isNotNull,
-        );
+        expect('Null-aware property access is skipped', isNotNull);
       });
 
       test('should skip trivial single-assignment method bodies', () {
@@ -171,10 +156,7 @@ void main() {
         // handleEmptyDeepLink SHOULD be checked (not ending with "empty")
         // processNullableUri SHOULD be checked if not a getter with is/has prefix
 
-        expect(
-          'Uses endsWith for precision, not contains',
-          isNotNull,
-        );
+        expect('Uses endsWith for precision, not contains', isNotNull);
       });
 
       test('should skip methods returning Widget types', () {
@@ -208,10 +190,7 @@ void main() {
         // - content.replaceAll('http://', 'https://')
         // - text.replace('http://', 'https://')
 
-        expect(
-          'Safe HTTP to HTTPS upgrade patterns are allowed',
-          isNotNull,
-        );
+        expect('Safe HTTP to HTTPS upgrade patterns are allowed', isNotNull);
       });
 
       test('should still detect hardcoded http URLs', () {
@@ -219,10 +198,7 @@ void main() {
         // - 'http://api.example.com/data'
         // - 'http://cdn.example.com/image.png'
 
-        expect(
-          'Hardcoded HTTP URLs are still detected',
-          isNotNull,
-        );
+        expect('Hardcoded HTTP URLs are still detected', isNotNull);
       });
 
       test('should allow localhost and development URLs', () {
@@ -232,10 +208,7 @@ void main() {
         // - http://[::1]:8080
         // - http://192.168.1.100:8080
 
-        expect(
-          'Localhost and local network URLs are allowed',
-          isNotNull,
-        );
+        expect('Localhost and local network URLs are allowed', isNotNull);
       });
     });
 
@@ -259,10 +232,7 @@ void main() {
         // - map[key] = map     // Assigning map to itself
         // - obj.compare(obj)   // Comparing object to itself
 
-        expect(
-          'Object self-references are still detected',
-          isNotNull,
-        );
+        expect('Object self-references are still detected', isNotNull);
       });
     });
 
@@ -279,10 +249,7 @@ void main() {
         //
         // The closures are siblings, not nested.
 
-        expect(
-          'Sibling closures have independent scopes',
-          isNotNull,
-        );
+        expect('Sibling closures have independent scopes', isNotNull);
       });
 
       test('should still detect true nested shadowing', () {
@@ -294,10 +261,7 @@ void main() {
         //   }
         // }
 
-        expect(
-          'Nested shadowing is still detected',
-          isNotNull,
-        );
+        expect('Nested shadowing is still detected', isNotNull);
       });
 
       test('should detect parameter shadowing', () {
@@ -305,10 +269,7 @@ void main() {
         // int value = 10;
         // void process(int value) { } // Shadows outer 'value'
 
-        expect(
-          'Parameter shadowing outer variable is detected',
-          isNotNull,
-        );
+        expect('Parameter shadowing outer variable is detected', isNotNull);
       });
     });
 
@@ -342,10 +303,7 @@ void main() {
         // - ValueNotifier(0)
         // - List<int>()
 
-        expect(
-          'Genuinely unused instances are still detected',
-          isNotNull,
-        );
+        expect('Genuinely unused instances are still detected', isNotNull);
       });
     });
 
@@ -355,10 +313,7 @@ void main() {
         // isar.clear() without kDebugMode guard SHOULD trigger
         // isar.clear() inside if (kDebugMode) should NOT trigger
 
-        expect(
-          'Only Isar.clear() triggers the rule',
-          isNotNull,
-        );
+        expect('Only Isar.clear() triggers the rule', isNotNull);
       });
 
       test('should not flag clear() on Map, List, Set, or other types', () {
@@ -369,53 +324,46 @@ void main() {
         // - buffer.clear()     (StringBuffer)
         // - controller.clear() (TextEditingController)
 
-        expect(
-          'Non-Isar clear() calls are not flagged',
-          isNotNull,
-        );
+        expect('Non-Isar clear() calls are not flagged', isNotNull);
       });
     });
 
     group('prefer_late_final', () {
-      test('should not flag fields assigned via method called multiple times',
-          () {
-        // Expected behavior:
-        // A late field assigned in a helper method that is called from
-        // multiple sites (e.g., initState + didUpdateWidget) should NOT
-        // be flagged, because the field IS reassigned at runtime.
-        //
-        // class MyState {
-        //   late Future<T> _future;
-        //   void _fetch() { _future = loadData(); }
-        //   void initState() { _fetch(); }           // Call site 1
-        //   void didUpdateWidget() { _fetch(); }     // Call site 2
-        // }
+      test(
+        'should not flag fields assigned via method called multiple times',
+        () {
+          // Expected behavior:
+          // A late field assigned in a helper method that is called from
+          // multiple sites (e.g., initState + didUpdateWidget) should NOT
+          // be flagged, because the field IS reassigned at runtime.
+          //
+          // class MyState {
+          //   late Future<T> _future;
+          //   void _fetch() { _future = loadData(); }
+          //   void initState() { _fetch(); }           // Call site 1
+          //   void didUpdateWidget() { _fetch(); }     // Call site 2
+          // }
 
-        expect(
-          'Method call-site analysis prevents false positives',
-          isNotNull,
-        );
-      });
+          expect(
+            'Method call-site analysis prevents false positives',
+            isNotNull,
+          );
+        },
+      );
 
       test('should still flag fields with single call-site methods', () {
         // Expected behavior: These SHOULD trigger
         // - late field assigned in a method called from only one place
         // - late field assigned directly in a single method
 
-        expect(
-          'Single-assignment fields are still detected',
-          isNotNull,
-        );
+        expect('Single-assignment fields are still detected', isNotNull);
       });
 
       test('should not flag fields with multiple direct assignments', () {
         // Expected behavior: These should NOT trigger
         // - late field assigned in init() AND reset()
 
-        expect(
-          'Multiple direct assignments prevent flagging',
-          isNotNull,
-        );
+        expect('Multiple direct assignments prevent flagging', isNotNull);
       });
     });
 
@@ -429,10 +377,7 @@ void main() {
         // for (int i = 0; i < n; i = next(i)) {}
         // for (int mask = 1; mask != 0; mask <<= 1) {}
 
-        expect(
-          'For-loop update clause assignments are not nested',
-          isNotNull,
-        );
+        expect('For-loop update clause assignments are not nested', isNotNull);
       });
 
       test('should still flag assignments in conditions and arguments', () {
@@ -441,10 +386,7 @@ void main() {
         // foo(x = 5)
         // final list = [x = 5]
 
-        expect(
-          'Genuinely nested assignments are still detected',
-          isNotNull,
-        );
+        expect('Genuinely nested assignments are still detected', isNotNull);
       });
     });
 
@@ -465,20 +407,22 @@ void main() {
         );
       });
 
-      test('should still flag classes that USE WebSocket without reconnection',
-          () {
-        // Expected behavior: These SHOULD trigger
-        // - class ChatService { WebSocketChannel.connect(url); }
-        // - class LiveFeed { WebSocket.connect(url); }
-        //
-        // Expected behavior: These should NOT trigger (has reconnection)
-        // - class ChatService { ... reconnect() ... onDone: ... }
+      test(
+        'should still flag classes that USE WebSocket without reconnection',
+        () {
+          // Expected behavior: These SHOULD trigger
+          // - class ChatService { WebSocketChannel.connect(url); }
+          // - class LiveFeed { WebSocket.connect(url); }
+          //
+          // Expected behavior: These should NOT trigger (has reconnection)
+          // - class ChatService { ... reconnect() ... onDone: ... }
 
-        expect(
-          'Classes using WebSocket without reconnection are detected',
-          isNotNull,
-        );
-      });
+          expect(
+            'Classes using WebSocket without reconnection are detected',
+            isNotNull,
+          );
+        },
+      );
 
       test('should not flag WebSocket subclass names', () {
         // Classes named BadWebSocketService, GoodWebSocketService,
@@ -522,10 +466,7 @@ void main() {
         // detected because timeout check only inspected direct arguments.
         // Now walks up AST parents to find chained .timeout() calls.
 
-        expect(
-          'Chained .timeout() is detected via AST parent walk',
-          isNotNull,
-        );
+        expect('Chained .timeout() is detected via AST parent walk', isNotNull);
       });
     });
 
@@ -539,10 +480,7 @@ void main() {
         // - CustomNavigatorState.pushRoute()
         // - NavigatorObserverLogger.log()
 
-        expect(
-          'Navigator exact match replaces substring matching',
-          isNotNull,
-        );
+        expect('Navigator exact match replaces substring matching', isNotNull);
       });
     });
 
@@ -624,10 +562,7 @@ void main() {
       // - list.where((e) => e is! String)
       // - items.where((w) => w is! PhoneRow)
 
-      expect(
-        'Negated is! checks are skipped via notOperator guard',
-        isNotNull,
-      );
+      expect('Negated is! checks are skipped via notOperator guard', isNotNull);
     });
 
     test('should still flag positive type checks', () {
@@ -635,10 +570,7 @@ void main() {
       // - list.where((e) => e is String)
       // - items.where((w) => w is Widget)
 
-      expect(
-        'Positive is checks are still detected',
-        isNotNull,
-      );
+      expect('Positive is checks are still detected', isNotNull);
     });
 
     test('auto-fix should not produce semantically wrong replacement', () {

@@ -192,7 +192,7 @@ class IgnoreUtils {
       }
       final int methodNameLine =
           lineInfo?.getLocation(node.methodName.offset).lineNumber ??
-              nodeStartLine;
+          nodeStartLine;
       if (_hasValidLeadingIgnoreComment(
         node.methodName.beginToken,
         ruleName,
@@ -207,7 +207,7 @@ class IgnoreUtils {
     if (node is PropertyAccess) {
       final int operatorLine =
           lineInfo?.getLocation(node.operator.offset).lineNumber ??
-              nodeStartLine;
+          nodeStartLine;
       if (_hasValidLeadingIgnoreComment(
         node.operator,
         ruleName,
@@ -218,7 +218,7 @@ class IgnoreUtils {
       }
       final int propertyLine =
           lineInfo?.getLocation(node.propertyName.offset).lineNumber ??
-              nodeStartLine;
+          nodeStartLine;
       if (_hasValidLeadingIgnoreComment(
         node.propertyName.beginToken,
         ruleName,

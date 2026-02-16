@@ -1048,7 +1048,6 @@ const Set<String> recommendedOnlyRules = <String>{
   'avoid_rebuild_on_scroll', // WARNING - memory leak
   'avoid_exception_in_constructor', // WARNING - error handling
   'require_permission_permanent_denial_handling', // WARNING - UX
-
   // Note: require_getit_registration_order, require_default_config, avoid_builder_index_out_of_bounds
   // moved to Essential (they cause crashes)
   'prefer_ios_safe_area', // INFO - iOS notch/Dynamic Island handling

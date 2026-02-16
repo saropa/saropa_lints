@@ -33,19 +33,13 @@ void main() {
 
       test('expectLater() calls should NOT be treated as setup code', () {
         // `expectLater(stream, emitsInOrder(...))` is an assertion
-        expect(
-          'expectLater is in _assertionFunctions set',
-          isNotNull,
-        );
+        expect('expectLater is in _assertionFunctions set', isNotNull);
       });
 
       test('await expectLater() should NOT be treated as setup code', () {
         // `await expectLater(...)` wraps MethodInvocation in AwaitExpression.
         // _isAssertionCall unwraps AwaitExpression before checking.
-        expect(
-          'AwaitExpression is unwrapped in _isAssertionCall',
-          isNotNull,
-        );
+        expect('AwaitExpression is unwrapped in _isAssertionCall', isNotNull);
       });
 
       test('verify() calls should NOT be treated as setup code', () {
@@ -58,10 +52,7 @@ void main() {
 
       test('fail() calls should NOT be treated as setup code', () {
         // fail() throws TestFailure — it is an assertion, not setup
-        expect(
-          'fail is in _assertionFunctions set',
-          isNotNull,
-        );
+        expect('fail is in _assertionFunctions set', isNotNull);
       });
 
       test('real setup code alongside assertions SHOULD still trigger', () {
@@ -78,27 +69,18 @@ void main() {
     group('group-scoped counting (false positive fix)', () {
       test('tests in SAME group count toward threshold', () {
         // 3+ tests within group('X', () { ... }) sharing setup → triggers
-        expect(
-          'grouped tests are compared within their scope',
-          isNotNull,
-        );
+        expect('grouped tests are compared within their scope', isNotNull);
       });
 
       test('tests in DIFFERENT groups do NOT count together', () {
         // 1 test in group A, 1 in group B, 1 in group C — same setup
         // pattern but only 1 per group → does NOT trigger
-        expect(
-          '_findEnclosingGroup scopes counting per group',
-          isNotNull,
-        );
+        expect('_findEnclosingGroup scopes counting per group', isNotNull);
       });
 
       test('top-level tests (no group) are counted together', () {
         // Tests not inside any group() share the null group key
-        expect(
-          'null group key collects top-level tests',
-          isNotNull,
-        );
+        expect('null group key collects top-level tests', isNotNull);
       });
     });
 
@@ -114,18 +96,12 @@ void main() {
 
       test('simple literal locals should NOT trigger', () {
         // `int count = 0; const iterations = 1000;` are simple inits
-        expect(
-          '_isSimpleLocalInit filters primitive declarations',
-          isNotNull,
-        );
+        expect('_isSimpleLocalInit filters primitive declarations', isNotNull);
       });
 
       test('fewer than 3 matches should NOT trigger', () {
         // Threshold is 3 — 2 identical patterns do not fire the rule
-        expect(
-          'entry.value < 3 → skip',
-          isNotNull,
-        );
+        expect('entry.value < 3 → skip', isNotNull);
       });
     });
   });

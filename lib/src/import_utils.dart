@@ -77,10 +77,7 @@ class PackageImports {
   };
 
   /// Hive database package imports.
-  static const Set<String> hive = {
-    'package:hive/',
-    'package:hive_flutter/',
-  };
+  static const Set<String> hive = {'package:hive/', 'package:hive_flutter/'};
 
   /// GetIt service locator package imports.
   static const Set<String> getIt = {'package:get_it/'};
@@ -89,10 +86,7 @@ class PackageImports {
   static const Set<String> provider = {'package:provider/'};
 
   /// Bloc packages.
-  static const Set<String> bloc = {
-    'package:bloc/',
-    'package:flutter_bloc/',
-  };
+  static const Set<String> bloc = {'package:bloc/', 'package:flutter_bloc/'};
 
   /// Firebase Auth package imports.
   static const Set<String> firebaseAuth = {'package:firebase_auth/'};

@@ -56,21 +56,18 @@ Map<OwaspWeb, List<String>> getWebCoverage(
 ({List<OwaspMobile> mobile, List<OwaspWeb> web}) getUncoveredCategories(
   Map<String, OwaspMapping> ruleMappings,
 ) {
-  final Map<OwaspMobile, List<String>> mobileCoverage =
-      getMobileCoverage(ruleMappings);
+  final Map<OwaspMobile, List<String>> mobileCoverage = getMobileCoverage(
+    ruleMappings,
+  );
   final Map<OwaspWeb, List<String>> webCoverage = getWebCoverage(ruleMappings);
 
   return (
     mobile: mobileCoverage.entries
-        .where(
-          (MapEntry<OwaspMobile, List<String>> e) => e.value.isEmpty,
-        )
+        .where((MapEntry<OwaspMobile, List<String>> e) => e.value.isEmpty)
         .map((MapEntry<OwaspMobile, List<String>> e) => e.key)
         .toList(),
     web: webCoverage.entries
-        .where(
-          (MapEntry<OwaspWeb, List<String>> e) => e.value.isEmpty,
-        )
+        .where((MapEntry<OwaspWeb, List<String>> e) => e.value.isEmpty)
         .map((MapEntry<OwaspWeb, List<String>> e) => e.key)
         .toList(),
   );
@@ -92,12 +89,14 @@ String generateComplianceReport(Map<String, OwaspMapping> ruleMappings) {
   buffer.writeln('| Category | Rules | Count |');
   buffer.writeln('|----------|-------|-------|');
 
-  final Map<OwaspMobile, List<String>> mobileCoverage =
-      getMobileCoverage(ruleMappings);
+  final Map<OwaspMobile, List<String>> mobileCoverage = getMobileCoverage(
+    ruleMappings,
+  );
   for (final OwaspMobile category in OwaspMobile.values) {
     final List<String> rules = mobileCoverage[category]!;
-    final String ruleList =
-        rules.isEmpty ? '_No coverage_' : rules.take(3).join(', ');
+    final String ruleList = rules.isEmpty
+        ? '_No coverage_'
+        : rules.take(3).join(', ');
     final String suffix = rules.length > 3 ? '...' : '';
     buffer.writeln(
       '| ${category.id}: ${category.name} | $ruleList$suffix | ${rules.length} |',
@@ -115,8 +114,9 @@ String generateComplianceReport(Map<String, OwaspMapping> ruleMappings) {
   final Map<OwaspWeb, List<String>> webCoverage = getWebCoverage(ruleMappings);
   for (final OwaspWeb category in OwaspWeb.values) {
     final List<String> rules = webCoverage[category]!;
-    final String ruleList =
-        rules.isEmpty ? '_No coverage_' : rules.take(3).join(', ');
+    final String ruleList = rules.isEmpty
+        ? '_No coverage_'
+        : rules.take(3).join(', ');
     final String suffix = rules.length > 3 ? '...' : '';
     buffer.writeln(
       '| ${category.id}: ${category.name} | $ruleList$suffix | ${rules.length} |',
@@ -126,21 +126,31 @@ String generateComplianceReport(Map<String, OwaspMapping> ruleMappings) {
   buffer.writeln();
 
   // Summary
-  final int totalMobileRules = mobileCoverage.values
-      .fold(0, (int sum, List<String> rules) => sum + rules.length);
-  final int totalWebRules = webCoverage.values
-      .fold(0, (int sum, List<String> rules) => sum + rules.length);
-  final int mobileCovered =
-      mobileCoverage.values.where((List<String> r) => r.isNotEmpty).length;
-  final int webCovered =
-      webCoverage.values.where((List<String> r) => r.isNotEmpty).length;
+  final int totalMobileRules = mobileCoverage.values.fold(
+    0,
+    (int sum, List<String> rules) => sum + rules.length,
+  );
+  final int totalWebRules = webCoverage.values.fold(
+    0,
+    (int sum, List<String> rules) => sum + rules.length,
+  );
+  final int mobileCovered = mobileCoverage.values
+      .where((List<String> r) => r.isNotEmpty)
+      .length;
+  final int webCovered = webCoverage.values
+      .where((List<String> r) => r.isNotEmpty)
+      .length;
 
   buffer.writeln('## Summary');
   buffer.writeln();
-  buffer.writeln('- **Mobile Top 10 Coverage**: $mobileCovered/10 categories '
-      '($totalMobileRules rule mappings)');
-  buffer.writeln('- **Web Top 10 Coverage**: $webCovered/10 categories '
-      '($totalWebRules rule mappings)');
+  buffer.writeln(
+    '- **Mobile Top 10 Coverage**: $mobileCovered/10 categories '
+    '($totalMobileRules rule mappings)',
+  );
+  buffer.writeln(
+    '- **Web Top 10 Coverage**: $webCovered/10 categories '
+    '($totalWebRules rule mappings)',
+  );
 
   return buffer.toString();
 }

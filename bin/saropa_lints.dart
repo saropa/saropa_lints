@@ -59,7 +59,8 @@ void _printUsage() {
   print('  -h, --help      Show this help message');
   print('');
   print(
-      'Run "dart run saropa_lints <command> --help" for command-specific help.');
+    'Run "dart run saropa_lints <command> --help" for command-specific help.',
+  );
   print('');
   print('Examples:');
   print('  dart run saropa_lints init --tier comprehensive');

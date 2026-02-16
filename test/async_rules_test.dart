@@ -177,10 +177,12 @@ void main() {
     });
 
     group('avoid_sequential_awaits', () {
-      test('multiple sequential awaits on independent Futures SHOULD trigger',
-          () {
-        expect('sequential awaits detected', isNotNull);
-      });
+      test(
+        'multiple sequential awaits on independent Futures SHOULD trigger',
+        () {
+          expect('sequential awaits detected', isNotNull);
+        },
+      );
     });
 
     group('require_future_timeout', () {
@@ -364,10 +366,12 @@ void main() {
     });
 
     group('prefer_future_void_function_over_async_callback', () {
-      test('AsyncCallback instead of Future<void> Function() SHOULD trigger',
-          () {
-        expect('AsyncCallback detected', isNotNull);
-      });
+      test(
+        'AsyncCallback instead of Future<void> Function() SHOULD trigger',
+        () {
+          expect('AsyncCallback detected', isNotNull);
+        },
+      );
     });
   });
 

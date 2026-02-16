@@ -166,10 +166,7 @@ void main() {}
           IgnoreUtils.isIgnoredForFile(content, 'require_https_over_http'),
           isTrue,
         );
-        expect(
-          IgnoreUtils.isIgnoredForFile(content, 'rule_a'),
-          isTrue,
-        );
+        expect(IgnoreUtils.isIgnoredForFile(content, 'rule_a'), isTrue);
       });
 
       test('handles extra whitespace in directive', () {
@@ -213,92 +210,59 @@ void main() {
       test('matches ignore_for_file with trailing comment', () {
         const line =
             '// ignore_for_file: require_https_over_http // reason here';
-        expect(
-          IgnoreUtils.trailingCommentOnIgnore.hasMatch(line),
-          isTrue,
-        );
+        expect(IgnoreUtils.trailingCommentOnIgnore.hasMatch(line), isTrue);
       });
 
       test('matches ignore with trailing comment', () {
         const line =
             '// ignore: avoid_platform_channel_on_web // no web support';
-        expect(
-          IgnoreUtils.trailingCommentOnIgnore.hasMatch(line),
-          isTrue,
-        );
+        expect(IgnoreUtils.trailingCommentOnIgnore.hasMatch(line), isTrue);
       });
 
       test('does not match ignore_for_file without trailing comment', () {
         const line = '// ignore_for_file: require_https_over_http';
-        expect(
-          IgnoreUtils.trailingCommentOnIgnore.hasMatch(line),
-          isFalse,
-        );
+        expect(IgnoreUtils.trailingCommentOnIgnore.hasMatch(line), isFalse);
       });
 
       test('does not match ignore without trailing comment', () {
         const line = '// ignore: my_rule';
-        expect(
-          IgnoreUtils.trailingCommentOnIgnore.hasMatch(line),
-          isFalse,
-        );
+        expect(IgnoreUtils.trailingCommentOnIgnore.hasMatch(line), isFalse);
       });
 
       test('does not match comma-separated rules without comment', () {
         const line = '// ignore_for_file: rule_a, rule_b';
-        expect(
-          IgnoreUtils.trailingCommentOnIgnore.hasMatch(line),
-          isFalse,
-        );
+        expect(IgnoreUtils.trailingCommentOnIgnore.hasMatch(line), isFalse);
       });
 
       test('matches when trailing comment follows comma-separated rules', () {
         const line = '// ignore_for_file: rule_a, rule_b // some reason';
-        expect(
-          IgnoreUtils.trailingCommentOnIgnore.hasMatch(line),
-          isTrue,
-        );
+        expect(IgnoreUtils.trailingCommentOnIgnore.hasMatch(line), isTrue);
       });
 
       test('does not match plain comment', () {
         const line = '// this is just a normal comment';
-        expect(
-          IgnoreUtils.trailingCommentOnIgnore.hasMatch(line),
-          isFalse,
-        );
+        expect(IgnoreUtils.trailingCommentOnIgnore.hasMatch(line), isFalse);
       });
 
       test('matches ignore with dash separator', () {
         const line = '// ignore: my_rule - no web support needed';
-        expect(
-          IgnoreUtils.trailingCommentOnIgnore.hasMatch(line),
-          isTrue,
-        );
+        expect(IgnoreUtils.trailingCommentOnIgnore.hasMatch(line), isTrue);
       });
 
       test('matches ignore_for_file with dash separator', () {
         const line =
             '// ignore_for_file: require_https_over_http - reports http links';
-        expect(
-          IgnoreUtils.trailingCommentOnIgnore.hasMatch(line),
-          isTrue,
-        );
+        expect(IgnoreUtils.trailingCommentOnIgnore.hasMatch(line), isTrue);
       });
 
       test('does not match hyphenated rule name without separator', () {
         const line = '// ignore: avoid-print';
-        expect(
-          IgnoreUtils.trailingCommentOnIgnore.hasMatch(line),
-          isFalse,
-        );
+        expect(IgnoreUtils.trailingCommentOnIgnore.hasMatch(line), isFalse);
       });
 
       test('matches dash separator with hyphenated rule name', () {
         const line = '// ignore: avoid-print - not needed in production';
-        expect(
-          IgnoreUtils.trailingCommentOnIgnore.hasMatch(line),
-          isTrue,
-        );
+        expect(IgnoreUtils.trailingCommentOnIgnore.hasMatch(line), isTrue);
       });
     });
 
@@ -448,10 +412,7 @@ void test() {
       });
 
       test('handles null token', () {
-        expect(
-          IgnoreUtils.hasIgnoreCommentOnToken(null, 'my_rule'),
-          isFalse,
-        );
+        expect(IgnoreUtils.hasIgnoreCommentOnToken(null, 'my_rule'), isFalse);
       });
     });
 
@@ -739,8 +700,9 @@ class C { C doIt() => this; }
 final obj = C();
 ''');
           final invocations = _findAll<MethodInvocation>(unit);
-          final doIt =
-              invocations.firstWhere((m) => m.methodName.name == 'doIt');
+          final doIt = invocations.firstWhere(
+            (m) => m.methodName.name == 'doIt',
+          );
           expect(IgnoreUtils.hasIgnoreComment(doIt, 'my_rule'), isTrue);
         });
 
@@ -755,8 +717,9 @@ class C { C doIt() => this; }
 final obj = C();
 ''');
           final invocations = _findAll<MethodInvocation>(unit);
-          final doIt =
-              invocations.firstWhere((m) => m.methodName.name == 'doIt');
+          final doIt = invocations.firstWhere(
+            (m) => m.methodName.name == 'doIt',
+          );
           expect(IgnoreUtils.hasIgnoreComment(doIt, 'my_rule'), isTrue);
         });
 
@@ -772,8 +735,9 @@ class C { C methodA() => this; C methodB() => this; }
 final obj = C();
 ''');
           final invocations = _findAll<MethodInvocation>(unit);
-          final methodB =
-              invocations.firstWhere((m) => m.methodName.name == 'methodB');
+          final methodB = invocations.firstWhere(
+            (m) => m.methodName.name == 'methodB',
+          );
           expect(IgnoreUtils.hasIgnoreComment(methodB, 'my_rule'), isFalse);
         });
       });
@@ -791,8 +755,9 @@ class C { final String prop = 'v'; }
 C getObj() => C();
 ''');
           final accesses = _findAll<PropertyAccess>(unit);
-          final prop =
-              accesses.firstWhere((p) => p.propertyName.name == 'prop');
+          final prop = accesses.firstWhere(
+            (p) => p.propertyName.name == 'prop',
+          );
           expect(IgnoreUtils.hasIgnoreComment(prop, 'my_rule'), isTrue);
         });
       });
