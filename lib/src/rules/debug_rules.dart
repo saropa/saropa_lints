@@ -2,11 +2,8 @@
 
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/token.dart';
-import 'package:analyzer/error/error.dart'
-    show AnalysisError, DiagnosticSeverity;
-import 'package:analyzer/source/source_range.dart';
-import 'package:custom_lint_builder/custom_lint_builder.dart';
 
+import '../fixes/comment_out_debug_print_fix.dart';
 import '../mode_constants_utils.dart';
 import '../saropa_lint_rule.dart';
 
@@ -16,7 +13,7 @@ import '../saropa_lint_rule.dart';
 ///
 /// Formerly: `always_fail_test_case`
 class AlwaysFailRule extends SaropaLintRule {
-  const AlwaysFailRule() : super(code: _code);
+  AlwaysFailRule() : super(code: _code);
 
   /// Style/consistency. Large counts acceptable in legacy code.
   @override
@@ -29,23 +26,21 @@ class AlwaysFailRule extends SaropaLintRule {
   List<String> get configAliases => const <String>['always_fail_test_case'];
 
   static const LintCode _code = LintCode(
-    name: 'prefer_fail_test_case',
-    problemMessage:
-        '[prefer_fail_test_case] This custom lint always fails (test hook). Formerly: always_fail_test_case. Test-only rule that always reports a lint at the start of the file. {v3}',
+    'prefer_fail_test_case',
+    '[prefer_fail_test_case] This custom lint always fails (test hook). Formerly: always_fail_test_case. Test-only rule that always reports a lint at the start of the file. {v3}',
     correctionMessage:
         'This rule always fails by design — it verifies your lint pipeline is active. Seeing this error confirms saropa_lints is running. Remove prefer_fail_test_case from your enabled rules once verified.',
-    errorSeverity: DiagnosticSeverity.ERROR,
+    severity: DiagnosticSeverity.ERROR,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addCompilationUnit((CompilationUnit unit) {
+    context.addCompilationUnit((CompilationUnit unit) {
       final Token firstToken = unit.beginToken;
-      reporter.atToken(firstToken, code);
+      reporter.atToken(firstToken);
     });
   }
 }
@@ -72,7 +67,7 @@ class AlwaysFailRule extends SaropaLintRule {
 ///
 /// **Quick fix available:** Comments out the debugPrint statement.
 class AvoidDebugPrintRule extends SaropaLintRule {
-  const AvoidDebugPrintRule() : super(code: _code);
+  AvoidDebugPrintRule() : super(code: _code);
 
   /// Style/consistency. Large counts acceptable in legacy code.
   @override
@@ -81,76 +76,32 @@ class AvoidDebugPrintRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.low;
 
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+    ({required CorrectionProducerContext context}) =>
+        CommentOutDebugPrintFix(context: context),
+  ];
+
   static const LintCode _code = LintCode(
-    name: 'avoid_debug_print',
-    problemMessage:
-        '[avoid_debug_print] debugPrint bypasses structured logging, making it impossible to filter, search, or disable output per environment. '
+    'avoid_debug_print',
+    '[avoid_debug_print] debugPrint bypasses structured logging, making it impossible to filter, search, or disable output per environment. '
         'Debug statements left in production code expose internal state to device logs, degrade performance through I/O overhead, and create noise that obscures real issues during troubleshooting. {v4}',
     correctionMessage:
         'Replace debugPrint with a structured logging package (e.g., logger, logging, or a custom Logger class) that supports log levels, filtering, and environment-aware output. '
         'This ensures debug output is suppressed in production while remaining available during development.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       if (node.methodName.name == 'debugPrint') {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
-  }
-
-  @override
-  List<Fix> getFixes() => <Fix>[_CommentOutDebugPrintFix()];
-}
-
-class _CommentOutDebugPrintFix extends DartFix {
-  @override
-  void run(
-    CustomLintResolver resolver,
-    ChangeReporter reporter,
-    CustomLintContext context,
-    AnalysisError analysisError,
-    List<AnalysisError> others,
-  ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
-      if (node.methodName.name != 'debugPrint') return;
-      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
-
-      // Find the statement containing this invocation
-      final AstNode? statement = _findContainingStatement(node);
-      if (statement == null) return;
-
-      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
-        message: 'Comment out debugPrint statement',
-        priority: 1,
-      );
-
-      changeBuilder.addDartFileEdit((builder) {
-        // Comment out the statement to preserve developer intent history
-        final String originalCode = statement.toSource();
-        builder.addSimpleReplacement(
-          SourceRange(statement.offset, statement.length),
-          '// $originalCode',
-        );
-      });
-    });
-  }
-
-  AstNode? _findContainingStatement(AstNode node) {
-    AstNode? current = node;
-    while (current != null) {
-      if (current is ExpressionStatement) {
-        return current;
-      }
-      current = current.parent;
-    }
-    return null;
   }
 }
 
@@ -193,7 +144,7 @@ class _CommentOutDebugPrintFix extends DartFix {
 /// }
 /// ```
 class AvoidUnguardedDebugRule extends SaropaLintRule {
-  const AvoidUnguardedDebugRule() : super(code: _code);
+  AvoidUnguardedDebugRule() : super(code: _code);
 
   /// Style/consistency. Large counts acceptable in legacy code.
   @override
@@ -203,12 +154,12 @@ class AvoidUnguardedDebugRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_unguarded_debug',
-    problemMessage:
-        '[avoid_unguarded_debug] debugPrint() is not guarded by a debug mode check. {v3}',
-    correctionMessage: 'Wrap in if (kDebugMode) or if (DebugType.*.isDebug). '
+    'avoid_unguarded_debug',
+    '[avoid_unguarded_debug] debugPrint() is not guarded by a debug mode check. {v3}',
+    correctionMessage:
+        'Wrap in if (kDebugMode) or if (DebugType.*.isDebug). '
         'Consider using debug() instead, which is production-safe.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   /// Pre-compiled patterns for performance - avoid creating RegExp in loops
@@ -217,32 +168,32 @@ class AvoidUnguardedDebugRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
     // Only flag debugPrint() — the project's debug() function is
     // production-safe logging infrastructure with its own level filtering.
     // Bare debug() calls are intentional and should not require guards.
 
     // Check for debugPrint() function calls
-    context.registry
-        .addFunctionExpressionInvocation((FunctionExpressionInvocation node) {
+    context.addFunctionExpressionInvocation((
+      FunctionExpressionInvocation node,
+    ) {
       final Expression function = node.function;
       if (function is SimpleIdentifier && function.name == 'debugPrint') {
         if (!_isGuarded(node)) {
-          reporter.atNode(node, code);
+          reporter.atNode(node);
         }
       }
     });
 
     // Check for debugPrint() method invocations
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       final String methodName = node.methodName.name;
 
       if (methodName == 'debugPrint') {
         if (!_isGuarded(node)) {
-          reporter.atNode(node, code);
+          reporter.atNode(node);
         }
       }
     });
@@ -372,7 +323,7 @@ class AvoidUnguardedDebugRule extends SaropaLintRule {
 /// print('Hello');
 /// ```
 class PreferCommentingAnalyzerIgnoresRule extends SaropaLintRule {
-  const PreferCommentingAnalyzerIgnoresRule() : super(code: _code);
+  PreferCommentingAnalyzerIgnoresRule() : super(code: _code);
 
   /// Style/consistency. Large counts acceptable in legacy code.
   @override
@@ -382,28 +333,27 @@ class PreferCommentingAnalyzerIgnoresRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'prefer_commenting_analyzer_ignores',
-    problemMessage:
-        '[prefer_commenting_analyzer_ignores] Analyzer ignore comment must have a preceding explanatory comment. This debug artifact executes in production, potentially exposing internal state or degrading performance. {v5}',
+    'prefer_commenting_analyzer_ignores',
+    '[prefer_commenting_analyzer_ignores] Analyzer ignore comment must have a preceding explanatory comment. This debug artifact executes in production, potentially exposing internal state or degrading performance. {v5}',
     correctionMessage:
         'Add a comment on the line above explaining why this rule is ignored. Verify the change works correctly with existing tests and add coverage for the new behavior.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   /// Pre-compiled patterns for performance
   static final RegExp _ignorePattern = RegExp(r'^//\s*ignore:');
   static final RegExp _ignoreForFilePattern = RegExp(r'^//\s*ignore_for_file:');
-  static final RegExp _ignoreDirectivePattern =
-      RegExp(r'//\s*ignore(?:_for_file)?:\s*\S+');
+  static final RegExp _ignoreDirectivePattern = RegExp(
+    r'//\s*ignore(?:_for_file)?:\s*\S+',
+  );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addCompilationUnit((CompilationUnit node) {
-      final String content = resolver.source.contents.data;
+    context.addCompilationUnit((CompilationUnit node) {
+      final String content = context.fileContent;
       final List<String> lines = content.split('\n');
 
       for (int i = 0; i < lines.length; i++) {
@@ -514,7 +464,7 @@ class PreferCommentingAnalyzerIgnoresRule extends SaropaLintRule {
 /// **Note:** In production code, consider using a proper logging framework
 /// instead of either print() or debugPrint().
 class PreferDebugPrintRule extends SaropaLintRule {
-  const PreferDebugPrintRule() : super(code: _code);
+  PreferDebugPrintRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.medium;
@@ -523,21 +473,19 @@ class PreferDebugPrintRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'prefer_debugPrint',
-    problemMessage:
-        '[prefer_debugPrint] print() should use debugPrint() for throttled console output. {v1}',
+    'prefer_debugPrint',
+    '[prefer_debugPrint] print() should use debugPrint() for throttled console output. {v1}',
     correctionMessage:
         'Replace print() with debugPrint() to prevent console buffer overflow.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       // Only check for print function calls
       if (node.methodName.name != 'print') return;
 
@@ -548,47 +496,17 @@ class PreferDebugPrintRule extends SaropaLintRule {
       // Skip if inside a test file - print is often acceptable there
       // (handled by testRelevance - default skips test files)
 
-      reporter.atNode(node, code);
+      reporter.atNode(node);
     });
 
     // Also check for function expression invocations of print
-    context.registry
-        .addFunctionExpressionInvocation((FunctionExpressionInvocation node) {
+    context.addFunctionExpressionInvocation((
+      FunctionExpressionInvocation node,
+    ) {
       final Expression function = node.function;
       if (function is SimpleIdentifier && function.name == 'print') {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
-    });
-  }
-
-  @override
-  List<Fix> getFixes() => <Fix>[_ReplaceWithDebugPrintFix()];
-}
-
-class _ReplaceWithDebugPrintFix extends DartFix {
-  @override
-  void run(
-    CustomLintResolver resolver,
-    ChangeReporter reporter,
-    CustomLintContext context,
-    AnalysisError analysisError,
-    List<AnalysisError> others,
-  ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
-      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
-      if (node.methodName.name != 'print') return;
-
-      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
-        message: 'Replace with debugPrint',
-        priority: 1,
-      );
-
-      changeBuilder.addDartFileEdit((builder) {
-        builder.addSimpleReplacement(
-          node.methodName.sourceRange,
-          'debugPrint',
-        );
-      });
     });
   }
 }
@@ -623,7 +541,7 @@ class _ReplaceWithDebugPrintFix extends DartFix {
 /// }
 /// ```
 class AvoidPrintInReleaseRule extends SaropaLintRule {
-  const AvoidPrintInReleaseRule() : super(code: _code);
+  AvoidPrintInReleaseRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.high;
@@ -632,35 +550,34 @@ class AvoidPrintInReleaseRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_print_in_release',
-    problemMessage:
-        '[avoid_print_in_release] Using print() in production exposes debug information to end users, can leak sensitive data, and negatively impacts performance. Print statements are not optimized for release builds and may clutter logs, making it harder to diagnose real issues. This can also violate privacy policies and app store guidelines. {v3}',
+    'avoid_print_in_release',
+    '[avoid_print_in_release] Using print() in production exposes debug information to end users, can leak sensitive data, and negatively impacts performance. Print statements are not optimized for release builds and may clutter logs, making it harder to diagnose real issues. This can also violate privacy policies and app store guidelines. {v3}',
     correctionMessage:
         'Wrap print() calls in if (kDebugMode) or use a logging framework with configurable log levels. Remove or refactor print statements before release to ensure only intentional logging is present.',
-    errorSeverity: DiagnosticSeverity.ERROR,
+    severity: DiagnosticSeverity.ERROR,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       if (node.methodName.name != 'print') return;
       if (node.target != null) return; // Skip object.print()
 
       if (!_isInsideDebugGuard(node)) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
 
-    context.registry
-        .addFunctionExpressionInvocation((FunctionExpressionInvocation node) {
+    context.addFunctionExpressionInvocation((
+      FunctionExpressionInvocation node,
+    ) {
       final Expression function = node.function;
       if (function is SimpleIdentifier && function.name == 'print') {
         if (!_isInsideDebugGuard(node)) {
-          reporter.atNode(node, code);
+          reporter.atNode(node);
         }
       }
     });
@@ -681,50 +598,6 @@ class AvoidPrintInReleaseRule extends SaropaLintRule {
       current = current.parent;
     }
     return false;
-  }
-
-  @override
-  List<Fix> getFixes() => <Fix>[_WrapInDebugModeFix()];
-}
-
-class _WrapInDebugModeFix extends DartFix {
-  @override
-  void run(
-    CustomLintResolver resolver,
-    ChangeReporter reporter,
-    CustomLintContext context,
-    AnalysisError analysisError,
-    List<AnalysisError> others,
-  ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
-      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
-      if (node.methodName.name != 'print') return;
-
-      final AstNode? statement = _findStatement(node);
-      if (statement == null) return;
-
-      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
-        message: 'Wrap in if (kDebugMode)',
-        priority: 1,
-      );
-
-      changeBuilder.addDartFileEdit((builder) {
-        final String original = statement.toSource();
-        builder.addSimpleReplacement(
-          SourceRange(statement.offset, statement.length),
-          'if (kDebugMode) {\n  $original\n}',
-        );
-      });
-    });
-  }
-
-  AstNode? _findStatement(AstNode node) {
-    AstNode? current = node;
-    while (current != null) {
-      if (current is ExpressionStatement) return current;
-      current = current.parent;
-    }
-    return null;
   }
 }
 
@@ -748,7 +621,7 @@ class _WrapInDebugModeFix extends DartFix {
 /// logger.error('Error occurred', error: error, stackTrace: stackTrace);
 /// ```
 class RequireStructuredLoggingRule extends SaropaLintRule {
-  const RequireStructuredLoggingRule() : super(code: _code);
+  RequireStructuredLoggingRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.medium;
@@ -757,12 +630,11 @@ class RequireStructuredLoggingRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'require_structured_logging',
-    problemMessage:
-        '[require_structured_logging] String concatenation in logs wastes CPU building strings even when logging is disabled. String concatenation in log messages wastes CPU cycles constructing strings even when logging is disabled. Use structured logging with placeholders or log levels. {v2}',
+    'require_structured_logging',
+    '[require_structured_logging] String concatenation in logs wastes CPU building strings even when logging is disabled. String concatenation in log messages wastes CPU cycles constructing strings even when logging is disabled. Use structured logging with placeholders or log levels. {v2}',
     correctionMessage:
         'Use structured logging with named parameters: log("event", data: {"key": value}).',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   static const Set<String> _logMethods = {
@@ -782,11 +654,10 @@ class RequireStructuredLoggingRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       final String methodName = node.methodName.name;
       if (!_logMethods.contains(methodName)) return;
 
@@ -798,7 +669,7 @@ class RequireStructuredLoggingRule extends SaropaLintRule {
       if (firstArg is NamedExpression) return;
 
       if (_usesConcatenation(firstArg)) {
-        reporter.atNode(firstArg, code);
+        reporter.atNode(firstArg);
       }
     });
   }
@@ -853,12 +724,13 @@ class RequireStructuredLoggingRule extends SaropaLintRule {
 ///
 /// **Quick fix available:** Comments out the sensitive log statement for review.
 class AvoidSensitiveInLogsRule extends SaropaLintRule {
-  const AvoidSensitiveInLogsRule() : super(code: _code);
+  AvoidSensitiveInLogsRule() : super(code: _code);
 
   /// Config alias for backwards compatibility with avoid_sensitive_data_in_logs
   @override
-  List<String> get configAliases =>
-      const <String>['avoid_sensitive_data_in_logs'];
+  List<String> get configAliases => const <String>[
+    'avoid_sensitive_data_in_logs',
+  ];
 
   @override
   LintImpact get impact => LintImpact.critical;
@@ -869,17 +741,16 @@ class AvoidSensitiveInLogsRule extends SaropaLintRule {
   /// OWASP mapping: M6 (Privacy Controls), A09 (Logging Failures)
   @override
   OwaspMapping get owasp => const OwaspMapping(
-        mobile: <OwaspMobile>{OwaspMobile.m6},
-        web: <OwaspWeb>{OwaspWeb.a09},
-      );
+    mobile: <OwaspMobile>{OwaspMobile.m6},
+    web: <OwaspWeb>{OwaspWeb.a09},
+  );
 
   static const LintCode _code = LintCode(
-    name: 'avoid_sensitive_in_logs',
-    problemMessage:
-        '[avoid_sensitive_in_logs] Logging sensitive data (such as passwords, tokens, or personal information) exposes users to credential theft, privacy violations, and compliance failures (e.g., OWASP A09). Attackers or support staff may access logs and extract secrets, leading to data breaches. {v5}',
+    'avoid_sensitive_in_logs',
+    '[avoid_sensitive_in_logs] Logging sensitive data (such as passwords, tokens, or personal information) exposes users to credential theft, privacy violations, and compliance failures (e.g., OWASP A09). Attackers or support staff may access logs and extract secrets, leading to data breaches. {v5}',
     correctionMessage:
         'Never log sensitive information. Remove or redact secrets, credentials, and personal data before logging. Use secure logging practices and review log statements for accidental leaks.',
-    errorSeverity: DiagnosticSeverity.ERROR,
+    severity: DiagnosticSeverity.ERROR,
   );
 
   static const Set<String> _logMethods = {
@@ -906,11 +777,10 @@ class AvoidSensitiveInLogsRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       final String methodName = node.methodName.name;
       if (!_logMethods.contains(methodName)) return;
 
@@ -918,10 +788,10 @@ class AvoidSensitiveInLogsRule extends SaropaLintRule {
       for (final Expression arg in node.argumentList.arguments) {
         if (arg is NamedExpression) {
           if (_containsSensitiveData(arg.expression)) {
-            reporter.atNode(arg, code);
+            reporter.atNode(arg);
           }
         } else if (_containsSensitiveData(arg)) {
-          reporter.atNode(arg, code);
+          reporter.atNode(arg);
         }
       }
     });
@@ -1020,43 +890,6 @@ class AvoidSensitiveInLogsRule extends SaropaLintRule {
     // For other expressions (literals, etc.), no sensitive data
     return false;
   }
-
-  @override
-  List<Fix> getFixes() => <Fix>[_CommentOutSensitiveLogFix()];
-}
-
-class _CommentOutSensitiveLogFix extends DartFix {
-  @override
-  void run(
-    CustomLintResolver resolver,
-    ChangeReporter reporter,
-    CustomLintContext context,
-    AnalysisError analysisError,
-    List<AnalysisError> others,
-  ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
-      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
-
-      // Find the statement containing this method invocation
-      AstNode? current = node;
-      while (current != null && current is! Statement) {
-        current = current.parent;
-      }
-      if (current == null) return;
-
-      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
-        message: 'Comment out sensitive log statement',
-        priority: 1,
-      );
-
-      changeBuilder.addDartFileEdit((builder) {
-        builder.addSimpleReplacement(
-          SourceRange(current!.offset, current.length),
-          '// SECURITY: ${current.toSource()}',
-        );
-      });
-    });
-  }
 }
 
 // =============================================================================
@@ -1091,7 +924,7 @@ class _CommentOutSensitiveLogFix extends DartFix {
 ///
 /// GitHub: https://github.com/saropa/saropa_lints/issues/18
 class RequireLogLevelForProductionRule extends SaropaLintRule {
-  const RequireLogLevelForProductionRule() : super(code: _code);
+  RequireLogLevelForProductionRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.medium;
@@ -1100,15 +933,15 @@ class RequireLogLevelForProductionRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'require_log_level_for_production',
-    problemMessage:
-        '[require_log_level_for_production] Verbose log method called without '
+    'require_log_level_for_production',
+    '[require_log_level_for_production] Verbose log method called without '
         'a debug-mode guard. In production builds, verbose logging exposes '
         'internal application state, degrades performance, and may leak '
         'sensitive information to device logs accessible by other apps. {v1}',
-    correctionMessage: 'Wrap verbose logging in if (kDebugMode) { ... } or use '
+    correctionMessage:
+        'Wrap verbose logging in if (kDebugMode) { ... } or use '
         'a log-level-aware logger that suppresses verbose output in release.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   /// Verbose log methods that should be guarded.
@@ -1134,11 +967,10 @@ class RequireLogLevelForProductionRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       if (!_verboseLogMethods.contains(node.methodName.name)) return;
 
       // Require a logger-like receiver to avoid false positives on
@@ -1151,17 +983,18 @@ class RequireLogLevelForProductionRule extends SaropaLintRule {
       // Skip if already inside a debug guard
       if (_isInsideDebugContext(node)) return;
 
-      reporter.atNode(node, code);
+      reporter.atNode(node);
     });
 
     // Bare function calls: log('message'), debug('info'), etc.
-    context.registry
-        .addFunctionExpressionInvocation((FunctionExpressionInvocation node) {
+    context.addFunctionExpressionInvocation((
+      FunctionExpressionInvocation node,
+    ) {
       final Expression function = node.function;
       if (function is SimpleIdentifier &&
           _verboseLogMethods.contains(function.name)) {
         if (!_isInsideDebugContext(node)) {
-          reporter.atNode(node, code);
+          reporter.atNode(node);
         }
       }
     });

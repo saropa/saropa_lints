@@ -4,10 +4,6 @@ import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/token.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
 import 'package:analyzer/dart/element/type.dart';
-import 'package:analyzer/error/error.dart'
-    show AnalysisError, DiagnosticSeverity;
-import 'package:analyzer/source/source_range.dart';
-import 'package:custom_lint_builder/custom_lint_builder.dart';
 
 import '../saropa_lint_rule.dart';
 
@@ -33,7 +29,7 @@ import '../saropa_lint_rule.dart';
 /// });
 /// ```
 class AvoidDuplicateTestAssertionsRule extends SaropaLintRule {
-  const AvoidDuplicateTestAssertionsRule() : super(code: _code);
+  AvoidDuplicateTestAssertionsRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -46,21 +42,19 @@ class AvoidDuplicateTestAssertionsRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.test};
 
   static const LintCode _code = LintCode(
-    name: 'avoid_duplicate_test_assertions',
-    problemMessage:
-        '[avoid_duplicate_test_assertions] Duplicate test assertion detected. Duplicate test assertions are made. This reduces test maintainability and makes it harder to identify which behavior failed when tests break. {v6}',
+    'avoid_duplicate_test_assertions',
+    '[avoid_duplicate_test_assertions] Duplicate test assertion detected. Duplicate test assertions are made. This reduces test maintainability and makes it harder to identify which behavior failed when tests break. {v6}',
     correctionMessage:
         'Remove the duplicate assertion or verify different values. Update related tests to reflect the new structure and verify they still pass.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addBlock((Block node) {
+    context.addBlock((Block node) {
       final List<String> seenAssertions = <String>[];
 
       for (final Statement stmt in node.statements) {
@@ -69,7 +63,7 @@ class AvoidDuplicateTestAssertionsRule extends SaropaLintRule {
           if (expr is MethodInvocation && expr.methodName.name == 'expect') {
             final String assertionStr = expr.toString();
             if (seenAssertions.contains(assertionStr)) {
-              reporter.atNode(expr, code);
+              reporter.atNode(expr);
             } else {
               seenAssertions.add(assertionStr);
             }
@@ -86,7 +80,7 @@ class AvoidDuplicateTestAssertionsRule extends SaropaLintRule {
 ///
 /// Alias: empty_group, empty_test_group, no_tests_in_group
 class AvoidEmptyTestGroupsRule extends SaropaLintRule {
-  const AvoidEmptyTestGroupsRule() : super(code: _code);
+  AvoidEmptyTestGroupsRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -99,29 +93,27 @@ class AvoidEmptyTestGroupsRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.test};
 
   static const LintCode _code = LintCode(
-    name: 'avoid_empty_test_groups',
-    problemMessage:
-        '[avoid_empty_test_groups] Test group has an empty body with no test cases. Empty groups clutter the test suite, provide false organization, and reduce confidence in actual test coverage. {v4}',
+    'avoid_empty_test_groups',
+    '[avoid_empty_test_groups] Test group has an empty body with no test cases. Empty groups clutter the test suite, provide false organization, and reduce confidence in actual test coverage. {v4}',
     correctionMessage:
         'Add tests to the group or remove it. Update related tests to reflect the new structure and verify they still pass.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
     // Only check test files
-    final String path = resolver.path;
+    final String path = context.filePath;
     if (!path.endsWith('_test.dart') &&
         !path.contains('/test/') &&
         !path.contains(r'\test\')) {
       return;
     }
 
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       if (node.methodName.name != 'group') return;
 
       final ArgumentList args = node.argumentList;
@@ -134,7 +126,7 @@ class AvoidEmptyTestGroupsRule extends SaropaLintRule {
       final FunctionBody body = callback.body;
       if (body is BlockFunctionBody) {
         if (body.block.statements.isEmpty) {
-          reporter.atNode(node, code);
+          reporter.atNode(node);
         }
       }
     });
@@ -163,7 +155,7 @@ class AvoidEmptyTestGroupsRule extends SaropaLintRule {
 /// String _helperFunction() => 'test';  // Private helper
 /// ```
 class AvoidTopLevelMembersInTestsRule extends SaropaLintRule {
-  const AvoidTopLevelMembersInTestsRule() : super(code: _code);
+  AvoidTopLevelMembersInTestsRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -176,31 +168,29 @@ class AvoidTopLevelMembersInTestsRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.test};
 
   static const LintCode _code = LintCode(
-    name: 'avoid_top_level_members_in_tests',
-    problemMessage:
-        '[avoid_top_level_members_in_tests] Public top-level member in test file leaks implementation details and pollutes the library namespace. '
+    'avoid_top_level_members_in_tests',
+    '[avoid_top_level_members_in_tests] Public top-level member in test file leaks implementation details and pollutes the library namespace. '
         'Other files can accidentally import test helpers, creating fragile dependencies on code that was never designed for reuse and may change without notice. {v3}',
     correctionMessage:
         'Make the member private by prefixing with an underscore (e.g., _createTestWidget()) to prevent accidental imports. '
         'If the helper is genuinely reusable across multiple test files, extract it to a dedicated test utilities file in the test/ directory.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
     // Only run in test files
-    final String path = resolver.path;
+    final String path = context.filePath;
     if (!path.contains('_test.dart') &&
         !path.contains('/test/') &&
         !path.contains(r'\test\')) {
       return;
     }
 
-    context.registry.addCompilationUnit((CompilationUnit unit) {
+    context.addCompilationUnit((CompilationUnit unit) {
       for (final CompilationUnitMember declaration in unit.declarations) {
         // Skip main function (test entry point)
         if (declaration is FunctionDeclaration &&
@@ -219,7 +209,7 @@ class AvoidTopLevelMembersInTestsRule extends SaropaLintRule {
               in declaration.variables.variables) {
             final String varName = variable.name.lexeme;
             if (!varName.startsWith('_')) {
-              reporter.atNode(variable, code);
+              reporter.atNode(variable);
             }
           }
           continue;
@@ -234,7 +224,7 @@ class AvoidTopLevelMembersInTestsRule extends SaropaLintRule {
         }
 
         if (name != null && !name.startsWith('_')) {
-          reporter.atNode(declaration, code);
+          reporter.atNode(declaration);
         }
       }
     });
@@ -263,7 +253,7 @@ class AvoidTopLevelMembersInTestsRule extends SaropaLintRule {
 /// test('returns empty list for null input', () { });
 /// ```
 class PreferDescriptiveTestNameRule extends SaropaLintRule {
-  const PreferDescriptiveTestNameRule() : super(code: _code);
+  PreferDescriptiveTestNameRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -276,12 +266,11 @@ class PreferDescriptiveTestNameRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.test};
 
   static const LintCode _code = LintCode(
-    name: 'prefer_descriptive_test_name',
-    problemMessage:
-        '[prefer_descriptive_test_name] Test name must be descriptive. Test names must be descriptive and follow conventions. Test names don\'t follow the expected format. This reduces test maintainability and makes it harder to identify which behavior failed when tests break. {v7}',
+    'prefer_descriptive_test_name',
+    '[prefer_descriptive_test_name] Test name must be descriptive. Test names must be descriptive and follow conventions. Test names don\'t follow the expected format. This reduces test maintainability and makes it harder to identify which behavior failed when tests break. {v7}',
     correctionMessage:
         'Use a descriptive test name that explains what is being tested. Update related tests to reflect the new structure and verify they still pass.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   static const Set<String> _testFunctions = <String>{
@@ -291,16 +280,17 @@ class PreferDescriptiveTestNameRule extends SaropaLintRule {
   };
 
   // Cached regex for performance - matches "test", "test1", "test2", etc.
-  static final RegExp _testNumberPattern =
-      RegExp(r'^test\d*$', caseSensitive: false);
+  static final RegExp _testNumberPattern = RegExp(
+    r'^test\d*$',
+    caseSensitive: false,
+  );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       final String methodName = node.methodName.name;
       if (!_testFunctions.contains(methodName)) return;
 
@@ -315,7 +305,7 @@ class PreferDescriptiveTestNameRule extends SaropaLintRule {
 
       // Check for poor test names
       if (_isPoorTestName(testName)) {
-        reporter.atNode(firstArg, code);
+        reporter.atNode(firstArg);
       }
     });
   }
@@ -357,7 +347,7 @@ class PreferDescriptiveTestNameRule extends SaropaLintRule {
 /// test/unit/my_class_test.dart
 /// ```
 class PreferCorrectTestFileNameRule extends SaropaLintRule {
-  const PreferCorrectTestFileNameRule() : super(code: _code);
+  PreferCorrectTestFileNameRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -370,21 +360,19 @@ class PreferCorrectTestFileNameRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.test};
 
   static const LintCode _code = LintCode(
-    name: 'prefer_correct_test_file_name',
-    problemMessage:
-        '[prefer_correct_test_file_name] Test files not following the _test.dart naming convention are invisible to dart test and CI runners. Non-matching names cause tests to be silently skipped. {v6}',
+    'prefer_correct_test_file_name',
+    '[prefer_correct_test_file_name] Test files not following the _test.dart naming convention are invisible to dart test and CI runners. Non-matching names cause tests to be silently skipped. {v6}',
     correctionMessage:
         'Test files should end with `_test.dart` and be in test/ directory. Update related tests to reflect the new structure and verify they still pass.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    final String path = resolver.path;
+    final String path = context.filePath;
 
     // Check if file is in test directory but doesn't end with _test.dart
     final bool isInTestDir =
@@ -395,7 +383,7 @@ class PreferCorrectTestFileNameRule extends SaropaLintRule {
 
     if (isInTestDir && !endsWithTest && !isTestHelper) {
       // Only warn if file contains test() or testWidgets() calls
-      context.registry.addCompilationUnit((CompilationUnit unit) {
+      context.addCompilationUnit((CompilationUnit unit) {
         bool hasTests = false;
         unit.visitChildren(
           _TestCallFinder(() {
@@ -436,7 +424,7 @@ class _TestCallFinder extends RecursiveAstVisitor<void> {
 ///
 /// **Quick fix available:** Replaces `expect` with `expectLater`.
 class PreferExpectLaterRule extends SaropaLintRule {
-  const PreferExpectLaterRule() : super(code: _code);
+  PreferExpectLaterRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -449,29 +437,27 @@ class PreferExpectLaterRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.test};
 
   static const LintCode _code = LintCode(
-    name: 'prefer_expect_later',
-    problemMessage:
-        '[prefer_expect_later] Use expectLater() for Future assertions. Quick fix available: Replaces expect with expectLater. Expect() is used with a Future instead of expectLater(). {v5}',
+    'prefer_expect_later',
+    '[prefer_expect_later] Use expectLater() for Future assertions. Quick fix available: Replaces expect with expectLater. Expect() is used with a Future instead of expectLater(). {v5}',
     correctionMessage:
         'Replace expect() with expectLater() for Futures. Update related tests to reflect the new structure and verify they still pass.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
     // Only check test files
-    final String path = resolver.path;
+    final String path = context.filePath;
     if (!path.endsWith('_test.dart') &&
         !path.contains('/test/') &&
         !path.contains(r'\test\')) {
       return;
     }
 
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       if (node.methodName.name != 'expect') return;
 
       final ArgumentList args = node.argumentList;
@@ -483,39 +469,8 @@ class PreferExpectLaterRule extends SaropaLintRule {
 
       final String typeName = type.getDisplayString();
       if (typeName.startsWith('Future')) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
-    });
-  }
-
-  @override
-  List<Fix> getFixes() => <Fix>[_ReplaceExpectWithExpectLaterFix()];
-}
-
-class _ReplaceExpectWithExpectLaterFix extends DartFix {
-  @override
-  void run(
-    CustomLintResolver resolver,
-    ChangeReporter reporter,
-    CustomLintContext context,
-    AnalysisError analysisError,
-    List<AnalysisError> others,
-  ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
-      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
-      if (node.methodName.name != 'expect') return;
-
-      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
-        message: "Replace 'expect' with 'expectLater'",
-        priority: 1,
-      );
-
-      changeBuilder.addDartFileEdit((builder) {
-        builder.addSimpleReplacement(
-          SourceRange(node.methodName.offset, node.methodName.length),
-          'expectLater',
-        );
-      });
     });
   }
 }
@@ -524,7 +479,7 @@ class _ReplaceExpectWithExpectLaterFix extends DartFix {
 ///
 /// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v4
 class PreferTestStructureRule extends SaropaLintRule {
-  const PreferTestStructureRule() : super(code: _code);
+  PreferTestStructureRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -537,29 +492,27 @@ class PreferTestStructureRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.test};
 
   static const LintCode _code = LintCode(
-    name: 'prefer_test_structure',
-    problemMessage:
-        '[prefer_test_structure] Test file should follow proper structure conventions. Test files don\'t follow proper structure. This reduces test maintainability and makes it harder to identify which behavior failed when tests break. {v4}',
+    'prefer_test_structure',
+    '[prefer_test_structure] Test file should follow proper structure conventions. Test files don\'t follow proper structure. This reduces test maintainability and makes it harder to identify which behavior failed when tests break. {v4}',
     correctionMessage:
         'Wrap tests in group() and use descriptive names. Update related tests to reflect the new structure and verify they still pass.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
     // Only check test files
-    final String path = resolver.path;
+    final String path = context.filePath;
     if (!path.endsWith('_test.dart') &&
         !path.contains('/test/') &&
         !path.contains(r'\test\')) {
       return;
     }
 
-    context.registry.addCompilationUnit((CompilationUnit node) {
+    context.addCompilationUnit((CompilationUnit node) {
       bool hasMainFunction = false;
 
       for (final CompilationUnitMember member in node.declarations) {
@@ -571,14 +524,12 @@ class PreferTestStructureRule extends SaropaLintRule {
       }
 
       if (!hasMainFunction) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
         return;
       }
 
       // Check for test() calls not wrapped in group()
-      node.accept(
-        _TestStructureVisitor(reporter, code, (_) {}),
-      );
+      node.accept(_TestStructureVisitor(reporter, code, (_) {}));
     });
   }
 }
@@ -631,7 +582,7 @@ class _TestStructureVisitor extends RecursiveAstVisitor<void> {
 /// test('returns true for empty input', () { });
 /// ```
 class PreferUniqueTestNamesRule extends SaropaLintRule {
-  const PreferUniqueTestNamesRule() : super(code: _code);
+  PreferUniqueTestNamesRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -644,21 +595,19 @@ class PreferUniqueTestNamesRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.test};
 
   static const LintCode _code = LintCode(
-    name: 'prefer_unique_test_names',
-    problemMessage:
-        '[prefer_unique_test_names] Duplicate test name found. Each test must have a unique name. Test names are duplicated within a test file. This reduces test maintainability and makes it harder to identify which behavior failed when tests break. {v5}',
+    'prefer_unique_test_names',
+    '[prefer_unique_test_names] Duplicate test name found. Each test must have a unique name. Test names are duplicated within a test file. This reduces test maintainability and makes it harder to identify which behavior failed when tests break. {v5}',
     correctionMessage:
         'Use a unique name for each test. Update related tests to reflect the new structure and verify they still pass.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addCompilationUnit((CompilationUnit unit) {
+    context.addCompilationUnit((CompilationUnit unit) {
       final visitor = _UniqueTestNameVisitor(reporter, code);
       unit.accept(visitor);
     });
@@ -683,7 +632,7 @@ class _UniqueTestNameVisitor extends RecursiveAstVisitor<void> {
           final String? testName = firstArg.stringValue;
           if (testName != null) {
             if (_testNames.contains(testName)) {
-              reporter.atNode(firstArg, code);
+              reporter.atNode(firstArg);
             } else {
               _testNames.add(testName);
             }
@@ -730,7 +679,7 @@ class _UniqueTestNameVisitor extends RecursiveAstVisitor<void> {
 /// }
 /// ```
 class RequireTestGroupsRule extends SaropaLintRule {
-  const RequireTestGroupsRule() : super(code: _code);
+  RequireTestGroupsRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -743,12 +692,11 @@ class RequireTestGroupsRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.test};
 
   static const LintCode _code = LintCode(
-    name: 'require_test_groups',
-    problemMessage:
-        '[require_test_groups] Many tests without group() organization. Group related tests. Large test files without groups are hard to navigate and maintain. Use group() to organize related tests by feature or scenario. {v3}',
+    'require_test_groups',
+    '[require_test_groups] Many tests without group() organization. Group related tests. Large test files without groups are hard to navigate and maintain. Use group() to organize related tests by feature or scenario. {v3}',
     correctionMessage:
         'Use group() to organize tests by feature, scenario, or component. Update related tests to reflect the new structure and verify they still pass.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   /// Number of tests that triggers the warning
@@ -756,19 +704,18 @@ class RequireTestGroupsRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
     // Only run in test files
-    final String path = resolver.source.fullName;
+    final String path = context.filePath;
     if (!path.contains('_test.dart') &&
         !path.contains('/test/') &&
         !path.contains('\\test\\')) {
       return;
     }
 
-    context.registry.addFunctionDeclaration((FunctionDeclaration node) {
+    context.addFunctionDeclaration((FunctionDeclaration node) {
       if (node.name.lexeme != 'main') return;
 
       final FunctionBody body = node.functionExpression.body;
@@ -832,7 +779,7 @@ class RequireTestGroupsRule extends SaropaLintRule {
 /// });
 /// ```
 class AvoidTestCouplingRule extends SaropaLintRule {
-  const AvoidTestCouplingRule() : super(code: _code);
+  AvoidTestCouplingRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -845,23 +792,21 @@ class AvoidTestCouplingRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.test};
 
   static const LintCode _code = LintCode(
-    name: 'avoid_test_coupling',
-    problemMessage:
-        '[avoid_test_coupling] Test appears to depend on shared mutable state from other tests. Tests must be independent and run in any order. Depending on state from previous tests creates fragile, unreliable tests. {v2}',
+    'avoid_test_coupling',
+    '[avoid_test_coupling] Test appears to depend on shared mutable state from other tests. Tests must be independent and run in any order. Depending on state from previous tests creates fragile, unreliable tests. {v2}',
     correctionMessage:
         'Make tests independent. Use setUp/tearDown for shared state,. Update related tests to reflect the new structure and verify they still pass.'
         'or combine dependent tests.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
     // Only run in test files
-    final String path = resolver.source.fullName;
+    final String path = context.filePath;
     if (!path.contains('_test.dart') &&
         !path.contains('/test/') &&
         !path.contains('\\test\\')) {
@@ -872,7 +817,7 @@ class AvoidTestCouplingRule extends SaropaLintRule {
     final Set<String> assignedInTests = <String>{};
     final List<_TestInfo> tests = <_TestInfo>[];
 
-    context.registry.addCompilationUnit((CompilationUnit unit) {
+    context.addCompilationUnit((CompilationUnit unit) {
       // Find top-level variables
       final Set<String> topLevelVars = <String>{};
       for (final CompilationUnitMember member in unit.declarations) {
@@ -959,11 +904,9 @@ class _TestAnalyzer extends RecursiveAstVisitor<void> {
             ),
           );
 
-          onTestFound(_TestInfo(
-            node: node,
-            assignsVars: assigns,
-            readsVars: reads,
-          ));
+          onTestFound(
+            _TestInfo(node: node, assignsVars: assigns, readsVars: reads),
+          );
         }
       }
     }
@@ -1039,7 +982,7 @@ class _VarAccessVisitor extends RecursiveAstVisitor<void> {
 /// });
 /// ```
 class RequireTestIsolationRule extends SaropaLintRule {
-  const RequireTestIsolationRule() : super(code: _code);
+  RequireTestIsolationRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -1052,32 +995,28 @@ class RequireTestIsolationRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.test};
 
   static const LintCode _code = LintCode(
-    name: 'require_test_isolation',
-    problemMessage:
-        '[require_test_isolation] Mutable top-level variable may cause test coupling. Tests must not share mutable state. Use setUp/tearDown to reset state between tests for proper isolation. {v4}',
+    'require_test_isolation',
+    '[require_test_isolation] Mutable top-level variable may cause test coupling. Tests must not share mutable state. Use setUp/tearDown to reset state between tests for proper isolation. {v4}',
     correctionMessage:
         'Use setUp() to initialize shared state before each test,. Update related tests to reflect the new structure and verify they still pass.'
         'ensuring tests are isolated.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
     // Only run in test files
-    final String path = resolver.source.fullName;
+    final String path = context.filePath;
     if (!path.contains('_test.dart') &&
         !path.contains('/test/') &&
         !path.contains('\\test\\')) {
       return;
     }
 
-    context.registry.addTopLevelVariableDeclaration((
-      TopLevelVariableDeclaration node,
-    ) {
+    context.addTopLevelVariableDeclaration((TopLevelVariableDeclaration node) {
       for (final VariableDeclaration variable in node.variables.variables) {
         // Skip final/const variables (immutable)
         if (node.variables.isFinal || node.variables.isConst) continue;
@@ -1096,7 +1035,7 @@ class RequireTestIsolationRule extends SaropaLintRule {
               (typeName.startsWith('List') ||
                   typeName.startsWith('Set') ||
                   typeName.startsWith('Map'))) {
-            reporter.atNode(variable, code);
+            reporter.atNode(variable);
           }
         }
       }
@@ -1132,7 +1071,7 @@ class RequireTestIsolationRule extends SaropaLintRule {
 /// });
 /// ```
 class AvoidRealDependenciesInTestsRule extends SaropaLintRule {
-  const AvoidRealDependenciesInTestsRule() : super(code: _code);
+  AvoidRealDependenciesInTestsRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -1145,13 +1084,12 @@ class AvoidRealDependenciesInTestsRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.test};
 
   static const LintCode _code = LintCode(
-    name: 'avoid_real_dependencies_in_tests',
-    problemMessage:
-        '[avoid_real_dependencies_in_tests] Test uses real network/database call. Use mocks instead. Tests must be fast, reliable, and not depend on external systems. Use mocks or fakes for external dependencies. {v3}',
+    'avoid_real_dependencies_in_tests',
+    '[avoid_real_dependencies_in_tests] Test uses real network/database call. Use mocks instead. Tests must be fast, reliable, and not depend on external systems. Use mocks or fakes for external dependencies. {v3}',
     correctionMessage:
         'Replace real HTTP/database calls with mocks for faster,. Update related tests to reflect the new structure and verify they still pass.'
         'more reliable tests.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   static const Set<String> _realCallPatterns = <String>{
@@ -1171,19 +1109,18 @@ class AvoidRealDependenciesInTestsRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
     // Only run in test files
-    final String path = resolver.source.fullName;
+    final String path = context.filePath;
     if (!path.contains('_test.dart') &&
         !path.contains('/test/') &&
         !path.contains('\\test\\')) {
       return;
     }
 
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       final String fullCall = node.toSource();
 
       // Check if inside a test() or testWidgets()
@@ -1191,15 +1128,13 @@ class AvoidRealDependenciesInTestsRule extends SaropaLintRule {
 
       for (final String pattern in _realCallPatterns) {
         if (fullCall.contains(pattern)) {
-          reporter.atNode(node, code);
+          reporter.atNode(node);
           return;
         }
       }
     });
 
-    context.registry.addInstanceCreationExpression((
-      InstanceCreationExpression node,
-    ) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final String fullCall = node.toSource();
 
       if (!_isInsideTest(node)) return;
@@ -1207,7 +1142,7 @@ class AvoidRealDependenciesInTestsRule extends SaropaLintRule {
       if (fullCall.contains('Dio(') ||
           fullCall.contains('HttpClient(') ||
           fullCall.contains('IOClient(')) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
   }
@@ -1259,7 +1194,7 @@ class AvoidRealDependenciesInTestsRule extends SaropaLintRule {
 /// });
 /// ```
 class RequireScrollTestsRule extends SaropaLintRule {
-  const RequireScrollTestsRule() : super(code: _code);
+  RequireScrollTestsRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -1272,12 +1207,11 @@ class RequireScrollTestsRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.test};
 
   static const LintCode _code = LintCode(
-    name: 'require_scroll_tests',
-    problemMessage:
-        '[require_scroll_tests] Widget test creates scrollable widget but does not test scrolling. Scrollable widgets must be tested for scroll behavior to catch overflow issues and ensure content is accessible. {v2}',
+    'require_scroll_tests',
+    '[require_scroll_tests] Widget test creates scrollable widget but does not test scrolling. Scrollable widgets must be tested for scroll behavior to catch overflow issues and ensure content is accessible. {v2}',
     correctionMessage:
         'Add tester.drag() or tester.scroll() to verify scroll behavior. Update related tests to reflect the new structure and verify they still pass.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   static const Set<String> _scrollableWidgets = <String>{
@@ -1292,19 +1226,18 @@ class RequireScrollTestsRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
     // Only run in test files
-    final String path = resolver.source.fullName;
+    final String path = context.filePath;
     if (!path.contains('_test.dart') &&
         !path.contains('/test/') &&
         !path.contains('\\test\\')) {
       return;
     }
 
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       if (node.methodName.name != 'testWidgets') return;
 
       final ArgumentList args = node.argumentList;
@@ -1327,7 +1260,8 @@ class RequireScrollTestsRule extends SaropaLintRule {
       if (!hasScrollable) return;
 
       // Check if test has scroll operations
-      final bool hasScrollTest = bodySource.contains('.drag(') ||
+      final bool hasScrollTest =
+          bodySource.contains('.drag(') ||
           bodySource.contains('.scroll(') ||
           bodySource.contains('.fling(') ||
           bodySource.contains('scrollController') ||
@@ -1370,7 +1304,7 @@ class RequireScrollTestsRule extends SaropaLintRule {
 /// });
 /// ```
 class RequireTextInputTestsRule extends SaropaLintRule {
-  const RequireTextInputTestsRule() : super(code: _code);
+  RequireTextInputTestsRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -1383,12 +1317,11 @@ class RequireTextInputTestsRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.test};
 
   static const LintCode _code = LintCode(
-    name: 'require_text_input_tests',
-    problemMessage:
-        '[require_text_input_tests] Widget test creates text input but does not test user input. Text fields must be tested for user input, validation, and submission behavior. This reduces test maintainability and makes it harder to identify which behavior failed when tests break. {v3}',
+    'require_text_input_tests',
+    '[require_text_input_tests] Widget test creates text input but does not test user input. Text fields must be tested for user input, validation, and submission behavior. This reduces test maintainability and makes it harder to identify which behavior failed when tests break. {v3}',
     correctionMessage:
         'Add tester.enterText() to verify text input behavior. Update related tests to reflect the new structure and verify they still pass.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   static const Set<String> _textInputWidgets = <String>{
@@ -1400,19 +1333,18 @@ class RequireTextInputTestsRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
     // Only run in test files
-    final String path = resolver.source.fullName;
+    final String path = context.filePath;
     if (!path.contains('_test.dart') &&
         !path.contains('/test/') &&
         !path.contains('\\test\\')) {
       return;
     }
 
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       if (node.methodName.name != 'testWidgets') return;
 
       final ArgumentList args = node.argumentList;
@@ -1435,7 +1367,8 @@ class RequireTextInputTestsRule extends SaropaLintRule {
       if (!hasTextInput) return;
 
       // Check if test has text input operations
-      final bool hasInputTest = bodySource.contains('.enterText(') ||
+      final bool hasInputTest =
+          bodySource.contains('.enterText(') ||
           bodySource.contains('.showKeyboard(') ||
           bodySource.contains('textEditingController') ||
           bodySource.contains('TextEditingController');
@@ -1478,7 +1411,7 @@ class RequireTextInputTestsRule extends SaropaLintRule {
 /// });
 /// ```
 class PreferFakeOverMockRule extends SaropaLintRule {
-  const PreferFakeOverMockRule() : super(code: _code);
+  PreferFakeOverMockRule() : super(code: _code);
 
   /// Team preference - some prefer fakes, others prefer mocks.
   @override
@@ -1491,12 +1424,11 @@ class PreferFakeOverMockRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.test};
 
   static const LintCode _code = LintCode(
-    name: 'prefer_fake_over_mock',
-    problemMessage:
-        '[prefer_fake_over_mock] Test uses mock with verify(). A hand-written fake keeps the test simpler and avoids mock-framework coupling. {v4}',
+    'prefer_fake_over_mock',
+    '[prefer_fake_over_mock] Test uses mock with verify(). A hand-written fake keeps the test simpler and avoids mock-framework coupling. {v4}',
     correctionMessage:
         'Create a hand-written Fake subclass instead of a Mock — fakes are easier to maintain and do not require verify() calls.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   // Cached regex for performance - matches MockClassName(
@@ -1504,19 +1436,18 @@ class PreferFakeOverMockRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
     // Only run in test files
-    final String path = resolver.source.fullName;
+    final String path = context.filePath;
     if (!path.contains('_test.dart') &&
         !path.contains('/test/') &&
         !path.contains('\\test\\')) {
       return;
     }
 
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       final String methodName = node.methodName.name;
 
       // Check for common test method names
@@ -1580,7 +1511,7 @@ class PreferFakeOverMockRule extends SaropaLintRule {
 /// });
 /// ```
 class RequireEdgeCaseTestsRule extends SaropaLintRule {
-  const RequireEdgeCaseTestsRule() : super(code: _code);
+  RequireEdgeCaseTestsRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.medium;
@@ -1592,12 +1523,11 @@ class RequireEdgeCaseTestsRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.test};
 
   static const LintCode _code = LintCode(
-    name: 'require_edge_case_tests',
-    problemMessage:
-        '[require_edge_case_tests] Test file may be missing edge case tests (empty, null, boundary). Test boundary conditions: empty lists, null values, max int, empty strings, unicode, negative numbers. Edge cases cause most production bugs. {v3}',
+    'require_edge_case_tests',
+    '[require_edge_case_tests] Test file may be missing edge case tests (empty, null, boundary). Test boundary conditions: empty lists, null values, max int, empty strings, unicode, negative numbers. Edge cases cause most production bugs. {v3}',
     correctionMessage:
         'Add tests for: empty collections, null values, boundary numbers, etc. Update related tests to reflect the new structure and verify they still pass.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   // Cached regex patterns for performance
@@ -1606,35 +1536,38 @@ class RequireEdgeCaseTestsRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
     // Only run in test files
-    final String path = resolver.source.fullName;
+    final String path = context.filePath;
     if (!path.contains('_test.dart') &&
         !path.contains('/test/') &&
         !path.contains('\\test\\')) {
       return;
     }
 
-    context.registry.addCompilationUnit((CompilationUnit unit) {
+    context.addCompilationUnit((CompilationUnit unit) {
       final String source = unit.toSource();
 
       // Count test cases
-      final int testCount = _testPattern.allMatches(source).length +
+      final int testCount =
+          _testPattern.allMatches(source).length +
           _testWidgetsPattern.allMatches(source).length;
 
       if (testCount < 3) return; // Not enough tests to analyze
 
       // Check for edge case patterns in test descriptions or assertions
-      final bool hasEmptyTest = source.contains('empty') ||
+      final bool hasEmptyTest =
+          source.contains('empty') ||
           source.contains('[]') ||
           source.contains('isEmpty');
-      final bool hasNullTest = source.contains('null') ||
+      final bool hasNullTest =
+          source.contains('null') ||
           source.contains('isNull') ||
           source.contains('Null');
-      final bool hasBoundaryTest = source.contains('max') ||
+      final bool hasBoundaryTest =
+          source.contains('max') ||
           source.contains('min') ||
           source.contains('boundary') ||
           source.contains('limit') ||
@@ -1675,7 +1608,7 @@ class RequireEdgeCaseTestsRule extends SaropaLintRule {
 /// test('user profile', () {
 ///   final user = User(
 ///     id: 1,
-///     name: 'Test',
+///     'Test',
 ///     email: 'test@example.com',
 ///     age: 30,
 ///     address: Address(...),
@@ -1694,7 +1627,7 @@ class RequireEdgeCaseTestsRule extends SaropaLintRule {
 /// });
 /// ```
 class PreferTestDataBuilderRule extends SaropaLintRule {
-  const PreferTestDataBuilderRule() : super(code: _code);
+  PreferTestDataBuilderRule() : super(code: _code);
 
   /// Team preference - builder pattern is one of several valid approaches.
   @override
@@ -1707,32 +1640,29 @@ class PreferTestDataBuilderRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.test};
 
   static const LintCode _code = LintCode(
-    name: 'prefer_test_data_builder',
-    problemMessage:
-        '[prefer_test_data_builder] Complex object construction in test duplicates setup logic across multiple test cases. Builder pattern for test objects is cleaner than constructors with many parameters and makes tests more readable. {v4}',
+    'prefer_test_data_builder',
+    '[prefer_test_data_builder] Complex object construction in test duplicates setup logic across multiple test cases. Builder pattern for test objects is cleaner than constructors with many parameters and makes tests more readable. {v4}',
     correctionMessage:
         "Extract a TestDataBuilder class (e.g., UserBuilder().withName('Test').build()) to share setup logic across tests.",
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   static const int _maxConstructorArgs = 5;
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
     // Only run in test files
-    final String path = resolver.source.fullName;
+    final String path = context.filePath;
     if (!path.contains('_test.dart') &&
         !path.contains('/test/') &&
         !path.contains('\\test\\')) {
       return;
     }
 
-    context.registry
-        .addInstanceCreationExpression((InstanceCreationExpression node) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final ArgumentList args = node.argumentList;
       final int argCount = args.arguments.length;
 
@@ -1769,7 +1699,7 @@ class PreferTestDataBuilderRule extends SaropaLintRule {
 
       // If complex construction (many args + nested), suggest builder
       if (argCount >= _maxConstructorArgs && nestedObjects >= 2) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
   }
@@ -1805,7 +1735,7 @@ class PreferTestDataBuilderRule extends SaropaLintRule {
 /// });
 /// ```
 class AvoidTestImplementationDetailsRule extends SaropaLintRule {
-  const AvoidTestImplementationDetailsRule() : super(code: _code);
+  AvoidTestImplementationDetailsRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.medium;
@@ -1817,29 +1747,27 @@ class AvoidTestImplementationDetailsRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.test};
 
   static const LintCode _code = LintCode(
-    name: 'avoid_test_implementation_details',
-    problemMessage:
-        '[avoid_test_implementation_details] Test verifies internal calls. Test behavior, not implementation. Tests that verify internal method calls break when you refactor. Test observable behavior (outputs, state changes) instead. {v3}',
+    'avoid_test_implementation_details',
+    '[avoid_test_implementation_details] Test verifies internal calls. Test behavior, not implementation. Tests that verify internal method calls break when you refactor. Test observable behavior (outputs, state changes) instead. {v3}',
     correctionMessage:
         'Focus on outputs and state changes, not internal method calls. Update related tests to reflect the new structure and verify they still pass.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
     // Only run in test files
-    final String path = resolver.source.fullName;
+    final String path = context.filePath;
     if (!path.contains('_test.dart') &&
         !path.contains('/test/') &&
         !path.contains('\\test\\')) {
       return;
     }
 
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       final String methodName = node.methodName.name;
 
       // Check for test method names
@@ -1854,7 +1782,8 @@ class AvoidTestImplementationDetailsRule extends SaropaLintRule {
       final String bodySource = callback.body.toSource();
 
       // Count verify calls vs expect calls
-      final int verifyCount = 'verify('.allMatches(bodySource).length +
+      final int verifyCount =
+          'verify('.allMatches(bodySource).length +
           'verifyNever('.allMatches(bodySource).length +
           'verifyInOrder('.allMatches(bodySource).length;
       final int expectCount = 'expect('.allMatches(bodySource).length;
@@ -1866,9 +1795,9 @@ class AvoidTestImplementationDetailsRule extends SaropaLintRule {
 
       // Also check for deep internal call verification patterns
       // e.g., verify(mock.internalMethod().subMethod()).called(1)
-      final int chainedVerifies = RegExp(r'verify\([^)]+\.[^)]+\.[^)]+\)')
-          .allMatches(bodySource)
-          .length;
+      final int chainedVerifies = RegExp(
+        r'verify\([^)]+\.[^)]+\.[^)]+\)',
+      ).allMatches(bodySource).length;
 
       if (chainedVerifies >= 2) {
         reporter.atNode(node.methodName, code);
@@ -1968,7 +1897,7 @@ class AvoidTestImplementationDetailsRule extends SaropaLintRule {
 /// });
 /// ```
 class MissingTestAssertionRule extends SaropaLintRule {
-  const MissingTestAssertionRule() : super(code: _code);
+  MissingTestAssertionRule() : super(code: _code);
 
   /// Critical test quality. No assertions = no value.
   @override
@@ -1981,13 +1910,12 @@ class MissingTestAssertionRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.test};
 
   static const LintCode _code = LintCode(
-    name: 'missing_test_assertion',
-    problemMessage:
-        '[missing_test_assertion] Test without assertions always passes, giving '
+    'missing_test_assertion',
+    '[missing_test_assertion] Test without assertions always passes, giving '
         'false confidence. Bugs slip through undetected. {v5}',
     correctionMessage:
         'Add expect(), verify(), or other assertion to validate behavior.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   /// Common assertion function names
@@ -2009,12 +1937,11 @@ class MissingTestAssertionRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
     // Only run in test files
-    final String path = resolver.path;
+    final String path = context.filePath;
     if (!path.endsWith('_test.dart') &&
         !path.contains('/test/') &&
         !path.contains(r'\test\')) {
@@ -2025,7 +1952,7 @@ class MissingTestAssertionRule extends SaropaLintRule {
     final Set<String> helperFunctionsWithAssertions = <String>{};
 
     // First pass: find all helper functions that contain assertions
-    context.registry.addCompilationUnit((CompilationUnit unit) {
+    context.addCompilationUnit((CompilationUnit unit) {
       final _HelperFunctionCollector collector = _HelperFunctionCollector(
         _builtInAssertionFunctions,
       );
@@ -2034,7 +1961,7 @@ class MissingTestAssertionRule extends SaropaLintRule {
     });
 
     // Second pass: check tests for assertions (including helper calls)
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       final String methodName = node.methodName.name;
 
       // Check for test() or testWidgets()
@@ -2064,53 +1991,8 @@ class MissingTestAssertionRule extends SaropaLintRule {
       body.visitChildren(finder);
 
       if (!finder.foundAssertion) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
-    });
-  }
-
-  @override
-  List<Fix> getFixes() => <Fix>[_AddAssertionReminderFix()];
-}
-
-class _AddAssertionReminderFix extends DartFix {
-  @override
-  void run(
-    CustomLintResolver resolver,
-    ChangeReporter reporter,
-    CustomLintContext context,
-    AnalysisError analysisError,
-    List<AnalysisError> others,
-  ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
-      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
-
-      final String methodName = node.methodName.name;
-      if (methodName != 'test' && methodName != 'testWidgets') return;
-
-      final ArgumentList args = node.argumentList;
-      if (args.arguments.length < 2) return;
-
-      final Expression callback = args.arguments[1];
-      if (callback is! FunctionExpression) return;
-
-      final FunctionBody body = callback.body;
-      if (body is! BlockFunctionBody) return;
-
-      // Find the position before the closing brace of the test body
-      final int insertOffset = body.block.rightBracket.offset;
-
-      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
-        message: 'Add expect() assertion placeholder',
-        priority: 1,
-      );
-
-      changeBuilder.addDartFileEdit((builder) {
-        builder.addSimpleInsertion(
-          insertOffset,
-          '\n    // HACK: Add assertion\n    expect(result, expected);\n  ',
-        );
-      });
     });
   }
 }
@@ -2223,7 +2105,7 @@ class _AssertionFinder extends RecursiveAstVisitor<void> {
 /// });
 /// ```
 class AvoidAsyncCallbackInFakeAsyncRule extends SaropaLintRule {
-  const AvoidAsyncCallbackInFakeAsyncRule() : super(code: _code);
+  AvoidAsyncCallbackInFakeAsyncRule() : super(code: _code);
 
   /// Critical bug. Async in fakeAsync causes unpredictable behavior.
   @override
@@ -2236,31 +2118,29 @@ class AvoidAsyncCallbackInFakeAsyncRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.test};
 
   static const LintCode _code = LintCode(
-    name: 'avoid_async_callback_in_fake_async',
-    problemMessage:
-        '[avoid_async_callback_in_fake_async] Async callback uses real time, '
+    'avoid_async_callback_in_fake_async',
+    '[avoid_async_callback_in_fake_async] Async callback uses real time, '
         'making tests hang or timeout instead of using controlled fake time. {v2}',
     correctionMessage:
         'Remove async keyword. Use synchronous code with fake.elapse() '
         'to control time.',
-    errorSeverity: DiagnosticSeverity.ERROR,
+    severity: DiagnosticSeverity.ERROR,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
     // Only run in test files
-    final String path = resolver.path;
+    final String path = context.filePath;
     if (!path.endsWith('_test.dart') &&
         !path.contains('/test/') &&
         !path.contains(r'\test\')) {
       return;
     }
 
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       if (node.methodName.name != 'fakeAsync') return;
 
       final ArgumentList args = node.argumentList;
@@ -2271,7 +2151,7 @@ class AvoidAsyncCallbackInFakeAsyncRule extends SaropaLintRule {
 
       // Check if the callback is async
       if (callback.body.isAsynchronous) {
-        reporter.atNode(callback, code);
+        reporter.atNode(callback);
       }
     });
   }
@@ -2300,7 +2180,7 @@ class AvoidAsyncCallbackInFakeAsyncRule extends SaropaLintRule {
 /// tester.widget(find.byKey(kSubmitButton));
 /// ```
 class PreferSymbolOverKeyRule extends SaropaLintRule {
-  const PreferSymbolOverKeyRule() : super(code: _code);
+  PreferSymbolOverKeyRule() : super(code: _code);
 
   /// Style preference for maintainability.
   @override
@@ -2314,30 +2194,27 @@ class PreferSymbolOverKeyRule extends SaropaLintRule {
 
   /// Alias: prefer_symbol_over_key_pattern
   static const LintCode _code = LintCode(
-    name: 'prefer_symbol_over_key',
-    problemMessage:
-        '[prefer_symbol_over_key] Use a constant Key instead of string literal. Using Symbols for test keys provides compile-time checking and better refactoring support compared to magic string keys. {v2}',
+    'prefer_symbol_over_key',
+    '[prefer_symbol_over_key] Use a constant Key instead of string literal. Using Symbols for test keys provides compile-time checking and better refactoring support compared to magic string keys. {v2}',
     correctionMessage:
         'Define a constant for the Key to improve maintainability. Update related tests to reflect the new structure and verify they still pass.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
     // Only run in test files
-    final String path = resolver.path;
+    final String path = context.filePath;
     if (!path.endsWith('_test.dart') &&
         !path.contains('/test/') &&
         !path.contains(r'\test\')) {
       return;
     }
 
-    context.registry
-        .addInstanceCreationExpression((InstanceCreationExpression node) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final String typeName = node.constructorName.type.name2.lexeme;
 
       // Check for Key constructor with string literal
@@ -2348,7 +2225,7 @@ class PreferSymbolOverKeyRule extends SaropaLintRule {
 
       final Expression firstArg = args.arguments.first;
       if (firstArg is StringLiteral) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
   }
@@ -2390,7 +2267,7 @@ class PreferSymbolOverKeyRule extends SaropaLintRule {
 /// });
 /// ```
 class RequireTestCleanupRule extends SaropaLintRule {
-  const RequireTestCleanupRule() : super(code: _code);
+  RequireTestCleanupRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.medium;
@@ -2402,21 +2279,19 @@ class RequireTestCleanupRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.test};
 
   static const LintCode _code = LintCode(
-    name: 'require_test_cleanup',
-    problemMessage:
-        '[require_test_cleanup] Test creates resources without tearDown cleanup. Tests that create files, directories, or database entries should clean up in tearDown to prevent test pollution and disk space issues. {v3}',
+    'require_test_cleanup',
+    '[require_test_cleanup] Test creates resources without tearDown cleanup. Tests that create files, directories, or database entries should clean up in tearDown to prevent test pollution and disk space issues. {v3}',
     correctionMessage:
         'Add tearDown to clean up created files or data. Update related tests to reflect the new structure and verify they still pass.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    final String path = resolver.path;
+    final String path = context.filePath;
     if (!path.endsWith('_test.dart') &&
         !path.contains('/test/') &&
         !path.contains(r'\test\')) {
@@ -2426,7 +2301,7 @@ class RequireTestCleanupRule extends SaropaLintRule {
     bool hasTearDown = false;
     MethodInvocation? testWithResourceCreation;
 
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       final String methodName = node.methodName.name;
 
       if (methodName == 'tearDown' || methodName == 'tearDownAll') {
@@ -2483,15 +2358,17 @@ class RequireTestCleanupRule extends SaropaLintRule {
 
     // Database operations - require specific target patterns
     // e.g., db.insert(, collection.insert(, table.insert(
-    final dbInsertPattern =
-        RegExp(r'\b(db|database|collection|table)\w*\.insert\(');
+    final dbInsertPattern = RegExp(
+      r'\b(db|database|collection|table)\w*\.insert\(',
+    );
     if (dbInsertPattern.hasMatch(bodySource.toLowerCase())) {
       return true;
     }
 
     // Hive/SharedPrefs operations - require box. or prefs. prefix
-    final storagePattern =
-        RegExp(r'\b(box|prefs|preferences|storage)\w*\.put\(');
+    final storagePattern = RegExp(
+      r'\b(box|prefs|preferences|storage)\w*\.put\(',
+    );
     if (storagePattern.hasMatch(bodySource.toLowerCase())) {
       return true;
     }
@@ -2530,7 +2407,7 @@ class RequireTestCleanupRule extends SaropaLintRule {
 /// });
 /// ```
 class PreferTestVariantRule extends SaropaLintRule {
-  const PreferTestVariantRule() : super(code: _code);
+  PreferTestVariantRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.low;
@@ -2542,21 +2419,19 @@ class PreferTestVariantRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.test};
 
   static const LintCode _code = LintCode(
-    name: 'prefer_test_variant',
-    problemMessage:
-        '[prefer_test_variant] Similar tests could use variant for different configurations. Duplicate tests for different screen sizes, locales, or themes should use testVariants for cleaner code and better coverage reporting. {v3}',
+    'prefer_test_variant',
+    '[prefer_test_variant] Similar tests could use variant for different configurations. Duplicate tests for different screen sizes, locales, or themes should use testVariants for cleaner code and better coverage reporting. {v3}',
     correctionMessage:
         'Use testWidgets variant parameter for configuration testing. Update related tests to reflect the new structure and verify they still pass.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    final String path = resolver.path;
+    final String path = context.filePath;
     if (!path.endsWith('_test.dart') &&
         !path.contains('/test/') &&
         !path.contains(r'\test\')) {
@@ -2565,7 +2440,7 @@ class PreferTestVariantRule extends SaropaLintRule {
 
     final List<MethodInvocation> sizeTests = <MethodInvocation>[];
 
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       if (node.methodName.name != 'testWidgets') return;
 
       final ArgumentList args = node.argumentList;
@@ -2623,7 +2498,7 @@ class PreferTestVariantRule extends SaropaLintRule {
 /// });
 /// ```
 class RequireAccessibilityTestsRule extends SaropaLintRule {
-  const RequireAccessibilityTestsRule() : super(code: _code);
+  RequireAccessibilityTestsRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.medium;
@@ -2635,21 +2510,19 @@ class RequireAccessibilityTestsRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.test};
 
   static const LintCode _code = LintCode(
-    name: 'require_accessibility_tests',
-    problemMessage:
-        '[require_accessibility_tests] Widget tests should include accessibility checks. Widget tests should verify accessibility to catch issues early. Use meetsGuideline matcher for automated accessibility testing. {v2}',
+    'require_accessibility_tests',
+    '[require_accessibility_tests] Widget tests should include accessibility checks. Widget tests should verify accessibility to catch issues early. Use meetsGuideline matcher for automated accessibility testing. {v2}',
     correctionMessage:
         'Add meetsGuideline assertions for accessibility. Update related tests to reflect the new structure and verify they still pass.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    final String path = resolver.path;
+    final String path = context.filePath;
     if (!path.endsWith('_test.dart') &&
         !path.contains('/test/') &&
         !path.contains(r'\test\')) {
@@ -2658,7 +2531,7 @@ class RequireAccessibilityTestsRule extends SaropaLintRule {
 
     bool hasAccessibilityTest = false;
 
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       final String methodName = node.methodName.name;
 
       // Check for accessibility testing patterns
@@ -2669,7 +2542,7 @@ class RequireAccessibilityTestsRule extends SaropaLintRule {
       }
     });
 
-    context.registry.addCompilationUnit((CompilationUnit unit) {
+    context.addCompilationUnit((CompilationUnit unit) {
       final String source = unit.toSource();
       if (source.contains('testWidgets') && !hasAccessibilityTest) {
         // Report at first testWidgets call
@@ -2705,7 +2578,7 @@ class RequireAccessibilityTestsRule extends SaropaLintRule {
 /// });
 /// ```
 class RequireAnimationTestsRule extends SaropaLintRule {
-  const RequireAnimationTestsRule() : super(code: _code);
+  RequireAnimationTestsRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.medium;
@@ -2717,12 +2590,11 @@ class RequireAnimationTestsRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.test};
 
   static const LintCode _code = LintCode(
-    name: 'require_animation_tests',
-    problemMessage:
-        '[require_animation_tests] Animated widget test should use pump with duration. Animations need time to complete. Tests must use pumpAndSettle or pump(duration) to advance animation frames. {v3}',
+    'require_animation_tests',
+    '[require_animation_tests] Animated widget test should use pump with duration. Animations need time to complete. Tests must use pumpAndSettle or pump(duration) to advance animation frames. {v3}',
     correctionMessage:
         'Use pump(Duration) or pumpAndSettle for animations. Update related tests to reflect the new structure and verify they still pass.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   // Animated widgets that need duration pump
@@ -2741,18 +2613,17 @@ class RequireAnimationTestsRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    final String path = resolver.path;
+    final String path = context.filePath;
     if (!path.endsWith('_test.dart') &&
         !path.contains('/test/') &&
         !path.contains(r'\test\')) {
       return;
     }
 
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       if (node.methodName.name != 'testWidgets') return;
 
       final ArgumentList args = node.argumentList;
@@ -2775,7 +2646,8 @@ class RequireAnimationTestsRule extends SaropaLintRule {
       if (!hasAnimatedWidget) return;
 
       // Check for proper pump usage
-      final bool hasDurationPump = bodySource.contains('pumpAndSettle') ||
+      final bool hasDurationPump =
+          bodySource.contains('pumpAndSettle') ||
           bodySource.contains('pump(const Duration') ||
           bodySource.contains('pump(Duration');
 
@@ -2811,7 +2683,7 @@ class RequireAnimationTestsRule extends SaropaLintRule {
 /// });
 /// ```
 class AvoidTestPrintStatementsRule extends SaropaLintRule {
-  const AvoidTestPrintStatementsRule() : super(code: _code);
+  AvoidTestPrintStatementsRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -2824,39 +2696,37 @@ class AvoidTestPrintStatementsRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.test};
 
   static const LintCode _code = LintCode(
-    name: 'avoid_test_print_statements',
-    problemMessage:
-        '[avoid_test_print_statements] Print statement in test file clutters output. Print statements in tests add noise to test output and can hide actual test failures. Use proper logging or debugging tools instead. {v2}',
+    'avoid_test_print_statements',
+    '[avoid_test_print_statements] Print statement in test file clutters output. Print statements in tests add noise to test output and can hide actual test failures. Use proper logging or debugging tools instead. {v2}',
     correctionMessage:
         'Remove debug print or use proper logging for test debugging. Update related tests to reflect the new structure and verify they still pass.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
     // Only check test files
-    final String path = resolver.path;
+    final String path = context.filePath;
     if (!path.endsWith('_test.dart') &&
         !path.contains('/test/') &&
         !path.contains(r'\test\')) {
       return;
     }
 
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       if (node.methodName.name == 'print') {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
 
-    context.registry.addFunctionExpressionInvocation((
+    context.addFunctionExpressionInvocation((
       FunctionExpressionInvocation node,
     ) {
       if (node.function.toSource() == 'print') {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
   }
@@ -2890,7 +2760,7 @@ class AvoidTestPrintStatementsRule extends SaropaLintRule {
 /// });
 /// ```
 class RequireMockHttpClientRule extends SaropaLintRule {
-  const RequireMockHttpClientRule() : super(code: _code);
+  RequireMockHttpClientRule() : super(code: _code);
 
   /// Significant issue. Address when count exceeds 10.
   @override
@@ -2903,12 +2773,11 @@ class RequireMockHttpClientRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.test};
 
   static const LintCode _code = LintCode(
-    name: 'require_mock_http_client',
-    problemMessage:
-        '[require_mock_http_client] Real HTTP calls in tests create network dependencies that cause flaky failures and slow CI pipelines. Tests become non-deterministic, failing on timeout when servers are slow and passing inconsistently across environments, making test results unreliable for merge decisions. {v5}',
+    'require_mock_http_client',
+    '[require_mock_http_client] Real HTTP calls in tests create network dependencies that cause flaky failures and slow CI pipelines. Tests become non-deterministic, failing on timeout when servers are slow and passing inconsistently across environments, making test results unreliable for merge decisions. {v5}',
     correctionMessage:
         'Use MockClient from the http package or inject a mock HTTP implementation to create fast, deterministic tests that run reliably without network access.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   static const Set<String> _httpMethods = <String>{
@@ -2922,19 +2791,18 @@ class RequireMockHttpClientRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
     // Only check test files
-    final String path = resolver.path;
+    final String path = context.filePath;
     if (!path.endsWith('_test.dart') &&
         !path.contains('/test/') &&
         !path.contains(r'\test\')) {
       return;
     }
 
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       final String methodName = node.methodName.name;
       if (!_httpMethods.contains(methodName)) return;
 
@@ -2949,7 +2817,7 @@ class RequireMockHttpClientRule extends SaropaLintRule {
           targetSource.contains('Client')) {
         // Check if this looks like a mock
         if (!targetSource.toLowerCase().contains('mock')) {
-          reporter.atNode(node, code);
+          reporter.atNode(node);
         }
       }
     });
@@ -2990,7 +2858,7 @@ class RequireMockHttpClientRule extends SaropaLintRule {
 ///
 /// **Quick fix available:** Inserts `await tester.pump();` after the interaction.
 class RequireTestWidgetPumpRule extends SaropaLintRule {
-  const RequireTestWidgetPumpRule() : super(code: _code);
+  RequireTestWidgetPumpRule() : super(code: _code);
 
   /// Flaky tests from missing pump cause CI failures.
   @override
@@ -3003,12 +2871,11 @@ class RequireTestWidgetPumpRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.test};
 
   static const LintCode _code = LintCode(
-    name: 'require_test_widget_pump',
-    problemMessage:
-        '[require_test_widget_pump] After simulating a tap or text entry in a widget test, failing to call pump() or pumpAndSettle() means the widget tree will not rebuild, so your test may pass even though the user experience is broken. Always process pending build events to ensure your test reflects real app behavior. {v3}',
+    'require_test_widget_pump',
+    '[require_test_widget_pump] After simulating a tap or text entry in a widget test, failing to call pump() or pumpAndSettle() means the widget tree will not rebuild, so your test may pass even though the user experience is broken. Always process pending build events to ensure your test reflects real app behavior. {v3}',
     correctionMessage:
         'After calling tester.tap() or tester.enterText(), always call await tester.pump() or await tester.pumpAndSettle() to process UI changes and verify correct behavior.',
-    errorSeverity: DiagnosticSeverity.ERROR,
+    severity: DiagnosticSeverity.ERROR,
   );
 
   /// Widget interaction methods that require pump after.
@@ -3034,19 +2901,18 @@ class RequireTestWidgetPumpRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
     // Only check test files
-    final String path = resolver.path;
+    final String path = context.filePath;
     if (!path.endsWith('_test.dart') &&
         !path.contains('/test/') &&
         !path.contains(r'\test\')) {
       return;
     }
 
-    context.registry.addBlock((Block block) {
+    context.addBlock((Block block) {
       final List<Statement> statements = block.statements;
 
       for (int i = 0; i < statements.length; i++) {
@@ -3100,48 +2966,9 @@ class RequireTestWidgetPumpRule extends SaropaLintRule {
         }
 
         if (!hasPump) {
-          reporter.atNode(interaction, code);
+          reporter.atNode(interaction);
         }
       }
-    });
-  }
-
-  @override
-  List<Fix> getFixes() => <Fix>[_AddPumpAfterInteractionFix()];
-}
-
-class _AddPumpAfterInteractionFix extends DartFix {
-  @override
-  void run(
-    CustomLintResolver resolver,
-    ChangeReporter reporter,
-    CustomLintContext context,
-    AnalysisError analysisError,
-    List<AnalysisError> others,
-  ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
-      if (!analysisError.sourceRange.intersects(node.sourceRange)) return;
-
-      // Find the statement containing this method invocation
-      AstNode? current = node.parent;
-      while (current != null && current is! Statement) {
-        current = current.parent;
-      }
-
-      if (current == null) return;
-      final Statement stmt = current as Statement;
-
-      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
-        message: 'Add await tester.pump() after interaction',
-        priority: 80,
-      );
-
-      changeBuilder.addDartFileEdit((builder) {
-        builder.addSimpleInsertion(
-          stmt.end,
-          '\n    await tester.pump();',
-        );
-      });
     });
   }
 }
@@ -3169,7 +2996,7 @@ class _AddPumpAfterInteractionFix extends DartFix {
 /// }, timeout: Timeout(Duration(minutes: 2)));
 /// ```
 class RequireIntegrationTestTimeoutRule extends SaropaLintRule {
-  const RequireIntegrationTestTimeoutRule() : super(code: _code);
+  RequireIntegrationTestTimeoutRule() : super(code: _code);
 
   /// Hanging tests block CI pipelines.
   @override
@@ -3182,28 +3009,26 @@ class RequireIntegrationTestTimeoutRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.test};
 
   static const LintCode _code = LintCode(
-    name: 'require_integration_test_timeout',
-    problemMessage:
-        '[require_integration_test_timeout] Integration test without timeout. May hang CI indefinitely. Long-running tests without timeouts can hang CI indefinitely. Always set timeouts on integration tests to catch infinite loops. {v2}',
+    'require_integration_test_timeout',
+    '[require_integration_test_timeout] Integration test without timeout. May hang CI indefinitely. Long-running tests without timeouts can hang CI indefinitely. Always set timeouts on integration tests to catch infinite loops. {v2}',
     correctionMessage:
         'Add timeout: Timeout(Duration(minutes: X)) to the test. Update related tests to reflect the new structure and verify they still pass.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
     // Only check integration test files
-    final String path = resolver.path;
+    final String path = context.filePath;
     if (!path.contains('integration_test') &&
         !path.contains('_integration_test.dart')) {
       return;
     }
 
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       final String methodName = node.methodName.name;
       if (methodName != 'testWidgets' && methodName != 'test') return;
 
@@ -3217,7 +3042,7 @@ class RequireIntegrationTestTimeoutRule extends SaropaLintRule {
       });
 
       if (!hasTimeout) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
   }
@@ -3254,7 +3079,7 @@ class RequireIntegrationTestTimeoutRule extends SaropaLintRule {
 /// expect(list, hasLength(3));
 /// ```
 class AvoidMisusedTestMatchersRule extends SaropaLintRule {
-  const AvoidMisusedTestMatchersRule() : super(code: _code);
+  AvoidMisusedTestMatchersRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.medium;
@@ -3266,9 +3091,8 @@ class AvoidMisusedTestMatchersRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.test};
 
   static const LintCode _code = LintCode(
-    name: 'avoid_misused_test_matchers',
-    problemMessage:
-        '[avoid_misused_test_matchers] Raw literal used as a test matcher '
+    'avoid_misused_test_matchers',
+    '[avoid_misused_test_matchers] Raw literal used as a test matcher '
         'instead of a proper matcher function. Using literals (true, false, '
         'null) as the second argument to expect() produces poor failure '
         'messages that show "Expected: true, Actual: false" instead of '
@@ -3276,21 +3100,21 @@ class AvoidMisusedTestMatchersRule extends SaropaLintRule {
         'isNull, hasLength, equals, and isA provide clearer assertion '
         'semantics and significantly better diagnostic output when tests '
         'fail, making debugging faster. {v1}',
-    correctionMessage: 'Replace literal matchers with proper test matchers: '
+    correctionMessage:
+        'Replace literal matchers with proper test matchers: '
         'expect(x, true) => expect(x, isTrue), '
         'expect(x, false) => expect(x, isFalse), '
         'expect(x, null) => expect(x, isNull), '
         'expect(list.length, N) => expect(list, hasLength(N)).',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       if (node.methodName.name != 'expect') return;
 
       final List<Expression> positionalArgs = node.argumentList.arguments
@@ -3304,19 +3128,19 @@ class AvoidMisusedTestMatchersRule extends SaropaLintRule {
 
       // Pattern 1: expect(x, true) or expect(x, false)
       if (matcher is BooleanLiteral) {
-        reporter.atNode(matcher, code);
+        reporter.atNode(matcher);
         return;
       }
 
       // Pattern 2: expect(x, null)
       if (matcher is NullLiteral) {
-        reporter.atNode(matcher, code);
+        reporter.atNode(matcher);
         return;
       }
 
       // Pattern 3: expect(list.length, N)
       if (matcher is IntegerLiteral && _isLengthAccess(actual)) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
         return;
       }
     });
@@ -3332,94 +3156,6 @@ class AvoidMisusedTestMatchersRule extends SaropaLintRule {
     }
     return false;
   }
-
-  @override
-  List<Fix> getFixes() => [_AvoidMisusedTestMatchersFix()];
 }
 
 /// Quick fix for [AvoidMisusedTestMatchersRule].
-class _AvoidMisusedTestMatchersFix extends DartFix {
-  @override
-  void run(
-    CustomLintResolver resolver,
-    ChangeReporter reporter,
-    CustomLintContext context,
-    AnalysisError analysisError,
-    List<AnalysisError> others,
-  ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
-      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
-      if (node.methodName.name != 'expect') return;
-
-      final List<Expression> positionalArgs = node.argumentList.arguments
-          .where((Expression e) => e is! NamedExpression)
-          .toList();
-
-      if (positionalArgs.length < 2) return;
-
-      final Expression actual = positionalArgs[0];
-      final Expression matcher = positionalArgs[1];
-
-      // Fix: expect(x, true) → expect(x, isTrue)
-      // Fix: expect(x, false) → expect(x, isFalse)
-      if (matcher is BooleanLiteral) {
-        final String replacement = matcher.value ? 'isTrue' : 'isFalse';
-        final changeBuilder = reporter.createChangeBuilder(
-          message: 'Replace with $replacement',
-          priority: 80,
-        );
-        changeBuilder.addDartFileEdit((builder) {
-          builder.addSimpleReplacement(matcher.sourceRange, replacement);
-        });
-        return;
-      }
-
-      // Fix: expect(x, null) → expect(x, isNull)
-      if (matcher is NullLiteral) {
-        final changeBuilder = reporter.createChangeBuilder(
-          message: 'Replace with isNull',
-          priority: 80,
-        );
-        changeBuilder.addDartFileEdit((builder) {
-          builder.addSimpleReplacement(matcher.sourceRange, 'isNull');
-        });
-        return;
-      }
-
-      // Fix: expect(list.length, N) → expect(list, hasLength(N))
-      if (matcher is IntegerLiteral && _isLengthTarget(actual)) {
-        final String collection = _extractBeforeLength(actual);
-        if (collection.isEmpty) return;
-
-        final changeBuilder = reporter.createChangeBuilder(
-          message: 'Replace with hasLength(${matcher.toSource()})',
-          priority: 80,
-        );
-        changeBuilder.addDartFileEdit((builder) {
-          builder.addSimpleReplacement(
-            SourceRange(
-              node.argumentList.leftParenthesis.offset + 1,
-              node.argumentList.rightParenthesis.offset -
-                  node.argumentList.leftParenthesis.offset -
-                  1,
-            ),
-            '$collection, hasLength(${matcher.toSource()})',
-          );
-        });
-      }
-    });
-  }
-
-  bool _isLengthTarget(Expression expr) {
-    if (expr is PropertyAccess) return expr.propertyName.name == 'length';
-    if (expr is PrefixedIdentifier) return expr.identifier.name == 'length';
-    return false;
-  }
-
-  /// Extracts the collection expression before `.length`.
-  String _extractBeforeLength(Expression expr) {
-    if (expr is PropertyAccess) return expr.target?.toSource() ?? '';
-    if (expr is PrefixedIdentifier) return expr.prefix.name;
-    return '';
-  }
-}

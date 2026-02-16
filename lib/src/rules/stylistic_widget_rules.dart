@@ -1,9 +1,6 @@
 // ignore_for_file: depend_on_referenced_packages, deprecated_member_use
 
 import 'package:analyzer/dart/ast/ast.dart';
-import 'package:analyzer/error/error.dart'
-    show AnalysisError, DiagnosticSeverity;
-import 'package:custom_lint_builder/custom_lint_builder.dart';
 
 import '../saropa_lint_rule.dart';
 
@@ -46,7 +43,7 @@ import '../saropa_lint_rule.dart';
 /// SizedBox(width: 100)
 /// ```
 class PreferSizedBoxOverContainerRule extends SaropaLintRule {
-  const PreferSizedBoxOverContainerRule() : super(code: _code);
+  PreferSizedBoxOverContainerRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.opinionated;
@@ -58,21 +55,19 @@ class PreferSizedBoxOverContainerRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
-    name: 'prefer_sizedbox_over_container',
-    problemMessage:
-        '[prefer_sizedbox_over_container] A Container is used only for width/height sizing, which adds unnecessary decoration and padding layers. Use SizedBox instead for a lighter widget with clearer intent. {v3}',
+    'prefer_sizedbox_over_container',
+    '[prefer_sizedbox_over_container] A Container is used only for width/height sizing, which adds unnecessary decoration and padding layers. Use SizedBox instead for a lighter widget with clearer intent. {v3}',
     correctionMessage:
         'Replace Container with SizedBox when you only need width and height \u2014 SizedBox skips the decoration/padding layers.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addInstanceCreationExpression((node) {
+    context.addInstanceCreationExpression((node) {
       final String? constructorName = node.constructorName.type.element?.name;
       if (constructorName != 'Container') return;
 
@@ -91,48 +86,9 @@ class PreferSizedBoxOverContainerRule extends SaropaLintRule {
       if (argNames.isNotEmpty && argNames.every(allowedArgs.contains)) {
         // Must have at least width or height to be a sizing container
         if (argNames.contains('width') || argNames.contains('height')) {
-          reporter.atNode(node, code);
+          reporter.atNode(node);
         }
       }
-    });
-  }
-
-  @override
-  List<Fix> get customFixes => <Fix>[_PreferSizedBoxOverContainerFix()];
-}
-
-class _PreferSizedBoxOverContainerFix extends DartFix {
-  @override
-  void run(
-    CustomLintResolver resolver,
-    ChangeReporter reporter,
-    CustomLintContext context,
-    AnalysisError analysisError,
-    List<AnalysisError> others,
-  ) {
-    context.registry
-        .addInstanceCreationExpression((InstanceCreationExpression node) {
-      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
-      if (node.constructorName.type.element?.name != 'Container') return;
-
-      final constPrefix = node.keyword?.lexeme == 'const' ? 'const ' : '';
-      final args = _extractNamedArgs(node);
-      final newArgs = <String>[];
-      if (args.containsKey('key')) newArgs.add('key: ${args['key']}');
-      if (args.containsKey('width')) newArgs.add('width: ${args['width']}');
-      if (args.containsKey('height')) newArgs.add('height: ${args['height']}');
-      if (args.containsKey('child')) newArgs.add('child: ${args['child']}');
-
-      final changeBuilder = reporter.createChangeBuilder(
-        message: 'Replace with SizedBox',
-        priority: 80,
-      );
-      changeBuilder.addDartFileEdit((builder) {
-        builder.addSimpleReplacement(
-          node.sourceRange,
-          '${constPrefix}SizedBox(${newArgs.join(', ')})',
-        );
-      });
     });
   }
 }
@@ -164,7 +120,7 @@ class _PreferSizedBoxOverContainerFix extends DartFix {
 /// Container(width: 16, height: 16)
 /// ```
 class PreferContainerOverSizedBoxRule extends SaropaLintRule {
-  const PreferContainerOverSizedBoxRule() : super(code: _code);
+  PreferContainerOverSizedBoxRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.opinionated;
@@ -176,21 +132,19 @@ class PreferContainerOverSizedBoxRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
-    name: 'prefer_container_over_sizedbox',
-    problemMessage:
-        '[prefer_container_over_sizedbox] A SizedBox was used where a Container would provide better consistency and easier future extension. Replace it with a Container to allow adding decoration, padding, or alignment without a widget swap. {v3}',
+    'prefer_container_over_sizedbox',
+    '[prefer_container_over_sizedbox] A SizedBox was used where a Container would provide better consistency and easier future extension. Replace it with a Container to allow adding decoration, padding, or alignment without a widget swap. {v3}',
     correctionMessage:
         'Replace SizedBox with Container so decoration, padding, or alignment can be added later without a widget swap.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addInstanceCreationExpression((node) {
+    context.addInstanceCreationExpression((node) {
       final String? constructorName = node.constructorName.type.element?.name;
       if (constructorName != 'SizedBox') return;
 
@@ -198,47 +152,7 @@ class PreferContainerOverSizedBoxRule extends SaropaLintRule {
       final namedConstructor = node.constructorName.name?.name;
       if (namedConstructor == 'shrink' || namedConstructor == 'expand') return;
 
-      reporter.atNode(node, code);
-    });
-  }
-
-  @override
-  List<Fix> get customFixes => <Fix>[_PreferContainerOverSizedBoxFix()];
-}
-
-class _PreferContainerOverSizedBoxFix extends DartFix {
-  @override
-  void run(
-    CustomLintResolver resolver,
-    ChangeReporter reporter,
-    CustomLintContext context,
-    AnalysisError analysisError,
-    List<AnalysisError> others,
-  ) {
-    context.registry
-        .addInstanceCreationExpression((InstanceCreationExpression node) {
-      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
-      if (node.constructorName.type.element?.name != 'SizedBox') return;
-      if (node.constructorName.name?.name != null) return;
-
-      final constPrefix = node.keyword?.lexeme == 'const' ? 'const ' : '';
-      final args = _extractNamedArgs(node);
-      final newArgs = <String>[];
-      if (args.containsKey('key')) newArgs.add('key: ${args['key']}');
-      if (args.containsKey('width')) newArgs.add('width: ${args['width']}');
-      if (args.containsKey('height')) newArgs.add('height: ${args['height']}');
-      if (args.containsKey('child')) newArgs.add('child: ${args['child']}');
-
-      final changeBuilder = reporter.createChangeBuilder(
-        message: 'Replace with Container',
-        priority: 80,
-      );
-      changeBuilder.addDartFileEdit((builder) {
-        builder.addSimpleReplacement(
-          node.sourceRange,
-          '${constPrefix}Container(${newArgs.join(', ')})',
-        );
-      });
+      reporter.atNode(node);
     });
   }
 }
@@ -275,7 +189,7 @@ class _PreferContainerOverSizedBoxFix extends DartFix {
 /// )
 /// ```
 class PreferTextRichOverRichTextRule extends SaropaLintRule {
-  const PreferTextRichOverRichTextRule() : super(code: _code);
+  PreferTextRichOverRichTextRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.opinionated;
@@ -287,24 +201,22 @@ class PreferTextRichOverRichTextRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
-    name: 'prefer_text_rich_over_richtext',
-    problemMessage:
-        '[prefer_text_rich_over_richtext] RichText widget does not inherit DefaultTextStyle, requiring manual base style setup. Text.rich() inherits the theme automatically and produces less boilerplate. {v3}',
+    'prefer_text_rich_over_richtext',
+    '[prefer_text_rich_over_richtext] RichText widget does not inherit DefaultTextStyle, requiring manual base style setup. Text.rich() inherits the theme automatically and produces less boilerplate. {v3}',
     correctionMessage:
         'Replace RichText with Text.rich() to inherit the DefaultTextStyle and avoid manually setting the base style.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addInstanceCreationExpression((node) {
+    context.addInstanceCreationExpression((node) {
       final String? constructorName = node.constructorName.type.element?.name;
       if (constructorName == 'RichText') {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
   }
@@ -337,7 +249,7 @@ class PreferTextRichOverRichTextRule extends SaropaLintRule {
 /// RichText(text: TextSpan(text: 'Hello'))
 /// ```
 class PreferRichTextOverTextRichRule extends SaropaLintRule {
-  const PreferRichTextOverTextRichRule() : super(code: _code);
+  PreferRichTextOverTextRichRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.opinionated;
@@ -349,26 +261,24 @@ class PreferRichTextOverTextRichRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
-    name: 'prefer_richtext_over_text_rich',
-    problemMessage:
-        '[prefer_richtext_over_text_rich] Text.rich() inherits DefaultTextStyle implicitly, which can cause unexpected styling. Use RichText instead for explicit control over the base text style without hidden theme inheritance. {v3}',
+    'prefer_richtext_over_text_rich',
+    '[prefer_richtext_over_text_rich] Text.rich() inherits DefaultTextStyle implicitly, which can cause unexpected styling. Use RichText instead for explicit control over the base text style without hidden theme inheritance. {v3}',
     correctionMessage:
         'Replace Text.rich() with RichText for full control over the base text style without implicit DefaultTextStyle inheritance.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addInstanceCreationExpression((node) {
+    context.addInstanceCreationExpression((node) {
       final String? constructorName = node.constructorName.type.element?.name;
       final String? namedConstructor = node.constructorName.name?.name;
 
       if (constructorName == 'Text' && namedConstructor == 'rich') {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
   }
@@ -402,7 +312,7 @@ class PreferRichTextOverTextRichRule extends SaropaLintRule {
 /// EdgeInsets.symmetric(horizontal: 16, vertical: 8)
 /// ```
 class PreferEdgeInsetsSymmetricRule extends SaropaLintRule {
-  const PreferEdgeInsetsSymmetricRule() : super(code: _code);
+  PreferEdgeInsetsSymmetricRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.opinionated;
@@ -415,21 +325,19 @@ class PreferEdgeInsetsSymmetricRule extends SaropaLintRule {
 
   //  cspell:ignore edgeinsets
   static const LintCode _code = LintCode(
-    name: 'prefer_edgeinsets_symmetric',
-    problemMessage:
-        '[prefer_edgeinsets_symmetric] EdgeInsets.only() was used with equal left/right or top/bottom values, which adds unnecessary repetition. Use EdgeInsets.symmetric() to express mirrored padding concisely. {v4}',
+    'prefer_edgeinsets_symmetric',
+    '[prefer_edgeinsets_symmetric] EdgeInsets.only() was used with equal left/right or top/bottom values, which adds unnecessary repetition. Use EdgeInsets.symmetric() to express mirrored padding concisely. {v4}',
     correctionMessage:
         'Replace EdgeInsets.only() with EdgeInsets.symmetric() when horizontal or vertical values are equal, for brevity.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addInstanceCreationExpression((node) {
+    context.addInstanceCreationExpression((node) {
       final String? constructorName = node.constructorName.type.element?.name;
       final String? namedConstructor = node.constructorName.name?.name;
 
@@ -467,59 +375,7 @@ class PreferEdgeInsetsSymmetricRule extends SaropaLintRule {
       if (hasH && !horizontalSymmetric) return;
       if (hasV && !verticalSymmetric) return;
 
-      reporter.atNode(node, code);
-    });
-  }
-
-  @override
-  List<Fix> get customFixes => <Fix>[_PreferEdgeInsetsSymmetricFix()];
-}
-
-class _PreferEdgeInsetsSymmetricFix extends DartFix {
-  @override
-  void run(
-    CustomLintResolver resolver,
-    ChangeReporter reporter,
-    CustomLintContext context,
-    AnalysisError analysisError,
-    List<AnalysisError> others,
-  ) {
-    context.registry
-        .addInstanceCreationExpression((InstanceCreationExpression node) {
-      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
-      if (node.constructorName.type.element?.name != 'EdgeInsets') return;
-      if (node.constructorName.name?.name != 'only') return;
-
-      final args = _extractNamedArgs(node);
-      final left = args['left'];
-      final right = args['right'];
-      final top = args['top'];
-      final bottom = args['bottom'];
-
-      // Only offer fix when all present pairs are symmetric
-      final hasH = left != null && right != null;
-      final hasV = top != null && bottom != null;
-      if (hasH && left != right) return;
-      if (hasV && top != bottom) return;
-      // Reject unpaired sides (e.g., left without right)
-      if ((left == null) != (right == null)) return;
-      if ((top == null) != (bottom == null)) return;
-
-      final constPrefix = node.keyword?.lexeme == 'const' ? 'const ' : '';
-      final newArgs = <String>[];
-      if (hasH) newArgs.add('horizontal: $left');
-      if (hasV) newArgs.add('vertical: $top');
-
-      final changeBuilder = reporter.createChangeBuilder(
-        message: 'Replace with EdgeInsets.symmetric()',
-        priority: 80,
-      );
-      changeBuilder.addDartFileEdit((builder) {
-        builder.addSimpleReplacement(
-          node.sourceRange,
-          '${constPrefix}EdgeInsets.symmetric(${newArgs.join(', ')})',
-        );
-      });
+      reporter.atNode(node);
     });
   }
 }
@@ -551,7 +407,7 @@ class _PreferEdgeInsetsSymmetricFix extends DartFix {
 /// EdgeInsets.only(left: 16, right: 16, top: 8, bottom: 8)
 /// ```
 class PreferEdgeInsetsOnlyRule extends SaropaLintRule {
-  const PreferEdgeInsetsOnlyRule() : super(code: _code);
+  PreferEdgeInsetsOnlyRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.opinionated;
@@ -563,74 +419,25 @@ class PreferEdgeInsetsOnlyRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
-    name: 'prefer_edgeinsets_only',
-    problemMessage:
-        '[prefer_edgeinsets_only] EdgeInsets.symmetric() hides which sides receive padding, making future per-side adjustments harder. Use EdgeInsets.only() to declare each side explicitly so values can be changed independently. {v3}',
+    'prefer_edgeinsets_only',
+    '[prefer_edgeinsets_only] EdgeInsets.symmetric() hides which sides receive padding, making future per-side adjustments harder. Use EdgeInsets.only() to declare each side explicitly so values can be changed independently. {v3}',
     correctionMessage:
         'Replace EdgeInsets.symmetric() with EdgeInsets.only() for explicit per-side values that are easier to adjust independently.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addInstanceCreationExpression((node) {
+    context.addInstanceCreationExpression((node) {
       final String? constructorName = node.constructorName.type.element?.name;
       final String? namedConstructor = node.constructorName.name?.name;
 
       if (constructorName == 'EdgeInsets' && namedConstructor == 'symmetric') {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
-    });
-  }
-
-  @override
-  List<Fix> get customFixes => <Fix>[_PreferEdgeInsetsOnlyFix()];
-}
-
-class _PreferEdgeInsetsOnlyFix extends DartFix {
-  @override
-  void run(
-    CustomLintResolver resolver,
-    ChangeReporter reporter,
-    CustomLintContext context,
-    AnalysisError analysisError,
-    List<AnalysisError> others,
-  ) {
-    context.registry
-        .addInstanceCreationExpression((InstanceCreationExpression node) {
-      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
-      if (node.constructorName.type.element?.name != 'EdgeInsets') return;
-      if (node.constructorName.name?.name != 'symmetric') return;
-
-      final args = _extractNamedArgs(node);
-      final horizontal = args['horizontal'];
-      final vertical = args['vertical'];
-
-      final constPrefix = node.keyword?.lexeme == 'const' ? 'const ' : '';
-      final newArgs = <String>[];
-      if (horizontal != null) {
-        newArgs.add('left: $horizontal');
-        newArgs.add('right: $horizontal');
-      }
-      if (vertical != null) {
-        newArgs.add('top: $vertical');
-        newArgs.add('bottom: $vertical');
-      }
-
-      final changeBuilder = reporter.createChangeBuilder(
-        message: 'Replace with EdgeInsets.only()',
-        priority: 80,
-      );
-      changeBuilder.addDartFileEdit((builder) {
-        builder.addSimpleReplacement(
-          node.sourceRange,
-          '${constPrefix}EdgeInsets.only(${newArgs.join(', ')})',
-        );
-      });
     });
   }
 }
@@ -664,7 +471,7 @@ class _PreferEdgeInsetsOnlyFix extends DartFix {
 /// BorderRadius.circular(8)
 /// ```
 class PreferBorderRadiusCircularRule extends SaropaLintRule {
-  const PreferBorderRadiusCircularRule() : super(code: _code);
+  PreferBorderRadiusCircularRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.opinionated;
@@ -677,21 +484,19 @@ class PreferBorderRadiusCircularRule extends SaropaLintRule {
 
   // cspell:ignore borderradius
   static const LintCode _code = LintCode(
-    name: 'prefer_borderradius_circular',
-    problemMessage:
-        '[prefer_borderradius_circular] Use BorderRadius.circular() instead of BorderRadius.all(Radius.circular()). This is an opinionated rule - not included in any tier by default. {v3}',
+    'prefer_borderradius_circular',
+    '[prefer_borderradius_circular] Use BorderRadius.circular() instead of BorderRadius.all(Radius.circular()). This is an opinionated rule - not included in any tier by default. {v3}',
     correctionMessage:
         'Replace BorderRadius.all(Radius.circular(r)) with BorderRadius.circular(r) for a shorter single-call equivalent.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addInstanceCreationExpression((node) {
+    context.addInstanceCreationExpression((node) {
       final String? constructorName = node.constructorName.type.element?.name;
       final String? namedConstructor = node.constructorName.name?.name;
 
@@ -708,53 +513,9 @@ class PreferBorderRadiusCircularRule extends SaropaLintRule {
         final argName = arg.constructorName.type.element?.name;
         final argConstructor = arg.constructorName.name?.name;
         if (argName == 'Radius' && argConstructor == 'circular') {
-          reporter.atNode(node, code);
+          reporter.atNode(node);
         }
       }
-    });
-  }
-
-  @override
-  List<Fix> get customFixes => <Fix>[_PreferBorderRadiusCircularFix()];
-}
-
-class _PreferBorderRadiusCircularFix extends DartFix {
-  @override
-  void run(
-    CustomLintResolver resolver,
-    ChangeReporter reporter,
-    CustomLintContext context,
-    AnalysisError analysisError,
-    List<AnalysisError> others,
-  ) {
-    context.registry
-        .addInstanceCreationExpression((InstanceCreationExpression node) {
-      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
-      if (node.constructorName.type.element?.name != 'BorderRadius') return;
-      if (node.constructorName.name?.name != 'all') return;
-
-      final args = node.argumentList.arguments;
-      if (args.length != 1) return;
-      final arg = args.first;
-      if (arg is! InstanceCreationExpression) return;
-      if (arg.constructorName.type.element?.name != 'Radius') return;
-      if (arg.constructorName.name?.name != 'circular') return;
-
-      // Extract the radius value from Radius.circular(X)
-      final innerArgs = arg.argumentList.arguments;
-      if (innerArgs.length != 1) return;
-      final radiusValue = innerArgs.first.toSource();
-
-      final changeBuilder = reporter.createChangeBuilder(
-        message: 'Replace with BorderRadius.circular()',
-        priority: 80,
-      );
-      changeBuilder.addDartFileEdit((builder) {
-        builder.addSimpleReplacement(
-          node.sourceRange,
-          'BorderRadius.circular($radiusValue)',
-        );
-      });
     });
   }
 }
@@ -787,7 +548,7 @@ class _PreferBorderRadiusCircularFix extends DartFix {
 /// Expanded(child: widget)
 /// ```
 class PreferExpandedOverFlexibleRule extends SaropaLintRule {
-  const PreferExpandedOverFlexibleRule() : super(code: _code);
+  PreferExpandedOverFlexibleRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.opinionated;
@@ -799,21 +560,19 @@ class PreferExpandedOverFlexibleRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
-    name: 'prefer_expanded_over_flexible',
-    problemMessage:
-        '[prefer_expanded_over_flexible] Flexible with fit: FlexFit.tight is equivalent to Expanded, adding unnecessary verbosity. Use Expanded directly for clearer intent and less boilerplate. {v3}',
+    'prefer_expanded_over_flexible',
+    '[prefer_expanded_over_flexible] Flexible with fit: FlexFit.tight is equivalent to Expanded, adding unnecessary verbosity. Use Expanded directly for clearer intent and less boilerplate. {v3}',
     correctionMessage:
         'Replace Flexible(fit: FlexFit.tight) with Expanded, which is the idiomatic shorthand for tight-fit flex children.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addInstanceCreationExpression((node) {
+    context.addInstanceCreationExpression((node) {
       final String? constructorName = node.constructorName.type.element?.name;
       if (constructorName != 'Flexible') return;
 
@@ -824,51 +583,12 @@ class PreferExpandedOverFlexibleRule extends SaropaLintRule {
           if (expr is PrefixedIdentifier) {
             if (expr.prefix.name == 'FlexFit' &&
                 expr.identifier.name == 'tight') {
-              reporter.atNode(node, code);
+              reporter.atNode(node);
               return;
             }
           }
         }
       }
-    });
-  }
-
-  @override
-  List<Fix> get customFixes => <Fix>[_PreferExpandedOverFlexibleFix()];
-}
-
-class _PreferExpandedOverFlexibleFix extends DartFix {
-  @override
-  void run(
-    CustomLintResolver resolver,
-    ChangeReporter reporter,
-    CustomLintContext context,
-    AnalysisError analysisError,
-    List<AnalysisError> others,
-  ) {
-    context.registry
-        .addInstanceCreationExpression((InstanceCreationExpression node) {
-      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
-      if (node.constructorName.type.element?.name != 'Flexible') return;
-
-      final constPrefix = node.keyword?.lexeme == 'const' ? 'const ' : '';
-      final args = _extractNamedArgs(node);
-      // Remove 'fit' and keep everything else
-      final newArgs = <String>[];
-      if (args.containsKey('key')) newArgs.add('key: ${args['key']}');
-      if (args.containsKey('flex')) newArgs.add('flex: ${args['flex']}');
-      if (args.containsKey('child')) newArgs.add('child: ${args['child']}');
-
-      final changeBuilder = reporter.createChangeBuilder(
-        message: 'Replace with Expanded',
-        priority: 80,
-      );
-      changeBuilder.addDartFileEdit((builder) {
-        builder.addSimpleReplacement(
-          node.sourceRange,
-          '${constPrefix}Expanded(${newArgs.join(', ')})',
-        );
-      });
     });
   }
 }
@@ -900,7 +620,7 @@ class _PreferExpandedOverFlexibleFix extends DartFix {
 /// Flexible(fit: FlexFit.tight, child: widget)
 /// ```
 class PreferFlexibleOverExpandedRule extends SaropaLintRule {
-  const PreferFlexibleOverExpandedRule() : super(code: _code);
+  PreferFlexibleOverExpandedRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.opinionated;
@@ -912,64 +632,23 @@ class PreferFlexibleOverExpandedRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
-    name: 'prefer_flexible_over_expanded',
-    problemMessage:
-        '[prefer_flexible_over_expanded] Expanded widget detected, which hides its fit parameter. Use Flexible with an explicit fit argument instead for greater clarity and easier adjustments to flex behavior. {v3}',
+    'prefer_flexible_over_expanded',
+    '[prefer_flexible_over_expanded] Expanded widget detected, which hides its fit parameter. Use Flexible with an explicit fit argument instead for greater clarity and easier adjustments to flex behavior. {v3}',
     correctionMessage:
         'Replace Expanded with Flexible(fit: FlexFit.tight) so the fit parameter is always visible and easy to change later.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addInstanceCreationExpression((node) {
+    context.addInstanceCreationExpression((node) {
       final String? constructorName = node.constructorName.type.element?.name;
       if (constructorName == 'Expanded') {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
-    });
-  }
-
-  @override
-  List<Fix> get customFixes => <Fix>[_PreferFlexibleOverExpandedFix()];
-}
-
-class _PreferFlexibleOverExpandedFix extends DartFix {
-  @override
-  void run(
-    CustomLintResolver resolver,
-    ChangeReporter reporter,
-    CustomLintContext context,
-    AnalysisError analysisError,
-    List<AnalysisError> others,
-  ) {
-    context.registry
-        .addInstanceCreationExpression((InstanceCreationExpression node) {
-      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
-      if (node.constructorName.type.element?.name != 'Expanded') return;
-
-      final constPrefix = node.keyword?.lexeme == 'const' ? 'const ' : '';
-      final args = _extractNamedArgs(node);
-      final newArgs = <String>[];
-      if (args.containsKey('key')) newArgs.add('key: ${args['key']}');
-      newArgs.add('fit: FlexFit.tight');
-      if (args.containsKey('flex')) newArgs.add('flex: ${args['flex']}');
-      if (args.containsKey('child')) newArgs.add('child: ${args['child']}');
-
-      final changeBuilder = reporter.createChangeBuilder(
-        message: 'Replace with Flexible',
-        priority: 80,
-      );
-      changeBuilder.addDartFileEdit((builder) {
-        builder.addSimpleReplacement(
-          node.sourceRange,
-          '${constPrefix}Flexible(${newArgs.join(', ')})',
-        );
-      });
     });
   }
 }
@@ -1004,7 +683,7 @@ class _PreferFlexibleOverExpandedFix extends DartFix {
 /// Text('Hi', style: TextStyle(color: Theme.of(context).colorScheme.error))
 /// ```
 class PreferMaterialThemeColorsRule extends SaropaLintRule {
-  const PreferMaterialThemeColorsRule() : super(code: _code);
+  PreferMaterialThemeColorsRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.opinionated;
@@ -1016,21 +695,19 @@ class PreferMaterialThemeColorsRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
-    name: 'prefer_material_theme_colors',
-    problemMessage:
-        '[prefer_material_theme_colors] Hardcoded Colors.* constant detected in a widget color parameter. Hardcoded colors ignore the active theme and break dark mode support. Use Theme.of(context).colorScheme for consistent theming. {v2}',
+    'prefer_material_theme_colors',
+    '[prefer_material_theme_colors] Hardcoded Colors.* constant detected in a widget color parameter. Hardcoded colors ignore the active theme and break dark mode support. Use Theme.of(context).colorScheme for consistent theming. {v2}',
     correctionMessage:
         'Replace hardcoded Colors.* with Theme.of(context).colorScheme values to support dark mode and keep colors consistent.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addPrefixedIdentifier((node) {
+    context.addPrefixedIdentifier((node) {
       if (node.prefix.name == 'Colors') {
         // Check if this is a color assignment in a widget context
         // We look for common color parameter names
@@ -1038,11 +715,11 @@ class PreferMaterialThemeColorsRule extends SaropaLintRule {
         if (parent is NamedExpression) {
           final paramName = parent.name.label.name;
           if (_isColorParam(paramName)) {
-            reporter.atNode(node, code);
+            reporter.atNode(node);
           }
         } else if (parent is ArgumentList) {
           // Positional color argument (less common but possible)
-          reporter.atNode(node, code);
+          reporter.atNode(node);
         }
       }
     });
@@ -1091,7 +768,7 @@ class PreferMaterialThemeColorsRule extends SaropaLintRule {
 /// Container(color: Colors.blue)
 /// ```
 class PreferExplicitColorsRule extends SaropaLintRule {
-  const PreferExplicitColorsRule() : super(code: _code);
+  PreferExplicitColorsRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.opinionated;
@@ -1103,21 +780,19 @@ class PreferExplicitColorsRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
-    name: 'prefer_explicit_colors',
-    problemMessage:
-        '[prefer_explicit_colors] Theme.of(context).colorScheme requires a BuildContext lookup at runtime, adding indirection. Use explicit Colors constants for predictable output without runtime context dependency. {v2}',
+    'prefer_explicit_colors',
+    '[prefer_explicit_colors] Theme.of(context).colorScheme requires a BuildContext lookup at runtime, adding indirection. Use explicit Colors constants for predictable output without runtime context dependency. {v2}',
     correctionMessage:
         'Replace Theme.of(context).colorScheme with explicit Colors.* values for predictable output without runtime context.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodInvocation((node) {
+    context.addMethodInvocation((node) {
       // Look for Theme.of(context)
       if (node.methodName.name != 'of') return;
       final target = node.target;
@@ -1128,7 +803,7 @@ class PreferExplicitColorsRule extends SaropaLintRule {
       final parent = node.parent;
       if (parent is PropertyAccess &&
           parent.propertyName.name == 'colorScheme') {
-        reporter.atNode(parent, code);
+        reporter.atNode(parent);
       }
     });
   }
@@ -1177,7 +852,7 @@ class PreferExplicitColorsRule extends SaropaLintRule {
 /// )
 /// ```
 class PreferClipRSuperellipseRule extends SaropaLintRule {
-  const PreferClipRSuperellipseRule() : super(code: _code);
+  PreferClipRSuperellipseRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.opinionated;
@@ -1189,21 +864,19 @@ class PreferClipRSuperellipseRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
-    name: 'prefer_clip_r_superellipse',
-    problemMessage:
-        '[prefer_clip_r_superellipse] ClipRRect uses circular arcs for rounded corners, which produce a visible transition between straight edges and curves. Use ClipRSuperellipse for smoother continuous corners matching iOS design language. {v2}',
+    'prefer_clip_r_superellipse',
+    '[prefer_clip_r_superellipse] ClipRRect uses circular arcs for rounded corners, which produce a visible transition between straight edges and curves. Use ClipRSuperellipse for smoother continuous corners matching iOS design language. {v2}',
     correctionMessage:
         'ClipRSuperellipse provides smoother corner transitions matching iOS design language. Requires Flutter 3.32+.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addInstanceCreationExpression((node) {
+    context.addInstanceCreationExpression((node) {
       final constructorName = node.constructorName.type.element?.name;
       if (constructorName != 'ClipRRect') return;
 
@@ -1215,52 +888,7 @@ class PreferClipRSuperellipseRule extends SaropaLintRule {
         }
       }
 
-      reporter.atNode(node, code);
-    });
-  }
-
-  @override
-  List<Fix> get customFixes => <Fix>[_PreferClipRSuperellipseFix()];
-}
-
-class _PreferClipRSuperellipseFix extends DartFix {
-  @override
-  void run(
-    CustomLintResolver resolver,
-    ChangeReporter reporter,
-    CustomLintContext context,
-    AnalysisError analysisError,
-    List<AnalysisError> others,
-  ) {
-    context.registry
-        .addInstanceCreationExpression((InstanceCreationExpression node) {
-      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
-      if (node.constructorName.type.element?.name != 'ClipRRect') return;
-
-      final constPrefix = node.keyword?.lexeme == 'const' ? 'const ' : '';
-      final args = _extractNamedArgs(node);
-      final newArgs = <String>[];
-      if (args.containsKey('key')) newArgs.add('key: ${args['key']}');
-      if (args.containsKey('borderRadius')) {
-        newArgs.add('borderRadius: ${args['borderRadius']}');
-      }
-      if (args.containsKey('clipBehavior')) {
-        newArgs.add('clipBehavior: ${args['clipBehavior']}');
-      }
-      if (args.containsKey('child')) {
-        newArgs.add('child: ${args['child']}');
-      }
-
-      final changeBuilder = reporter.createChangeBuilder(
-        message: 'Replace with ClipRSuperellipse',
-        priority: 80,
-      );
-      changeBuilder.addDartFileEdit((builder) {
-        builder.addSimpleReplacement(
-          node.sourceRange,
-          '${constPrefix}ClipRSuperellipse(${newArgs.join(', ')})',
-        );
-      });
+      reporter.atNode(node);
     });
   }
 }
@@ -1300,7 +928,7 @@ class _PreferClipRSuperellipseFix extends DartFix {
 /// )
 /// ```
 class PreferClipRSuperellipseClipperRule extends SaropaLintRule {
-  const PreferClipRSuperellipseClipperRule() : super(code: _code);
+  PreferClipRSuperellipseClipperRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.opinionated;
@@ -1312,21 +940,19 @@ class PreferClipRSuperellipseClipperRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
-    name: 'prefer_clip_r_superellipse_clipper',
-    problemMessage:
-        '[prefer_clip_r_superellipse_clipper] Use ClipRSuperellipse instead of ClipRRect for smoother continuous corners. This is an opinionated rule — not included in any tier by default. {v2}',
+    'prefer_clip_r_superellipse_clipper',
+    '[prefer_clip_r_superellipse_clipper] Use ClipRSuperellipse instead of ClipRRect for smoother continuous corners. This is an opinionated rule — not included in any tier by default. {v2}',
     correctionMessage:
         'The custom clipper must be rewritten as CustomClipper<RSuperellipse>. Requires Flutter 3.32+.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addInstanceCreationExpression((node) {
+    context.addInstanceCreationExpression((node) {
       final constructorName = node.constructorName.type.element?.name;
       if (constructorName != 'ClipRRect') return;
 
@@ -1336,23 +962,7 @@ class PreferClipRSuperellipseClipperRule extends SaropaLintRule {
       );
       if (!hasClipper) return;
 
-      reporter.atNode(node, code);
+      reporter.atNode(node);
     });
   }
-}
-
-// =============================================================================
-// Shared helpers for quick fixes
-// =============================================================================
-
-/// Extracts named arguments from an [InstanceCreationExpression] as a map
-/// of argument name to source text.
-Map<String, String> _extractNamedArgs(InstanceCreationExpression node) {
-  final args = <String, String>{};
-  for (final arg in node.argumentList.arguments) {
-    if (arg is NamedExpression) {
-      args[arg.name.label.name] = arg.expression.toSource();
-    }
-  }
-  return args;
 }

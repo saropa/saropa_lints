@@ -7,11 +7,7 @@
 library;
 
 import 'package:analyzer/dart/ast/ast.dart';
-import 'package:analyzer/dart/ast/token.dart' show Token;
 import 'package:analyzer/dart/ast/visitor.dart';
-import 'package:analyzer/error/error.dart'
-    show AnalysisError, DiagnosticSeverity;
-import 'package:custom_lint_builder/custom_lint_builder.dart';
 
 import '../saropa_lint_rule.dart';
 
@@ -44,7 +40,7 @@ import '../saropa_lint_rule.dart';
 ///
 /// **Quick fix available:** Adds a comment to flag for attention.
 class AvoidSwallowingExceptionsRule extends SaropaLintRule {
-  const AvoidSwallowingExceptionsRule() : super(code: _code);
+  AvoidSwallowingExceptionsRule() : super(code: _code);
 
   /// Significant issue. Address when count exceeds 10.
   @override
@@ -54,26 +50,24 @@ class AvoidSwallowingExceptionsRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_swallowing_exceptions',
-    problemMessage:
-        '[avoid_swallowing_exceptions] Catch block swallows exception without logging, rethrowing, or handling it. Silent failures hide production bugs, break monitoring and alerting systems, and make it impossible to diagnose issues reported by users. Every caught exception must be acknowledged. {v5}',
+    'avoid_swallowing_exceptions',
+    '[avoid_swallowing_exceptions] Catch block swallows exception without logging, rethrowing, or handling it. Silent failures hide production bugs, break monitoring and alerting systems, and make it impossible to diagnose issues reported by users. Every caught exception must be acknowledged. {v5}',
     correctionMessage:
         'Log the error, rethrow, or handle it with a user-visible message or recovery action. Example: catch (e, st) { logger.error("Operation failed", e, st); rethrow; }',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addCatchClause((CatchClause node) {
+    context.addCatchClause((CatchClause node) {
       final Block body = node.body;
 
       // Check if catch body is empty or only has comments
       if (body.statements.isEmpty) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
         return;
       }
 
@@ -91,38 +85,8 @@ class AvoidSwallowingExceptionsRule extends SaropaLintRule {
       );
 
       if (!exceptionUsed) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
-    });
-  }
-
-  @override
-  List<Fix> getFixes() => <Fix>[_AddHackCommentForSwallowedExceptionFix()];
-}
-
-class _AddHackCommentForSwallowedExceptionFix extends DartFix {
-  @override
-  void run(
-    CustomLintResolver resolver,
-    ChangeReporter reporter,
-    CustomLintContext context,
-    AnalysisError analysisError,
-    List<AnalysisError> others,
-  ) {
-    context.registry.addCatchClause((CatchClause node) {
-      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
-
-      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
-        message: 'Add HACK comment for unhandled exception',
-        priority: 2,
-      );
-
-      changeBuilder.addDartFileEdit((builder) {
-        builder.addSimpleInsertion(
-          node.offset,
-          '// HACK: handle or log this exception\n    ',
-        );
-      });
     });
   }
 }
@@ -170,7 +134,7 @@ class _IdentifierUsageVisitor extends RecursiveAstVisitor<void> {
 ///
 /// **Quick fix available:** Adds a stack trace parameter to the catch clause.
 class AvoidLosingStackTraceRule extends SaropaLintRule {
-  const AvoidLosingStackTraceRule() : super(code: _code);
+  AvoidLosingStackTraceRule() : super(code: _code);
 
   /// Significant issue. Address when count exceeds 10.
   @override
@@ -180,21 +144,19 @@ class AvoidLosingStackTraceRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_losing_stack_trace',
-    problemMessage:
-        '[avoid_losing_stack_trace] Rethrowing without preserving the stack trace loses the original error location and call chain. Production debugging becomes impossible because crash reports show only the rethrow site, not where the error actually originated. Always capture and forward the full stack trace. {v2}',
+    'avoid_losing_stack_trace',
+    '[avoid_losing_stack_trace] Rethrowing without preserving the stack trace loses the original error location and call chain. Production debugging becomes impossible because crash reports show only the rethrow site, not where the error actually originated. Always capture and forward the full stack trace. {v2}',
     correctionMessage:
         'Capture the stack trace parameter and use Error.throwWithStackTrace or include it in the new exception. Example: catch (e, st) { Error.throwWithStackTrace(CustomError(e), st); }',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addCatchClause((CatchClause node) {
+    context.addCatchClause((CatchClause node) {
       // Check if stack trace is captured
       final CatchClauseParameter? stackTraceParam = node.stackTraceParameter;
 
@@ -211,43 +173,8 @@ class AvoidLosingStackTraceRule extends SaropaLintRule {
 
       // If throwing new exception without stack trace param, warn
       if (hasThrow && !hasRethrow && stackTraceParam == null) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
-    });
-  }
-
-  @override
-  List<Fix> getFixes() => <Fix>[_AddStackTraceParameterFix()];
-}
-
-class _AddStackTraceParameterFix extends DartFix {
-  @override
-  void run(
-    CustomLintResolver resolver,
-    ChangeReporter reporter,
-    CustomLintContext context,
-    AnalysisError analysisError,
-    List<AnalysisError> others,
-  ) {
-    context.registry.addCatchClause((CatchClause node) {
-      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
-      if (node.stackTraceParameter != null) return;
-
-      final CatchClauseParameter? exceptionParam = node.exceptionParameter;
-      if (exceptionParam == null) return;
-
-      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
-        message: 'Add stackTrace parameter',
-        priority: 1,
-      );
-
-      changeBuilder.addDartFileEdit((builder) {
-        // Insert ", stackTrace" after the exception parameter
-        builder.addSimpleInsertion(
-          exceptionParam.end,
-          ', stackTrace',
-        );
-      });
     });
   }
 }
@@ -289,7 +216,7 @@ class _ThrowVisitor extends RecursiveAstVisitor<void> {
 /// throw NetworkException('Failed to connect to server');
 /// ```
 class AvoidGenericExceptionsRule extends SaropaLintRule {
-  const AvoidGenericExceptionsRule() : super(code: _code);
+  AvoidGenericExceptionsRule() : super(code: _code);
 
   /// Significant issue. Address when count exceeds 10.
   @override
@@ -299,27 +226,25 @@ class AvoidGenericExceptionsRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_generic_exceptions',
-    problemMessage:
-        '[avoid_generic_exceptions] Generic Exception thrown instead of a specific error type. This prevents callers from distinguishing between different failure modes, forces broad catch-all blocks, and makes error traceability across services impossible. Specific exception types enable targeted recovery and clearer crash reports. {v4}',
+    'avoid_generic_exceptions',
+    '[avoid_generic_exceptions] Generic Exception thrown instead of a specific error type. This prevents callers from distinguishing between different failure modes, forces broad catch-all blocks, and makes error traceability across services impossible. Specific exception types enable targeted recovery and clearer crash reports. {v4}',
     correctionMessage:
         'Create and throw a specific exception type for each error case. Example: throw UserNotFoundException(userId) instead of throw Exception("not found").',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addThrowExpression((ThrowExpression node) {
+    context.addThrowExpression((ThrowExpression node) {
       final Expression thrown = node.expression;
 
       if (thrown is InstanceCreationExpression) {
         final String? typeName = thrown.constructorName.type.element?.name;
         if (typeName == 'Exception' || typeName == 'Error') {
-          reporter.atNode(thrown, code);
+          reporter.atNode(thrown);
         }
       }
     });
@@ -344,7 +269,7 @@ class AvoidGenericExceptionsRule extends SaropaLintRule {
 /// throw Exception('Failed to load user $userId: $reason');
 /// ```
 class RequireErrorContextRule extends SaropaLintRule {
-  const RequireErrorContextRule() : super(code: _code);
+  RequireErrorContextRule() : super(code: _code);
 
   /// Significant issue. Address when count exceeds 10.
   @override
@@ -354,29 +279,27 @@ class RequireErrorContextRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'require_error_context',
-    problemMessage:
-        '[require_error_context] Error message is missing contextual details such as entity IDs, operation names, or relevant state. Without this context, production crash reports and logs become impossible to correlate with specific user actions, and debugging requires reproducing the exact conditions that caused the failure. {v5}',
+    'require_error_context',
+    '[require_error_context] Error message is missing contextual details such as entity IDs, operation names, or relevant state. Without this context, production crash reports and logs become impossible to correlate with specific user actions, and debugging requires reproducing the exact conditions that caused the failure. {v5}',
     correctionMessage:
         'Include relevant context in error messages such as IDs, state, or operation details. Example: throw Exception("Failed to load user \$userId: \$reason").',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   static const int _minMessageLength = 20;
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addThrowExpression((ThrowExpression node) {
+    context.addThrowExpression((ThrowExpression node) {
       final Expression thrown = node.expression;
 
       if (thrown is InstanceCreationExpression) {
         // Check first argument (usually the message)
         if (thrown.argumentList.arguments.isEmpty) {
-          reporter.atNode(thrown, code);
+          reporter.atNode(thrown);
           return;
         }
 
@@ -384,7 +307,7 @@ class RequireErrorContextRule extends SaropaLintRule {
         if (firstArg is SimpleStringLiteral) {
           // Check if message is too short
           if (firstArg.value.length < _minMessageLength) {
-            reporter.atNode(thrown, code);
+            reporter.atNode(thrown);
           }
         }
       }
@@ -422,7 +345,7 @@ class RequireErrorContextRule extends SaropaLintRule {
 /// }
 /// ```
 class PreferResultPatternRule extends SaropaLintRule {
-  const PreferResultPatternRule() : super(code: _code);
+  PreferResultPatternRule() : super(code: _code);
 
   /// Significant issue. Address when count exceeds 10.
   @override
@@ -432,25 +355,23 @@ class PreferResultPatternRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'prefer_result_pattern',
-    problemMessage:
-        '[prefer_result_pattern] Throwing exceptions for recoverable errors like validation failures forces try-catch blocks at every call site and obscures control flow. This makes error handling inconsistent, increases boilerplate, and causes callers to miss failure cases entirely when they forget to add try-catch. {v5}',
+    'prefer_result_pattern',
+    '[prefer_result_pattern] Throwing exceptions for recoverable errors like validation failures forces try-catch blocks at every call site and obscures control flow. This makes error handling inconsistent, increases boilerplate, and causes callers to miss failure cases entirely when they forget to add try-catch. {v5}',
     correctionMessage:
         'Return Result<T, E> or a sealed class for recoverable errors instead of throwing exceptions. Example: return Result.error(ValidationError("invalid email")).',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addFunctionDeclaration((FunctionDeclaration node) {
+    context.addFunctionDeclaration((FunctionDeclaration node) {
       _checkForExpectedThrows(node.functionExpression.body, node, reporter);
     });
 
-    context.registry.addMethodDeclaration((MethodDeclaration node) {
+    context.addMethodDeclaration((MethodDeclaration node) {
       _checkForExpectedThrows(node.body, node, reporter);
     });
   }
@@ -466,7 +387,7 @@ class PreferResultPatternRule extends SaropaLintRule {
 
     // If function has multiple throws, suggest Result pattern
     if (throwCount >= 2) {
-      reporter.atNode(reportNode, code);
+      reporter.atNode(reportNode);
     }
   }
 }
@@ -510,7 +431,7 @@ class _ThrowCountVisitor extends RecursiveAstVisitor<void> {
 /// }
 /// ```
 class RequireAsyncErrorDocumentationRule extends SaropaLintRule {
-  const RequireAsyncErrorDocumentationRule() : super(code: _code);
+  RequireAsyncErrorDocumentationRule() : super(code: _code);
 
   /// Significant issue. Address when count exceeds 10.
   @override
@@ -520,21 +441,19 @@ class RequireAsyncErrorDocumentationRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'require_async_error_documentation',
-    problemMessage:
-        '[require_async_error_documentation] Async function with await expressions does not document thrown exceptions or handle errors internally. Unhandled async errors propagate as uncaught Future failures that can crash the app, produce silent data loss, or leave the UI in an inconsistent state with no recovery path. {v5}',
+    'require_async_error_documentation',
+    '[require_async_error_documentation] Async function with await expressions does not document thrown exceptions or handle errors internally. Unhandled async errors propagate as uncaught Future failures that can crash the app, produce silent data loss, or leave the UI in an inconsistent state with no recovery path. {v5}',
     correctionMessage:
         'Add try-catch to handle errors, or document thrown exceptions with /// Throws [ExceptionType]. Example: /// Throws [NetworkException] if the request fails.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodDeclaration((MethodDeclaration node) {
+    context.addMethodDeclaration((MethodDeclaration node) {
       if (!node.body.isAsynchronous) return;
 
       // Check if has await expressions
@@ -560,7 +479,7 @@ class RequireAsyncErrorDocumentationRule extends SaropaLintRule {
         }
       }
 
-      reporter.atNode(node, code);
+      reporter.atNode(node);
     });
   }
 }
@@ -624,7 +543,7 @@ class _AsyncAnalysisVisitor extends RecursiveAstVisitor<void> {
 /// }
 /// ```
 class AvoidNestedTryStatementsRule extends SaropaLintRule {
-  const AvoidNestedTryStatementsRule() : super(code: _code);
+  AvoidNestedTryStatementsRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.low;
@@ -633,26 +552,24 @@ class AvoidNestedTryStatementsRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_nested_try_statements',
-    problemMessage:
-        '[avoid_nested_try_statements] Nested try statements found. Deeply nested error handling is hard to read and maintain. Nested try-catch blocks make code harder to read and maintain. Extract nested logic into separate functions. {v2}',
+    'avoid_nested_try_statements',
+    '[avoid_nested_try_statements] Nested try statements found. Deeply nested error handling is hard to read and maintain. Nested try-catch blocks make code harder to read and maintain. Extract nested logic into separate functions. {v2}',
     correctionMessage:
         'Extract inner try-catch into a separate function or refactor to flatten error handling. Example: move inner try to a helper method.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addTryStatement((TryStatement node) {
+    context.addTryStatement((TryStatement node) {
       // Check if this try is nested inside another try
       AstNode? parent = node.parent;
       while (parent != null) {
         if (parent is TryStatement) {
-          reporter.atNode(node, code);
+          reporter.atNode(node);
           return;
         }
         // Stop at function/method boundaries
@@ -688,7 +605,7 @@ class AvoidNestedTryStatementsRule extends SaropaLintRule {
 /// )
 /// ```
 class RequireErrorBoundaryRule extends SaropaLintRule {
-  const RequireErrorBoundaryRule() : super(code: _code);
+  RequireErrorBoundaryRule() : super(code: _code);
 
   /// Significant issue. Address when count exceeds 10.
   @override
@@ -698,23 +615,19 @@ class RequireErrorBoundaryRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'require_error_boundary',
-    problemMessage:
-        '[require_error_boundary] Top-level MaterialApp or CupertinoApp is missing an error boundary in its build tree. Without a dedicated error handler, uncaught exceptions will crash the entire application, leaving users with a blank or frozen screen and no recovery path. All production apps must provide a visible fallback UI for unexpected errors. {v2}',
+    'require_error_boundary',
+    '[require_error_boundary] Top-level MaterialApp or CupertinoApp is missing an error boundary in its build tree. Without a dedicated error handler, uncaught exceptions will crash the entire application, leaving users with a blank or frozen screen and no recovery path. All production apps must provide a visible fallback UI for unexpected errors. {v2}',
     correctionMessage:
         'Add a builder parameter to your MaterialApp or CupertinoApp that wraps the child tree in an ErrorBoundary. Example: builder: (context, child) => ErrorBoundary(child: child!).',
-    errorSeverity: DiagnosticSeverity.ERROR,
+    severity: DiagnosticSeverity.ERROR,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addInstanceCreationExpression((
-      InstanceCreationExpression node,
-    ) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final String? constructorName = node.constructorName.type.element?.name;
       if (constructorName != 'MaterialApp' &&
           constructorName != 'CupertinoApp') {
@@ -820,7 +733,7 @@ class RequireErrorBoundaryRule extends SaropaLintRule {
 /// - Add `.catchError()` with `debugPrint`
 /// - Add `// ignore:` comment
 class AvoidUncaughtFutureErrorsRule extends SaropaLintRule {
-  const AvoidUncaughtFutureErrorsRule() : super(code: _code);
+  AvoidUncaughtFutureErrorsRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.high;
@@ -829,12 +742,11 @@ class AvoidUncaughtFutureErrorsRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_uncaught_future_errors',
-    problemMessage:
-        '[avoid_uncaught_future_errors] Fire-and-forget Future called without error handling. Any exception thrown by this Future is silently lost or crashes the app via the global error handler. Without .catchError(), try-catch, or .ignore(), async failures become invisible in production and extremely difficult to diagnose from crash logs. {v5}',
+    'avoid_uncaught_future_errors',
+    '[avoid_uncaught_future_errors] Fire-and-forget Future called without error handling. Any exception thrown by this Future is silently lost or crashes the app via the global error handler. Without .catchError(), try-catch, or .ignore(), async failures become invisible in production and extremely difficult to diagnose from crash logs. {v5}',
     correctionMessage:
         'Add try-catch inside the async function, chain .catchError() at the call site, or use .ignore() to explicitly acknowledge fire-and-forget. Example: loadData().catchError((e) => log(e));',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   /// Methods that are safe to call without awaiting or catching errors.
@@ -869,20 +781,19 @@ class AvoidUncaughtFutureErrorsRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
     // Collect all functions/methods with try-catch in their body.
     // CompilationUnit is visited first in pre-order traversal, so this
     // callback fires BEFORE addExpressionStatement callbacks.
     final Set<String> functionsWithTryCatch = <String>{};
 
-    context.registry.addCompilationUnit((CompilationUnit unit) {
+    context.addCompilationUnit((CompilationUnit unit) {
       _collectFunctionsWithTryCatch(unit, functionsWithTryCatch);
     });
 
-    context.registry.addExpressionStatement((ExpressionStatement node) {
+    context.addExpressionStatement((ExpressionStatement node) {
       final Expression expression = node.expression;
 
       // Only check for fire-and-forget Future calls (unawaited futures)
@@ -914,7 +825,7 @@ class AvoidUncaughtFutureErrorsRule extends SaropaLintRule {
 
           // Check if it has error handling (.catchError, .then(onError:), unawaited)
           if (!_hasErrorHandling(expression)) {
-            reporter.atNode(expression, code);
+            reporter.atNode(expression);
           }
         }
       }
@@ -922,10 +833,7 @@ class AvoidUncaughtFutureErrorsRule extends SaropaLintRule {
   }
 
   /// Collects all function and method names that have try-catch in their body.
-  void _collectFunctionsWithTryCatch(
-    CompilationUnit unit,
-    Set<String> result,
-  ) {
+  void _collectFunctionsWithTryCatch(CompilationUnit unit, Set<String> result) {
     for (final CompilationUnitMember declaration in unit.declarations) {
       if (declaration is FunctionDeclaration) {
         if (_bodyHasTryCatch(declaration.functionExpression.body)) {
@@ -1032,93 +940,6 @@ class AvoidUncaughtFutureErrorsRule extends SaropaLintRule {
     }
     return false;
   }
-
-  @override
-  List<Fix> getFixes() => <Fix>[
-        _AddCatchErrorToFutureFix(),
-        _AddIgnoreCommentForUncaughtFutureFix(),
-      ];
-}
-
-class _AddCatchErrorToFutureFix extends DartFix {
-  @override
-  void run(
-    CustomLintResolver resolver,
-    ChangeReporter reporter,
-    CustomLintContext context,
-    AnalysisError analysisError,
-    List<AnalysisError> others,
-  ) {
-    context.registry.addExpressionStatement((ExpressionStatement node) {
-      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
-
-      final Expression expr = node.expression;
-      if (expr is! MethodInvocation) return;
-
-      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
-        message: "Add .catchError() handler",
-        priority: 1,
-      );
-
-      changeBuilder.addDartFileEdit((builder) {
-        // Insert .catchError() before the semicolon
-        builder.addSimpleInsertion(
-          expr.end,
-          ".catchError((Object e, StackTrace s) {\n"
-          "      debugPrint('\$e\\n\$s');\n"
-          "    })",
-        );
-      });
-    });
-  }
-}
-
-class _AddIgnoreCommentForUncaughtFutureFix extends DartFix {
-  @override
-  void run(
-    CustomLintResolver resolver,
-    ChangeReporter reporter,
-    CustomLintContext context,
-    AnalysisError analysisError,
-    List<AnalysisError> others,
-  ) {
-    context.registry.addExpressionStatement((ExpressionStatement node) {
-      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
-
-      final Expression expr = node.expression;
-      if (expr is! MethodInvocation) return;
-
-      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
-        message: 'Add // ignore: comment',
-        priority: 2,
-      );
-
-      changeBuilder.addDartFileEdit((builder) {
-        // Find the line start to insert the comment before the statement
-        final lineInfo = resolver.lineInfo;
-        final lineNumber = lineInfo.getLocation(node.offset).lineNumber;
-        final lineStart = lineInfo.getOffsetOfLine(lineNumber - 1);
-
-        // Get the indentation of the current line
-        final source = resolver.source.contents.data;
-        var indent = '';
-        for (int i = lineStart; i < node.offset; i++) {
-          final char = source[i];
-          if (char == ' ' || char == '\t') {
-            indent += char;
-          } else {
-            break;
-          }
-        }
-
-        builder.addSimpleInsertion(
-          lineStart,
-          '$indent// ignore: avoid_uncaught_future_errors, '
-          'method handles errors internally\n',
-        );
-      });
-    });
-  }
 }
 
 /// Warns when print() is used for error logging in catch blocks.
@@ -1150,7 +971,7 @@ class _AddIgnoreCommentForUncaughtFutureFix extends DartFix {
 /// }
 /// ```
 class AvoidPrintErrorRule extends SaropaLintRule {
-  const AvoidPrintErrorRule() : super(code: _code);
+  AvoidPrintErrorRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.high;
@@ -1159,21 +980,19 @@ class AvoidPrintErrorRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_print_error',
-    problemMessage:
-        '[avoid_print_error] Using print() for error logging in a catch block. In production, print() output is not captured by crash reporting services like Crashlytics or Sentry, making errors invisible to monitoring dashboards. Errors logged only via print() are effectively lost and cannot trigger alerts or be tracked over time. {v2}',
+    'avoid_print_error',
+    '[avoid_print_error] Using print() for error logging in a catch block. In production, print() output is not captured by crash reporting services like Crashlytics or Sentry, making errors invisible to monitoring dashboards. Errors logged only via print() are effectively lost and cannot trigger alerts or be tracked over time. {v2}',
     correctionMessage:
         'Use a structured logging framework like logger, Crashlytics, or Sentry to capture errors with full stack traces. Example: logger.e("Fetch failed", error: e, stackTrace: st);',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addCatchClause((CatchClause node) {
+    context.addCatchClause((CatchClause node) {
       final CatchClauseParameter? exceptionParam = node.exceptionParameter;
       if (exceptionParam == null) return;
 
@@ -1184,7 +1003,7 @@ class AvoidPrintErrorRule extends SaropaLintRule {
         _PrintErrorVisitor(
           exceptionName: exceptionName,
           onPrintError: (AstNode printNode) {
-            reporter.atNode(printNode, code);
+            reporter.atNode(printNode);
           },
         ),
       );
@@ -1193,10 +1012,7 @@ class AvoidPrintErrorRule extends SaropaLintRule {
 }
 
 class _PrintErrorVisitor extends RecursiveAstVisitor<void> {
-  _PrintErrorVisitor({
-    required this.exceptionName,
-    required this.onPrintError,
-  });
+  _PrintErrorVisitor({required this.exceptionName, required this.onPrintError});
 
   final String exceptionName;
   final void Function(AstNode) onPrintError;
@@ -1300,7 +1116,7 @@ class _PrintErrorVisitor extends RecursiveAstVisitor<void> {
 ///
 /// **Quick fix available:** Adds `on Object` before bare catch.
 class AvoidCatchAllRule extends SaropaLintRule {
-  const AvoidCatchAllRule() : super(code: _code);
+  AvoidCatchAllRule() : super(code: _code);
 
   /// Significant issue. Address when count exceeds 10.
   @override
@@ -1310,58 +1126,25 @@ class AvoidCatchAllRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_catch_all',
-    problemMessage:
-        '[avoid_catch_all] Bare catch clause without an on-type hides the specific error type being caught and silently swallows critical failures like OutOfMemoryError and StackOverflowError. This can mask fatal programming bugs, making them impossible to detect in crash reports or monitoring systems. {v3}',
+    'avoid_catch_all',
+    '[avoid_catch_all] Bare catch clause without an on-type hides the specific error type being caught and silently swallows critical failures like OutOfMemoryError and StackOverflowError. This can mask fatal programming bugs, making them impossible to detect in crash reports or monitoring systems. {v3}',
     correctionMessage:
         'Use "on Object catch (e, st)" for comprehensive error handling, or catch specific types like HttpException. Example: on Object catch (e, st) { logger.error(e, st); }',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addCatchClause((CatchClause node) {
+    context.addCatchClause((CatchClause node) {
       final TypeAnnotation? exceptionType = node.exceptionType;
 
       if (exceptionType == null) {
         // catch (e) without type - implicit catch-all, may be accidental
-        reporter.atNode(node, _code);
+        reporter.atNode(node);
       }
-    });
-  }
-
-  @override
-  List<Fix> getFixes() => <Fix>[_AddOnObjectToBareCatchFix()];
-}
-
-class _AddOnObjectToBareCatchFix extends DartFix {
-  @override
-  void run(
-    CustomLintResolver resolver,
-    ChangeReporter reporter,
-    CustomLintContext context,
-    AnalysisError analysisError,
-    List<AnalysisError> others,
-  ) {
-    context.registry.addCatchClause((CatchClause node) {
-      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
-      if (node.exceptionType != null) return;
-
-      final Token? catchKeyword = node.catchKeyword;
-      if (catchKeyword == null) return;
-
-      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
-        message: 'Add "on Object" for comprehensive error handling',
-        priority: 1,
-      );
-
-      changeBuilder.addDartFileEdit((builder) {
-        builder.addSimpleInsertion(catchKeyword.offset, 'on Object ');
-      });
     });
   }
 }
@@ -1424,7 +1207,7 @@ class _AddOnObjectToBareCatchFix extends DartFix {
 ///
 /// **Quick fix available:** Changes `Exception` to `Object`.
 class AvoidCatchExceptionAloneRule extends SaropaLintRule {
-  const AvoidCatchExceptionAloneRule() : super(code: _code);
+  AvoidCatchExceptionAloneRule() : super(code: _code);
 
   /// Significant issue. Address when count exceeds 10.
   @override
@@ -1434,21 +1217,19 @@ class AvoidCatchExceptionAloneRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_catch_exception_alone',
-    problemMessage:
-        '[avoid_catch_exception_alone] Using "on Exception catch" without an "on Object catch" fallback silently misses all Error types including StateError, TypeError, and RangeError. These programming errors will crash the app without being logged or reported, making production debugging extremely difficult. {v2}',
+    'avoid_catch_exception_alone',
+    '[avoid_catch_exception_alone] Using "on Exception catch" without an "on Object catch" fallback silently misses all Error types including StateError, TypeError, and RangeError. These programming errors will crash the app without being logged or reported, making production debugging extremely difficult. {v2}',
     correctionMessage:
         'Use "on Object catch" to catch all throwables, or add an "on Object catch" fallback after your Exception handler. Example: on Object catch (e, st) { logger.error(e, st); }',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addCatchClause((CatchClause node) {
+    context.addCatchClause((CatchClause node) {
       final TypeAnnotation? exceptionType = node.exceptionType;
       if (exceptionType == null) {
         return; // Bare catch handled by AvoidCatchAllRule
@@ -1460,7 +1241,7 @@ class AvoidCatchExceptionAloneRule extends SaropaLintRule {
         if (typeName == 'Exception') {
           // Check if there's a fallback catch-all in the same try statement
           if (!_hasObjectCatchFallback(node)) {
-            reporter.atNode(node, _code);
+            reporter.atNode(node);
           }
         }
       }
@@ -1488,40 +1269,6 @@ class AvoidCatchExceptionAloneRule extends SaropaLintRule {
       }
     }
     return false;
-  }
-
-  @override
-  List<Fix> getFixes() => <Fix>[_ChangeExceptionToObjectFix()];
-}
-
-class _ChangeExceptionToObjectFix extends DartFix {
-  @override
-  void run(
-    CustomLintResolver resolver,
-    ChangeReporter reporter,
-    CustomLintContext context,
-    AnalysisError analysisError,
-    List<AnalysisError> others,
-  ) {
-    context.registry.addCatchClause((CatchClause node) {
-      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
-
-      final TypeAnnotation? exceptionType = node.exceptionType;
-      if (exceptionType is! NamedType) return;
-      if (exceptionType.name2.lexeme != 'Exception') return;
-
-      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
-        message: 'Change to "on Object" to catch Error types too',
-        priority: 1,
-      );
-
-      changeBuilder.addDartFileEdit((builder) {
-        builder.addSimpleReplacement(
-          exceptionType.sourceRange,
-          'Object',
-        );
-      });
-    });
   }
 }
 
@@ -1563,7 +1310,7 @@ class _ChangeExceptionToObjectFix extends DartFix {
 /// }
 /// ```
 class AvoidExceptionInConstructorRule extends SaropaLintRule {
-  const AvoidExceptionInConstructorRule() : super(code: _code);
+  AvoidExceptionInConstructorRule() : super(code: _code);
 
   /// Exceptions in constructors are hard to handle properly.
   @override
@@ -1573,28 +1320,26 @@ class AvoidExceptionInConstructorRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_exception_in_constructor',
-    problemMessage:
-        '[avoid_exception_in_constructor] Throwing in a constructor creates a partially constructed object that can leak resources and leave dependent fields uninitialized. Callers cannot easily recover because the constructor has already failed midway through initialization. {v3}',
+    'avoid_exception_in_constructor',
+    '[avoid_exception_in_constructor] Throwing in a constructor creates a partially constructed object that can leak resources and leave dependent fields uninitialized. Callers cannot easily recover because the constructor has already failed midway through initialization. {v3}',
     correctionMessage:
         'Use a factory constructor, static tryCreate() method, or return null for invalid input. Example: static User? tryCreate(String email) { if (!valid) return null; }',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addThrowExpression((ThrowExpression node) {
+    context.addThrowExpression((ThrowExpression node) {
       // Check if inside a constructor
       AstNode? current = node.parent;
       while (current != null) {
         if (current is ConstructorDeclaration) {
           // Allow in factory constructors
           if (current.factoryKeyword != null) return;
-          reporter.atNode(node, code);
+          reporter.atNode(node);
           return;
         }
         // Stop at method/function boundary
@@ -1605,38 +1350,9 @@ class AvoidExceptionInConstructorRule extends SaropaLintRule {
       }
     });
   }
-
-  @override
-  List<Fix> getFixes() => <Fix>[_AddHackCommentForConstructorThrowFix()];
 }
 
 /// Quick fix: Adds a `HACK` comment suggesting factory constructor conversion.
-class _AddHackCommentForConstructorThrowFix extends DartFix {
-  @override
-  void run(
-    CustomLintResolver resolver,
-    ChangeReporter reporter,
-    CustomLintContext context,
-    AnalysisError analysisError,
-    List<AnalysisError> others,
-  ) {
-    context.registry.addThrowExpression((ThrowExpression node) {
-      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
-
-      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
-        message: 'Add HACK comment for factory conversion',
-        priority: 2,
-      );
-
-      changeBuilder.addDartFileEdit((builder) {
-        builder.addSimpleInsertion(
-          node.offset,
-          '// HACK: Move validation to factory constructor or static method\n      ',
-        );
-      });
-    });
-  }
-}
 
 /// Warns when cache keys use non-deterministic values.
 ///
@@ -1661,7 +1377,7 @@ class _AddHackCommentForConstructorThrowFix extends DartFix {
 ///
 /// **Quick fix available:** Adds a `HACK` comment for manual key review.
 class RequireCacheKeyDeterminismRule extends SaropaLintRule {
-  const RequireCacheKeyDeterminismRule() : super(code: _code);
+  RequireCacheKeyDeterminismRule() : super(code: _code);
 
   /// Non-deterministic cache keys cause cache misses and memory bloat.
   @override
@@ -1671,12 +1387,11 @@ class RequireCacheKeyDeterminismRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'require_cache_key_determinism',
-    problemMessage:
-        '[require_cache_key_determinism] Cache key uses non-deterministic values (e.g., DateTime.now, Random, hashCode, or UUID). This causes cache misses, duplicated resources, and unpredictable behavior. Cache keys must uniquely and consistently identify the same resource for the same input. Using unstable values breaks cache integrity and wastes memory. {v4}',
+    'require_cache_key_determinism',
+    '[require_cache_key_determinism] Cache key uses non-deterministic values (e.g., DateTime.now, Random, hashCode, or UUID). This causes cache misses, duplicated resources, and unpredictable behavior. Cache keys must uniquely and consistently identify the same resource for the same input. Using unstable values breaks cache integrity and wastes memory. {v4}',
     correctionMessage:
         'Construct cache keys only from stable, deterministic values such as unique IDs, query parameters, or content hashes. Never use timestamps, random numbers, or object hashCodes. Example: cacheKey = "user_\$userId" or hash(queryParams).',
-    errorSeverity: DiagnosticSeverity.ERROR,
+    severity: DiagnosticSeverity.ERROR,
   );
 
   /// Regex patterns that indicate non-deterministic values.
@@ -1687,10 +1402,8 @@ class RequireCacheKeyDeterminismRule extends SaropaLintRule {
     RegExp(r'DateTime\.now\b'), // DateTime.now() or DateTime.now(
     RegExp(r'\bRandom\s*\('), // Random() or Random(seed)
     RegExp(r'\bidentityHashCode\s*\('), // identityHashCode(obj)
-
     // Property access .hashCode - must have dot prefix to avoid myHashCode
     RegExp(r'\.hashCode\b'), // obj.hashCode but not myHashCode
-
     // Uuid patterns - constructor or static methods only
     RegExp(r'\bUuid\s*\('), // Uuid() constructor
     RegExp(r'\bUuid\.v[1-8]\b'), // Uuid.v1(), Uuid.v4(), etc.
@@ -1783,12 +1496,11 @@ class RequireCacheKeyDeterminismRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
     // Check 1: Variables ending with 'key'
-    context.registry.addVariableDeclaration((VariableDeclaration node) {
+    context.addVariableDeclaration((VariableDeclaration node) {
       final String varName = node.name.lexeme.toLowerCase();
 
       // Only check variables that end with 'key' - this avoids false positives like
@@ -1809,7 +1521,7 @@ class RequireCacheKeyDeterminismRule extends SaropaLintRule {
     });
 
     // Check 2: API-based detection - monitor calls to known caching methods
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       final String methodName = node.methodName.name;
 
       // Skip if not a known caching method
@@ -1826,15 +1538,21 @@ class RequireCacheKeyDeterminismRule extends SaropaLintRule {
 
       // Check if key contains non-deterministic values
       if (_containsNonDeterministicValue(keyArg)) {
-        reporter.atNode(keyArg, code);
+        reporter.atNode(keyArg);
       }
     });
   }
 
   /// Returns true for generic method names that need receiver context validation.
   bool _isGenericMethodName(String methodName) {
-    return const <String>{'get', 'put', 'delete', 'read', 'write', 'remove'}
-        .contains(methodName);
+    return const <String>{
+      'get',
+      'put',
+      'delete',
+      'read',
+      'write',
+      'remove',
+    }.contains(methodName);
   }
 
   /// Checks if the method receiver suggests a caching context.
@@ -1890,7 +1608,7 @@ class RequireCacheKeyDeterminismRule extends SaropaLintRule {
 
     // For other expressions, check the whole source
     if (_containsNonDeterministicValue(expression)) {
-      reporter.atNode(reportNode, code);
+      reporter.atNode(reportNode);
     }
   }
 
@@ -1907,13 +1625,13 @@ class RequireCacheKeyDeterminismRule extends SaropaLintRule {
         if (_debugOnlyParameters.contains(paramName)) continue;
         if (_metadataParameters.contains(paramName)) continue;
         if (_containsNonDeterministicValue(arg.expression)) {
-          reporter.atNode(arg, code);
+          reporter.atNode(arg);
           return;
         }
       } else {
         // Positional argument
         if (_containsNonDeterministicValue(arg)) {
-          reporter.atNode(arg, code);
+          reporter.atNode(arg);
           return;
         }
       }
@@ -1929,54 +1647,6 @@ class RequireCacheKeyDeterminismRule extends SaropaLintRule {
       }
     }
     return false;
-  }
-
-  @override
-  List<Fix> getFixes() =>
-      <Fix>[_AddHackCommentForNonDeterministicCacheKeyFix()];
-}
-
-class _AddHackCommentForNonDeterministicCacheKeyFix extends DartFix {
-  @override
-  void run(
-    CustomLintResolver resolver,
-    ChangeReporter reporter,
-    CustomLintContext context,
-    AnalysisError analysisError,
-    List<AnalysisError> others,
-  ) {
-    context.registry.addVariableDeclaration((VariableDeclaration node) {
-      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
-
-      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
-        message: 'Add HACK comment for cache key review',
-        priority: 2,
-      );
-
-      changeBuilder.addDartFileEdit((builder) {
-        builder.addSimpleInsertion(
-          node.offset,
-          '// HACK: Replace non-deterministic value with stable identifier (e.g., userId, itemId)\n    ',
-        );
-      });
-    });
-
-    // Also handle method invocation arguments (API-based detection)
-    context.registry.addMethodInvocation((MethodInvocation node) {
-      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
-
-      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
-        message: 'Add HACK comment for cache key review',
-        priority: 2,
-      );
-
-      changeBuilder.addDartFileEdit((builder) {
-        builder.addSimpleInsertion(
-          node.offset,
-          '// HACK: Cache key may be non-deterministic - use stable identifier\n    ',
-        );
-      });
-    });
   }
 }
 
@@ -2005,7 +1675,7 @@ class _AddHackCommentForNonDeterministicCacheKeyFix extends DartFix {
 /// }
 /// ```
 class RequirePermissionPermanentDenialHandlingRule extends SaropaLintRule {
-  const RequirePermissionPermanentDenialHandlingRule() : super(code: _code);
+  RequirePermissionPermanentDenialHandlingRule() : super(code: _code);
 
   /// Users stuck on permission denied screen is poor UX.
   @override
@@ -2015,21 +1685,19 @@ class RequirePermissionPermanentDenialHandlingRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'require_permission_permanent_denial_handling',
-    problemMessage:
-        '[require_permission_permanent_denial_handling] Permission request does not handle permanent denial. Users who permanently deny a permission are stuck with no way to re-enable it from within the app, causing frustration and feature abandonment. {v3}',
+    'require_permission_permanent_denial_handling',
+    '[require_permission_permanent_denial_handling] Permission request does not handle permanent denial. Users who permanently deny a permission are stuck with no way to re-enable it from within the app, causing frustration and feature abandonment. {v3}',
     correctionMessage:
         'Check isPermanentlyDenied and call openAppSettings() to guide users to re-enable the permission. Example: if (status.isPermanentlyDenied) await openAppSettings();',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       if (node.methodName.name != 'request') return;
 
       // Check if it's a Permission.X.request() call
@@ -2056,7 +1724,7 @@ class RequirePermissionPermanentDenialHandlingRule extends SaropaLintRule {
       final String bodySource = enclosingBody.toSource();
       if (!bodySource.contains('isPermanentlyDenied') &&
           !bodySource.contains('openAppSettings')) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
   }
@@ -2093,7 +1761,7 @@ class RequirePermissionPermanentDenialHandlingRule extends SaropaLintRule {
 /// }
 /// ```
 class RequireNotificationActionHandlingRule extends SaropaLintRule {
-  const RequireNotificationActionHandlingRule() : super(code: _code);
+  RequireNotificationActionHandlingRule() : super(code: _code);
 
   /// Broken notification actions frustrate users.
   @override
@@ -2103,23 +1771,19 @@ class RequireNotificationActionHandlingRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'require_notification_action_handling',
-    problemMessage:
-        '[require_notification_action_handling] Notification with action buttons lacks an onDidReceiveNotificationResponse handler. Users who tap notification action buttons will see no response, breaking the expected interaction flow and frustrating users who may abandon the feature or uninstall the app entirely. {v2}',
+    'require_notification_action_handling',
+    '[require_notification_action_handling] Notification with action buttons lacks an onDidReceiveNotificationResponse handler. Users who tap notification action buttons will see no response, breaking the expected interaction flow and frustrating users who may abandon the feature or uninstall the app entirely. {v2}',
     correctionMessage:
         'Add onDidReceiveNotificationResponse to handle each action ID. Example: onDidReceiveNotificationResponse: (details) { if (details.actionId == "reply") handleReply(); }',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addInstanceCreationExpression((
-      InstanceCreationExpression node,
-    ) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final String typeName = node.constructorName.type.name.lexeme;
       if (typeName != 'AndroidNotificationDetails' &&
           typeName != 'DarwinNotificationDetails') {
@@ -2140,7 +1804,7 @@ class RequireNotificationActionHandlingRule extends SaropaLintRule {
       if (hasActions) {
         // Check if there's a handler in the file
         // This is a simple heuristic - flag to remind developers
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
   }
@@ -2177,7 +1841,7 @@ class RequireNotificationActionHandlingRule extends SaropaLintRule {
 /// }
 /// ```
 class RequireFinallyCleanupRule extends SaropaLintRule {
-  const RequireFinallyCleanupRule() : super(code: _code);
+  RequireFinallyCleanupRule() : super(code: _code);
 
   /// Resource leaks from missed cleanup.
   @override
@@ -2187,12 +1851,11 @@ class RequireFinallyCleanupRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'require_finally_cleanup',
-    problemMessage:
-        '[require_finally_cleanup] Cleanup code such as close(), dispose(), or cancel() is placed in a catch block instead of a finally block. This means cleanup only runs when an exception occurs, causing resource leaks of file handles, database connections, or stream subscriptions during normal execution when no error is thrown. {v2}',
+    'require_finally_cleanup',
+    '[require_finally_cleanup] Cleanup code such as close(), dispose(), or cancel() is placed in a catch block instead of a finally block. This means cleanup only runs when an exception occurs, causing resource leaks of file handles, database connections, or stream subscriptions during normal execution when no error is thrown. {v2}',
     correctionMessage:
         'Move cleanup code to a finally block to guarantee it always runs regardless of success or failure. Example: try { file = open(); } finally { file?.close(); }',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   /// Methods that suggest cleanup operations.
@@ -2209,11 +1872,10 @@ class RequireFinallyCleanupRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addTryStatement((TryStatement node) {
+    context.addTryStatement((TryStatement node) {
       // Skip if already has finally
       if (node.finallyBlock != null) return;
 
@@ -2223,7 +1885,7 @@ class RequireFinallyCleanupRule extends SaropaLintRule {
         for (final String method in _cleanupMethods) {
           if (catchSource.contains('.$method(') ||
               catchSource.contains('.$method;')) {
-            reporter.atNode(catchClause, code);
+            reporter.atNode(catchClause);
             return;
           }
         }
@@ -2271,7 +1933,7 @@ class RequireFinallyCleanupRule extends SaropaLintRule {
 ///
 /// **Quick fix available:** Adds a debugPrint statement for the error.
 class RequireErrorLoggingRule extends SaropaLintRule {
-  const RequireErrorLoggingRule() : super(code: _code);
+  RequireErrorLoggingRule() : super(code: _code);
 
   /// Unlogged errors make debugging production issues nearly impossible.
   @override
@@ -2281,12 +1943,11 @@ class RequireErrorLoggingRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'require_error_logging',
-    problemMessage:
-        '[require_error_logging] Caught error is not logged to any logging framework or crash reporting service. Silent catch blocks make production debugging impossible because errors leave no trace in logs, crash reports, or monitoring dashboards. Without logging, you cannot detect, alert on, or diagnose failures reported by users. {v2}',
+    'require_error_logging',
+    '[require_error_logging] Caught error is not logged to any logging framework or crash reporting service. Silent catch blocks make production debugging impossible because errors leave no trace in logs, crash reports, or monitoring dashboards. Without logging, you cannot detect, alert on, or diagnose failures reported by users. {v2}',
     correctionMessage:
         'Log the error using a structured logger, debugPrint, or a crash reporting service like Crashlytics. Example: logger.error("Fetch failed", error: e, stackTrace: st);',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   /// Method/function names that indicate logging is happening.
@@ -2350,11 +2011,10 @@ class RequireErrorLoggingRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addCatchClause((CatchClause node) {
+    context.addCatchClause((CatchClause node) {
       final Block body = node.body;
 
       // Skip empty catch blocks - handled by AvoidSwallowingExceptionsRule
@@ -2364,13 +2024,13 @@ class RequireErrorLoggingRule extends SaropaLintRule {
       final CatchClauseParameter? exceptionParam = node.exceptionParameter;
       if (exceptionParam == null) {
         // No exception variable captured - can't log it
-        reporter.atNode(node, code);
+        reporter.atNode(node);
         return;
       }
 
       // Check if any logging method is called in the catch body
       if (!_hasLoggingCall(body)) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
   }
@@ -2405,47 +2065,6 @@ class RequireErrorLoggingRule extends SaropaLintRule {
     }
 
     return false;
-  }
-
-  @override
-  List<Fix> getFixes() => <Fix>[_AddDebugPrintForErrorFix()];
-}
-
-class _AddDebugPrintForErrorFix extends DartFix {
-  @override
-  void run(
-    CustomLintResolver resolver,
-    ChangeReporter reporter,
-    CustomLintContext context,
-    AnalysisError analysisError,
-    List<AnalysisError> others,
-  ) {
-    context.registry.addCatchClause((CatchClause node) {
-      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
-
-      final CatchClauseParameter? exceptionParam = node.exceptionParameter;
-      if (exceptionParam == null) return;
-
-      final String exceptionName = exceptionParam.name.lexeme;
-      final CatchClauseParameter? stackParam = node.stackTraceParameter;
-      final String stackName = stackParam?.name.lexeme ?? 'stackTrace';
-
-      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
-        message: 'Add debugPrint for error logging',
-        priority: 1,
-      );
-
-      changeBuilder.addDartFileEdit((builder) {
-        // Insert debugPrint at the start of the catch body
-        final int insertOffset = node.body.leftBracket.end;
-
-        final String logStatement = stackParam != null
-            ? "\n      debugPrint('Error: \$$exceptionName\\n\$$stackName');"
-            : "\n      debugPrint('Error: \$$exceptionName');";
-
-        builder.addSimpleInsertion(insertOffset, logStatement);
-      });
-    });
   }
 }
 
@@ -2488,7 +2107,7 @@ class _AddDebugPrintForErrorFix extends DartFix {
 /// }
 /// ```
 class RequireAppStartupErrorHandlingRule extends SaropaLintRule {
-  const RequireAppStartupErrorHandlingRule() : super(code: _code);
+  RequireAppStartupErrorHandlingRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.high;
@@ -2500,21 +2119,19 @@ class RequireAppStartupErrorHandlingRule extends SaropaLintRule {
   bool get requiresMainFunction => true;
 
   static const LintCode _code = LintCode(
-    name: 'require_app_startup_error_handling',
-    problemMessage:
-        '[require_app_startup_error_handling] runApp() is called without runZonedGuarded or FlutterError.onError. Uncaught errors during app startup will crash the application silently with no crash report sent to monitoring services. Users see a blank or frozen screen with no diagnostic information available to the development team. {v2}',
+    'require_app_startup_error_handling',
+    '[require_app_startup_error_handling] runApp() is called without runZonedGuarded or FlutterError.onError. Uncaught errors during app startup will crash the application silently with no crash report sent to monitoring services. Users see a blank or frozen screen with no diagnostic information available to the development team. {v2}',
     correctionMessage:
         'Wrap runApp() in runZonedGuarded and set FlutterError.onError to capture all errors. Example: runZonedGuarded(() { runApp(MyApp()); }, (e, st) { reportToCrashlytics(e, st); });',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addFunctionDeclaration((FunctionDeclaration node) {
+    context.addFunctionDeclaration((FunctionDeclaration node) {
       // Only check main function
       if (node.name.lexeme != 'main') return;
 
@@ -2534,7 +2151,7 @@ class RequireAppStartupErrorHandlingRule extends SaropaLintRule {
         return; // Has error handling
       }
 
-      reporter.atNode(node, code);
+      reporter.atNode(node);
     });
   }
 }
@@ -2582,7 +2199,7 @@ class RequireAppStartupErrorHandlingRule extends SaropaLintRule {
 /// }
 /// ```
 class AvoidAssertInProductionRule extends SaropaLintRule {
-  const AvoidAssertInProductionRule() : super(code: _code);
+  AvoidAssertInProductionRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.high;
@@ -2591,12 +2208,11 @@ class AvoidAssertInProductionRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_assert_in_production',
-    problemMessage:
-        '[avoid_assert_in_production] assert() is compiled out of release builds by the Dart compiler. Any validation, input checking, or security enforcement using assert() will silently stop running in production, allowing invalid data, unauthorized access, or corrupted state to pass through unchecked. {v2}',
+    'avoid_assert_in_production',
+    '[avoid_assert_in_production] assert() is compiled out of release builds by the Dart compiler. Any validation, input checking, or security enforcement using assert() will silently stop running in production, allowing invalid data, unauthorized access, or corrupted state to pass through unchecked. {v2}',
     correctionMessage:
         'Use if-throw for validation that must work in release mode. Example: if (amount <= 0) throw ArgumentError("Amount must be positive: \$amount");',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   /// Keywords that suggest the assert is doing important validation
@@ -2624,24 +2240,23 @@ class AvoidAssertInProductionRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addAssertStatement((AssertStatement node) {
+    context.addAssertStatement((AssertStatement node) {
       final String condition = node.condition.toSource().toLowerCase();
 
       // Check if this assert is doing important validation
       for (final String keyword in _validationKeywords) {
         if (condition.contains(keyword)) {
-          reporter.atNode(node, code);
+          reporter.atNode(node);
           return;
         }
       }
 
       // Check for null checks that should be real validation
       if (condition.contains('!= null') || condition.contains('is!')) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
   }

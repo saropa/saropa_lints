@@ -8,9 +8,6 @@
 library;
 
 import 'package:analyzer/dart/ast/ast.dart';
-import 'package:analyzer/error/error.dart'
-    show AnalysisError, DiagnosticSeverity;
-import 'package:custom_lint_builder/custom_lint_builder.dart';
 
 import '../saropa_lint_rule.dart';
 
@@ -42,7 +39,7 @@ import '../saropa_lint_rule.dart';
 /// debugPrint('Token refreshed');
 /// ```
 class AvoidLoggingSensitiveDataRule extends SaropaLintRule {
-  const AvoidLoggingSensitiveDataRule() : super(code: _code);
+  AvoidLoggingSensitiveDataRule() : super(code: _code);
 
   /// Logging PII exposes sensitive data in crash reports and logs.
   /// Each occurrence is a potential data breach.
@@ -54,17 +51,16 @@ class AvoidLoggingSensitiveDataRule extends SaropaLintRule {
 
   @override
   OwaspMapping get owasp => const OwaspMapping(
-        mobile: <OwaspMobile>{OwaspMobile.m6},
-        web: <OwaspWeb>{OwaspWeb.a09},
-      );
+    mobile: <OwaspMobile>{OwaspMobile.m6},
+    web: <OwaspWeb>{OwaspWeb.a09},
+  );
 
   static const LintCode _code = LintCode(
-    name: 'avoid_logging_sensitive_data',
-    problemMessage:
-        '[avoid_logging_sensitive_data] Logging sensitive data such as passwords, tokens, or personally identifiable information (PII) exposes users to privacy risks and can result in data leaks if logs are accessed by unauthorized parties. Sensitive information in logs may appear in crash reports, debug output, or be inadvertently shared with third parties, leading to compliance violations and loss of user trust. Always sanitize logs to prevent exposure of confidential data. {v6}',
+    'avoid_logging_sensitive_data',
+    '[avoid_logging_sensitive_data] Logging sensitive data such as passwords, tokens, or personally identifiable information (PII) exposes users to privacy risks and can result in data leaks if logs are accessed by unauthorized parties. Sensitive information in logs may appear in crash reports, debug output, or be inadvertently shared with third parties, leading to compliance violations and loss of user trust. Always sanitize logs to prevent exposure of confidential data. {v6}',
     correctionMessage:
         'Remove all sensitive data (passwords, tokens, PII) from logs. Instead, log only non-sensitive metadata or a generic success/failure message. Use dedicated logging utilities to redact or filter sensitive fields before outputting logs.',
-    errorSeverity: DiagnosticSeverity.ERROR,
+    severity: DiagnosticSeverity.ERROR,
   );
 
   /// Sensitive patterns that indicate PII or credentials.
@@ -131,11 +127,10 @@ class AvoidLoggingSensitiveDataRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       final String methodName = node.methodName.name;
 
       // Check direct logging calls
@@ -156,7 +151,7 @@ class AvoidLoggingSensitiveDataRule extends SaropaLintRule {
         for (final String pattern in _sensitivePatterns) {
           if (argSource.contains(pattern) &&
               !_isSafeMatch(argSource, pattern)) {
-            reporter.atNode(node, code);
+            reporter.atNode(node);
             return;
           }
         }
@@ -164,7 +159,7 @@ class AvoidLoggingSensitiveDataRule extends SaropaLintRule {
     });
 
     // Also check function expression invocations like print(...)
-    context.registry.addFunctionExpressionInvocation((
+    context.addFunctionExpressionInvocation((
       FunctionExpressionInvocation node,
     ) {
       final Expression function = node.function;
@@ -177,59 +172,11 @@ class AvoidLoggingSensitiveDataRule extends SaropaLintRule {
         for (final String pattern in _sensitivePatterns) {
           if (argSource.contains(pattern) &&
               !_isSafeMatch(argSource, pattern)) {
-            reporter.atNode(node, code);
+            reporter.atNode(node);
             return;
           }
         }
       }
-    });
-  }
-
-  @override
-  List<Fix> getFixes() => <Fix>[_AddTodoForSensitiveLoggingFix()];
-}
-
-class _AddTodoForSensitiveLoggingFix extends DartFix {
-  @override
-  void run(
-    CustomLintResolver resolver,
-    ChangeReporter reporter,
-    CustomLintContext context,
-    AnalysisError analysisError,
-    List<AnalysisError> others,
-  ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
-      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
-
-      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
-        message: 'Add HACK comment for sensitive data logging',
-        priority: 1,
-      );
-
-      changeBuilder.addDartFileEdit((builder) {
-        builder.addSimpleInsertion(
-          node.offset,
-          '// HACK: remove sensitive data from this log statement\n',
-        );
-      });
-    });
-
-    context.registry.addFunctionExpressionInvocation((
-      FunctionExpressionInvocation node,
-    ) {
-      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
-
-      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
-        message: 'Add HACK comment for sensitive data logging',
-        priority: 1,
-      );
-
-      changeBuilder.addDartFileEdit((builder) {
-        builder.addSimpleInsertion(
-          node.offset,
-          '// HACK: remove sensitive data from this log statement\n',
-        );
-      });
     });
   }
 }
@@ -255,7 +202,7 @@ class _AddTodoForSensitiveLoggingFix extends DartFix {
 /// secureStorage.write(key: 'auth_token', value: token);
 /// ```
 class RequireSecureStorageRule extends SaropaLintRule {
-  const RequireSecureStorageRule() : super(code: _code);
+  RequireSecureStorageRule() : super(code: _code);
 
   /// Plain text storage of credentials is readable on rooted devices.
   /// Each occurrence exposes sensitive data.
@@ -267,18 +214,17 @@ class RequireSecureStorageRule extends SaropaLintRule {
 
   @override
   OwaspMapping get owasp => const OwaspMapping(
-        mobile: <OwaspMobile>{OwaspMobile.m9},
-        web: <OwaspWeb>{OwaspWeb.a02},
-      );
+    mobile: <OwaspMobile>{OwaspMobile.m9},
+    web: <OwaspWeb>{OwaspWeb.a02},
+  );
 
   static const LintCode _code = LintCode(
-    name: 'require_secure_storage',
-    problemMessage:
-        '[require_secure_storage] SharedPreferences stores data in plain XML. '
+    'require_secure_storage',
+    '[require_secure_storage] SharedPreferences stores data in plain XML. '
         'On rooted/jailbroken devices, attackers extract credentials for account takeover. {v7}',
     correctionMessage:
         'Use flutter_secure_storage: secureStorage.write(key: k, value: v).',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   /// Patterns for sensitive keys - must match as word boundaries.
@@ -302,11 +248,10 @@ class RequireSecureStorageRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       final String methodName = node.methodName.name;
 
       // Check for SharedPreferences set methods
@@ -329,7 +274,7 @@ class RequireSecureStorageRule extends SaropaLintRule {
 
       for (final String pattern in _sensitiveKeys) {
         if (keySource.contains(pattern)) {
-          reporter.atNode(node, code);
+          reporter.atNode(node);
           return;
         }
       }
@@ -358,7 +303,7 @@ class RequireSecureStorageRule extends SaropaLintRule {
 /// final password = await secureStorage.read(key: 'password');
 /// ```
 class AvoidHardcodedCredentialsRule extends SaropaLintRule {
-  const AvoidHardcodedCredentialsRule() : super(code: _code);
+  AvoidHardcodedCredentialsRule() : super(code: _code);
 
   /// Hardcoded credentials will be committed to version control.
   /// Each occurrence is a security vulnerability.
@@ -370,17 +315,16 @@ class AvoidHardcodedCredentialsRule extends SaropaLintRule {
 
   @override
   OwaspMapping get owasp => const OwaspMapping(
-        mobile: <OwaspMobile>{OwaspMobile.m1},
-        web: <OwaspWeb>{OwaspWeb.a07},
-      );
+    mobile: <OwaspMobile>{OwaspMobile.m1},
+    web: <OwaspWeb>{OwaspWeb.a07},
+  );
 
   static const LintCode _code = LintCode(
-    name: 'avoid_hardcoded_credentials',
-    problemMessage:
-        '[avoid_hardcoded_credentials] Hardcoding credentials (such as passwords, API keys, or tokens) in source code exposes them to anyone with access to the codebase, including public repositories and version control history. This can lead to unauthorized access, data breaches, and compromised systems. Credentials should always be stored securely and never committed to version control. {v5}',
+    'avoid_hardcoded_credentials',
+    '[avoid_hardcoded_credentials] Hardcoding credentials (such as passwords, API keys, or tokens) in source code exposes them to anyone with access to the codebase, including public repositories and version control history. This can lead to unauthorized access, data breaches, and compromised systems. Credentials should always be stored securely and never committed to version control. {v5}',
     correctionMessage:
         'Store credentials in secure storage or environment variables. Use String.fromEnvironment(\'KEY\') or a secure vault at runtime. Never commit secrets to source control.',
-    errorSeverity: DiagnosticSeverity.ERROR,
+    severity: DiagnosticSeverity.ERROR,
   );
 
   static const Set<String> _credentialNames = <String>{
@@ -411,11 +355,10 @@ class AvoidHardcodedCredentialsRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addVariableDeclaration((VariableDeclaration node) {
+    context.addVariableDeclaration((VariableDeclaration node) {
       final String varName = node.name.lexeme.toLowerCase();
 
       // Check if variable name suggests credentials
@@ -430,63 +373,17 @@ class AvoidHardcodedCredentialsRule extends SaropaLintRule {
       if (initializer is StringLiteral) {
         final String? value = initializer.stringValue;
         if (value != null && value.isNotEmpty && value.length > 3) {
-          reporter.atNode(node, code);
+          reporter.atNode(node);
         }
       }
     });
 
     // Also check for string literals that look like credentials
-    context.registry.addSimpleStringLiteral((SimpleStringLiteral node) {
+    context.addSimpleStringLiteral((SimpleStringLiteral node) {
       final String value = node.value;
       if (_credentialPatterns.hasMatch(value)) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
-    });
-  }
-
-  @override
-  List<Fix> getFixes() => <Fix>[_AddTodoForHardcodedCredentialsFix()];
-}
-
-class _AddTodoForHardcodedCredentialsFix extends DartFix {
-  @override
-  void run(
-    CustomLintResolver resolver,
-    ChangeReporter reporter,
-    CustomLintContext context,
-    AnalysisError analysisError,
-    List<AnalysisError> others,
-  ) {
-    context.registry.addVariableDeclaration((VariableDeclaration node) {
-      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
-
-      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
-        message: 'Add HACK comment for hardcoded credential',
-        priority: 1,
-      );
-
-      changeBuilder.addDartFileEdit((builder) {
-        builder.addSimpleInsertion(
-          node.offset,
-          '// HACK: use environment variable or secure storage instead\n',
-        );
-      });
-    });
-
-    context.registry.addSimpleStringLiteral((SimpleStringLiteral node) {
-      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
-
-      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
-        message: 'Add HACK comment for hardcoded credential',
-        priority: 1,
-      );
-
-      changeBuilder.addDartFileEdit((builder) {
-        builder.addSimpleInsertion(
-          node.offset,
-          '// HACK: use environment variable or secure storage instead\n',
-        );
-      });
     });
   }
 }
@@ -516,7 +413,7 @@ class _AddTodoForHardcodedCredentialsFix extends DartFix {
 /// }
 /// ```
 class RequireInputSanitizationRule extends SaropaLintRule {
-  const RequireInputSanitizationRule() : super(code: _code);
+  RequireInputSanitizationRule() : super(code: _code);
 
   /// Unsanitized input enables injection attacks.
   /// Each occurrence is a potential security exploit.
@@ -528,27 +425,25 @@ class RequireInputSanitizationRule extends SaropaLintRule {
 
   @override
   OwaspMapping get owasp => const OwaspMapping(
-        mobile: <OwaspMobile>{OwaspMobile.m4},
-        web: <OwaspWeb>{OwaspWeb.a03},
-      );
+    mobile: <OwaspMobile>{OwaspMobile.m4},
+    web: <OwaspWeb>{OwaspWeb.a03},
+  );
 
   static const LintCode _code = LintCode(
-    name: 'require_input_sanitization',
-    problemMessage:
-        '[require_input_sanitization] Unsanitized user input in SQL or commands '
+    'require_input_sanitization',
+    '[require_input_sanitization] Unsanitized user input in SQL or commands '
         'enables injection attacks, allowing data theft or system compromise. {v6}',
     correctionMessage:
         'Validate and sanitize user input to prevent injection attacks.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       final String methodName = node.methodName.name;
 
       // Check for SQL-like operations
@@ -562,7 +457,7 @@ class RequireInputSanitizationRule extends SaropaLintRule {
 
         final Expression firstArg = node.argumentList.arguments.first;
         if (firstArg is StringInterpolation) {
-          reporter.atNode(node, code);
+          reporter.atNode(node);
         }
       }
 
@@ -579,7 +474,7 @@ class RequireInputSanitizationRule extends SaropaLintRule {
           if (name.contains('user') ||
               name.contains('input') ||
               name.contains('param')) {
-            reporter.atNode(node, code);
+            reporter.atNode(node);
           }
         }
       }
@@ -613,7 +508,7 @@ class RequireInputSanitizationRule extends SaropaLintRule {
 /// )
 /// ```
 class AvoidWebViewJavaScriptEnabledRule extends SaropaLintRule {
-  const AvoidWebViewJavaScriptEnabledRule() : super(code: _code);
+  AvoidWebViewJavaScriptEnabledRule() : super(code: _code);
 
   /// JavaScript in WebView can enable XSS attacks with untrusted content.
   /// Review each occurrence for security implications.
@@ -625,28 +520,24 @@ class AvoidWebViewJavaScriptEnabledRule extends SaropaLintRule {
 
   @override
   OwaspMapping get owasp => const OwaspMapping(
-        mobile: <OwaspMobile>{OwaspMobile.m8},
-        web: <OwaspWeb>{OwaspWeb.a05, OwaspWeb.a06},
-      );
+    mobile: <OwaspMobile>{OwaspMobile.m8},
+    web: <OwaspWeb>{OwaspWeb.a05, OwaspWeb.a06},
+  );
 
   static const LintCode _code = LintCode(
-    name: 'avoid_webview_javascript_enabled',
-    problemMessage:
-        '[avoid_webview_javascript_enabled] WebView with JavaScript enabled expands the attack surface to cross-site scripting (XSS) vulnerabilities. Malicious scripts injected through untrusted content can steal session tokens, access device APIs, redirect users to phishing pages, and exfiltrate sensitive data without the user\'s knowledge. {v5}',
+    'avoid_webview_javascript_enabled',
+    '[avoid_webview_javascript_enabled] WebView with JavaScript enabled expands the attack surface to cross-site scripting (XSS) vulnerabilities. Malicious scripts injected through untrusted content can steal session tokens, access device APIs, redirect users to phishing pages, and exfiltrate sensitive data without the user\'s knowledge. {v5}',
     correctionMessage:
         'Disable JavaScript with javaScriptEnabled: false unless required, and ensure only trusted HTTPS content is loaded when JavaScript must remain enabled.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addInstanceCreationExpression((
-      InstanceCreationExpression node,
-    ) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final String? constructorName = node.constructorName.type.element?.name;
       if (constructorName != 'WebView' &&
           constructorName != 'WebViewWidget' &&
@@ -664,7 +555,7 @@ class AvoidWebViewJavaScriptEnabledRule extends SaropaLintRule {
             final String argSource = arg.expression.toSource();
             if (argSource.contains('unrestricted') ||
                 argSource.contains('true')) {
-              reporter.atNode(arg, code);
+              reporter.atNode(arg);
               return;
             }
           }
@@ -701,7 +592,7 @@ class AvoidWebViewJavaScriptEnabledRule extends SaropaLintRule {
 /// }
 /// ```
 class RequireBiometricFallbackRule extends SaropaLintRule {
-  const RequireBiometricFallbackRule() : super(code: _code);
+  RequireBiometricFallbackRule() : super(code: _code);
 
   /// Missing biometric fallback is a usability issue, not a security risk.
   /// Address for better UX on devices without biometrics.
@@ -713,26 +604,24 @@ class RequireBiometricFallbackRule extends SaropaLintRule {
 
   @override
   OwaspMapping get owasp => const OwaspMapping(
-        mobile: <OwaspMobile>{OwaspMobile.m8},
-        web: <OwaspWeb>{OwaspWeb.a04},
-      );
+    mobile: <OwaspMobile>{OwaspMobile.m8},
+    web: <OwaspWeb>{OwaspWeb.a04},
+  );
 
   static const LintCode _code = LintCode(
-    name: 'require_biometric_fallback',
-    problemMessage:
-        '[require_biometric_fallback] Biometric-only auth locks out users with damaged sensors. Not all devices support biometrics, and users must have an alternative authentication method. {v6}',
+    'require_biometric_fallback',
+    '[require_biometric_fallback] Biometric-only auth locks out users with damaged sensors. Not all devices support biometrics, and users must have an alternative authentication method. {v6}',
     correctionMessage:
         'Set biometricOnly to false or provide an alternative auth method. Audit similar patterns across the codebase to ensure consistent security practices.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       final String methodName = node.methodName.name;
       if (methodName != 'authenticate') return;
 
@@ -752,7 +641,7 @@ class RequireBiometricFallbackRule extends SaropaLintRule {
             if (arg.expression is BooleanLiteral) {
               final BooleanLiteral boolLit = arg.expression as BooleanLiteral;
               if (boolLit.value) {
-                reporter.atNode(arg, code);
+                reporter.atNode(arg);
                 return;
               }
             }
@@ -785,7 +674,7 @@ class RequireBiometricFallbackRule extends SaropaLintRule {
 /// }
 /// ```
 class AvoidEvalLikePatternsRule extends SaropaLintRule {
-  const AvoidEvalLikePatternsRule() : super(code: _code);
+  AvoidEvalLikePatternsRule() : super(code: _code);
 
   /// Dynamic code execution enables code injection attacks.
   /// Each occurrence is a serious security vulnerability.
@@ -797,34 +686,32 @@ class AvoidEvalLikePatternsRule extends SaropaLintRule {
 
   @override
   OwaspMapping get owasp => const OwaspMapping(
-        mobile: <OwaspMobile>{OwaspMobile.m4, OwaspMobile.m7},
-        web: <OwaspWeb>{OwaspWeb.a03},
-      );
+    mobile: <OwaspMobile>{OwaspMobile.m4, OwaspMobile.m7},
+    web: <OwaspWeb>{OwaspWeb.a03},
+  );
 
   static const LintCode _code = LintCode(
-    name: 'avoid_eval_like_patterns',
-    problemMessage:
-        '[avoid_eval_like_patterns] Dynamic code execution allows arbitrary '
+    'avoid_eval_like_patterns',
+    '[avoid_eval_like_patterns] Dynamic code execution allows arbitrary '
         'code injection, enabling attackers to execute malicious code. {v7}',
     correctionMessage:
         'Use static dispatch or explicit mappings instead of dynamic invocation.',
-    errorSeverity: DiagnosticSeverity.ERROR,
+    severity: DiagnosticSeverity.ERROR,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
     // Check for Function.apply - dynamic function invocation
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       final String methodName = node.methodName.name;
 
       if (methodName == 'apply') {
         final Expression? target = node.target;
         if (target is SimpleIdentifier && target.name == 'Function') {
-          reporter.atNode(node, code);
+          reporter.atNode(node);
         }
       }
 
@@ -834,57 +721,11 @@ class AvoidEvalLikePatternsRule extends SaropaLintRule {
     });
 
     // Check for dart:mirrors import - reflection is a security risk
-    context.registry.addImportDirective((ImportDirective node) {
+    context.addImportDirective((ImportDirective node) {
       final String? uri = node.uri.stringValue;
       if (uri != null && uri.contains('dart:mirrors')) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
-    });
-  }
-
-  @override
-  List<Fix> getFixes() => <Fix>[_AddTodoForEvalPatternFix()];
-}
-
-class _AddTodoForEvalPatternFix extends DartFix {
-  @override
-  void run(
-    CustomLintResolver resolver,
-    ChangeReporter reporter,
-    CustomLintContext context,
-    AnalysisError analysisError,
-    List<AnalysisError> others,
-  ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
-      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
-
-      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
-        message: 'Add HACK comment for dynamic code execution',
-        priority: 1,
-      );
-
-      changeBuilder.addDartFileEdit((builder) {
-        builder.addSimpleInsertion(
-          node.offset,
-          '// HACK: replace with static dispatch or explicit mapping\n',
-        );
-      });
-    });
-
-    context.registry.addImportDirective((ImportDirective node) {
-      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
-
-      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
-        message: 'Add HACK comment for dart:mirrors import',
-        priority: 1,
-      );
-
-      changeBuilder.addDartFileEdit((builder) {
-        builder.addSimpleInsertion(
-          node.offset,
-          '// HACK: remove dart:mirrors usage for security\n',
-        );
-      });
     });
   }
 }
@@ -924,7 +765,7 @@ class _AddTodoForEvalPatternFix extends DartFix {
 ///
 /// **OWASP:** `M2:Inadequate-Supply-Chain-Security`
 class AvoidDynamicCodeLoadingRule extends SaropaLintRule {
-  const AvoidDynamicCodeLoadingRule() : super(code: _code);
+  AvoidDynamicCodeLoadingRule() : super(code: _code);
 
   /// Runtime code loading enables supply chain attacks.
   /// Each occurrence is a critical security vulnerability.
@@ -935,24 +776,22 @@ class AvoidDynamicCodeLoadingRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   @override
-  OwaspMapping get owasp => const OwaspMapping(
-        mobile: <OwaspMobile>{OwaspMobile.m2},
-      );
+  OwaspMapping get owasp =>
+      const OwaspMapping(mobile: <OwaspMobile>{OwaspMobile.m2});
 
   @override
   Set<String>? get requiredPatterns => const <String>{'Isolate', 'Process'};
 
   static const LintCode _code = LintCode(
-    name: 'avoid_dynamic_code_loading',
-    problemMessage:
-        '[avoid_dynamic_code_loading] Dynamic code loading at runtime '
+    'avoid_dynamic_code_loading',
+    '[avoid_dynamic_code_loading] Dynamic code loading at runtime '
         'bypasses compile-time dependency verification, allowing execution '
         'of unverified code and creating supply chain attack vectors. {v3}',
     correctionMessage:
         'Use static imports for all code dependencies. For background '
         'computation, use Isolate.run() or Isolate.spawn() with static '
         'entry points instead of Isolate.spawnUri().',
-    errorSeverity: DiagnosticSeverity.ERROR,
+    severity: DiagnosticSeverity.ERROR,
   );
 
   /// Package manager executables to detect.
@@ -982,11 +821,10 @@ class AvoidDynamicCodeLoadingRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       final String methodName = node.methodName.name;
       final Expression? target = node.target;
       if (target == null) return;
@@ -995,7 +833,7 @@ class AvoidDynamicCodeLoadingRule extends SaropaLintRule {
 
       // Detect Isolate.spawnUri() - all calls are flagged
       if (methodName == 'spawnUri' && targetSource == 'Isolate') {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
         return;
       }
 
@@ -1032,48 +870,11 @@ class AvoidDynamicCodeLoadingRule extends SaropaLintRule {
       if (element is StringLiteral) {
         final String? value = element.stringValue;
         if (value != null && _installCommands.contains(value)) {
-          reporter.atNode(node, code);
+          reporter.atNode(node);
           return;
         }
       }
     }
-  }
-
-  @override
-  List<Fix> getFixes() => <Fix>[_AddTodoForDynamicCodeLoadingFix()];
-}
-
-class _AddTodoForDynamicCodeLoadingFix extends DartFix {
-  @override
-  void run(
-    CustomLintResolver resolver,
-    ChangeReporter reporter,
-    CustomLintContext context,
-    AnalysisError analysisError,
-    List<AnalysisError> others,
-  ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
-      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
-
-      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
-        message: 'Add HACK comment for dynamic code loading',
-        priority: 1,
-      );
-
-      changeBuilder.addDartFileEdit((builder) {
-        // Find the start of the statement
-        AstNode? statement = node.parent;
-        while (statement != null && statement is! ExpressionStatement) {
-          statement = statement.parent;
-        }
-        final int offset = statement?.offset ?? node.offset;
-
-        builder.addSimpleInsertion(
-          offset,
-          '// HACK: replace dynamic code loading with static imports\n',
-        );
-      });
-    });
   }
 }
 
@@ -1111,7 +912,7 @@ class _AddTodoForDynamicCodeLoadingFix extends DartFix {
 ///
 /// **OWASP:** `M2:Inadequate-Supply-Chain-Security`
 class AvoidUnverifiedNativeLibraryRule extends SaropaLintRule {
-  const AvoidUnverifiedNativeLibraryRule() : super(code: _code);
+  AvoidUnverifiedNativeLibraryRule() : super(code: _code);
 
   /// Loading unverified native code enables supply chain attacks.
   @override
@@ -1121,33 +922,30 @@ class AvoidUnverifiedNativeLibraryRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   @override
-  OwaspMapping get owasp => const OwaspMapping(
-        mobile: <OwaspMobile>{OwaspMobile.m2},
-      );
+  OwaspMapping get owasp =>
+      const OwaspMapping(mobile: <OwaspMobile>{OwaspMobile.m2});
 
   @override
   Set<String>? get requiredPatterns => const <String>{'DynamicLibrary'};
 
   static const LintCode _code = LintCode(
-    name: 'avoid_unverified_native_library',
-    problemMessage:
-        '[avoid_unverified_native_library] Loading native libraries from '
+    'avoid_unverified_native_library',
+    '[avoid_unverified_native_library] Loading native libraries from '
         'dynamic or absolute paths bypasses package verification, allowing '
         'attackers to substitute malicious native code. {v3}',
     correctionMessage:
         'Use library names without paths (e.g., \'libfoo.so\') to load '
         'from verified app bundle resources. Avoid loading from dynamic '
         'paths or user-provided locations.',
-    errorSeverity: DiagnosticSeverity.ERROR,
+    severity: DiagnosticSeverity.ERROR,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       if (node.methodName.name != 'open') return;
 
       final Expression? target = node.target;
@@ -1161,51 +959,15 @@ class AvoidUnverifiedNativeLibraryRule extends SaropaLintRule {
 
       // Non-constant argument (variable, interpolation, etc.)
       if (firstArg is! SimpleStringLiteral) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
         return;
       }
 
       // String literal with path separators or traversal
       final String value = firstArg.value;
       if (value.contains('/') || value.contains(r'\') || value.contains('..')) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
-    });
-  }
-
-  @override
-  List<Fix> getFixes() => <Fix>[_AddTodoForUnverifiedNativeLibraryFix()];
-}
-
-class _AddTodoForUnverifiedNativeLibraryFix extends DartFix {
-  @override
-  void run(
-    CustomLintResolver resolver,
-    ChangeReporter reporter,
-    CustomLintContext context,
-    AnalysisError analysisError,
-    List<AnalysisError> others,
-  ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
-      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
-
-      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
-        message: 'Add HACK comment for unverified native library',
-        priority: 1,
-      );
-
-      changeBuilder.addDartFileEdit((builder) {
-        AstNode? statement = node.parent;
-        while (statement != null && statement is! ExpressionStatement) {
-          statement = statement.parent;
-        }
-        final int offset = statement?.offset ?? node.offset;
-
-        builder.addSimpleInsertion(
-          offset,
-          '// HACK: use bundled library name without path\n',
-        );
-      });
     });
   }
 }
@@ -1237,7 +999,7 @@ class _AddTodoForUnverifiedNativeLibraryFix extends DartFix {
 ///
 /// **OWASP:** `M7:Insufficient-Binary-Protections`
 class AvoidHardcodedSigningConfigRule extends SaropaLintRule {
-  const AvoidHardcodedSigningConfigRule() : super(code: _code);
+  AvoidHardcodedSigningConfigRule() : super(code: _code);
 
   /// Signing config in source code aids reverse engineering.
   @override
@@ -1247,25 +1009,23 @@ class AvoidHardcodedSigningConfigRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   @override
-  OwaspMapping get owasp => const OwaspMapping(
-        mobile: <OwaspMobile>{OwaspMobile.m7},
-      );
+  OwaspMapping get owasp =>
+      const OwaspMapping(mobile: <OwaspMobile>{OwaspMobile.m7});
 
   @override
   Set<String>? get requiredPatterns => const <String>{
-        'keystore',
-        'jks',
-        'signing',
-        'storePassword',
-        'keyPassword',
-        'keyAlias',
-        'key.properties',
-      };
+    'keystore',
+    'jks',
+    'signing',
+    'storePassword',
+    'keyPassword',
+    'keyAlias',
+    'key.properties',
+  };
 
   static const LintCode _code = LintCode(
-    name: 'avoid_hardcoded_signing_config',
-    problemMessage:
-        '[avoid_hardcoded_signing_config] Hardcoding keystore paths, '
+    'avoid_hardcoded_signing_config',
+    '[avoid_hardcoded_signing_config] Hardcoding keystore paths, '
         'passwords, or signing configuration in source code exposes them '
         'to reverse engineering. These values are extractable from compiled '
         'binaries and enable attackers to sign malicious builds. {v3}',
@@ -1273,7 +1033,7 @@ class AvoidHardcodedSigningConfigRule extends SaropaLintRule {
         'Store signing configuration in environment variables or secure '
         'CI/CD secrets. Use Platform.environment or load from external '
         'configuration files excluded from version control.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   /// Patterns in string literals that indicate signing configuration.
@@ -1301,12 +1061,11 @@ class AvoidHardcodedSigningConfigRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
     // Check string literals for signing-related content
-    context.registry.addSimpleStringLiteral((SimpleStringLiteral node) {
+    context.addSimpleStringLiteral((SimpleStringLiteral node) {
       // Skip import URIs
       if (node.parent is ImportDirective || node.parent is ExportDirective) {
         return;
@@ -1315,14 +1074,14 @@ class AvoidHardcodedSigningConfigRule extends SaropaLintRule {
       final String lower = node.value.toLowerCase();
       for (final String pattern in _signingStringPatterns) {
         if (lower.contains(pattern)) {
-          reporter.atNode(node, code);
+          reporter.atNode(node);
           return;
         }
       }
     });
 
     // Check variable names with signing-related names assigned strings
-    context.registry.addVariableDeclaration((VariableDeclaration node) {
+    context.addVariableDeclaration((VariableDeclaration node) {
       final String varName = node.name.lexeme.toLowerCase();
 
       final bool isSigningVar = _signingVarPatterns.any(varName.contains);
@@ -1332,66 +1091,9 @@ class AvoidHardcodedSigningConfigRule extends SaropaLintRule {
       if (initializer is StringLiteral) {
         final String? value = initializer.stringValue;
         if (value != null && value.isNotEmpty) {
-          reporter.atNode(node, code);
+          reporter.atNode(node);
         }
       }
-    });
-  }
-
-  @override
-  List<Fix> getFixes() => <Fix>[_AddTodoForHardcodedSigningConfigFix()];
-}
-
-class _AddTodoForHardcodedSigningConfigFix extends DartFix {
-  @override
-  void run(
-    CustomLintResolver resolver,
-    ChangeReporter reporter,
-    CustomLintContext context,
-    AnalysisError analysisError,
-    List<AnalysisError> others,
-  ) {
-    context.registry.addSimpleStringLiteral((SimpleStringLiteral node) {
-      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
-
-      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
-        message: 'Add comment to use environment variable',
-        priority: 1,
-      );
-
-      changeBuilder.addDartFileEdit((builder) {
-        AstNode? statement = node.parent;
-        while (statement != null &&
-            statement is! VariableDeclarationStatement &&
-            statement is! ExpressionStatement) {
-          statement = statement.parent;
-        }
-        final int offset = statement?.offset ?? node.offset;
-
-        builder.addSimpleInsertion(
-          offset,
-          '// HACK: use Platform.environment or CI/CD secrets instead\n',
-        );
-      });
-    });
-
-    context.registry.addVariableDeclaration((VariableDeclaration node) {
-      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
-
-      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
-        message: 'Add comment to use environment variable',
-        priority: 1,
-      );
-
-      changeBuilder.addDartFileEdit((builder) {
-        AstNode? statement = node.parent?.parent;
-        final int offset = statement?.offset ?? node.offset;
-
-        builder.addSimpleInsertion(
-          offset,
-          '// HACK: use Platform.environment or CI/CD secrets instead\n',
-        );
-      });
     });
   }
 }
@@ -1418,7 +1120,7 @@ class _AddTodoForHardcodedSigningConfigFix extends DartFix {
 ///   };
 /// ```
 class RequireCertificatePinningRule extends SaropaLintRule {
-  const RequireCertificatePinningRule() : super(code: _code);
+  RequireCertificatePinningRule() : super(code: _code);
 
   /// Missing certificate pinning enables man-in-the-middle attacks.
   /// Important for apps handling sensitive data.
@@ -1430,28 +1132,24 @@ class RequireCertificatePinningRule extends SaropaLintRule {
 
   @override
   OwaspMapping get owasp => const OwaspMapping(
-        mobile: <OwaspMobile>{OwaspMobile.m5},
-        web: <OwaspWeb>{OwaspWeb.a02, OwaspWeb.a05},
-      );
+    mobile: <OwaspMobile>{OwaspMobile.m5},
+    web: <OwaspWeb>{OwaspWeb.a02, OwaspWeb.a05},
+  );
 
   static const LintCode _code = LintCode(
-    name: 'require_certificate_pinning',
-    problemMessage:
-        '[require_certificate_pinning] HttpClient without certificate pinning accepts any valid certificate, making it vulnerable to man-in-the-middle attacks. Attackers on the same network can intercept, read, and modify all HTTPS traffic including authentication tokens, personal data, and financial information without detection. {v6}',
+    'require_certificate_pinning',
+    '[require_certificate_pinning] HttpClient without certificate pinning accepts any valid certificate, making it vulnerable to man-in-the-middle attacks. Attackers on the same network can intercept, read, and modify all HTTPS traffic including authentication tokens, personal data, and financial information without detection. {v6}',
     correctionMessage:
         'Set badCertificateCallback to validate the server certificate fingerprint against a known pin, rejecting connections that do not match your expected certificate.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addInstanceCreationExpression((
-      InstanceCreationExpression node,
-    ) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final String? constructorName = node.constructorName.type.element?.name;
       if (constructorName != 'HttpClient') return;
 
@@ -1495,7 +1193,7 @@ class RequireCertificatePinningRule extends SaropaLintRule {
 /// );
 /// ```
 class AvoidTokenInUrlRule extends SaropaLintRule {
-  const AvoidTokenInUrlRule() : super(code: _code);
+  AvoidTokenInUrlRule() : super(code: _code);
 
   /// Tokens in URLs are logged and visible in browser history.
   /// Each occurrence exposes credentials.
@@ -1507,18 +1205,17 @@ class AvoidTokenInUrlRule extends SaropaLintRule {
 
   @override
   OwaspMapping get owasp => const OwaspMapping(
-        mobile: <OwaspMobile>{OwaspMobile.m1},
-        web: <OwaspWeb>{OwaspWeb.a07},
-      );
+    mobile: <OwaspMobile>{OwaspMobile.m1},
+    web: <OwaspWeb>{OwaspWeb.a07},
+  );
 
   static const LintCode _code = LintCode(
-    name: 'avoid_token_in_url',
-    problemMessage:
-        '[avoid_token_in_url] Tokens in URLs are logged in browser history, '
+    'avoid_token_in_url',
+    '[avoid_token_in_url] Tokens in URLs are logged in browser history, '
         'server logs, and referrer headers, exposing credentials. {v5}',
     correctionMessage:
         'Use Authorization header or request body for sensitive data.',
-    errorSeverity: DiagnosticSeverity.ERROR,
+    severity: DiagnosticSeverity.ERROR,
   );
 
   /// Pattern to detect sensitive tokens in URLs.
@@ -1532,21 +1229,20 @@ class AvoidTokenInUrlRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addSimpleStringLiteral((SimpleStringLiteral node) {
+    context.addSimpleStringLiteral((SimpleStringLiteral node) {
       final String value = node.value;
       if (_tokenPattern.hasMatch(value)) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
 
-    context.registry.addStringInterpolation((StringInterpolation node) {
+    context.addStringInterpolation((StringInterpolation node) {
       final String source = node.toSource().toLowerCase();
       if (_tokenPattern.hasMatch(source)) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
   }
@@ -1571,7 +1267,7 @@ class AvoidTokenInUrlRule extends SaropaLintRule {
 /// // Use secure input fields with obscureText instead
 /// ```
 class AvoidClipboardSensitiveRule extends SaropaLintRule {
-  const AvoidClipboardSensitiveRule() : super(code: _code);
+  AvoidClipboardSensitiveRule() : super(code: _code);
 
   /// Clipboard data is accessible by other apps and persists.
   /// Each occurrence risks credential exposure.
@@ -1583,18 +1279,17 @@ class AvoidClipboardSensitiveRule extends SaropaLintRule {
 
   @override
   OwaspMapping get owasp => const OwaspMapping(
-        mobile: <OwaspMobile>{OwaspMobile.m6},
-        web: <OwaspWeb>{OwaspWeb.a04},
-      );
+    mobile: <OwaspMobile>{OwaspMobile.m6},
+    web: <OwaspWeb>{OwaspWeb.a04},
+  );
 
   static const LintCode _code = LintCode(
-    name: 'avoid_clipboard_sensitive',
-    problemMessage:
-        '[avoid_clipboard_sensitive] Clipboard contents persist and are '
+    'avoid_clipboard_sensitive',
+    '[avoid_clipboard_sensitive] Clipboard contents persist and are '
         'readable by other apps, exposing passwords and tokens. {v4}',
     correctionMessage:
         'Clipboard can be read by other apps. Never copy passwords or tokens.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   static const Set<String> _sensitivePatterns = <String>{
@@ -1611,11 +1306,10 @@ class AvoidClipboardSensitiveRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       final String methodName = node.methodName.name;
       if (methodName != 'setData') return;
 
@@ -1627,7 +1321,7 @@ class AvoidClipboardSensitiveRule extends SaropaLintRule {
         final String argSource = arg.toSource().toLowerCase();
         for (final String pattern in _sensitivePatterns) {
           if (argSource.contains(pattern)) {
-            reporter.atNode(node, code);
+            reporter.atNode(node);
             return;
           }
         }
@@ -1655,7 +1349,7 @@ class AvoidClipboardSensitiveRule extends SaropaLintRule {
 /// await secureStorage.write(key: 'password', value: userPassword);
 /// ```
 class AvoidStoringPasswordsRule extends SaropaLintRule {
-  const AvoidStoringPasswordsRule() : super(code: _code);
+  AvoidStoringPasswordsRule() : super(code: _code);
 
   /// Passwords in SharedPreferences are stored as plain text.
   /// Each occurrence exposes user credentials.
@@ -1667,27 +1361,25 @@ class AvoidStoringPasswordsRule extends SaropaLintRule {
 
   @override
   OwaspMapping get owasp => const OwaspMapping(
-        mobile: <OwaspMobile>{OwaspMobile.m1},
-        web: <OwaspWeb>{OwaspWeb.a07},
-      );
+    mobile: <OwaspMobile>{OwaspMobile.m1},
+    web: <OwaspWeb>{OwaspWeb.a07},
+  );
 
   static const LintCode _code = LintCode(
-    name: 'avoid_storing_passwords',
-    problemMessage:
-        '[avoid_storing_passwords] SharedPreferences stores passwords in '
+    'avoid_storing_passwords',
+    '[avoid_storing_passwords] SharedPreferences stores passwords in '
         'plaintext, readable by anyone with device access or backup. {v4}',
     correctionMessage:
         'Use flutter_secure_storage for passwords and sensitive data.',
-    errorSeverity: DiagnosticSeverity.ERROR,
+    severity: DiagnosticSeverity.ERROR,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       final String methodName = node.methodName.name;
 
       // Check for SharedPreferences set methods
@@ -1707,7 +1399,7 @@ class AvoidStoringPasswordsRule extends SaropaLintRule {
       final String keySource = firstArg.toSource().toLowerCase();
 
       if (keySource.contains('password') || keySource.contains('passwd')) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
   }
@@ -1734,7 +1426,7 @@ class AvoidStoringPasswordsRule extends SaropaLintRule {
 /// db.query('users', where: 'id = ?', whereArgs: [userId]);
 /// ```
 class AvoidDynamicSqlRule extends SaropaLintRule {
-  const AvoidDynamicSqlRule() : super(code: _code);
+  AvoidDynamicSqlRule() : super(code: _code);
 
   /// String interpolation in SQL enables SQL injection attacks.
   /// Each occurrence is a critical security vulnerability.
@@ -1746,17 +1438,16 @@ class AvoidDynamicSqlRule extends SaropaLintRule {
 
   @override
   OwaspMapping get owasp => const OwaspMapping(
-        mobile: <OwaspMobile>{OwaspMobile.m4},
-        web: <OwaspWeb>{OwaspWeb.a03},
-      );
+    mobile: <OwaspMobile>{OwaspMobile.m4},
+    web: <OwaspWeb>{OwaspWeb.a03},
+  );
 
   static const LintCode _code = LintCode(
-    name: 'avoid_dynamic_sql',
-    problemMessage:
-        '[avoid_dynamic_sql] Constructing SQL queries by concatenating or interpolating user input directly into the query string exposes your application to SQL injection attacks. Attackers can craft input that alters the structure of your query, allowing them to read, modify, or delete arbitrary data, escalate privileges, or compromise the entire database. SQL injection is one of the most critical and well-documented security vulnerabilities in software development, and has led to major data breaches across industries. {v3}',
+    'avoid_dynamic_sql',
+    '[avoid_dynamic_sql] Constructing SQL queries by concatenating or interpolating user input directly into the query string exposes your application to SQL injection attacks. Attackers can craft input that alters the structure of your query, allowing them to read, modify, or delete arbitrary data, escalate privileges, or compromise the entire database. SQL injection is one of the most critical and well-documented security vulnerabilities in software development, and has led to major data breaches across industries. {v3}',
     correctionMessage:
         'Always use parameterized queries, prepared statements, or trusted query builders to safely insert user input into SQL queries. Never concatenate or interpolate user data directly into SQL strings. Audit your codebase for dynamic SQL construction and refactor to use safe patterns. Test your application for SQL injection vulnerabilities using automated tools or manual review. Document secure query practices in your team guidelines.',
-    errorSeverity: DiagnosticSeverity.ERROR,
+    severity: DiagnosticSeverity.ERROR,
   );
 
   /// SQL method names that take a raw query string.
@@ -1771,11 +1462,10 @@ class AvoidDynamicSqlRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       final String methodName = node.methodName.name;
 
       if (!_sqlMethods.contains(methodName)) return;
@@ -1786,7 +1476,7 @@ class AvoidDynamicSqlRule extends SaropaLintRule {
 
       // Check for string interpolation
       if (firstArg is StringInterpolation) {
-        reporter.atNode(firstArg, code);
+        reporter.atNode(firstArg);
         return;
       }
 
@@ -1800,7 +1490,7 @@ class AvoidDynamicSqlRule extends SaropaLintRule {
             leftSource.contains('delete') ||
             leftSource.contains('from') ||
             leftSource.contains('where')) {
-          reporter.atNode(firstArg, code);
+          reporter.atNode(firstArg);
           return;
         }
       }
@@ -1809,41 +1499,11 @@ class AvoidDynamicSqlRule extends SaropaLintRule {
       if (firstArg is AdjacentStrings) {
         for (final StringLiteral string in firstArg.strings) {
           if (string is StringInterpolation) {
-            reporter.atNode(firstArg, code);
+            reporter.atNode(firstArg);
             return;
           }
         }
       }
-    });
-  }
-
-  @override
-  List<Fix> getFixes() => <Fix>[_AddTodoForDynamicSqlFix()];
-}
-
-class _AddTodoForDynamicSqlFix extends DartFix {
-  @override
-  void run(
-    CustomLintResolver resolver,
-    ChangeReporter reporter,
-    CustomLintContext context,
-    AnalysisError analysisError,
-    List<AnalysisError> others,
-  ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
-      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
-
-      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
-        message: 'Add HACK: Use parameterized query',
-        priority: 1,
-      );
-
-      changeBuilder.addDartFileEdit((builder) {
-        builder.addSimpleInsertion(
-          node.offset,
-          '// HACK: Use parameterized query with ? placeholders\n',
-        );
-      });
     });
   }
 }
@@ -1863,7 +1523,7 @@ class _AddTodoForDynamicSqlFix extends DartFix {
 /// final url = 'https://api.example.com?authtoken=$token';
 /// ```
 class AvoidGenericKeyInUrlRule extends SaropaLintRule {
-  const AvoidGenericKeyInUrlRule() : super(code: _code);
+  AvoidGenericKeyInUrlRule() : super(code: _code);
 
   /// Generic key parameters in URLs may contain sensitive data.
   /// Review for potential credential exposure.
@@ -1875,17 +1535,16 @@ class AvoidGenericKeyInUrlRule extends SaropaLintRule {
 
   @override
   OwaspMapping get owasp => const OwaspMapping(
-        mobile: <OwaspMobile>{OwaspMobile.m1},
-        web: <OwaspWeb>{OwaspWeb.a07},
-      );
+    mobile: <OwaspMobile>{OwaspMobile.m1},
+    web: <OwaspWeb>{OwaspWeb.a07},
+  );
 
   static const LintCode _code = LintCode(
-    name: 'avoid_generic_key_in_url',
-    problemMessage:
-        '[avoid_generic_key_in_url] Sensitive data embedded in URL query parameters is logged by web servers, proxy caches, browser history, and analytics tools. This exposes API keys, tokens, and credentials in access logs and referrer headers, where they persist indefinitely and can be harvested by attackers with log access. {v4}',
+    'avoid_generic_key_in_url',
+    '[avoid_generic_key_in_url] Sensitive data embedded in URL query parameters is logged by web servers, proxy caches, browser history, and analytics tools. This exposes API keys, tokens, and credentials in access logs and referrer headers, where they persist indefinitely and can be harvested by attackers with log access. {v4}',
     correctionMessage:
         'Move sensitive parameters to the Authorization header or request body where they are not logged by intermediate network infrastructure.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   /// Generic patterns that might indicate sensitive data but have higher
@@ -1897,21 +1556,20 @@ class AvoidGenericKeyInUrlRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addSimpleStringLiteral((SimpleStringLiteral node) {
+    context.addSimpleStringLiteral((SimpleStringLiteral node) {
       final String value = node.value;
       if (_genericKeyPattern.hasMatch(value)) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
 
-    context.registry.addStringInterpolation((StringInterpolation node) {
+    context.addStringInterpolation((StringInterpolation node) {
       final String source = node.toSource().toLowerCase();
       if (_genericKeyPattern.hasMatch(source)) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
   }
@@ -1937,7 +1595,7 @@ class AvoidGenericKeyInUrlRule extends SaropaLintRule {
 /// final token = List.generate(32, (_) => random.nextInt(256));
 /// ```
 class PreferSecureRandomRule extends SaropaLintRule {
-  const PreferSecureRandomRule() : super(code: _code);
+  PreferSecureRandomRule() : super(code: _code);
 
   /// Random() is predictable and unsuitable for security.
   /// Use Random.secure() for tokens and crypto operations.
@@ -1949,28 +1607,24 @@ class PreferSecureRandomRule extends SaropaLintRule {
 
   @override
   OwaspMapping get owasp => const OwaspMapping(
-        mobile: <OwaspMobile>{OwaspMobile.m10},
-        web: <OwaspWeb>{OwaspWeb.a02},
-      );
+    mobile: <OwaspMobile>{OwaspMobile.m10},
+    web: <OwaspWeb>{OwaspWeb.a02},
+  );
 
   static const LintCode _code = LintCode(
-    name: 'prefer_secure_random',
-    problemMessage:
-        '[prefer_secure_random] Random() uses a predictable pseudo-random number generator that produces reproducible sequences from a known seed. Tokens, passwords, encryption keys, or nonces generated with Random() can be predicted by attackers, enabling session hijacking, credential guessing, and cryptographic attacks. {v3}',
+    'prefer_secure_random',
+    '[prefer_secure_random] Random() uses a predictable pseudo-random number generator that produces reproducible sequences from a known seed. Tokens, passwords, encryption keys, or nonces generated with Random() can be predicted by attackers, enabling session hijacking, credential guessing, and cryptographic attacks. {v3}',
     correctionMessage:
         'Replace Random() with Random.secure() for security-sensitive operations such as token generation, password creation, nonce generation, and cryptographic key derivation.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addInstanceCreationExpression((
-      InstanceCreationExpression node,
-    ) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final String? constructorName = node.constructorName.type.element?.name;
       if (constructorName != 'Random') return;
 
@@ -1978,39 +1632,7 @@ class PreferSecureRandomRule extends SaropaLintRule {
       final String? namedConstructor = node.constructorName.name?.name;
       if (namedConstructor == 'secure') return;
 
-      reporter.atNode(node, code);
-    });
-  }
-
-  @override
-  List<Fix> getFixes() => <Fix>[_UseSecureRandomFix()];
-}
-
-class _UseSecureRandomFix extends DartFix {
-  @override
-  void run(
-    CustomLintResolver resolver,
-    ChangeReporter reporter,
-    CustomLintContext context,
-    AnalysisError analysisError,
-    List<AnalysisError> others,
-  ) {
-    context.registry.addInstanceCreationExpression((
-      InstanceCreationExpression node,
-    ) {
-      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
-
-      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
-        message: 'Use Random.secure()',
-        priority: 1,
-      );
-
-      changeBuilder.addDartFileEdit((builder) {
-        builder.addSimpleReplacement(
-          node.sourceRange,
-          'Random.secure()',
-        );
-      });
+      reporter.atNode(node);
     });
   }
 }
@@ -2035,7 +1657,7 @@ class _UseSecureRandomFix extends DartFix {
 /// final Uint8List fileContents = await file.readAsBytes();
 /// ```
 class PreferTypedDataRule extends SaropaLintRule {
-  const PreferTypedDataRule() : super(code: _code);
+  PreferTypedDataRule() : super(code: _code);
 
   /// `List<int>` for binary data is inefficient but functional.
   /// Optimization suggestion, not a bug.
@@ -2046,21 +1668,19 @@ class PreferTypedDataRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'prefer_typed_data',
-    problemMessage:
-        '[prefer_typed_data] List<int> for binary data wastes memory. Use Uint8List instead. Uint8List is more memory-efficient for binary data and provides better interoperability with native code and I/O operations. List<int> uses 8 bytes per element vs 1 byte for Uint8List. {v3}',
+    'prefer_typed_data',
+    '[prefer_typed_data] List<int> for binary data wastes memory. Use Uint8List instead. Uint8List is more memory-efficient for binary data and provides better interoperability with native code and I/O operations. List<int> uses 8 bytes per element vs 1 byte for Uint8List. {v3}',
     correctionMessage:
         'Use Uint8List for binary data - 8x more memory efficient. Audit similar patterns across the codebase to ensure consistent security practices.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addVariableDeclaration((VariableDeclaration node) {
+    context.addVariableDeclaration((VariableDeclaration node) {
       // Get the type from the parent VariableDeclarationList
       final AstNode? parent = node.parent;
       if (parent is! VariableDeclarationList) return;
@@ -2079,7 +1699,7 @@ class PreferTypedDataRule extends SaropaLintRule {
             varName.contains('buffer') ||
             varName.contains('content') ||
             varName.contains('binary')) {
-          reporter.atNode(typeAnnotation, code);
+          reporter.atNode(typeAnnotation);
         }
       }
     });
@@ -2112,7 +1732,7 @@ class PreferTypedDataRule extends SaropaLintRule {
 /// return adults.length;
 /// ```
 class AvoidUnnecessaryToListRule extends SaropaLintRule {
-  const AvoidUnnecessaryToListRule() : super(code: _code);
+  AvoidUnnecessaryToListRule() : super(code: _code);
 
   /// Unnecessary toList() is inefficient but functional.
   /// Performance optimization, not a bug.
@@ -2123,21 +1743,19 @@ class AvoidUnnecessaryToListRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_unnecessary_to_list',
-    problemMessage:
-        '[avoid_unnecessary_to_list] .toList() may be unnecessary here. Lazy iterables are more efficient. Calling .toList() after .map(), .where(), .take(), etc. creates an intermediate list that may not be needed. Dart\'s lazy iterables are more memory efficient. {v3}',
+    'avoid_unnecessary_to_list',
+    '[avoid_unnecessary_to_list] .toList() may be unnecessary here. Lazy iterables are more efficient. Calling .toList() after .map(), .where(), .take(), etc. creates an intermediate list that may not be needed. Dart\'s lazy iterables are more memory efficient. {v3}',
     correctionMessage:
         'Remove .toList() unless you need to modify the list or access by index. Audit similar patterns across the codebase to ensure consistent security practices.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       if (node.methodName.name != 'toList') return;
 
       // Check if this is chained after an iterable method
@@ -2213,7 +1831,7 @@ class AvoidUnnecessaryToListRule extends SaropaLintRule {
 /// }
 /// ```
 class RequireAuthCheckRule extends SaropaLintRule {
-  const RequireAuthCheckRule() : super(code: _code);
+  RequireAuthCheckRule() : super(code: _code);
 
   /// Missing auth check exposes protected endpoints.
   /// Each occurrence is an unauthorized access risk.
@@ -2225,18 +1843,17 @@ class RequireAuthCheckRule extends SaropaLintRule {
 
   @override
   OwaspMapping get owasp => const OwaspMapping(
-        mobile: <OwaspMobile>{OwaspMobile.m3},
-        web: <OwaspWeb>{OwaspWeb.a01, OwaspWeb.a07},
-      );
+    mobile: <OwaspMobile>{OwaspMobile.m3},
+    web: <OwaspWeb>{OwaspWeb.a01, OwaspWeb.a07},
+  );
 
   static const LintCode _code = LintCode(
-    name: 'require_auth_check',
-    problemMessage:
-        '[require_auth_check] Missing auth check allows unauthorized access '
+    'require_auth_check',
+    '[require_auth_check] Missing auth check allows unauthorized access '
         'to protected user data and privileged operations. {v5}',
     correctionMessage:
         'Add authentication verification before processing protected requests.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   static const Set<String> _protectedEndpointPatterns = <String>{
@@ -2327,11 +1944,10 @@ class RequireAuthCheckRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addFunctionDeclaration((FunctionDeclaration node) {
+    context.addFunctionDeclaration((FunctionDeclaration node) {
       final String functionName = node.name.lexeme.toLowerCase();
 
       // Skip Flutter UI functions by name prefix
@@ -2461,7 +2077,7 @@ class RequireAuthCheckRule extends SaropaLintRule {
 /// }
 /// ```
 class RequireTokenRefreshRule extends SaropaLintRule {
-  const RequireTokenRefreshRule() : super(code: _code);
+  RequireTokenRefreshRule() : super(code: _code);
 
   /// Missing token refresh causes unexpected logouts.
   /// UX issue rather than security vulnerability.
@@ -2473,26 +2089,24 @@ class RequireTokenRefreshRule extends SaropaLintRule {
 
   @override
   OwaspMapping get owasp => const OwaspMapping(
-        mobile: <OwaspMobile>{OwaspMobile.m3},
-        web: <OwaspWeb>{OwaspWeb.a07},
-      );
+    mobile: <OwaspMobile>{OwaspMobile.m3},
+    web: <OwaspWeb>{OwaspWeb.a07},
+  );
 
   static const LintCode _code = LintCode(
-    name: 'require_token_refresh',
-    problemMessage:
-        '[require_token_refresh] Auth service stores access token but may lack refresh logic. Access tokens expire. Without refresh logic, users get logged out unexpectedly. Implement proactive token refresh. {v2}',
+    'require_token_refresh',
+    '[require_token_refresh] Auth service stores access token but may lack refresh logic. Access tokens expire. Without refresh logic, users get logged out unexpectedly. Implement proactive token refresh. {v2}',
     correctionMessage:
         'Implement token refresh to handle expiration gracefully. Audit similar patterns across the codebase to ensure consistent security practices.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addClassDeclaration((ClassDeclaration node) {
+    context.addClassDeclaration((ClassDeclaration node) {
       final String className = node.name.lexeme.toLowerCase();
 
       // Check if class is auth-related
@@ -2570,7 +2184,7 @@ class RequireTokenRefreshRule extends SaropaLintRule {
 /// }
 /// ```
 class AvoidJwtDecodeClientRule extends SaropaLintRule {
-  const AvoidJwtDecodeClientRule() : super(code: _code);
+  AvoidJwtDecodeClientRule() : super(code: _code);
 
   /// Client-decoded JWTs can be manipulated for authorization bypass.
   /// Each occurrence risks privilege escalation.
@@ -2582,26 +2196,24 @@ class AvoidJwtDecodeClientRule extends SaropaLintRule {
 
   @override
   OwaspMapping get owasp => const OwaspMapping(
-        mobile: <OwaspMobile>{OwaspMobile.m3},
-        web: <OwaspWeb>{OwaspWeb.a07},
-      );
+    mobile: <OwaspMobile>{OwaspMobile.m3},
+    web: <OwaspWeb>{OwaspWeb.a07},
+  );
 
   static const LintCode _code = LintCode(
-    name: 'avoid_jwt_decode_client',
-    problemMessage:
-        '[avoid_jwt_decode_client] Decoding JWT tokens on the client for authorization decisions is insecure because the client cannot verify token signatures. Attackers can craft or modify JWT claims to bypass permission checks, escalate privileges, and access restricted features or data without valid server-issued credentials. {v4}',
+    'avoid_jwt_decode_client',
+    '[avoid_jwt_decode_client] Decoding JWT tokens on the client for authorization decisions is insecure because the client cannot verify token signatures. Attackers can craft or modify JWT claims to bypass permission checks, escalate privileges, and access restricted features or data without valid server-issued credentials. {v4}',
     correctionMessage:
         'Verify JWT claims and signature on the server side only. Use client-decoded JWT data for display purposes only, never for authorization or access control decisions.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       final String methodName = node.methodName.name.toLowerCase();
 
       // Check for JWT decode calls
@@ -2627,7 +2239,7 @@ class AvoidJwtDecodeClientRule extends SaropaLintRule {
               condition.contains('permission') ||
               condition.contains('scope') ||
               condition.contains('claim')) {
-            reporter.atNode(node, code);
+            reporter.atNode(node);
             return;
           }
         }
@@ -2636,11 +2248,9 @@ class AvoidJwtDecodeClientRule extends SaropaLintRule {
     });
 
     // Also check for direct JWT library usage
-    context.registry.addInstanceCreationExpression((
-      InstanceCreationExpression node,
-    ) {
-      final String typeName =
-          node.constructorName.type.name.lexeme.toLowerCase();
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
+      final String typeName = node.constructorName.type.name.lexeme
+          .toLowerCase();
       if (typeName.contains('jwt') || typeName.contains('jsonwebtoken')) {
         reporter.atNode(node.constructorName, code);
       }
@@ -2674,7 +2284,7 @@ class AvoidJwtDecodeClientRule extends SaropaLintRule {
 /// }
 /// ```
 class RequireLogoutCleanupRule extends SaropaLintRule {
-  const RequireLogoutCleanupRule() : super(code: _code);
+  RequireLogoutCleanupRule() : super(code: _code);
 
   /// Incomplete logout cleanup leaves sensitive data accessible.
   /// Each occurrence risks data leakage after logout.
@@ -2686,26 +2296,24 @@ class RequireLogoutCleanupRule extends SaropaLintRule {
 
   @override
   OwaspMapping get owasp => const OwaspMapping(
-        mobile: <OwaspMobile>{OwaspMobile.m3},
-        web: <OwaspWeb>{OwaspWeb.a07},
-      );
+    mobile: <OwaspMobile>{OwaspMobile.m3},
+    web: <OwaspWeb>{OwaspWeb.a07},
+  );
 
   static const LintCode _code = LintCode(
-    name: 'require_logout_cleanup',
-    problemMessage:
-        '[require_logout_cleanup] Incomplete logout cleanup leaves session tokens, cached user data, and authentication state accessible in local storage. On shared or stolen devices, the next user can access the previous account, personal data, and session tokens without re-authenticating, enabling unauthorized account access. {v4}',
+    'require_logout_cleanup',
+    '[require_logout_cleanup] Incomplete logout cleanup leaves session tokens, cached user data, and authentication state accessible in local storage. On shared or stolen devices, the next user can access the previous account, personal data, and session tokens without re-authenticating, enabling unauthorized account access. {v4}',
     correctionMessage:
         'Ensure logout clears all tokens from secure storage, removes cached user data, resets navigation state, and invalidates the server session to prevent unauthorized access.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodDeclaration((MethodDeclaration node) {
+    context.addMethodDeclaration((MethodDeclaration node) {
       final String methodName = node.name.lexeme.toLowerCase();
 
       if (methodName != 'logout' &&
@@ -2717,11 +2325,13 @@ class RequireLogoutCleanupRule extends SaropaLintRule {
       final String bodySource = node.body.toSource().toLowerCase();
 
       // Check for cleanup operations
-      final bool clearsStorage = bodySource.contains('delete') ||
+      final bool clearsStorage =
+          bodySource.contains('delete') ||
           bodySource.contains('remove') ||
           bodySource.contains('clear');
 
-      final bool clearsToken = bodySource.contains('token') ||
+      final bool clearsToken =
+          bodySource.contains('token') ||
           bodySource.contains('credential') ||
           bodySource.contains('auth');
 
@@ -2757,7 +2367,7 @@ class RequireLogoutCleanupRule extends SaropaLintRule {
 /// );
 /// ```
 class AvoidAuthInQueryParamsRule extends SaropaLintRule {
-  const AvoidAuthInQueryParamsRule() : super(code: _code);
+  AvoidAuthInQueryParamsRule() : super(code: _code);
 
   /// Auth tokens in query params are logged and leak via referrers.
   /// Each occurrence exposes credentials.
@@ -2769,18 +2379,17 @@ class AvoidAuthInQueryParamsRule extends SaropaLintRule {
 
   @override
   OwaspMapping get owasp => const OwaspMapping(
-        mobile: <OwaspMobile>{OwaspMobile.m1},
-        web: <OwaspWeb>{OwaspWeb.a03, OwaspWeb.a07},
-      );
+    mobile: <OwaspMobile>{OwaspMobile.m1},
+    web: <OwaspWeb>{OwaspWeb.a03, OwaspWeb.a07},
+  );
 
   static const LintCode _code = LintCode(
-    name: 'avoid_auth_in_query_params',
-    problemMessage:
-        '[avoid_auth_in_query_params] Query params are logged in server logs, '
+    'avoid_auth_in_query_params',
+    '[avoid_auth_in_query_params] Query params are logged in server logs, '
         'browser history, and referrer headers, leaking auth tokens. {v3}',
     correctionMessage:
         'Move token to Authorization header to prevent logging and leakage.',
-    errorSeverity: DiagnosticSeverity.ERROR,
+    severity: DiagnosticSeverity.ERROR,
   );
 
   static const Set<String> _tokenPatterns = <String>{
@@ -2796,40 +2405,39 @@ class AvoidAuthInQueryParamsRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addStringInterpolation((StringInterpolation node) {
+    context.addStringInterpolation((StringInterpolation node) {
       final String fullString = node.toSource().toLowerCase();
 
       for (final String pattern in _tokenPatterns) {
         if (fullString.contains(pattern)) {
-          reporter.atNode(node, code);
+          reporter.atNode(node);
           return;
         }
       }
     });
 
-    context.registry.addAdjacentStrings((AdjacentStrings node) {
+    context.addAdjacentStrings((AdjacentStrings node) {
       final String fullString = node.toSource().toLowerCase();
 
       for (final String pattern in _tokenPatterns) {
         if (fullString.contains(pattern)) {
-          reporter.atNode(node, code);
+          reporter.atNode(node);
           return;
         }
       }
     });
 
-    context.registry.addBinaryExpression((BinaryExpression node) {
+    context.addBinaryExpression((BinaryExpression node) {
       // Check for string concatenation with token
       if (node.operator.lexeme != '+') return;
 
       final String fullExpr = node.toSource().toLowerCase();
       for (final String pattern in _tokenPatterns) {
         if (fullExpr.contains(pattern)) {
-          reporter.atNode(node, code);
+          reporter.atNode(node);
           return;
         }
       }
@@ -2872,7 +2480,7 @@ class AvoidAuthInQueryParamsRule extends SaropaLintRule {
 /// }
 /// ```
 class RequireDeepLinkValidationRule extends SaropaLintRule {
-  const RequireDeepLinkValidationRule() : super(code: _code);
+  RequireDeepLinkValidationRule() : super(code: _code);
 
   /// Deep links without validation enable injection attacks.
   @override
@@ -2883,26 +2491,24 @@ class RequireDeepLinkValidationRule extends SaropaLintRule {
 
   @override
   OwaspMapping get owasp => const OwaspMapping(
-        mobile: <OwaspMobile>{OwaspMobile.m4, OwaspMobile.m8},
-        web: <OwaspWeb>{OwaspWeb.a01, OwaspWeb.a03},
-      );
+    mobile: <OwaspMobile>{OwaspMobile.m4, OwaspMobile.m8},
+    web: <OwaspWeb>{OwaspWeb.a01, OwaspWeb.a03},
+  );
 
   static const LintCode _code = LintCode(
-    name: 'require_deep_link_validation',
-    problemMessage:
-        '[require_deep_link_validation] Deep link parameter used without validation allows attackers to craft malicious URLs that inject arbitrary data into your app. Unvalidated deep link parameters can cause crashes from unexpected types, unauthorized access to restricted screens, or execution of unintended actions on behalf of the user. {v3}',
+    'require_deep_link_validation',
+    '[require_deep_link_validation] Deep link parameter used without validation allows attackers to craft malicious URLs that inject arbitrary data into your app. Unvalidated deep link parameters can cause crashes from unexpected types, unauthorized access to restricted screens, or execution of unintended actions on behalf of the user. {v3}',
     correctionMessage:
         'Add null checks, type validation, and format verification for all deep link parameters before using them for navigation or data operations.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       // Check for queryParameters access
       if (node.methodName.name != '[]') return;
 
@@ -2946,7 +2552,7 @@ class RequireDeepLinkValidationRule extends SaropaLintRule {
       // Check if immediately null-asserted without check (dangerous)
       final AstNode? parent = node.parent;
       if (parent is PostfixExpression && parent.operator.lexeme == '!') {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
         return;
       }
 
@@ -2957,13 +2563,13 @@ class RequireDeepLinkValidationRule extends SaropaLintRule {
             methodName == 'int' ||
             methodName == 'double' ||
             methodName == 'Uri') {
-          reporter.atNode(node, code);
+          reporter.atNode(node);
         }
       }
     });
 
     // Also check for RouteSettings.arguments usage
-    context.registry.addPropertyAccess((PropertyAccess node) {
+    context.addPropertyAccess((PropertyAccess node) {
       if (node.propertyName.name != 'arguments') return;
 
       final String targetSource = node.target?.toSource() ?? '';
@@ -2987,38 +2593,8 @@ class RequireDeepLinkValidationRule extends SaropaLintRule {
           }
           current = current.parent;
         }
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
-    });
-  }
-
-  @override
-  List<Fix> getFixes() => <Fix>[_AddDeepLinkValidationFix()];
-}
-
-class _AddDeepLinkValidationFix extends DartFix {
-  @override
-  void run(
-    CustomLintResolver resolver,
-    ChangeReporter reporter,
-    CustomLintContext context,
-    AnalysisError analysisError,
-    List<AnalysisError> others,
-  ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
-      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
-
-      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
-        message: 'Add HACK: Validate deep link parameter',
-        priority: 1,
-      );
-
-      changeBuilder.addDartFileEdit((builder) {
-        builder.addSimpleInsertion(
-          node.offset,
-          '// HACK: Validate this deep link parameter before use\n',
-        );
-      });
     });
   }
 }
@@ -3045,7 +2621,7 @@ class _AddDeepLinkValidationFix extends DartFix {
 /// await file.writeAsBytes(encrypted);
 /// ```
 class RequireDataEncryptionRule extends SaropaLintRule {
-  const RequireDataEncryptionRule() : super(code: _code);
+  RequireDataEncryptionRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.critical;
@@ -3055,18 +2631,17 @@ class RequireDataEncryptionRule extends SaropaLintRule {
 
   @override
   OwaspMapping get owasp => const OwaspMapping(
-        mobile: <OwaspMobile>{OwaspMobile.m9, OwaspMobile.m10},
-        web: <OwaspWeb>{OwaspWeb.a02},
-      );
+    mobile: <OwaspMobile>{OwaspMobile.m9, OwaspMobile.m10},
+    web: <OwaspWeb>{OwaspWeb.a02},
+  );
 
   static const LintCode _code = LintCode(
-    name: 'require_data_encryption',
-    problemMessage:
-        '[require_data_encryption] Unencrypted sensitive data exposes '
+    'require_data_encryption',
+    '[require_data_encryption] Unencrypted sensitive data exposes '
         'credentials to attackers via device access or backup extraction. {v5}',
     correctionMessage:
         'Use flutter_secure_storage, encrypted Hive box, or AES encryption.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   static const Set<String> _sensitiveKeywords = {
@@ -3092,11 +2667,10 @@ class RequireDataEncryptionRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       final String methodName = node.methodName.name;
 
       // Check for storage write operations
@@ -3125,7 +2699,7 @@ class RequireDataEncryptionRule extends SaropaLintRule {
 
       for (final String keyword in _sensitiveKeywords) {
         if (nodeSource.contains(keyword)) {
-          reporter.atNode(node, code);
+          reporter.atNode(node);
           return;
         }
       }
@@ -3154,7 +2728,7 @@ class RequireDataEncryptionRule extends SaropaLintRule {
 /// Text(maskPhoneNumber(user.phoneNumber)); // Custom masking
 /// ```
 class PreferDataMaskingRule extends SaropaLintRule {
-  const PreferDataMaskingRule() : super(code: _code);
+  PreferDataMaskingRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.medium;
@@ -3164,17 +2738,16 @@ class PreferDataMaskingRule extends SaropaLintRule {
 
   @override
   OwaspMapping get owasp => const OwaspMapping(
-        mobile: <OwaspMobile>{OwaspMobile.m6},
-        web: <OwaspWeb>{OwaspWeb.a04},
-      );
+    mobile: <OwaspMobile>{OwaspMobile.m6},
+    web: <OwaspWeb>{OwaspWeb.a04},
+  );
 
   static const LintCode _code = LintCode(
-    name: 'prefer_data_masking',
-    problemMessage:
-        '[prefer_data_masking] Unmasked sensitive data visible in UI and screenshots. Sensitive data (SSN, credit cards, passwords) must be partially masked when displayed to prevent shoulder surfing. {v4}',
+    'prefer_data_masking',
+    '[prefer_data_masking] Unmasked sensitive data visible in UI and screenshots. Sensitive data (SSN, credit cards, passwords) must be partially masked when displayed to prevent shoulder surfing. {v4}',
     correctionMessage:
         'Mask sensitive data: "****-****-****-1234" instead of full number. Audit similar patterns across the codebase to ensure consistent security practices.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   static const Set<String> _sensitivePatterns = {
@@ -3197,12 +2770,10 @@ class PreferDataMaskingRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry
-        .addInstanceCreationExpression((InstanceCreationExpression node) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final String typeName = node.constructorName.type.name2.lexeme;
 
       // Check for Text widgets
@@ -3221,7 +2792,7 @@ class PreferDataMaskingRule extends SaropaLintRule {
             return; // Already masked
           }
 
-          reporter.atNode(node, code);
+          reporter.atNode(node);
           return;
         }
       }
@@ -3263,7 +2834,7 @@ class PreferDataMaskingRule extends SaropaLintRule {
 /// }
 /// ```
 class AvoidScreenshotSensitiveRule extends SaropaLintRule {
-  const AvoidScreenshotSensitiveRule() : super(code: _code);
+  AvoidScreenshotSensitiveRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.medium;
@@ -3273,17 +2844,16 @@ class AvoidScreenshotSensitiveRule extends SaropaLintRule {
 
   @override
   OwaspMapping get owasp => const OwaspMapping(
-        mobile: <OwaspMobile>{OwaspMobile.m6},
-        web: <OwaspWeb>{OwaspWeb.a04},
-      );
+    mobile: <OwaspMobile>{OwaspMobile.m6},
+    web: <OwaspWeb>{OwaspWeb.a04},
+  );
 
   static const LintCode _code = LintCode(
-    name: 'avoid_screenshot_sensitive',
-    problemMessage:
-        '[avoid_screenshot_sensitive] Sensitive screen allows screenshots and screen recording. Financial and authentication screens should disable screenshots using platform APIs to prevent sensitive data exposure. {v5}',
+    'avoid_screenshot_sensitive',
+    '[avoid_screenshot_sensitive] Sensitive screen allows screenshots and screen recording. Financial and authentication screens should disable screenshots using platform APIs to prevent sensitive data exposure. {v5}',
     correctionMessage:
         'Use FlutterWindowManager.addFlags(FLAG_SECURE) for sensitive screens. Audit similar patterns across the codebase to ensure consistent security practices.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   static const Set<String> _sensitiveScreenNames = {
@@ -3308,11 +2878,10 @@ class AvoidScreenshotSensitiveRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addClassDeclaration((ClassDeclaration node) {
+    context.addClassDeclaration((ClassDeclaration node) {
       final String className = node.name.lexeme.toLowerCase();
 
       // Check if this looks like a sensitive screen
@@ -3340,7 +2909,7 @@ class AvoidScreenshotSensitiveRule extends SaropaLintRule {
         return; // Has protection
       }
 
-      reporter.atNode(node, code);
+      reporter.atNode(node);
     });
   }
 }
@@ -3372,7 +2941,7 @@ class AvoidScreenshotSensitiveRule extends SaropaLintRule {
 /// )
 /// ```
 class RequireSecurePasswordFieldRule extends SaropaLintRule {
-  const RequireSecurePasswordFieldRule() : super(code: _code);
+  RequireSecurePasswordFieldRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.critical;
@@ -3382,27 +2951,24 @@ class RequireSecurePasswordFieldRule extends SaropaLintRule {
 
   @override
   OwaspMapping get owasp => const OwaspMapping(
-        mobile: <OwaspMobile>{OwaspMobile.m1, OwaspMobile.m9},
-        web: <OwaspWeb>{OwaspWeb.a02, OwaspWeb.a07},
-      );
+    mobile: <OwaspMobile>{OwaspMobile.m1, OwaspMobile.m9},
+    web: <OwaspWeb>{OwaspWeb.a02, OwaspWeb.a07},
+  );
 
   static const LintCode _code = LintCode(
-    name: 'require_secure_password_field',
-    problemMessage:
-        '[require_secure_password_field] Password input fields must disable suggestions and autocorrect to prevent sensitive information from being stored in device dictionaries or suggested to users inappropriately. Failing to do so increases the risk of password leakage, accidental exposure, and poor user privacy. Always configure password fields to maximize security and user trust. {v5}',
+    'require_secure_password_field',
+    '[require_secure_password_field] Password input fields must disable suggestions and autocorrect to prevent sensitive information from being stored in device dictionaries or suggested to users inappropriately. Failing to do so increases the risk of password leakage, accidental exposure, and poor user privacy. Always configure password fields to maximize security and user trust. {v5}',
     correctionMessage:
         'Set enableSuggestions: false and autocorrect: false on all password fields (TextField, TextFormField, CupertinoTextField) to prevent password suggestions and autocorrect. This helps protect user credentials from being stored or exposed.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry
-        .addInstanceCreationExpression((InstanceCreationExpression node) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final String typeName = node.constructorName.type.name2.lexeme;
 
       if (typeName != 'TextField' &&
@@ -3420,67 +2986,14 @@ class RequireSecurePasswordFieldRule extends SaropaLintRule {
       }
 
       // Check for secure keyboard settings
-      final bool hasEnableSuggestions =
-          nodeSource.contains('enableSuggestions: false');
+      final bool hasEnableSuggestions = nodeSource.contains(
+        'enableSuggestions: false',
+      );
       final bool hasAutocorrect = nodeSource.contains('autocorrect: false');
 
       if (!hasEnableSuggestions || !hasAutocorrect) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
-    });
-  }
-
-  @override
-  List<Fix> getFixes() => <Fix>[_AddSecureKeyboardSettingsFix()];
-}
-
-class _AddSecureKeyboardSettingsFix extends DartFix {
-  @override
-  void run(
-    CustomLintResolver resolver,
-    ChangeReporter reporter,
-    CustomLintContext context,
-    AnalysisError analysisError,
-    List<AnalysisError> others,
-  ) {
-    context.registry
-        .addInstanceCreationExpression((InstanceCreationExpression node) {
-      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
-
-      final String typeName = node.constructorName.type.name2.lexeme;
-      if (typeName != 'TextField' &&
-          typeName != 'TextFormField' &&
-          typeName != 'CupertinoTextField') {
-        return;
-      }
-
-      final String nodeSource = node.toSource();
-      final bool hasEnableSuggestions =
-          nodeSource.contains('enableSuggestions: false');
-      final bool hasAutocorrect = nodeSource.contains('autocorrect: false');
-
-      if (hasEnableSuggestions && hasAutocorrect) return;
-
-      // Build the properties to add
-      final List<String> propsToAdd = <String>[];
-      if (!hasEnableSuggestions) propsToAdd.add('enableSuggestions: false');
-      if (!hasAutocorrect) propsToAdd.add('autocorrect: false');
-
-      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
-        message: 'Add secure keyboard settings',
-        priority: 1,
-      );
-
-      changeBuilder.addDartFileEdit((builder) {
-        // Find the last named argument to insert after
-        final ArgumentList args = node.argumentList;
-        if (args.arguments.isEmpty) return;
-
-        final Expression lastArg = args.arguments.last;
-        final String insertion = ', ${propsToAdd.join(', ')}';
-
-        builder.addSimpleInsertion(lastArg.end, insertion);
-      });
     });
   }
 }
@@ -3537,7 +3050,7 @@ class _AddSecureKeyboardSettingsFix extends DartFix {
 ///
 /// See also: `require_file_path_sanitization` for a similar rule.
 class AvoidPathTraversalRule extends SaropaLintRule {
-  const AvoidPathTraversalRule() : super(code: _code);
+  AvoidPathTraversalRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.critical;
@@ -3547,27 +3060,24 @@ class AvoidPathTraversalRule extends SaropaLintRule {
 
   @override
   OwaspMapping get owasp => const OwaspMapping(
-        mobile: <OwaspMobile>{OwaspMobile.m4},
-        web: <OwaspWeb>{OwaspWeb.a01, OwaspWeb.a03},
-      );
+    mobile: <OwaspMobile>{OwaspMobile.m4},
+    web: <OwaspWeb>{OwaspWeb.a01, OwaspWeb.a03},
+  );
 
   static const LintCode _code = LintCode(
-    name: 'avoid_path_traversal',
-    problemMessage:
-        '[avoid_path_traversal] File paths constructed from user input may allow path traversal attacks (e.g., "../"), enabling access to sensitive files outside the intended directory. This is a critical security risk. {v7}',
+    'avoid_path_traversal',
+    '[avoid_path_traversal] File paths constructed from user input may allow path traversal attacks (e.g., "../"), enabling access to sensitive files outside the intended directory. This is a critical security risk. {v7}',
     correctionMessage:
         'Sanitize and validate file paths to prevent traversal (e.g., remove "../", use path package), and restrict access to allowed directories only.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry
-        .addInstanceCreationExpression((InstanceCreationExpression node) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final String typeName = node.constructorName.type.name2.lexeme;
 
       // Check for File/Directory creation
@@ -3602,20 +3112,20 @@ class AvoidPathTraversalRule extends SaropaLintRule {
       // Parameter is used - check for validation
       if (_hasPathValidation(node)) return;
 
-      reporter.atNode(node, code);
+      reporter.atNode(node);
     });
   }
 
   /// Gets the parameters of the enclosing function or method.
   FormalParameterList? _getFunctionParameters(AstNode node) {
-    final FunctionDeclaration? funcDecl =
-        node.thisOrAncestorOfType<FunctionDeclaration>();
+    final FunctionDeclaration? funcDecl = node
+        .thisOrAncestorOfType<FunctionDeclaration>();
     if (funcDecl != null) {
       return funcDecl.functionExpression.parameters;
     }
 
-    final MethodDeclaration? methodDecl =
-        node.thisOrAncestorOfType<MethodDeclaration>();
+    final MethodDeclaration? methodDecl = node
+        .thisOrAncestorOfType<MethodDeclaration>();
     if (methodDecl != null) {
       return methodDecl.parameters;
     }
@@ -3681,7 +3191,7 @@ class AvoidPathTraversalRule extends SaropaLintRule {
 /// final sanitized = sanitizeHtml(userComment);
 /// ```
 class PreferHtmlEscapeRule extends SaropaLintRule {
-  const PreferHtmlEscapeRule() : super(code: _code);
+  PreferHtmlEscapeRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.critical;
@@ -3691,27 +3201,24 @@ class PreferHtmlEscapeRule extends SaropaLintRule {
 
   @override
   OwaspMapping get owasp => const OwaspMapping(
-        mobile: <OwaspMobile>{OwaspMobile.m4},
-        web: <OwaspWeb>{OwaspWeb.a03},
-      );
+    mobile: <OwaspMobile>{OwaspMobile.m4},
+    web: <OwaspWeb>{OwaspWeb.a03},
+  );
 
   static const LintCode _code = LintCode(
-    name: 'prefer_html_escape',
-    problemMessage:
-        '[prefer_html_escape] Displaying user-generated content in a WebView without proper HTML escaping exposes your app to cross-site scripting (XSS) attacks. Malicious input can execute scripts, steal user data, or compromise device security. Always sanitize and escape user content before rendering it in a web context. {v4}',
+    'prefer_html_escape',
+    '[prefer_html_escape] Displaying user-generated content in a WebView without proper HTML escaping exposes your app to cross-site scripting (XSS) attacks. Malicious input can execute scripts, steal user data, or compromise device security. Always sanitize and escape user content before rendering it in a web context. {v4}',
     correctionMessage:
         'Escape all user content using htmlEscape.convert() or a trusted sanitization library before displaying it in a WebView or similar widget. This prevents XSS and protects users from malicious input.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry
-        .addInstanceCreationExpression((InstanceCreationExpression node) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final String typeName = node.constructorName.type.name2.lexeme;
 
       // Check for WebView widgets
@@ -3740,12 +3247,12 @@ class PreferHtmlEscapeRule extends SaropaLintRule {
           return; // Has escaping
         }
 
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
 
     // Also check for direct loadHtml calls
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       final String methodName = node.methodName.name;
 
       if (methodName != 'loadHtml' &&
@@ -3761,7 +3268,7 @@ class PreferHtmlEscapeRule extends SaropaLintRule {
           !nodeSource.contains('htmlEscape') &&
           !nodeSource.contains('sanitize') &&
           !nodeSource.contains('escape')) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
   }
@@ -3796,7 +3303,7 @@ class PreferHtmlEscapeRule extends SaropaLintRule {
 /// await FlutterSecureStorage().write(key: 'auth', value: jwtToken);
 /// ```
 class RequireSecureStorageForAuthRule extends SaropaLintRule {
-  const RequireSecureStorageForAuthRule() : super(code: _code);
+  RequireSecureStorageForAuthRule() : super(code: _code);
 
   /// Storing auth tokens in SharedPreferences exposes credentials.
   /// Critical security vulnerability.
@@ -3808,18 +3315,17 @@ class RequireSecureStorageForAuthRule extends SaropaLintRule {
 
   @override
   OwaspMapping get owasp => const OwaspMapping(
-        mobile: <OwaspMobile>{OwaspMobile.m3, OwaspMobile.m9},
-        web: <OwaspWeb>{OwaspWeb.a02, OwaspWeb.a07},
-      );
+    mobile: <OwaspMobile>{OwaspMobile.m3, OwaspMobile.m9},
+    web: <OwaspWeb>{OwaspWeb.a02, OwaspWeb.a07},
+  );
 
   static const LintCode _code = LintCode(
-    name: 'require_secure_storage_for_auth',
-    problemMessage:
-        '[require_secure_storage_for_auth] Auth tokens in SharedPreferences '
+    'require_secure_storage_for_auth',
+    '[require_secure_storage_for_auth] Auth tokens in SharedPreferences '
         'leak via backup extraction, enabling account takeover. {v4}',
     correctionMessage:
         'Use FlutterSecureStorage for JWT, bearer tokens, and auth credentials.',
-    errorSeverity: DiagnosticSeverity.ERROR,
+    severity: DiagnosticSeverity.ERROR,
   );
 
   /// Auth-specific patterns to check in VALUE (not key).
@@ -3837,11 +3343,10 @@ class RequireSecureStorageForAuthRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       final String methodName = node.methodName.name;
       if (methodName != 'setString') return;
 
@@ -3852,7 +3357,8 @@ class RequireSecureStorageForAuthRule extends SaropaLintRule {
       final String targetType = target.staticType?.toString() ?? '';
       final String targetSource = target.toSource().toLowerCase();
 
-      final bool isPrefs = targetType.contains('SharedPreferences') ||
+      final bool isPrefs =
+          targetType.contains('SharedPreferences') ||
           targetSource.contains('pref') ||
           targetSource.contains('sharedpreferences');
 
@@ -3866,7 +3372,7 @@ class RequireSecureStorageForAuthRule extends SaropaLintRule {
 
       for (final String pattern in _authValuePatterns) {
         if (valueSource.contains(pattern)) {
-          reporter.atNode(node, code);
+          reporter.atNode(node);
           return;
         }
       }
@@ -3896,7 +3402,7 @@ class RequireSecureStorageForAuthRule extends SaropaLintRule {
 /// http.get(url);
 /// ```
 class RequireUrlValidationRule extends SaropaLintRule {
-  const RequireUrlValidationRule() : super(code: _code);
+  RequireUrlValidationRule() : super(code: _code);
 
   /// Security vulnerability - unvalidated URLs can be exploited.
   @override
@@ -3907,26 +3413,24 @@ class RequireUrlValidationRule extends SaropaLintRule {
 
   @override
   OwaspMapping get owasp => const OwaspMapping(
-        mobile: <OwaspMobile>{OwaspMobile.m4},
-        web: <OwaspWeb>{OwaspWeb.a03, OwaspWeb.a10},
-      );
+    mobile: <OwaspMobile>{OwaspMobile.m4},
+    web: <OwaspWeb>{OwaspWeb.a03, OwaspWeb.a10},
+  );
 
   static const LintCode _code = LintCode(
-    name: 'require_url_validation',
-    problemMessage:
-        '[require_url_validation] Uri.parse on user input without scheme validation enables SSRF attacks. Attackers can make your app connect to internal servers, databases, or use malicious protocols to exfiltrate data. {v5}',
+    'require_url_validation',
+    '[require_url_validation] Uri.parse on user input without scheme validation enables SSRF attacks. Attackers can make your app connect to internal servers, databases, or use malicious protocols to exfiltrate data. {v5}',
     correctionMessage:
         'Validate url.scheme is https or http before making requests, and reject file://, data://, and other dangerous schemes that could access local resources.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodInvocation((node) {
+    context.addMethodInvocation((node) {
       // Check for Uri.parse
       final target = node.target;
       if (target is! SimpleIdentifier || target.name != 'Uri') {
@@ -3973,7 +3477,7 @@ class RequireUrlValidationRule extends SaropaLintRule {
         return;
       }
 
-      reporter.atNode(node, code);
+      reporter.atNode(node);
     });
   }
 }
@@ -4005,7 +3509,7 @@ class RequireUrlValidationRule extends SaropaLintRule {
 /// }
 /// ```
 class AvoidRedirectInjectionRule extends SaropaLintRule {
-  const AvoidRedirectInjectionRule() : super(code: _code);
+  AvoidRedirectInjectionRule() : super(code: _code);
 
   /// Security vulnerability - open redirects enable phishing.
   @override
@@ -4016,17 +3520,16 @@ class AvoidRedirectInjectionRule extends SaropaLintRule {
 
   @override
   OwaspMapping get owasp => const OwaspMapping(
-        mobile: <OwaspMobile>{OwaspMobile.m4},
-        web: <OwaspWeb>{OwaspWeb.a01},
-      );
+    mobile: <OwaspMobile>{OwaspMobile.m4},
+    web: <OwaspWeb>{OwaspWeb.a01},
+  );
 
   static const LintCode _code = LintCode(
-    name: 'avoid_redirect_injection',
-    problemMessage:
-        '[avoid_redirect_injection] Redirect URL read from a parameter or user input without domain validation creates an open redirect vulnerability. Attackers craft URLs pointing to your app that redirect victims to phishing sites, credential harvesters, or malware downloads while appearing to originate from your trusted domain. {v5}',
+    'avoid_redirect_injection',
+    '[avoid_redirect_injection] Redirect URL read from a parameter or user input without domain validation creates an open redirect vulnerability. Attackers craft URLs pointing to your app that redirect victims to phishing sites, credential harvesters, or malware downloads while appearing to originate from your trusted domain. {v5}',
     correctionMessage:
         'Validate the redirect URL host against an allowlist of trusted domains before performing the redirect, and reject URLs with unexpected schemes or external hosts.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   static const _redirectTerms = [
@@ -4042,11 +3545,10 @@ class AvoidRedirectInjectionRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodInvocation((node) {
+    context.addMethodInvocation((node) {
       final methodName = node.methodName.name.toLowerCase();
 
       // Check for navigation methods
@@ -4061,8 +3563,9 @@ class AvoidRedirectInjectionRule extends SaropaLintRule {
       // Check arguments for redirect-related variable names
       for (final arg in node.argumentList.arguments) {
         // Get the actual expression (unwrap NamedExpression if needed)
-        final Expression actualArg =
-            arg is NamedExpression ? arg.expression : arg;
+        final Expression actualArg = arg is NamedExpression
+            ? arg.expression
+            : arg;
 
         // Skip property access on typed objects (e.g., item.destination)
         // Even though item.destination has type String, the source is a typed
@@ -4079,7 +3582,8 @@ class AvoidRedirectInjectionRule extends SaropaLintRule {
           final typeName = argType.getDisplayString();
 
           // Skip custom object types (start with uppercase, not String/Uri/dynamic)
-          final isCustomType = typeName.isNotEmpty &&
+          final isCustomType =
+              typeName.isNotEmpty &&
               typeName[0].toUpperCase() == typeName[0] &&
               !typeName.startsWith('String') &&
               !typeName.startsWith('Uri') &&
@@ -4092,7 +3596,8 @@ class AvoidRedirectInjectionRule extends SaropaLintRule {
           }
 
           // Also skip obvious non-URL primitive types
-          final isUrlType = typeName == 'String' ||
+          final isUrlType =
+              typeName == 'String' ||
               typeName == 'String?' ||
               typeName == 'Uri' ||
               typeName == 'Uri?' ||
@@ -4108,8 +3613,9 @@ class AvoidRedirectInjectionRule extends SaropaLintRule {
         final argSource = arg.toSource().toLowerCase();
 
         // Check if argument name suggests redirect
-        final isRedirectRelated =
-            _redirectTerms.any((term) => argSource.contains(term));
+        final isRedirectRelated = _redirectTerms.any(
+          (term) => argSource.contains(term),
+        );
 
         if (!isRedirectRelated) {
           continue;
@@ -4138,45 +3644,8 @@ class AvoidRedirectInjectionRule extends SaropaLintRule {
           }
         }
 
-        reporter.atNode(arg, code);
+        reporter.atNode(arg);
       }
-    });
-  }
-
-  @override
-  List<Fix> getFixes() => <Fix>[_AddRedirectValidationCommentFix()];
-}
-
-class _AddRedirectValidationCommentFix extends DartFix {
-  @override
-  void run(
-    CustomLintResolver resolver,
-    ChangeReporter reporter,
-    CustomLintContext context,
-    AnalysisError analysisError,
-    List<AnalysisError> others,
-  ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
-      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
-
-      // Find the statement containing this invocation
-      AstNode? current = node;
-      while (current != null && current is! ExpressionStatement) {
-        current = current.parent;
-      }
-      if (current == null) return;
-
-      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
-        message: 'Add domain validation comment',
-        priority: 1,
-      );
-
-      changeBuilder.addDartFileEdit((builder) {
-        builder.addSimpleInsertion(
-          current!.offset,
-          '// HACK: Validate redirect URL host against trusted domains allowlist\n    ',
-        );
-      });
     });
   }
 }
@@ -4207,7 +3676,7 @@ class _AddRedirectValidationCommentFix extends DartFix {
 /// File('${dir.path}/data.enc').writeAsString(encrypted);
 /// ```
 class AvoidExternalStorageSensitiveRule extends SaropaLintRule {
-  const AvoidExternalStorageSensitiveRule() : super(code: _code);
+  AvoidExternalStorageSensitiveRule() : super(code: _code);
 
   /// Security vulnerability - sensitive data exposed.
   @override
@@ -4218,18 +3687,17 @@ class AvoidExternalStorageSensitiveRule extends SaropaLintRule {
 
   @override
   OwaspMapping get owasp => const OwaspMapping(
-        mobile: <OwaspMobile>{OwaspMobile.m9},
-        web: <OwaspWeb>{OwaspWeb.a01},
-      );
+    mobile: <OwaspMobile>{OwaspMobile.m9},
+    web: <OwaspWeb>{OwaspWeb.a01},
+  );
 
   static const LintCode _code = LintCode(
-    name: 'avoid_external_storage_sensitive',
-    problemMessage:
-        '[avoid_external_storage_sensitive] External storage is world-readable '
+    'avoid_external_storage_sensitive',
+    '[avoid_external_storage_sensitive] External storage is world-readable '
         'on Android, exposing credentials to any installed app. {v4}',
     correctionMessage:
         'Use getApplicationDocumentsDirectory() or encrypt data first.',
-    errorSeverity: DiagnosticSeverity.ERROR,
+    severity: DiagnosticSeverity.ERROR,
   );
 
   static const _sensitiveTerms = [
@@ -4246,11 +3714,10 @@ class AvoidExternalStorageSensitiveRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodInvocation((node) {
+    context.addMethodInvocation((node) {
       final methodName = node.methodName.name;
 
       // Check for file write methods
@@ -4290,16 +3757,18 @@ class AvoidExternalStorageSensitiveRule extends SaropaLintRule {
           ? node.argumentList.arguments.first.toSource().toLowerCase()
           : '';
 
-      final isSensitive =
-          _sensitiveTerms.any((term) => writeDataSource.contains(term));
+      final isSensitive = _sensitiveTerms.any(
+        (term) => writeDataSource.contains(term),
+      );
 
       // Also check the file path
       final filePathSource = node.target?.toSource().toLowerCase() ?? '';
-      final pathSensitive =
-          _sensitiveTerms.any((term) => filePathSource.contains(term));
+      final pathSensitive = _sensitiveTerms.any(
+        (term) => filePathSource.contains(term),
+      );
 
       if (isSensitive || pathSensitive) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
   }
@@ -4330,7 +3799,7 @@ class AvoidExternalStorageSensitiveRule extends SaropaLintRule {
 /// }
 /// ```
 class PreferLocalAuthRule extends SaropaLintRule {
-  const PreferLocalAuthRule() : super(code: _code);
+  PreferLocalAuthRule() : super(code: _code);
 
   /// Security best practice for sensitive operations.
   @override
@@ -4341,17 +3810,16 @@ class PreferLocalAuthRule extends SaropaLintRule {
 
   @override
   OwaspMapping get owasp => const OwaspMapping(
-        mobile: <OwaspMobile>{OwaspMobile.m3},
-        web: <OwaspWeb>{OwaspWeb.a07},
-      );
+    mobile: <OwaspMobile>{OwaspMobile.m3},
+    web: <OwaspWeb>{OwaspWeb.a07},
+  );
 
   static const LintCode _code = LintCode(
-    name: 'prefer_local_auth',
-    problemMessage:
-        '[prefer_local_auth] Payment/sensitive operation without biometric authentication. Critical operations like payments should require additional authentication to prevent unauthorized access even if the device is unlocked. {v3}',
+    'prefer_local_auth',
+    '[prefer_local_auth] Payment/sensitive operation without biometric authentication. Critical operations like payments should require additional authentication to prevent unauthorized access even if the device is unlocked. {v3}',
     correctionMessage:
         'Add LocalAuthentication().authenticate() before sensitive operations. Audit similar patterns across the codebase to ensure consistent security practices.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   static const _sensitiveOperations = [
@@ -4368,16 +3836,16 @@ class PreferLocalAuthRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodDeclaration((node) {
+    context.addMethodDeclaration((node) {
       final methodName = node.name.lexeme.toLowerCase();
 
       // Check if method name suggests sensitive operation
-      final isSensitive =
-          _sensitiveOperations.any((op) => methodName.contains(op));
+      final isSensitive = _sensitiveOperations.any(
+        (op) => methodName.contains(op),
+      );
 
       if (!isSensitive) {
         return;
@@ -4394,7 +3862,7 @@ class PreferLocalAuthRule extends SaropaLintRule {
         return;
       }
 
-      reporter.atNode(node, code);
+      reporter.atNode(node);
     });
   }
 }
@@ -4425,7 +3893,7 @@ class PreferLocalAuthRule extends SaropaLintRule {
 /// await storage.write(key: 'jwt', value: token);  // Encrypted
 /// ```
 class RequireSecureStorageAuthDataRule extends SaropaLintRule {
-  const RequireSecureStorageAuthDataRule() : super(code: _code);
+  RequireSecureStorageAuthDataRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.critical;
@@ -4435,18 +3903,17 @@ class RequireSecureStorageAuthDataRule extends SaropaLintRule {
 
   @override
   OwaspMapping get owasp => const OwaspMapping(
-        mobile: <OwaspMobile>{OwaspMobile.m3, OwaspMobile.m9},
-        web: <OwaspWeb>{OwaspWeb.a02, OwaspWeb.a07},
-      );
+    mobile: <OwaspMobile>{OwaspMobile.m3, OwaspMobile.m9},
+    web: <OwaspWeb>{OwaspWeb.a02, OwaspWeb.a07},
+  );
 
   static const LintCode _code = LintCode(
-    name: 'require_secure_storage_auth_data',
-    problemMessage:
-        '[require_secure_storage_auth_data] Plaintext auth tokens enable '
+    'require_secure_storage_auth_data',
+    '[require_secure_storage_auth_data] Plaintext auth tokens enable '
         'session hijacking via device backup or physical access. {v3}',
     correctionMessage:
         'Replace SharedPreferences with FlutterSecureStorage for sensitive data.',
-    errorSeverity: DiagnosticSeverity.ERROR,
+    severity: DiagnosticSeverity.ERROR,
   );
 
   static const Set<String> _sensitiveKeys = <String>{
@@ -4468,11 +3935,10 @@ class RequireSecureStorageAuthDataRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       // Check for SharedPreferences set methods
       final methodName = node.methodName.name;
       if (methodName != 'setString' && methodName != 'setStringList') return;
@@ -4549,7 +4015,7 @@ class RequireSecureStorageAuthDataRule extends SaropaLintRule {
 /// )
 /// ```
 class PreferWebViewJavaScriptDisabledRule extends SaropaLintRule {
-  const PreferWebViewJavaScriptDisabledRule() : super(code: _code);
+  PreferWebViewJavaScriptDisabledRule() : super(code: _code);
 
   /// JavaScript in WebView increases XSS attack surface.
   /// Review each occurrence for security implications.
@@ -4561,17 +4027,16 @@ class PreferWebViewJavaScriptDisabledRule extends SaropaLintRule {
 
   @override
   OwaspMapping get owasp => const OwaspMapping(
-        mobile: <OwaspMobile>{OwaspMobile.m8},
-        web: <OwaspWeb>{OwaspWeb.a05, OwaspWeb.a06},
-      );
+    mobile: <OwaspMobile>{OwaspMobile.m8},
+    web: <OwaspWeb>{OwaspWeb.a05, OwaspWeb.a06},
+  );
 
   static const LintCode _code = LintCode(
-    name: 'prefer_webview_javascript_disabled',
-    problemMessage:
-        '[prefer_webview_javascript_disabled] WebView with JavaScript enabled expands the attack surface for cross-site scripting and remote code execution. Malicious scripts can steal authentication tokens, access device APIs through JavaScript bridges, read local storage, and exfiltrate user data to attacker-controlled servers without detection. {v4}',
+    'prefer_webview_javascript_disabled',
+    '[prefer_webview_javascript_disabled] WebView with JavaScript enabled expands the attack surface for cross-site scripting and remote code execution. Malicious scripts can steal authentication tokens, access device APIs through JavaScript bridges, read local storage, and exfiltrate user data to attacker-controlled servers without detection. {v4}',
     correctionMessage:
         'Set javaScriptEnabled: false or javascriptMode: JavascriptMode.disabled unless JavaScript is required, and restrict content to trusted HTTPS sources only.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   static const Set<String> _webViewTypes = <String>{
@@ -4584,13 +4049,10 @@ class PreferWebViewJavaScriptDisabledRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addInstanceCreationExpression((
-      InstanceCreationExpression node,
-    ) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final String typeName = node.constructorName.type.name2.lexeme;
       if (!_webViewTypes.contains(typeName)) return;
 
@@ -4660,7 +4122,7 @@ class PreferWebViewJavaScriptDisabledRule extends SaropaLintRule {
 /// )
 /// ```
 class AvoidWebViewInsecureContentRule extends SaropaLintRule {
-  const AvoidWebViewInsecureContentRule() : super(code: _code);
+  AvoidWebViewInsecureContentRule() : super(code: _code);
 
   /// Mixed content bypasses HTTPS encryption.
   /// Critical security vulnerability.
@@ -4672,28 +4134,24 @@ class AvoidWebViewInsecureContentRule extends SaropaLintRule {
 
   @override
   OwaspMapping get owasp => const OwaspMapping(
-        mobile: <OwaspMobile>{OwaspMobile.m8},
-        web: <OwaspWeb>{OwaspWeb.a05},
-      );
+    mobile: <OwaspMobile>{OwaspMobile.m8},
+    web: <OwaspWeb>{OwaspWeb.a05},
+  );
 
   static const LintCode _code = LintCode(
-    name: 'avoid_webview_insecure_content',
-    problemMessage:
-        '[avoid_webview_insecure_content] Allowing mixed (HTTP and HTTPS) content in a WebView exposes users to man-in-the-middle attacks, data interception, and content tampering. Insecure content can compromise the confidentiality and integrity of user data. Always restrict WebView to load only secure (HTTPS) content. {v3}',
+    'avoid_webview_insecure_content',
+    '[avoid_webview_insecure_content] Allowing mixed (HTTP and HTTPS) content in a WebView exposes users to man-in-the-middle attacks, data interception, and content tampering. Insecure content can compromise the confidentiality and integrity of user data. Always restrict WebView to load only secure (HTTPS) content. {v3}',
     correctionMessage:
         'Set mixedContentMode to MIXED_CONTENT_NEVER_ALLOW (or equivalent) to block insecure HTTP content in WebView. This ensures all loaded resources are secure and protects users from network-based attacks.',
-    errorSeverity: DiagnosticSeverity.ERROR,
+    severity: DiagnosticSeverity.ERROR,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addInstanceCreationExpression((
-      InstanceCreationExpression node,
-    ) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final String typeName = node.constructorName.type.name2.lexeme;
 
       // Check for InAppWebViewSettings or similar
@@ -4713,7 +4171,7 @@ class AvoidWebViewInsecureContentRule extends SaropaLintRule {
                 value.contains('alwaysallow') ||
                 value.contains('compatibility_mode') ||
                 value.contains('compatibilitymode')) {
-              reporter.atNode(arg, code);
+              reporter.atNode(arg);
               return;
             }
           }
@@ -4723,7 +4181,7 @@ class AvoidWebViewInsecureContentRule extends SaropaLintRule {
     });
 
     // Also check for method invocations
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       final String methodName = node.methodName.name.toLowerCase();
 
       // cspell:ignore setmixedcontentmode allowmixedcontent
@@ -4733,7 +4191,7 @@ class AvoidWebViewInsecureContentRule extends SaropaLintRule {
           final String argSource = arg.toSource().toLowerCase();
           if (argSource.contains('always') ||
               argSource.contains('compatibility')) {
-            reporter.atNode(node, code);
+            reporter.atNode(node);
             return;
           }
         }
@@ -4781,7 +4239,7 @@ class AvoidWebViewInsecureContentRule extends SaropaLintRule {
 /// )
 /// ```
 class RequireWebViewErrorHandlingRule extends SaropaLintRule {
-  const RequireWebViewErrorHandlingRule() : super(code: _code);
+  RequireWebViewErrorHandlingRule() : super(code: _code);
 
   /// Missing error handling creates poor UX on network failures.
   @override
@@ -4792,17 +4250,16 @@ class RequireWebViewErrorHandlingRule extends SaropaLintRule {
 
   @override
   OwaspMapping get owasp => const OwaspMapping(
-        mobile: <OwaspMobile>{OwaspMobile.m8},
-        web: <OwaspWeb>{OwaspWeb.a05},
-      );
+    mobile: <OwaspMobile>{OwaspMobile.m8},
+    web: <OwaspWeb>{OwaspWeb.a05},
+  );
 
   static const LintCode _code = LintCode(
-    name: 'require_webview_error_handling',
-    problemMessage:
-        '[require_webview_error_handling] WebView without an error handler displays a blank white page when network requests fail, SSL errors occur, or resources cannot be loaded. Users see no feedback about what went wrong and have no way to retry, creating a confusing and broken experience that appears as an app crash. {v3}',
+    'require_webview_error_handling',
+    '[require_webview_error_handling] WebView without an error handler displays a blank white page when network requests fail, SSL errors occur, or resources cannot be loaded. Users see no feedback about what went wrong and have no way to retry, creating a confusing and broken experience that appears as an app crash. {v3}',
     correctionMessage:
         'Add an onWebResourceError or onLoadError callback that displays a user-friendly error message with a retry option when WebView content fails to load.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   static const Set<String> _webViewTypes = <String>{
@@ -4829,13 +4286,10 @@ class RequireWebViewErrorHandlingRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addInstanceCreationExpression((
-      InstanceCreationExpression node,
-    ) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final String typeName = node.constructorName.type.name2.lexeme;
       if (!_webViewTypes.contains(typeName)) return;
 
@@ -4884,7 +4338,7 @@ class RequireWebViewErrorHandlingRule extends SaropaLintRule {
 /// final headers = {'X-API-Key': Config.apiKey};
 /// ```
 class AvoidApiKeyInCodeRule extends SaropaLintRule {
-  const AvoidApiKeyInCodeRule() : super(code: _code);
+  AvoidApiKeyInCodeRule() : super(code: _code);
 
   /// Hardcoded API keys can be extracted from builds.
   @override
@@ -4895,18 +4349,17 @@ class AvoidApiKeyInCodeRule extends SaropaLintRule {
 
   @override
   OwaspMapping get owasp => const OwaspMapping(
-        mobile: <OwaspMobile>{OwaspMobile.m1},
-        web: <OwaspWeb>{OwaspWeb.a07},
-      );
+    mobile: <OwaspMobile>{OwaspMobile.m1},
+    web: <OwaspWeb>{OwaspWeb.a07},
+  );
 
   static const LintCode _code = LintCode(
-    name: 'avoid_api_key_in_code',
-    problemMessage:
-        '[avoid_api_key_in_code] Hardcoded keys are extractable from app '
+    'avoid_api_key_in_code',
+    '[avoid_api_key_in_code] Hardcoded keys are extractable from app '
         'binaries, enabling unauthorized API access and billing abuse. {v3}',
     correctionMessage:
         'Use environment variables, secure storage, or build config to inject keys.',
-    errorSeverity: DiagnosticSeverity.ERROR,
+    severity: DiagnosticSeverity.ERROR,
   );
 
   // cspell:disable
@@ -4947,11 +4400,10 @@ class AvoidApiKeyInCodeRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addVariableDeclaration((VariableDeclaration node) {
+    context.addVariableDeclaration((VariableDeclaration node) {
       final String varName = node.name.lexeme.toLowerCase();
 
       // Check if variable name suggests an API key
@@ -4969,17 +4421,17 @@ class AvoidApiKeyInCodeRule extends SaropaLintRule {
         final String value = initializer.value;
         // Check length to avoid false positives on short placeholder strings
         if (value.length >= 16) {
-          reporter.atNode(node, code);
+          reporter.atNode(node);
         }
       }
     });
 
     // Also check string literals with API key patterns
-    context.registry.addSimpleStringLiteral((SimpleStringLiteral node) {
+    context.addSimpleStringLiteral((SimpleStringLiteral node) {
       final String value = node.value;
       for (final String prefix in _apiKeyPrefixes) {
         if (value.startsWith(prefix) && value.length > prefix.length + 10) {
-          reporter.atNode(node, code);
+          reporter.atNode(node);
           return;
         }
       }
@@ -5008,7 +4460,7 @@ class AvoidApiKeyInCodeRule extends SaropaLintRule {
 /// await encryptedBox.put('password', password);
 /// ```
 class AvoidStoringSensitiveUnencryptedRule extends SaropaLintRule {
-  const AvoidStoringSensitiveUnencryptedRule() : super(code: _code);
+  AvoidStoringSensitiveUnencryptedRule() : super(code: _code);
 
   /// Unencrypted sensitive data is readable on rooted/jailbroken devices.
   @override
@@ -5019,18 +4471,17 @@ class AvoidStoringSensitiveUnencryptedRule extends SaropaLintRule {
 
   @override
   OwaspMapping get owasp => const OwaspMapping(
-        mobile: <OwaspMobile>{OwaspMobile.m9},
-        web: <OwaspWeb>{OwaspWeb.a02},
-      );
+    mobile: <OwaspMobile>{OwaspMobile.m9},
+    web: <OwaspWeb>{OwaspWeb.a02},
+  );
 
   static const LintCode _code = LintCode(
-    name: 'avoid_storing_sensitive_unencrypted',
-    problemMessage:
-        '[avoid_storing_sensitive_unencrypted] Unencrypted sensitive data exposed '
+    'avoid_storing_sensitive_unencrypted',
+    '[avoid_storing_sensitive_unencrypted] Unencrypted sensitive data exposed '
         'via device backup extraction or rooted device access, enabling identity theft. {v4}',
     correctionMessage:
         'Use flutter_secure_storage or an encrypted Hive box for sensitive data.',
-    errorSeverity: DiagnosticSeverity.ERROR,
+    severity: DiagnosticSeverity.ERROR,
   );
 
   /// Keys that indicate sensitive data.
@@ -5064,11 +4515,10 @@ class AvoidStoringSensitiveUnencryptedRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       final String methodName = node.methodName.name;
       if (!_unsecureMethods.contains(methodName)) return;
 
@@ -5084,7 +4534,8 @@ class AvoidStoringSensitiveUnencryptedRule extends SaropaLintRule {
       }
 
       // Check if it's SharedPreferences or Hive
-      final bool isStorage = targetSource.contains('pref') ||
+      final bool isStorage =
+          targetSource.contains('pref') ||
           targetSource.contains('box') ||
           targetSource.contains('storage');
 
@@ -5101,14 +4552,14 @@ class AvoidStoringSensitiveUnencryptedRule extends SaropaLintRule {
         keyValue = firstArg.value.toLowerCase();
       } else if (firstArg is NamedExpression &&
           firstArg.expression is SimpleStringLiteral) {
-        keyValue =
-            (firstArg.expression as SimpleStringLiteral).value.toLowerCase();
+        keyValue = (firstArg.expression as SimpleStringLiteral).value
+            .toLowerCase();
       }
 
       if (keyValue != null) {
         for (final String sensitiveKey in _sensitiveKeys) {
           if (keyValue.contains(sensitiveKey)) {
-            reporter.atNode(node, code);
+            reporter.atNode(node);
             return;
           }
         }
@@ -5154,7 +4605,7 @@ class AvoidStoringSensitiveUnencryptedRule extends SaropaLintRule {
 ///   };
 /// ```
 class AvoidIgnoringSslErrorsRule extends SaropaLintRule {
-  const AvoidIgnoringSslErrorsRule() : super(code: _code);
+  AvoidIgnoringSslErrorsRule() : super(code: _code);
 
   /// Ignoring SSL errors enables man-in-the-middle attacks.
   /// Critical security vulnerability.
@@ -5166,27 +4617,25 @@ class AvoidIgnoringSslErrorsRule extends SaropaLintRule {
 
   @override
   OwaspMapping get owasp => const OwaspMapping(
-        mobile: <OwaspMobile>{OwaspMobile.m5},
-        web: <OwaspWeb>{OwaspWeb.a05},
-      );
+    mobile: <OwaspMobile>{OwaspMobile.m5},
+    web: <OwaspWeb>{OwaspWeb.a05},
+  );
 
   static const LintCode _code = LintCode(
-    name: 'avoid_ignoring_ssl_errors',
-    problemMessage:
-        '[avoid_ignoring_ssl_errors] Bypassing or ignoring SSL/TLS certificate errors disables the core security guarantees of HTTPS, allowing man-in-the-middle attackers to intercept, modify, or steal all data sent over the network. This exposes user credentials, tokens, and sensitive personal data to silent compromise, and is a leading cause of real-world security breaches. SSL validation must never be disabled in production code. {v3}',
+    'avoid_ignoring_ssl_errors',
+    '[avoid_ignoring_ssl_errors] Bypassing or ignoring SSL/TLS certificate errors disables the core security guarantees of HTTPS, allowing man-in-the-middle attackers to intercept, modify, or steal all data sent over the network. This exposes user credentials, tokens, and sensitive personal data to silent compromise, and is a leading cause of real-world security breaches. SSL validation must never be disabled in production code. {v3}',
     correctionMessage:
         'Always validate SSL/TLS certificates in your network stack. Never return true unconditionally or bypass certificate checks, even for testing. Use certificate pinning or trusted certificate authorities for additional security. Audit your codebase for insecure SSL handling and refactor to enforce strict validation. Document secure network practices for your team.',
-    errorSeverity: DiagnosticSeverity.ERROR,
+    severity: DiagnosticSeverity.ERROR,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
     // Check for badCertificateCallback assignments
-    context.registry.addAssignmentExpression((AssignmentExpression node) {
+    context.addAssignmentExpression((AssignmentExpression node) {
       final Expression leftSide = node.leftHandSide;
       if (leftSide is! PropertyAccess) return;
 
@@ -5196,12 +4645,12 @@ class AvoidIgnoringSslErrorsRule extends SaropaLintRule {
       // Check if the right side unconditionally returns true
       final Expression rightSide = node.rightHandSide;
       if (_returnsUnconditionalTrue(rightSide)) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
 
     // Check for cascade assignments
-    context.registry.addCascadeExpression((CascadeExpression node) {
+    context.addCascadeExpression((CascadeExpression node) {
       for (final Expression section in node.cascadeSections) {
         if (section is! AssignmentExpression) continue;
 
@@ -5213,15 +4662,13 @@ class AvoidIgnoringSslErrorsRule extends SaropaLintRule {
 
         final Expression rightSide = section.rightHandSide;
         if (_returnsUnconditionalTrue(rightSide)) {
-          reporter.atNode(section, code);
+          reporter.atNode(section);
         }
       }
     });
 
     // Check for named parameter in constructor calls (e.g., dio)
-    context.registry.addInstanceCreationExpression((
-      InstanceCreationExpression node,
-    ) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
       for (final Expression arg in node.argumentList.arguments) {
         if (arg is! NamedExpression) continue;
 
@@ -5235,7 +4682,7 @@ class AvoidIgnoringSslErrorsRule extends SaropaLintRule {
         // cspell:enable
 
         if (_returnsUnconditionalTrue(arg.expression)) {
-          reporter.atNode(arg, code);
+          reporter.atNode(arg);
         }
       }
     });
@@ -5296,7 +4743,7 @@ class AvoidIgnoringSslErrorsRule extends SaropaLintRule {
 /// final secureUrl = url.replaceFirst('http://', 'https://');
 /// ```
 class RequireHttpsOnlyRule extends SaropaLintRule {
-  const RequireHttpsOnlyRule() : super(code: _code);
+  RequireHttpsOnlyRule() : super(code: _code);
 
   /// HTTP traffic is unencrypted and can be intercepted.
   /// Critical for any network communication.
@@ -5308,17 +4755,16 @@ class RequireHttpsOnlyRule extends SaropaLintRule {
 
   @override
   OwaspMapping get owasp => const OwaspMapping(
-        mobile: <OwaspMobile>{OwaspMobile.m5},
-        web: <OwaspWeb>{OwaspWeb.a05},
-      );
+    mobile: <OwaspMobile>{OwaspMobile.m5},
+    web: <OwaspWeb>{OwaspWeb.a05},
+  );
 
   static const LintCode _code = LintCode(
-    name: 'require_https_only',
-    problemMessage:
-        '[require_https_only] HTTP URL detected in network request. Unencrypted HTTP traffic is vulnerable to interception, modification, and eavesdropping by any attacker on the network path. Sensitive data including credentials, personal information, and session tokens transmitted over HTTP can be silently captured in plaintext. {v4}',
+    'require_https_only',
+    '[require_https_only] HTTP URL detected in network request. Unencrypted HTTP traffic is vulnerable to interception, modification, and eavesdropping by any attacker on the network path. Sensitive data including credentials, personal information, and session tokens transmitted over HTTP can be silently captured in plaintext. {v4}',
     correctionMessage:
         'Replace http:// with https:// to encrypt all network traffic and prevent man-in-the-middle attacks, data interception, and content tampering.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   /// Localhost patterns that are safe to use HTTP.
@@ -5340,8 +4786,11 @@ class RequireHttpsOnlyRule extends SaropaLintRule {
     if (grandparent is! MethodInvocation) return false;
 
     final String methodName = grandparent.methodName.name;
-    if (!const <String>{'replaceFirst', 'replaceAll', 'replace'}
-        .contains(methodName)) {
+    if (!const <String>{
+      'replaceFirst',
+      'replaceAll',
+      'replace',
+    }.contains(methodName)) {
       return false;
     }
 
@@ -5360,11 +4809,10 @@ class RequireHttpsOnlyRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    checkHttpUrls(context, (AstNode node) => reporter.atNode(node, code));
+    checkHttpUrls(context, (AstNode node) => reporter.atNode(node));
   }
 
   /// Shared detection logic for HTTP URL checking.
@@ -5373,10 +4821,10 @@ class RequireHttpsOnlyRule extends SaropaLintRule {
   /// to avoid duplicating the detection logic across production and test
   /// rule variants.
   static void checkHttpUrls(
-    CustomLintContext context,
+    SaropaContext context,
     void Function(AstNode node) onViolation,
   ) {
-    context.registry.addSimpleStringLiteral((SimpleStringLiteral node) {
+    context.addSimpleStringLiteral((SimpleStringLiteral node) {
       final String value = node.value;
 
       // Check if it's an HTTP URL
@@ -5394,7 +4842,7 @@ class RequireHttpsOnlyRule extends SaropaLintRule {
     });
 
     // Also check string interpolations that might construct HTTP URLs
-    context.registry.addStringInterpolation((StringInterpolation node) {
+    context.addStringInterpolation((StringInterpolation node) {
       // Get the first element to check for http:// prefix
       final List<InterpolationElement> elements = node.elements;
       if (elements.isEmpty) return;
@@ -5411,40 +4859,6 @@ class RequireHttpsOnlyRule extends SaropaLintRule {
       }
 
       onViolation(node);
-    });
-  }
-
-  @override
-  List<Fix> getFixes() => <Fix>[_ReplaceWithHttpsFix()];
-}
-
-class _ReplaceWithHttpsFix extends DartFix {
-  @override
-  void run(
-    CustomLintResolver resolver,
-    ChangeReporter reporter,
-    CustomLintContext context,
-    AnalysisError analysisError,
-    List<AnalysisError> others,
-  ) {
-    context.registry.addSimpleStringLiteral((SimpleStringLiteral node) {
-      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
-
-      final String value = node.value;
-      if (!value.startsWith('http://')) return;
-
-      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
-        message: 'Replace with HTTPS',
-        priority: 1,
-      );
-
-      changeBuilder.addDartFileEdit((builder) {
-        final String newValue = value.replaceFirst('http://', 'https://');
-        builder.addSimpleReplacement(
-          node.sourceRange,
-          "'$newValue'",
-        );
-      });
     });
   }
 }
@@ -5471,7 +4885,7 @@ class _ReplaceWithHttpsFix extends DartFix {
 /// });
 /// ```
 class RequireHttpsOnlyTestRule extends SaropaLintRule {
-  const RequireHttpsOnlyTestRule() : super(code: _code);
+  RequireHttpsOnlyTestRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.low;
@@ -5483,28 +4897,24 @@ class RequireHttpsOnlyTestRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => const <FileType>{FileType.test};
 
   static const LintCode _code = LintCode(
-    name: 'require_https_only_test',
-    problemMessage: '[require_https_only_test] HTTP URL detected in test file. '
+    'require_https_only_test',
+    '[require_https_only_test] HTTP URL detected in test file. '
         'Consider using HTTPS even in test data. {v3}',
     correctionMessage:
         'Replace http:// with https:// or disable this rule for test files.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
     RequireHttpsOnlyRule.checkHttpUrls(
       context,
-      (AstNode node) => reporter.atNode(node, code),
+      (AstNode node) => reporter.atNode(node),
     );
   }
-
-  @override
-  List<Fix> getFixes() => <Fix>[_ReplaceWithHttpsFix()];
 }
 
 /// Warns when JSON is decoded from untrusted sources without type validation.
@@ -5538,7 +4948,7 @@ class RequireHttpsOnlyTestRule extends SaropaLintRule {
 /// final user = User.fromJson(jsonDecode(response.body));
 /// ```
 class AvoidUnsafeDeserializationRule extends SaropaLintRule {
-  const AvoidUnsafeDeserializationRule() : super(code: _code);
+  AvoidUnsafeDeserializationRule() : super(code: _code);
 
   /// Untrusted deserialization can lead to data integrity issues.
   @override
@@ -5549,17 +4959,16 @@ class AvoidUnsafeDeserializationRule extends SaropaLintRule {
 
   @override
   OwaspMapping get owasp => const OwaspMapping(
-        mobile: <OwaspMobile>{OwaspMobile.m4},
-        web: <OwaspWeb>{OwaspWeb.a08},
-      );
+    mobile: <OwaspMobile>{OwaspMobile.m4},
+    web: <OwaspWeb>{OwaspWeb.a08},
+  );
 
   static const LintCode _code = LintCode(
-    name: 'avoid_unsafe_deserialization',
-    problemMessage:
-        '[avoid_unsafe_deserialization] Unvalidated JSON from untrusted sources can crash the app, inject malicious data, or corrupt application state. Attackers can exploit this vulnerability to trigger unexpected behavior, bypass security checks, or cause data loss by crafting malicious payloads. {v4}',
+    'avoid_unsafe_deserialization',
+    '[avoid_unsafe_deserialization] Unvalidated JSON from untrusted sources can crash the app, inject malicious data, or corrupt application state. Attackers can exploit this vulnerability to trigger unexpected behavior, bypass security checks, or cause data loss by crafting malicious payloads. {v4}',
     correctionMessage:
         'Validate JSON structure with pattern matching or deserialize into typed model classes.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   static const Set<String> _dangerousMethods = <String>{
@@ -5579,11 +4988,10 @@ class AvoidUnsafeDeserializationRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       final String methodName = node.methodName.name.toLowerCase();
 
       // cspell:ignore jsondecode
@@ -5618,7 +5026,8 @@ class AvoidUnsafeDeserializationRule extends SaropaLintRule {
 
       // cspell:disable
       // Check for pattern matching or type checking
-      final bool hasTypeCheck = blockSource.contains('case {') ||
+      final bool hasTypeCheck =
+          blockSource.contains('case {') ||
           blockSource.contains('is map') ||
           blockSource.contains('is list') ||
           blockSource.contains('.fromjson') ||
@@ -5636,13 +5045,14 @@ class AvoidUnsafeDeserializationRule extends SaropaLintRule {
 
       // Only flag if there's a dangerous operation without type checking
       if (hasDangerousOperation) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
 
     // Check for function expression invocations like jsonDecode(...)
-    context.registry
-        .addFunctionExpressionInvocation((FunctionExpressionInvocation node) {
+    context.addFunctionExpressionInvocation((
+      FunctionExpressionInvocation node,
+    ) {
       final String funcName = node.function.toSource().toLowerCase();
 
       if (!_dangerousMethods.any((m) => funcName.contains(m))) return;
@@ -5665,7 +5075,8 @@ class AvoidUnsafeDeserializationRule extends SaropaLintRule {
 
       // cspell:ignore fromjson frommap
       // Check for type validation
-      final bool hasTypeCheck = blockSource.contains('case {') ||
+      final bool hasTypeCheck =
+          blockSource.contains('case {') ||
           blockSource.contains('is map') ||
           blockSource.contains('is list') ||
           blockSource.contains('.fromjson') ||
@@ -5679,7 +5090,7 @@ class AvoidUnsafeDeserializationRule extends SaropaLintRule {
       );
 
       if (hasDangerousOperation) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
   }
@@ -5723,7 +5134,7 @@ class AvoidUnsafeDeserializationRule extends SaropaLintRule {
 /// }
 /// ```
 class AvoidUserControlledUrlsRule extends SaropaLintRule {
-  const AvoidUserControlledUrlsRule() : super(code: _code);
+  AvoidUserControlledUrlsRule() : super(code: _code);
 
   /// SSRF can expose internal services and data.
   /// Critical vulnerability in server-facing applications.
@@ -5735,17 +5146,16 @@ class AvoidUserControlledUrlsRule extends SaropaLintRule {
 
   @override
   OwaspMapping get owasp => const OwaspMapping(
-        mobile: <OwaspMobile>{OwaspMobile.m4},
-        web: <OwaspWeb>{OwaspWeb.a10},
-      );
+    mobile: <OwaspMobile>{OwaspMobile.m4},
+    web: <OwaspWeb>{OwaspWeb.a10},
+  );
 
   static const LintCode _code = LintCode(
-    name: 'avoid_user_controlled_urls',
-    problemMessage:
-        '[avoid_user_controlled_urls] Allowing user-controlled URLs to be loaded without validation exposes your app to security vulnerabilities such as phishing, open redirects, and malicious content injection. This can compromise user data and app integrity. Always validate and sanitize URLs before loading or displaying them. See https://owasp.org/www-community/attacks/Unvalidated_Redirects_and_Forwards_Cheat_Sheet and https://pub.dev/packages/webview_flutter#security-considerations. {v3}',
+    'avoid_user_controlled_urls',
+    '[avoid_user_controlled_urls] Allowing user-controlled URLs to be loaded without validation exposes your app to security vulnerabilities such as phishing, open redirects, and malicious content injection. This can compromise user data and app integrity. Always validate and sanitize URLs before loading or displaying them. See https://owasp.org/www-community/attacks/Unvalidated_Redirects_and_Forwards_Cheat_Sheet and https://pub.dev/packages/webview_flutter#security-considerations. {v3}',
     correctionMessage:
         'Implement strict validation and sanitization of all user-provided URLs to prevent security breaches and protect users from malicious content. See https://owasp.org/www-community/attacks/Unvalidated_Redirects_and_Forwards_Cheat_Sheet and https://pub.dev/packages/webview_flutter#security-considerations.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   // cspell:disable
@@ -5784,11 +5194,10 @@ class AvoidUserControlledUrlsRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       final String methodName = node.methodName.name.toLowerCase();
 
       // Check if this is an HTTP method
@@ -5799,7 +5208,8 @@ class AvoidUserControlledUrlsRule extends SaropaLintRule {
       if (target == null) return;
 
       final String targetSource = target.toSource().toLowerCase();
-      final bool isHttpClient = targetSource.contains('http') ||
+      final bool isHttpClient =
+          targetSource.contains('http') ||
           targetSource.contains('dio') ||
           targetSource.contains('client') ||
           targetSource.contains('api');
@@ -5811,8 +5221,9 @@ class AvoidUserControlledUrlsRule extends SaropaLintRule {
         final String argSource = arg.toSource().toLowerCase();
 
         // Check for user input patterns
-        final bool isUserControlled =
-            _userInputPatterns.any((p) => argSource.contains(p));
+        final bool isUserControlled = _userInputPatterns.any(
+          (p) => argSource.contains(p),
+        );
 
         if (!isUserControlled) continue;
 
@@ -5833,7 +5244,8 @@ class AvoidUserControlledUrlsRule extends SaropaLintRule {
 
           // cspell:ignore allowedhost trusteddom
           // Check for URL validation patterns
-          final bool hasValidation = blockSource.contains('.scheme') ||
+          final bool hasValidation =
+              blockSource.contains('.scheme') ||
               blockSource.contains('.host') ||
               blockSource.contains('allowlist') ||
               blockSource.contains('whitelist') ||
@@ -5845,14 +5257,12 @@ class AvoidUserControlledUrlsRule extends SaropaLintRule {
           if (hasValidation) continue;
         }
 
-        reporter.atNode(arg, code);
+        reporter.atNode(arg);
       }
     });
 
     // Check for Uri.parse with user input passed to HTTP methods
-    context.registry.addInstanceCreationExpression((
-      InstanceCreationExpression node,
-    ) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final String typeName = node.constructorName.type.name2.lexeme;
       if (typeName != 'Uri') return;
 
@@ -5860,8 +5270,9 @@ class AvoidUserControlledUrlsRule extends SaropaLintRule {
       for (final Expression arg in node.argumentList.arguments) {
         final String argSource = arg.toSource().toLowerCase();
 
-        final bool isUserControlled =
-            _userInputPatterns.any((p) => argSource.contains(p));
+        final bool isUserControlled = _userInputPatterns.any(
+          (p) => argSource.contains(p),
+        );
 
         if (!isUserControlled) continue;
 
@@ -5884,15 +5295,17 @@ class AvoidUserControlledUrlsRule extends SaropaLintRule {
               }
 
               if (enclosingBlock != null) {
-                final String blockSource =
-                    enclosingBlock.toSource().toLowerCase();
-                final bool hasValidation = blockSource.contains('.scheme') ||
+                final String blockSource = enclosingBlock
+                    .toSource()
+                    .toLowerCase();
+                final bool hasValidation =
+                    blockSource.contains('.scheme') ||
                     blockSource.contains('.host') ||
                     blockSource.contains('allowlist') ||
                     blockSource.contains('whitelist');
 
                 if (!hasValidation) {
-                  reporter.atNode(arg, code);
+                  reporter.atNode(arg);
                 }
               }
               break;
@@ -5948,7 +5361,7 @@ class AvoidUserControlledUrlsRule extends SaropaLintRule {
 /// }
 /// ```
 class RequireCatchLoggingRule extends SaropaLintRule {
-  const RequireCatchLoggingRule() : super(code: _code);
+  RequireCatchLoggingRule() : super(code: _code);
 
   /// Silent exception swallowing hides security-relevant errors.
   @override
@@ -5959,17 +5372,16 @@ class RequireCatchLoggingRule extends SaropaLintRule {
 
   @override
   OwaspMapping get owasp => const OwaspMapping(
-        mobile: <OwaspMobile>{OwaspMobile.m8},
-        web: <OwaspWeb>{OwaspWeb.a09},
-      );
+    mobile: <OwaspMobile>{OwaspMobile.m8},
+    web: <OwaspWeb>{OwaspWeb.a09},
+  );
 
   static const LintCode _code = LintCode(
-    name: 'require_catch_logging',
-    problemMessage:
-        '[require_catch_logging] Catch block swallows the exception without logging or rethrowing. Security-relevant errors such as authentication failures, permission violations, and data corruption go completely undetected. This prevents incident response, makes debugging production issues impossible, and hides potential attack activity. {v2}',
+    'require_catch_logging',
+    '[require_catch_logging] Catch block swallows the exception without logging or rethrowing. Security-relevant errors such as authentication failures, permission violations, and data corruption go completely undetected. This prevents incident response, makes debugging production issues impossible, and hides potential attack activity. {v2}',
     correctionMessage:
         'Log the exception with a structured logger (e.g., logger.error(message, error, stackTrace)) or rethrow to ensure errors are visible for debugging and monitoring.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   // cspell:disable
@@ -5999,23 +5411,19 @@ class RequireCatchLoggingRule extends SaropaLintRule {
   // cspell:enable
 
   /// Patterns that indicate the exception is being handled appropriately.
-  static const Set<String> _rethrowPatterns = <String>{
-    'rethrow',
-    'throw',
-  };
+  static const Set<String> _rethrowPatterns = <String>{'rethrow', 'throw'};
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addCatchClause((CatchClause node) {
+    context.addCatchClause((CatchClause node) {
       final Block body = node.body;
 
       // Empty catch blocks are always bad
       if (body.statements.isEmpty) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
         return;
       }
 
@@ -6051,7 +5459,7 @@ class RequireCatchLoggingRule extends SaropaLintRule {
         }
       }
 
-      reporter.atNode(node, code);
+      reporter.atNode(node);
     });
   }
 
@@ -6076,7 +5484,7 @@ class RequireCatchLoggingRule extends SaropaLintRule {
       final String lowerSource = source.toLowerCase();
       final bool isOnlyBasicMethods =
           lowerSource.contains('$exceptionName.tostring()'.toLowerCase()) ||
-              lowerSource.contains('$exceptionName.message'.toLowerCase());
+          lowerSource.contains('$exceptionName.message'.toLowerCase());
 
       if (!isOnlyBasicMethods) {
         return false; // Passed to a method, consider it handled
@@ -6125,7 +5533,7 @@ class RequireCatchLoggingRule extends SaropaLintRule {
 /// }
 /// ```
 class RequireSecureStorageErrorHandlingRule extends SaropaLintRule {
-  const RequireSecureStorageErrorHandlingRule() : super(code: _code);
+  RequireSecureStorageErrorHandlingRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.high;
@@ -6134,12 +5542,11 @@ class RequireSecureStorageErrorHandlingRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'require_secure_storage_error_handling',
-    problemMessage:
-        '[require_secure_storage_error_handling] Secure storage operation '
+    'require_secure_storage_error_handling',
+    '[require_secure_storage_error_handling] Secure storage operation '
         'without error handling. May fail on some devices. {v3}',
     correctionMessage: 'Wrap in try-catch to handle PlatformException.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   static const Set<String> _secureStorageMethods = <String>{
@@ -6153,11 +5560,10 @@ class RequireSecureStorageErrorHandlingRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addAwaitExpression((AwaitExpression node) {
+    context.addAwaitExpression((AwaitExpression node) {
       final Expression expr = node.expression;
       if (expr is! MethodInvocation) return;
 
@@ -6180,7 +5586,7 @@ class RequireSecureStorageErrorHandlingRule extends SaropaLintRule {
       // Check if inside try-catch
       if (_isInsideTryCatch(node)) return;
 
-      reporter.atNode(node, code);
+      reporter.atNode(node);
     });
   }
 
@@ -6219,7 +5625,7 @@ class RequireSecureStorageErrorHandlingRule extends SaropaLintRule {
 /// await secureStorage.write(key: 'token', value: token);
 /// ```
 class AvoidSecureStorageLargeDataRule extends SaropaLintRule {
-  const AvoidSecureStorageLargeDataRule() : super(code: _code);
+  AvoidSecureStorageLargeDataRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.medium;
@@ -6228,23 +5634,21 @@ class AvoidSecureStorageLargeDataRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_secure_storage_large_data',
-    problemMessage:
-        '[avoid_secure_storage_large_data] `[HEURISTIC]` Storing large data in '
+    'avoid_secure_storage_large_data',
+    '[avoid_secure_storage_large_data] `[HEURISTIC]` Storing large data in '
         'secure storage. It\'s designed for small secrets like tokens. {v3}',
     correctionMessage:
         'Use encrypted file storage for large data. Secure storage is slow '
         'and has size limits.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       if (node.methodName.name != 'write') return;
 
       // Check if target is secure storage
@@ -6270,7 +5674,7 @@ class AvoidSecureStorageLargeDataRule extends SaropaLintRule {
               valueSource.contains('imagedata') ||
               valueSource.contains('bytes') ||
               valueSource.contains('base64')) {
-            reporter.atNode(node, code);
+            reporter.atNode(node);
           }
         }
       }
@@ -6309,7 +5713,7 @@ class AvoidSecureStorageLargeDataRule extends SaropaLintRule {
 /// }
 /// ```
 class AvoidSensitiveDataInClipboardRule extends SaropaLintRule {
-  const AvoidSensitiveDataInClipboardRule() : super(code: _code);
+  AvoidSensitiveDataInClipboardRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.critical;
@@ -6318,12 +5722,11 @@ class AvoidSensitiveDataInClipboardRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_sensitive_data_in_clipboard',
-    problemMessage:
-        '[avoid_sensitive_data_in_clipboard] Copying sensitive data such as passwords, tokens, or personal information to the clipboard exposes users to data theft, as other apps or malicious actors can access clipboard contents. This is a significant privacy and security risk, especially on shared or compromised devices. See https://owasp.org/www-project-top-ten/2017/A3_2017-Sensitive_Data_Exposure.html and https://api.flutter.dev/flutter/services/Clipboard-class.html. {v3}',
+    'avoid_sensitive_data_in_clipboard',
+    '[avoid_sensitive_data_in_clipboard] Copying sensitive data such as passwords, tokens, or personal information to the clipboard exposes users to data theft, as other apps or malicious actors can access clipboard contents. This is a significant privacy and security risk, especially on shared or compromised devices. See https://owasp.org/www-project-top-ten/2017/A3_2017-Sensitive_Data_Exposure.html and https://api.flutter.dev/flutter/services/Clipboard-class.html. {v3}',
     correctionMessage:
         'Avoid placing sensitive data on the clipboard and implement safeguards to prevent accidental exposure. Educate users about the risks and follow platform-specific security guidelines. See https://owasp.org/www-project-top-ten/2017/A3_2017-Sensitive_Data_Exposure.html and https://api.flutter.dev/flutter/services/Clipboard-class.html.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   static final RegExp _sensitivePattern = RegExp(
@@ -6335,11 +5738,10 @@ class AvoidSensitiveDataInClipboardRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       if (node.methodName.name != 'setData') return;
 
       // Check if called on Clipboard
@@ -6350,7 +5752,7 @@ class AvoidSensitiveDataInClipboardRule extends SaropaLintRule {
       for (final Expression arg in node.argumentList.arguments) {
         final String argSource = arg.toSource();
         if (_sensitivePattern.hasMatch(argSource)) {
-          reporter.atNode(node, code);
+          reporter.atNode(node);
           return;
         }
       }
@@ -6386,7 +5788,7 @@ class AvoidSensitiveDataInClipboardRule extends SaropaLintRule {
 /// }
 /// ```
 class RequireClipboardPasteValidationRule extends SaropaLintRule {
-  const RequireClipboardPasteValidationRule() : super(code: _code);
+  RequireClipboardPasteValidationRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.medium;
@@ -6395,21 +5797,19 @@ class RequireClipboardPasteValidationRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'require_clipboard_paste_validation',
-    problemMessage:
-        '[require_clipboard_paste_validation] Clipboard data used without validation. Pasted content can be unexpected format or malicious. Validate clipboard data before using it. This creates a security vulnerability that attackers can exploit to compromise user data or application integrity. {v2}',
+    'require_clipboard_paste_validation',
+    '[require_clipboard_paste_validation] Clipboard data used without validation. Pasted content can be unexpected format or malicious. Validate clipboard data before using it. This creates a security vulnerability that attackers can exploit to compromise user data or application integrity. {v2}',
     correctionMessage:
         'Validate clipboard content format and sanitize before using. Audit similar patterns across the codebase to ensure consistent security practices.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       if (node.methodName.name != 'getData') return;
 
       // Check if called on Clipboard
@@ -6424,7 +5824,7 @@ class RequireClipboardPasteValidationRule extends SaropaLintRule {
           // Check if there's validation logic nearby
           final AstNode? block = _findContainingBlockForClipboard(awaitParent);
           if (block != null && !_hasValidationLogicForClipboard(block)) {
-            reporter.atNode(node, code);
+            reporter.atNode(node);
           }
         }
       }
@@ -6486,7 +5886,7 @@ class RequireClipboardPasteValidationRule extends SaropaLintRule {
 /// }
 /// ```
 class AvoidEncryptionKeyInMemoryRule extends SaropaLintRule {
-  const AvoidEncryptionKeyInMemoryRule() : super(code: _code);
+  AvoidEncryptionKeyInMemoryRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.high;
@@ -6495,12 +5895,11 @@ class AvoidEncryptionKeyInMemoryRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_encryption_key_in_memory',
-    problemMessage:
-        '[avoid_encryption_key_in_memory] Encryption key stored as a persistent class field remains in process memory for the lifetime of the object. Memory dumps, debugging tools, or memory-scanning malware can extract the key, compromising all data encrypted with it. Keys in memory survive garbage collection and are visible in heap snapshots. {v2}',
+    'avoid_encryption_key_in_memory',
+    '[avoid_encryption_key_in_memory] Encryption key stored as a persistent class field remains in process memory for the lifetime of the object. Memory dumps, debugging tools, or memory-scanning malware can extract the key, compromising all data encrypted with it. Keys in memory survive garbage collection and are visible in heap snapshots. {v2}',
     correctionMessage:
         'Load encryption keys on demand from secure storage, use them immediately for the operation, and clear the variable after use to minimize the exposure window.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   static final RegExp _keyFieldPattern = RegExp(
@@ -6510,18 +5909,17 @@ class AvoidEncryptionKeyInMemoryRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addFieldDeclaration((FieldDeclaration node) {
+    context.addFieldDeclaration((FieldDeclaration node) {
       for (final VariableDeclaration variable in node.fields.variables) {
         final String fieldName = variable.name.lexeme;
 
         if (_keyFieldPattern.hasMatch(fieldName)) {
           // Check if it's a final field (stored persistently)
           if (node.fields.isFinal || node.fields.isConst) {
-            reporter.atNode(variable, code);
+            reporter.atNode(variable);
           }
         }
       }
@@ -6560,7 +5958,7 @@ class AvoidEncryptionKeyInMemoryRule extends SaropaLintRule {
 /// );
 /// ```
 class PreferOauthPkceRule extends SaropaLintRule {
-  const PreferOauthPkceRule() : super(code: _code);
+  PreferOauthPkceRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.high;
@@ -6569,12 +5967,11 @@ class PreferOauthPkceRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'prefer_oauth_pkce',
-    problemMessage:
-        '[prefer_oauth_pkce] OAuth authorization request without PKCE (Proof Key for Code Exchange). Mobile OAuth flows without PKCE are vulnerable to authorization code interception — a malicious app registers for the same redirect URI and steals the code before your app receives it. PKCE binds the authorization request to the token exchange with a code verifier/challenge pair, preventing interception. All mobile OAuth flows must use PKCE per RFC 7636. {v1}',
+    'prefer_oauth_pkce',
+    '[prefer_oauth_pkce] OAuth authorization request without PKCE (Proof Key for Code Exchange). Mobile OAuth flows without PKCE are vulnerable to authorization code interception — a malicious app registers for the same redirect URI and steals the code before your app receives it. PKCE binds the authorization request to the token exchange with a code verifier/challenge pair, preventing interception. All mobile OAuth flows must use PKCE per RFC 7636. {v1}',
     correctionMessage:
         'Add codeVerifier (or codeChallenge) parameter to the authorization request. Use a cryptographically random code verifier generated with PKCE utilities.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   /// Constructor/class names related to OAuth authorization.
@@ -6593,14 +5990,11 @@ class PreferOauthPkceRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
     // Check OAuth constructor calls for PKCE parameters
-    context.registry.addInstanceCreationExpression((
-      InstanceCreationExpression node,
-    ) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final String typeName = node.constructorName.type.name.lexeme;
       if (!_oauthConstructors.contains(typeName)) return;
 
@@ -6620,14 +6014,15 @@ class PreferOauthPkceRule extends SaropaLintRule {
     });
 
     // Check OAuth method calls
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       if (!_oauthMethods.contains(node.methodName.name)) return;
 
       // Check if target looks like an OAuth/AppAuth instance
       final String? targetSource = node.target?.toSource();
       if (targetSource == null) return;
 
-      final bool isOAuth = targetSource.contains('appAuth') ||
+      final bool isOAuth =
+          targetSource.contains('appAuth') ||
           targetSource.contains('AppAuth') ||
           targetSource.contains('oauth') ||
           targetSource.contains('OAuth');
@@ -6642,7 +6037,7 @@ class PreferOauthPkceRule extends SaropaLintRule {
         return; // Has PKCE, OK
       }
 
-      reporter.atNode(node, code);
+      reporter.atNode(node);
     });
   }
 }
@@ -6682,7 +6077,7 @@ class PreferOauthPkceRule extends SaropaLintRule {
 /// }
 /// ```
 class RequireSessionTimeoutRule extends SaropaLintRule {
-  const RequireSessionTimeoutRule() : super(code: _code);
+  RequireSessionTimeoutRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.high;
@@ -6694,9 +6089,8 @@ class RequireSessionTimeoutRule extends SaropaLintRule {
   Set<String>? get requiredPatterns => const <String>{'signIn', 'signUp'};
 
   static const LintCode _code = LintCode(
-    name: 'require_session_timeout',
-    problemMessage:
-        '[require_session_timeout] Authentication sign-in without session '
+    'require_session_timeout',
+    '[require_session_timeout] Authentication sign-in without session '
         'timeout handling. Sessions without timeout remain valid forever if '
         'tokens are stolen or compromised. This is a security risk that '
         'allows indefinite access to user accounts. Implement idle timeout '
@@ -6704,7 +6098,7 @@ class RequireSessionTimeoutRule extends SaropaLintRule {
     correctionMessage:
         'Add session timeout logic (Timer, Duration) after sign-in to '
         'automatically expire sessions.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   /// Method name patterns that indicate authentication sign-in.
@@ -6740,11 +6134,10 @@ class RequireSessionTimeoutRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       final String methodName = node.methodName.name;
 
       // Check if this is a sign-in method
@@ -6761,7 +6154,7 @@ class RequireSessionTimeoutRule extends SaropaLintRule {
         if (bodySource.contains(indicator)) return;
       }
 
-      reporter.atNode(node, code);
+      reporter.atNode(node);
     });
   }
 

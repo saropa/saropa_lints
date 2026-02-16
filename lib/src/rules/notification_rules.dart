@@ -7,9 +7,6 @@
 library;
 
 import 'package:analyzer/dart/ast/ast.dart';
-import 'package:analyzer/error/error.dart'
-    show AnalysisError, DiagnosticSeverity;
-import 'package:custom_lint_builder/custom_lint_builder.dart';
 
 import '../saropa_lint_rule.dart';
 
@@ -42,7 +39,7 @@ import '../saropa_lint_rule.dart';
 /// );
 /// ```
 class RequireNotificationChannelAndroidRule extends SaropaLintRule {
-  const RequireNotificationChannelAndroidRule() : super(code: _code);
+  RequireNotificationChannelAndroidRule() : super(code: _code);
 
   /// Missing channel means notifications won't display on Android 8.0+.
   /// Critical functionality bug affecting most Android users.
@@ -53,23 +50,19 @@ class RequireNotificationChannelAndroidRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'require_notification_channel_android',
-    problemMessage:
-        '[require_notification_channel_android] Android notification is missing a channel ID or description. Without these, notifications may not appear or may be grouped incorrectly on Android 8.0+ devices, reducing reliability and user engagement. {v2}',
+    'require_notification_channel_android',
+    '[require_notification_channel_android] Android notification is missing a channel ID or description. Without these, notifications may not appear or may be grouped incorrectly on Android 8.0+ devices, reducing reliability and user engagement. {v2}',
     correctionMessage:
         'Add a channelId and channelDescription to your AndroidNotificationDetails to ensure notifications are delivered and categorized correctly on Android 8.0+ devices. This improves reliability and user experience.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addInstanceCreationExpression((
-      InstanceCreationExpression node,
-    ) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final String typeName = node.constructorName.type.name.lexeme;
 
       // Check for AndroidNotificationDetails constructor
@@ -101,38 +94,6 @@ class RequireNotificationChannelAndroidRule extends SaropaLintRule {
       if (!hasImportance) {
         reporter.atNode(node.constructorName, code);
       }
-    });
-  }
-
-  @override
-  List<Fix> getFixes() => <Fix>[_AddNotificationChannelFix()];
-}
-
-class _AddNotificationChannelFix extends DartFix {
-  @override
-  void run(
-    CustomLintResolver resolver,
-    ChangeReporter reporter,
-    CustomLintContext context,
-    AnalysisError analysisError,
-    List<AnalysisError> others,
-  ) {
-    context.registry.addInstanceCreationExpression((
-      InstanceCreationExpression node,
-    ) {
-      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
-
-      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
-        message: 'Add HACK comment for missing channel settings',
-        priority: 1,
-      );
-
-      changeBuilder.addDartFileEdit((builder) {
-        builder.addSimpleInsertion(
-          node.offset,
-          '// HACK: Add channelDescription and importance for Android 8.0+\n',
-        );
-      });
     });
   }
 }
@@ -170,7 +131,7 @@ class _AddNotificationChannelFix extends DartFix {
 /// );
 /// ```
 class AvoidNotificationPayloadSensitiveRule extends SaropaLintRule {
-  const AvoidNotificationPayloadSensitiveRule() : super(code: _code);
+  AvoidNotificationPayloadSensitiveRule() : super(code: _code);
 
   /// Sensitive data visible on lock screen exposes user credentials.
   /// Privacy/security issue that can expose passwords, tokens, PII.
@@ -181,12 +142,11 @@ class AvoidNotificationPayloadSensitiveRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_notification_payload_sensitive',
-    problemMessage:
-        '[avoid_notification_payload_sensitive] Sensitive data in notifications exposes passwords, tokens, or PII on the lock screen. Anyone nearby can read this information without unlocking the device, creating a security vulnerability. {v4}',
+    'avoid_notification_payload_sensitive',
+    '[avoid_notification_payload_sensitive] Sensitive data in notifications exposes passwords, tokens, or PII on the lock screen. Anyone nearby can read this information without unlocking the device, creating a security vulnerability. {v4}',
     correctionMessage:
         'Use generic messages like "New message received" instead of actual content, and require user authentication before displaying sensitive details inside the app.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   static const Set<String> _sensitivePatterns = <String>{
@@ -225,11 +185,10 @@ class AvoidNotificationPayloadSensitiveRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       final String methodName = node.methodName.name;
 
       // Check if it's a notification method
@@ -256,7 +215,7 @@ class AvoidNotificationPayloadSensitiveRule extends SaropaLintRule {
 
         for (final String pattern in _sensitivePatterns) {
           if (argSource.contains(pattern)) {
-            reporter.atNode(node, code);
+            reporter.atNode(node);
             return;
           }
         }
@@ -264,9 +223,7 @@ class AvoidNotificationPayloadSensitiveRule extends SaropaLintRule {
     });
 
     // Also check NotificationDetails/AndroidNotificationDetails creation
-    context.registry.addInstanceCreationExpression((
-      InstanceCreationExpression node,
-    ) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final String typeName = node.constructorName.type.name.lexeme;
 
       if (typeName != 'NotificationDetails' &&
@@ -288,59 +245,11 @@ class AvoidNotificationPayloadSensitiveRule extends SaropaLintRule {
         final String argSource = arg.expression.toSource().toLowerCase();
         for (final String pattern in _sensitivePatterns) {
           if (argSource.contains(pattern)) {
-            reporter.atNode(node, code);
+            reporter.atNode(node);
             return;
           }
         }
       }
-    });
-  }
-
-  @override
-  List<Fix> getFixes() => <Fix>[_AddSensitiveNotificationTodoFix()];
-}
-
-class _AddSensitiveNotificationTodoFix extends DartFix {
-  @override
-  void run(
-    CustomLintResolver resolver,
-    ChangeReporter reporter,
-    CustomLintContext context,
-    AnalysisError analysisError,
-    List<AnalysisError> others,
-  ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
-      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
-
-      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
-        message: 'Add HACK: Remove sensitive data from notification',
-        priority: 1,
-      );
-
-      changeBuilder.addDartFileEdit((builder) {
-        builder.addSimpleInsertion(
-          node.offset,
-          '// HACK: Remove sensitive data - notifications are visible on lock screen\n',
-        );
-      });
-    });
-
-    context.registry.addInstanceCreationExpression((
-      InstanceCreationExpression node,
-    ) {
-      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
-
-      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
-        message: 'Add HACK: Remove sensitive data from notification',
-        priority: 1,
-      );
-
-      changeBuilder.addDartFileEdit((builder) {
-        builder.addSimpleInsertion(
-          node.offset,
-          '// HACK: Remove sensitive data - notifications are visible on lock screen\n',
-        );
-      });
     });
   }
 }
@@ -389,7 +298,7 @@ class _AddSensitiveNotificationTodoFix extends DartFix {
 /// );
 /// ```
 class RequireNotificationInitializePerPlatformRule extends SaropaLintRule {
-  const RequireNotificationInitializePerPlatformRule() : super(code: _code);
+  RequireNotificationInitializePerPlatformRule() : super(code: _code);
 
   /// High impact - notifications fail silently, hard to debug.
   @override
@@ -399,23 +308,19 @@ class RequireNotificationInitializePerPlatformRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'require_notification_initialize_per_platform',
-    problemMessage:
-        '[require_notification_initialize_per_platform] Missing platform-specific initialization settings (android: or iOS: parameters) causes notifications to fail silently, breaking critical app functionality. Users on the unconfigured platform will never receive time-sensitive alerts, security notifications, or important updates. {v4}',
+    'require_notification_initialize_per_platform',
+    '[require_notification_initialize_per_platform] Missing platform-specific initialization settings (android: or iOS: parameters) causes notifications to fail silently, breaking critical app functionality. Users on the unconfigured platform will never receive time-sensitive alerts, security notifications, or important updates. {v4}',
     correctionMessage:
         'Add both android: and iOS: parameters to ensure notifications work on all platforms.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addInstanceCreationExpression((
-      InstanceCreationExpression node,
-    ) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final String typeName = node.constructorName.type.name.lexeme;
 
       if (typeName != 'InitializationSettings') return;
@@ -436,67 +341,6 @@ class RequireNotificationInitializePerPlatformRule extends SaropaLintRule {
       if (!hasAndroid || !hasIOS) {
         reporter.atNode(node.constructorName, code);
       }
-    });
-  }
-
-  @override
-  List<Fix> getFixes() => <Fix>[_AddPlatformSettingsTodoFix()];
-}
-
-class _AddPlatformSettingsTodoFix extends DartFix {
-  @override
-  void run(
-    CustomLintResolver resolver,
-    ChangeReporter reporter,
-    CustomLintContext context,
-    AnalysisError analysisError,
-    List<AnalysisError> others,
-  ) {
-    context.registry.addInstanceCreationExpression((
-      InstanceCreationExpression node,
-    ) {
-      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
-
-      // Determine which settings are missing
-      bool hasAndroid = false;
-      bool hasIOS = false;
-
-      for (final Expression arg in node.argumentList.arguments) {
-        if (arg is NamedExpression) {
-          final String name = arg.name.label.name;
-          if (name == 'android') hasAndroid = true;
-          if (name == 'iOS') hasIOS = true;
-        }
-      }
-
-      String message = 'Add TODO: Add ';
-      if (!hasAndroid && !hasIOS) {
-        message += 'android and iOS settings';
-      } else if (!hasAndroid) {
-        message += 'android settings';
-      } else {
-        message += 'iOS settings';
-      }
-
-      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
-        message: message,
-        priority: 1,
-      );
-
-      changeBuilder.addDartFileEdit((builder) {
-        String todoText = '// HACK: Add ';
-        if (!hasAndroid && !hasIOS) {
-          todoText +=
-              'both android: and iOS: parameters for cross-platform support\n';
-        } else if (!hasAndroid) {
-          todoText +=
-              'android: AndroidInitializationSettings for Android support\n';
-        } else {
-          todoText += 'iOS: DarwinInitializationSettings for iOS support\n';
-        }
-
-        builder.addSimpleInsertion(node.offset, todoText);
-      });
     });
   }
 }
@@ -539,7 +383,7 @@ class _AddPlatformSettingsTodoFix extends DartFix {
 /// );
 /// ```
 class RequireNotificationTimezoneAwarenessRule extends SaropaLintRule {
-  const RequireNotificationTimezoneAwarenessRule() : super(code: _code);
+  RequireNotificationTimezoneAwarenessRule() : super(code: _code);
 
   /// Medium impact - notifications may fire at wrong time, but not a crash.
   @override
@@ -549,12 +393,11 @@ class RequireNotificationTimezoneAwarenessRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'require_notification_timezone_awareness',
-    problemMessage:
-        '[require_notification_timezone_awareness] Scheduled notification should use TZDateTime instead of DateTime. Scheduled notifications require timezone-aware datetime handling to ensure notifications fire at the correct time across timezone changes, daylight saving time transitions, and for users in different time zones. {v3}',
+    'require_notification_timezone_awareness',
+    '[require_notification_timezone_awareness] Scheduled notification should use TZDateTime instead of DateTime. Scheduled notifications require timezone-aware datetime handling to ensure notifications fire at the correct time across timezone changes, daylight saving time transitions, and for users in different time zones. {v3}',
     correctionMessage:
         'Use tz.TZDateTime.now(tz.local) or tz.TZDateTime.from() for timezone-aware scheduling.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   /// Methods that schedule notifications and require timezone-aware datetime.
@@ -568,11 +411,10 @@ class RequireNotificationTimezoneAwarenessRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       final String methodName = node.methodName.name;
 
       // Check if it's a scheduling method
@@ -609,16 +451,14 @@ class RequireNotificationTimezoneAwarenessRule extends SaropaLintRule {
     });
 
     // Also check for DateTime.now() or DateTime.parse() in notification context
-    context.registry.addInstanceCreationExpression((
-      InstanceCreationExpression node,
-    ) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
       // Check for DateTime constructor usage near notification scheduling
       final String typeName = node.constructorName.type.name.lexeme;
       if (typeName != 'DateTime') return;
 
       // Check if this is in a notification scheduling context
       if (_isInNotificationSchedulingContext(node)) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
   }
@@ -637,7 +477,7 @@ class RequireNotificationTimezoneAwarenessRule extends SaropaLintRule {
       // Verify this is a datetime argument, not some other type
       final String? staticTypeName = expr.staticType?.element?.name;
       if (staticTypeName == 'DateTime') {
-        reporter.atNode(expr, code);
+        reporter.atNode(expr);
       }
     }
   }
@@ -658,54 +498,6 @@ class RequireNotificationTimezoneAwarenessRule extends SaropaLintRule {
       depth++;
     }
     return false;
-  }
-
-  @override
-  List<Fix> getFixes() => <Fix>[_AddTimezoneAwarenessFix()];
-}
-
-class _AddTimezoneAwarenessFix extends DartFix {
-  @override
-  void run(
-    CustomLintResolver resolver,
-    ChangeReporter reporter,
-    CustomLintContext context,
-    AnalysisError analysisError,
-    List<AnalysisError> others,
-  ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
-      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
-
-      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
-        message: 'Add HACK comment for timezone-aware datetime',
-        priority: 1,
-      );
-
-      changeBuilder.addDartFileEdit((builder) {
-        builder.addSimpleInsertion(
-          node.offset,
-          '// HACK: Use TZDateTime instead of DateTime for timezone-aware scheduling\n',
-        );
-      });
-    });
-
-    context.registry.addInstanceCreationExpression((
-      InstanceCreationExpression node,
-    ) {
-      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
-
-      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
-        message: 'Add HACK comment for timezone-aware datetime',
-        priority: 1,
-      );
-
-      changeBuilder.addDartFileEdit((builder) {
-        builder.addSimpleInsertion(
-          node.offset,
-          '// HACK: Use tz.TZDateTime instead of DateTime\n',
-        );
-      });
-    });
   }
 }
 
@@ -734,7 +526,7 @@ class _AddTimezoneAwarenessFix extends DartFix {
 /// }
 /// ```
 class AvoidNotificationSameIdRule extends SaropaLintRule {
-  const AvoidNotificationSameIdRule() : super(code: _code);
+  AvoidNotificationSameIdRule() : super(code: _code);
 
   /// Significant issue. Address when count exceeds 10.
   @override
@@ -744,21 +536,19 @@ class AvoidNotificationSameIdRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_notification_same_id',
-    problemMessage:
-        '[avoid_notification_same_id] Static or hardcoded notification ID causes newer notifications to silently replace older ones using the same identifier. Users will miss important alerts, messages, and time-sensitive updates without any indication that previous notifications were overwritten, leading to lost information and degraded communication reliability. {v3}',
+    'avoid_notification_same_id',
+    '[avoid_notification_same_id] Static or hardcoded notification ID causes newer notifications to silently replace older ones using the same identifier. Users will miss important alerts, messages, and time-sensitive updates without any indication that previous notifications were overwritten, leading to lost information and degraded communication reliability. {v3}',
     correctionMessage:
         'Generate a unique ID per notification using DateTime.now().millisecondsSinceEpoch or an incrementing counter to prevent silent notification replacement.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       final String methodName = node.methodName.name;
       if (!methodName.contains('show') && !methodName.contains('notify')) {
         return;
@@ -781,7 +571,7 @@ class AvoidNotificationSameIdRule extends SaropaLintRule {
                       idExpr.name.contains('ID')))) {
             // Check if it's a constant
             if (idExpr is IntegerLiteral) {
-              reporter.atNode(idExpr, code);
+              reporter.atNode(idExpr);
             }
           }
         }
@@ -852,7 +642,7 @@ class AvoidNotificationSameIdRule extends SaropaLintRule {
 /// );
 /// ```
 class PreferNotificationGroupingRule extends SaropaLintRule {
-  const PreferNotificationGroupingRule() : super(code: _code);
+  PreferNotificationGroupingRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.low;
@@ -861,22 +651,20 @@ class PreferNotificationGroupingRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'prefer_notification_grouping',
-    problemMessage:
-        '[prefer_notification_grouping] Multiple notifications shown in loop '
+    'prefer_notification_grouping',
+    '[prefer_notification_grouping] Multiple notifications shown in loop '
         'without groupKey. Notifications will clutter the notification shade. {v2}',
     correctionMessage:
         'Add groupKey to AndroidNotificationDetails to group related notifications.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       final String methodName = node.methodName.name;
 
       // Check for notification show methods
@@ -916,7 +704,7 @@ class PreferNotificationGroupingRule extends SaropaLintRule {
         return; // Has grouping
       }
 
-      reporter.atNode(node, code);
+      reporter.atNode(node);
     });
   }
 }
@@ -951,7 +739,7 @@ class PreferNotificationGroupingRule extends SaropaLintRule {
 /// }
 /// ```
 class AvoidNotificationSilentFailureRule extends SaropaLintRule {
-  const AvoidNotificationSilentFailureRule() : super(code: _code);
+  AvoidNotificationSilentFailureRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.high;
@@ -960,13 +748,12 @@ class AvoidNotificationSilentFailureRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_notification_silent_failure',
-    problemMessage:
-        '[avoid_notification_silent_failure] Notification operation without '
+    'avoid_notification_silent_failure',
+    '[avoid_notification_silent_failure] Notification operation without '
         'error handling. Failures will be silent and hard to debug. {v2}',
     correctionMessage:
         'Wrap notification calls in try-catch to handle permission or platform errors.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   static const Set<String> _notificationMethods = <String>{
@@ -980,11 +767,10 @@ class AvoidNotificationSilentFailureRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       final String methodName = node.methodName.name;
 
       if (!_notificationMethods.contains(methodName)) return;
@@ -1033,7 +819,7 @@ class AvoidNotificationSilentFailureRule extends SaropaLintRule {
         parent = parent.parent;
       }
 
-      reporter.atNode(node, code);
+      reporter.atNode(node);
     });
   }
 }

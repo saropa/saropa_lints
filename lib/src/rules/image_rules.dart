@@ -1,9 +1,6 @@
 // ignore_for_file: deprecated_member_use
 
 import 'package:analyzer/dart/ast/ast.dart';
-import 'package:analyzer/error/error.dart'
-    show AnalysisError, DiagnosticSeverity;
-import 'package:custom_lint_builder/custom_lint_builder.dart';
 import 'package:saropa_lints/src/saropa_lint_rule.dart';
 
 /// Warns when Image.network is used inside ListView.builder without caching.
@@ -29,7 +26,7 @@ import 'package:saropa_lints/src/saropa_lint_rule.dart';
 /// )
 /// ```
 class AvoidImageRebuildOnScrollRule extends SaropaLintRule {
-  const AvoidImageRebuildOnScrollRule() : super(code: _code);
+  AvoidImageRebuildOnScrollRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -39,12 +36,11 @@ class AvoidImageRebuildOnScrollRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_image_rebuild_on_scroll',
-    problemMessage:
-        '[avoid_image_rebuild_on_scroll] Image.network in ListView.builder will rebuild on scroll. Images in scrollable lists will be rebuilt on every scroll, causing unnecessary network requests and poor performance. {v2}',
+    'avoid_image_rebuild_on_scroll',
+    '[avoid_image_rebuild_on_scroll] Image.network in ListView.builder will rebuild on scroll. Images in scrollable lists will be rebuilt on every scroll, causing unnecessary network requests and poor performance. {v2}',
     correctionMessage:
         'Use CachedNetworkImage or move image loading outside the builder. Verify the change works correctly with existing tests and add coverage for the new behavior.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   static const Set<String> _listBuilders = <String>{
@@ -56,13 +52,10 @@ class AvoidImageRebuildOnScrollRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addInstanceCreationExpression((
-      InstanceCreationExpression node,
-    ) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final String typeName = node.constructorName.type.name.lexeme;
       final String? constructorName = node.constructorName.name?.name;
 
@@ -137,7 +130,7 @@ class AvoidImageRebuildOnScrollRule extends SaropaLintRule {
 /// )
 /// ```
 class RequireAvatarFallbackRule extends SaropaLintRule {
-  const RequireAvatarFallbackRule() : super(code: _code);
+  RequireAvatarFallbackRule() : super(code: _code);
 
   /// Significant issue. Address when count exceeds 10.
   @override
@@ -147,23 +140,19 @@ class RequireAvatarFallbackRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'require_avatar_fallback',
-    problemMessage:
-        '[require_avatar_fallback] CircleAvatar with NetworkImage fails silently when image load fails. Users will see a broken or blank avatar with no indication of the error, leading to confusion, poor UX, and missed identity cues. This can also mask backend or connectivity issues during development. {v3}',
+    'require_avatar_fallback',
+    '[require_avatar_fallback] CircleAvatar with NetworkImage fails silently when image load fails. Users will see a broken or blank avatar with no indication of the error, leading to confusion, poor UX, and missed identity cues. This can also mask backend or connectivity issues during development. {v3}',
     correctionMessage:
         'Add onBackgroundImageError callback or use Image with ClipOval and provide a fallback asset or initials. Audit all avatar usage for error handling and add tests for image failure scenarios. Document fallback logic for maintainability.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addInstanceCreationExpression((
-      InstanceCreationExpression node,
-    ) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final String? constructorName = node.constructorName.type.element?.name;
       if (constructorName != 'CircleAvatar') return;
 
@@ -226,7 +215,7 @@ class RequireAvatarFallbackRule extends SaropaLintRule {
 /// )
 /// ```
 class PreferVideoLoadingPlaceholderRule extends SaropaLintRule {
-  const PreferVideoLoadingPlaceholderRule() : super(code: _code);
+  PreferVideoLoadingPlaceholderRule() : super(code: _code);
 
   /// Minor improvement. Track for later review.
   @override
@@ -236,12 +225,11 @@ class PreferVideoLoadingPlaceholderRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'prefer_video_loading_placeholder',
-    problemMessage:
-        '[prefer_video_loading_placeholder] Video player must have a loading placeholder. Video widgets should show a placeholder while loading to provide visual feedback and prevent layout shifts. {v2}',
+    'prefer_video_loading_placeholder',
+    '[prefer_video_loading_placeholder] Video player must have a loading placeholder. Video widgets should show a placeholder while loading to provide visual feedback and prevent layout shifts. {v2}',
     correctionMessage:
         'Add placeholder parameter to improve UX during load. Verify the change works correctly with existing tests and add coverage for the new behavior.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   // Video widgets that support placeholder parameter
@@ -252,13 +240,10 @@ class PreferVideoLoadingPlaceholderRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addInstanceCreationExpression((
-      InstanceCreationExpression node,
-    ) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final String? constructorName = node.constructorName.type.element?.name;
       if (!_videoWidgetsWithPlaceholder.contains(constructorName)) return;
 
@@ -310,7 +295,7 @@ class PreferVideoLoadingPlaceholderRule extends SaropaLintRule {
 /// )
 /// ```
 class PreferImageSizeConstraintsRule extends SaropaLintRule {
-  const PreferImageSizeConstraintsRule() : super(code: _code);
+  PreferImageSizeConstraintsRule() : super(code: _code);
 
   /// Performance optimization.
   @override
@@ -320,23 +305,19 @@ class PreferImageSizeConstraintsRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'prefer_image_size_constraints',
-    problemMessage:
-        '[prefer_image_size_constraints] Missing cacheWidth/cacheHeight decodes full resolution into memory. Images decoded at full resolution consume excessive memory. Use cacheWidth or cacheHeight to decode images at display size, significantly reducing memory usage for large images. {v3}',
+    'prefer_image_size_constraints',
+    '[prefer_image_size_constraints] Missing cacheWidth/cacheHeight decodes full resolution into memory. Images decoded at full resolution consume excessive memory. Use cacheWidth or cacheHeight to decode images at display size, significantly reducing memory usage for large images. {v3}',
     correctionMessage:
         'Set cacheWidth/cacheHeight to avoid decoding at full resolution. Verify the change works correctly with existing tests and add coverage for the new behavior.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addInstanceCreationExpression((
-      InstanceCreationExpression node,
-    ) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final String typeName = node.constructorName.type.name.lexeme;
       final String? constructorName = node.constructorName.name?.name;
 
@@ -363,39 +344,6 @@ class PreferImageSizeConstraintsRule extends SaropaLintRule {
       if ((hasWidth || hasHeight) && !hasCacheWidth && !hasCacheHeight) {
         reporter.atNode(node.constructorName, code);
       }
-    });
-  }
-
-  @override
-  List<Fix> getFixes() => <Fix>[_PreferImageSizeConstraintsFix()];
-}
-
-class _PreferImageSizeConstraintsFix extends DartFix {
-  @override
-  void run(
-    CustomLintResolver resolver,
-    ChangeReporter reporter,
-    CustomLintContext context,
-    AnalysisError analysisError,
-    List<AnalysisError> others,
-  ) {
-    context.registry.addInstanceCreationExpression((
-      InstanceCreationExpression node,
-    ) {
-      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
-
-      final changeBuilder = reporter.createChangeBuilder(
-        message: 'Add cacheWidth and cacheHeight',
-        priority: 80,
-      );
-
-      changeBuilder.addDartFileEdit((builder) {
-        final args = node.argumentList;
-        builder.addSimpleInsertion(
-          args.arguments.last.end,
-          ', cacheWidth: 200, cacheHeight: 200',
-        );
-      });
     });
   }
 }
@@ -425,7 +373,7 @@ class _PreferImageSizeConstraintsFix extends DartFix {
 /// )
 /// ```
 class RequireImageErrorFallbackRule extends SaropaLintRule {
-  const RequireImageErrorFallbackRule() : super(code: _code);
+  RequireImageErrorFallbackRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.high;
@@ -434,23 +382,19 @@ class RequireImageErrorFallbackRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'require_image_error_fallback',
-    problemMessage:
-        '[require_image_error_fallback] Image.network used without an errorBuilder callback. When the network request fails due to connectivity issues, 404 errors, or server timeouts, Flutter displays a broken image icon placeholder. Users see an ugly, unexplained error state instead of a meaningful fallback such as a retry button or alternative content that maintains the visual layout. {v2}',
+    'require_image_error_fallback',
+    '[require_image_error_fallback] Image.network used without an errorBuilder callback. When the network request fails due to connectivity issues, 404 errors, or server timeouts, Flutter displays a broken image icon placeholder. Users see an ugly, unexplained error state instead of a meaningful fallback such as a retry button or alternative content that maintains the visual layout. {v2}',
     correctionMessage:
         'Add an errorBuilder callback to Image.network that returns a fallback widget, such as an error icon with retry functionality or a placeholder image, when the network request fails.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addInstanceCreationExpression((
-      InstanceCreationExpression node,
-    ) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final String typeName = node.constructorName.type.name.lexeme;
       final String? constructorName = node.constructorName.name?.name;
 
@@ -501,7 +445,7 @@ class RequireImageErrorFallbackRule extends SaropaLintRule {
 /// )
 /// ```
 class RequireImageLoadingPlaceholderRule extends SaropaLintRule {
-  const RequireImageLoadingPlaceholderRule() : super(code: _code);
+  RequireImageLoadingPlaceholderRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.medium;
@@ -510,23 +454,19 @@ class RequireImageLoadingPlaceholderRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'require_image_loading_placeholder',
-    problemMessage:
-        '[require_image_loading_placeholder] Image.network without loadingBuilder shows blank space during load. Network images take time to download. Without a loading indicator, users see an empty space which creates a poor user experience. {v4}',
+    'require_image_loading_placeholder',
+    '[require_image_loading_placeholder] Image.network without loadingBuilder shows blank space during load. Network images take time to download. Without a loading indicator, users see an empty space which creates a poor user experience. {v4}',
     correctionMessage:
         'Add loadingBuilder to show progress while loading. Verify the change works correctly with existing tests and add coverage for the new behavior.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addInstanceCreationExpression((
-      InstanceCreationExpression node,
-    ) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final String typeName = node.constructorName.type.name.lexeme;
       final String? constructorName = node.constructorName.name?.name;
 
@@ -576,7 +516,7 @@ class RequireImageLoadingPlaceholderRule extends SaropaLintRule {
 /// }
 /// ```
 class RequireMediaLoadingStateRule extends SaropaLintRule {
-  const RequireMediaLoadingStateRule() : super(code: _code);
+  RequireMediaLoadingStateRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.high;
@@ -585,23 +525,19 @@ class RequireMediaLoadingStateRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'require_media_loading_state',
-    problemMessage:
-        '[require_media_loading_state] VideoPlayer displayed without checking isInitialized shows a black rectangle or crashes. The video player needs time to load the video before the build method can render it properly. {v4}',
+    'require_media_loading_state',
+    '[require_media_loading_state] VideoPlayer displayed without checking isInitialized shows a black rectangle or crashes. The video player needs time to load the video before the build method can render it properly. {v4}',
     correctionMessage:
         'Wrap VideoPlayer in a conditional checking controller.value.isInitialized. This prevents errors and ensures the video is ready before display.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addInstanceCreationExpression((
-      InstanceCreationExpression node,
-    ) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final String typeName = node.constructorName.type.name.lexeme;
       if (typeName != 'VideoPlayer') return;
 
@@ -672,7 +608,7 @@ class RequireMediaLoadingStateRule extends SaropaLintRule {
 /// )
 /// ```
 class RequirePdfLoadingIndicatorRule extends SaropaLintRule {
-  const RequirePdfLoadingIndicatorRule() : super(code: _code);
+  RequirePdfLoadingIndicatorRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.medium;
@@ -681,12 +617,11 @@ class RequirePdfLoadingIndicatorRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'require_pdf_loading_indicator',
-    problemMessage:
-        '[require_pdf_loading_indicator] PDF viewer should provide loading feedback. PDF loading can be slow, especially for large documents or over network. Users should see progress feedback during load. {v2}',
+    'require_pdf_loading_indicator',
+    '[require_pdf_loading_indicator] PDF viewer should provide loading feedback. PDF loading can be slow, especially for large documents or over network. Users should see progress feedback during load. {v2}',
     correctionMessage:
         'Add loading state handling or use onDocumentLoaded callback. Verify the change works correctly with existing tests and add coverage for the new behavior.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   // Common PDF viewer widgets
@@ -699,13 +634,10 @@ class RequirePdfLoadingIndicatorRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addInstanceCreationExpression((
-      InstanceCreationExpression node,
-    ) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final String typeName = node.constructorName.type.name.lexeme;
       if (!_pdfViewers.contains(typeName)) return;
 
@@ -758,7 +690,7 @@ class RequirePdfLoadingIndicatorRule extends SaropaLintRule {
 /// }
 /// ```
 class PreferClipboardFeedbackRule extends SaropaLintRule {
-  const PreferClipboardFeedbackRule() : super(code: _code);
+  PreferClipboardFeedbackRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.medium;
@@ -767,21 +699,19 @@ class PreferClipboardFeedbackRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'prefer_clipboard_feedback',
-    problemMessage:
-        '[prefer_clipboard_feedback] Clipboard.setData should provide user feedback. Clipboard operations should provide user feedback (SnackBar, Toast, etc.) to confirm the action was successful. Without feedback, users won\'t know if the copy succeeded. {v2}',
+    'prefer_clipboard_feedback',
+    '[prefer_clipboard_feedback] Clipboard.setData should provide user feedback. Clipboard operations should provide user feedback (SnackBar, Toast, etc.) to confirm the action was successful. Without feedback, users won\'t know if the copy succeeded. {v2}',
     correctionMessage:
         'Add SnackBar or Toast to confirm clipboard operation. Verify the change works correctly with existing tests and add coverage for the new behavior.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       // Check for Clipboard.setData
       final Expression? target = node.target;
       if (target == null) return;
@@ -805,7 +735,8 @@ class PreferClipboardFeedbackRule extends SaropaLintRule {
       if (enclosingBody == null) return;
 
       final String bodySource = enclosingBody.toSource();
-      final bool hasFeedback = bodySource.contains('showSnackBar') ||
+      final bool hasFeedback =
+          bodySource.contains('showSnackBar') ||
           bodySource.contains('ScaffoldMessenger') ||
           bodySource.contains('Toast') ||
           bodySource.contains('Fluttertoast') ||
@@ -813,7 +744,7 @@ class PreferClipboardFeedbackRule extends SaropaLintRule {
           bodySource.contains('showMessage');
 
       if (!hasFeedback) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
   }
@@ -844,7 +775,7 @@ class PreferClipboardFeedbackRule extends SaropaLintRule {
 /// )
 /// ```
 class RequireCachedImageDimensionsRule extends SaropaLintRule {
-  const RequireCachedImageDimensionsRule() : super(code: _code);
+  RequireCachedImageDimensionsRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.high;
@@ -853,23 +784,19 @@ class RequireCachedImageDimensionsRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'require_cached_image_dimensions',
-    problemMessage:
-        '[require_cached_image_dimensions] CachedNetworkImage without cache dimensions loads full-resolution images into memory, causing out-of-memory errors and app crashes on devices with limited RAM. Large images (such as high-resolution photos from modern cameras) can consume hundreds of megabytes when decoded, quickly exhausting available memory. {v4}',
+    'require_cached_image_dimensions',
+    '[require_cached_image_dimensions] CachedNetworkImage without cache dimensions loads full-resolution images into memory, causing out-of-memory errors and app crashes on devices with limited RAM. Large images (such as high-resolution photos from modern cameras) can consume hundreds of megabytes when decoded, quickly exhausting available memory. {v4}',
     correctionMessage:
         'Add memCacheWidth/memCacheHeight to limit decoded image size. This reduces memory usage and prevents crashes.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addInstanceCreationExpression((
-      InstanceCreationExpression node,
-    ) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final String typeName = node.constructorName.type.name.lexeme;
       if (typeName != 'CachedNetworkImage') return;
 
@@ -893,41 +820,8 @@ class RequireCachedImageDimensionsRule extends SaropaLintRule {
           !hasMemCacheHeight &&
           !hasMaxWidthDiskCache &&
           !hasMaxHeightDiskCache) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
-    });
-  }
-
-  @override
-  List<Fix> getFixes() => <Fix>[_RequireCachedImageDimensionsFix()];
-}
-
-class _RequireCachedImageDimensionsFix extends DartFix {
-  @override
-  void run(
-    CustomLintResolver resolver,
-    ChangeReporter reporter,
-    CustomLintContext context,
-    AnalysisError analysisError,
-    List<AnalysisError> others,
-  ) {
-    context.registry.addInstanceCreationExpression((
-      InstanceCreationExpression node,
-    ) {
-      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
-
-      final changeBuilder = reporter.createChangeBuilder(
-        message: 'Add memCacheWidth and memCacheHeight',
-        priority: 80,
-      );
-
-      changeBuilder.addDartFileEdit((builder) {
-        final args = node.argumentList;
-        builder.addSimpleInsertion(
-          args.arguments.last.end,
-          ', memCacheWidth: 300, memCacheHeight: 300',
-        );
-      });
     });
   }
 }
@@ -951,7 +845,7 @@ class _RequireCachedImageDimensionsFix extends DartFix {
 /// )
 /// ```
 class RequireCachedImagePlaceholderRule extends SaropaLintRule {
-  const RequireCachedImagePlaceholderRule() : super(code: _code);
+  RequireCachedImagePlaceholderRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.medium;
@@ -960,23 +854,19 @@ class RequireCachedImagePlaceholderRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'require_cached_image_placeholder',
-    problemMessage:
-        '[require_cached_image_placeholder] CachedNetworkImage without placeholder. User sees blank during load. Placeholders provide visual feedback while the image loads. This image handling causes excessive memory usage, visual artifacts, or slow load times. {v2}',
+    'require_cached_image_placeholder',
+    '[require_cached_image_placeholder] CachedNetworkImage without placeholder. User sees blank during load. Placeholders provide visual feedback while the image loads. This image handling causes excessive memory usage, visual artifacts, or slow load times. {v2}',
     correctionMessage:
         'Add placeholder parameter for loading state. Verify the change works correctly with existing tests and add coverage for the new behavior.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addInstanceCreationExpression((
-      InstanceCreationExpression node,
-    ) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final String typeName = node.constructorName.type.name.lexeme;
       if (typeName != 'CachedNetworkImage') return;
 
@@ -992,7 +882,7 @@ class RequireCachedImagePlaceholderRule extends SaropaLintRule {
       }
 
       if (!hasPlaceholder && !hasProgressIndicator) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
   }
@@ -1017,7 +907,7 @@ class RequireCachedImagePlaceholderRule extends SaropaLintRule {
 /// )
 /// ```
 class RequireCachedImageErrorWidgetRule extends SaropaLintRule {
-  const RequireCachedImageErrorWidgetRule() : super(code: _code);
+  RequireCachedImageErrorWidgetRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.medium;
@@ -1029,23 +919,19 @@ class RequireCachedImageErrorWidgetRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
-    name: 'require_cached_image_error_widget',
-    problemMessage:
-        '[require_cached_image_error_widget] CachedNetworkImage without errorWidget. Broken images show nothing. Network images can fail. Always provide fallback for broken images. CachedNetworkImage is used without error widget. {v2}',
+    'require_cached_image_error_widget',
+    '[require_cached_image_error_widget] CachedNetworkImage without errorWidget. Broken images show nothing. Network images can fail. Always provide fallback for broken images. CachedNetworkImage is used without error widget. {v2}',
     correctionMessage:
         'Add errorWidget parameter to handle failed loads. Verify the change works correctly with existing tests and add coverage for the new behavior.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addInstanceCreationExpression((
-      InstanceCreationExpression node,
-    ) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final String typeName = node.constructorName.type.name.lexeme;
       if (typeName != 'CachedNetworkImage') return;
 
@@ -1059,7 +945,7 @@ class RequireCachedImageErrorWidgetRule extends SaropaLintRule {
       }
 
       if (!hasErrorWidget) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
   }
@@ -1093,7 +979,7 @@ class RequireCachedImageErrorWidgetRule extends SaropaLintRule {
 /// Image.file(fixed!);
 /// ```
 class RequireExifHandlingRule extends SaropaLintRule {
-  const RequireExifHandlingRule() : super(code: _code);
+  RequireExifHandlingRule() : super(code: _code);
 
   /// Visual issue - images may display rotated.
   @override
@@ -1103,21 +989,19 @@ class RequireExifHandlingRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'require_exif_handling',
-    problemMessage:
-        '[require_exif_handling] Image.file may show photos rotated. Prefer EXIF handling. Photos from cameras often have EXIF orientation metadata. Without handling, images may appear rotated incorrectly. {v2}',
+    'require_exif_handling',
+    '[require_exif_handling] Image.file may show photos rotated. Prefer EXIF handling. Photos from cameras often have EXIF orientation metadata. Without handling, images may appear rotated incorrectly. {v2}',
     correctionMessage:
         'Use flutter_image_compress or similar to auto-rotate camera photos. Verify the change works correctly with existing tests and add coverage for the new behavior.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addInstanceCreationExpression((node) {
+    context.addInstanceCreationExpression((node) {
       final typeName = node.constructorName.type.name.lexeme;
       final constructorName = node.constructorName.name?.name;
 
@@ -1131,7 +1015,8 @@ class RequireExifHandlingRule extends SaropaLintRule {
           ? node.argumentList.arguments.first.toSource().toLowerCase()
           : '';
 
-      final isCameraRelated = argSource.contains('photo') ||
+      final isCameraRelated =
+          argSource.contains('photo') ||
           argSource.contains('camera') ||
           argSource.contains('image') ||
           argSource.contains('picture');
@@ -1182,7 +1067,7 @@ class RequireExifHandlingRule extends SaropaLintRule {
 /// )
 /// ```
 class PreferCachedImageFadeAnimationRule extends SaropaLintRule {
-  const PreferCachedImageFadeAnimationRule() : super(code: _code);
+  PreferCachedImageFadeAnimationRule() : super(code: _code);
 
   /// Low impact - style suggestion, not a bug.
   @override
@@ -1192,21 +1077,19 @@ class PreferCachedImageFadeAnimationRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'prefer_cached_image_fade_animation',
-    problemMessage:
-        '[prefer_cached_image_fade_animation] CachedNetworkImage without fadeInDuration causes abrupt image pop-in. CachedNetworkImage has a default fadeInDuration of 500ms, which works well for most cases. However, explicitly setting this value signals intentional UX design and allows customization for different contexts: - Fast transitions: 150-200ms for thumbnail grids - Smooth transitions: 300-400ms for hero images - No transition: Duration.zero for instant display. {v3}',
+    'prefer_cached_image_fade_animation',
+    '[prefer_cached_image_fade_animation] CachedNetworkImage without fadeInDuration causes abrupt image pop-in. CachedNetworkImage has a default fadeInDuration of 500ms, which works well for most cases. However, explicitly setting this value signals intentional UX design and allows customization for different contexts: - Fast transitions: 150-200ms for thumbnail grids - Smooth transitions: 300-400ms for hero images - No transition: Duration.zero for instant display. {v3}',
     correctionMessage:
         'Add fadeInDuration for a smoother loading experience. Verify the change works correctly with existing tests and add coverage for the new behavior.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addInstanceCreationExpression((node) {
+    context.addInstanceCreationExpression((node) {
       final String typeName = node.constructorName.type.name.lexeme;
 
       if (typeName != 'CachedNetworkImage') return;
@@ -1224,39 +1107,6 @@ class PreferCachedImageFadeAnimationRule extends SaropaLintRule {
       if (!hasFadeInDuration) {
         reporter.atNode(node.constructorName, code);
       }
-    });
-  }
-
-  @override
-  List<Fix> getFixes() => <Fix>[_PreferCachedImageFadeAnimationFix()];
-}
-
-class _PreferCachedImageFadeAnimationFix extends DartFix {
-  @override
-  void run(
-    CustomLintResolver resolver,
-    ChangeReporter reporter,
-    CustomLintContext context,
-    AnalysisError analysisError,
-    List<AnalysisError> others,
-  ) {
-    context.registry.addInstanceCreationExpression((
-      InstanceCreationExpression node,
-    ) {
-      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
-
-      final changeBuilder = reporter.createChangeBuilder(
-        message: 'Add fadeInDuration',
-        priority: 80,
-      );
-
-      changeBuilder.addDartFileEdit((builder) {
-        final args = node.argumentList;
-        builder.addSimpleInsertion(
-          args.arguments.last.end,
-          ', fadeInDuration: const Duration(milliseconds: 300)',
-        );
-      });
     });
   }
 }
@@ -1318,7 +1168,7 @@ class _PreferCachedImageFadeAnimationFix extends DartFix {
 /// }
 /// ```
 class RequireImageStreamDisposeRule extends SaropaLintRule {
-  const RequireImageStreamDisposeRule() : super(code: _code);
+  RequireImageStreamDisposeRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.high;
@@ -1330,21 +1180,19 @@ class RequireImageStreamDisposeRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
-    name: 'require_image_stream_dispose',
-    problemMessage:
-        '[require_image_stream_dispose] ImageStream listener is not removed in the dispose() method. The listener retains a reference to the widget State object, preventing garbage collection after the widget is removed from the tree. This creates a memory leak where decoded image data and the entire widget state remain allocated indefinitely, consuming device memory. {v2}',
+    'require_image_stream_dispose',
+    '[require_image_stream_dispose] ImageStream listener is not removed in the dispose() method. The listener retains a reference to the widget State object, preventing garbage collection after the widget is removed from the tree. This creates a memory leak where decoded image data and the entire widget state remain allocated indefinitely, consuming device memory. {v2}',
     correctionMessage:
         'Add _imageStream?.removeListener(_listener) in the dispose() method before calling super.dispose() to release the ImageStream reference and prevent memory leaks.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addClassDeclaration((ClassDeclaration node) {
+    context.addClassDeclaration((ClassDeclaration node) {
       // Check if extends State<T>
       final ExtendsClause? extendsClause = node.extendsClause;
       if (extendsClause == null) return;
@@ -1389,7 +1237,8 @@ class RequireImageStreamDisposeRule extends SaropaLintRule {
 
       // Report ImageStreams without removeListener in dispose
       for (final String fieldName in imageStreamFields) {
-        final bool hasRemoveListener = disposeBody != null &&
+        final bool hasRemoveListener =
+            disposeBody != null &&
             (disposeBody.contains('$fieldName.removeListener(') ||
                 disposeBody.contains('$fieldName?.removeListener('));
 
@@ -1399,7 +1248,7 @@ class RequireImageStreamDisposeRule extends SaropaLintRule {
               for (final VariableDeclaration variable
                   in member.fields.variables) {
                 if (variable.name.lexeme == fieldName) {
-                  reporter.atNode(variable, code);
+                  reporter.atNode(variable);
                 }
               }
             }
@@ -1443,7 +1292,7 @@ class RequireImageStreamDisposeRule extends SaropaLintRule {
 /// );
 /// ```
 class PreferImagePickerRequestFullMetadataRule extends SaropaLintRule {
-  const PreferImagePickerRequestFullMetadataRule() : super(code: _code);
+  PreferImagePickerRequestFullMetadataRule() : super(code: _code);
 
   /// Privacy consideration - unnecessary metadata collection.
   @override
@@ -1453,21 +1302,19 @@ class PreferImagePickerRequestFullMetadataRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'prefer_image_picker_request_full_metadata',
-    problemMessage:
-        '[prefer_image_picker_request_full_metadata] pickImage collects EXIF metadata (GPS, timestamps) by default. By default, image_picker includes full EXIF metadata (GPS location, camera info, timestamps). If your app doesn\'t need this metadata, set requestFullMetadata: false to improve privacy and reduce permissions needed. {v3}',
+    'prefer_image_picker_request_full_metadata',
+    '[prefer_image_picker_request_full_metadata] pickImage collects EXIF metadata (GPS, timestamps) by default. By default, image_picker includes full EXIF metadata (GPS location, camera info, timestamps). If your app doesn\'t need this metadata, set requestFullMetadata: false to improve privacy and reduce permissions needed. {v3}',
     correctionMessage:
         'Add requestFullMetadata: false if EXIF data (GPS, timestamps) not needed. Verify the change works correctly with existing tests and add coverage for the new behavior.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       final String methodName = node.methodName.name;
 
       // Check for pickImage, pickVideo, pickMultiImage
@@ -1505,44 +1352,6 @@ class PreferImagePickerRequestFullMetadataRule extends SaropaLintRule {
       }
     });
   }
-
-  @override
-  List<Fix> getFixes() => <Fix>[_PreferImagePickerRequestFullMetadataFix()];
-}
-
-class _PreferImagePickerRequestFullMetadataFix extends DartFix {
-  @override
-  void run(
-    CustomLintResolver resolver,
-    ChangeReporter reporter,
-    CustomLintContext context,
-    AnalysisError analysisError,
-    List<AnalysisError> others,
-  ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
-      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
-
-      final changeBuilder = reporter.createChangeBuilder(
-        message: 'Add requestFullMetadata: false',
-        priority: 80,
-      );
-
-      changeBuilder.addDartFileEdit((builder) {
-        final args = node.argumentList;
-        if (args.arguments.isEmpty) {
-          builder.addSimpleInsertion(
-            args.leftParenthesis.end,
-            'requestFullMetadata: false',
-          );
-        } else {
-          builder.addSimpleInsertion(
-            args.arguments.last.end,
-            ', requestFullMetadata: false',
-          );
-        }
-      });
-    });
-  }
 }
 
 /// Warns when pickImage is called without imageQuality for compression.
@@ -1578,7 +1387,7 @@ class _PreferImagePickerRequestFullMetadataFix extends DartFix {
 /// );
 /// ```
 class AvoidImagePickerLargeFilesRule extends SaropaLintRule {
-  const AvoidImagePickerLargeFilesRule() : super(code: _code);
+  AvoidImagePickerLargeFilesRule() : super(code: _code);
 
   /// Performance issue - large files waste bandwidth and memory.
   @override
@@ -1588,21 +1397,19 @@ class AvoidImagePickerLargeFilesRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_image_picker_large_files',
-    problemMessage:
-        '[avoid_image_picker_large_files] pickImage without imageQuality allows raw photos that can be 10+ MB in size, creating slow uploads and wasteful bandwidth consumption. Large image files cause network timeouts, drain battery, consume expensive mobile data, and may trigger out-of-memory errors when the app attempts to process them. {v5}',
+    'avoid_image_picker_large_files',
+    '[avoid_image_picker_large_files] pickImage without imageQuality allows raw photos that can be 10+ MB in size, creating slow uploads and wasteful bandwidth consumption. Large image files cause network timeouts, drain battery, consume expensive mobile data, and may trigger out-of-memory errors when the app attempts to process them. {v5}',
     correctionMessage:
         'Add imageQuality (e.g., 85) to compress images and reduce file size. This improves performance and reliability.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       final String methodName = node.methodName.name;
 
       // Check for pickImage (not pickVideo - video has different compression)
@@ -1641,44 +1448,6 @@ class AvoidImagePickerLargeFilesRule extends SaropaLintRule {
       }
     });
   }
-
-  @override
-  List<Fix> getFixes() => <Fix>[_AvoidImagePickerLargeFilesFix()];
-}
-
-class _AvoidImagePickerLargeFilesFix extends DartFix {
-  @override
-  void run(
-    CustomLintResolver resolver,
-    ChangeReporter reporter,
-    CustomLintContext context,
-    AnalysisError analysisError,
-    List<AnalysisError> others,
-  ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
-      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
-
-      final changeBuilder = reporter.createChangeBuilder(
-        message: 'Add imageQuality: 85',
-        priority: 80,
-      );
-
-      changeBuilder.addDartFileEdit((builder) {
-        final args = node.argumentList;
-        if (args.arguments.isEmpty) {
-          builder.addSimpleInsertion(
-            args.leftParenthesis.end,
-            'imageQuality: 85',
-          );
-        } else {
-          builder.addSimpleInsertion(
-            args.arguments.last.end,
-            ', imageQuality: 85',
-          );
-        }
-      });
-    });
-  }
 }
 
 /// Warns when CachedNetworkImage doesn't use a custom CacheManager.
@@ -1711,7 +1480,7 @@ class _AvoidImagePickerLargeFilesFix extends DartFix {
 /// )
 /// ```
 class PreferCachedImageCacheManagerRule extends SaropaLintRule {
-  const PreferCachedImageCacheManagerRule() : super(code: _code);
+  PreferCachedImageCacheManagerRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -1721,23 +1490,19 @@ class PreferCachedImageCacheManagerRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'prefer_cached_image_cache_manager',
-    problemMessage:
-        '[prefer_cached_image_cache_manager] CachedNetworkImage without CacheManager. Cache may grow unbounded. Without a custom CacheManager, cached images can grow unbounded and consume excessive storage. Configure limits for production apps. {v2}',
+    'prefer_cached_image_cache_manager',
+    '[prefer_cached_image_cache_manager] CachedNetworkImage without CacheManager. Cache may grow unbounded. Without a custom CacheManager, cached images can grow unbounded and consume excessive storage. Configure limits for production apps. {v2}',
     correctionMessage:
         'Add cacheManager parameter to limit cache size and stale period. Verify the change works correctly with existing tests and add coverage for the new behavior.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addInstanceCreationExpression((
-      InstanceCreationExpression node,
-    ) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final String typeName = node.constructorName.type.name.lexeme;
       if (typeName != 'CachedNetworkImage') return;
 
@@ -1780,7 +1545,7 @@ class PreferCachedImageCacheManagerRule extends SaropaLintRule {
 /// )
 /// ```
 class RequireImageCacheDimensionsRule extends SaropaLintRule {
-  const RequireImageCacheDimensionsRule() : super(code: _code);
+  RequireImageCacheDimensionsRule() : super(code: _code);
 
   /// Significant issue. Address when count exceeds 10.
   @override
@@ -1790,23 +1555,19 @@ class RequireImageCacheDimensionsRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'require_image_cache_dimensions',
-    problemMessage:
-        '[require_image_cache_dimensions] Image.network loads the full-resolution image into memory without cacheWidth or cacheHeight constraints. A 4000x3000 pixel photo decodes to approximately 48MB of uncompressed bitmap data in memory. Without cache dimensions, displaying multiple images causes excessive memory consumption that leads to out-of-memory crashes on lower-end devices. {v6}',
+    'require_image_cache_dimensions',
+    '[require_image_cache_dimensions] Image.network loads the full-resolution image into memory without cacheWidth or cacheHeight constraints. A 4000x3000 pixel photo decodes to approximately 48MB of uncompressed bitmap data in memory. Without cache dimensions, displaying multiple images causes excessive memory consumption that leads to out-of-memory crashes on lower-end devices. {v6}',
     correctionMessage:
         'Add cacheWidth and cacheHeight parameters matching the display dimensions to limit the decoded image size in memory and reduce overall memory consumption.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addInstanceCreationExpression((
-      InstanceCreationExpression node,
-    ) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final String constructorSource = node.constructorName.toSource();
       if (constructorSource != 'Image.network') return;
 
@@ -1825,39 +1586,6 @@ class RequireImageCacheDimensionsRule extends SaropaLintRule {
       if (!hasCacheDimensions) {
         reporter.atNode(node.constructorName, code);
       }
-    });
-  }
-
-  @override
-  List<Fix> getFixes() => <Fix>[_RequireImageCacheDimensionsFix()];
-}
-
-class _RequireImageCacheDimensionsFix extends DartFix {
-  @override
-  void run(
-    CustomLintResolver resolver,
-    ChangeReporter reporter,
-    CustomLintContext context,
-    AnalysisError analysisError,
-    List<AnalysisError> others,
-  ) {
-    context.registry.addInstanceCreationExpression((
-      InstanceCreationExpression node,
-    ) {
-      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
-
-      final changeBuilder = reporter.createChangeBuilder(
-        message: 'Add cacheWidth and cacheHeight',
-        priority: 80,
-      );
-
-      changeBuilder.addDartFileEdit((builder) {
-        final args = node.argumentList;
-        builder.addSimpleInsertion(
-          args.arguments.last.end,
-          ', cacheWidth: 400, cacheHeight: 400',
-        );
-      });
     });
   }
 }
@@ -1894,7 +1622,7 @@ class _RequireImageCacheDimensionsFix extends DartFix {
 /// )
 /// ```
 class RequireCachedImageDevicePixelRatioRule extends SaropaLintRule {
-  const RequireCachedImageDevicePixelRatioRule() : super(code: _code);
+  RequireCachedImageDevicePixelRatioRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.medium;
@@ -1903,23 +1631,19 @@ class RequireCachedImageDevicePixelRatioRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'require_cached_image_device_pixel_ratio',
-    problemMessage:
-        '[require_cached_image_device_pixel_ratio] CachedNetworkImage has fixed width or height without considering devicePixelRatio. A 200px image looks crisp on a 1x display but blurry on 2x and 3x screens (most modern phones). Without DPR scaling, images appear pixelated on high-density devices or waste bandwidth on low-density ones. Scale dimensions by MediaQuery.of(context).devicePixelRatio or use memCacheWidth/memCacheHeight for memory-efficient DPR-aware sizing. {v1}',
+    'require_cached_image_device_pixel_ratio',
+    '[require_cached_image_device_pixel_ratio] CachedNetworkImage has fixed width or height without considering devicePixelRatio. A 200px image looks crisp on a 1x display but blurry on 2x and 3x screens (most modern phones). Without DPR scaling, images appear pixelated on high-density devices or waste bandwidth on low-density ones. Scale dimensions by MediaQuery.of(context).devicePixelRatio or use memCacheWidth/memCacheHeight for memory-efficient DPR-aware sizing. {v1}',
     correctionMessage:
         'Multiply the fixed dimensions by MediaQuery.of(context).devicePixelRatio, or use memCacheWidth/memCacheHeight for cache-level DPR scaling.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addInstanceCreationExpression((
-      InstanceCreationExpression node,
-    ) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final String typeName = node.constructorName.type.name.lexeme;
       if (typeName != 'CachedNetworkImage') return;
 
@@ -1995,7 +1719,7 @@ class RequireCachedImageDevicePixelRatioRule extends SaropaLintRule {
 /// )
 /// ```
 class AvoidCachedImageUnboundedListRule extends SaropaLintRule {
-  const AvoidCachedImageUnboundedListRule() : super(code: _code);
+  AvoidCachedImageUnboundedListRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.high;
@@ -2010,9 +1734,8 @@ class AvoidCachedImageUnboundedListRule extends SaropaLintRule {
   Set<String>? get requiredPatterns => const <String>{'CachedNetworkImage'};
 
   static const LintCode _code = LintCode(
-    name: 'avoid_cached_image_unbounded_list',
-    problemMessage:
-        '[avoid_cached_image_unbounded_list] CachedNetworkImage used inside '
+    'avoid_cached_image_unbounded_list',
+    '[avoid_cached_image_unbounded_list] CachedNetworkImage used inside '
         'a scrollable list without memCacheWidth or memCacheHeight. All '
         'images are cached at full resolution, causing excessive memory '
         'usage that can lead to OOM crashes on lower-end devices. In a long '
@@ -2020,18 +1743,15 @@ class AvoidCachedImageUnboundedListRule extends SaropaLintRule {
     correctionMessage:
         'Add memCacheWidth and/or memCacheHeight to limit cached image '
         'resolution.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addInstanceCreationExpression((
-      InstanceCreationExpression node,
-    ) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final String constructorSource = node.constructorName.toSource();
       if (!constructorSource.contains('CachedNetworkImage')) return;
 

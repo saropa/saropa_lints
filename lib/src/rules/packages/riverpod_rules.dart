@@ -5,9 +5,6 @@
 
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
-import 'package:analyzer/error/error.dart'
-    show AnalysisError, DiagnosticSeverity;
-import 'package:custom_lint_builder/custom_lint_builder.dart';
 
 import '../../import_utils.dart';
 import '../../saropa_lint_rule.dart';
@@ -41,15 +38,14 @@ import '../../saropa_lint_rule.dart';
 /// ```
 class AvoidRefReadInsideBuildRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
-    name: 'avoid_ref_read_inside_build',
-    problemMessage:
-        '[avoid_ref_read_inside_build] ref.read() called inside build() bypasses Riverpod reactivity. The widget will not rebuild when the provider state changes, resulting in stale data displayed to the user. This creates inconsistent UI state that fails silently and produces hard-to-diagnose rendering errors across dependent widgets. {v2}',
+    'avoid_ref_read_inside_build',
+    '[avoid_ref_read_inside_build] ref.read() called inside build() bypasses Riverpod reactivity. The widget will not rebuild when the provider state changes, resulting in stale data displayed to the user. This creates inconsistent UI state that fails silently and produces hard-to-diagnose rendering errors across dependent widgets. {v2}',
     correctionMessage:
         'Replace ref.read() with ref.watch() inside build() to subscribe to provider changes and trigger automatic widget rebuilds on state updates.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
-  const AvoidRefReadInsideBuildRule() : super(code: _code);
+  AvoidRefReadInsideBuildRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.high;
@@ -62,11 +58,10 @@ class AvoidRefReadInsideBuildRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodDeclaration((MethodDeclaration node) {
+    context.addMethodDeclaration((MethodDeclaration node) {
       if (node.name.lexeme != 'build') return;
       node.body.visitChildren(_RefReadVisitor(reporter, code));
     });
@@ -84,7 +79,7 @@ class _RefReadVisitor extends RecursiveAstVisitor<void> {
     if (node.methodName.name == 'read' &&
         node.target != null &&
         node.target.toString() == 'ref') {
-      reporter.atNode(node, code);
+      reporter.atNode(node);
     }
     super.visitMethodInvocation(node);
   }
@@ -117,15 +112,14 @@ class _RefReadVisitor extends RecursiveAstVisitor<void> {
 /// ```
 class AvoidRefWatchOutsideBuildRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
-    name: 'avoid_ref_watch_outside_build',
-    problemMessage:
-        '[avoid_ref_watch_outside_build] ref.watch() detected outside build() method, breaking the Riverpod widget lifecycle. Subscriptions created outside build() leak memory, produce stale data, and cause missed UI updates that lead to inconsistent state and hard-to-debug rendering errors across dependent widgets. {v3}',
+    'avoid_ref_watch_outside_build',
+    '[avoid_ref_watch_outside_build] ref.watch() detected outside build() method, breaking the Riverpod widget lifecycle. Subscriptions created outside build() leak memory, produce stale data, and cause missed UI updates that lead to inconsistent state and hard-to-debug rendering errors across dependent widgets. {v3}',
     correctionMessage:
         'Move ref.watch() calls into the build() method where Riverpod manages subscription lifecycle and automatic widget rebuilds on provider state changes.',
-    errorSeverity: DiagnosticSeverity.ERROR,
+    severity: DiagnosticSeverity.ERROR,
   );
 
-  const AvoidRefWatchOutsideBuildRule() : super(code: _code);
+  AvoidRefWatchOutsideBuildRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.critical;
@@ -138,11 +132,10 @@ class AvoidRefWatchOutsideBuildRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       if (node.methodName.name == 'watch' &&
           node.target != null &&
           node.target.toString() == 'ref') {
@@ -154,7 +147,7 @@ class AvoidRefWatchOutsideBuildRule extends SaropaLintRule {
         if (parent is MethodDeclaration && parent.name.lexeme == 'build') {
           // OK
         } else {
-          reporter.atNode(node, code);
+          reporter.atNode(node);
         }
       }
     });
@@ -200,15 +193,14 @@ class AvoidRefWatchOutsideBuildRule extends SaropaLintRule {
 /// ```
 class AvoidRefInsideStateDisposeRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
-    name: 'avoid_ref_inside_state_dispose',
-    problemMessage:
-        '[avoid_ref_inside_state_dispose] Ref may already be disposed when '
+    'avoid_ref_inside_state_dispose',
+    '[avoid_ref_inside_state_dispose] Ref may already be disposed when '
         'dispose() runs, causing "already disposed" errors or crashes. {v3}',
     correctionMessage: 'Cache values in initState instead.',
-    errorSeverity: DiagnosticSeverity.ERROR,
+    severity: DiagnosticSeverity.ERROR,
   );
 
-  const AvoidRefInsideStateDisposeRule() : super(code: _code);
+  AvoidRefInsideStateDisposeRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.critical;
@@ -221,11 +213,10 @@ class AvoidRefInsideStateDisposeRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodDeclaration((MethodDeclaration node) {
+    context.addMethodDeclaration((MethodDeclaration node) {
       if (node.name.lexeme != 'dispose') return;
       node.body.visitChildren(_RefAccessVisitor(reporter, code));
     });
@@ -241,7 +232,7 @@ class _RefAccessVisitor extends RecursiveAstVisitor<void> {
   @override
   void visitSimpleIdentifier(SimpleIdentifier node) {
     if (node.name == 'ref') {
-      reporter.atNode(node, code);
+      reporter.atNode(node);
     }
     super.visitSimpleIdentifier(node);
   }
@@ -276,15 +267,14 @@ class _RefAccessVisitor extends RecursiveAstVisitor<void> {
 /// ```
 class UseRefReadSynchronouslyRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
-    name: 'use_ref_read_synchronously',
-    problemMessage:
-        '[use_ref_read_synchronously] ref.read() after await may access a '
+    'use_ref_read_synchronously',
+    '[use_ref_read_synchronously] ref.read() after await may access a '
         'disposed or invalidated provider, causing crashes or stale reads. {v2}',
     correctionMessage: 'Cache ref.read() result before async gap.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
-  const UseRefReadSynchronouslyRule() : super(code: _code);
+  UseRefReadSynchronouslyRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.high;
@@ -297,11 +287,10 @@ class UseRefReadSynchronouslyRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodDeclaration((MethodDeclaration node) {
+    context.addMethodDeclaration((MethodDeclaration node) {
       if (!node.body.isAsynchronous) return;
       node.body.visitChildren(_RefReadAfterAwaitVisitor(reporter, code));
     });
@@ -327,7 +316,7 @@ class _RefReadAfterAwaitVisitor extends RecursiveAstVisitor<void> {
         node.methodName.name == 'read' &&
         node.target != null &&
         node.target.toString() == 'ref') {
-      reporter.atNode(node, code);
+      reporter.atNode(node);
     }
     super.visitMethodInvocation(node);
   }
@@ -363,15 +352,14 @@ class _RefReadAfterAwaitVisitor extends RecursiveAstVisitor<void> {
 /// ```
 class UseRefAndStateSynchronouslyRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
-    name: 'use_ref_and_state_synchronously',
-    problemMessage:
-        '[use_ref_and_state_synchronously] Using ref after await risks '
+    'use_ref_and_state_synchronously',
+    '[use_ref_and_state_synchronously] Using ref after await risks '
         'accessing disposed provider, causing runtime errors or stale data. {v2}',
     correctionMessage: 'Cache ref values before await.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
-  const UseRefAndStateSynchronouslyRule() : super(code: _code);
+  UseRefAndStateSynchronouslyRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.high;
@@ -384,11 +372,10 @@ class UseRefAndStateSynchronouslyRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodDeclaration((MethodDeclaration node) {
+    context.addMethodDeclaration((MethodDeclaration node) {
       if (!node.body.isAsynchronous) return;
       node.body.visitChildren(_RefAfterAwaitVisitor(reporter, code));
     });
@@ -412,7 +399,7 @@ class _RefAfterAwaitVisitor extends RecursiveAstVisitor<void> {
   void visitSimpleIdentifier(SimpleIdentifier node) {
     // Only flag 'ref' - 'state' is too common a variable name
     if (foundAwait && node.name == 'ref') {
-      reporter.atNode(node, code);
+      reporter.atNode(node);
     }
     super.visitSimpleIdentifier(node);
   }
@@ -455,15 +442,14 @@ class _RefAfterAwaitVisitor extends RecursiveAstVisitor<void> {
 /// ```
 class AvoidAssigningNotifiersRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
-    name: 'avoid_assigning_notifiers',
-    problemMessage:
-        '[avoid_assigning_notifiers] Reassigning Notifier breaks provider '
+    'avoid_assigning_notifiers',
+    '[avoid_assigning_notifiers] Reassigning Notifier breaks provider '
         'contract. State updates are lost and listeners receive stale data. {v3}',
     correctionMessage: 'Modify state through Notifier methods instead.',
-    errorSeverity: DiagnosticSeverity.ERROR,
+    severity: DiagnosticSeverity.ERROR,
   );
 
-  const AvoidAssigningNotifiersRule() : super(code: _code);
+  AvoidAssigningNotifiersRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.critical;
@@ -496,12 +482,11 @@ class AvoidAssigningNotifiersRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
     // Use direct assignment expression callback for reliable detection
-    context.registry.addAssignmentExpression((AssignmentExpression node) {
+    context.addAssignmentExpression((AssignmentExpression node) {
       final lhs = node.leftHandSide;
 
       // Only match variables ending with 'notifier'
@@ -528,7 +513,7 @@ class AvoidAssigningNotifiersRule extends SaropaLintRule {
       final rhsType = rhs.staticType?.getDisplayString();
       if (rhsType != null && _isFlutterNotifierType(rhsType)) return;
 
-      reporter.atNode(node, code);
+      reporter.atNode(node);
     });
   }
 
@@ -568,42 +553,9 @@ class AvoidAssigningNotifiersRule extends SaropaLintRule {
     }
     return false;
   }
-
-  @override
-  List<Fix> getFixes() => <Fix>[_CommentOutNotifierAssignmentFix()];
 }
 
 /// Quick fix that comments out the problematic notifier assignment.
-class _CommentOutNotifierAssignmentFix extends DartFix {
-  @override
-  void run(
-    CustomLintResolver resolver,
-    ChangeReporter reporter,
-    CustomLintContext context,
-    AnalysisError analysisError,
-    List<AnalysisError> others,
-  ) {
-    context.registry.addAssignmentExpression((AssignmentExpression node) {
-      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
-
-      final statement = node.thisOrAncestorOfType<ExpressionStatement>();
-      if (statement == null) return;
-
-      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
-        message: 'Comment out notifier assignment',
-        priority: 1,
-      );
-
-      changeBuilder.addDartFileEdit((builder) {
-        builder.addSimpleReplacement(
-          statement.sourceRange,
-          '// HACK: Notifier assignment - use ref.read(provider.notifier) instead\n'
-          '// ${statement.toSource()}',
-        );
-      });
-    });
-  }
-}
 
 /// Warns when a Riverpod Notifier class has an explicit constructor.
 ///
@@ -637,15 +589,14 @@ class AvoidNotifierConstructorsRule extends SaropaLintRule {
   /// Alias: avoid_notifier_constructors_usage
 
   static const LintCode _code = LintCode(
-    name: 'avoid_notifier_constructors',
-    problemMessage:
-        '[avoid_notifier_constructors] Notifier constructors break Riverpod '
+    'avoid_notifier_constructors',
+    '[avoid_notifier_constructors] Notifier constructors break Riverpod '
         'lifecycle management. Initialization logic is skipped during rebuild. {v2}',
     correctionMessage: 'Use build() method for initialization.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
-  const AvoidNotifierConstructorsRule() : super(code: _code);
+  AvoidNotifierConstructorsRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.medium;
@@ -668,11 +619,10 @@ class AvoidNotifierConstructorsRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addClassDeclaration((ClassDeclaration node) {
+    context.addClassDeclaration((ClassDeclaration node) {
       // Check if class extends a known Notifier base class
       final extendsClause = node.extendsClause;
       if (extendsClause == null) return;
@@ -690,7 +640,7 @@ class AvoidNotifierConstructorsRule extends SaropaLintRule {
 
           // Flag if constructor has a body with statements
           if (body is BlockFunctionBody && body.block.statements.isNotEmpty) {
-            reporter.atNode(member, code);
+            reporter.atNode(member);
           }
         }
       }
@@ -728,15 +678,14 @@ class PreferImmutableProviderArgumentsRule extends SaropaLintRule {
   /// Alias: prefer_immutable_provider_arguments_type
 
   static const LintCode _code = LintCode(
-    name: 'prefer_immutable_provider_arguments',
-    problemMessage:
-        '[prefer_immutable_provider_arguments] Mutable provider arguments cause unpredictable rebuilds. Provider arguments must be immutable for consistent behavior. Mutable arguments can lead to unexpected state changes within the provider callback. {v3}',
+    'prefer_immutable_provider_arguments',
+    '[prefer_immutable_provider_arguments] Mutable provider arguments cause unpredictable rebuilds. Provider arguments must be immutable for consistent behavior. Mutable arguments can lead to unexpected state changes within the provider callback. {v3}',
     correctionMessage:
         'Use final for provider arguments. Verify the change works correctly with existing tests and add coverage for the new behavior.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
-  const PreferImmutableProviderArgumentsRule() : super(code: _code);
+  PreferImmutableProviderArgumentsRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.medium;
@@ -749,17 +698,16 @@ class PreferImmutableProviderArgumentsRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addFunctionDeclaration((FunctionDeclaration node) {
+    context.addFunctionDeclaration((FunctionDeclaration node) {
       if (node.name.lexeme.endsWith('Provider')) {
         final parameters = node.functionExpression.parameters?.parameters;
         if (parameters != null) {
           for (final param in parameters) {
             if (param is SimpleFormalParameter && !param.isFinal) {
-              reporter.atNode(param, code);
+              reporter.atNode(param);
             }
           }
         }
@@ -795,7 +743,7 @@ class PreferImmutableProviderArgumentsRule extends SaropaLintRule {
 /// }
 /// ```
 class AvoidUnnecessaryConsumerWidgetsRule extends SaropaLintRule {
-  const AvoidUnnecessaryConsumerWidgetsRule() : super(code: _code);
+  AvoidUnnecessaryConsumerWidgetsRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.low;
@@ -807,21 +755,19 @@ class AvoidUnnecessaryConsumerWidgetsRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.provider};
 
   static const LintCode _code = LintCode(
-    name: 'avoid_unnecessary_consumer_widgets',
-    problemMessage:
-        '[avoid_unnecessary_consumer_widgets] ConsumerWidget does not use ref parameter. If a widget extends ConsumerWidget but doesn\'t use ref, it must be a regular StatelessWidget instead. {v2}',
+    'avoid_unnecessary_consumer_widgets',
+    '[avoid_unnecessary_consumer_widgets] ConsumerWidget does not use ref parameter. If a widget extends ConsumerWidget but doesn\'t use ref, it must be a regular StatelessWidget instead. {v2}',
     correctionMessage:
         'Use StatelessWidget instead if ref is not needed. Verify the change works correctly with existing tests and add coverage for the new behavior.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addClassDeclaration((ClassDeclaration node) {
+    context.addClassDeclaration((ClassDeclaration node) {
       final ExtendsClause? extendsClause = node.extendsClause;
       if (extendsClause == null) return;
 
@@ -836,12 +782,16 @@ class AvoidUnnecessaryConsumerWidgetsRule extends SaropaLintRule {
         if (member is MethodDeclaration && member.name.lexeme == 'build') {
           // Check if ref is used in the body
           bool usesRef = false;
-          member.body.visitChildren(_RefUsageVisitor(onRefFound: () {
-            usesRef = true;
-          }));
+          member.body.visitChildren(
+            _RefUsageVisitor(
+              onRefFound: () {
+                usesRef = true;
+              },
+            ),
+          );
 
           if (!usesRef) {
-            reporter.atNode(node, code);
+            reporter.atNode(node);
           }
           break;
         }
@@ -886,7 +836,7 @@ class _RefUsageVisitor extends RecursiveAstVisitor<void> {
 /// )
 /// ```
 class AvoidNullableAsyncValuePatternRule extends SaropaLintRule {
-  const AvoidNullableAsyncValuePatternRule() : super(code: _code);
+  AvoidNullableAsyncValuePatternRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.medium;
@@ -898,23 +848,21 @@ class AvoidNullableAsyncValuePatternRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.provider};
 
   static const LintCode _code = LintCode(
-    name: 'avoid_nullable_async_value_pattern',
-    problemMessage:
-        '[avoid_nullable_async_value_pattern] Nullable access on AsyncValue bypasses the type system error and loading state handling. '
+    'avoid_nullable_async_value_pattern',
+    '[avoid_nullable_async_value_pattern] Nullable access on AsyncValue bypasses the type system error and loading state handling. '
         'Accessing .value directly returns null during loading and error states, which can propagate nulls through the UI and hide error conditions that users should see. {v3}',
     correctionMessage:
         'Use when() or map() to handle all three AsyncValue states (data, loading, error) explicitly. '
         'This ensures loading indicators are shown, errors are surfaced to the user, and the data path only executes when a value is actually available.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addPropertyAccess((PropertyAccess node) {
+    context.addPropertyAccess((PropertyAccess node) {
       final String propertyName = node.propertyName.name;
       if (propertyName != 'value') return;
 
@@ -923,12 +871,12 @@ class AvoidNullableAsyncValuePatternRule extends SaropaLintRule {
       if (targetSource.contains('AsyncValue') ||
           targetSource.endsWith('async') ||
           targetSource.endsWith('Async')) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
 
     // Also check simple identifier access like asyncValue.value
-    context.registry.addPrefixedIdentifier((PrefixedIdentifier node) {
+    context.addPrefixedIdentifier((PrefixedIdentifier node) {
       if (node.identifier.name != 'value') return;
 
       final String prefixName = node.prefix.name.toLowerCase();
@@ -938,7 +886,7 @@ class AvoidNullableAsyncValuePatternRule extends SaropaLintRule {
         // This is a heuristic - may have some false positives
         // Only flag if the name strongly suggests AsyncValue
         if (prefixName.contains('async')) {
-          reporter.atNode(node, code);
+          reporter.atNode(node);
         }
       }
     });
@@ -970,7 +918,7 @@ class AvoidNullableAsyncValuePatternRule extends SaropaLintRule {
 /// );
 /// ```
 class RequireRiverpodErrorHandlingRule extends SaropaLintRule {
-  const RequireRiverpodErrorHandlingRule() : super(code: _code);
+  RequireRiverpodErrorHandlingRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.high;
@@ -982,21 +930,19 @@ class RequireRiverpodErrorHandlingRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.provider};
 
   static const LintCode _code = LintCode(
-    name: 'require_riverpod_error_handling',
-    problemMessage:
-        '[require_riverpod_error_handling] AsyncValue from a Riverpod provider accessed without handling error and loading states. When the async operation fails or is in progress, accessing .value directly throws a StateError or returns null, causing crashes or displaying stale data. Users see broken UI instead of loading indicators or error messages. {v2}',
+    'require_riverpod_error_handling',
+    '[require_riverpod_error_handling] AsyncValue from a Riverpod provider accessed without handling error and loading states. When the async operation fails or is in progress, accessing .value directly throws a StateError or returns null, causing crashes or displaying stale data. Users see broken UI instead of loading indicators or error messages. {v2}',
     correctionMessage:
         'Use .when(data: _, loading: _, error: _) or .maybeWhen() to handle all AsyncValue states explicitly, providing loading indicators and error messages.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addPropertyAccess((PropertyAccess node) {
+    context.addPropertyAccess((PropertyAccess node) {
       // Check for direct .value access on AsyncValue
       if (node.propertyName.name != 'value') return;
 
@@ -1010,7 +956,7 @@ class RequireRiverpodErrorHandlingRule extends SaropaLintRule {
         if (targetSource.contains('async') ||
             targetSource.contains('future') ||
             targetSource.contains('stream')) {
-          reporter.atNode(node, code);
+          reporter.atNode(node);
         }
       }
     });
@@ -1039,7 +985,7 @@ class RequireRiverpodErrorHandlingRule extends SaropaLintRule {
 /// }
 /// ```
 class AvoidRiverpodStateMutationRule extends SaropaLintRule {
-  const AvoidRiverpodStateMutationRule() : super(code: _code);
+  AvoidRiverpodStateMutationRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.high;
@@ -1051,12 +997,11 @@ class AvoidRiverpodStateMutationRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.provider};
 
   static const LintCode _code = LintCode(
-    name: 'avoid_riverpod_state_mutation',
-    problemMessage:
-        '[avoid_riverpod_state_mutation] Riverpod state mutated directly instead of replaced. Direct mutations don\'t trigger Notifier rebuilds, causing the UI to display stale, inconsistent data. Listeners and consumers will not receive the updated values. {v2}',
+    'avoid_riverpod_state_mutation',
+    '[avoid_riverpod_state_mutation] Riverpod state mutated directly instead of replaced. Direct mutations don\'t trigger Notifier rebuilds, causing the UI to display stale, inconsistent data. Listeners and consumers will not receive the updated values. {v2}',
     correctionMessage:
         'Use state = state.copyWith(..) to replace state. Verify the change works correctly with existing tests and add coverage for the new behavior.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   static const Set<String> _mutatingMethods = <String>{
@@ -1075,11 +1020,10 @@ class AvoidRiverpodStateMutationRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       final String methodName = node.methodName.name;
       if (!_mutatingMethods.contains(methodName)) return;
 
@@ -1098,7 +1042,7 @@ class AvoidRiverpodStateMutationRule extends SaropaLintRule {
             if (extendsName != null &&
                 (extendsName.contains('Notifier') ||
                     extendsName.contains('StateNotifier'))) {
-              reporter.atNode(node, code);
+              reporter.atNode(node);
             }
             break;
           }
@@ -1127,7 +1071,7 @@ class AvoidRiverpodStateMutationRule extends SaropaLintRule {
 /// // Only rebuilds when name changes
 /// ```
 class PreferRiverpodSelectRule extends SaropaLintRule {
-  const PreferRiverpodSelectRule() : super(code: _code);
+  PreferRiverpodSelectRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.medium;
@@ -1139,21 +1083,19 @@ class PreferRiverpodSelectRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.provider};
 
   static const LintCode _code = LintCode(
-    name: 'prefer_riverpod_select',
-    problemMessage:
-        '[prefer_riverpod_select] ref.watch() accessing single field. Use .select() for efficiency. This pattern increases maintenance cost and the likelihood of introducing bugs during future changes. {v2}',
+    'prefer_riverpod_select',
+    '[prefer_riverpod_select] ref.watch() accessing single field. Use .select() for efficiency. This pattern increases maintenance cost and the likelihood of introducing bugs during future changes. {v2}',
     correctionMessage:
         'Use ref.watch(provider.select((s) => s.field)) for targeted rebuilds. Verify the change works correctly with existing tests and add coverage for the new behavior.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addPropertyAccess((PropertyAccess node) {
+    context.addPropertyAccess((PropertyAccess node) {
       // Check pattern: ref.watch(provider).field
       final Expression? target = node.target;
       if (target is! MethodInvocation) return;
@@ -1171,7 +1113,7 @@ class PreferRiverpodSelectRule extends SaropaLintRule {
       final String watchSource = target.toSource();
       if (watchSource.contains('.select(')) return;
 
-      reporter.atNode(node, code);
+      reporter.atNode(node);
     });
   }
 }
@@ -1199,7 +1141,7 @@ class PreferRiverpodSelectRule extends SaropaLintRule {
 /// import 'package:flutter_riverpod/flutter_riverpod.dart';
 /// ```
 class RequireFlutterRiverpodPackageRule extends SaropaLintRule {
-  const RequireFlutterRiverpodPackageRule() : super(code: _code);
+  RequireFlutterRiverpodPackageRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.critical;
@@ -1211,22 +1153,20 @@ class RequireFlutterRiverpodPackageRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.provider};
 
   static const LintCode _code = LintCode(
-    name: 'require_flutter_riverpod_package',
-    problemMessage:
-        '[require_flutter_riverpod_package] Base riverpod package lacks '
+    'require_flutter_riverpod_package',
+    '[require_flutter_riverpod_package] Base riverpod package lacks '
         'Flutter widgets (ProviderScope, ConsumerWidget), causing errors. {v1}',
     correctionMessage:
         'Import package:flutter_riverpod/flutter_riverpod.dart instead.',
-    errorSeverity: DiagnosticSeverity.ERROR,
+    severity: DiagnosticSeverity.ERROR,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addImportDirective((ImportDirective node) {
+    context.addImportDirective((ImportDirective node) {
       final uri = node.uri.stringValue;
       if (uri == null) return;
 
@@ -1261,7 +1201,7 @@ class RequireFlutterRiverpodPackageRule extends SaropaLintRule {
 /// final myProvider = StateProvider.autoDispose<int>((ref) => 0);
 /// ```
 class PreferRiverpodAutoDisposeRule extends SaropaLintRule {
-  const PreferRiverpodAutoDisposeRule() : super(code: _code);
+  PreferRiverpodAutoDisposeRule() : super(code: _code);
 
   /// Memory leaks from retained providers.
   @override
@@ -1274,12 +1214,11 @@ class PreferRiverpodAutoDisposeRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.provider};
 
   static const LintCode _code = LintCode(
-    name: 'prefer_riverpod_auto_dispose',
-    problemMessage:
-        '[prefer_riverpod_auto_dispose] Provider declared without the autoDispose modifier retains its state and resources indefinitely even after all listening child widgets are destroyed from the widget tree. This causes memory leaks, stale data accumulation, and unnecessary background computation that grows over the app lifetime, degrading performance progressively. {v3}',
+    'prefer_riverpod_auto_dispose',
+    '[prefer_riverpod_auto_dispose] Provider declared without the autoDispose modifier retains its state and resources indefinitely even after all listening child widgets are destroyed from the widget tree. This causes memory leaks, stale data accumulation, and unnecessary background computation that grows over the app lifetime, degrading performance progressively. {v3}',
     correctionMessage:
         'Add the .autoDispose modifier to the provider declaration (e.g., StateProvider.autoDispose<T>) so resources are released when no consumer is actively listening.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   /// Provider constructors that have autoDispose variants.
@@ -1295,11 +1234,10 @@ class PreferRiverpodAutoDisposeRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addVariableDeclaration((VariableDeclaration node) {
+    context.addVariableDeclaration((VariableDeclaration node) {
       final Expression? initializer = node.initializer;
       if (initializer == null) return;
 
@@ -1312,7 +1250,7 @@ class PreferRiverpodAutoDisposeRule extends SaropaLintRule {
         final String source = initializer.toSource();
         if (source.contains('.autoDispose')) return;
 
-        reporter.atNode(initializer, code);
+        reporter.atNode(initializer);
       }
     });
   }
@@ -1351,7 +1289,7 @@ class PreferRiverpodAutoDisposeRule extends SaropaLintRule {
 /// // Usage: ref.watch(userProvider(userId));
 /// ```
 class PreferRiverpodFamilyForParamsRule extends SaropaLintRule {
-  const PreferRiverpodFamilyForParamsRule() : super(code: _code);
+  PreferRiverpodFamilyForParamsRule() : super(code: _code);
 
   /// Improves type safety and cache behavior.
   @override
@@ -1364,21 +1302,19 @@ class PreferRiverpodFamilyForParamsRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.provider};
 
   static const LintCode _code = LintCode(
-    name: 'prefer_riverpod_family_for_params',
-    problemMessage:
-        '[prefer_riverpod_family_for_params] Provider uses nullable state for parameterized data. Use .family instead. Using state to pass parameters to providers is error-prone. The .family modifier provides type-safe parameter passing. {v2}',
+    'prefer_riverpod_family_for_params',
+    '[prefer_riverpod_family_for_params] Provider uses nullable state for parameterized data. Use .family instead. Using state to pass parameters to providers is error-prone. The .family modifier provides type-safe parameter passing. {v2}',
     correctionMessage:
         'Use FutureProvider.family<T, Param>((ref, param) => ..) for parameterized providers.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addVariableDeclaration((VariableDeclaration node) {
+    context.addVariableDeclaration((VariableDeclaration node) {
       final Expression? initializer = node.initializer;
       if (initializer == null) return;
 
@@ -1395,7 +1331,7 @@ class PreferRiverpodFamilyForParamsRule extends SaropaLintRule {
       // Check if the initializer returns null (pattern: (ref) => null)
       if (!source.contains('=> null')) return;
 
-      reporter.atNode(initializer, code);
+      reporter.atNode(initializer);
     });
   }
 }
@@ -1425,7 +1361,7 @@ class PreferRiverpodFamilyForParamsRule extends SaropaLintRule {
 /// )
 /// ```
 class AvoidGlobalRiverpodProvidersRule extends SaropaLintRule {
-  const AvoidGlobalRiverpodProvidersRule() : super(code: _code);
+  AvoidGlobalRiverpodProvidersRule() : super(code: _code);
 
   /// Significant issue. Address when count exceeds 10.
   @override
@@ -1438,12 +1374,11 @@ class AvoidGlobalRiverpodProvidersRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.provider};
 
   static const LintCode _code = LintCode(
-    name: 'avoid_global_riverpod_providers',
-    problemMessage:
-        '[avoid_global_riverpod_providers] Defining providers at the global scope creates implicit dependencies, makes testing difficult, and can cause state to leak between tests or app sessions. This leads to flaky tests, unpredictable bugs, and hard-to-maintain code. {v5}',
+    'avoid_global_riverpod_providers',
+    '[avoid_global_riverpod_providers] Defining providers at the global scope creates implicit dependencies, makes testing difficult, and can cause state to leak between tests or app sessions. This leads to flaky tests, unpredictable bugs, and hard-to-maintain code. {v5}',
     correctionMessage:
         'Define providers inside a ProviderScope or document their scope clearly to ensure test isolation and predictable state management.',
-    errorSeverity: DiagnosticSeverity.ERROR,
+    severity: DiagnosticSeverity.ERROR,
   );
 
   static const Set<String> _providerTypes = <String>{
@@ -1459,27 +1394,24 @@ class AvoidGlobalRiverpodProvidersRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addTopLevelVariableDeclaration((
-      TopLevelVariableDeclaration node,
-    ) {
+    context.addTopLevelVariableDeclaration((TopLevelVariableDeclaration node) {
       for (final VariableDeclaration variable in node.variables.variables) {
         final Expression? initializer = variable.initializer;
         if (initializer is MethodInvocation) {
           // Check for provider creation
           final String methodName = initializer.methodName.name;
           if (_providerTypes.any((String t) => methodName.contains(t))) {
-            reporter.atNode(variable, code);
+            reporter.atNode(variable);
           }
         }
         if (initializer is InstanceCreationExpression) {
           final String? typeName =
               initializer.constructorName.type.element?.name;
           if (typeName != null && _providerTypes.contains(typeName)) {
-            reporter.atNode(variable, code);
+            reporter.atNode(variable);
           }
         }
       }
@@ -1520,7 +1452,7 @@ class AvoidGlobalRiverpodProvidersRule extends SaropaLintRule {
 /// }
 /// ```
 class PreferConsumerWidgetRule extends SaropaLintRule {
-  const PreferConsumerWidgetRule() : super(code: _code);
+  PreferConsumerWidgetRule() : super(code: _code);
 
   /// Significant issue. Address when count exceeds 10.
   @override
@@ -1534,23 +1466,19 @@ class PreferConsumerWidgetRule extends SaropaLintRule {
 
   /// Alias: prefer_consumer_widget_pattern
   static const LintCode _code = LintCode(
-    name: 'prefer_consumer_widget',
-    problemMessage:
-        '[prefer_consumer_widget] Wrapping widgets with Consumer adds unnecessary nesting and boilerplate instead of using ConsumerWidget directly. The extra widget layer causes redundant rebuilds and increases the widget tree depth, leading to harder-to-debug rebuild cascades and degraded rendering performance. {v4}',
+    'prefer_consumer_widget',
+    '[prefer_consumer_widget] Wrapping widgets with Consumer adds unnecessary nesting and boilerplate instead of using ConsumerWidget directly. The extra widget layer causes redundant rebuilds and increases the widget tree depth, leading to harder-to-debug rebuild cascades and degraded rendering performance. {v4}',
     correctionMessage:
         'Extend ConsumerWidget instead of wrapping with Consumer to simplify your widget tree and improve code clarity.',
-    errorSeverity: DiagnosticSeverity.ERROR,
+    severity: DiagnosticSeverity.ERROR,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addInstanceCreationExpression((
-      InstanceCreationExpression node,
-    ) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final String typeName = node.constructorName.type.name.lexeme;
       if (typeName != 'Consumer') return;
 
@@ -1565,7 +1493,7 @@ class PreferConsumerWidgetRule extends SaropaLintRule {
               final AstNode? bodyParent = blockParent.parent;
               if (bodyParent is MethodDeclaration &&
                   bodyParent.name.lexeme == 'build') {
-                reporter.atNode(node, code);
+                reporter.atNode(node);
                 return;
               }
             }
@@ -1576,7 +1504,7 @@ class PreferConsumerWidgetRule extends SaropaLintRule {
           final AstNode? bodyParent = current.parent;
           if (bodyParent is MethodDeclaration &&
               bodyParent.name.lexeme == 'build') {
-            reporter.atNode(node, code);
+            reporter.atNode(node);
             return;
           }
         }
@@ -1606,7 +1534,7 @@ class PreferConsumerWidgetRule extends SaropaLintRule {
 /// class MyNotifier extends _$MyNotifier { ... }
 /// ```
 class RequireAutoDisposeRule extends SaropaLintRule {
-  const RequireAutoDisposeRule() : super(code: _code);
+  RequireAutoDisposeRule() : super(code: _code);
 
   /// Significant issue. Address when count exceeds 10.
   @override
@@ -1619,12 +1547,11 @@ class RequireAutoDisposeRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
-    name: 'require_auto_dispose',
-    problemMessage:
-        '[require_auto_dispose] Not using autoDispose with Riverpod providers can cause memory leaks, as providers and their resources may remain in memory after they are no longer needed. This can lead to increased memory usage and degraded app performance. {v2}',
+    'require_auto_dispose',
+    '[require_auto_dispose] Not using autoDispose with Riverpod providers can cause memory leaks, as providers and their resources may remain in memory after they are no longer needed. This can lead to increased memory usage and degraded app performance. {v2}',
     correctionMessage:
         'Use Provider.autoDispose, StateProvider.autoDispose, etc., to ensure providers are disposed when no longer needed and prevent memory leaks.',
-    errorSeverity: DiagnosticSeverity.ERROR,
+    severity: DiagnosticSeverity.ERROR,
   );
 
   static const Set<String> _providerTypes = <String>{
@@ -1640,13 +1567,10 @@ class RequireAutoDisposeRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addTopLevelVariableDeclaration((
-      TopLevelVariableDeclaration node,
-    ) {
+    context.addTopLevelVariableDeclaration((TopLevelVariableDeclaration node) {
       for (final VariableDeclaration variable in node.variables.variables) {
         final Expression? initializer = variable.initializer;
 
@@ -1663,7 +1587,7 @@ class RequireAutoDisposeRule extends SaropaLintRule {
             final String targetName = target.name;
             if (_providerTypes.contains(targetName)) {
               // It's a provider modifier (like .family) without autoDispose
-              reporter.atNode(variable, code);
+              reporter.atNode(variable);
             }
           }
         }
@@ -1679,7 +1603,7 @@ class RequireAutoDisposeRule extends SaropaLintRule {
             // Check if it uses autoDispose constructor
             if (constructorName != 'autoDispose' &&
                 !typeName.contains('AutoDispose')) {
-              reporter.atNode(variable, code);
+              reporter.atNode(variable);
             }
           }
         }
@@ -1721,7 +1645,7 @@ class RequireAutoDisposeRule extends SaropaLintRule {
 /// **Note:** ref.read() is correct in callbacks (onPressed, etc.) where you
 /// want the current value without rebuilding.
 class AvoidRefInBuildBodyRule extends SaropaLintRule {
-  const AvoidRefInBuildBodyRule() : super(code: _code);
+  AvoidRefInBuildBodyRule() : super(code: _code);
 
   /// Significant issue. Address when count exceeds 10.
   @override
@@ -1731,21 +1655,19 @@ class AvoidRefInBuildBodyRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_ref_in_build_body',
-    problemMessage:
-        '[avoid_ref_in_build_body] Using ref.read() in build() does not trigger widget rebuilds when the provider changes, leading to stale UI, missed updates, and confusing bugs. This breaks the reactive model of Riverpod and can cause your app to display outdated information. {v4}',
+    'avoid_ref_in_build_body',
+    '[avoid_ref_in_build_body] Using ref.read() in build() does not trigger widget rebuilds when the provider changes, leading to stale UI, missed updates, and confusing bugs. This breaks the reactive model of Riverpod and can cause your app to display outdated information. {v4}',
     correctionMessage:
         'Use ref.watch() for reactive updates in build(), or move ref.read() to a callback like onPressed to ensure the UI updates correctly.',
-    errorSeverity: DiagnosticSeverity.ERROR,
+    severity: DiagnosticSeverity.ERROR,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodDeclaration((MethodDeclaration node) {
+    context.addMethodDeclaration((MethodDeclaration node) {
       // Only check build methods
       if (node.name.lexeme != 'build') return;
 
@@ -1817,7 +1739,7 @@ class _RefReadInBuildVisitor extends RecursiveAstVisitor<void> {
     if (methodName == 'read' && _callbackDepth == 0) {
       final Expression? target = node.target;
       if (target is SimpleIdentifier && target.name == 'ref') {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     }
 
@@ -1872,29 +1794,27 @@ class _RefReadInBuildVisitor extends RecursiveAstVisitor<void> {
 /// }
 /// ```
 class AvoidRefInDisposeRule extends SaropaLintRule {
-  const AvoidRefInDisposeRule() : super(code: _code);
+  AvoidRefInDisposeRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
-    name: 'avoid_ref_in_dispose',
-    problemMessage:
-        '[avoid_ref_in_dispose] Using ref in dispose() is unsafe because the provider may already be destroyed, leading to runtime errors, crashes, or accessing invalid state. This can cause unpredictable bugs and app instability. {v1}',
+    'avoid_ref_in_dispose',
+    '[avoid_ref_in_dispose] Using ref in dispose() is unsafe because the provider may already be destroyed, leading to runtime errors, crashes, or accessing invalid state. This can cause unpredictable bugs and app instability. {v1}',
     correctionMessage:
         'Remove ref usage from dispose(). Access provider values earlier in the widget lifecycle if needed to ensure safe and predictable behavior.',
-    errorSeverity: DiagnosticSeverity.ERROR,
+    severity: DiagnosticSeverity.ERROR,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodDeclaration((MethodDeclaration node) {
+    context.addMethodDeclaration((MethodDeclaration node) {
       if (node.name.lexeme != 'dispose') return;
 
       // Check if this is in a ConsumerState class
-      final ClassDeclaration? classDecl =
-          node.thisOrAncestorOfType<ClassDeclaration>();
+      final ClassDeclaration? classDecl = node
+          .thisOrAncestorOfType<ClassDeclaration>();
       if (classDecl == null) return;
 
       final ExtendsClause? extendsClause = classDecl.extendsClause;
@@ -1920,7 +1840,7 @@ class _RefInDisposeVisitor extends RecursiveAstVisitor<void> {
   void visitMethodInvocation(MethodInvocation node) {
     final Expression? target = node.target;
     if (target is SimpleIdentifier && target.name == 'ref') {
-      reporter.atNode(node, code);
+      reporter.atNode(node);
     }
     super.visitMethodInvocation(node);
   }
@@ -1951,7 +1871,7 @@ class _RefInDisposeVisitor extends RecursiveAstVisitor<void> {
 /// }
 /// ```
 class RequireProviderScopeRule extends SaropaLintRule {
-  const RequireProviderScopeRule() : super(code: _code);
+  RequireProviderScopeRule() : super(code: _code);
 
   /// Significant issue. Address when count exceeds 10.
   @override
@@ -1964,38 +1884,38 @@ class RequireProviderScopeRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.provider};
 
   static const LintCode _code = LintCode(
-    name: 'require_provider_scope',
-    problemMessage:
-        '[require_provider_scope] If your Riverpod app is missing ProviderScope at the root, any attempt to access providers will throw runtime exceptions and crash the app. This makes the app unusable and breaks all provider-based state management. {v2}',
+    'require_provider_scope',
+    '[require_provider_scope] If your Riverpod app is missing ProviderScope at the root, any attempt to access providers will throw runtime exceptions and crash the app. This makes the app unusable and breaks all provider-based state management. {v2}',
     correctionMessage:
         'Wrap your app with ProviderScope: runApp(ProviderScope(child: MyApp())) to enable provider access and prevent crashes.',
-    errorSeverity: DiagnosticSeverity.ERROR,
+    severity: DiagnosticSeverity.ERROR,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addFunctionDeclaration((FunctionDeclaration node) {
+    context.addFunctionDeclaration((FunctionDeclaration node) {
       if (node.name.lexeme != 'main') return;
 
       final FunctionBody body = node.functionExpression.body;
       final String bodySource = body.toSource();
 
       // Check if using Riverpod (has ConsumerWidget, ref.watch, etc.)
-      final bool usesRiverpod = bodySource.contains('Consumer') ||
+      final bool usesRiverpod =
+          bodySource.contains('Consumer') ||
           bodySource.contains('ref.watch') ||
           bodySource.contains('ref.read');
 
       // Also check the whole file for Riverpod patterns
-      final CompilationUnit? unit =
-          node.thisOrAncestorOfType<CompilationUnit>();
+      final CompilationUnit? unit = node
+          .thisOrAncestorOfType<CompilationUnit>();
       if (unit == null) return;
 
       final String fileSource = unit.toSource();
-      final bool fileUsesRiverpod = fileSource.contains('ConsumerWidget') ||
+      final bool fileUsesRiverpod =
+          fileSource.contains('ConsumerWidget') ||
           fileSource.contains('ConsumerStatefulWidget') ||
           fileSource.contains('ProviderScope') ||
           fileSource.contains('flutter_riverpod');
@@ -2034,7 +1954,7 @@ class RequireProviderScopeRule extends SaropaLintRule {
 /// }
 /// ```
 class PreferSelectForPartialRule extends SaropaLintRule {
-  const PreferSelectForPartialRule() : super(code: _code);
+  PreferSelectForPartialRule() : super(code: _code);
 
   /// Significant issue. Address when count exceeds 10.
   @override
@@ -2045,21 +1965,19 @@ class PreferSelectForPartialRule extends SaropaLintRule {
 
   /// Alias: prefer_select_for_partial_state
   static const LintCode _code = LintCode(
-    name: 'prefer_select_for_partial',
-    problemMessage:
-        '[prefer_select_for_partial] Watching the entire provider when only one field is needed causes unnecessary widget tree rebuilds, wasting memory and CPU cycles and reducing app performance. This makes your UI less efficient and responsive. {v2}',
+    'prefer_select_for_partial',
+    '[prefer_select_for_partial] Watching the entire provider when only one field is needed causes unnecessary widget tree rebuilds, wasting memory and CPU cycles and reducing app performance. This makes your UI less efficient and responsive. {v2}',
     correctionMessage:
         'Use ref.watch(provider.select((s) => s.field)) for partial watching to optimize rebuilds and improve performance.',
-    errorSeverity: DiagnosticSeverity.ERROR,
+    severity: DiagnosticSeverity.ERROR,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodDeclaration((MethodDeclaration node) {
+    context.addMethodDeclaration((MethodDeclaration node) {
       if (node.name.lexeme != 'build') return;
 
       // Collect watched providers and how they're used
@@ -2088,7 +2006,7 @@ class PreferSelectForPartialRule extends SaropaLintRule {
             // Check if already using select
             final String callSource = call.toSource();
             if (!callSource.contains('.select(')) {
-              reporter.atNode(call, code);
+              reporter.atNode(call);
             }
           }
         }
@@ -2164,7 +2082,7 @@ class _ProviderUsageVisitor extends RecursiveAstVisitor<void> {
 /// final user = ref.watch(userProvider(userId));
 /// ```
 class PreferFamilyForParamsRule extends SaropaLintRule {
-  const PreferFamilyForParamsRule() : super(code: _code);
+  PreferFamilyForParamsRule() : super(code: _code);
 
   /// Significant issue. Address when count exceeds 10.
   @override
@@ -2175,23 +2093,19 @@ class PreferFamilyForParamsRule extends SaropaLintRule {
 
   /// Alias: prefer_family_for_params_pattern
   static const LintCode _code = LintCode(
-    name: 'prefer_family_for_params',
-    problemMessage:
-        '[prefer_family_for_params] Not using .family for parameterized providers creates a new provider instance on each call, breaking caching and causing duplicate providers. This leads to wasted resources, memory leaks, and unpredictable app behavior. {v2}',
+    'prefer_family_for_params',
+    '[prefer_family_for_params] Not using .family for parameterized providers creates a new provider instance on each call, breaking caching and causing duplicate providers. This leads to wasted resources, memory leaks, and unpredictable app behavior. {v2}',
     correctionMessage:
         'Use Provider.family((ref, param) => ...) and watch with provider(param) to ensure proper caching and a single provider instance per parameter.',
-    errorSeverity: DiagnosticSeverity.ERROR,
+    severity: DiagnosticSeverity.ERROR,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addInstanceCreationExpression((
-      InstanceCreationExpression node,
-    ) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final String typeName = node.constructorName.type.name.lexeme;
 
       // Check if it's a provider type
@@ -2243,7 +2157,7 @@ class PreferFamilyForParamsRule extends SaropaLintRule {
 /// }
 /// ```
 class PreferRefWatchOverReadRule extends SaropaLintRule {
-  const PreferRefWatchOverReadRule() : super(code: _code);
+  PreferRefWatchOverReadRule() : super(code: _code);
 
   /// ref.read in build() won't trigger rebuilds when provider changes.
   /// UI will show stale data until something else triggers a rebuild.
@@ -2254,21 +2168,19 @@ class PreferRefWatchOverReadRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'prefer_ref_watch_over_read',
-    problemMessage:
-        '[prefer_ref_watch_over_read] ref.read in build() won\'t rebuild widget when provider changes. ref.read doesn\'t subscribe to changes - widget won\'t rebuild when provider updates. Use ref.watch in build methods for reactive updates. {v2}',
+    'prefer_ref_watch_over_read',
+    '[prefer_ref_watch_over_read] ref.read in build() won\'t rebuild widget when provider changes. ref.read doesn\'t subscribe to changes - widget won\'t rebuild when provider updates. Use ref.watch in build methods for reactive updates. {v2}',
     correctionMessage:
         'Use ref.watch() in build methods for reactive updates. Verify the change works correctly with existing tests and add coverage for the new behavior.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       if (node.methodName.name != 'read') return;
 
       final Expression? target = node.target;
@@ -2280,43 +2192,12 @@ class PreferRefWatchOverReadRule extends SaropaLintRule {
       while (current != null) {
         if (current is MethodDeclaration) {
           if (current.name.lexeme == 'build') {
-            reporter.atNode(node, code);
+            reporter.atNode(node);
           }
           return;
         }
         current = current.parent;
       }
-    });
-  }
-
-  @override
-  List<Fix> getFixes() => <Fix>[_ReplaceReadWithWatchFix()];
-}
-
-class _ReplaceReadWithWatchFix extends DartFix {
-  @override
-  void run(
-    CustomLintResolver resolver,
-    ChangeReporter reporter,
-    CustomLintContext context,
-    AnalysisError analysisError,
-    List<AnalysisError> others,
-  ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
-      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
-      if (node.methodName.name != 'read') return;
-
-      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
-        message: 'Replace ref.read with ref.watch',
-        priority: 1,
-      );
-
-      changeBuilder.addDartFileEdit((builder) {
-        builder.addSimpleReplacement(
-          node.methodName.sourceRange,
-          'watch',
-        );
-      });
     });
   }
 }
@@ -2350,7 +2231,7 @@ class _ReplaceReadWithWatchFix extends DartFix {
 /// });
 /// ```
 class AvoidCircularProviderDepsRule extends SaropaLintRule {
-  const AvoidCircularProviderDepsRule() : super(code: _code);
+  AvoidCircularProviderDepsRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.critical;
@@ -2362,27 +2243,23 @@ class AvoidCircularProviderDepsRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.provider};
 
   static const LintCode _code = LintCode(
-    name: 'avoid_circular_provider_deps',
-    problemMessage:
-        '[avoid_circular_provider_deps] Circular dependencies between providers cause stack overflows, infinite loops, and unpredictable initialization order. This leads to runtime crashes, hard-to-debug errors, and broken state management. If not fixed, your app may crash or behave unpredictably in production. Always design provider graphs to be acyclic for reliability and maintainability. {v1}',
+    'avoid_circular_provider_deps',
+    '[avoid_circular_provider_deps] Circular dependencies between providers cause stack overflows, infinite loops, and unpredictable initialization order. This leads to runtime crashes, hard-to-debug errors, and broken state management. If not fixed, your app may crash or behave unpredictably in production. Always design provider graphs to be acyclic for reliability and maintainability. {v1}',
     correctionMessage:
         'Analyze the provider dependency graph and break cycles by extracting shared logic, refactoring providers, or using ref.read in callbacks instead of ref.watch. Ensure no provider directly or indirectly depends on itself. Use tools or diagrams to visualize dependencies if needed.',
-    errorSeverity: DiagnosticSeverity.ERROR,
+    severity: DiagnosticSeverity.ERROR,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
     // Track provider definitions and their dependencies
     final Map<String, Set<String>> providerDeps = <String, Set<String>>{};
     final Map<String, AstNode> providerNodes = <String, AstNode>{};
 
-    context.registry.addTopLevelVariableDeclaration((
-      TopLevelVariableDeclaration node,
-    ) {
+    context.addTopLevelVariableDeclaration((TopLevelVariableDeclaration node) {
       for (final VariableDeclaration variable in node.variables.variables) {
         final String providerName = variable.name.lexeme;
         final Expression? initializer = variable.initializer;
@@ -2414,7 +2291,7 @@ class AvoidCircularProviderDepsRule extends SaropaLintRule {
         if (_hasCircularDep(provider, provider, providerDeps, visited)) {
           final AstNode? node = providerNodes[provider];
           if (node != null) {
-            reporter.atNode(node, code);
+            reporter.atNode(node);
           }
         }
       }
@@ -2500,7 +2377,7 @@ class _ProviderDepVisitor extends RecursiveAstVisitor<void> {
 /// );
 /// ```
 class RequireErrorHandlingInAsyncRule extends SaropaLintRule {
-  const RequireErrorHandlingInAsyncRule() : super(code: _code);
+  RequireErrorHandlingInAsyncRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.high;
@@ -2509,12 +2386,11 @@ class RequireErrorHandlingInAsyncRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'require_error_handling_in_async',
-    problemMessage:
-        '[require_error_handling_in_async] Async provider without error handling allows exceptions to propagate unhandled. Unhandled errors in FutureProvider or StreamProvider surface as uncaught exceptions that crash the app or leave the UI in a permanent loading state with no recovery path. {v3}',
+    'require_error_handling_in_async',
+    '[require_error_handling_in_async] Async provider without error handling allows exceptions to propagate unhandled. Unhandled errors in FutureProvider or StreamProvider surface as uncaught exceptions that crash the app or leave the UI in a permanent loading state with no recovery path. {v3}',
     correctionMessage:
         'Add try-catch in the provider body or handle AsyncValue.error in the UI with .when() to show error states and enable user recovery.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   static const Set<String> _asyncProviderTypes = <String>{
@@ -2525,13 +2401,10 @@ class RequireErrorHandlingInAsyncRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addTopLevelVariableDeclaration((
-      TopLevelVariableDeclaration node,
-    ) {
+    context.addTopLevelVariableDeclaration((TopLevelVariableDeclaration node) {
       for (final VariableDeclaration variable in node.variables.variables) {
         final Expression? initializer = variable.initializer;
         if (initializer == null) continue;
@@ -2555,7 +2428,7 @@ class RequireErrorHandlingInAsyncRule extends SaropaLintRule {
         // Check if callback has try-catch
         final String initSource = initializer.toSource();
         if (!initSource.contains('try') && !initSource.contains('catch')) {
-          reporter.atNode(variable, code);
+          reporter.atNode(variable);
         }
       }
     });
@@ -2595,7 +2468,7 @@ class RequireErrorHandlingInAsyncRule extends SaropaLintRule {
 /// );
 /// ```
 class PreferNotifierOverStateRule extends SaropaLintRule {
-  const PreferNotifierOverStateRule() : super(code: _code);
+  PreferNotifierOverStateRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.medium;
@@ -2604,27 +2477,23 @@ class PreferNotifierOverStateRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'prefer_notifier_over_state',
-    problemMessage:
-        '[prefer_notifier_over_state] StateProvider exposes raw state to uncontrolled mutation. StateProvider is fine for simple state but Notifier provides: - Encapsulated business logic - Methods instead of raw state mutation - Better testability. {v2}',
+    'prefer_notifier_over_state',
+    '[prefer_notifier_over_state] StateProvider exposes raw state to uncontrolled mutation. StateProvider is fine for simple state but Notifier provides: - Encapsulated business logic - Methods instead of raw state mutation - Better testability. {v2}',
     correctionMessage:
         'Use NotifierProvider for encapsulated business logic and testability. Verify the change works correctly with existing tests and add coverage for the new behavior.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
     // Track StateProvider usages
     final Map<String, int> stateProviderMutations = <String, int>{};
     final Map<String, AstNode> stateProviderDecls = <String, AstNode>{};
 
-    context.registry.addTopLevelVariableDeclaration((
-      TopLevelVariableDeclaration node,
-    ) {
+    context.addTopLevelVariableDeclaration((TopLevelVariableDeclaration node) {
       for (final VariableDeclaration variable in node.variables.variables) {
         final Expression? initializer = variable.initializer;
         if (initializer == null) continue;
@@ -2639,7 +2508,7 @@ class PreferNotifierOverStateRule extends SaropaLintRule {
     });
 
     // Count .notifier.state mutations
-    context.registry.addAssignmentExpression((AssignmentExpression node) {
+    context.addAssignmentExpression((AssignmentExpression node) {
       final String source = node.leftHandSide.toSource();
       if (source.contains('.notifier.state')) {
         // Extract provider name
@@ -2658,7 +2527,7 @@ class PreferNotifierOverStateRule extends SaropaLintRule {
         if (entry.value >= 3) {
           final AstNode? decl = stateProviderDecls[entry.key];
           if (decl != null) {
-            reporter.atNode(decl, code);
+            reporter.atNode(decl);
           }
         }
       }
@@ -2692,7 +2561,7 @@ class PreferNotifierOverStateRule extends SaropaLintRule {
 ///   riverpod_lint: ^2.0.0
 /// ```
 class RequireRiverpodLintRule extends SaropaLintRule {
-  const RequireRiverpodLintRule() : super(code: _code);
+  RequireRiverpodLintRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.medium;
@@ -2704,22 +2573,20 @@ class RequireRiverpodLintRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.provider};
 
   static const LintCode _code = LintCode(
-    name: 'require_riverpod_lint',
-    problemMessage:
-        '[require_riverpod_lint] Project uses Riverpod but riverpod_lint is not configured. The official riverpod_lint package catches Riverpod-specific mistakes that general linters miss. Use it alongside saropa_lints for complete coverage. {v2}',
+    'require_riverpod_lint',
+    '[require_riverpod_lint] Project uses Riverpod but riverpod_lint is not configured. The official riverpod_lint package catches Riverpod-specific mistakes that general linters miss. Use it alongside saropa_lints for complete coverage. {v2}',
     correctionMessage:
         'Add riverpod_lint to dev_dependencies for Riverpod-specific linting. Verify the change works correctly with existing tests and add coverage for the new behavior.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
     // This rule checks file-level imports for Riverpod usage
-    context.registry.addImportDirective((ImportDirective node) {
+    context.addImportDirective((ImportDirective node) {
       final String? uri = node.uri.stringValue;
       if (uri == null) return;
 
@@ -2753,7 +2620,7 @@ class RequireRiverpodLintRule extends SaropaLintRule {
             source.contains('StreamProvider(')) {
           // Using classic providers - suggest riverpod_lint
           // Only report once per file
-          reporter.atNode(node, code);
+          reporter.atNode(node);
         }
       }
     });
@@ -2783,7 +2650,7 @@ class RequireRiverpodLintRule extends SaropaLintRule {
 /// }
 /// ```
 class AvoidListenInAsyncRule extends SaropaLintRule {
-  const AvoidListenInAsyncRule() : super(code: _code);
+  AvoidListenInAsyncRule() : super(code: _code);
 
   /// watch() in async callbacks causes subscription leaks.
   @override
@@ -2793,21 +2660,19 @@ class AvoidListenInAsyncRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_listen_in_async',
-    problemMessage:
-        '[avoid_listen_in_async] Using context.watch() inside an async callback triggers widget rebuilds during asynchronous execution, creating stale closures that capture outdated state. This causes data races where async operations complete with wrong values, leading to corrupted state or duplicate side effects. {v4}',
+    'avoid_listen_in_async',
+    '[avoid_listen_in_async] Using context.watch() inside an async callback triggers widget rebuilds during asynchronous execution, creating stale closures that capture outdated state. This causes data races where async operations complete with wrong values, leading to corrupted state or duplicate side effects. {v4}',
     correctionMessage:
         'Replace context.watch() with context.read() in async callbacks to capture the current value without subscribing to rebuilds.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       if (node.methodName.name != 'watch') return;
 
       // Check if target is context
@@ -2821,7 +2686,7 @@ class AvoidListenInAsyncRule extends SaropaLintRule {
       while (current != null) {
         if (current is FunctionExpression) {
           if (current.body.isAsynchronous) {
-            reporter.atNode(node, code);
+            reporter.atNode(node);
             return;
           }
         }
@@ -2829,7 +2694,7 @@ class AvoidListenInAsyncRule extends SaropaLintRule {
           if (current.body.isAsynchronous) {
             // Only report if not in build method
             if (current.name.lexeme != 'build') {
-              reporter.atNode(node, code);
+              reporter.atNode(node);
             }
             return;
           }
@@ -2865,7 +2730,7 @@ class AvoidListenInAsyncRule extends SaropaLintRule {
 /// );
 /// ```
 class RequireAsyncValueOrderRule extends SaropaLintRule {
-  const RequireAsyncValueOrderRule() : super(code: _code);
+  RequireAsyncValueOrderRule() : super(code: _code);
 
   /// Consistent ordering improves code readability.
   @override
@@ -2875,21 +2740,19 @@ class RequireAsyncValueOrderRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'require_async_value_order',
-    problemMessage:
-        '[require_async_value_order] AsyncValue.when() has non-standard parameter order. The standard order is data, error, loading. Incorrect order makes code harder to read and may indicate confusion about the API. {v2}',
+    'require_async_value_order',
+    '[require_async_value_order] AsyncValue.when() has non-standard parameter order. The standard order is data, error, loading. Incorrect order makes code harder to read and may indicate confusion about the API. {v2}',
     correctionMessage:
         'Use order: data, error, loading for consistency. Verify the change works correctly with existing tests and add coverage for the new behavior.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       if (node.methodName.name != 'when') return;
 
       // Check named arguments order
@@ -2909,7 +2772,7 @@ class RequireAsyncValueOrderRule extends SaropaLintRule {
         if (paramOrder[0] != 'data' ||
             paramOrder[1] != 'error' ||
             paramOrder[2] != 'loading') {
-          reporter.atNode(node, code);
+          reporter.atNode(node);
         }
       }
     });
@@ -2935,7 +2798,7 @@ class RequireAsyncValueOrderRule extends SaropaLintRule {
 /// // Only rebuilds when user changes
 /// ```
 class PreferSelectorRule extends SaropaLintRule {
-  const PreferSelectorRule() : super(code: _code);
+  PreferSelectorRule() : super(code: _code);
 
   /// select() provides more granular rebuild control.
   @override
@@ -2945,21 +2808,19 @@ class PreferSelectorRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'prefer_context_selector',
-    problemMessage:
-        '[prefer_context_selector] context.watch() accessing property. Use select() for efficiency. watch() rebuilds on any change to the provider. Using select() limits rebuilds to specific property changes. {v2}',
+    'prefer_context_selector',
+    '[prefer_context_selector] context.watch() accessing property. Use select() for efficiency. watch() rebuilds on any change to the provider. Using select() limits rebuilds to specific property changes. {v2}',
     correctionMessage:
         'Replace with context.select((notifier) => notifier.field). Verify the change works correctly with existing tests and add coverage for the new behavior.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addPropertyAccess((PropertyAccess node) {
+    context.addPropertyAccess((PropertyAccess node) {
       // Check if target is context.watch()
       final Expression? target = node.target;
       if (target is! MethodInvocation) return;
@@ -2972,7 +2833,7 @@ class PreferSelectorRule extends SaropaLintRule {
       final String watchTargetSource = watchTarget.toSource().toLowerCase();
       if (!watchTargetSource.contains('context')) return;
 
-      reporter.atNode(node, code);
+      reporter.atNode(node);
     });
   }
 }
@@ -3010,7 +2871,7 @@ class PreferSelectorRule extends SaropaLintRule {
 /// }
 /// ```
 class AvoidRiverpodNotifierInBuildRule extends SaropaLintRule {
-  const AvoidRiverpodNotifierInBuildRule() : super(code: _code);
+  AvoidRiverpodNotifierInBuildRule() : super(code: _code);
 
   /// State is lost on every rebuild.
   @override
@@ -3023,12 +2884,11 @@ class AvoidRiverpodNotifierInBuildRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.provider};
 
   static const LintCode _code = LintCode(
-    name: 'avoid_riverpod_notifier_in_build',
-    problemMessage:
-        '[avoid_riverpod_notifier_in_build] Creating a Riverpod Notifier inside the build method reinstantiates it on every widget rebuild, discarding all accumulated state. Users experience lost form input, reset scroll positions, and flickering UI as the notifier repeatedly initializes from scratch. {v5}',
+    'avoid_riverpod_notifier_in_build',
+    '[avoid_riverpod_notifier_in_build] Creating a Riverpod Notifier inside the build method reinstantiates it on every widget rebuild, discarding all accumulated state. Users experience lost form input, reset scroll positions, and flickering UI as the notifier repeatedly initializes from scratch. {v5}',
     correctionMessage:
         'Define the provider outside the widget class (at the file level as a global) and use ref.watch() to access it, ensuring stable state across rebuilds.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   /// Notifier types that shouldn't be created in build.
@@ -3043,12 +2903,10 @@ class AvoidRiverpodNotifierInBuildRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry
-        .addInstanceCreationExpression((InstanceCreationExpression node) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final String typeName = node.constructorName.type.name2.lexeme;
 
       // Check if it's a Notifier type
@@ -3064,7 +2922,7 @@ class AvoidRiverpodNotifierInBuildRule extends SaropaLintRule {
       AstNode? current = node.parent;
       while (current != null) {
         if (current is MethodDeclaration && current.name.lexeme == 'build') {
-          reporter.atNode(node, code);
+          reporter.atNode(node);
           return;
         }
         current = current.parent;
@@ -3104,7 +2962,7 @@ class AvoidRiverpodNotifierInBuildRule extends SaropaLintRule {
 /// }
 /// ```
 class RequireRiverpodAsyncValueGuardRule extends SaropaLintRule {
-  const RequireRiverpodAsyncValueGuardRule() : super(code: _code);
+  RequireRiverpodAsyncValueGuardRule() : super(code: _code);
 
   /// AsyncValue.guard provides consistent error state handling.
   @override
@@ -3117,21 +2975,19 @@ class RequireRiverpodAsyncValueGuardRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.provider};
 
   static const LintCode _code = LintCode(
-    name: 'require_riverpod_async_value_guard',
-    problemMessage:
-        '[require_riverpod_async_value_guard] Try-catch in async provider. Use AsyncValue.guard for consistent error handling. AsyncValue.guard provides better error handling and state management for async operations in Riverpod providers. {v2}',
+    'require_riverpod_async_value_guard',
+    '[require_riverpod_async_value_guard] Try-catch in async provider. Use AsyncValue.guard for consistent error handling. AsyncValue.guard provides better error handling and state management for async operations in Riverpod providers. {v2}',
     correctionMessage:
         'Replace try-catch with AsyncValue.guard(() => yourAsyncOperation()). Verify the change works correctly with existing tests and add coverage for the new behavior.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addTryStatement((TryStatement node) {
+    context.addTryStatement((TryStatement node) {
       // Check if inside an AsyncNotifier or async provider
       AstNode? current = node.parent;
       bool inAsyncNotifier = false;
@@ -3160,7 +3016,7 @@ class RequireRiverpodAsyncValueGuardRule extends SaropaLintRule {
           if (stmt is ExpressionStatement) {
             final Expression expr = stmt.expression;
             if (expr is ThrowExpression || expr is RethrowExpression) {
-              reporter.atNode(node, code);
+              reporter.atNode(node);
               return;
             }
           }
@@ -3190,7 +3046,7 @@ class RequireRiverpodAsyncValueGuardRule extends SaropaLintRule {
 /// import 'package:hooks_riverpod/hooks_riverpod.dart';
 /// ```
 class RequireFlutterRiverpodNotRiverpodRule extends SaropaLintRule {
-  const RequireFlutterRiverpodNotRiverpodRule() : super(code: _code);
+  RequireFlutterRiverpodNotRiverpodRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.critical;
@@ -3199,28 +3055,27 @@ class RequireFlutterRiverpodNotRiverpodRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'require_flutter_riverpod_not_riverpod',
-    problemMessage:
-        '[require_flutter_riverpod_not_riverpod] Flutter apps should use '
+    'require_flutter_riverpod_not_riverpod',
+    '[require_flutter_riverpod_not_riverpod] Flutter apps should use '
         'flutter_riverpod, not riverpod package directly. {v2}',
-    correctionMessage: 'Replace "package:riverpod/riverpod.dart" with '
+    correctionMessage:
+        'Replace "package:riverpod/riverpod.dart" with '
         '"package:flutter_riverpod/flutter_riverpod.dart".',
-    errorSeverity: DiagnosticSeverity.ERROR,
+    severity: DiagnosticSeverity.ERROR,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addImportDirective((ImportDirective node) {
+    context.addImportDirective((ImportDirective node) {
       final String? uri = node.uri.stringValue;
       if (uri == null) return;
 
       // Check for base riverpod import
       if (uri == 'package:riverpod/riverpod.dart') {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
   }
@@ -3260,7 +3115,7 @@ class RequireFlutterRiverpodNotRiverpodRule extends SaropaLintRule {
 /// }
 /// ```
 class AvoidRiverpodNavigationRule extends SaropaLintRule {
-  const AvoidRiverpodNavigationRule() : super(code: _code);
+  AvoidRiverpodNavigationRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.medium;
@@ -3269,23 +3124,21 @@ class AvoidRiverpodNavigationRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_riverpod_navigation',
-    problemMessage:
-        '[avoid_riverpod_navigation] Riverpod provider managing navigation. '
+    'avoid_riverpod_navigation',
+    '[avoid_riverpod_navigation] Riverpod provider managing navigation. '
         'Navigation belongs in widgets, not state management. {v2}',
     correctionMessage:
         'Move navigation logic to widgets using Navigator.of(context).',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
     // Check for GlobalKey<NavigatorState> in providers
-    context.registry.addVariableDeclaration((VariableDeclaration node) {
+    context.addVariableDeclaration((VariableDeclaration node) {
       final String? typeName = node.parent is VariableDeclarationList
           ? (node.parent as VariableDeclarationList).type?.toSource()
           : null;
@@ -3303,7 +3156,7 @@ class AvoidRiverpodNavigationRule extends SaropaLintRule {
                 methodName == 'StateProvider' ||
                 methodName == 'FutureProvider' ||
                 methodName == 'StreamProvider') {
-              reporter.atNode(node, code);
+              reporter.atNode(node);
               return;
             }
           }
@@ -3316,7 +3169,7 @@ class AvoidRiverpodNavigationRule extends SaropaLintRule {
                 if (target is SimpleIdentifier &&
                     (target.name == 'Provider' ||
                         target.name == 'StateProvider')) {
-                  reporter.atNode(node, code);
+                  reporter.atNode(node);
                   return;
                 }
               }
@@ -3328,7 +3181,7 @@ class AvoidRiverpodNavigationRule extends SaropaLintRule {
     });
 
     // Check for navigation calls in StateNotifier/Notifier classes
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       final String methodName = node.methodName.name;
 
       // Navigation methods
@@ -3356,7 +3209,7 @@ class AvoidRiverpodNavigationRule extends SaropaLintRule {
                 if (superName.contains('StateNotifier') ||
                     superName.contains('Notifier') ||
                     superName.contains('AsyncNotifier')) {
-                  reporter.atNode(node, code);
+                  reporter.atNode(node);
                   return;
                 }
               }
@@ -3393,7 +3246,7 @@ class AvoidRiverpodNavigationRule extends SaropaLintRule {
 /// }
 /// ```
 class AvoidRiverpodForNetworkOnlyRule extends SaropaLintRule {
-  const AvoidRiverpodForNetworkOnlyRule() : super(code: _code);
+  AvoidRiverpodForNetworkOnlyRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.low;
@@ -3402,12 +3255,11 @@ class AvoidRiverpodForNetworkOnlyRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_riverpod_for_network_only',
-    problemMessage:
-        '[avoid_riverpod_for_network_only] Provider adds unnecessary indirection for a simple network client. Harder to debug. Using Riverpod just to access a network layer when direct injection would suffice adds unnecessary complexity. {v2}',
+    'avoid_riverpod_for_network_only',
+    '[avoid_riverpod_for_network_only] Provider adds unnecessary indirection for a simple network client. Harder to debug. Using Riverpod just to access a network layer when direct injection would suffice adds unnecessary complexity. {v2}',
     correctionMessage:
         'Use direct dependency injection instead of wrapping in a Provider. Verify the change works correctly with existing tests and add coverage for the new behavior.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   static final RegExp _networkClientPattern = RegExp(
@@ -3417,12 +3269,10 @@ class AvoidRiverpodForNetworkOnlyRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry
-        .addTopLevelVariableDeclaration((TopLevelVariableDeclaration node) {
+    context.addTopLevelVariableDeclaration((TopLevelVariableDeclaration node) {
       for (final VariableDeclaration variable in node.variables.variables) {
         final Expression? initializer = variable.initializer;
         if (initializer == null) continue;
@@ -3438,7 +3288,7 @@ class AvoidRiverpodForNetworkOnlyRule extends SaropaLintRule {
           if (!initSource.contains('ref.watch') &&
               !initSource.contains('ref.read') &&
               !initSource.contains('ref.listen')) {
-            reporter.atNode(variable, code);
+            reporter.atNode(variable);
           }
         }
       }

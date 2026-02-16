@@ -1,28 +1,38 @@
-// ignore_for_file: always_specify_types, depend_on_referenced_packages, unused_element
+// ignore_for_file: always_specify_types, depend_on_referenced_packages, unused_element, unused_field, unused_import
 
 import 'dart:collection' show LinkedHashSet;
 import 'dart:developer' as developer;
 import 'dart:io' show Directory, File, Platform, stderr, stdout;
 import 'dart:math' show max;
 
+import 'package:analyzer/analysis_rule/analysis_rule.dart';
+import 'package:analyzer/analysis_rule/rule_context.dart';
+import 'package:analyzer/analysis_rule/rule_visitor_registry.dart';
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/token.dart';
-import 'package:analyzer/error/error.dart' show DiagnosticSeverity;
-import 'package:analyzer/error/listener.dart';
-import 'package:custom_lint_builder/custom_lint_builder.dart';
+import 'package:analyzer/error/error.dart'
+    show DiagnosticCode, DiagnosticSeverity, LintCode;
 
 import 'baseline/baseline_manager.dart';
-import 'ignore_fixes.dart';
 import 'ignore_utils.dart';
+import 'native/saropa_context.dart';
+import 'native/saropa_fix.dart' show SaropaFixGenerator;
 import 'report/analysis_reporter.dart';
 import 'report/import_graph_tracker.dart';
 import 'owasp/owasp.dart';
 import 'project_context.dart';
 import 'tiers.dart' show essentialRules;
-
-// Re-export types needed by rule implementations
-export 'ignore_fixes.dart'
-    show AddIgnoreCommentFix, AddIgnoreForFileFix, WrapInTryCatchFix;
+export 'package:analyzer/error/error.dart' show DiagnosticSeverity, LintCode;
+export 'native/saropa_context.dart' show SaropaContext;
+export 'native/saropa_fix.dart'
+    show
+        SaropaFixGenerator,
+        SaropaFixProducer,
+        CorrectionProducerContext,
+        CorrectionApplicability,
+        ChangeBuilder,
+        FixKind,
+        ProducerGenerator;
 export 'owasp/owasp.dart' show OwaspMapping, OwaspMobile, OwaspWeb;
 export 'project_context.dart'
     show
@@ -99,7 +109,7 @@ export 'project_context.dart'
 /// Set via environment variable: SAROPA_LINTS_PROFILE=true
 final bool _profilingEnabled =
     const bool.fromEnvironment('SAROPA_LINTS_PROFILE') ||
-        const String.fromEnvironment('SAROPA_LINTS_PROFILE') == 'true';
+    const String.fromEnvironment('SAROPA_LINTS_PROFILE') == 'true';
 
 /// Threshold in milliseconds for logging slow rules.
 const int _slowRuleThresholdMs = 10;
@@ -113,7 +123,8 @@ const int _deferThresholdMs = 50;
 /// pass. Run with SAROPA_LINTS_DEFERRED=true to run only the deferred rules.
 ///
 /// Set via environment variable: SAROPA_LINTS_DEFER=true
-final bool _deferSlowRules = const bool.fromEnvironment('SAROPA_LINTS_DEFER') ||
+final bool _deferSlowRules =
+    const bool.fromEnvironment('SAROPA_LINTS_DEFER') ||
     const String.fromEnvironment('SAROPA_LINTS_DEFER') == 'true';
 
 /// Controls whether to run ONLY deferred (slow) rules.
@@ -121,16 +132,18 @@ final bool _deferSlowRules = const bool.fromEnvironment('SAROPA_LINTS_DEFER') ||
 /// Set via environment variable: SAROPA_LINTS_DEFERRED=true
 final bool _runDeferredOnly =
     const bool.fromEnvironment('SAROPA_LINTS_DEFERRED') ||
-        const String.fromEnvironment('SAROPA_LINTS_DEFERRED') == 'true';
+    const String.fromEnvironment('SAROPA_LINTS_DEFERRED') == 'true';
 
 /// Controls whether progress reporting is enabled (default: true).
 ///
 /// Disable via environment variable: SAROPA_LINTS_PROGRESS=false
 final bool _progressEnabled =
     const bool.fromEnvironment('SAROPA_LINTS_PROGRESS', defaultValue: true) &&
-        const String.fromEnvironment('SAROPA_LINTS_PROGRESS',
-                defaultValue: 'true') !=
-            'false';
+    const String.fromEnvironment(
+          'SAROPA_LINTS_PROGRESS',
+          defaultValue: 'true',
+        ) !=
+        'false';
 
 // =============================================================================
 // TERMINAL COLOR SUPPORT
@@ -381,10 +394,14 @@ class ProgressTracker {
       if (!_limitReached) {
         _limitReached = true;
         stderr.writeln('');
-        stderr.writeln('[saropa_lints] $_maxIssues issues in Problems tab. '
-            'Remaining issues will be in the report only.');
-        stderr.writeln('[saropa_lints] Create .saropa_stop in project root '
-            'to abort analysis.');
+        stderr.writeln(
+          '[saropa_lints] $_maxIssues issues in Problems tab. '
+          'Remaining issues will be in the report only.',
+        );
+        stderr.writeln(
+          '[saropa_lints] Create .saropa_stop in project root '
+          'to abort analysis.',
+        );
       }
     }
 
@@ -547,12 +564,16 @@ class ProgressTracker {
         : '$_violationsFound';
 
     if (_discoveredFromFiles && _totalExpectedFiles > 0) {
-      final percent =
-          (fileCount * 100 / _totalExpectedFiles).clamp(0, 100).round();
-      final remaining =
-          (_totalExpectedFiles - fileCount).clamp(0, _totalExpectedFiles);
-      final etaSeconds =
-          filesPerSec > 0 ? (remaining / filesPerSec).round() : 0;
+      final percent = (fileCount * 100 / _totalExpectedFiles)
+          .clamp(0, 100)
+          .round();
+      final remaining = (_totalExpectedFiles - fileCount).clamp(
+        0,
+        _totalExpectedFiles,
+      );
+      final etaSeconds = filesPerSec > 0
+          ? (remaining / filesPerSec).round()
+          : 0;
 
       // Visual progress bar (20 chars wide)
       const barWidth = 20;
@@ -564,8 +585,8 @@ class ProgressTracker {
       final issuesColor = _violationsFound == 0
           ? green
           : _errorCount > 0
-              ? red
-              : yellow;
+          ? red
+          : yellow;
       final issuesStr = '$issuesColor$issuesDisplay$reset';
 
       // Build compact status line with clear labels
@@ -574,7 +595,8 @@ class ProgressTracker {
         ..write('$bar $bold$percent%$reset ')
         ..write('$dim│$reset ')
         ..write(
-            '${dim}Files:$reset $cyan$fileCount$reset/$dim$_totalExpectedFiles$reset ')
+          '${dim}Files:$reset $cyan$fileCount$reset/$dim$_totalExpectedFiles$reset ',
+        )
         ..write('$dim│$reset ')
         ..write('${dim}Issues:$reset $issuesStr ')
         ..write('$dim│$reset ')
@@ -634,23 +656,29 @@ class ProgressTracker {
 
     // Overview with color
     buf.writeln();
-    final rulesStr =
-        _totalEnabledRules > 0 ? ' with $_totalEnabledRules rules' : '';
+    final rulesStr = _totalEnabledRules > 0
+        ? ' with $_totalEnabledRules rules'
+        : '';
     buf.writeln(
-        '  $dim📁$reset Files: $bold$fileCount$reset analyzed$rulesStr in $cyan${_formatDuration(elapsed.inSeconds)}$reset (${filesPerSec.round()}/s)');
+      '  $dim📁$reset Files: $bold$fileCount$reset analyzed$rulesStr in $cyan${_formatDuration(elapsed.inSeconds)}$reset (${filesPerSec.round()}/s)',
+    );
 
-    final issuePercent =
-        fileCount > 0 ? (_filesWithIssues * 100 / fileCount).round() : 0;
+    final issuePercent = fileCount > 0
+        ? (_filesWithIssues * 100 / fileCount).round()
+        : 0;
     final issueColor = _filesWithIssues == 0 ? green : yellow;
     buf.writeln(
-        '  $dim📄$reset Files with issues: $issueColor$_filesWithIssues$reset ($issuePercent%)');
+      '  $dim📄$reset Files with issues: $issueColor$_filesWithIssues$reset ($issuePercent%)',
+    );
 
     // Note if issue limit was reached (Problems tab capped, report has all)
     if (_limitReached) {
       final report = AnalysisReporter.reportPath;
       buf.writeln();
-      buf.writeln('$yellow  ⚠️  Problems tab capped at $_maxIssues. '
-          'All $_violationsFound issues in report.$reset');
+      buf.writeln(
+        '$yellow  ⚠️  Problems tab capped at $_maxIssues. '
+        'All $_violationsFound issues in report.$reset',
+      );
       if (report != null) {
         buf.writeln('$dim     $report$reset');
       }
@@ -690,7 +718,8 @@ class ProgressTracker {
       for (final entry in topFiles) {
         final shortName = entry.key.split('/').last.split('\\').last;
         buf.writeln(
-            '    $yellow${entry.value.toString().padLeft(3)}$reset issues  $dim$shortName$reset');
+          '    $yellow${entry.value.toString().padLeft(3)}$reset issues  $dim$shortName$reset',
+        );
       }
     }
 
@@ -709,10 +738,11 @@ class ProgressTracker {
         final severityColor = severity == 'ERROR'
             ? red
             : severity == 'WARNING'
-                ? yellow
-                : cyan;
+            ? yellow
+            : cyan;
         buf.writeln(
-            '    $severityColor●$reset ${entry.value.toString().padLeft(3)}x  $dim${entry.key}$reset');
+          '    $severityColor●$reset ${entry.value.toString().padLeft(3)}x  $dim${entry.key}$reset',
+        );
       }
     }
 
@@ -725,7 +755,8 @@ class ProgressTracker {
       buf.writeln();
       buf.writeln('$dim${'─' * 70}$reset');
       buf.writeln(
-          '  $bold ⏱️  SLOW FILES$reset $dim(>${_slowFiles.length} files took >2s)$reset');
+        '  $bold ⏱️  SLOW FILES$reset $dim(>${_slowFiles.length} files took >2s)$reset',
+      );
       buf.writeln('$dim${'─' * 70}$reset');
       for (final entry in topSlow) {
         final shortName = entry.key.split('/').last.split('\\').last;
@@ -776,7 +807,8 @@ class ProgressTracker {
           ..sort((a, b) => b.value.compareTo(a.value));
         for (final entry in sortedFiles) {
           logBuf.writeln(
-              '  ${entry.value.toString().padLeft(4)} issues  ${entry.key}');
+            '  ${entry.value.toString().padLeft(4)} issues  ${entry.key}',
+          );
         }
       }
 
@@ -791,7 +823,8 @@ class ProgressTracker {
         for (final entry in sortedRules) {
           final severity = _ruleSeverities[entry.key] ?? '?';
           logBuf.writeln(
-              '  [$severity] ${entry.value.toString().padLeft(4)}x  ${entry.key}');
+            '  [$severity] ${entry.value.toString().padLeft(4)}x  ${entry.key}',
+          );
         }
       }
 
@@ -807,16 +840,16 @@ class ProgressTracker {
 
   /// Get a snapshot of all tracking data for report generation.
   static ProgressTrackerData get reportData => ProgressTrackerData(
-        filesAnalyzed: _seenFiles.length,
-        filesWithIssues: _filesWithIssues,
-        violationsFound: _violationsFound,
-        errorCount: _errorCount,
-        warningCount: _warningCount,
-        infoCount: _infoCount,
-        issuesByFile: Map<String, int>.unmodifiable(_issuesByFile),
-        issuesByRule: Map<String, int>.unmodifiable(_issuesByRule),
-        ruleSeverities: Map<String, String>.unmodifiable(_ruleSeverities),
-      );
+    filesAnalyzed: _seenFiles.length,
+    filesWithIssues: _filesWithIssues,
+    violationsFound: _violationsFound,
+    errorCount: _errorCount,
+    warningCount: _warningCount,
+    infoCount: _infoCount,
+    issuesByFile: Map<String, int>.unmodifiable(_issuesByFile),
+    issuesByRule: Map<String, int>.unmodifiable(_issuesByRule),
+    ruleSeverities: Map<String, String>.unmodifiable(_ruleSeverities),
+  );
 
   /// Check for `.saropa_stop` sentinel file in the project root.
   ///
@@ -834,9 +867,11 @@ class ProgressTracker {
       sentinel.deleteSync();
 
       stderr.writeln('');
-      stderr.writeln('[saropa_lints] Abort requested (.saropa_stop). '
-          'Partial report: $_violationsFound issues '
-          'from ${_seenFiles.length} files.');
+      stderr.writeln(
+        '[saropa_lints] Abort requested (.saropa_stop). '
+        'Partial report: $_violationsFound issues '
+        'from ${_seenFiles.length} files.',
+      );
 
       AnalysisReporter.writeNow();
     } catch (e) {
@@ -1045,8 +1080,9 @@ class RuleTimingTracker {
     buffer.writeln('');
 
     for (final timing in timings) {
-      final isSlowMarker =
-          _slowRules.contains(timing.ruleName) ? '[SLOW] ' : '';
+      final isSlowMarker = _slowRules.contains(timing.ruleName)
+          ? '[SLOW] '
+          : '';
       buffer.writeln(
         '  $isSlowMarker${timing.ruleName}: '
         '${timing.totalTime.inMilliseconds}ms total, '
@@ -1059,7 +1095,8 @@ class RuleTimingTracker {
     if (_slowRules.isNotEmpty) {
       buffer.writeln('');
       buffer.writeln(
-          '=== RULES ELIGIBLE FOR DEFERRAL (>${_deferThresholdMs}ms) ===');
+        '=== RULES ELIGIBLE FOR DEFERRAL (>${_deferThresholdMs}ms) ===',
+      );
       buffer.writeln('Use SAROPA_LINTS_DEFER=true to defer these rules.');
       buffer.writeln('');
       for (final rule in _slowRules) {
@@ -1112,7 +1149,8 @@ class RuleTimingRecord {
 /// Controls whether report writing is enabled.
 ///
 /// Set via environment variable: SAROPA_LINTS_REPORT=true
-final bool _reportEnabled = const bool.fromEnvironment('SAROPA_LINTS_REPORT') ||
+final bool _reportEnabled =
+    const bool.fromEnvironment('SAROPA_LINTS_REPORT') ||
     const String.fromEnvironment('SAROPA_LINTS_REPORT') == 'true';
 
 /// Writes detailed analysis reports to a reports/ folder.
@@ -1201,7 +1239,8 @@ class ReportWriter {
       // Dynamic import of dart:io
       // This allows the code to compile on web but gracefully fail
       return await Future.value(
-          null); // Placeholder - actual impl needs dart:io
+        null,
+      ); // Placeholder - actual impl needs dart:io
     } catch (_) {
       return null;
     }
@@ -1524,29 +1563,30 @@ class ImpactTracker {
     required String message,
     String? correction,
   }) {
-    _violations[impact]!.add(ViolationRecord(
-      rule: rule,
-      file: file,
-      line: line,
-      message: message,
-      correction: correction,
-    ));
+    _violations[impact]!.add(
+      ViolationRecord(
+        rule: rule,
+        file: file,
+        line: line,
+        message: message,
+        correction: correction,
+      ),
+    );
   }
 
   /// Get all violations grouped by impact.
   static Map<LintImpact, List<ViolationRecord>> get violations => {
-        for (final entry in _violations.entries)
-          entry.key: entry.value.toList(),
-      };
+    for (final entry in _violations.entries) entry.key: entry.value.toList(),
+  };
 
   /// Get count of violations by impact level.
   static Map<LintImpact, int> get counts => {
-        LintImpact.critical: _violations[LintImpact.critical]!.length,
-        LintImpact.high: _violations[LintImpact.high]!.length,
-        LintImpact.medium: _violations[LintImpact.medium]!.length,
-        LintImpact.low: _violations[LintImpact.low]!.length,
-        LintImpact.opinionated: _violations[LintImpact.opinionated]!.length,
-      };
+    LintImpact.critical: _violations[LintImpact.critical]!.length,
+    LintImpact.high: _violations[LintImpact.high]!.length,
+    LintImpact.medium: _violations[LintImpact.medium]!.length,
+    LintImpact.low: _violations[LintImpact.low]!.length,
+    LintImpact.opinionated: _violations[LintImpact.opinionated]!.length,
+  };
 
   /// Get total violation count.
   static int get total =>
@@ -1590,7 +1630,8 @@ class ImpactTracker {
     }
     if (c[LintImpact.opinionated]! > 0) {
       buffer.writeln(
-          'OPINIONATED: ${c[LintImpact.opinionated]} (team preference)');
+        'OPINIONATED: ${c[LintImpact.opinionated]} (team preference)',
+      );
     }
 
     if (total == 0) {
@@ -1697,8 +1738,18 @@ class ViolationRecord {
 ///   }
 /// }
 /// ```
-abstract class SaropaLintRule extends DartLintRule {
-  const SaropaLintRule({required super.code});
+abstract class SaropaLintRule extends AnalysisRule {
+  SaropaLintRule({required LintCode code})
+    : _lintCode = code,
+      super(name: code.name, description: code.problemMessage);
+
+  final LintCode _lintCode;
+
+  /// The lint code for this rule.
+  LintCode get code => _lintCode;
+
+  @override
+  DiagnosticCode get diagnosticCode => _lintCode;
 
   // ============================================================
   // Impact Classification
@@ -1787,63 +1838,29 @@ abstract class SaropaLintRule extends DartLintRule {
   OwaspMapping? get owasp => null;
 
   // ============================================================
-  // Quick Fixes (Automatic Ignore Suppression)
+  // Quick Fixes
   // ============================================================
 
-  /// Rule-specific quick fixes.
+  /// Fix producer generators for this rule.
   ///
-  /// Override this getter to provide custom fixes for your rule.
-  /// These are combined with the automatic ignore fixes.
+  /// Override to provide quick fixes that appear in the IDE lightbulb menu.
+  /// Each generator is a factory function that creates a [SaropaFixProducer].
   ///
-  /// Example:
-  /// ```dart
-  /// @override
-  /// List<Fix> get customFixes => [_MyRuleSpecificFix()];
-  /// ```
-  ///
-  /// Default: empty list (only ignore fixes provided)
-  List<Fix> get customFixes => const <Fix>[];
-
-  /// Whether to include automatic "ignore" quick fixes.
-  ///
-  /// When `true` (default), every rule automatically gets two quick fixes:
-  /// - "Ignore 'rule_name' for this line" - adds `// ignore: rule_name`
-  /// - "Ignore 'rule_name' for this file" - adds `// ignore_for_file: rule_name`
-  ///
-  /// Set to `false` for rules where suppression should not be offered
-  /// (e.g., critical security rules).
+  /// Registered with the analysis server at plugin initialization via
+  /// `registry.registerFixForRule(code, generator)`.
   ///
   /// Example:
   /// ```dart
   /// @override
-  /// bool get includeIgnoreFixes => false; // Don't allow suppression
+  /// List<SaropaFixGenerator> get fixGenerators => [
+  ///   ({required CorrectionProducerContext context}) =>
+  ///       MyFix(context: context),
+  /// ];
   /// ```
-  bool get includeIgnoreFixes => true;
-
-  /// Returns the complete list of quick fixes for this rule.
   ///
-  /// By default, this combines [customFixes] with automatic ignore fixes
-  /// (if [includeIgnoreFixes] is `true`).
-  ///
-  /// **For new rules:** Override [customFixes] to add rule-specific fixes.
-  ///
-  /// **For existing rules:** If you override `getFixes()` directly, you can
-  /// call `super.getFixes()` to include the ignore fixes:
-  /// ```dart
-  /// @override
-  /// List<Fix> getFixes() => [...super.getFixes(), _MyCustomFix()];
-  /// ```
-  @override
-  List<Fix> getFixes() {
-    final fixes = <Fix>[...customFixes];
-    if (includeIgnoreFixes) {
-      fixes.addAll(<Fix>[
-        AddIgnoreCommentFix(code.name),
-        AddIgnoreForFileFix(code.name),
-      ]);
-    }
-    return fixes;
-  }
+  /// Default: empty (no custom fixes). Note that ignore-comment fixes
+  /// are provided automatically by the native analysis server framework.
+  List<SaropaFixGenerator> get fixGenerators => const <SaropaFixGenerator>[];
 
   // ============================================================
   // File Type Filtering (Performance Optimization)
@@ -2154,7 +2171,7 @@ abstract class SaropaLintRule extends DartLintRule {
   }
 
   /// Check if a file path should be skipped based on context settings.
-  bool _shouldSkipFile(String path) {
+  bool shouldSkipFile(String path) {
     // Normalize path separators
     final normalizedPath = path.replaceAll('\\', '/');
 
@@ -2213,7 +2230,8 @@ abstract class SaropaLintRule extends DartLintRule {
     // Check fixture files - but NOT in example/ directory
     // (example fixtures are specifically for testing the linter rules)
     if (skipFixtureFiles) {
-      final isInExample = normalizedPath.contains('/example/') ||
+      final isInExample =
+          normalizedPath.contains('/example/') ||
           normalizedPath.contains('/examples/');
       if (!isInExample) {
         if (normalizedPath.contains('/fixture/') ||
@@ -2272,7 +2290,7 @@ abstract class SaropaLintRule extends DartLintRule {
 
   /// Get the effective severity for this rule, considering overrides.
   DiagnosticSeverity? get effectiveSeverity =>
-      severityOverrides?[code.name] ?? code.errorSeverity;
+      severityOverrides?[code.name] ?? code.severity;
 
   // ============================================================
   // Core Implementation
@@ -2365,526 +2383,93 @@ abstract class SaropaLintRule extends DartLintRule {
     return essentialRules.contains(code.name);
   }
 
+  // =========================================================================
+  // Native Plugin Registration
+  // =========================================================================
+  // In the native analyzer plugin system, registerNodeProcessors is called
+  // ONCE per rule (not per file). Per-file pre-filtering (file type checks,
+  // content pattern matching, incremental analysis, etc.) will be re-enabled
+  // in Phase 2 by wrapping callbacks with lazy per-file checks.
+  // =========================================================================
+
   @override
-  void run(
-    CustomLintResolver resolver,
-    DiagnosticReporter reporter,
-    CustomLintContext context,
+  void registerNodeProcessors(
+    RuleVisitorRegistry registry,
+    RuleContext ruleContext,
   ) {
     // Check if rule is disabled
     if (isDisabled) return;
 
-    // Check if abort was requested via .saropa_stop sentinel file
-    if (ProgressTracker.isAbortRequested) return;
-
-    // =========================================================================
-    // SLOW RULE DEFERRAL (Performance Optimization)
-    // =========================================================================
-    // When SAROPA_LINTS_DEFER=true, skip rules that historically take >50ms.
-    // Run these later with SAROPA_LINTS_DEFERRED=true for a two-pass approach.
-    if (RuleTimingTracker.shouldDefer(code.name)) {
-      return; // Will run in second pass with SAROPA_LINTS_DEFERRED=true
-    }
-    if (RuleTimingTracker.shouldSkipInDeferredMode(code.name)) {
-      return; // Already ran in first pass
-    }
-
-    // Check if file should be skipped based on context
-    final path = resolver.source.fullName;
-    if (_shouldSkipFile(path)) return;
-
-    // =========================================================================
-    // PROGRESS TRACKING (User Feedback)
-    // =========================================================================
-    // Record this file for progress reporting. Only fires when enabled via
-    // environment variable SAROPA_LINTS_PROGRESS=true
-    ProgressTracker.recordFile(path);
-
-    // Reset the report-write debounce on every file so the timer only fires
-    // after analysis truly goes idle, not just between violations.
-    AnalysisReporter.scheduleWrite();
-
-    // =========================================================================
-    // BATCH EXECUTION PLAN CHECK (Performance Optimization)
-    // =========================================================================
-    // If a batch execution plan was created, check if this rule should run
-    // on this file. The plan was computed via parallel pre-analysis.
-    if (!RuleBatchExecutor.shouldRuleRunOnFile(code.name, path)) {
-      return;
-    }
-
-    // Get file content from resolver (already loaded by analyzer)
-    final content = resolver.source.contents.data;
-
-    // Collect imports for dependency graph before ignore checks so that
-    // ignored files still contribute edges to the project structure.
-    ImportGraphTracker.collectImports(path, content);
-
-    // =========================================================================
-    // FILE-LEVEL IGNORE CHECK
-    // =========================================================================
-    // Respect `// ignore_for_file: rule_name` directives. This check runs
-    // once per rule per file, before any AST callbacks, so the entire rule
-    // is skipped efficiently when the file opts out.
-    if (IgnoreUtils.isIgnoredForFile(content, code.name)) {
-      return;
-    }
-
-    // =========================================================================
-    // CONTENT-BASED GENERATED FILE DETECTION (Performance Optimization)
-    // =========================================================================
-    // Some generated files don't have a recognizable suffix. Detect them by
-    // looking for common generator markers in the first 500 chars of the file.
-    if (skipGeneratedCode && _isGeneratedContent(content)) {
-      return;
-    }
-
-    // =========================================================================
-    // DISK PERSISTENCE INITIALIZATION (Performance Optimization)
-    // =========================================================================
-    // On first file, detect project root and load cached analysis state.
-    // This allows the cache to survive IDE restarts.
-    if (!_projectRootInitialized) {
-      _projectRootInitialized = true;
-      final projectRoot = ProjectContext.findProjectRoot(path);
-      if (projectRoot != null) {
-        IncrementalAnalysisTracker.setProjectRoot(projectRoot);
-        // Initialize git-aware prioritization for faster feedback on edited files
-        GitAwarePriority.initialize(projectRoot);
-        // Initialize report writer for automatic report generation
-        AnalysisReporter.initialize(projectRoot);
-        // Initialize import graph tracker for priority-based reports
-        ImportGraphTracker.setProjectInfo(
-          projectRoot,
-          ProjectContext.getPackageName(projectRoot),
-        );
-      }
-    }
-
-    // =========================================================================
-    // MEMORY PRESSURE CHECK (Performance Optimization)
-    // =========================================================================
-    // Record that a file is being processed. This triggers automatic cache
-    // clearing when memory usage exceeds the configured threshold.
-    MemoryPressureHandler.recordFileProcessed();
-
-    // =========================================================================
-    // RAPID ANALYSIS THROTTLE (Performance Optimization)
-    // =========================================================================
-    // Skip if we just analyzed this exact content. This prevents redundant
-    // analysis during rapid saves while still analyzing changed content.
-    // BUG FIX: Include rule name in key so different rules don't share throttle
-    final analysisKey = '$path:${content.hashCode}:${code.name}';
-    final now = DateTime.now();
-    final lastAnalysis = _recentAnalysis[analysisKey];
-    if (lastAnalysis != null &&
-        now.difference(lastAnalysis) < _throttleWindow) {
-      return; // Same content analyzed too recently
-    }
-    _recentAnalysis[analysisKey] = now;
-
-    // Cleanup stale entries periodically to prevent memory leaks
-    if (_recentAnalysis.length > 1000) {
-      final cutoff = now.subtract(const Duration(seconds: 10));
-      _recentAnalysis.removeWhere((_, time) => time.isBefore(cutoff));
-    }
-
-    // =========================================================================
-    // INCREMENTAL ANALYSIS CHECK (Performance Optimization)
-    // =========================================================================
-    // If this rule already passed on this unchanged file, skip re-analysis.
-    // This provides massive speedups for subsequent analysis runs.
-    if (IncrementalAnalysisTracker.canSkipRule(path, content, code.name)) {
-      return;
-    }
-
-    // =========================================================================
-    // EARLY EXIT BY REQUIRED PATTERNS (Performance Optimization)
-    // =========================================================================
-    // If this rule specifies required patterns, check if the file contains
-    // any of them before doing expensive AST work. This is a fast string search.
-    final patterns = requiredPatterns;
-    if (patterns != null && patterns.isNotEmpty) {
-      final hasAnyPattern = patterns.any((p) => content.contains(p));
-      if (!hasAnyPattern) {
-        // Early exit - file doesn't contain any required patterns
-        // Record as passed since it can never violate this rule
-        IncrementalAnalysisTracker.recordRulePassed(path, content, code.name);
-        return;
-      }
-    }
-
-    // =========================================================================
-    // FILE METRICS CHECKS (Performance Optimization)
-    // =========================================================================
-    // Use cached file metrics for fast filtering based on file characteristics.
-    final metrics = FileMetricsCache.get(path, content);
-
-    // Check minimum line count
-    final minLines = minimumLineCount;
-    if (minLines > 0 && metrics.lineCount < minLines) {
-      IncrementalAnalysisTracker.recordRulePassed(path, content, code.name);
-      return;
-    }
-
-    // Check maximum line count (DANGEROUS - only for O(n²) rules)
-    final maxLines = maximumLineCount;
-    if (maxLines > 0 && metrics.lineCount > maxLines) {
-      // NOTE: This skips analysis! Only use for prohibitively slow rules.
-      IncrementalAnalysisTracker.recordRulePassed(path, content, code.name);
-      return;
-    }
-
-    // Check async code requirement
-    if (requiresAsync && !metrics.hasAsyncCode) {
-      IncrementalAnalysisTracker.recordRulePassed(path, content, code.name);
-      return;
-    }
-
-    // Check widget code requirement
-    if (requiresWidgets && !metrics.hasWidgets) {
-      IncrementalAnalysisTracker.recordRulePassed(path, content, code.name);
-      return;
-    }
-
-    // =========================================================================
-    // CONTENT REGION CHECKS (Performance Optimization)
-    // =========================================================================
-    // Use ContentRegionIndex for fast structural checks without full AST parse.
-    if (requiresClassDeclaration || requiresMainFunction || requiresImports) {
-      final regions = ContentRegionIndex.get(path, content);
-
-      // Check class declaration requirement
-      if (requiresClassDeclaration && regions.classDeclarations.isEmpty) {
-        IncrementalAnalysisTracker.recordRulePassed(path, content, code.name);
-        return;
-      }
-
-      // Check main function requirement
-      if (requiresMainFunction && !regions.hasMain) {
-        IncrementalAnalysisTracker.recordRulePassed(path, content, code.name);
-        return;
-      }
-
-      // Check imports requirement
-      if (requiresImports && regions.importRegion.isEmpty) {
-        IncrementalAnalysisTracker.recordRulePassed(path, content, code.name);
-        return;
-      }
-    }
-
-    // =========================================================================
-    // PACKAGE IMPORT CHECKS (Performance Optimization)
-    // =========================================================================
-    // Use cached FileMetrics for O(1) import detection. Avoids redundant
-    // string searches when multiple rules check the same imports.
-    if (requiresFlutterImport && !metrics.hasFlutterImport) {
-      IncrementalAnalysisTracker.recordRulePassed(path, content, code.name);
-      return;
-    }
-    if (requiresBlocImport && !metrics.hasBlocImport) {
-      IncrementalAnalysisTracker.recordRulePassed(path, content, code.name);
-      return;
-    }
-    if (requiresProviderImport && !metrics.hasProviderImport) {
-      IncrementalAnalysisTracker.recordRulePassed(path, content, code.name);
-      return;
-    }
-    if (requiresRiverpodImport && !metrics.hasRiverpodImport) {
-      IncrementalAnalysisTracker.recordRulePassed(path, content, code.name);
-      return;
-    }
-
-    // =========================================================================
-    // ADAPTIVE TIER SWITCHING (Performance Optimization)
-    // =========================================================================
-    // During rapid editing (same file analyzed 3+ times in 2 seconds), only
-    // run essential-tier rules. Full analysis runs after editing settles.
-    // BUG FIX: Disable during CLI runs - this was incorrectly triggering when
-    // multiple rules analyze the same file within a single custom_lint run.
-    // TODO: Re-enable only for IDE/interactive analysis mode
-    // if (_isRapidEditMode(path) && !_isEssentialTierRule()) {
-    //   // Skip non-essential rules during rapid editing for faster feedback
-    //   return;
-    // }
-
-    // =========================================================================
-    // EARLY EXIT BY FILE TYPE (Performance Optimization)
-    // =========================================================================
-    // If this rule specifies applicable file types, check if the current file
-    // matches before doing any expensive AST work. This can skip entire rules
-    // for files where they don't apply (e.g., widget rules on non-widget files).
-    final applicable = applicableFileTypes;
-    if (applicable != null && applicable.isNotEmpty) {
-      final fileTypes = FileTypeDetector.detect(path, content);
-
-      // Check if any of the rule's applicable types match the file's types
-      final hasMatch = applicable.any((type) => fileTypes.contains(type));
-      if (!hasMatch) {
-        // Early exit - this rule doesn't apply to this file type
-        IncrementalAnalysisTracker.recordRulePassed(path, content, code.name);
-        return;
-      }
-    }
-
-    // Run the rule
-    _runRuleWithReporter(resolver, reporter, path, content, context);
-  }
-
-  /// Internal helper to run the rule with timing and reporter wrapping.
-  void _runRuleWithReporter(
-    CustomLintResolver resolver,
-    DiagnosticReporter reporter,
-    String path,
-    String content,
-    CustomLintContext context,
-  ) {
-    // Create wrapped reporter with severity override and impact tracking
-    final wrappedReporter = SaropaDiagnosticReporter(
-      reporter,
+    final saropaContext = SaropaContext(registry, this, ruleContext);
+    final reporter = SaropaDiagnosticReporter(
+      this,
       code.name,
-      filePath: path,
       impact: impact,
-      severityOverride: severityOverrides?[code.name],
+      lintCode: _lintCode,
     );
-
-    // Track whether rule reports any violations
-    var hadViolations = false;
-    final trackingReporter = _TrackingReporter(
-      wrappedReporter,
-      onViolation: () => hadViolations = true,
-    );
-
-    // =========================================================================
-    // TIMING INSTRUMENTATION
-    // =========================================================================
-    // When profiling is enabled (SAROPA_LINTS_PROFILE=true), measure rule
-    // execution time and log slow rules (>10ms) for performance investigation.
-    if (_profilingEnabled) {
-      final stopwatch = Stopwatch()..start();
-      runWithReporter(resolver, trackingReporter, context);
-      stopwatch.stop();
-      RuleTimingTracker.record(code.name, stopwatch.elapsed);
-    } else {
-      runWithReporter(resolver, trackingReporter, context);
-    }
-
-    // =========================================================================
-    // RECORD CLEAN FILES (Performance Optimization)
-    // =========================================================================
-    // If the rule found no violations, record this for incremental analysis.
-    // Next time, we can skip this rule entirely if the file hasn't changed.
-    if (!hadViolations) {
-      IncrementalAnalysisTracker.recordRulePassed(path, content, code.name);
-    }
+    runWithReporter(reporter, saropaContext);
   }
 
-  /// Override this method instead of [run] to implement your lint rule.
+  /// Override this method to implement your lint rule.
   ///
-  /// The [reporter] automatically handles:
-  /// - Hyphenated ignore comment aliases
-  /// - Severity overrides
-  /// - Context-aware suppression (files are pre-filtered)
+  /// Use [context] to register callbacks for AST node types:
+  /// ```dart
+  /// context.addMethodInvocation((node) {
+  ///   if (condition) {
+  ///     reporter.atNode(node);
+  ///   }
+  /// });
+  /// ```
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   );
 }
 
-/// A diagnostic reporter that checks for hyphenated ignore comments,
-/// supports severity overrides, and tracks violations by impact level.
+/// Reporter that wraps the native [AnalysisRule] reporting methods.
 ///
-/// Wraps a [DiagnosticReporter] and intercepts [atNode] calls to check
-/// for ignore comments in both underscore and hyphen formats.
+/// Delegates to [AnalysisRule.reportAtNode] etc. The diagnostic code is
+/// implicit from the rule's [AnalysisRule.diagnosticCode] getter.
+///
+/// The optional [LintCode] parameters on [atNode], [atToken], and [atOffset]
+/// exist for backwards compatibility with existing rule files that pass
+/// the code explicitly. In the native system, these are ignored — the
+/// rule's diagnosticCode is always used.
 class SaropaDiagnosticReporter {
   SaropaDiagnosticReporter(
-    this._delegate,
+    this._rule,
     this._ruleName, {
-    required this.filePath,
     required this.impact,
-    this.severityOverride,
+    required this.lintCode,
   });
 
-  final DiagnosticReporter _delegate;
+  final AnalysisRule _rule;
   final String _ruleName;
-  final String filePath;
   final LintImpact impact;
+  final LintCode lintCode;
 
-  /// Optional severity override for this rule.
-  final DiagnosticSeverity? severityOverride;
-
-  /// Creates a new LintCode with overridden severity if configured.
-  LintCode _applyOverride(LintCode code) {
-    final override = severityOverride;
-    if (override == null) return code;
-
-    return LintCode(
-      name: code.name,
-      problemMessage: code.problemMessage,
-      correctionMessage: code.correctionMessage,
-      uniqueName: code.uniqueName,
-      url: code.url,
-      errorSeverity: override,
-    );
-  }
-
-  /// Reports a diagnostic at the given [node], unless an ignore comment
-  /// is present (supports both underscore and hyphen formats), or the
-  /// violation is suppressed by baseline configuration.
-  void atNode(AstNode node, LintCode code) {
-    // Check for hyphenated ignore comment before reporting
-    if (IgnoreUtils.hasIgnoreComment(node, _ruleName)) {
-      return;
-    }
-
-    // Check if violation is suppressed by baseline
-    final line = _getLineNumber(node.offset, node);
-    if (BaselineManager.isBaselined(filePath, _ruleName, line)) {
-      return;
-    }
-
-    // Track the violation by impact level (always, for report log)
-    _trackViolation(code, line);
-
-    // Only push to Problems tab if under the issue limit
-    if (ProgressTracker.shouldReportToProblems) {
-      _delegate.atNode(node, _applyOverride(code));
-    }
+  /// Reports a diagnostic at the given [node].
+  ///
+  /// The optional [code] parameter is accepted for backwards compatibility
+  /// but ignored — the native system uses the rule's diagnosticCode.
+  void atNode(AstNode node, [LintCode? code]) {
+    _rule.reportAtNode(node);
   }
 
   /// Reports a diagnostic at the given [token].
-  void atToken(Token token, LintCode code) {
-    // Check for hyphenated ignore comment on the token
-    if (IgnoreUtils.hasIgnoreCommentOnToken(token, _ruleName)) {
-      return;
-    }
-
-    // Check if violation is suppressed by baseline (path-based only for tokens)
-    // Token doesn't have easy line access, so line-based baseline won't match
-    if (BaselineManager.isBaselined(filePath, _ruleName, 0)) {
-      return;
-    }
-
-    // Track the violation by impact level (always, for report log)
-    _trackViolation(code, 0); // Token doesn't have easy line access
-
-    // Only push to Problems tab if under the issue limit.
-    // Use atOffset instead of atToken to ensure proper span width.
-    // The built-in atToken has a bug where endColumn equals startColumn
-    // (zero-width highlight). Using atOffset with explicit length fixes this.
-    if (ProgressTracker.shouldReportToProblems) {
-      _delegate.atOffset(
-        offset: token.offset,
-        length: token.length,
-        diagnosticCode: _applyOverride(code),
-      );
-    }
+  void atToken(Token token, [LintCode? code]) {
+    _rule.reportAtToken(token);
   }
 
   /// Reports a diagnostic at the given offset and length.
   ///
-  /// Note: This method cannot check for ignore comments or line-based baseline
-  /// since we only have offset/length, not an AST node. Use [atNode] when possible.
+  /// The [errorCode] parameter is accepted for backwards compatibility
+  /// but ignored.
   void atOffset({
     required int offset,
     required int length,
-    required LintCode errorCode,
+    LintCode? errorCode,
   }) {
-    // Check if violation is suppressed by baseline (path-based only)
-    if (BaselineManager.isBaselined(filePath, errorCode.name, 0)) {
-      return;
-    }
-
-    // Track the violation by impact level (always, for report log)
-    _trackViolation(errorCode, 0);
-
-    // Only push to Problems tab if under the issue limit
-    if (ProgressTracker.shouldReportToProblems) {
-      _delegate.atOffset(
-        offset: offset,
-        length: length,
-        diagnosticCode: _applyOverride(errorCode),
-      );
-    }
-  }
-
-  /// Track a violation in the ImpactTracker and ProgressTracker.
-  void _trackViolation(LintCode code, int line) {
-    // Track for impact reporting
-    ImpactTracker.record(
-      impact: impact,
-      rule: _ruleName,
-      file: filePath,
-      line: line,
-      message: code.problemMessage,
-      correction: code.correctionMessage,
-    );
-
-    // Track for progress reporting with severity
-    final severity = code.errorSeverity.name;
-    ProgressTracker.recordViolation(
-      severity: severity,
-      ruleName: _ruleName,
-      line: line,
-    );
-
-    // Schedule report file writing (debounced)
-    AnalysisReporter.scheduleWrite();
-  }
-
-  /// Get approximate line number from an AST node.
-  int _getLineNumber(int offset, AstNode node) {
-    // Try to get line info from the node's root
-    try {
-      final root = node.root;
-      if (root is CompilationUnit) {
-        return root.lineInfo.getLocation(offset).lineNumber;
-      }
-    } catch (_) {
-      // Fall back to 0 if we can't determine the line
-    }
-    return 0;
-  }
-}
-
-/// A wrapper reporter that tracks whether any violations were reported.
-///
-/// Used by the incremental analysis system to record rules that pass
-/// (report no violations) so they can be skipped on subsequent runs.
-class _TrackingReporter extends SaropaDiagnosticReporter {
-  _TrackingReporter(
-    SaropaDiagnosticReporter delegate, {
-    required this.onViolation,
-  }) : super(
-          delegate._delegate,
-          delegate._ruleName,
-          filePath: delegate.filePath,
-          impact: delegate.impact,
-          severityOverride: delegate.severityOverride,
-        );
-
-  final void Function() onViolation;
-
-  @override
-  void atNode(AstNode node, LintCode code) {
-    onViolation();
-    super.atNode(node, code);
-  }
-
-  @override
-  void atToken(Token token, LintCode code) {
-    onViolation();
-    super.atToken(token, code);
-  }
-
-  @override
-  void atOffset({
-    required int offset,
-    required int length,
-    required LintCode errorCode,
-  }) {
-    onViolation();
-    super.atOffset(offset: offset, length: length, errorCode: errorCode);
+    _rule.reportAtOffset(offset, length);
   }
 }

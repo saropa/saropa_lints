@@ -1,6 +1,4 @@
 import 'package:analyzer/dart/ast/ast.dart';
-import 'package:analyzer/error/error.dart' show DiagnosticSeverity;
-import 'package:custom_lint_builder/custom_lint_builder.dart';
 import 'package:saropa_lints/src/saropa_lint_rule.dart';
 
 /// Warns when QR scan success callback lacks haptic/visual feedback.
@@ -30,7 +28,7 @@ import 'package:saropa_lints/src/saropa_lint_rule.dart';
 /// )
 /// ```
 class RequireQrScanFeedbackRule extends SaropaLintRule {
-  const RequireQrScanFeedbackRule() : super(code: _code);
+  RequireQrScanFeedbackRule() : super(code: _code);
 
   /// UX improvement, not critical.
   @override
@@ -40,12 +38,11 @@ class RequireQrScanFeedbackRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'require_qr_scan_feedback',
-    problemMessage:
-        '[require_qr_scan_feedback] QR scan callback should provide user feedback. Users need confirmation that their scan was successful. Haptic feedback (vibration) or visual feedback (flash, animation) improves user experience and prevents double-scanning. {v2}',
+    'require_qr_scan_feedback',
+    '[require_qr_scan_feedback] QR scan callback should provide user feedback. Users need confirmation that their scan was successful. Haptic feedback (vibration) or visual feedback (flash, animation) improves user experience and prevents double-scanning. {v2}',
     correctionMessage:
         'Add HapticFeedback.mediumImpact() or visual feedback on scan. Verify the change works correctly with existing tests and add coverage for the new behavior.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   static const Set<String> _scanCallbacks = <String>{
@@ -57,11 +54,10 @@ class RequireQrScanFeedbackRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addNamedExpression((NamedExpression node) {
+    context.addNamedExpression((NamedExpression node) {
       final String paramName = node.name.label.name;
       if (!_scanCallbacks.contains(paramName)) return;
 
@@ -78,7 +74,8 @@ class RequireQrScanFeedbackRule extends SaropaLintRule {
 
       if (callbackSource.isEmpty) return;
 
-      final bool hasFeedback = callbackSource.contains('HapticFeedback') ||
+      final bool hasFeedback =
+          callbackSource.contains('HapticFeedback') ||
           callbackSource.contains('haptic') ||
           callbackSource.contains('vibrate') ||
           callbackSource.contains('Vibration') ||
@@ -124,7 +121,7 @@ class RequireQrScanFeedbackRule extends SaropaLintRule {
 /// }
 /// ```
 class AvoidQrScannerAlwaysActiveRule extends SaropaLintRule {
-  const AvoidQrScannerAlwaysActiveRule() : super(code: _code);
+  AvoidQrScannerAlwaysActiveRule() : super(code: _code);
 
   /// Battery optimization issue.
   @override
@@ -134,12 +131,11 @@ class AvoidQrScannerAlwaysActiveRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_qr_scanner_always_active',
-    problemMessage:
-        '[avoid_qr_scanner_always_active] QR scanner should pause when app is backgrounded. Camera for QR scanning drains battery significantly. Without proper lifecycle handling, the camera stays active when the app is backgrounded or the screen is turned off. {v2}',
+    'avoid_qr_scanner_always_active',
+    '[avoid_qr_scanner_always_active] QR scanner should pause when app is backgrounded. Camera for QR scanning drains battery significantly. Without proper lifecycle handling, the camera stays active when the app is backgrounded or the screen is turned off. {v2}',
     correctionMessage:
         'Add WidgetsBindingObserver and pause camera in didChangeAppLifecycleState. Verify the change works correctly with existing tests and add coverage for the new behavior.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   static const Set<String> _scannerControllers = <String>{
@@ -151,11 +147,10 @@ class AvoidQrScannerAlwaysActiveRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addFieldDeclaration((FieldDeclaration node) {
+    context.addFieldDeclaration((FieldDeclaration node) {
       // Check if field type is a scanner controller
       final String? typeName = node.fields.type?.toSource();
       if (typeName == null) return;
@@ -187,7 +182,7 @@ class AvoidQrScannerAlwaysActiveRule extends SaropaLintRule {
       final String classSource = enclosingClass.toSource();
       final bool hasLifecycleHandling =
           classSource.contains('WidgetsBindingObserver') &&
-              classSource.contains('didChangeAppLifecycleState');
+          classSource.contains('didChangeAppLifecycleState');
 
       if (!hasLifecycleHandling) {
         reporter.atNode(node.fields.variables.first, code);
@@ -239,7 +234,7 @@ class AvoidQrScannerAlwaysActiveRule extends SaropaLintRule {
 /// )
 /// ```
 class RequireQrContentValidationRule extends SaropaLintRule {
-  const RequireQrContentValidationRule() : super(code: _code);
+  RequireQrContentValidationRule() : super(code: _code);
 
   /// Security issue - can lead to phishing or malicious redirects.
   @override
@@ -249,12 +244,11 @@ class RequireQrContentValidationRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'require_qr_content_validation',
-    problemMessage:
-        '[require_qr_content_validation] QR code scan result used without validation creates a security vulnerability. Malicious QR codes can contain crafted URLs that redirect to phishing sites, inject JavaScript through URL schemes, trigger automatic downloads, or launch unintended app actions. Users scanning codes in public places are especially vulnerable. {v2}',
+    'require_qr_content_validation',
+    '[require_qr_content_validation] QR code scan result used without validation creates a security vulnerability. Malicious QR codes can contain crafted URLs that redirect to phishing sites, inject JavaScript through URL schemes, trigger automatic downloads, or launch unintended app actions. Users scanning codes in public places are especially vulnerable. {v2}',
     correctionMessage:
         'Validate the URL scheme (allow only https://), optionally verify the domain against an allowlist, and sanitize content before navigation or processing.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   /// QR scan callback parameter names.
@@ -277,11 +271,10 @@ class RequireQrContentValidationRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addNamedExpression((NamedExpression node) {
+    context.addNamedExpression((NamedExpression node) {
       final String paramName = node.name.label.name;
       if (!_scanCallbacks.contains(paramName)) return;
 
@@ -312,7 +305,8 @@ class RequireQrContentValidationRule extends SaropaLintRule {
       // Check for validation patterns
       // Uri.tryParse is always safe (returns null on failure)
       // Uri.parse is only safe if combined with scheme validation
-      final bool hasValidation = callbackSource.contains('Uri.tryParse') ||
+      final bool hasValidation =
+          callbackSource.contains('Uri.tryParse') ||
           (callbackSource.contains('Uri.parse') &&
               callbackSource.contains('scheme')) ||
           callbackSource.contains('isValidUrl') ||
@@ -330,7 +324,7 @@ class RequireQrContentValidationRule extends SaropaLintRule {
     });
 
     // Also check for direct usage of barcode rawValue with launchUrl
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       final String methodName = node.methodName.name;
       if (!_dangerousMethods.contains(methodName)) return;
 
@@ -364,7 +358,7 @@ class RequireQrContentValidationRule extends SaropaLintRule {
             }
           }
 
-          reporter.atNode(node, code);
+          reporter.atNode(node);
           return;
         }
       }

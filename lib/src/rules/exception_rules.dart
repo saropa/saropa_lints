@@ -4,9 +4,6 @@ import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
 import 'package:analyzer/dart/element/element.dart';
 import 'package:analyzer/dart/element/type.dart';
-import 'package:analyzer/error/error.dart'
-    show AnalysisError, DiagnosticSeverity;
-import 'package:custom_lint_builder/custom_lint_builder.dart';
 
 import '../saropa_lint_rule.dart';
 
@@ -16,7 +13,7 @@ import '../saropa_lint_rule.dart';
 ///
 /// **Quick fix available:** Adds a comment to flag for manual review.
 class AvoidNonFinalExceptionClassFieldsRule extends SaropaLintRule {
-  const AvoidNonFinalExceptionClassFieldsRule() : super(code: _code);
+  AvoidNonFinalExceptionClassFieldsRule() : super(code: _code);
 
   /// Significant issue. Address when count exceeds 10.
   @override
@@ -26,21 +23,19 @@ class AvoidNonFinalExceptionClassFieldsRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_non_final_exception_class_fields',
-    problemMessage:
-        '[avoid_non_final_exception_class_fields] Mutable exception fields '
+    'avoid_non_final_exception_class_fields',
+    '[avoid_non_final_exception_class_fields] Mutable exception fields '
         'allow modification after throw, corrupting error data for handlers. {v4}',
     correctionMessage: 'Make all fields final in exception classes.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addClassDeclaration((ClassDeclaration node) {
+    context.addClassDeclaration((ClassDeclaration node) {
       // Check if this class extends Exception or Error
       final ExtendsClause? extendsClause = node.extendsClause;
       if (extendsClause == null) return;
@@ -66,9 +61,6 @@ class AvoidNonFinalExceptionClassFieldsRule extends SaropaLintRule {
       }
     });
   }
-
-  @override
-  List<Fix> getFixes() => <Fix>[_AddHackForNonFinalExceptionFieldFix()];
 }
 
 /// Warns when a catch clause only contains a rethrow.
@@ -92,7 +84,7 @@ class AvoidNonFinalExceptionClassFieldsRule extends SaropaLintRule {
 ///
 /// **Quick fix available:** Adds a comment to flag for manual review.
 class AvoidOnlyRethrowRule extends SaropaLintRule {
-  const AvoidOnlyRethrowRule() : super(code: _code);
+  AvoidOnlyRethrowRule() : super(code: _code);
 
   /// Significant issue. Address when count exceeds 10.
   @override
@@ -102,34 +94,29 @@ class AvoidOnlyRethrowRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_only_rethrow',
-    problemMessage:
-        '[avoid_only_rethrow] Catch-rethrow with no handling is dead code that '
+    'avoid_only_rethrow',
+    '[avoid_only_rethrow] Catch-rethrow with no handling is dead code that '
         'adds nesting and complexity without providing any value. {v4}',
     correctionMessage: 'Remove the try-catch or add meaningful error handling.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addCatchClause((CatchClause node) {
+    context.addCatchClause((CatchClause node) {
       final Block body = node.body;
       if (body.statements.length == 1) {
         final Statement statement = body.statements.first;
         if (statement is ExpressionStatement &&
             statement.expression is RethrowExpression) {
-          reporter.atNode(node, code);
+          reporter.atNode(node);
         }
       }
     });
   }
-
-  @override
-  List<Fix> getFixes() => <Fix>[_AddHackForOnlyRethrowFix()];
 }
 
 /// Warns when throw is used inside a catch block, which loses the stack trace.
@@ -156,7 +143,7 @@ class AvoidOnlyRethrowRule extends SaropaLintRule {
 ///
 /// **Quick fix available:** Adds a comment to flag for manual review.
 class AvoidThrowInCatchBlockRule extends SaropaLintRule {
-  const AvoidThrowInCatchBlockRule() : super(code: _code);
+  AvoidThrowInCatchBlockRule() : super(code: _code);
 
   /// Significant issue. Address when count exceeds 10.
   @override
@@ -169,28 +156,23 @@ class AvoidThrowInCatchBlockRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.bloc};
 
   static const LintCode _code = LintCode(
-    name: 'avoid_throw_in_catch_block',
-    problemMessage:
-        '[avoid_throw_in_catch_block] Throwing a new error in a catch block without preserving the original stack trace makes debugging much harder. This can hide the root cause of failures and lead to incomplete error logs, making it difficult to diagnose and fix issues. {v6}',
+    'avoid_throw_in_catch_block',
+    '[avoid_throw_in_catch_block] Throwing a new error in a catch block without preserving the original stack trace makes debugging much harder. This can hide the root cause of failures and lead to incomplete error logs, making it difficult to diagnose and fix issues. {v6}',
     correctionMessage:
         'Use rethrow to propagate the original error, or Error.throwWithStackTrace to preserve the stack trace when throwing a new error. Always document error handling logic for maintainability.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addCatchClause((CatchClause node) {
+    context.addCatchClause((CatchClause node) {
       // Visit the catch body to find throw statements
       node.body.visitChildren(_ThrowVisitor(reporter, code));
     });
   }
-
-  @override
-  List<Fix> getFixes() => <Fix>[_AddHackForThrowInCatchFix()];
 }
 
 class _ThrowVisitor extends RecursiveAstVisitor<void> {
@@ -201,7 +183,7 @@ class _ThrowVisitor extends RecursiveAstVisitor<void> {
 
   @override
   void visitThrowExpression(ThrowExpression node) {
-    reporter.atNode(node, code);
+    reporter.atNode(node);
     super.visitThrowExpression(node);
   }
 }
@@ -229,7 +211,7 @@ class _ThrowVisitor extends RecursiveAstVisitor<void> {
 /// throw MyError('Something went wrong');
 /// ```
 class AvoidThrowObjectsWithoutToStringRule extends SaropaLintRule {
-  const AvoidThrowObjectsWithoutToStringRule() : super(code: _code);
+  AvoidThrowObjectsWithoutToStringRule() : super(code: _code);
 
   /// Significant issue. Address when count exceeds 10.
   @override
@@ -239,12 +221,11 @@ class AvoidThrowObjectsWithoutToStringRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.high;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_throw_objects_without_tostring',
-    problemMessage:
-        '[avoid_throw_objects_without_tostring] Thrown objects without a useful toString() method produce cryptic error logs that hinder troubleshooting. When caught in production, these errors display unhelpful messages like "Instance of MyClass" instead of actionable details, making it nearly impossible to diagnose root causes from crash reports. {v6}',
+    'avoid_throw_objects_without_tostring',
+    '[avoid_throw_objects_without_tostring] Thrown objects without a useful toString() method produce cryptic error logs that hinder troubleshooting. When caught in production, these errors display unhelpful messages like "Instance of MyClass" instead of actionable details, making it nearly impossible to diagnose root causes from crash reports. {v6}',
     correctionMessage:
         'Throw Exception or Error subclasses, or implement toString() on custom error objects. Ensure error messages are clear and actionable for maintainers and support teams.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   // Types that are known to have useful toString implementations
@@ -266,11 +247,10 @@ class AvoidThrowObjectsWithoutToStringRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addThrowExpression((ThrowExpression node) {
+    context.addThrowExpression((ThrowExpression node) {
       final Expression expression = node.expression;
       final DartType? type = expression.staticType;
 
@@ -297,7 +277,7 @@ class AvoidThrowObjectsWithoutToStringRule extends SaropaLintRule {
         if (hasToString) return;
       }
 
-      reporter.atNode(node, code);
+      reporter.atNode(node);
     });
   }
 }
@@ -306,7 +286,7 @@ class AvoidThrowObjectsWithoutToStringRule extends SaropaLintRule {
 ///
 /// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v4
 class PreferPublicExceptionClassesRule extends SaropaLintRule {
-  const PreferPublicExceptionClassesRule() : super(code: _code);
+  PreferPublicExceptionClassesRule() : super(code: _code);
 
   /// Significant issue. Address when count exceeds 10.
   @override
@@ -316,21 +296,19 @@ class PreferPublicExceptionClassesRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'prefer_public_exception_classes',
-    problemMessage:
-        '[prefer_public_exception_classes] Private exception classes cannot be '
+    'prefer_public_exception_classes',
+    '[prefer_public_exception_classes] Private exception classes cannot be '
         'caught by name outside this library, forcing generic catch blocks. {v4}',
     correctionMessage: 'Remove underscore prefix from exception class name.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addClassDeclaration((ClassDeclaration node) {
+    context.addClassDeclaration((ClassDeclaration node) {
       final String className = node.name.lexeme;
       if (!className.startsWith('_')) return;
 
@@ -345,87 +323,6 @@ class PreferPublicExceptionClassesRule extends SaropaLintRule {
           superName.endsWith('Error')) {
         reporter.atToken(node.name, code);
       }
-    });
-  }
-}
-
-class _AddHackForNonFinalExceptionFieldFix extends DartFix {
-  @override
-  void run(
-    CustomLintResolver resolver,
-    ChangeReporter reporter,
-    CustomLintContext context,
-    AnalysisError analysisError,
-    List<AnalysisError> others,
-  ) {
-    context.registry.addFieldDeclaration((FieldDeclaration node) {
-      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
-
-      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
-        message: 'Add HACK comment for non-final field',
-        priority: 1,
-      );
-
-      changeBuilder.addDartFileEdit((builder) {
-        builder.addSimpleInsertion(
-          node.offset,
-          '// HACK: make this field final\n  ',
-        );
-      });
-    });
-  }
-}
-
-class _AddHackForOnlyRethrowFix extends DartFix {
-  @override
-  void run(
-    CustomLintResolver resolver,
-    ChangeReporter reporter,
-    CustomLintContext context,
-    AnalysisError analysisError,
-    List<AnalysisError> others,
-  ) {
-    context.registry.addCatchClause((CatchClause node) {
-      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
-
-      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
-        message: 'Add HACK comment for pointless rethrow',
-        priority: 1,
-      );
-
-      changeBuilder.addDartFileEdit((builder) {
-        builder.addSimpleInsertion(
-          node.offset,
-          '/* HACK: remove try-catch or add error handling */ ',
-        );
-      });
-    });
-  }
-}
-
-class _AddHackForThrowInCatchFix extends DartFix {
-  @override
-  void run(
-    CustomLintResolver resolver,
-    ChangeReporter reporter,
-    CustomLintContext context,
-    AnalysisError analysisError,
-    List<AnalysisError> others,
-  ) {
-    context.registry.addThrowExpression((ThrowExpression node) {
-      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
-
-      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
-        message: 'Add HACK comment for throw in catch',
-        priority: 1,
-      );
-
-      changeBuilder.addDartFileEdit((builder) {
-        builder.addSimpleInsertion(
-          node.offset,
-          '/* HACK: use rethrow or Error.throwWithStackTrace */ ',
-        );
-      });
     });
   }
 }

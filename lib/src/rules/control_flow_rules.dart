@@ -2,10 +2,6 @@
 
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/token.dart';
-import 'package:analyzer/error/error.dart'
-    show AnalysisError, DiagnosticSeverity;
-import 'package:analyzer/source/source_range.dart';
-import 'package:custom_lint_builder/custom_lint_builder.dart';
 
 import '../saropa_lint_rule.dart';
 
@@ -25,7 +21,7 @@ import '../saropa_lint_rule.dart';
 /// if (x != 0) { }
 /// ```
 class AvoidAssignmentsAsConditionsRule extends SaropaLintRule {
-  const AvoidAssignmentsAsConditionsRule() : super(code: _code);
+  AvoidAssignmentsAsConditionsRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -35,37 +31,35 @@ class AvoidAssignmentsAsConditionsRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_assignments_as_conditions',
-    problemMessage:
-        '[avoid_assignments_as_conditions] Assignment operator (=) used inside a condition expression where a comparison (==) was likely intended. The condition silently assigns a new value instead of testing the current one, causing incorrect control flow and overwriting the original variable value. {v4}',
+    'avoid_assignments_as_conditions',
+    '[avoid_assignments_as_conditions] Assignment operator (=) used inside a condition expression where a comparison (==) was likely intended. The condition silently assigns a new value instead of testing the current one, causing incorrect control flow and overwriting the original variable value. {v4}',
     correctionMessage:
         'Replace = with == if comparing, or move the assignment to a separate statement before the condition to make the intent explicit.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
     // Check if statements
-    context.registry.addIfStatement((IfStatement node) {
+    context.addIfStatement((IfStatement node) {
       _checkCondition(node.expression, reporter);
     });
 
     // Check while statements
-    context.registry.addWhileStatement((WhileStatement node) {
+    context.addWhileStatement((WhileStatement node) {
       _checkCondition(node.condition, reporter);
     });
 
     // Check do-while statements
-    context.registry.addDoStatement((DoStatement node) {
+    context.addDoStatement((DoStatement node) {
       _checkCondition(node.condition, reporter);
     });
 
     // Check for statements (ForStatement uses forLoopParts)
-    context.registry.addForStatement((ForStatement node) {
+    context.addForStatement((ForStatement node) {
       final ForLoopParts parts = node.forLoopParts;
       if (parts is ForParts) {
         final Expression? condition = parts.condition;
@@ -76,20 +70,22 @@ class AvoidAssignmentsAsConditionsRule extends SaropaLintRule {
     });
 
     // Check ternary expressions
-    context.registry.addConditionalExpression((ConditionalExpression node) {
+    context.addConditionalExpression((ConditionalExpression node) {
       _checkCondition(node.condition, reporter);
     });
   }
 
   void _checkCondition(
-      Expression condition, SaropaDiagnosticReporter reporter) {
+    Expression condition,
+    SaropaDiagnosticReporter reporter,
+  ) {
     if (condition is AssignmentExpression) {
-      reporter.atNode(condition, code);
+      reporter.atNode(condition);
     }
     // Check for parenthesized assignment
     if (condition is ParenthesizedExpression) {
       if (condition.expression is AssignmentExpression) {
-        reporter.atNode(condition, code);
+        reporter.atNode(condition);
       }
     }
   }
@@ -120,7 +116,7 @@ class AvoidAssignmentsAsConditionsRule extends SaropaLintRule {
 ///
 /// **Quick fix available:** Adds a comment to flag for refactoring.
 class AvoidCollapsibleIfRule extends SaropaLintRule {
-  const AvoidCollapsibleIfRule() : super(code: _code);
+  AvoidCollapsibleIfRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -130,21 +126,19 @@ class AvoidCollapsibleIfRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_collapsible_if',
-    problemMessage:
-        '[avoid_collapsible_if] Nested if statement without an else clause can be merged with its parent if. The extra nesting level adds indentation and cognitive load without any logical benefit, making the combined condition harder to scan than a single flattened check. {v5}',
+    'avoid_collapsible_if',
+    '[avoid_collapsible_if] Nested if statement without an else clause can be merged with its parent if. The extra nesting level adds indentation and cognitive load without any logical benefit, making the combined condition harder to scan than a single flattened check. {v5}',
     correctionMessage:
         'Combine into a single if statement using && (e.g. if (a && b) { ... }) to reduce nesting depth and improve readability.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addIfStatement((IfStatement node) {
+    context.addIfStatement((IfStatement node) {
       // Skip if has else clause
       if (node.elseStatement != null) return;
 
@@ -167,37 +161,7 @@ class AvoidCollapsibleIfRule extends SaropaLintRule {
       if (innerIf.elseStatement != null) return;
 
       // Report collapsible if
-      reporter.atNode(node, code);
-    });
-  }
-
-  @override
-  List<Fix> getFixes() => <Fix>[_AddHackForCollapsibleIfFix()];
-}
-
-class _AddHackForCollapsibleIfFix extends DartFix {
-  @override
-  void run(
-    CustomLintResolver resolver,
-    ChangeReporter reporter,
-    CustomLintContext context,
-    AnalysisError analysisError,
-    List<AnalysisError> others,
-  ) {
-    context.registry.addIfStatement((IfStatement node) {
-      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
-
-      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
-        message: 'Add HACK comment to collapse if statements',
-        priority: 2,
-      );
-
-      changeBuilder.addDartFileEdit((builder) {
-        builder.addSimpleInsertion(
-          node.offset,
-          '// HACK: collapse nested if using && operator\n    ',
-        );
-      });
+      reporter.atNode(node);
     });
   }
 }
@@ -233,7 +197,7 @@ class _AddHackForCollapsibleIfFix extends DartFix {
 ///
 /// **Quick fix available:** Simplifies to the non-redundant expression.
 class AvoidConditionsWithBooleanLiteralsRule extends SaropaLintRule {
-  const AvoidConditionsWithBooleanLiteralsRule() : super(code: _code);
+  AvoidConditionsWithBooleanLiteralsRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -243,22 +207,20 @@ class AvoidConditionsWithBooleanLiteralsRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_conditions_with_boolean_literals',
-    problemMessage:
-        '[avoid_conditions_with_boolean_literals] Boolean literal used in a logical expression where it has no effect or makes the result constant. Expressions like x || true are always true and x && false are always false, indicating dead code or a logic error where a variable was intended. {v6}',
+    'avoid_conditions_with_boolean_literals',
+    '[avoid_conditions_with_boolean_literals] Boolean literal used in a logical expression where it has no effect or makes the result constant. Expressions like x || true are always true and x && false are always false, indicating dead code or a logic error where a variable was intended. {v6}',
     correctionMessage:
         'Remove the boolean literal and simplify the expression: x || true becomes true, x && false becomes false, '
         'x || false is x, x && true is x.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addBinaryExpression((BinaryExpression node) {
+    context.addBinaryExpression((BinaryExpression node) {
       final TokenType operator = node.operator.type;
 
       // Only check logical operators (&&, ||)
@@ -268,78 +230,9 @@ class AvoidConditionsWithBooleanLiteralsRule extends SaropaLintRule {
           operator == TokenType.AMPERSAND_AMPERSAND) {
         if (node.leftOperand is BooleanLiteral ||
             node.rightOperand is BooleanLiteral) {
-          reporter.atNode(node, code);
+          reporter.atNode(node);
         }
       }
-    });
-  }
-
-  @override
-  List<Fix> getFixes() => <Fix>[_SimplifyBooleanComparisonFix()];
-}
-
-class _SimplifyBooleanComparisonFix extends DartFix {
-  @override
-  void run(
-    CustomLintResolver resolver,
-    ChangeReporter reporter,
-    CustomLintContext context,
-    AnalysisError analysisError,
-    List<AnalysisError> others,
-  ) {
-    context.registry.addBinaryExpression((BinaryExpression node) {
-      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
-
-      final TokenType operator = node.operator.type;
-      String? replacement;
-
-      // Handle logical operators with boolean literals:
-      // x || true  -> true
-      // x || false -> x
-      // x && true  -> x
-      // x && false -> false
-      if (operator == TokenType.BAR_BAR ||
-          operator == TokenType.AMPERSAND_AMPERSAND) {
-        final bool isOr = operator == TokenType.BAR_BAR;
-        final Expression left = node.leftOperand;
-        final Expression right = node.rightOperand;
-
-        BooleanLiteral? literal;
-        Expression? other;
-
-        if (left is BooleanLiteral) {
-          literal = left;
-          other = right;
-        } else if (right is BooleanLiteral) {
-          literal = right;
-          other = left;
-        }
-
-        if (literal != null && other != null) {
-          final bool value = literal.value;
-          if (isOr) {
-            // x || true -> true, x || false -> x
-            replacement = value ? 'true' : other.toSource();
-          } else {
-            // x && true -> x, x && false -> false
-            replacement = value ? other.toSource() : 'false';
-          }
-        }
-      }
-
-      if (replacement == null) return;
-
-      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
-        message: 'Simplify to: $replacement',
-        priority: 1,
-      );
-
-      changeBuilder.addDartFileEdit((builder) {
-        builder.addSimpleReplacement(
-          SourceRange(node.offset, node.length),
-          replacement!,
-        );
-      });
     });
   }
 }
@@ -363,7 +256,7 @@ class _SimplifyBooleanComparisonFix extends DartFix {
 /// assert(list.isNotEmpty);
 /// ```
 class AvoidConstantAssertConditionsRule extends SaropaLintRule {
-  const AvoidConstantAssertConditionsRule() : super(code: _code);
+  AvoidConstantAssertConditionsRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -373,25 +266,23 @@ class AvoidConstantAssertConditionsRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_constant_assert_conditions',
-    problemMessage:
-        '[avoid_constant_assert_conditions] Assert condition evaluates to a compile-time constant, making it either always pass (true) or always fail (false). A constant assert provides no runtime safety check and misleads readers into thinking a dynamic invariant is being verified. {v5}',
+    'avoid_constant_assert_conditions',
+    '[avoid_constant_assert_conditions] Assert condition evaluates to a compile-time constant, making it either always pass (true) or always fail (false). A constant assert provides no runtime safety check and misleads readers into thinking a dynamic invariant is being verified. {v5}',
     correctionMessage:
         'Replace the constant with a meaningful runtime expression that validates actual program state, or remove the assert if the check is no longer needed.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addAssertStatement((AssertStatement node) {
+    context.addAssertStatement((AssertStatement node) {
       final Expression condition = node.condition;
 
       if (condition is BooleanLiteral) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
         return;
       }
 
@@ -402,7 +293,7 @@ class AvoidConstantAssertConditionsRule extends SaropaLintRule {
 
         // Check if both sides are the same literal
         if (_areSameLiteral(left, right)) {
-          reporter.atNode(node, code);
+          reporter.atNode(node);
         }
       }
     });
@@ -444,7 +335,7 @@ class AvoidConstantAssertConditionsRule extends SaropaLintRule {
 /// switch (getValue()) { ... }
 /// ```
 class AvoidConstantSwitchesRule extends SaropaLintRule {
-  const AvoidConstantSwitchesRule() : super(code: _code);
+  AvoidConstantSwitchesRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -454,27 +345,25 @@ class AvoidConstantSwitchesRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_constant_switches',
-    problemMessage:
-        '[avoid_constant_switches] Switch expression matches against a compile-time constant, so only one case ever executes. The switch adds structural complexity without providing any branching value, and the unreachable cases are dead code that misleads readers. {v5}',
+    'avoid_constant_switches',
+    '[avoid_constant_switches] Switch expression matches against a compile-time constant, so only one case ever executes. The switch adds structural complexity without providing any branching value, and the unreachable cases are dead code that misleads readers. {v5}',
     correctionMessage:
         'Replace the switch with the body of the matching case directly, or use a variable expression in the switch if dynamic branching is intended.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addSwitchStatement((SwitchStatement node) {
+    context.addSwitchStatement((SwitchStatement node) {
       if (_isConstantExpression(node.expression)) {
         reporter.atNode(node.expression, code);
       }
     });
 
-    context.registry.addSwitchExpression((SwitchExpression node) {
+    context.addSwitchExpression((SwitchExpression node) {
       if (_isConstantExpression(node.expression)) {
         reporter.atNode(node.expression, code);
       }
@@ -513,7 +402,7 @@ class AvoidConstantSwitchesRule extends SaropaLintRule {
 ///
 /// Formerly: `avoid_continue_statement`
 class AvoidContinueRule extends SaropaLintRule {
-  const AvoidContinueRule() : super(code: _code);
+  AvoidContinueRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -526,22 +415,20 @@ class AvoidContinueRule extends SaropaLintRule {
   List<String> get configAliases => const <String>['avoid_continue_statement'];
 
   static const LintCode _code = LintCode(
-    name: 'prefer_no_continue_statement',
-    problemMessage:
-        '[prefer_no_continue_statement] Loop body uses a continue statement to skip to the next iteration. Continue statements break the linear flow of the loop, forcing readers to mentally track which paths reach the end of the body and which jump back to the loop header. {v2}',
+    'prefer_no_continue_statement',
+    '[prefer_no_continue_statement] Loop body uses a continue statement to skip to the next iteration. Continue statements break the linear flow of the loop, forcing readers to mentally track which paths reach the end of the body and which jump back to the loop header. {v2}',
     correctionMessage:
         'Invert the condition and wrap the remaining body in an if block, or extract the skip logic into an early return within a helper method.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addContinueStatement((ContinueStatement node) {
-      reporter.atNode(node, code);
+    context.addContinueStatement((ContinueStatement node) {
+      reporter.atNode(node);
     });
   }
 }
@@ -564,7 +451,7 @@ class AvoidContinueRule extends SaropaLintRule {
 /// }
 /// ```
 class AvoidDuplicateSwitchCaseConditionsRule extends SaropaLintRule {
-  const AvoidDuplicateSwitchCaseConditionsRule() : super(code: _code);
+  AvoidDuplicateSwitchCaseConditionsRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -574,21 +461,19 @@ class AvoidDuplicateSwitchCaseConditionsRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_duplicate_switch_case_conditions',
-    problemMessage:
-        '[avoid_duplicate_switch_case_conditions] Same condition value appears in multiple switch cases. The second occurrence is unreachable because the first matching case always executes, making the duplicate case dead code that indicates a copy-paste error or incomplete refactoring. {v4}',
+    'avoid_duplicate_switch_case_conditions',
+    '[avoid_duplicate_switch_case_conditions] Same condition value appears in multiple switch cases. The second occurrence is unreachable because the first matching case always executes, making the duplicate case dead code that indicates a copy-paste error or incomplete refactoring. {v4}',
     correctionMessage:
         'Remove the duplicate case clause entirely, or change one of the values if different conditions were intended for each branch.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addSwitchStatement((SwitchStatement node) {
+    context.addSwitchStatement((SwitchStatement node) {
       final Set<String> seenConditions = <String>{};
 
       for (final SwitchMember member in node.members) {
@@ -603,7 +488,7 @@ class AvoidDuplicateSwitchCaseConditionsRule extends SaropaLintRule {
       }
     });
 
-    context.registry.addSwitchExpression((SwitchExpression node) {
+    context.addSwitchExpression((SwitchExpression node) {
       final Set<String> seenConditions = <String>{};
 
       for (final SwitchExpressionCase switchCase in node.cases) {
@@ -640,7 +525,7 @@ class AvoidDuplicateSwitchCaseConditionsRule extends SaropaLintRule {
 /// }
 /// ```
 class AvoidIfWithManyBranchesRule extends SaropaLintRule {
-  const AvoidIfWithManyBranchesRule() : super(code: _code);
+  AvoidIfWithManyBranchesRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -650,23 +535,21 @@ class AvoidIfWithManyBranchesRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_if_with_many_branches',
-    problemMessage:
-        '[avoid_if_with_many_branches] If/else-if chain has more than 4 branches, making the control flow difficult to follow. Long chains are error-prone because conditions are checked sequentially and later branches depend on all previous conditions being false. {v5}',
+    'avoid_if_with_many_branches',
+    '[avoid_if_with_many_branches] If/else-if chain has more than 4 branches, making the control flow difficult to follow. Long chains are error-prone because conditions are checked sequentially and later branches depend on all previous conditions being false. {v5}',
     correctionMessage:
         'Refactor to a switch statement for exhaustiveness checking, or extract each branch into a named method to reduce the cognitive load of the chain.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   static const int _maxBranches = 4;
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addIfStatement((IfStatement node) {
+    context.addIfStatement((IfStatement node) {
       // Only check top-level if statements (not else-if)
       // Check if this if is the else branch of another if
       final AstNode? parent = node.parent;
@@ -705,7 +588,7 @@ class AvoidIfWithManyBranchesRule extends SaropaLintRule {
 ///
 /// **Quick fix available:** Inverts the operator (e.g., `!(a > b)` → `a <= b`).
 class AvoidInvertedBooleanChecksRule extends SaropaLintRule {
-  const AvoidInvertedBooleanChecksRule() : super(code: _code);
+  AvoidInvertedBooleanChecksRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -715,21 +598,19 @@ class AvoidInvertedBooleanChecksRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_inverted_boolean_checks',
-    problemMessage:
-        '[avoid_inverted_boolean_checks] Boolean expression negated with ! when a direct opposite operator exists. Negated conditions add a mental inversion step for readers and are more error-prone during modification, especially in compound expressions with multiple negations. {v4}',
+    'avoid_inverted_boolean_checks',
+    '[avoid_inverted_boolean_checks] Boolean expression negated with ! when a direct opposite operator exists. Negated conditions add a mental inversion step for readers and are more error-prone during modification, especially in compound expressions with multiple negations. {v4}',
     correctionMessage:
         'Replace the negated expression with the direct opposite: use != instead of !(==), isNotEmpty instead of !isEmpty, or > instead of !(<=).',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addPrefixExpression((PrefixExpression node) {
+    context.addPrefixExpression((PrefixExpression node) {
       if (node.operator.type != TokenType.BANG) return;
 
       final Expression operand = node.operand;
@@ -744,62 +625,10 @@ class AvoidInvertedBooleanChecksRule extends SaropaLintRule {
               op == TokenType.GT ||
               op == TokenType.LT_EQ ||
               op == TokenType.GT_EQ) {
-            reporter.atNode(node, code);
+            reporter.atNode(node);
           }
         }
       }
-    });
-  }
-
-  @override
-  List<Fix> getFixes() => <Fix>[_InvertOperatorFix()];
-}
-
-class _InvertOperatorFix extends DartFix {
-  static const Map<TokenType, String> _oppositeOperators = <TokenType, String>{
-    TokenType.EQ_EQ: '!=',
-    TokenType.BANG_EQ: '==',
-    TokenType.LT: '>=',
-    TokenType.GT: '<=',
-    TokenType.LT_EQ: '>',
-    TokenType.GT_EQ: '<',
-  };
-
-  @override
-  void run(
-    CustomLintResolver resolver,
-    ChangeReporter reporter,
-    CustomLintContext context,
-    AnalysisError analysisError,
-    List<AnalysisError> others,
-  ) {
-    context.registry.addPrefixExpression((PrefixExpression node) {
-      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
-      if (node.operator.type != TokenType.BANG) return;
-
-      final Expression operand = node.operand;
-      if (operand is! ParenthesizedExpression) return;
-
-      final Expression inner = operand.expression;
-      if (inner is! BinaryExpression) return;
-
-      final String? oppositeOp = _oppositeOperators[inner.operator.type];
-      if (oppositeOp == null) return;
-
-      final String left = inner.leftOperand.toSource();
-      final String right = inner.rightOperand.toSource();
-
-      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
-        message: 'Use $oppositeOp operator',
-        priority: 1,
-      );
-
-      changeBuilder.addDartFileEdit((builder) {
-        builder.addSimpleReplacement(
-          SourceRange(node.offset, node.length),
-          '$left $oppositeOp $right',
-        );
-      });
     });
   }
 }
@@ -822,7 +651,7 @@ class _InvertOperatorFix extends DartFix {
 ///
 /// **Quick fix available:** Replaces `!x.isEmpty` with `x.isNotEmpty`.
 class AvoidNegatedConditionsRule extends SaropaLintRule {
-  const AvoidNegatedConditionsRule() : super(code: _code);
+  AvoidNegatedConditionsRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -832,12 +661,11 @@ class AvoidNegatedConditionsRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_negated_conditions',
-    problemMessage:
-        '[avoid_negated_conditions] Condition uses negation (!) where a positive equivalent exists. Negated conditions force readers to mentally invert the logic, increasing cognitive load and the likelihood of misreading compound boolean expressions during code review. {v4}',
+    'avoid_negated_conditions',
+    '[avoid_negated_conditions] Condition uses negation (!) where a positive equivalent exists. Negated conditions force readers to mentally invert the logic, increasing cognitive load and the likelihood of misreading compound boolean expressions during code review. {v4}',
     correctionMessage:
         'Rewrite using the positive form: replace !isEmpty with isNotEmpty, !is with is!, == null with != null, or swap if/else branches to use the positive condition first.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   static const List<String> _negateableMethods = <String>[
@@ -852,11 +680,10 @@ class AvoidNegatedConditionsRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addPrefixExpression((PrefixExpression node) {
+    context.addPrefixExpression((PrefixExpression node) {
       if (node.operator.type != TokenType.BANG) return;
 
       final Expression operand = node.operand;
@@ -864,70 +691,16 @@ class AvoidNegatedConditionsRule extends SaropaLintRule {
       if (operand is PropertyAccess) {
         final String propertyName = operand.propertyName.name;
         if (_negateableMethods.contains(propertyName)) {
-          reporter.atNode(node, code);
+          reporter.atNode(node);
         }
       }
       // Check for !x.isEmpty on simple identifiers
       if (operand is PrefixedIdentifier) {
         final String propertyName = operand.identifier.name;
         if (_negateableMethods.contains(propertyName)) {
-          reporter.atNode(node, code);
+          reporter.atNode(node);
         }
       }
-    });
-  }
-
-  @override
-  List<Fix> getFixes() => <Fix>[_UsePositiveFormFix()];
-}
-
-class _UsePositiveFormFix extends DartFix {
-  static const Map<String, String> _positiveAlternatives = <String, String>{
-    'isEmpty': 'isNotEmpty',
-    'isEven': 'isOdd',
-    'isOdd': 'isEven',
-  };
-
-  @override
-  void run(
-    CustomLintResolver resolver,
-    ChangeReporter reporter,
-    CustomLintContext context,
-    AnalysisError analysisError,
-    List<AnalysisError> others,
-  ) {
-    context.registry.addPrefixExpression((PrefixExpression node) {
-      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
-      if (node.operator.type != TokenType.BANG) return;
-
-      final Expression operand = node.operand;
-      String? targetSource;
-      String? propertyName;
-
-      if (operand is PropertyAccess) {
-        targetSource = operand.target?.toSource();
-        propertyName = operand.propertyName.name;
-      } else if (operand is PrefixedIdentifier) {
-        targetSource = operand.prefix.name;
-        propertyName = operand.identifier.name;
-      }
-
-      if (targetSource == null || propertyName == null) return;
-
-      final String? positiveForm = _positiveAlternatives[propertyName];
-      if (positiveForm == null) return;
-
-      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
-        message: 'Use $positiveForm',
-        priority: 1,
-      );
-
-      changeBuilder.addDartFileEdit((builder) {
-        builder.addSimpleReplacement(
-          SourceRange(node.offset, node.length),
-          '$targetSource.$positiveForm',
-        );
-      });
     });
   }
 }
@@ -954,7 +727,7 @@ class _UsePositiveFormFix extends DartFix {
 /// list.add(y);
 /// ```
 class AvoidNestedAssignmentsRule extends SaropaLintRule {
-  const AvoidNestedAssignmentsRule() : super(code: _code);
+  AvoidNestedAssignmentsRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -964,21 +737,19 @@ class AvoidNestedAssignmentsRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_nested_assignments',
-    problemMessage:
-        '[avoid_nested_assignments] Assignment expression embedded inside another expression (e.g. condition, argument, or return). Nested assignments obscure the data flow and make it unclear whether the intent is comparison, assignment, or both, increasing the risk of logic errors. {v7}',
+    'avoid_nested_assignments',
+    '[avoid_nested_assignments] Assignment expression embedded inside another expression (e.g. condition, argument, or return). Nested assignments obscure the data flow and make it unclear whether the intent is comparison, assignment, or both, increasing the risk of logic errors. {v7}',
     correctionMessage:
         'Extract the assignment to a separate statement on its own line, then reference the variable in the expression to make the data flow explicit.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addAssignmentExpression((AssignmentExpression node) {
+    context.addAssignmentExpression((AssignmentExpression node) {
       // Check if this assignment is nested inside another expression
       final AstNode? parent = node.parent;
 
@@ -1004,7 +775,7 @@ class AvoidNestedAssignmentsRule extends SaropaLintRule {
       if (parent is ExpressionFunctionBody) return;
 
       // Report nested assignment
-      reporter.atNode(node, code);
+      reporter.atNode(node);
     });
   }
 }
@@ -1016,7 +787,7 @@ class AvoidNestedAssignmentsRule extends SaropaLintRule {
 /// Nested ternary operators can be hard to read. Consider using if-else
 /// statements or extracting logic into separate methods.
 class AvoidNestedConditionalExpressionsRule extends SaropaLintRule {
-  const AvoidNestedConditionalExpressionsRule() : super(code: _code);
+  AvoidNestedConditionalExpressionsRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -1026,21 +797,19 @@ class AvoidNestedConditionalExpressionsRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_nested_conditional_expressions',
-    problemMessage:
-        '[avoid_nested_conditional_expressions] Ternary expression contains another ternary, creating a multi-level conditional that is difficult to parse visually. Nested ternaries lack clear precedence at a glance and are a common source of logic errors during editing. {v4}',
+    'avoid_nested_conditional_expressions',
+    '[avoid_nested_conditional_expressions] Ternary expression contains another ternary, creating a multi-level conditional that is difficult to parse visually. Nested ternaries lack clear precedence at a glance and are a common source of logic errors during editing. {v4}',
     correctionMessage:
         'Refactor to an if-else statement for clarity, or extract the inner conditional into a named variable or helper method with a descriptive name.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addConditionalExpression((ConditionalExpression node) {
+    context.addConditionalExpression((ConditionalExpression node) {
       // Only report on the OUTERMOST conditional to avoid double reporting
       // Check if this conditional is nested inside another conditional
       AstNode? parent = node.parent;
@@ -1057,7 +826,7 @@ class AvoidNestedConditionalExpressionsRule extends SaropaLintRule {
       // Now check if this outermost conditional has nested conditionals
       if (node.thenExpression is ConditionalExpression ||
           node.elseExpression is ConditionalExpression) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
   }
@@ -1077,7 +846,7 @@ class AvoidNestedConditionalExpressionsRule extends SaropaLintRule {
 /// }
 /// ```
 class AvoidNestedSwitchesRule extends SaropaLintRule {
-  const AvoidNestedSwitchesRule() : super(code: _code);
+  AvoidNestedSwitchesRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -1087,21 +856,19 @@ class AvoidNestedSwitchesRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_nested_switches',
-    problemMessage:
-        '[avoid_nested_switches] Switch statement contains another switch statement, creating multi-dimensional branching that is hard to follow and test. Each nesting level multiplies the number of code paths, making exhaustive testing impractical and bugs harder to locate. {v4}',
+    'avoid_nested_switches',
+    '[avoid_nested_switches] Switch statement contains another switch statement, creating multi-dimensional branching that is hard to follow and test. Each nesting level multiplies the number of code paths, making exhaustive testing impractical and bugs harder to locate. {v4}',
     correctionMessage:
         'Extract the inner switch into a named method that handles the secondary dispatch. This flattens the nesting and makes each branching level independently testable.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addSwitchStatement((SwitchStatement node) {
+    context.addSwitchStatement((SwitchStatement node) {
       // Check if this switch is inside another switch
       AstNode? current = node.parent;
       while (current != null) {
@@ -1151,7 +918,7 @@ class AvoidNestedSwitchesRule extends SaropaLintRule {
 /// };
 /// ```
 class AvoidNestedSwitchExpressionsRule extends SaropaLintRule {
-  const AvoidNestedSwitchExpressionsRule() : super(code: _code);
+  AvoidNestedSwitchExpressionsRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -1161,26 +928,24 @@ class AvoidNestedSwitchExpressionsRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_nested_switch_expressions',
-    problemMessage:
-        '[avoid_nested_switch_expressions] Switch expression contains another switch expression, creating multi-level branching that is extremely difficult to read and reason about. Each nesting level multiplies the number of result paths, making the expression fragile and hard to maintain. {v4}',
+    'avoid_nested_switch_expressions',
+    '[avoid_nested_switch_expressions] Switch expression contains another switch expression, creating multi-level branching that is extremely difficult to read and reason about. Each nesting level multiplies the number of result paths, making the expression fragile and hard to maintain. {v4}',
     correctionMessage:
         'Extract the inner switch expression into a named helper function that returns the computed value, keeping each switch flat and independently testable.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addSwitchExpression((SwitchExpression node) {
+    context.addSwitchExpression((SwitchExpression node) {
       // Check if this switch is inside another switch expression
       AstNode? parent = node.parent;
       while (parent != null) {
         if (parent is SwitchExpression) {
-          reporter.atNode(node, code);
+          reporter.atNode(node);
           return;
         }
         // Stop at function boundaries
@@ -1208,7 +973,7 @@ class AvoidNestedSwitchExpressionsRule extends SaropaLintRule {
 /// } catch (e) { }
 /// ```
 class AvoidNestedTryRule extends SaropaLintRule {
-  const AvoidNestedTryRule() : super(code: _code);
+  AvoidNestedTryRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -1218,21 +983,19 @@ class AvoidNestedTryRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_nested_try',
-    problemMessage:
-        '[avoid_nested_try] Try-catch block nested inside another try-catch, creating layered error handling that is difficult to trace. Nested try blocks obscure which catch clause handles which error, increasing the risk of swallowing exceptions or applying the wrong recovery logic. {v4}',
+    'avoid_nested_try',
+    '[avoid_nested_try] Try-catch block nested inside another try-catch, creating layered error handling that is difficult to trace. Nested try blocks obscure which catch clause handles which error, increasing the risk of swallowing exceptions or applying the wrong recovery logic. {v4}',
     correctionMessage:
         'Extract the inner try-catch into a separate method with a clear name that describes its error handling responsibility, keeping each try block focused on one concern.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addTryStatement((TryStatement node) {
+    context.addTryStatement((TryStatement node) {
       // Check if this try is inside another try
       AstNode? current = node.parent;
       while (current != null) {
@@ -1273,24 +1036,22 @@ class AvoidNestedTryRule extends SaropaLintRule {
 /// return 2;
 /// ```
 class AvoidRedundantElseRule extends SaropaLintRule {
-  const AvoidRedundantElseRule() : super(code: _code);
+  AvoidRedundantElseRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
-    name: 'avoid_redundant_else',
-    problemMessage:
-        '[avoid_redundant_else] Else clause follows a branch that already exits via return, throw, break, or continue. The else keyword is redundant because the code after the if block only runs when the condition is false, adding unnecessary nesting and indentation. {v3}',
+    'avoid_redundant_else',
+    '[avoid_redundant_else] Else clause follows a branch that already exits via return, throw, break, or continue. The else keyword is redundant because the code after the if block only runs when the condition is false, adding unnecessary nesting and indentation. {v3}',
     correctionMessage:
         'Remove the else clause and un-indent the code so it runs at the same level as the if block, reducing nesting depth and improving readability.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addIfStatement((IfStatement node) {
+    context.addIfStatement((IfStatement node) {
       final Statement? elseStatement = node.elseStatement;
       if (elseStatement == null) return;
 
@@ -1344,7 +1105,7 @@ class AvoidRedundantElseRule extends SaropaLintRule {
 /// }
 /// ```
 class AvoidUnconditionalBreakRule extends SaropaLintRule {
-  const AvoidUnconditionalBreakRule() : super(code: _code);
+  AvoidUnconditionalBreakRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -1354,35 +1115,32 @@ class AvoidUnconditionalBreakRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_unconditional_break',
-    problemMessage:
-        '[avoid_unconditional_break] Unconditional break or continue at the start of a loop body causes the loop to execute at most once. This defeats the purpose of the loop construct and usually indicates a logic error where a condition was accidentally omitted. {v5}',
+    'avoid_unconditional_break',
+    '[avoid_unconditional_break] Unconditional break or continue at the start of a loop body causes the loop to execute at most once. This defeats the purpose of the loop construct and usually indicates a logic error where a condition was accidentally omitted. {v5}',
     correctionMessage:
         'Wrap the break/continue in a conditional check, or remove the loop entirely if only one iteration is intended.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
     // Check for loops
-    context.registry.addForStatement((ForStatement node) {
+    context.addForStatement((ForStatement node) {
       _checkLoopBody(node.body, reporter);
     });
 
-    context.registry
-        .addForEachPartsWithDeclaration((ForEachPartsWithDeclaration node) {
+    context.addForEachPartsWithDeclaration((ForEachPartsWithDeclaration node) {
       // The body is in the parent ForStatement
     });
 
-    context.registry.addWhileStatement((WhileStatement node) {
+    context.addWhileStatement((WhileStatement node) {
       _checkLoopBody(node.body, reporter);
     });
 
-    context.registry.addDoStatement((DoStatement node) {
+    context.addDoStatement((DoStatement node) {
       _checkLoopBody(node.body, reporter);
     });
   }
@@ -1404,7 +1162,7 @@ class AvoidUnconditionalBreakRule extends SaropaLintRule {
     // Check if first statement is unconditional break/continue
     if (firstStatement is BreakStatement ||
         firstStatement is ContinueStatement) {
-      reporter.atNode(firstStatement, code);
+      reporter.atNode(firstStatement);
     }
   }
 }
@@ -1425,7 +1183,7 @@ class AvoidUnconditionalBreakRule extends SaropaLintRule {
 /// if (someCondition) { }
 /// ```
 class AvoidUnnecessaryConditionalsRule extends SaropaLintRule {
-  const AvoidUnnecessaryConditionalsRule() : super(code: _code);
+  AvoidUnnecessaryConditionalsRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -1435,29 +1193,27 @@ class AvoidUnnecessaryConditionalsRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_unnecessary_conditionals',
-    problemMessage:
-        '[avoid_unnecessary_conditionals] Conditional expression or if statement has a condition that always evaluates to the same boolean value. The unnecessary branch adds dead code that will never execute, and it misleads readers into thinking the outcome can vary at runtime. {v4}',
+    'avoid_unnecessary_conditionals',
+    '[avoid_unnecessary_conditionals] Conditional expression or if statement has a condition that always evaluates to the same boolean value. The unnecessary branch adds dead code that will never execute, and it misleads readers into thinking the outcome can vary at runtime. {v4}',
     correctionMessage:
         'Remove the conditional and keep only the reachable branch, or replace the constant condition with the intended dynamic expression.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
     // Check if statements with boolean literal conditions
-    context.registry.addIfStatement((IfStatement node) {
+    context.addIfStatement((IfStatement node) {
       if (node.expression is BooleanLiteral) {
         reporter.atNode(node.expression, code);
       }
     });
 
     // Check while statements
-    context.registry.addWhileStatement((WhileStatement node) {
+    context.addWhileStatement((WhileStatement node) {
       if (node.condition is BooleanLiteral) {
         final BooleanLiteral literal = node.condition as BooleanLiteral;
         // while(true) is often intentional, only flag while(false)
@@ -1469,7 +1225,7 @@ class AvoidUnnecessaryConditionalsRule extends SaropaLintRule {
 
     // Check ternary with same then/else (already covered by NoEqualThenElseRule)
     // but also check for boolean literal conditions
-    context.registry.addConditionalExpression((ConditionalExpression node) {
+    context.addConditionalExpression((ConditionalExpression node) {
       if (node.condition is BooleanLiteral) {
         reporter.atNode(node.condition, code);
       }
@@ -1502,24 +1258,22 @@ class AvoidUnnecessaryConditionalsRule extends SaropaLintRule {
 ///
 /// **Quick fix available:** Comments out the unnecessary continue.
 class AvoidUnnecessaryContinueRule extends SaropaLintRule {
-  const AvoidUnnecessaryContinueRule() : super(code: _code);
+  AvoidUnnecessaryContinueRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
-    name: 'avoid_unnecessary_continue',
-    problemMessage:
-        '[avoid_unnecessary_continue] Continue statement at the end of a loop body has no effect because the loop would proceed to the next iteration anyway. The redundant statement adds noise and can mislead readers into thinking it skips code that follows. {v3}',
+    'avoid_unnecessary_continue',
+    '[avoid_unnecessary_continue] Continue statement at the end of a loop body has no effect because the loop would proceed to the next iteration anyway. The redundant statement adds noise and can mislead readers into thinking it skips code that follows. {v3}',
     correctionMessage:
         'Remove the continue statement entirely. The loop will naturally proceed to the next iteration at the end of the body without it.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addContinueStatement((ContinueStatement node) {
+    context.addContinueStatement((ContinueStatement node) {
       // Check if this is the last statement in a block
       final AstNode? parent = node.parent;
       if (parent is! Block) return;
@@ -1533,38 +1287,8 @@ class AvoidUnnecessaryContinueRule extends SaropaLintRule {
           blockParent is WhileStatement ||
           blockParent is DoStatement ||
           blockParent is ForElement) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
-    });
-  }
-
-  @override
-  List<Fix> getFixes() => <Fix>[_CommentOutUnnecessaryContinueFix()];
-}
-
-class _CommentOutUnnecessaryContinueFix extends DartFix {
-  @override
-  void run(
-    CustomLintResolver resolver,
-    ChangeReporter reporter,
-    CustomLintContext context,
-    AnalysisError analysisError,
-    List<AnalysisError> others,
-  ) {
-    context.registry.addContinueStatement((ContinueStatement node) {
-      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
-
-      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
-        message: 'Comment out unnecessary continue',
-        priority: 1,
-      );
-
-      changeBuilder.addDartFileEdit((builder) {
-        builder.addSimpleReplacement(
-          SourceRange(node.offset, node.length),
-          '// ${node.toSource()}',
-        );
-      });
     });
   }
 }
@@ -1573,7 +1297,7 @@ class _CommentOutUnnecessaryContinueFix extends DartFix {
 ///
 /// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v4
 class AvoidUnnecessaryIfRule extends SaropaLintRule {
-  const AvoidUnnecessaryIfRule() : super(code: _code);
+  AvoidUnnecessaryIfRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -1583,21 +1307,19 @@ class AvoidUnnecessaryIfRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_unnecessary_if',
-    problemMessage:
-        '[avoid_unnecessary_if] If statement returns true in one branch and false in the other, which is equivalent to returning the condition expression directly. The extra branching adds visual complexity without changing the result. {v4}',
+    'avoid_unnecessary_if',
+    '[avoid_unnecessary_if] If statement returns true in one branch and false in the other, which is equivalent to returning the condition expression directly. The extra branching adds visual complexity without changing the result. {v4}',
     correctionMessage:
         'Replace the if/else with a direct return of the condition (e.g. return condition;) or its negation (return !condition;) for clarity.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addIfStatement((IfStatement node) {
+    context.addIfStatement((IfStatement node) {
       // Check for: if (x) return true; followed by return false;
       // Or: if (x) return false; followed by return true;
       if (node.elseStatement != null) return;
@@ -1633,7 +1355,7 @@ class AvoidUnnecessaryIfRule extends SaropaLintRule {
 
       // Check they return opposite booleans
       if (thenExpr.value != nextExpr.value) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
   }
@@ -1663,7 +1385,7 @@ class AvoidUnnecessaryIfRule extends SaropaLintRule {
 /// }
 /// ```
 class NoEqualConditionsRule extends SaropaLintRule {
-  const NoEqualConditionsRule() : super(code: _code);
+  NoEqualConditionsRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -1673,21 +1395,19 @@ class NoEqualConditionsRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'no_equal_conditions',
-    problemMessage:
-        '[no_equal_conditions] Same condition appears more than once in an if/else-if chain. The duplicate branch is unreachable because the first occurrence already handles all cases where the condition is true, making the repeated check dead code. {v5}',
+    'no_equal_conditions',
+    '[no_equal_conditions] Same condition appears more than once in an if/else-if chain. The duplicate branch is unreachable because the first occurrence already handles all cases where the condition is true, making the repeated check dead code. {v5}',
     correctionMessage:
         'Remove the duplicate condition and its branch, or correct the expression if a different condition was intended.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addIfStatement((IfStatement node) {
+    context.addIfStatement((IfStatement node) {
       // Collect all conditions in the if-else chain
       final List<String> conditions = <String>[];
       final List<Expression> conditionNodes = <Expression>[];
@@ -1743,7 +1463,7 @@ class NoEqualConditionsRule extends SaropaLintRule {
 /// doSomething();  // No need for the condition
 /// ```
 class NoEqualThenElseRule extends SaropaLintRule {
-  const NoEqualThenElseRule() : super(code: _code);
+  NoEqualThenElseRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -1753,21 +1473,19 @@ class NoEqualThenElseRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'no_equal_then_else',
-    problemMessage:
-        '[no_equal_then_else] If and else branches contain identical code, so the condition has no effect on behavior. The branch structure misleads readers into thinking different paths produce different results, when in fact the outcome is the same regardless of the condition. {v4}',
+    'no_equal_then_else',
+    '[no_equal_then_else] If and else branches contain identical code, so the condition has no effect on behavior. The branch structure misleads readers into thinking different paths produce different results, when in fact the outcome is the same regardless of the condition. {v4}',
     correctionMessage:
         'Remove the if/else entirely and keep only the common code. If different behavior was intended, correct one of the branches.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addIfStatement((IfStatement node) {
+    context.addIfStatement((IfStatement node) {
       final Statement? elseStatement = node.elseStatement;
       if (elseStatement == null) return;
 
@@ -1776,17 +1494,17 @@ class NoEqualThenElseRule extends SaropaLintRule {
       final String elseSource = elseStatement.toSource();
 
       if (thenSource == elseSource) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
 
     // Also check conditional expressions (ternary)
-    context.registry.addConditionalExpression((ConditionalExpression node) {
+    context.addConditionalExpression((ConditionalExpression node) {
       final String thenSource = node.thenExpression.toSource();
       final String elseSource = node.elseExpression.toSource();
 
       if (thenSource == elseSource) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
   }
@@ -1801,7 +1519,7 @@ class NoEqualThenElseRule extends SaropaLintRule {
 /// Simple if-else statements that assign to the same variable or return
 /// values can often be replaced with a ternary operator.
 class PreferConditionalExpressionsRule extends SaropaLintRule {
-  const PreferConditionalExpressionsRule() : super(code: _code);
+  PreferConditionalExpressionsRule() : super(code: _code);
 
   /// Stylistic preference only. No performance or correctness benefit.
   @override
@@ -1811,21 +1529,19 @@ class PreferConditionalExpressionsRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'prefer_conditional_expressions',
-    problemMessage:
-        '[prefer_conditional_expressions] Using ternary expressions instead of if-else is a code shape preference. Both compile to equivalent code with no performance impact. Enable via the stylistic tier. {v4}',
+    'prefer_conditional_expressions',
+    '[prefer_conditional_expressions] Using ternary expressions instead of if-else is a code shape preference. Both compile to equivalent code with no performance impact. Enable via the stylistic tier. {v4}',
     correctionMessage:
         'Replace with a conditional expression (condition ? thenValue : elseValue) for concise value selection. Ternary expressions make the intent clear, reduce nesting levels, and improve code density for simple branching.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addIfStatement((IfStatement node) {
+    context.addIfStatement((IfStatement node) {
       // Check if both branches are single return or assignment statements
       final Statement thenStatement = node.thenStatement;
       final Statement? elseStatement = node.elseStatement;
@@ -1837,7 +1553,7 @@ class PreferConditionalExpressionsRule extends SaropaLintRule {
           elseStatement is ReturnStatement) {
         if (thenStatement.expression != null &&
             elseStatement.expression != null) {
-          reporter.atNode(node, code);
+          reporter.atNode(node);
         }
       }
 
@@ -1851,7 +1567,7 @@ class PreferConditionalExpressionsRule extends SaropaLintRule {
             elseExpr is AssignmentExpression) {
           if (thenExpr.leftHandSide.toSource() ==
               elseExpr.leftHandSide.toSource()) {
-            reporter.atNode(node, code);
+            reporter.atNode(node);
           }
         }
       }
@@ -1887,7 +1603,7 @@ class PreferConditionalExpressionsRule extends SaropaLintRule {
 /// }
 /// ```
 class PreferCorrectSwitchLengthRule extends SaropaLintRule {
-  const PreferCorrectSwitchLengthRule() : super(code: _code);
+  PreferCorrectSwitchLengthRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -1899,21 +1615,19 @@ class PreferCorrectSwitchLengthRule extends SaropaLintRule {
   static const int _minCases = 2;
 
   static const LintCode _code = LintCode(
-    name: 'prefer_correct_switch_length',
-    problemMessage:
-        '[prefer_correct_switch_length] Switch statement has fewer cases than the minimum threshold, making the switch overhead unnecessary. A switch with one or two cases is more verbosely expressed than an equivalent if/else and adds boilerplate (case, break) without benefit. {v4}',
+    'prefer_correct_switch_length',
+    '[prefer_correct_switch_length] Switch statement has fewer cases than the minimum threshold, making the switch overhead unnecessary. A switch with one or two cases is more verbosely expressed than an equivalent if/else and adds boilerplate (case, break) without benefit. {v4}',
     correctionMessage:
         'Replace the switch with an if/else statement for simple branching, or add the missing cases if the switch is incomplete.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addSwitchStatement((SwitchStatement node) {
+    context.addSwitchStatement((SwitchStatement node) {
       final int caseCount = node.members.length;
 
       if (caseCount < _minCases) {
@@ -1949,7 +1663,7 @@ class PreferCorrectSwitchLengthRule extends SaropaLintRule {
 /// bool isValid(int x) => x > 0;
 /// ```
 class PreferReturningConditionalsRule extends SaropaLintRule {
-  const PreferReturningConditionalsRule() : super(code: _code);
+  PreferReturningConditionalsRule() : super(code: _code);
 
   /// Stylistic preference only. No performance or correctness benefit.
   @override
@@ -1959,21 +1673,19 @@ class PreferReturningConditionalsRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'prefer_returning_conditionals',
-    problemMessage:
-        '[prefer_returning_conditionals] Simplifying return logic to a single conditional expression is a code shape preference. Both forms produce equivalent compiled output. Enable via the stylistic tier. {v4}',
+    'prefer_returning_conditionals',
+    '[prefer_returning_conditionals] Simplifying return logic to a single conditional expression is a code shape preference. Both forms produce equivalent compiled output. Enable via the stylistic tier. {v4}',
     correctionMessage:
         'Replace the if/else with return condition; (or return !condition; if the branches are swapped) to communicate the intent more concisely.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addIfStatement((IfStatement node) {
+    context.addIfStatement((IfStatement node) {
       // Only handle pattern: if (cond) return true; return false;
       // Skip if-else patterns - handled by PreferReturningConditionRule
       if (node.elseStatement != null) return;
@@ -1998,7 +1710,7 @@ class PreferReturningConditionalsRule extends SaropaLintRule {
     });
 
     // Also check ternary: return cond ? true : false;
-    context.registry.addReturnStatement((ReturnStatement node) {
+    context.addReturnStatement((ReturnStatement node) {
       final Expression? expr = node.expression;
       if (expr is! ConditionalExpression) return;
 
@@ -2009,7 +1721,7 @@ class PreferReturningConditionalsRule extends SaropaLintRule {
           thenExpr.value &&
           elseExpr is BooleanLiteral &&
           !elseExpr.value) {
-        reporter.atNode(expr, code);
+        reporter.atNode(expr);
       }
     });
   }
@@ -2051,7 +1763,7 @@ class PreferReturningConditionalsRule extends SaropaLintRule {
 /// }
 /// ```
 class PreferReturningConditionRule extends SaropaLintRule {
-  const PreferReturningConditionRule() : super(code: _code);
+  PreferReturningConditionRule() : super(code: _code);
 
   /// Stylistic preference only. No performance or correctness benefit.
   @override
@@ -2061,21 +1773,19 @@ class PreferReturningConditionRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'prefer_returning_condition',
-    problemMessage:
-        '[prefer_returning_condition] Returning a condition directly instead of if-else with true/false is a simplification preference. No performance or correctness difference. Enable via the stylistic tier. {v4}',
+    'prefer_returning_condition',
+    '[prefer_returning_condition] Returning a condition directly instead of if-else with true/false is a simplification preference. No performance or correctness difference. Enable via the stylistic tier. {v4}',
     correctionMessage:
         'Return the condition expression directly instead of assigning to a temporary variable, reducing the code to a single return statement.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addIfStatement((IfStatement node) {
+    context.addIfStatement((IfStatement node) {
       // Check for if-else pattern
       final Statement? elseStatement = node.elseStatement;
       if (elseStatement == null) return;
@@ -2089,7 +1799,7 @@ class PreferReturningConditionRule extends SaropaLintRule {
       // Check if one returns true and the other returns false
       if ((thenReturnsBool && !elseReturnsBool) ||
           (!thenReturnsBool && elseReturnsBool)) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
   }
@@ -2147,24 +1857,22 @@ class PreferReturningConditionRule extends SaropaLintRule {
 /// }
 /// ```
 class PreferWhenGuardOverIfRule extends SaropaLintRule {
-  const PreferWhenGuardOverIfRule() : super(code: _code);
+  PreferWhenGuardOverIfRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
-    name: 'prefer_when_guard_over_if',
-    problemMessage:
-        '[prefer_when_guard_over_if] Switch case body starts with an if statement that could be expressed as a when guard on the case pattern. Moving the condition into the when clause reduces nesting and lets the switch handle the filtering directly. {v2}',
+    'prefer_when_guard_over_if',
+    '[prefer_when_guard_over_if] Switch case body starts with an if statement that could be expressed as a when guard on the case pattern. Moving the condition into the when clause reduces nesting and lets the switch handle the filtering directly. {v2}',
     correctionMessage:
         'Replace the nested if with a when guard: change "case pattern:" + if (condition) to "case pattern when condition:" for flatter, more readable switch cases.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addSwitchPatternCase((SwitchPatternCase node) {
+    context.addSwitchPatternCase((SwitchPatternCase node) {
       // Check if the case body is just an if statement (possibly in a block)
       final List<Statement> statements = node.statements;
       if (statements.isEmpty) return;
@@ -2200,7 +1908,7 @@ class PreferWhenGuardOverIfRule extends SaropaLintRule {
       if (ifStmt.elseStatement != null) return;
 
       // The if condition could be moved to a when guard
-      reporter.atNode(ifStmt, code);
+      reporter.atNode(ifStmt);
     });
 
     // Note: Traditional SwitchCase (`case 1:`) does NOT support when guards.
@@ -2239,7 +1947,7 @@ class PreferWhenGuardOverIfRule extends SaropaLintRule {
 ///
 /// **Quick fix available:** Applies De Morgan's law or removes double negation.
 class PreferSimplerBooleanExpressionsRule extends SaropaLintRule {
-  const PreferSimplerBooleanExpressionsRule() : super(code: _code);
+  PreferSimplerBooleanExpressionsRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -2249,21 +1957,19 @@ class PreferSimplerBooleanExpressionsRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'prefer_simpler_boolean_expressions',
-    problemMessage:
-        '[prefer_simpler_boolean_expressions] Boolean expression contains redundant negations or can be reduced using De Morgan\'s law. Complex negated compound expressions are harder to read and more error-prone during modification than their simplified equivalents. {v3}',
+    'prefer_simpler_boolean_expressions',
+    '[prefer_simpler_boolean_expressions] Boolean expression contains redundant negations or can be reduced using De Morgan\'s law. Complex negated compound expressions are harder to read and more error-prone during modification than their simplified equivalents. {v3}',
     correctionMessage:
         'Simplify using De Morgan\'s law: !(a && b) becomes !a || !b, !(a || b) becomes !a && !b. Remove double negations (!!x becomes x).',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addPrefixExpression((PrefixExpression node) {
+    context.addPrefixExpression((PrefixExpression node) {
       if (node.operator.type != TokenType.BANG) return;
 
       final Expression operand = node.operand;
@@ -2329,110 +2035,18 @@ class PreferSimplerBooleanExpressionsRule extends SaropaLintRule {
   }
 
   static const LintCode _codeDoubleNegation = LintCode(
-    name: 'prefer_simpler_boolean_expressions',
-    problemMessage:
-        '[prefer_simpler_boolean_expressions] Double negation (!!x) applied to a boolean expression, which cancels out and returns the original value. The redundant negations add visual complexity without changing the result and may confuse readers into thinking a type coercion is intended. {v3}',
+    'prefer_simpler_boolean_expressions',
+    '[prefer_simpler_boolean_expressions] Double negation (!!x) applied to a boolean expression, which cancels out and returns the original value. The redundant negations add visual complexity without changing the result and may confuse readers into thinking a type coercion is intended. {v3}',
     correctionMessage:
         'Remove both negation operators to use the boolean expression directly (!!x becomes x), keeping the code concise and clear.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   static const LintCode _codeDeMorgan = LintCode(
-    name: 'prefer_simpler_boolean_expressions',
-    problemMessage:
-        '[prefer_simpler_boolean_expressions] Negated compound expression can be simplified using De Morgan\'s law. De Morgan\'s laws state: - !(a && b) is equivalent to !a || !b - !(a || b) is equivalent to !a && !b. {v3}',
+    'prefer_simpler_boolean_expressions',
+    '[prefer_simpler_boolean_expressions] Negated compound expression can be simplified using De Morgan\'s law. De Morgan\'s laws state: - !(a && b) is equivalent to !a || !b - !(a || b) is equivalent to !a && !b. {v3}',
     correctionMessage:
         'Use !(a && b) → !a || !b, or !(a || b) → !a && !b. Verify the change works correctly with existing tests and add coverage for the new behavior.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
-
-  @override
-  List<Fix> getFixes() => <Fix>[_SimplifyBooleanExpressionFix()];
-}
-
-class _SimplifyBooleanExpressionFix extends DartFix {
-  @override
-  void run(
-    CustomLintResolver resolver,
-    ChangeReporter reporter,
-    CustomLintContext context,
-    AnalysisError analysisError,
-    List<AnalysisError> others,
-  ) {
-    context.registry.addPrefixExpression((PrefixExpression node) {
-      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
-      if (node.operator.type != TokenType.BANG) return;
-
-      final Expression operand = node.operand;
-
-      // Handle double negation: !!x -> x
-      if (operand is PrefixExpression &&
-          operand.operator.type == TokenType.BANG) {
-        final String innerExpr = operand.operand.toSource();
-
-        final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
-          message: 'Remove double negation',
-          priority: 1,
-        );
-
-        changeBuilder.addDartFileEdit((builder) {
-          builder.addSimpleReplacement(
-            SourceRange(node.offset, node.length),
-            innerExpr,
-          );
-        });
-        return;
-      }
-
-      // Handle De Morgan's law: !(a && b) -> !a || !b, !(a || b) -> !a && !b
-      if (operand is ParenthesizedExpression) {
-        final Expression inner = operand.expression;
-        if (inner is BinaryExpression) {
-          final TokenType op = inner.operator.type;
-          String? oppositeOp;
-          if (op == TokenType.AMPERSAND_AMPERSAND) {
-            oppositeOp = '||';
-          } else if (op == TokenType.BAR_BAR) {
-            oppositeOp = '&&';
-          }
-
-          if (oppositeOp == null) return;
-
-          final String left = _negateExpression(inner.leftOperand);
-          final String right = _negateExpression(inner.rightOperand);
-
-          final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
-            message: 'Apply De Morgan\'s law',
-            priority: 1,
-          );
-
-          changeBuilder.addDartFileEdit((builder) {
-            builder.addSimpleReplacement(
-              SourceRange(node.offset, node.length),
-              '$left $oppositeOp $right',
-            );
-          });
-        }
-      }
-    });
-  }
-
-  /// Negate an expression, handling already-negated expressions.
-  String _negateExpression(Expression expr) {
-    // If already negated, remove the negation
-    if (expr is PrefixExpression && expr.operator.type == TokenType.BANG) {
-      return expr.operand.toSource();
-    }
-    // If it's a boolean literal, negate it directly
-    if (expr is BooleanLiteral) {
-      return expr.value ? 'false' : 'true';
-    }
-    // Otherwise, add negation
-    final String source = expr.toSource();
-    // Add parentheses if the expression is complex
-    if (expr is BinaryExpression || expr is ConditionalExpression) {
-      return '!($source)';
-    }
-    return '!$source';
-  }
 }

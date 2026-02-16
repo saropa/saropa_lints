@@ -9,9 +9,6 @@ library;
 
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
-import 'package:analyzer/error/error.dart'
-    show AnalysisError, DiagnosticSeverity;
-import 'package:custom_lint_builder/custom_lint_builder.dart';
 
 import '../../saropa_lint_rule.dart';
 
@@ -38,7 +35,7 @@ import '../../saropa_lint_rule.dart';
 /// // Add event from outside: bloc.add(LoadEvent());
 /// ```
 class AvoidBlocEventInConstructorRule extends SaropaLintRule {
-  const AvoidBlocEventInConstructorRule() : super(code: _code);
+  AvoidBlocEventInConstructorRule() : super(code: _code);
 
   /// Significant issue. Address when count exceeds 10.
   @override
@@ -51,24 +48,22 @@ class AvoidBlocEventInConstructorRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.bloc};
 
   static const LintCode _code = LintCode(
-    name: 'avoid_bloc_event_in_constructor',
-    problemMessage:
-        '[avoid_bloc_event_in_constructor] Adding a BLoC event in the constructor runs it before listeners are attached, causing missed state updates and unpredictable app behavior. This can result in lost events, bugs that are hard to trace, and inconsistent UI state. {v5}',
+    'avoid_bloc_event_in_constructor',
+    '[avoid_bloc_event_in_constructor] Adding a BLoC event in the constructor runs it before listeners are attached, causing missed state updates and unpredictable app behavior. This can result in lost events, bugs that are hard to trace, and inconsistent UI state. {v5}',
     correctionMessage:
         'Dispatch initial events from the widget that creates the BLoC, not from the BLoC constructor, to ensure all listeners are attached and receive the event.',
-    errorSeverity: DiagnosticSeverity.ERROR,
+    severity: DiagnosticSeverity.ERROR,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addConstructorDeclaration((ConstructorDeclaration node) {
+    context.addConstructorDeclaration((ConstructorDeclaration node) {
       // Check if in a Bloc class
-      final ClassDeclaration? classDecl =
-          node.thisOrAncestorOfType<ClassDeclaration>();
+      final ClassDeclaration? classDecl = node
+          .thisOrAncestorOfType<ClassDeclaration>();
       if (classDecl == null) return;
 
       final ExtendsClause? extendsClause = classDecl.extendsClause;
@@ -93,7 +88,7 @@ class _AddCallVisitor extends RecursiveAstVisitor<void> {
   @override
   void visitMethodInvocation(MethodInvocation node) {
     if (node.methodName.name == 'add') {
-      reporter.atNode(node, code);
+      reporter.atNode(node);
     }
     super.visitMethodInvocation(node);
   }
@@ -131,7 +126,7 @@ class _AddCallVisitor extends RecursiveAstVisitor<void> {
 /// Note: Blocs provided via BlocProvider or dependency injection
 /// are typically managed externally and don't need to be closed here.
 class RequireBlocCloseRule extends SaropaLintRule {
-  const RequireBlocCloseRule() : super(code: _code);
+  RequireBlocCloseRule() : super(code: _code);
 
   /// Significant issue. Address when count exceeds 10.
   @override
@@ -144,21 +139,19 @@ class RequireBlocCloseRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.bloc};
 
   static const LintCode _code = LintCode(
-    name: 'require_bloc_close',
-    problemMessage:
-        '[require_bloc_close] If you do not close your Bloc or Cubit in the StatefulWidget dispose() method, it will leak memory, keep stream subscriptions active, and cause app slowdowns or crashes. Always close Blocs and Cubits to prevent leaks and unexpected behavior after the widget tree is rebuilt. {v3}',
+    'require_bloc_close',
+    '[require_bloc_close] If you do not close your Bloc or Cubit in the StatefulWidget dispose() method, it will leak memory, keep stream subscriptions active, and cause app slowdowns or crashes. Always close Blocs and Cubits to prevent leaks and unexpected behavior after the widget tree is rebuilt. {v3}',
     correctionMessage:
         'Add _bloc.close() (or cubit.close()) in the dispose() method before calling super.dispose() to properly release resources and prevent memory leaks.',
-    errorSeverity: DiagnosticSeverity.ERROR,
+    severity: DiagnosticSeverity.ERROR,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addClassDeclaration((ClassDeclaration node) {
+    context.addClassDeclaration((ClassDeclaration node) {
       // Check if extends State<T>
       final ExtendsClause? extendsClause = node.extendsClause;
       if (extendsClause == null) return;
@@ -217,7 +210,8 @@ class RequireBlocCloseRule extends SaropaLintRule {
 
       // Check if each bloc is closed
       for (final String name in blocNames) {
-        final bool isClosed = disposeBody != null &&
+        final bool isClosed =
+            disposeBody != null &&
             (disposeBody.contains('$name.close(') ||
                 disposeBody.contains('$name?.close(') ||
                 disposeBody.contains('$name.closeSafe(') ||
@@ -231,94 +225,12 @@ class RequireBlocCloseRule extends SaropaLintRule {
               for (final VariableDeclaration variable
                   in member.fields.variables) {
                 if (variable.name.lexeme == name) {
-                  reporter.atNode(variable, code);
+                  reporter.atNode(variable);
                 }
               }
             }
           }
         }
-      }
-    });
-  }
-
-  @override
-  List<Fix> getFixes() => <Fix>[_AddBlocCloseFix()];
-}
-
-class _AddBlocCloseFix extends DartFix {
-  @override
-  void run(
-    CustomLintResolver resolver,
-    ChangeReporter reporter,
-    CustomLintContext context,
-    AnalysisError analysisError,
-    List<AnalysisError> others,
-  ) {
-    context.registry.addVariableDeclaration((VariableDeclaration node) {
-      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
-
-      final String fieldName = node.name.lexeme;
-
-      // Find the containing class
-      AstNode? current = node.parent;
-      while (current != null && current is! ClassDeclaration) {
-        current = current.parent;
-      }
-      if (current is! ClassDeclaration) return;
-
-      final ClassDeclaration classNode = current;
-
-      // Find existing dispose method
-      MethodDeclaration? disposeMethod;
-      for (final ClassMember member in classNode.members) {
-        if (member is MethodDeclaration && member.name.lexeme == 'dispose') {
-          disposeMethod = member;
-          break;
-        }
-      }
-
-      if (disposeMethod != null) {
-        // Insert close() call before super.dispose()
-        final String bodySource = disposeMethod.body.toSource();
-        final int superDisposeIndex = bodySource.indexOf('super.dispose()');
-
-        if (superDisposeIndex != -1) {
-          final int bodyOffset = disposeMethod.body.offset;
-          final int insertOffset = bodyOffset + superDisposeIndex;
-
-          final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
-            message: 'Add $fieldName.close()',
-            priority: 1,
-          );
-
-          changeBuilder.addDartFileEdit((builder) {
-            builder.addSimpleInsertion(
-              insertOffset,
-              '$fieldName.close();\n    ',
-            );
-          });
-        }
-      } else {
-        // Create new dispose method
-        int insertOffset = classNode.rightBracket.offset;
-
-        for (final ClassMember member in classNode.members) {
-          if (member is FieldDeclaration || member is ConstructorDeclaration) {
-            insertOffset = member.end;
-          }
-        }
-
-        final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
-          message: 'Add dispose() method with $fieldName.close()',
-          priority: 1,
-        );
-
-        changeBuilder.addDartFileEdit((builder) {
-          builder.addSimpleInsertion(
-            insertOffset,
-            '\n\n  @override\n  void dispose() {\n    $fieldName.close();\n    super.dispose();\n  }',
-          );
-        });
       }
     });
   }
@@ -363,7 +275,7 @@ class _AddBlocCloseFix extends DartFix {
 /// }
 /// ```
 class RequireImmutableBlocStateRule extends SaropaLintRule {
-  const RequireImmutableBlocStateRule() : super(code: _code);
+  RequireImmutableBlocStateRule() : super(code: _code);
 
   /// Significant issue. Address when count exceeds 10.
   @override
@@ -393,21 +305,19 @@ class RequireImmutableBlocStateRule extends SaropaLintRule {
   };
 
   static const LintCode _code = LintCode(
-    name: 'require_immutable_bloc_state',
-    problemMessage:
-        '[require_immutable_bloc_state] If your BLoC state is mutable, it causes unpredictable UI updates, breaks state comparison, and leads to missed widget rebuilds. This results in subtle bugs, inconsistent UI, and hard-to-maintain code. {v5}',
+    'require_immutable_bloc_state',
+    '[require_immutable_bloc_state] If your BLoC state is mutable, it causes unpredictable UI updates, breaks state comparison, and leads to missed widget rebuilds. This results in subtle bugs, inconsistent UI, and hard-to-maintain code. {v5}',
     correctionMessage:
         'Add the @immutable annotation or extend Equatable to ensure your BLoC state is immutable and supports proper equality comparisons. This guarantees reliable UI updates and easier debugging.',
-    errorSeverity: DiagnosticSeverity.ERROR,
+    severity: DiagnosticSeverity.ERROR,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addClassDeclaration((ClassDeclaration node) {
+    context.addClassDeclaration((ClassDeclaration node) {
       final String className = node.name.lexeme;
 
       // Check if class name ends with 'State' (BLoC convention)
@@ -510,7 +420,7 @@ class RequireImmutableBlocStateRule extends SaropaLintRule {
 /// }
 /// ```
 class PreferCubitForSimpleRule extends SaropaLintRule {
-  const PreferCubitForSimpleRule() : super(code: _code);
+  PreferCubitForSimpleRule() : super(code: _code);
 
   /// Significant issue. Address when count exceeds 10.
   @override
@@ -523,12 +433,11 @@ class PreferCubitForSimpleRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.bloc};
 
   static const LintCode _code = LintCode(
-    name: 'prefer_cubit_for_simple',
-    problemMessage:
-        '[prefer_cubit_for_simple] Using Bloc for simple state management with few events adds unnecessary boilerplate, indirection, and makes code harder to maintain. This can slow down development and introduce avoidable complexity. {v3}',
+    'prefer_cubit_for_simple',
+    '[prefer_cubit_for_simple] Using Bloc for simple state management with few events adds unnecessary boilerplate, indirection, and makes code harder to maintain. This can slow down development and introduce avoidable complexity. {v3}',
     correctionMessage:
         'Use Cubit for straightforward state management. Reserve Bloc for cases with complex event handling or multiple event types.',
-    errorSeverity: DiagnosticSeverity.ERROR,
+    severity: DiagnosticSeverity.ERROR,
   );
 
   // Cached regex for performance
@@ -536,11 +445,10 @@ class PreferCubitForSimpleRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addClassDeclaration((ClassDeclaration node) {
+    context.addClassDeclaration((ClassDeclaration node) {
       final ExtendsClause? extendsClause = node.extendsClause;
       if (extendsClause == null) return;
 
@@ -602,7 +510,7 @@ class PreferCubitForSimpleRule extends SaropaLintRule {
 /// }
 /// ```
 class RequireBlocObserverRule extends SaropaLintRule {
-  const RequireBlocObserverRule() : super(code: _code);
+  RequireBlocObserverRule() : super(code: _code);
 
   /// Significant issue. Address when count exceeds 10.
   @override
@@ -616,21 +524,19 @@ class RequireBlocObserverRule extends SaropaLintRule {
 
   /// Alias: require_bloc_observer_instance
   static const LintCode _code = LintCode(
-    name: 'require_bloc_observer',
-    problemMessage:
-        '[require_bloc_observer] Without a BlocObserver, state transitions and errors are invisible, making it extremely difficult to debug production issues, track bugs, or monitor app health. This can lead to undetected failures and poor user experience. {v3}',
+    'require_bloc_observer',
+    '[require_bloc_observer] Without a BlocObserver, state transitions and errors are invisible, making it extremely difficult to debug production issues, track bugs, or monitor app health. This can lead to undetected failures and poor user experience. {v3}',
     correctionMessage:
         'Add Bloc.observer = AppBlocObserver() in main() to enable centralized logging and error handling for all Blocs and Cubits.',
-    errorSeverity: DiagnosticSeverity.ERROR,
+    severity: DiagnosticSeverity.ERROR,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addFunctionDeclaration((FunctionDeclaration node) {
+    context.addFunctionDeclaration((FunctionDeclaration node) {
       if (node.name.lexeme != 'main') return;
 
       final FunctionBody body = node.functionExpression.body;
@@ -645,7 +551,7 @@ class RequireBlocObserverRule extends SaropaLintRule {
       // Check if BlocObserver is set
       if (!bodySource.contains('Bloc.observer') &&
           !bodySource.contains('BlocObserver')) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
   }
@@ -679,7 +585,7 @@ class RequireBlocObserverRule extends SaropaLintRule {
 /// }
 /// ```
 class AvoidBlocEventMutationRule extends SaropaLintRule {
-  const AvoidBlocEventMutationRule() : super(code: _code);
+  AvoidBlocEventMutationRule() : super(code: _code);
 
   /// Significant issue. Address when count exceeds 10.
   @override
@@ -692,21 +598,19 @@ class AvoidBlocEventMutationRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.bloc};
 
   static const LintCode _code = LintCode(
-    name: 'avoid_bloc_event_mutation',
-    problemMessage:
-        '[avoid_bloc_event_mutation] If BLoC events are mutable, they can be modified during processing, causing race conditions, unpredictable state changes, and hard-to-debug bugs. This breaks the contract of event immutability and can destabilize your app. {v3}',
+    'avoid_bloc_event_mutation',
+    '[avoid_bloc_event_mutation] If BLoC events are mutable, they can be modified during processing, causing race conditions, unpredictable state changes, and hard-to-debug bugs. This breaks the contract of event immutability and can destabilize your app. {v3}',
     correctionMessage:
         'Make all event fields final and use a const constructor to ensure events are immutable and safe to use in BLoC.',
-    errorSeverity: DiagnosticSeverity.ERROR,
+    severity: DiagnosticSeverity.ERROR,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addClassDeclaration((ClassDeclaration node) {
+    context.addClassDeclaration((ClassDeclaration node) {
       // Check if this is an event class (naming convention)
       final String className = node.name.lexeme;
       if (!className.endsWith('Event')) return;
@@ -715,7 +619,7 @@ class AvoidBlocEventMutationRule extends SaropaLintRule {
       for (final ClassMember member in node.members) {
         if (member is FieldDeclaration) {
           if (!member.isStatic && !member.fields.isFinal) {
-            reporter.atNode(member, code);
+            reporter.atNode(member);
           }
         }
       }
@@ -740,7 +644,7 @@ class AvoidBlocEventMutationRule extends SaropaLintRule {
 /// emit(state.copyWith(count: 5)); // New immutable state
 /// ```
 class PreferCopyWithForStateRule extends SaropaLintRule {
-  const PreferCopyWithForStateRule() : super(code: _code);
+  PreferCopyWithForStateRule() : super(code: _code);
 
   /// Significant issue. Address when count exceeds 10.
   @override
@@ -751,26 +655,24 @@ class PreferCopyWithForStateRule extends SaropaLintRule {
 
   /// Alias: prefer_copy_with_for_state_class
   static const LintCode _code = LintCode(
-    name: 'prefer_copy_with_for_state',
-    problemMessage:
-        '[prefer_copy_with_for_state] Directly modifying BLoC state breaks immutability, leading to unpredictable UI updates, missed rebuilds, and subtle bugs that surface only in production. The BLoC pattern relies on immutable state transitions to guarantee that every emit triggers a rebuild; mutating fields in place silently bypasses this contract. {v4}',
+    'prefer_copy_with_for_state',
+    '[prefer_copy_with_for_state] Directly modifying BLoC state breaks immutability, leading to unpredictable UI updates, missed rebuilds, and subtle bugs that surface only in production. The BLoC pattern relies on immutable state transitions to guarantee that every emit triggers a rebuild; mutating fields in place silently bypasses this contract. {v4}',
     correctionMessage:
         'Use state.copyWith(field: value) to create a new immutable state object and trigger proper UI updates.',
-    errorSeverity: DiagnosticSeverity.ERROR,
+    severity: DiagnosticSeverity.ERROR,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addCascadeExpression((CascadeExpression node) {
+    context.addCascadeExpression((CascadeExpression node) {
       final Expression target = node.target;
       if (target is SimpleIdentifier && target.name == 'state') {
         for (final Expression section in node.cascadeSections) {
           if (section is AssignmentExpression) {
-            reporter.atNode(node, code);
+            reporter.atNode(node);
             return;
           }
         }
@@ -803,7 +705,7 @@ class PreferCopyWithForStateRule extends SaropaLintRule {
 /// }
 /// ```
 class AvoidBlocListenInBuildRule extends SaropaLintRule {
-  const AvoidBlocListenInBuildRule() : super(code: _code);
+  AvoidBlocListenInBuildRule() : super(code: _code);
 
   /// Significant issue. Address when count exceeds 10.
   @override
@@ -816,21 +718,19 @@ class AvoidBlocListenInBuildRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.bloc};
 
   static const LintCode _code = LintCode(
-    name: 'avoid_bloc_listen_in_build',
-    problemMessage:
-        '[avoid_bloc_listen_in_build] Using BlocProvider.of in build() with listen:true causes the widget to rebuild on every state change, leading to performance issues and unpredictable UI updates. This can make your app less efficient and harder to maintain. {v3}',
+    'avoid_bloc_listen_in_build',
+    '[avoid_bloc_listen_in_build] Using BlocProvider.of in build() with listen:true causes the widget to rebuild on every state change, leading to performance issues and unpredictable UI updates. This can make your app less efficient and harder to maintain. {v3}',
     correctionMessage:
         'Use BlocBuilder for reactive UI updates, or context.read() for one-time access to the bloc, to avoid unnecessary rebuilds and improve performance.',
-    errorSeverity: DiagnosticSeverity.ERROR,
+    severity: DiagnosticSeverity.ERROR,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodDeclaration((MethodDeclaration node) {
+    context.addMethodDeclaration((MethodDeclaration node) {
       if (node.name.lexeme != 'build') return;
 
       node.body.visitChildren(_BlocProviderOfVisitor(reporter, code));
@@ -861,7 +761,7 @@ class _BlocProviderOfVisitor extends RecursiveAstVisitor<void> {
           }
         }
         if (!hasListenFalse) {
-          reporter.atNode(node, code);
+          reporter.atNode(node);
         }
       }
     }
@@ -890,7 +790,7 @@ class _BlocProviderOfVisitor extends RecursiveAstVisitor<void> {
 /// }
 /// ```
 class RequireInitialStateRule extends SaropaLintRule {
-  const RequireInitialStateRule() : super(code: _code);
+  RequireInitialStateRule() : super(code: _code);
 
   /// Significant issue. Address when count exceeds 10.
   @override
@@ -900,21 +800,19 @@ class RequireInitialStateRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'require_initial_state',
-    problemMessage:
-        '[require_initial_state] If a BLoC or Cubit does not provide an initial state, it will throw a LateInitializationError at runtime when BlocBuilder or BlocConsumer tries to read the state. This causes your app to crash and makes debugging difficult. {v3}',
+    'require_initial_state',
+    '[require_initial_state] If a BLoC or Cubit does not provide an initial state, it will throw a LateInitializationError at runtime when BlocBuilder or BlocConsumer tries to read the state. This causes your app to crash and makes debugging difficult. {v3}',
     correctionMessage:
         'Always add an initial state: super(InitialState()) or super(const State()) in your BLoC/Cubit constructor to prevent runtime errors.',
-    errorSeverity: DiagnosticSeverity.ERROR,
+    severity: DiagnosticSeverity.ERROR,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addClassDeclaration((ClassDeclaration node) {
+    context.addClassDeclaration((ClassDeclaration node) {
       final ExtendsClause? extendsClause = node.extendsClause;
       if (extendsClause == null) return;
 
@@ -933,7 +831,7 @@ class RequireInitialStateRule extends SaropaLintRule {
             }
           }
           if (!hasSuperWithArg) {
-            reporter.atNode(member, code);
+            reporter.atNode(member);
           }
         }
       }
@@ -966,7 +864,7 @@ class RequireInitialStateRule extends SaropaLintRule {
 /// }
 /// ```
 class RequireErrorStateRule extends SaropaLintRule {
-  const RequireErrorStateRule() : super(code: _code);
+  RequireErrorStateRule() : super(code: _code);
 
   /// Significant issue. Address when count exceeds 10.
   @override
@@ -977,25 +875,23 @@ class RequireErrorStateRule extends SaropaLintRule {
 
   /// Alias: require_error_state_context
   static const LintCode _code = LintCode(
-    name: 'require_error_state',
-    problemMessage:
-        '[require_error_state] If your BLoC state hierarchy does not include an error state, failures will be unhandled, leading to crashes or missing error UI. This makes your app less robust and harder to debug. {v3}',
+    'require_error_state',
+    '[require_error_state] If your BLoC state hierarchy does not include an error state, failures will be unhandled, leading to crashes or missing error UI. This makes your app less robust and harder to debug. {v3}',
     correctionMessage:
         'Add an Error state class (e.g., UserError) to your BLoC state hierarchy to handle failures gracefully and display error messages to users.',
-    errorSeverity: DiagnosticSeverity.ERROR,
+    severity: DiagnosticSeverity.ERROR,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
     final Map<String, ClassDeclaration> stateClasses =
         <String, ClassDeclaration>{};
     final Set<String> sealedBases = <String>{};
 
-    context.registry.addClassDeclaration((ClassDeclaration node) {
+    context.addClassDeclaration((ClassDeclaration node) {
       final String className = node.name.lexeme;
       if (className.endsWith('State')) {
         stateClasses[className] = node;
@@ -1054,7 +950,7 @@ class RequireErrorStateRule extends SaropaLintRule {
 /// )
 /// ```
 class AvoidBlocInBlocRule extends SaropaLintRule {
-  const AvoidBlocInBlocRule() : super(code: _code);
+  AvoidBlocInBlocRule() : super(code: _code);
 
   /// Significant issue. Address when count exceeds 10.
   @override
@@ -1068,21 +964,19 @@ class AvoidBlocInBlocRule extends SaropaLintRule {
 
   /// Alias: avoid_bloc_in_bloc_pattern
   static const LintCode _code = LintCode(
-    name: 'avoid_bloc_in_bloc',
-    problemMessage:
-        '[avoid_bloc_in_bloc] BLoC directly calling another BLoC creates tight coupling between state managers. This makes unit testing difficult, risks circular dependencies, and breaks the unidirectional data flow pattern that BLoC relies on for predictable state management. {v5}',
+    'avoid_bloc_in_bloc',
+    '[avoid_bloc_in_bloc] BLoC directly calling another BLoC creates tight coupling between state managers. This makes unit testing difficult, risks circular dependencies, and breaks the unidirectional data flow pattern that BLoC relies on for predictable state management. {v5}',
     correctionMessage:
         'Coordinate between BLoCs at the widget layer using BlocListener, or communicate through shared streams to maintain loose coupling.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addClassDeclaration((ClassDeclaration node) {
+    context.addClassDeclaration((ClassDeclaration node) {
       final ExtendsClause? extendsClause = node.extendsClause;
       if (extendsClause == null) return;
 
@@ -1105,8 +999,9 @@ class AvoidBlocInBlocRule extends SaropaLintRule {
       // Check for .add() calls on bloc fields
       for (final ClassMember member in node.members) {
         if (member is MethodDeclaration) {
-          member.body
-              .visitChildren(_BlocAddVisitor(reporter, code, blocFields));
+          member.body.visitChildren(
+            _BlocAddVisitor(reporter, code, blocFields),
+          );
         }
       }
     });
@@ -1125,7 +1020,7 @@ class _BlocAddVisitor extends RecursiveAstVisitor<void> {
     if (node.methodName.name == 'add' || node.methodName.name == 'emit') {
       final Expression? target = node.target;
       if (target is SimpleIdentifier && blocFields.contains(target.name)) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     }
     super.visitMethodInvocation(node);
@@ -1153,7 +1048,7 @@ class _BlocAddVisitor extends RecursiveAstVisitor<void> {
 /// class Decrement extends CounterEvent {}
 /// ```
 class PreferSealedEventsRule extends SaropaLintRule {
-  const PreferSealedEventsRule() : super(code: _code);
+  PreferSealedEventsRule() : super(code: _code);
 
   /// Significant issue. Address when count exceeds 10.
   @override
@@ -1164,28 +1059,26 @@ class PreferSealedEventsRule extends SaropaLintRule {
 
   /// Alias: prefer_sealed_events_pattern
   static const LintCode _code = LintCode(
-    name: 'prefer_sealed_events',
-    problemMessage:
-        '[prefer_sealed_events] Non-sealed events allow subclassing anywhere, '
+    'prefer_sealed_events',
+    '[prefer_sealed_events] Non-sealed events allow subclassing anywhere, '
         'preventing compiler exhaustiveness checks in switch statements. {v2}',
     correctionMessage:
         'Use sealed class instead of abstract class for event hierarchy.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addClassDeclaration((ClassDeclaration node) {
+    context.addClassDeclaration((ClassDeclaration node) {
       final String className = node.name.lexeme;
       if (!className.endsWith('Event')) return;
 
       // Check if abstract but not sealed
       if (node.abstractKeyword != null && node.sealedKeyword == null) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
   }
@@ -1226,7 +1119,7 @@ class PreferSealedEventsRule extends SaropaLintRule {
 /// }
 /// ```
 class RequireBlocTransformerRule extends SaropaLintRule {
-  const RequireBlocTransformerRule() : super(code: _code);
+  RequireBlocTransformerRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.medium;
@@ -1238,12 +1131,11 @@ class RequireBlocTransformerRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.bloc};
 
   static const LintCode _code = LintCode(
-    name: 'require_bloc_transformer',
-    problemMessage:
-        '[require_bloc_transformer] Bloc on<Event> without transformer processes all events sequentially. Without EventTransformer, rapid events are processed sequentially. Use transformers for debouncing, throttling, or concurrent processing. {v1}',
+    'require_bloc_transformer',
+    '[require_bloc_transformer] Bloc on<Event> without transformer processes all events sequentially. Without EventTransformer, rapid events are processed sequentially. Use transformers for debouncing, throttling, or concurrent processing. {v1}',
     correctionMessage:
         'Add transformer: for debounce, throttle, or concurrent event handling. Verify the change works correctly with existing tests and add coverage for the new behavior.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   /// Event names that commonly benefit from transformers
@@ -1258,11 +1150,10 @@ class RequireBlocTransformerRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       // Check for on<EventType>(...) pattern
       if (node.methodName.name != 'on') return;
 
@@ -1293,7 +1184,7 @@ class RequireBlocTransformerRule extends SaropaLintRule {
       }
 
       if (!hasTransformer) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
   }
@@ -1335,7 +1226,7 @@ class RequireBlocTransformerRule extends SaropaLintRule {
 /// }
 /// ```
 class AvoidLongEventHandlersRule extends SaropaLintRule {
-  const AvoidLongEventHandlersRule() : super(code: _code);
+  AvoidLongEventHandlersRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.medium;
@@ -1344,12 +1235,11 @@ class AvoidLongEventHandlersRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_long_event_handlers',
-    problemMessage:
-        '[avoid_long_event_handlers] Bloc event handler is too long. Extract logic to separate methods. Long event handlers indicate the handler is doing too much. Extract business logic to separate methods or services for testability. {v1}',
+    'avoid_long_event_handlers',
+    '[avoid_long_event_handlers] Bloc event handler is too long. Extract logic to separate methods. Long event handlers indicate the handler is doing too much. Extract business logic to separate methods or services for testability. {v1}',
     correctionMessage:
         'Move complex logic to named methods or use cases to improve testability. Verify the change works correctly with existing tests and add coverage for the new behavior.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   /// Maximum lines before warning
@@ -1357,11 +1247,10 @@ class AvoidLongEventHandlersRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       if (node.methodName.name != 'on') return;
 
       // Find the handler function in arguments
@@ -1371,7 +1260,7 @@ class AvoidLongEventHandlersRule extends SaropaLintRule {
           final int lineCount = '\n'.allMatches(source).length + 1;
 
           if (lineCount > _maxLines) {
-            reporter.atNode(node, code);
+            reporter.atNode(node);
           }
         }
       }
@@ -1410,7 +1299,7 @@ class AvoidLongEventHandlersRule extends SaropaLintRule {
 ///
 /// **Quick fix available:** Adds a `TODO` comment for manual conversion.
 class PreferMultiBlocProviderRule extends SaropaLintRule {
-  const PreferMultiBlocProviderRule() : super(code: _code);
+  PreferMultiBlocProviderRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -1423,22 +1312,19 @@ class PreferMultiBlocProviderRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.provider};
 
   static const LintCode _code = LintCode(
-    name: 'prefer_multi_bloc_provider',
-    problemMessage:
-        '[prefer_multi_bloc_provider] Nested BlocProviders should use MultiBlocProvider instead. Use MultiBlocProvider when providing multiple blocs to reduce nesting and improve readability. {v2}',
+    'prefer_multi_bloc_provider',
+    '[prefer_multi_bloc_provider] Nested BlocProviders should use MultiBlocProvider instead. Use MultiBlocProvider when providing multiple blocs to reduce nesting and improve readability. {v2}',
     correctionMessage:
         'Combine into MultiBlocProvider(providers: [..], child: ..). Verify the change works correctly with existing tests and add coverage for the new behavior.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry
-        .addInstanceCreationExpression((InstanceCreationExpression node) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final String typeName = node.constructorName.type.name.lexeme;
       if (typeName != 'BlocProvider') return;
 
@@ -1449,7 +1335,7 @@ class PreferMultiBlocProviderRule extends SaropaLintRule {
           if (childExpr is InstanceCreationExpression) {
             final String childType = childExpr.constructorName.type.name.lexeme;
             if (childType == 'BlocProvider') {
-              reporter.atNode(node, code);
+              reporter.atNode(node);
               return;
             }
           }
@@ -1488,7 +1374,7 @@ class PreferMultiBlocProviderRule extends SaropaLintRule {
 /// )
 /// ```
 class AvoidInstantiatingInBlocValueProviderRule extends SaropaLintRule {
-  const AvoidInstantiatingInBlocValueProviderRule() : super(code: _code);
+  AvoidInstantiatingInBlocValueProviderRule() : super(code: _code);
 
   /// Critical - memory leak potential.
   @override
@@ -1501,22 +1387,19 @@ class AvoidInstantiatingInBlocValueProviderRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.provider};
 
   static const LintCode _code = LintCode(
-    name: 'avoid_instantiating_in_bloc_value_provider',
-    problemMessage:
-        '[avoid_instantiating_in_bloc_value_provider] Creating a new bloc instance inside BlocProvider.value prevents the bloc from being automatically closed, leading to memory leaks and unpredictable state. This is a critical resource management issue that can degrade app performance and reliability. {v2}',
+    'avoid_instantiating_in_bloc_value_provider',
+    '[avoid_instantiating_in_bloc_value_provider] Creating a new bloc instance inside BlocProvider.value prevents the bloc from being automatically closed, leading to memory leaks and unpredictable state. This is a critical resource management issue that can degrade app performance and reliability. {v2}',
     correctionMessage:
         'Always use BlocProvider(create: ...) to create new bloc instances, or pass an existing bloc variable to BlocProvider.value. Never instantiate a bloc directly inside BlocProvider.value.',
-    errorSeverity: DiagnosticSeverity.ERROR,
+    severity: DiagnosticSeverity.ERROR,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry
-        .addInstanceCreationExpression((InstanceCreationExpression node) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final ConstructorName constructorName = node.constructorName;
       final String typeName = constructorName.type.name.lexeme;
       if (typeName != 'BlocProvider') return;
@@ -1530,7 +1413,7 @@ class AvoidInstantiatingInBlocValueProviderRule extends SaropaLintRule {
           final Expression valueExpr = arg.expression;
           if (valueExpr is InstanceCreationExpression) {
             // This is creating a new instance in value - BAD
-            reporter.atNode(valueExpr, code);
+            reporter.atNode(valueExpr);
             return;
           }
         }
@@ -1570,7 +1453,7 @@ class AvoidInstantiatingInBlocValueProviderRule extends SaropaLintRule {
 /// )
 /// ```
 class AvoidExistingInstancesInBlocProviderRule extends SaropaLintRule {
-  const AvoidExistingInstancesInBlocProviderRule() : super(code: _code);
+  AvoidExistingInstancesInBlocProviderRule() : super(code: _code);
 
   /// Critical - unexpected bloc closure.
   @override
@@ -1583,22 +1466,19 @@ class AvoidExistingInstancesInBlocProviderRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.provider};
 
   static const LintCode _code = LintCode(
-    name: 'avoid_existing_instances_in_bloc_provider',
-    problemMessage:
-        '[avoid_existing_instances_in_bloc_provider] Returning an existing bloc instance from BlocProvider(create: ...) causes the bloc to be closed when the provider disposes, even if it is still used elsewhere. This can lead to unexpected state loss, runtime errors, and hard-to-debug bugs. Always use the correct provider pattern for new vs. existing blocs. {v2}',
+    'avoid_existing_instances_in_bloc_provider',
+    '[avoid_existing_instances_in_bloc_provider] Returning an existing bloc instance from BlocProvider(create: ...) causes the bloc to be closed when the provider disposes, even if it is still used elsewhere. This can lead to unexpected state loss, runtime errors, and hard-to-debug bugs. Always use the correct provider pattern for new vs. existing blocs. {v2}',
     correctionMessage:
         'For existing bloc instances, use BlocProvider.value(value: existingBloc). Only use BlocProvider(create: ...) to create new bloc instances. This ensures proper lifecycle management and prevents accidental closure of shared blocs.',
-    errorSeverity: DiagnosticSeverity.ERROR,
+    severity: DiagnosticSeverity.ERROR,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry
-        .addInstanceCreationExpression((InstanceCreationExpression node) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final ConstructorName constructorName = node.constructorName;
       final String typeName = constructorName.type.name.lexeme;
       if (typeName != 'BlocProvider') return;
@@ -1618,7 +1498,7 @@ class AvoidExistingInstancesInBlocProviderRule extends SaropaLintRule {
               if (returnExpr is SimpleIdentifier) {
                 // Check it's not calling a constructor
                 // A simple identifier returning means it's an existing variable
-                reporter.atNode(returnExpr, code);
+                reporter.atNode(returnExpr);
                 return;
               }
             }
@@ -1656,7 +1536,7 @@ class AvoidExistingInstancesInBlocProviderRule extends SaropaLintRule {
 /// )
 /// ```
 class PreferCorrectBlocProviderRule extends SaropaLintRule {
-  const PreferCorrectBlocProviderRule() : super(code: _code);
+  PreferCorrectBlocProviderRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -1669,23 +1549,20 @@ class PreferCorrectBlocProviderRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.provider};
 
   static const LintCode _code = LintCode(
-    name: 'prefer_correct_bloc_provider',
-    problemMessage:
-        '[prefer_correct_bloc_provider] Using context.read() in BlocProvider.create returns an existing bloc. '
+    'prefer_correct_bloc_provider',
+    '[prefer_correct_bloc_provider] Using context.read() in BlocProvider.create returns an existing bloc. '
         'Use BlocProvider.value instead. {v2}',
     correctionMessage:
         'Replace with BlocProvider.value(value: context.read<T>(), ...).',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry
-        .addInstanceCreationExpression((InstanceCreationExpression node) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final ConstructorName constructorName = node.constructorName;
       final String typeName = constructorName.type.name.lexeme;
       if (typeName != 'BlocProvider') return;
@@ -1705,7 +1582,7 @@ class PreferCorrectBlocProviderRule extends SaropaLintRule {
               if (returnExpr is MethodInvocation) {
                 final String methodName = returnExpr.methodName.name;
                 if (methodName == 'read' || methodName == 'watch') {
-                  reporter.atNode(node, code);
+                  reporter.atNode(node);
                   return;
                 }
               }
@@ -1744,7 +1621,7 @@ class PreferCorrectBlocProviderRule extends SaropaLintRule {
 /// });
 /// ```
 class CheckIsNotClosedAfterAsyncGapRule extends SaropaLintRule {
-  const CheckIsNotClosedAfterAsyncGapRule() : super(code: _code);
+  CheckIsNotClosedAfterAsyncGapRule() : super(code: _code);
 
   /// Critical bug. Emit after close causes crash.
   @override
@@ -1754,22 +1631,20 @@ class CheckIsNotClosedAfterAsyncGapRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'check_is_not_closed_after_async_gap',
-    problemMessage:
-        '[check_is_not_closed_after_async_gap] Emitting to closed Bloc throws '
+    'check_is_not_closed_after_async_gap',
+    '[check_is_not_closed_after_async_gap] Emitting to closed Bloc throws '
         'StateError, crashing the app when widget is disposed during async. {v2}',
     correctionMessage:
         'Add if (!isClosed) check before emit() after async operations.',
-    errorSeverity: DiagnosticSeverity.ERROR,
+    severity: DiagnosticSeverity.ERROR,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       // Look for on<Event> handler registration
       if (node.methodName.name != 'on') return;
 
@@ -1788,7 +1663,7 @@ class CheckIsNotClosedAfterAsyncGapRule extends SaropaLintRule {
       body.accept(visitor);
 
       for (final MethodInvocation emitCall in visitor.emitCallsAfterAwait) {
-        reporter.atNode(emitCall, code);
+        reporter.atNode(emitCall);
       }
     });
   }
@@ -1871,7 +1746,7 @@ class _EmitAfterAwaitVisitor extends RecursiveAstVisitor<void> {
 /// }
 /// ```
 class AvoidDuplicateBlocEventHandlersRule extends SaropaLintRule {
-  const AvoidDuplicateBlocEventHandlersRule() : super(code: _code);
+  AvoidDuplicateBlocEventHandlersRule() : super(code: _code);
 
   /// Critical bug. Duplicate handlers cause unexpected behavior.
   @override
@@ -1884,22 +1759,20 @@ class AvoidDuplicateBlocEventHandlersRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.bloc};
 
   static const LintCode _code = LintCode(
-    name: 'avoid_duplicate_bloc_event_handlers',
-    problemMessage:
-        '[avoid_duplicate_bloc_event_handlers] Second handler for same event '
+    'avoid_duplicate_bloc_event_handlers',
+    '[avoid_duplicate_bloc_event_handlers] Second handler for same event '
         'type is ignored, causing silent bugs when expected logic runs. {v2}',
     correctionMessage:
         'Combine handlers into one on<Event> call. Only one handler per event type.',
-    errorSeverity: DiagnosticSeverity.ERROR,
+    severity: DiagnosticSeverity.ERROR,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addClassDeclaration((ClassDeclaration node) {
+    context.addClassDeclaration((ClassDeclaration node) {
       // Check if class extends Bloc
       final ExtendsClause? extendsClause = node.extendsClause;
       if (extendsClause == null) return;
@@ -1985,7 +1858,7 @@ class _OnCallVisitor extends RecursiveAstVisitor<void> {
 /// }
 /// ```
 class PreferImmutableBlocEventsRule extends SaropaLintRule {
-  const PreferImmutableBlocEventsRule() : super(code: _code);
+  PreferImmutableBlocEventsRule() : super(code: _code);
 
   /// Bug risk. Mutable events can cause unexpected behavior.
   @override
@@ -1999,21 +1872,19 @@ class PreferImmutableBlocEventsRule extends SaropaLintRule {
 
   /// Alias: prefer_immutable_bloc_events_pattern
   static const LintCode _code = LintCode(
-    name: 'prefer_immutable_bloc_events',
-    problemMessage:
-        '[prefer_immutable_bloc_events] Mutable event fields can be changed '
+    'prefer_immutable_bloc_events',
+    '[prefer_immutable_bloc_events] Mutable event fields can be changed '
         'during processing, causing inconsistent state and debugging nightmares. {v2}',
     correctionMessage: 'Mark all fields as final for immutable events.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addClassDeclaration((ClassDeclaration node) {
+    context.addClassDeclaration((ClassDeclaration node) {
       // Check if class name ends with Event
       final String className = node.name.lexeme;
       if (!className.endsWith('Event')) return;
@@ -2023,7 +1894,7 @@ class PreferImmutableBlocEventsRule extends SaropaLintRule {
         if (member is FieldDeclaration && !member.isStatic) {
           final VariableDeclarationList fields = member.fields;
           if (!fields.isFinal && !fields.isConst) {
-            reporter.atNode(member, code);
+            reporter.atNode(member);
           }
         }
       }
@@ -2056,7 +1927,7 @@ class PreferImmutableBlocEventsRule extends SaropaLintRule {
 /// }
 /// ```
 class PreferImmutableBlocStateRule extends SaropaLintRule {
-  const PreferImmutableBlocStateRule() : super(code: _code);
+  PreferImmutableBlocStateRule() : super(code: _code);
 
   /// Bug risk. Mutable state breaks bloc pattern.
   @override
@@ -2070,21 +1941,19 @@ class PreferImmutableBlocStateRule extends SaropaLintRule {
 
   /// Alias: prefer_immutable_bloc_state_pattern
   static const LintCode _code = LintCode(
-    name: 'prefer_immutable_bloc_state',
-    problemMessage:
-        '[prefer_immutable_bloc_state] Mutable state fields break equality '
+    'prefer_immutable_bloc_state',
+    '[prefer_immutable_bloc_state] Mutable state fields break equality '
         'comparison, causing BlocBuilder to miss or duplicate updates. {v2}',
     correctionMessage: 'Mark all fields as final for immutable state.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addClassDeclaration((ClassDeclaration node) {
+    context.addClassDeclaration((ClassDeclaration node) {
       // Check if class name ends with State
       final String className = node.name.lexeme;
       if (!className.endsWith('State')) return;
@@ -2101,7 +1970,7 @@ class PreferImmutableBlocStateRule extends SaropaLintRule {
         if (member is FieldDeclaration && !member.isStatic) {
           final VariableDeclarationList fields = member.fields;
           if (!fields.isFinal && !fields.isConst) {
-            reporter.atNode(member, code);
+            reporter.atNode(member);
           }
         }
       }
@@ -2130,7 +1999,7 @@ class PreferImmutableBlocStateRule extends SaropaLintRule {
 /// class LoadUserEvent extends UserEvent {}
 /// ```
 class PreferSealedBlocEventsRule extends SaropaLintRule {
-  const PreferSealedBlocEventsRule() : super(code: _code);
+  PreferSealedBlocEventsRule() : super(code: _code);
 
   /// Code quality. Sealed classes improve type safety.
   @override
@@ -2144,21 +2013,19 @@ class PreferSealedBlocEventsRule extends SaropaLintRule {
 
   /// Alias: prefer_sealed_bloc_events_pattern
   static const LintCode _code = LintCode(
-    name: 'prefer_sealed_bloc_events',
-    problemMessage:
-        '[prefer_sealed_bloc_events] Bloc event base class must be sealed. Sealed event classes ensure exhaustive pattern matching in handlers and prevent unexpected event subtypes from being created. {v2}',
+    'prefer_sealed_bloc_events',
+    '[prefer_sealed_bloc_events] Bloc event base class must be sealed. Sealed event classes ensure exhaustive pattern matching in handlers and prevent unexpected event subtypes from being created. {v2}',
     correctionMessage:
         'Use sealed keyword for exhaustive pattern matching. Verify the change works correctly with existing tests and add coverage for the new behavior.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addClassDeclaration((ClassDeclaration node) {
+    context.addClassDeclaration((ClassDeclaration node) {
       // Check if class name ends with Event
       final String className = node.name.lexeme;
       if (!className.endsWith('Event')) return;
@@ -2176,7 +2043,7 @@ class PreferSealedBlocEventsRule extends SaropaLintRule {
         if (superName.endsWith('Event')) return; // Not a base class
       }
 
-      reporter.atNode(node, code);
+      reporter.atNode(node);
     });
   }
 }
@@ -2202,7 +2069,7 @@ class PreferSealedBlocEventsRule extends SaropaLintRule {
 /// class LoadingState extends UserState {}
 /// ```
 class PreferSealedBlocStateRule extends SaropaLintRule {
-  const PreferSealedBlocStateRule() : super(code: _code);
+  PreferSealedBlocStateRule() : super(code: _code);
 
   /// Code quality. Sealed classes improve type safety.
   @override
@@ -2216,21 +2083,19 @@ class PreferSealedBlocStateRule extends SaropaLintRule {
 
   /// Alias: prefer_sealed_bloc_state_pattern
   static const LintCode _code = LintCode(
-    name: 'prefer_sealed_bloc_state',
-    problemMessage:
-        '[prefer_sealed_bloc_state] Bloc state base class must be sealed. Sealed state classes ensure exhaustive pattern matching in widgets and prevent unexpected state subtypes from being created. {v2}',
+    'prefer_sealed_bloc_state',
+    '[prefer_sealed_bloc_state] Bloc state base class must be sealed. Sealed state classes ensure exhaustive pattern matching in widgets and prevent unexpected state subtypes from being created. {v2}',
     correctionMessage:
         'Use sealed keyword for exhaustive pattern matching. Verify the change works correctly with existing tests and add coverage for the new behavior.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addClassDeclaration((ClassDeclaration node) {
+    context.addClassDeclaration((ClassDeclaration node) {
       // Check if class name ends with State
       final String className = node.name.lexeme;
       if (!className.endsWith('State')) return;
@@ -2250,7 +2115,7 @@ class PreferSealedBlocStateRule extends SaropaLintRule {
         }
       }
 
-      reporter.atNode(node, code);
+      reporter.atNode(node);
     });
   }
 }
@@ -2275,7 +2140,7 @@ class PreferSealedBlocStateRule extends SaropaLintRule {
 /// class LoadUserEvent extends UserEvent {}
 /// ```
 class PreferBlocEventSuffixRule extends SaropaLintRule {
-  const PreferBlocEventSuffixRule() : super(code: _code);
+  PreferBlocEventSuffixRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.opinionated;
@@ -2287,21 +2152,19 @@ class PreferBlocEventSuffixRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.bloc};
 
   static const LintCode _code = LintCode(
-    name: 'prefer_bloc_event_suffix',
-    problemMessage:
-        '[prefer_bloc_event_suffix] Suffixing Bloc event class names with Event is a naming convention. The suffix does not affect Bloc behavior or performance. Enable via the stylistic tier. {v2}',
+    'prefer_bloc_event_suffix',
+    '[prefer_bloc_event_suffix] Suffixing Bloc event class names with Event is a naming convention. The suffix does not affect Bloc behavior or performance. Enable via the stylistic tier. {v2}',
     correctionMessage:
         'Rename class to include Event suffix (e.g., LoadUserEvent). Verify the change works correctly with existing tests and add coverage for the new behavior.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addClassDeclaration((ClassDeclaration node) {
+    context.addClassDeclaration((ClassDeclaration node) {
       final ExtendsClause? extendsClause = node.extendsClause;
       if (extendsClause == null) return;
 
@@ -2312,7 +2175,7 @@ class PreferBlocEventSuffixRule extends SaropaLintRule {
       if (superName.endsWith('Event')) {
         final String className = node.name.lexeme;
         if (!className.endsWith('Event')) {
-          reporter.atNode(node, code);
+          reporter.atNode(node);
         }
       }
     });
@@ -2339,7 +2202,7 @@ class PreferBlocEventSuffixRule extends SaropaLintRule {
 /// class UserLoadingState extends UserState {}
 /// ```
 class PreferBlocStateSuffixRule extends SaropaLintRule {
-  const PreferBlocStateSuffixRule() : super(code: _code);
+  PreferBlocStateSuffixRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.opinionated;
@@ -2351,21 +2214,19 @@ class PreferBlocStateSuffixRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.bloc};
 
   static const LintCode _code = LintCode(
-    name: 'prefer_bloc_state_suffix',
-    problemMessage:
-        '[prefer_bloc_state_suffix] Suffixing Bloc state class names with State is a naming convention. The suffix does not affect Bloc behavior or performance. Enable via the stylistic tier. {v2}',
+    'prefer_bloc_state_suffix',
+    '[prefer_bloc_state_suffix] Suffixing Bloc state class names with State is a naming convention. The suffix does not affect Bloc behavior or performance. Enable via the stylistic tier. {v2}',
     correctionMessage:
         'Rename class to include State suffix (e.g., UserLoadingState). Verify the change works correctly with existing tests and add coverage for the new behavior.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addClassDeclaration((ClassDeclaration node) {
+    context.addClassDeclaration((ClassDeclaration node) {
       final ExtendsClause? extendsClause = node.extendsClause;
       if (extendsClause == null) return;
 
@@ -2376,7 +2237,7 @@ class PreferBlocStateSuffixRule extends SaropaLintRule {
       if (superName.endsWith('State') && superName != 'State') {
         final String className = node.name.lexeme;
         if (!className.endsWith('State')) {
-          reporter.atNode(node, code);
+          reporter.atNode(node);
         }
       }
     });
@@ -2406,7 +2267,7 @@ class PreferBlocStateSuffixRule extends SaropaLintRule {
 /// });
 /// ```
 class AvoidYieldInOnEventRule extends SaropaLintRule {
-  const AvoidYieldInOnEventRule() : super(code: _code);
+  AvoidYieldInOnEventRule() : super(code: _code);
 
   /// Using yield in Bloc handlers is deprecated and broken.
   @override
@@ -2416,29 +2277,27 @@ class AvoidYieldInOnEventRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_yield_in_on_event',
-    problemMessage:
-        '[avoid_yield_in_on_event] yield breaks Bloc 8.0+ concurrency and '
+    'avoid_yield_in_on_event',
+    '[avoid_yield_in_on_event] yield breaks Bloc 8.0+ concurrency and '
         'event ordering, causing unpredictable state updates. {v3}',
     correctionMessage:
         'Replace yield with emit() - yield is deprecated in Bloc 8.0+.',
-    errorSeverity: DiagnosticSeverity.ERROR,
+    severity: DiagnosticSeverity.ERROR,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addYieldStatement((YieldStatement node) {
+    context.addYieldStatement((YieldStatement node) {
       // Check if inside on<Event> handler
       AstNode? current = node.parent;
       while (current != null) {
         if (current is MethodInvocation) {
           final String methodName = current.methodName.name;
           if (methodName == 'on') {
-            reporter.atNode(node, code);
+            reporter.atNode(node);
             return;
           }
         }
@@ -2468,7 +2327,7 @@ class AvoidYieldInOnEventRule extends SaropaLintRule {
 /// emit(MyState(count: newCount));
 /// ```
 class EmitNewBlocStateInstancesRule extends SaropaLintRule {
-  const EmitNewBlocStateInstancesRule() : super(code: _code);
+  EmitNewBlocStateInstancesRule() : super(code: _code);
 
   /// State mutation breaks Bloc equality and causes bugs.
   @override
@@ -2481,21 +2340,19 @@ class EmitNewBlocStateInstancesRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.bloc};
 
   static const LintCode _code = LintCode(
-    name: 'emit_new_bloc_state_instances',
-    problemMessage:
-        '[emit_new_bloc_state_instances] Mutating state object breaks equality '
+    'emit_new_bloc_state_instances',
+    '[emit_new_bloc_state_instances] Mutating state object breaks equality '
         'checks, preventing BlocBuilder from detecting changes. {v2}',
     correctionMessage: 'Use copyWith() or constructor to create new state.',
-    errorSeverity: DiagnosticSeverity.ERROR,
+    severity: DiagnosticSeverity.ERROR,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       if (node.methodName.name != 'emit') return;
 
       // Check argument for cascade expression
@@ -2507,7 +2364,7 @@ class EmitNewBlocStateInstancesRule extends SaropaLintRule {
         // Check if target is 'state'
         final String targetSource = arg.target.toSource();
         if (targetSource == 'state') {
-          reporter.atNode(arg, code);
+          reporter.atNode(arg);
         }
       }
     });
@@ -2537,7 +2394,7 @@ class EmitNewBlocStateInstancesRule extends SaropaLintRule {
 /// }
 /// ```
 class AvoidBlocPublicFieldsRule extends SaropaLintRule {
-  const AvoidBlocPublicFieldsRule() : super(code: _code);
+  AvoidBlocPublicFieldsRule() : super(code: _code);
 
   /// Public fields expose Bloc internals and break encapsulation.
   @override
@@ -2550,21 +2407,19 @@ class AvoidBlocPublicFieldsRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.bloc};
 
   static const LintCode _code = LintCode(
-    name: 'avoid_bloc_public_fields',
-    problemMessage:
-        '[avoid_bloc_public_fields] Public field in Bloc. Keep internals private. Bloc internals must be private. Public fields expose implementation details and allow external modification of state. {v2}',
+    'avoid_bloc_public_fields',
+    '[avoid_bloc_public_fields] Public field in Bloc. Keep internals private. Bloc internals must be private. Public fields expose implementation details and allow external modification of state. {v2}',
     correctionMessage:
         'Make field private (_fieldName) or final. Verify the change works correctly with existing tests and add coverage for the new behavior.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addClassDeclaration((ClassDeclaration node) {
+    context.addClassDeclaration((ClassDeclaration node) {
       // Check if extends Bloc or Cubit
       final ExtendsClause? extendsClause = node.extendsClause;
       if (extendsClause == null) return;
@@ -2579,7 +2434,7 @@ class AvoidBlocPublicFieldsRule extends SaropaLintRule {
           for (final VariableDeclaration field in member.fields.variables) {
             final String fieldName = field.name.lexeme;
             if (!fieldName.startsWith('_') && !member.fields.isFinal) {
-              reporter.atNode(field, code);
+              reporter.atNode(field);
             }
           }
         }
@@ -2612,7 +2467,7 @@ class AvoidBlocPublicFieldsRule extends SaropaLintRule {
 /// }
 /// ```
 class AvoidBlocPublicMethodsRule extends SaropaLintRule {
-  const AvoidBlocPublicMethodsRule() : super(code: _code);
+  AvoidBlocPublicMethodsRule() : super(code: _code);
 
   /// Public methods bypass Bloc's event-driven architecture.
   @override
@@ -2625,12 +2480,11 @@ class AvoidBlocPublicMethodsRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.bloc};
 
   static const LintCode _code = LintCode(
-    name: 'avoid_bloc_public_methods',
-    problemMessage:
-        '[avoid_bloc_public_methods] Public method in Bloc. Use events via add() instead. Bloc should only expose add() for events. Other public methods break the event-driven architecture and make testing harder. {v2}',
+    'avoid_bloc_public_methods',
+    '[avoid_bloc_public_methods] Public method in Bloc. Use events via add() instead. Bloc should only expose add() for events. Other public methods break the event-driven architecture and make testing harder. {v2}',
     correctionMessage:
         'Convert to event class and handle in on<Event>(). Verify the change works correctly with existing tests and add coverage for the new behavior.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   static const Set<String> _allowedMethods = <String>{
@@ -2650,11 +2504,10 @@ class AvoidBlocPublicMethodsRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addClassDeclaration((ClassDeclaration node) {
+    context.addClassDeclaration((ClassDeclaration node) {
       // Check if extends Bloc
       final ExtendsClause? extendsClause = node.extendsClause;
       if (extendsClause == null) return;
@@ -2704,7 +2557,7 @@ class AvoidBlocPublicMethodsRule extends SaropaLintRule {
 /// )
 /// ```
 class RequireBlocSelectorRule extends SaropaLintRule {
-  const RequireBlocSelectorRule() : super(code: _code);
+  RequireBlocSelectorRule() : super(code: _code);
 
   /// BlocSelector provides more targeted rebuilds.
   @override
@@ -2717,23 +2570,19 @@ class RequireBlocSelectorRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.bloc};
 
   static const LintCode _code = LintCode(
-    name: 'require_bloc_selector',
-    problemMessage:
-        '[require_bloc_selector] BlocBuilder accessing single field. Use BlocSelector instead. Using BlocSelector instead of BlocBuilder when you only need one field prevents unnecessary rebuilds when other fields change. {v2}',
+    'require_bloc_selector',
+    '[require_bloc_selector] BlocBuilder accessing single field. Use BlocSelector instead. Using BlocSelector instead of BlocBuilder when you only need one field prevents unnecessary rebuilds when other fields change. {v2}',
     correctionMessage:
         'Replace with BlocSelector for targeted rebuilds on specific field. Verify the change works correctly with existing tests and add coverage for the new behavior.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addInstanceCreationExpression((
-      InstanceCreationExpression node,
-    ) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final String typeName = node.constructorName.type.name.lexeme;
       if (typeName != 'BlocBuilder') return;
 
@@ -2749,7 +2598,7 @@ class RequireBlocSelectorRule extends SaropaLintRule {
             // If only one unique field is accessed, suggest BlocSelector
             if (counter.accessedFields.length == 1 &&
                 counter.accessCount <= 2) {
-              reporter.atNode(node, code);
+              reporter.atNode(node);
             }
           }
         }
@@ -2809,7 +2658,7 @@ class _StateAccessCounter extends RecursiveAstVisitor<void> {
 /// }
 /// ```
 class AvoidBlocEmitAfterCloseRule extends SaropaLintRule {
-  const AvoidBlocEmitAfterCloseRule() : super(code: _code);
+  AvoidBlocEmitAfterCloseRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.critical;
@@ -2821,21 +2670,19 @@ class AvoidBlocEmitAfterCloseRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.bloc};
 
   static const LintCode _code = LintCode(
-    name: 'avoid_bloc_emit_after_close',
-    problemMessage:
-        '[avoid_bloc_emit_after_close] Calling emit() after an await may throw an exception if the Bloc has been closed, leading to runtime errors and unpredictable state changes. This can cause crashes or silent failures, especially in asynchronous event handlers. Always check that the Bloc is still open before emitting new states after an await. {v1}',
+    'avoid_bloc_emit_after_close',
+    '[avoid_bloc_emit_after_close] Calling emit() after an await may throw an exception if the Bloc has been closed, leading to runtime errors and unpredictable state changes. This can cause crashes or silent failures, especially in asynchronous event handlers. Always check that the Bloc is still open before emitting new states after an await. {v1}',
     correctionMessage:
         'Before calling emit() after an await, add an "if (!isClosed)" check to ensure the Bloc is still active. This prevents exceptions and ensures state updates are only performed on open Blocs.',
-    errorSeverity: DiagnosticSeverity.ERROR,
+    severity: DiagnosticSeverity.ERROR,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       if (node.methodName.name != 'emit') return;
 
       // Find enclosing method
@@ -2862,8 +2709,10 @@ class AvoidBlocEmitAfterCloseRule extends SaropaLintRule {
       final emitOffset = node.offset - enclosingMethod.body.offset;
 
       // Simple heuristic: check if there's an await before this emit
-      final beforeEmit =
-          methodSource.substring(0, emitOffset.clamp(0, methodSource.length));
+      final beforeEmit = methodSource.substring(
+        0,
+        emitOffset.clamp(0, methodSource.length),
+      );
       if (!beforeEmit.contains('await ')) return;
 
       // Check if there's an isClosed check protecting this emit
@@ -2913,7 +2762,7 @@ class AvoidBlocEmitAfterCloseRule extends SaropaLintRule {
 /// }
 /// ```
 class AvoidBlocStateMutationRule extends SaropaLintRule {
-  const AvoidBlocStateMutationRule() : super(code: _code);
+  AvoidBlocStateMutationRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.critical;
@@ -2925,21 +2774,19 @@ class AvoidBlocStateMutationRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.bloc};
 
   static const LintCode _code = LintCode(
-    name: 'avoid_bloc_state_mutation',
-    problemMessage:
-        '[avoid_bloc_state_mutation] Direct mutation bypasses equality checks, '
+    'avoid_bloc_state_mutation',
+    '[avoid_bloc_state_mutation] Direct mutation bypasses equality checks, '
         'preventing UI rebuild and causing stale data display. {v1}',
     correctionMessage: 'Use state.copyWith() to create a new state instance.',
-    errorSeverity: DiagnosticSeverity.ERROR,
+    severity: DiagnosticSeverity.ERROR,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addAssignmentExpression((AssignmentExpression node) {
+    context.addAssignmentExpression((AssignmentExpression node) {
       // Check for state.field = value pattern
       final leftSide = node.leftHandSide;
       if (leftSide is! PropertyAccess) return;
@@ -2956,7 +2803,7 @@ class AvoidBlocStateMutationRule extends SaropaLintRule {
           if (extendsClause != null) {
             final superName = extendsClause.superclass.name.lexeme;
             if (superName == 'Bloc' || superName == 'Cubit') {
-              reporter.atNode(leftSide, code);
+              reporter.atNode(leftSide);
               return;
             }
           }
@@ -2994,7 +2841,7 @@ class AvoidBlocStateMutationRule extends SaropaLintRule {
 /// }
 /// ```
 class RequireBlocInitialStateRule extends SaropaLintRule {
-  const RequireBlocInitialStateRule() : super(code: _code);
+  RequireBlocInitialStateRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.critical;
@@ -3006,20 +2853,19 @@ class RequireBlocInitialStateRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.bloc};
 
   static const LintCode _code = LintCode(
-    name: 'require_bloc_initial_state',
-    problemMessage: '[require_bloc_initial_state] Missing initial state throws '
+    'require_bloc_initial_state',
+    '[require_bloc_initial_state] Missing initial state throws '
         'LateInitializationError when BlocBuilder tries to read state. {v1}',
     correctionMessage: 'Add : super(InitialState()) to the constructor.',
-    errorSeverity: DiagnosticSeverity.ERROR,
+    severity: DiagnosticSeverity.ERROR,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addClassDeclaration((ClassDeclaration node) {
+    context.addClassDeclaration((ClassDeclaration node) {
       final extendsClause = node.extendsClause;
       if (extendsClause == null) return;
 
@@ -3039,7 +2885,7 @@ class RequireBlocInitialStateRule extends SaropaLintRule {
           }
 
           if (!hasSuperInit) {
-            reporter.atNode(member, code);
+            reporter.atNode(member);
           }
         }
       }
@@ -3072,7 +2918,7 @@ class RequireBlocInitialStateRule extends SaropaLintRule {
 /// }
 /// ```
 class RequireBlocLoadingStateRule extends SaropaLintRule {
-  const RequireBlocLoadingStateRule() : super(code: _code);
+  RequireBlocLoadingStateRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.low;
@@ -3084,21 +2930,19 @@ class RequireBlocLoadingStateRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.bloc};
 
   static const LintCode _code = LintCode(
-    name: 'require_bloc_loading_state',
-    problemMessage:
-        '[require_bloc_loading_state] Async Bloc handler should emit loading state. Async operations should emit loading state to show UI feedback. {v1}',
+    'require_bloc_loading_state',
+    '[require_bloc_loading_state] Async Bloc handler should emit loading state. Async operations should emit loading state to show UI feedback. {v1}',
     correctionMessage:
         'Add emit(LoadingState()) before async operations. Verify the change works correctly with existing tests and add coverage for the new behavior.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodDeclaration((MethodDeclaration node) {
+    context.addMethodDeclaration((MethodDeclaration node) {
       // Check if async method
       if (node.body is! BlockFunctionBody) return;
       final body = node.body as BlockFunctionBody;
@@ -3132,12 +2976,13 @@ class RequireBlocLoadingStateRule extends SaropaLintRule {
       final beforeAwait = methodSource.substring(0, awaitIndex);
 
       // cspell:ignore inprogress
-      final hasLoadingEmit = beforeAwait.contains('emit(') &&
+      final hasLoadingEmit =
+          beforeAwait.contains('emit(') &&
           (beforeAwait.toLowerCase().contains('loading') ||
               beforeAwait.toLowerCase().contains('inprogress'));
 
       if (!hasLoadingEmit) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
   }
@@ -3167,7 +3012,7 @@ class RequireBlocLoadingStateRule extends SaropaLintRule {
 /// class UserError extends UserState {}
 /// ```
 class RequireBlocErrorStateRule extends SaropaLintRule {
-  const RequireBlocErrorStateRule() : super(code: _code);
+  RequireBlocErrorStateRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.low;
@@ -3179,38 +3024,37 @@ class RequireBlocErrorStateRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.bloc};
 
   static const LintCode _code = LintCode(
-    name: 'require_bloc_error_state',
-    problemMessage:
-        '[require_bloc_error_state] Bloc state sealed class must have an error case. Bloc states should include an error case for proper error handling. {v1}',
+    'require_bloc_error_state',
+    '[require_bloc_error_state] Bloc state sealed class must have an error case. Bloc states should include an error case for proper error handling. {v1}',
     correctionMessage:
         'Add an error state class (e.g., UserError). Verify the change works correctly with existing tests and add coverage for the new behavior.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addClassDeclaration((ClassDeclaration node) {
+    context.addClassDeclaration((ClassDeclaration node) {
       // Check if sealed class ending with State
       if (node.sealedKeyword == null) return;
       if (!node.name.lexeme.endsWith('State')) return;
 
       // This is a sealed state class - check file for error subclass
-      final fileSource = resolver.source.contents.data;
+      final fileSource = context.fileContent;
       final className = node.name.lexeme;
       final baseName = className.replaceAll('State', '');
 
       // Look for error/failure subclass
-      final hasError = fileSource.contains('${baseName}Error') ||
+      final hasError =
+          fileSource.contains('${baseName}Error') ||
           fileSource.contains('${baseName}Failure') ||
           fileSource.contains('${className}Error') ||
           fileSource.contains('Error extends $className');
 
       if (!hasError) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
   }
@@ -3255,7 +3099,7 @@ class RequireBlocErrorStateRule extends SaropaLintRule {
 /// }
 /// ```
 class RequireBlocManualDisposeRule extends SaropaLintRule {
-  const RequireBlocManualDisposeRule() : super(code: _code);
+  RequireBlocManualDisposeRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.high;
@@ -3267,12 +3111,11 @@ class RequireBlocManualDisposeRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
-    name: 'require_bloc_manual_dispose',
-    problemMessage:
-        '[require_bloc_manual_dispose] Bloc or Cubit holds StreamController or Timer fields but does not override close() to dispose them. Undisposed resources cause memory leaks that accumulate across navigation, eventually increasing memory pressure until the operating system kills the app. {v5}',
+    'require_bloc_manual_dispose',
+    '[require_bloc_manual_dispose] Bloc or Cubit holds StreamController or Timer fields but does not override close() to dispose them. Undisposed resources cause memory leaks that accumulate across navigation, eventually increasing memory pressure until the operating system kills the app. {v5}',
     correctionMessage:
         'Override close() to dispose StreamController, Timer, and other held resources, then call super.close() to complete the Bloc lifecycle.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   /// Types that require disposal in Bloc/Cubit close() method
@@ -3290,11 +3133,10 @@ class RequireBlocManualDisposeRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addClassDeclaration((ClassDeclaration node) {
+    context.addClassDeclaration((ClassDeclaration node) {
       // Check if extends Bloc or Cubit
       final ExtendsClause? extendsClause = node.extendsClause;
       if (extendsClause == null) return;
@@ -3357,7 +3199,8 @@ class RequireBlocManualDisposeRule extends SaropaLintRule {
 
       // Check if all disposable fields are cleaned up
       for (final String fieldName in disposableFields) {
-        final bool isCleaned = closeBody != null &&
+        final bool isCleaned =
+            closeBody != null &&
             (closeBody.contains('$fieldName.close()') ||
                 closeBody.contains('$fieldName?.close()') ||
                 closeBody.contains('$fieldName.dispose()') ||
@@ -3372,7 +3215,7 @@ class RequireBlocManualDisposeRule extends SaropaLintRule {
               for (final VariableDeclaration variable
                   in member.fields.variables) {
                 if (variable.name.lexeme == fieldName) {
-                  reporter.atNode(variable, code);
+                  reporter.atNode(variable);
                 }
               }
             }
@@ -3416,7 +3259,7 @@ class RequireBlocManualDisposeRule extends SaropaLintRule {
 /// }
 /// ```
 class PreferCubitForSimpleStateRule extends SaropaLintRule {
-  const PreferCubitForSimpleStateRule() : super(code: _code);
+  PreferCubitForSimpleStateRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.medium;
@@ -3428,21 +3271,19 @@ class PreferCubitForSimpleStateRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.bloc};
 
   static const LintCode _code = LintCode(
-    name: 'prefer_cubit_for_simple_state',
-    problemMessage:
-        '[prefer_cubit_for_simple_state] Bloc with single event type. Use Cubit for simpler code. Bloc is designed for complex state management with multiple events. When a Bloc only has one event type, a Cubit is simpler and more direct. {v3}',
+    'prefer_cubit_for_simple_state',
+    '[prefer_cubit_for_simple_state] Bloc with single event type. Use Cubit for simpler code. Bloc is designed for complex state management with multiple events. When a Bloc only has one event type, a Cubit is simpler and more direct. {v3}',
     correctionMessage:
         'Replace with Cubit when only one event/action is needed. Verify the change works correctly with existing tests and add coverage for the new behavior.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addClassDeclaration((ClassDeclaration node) {
+    context.addClassDeclaration((ClassDeclaration node) {
       // Check if extends Bloc<Event, State>
       final ExtendsClause? extendsClause = node.extendsClause;
       if (extendsClause == null) return;
@@ -3460,8 +3301,9 @@ class PreferCubitForSimpleStateRule extends SaropaLintRule {
 
           // Find all on<EventType> patterns
           final RegExp onEventPattern = RegExp(r'on<(\w+)>');
-          final Iterable<RegExpMatch> matches =
-              onEventPattern.allMatches(bodySource);
+          final Iterable<RegExpMatch> matches = onEventPattern.allMatches(
+            bodySource,
+          );
 
           for (final RegExpMatch match in matches) {
             eventHandlerCount++;
@@ -3512,7 +3354,7 @@ class PreferCubitForSimpleStateRule extends SaropaLintRule {
 /// // Or use BlocConsumer for both
 /// ```
 class PreferBlocListenerForSideEffectsRule extends SaropaLintRule {
-  const PreferBlocListenerForSideEffectsRule() : super(code: _code);
+  PreferBlocListenerForSideEffectsRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.high;
@@ -3524,12 +3366,11 @@ class PreferBlocListenerForSideEffectsRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.bloc};
 
   static const LintCode _code = LintCode(
-    name: 'prefer_bloc_listener_for_side_effects',
-    problemMessage:
-        '[prefer_bloc_listener_for_side_effects] Side effects inside BlocBuilder execute on every widget rebuild, causing user-facing errors like duplicate navigation pushes, multiple snackbars stacking on screen, or repeated API calls that waste bandwidth and may corrupt server-side state. {v6}',
+    'prefer_bloc_listener_for_side_effects',
+    '[prefer_bloc_listener_for_side_effects] Side effects inside BlocBuilder execute on every widget rebuild, causing user-facing errors like duplicate navigation pushes, multiple snackbars stacking on screen, or repeated API calls that waste bandwidth and may corrupt server-side state. {v6}',
     correctionMessage:
         'Move side effects (navigation, snackbars, API calls) to BlocListener or use BlocConsumer to separate rebuilds from one-time actions.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   /// Patterns that indicate side effects
@@ -3553,12 +3394,10 @@ class PreferBlocListenerForSideEffectsRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry
-        .addInstanceCreationExpression((InstanceCreationExpression node) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final String typeName = node.constructorName.type.name.lexeme;
       if (typeName != 'BlocBuilder') return;
 
@@ -3613,7 +3452,7 @@ class PreferBlocListenerForSideEffectsRule extends SaropaLintRule {
 /// )
 /// ```
 class RequireBlocConsumerWhenBothRule extends SaropaLintRule {
-  const RequireBlocConsumerWhenBothRule() : super(code: _code);
+  RequireBlocConsumerWhenBothRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.medium;
@@ -3625,22 +3464,19 @@ class RequireBlocConsumerWhenBothRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.provider};
 
   static const LintCode _code = LintCode(
-    name: 'require_bloc_consumer_when_both',
-    problemMessage:
-        '[require_bloc_consumer_when_both] Nested BlocListener + BlocBuilder. Use BlocConsumer instead. When you need both listener (for side effects) and builder (for UI), BlocConsumer provides a cleaner single-widget solution. {v3}',
+    'require_bloc_consumer_when_both',
+    '[require_bloc_consumer_when_both] Nested BlocListener + BlocBuilder. Use BlocConsumer instead. When you need both listener (for side effects) and builder (for UI), BlocConsumer provides a cleaner single-widget solution. {v3}',
     correctionMessage:
         'Replace with BlocConsumer which combines listener and builder. Verify the change works correctly with existing tests and add coverage for the new behavior.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry
-        .addInstanceCreationExpression((InstanceCreationExpression node) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final String typeName = node.constructorName.type.name.lexeme;
       if (typeName != 'BlocListener') return;
 
@@ -3703,7 +3539,7 @@ class RequireBlocConsumerWhenBothRule extends SaropaLintRule {
 /// }
 /// ```
 class AvoidBlocContextDependencyRule extends SaropaLintRule {
-  const AvoidBlocContextDependencyRule() : super(code: _code);
+  AvoidBlocContextDependencyRule() : super(code: _code);
 
   /// Significant issue. Address when count exceeds 10.
   @override
@@ -3716,12 +3552,11 @@ class AvoidBlocContextDependencyRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.bloc};
 
   static const LintCode _code = LintCode(
-    name: 'avoid_bloc_context_dependency',
-    problemMessage:
-        '[avoid_bloc_context_dependency] Bloc depending on BuildContext couples business logic to the UI layer. This makes the Bloc untestable in isolation, prevents reuse across widgets, and can cause crashes when the context becomes invalid after the widget is removed from the tree. {v6}',
+    'avoid_bloc_context_dependency',
+    '[avoid_bloc_context_dependency] Bloc depending on BuildContext couples business logic to the UI layer. This makes the Bloc untestable in isolation, prevents reuse across widgets, and can cause crashes when the context becomes invalid after the widget is removed from the tree. {v6}',
     correctionMessage:
         'Inject dependencies through the constructor instead of passing BuildContext, keeping business logic independent from the UI layer for better testability.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   static const Set<String> _blocSuperclasses = <String>{
@@ -3733,11 +3568,10 @@ class AvoidBlocContextDependencyRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addClassDeclaration((ClassDeclaration node) {
+    context.addClassDeclaration((ClassDeclaration node) {
       // Check if this is a Bloc/Cubit
       final ExtendsClause? extendsClause = node.extendsClause;
       if (extendsClause == null) return;
@@ -3754,7 +3588,7 @@ class AvoidBlocContextDependencyRule extends SaropaLintRule {
           for (final FormalParameter param in params.parameters) {
             final String paramSource = param.toSource();
             if (paramSource.contains('BuildContext')) {
-              reporter.atNode(param, code);
+              reporter.atNode(param);
             }
           }
         }
@@ -3791,7 +3625,7 @@ class AvoidBlocContextDependencyRule extends SaropaLintRule {
 /// }
 /// ```
 class AvoidBlocBusinessLogicInUiRule extends SaropaLintRule {
-  const AvoidBlocBusinessLogicInUiRule() : super(code: _code);
+  AvoidBlocBusinessLogicInUiRule() : super(code: _code);
 
   /// Blocs with UI code are hard to test and violate separation.
   @override
@@ -3804,12 +3638,11 @@ class AvoidBlocBusinessLogicInUiRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.bloc};
 
   static const LintCode _code = LintCode(
-    name: 'avoid_bloc_business_logic_in_ui',
-    problemMessage:
-        '[avoid_bloc_business_logic_in_ui] UI code such as showDialog or Navigator calls inside a Bloc breaks separation of concerns and makes the Bloc untestable without a widget tree. Business logic becomes coupled to the UI framework, preventing reuse across platforms and complicating unit testing. {v5}',
+    'avoid_bloc_business_logic_in_ui',
+    '[avoid_bloc_business_logic_in_ui] UI code such as showDialog or Navigator calls inside a Bloc breaks separation of concerns and makes the Bloc untestable without a widget tree. Business logic becomes coupled to the UI framework, preventing reuse across platforms and complicating unit testing. {v5}',
     correctionMessage:
         'Emit a state representing the UI action (e.g., ShowDialogState or NavigateState) and handle the actual UI change in a BlocListener within the widget layer.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   /// Methods that indicate UI code.
@@ -3828,11 +3661,10 @@ class AvoidBlocBusinessLogicInUiRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       final String methodName = node.methodName.name;
       if (!_uiMethods.contains(methodName)) return;
 
@@ -3844,7 +3676,7 @@ class AvoidBlocBusinessLogicInUiRule extends SaropaLintRule {
               current.extendsClause?.superclass.name2.lexeme;
           if (extendsName != null &&
               (extendsName == 'Bloc' || extendsName == 'Cubit')) {
-            reporter.atNode(node, code);
+            reporter.atNode(node);
           }
           return;
         }
@@ -3880,7 +3712,7 @@ class AvoidBlocBusinessLogicInUiRule extends SaropaLintRule {
 /// final class DecrementEvent extends CounterEvent {}
 /// ```
 class RequireBlocEventSealedRule extends SaropaLintRule {
-  const RequireBlocEventSealedRule() : super(code: _code);
+  RequireBlocEventSealedRule() : super(code: _code);
 
   /// Type safety improvement.
   @override
@@ -3893,21 +3725,19 @@ class RequireBlocEventSealedRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.bloc};
 
   static const LintCode _code = LintCode(
-    name: 'require_bloc_event_sealed',
-    problemMessage:
-        '[require_bloc_event_sealed] Bloc event hierarchy should use sealed class for exhaustive matching. Using sealed classes for Bloc events enables exhaustive pattern matching and prevents invalid event subtypes. {v2}',
+    'require_bloc_event_sealed',
+    '[require_bloc_event_sealed] Bloc event hierarchy should use sealed class for exhaustive matching. Using sealed classes for Bloc events enables exhaustive pattern matching and prevents invalid event subtypes. {v2}',
     correctionMessage:
         'Change abstract class XEvent to sealed class XEvent for Dart 3+ pattern matching.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addClassDeclaration((ClassDeclaration node) {
+    context.addClassDeclaration((ClassDeclaration node) {
       // Check if class name ends with Event
       final name = node.name.lexeme;
       if (!name.endsWith('Event')) return;
@@ -3916,7 +3746,7 @@ class RequireBlocEventSealedRule extends SaropaLintRule {
       if (node.abstractKeyword != null && node.sealedKeyword == null) {
         // Make sure it looks like a Bloc event (has subclasses pattern)
         if (node.members.isEmpty || _looksLikeBlocEvent(node)) {
-          reporter.atNode(node, code);
+          reporter.atNode(node);
         }
       }
     });
@@ -3958,7 +3788,7 @@ class RequireBlocEventSealedRule extends SaropaLintRule {
 /// }
 /// ```
 class RequireBlocRepositoryAbstractionRule extends SaropaLintRule {
-  const RequireBlocRepositoryAbstractionRule() : super(code: _code);
+  RequireBlocRepositoryAbstractionRule() : super(code: _code);
 
   /// Architecture improvement.
   @override
@@ -3972,12 +3802,11 @@ class RequireBlocRepositoryAbstractionRule extends SaropaLintRule {
 
   /// Alias: require_bloc_repository_abstraction_layer
   static const LintCode _code = LintCode(
-    name: 'require_bloc_repository_abstraction',
-    problemMessage:
-        '[require_bloc_repository_abstraction] Bloc depends on concrete repository. Use abstract interface for testability. Blocs should depend on abstract repository interfaces, not concrete implementations. This enables testing and swapping implementations. {v2}',
+    'require_bloc_repository_abstraction',
+    '[require_bloc_repository_abstraction] Bloc depends on concrete repository. Use abstract interface for testability. Blocs should depend on abstract repository interfaces, not concrete implementations. This enables testing and swapping implementations. {v2}',
     correctionMessage:
         'Inject UserRepository interface instead of FirebaseUserRepository. Verify the change works correctly with existing tests and add coverage for the new behavior.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   /// Prefixes that indicate concrete implementations.
@@ -4000,11 +3829,10 @@ class RequireBlocRepositoryAbstractionRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addClassDeclaration((ClassDeclaration node) {
+    context.addClassDeclaration((ClassDeclaration node) {
       // Check if class is a Bloc
       final extendsClause = node.extendsClause;
       if (extendsClause == null) return;
@@ -4024,7 +3852,7 @@ class RequireBlocRepositoryAbstractionRule extends SaropaLintRule {
                 (typeName.contains('Repository') ||
                     typeName.contains('Service') ||
                     typeName.contains('DataSource'))) {
-              reporter.atNode(member, code);
+              reporter.atNode(member);
               break;
             }
           }
@@ -4064,7 +3892,7 @@ class RequireBlocRepositoryAbstractionRule extends SaropaLintRule {
 /// }
 /// ```
 class PreferBlocTransformRule extends SaropaLintRule {
-  const PreferBlocTransformRule() : super(code: _code);
+  PreferBlocTransformRule() : super(code: _code);
 
   /// Performance suggestion.
   @override
@@ -4078,12 +3906,11 @@ class PreferBlocTransformRule extends SaropaLintRule {
 
   /// Alias: prefer_bloc_transform_pattern
   static const LintCode _code = LintCode(
-    name: 'prefer_bloc_transform',
-    problemMessage:
-        '[prefer_bloc_transform] Search/input event without transformer. Prefer debounce/throttle. For events like search queries, use EventTransformer to debounce or throttle, preventing excessive API calls. {v2}',
+    'prefer_bloc_transform',
+    '[prefer_bloc_transform] Search/input event without transformer. Prefer debounce/throttle. For events like search queries, use EventTransformer to debounce or throttle, preventing excessive API calls. {v2}',
     correctionMessage:
         'Add transformer: debounce(Duration(milliseconds: 300)) to on<Event>(). Verify the change works correctly with existing tests and add coverage for the new behavior.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   /// Event name patterns that typically need debouncing.
@@ -4099,11 +3926,10 @@ class PreferBlocTransformRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       if (node.methodName.name != 'on') return;
 
       // Check if inside a Bloc constructor
@@ -4129,7 +3955,7 @@ class PreferBlocTransformRule extends SaropaLintRule {
       });
 
       if (!hasTransformer) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
   }
@@ -4181,7 +4007,7 @@ class PreferBlocTransformRule extends SaropaLintRule {
 /// }
 /// ```
 class AvoidPassingBlocToBlocRule extends SaropaLintRule {
-  const AvoidPassingBlocToBlocRule() : super(code: _code);
+  AvoidPassingBlocToBlocRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.high;
@@ -4190,22 +4016,20 @@ class AvoidPassingBlocToBlocRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_passing_bloc_to_bloc',
-    problemMessage:
-        '[avoid_passing_bloc_to_bloc] Bloc should not depend on another Bloc. '
+    'avoid_passing_bloc_to_bloc',
+    '[avoid_passing_bloc_to_bloc] Bloc should not depend on another Bloc. '
         'This creates tight coupling and makes testing difficult. {v2}',
     correctionMessage:
         'Use streams or events for inter-Bloc communication instead.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addClassDeclaration((ClassDeclaration node) {
+    context.addClassDeclaration((ClassDeclaration node) {
       final extendsClause = node.extendsClause;
       if (extendsClause == null) return;
 
@@ -4233,7 +4057,7 @@ class AvoidPassingBlocToBlocRule extends SaropaLintRule {
     for (final param in params.parameters) {
       final String? typeName = _getParameterTypeName(param);
       if (typeName != null && _isBlocType(typeName)) {
-        reporter.atNode(param, code);
+        reporter.atNode(param);
       }
     }
   }
@@ -4245,7 +4069,7 @@ class AvoidPassingBlocToBlocRule extends SaropaLintRule {
     final typeName = field.fields.type?.toSource();
     if (typeName != null && _isBlocType(typeName)) {
       for (final variable in field.fields.variables) {
-        reporter.atNode(variable, code);
+        reporter.atNode(variable);
       }
     }
   }
@@ -4290,7 +4114,7 @@ class AvoidPassingBlocToBlocRule extends SaropaLintRule {
 /// }
 /// ```
 class AvoidPassingBuildContextToBlocsRule extends SaropaLintRule {
-  const AvoidPassingBuildContextToBlocsRule() : super(code: _code);
+  AvoidPassingBuildContextToBlocsRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.high;
@@ -4299,22 +4123,20 @@ class AvoidPassingBuildContextToBlocsRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_passing_build_context_to_blocs',
-    problemMessage:
-        '[avoid_passing_build_context_to_blocs] BuildContext in Bloc couples '
+    'avoid_passing_build_context_to_blocs',
+    '[avoid_passing_build_context_to_blocs] BuildContext in Bloc couples '
         'UI to business logic and makes testing difficult. {v2}',
     correctionMessage:
         'Remove BuildContext parameter. Extract needed values before passing to Bloc.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addClassDeclaration((ClassDeclaration node) {
+    context.addClassDeclaration((ClassDeclaration node) {
       final extendsClause = node.extendsClause;
       if (extendsClause == null) return;
 
@@ -4331,7 +4153,7 @@ class AvoidPassingBuildContextToBlocsRule extends SaropaLintRule {
           final typeName = member.fields.type?.toSource();
           if (typeName == 'BuildContext') {
             for (final variable in member.fields.variables) {
-              reporter.atNode(variable, code);
+              reporter.atNode(variable);
             }
           }
         }
@@ -4354,7 +4176,7 @@ class AvoidPassingBuildContextToBlocsRule extends SaropaLintRule {
         }
       }
       if (typeName == 'BuildContext') {
-        reporter.atNode(param, code);
+        reporter.atNode(param);
       }
     }
   }
@@ -4388,7 +4210,7 @@ class AvoidPassingBuildContextToBlocsRule extends SaropaLintRule {
 /// }
 /// ```
 class AvoidReturningValueFromCubitMethodsRule extends SaropaLintRule {
-  const AvoidReturningValueFromCubitMethodsRule() : super(code: _code);
+  AvoidReturningValueFromCubitMethodsRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.medium;
@@ -4397,22 +4219,20 @@ class AvoidReturningValueFromCubitMethodsRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_returning_value_from_cubit_methods',
-    problemMessage:
-        '[avoid_returning_value_from_cubit_methods] Cubit methods should emit '
+    'avoid_returning_value_from_cubit_methods',
+    '[avoid_returning_value_from_cubit_methods] Cubit methods should emit '
         'states, not return values. This bypasses reactive state management. {v2}',
     correctionMessage:
         'Change return type to void and use emit() to update state.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addClassDeclaration((ClassDeclaration node) {
+    context.addClassDeclaration((ClassDeclaration node) {
       final extendsClause = node.extendsClause;
       if (extendsClause == null) return;
 
@@ -4429,7 +4249,9 @@ class AvoidReturningValueFromCubitMethodsRule extends SaropaLintRule {
   }
 
   void _checkMethod(
-      MethodDeclaration method, SaropaDiagnosticReporter reporter) {
+    MethodDeclaration method,
+    SaropaDiagnosticReporter reporter,
+  ) {
     // Skip getters, setters, and special methods
     if (method.isGetter || method.isSetter || method.isStatic) return;
     if (method.name.lexeme == 'close' || method.name.lexeme == 'emit') return;
@@ -4493,7 +4315,7 @@ class _EmitCallVisitor extends RecursiveAstVisitor<void> {
 /// }
 /// ```
 class RequireBlocRepositoryInjectionRule extends SaropaLintRule {
-  const RequireBlocRepositoryInjectionRule() : super(code: _code);
+  RequireBlocRepositoryInjectionRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.medium;
@@ -4502,13 +4324,12 @@ class RequireBlocRepositoryInjectionRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'require_bloc_repository_injection',
-    problemMessage:
-        '[require_bloc_repository_injection] Bloc creates its own repository. '
+    'require_bloc_repository_injection',
+    '[require_bloc_repository_injection] Bloc creates its own repository. '
         'This makes testing difficult and violates dependency injection. {v2}',
     correctionMessage:
         'Inject the repository via constructor parameter instead.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   static const Set<String> _repositorySuffixes = <String>{
@@ -4521,11 +4342,10 @@ class RequireBlocRepositoryInjectionRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addClassDeclaration((ClassDeclaration node) {
+    context.addClassDeclaration((ClassDeclaration node) {
       final extendsClause = node.extendsClause;
       if (extendsClause == null) return;
 
@@ -4549,7 +4369,7 @@ class RequireBlocRepositoryInjectionRule extends SaropaLintRule {
     SaropaDiagnosticReporter reporter,
   ) {
     constructor.body.visitChildren(
-      _RepositoryCreationVisitor((node) => reporter.atNode(node, code)),
+      _RepositoryCreationVisitor((node) => reporter.atNode(node)),
     );
   }
 
@@ -4562,7 +4382,7 @@ class RequireBlocRepositoryInjectionRule extends SaropaLintRule {
       if (initializer is InstanceCreationExpression) {
         final typeName = initializer.constructorName.type.name2.lexeme;
         if (_repositorySuffixes.any((s) => typeName.endsWith(s))) {
-          reporter.atNode(initializer, code);
+          reporter.atNode(initializer);
         }
       }
     }
@@ -4623,7 +4443,7 @@ class _RepositoryCreationVisitor extends RecursiveAstVisitor<void> {
 /// }
 /// ```
 class PreferBlocHydrationRule extends SaropaLintRule {
-  const PreferBlocHydrationRule() : super(code: _code);
+  PreferBlocHydrationRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.medium;
@@ -4632,22 +4452,20 @@ class PreferBlocHydrationRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'prefer_bloc_hydration',
-    problemMessage:
-        '[prefer_bloc_hydration] Bloc uses SharedPreferences for persistence. '
+    'prefer_bloc_hydration',
+    '[prefer_bloc_hydration] Bloc uses SharedPreferences for persistence. '
         'Consider using HydratedBloc for automatic state persistence. {v2}',
     correctionMessage:
         'Extend HydratedBloc instead and implement fromJson/toJson.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addClassDeclaration((ClassDeclaration node) {
+    context.addClassDeclaration((ClassDeclaration node) {
       final extendsClause = node.extendsClause;
       if (extendsClause == null) return;
 
@@ -4734,7 +4552,7 @@ class _SharedPrefsUsageVisitor extends RecursiveAstVisitor<void> {
 /// class PaymentBloc extends Bloc<PaymentEvent, PaymentState> { /* Payments only */ }
 /// ```
 class AvoidLargeBlocRule extends SaropaLintRule {
-  const AvoidLargeBlocRule() : super(code: _code);
+  AvoidLargeBlocRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.medium;
@@ -4743,23 +4561,21 @@ class AvoidLargeBlocRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_large_bloc',
-    problemMessage:
-        '[avoid_large_bloc] Bloc with 7+ event handlers becomes difficult to test and reason about. Blocs handling too many responsibilities become hard to maintain. Keep Blocs focused on a single domain. {v2}',
+    'avoid_large_bloc',
+    '[avoid_large_bloc] Bloc with 7+ event handlers becomes difficult to test and reason about. Blocs handling too many responsibilities become hard to maintain. Keep Blocs focused on a single domain. {v2}',
     correctionMessage:
         'Split into smaller domain-focused Blocs: UserBloc, OrderBloc, etc. Verify the change works correctly with existing tests and add coverage for the new behavior.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   static const int _maxEventHandlers = 7;
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addClassDeclaration((ClassDeclaration node) {
+    context.addClassDeclaration((ClassDeclaration node) {
       final ExtendsClause? extendsClause = node.extendsClause;
       if (extendsClause == null) return;
 
@@ -4775,7 +4591,7 @@ class AvoidLargeBlocRule extends SaropaLintRule {
       eventHandlerCount = onPattern.allMatches(classSource).length;
 
       if (eventHandlerCount > _maxEventHandlers) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
   }
@@ -4812,7 +4628,7 @@ class AvoidLargeBlocRule extends SaropaLintRule {
 /// }
 /// ```
 class AvoidOverengineeredBlocStatesRule extends SaropaLintRule {
-  const AvoidOverengineeredBlocStatesRule() : super(code: _code);
+  AvoidOverengineeredBlocStatesRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.low;
@@ -4821,27 +4637,25 @@ class AvoidOverengineeredBlocStatesRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_overengineered_bloc_states',
-    problemMessage:
-        '[avoid_overengineered_bloc_states] More than 5 state subclasses adds complexity without benefit. Harder to maintain and test. Separate states for "loading" and "idle" when a boolean would suffice. Simpler state machines are easier to reason about. {v2}',
+    'avoid_overengineered_bloc_states',
+    '[avoid_overengineered_bloc_states] More than 5 state subclasses adds complexity without benefit. Harder to maintain and test. Separate states for "loading" and "idle" when a boolean would suffice. Simpler state machines are easier to reason about. {v2}',
     correctionMessage:
         'Use a single state class with isLoading, error, data properties. Verify the change works correctly with existing tests and add coverage for the new behavior.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   static const int _maxStateSubclasses = 5;
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
     // Track state base classes and their subclasses
     final Map<String, List<ClassDeclaration>> stateHierarchy =
         <String, List<ClassDeclaration>>{};
 
-    context.registry.addClassDeclaration((ClassDeclaration node) {
+    context.addClassDeclaration((ClassDeclaration node) {
       final String className = node.name.lexeme;
 
       // Check if this is a state base class (abstract class ending in State)

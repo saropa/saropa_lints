@@ -7,9 +7,6 @@
 library;
 
 import 'package:analyzer/dart/ast/ast.dart';
-import 'package:analyzer/error/error.dart'
-    show AnalysisError, DiagnosticSeverity;
-import 'package:custom_lint_builder/custom_lint_builder.dart';
 
 import '../saropa_lint_rule.dart';
 
@@ -35,7 +32,7 @@ import '../saropa_lint_rule.dart';
 /// BetterPlayerController(configuration: BetterPlayerConfiguration(autoPlay: false));
 /// ```
 class AvoidAutoplayAudioRule extends SaropaLintRule {
-  const AvoidAutoplayAudioRule() : super(code: _code);
+  AvoidAutoplayAudioRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.low;
@@ -44,21 +41,19 @@ class AvoidAutoplayAudioRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_autoplay_audio',
-    problemMessage:
-        '[avoid_autoplay_audio] Autoplay is blocked on iOS/web and annoys users. Autoplaying audio is blocked on iOS/web and annoying to users. Require explicit user interaction to start playback. {v3}',
+    'avoid_autoplay_audio',
+    '[avoid_autoplay_audio] Autoplay is blocked on iOS/web and annoys users. Autoplaying audio is blocked on iOS/web and annoying to users. Require explicit user interaction to start playback. {v3}',
     correctionMessage:
         'Set autoPlay: false and require user interaction to play. Verify the change works correctly with existing tests and add coverage for the new behavior.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addNamedExpression((NamedExpression node) {
+    context.addNamedExpression((NamedExpression node) {
       if (node.name.label.name != 'autoPlay' &&
           node.name.label.name != 'autoplay') {
         return;
@@ -66,41 +61,8 @@ class AvoidAutoplayAudioRule extends SaropaLintRule {
 
       final Expression value = node.expression;
       if (value is BooleanLiteral && value.value) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
-    });
-  }
-
-  @override
-  List<Fix> getFixes() => <Fix>[_DisableAutoplayFix()];
-}
-
-class _DisableAutoplayFix extends DartFix {
-  @override
-  void run(
-    CustomLintResolver resolver,
-    ChangeReporter reporter,
-    CustomLintContext context,
-    AnalysisError analysisError,
-    List<AnalysisError> others,
-  ) {
-    context.registry.addNamedExpression((NamedExpression node) {
-      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
-
-      final Expression value = node.expression;
-      if (value is! BooleanLiteral || !value.value) return;
-
-      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
-        message: 'Set autoPlay to false',
-        priority: 1,
-      );
-
-      changeBuilder.addDartFileEdit((builder) {
-        builder.addSimpleReplacement(
-          value.sourceRange,
-          'false',
-        );
-      });
     });
   }
 }
@@ -126,7 +88,7 @@ class _DisableAutoplayFix extends DartFix {
 /// );
 /// ```
 class PreferCameraResolutionSelectionRule extends SaropaLintRule {
-  const PreferCameraResolutionSelectionRule() : super(code: _code);
+  PreferCameraResolutionSelectionRule() : super(code: _code);
 
   /// Performance/battery consideration.
   @override
@@ -136,21 +98,19 @@ class PreferCameraResolutionSelectionRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'prefer_camera_resolution_selection',
-    problemMessage:
-        '[prefer_camera_resolution_selection] CameraController with max resolution. Prefer app-specific needs. Camera resolution affects performance, battery, and storage. Always specify the desired resolution for your use case. {v2}',
+    'prefer_camera_resolution_selection',
+    '[prefer_camera_resolution_selection] CameraController with max resolution. Prefer app-specific needs. Camera resolution affects performance, battery, and storage. Always specify the desired resolution for your use case. {v2}',
     correctionMessage:
         'Use ResolutionPreset.medium for video calls, .high for photos. Verify the change works correctly with existing tests and add coverage for the new behavior.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addInstanceCreationExpression((node) {
+    context.addInstanceCreationExpression((node) {
       final typeName = node.constructorName.type.name.lexeme;
 
       if (typeName != 'CameraController') {
@@ -193,7 +153,7 @@ class PreferCameraResolutionSelectionRule extends SaropaLintRule {
 /// await player.play(UrlSource(url));
 /// ```
 class PreferAudioSessionConfigRule extends SaropaLintRule {
-  const PreferAudioSessionConfigRule() : super(code: _code);
+  PreferAudioSessionConfigRule() : super(code: _code);
 
   /// Audio UX issue - unexpected behavior with other apps.
   @override
@@ -203,21 +163,19 @@ class PreferAudioSessionConfigRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'prefer_audio_session_config',
-    problemMessage:
-        '[prefer_audio_session_config] AudioPlayer used without audio session config. May conflict with other audio. Audio session determines how your app interacts with other audio. Without configuration, audio may behave unexpectedly. {v2}',
+    'prefer_audio_session_config',
+    '[prefer_audio_session_config] AudioPlayer used without audio session config. May conflict with other audio. Audio session determines how your app interacts with other audio. Without configuration, audio may behave unexpectedly. {v2}',
     correctionMessage:
         'Configure AudioSession.instance before playing audio. Verify the change works correctly with existing tests and add coverage for the new behavior.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodInvocation((node) {
+    context.addMethodInvocation((node) {
       final methodName = node.methodName.name;
 
       // Check for play method on audio player
@@ -254,7 +212,7 @@ class PreferAudioSessionConfigRule extends SaropaLintRule {
         return;
       }
 
-      reporter.atNode(node, code);
+      reporter.atNode(node);
     });
   }
 }

@@ -8,9 +8,6 @@ library;
 
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
-import 'package:analyzer/error/error.dart'
-    show AnalysisError, DiagnosticSeverity;
-import 'package:custom_lint_builder/custom_lint_builder.dart';
 
 import '../saropa_lint_rule.dart';
 
@@ -44,7 +41,7 @@ import '../saropa_lint_rule.dart';
 /// }
 /// ```
 class RequireVsyncMixinRule extends SaropaLintRule {
-  const RequireVsyncMixinRule() : super(code: _code);
+  RequireVsyncMixinRule() : super(code: _code);
 
   /// Missing vsync causes visual glitches and sync issues.
   /// Each occurrence is a bug that should be fixed.
@@ -55,23 +52,19 @@ class RequireVsyncMixinRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'require_vsync_mixin',
-    problemMessage:
-        '[require_vsync_mixin] AnimationController is missing a vsync parameter. Without vsync, animations run without frame synchronization, causing visual tearing, wasted CPU cycles, and degraded user experience. This can lead to janky motion and battery drain, especially on mobile devices. Always provide vsync: this and mix in SingleTickerProviderStateMixin to ensure smooth, efficient animations and proper animation controller lifecycle management. {v4}',
+    'require_vsync_mixin',
+    '[require_vsync_mixin] AnimationController is missing a vsync parameter. Without vsync, animations run without frame synchronization, causing visual tearing, wasted CPU cycles, and degraded user experience. This can lead to janky motion and battery drain, especially on mobile devices. Always provide vsync: this and mix in SingleTickerProviderStateMixin to ensure smooth, efficient animations and proper animation controller lifecycle management. {v4}',
     correctionMessage:
         'Add vsync: this and mix in SingleTickerProviderStateMixin to synchronize animation frames with the display refresh rate, preventing unnecessary CPU and memory usage.',
-    errorSeverity: DiagnosticSeverity.ERROR,
+    severity: DiagnosticSeverity.ERROR,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addInstanceCreationExpression((
-      InstanceCreationExpression node,
-    ) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final String? constructorName = node.constructorName.type.element?.name;
       if (constructorName != 'AnimationController') return;
 
@@ -87,46 +80,6 @@ class RequireVsyncMixinRule extends SaropaLintRule {
       if (!hasVsync) {
         reporter.atNode(node.constructorName, code);
       }
-    });
-  }
-
-  @override
-  List<Fix> getFixes() => <Fix>[_AddVsyncFix()];
-}
-
-class _AddVsyncFix extends DartFix {
-  @override
-  void run(
-    CustomLintResolver resolver,
-    ChangeReporter reporter,
-    CustomLintContext context,
-    AnalysisError analysisError,
-    List<AnalysisError> others,
-  ) {
-    context.registry.addInstanceCreationExpression((
-      InstanceCreationExpression node,
-    ) {
-      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
-
-      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
-        message: 'Add vsync: this',
-        priority: 1,
-      );
-
-      changeBuilder.addDartFileEdit((builder) {
-        final ArgumentList args = node.argumentList;
-        if (args.arguments.isEmpty) {
-          builder.addSimpleInsertion(
-            args.leftParenthesis.end,
-            'vsync: this',
-          );
-        } else {
-          builder.addSimpleInsertion(
-            args.arguments.last.end,
-            ', vsync: this',
-          );
-        }
-      });
     });
   }
 }
@@ -160,7 +113,7 @@ class _AddVsyncFix extends DartFix {
 /// }
 /// ```
 class AvoidAnimationInBuildRule extends SaropaLintRule {
-  const AvoidAnimationInBuildRule() : super(code: _code);
+  AvoidAnimationInBuildRule() : super(code: _code);
 
   /// Creating controllers in build() causes resource leaks on every rebuild.
   /// Each occurrence is a memory leak bug.
@@ -171,21 +124,19 @@ class AvoidAnimationInBuildRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_animation_in_build',
-    problemMessage:
-        '[avoid_animation_in_build] Creating an AnimationController inside the build() method causes a new controller to be instantiated on every widget rebuild, leading to severe memory leaks, degraded animation performance, and unpredictable UI behavior. Previous controllers are never disposed, which can crash your app or exhaust system resources. AnimationControllers must be long-lived and managed at the widget level, not recreated per frame. This is a critical resource management issue in Flutter. {v2}',
+    'avoid_animation_in_build',
+    '[avoid_animation_in_build] Creating an AnimationController inside the build() method causes a new controller to be instantiated on every widget rebuild, leading to severe memory leaks, degraded animation performance, and unpredictable UI behavior. Previous controllers are never disposed, which can crash your app or exhaust system resources. AnimationControllers must be long-lived and managed at the widget level, not recreated per frame. This is a critical resource management issue in Flutter. {v2}',
     correctionMessage:
         'Always create AnimationController instances in initState() and store them as fields in your State class. Dispose of them in the dispose() method to release resources and prevent leaks. Audit your codebase for AnimationController usage and refactor any controllers created in build() to follow this pattern. See Flutter documentation for best practices on animation lifecycle management.',
-    errorSeverity: DiagnosticSeverity.ERROR,
+    severity: DiagnosticSeverity.ERROR,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodDeclaration((MethodDeclaration node) {
+    context.addMethodDeclaration((MethodDeclaration node) {
       if (node.name.lexeme != 'build') return;
 
       node.body.visitChildren(_AnimationControllerVisitor(reporter, code));
@@ -203,7 +154,7 @@ class _AnimationControllerVisitor extends RecursiveAstVisitor<void> {
   void visitInstanceCreationExpression(InstanceCreationExpression node) {
     final String? typeName = node.constructorName.type.element?.name;
     if (typeName == 'AnimationController') {
-      reporter.atNode(node, code);
+      reporter.atNode(node);
     }
     super.visitInstanceCreationExpression(node);
   }
@@ -283,7 +234,7 @@ class _AnimationControllerVisitor extends RecursiveAstVisitor<void> {
 /// }
 /// ```
 class RequireAnimationControllerDisposeRule extends SaropaLintRule {
-  const RequireAnimationControllerDisposeRule() : super(code: _code);
+  RequireAnimationControllerDisposeRule() : super(code: _code);
 
   /// Undisposed controllers cause memory leaks. Each occurrence leaks memory
   /// and prevents garbage collection. Even 1-2 is serious in production.
@@ -297,21 +248,19 @@ class RequireAnimationControllerDisposeRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
-    name: 'require_animation_controller_dispose',
-    problemMessage:
-        '[require_animation_controller_dispose] Neglecting to dispose of an AnimationController when a widget is removed from the tree causes memory leaks and can lead to performance degradation, as the controller continues to consume resources and tick animations in the background. This can eventually crash your app or cause unexpected behavior. Always dispose of AnimationControllers to maintain optimal app performance. See https://api.flutter.dev/flutter/animation/AnimationController/dispose.html. {v2}',
+    'require_animation_controller_dispose',
+    '[require_animation_controller_dispose] Neglecting to dispose of an AnimationController when a widget is removed from the tree causes memory leaks and can lead to performance degradation, as the controller continues to consume resources and tick animations in the background. This can eventually crash your app or cause unexpected behavior. Always dispose of AnimationControllers to maintain optimal app performance. See https://api.flutter.dev/flutter/animation/AnimationController/dispose.html. {v2}',
     correctionMessage:
         'Call dispose on your AnimationController in the widget’s dispose method to release resources and prevent memory leaks. This is a core Flutter best practice for managing animation lifecycles. See https://api.flutter.dev/flutter/animation/AnimationController/dispose.html for details.',
-    errorSeverity: DiagnosticSeverity.ERROR,
+    severity: DiagnosticSeverity.ERROR,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addClassDeclaration((ClassDeclaration node) {
+    context.addClassDeclaration((ClassDeclaration node) {
       // Check if extends State<T>
       final ExtendsClause? extendsClause = node.extendsClause;
       if (extendsClause == null) return;
@@ -366,7 +315,8 @@ class RequireAnimationControllerDisposeRule extends SaropaLintRule {
 
       // Check if controllers are disposed
       for (final String name in controllerNames) {
-        final bool isDisposed = disposeBody != null &&
+        final bool isDisposed =
+            disposeBody != null &&
             RegExp(
               '${RegExp.escape(name)}\\s*[?.]+'
               '\\s*dispose(Safe)?\\s*\\(',
@@ -378,94 +328,12 @@ class RequireAnimationControllerDisposeRule extends SaropaLintRule {
               for (final VariableDeclaration variable
                   in member.fields.variables) {
                 if (variable.name.lexeme == name) {
-                  reporter.atNode(variable, code);
+                  reporter.atNode(variable);
                 }
               }
             }
           }
         }
-      }
-    });
-  }
-
-  @override
-  List<Fix> getFixes() => <Fix>[_AddAnimationControllerDisposeFix()];
-}
-
-class _AddAnimationControllerDisposeFix extends DartFix {
-  @override
-  void run(
-    CustomLintResolver resolver,
-    ChangeReporter reporter,
-    CustomLintContext context,
-    AnalysisError analysisError,
-    List<AnalysisError> others,
-  ) {
-    context.registry.addVariableDeclaration((VariableDeclaration node) {
-      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
-
-      final String fieldName = node.name.lexeme;
-
-      // Find the containing class
-      AstNode? current = node.parent;
-      while (current != null && current is! ClassDeclaration) {
-        current = current.parent;
-      }
-      if (current is! ClassDeclaration) return;
-
-      final ClassDeclaration classNode = current;
-
-      // Find existing dispose method
-      MethodDeclaration? disposeMethod;
-      for (final ClassMember member in classNode.members) {
-        if (member is MethodDeclaration && member.name.lexeme == 'dispose') {
-          disposeMethod = member;
-          break;
-        }
-      }
-
-      if (disposeMethod != null) {
-        // Insert dispose() call before super.dispose()
-        final String bodySource = disposeMethod.body.toSource();
-        final int superDisposeIndex = bodySource.indexOf('super.dispose()');
-
-        if (superDisposeIndex != -1) {
-          final int bodyOffset = disposeMethod.body.offset;
-          final int insertOffset = bodyOffset + superDisposeIndex;
-
-          final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
-            message: 'Add $fieldName.dispose()',
-            priority: 1,
-          );
-
-          changeBuilder.addDartFileEdit((builder) {
-            builder.addSimpleInsertion(
-              insertOffset,
-              '$fieldName.dispose();\n    ',
-            );
-          });
-        }
-      } else {
-        // Create new dispose method
-        int insertOffset = classNode.rightBracket.offset;
-
-        for (final ClassMember member in classNode.members) {
-          if (member is FieldDeclaration || member is ConstructorDeclaration) {
-            insertOffset = member.end;
-          }
-        }
-
-        final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
-          message: 'Add dispose() method with $fieldName.dispose()',
-          priority: 1,
-        );
-
-        changeBuilder.addDartFileEdit((builder) {
-          builder.addSimpleInsertion(
-            insertOffset,
-            '\n\n  @override\n  void dispose() {\n    $fieldName.dispose();\n    super.dispose();\n  }',
-          );
-        });
       }
     });
   }
@@ -495,7 +363,7 @@ class _AddAnimationControllerDisposeFix extends DartFix {
 /// Hero(tag: 'profile-${user.id}', child: avatar),
 /// ```
 class RequireHeroTagUniquenessRule extends SaropaLintRule {
-  const RequireHeroTagUniquenessRule() : super(code: _code);
+  RequireHeroTagUniquenessRule() : super(code: _code);
 
   /// Duplicate Hero tags cause runtime crashes during navigation.
   /// Each occurrence is a crash waiting to happen.
@@ -506,22 +374,20 @@ class RequireHeroTagUniquenessRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'require_hero_tag_uniqueness',
-    problemMessage:
-        '[require_hero_tag_uniqueness] Using duplicate Hero tags within the same navigation context causes Hero animations to fail, resulting in visual glitches and confusing user experiences. This can break navigation transitions and reduce the perceived quality of your app. Ensure each Hero tag is unique within a given Navigator to maintain smooth and predictable animations. See https://docs.flutter.dev/ui/animations/hero-animations#the-hero-tag. {v3}',
+    'require_hero_tag_uniqueness',
+    '[require_hero_tag_uniqueness] Using duplicate Hero tags within the same navigation context causes Hero animations to fail, resulting in visual glitches and confusing user experiences. This can break navigation transitions and reduce the perceived quality of your app. Ensure each Hero tag is unique within a given Navigator to maintain smooth and predictable animations. See https://docs.flutter.dev/ui/animations/hero-animations#the-hero-tag. {v3}',
     correctionMessage:
         'Assign unique tags to each Hero widget within the same navigation context to guarantee correct animation behavior and prevent transition errors. Refer to https://docs.flutter.dev/ui/animations/hero-animations#the-hero-tag for best practices.',
-    errorSeverity: DiagnosticSeverity.ERROR,
+    severity: DiagnosticSeverity.ERROR,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
     // Use CompilationUnit visitor to collect all Hero tags first, then report
-    context.registry.addCompilationUnit((CompilationUnit unit) {
+    context.addCompilationUnit((CompilationUnit unit) {
       final Map<String, List<AstNode>> heroTags = <String, List<AstNode>>{};
 
       unit.visitChildren(_HeroTagCollector(heroTags));
@@ -594,7 +460,7 @@ class _HeroTagCollector extends RecursiveAstVisitor<void> {
 /// )
 /// ```
 class AvoidLayoutPassesRule extends SaropaLintRule {
-  const AvoidLayoutPassesRule() : super(code: _code);
+  AvoidLayoutPassesRule() : super(code: _code);
 
   /// Double layout passes hurt performance, especially in lists.
   /// A few is okay, but 10+ in hot paths causes noticeable jank.
@@ -605,23 +471,19 @@ class AvoidLayoutPassesRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_layout_passes',
-    problemMessage:
-        '[avoid_layout_passes] Using IntrinsicWidth or IntrinsicHeight causes Flutter to perform two layout passes for affected child widgets in the build tree, which significantly hurts performance, especially in complex UIs or lists. This can lead to dropped frames, laggy animations, and poor user experience. Prefer using CrossAxisAlignment.stretch, Expanded, or fixed dimensions to avoid extra layout computation. {v2}',
+    'avoid_layout_passes',
+    '[avoid_layout_passes] Using IntrinsicWidth or IntrinsicHeight causes Flutter to perform two layout passes for affected child widgets in the build tree, which significantly hurts performance, especially in complex UIs or lists. This can lead to dropped frames, laggy animations, and poor user experience. Prefer using CrossAxisAlignment.stretch, Expanded, or fixed dimensions to avoid extra layout computation. {v2}',
     correctionMessage:
         'Replace IntrinsicWidth/IntrinsicHeight with CrossAxisAlignment.stretch, Expanded, or fixed dimensions to eliminate the extra layout pass in the build tree.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addInstanceCreationExpression((
-      InstanceCreationExpression node,
-    ) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final String? constructorName = node.constructorName.type.element?.name;
       if (constructorName != 'IntrinsicWidth' &&
           constructorName != 'IntrinsicHeight') {
@@ -662,7 +524,7 @@ class AvoidLayoutPassesRule extends SaropaLintRule {
 /// Future.delayed(kDelayDuration);
 /// ```
 class AvoidHardcodedDurationRule extends SaropaLintRule {
-  const AvoidHardcodedDurationRule() : super(code: _code);
+  AvoidHardcodedDurationRule() : super(code: _code);
 
   /// Hardcoded durations affect maintainability, not correctness.
   /// 1000+ is fine in legacy code; enforce on new code only.
@@ -673,23 +535,19 @@ class AvoidHardcodedDurationRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_hardcoded_duration',
-    problemMessage:
-        '[avoid_hardcoded_duration] Hardcoded Duration values make it difficult to maintain consistent timing across the app and can lead to subtle bugs when timings need to be updated globally. This practice reduces maintainability and increases the risk of inconsistent user experiences. Always extract Duration values to named constants for clarity, reusability, and easier updates. {v2}',
+    'avoid_hardcoded_duration',
+    '[avoid_hardcoded_duration] Hardcoded Duration values make it difficult to maintain consistent timing across the app and can lead to subtle bugs when timings need to be updated globally. This practice reduces maintainability and increases the risk of inconsistent user experiences. Always extract Duration values to named constants for clarity, reusability, and easier updates. {v2}',
     correctionMessage:
         'Extract Duration to a named constant for consistency and maintainability. Test on a low-end device to confirm smooth rendering after the fix.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addInstanceCreationExpression((
-      InstanceCreationExpression node,
-    ) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final String typeName = node.constructorName.type.name.lexeme;
       if (typeName != 'Duration') return;
 
@@ -725,7 +583,7 @@ class AvoidHardcodedDurationRule extends SaropaLintRule {
       }
 
       if (hasLiteralArgs) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
   }
@@ -763,7 +621,7 @@ class AvoidHardcodedDurationRule extends SaropaLintRule {
 /// );
 /// ```
 class RequireAnimationCurveRule extends SaropaLintRule {
-  const RequireAnimationCurveRule() : super(code: _code);
+  RequireAnimationCurveRule() : super(code: _code);
 
   /// Missing curves affect UX polish, not functionality.
   /// Address when improving animation quality; not urgent.
@@ -774,21 +632,19 @@ class RequireAnimationCurveRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'require_animation_curve',
-    problemMessage:
-        '[require_animation_curve] Animation uses the default linear curve, which often results in unnatural or robotic motion. Without specifying a curve, transitions may feel abrupt and lack the smoothness users expect. Always wrap with CurvedAnimation or use .animate() with a curve parameter to create more natural, visually appealing animations that enhance user experience. {v2}',
+    'require_animation_curve',
+    '[require_animation_curve] Animation uses the default linear curve, which often results in unnatural or robotic motion. Without specifying a curve, transitions may feel abrupt and lack the smoothness users expect. Always wrap with CurvedAnimation or use .animate() with a curve parameter to create more natural, visually appealing animations that enhance user experience. {v2}',
     correctionMessage:
         'Wrap with CurvedAnimation or use .animate() with a curve parameter. Test on a low-end device to confirm smooth rendering after the fix.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       // Check for Tween.animate() without curve
       if (node.methodName.name != 'animate') return;
 
@@ -816,7 +672,7 @@ class RequireAnimationCurveRule extends SaropaLintRule {
         final Expression firstArg = node.argumentList.arguments.first;
         if (firstArg is SimpleIdentifier || firstArg is PrefixedIdentifier) {
           // Direct controller reference without CurvedAnimation
-          reporter.atNode(node, code);
+          reporter.atNode(node);
         }
       }
     });
@@ -859,7 +715,7 @@ class RequireAnimationCurveRule extends SaropaLintRule {
 /// )
 /// ```
 class PreferImplicitAnimationsRule extends SaropaLintRule {
-  const PreferImplicitAnimationsRule() : super(code: _code);
+  PreferImplicitAnimationsRule() : super(code: _code);
 
   /// Code simplification suggestion. Explicit animations work fine.
   /// Address during refactoring; not a bug.
@@ -870,12 +726,11 @@ class PreferImplicitAnimationsRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'prefer_implicit_animations',
-    problemMessage:
-        '[prefer_implicit_animations] Simple animations such as opacity, size, or color changes are implemented with explicit AnimationController and transition widgets. This adds unnecessary complexity and increases the risk of memory leaks if disposal is missed. Prefer using implicit animation widgets like AnimatedOpacity or AnimatedContainer, which are simpler, auto-dispose, and improve code maintainability and reliability. {v2}',
+    'prefer_implicit_animations',
+    '[prefer_implicit_animations] Simple animations such as opacity, size, or color changes are implemented with explicit AnimationController and transition widgets. This adds unnecessary complexity and increases the risk of memory leaks if disposal is missed. Prefer using implicit animation widgets like AnimatedOpacity or AnimatedContainer, which are simpler, auto-dispose, and improve code maintainability and reliability. {v2}',
     correctionMessage:
         'Implicit animations are simpler and auto-dispose. Use for single-property changes.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   /// Transition widgets that have implicit equivalents
@@ -890,18 +745,15 @@ class PreferImplicitAnimationsRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
     // Track transitions per class to avoid O(n^2) complexity
     final Map<ClassDeclaration, int> transitionCounts =
         <ClassDeclaration, int>{};
     final List<_TransitionNode> pendingReports = <_TransitionNode>[];
 
-    context.registry.addInstanceCreationExpression((
-      InstanceCreationExpression node,
-    ) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final String? typeName = node.constructorName.type.element?.name;
       if (typeName == null) return;
 
@@ -971,7 +823,7 @@ class _TransitionNode {
 /// )
 /// ```
 class RequireStaggeredAnimationDelaysRule extends SaropaLintRule {
-  const RequireStaggeredAnimationDelaysRule() : super(code: _code);
+  RequireStaggeredAnimationDelaysRule() : super(code: _code);
 
   /// UX polish suggestion. Non-staggered animations work but look less polished.
   /// Address when improving animation quality; not urgent.
@@ -982,12 +834,11 @@ class RequireStaggeredAnimationDelaysRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'require_staggered_animation_delays',
-    problemMessage:
-        '[require_staggered_animation_delays] List item animations are not staggered, resulting in all items animating simultaneously. This creates a chaotic and unnatural cascade effect, making it hard for users to follow the UI changes. Use index-based delays (e.g., Interval(index * 0.1, ..)) to stagger animations for a smooth, visually appealing transition. {v2}',
+    'require_staggered_animation_delays',
+    '[require_staggered_animation_delays] List item animations are not staggered, resulting in all items animating simultaneously. This creates a chaotic and unnatural cascade effect, making it hard for users to follow the UI changes. Use index-based delays (e.g., Interval(index * 0.1, ..)) to stagger animations for a smooth, visually appealing transition. {v2}',
     correctionMessage:
         'Use Interval with index-based delays: Interval(index * 0.1, ..). Test on a low-end device to confirm smooth rendering after the fix.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   static const Set<String> _transitionWidgets = <String>{
@@ -1001,13 +852,10 @@ class RequireStaggeredAnimationDelaysRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addInstanceCreationExpression((
-      InstanceCreationExpression node,
-    ) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final String? typeName = node.constructorName.type.element?.name;
       if (typeName != 'ListView' && typeName != 'GridView') return;
 
@@ -1028,7 +876,8 @@ class RequireStaggeredAnimationDelaysRule extends SaropaLintRule {
           if (!hasTransition) return;
 
           // Check if using staggered animations
-          final bool hasStagger = builderSource.contains('Interval') ||
+          final bool hasStagger =
+              builderSource.contains('Interval') ||
               builderSource.contains('index *') ||
               builderSource.contains('index*') ||
               builderSource.contains('delay') ||
@@ -1070,7 +919,7 @@ class RequireStaggeredAnimationDelaysRule extends SaropaLintRule {
 /// ]).animate(_controller);
 /// ```
 class PreferTweenSequenceRule extends SaropaLintRule {
-  const PreferTweenSequenceRule() : super(code: _code);
+  PreferTweenSequenceRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.medium;
@@ -1079,21 +928,19 @@ class PreferTweenSequenceRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'prefer_tween_sequence',
-    problemMessage:
-        '[prefer_tween_sequence] Multiple chained animations are implemented without using TweenSequence, which can lead to complex, error-prone code and unpredictable animation timing. TweenSequence simplifies sequential animations, making them easier to manage and ensuring smooth transitions. Use TweenSequence for sequential property changes to improve maintainability and user experience. {v2}',
+    'prefer_tween_sequence',
+    '[prefer_tween_sequence] Multiple chained animations are implemented without using TweenSequence, which can lead to complex, error-prone code and unpredictable animation timing. TweenSequence simplifies sequential animations, making them easier to manage and ensuring smooth transitions. Use TweenSequence for sequential property changes to improve maintainability and user experience. {v2}',
     correctionMessage:
         'Use TweenSequence for sequential animations. Test on a low-end device to confirm smooth rendering after the fix.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       if (node.methodName.name != 'then') return;
 
       // Check if called on .forward()
@@ -1109,7 +956,7 @@ class PreferTweenSequenceRule extends SaropaLintRule {
       if (callback is FunctionExpression) {
         final String bodySource = callback.body.toSource();
         if (bodySource.contains('.forward()')) {
-          reporter.atNode(node, code);
+          reporter.atNode(node);
         }
       }
     });
@@ -1141,7 +988,7 @@ class PreferTweenSequenceRule extends SaropaLintRule {
 /// _controller.forward();
 /// ```
 class RequireAnimationStatusListenerRule extends SaropaLintRule {
-  const RequireAnimationStatusListenerRule() : super(code: _code);
+  RequireAnimationStatusListenerRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.medium;
@@ -1150,26 +997,24 @@ class RequireAnimationStatusListenerRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'require_animation_status_listener',
-    problemMessage:
-        '[require_animation_status_listener] AnimationController.forward() called without addStatusListener to detect completion. The animation will run but your application cannot respond when it finishes, preventing cleanup, sequencing, or triggering follow-up actions. {v2}',
+    'require_animation_status_listener',
+    '[require_animation_status_listener] AnimationController.forward() called without addStatusListener to detect completion. The animation will run but your application cannot respond when it finishes, preventing cleanup, sequencing, or triggering follow-up actions. {v2}',
     correctionMessage:
         'Add controller.addStatusListener and check for AnimationStatus.completed or AnimationStatus.dismissed to execute code when the animation finishes, enabling proper resource management and action sequencing.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
     // Track controllers and their listeners
     final Set<String> controllersWithListener = <String>{};
     final Map<String, MethodInvocation> forwardCalls =
         <String, MethodInvocation>{};
 
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       final String methodName = node.methodName.name;
 
       if (methodName == 'addStatusListener') {
@@ -1273,7 +1118,7 @@ class RequireAnimationStatusListenerRule extends SaropaLintRule {
 /// )
 /// ```
 class AvoidOverlappingAnimationsRule extends SaropaLintRule {
-  const AvoidOverlappingAnimationsRule() : super(code: _code);
+  AvoidOverlappingAnimationsRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.high;
@@ -1286,20 +1131,19 @@ class AvoidOverlappingAnimationsRule extends SaropaLintRule {
 
   @override
   Set<String>? get requiredPatterns => const <String>{
-        'ScaleTransition',
-        'FadeTransition',
-        'SlideTransition',
-        'RotationTransition',
-        'SizeTransition',
-      };
+    'ScaleTransition',
+    'FadeTransition',
+    'SlideTransition',
+    'RotationTransition',
+    'SizeTransition',
+  };
 
   static const LintCode _code = LintCode(
-    name: 'avoid_overlapping_animations',
-    problemMessage:
-        '[avoid_overlapping_animations] Multiple animations targeting the same property (e.g., opacity, position, scale) at the same time cause visual jitter, unpredictable results, and confusing UI behavior. Overlapping animations can make transitions hard to follow and degrade user experience, especially for users with cognitive or visual disabilities. {v4}',
+    'avoid_overlapping_animations',
+    '[avoid_overlapping_animations] Multiple animations targeting the same property (e.g., opacity, position, scale) at the same time cause visual jitter, unpredictable results, and confusing UI behavior. Overlapping animations can make transitions hard to follow and degrade user experience, especially for users with cognitive or visual disabilities. {v4}',
     correctionMessage:
         'Refactor your code to combine overlapping animations into a single AnimationController, or animate different properties separately. Audit your widget tree for conflicting animations and document animation best practices for your team.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   // Map transition types to the property they animate
@@ -1340,13 +1184,10 @@ class AvoidOverlappingAnimationsRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addInstanceCreationExpression((
-      InstanceCreationExpression node,
-    ) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final String typeName = node.constructorName.type.name.lexeme;
       final String? property = _getEffectiveProperty(typeName, node);
       if (property == null) return;
@@ -1357,8 +1198,10 @@ class AvoidOverlappingAnimationsRule extends SaropaLintRule {
           final Expression child = arg.expression;
           if (child is InstanceCreationExpression) {
             final String childTypeName = child.constructorName.type.name.lexeme;
-            final String? childProperty =
-                _getEffectiveProperty(childTypeName, child);
+            final String? childProperty = _getEffectiveProperty(
+              childTypeName,
+              child,
+            );
             if (childProperty == property) {
               reporter.atNode(child.constructorName, code);
             }
@@ -1411,7 +1254,7 @@ class AvoidOverlappingAnimationsRule extends SaropaLintRule {
 /// )
 /// ```
 class AvoidAnimationRebuildWasteRule extends SaropaLintRule {
-  const AvoidAnimationRebuildWasteRule() : super(code: _code);
+  AvoidAnimationRebuildWasteRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.high;
@@ -1420,12 +1263,11 @@ class AvoidAnimationRebuildWasteRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_animation_rebuild_waste',
-    problemMessage:
-        '[avoid_animation_rebuild_waste] AnimatedBuilder wraps too much of the widget tree, causing unnecessary rebuilds and wasted CPU cycles. This can degrade animation performance, increase battery usage, and make your app feel sluggish, especially on lower-end devices. {v3}',
+    'avoid_animation_rebuild_waste',
+    '[avoid_animation_rebuild_waste] AnimatedBuilder wraps too much of the widget tree, causing unnecessary rebuilds and wasted CPU cycles. This can degrade animation performance, increase battery usage, and make your app feel sluggish, especially on lower-end devices. {v3}',
     correctionMessage:
         'Move AnimatedBuilder as close as possible to the widgets that actually change during the animation. Avoid wrapping large containers or static content. Audit your widget tree for excessive rebuilds and educate your team on animation performance best practices.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   // Large container widgets that shouldn't be inside AnimatedBuilder
@@ -1440,13 +1282,10 @@ class AvoidAnimationRebuildWasteRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addInstanceCreationExpression((
-      InstanceCreationExpression node,
-    ) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final String typeName = node.constructorName.type.name.lexeme;
       if (typeName != 'AnimatedBuilder') return;
 
@@ -1497,7 +1336,7 @@ class AvoidAnimationRebuildWasteRule extends SaropaLintRule {
 /// }
 /// ```
 class PreferPhysicsSimulationRule extends SaropaLintRule {
-  const PreferPhysicsSimulationRule() : super(code: _code);
+  PreferPhysicsSimulationRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.low;
@@ -1506,21 +1345,19 @@ class PreferPhysicsSimulationRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'prefer_physics_simulation',
-    problemMessage:
-        '[prefer_physics_simulation] Drag-release should use physics simulation for natural feel. Abruptly stopping animations on release feels unnatural. Use spring or friction physics for smooth deceleration. {v2}',
+    'prefer_physics_simulation',
+    '[prefer_physics_simulation] Drag-release should use physics simulation for natural feel. Abruptly stopping animations on release feels unnatural. Use spring or friction physics for smooth deceleration. {v2}',
     correctionMessage:
         'Use SpringSimulation or FrictionSimulation with animateWith. Test on a low-end device to confirm smooth rendering after the fix.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addNamedExpression((NamedExpression node) {
+    context.addNamedExpression((NamedExpression node) {
       final String name = node.name.label.name;
 
       if (name != 'onPanEnd' && name != 'onDragEnd') return;
@@ -1543,7 +1380,7 @@ class PreferPhysicsSimulationRule extends SaropaLintRule {
           return;
         }
 
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
   }
@@ -1607,7 +1444,7 @@ class PreferPhysicsSimulationRule extends SaropaLintRule {
 /// }
 /// ```
 class RequireAnimationTickerDisposalRule extends SaropaLintRule {
-  const RequireAnimationTickerDisposalRule() : super(code: _code);
+  RequireAnimationTickerDisposalRule() : super(code: _code);
 
   /// Ticker leaks cause memory issues and error messages.
   @override
@@ -1617,21 +1454,19 @@ class RequireAnimationTickerDisposalRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'require_animation_ticker_disposal',
-    problemMessage:
-        '[require_animation_ticker_disposal] If you do not stop your Ticker in dispose(), it will continue running and leak memory, causing slowdowns and error messages. This can degrade performance and lead to crashes in long-running apps. {v2}',
+    'require_animation_ticker_disposal',
+    '[require_animation_ticker_disposal] If you do not stop your Ticker in dispose(), it will continue running and leak memory, causing slowdowns and error messages. This can degrade performance and lead to crashes in long-running apps. {v2}',
     correctionMessage:
         'Always call _ticker.stop() in dispose() before super.dispose() to safely release resources and prevent memory leaks.',
-    errorSeverity: DiagnosticSeverity.ERROR,
+    severity: DiagnosticSeverity.ERROR,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addClassDeclaration((ClassDeclaration node) {
+    context.addClassDeclaration((ClassDeclaration node) {
       // Check if extends State<T>
       final ExtendsClause? extendsClause = node.extendsClause;
       if (extendsClause == null) return;
@@ -1670,7 +1505,8 @@ class RequireAnimationTickerDisposalRule extends SaropaLintRule {
 
       // Report tickers not stopped in dispose
       for (final String fieldName in tickerFields) {
-        final bool isStopped = disposeBody != null &&
+        final bool isStopped =
+            disposeBody != null &&
             RegExp(
               '${RegExp.escape(fieldName)}\\s*[?.]+'
               '\\s*(stop|dispose)\\s*\\(\\)',
@@ -1682,7 +1518,7 @@ class RequireAnimationTickerDisposalRule extends SaropaLintRule {
               for (final VariableDeclaration variable
                   in member.fields.variables) {
                 if (variable.name.lexeme == fieldName) {
-                  reporter.atNode(variable, code);
+                  reporter.atNode(variable);
                 }
               }
             }
@@ -1721,7 +1557,7 @@ class RequireAnimationTickerDisposalRule extends SaropaLintRule {
 /// controller.animateWith(SpringSimulation(spring, 0, 1, velocity));
 /// ```
 class PreferSpringAnimationRule extends SaropaLintRule {
-  const PreferSpringAnimationRule() : super(code: _code);
+  PreferSpringAnimationRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.low;
@@ -1730,12 +1566,11 @@ class PreferSpringAnimationRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'prefer_spring_animation',
-    problemMessage:
-        '[prefer_spring_animation] CurvedAnimation with a physics-like curve (bounceOut, elasticOut, bounceIn, elasticIn, etc.) is being used where a SpringSimulation would produce smoother, more natural-feeling motion. CurvedAnimation uses a fixed duration that cannot respond to user input velocity, causing disconnects between gesture speed and animation behavior that feel artificial and jarring to users. {v2}',
+    'prefer_spring_animation',
+    '[prefer_spring_animation] CurvedAnimation with a physics-like curve (bounceOut, elasticOut, bounceIn, elasticIn, etc.) is being used where a SpringSimulation would produce smoother, more natural-feeling motion. CurvedAnimation uses a fixed duration that cannot respond to user input velocity, causing disconnects between gesture speed and animation behavior that feel artificial and jarring to users. {v2}',
     correctionMessage:
         'Consider using SpringSimulation with SpringDescription for physics-based animations, especially for gestures like drag, fling, and bounce where animation should respond to input velocity.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   /// Curves that mimic physics and are better served by SpringSimulation.
@@ -1750,13 +1585,10 @@ class PreferSpringAnimationRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addInstanceCreationExpression((
-      InstanceCreationExpression node,
-    ) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final String? constructorName = node.constructorName.type.element?.name;
       if (constructorName != 'CurvedAnimation') return;
 
@@ -1766,44 +1598,12 @@ class PreferSpringAnimationRule extends SaropaLintRule {
           final String curveSource = arg.expression.toSource();
           for (final String physicsCurve in _physicsLikeCurves) {
             if (curveSource.contains(physicsCurve)) {
-              reporter.atNode(node, code);
+              reporter.atNode(node);
               return;
             }
           }
         }
       }
-    });
-  }
-
-  @override
-  List<Fix> getFixes() => <Fix>[_SuggestSpringSimulationFix()];
-}
-
-class _SuggestSpringSimulationFix extends DartFix {
-  @override
-  void run(
-    CustomLintResolver resolver,
-    ChangeReporter reporter,
-    CustomLintContext context,
-    AnalysisError analysisError,
-    List<AnalysisError> others,
-  ) {
-    context.registry.addInstanceCreationExpression((
-      InstanceCreationExpression node,
-    ) {
-      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
-
-      final changeBuilder = reporter.createChangeBuilder(
-        message: 'Add TODO: consider SpringSimulation for natural physics',
-        priority: 1,
-      );
-
-      changeBuilder.addDartFileEdit((builder) {
-        builder.addSimpleInsertion(
-          node.offset,
-          '/* TODO: consider SpringSimulation for natural physics-based motion */ ',
-        );
-      });
     });
   }
 }
@@ -1852,7 +1652,7 @@ class _SuggestSpringSimulationFix extends DartFix {
 /// )
 /// ```
 class AvoidExcessiveRebuildsAnimationRule extends SaropaLintRule {
-  const AvoidExcessiveRebuildsAnimationRule() : super(code: _code);
+  AvoidExcessiveRebuildsAnimationRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.high;
@@ -1861,9 +1661,8 @@ class AvoidExcessiveRebuildsAnimationRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_excessive_rebuilds_animation',
-    problemMessage:
-        '[avoid_excessive_rebuilds_animation] The builder callback of this '
+    'avoid_excessive_rebuilds_animation',
+    '[avoid_excessive_rebuilds_animation] The builder callback of this '
         'animation widget contains too many widget constructors, causing the '
         'entire subtree to rebuild on every animation frame (typically 60 '
         'times per second). This wastes CPU cycles, increases battery drain, '
@@ -1874,7 +1673,7 @@ class AvoidExcessiveRebuildsAnimationRule extends SaropaLintRule {
         'Extract static widgets outside the builder callback. Use the child '
         'parameter to pass non-animating subtrees through. Only keep widgets '
         'that depend on the animation value inside the builder.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   static const Set<String> _builderWidgets = <String>{
@@ -1890,13 +1689,10 @@ class AvoidExcessiveRebuildsAnimationRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addInstanceCreationExpression((
-      InstanceCreationExpression node,
-    ) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final String typeName = node.constructorName.type.name.lexeme;
       if (!_builderWidgets.contains(typeName)) return;
 

@@ -1,9 +1,6 @@
 // ignore_for_file: depend_on_referenced_packages, deprecated_member_use
 
 import 'package:analyzer/dart/ast/ast.dart';
-import 'package:analyzer/error/error.dart'
-    show AnalysisError, DiagnosticSeverity;
-import 'package:custom_lint_builder/custom_lint_builder.dart';
 import 'package:saropa_lints/src/saropa_lint_rule.dart';
 
 /// Warns when SnackBar is created without explicit duration.
@@ -31,7 +28,7 @@ import 'package:saropa_lints/src/saropa_lint_rule.dart';
 /// );
 /// ```
 class RequireSnackbarDurationRule extends SaropaLintRule {
-  const RequireSnackbarDurationRule() : super(code: _code);
+  RequireSnackbarDurationRule() : super(code: _code);
 
   /// Minor improvement. Track for later review.
   @override
@@ -41,23 +38,19 @@ class RequireSnackbarDurationRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'require_snackbar_duration',
-    problemMessage:
-        '[require_snackbar_duration] Default duration varies by platform, '
+    'require_snackbar_duration',
+    '[require_snackbar_duration] Default duration varies by platform, '
         'causing inconsistent UX across devices. {v3}',
     correctionMessage: 'Add duration parameter for consistent UX timing.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addInstanceCreationExpression((
-      InstanceCreationExpression node,
-    ) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final String? constructorName = node.constructorName.type.element?.name;
       if (constructorName != 'SnackBar') return;
 
@@ -73,46 +66,6 @@ class RequireSnackbarDurationRule extends SaropaLintRule {
       if (!hasDuration) {
         reporter.atNode(node.constructorName, code);
       }
-    });
-  }
-
-  @override
-  List<Fix> getFixes() => [_AddDurationFix()];
-}
-
-class _AddDurationFix extends DartFix {
-  @override
-  void run(
-    CustomLintResolver resolver,
-    ChangeReporter reporter,
-    CustomLintContext context,
-    AnalysisError analysisError,
-    List<AnalysisError> others,
-  ) {
-    context.registry.addInstanceCreationExpression((
-      InstanceCreationExpression node,
-    ) {
-      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
-
-      final changeBuilder = reporter.createChangeBuilder(
-        message: 'Add duration: const Duration(seconds: 4)',
-        priority: 80,
-      );
-
-      changeBuilder.addDartFileEdit((builder) {
-        final args = node.argumentList;
-        if (args.arguments.isEmpty) {
-          builder.addSimpleInsertion(
-            args.leftParenthesis.end,
-            'duration: const Duration(seconds: 4)',
-          );
-        } else {
-          builder.addSimpleInsertion(
-            args.arguments.last.end,
-            ', duration: const Duration(seconds: 4)',
-          );
-        }
-      });
     });
   }
 }
@@ -142,7 +95,7 @@ class _AddDurationFix extends DartFix {
 /// );
 /// ```
 class RequireDialogBarrierDismissibleRule extends SaropaLintRule {
-  const RequireDialogBarrierDismissibleRule() : super(code: _code);
+  RequireDialogBarrierDismissibleRule() : super(code: _code);
 
   /// Minor improvement. Track for later review.
   @override
@@ -152,22 +105,20 @@ class RequireDialogBarrierDismissibleRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'require_dialog_barrier_dismissible',
-    problemMessage:
-        '[require_dialog_barrier_dismissible] Default barrier behavior may '
+    'require_dialog_barrier_dismissible',
+    '[require_dialog_barrier_dismissible] Default barrier behavior may '
         'allow accidental dismissal, losing unsaved user input. {v3}',
     correctionMessage:
         'Add barrierDismissible: true or false to make intent clear.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       if (node.methodName.name != 'showDialog') return;
 
       // Check for barrierDismissible parameter
@@ -183,44 +134,6 @@ class RequireDialogBarrierDismissibleRule extends SaropaLintRule {
       if (!hasBarrierDismissible) {
         reporter.atNode(node.methodName, code);
       }
-    });
-  }
-
-  @override
-  List<Fix> getFixes() => [_AddBarrierDismissibleFix()];
-}
-
-class _AddBarrierDismissibleFix extends DartFix {
-  @override
-  void run(
-    CustomLintResolver resolver,
-    ChangeReporter reporter,
-    CustomLintContext context,
-    AnalysisError analysisError,
-    List<AnalysisError> others,
-  ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
-      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
-
-      final changeBuilder = reporter.createChangeBuilder(
-        message: 'Add barrierDismissible: false',
-        priority: 80,
-      );
-
-      changeBuilder.addDartFileEdit((builder) {
-        final args = node.argumentList;
-        if (args.arguments.isEmpty) {
-          builder.addSimpleInsertion(
-            args.leftParenthesis.end,
-            'barrierDismissible: false',
-          );
-        } else {
-          builder.addSimpleInsertion(
-            args.arguments.last.end,
-            ', barrierDismissible: false',
-          );
-        }
-      });
     });
   }
 }
@@ -259,7 +172,7 @@ class _AddBarrierDismissibleFix extends DartFix {
 /// }
 /// ```
 class RequireDialogResultHandlingRule extends SaropaLintRule {
-  const RequireDialogResultHandlingRule() : super(code: _code);
+  RequireDialogResultHandlingRule() : super(code: _code);
 
   /// Minor improvement. Track for later review.
   @override
@@ -269,21 +182,19 @@ class RequireDialogResultHandlingRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'require_dialog_result_handling',
-    problemMessage:
-        '[require_dialog_result_handling] showDialog result must be awaited or handled. Dialogs that return values (like confirmation dialogs) must have their results awaited and processed. Ignoring the result can lead to missed user actions. {v2}',
+    'require_dialog_result_handling',
+    '[require_dialog_result_handling] showDialog result must be awaited or handled. Dialogs that return values (like confirmation dialogs) must have their results awaited and processed. Ignoring the result can lead to missed user actions. {v2}',
     correctionMessage:
         'Use await showDialog() or .then() to handle the dialog result. Verify the change works correctly with existing tests and add coverage for the new behavior.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       if (node.methodName.name != 'showDialog') return;
 
       // Check if the result is used
@@ -333,7 +244,7 @@ class RequireDialogResultHandlingRule extends SaropaLintRule {
 /// );
 /// ```
 class AvoidSnackbarQueueBuildupRule extends SaropaLintRule {
-  const AvoidSnackbarQueueBuildupRule() : super(code: _code);
+  AvoidSnackbarQueueBuildupRule() : super(code: _code);
 
   /// Minor improvement. Track for later review.
   @override
@@ -343,21 +254,19 @@ class AvoidSnackbarQueueBuildupRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_snackbar_queue_buildup',
-    problemMessage:
-        '[avoid_snackbar_queue_buildup] Prefer clearing snackbars before showing new ones. Multiple snackbars can queue up, leading to poor UX where users see stale messages. Prefer clearing or hiding previous snackbars before showing new ones. {v2}',
+    'avoid_snackbar_queue_buildup',
+    '[avoid_snackbar_queue_buildup] Prefer clearing snackbars before showing new ones. Multiple snackbars can queue up, leading to poor UX where users see stale messages. Prefer clearing or hiding previous snackbars before showing new ones. {v2}',
     correctionMessage:
         'Call clearSnackBars() or hideCurrentSnackBar() before showSnackBar(). Verify the change works correctly with existing tests and add coverage for the new behavior.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       if (node.methodName.name != 'showSnackBar') return;
 
       // Check if preceded by clearSnackBars or hideCurrentSnackBar in same block
@@ -433,7 +342,7 @@ class AvoidSnackbarQueueBuildupRule extends SaropaLintRule {
 /// );
 /// ```
 class PreferAdaptiveDialogRule extends SaropaLintRule {
-  const PreferAdaptiveDialogRule() : super(code: _code);
+  PreferAdaptiveDialogRule() : super(code: _code);
 
   /// UX improvement - native platform feel.
   @override
@@ -443,21 +352,19 @@ class PreferAdaptiveDialogRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'prefer_adaptive_dialog',
-    problemMessage:
-        '[prefer_adaptive_dialog] AlertDialog without adaptive styling. May look non-native on iOS. Dialogs should adapt to the platform (Material on Android, Cupertino on iOS) for native look and feel. {v3}',
+    'prefer_adaptive_dialog',
+    '[prefer_adaptive_dialog] AlertDialog without adaptive styling. May look non-native on iOS. Dialogs should adapt to the platform (Material on Android, Cupertino on iOS) for native look and feel. {v3}',
     correctionMessage:
         'Use AlertDialog.adaptive() or platform-specific dialogs. Verify the change works correctly with existing tests and add coverage for the new behavior.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addInstanceCreationExpression((node) {
+    context.addInstanceCreationExpression((node) {
       final typeName = node.constructorName.type.name.lexeme;
       final constructorName = node.constructorName.name?.name;
 
@@ -491,38 +398,6 @@ class PreferAdaptiveDialogRule extends SaropaLintRule {
       reporter.atNode(node.constructorName, code);
     });
   }
-
-  @override
-  List<Fix> getFixes() => [_UseAdaptiveDialogFix()];
-}
-
-class _UseAdaptiveDialogFix extends DartFix {
-  @override
-  void run(
-    CustomLintResolver resolver,
-    ChangeReporter reporter,
-    CustomLintContext context,
-    AnalysisError analysisError,
-    List<AnalysisError> others,
-  ) {
-    context.registry.addInstanceCreationExpression((
-      InstanceCreationExpression node,
-    ) {
-      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
-
-      final changeBuilder = reporter.createChangeBuilder(
-        message: 'Use AlertDialog.adaptive()',
-        priority: 80,
-      );
-
-      changeBuilder.addDartFileEdit((builder) {
-        builder.addSimpleReplacement(
-          node.constructorName.sourceRange,
-          'AlertDialog.adaptive',
-        );
-      });
-    });
-  }
 }
 
 /// Warns when SnackBar for delete operation doesn't have undo action.
@@ -552,7 +427,7 @@ class _UseAdaptiveDialogFix extends DartFix {
 /// );
 /// ```
 class RequireSnackbarActionForUndoRule extends SaropaLintRule {
-  const RequireSnackbarActionForUndoRule() : super(code: _code);
+  RequireSnackbarActionForUndoRule() : super(code: _code);
 
   /// UX improvement - allows recovery from accidents.
   @override
@@ -562,29 +437,21 @@ class RequireSnackbarActionForUndoRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'require_snackbar_action_for_undo',
-    problemMessage:
-        '[require_snackbar_action_for_undo] SnackBar for delete/remove without undo action. Users can\'t recover. Destructive actions should provide an undo option. SnackBars are perfect for this pattern with their action button. {v2}',
+    'require_snackbar_action_for_undo',
+    '[require_snackbar_action_for_undo] SnackBar for delete/remove without undo action. Users can\'t recover. Destructive actions should provide an undo option. SnackBars are perfect for this pattern with their action button. {v2}',
     correctionMessage:
         'Add action parameter with SnackBarAction for undo functionality. Verify the change works correctly with existing tests and add coverage for the new behavior.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
-  static const _deleteTerms = [
-    'delete',
-    'remove',
-    'clear',
-    'erase',
-    'discard',
-  ];
+  static const _deleteTerms = ['delete', 'remove', 'clear', 'erase', 'discard'];
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addInstanceCreationExpression((node) {
+    context.addInstanceCreationExpression((node) {
       final typeName = node.constructorName.type.name.lexeme;
 
       if (typeName != 'SnackBar') {
@@ -593,8 +460,9 @@ class RequireSnackbarActionForUndoRule extends SaropaLintRule {
 
       // Check if content mentions delete-related terms
       final snackbarSource = node.toSource().toLowerCase();
-      final isDeleteRelated =
-          _deleteTerms.any((term) => snackbarSource.contains(term));
+      final isDeleteRelated = _deleteTerms.any(
+        (term) => snackbarSource.contains(term),
+      );
 
       if (!isDeleteRelated) {
         return;

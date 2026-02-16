@@ -7,9 +7,6 @@
 library;
 
 import 'package:analyzer/dart/ast/ast.dart';
-import 'package:analyzer/error/error.dart'
-    show AnalysisError, DiagnosticSeverity;
-import 'package:custom_lint_builder/custom_lint_builder.dart';
 
 import '../saropa_lint_rule.dart';
 
@@ -38,7 +35,7 @@ import '../saropa_lint_rule.dart';
 /// }
 /// ```
 class AvoidLargeObjectsInStateRule extends SaropaLintRule {
-  const AvoidLargeObjectsInStateRule() : super(code: _code);
+  AvoidLargeObjectsInStateRule() : super(code: _code);
 
   /// Large unbounded data in state can cause OOM errors.
   /// Review for potential memory issues.
@@ -49,12 +46,11 @@ class AvoidLargeObjectsInStateRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_large_objects_in_state',
-    problemMessage:
-        '[avoid_large_objects_in_state] Unbounded List, Map, Set, or ByteData field declared in a State class grows without limit as data accumulates. Without pagination or size constraints, this allocates excessive memory that degrades scroll performance, increases garbage collection pressure, and eventually crashes the app with an out-of-memory error on devices with limited RAM. {v4}',
+    'avoid_large_objects_in_state',
+    '[avoid_large_objects_in_state] Unbounded List, Map, Set, or ByteData field declared in a State class grows without limit as data accumulates. Without pagination or size constraints, this allocates excessive memory that degrades scroll performance, increases garbage collection pressure, and eventually crashes the app with an out-of-memory error on devices with limited RAM. {v4}',
     correctionMessage:
         'Use pagination to load data in fixed-size chunks, stream results lazily from the data source, or move large collections to external state management with disposal and lifecycle control.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   static const Set<String> _largeTypePatterns = <String>{
@@ -68,11 +64,10 @@ class AvoidLargeObjectsInStateRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addClassDeclaration((ClassDeclaration node) {
+    context.addClassDeclaration((ClassDeclaration node) {
       // Check if this is a State class
       final ExtendsClause? extendsClause = node.extendsClause;
       if (extendsClause == null) return;
@@ -94,7 +89,7 @@ class AvoidLargeObjectsInStateRule extends SaropaLintRule {
               if (!fieldSource.contains('// bounded') &&
                   !fieldSource.contains('maxSize') &&
                   !fieldSource.contains('limit')) {
-                reporter.atNode(member, code);
+                reporter.atNode(member);
                 break;
               }
             }
@@ -134,7 +129,7 @@ class AvoidLargeObjectsInStateRule extends SaropaLintRule {
 /// }
 /// ```
 class RequireImageDisposalRule extends SaropaLintRule {
-  const RequireImageDisposalRule() : super(code: _code);
+  RequireImageDisposalRule() : super(code: _code);
 
   /// Undisposed images leak native memory and cause OOM crashes.
   /// Each occurrence is a memory leak.
@@ -145,21 +140,19 @@ class RequireImageDisposalRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'require_image_disposal',
-    problemMessage:
-        '[require_image_disposal] Failing to dispose of images or image streams can lead to memory leaks, increased memory usage, and eventual app crashes, especially in image-heavy applications. This is critical for apps that load or manipulate images dynamically. See https://docs.flutter.dev/perf/memory#images. {v6}',
+    'require_image_disposal',
+    '[require_image_disposal] Failing to dispose of images or image streams can lead to memory leaks, increased memory usage, and eventual app crashes, especially in image-heavy applications. This is critical for apps that load or manipulate images dynamically. See https://docs.flutter.dev/perf/memory#images. {v6}',
     correctionMessage:
         'Dispose of images and image streams when they are no longer needed to free memory and maintain app performance. See https://docs.flutter.dev/perf/memory#images for best practices.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addClassDeclaration((ClassDeclaration node) {
+    context.addClassDeclaration((ClassDeclaration node) {
       // Check if this is a State class
       final ExtendsClause? extendsClause = node.extendsClause;
       if (extendsClause == null) return;
@@ -192,7 +185,7 @@ class RequireImageDisposalRule extends SaropaLintRule {
       }
 
       if (hasUiImageField && !hasDisposeCall) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
   }
@@ -240,7 +233,7 @@ class RequireImageDisposalRule extends SaropaLintRule {
 /// }
 /// ```
 class AvoidCapturingThisInCallbacksRule extends SaropaLintRule {
-  const AvoidCapturingThisInCallbacksRule() : super(code: _code);
+  AvoidCapturingThisInCallbacksRule() : super(code: _code);
 
   /// Captured references prevent garbage collection and leak memory.
   /// Review long-lived callbacks for proper lifecycle management.
@@ -251,12 +244,11 @@ class AvoidCapturingThisInCallbacksRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_capturing_this_in_callbacks',
-    problemMessage:
-        '[avoid_capturing_this_in_callbacks] Closure callback captures a reference to the entire enclosing object instance via implicit this. This prevents garbage collection of the object and all its fields for as long as the callback exists. Long-lived callbacks such as stream listeners, timers, or global event handlers create memory leaks that accumulate over the app session lifetime. {v4}',
+    'avoid_capturing_this_in_callbacks',
+    '[avoid_capturing_this_in_callbacks] Closure callback captures a reference to the entire enclosing object instance via implicit this. This prevents garbage collection of the object and all its fields for as long as the callback exists. Long-lived callbacks such as stream listeners, timers, or global event handlers create memory leaks that accumulate over the app session lifetime. {v4}',
     correctionMessage:
         'Extract only the specific values needed into local variables before the closure, or use a static method reference that does not capture the enclosing object instance.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   static const Set<String> _longLivedCallbacks = <String>{
@@ -269,11 +261,10 @@ class AvoidCapturingThisInCallbacksRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       final String fullCall = node.toSource();
 
       bool isLongLivedCallback = false;
@@ -293,7 +284,7 @@ class AvoidCapturingThisInCallbacksRule extends SaropaLintRule {
           if (funcSource.contains('setState') ||
               funcSource.contains('this.') ||
               funcSource.contains('widget.')) {
-            reporter.atNode(arg, code);
+            reporter.atNode(arg);
             return;
           }
         }
@@ -335,7 +326,7 @@ class AvoidCapturingThisInCallbacksRule extends SaropaLintRule {
 /// }
 /// ```
 class RequireCacheEvictionPolicyRule extends SaropaLintRule {
-  const RequireCacheEvictionPolicyRule() : super(code: _code);
+  RequireCacheEvictionPolicyRule() : super(code: _code);
 
   /// Unbounded caches grow indefinitely and cause OOM errors.
   /// Each occurrence is a potential memory leak.
@@ -346,21 +337,19 @@ class RequireCacheEvictionPolicyRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'require_cache_eviction_policy',
-    problemMessage:
-        '[require_cache_eviction_policy] Unbounded cache consumes memory until '
+    'require_cache_eviction_policy',
+    '[require_cache_eviction_policy] Unbounded cache consumes memory until '
         'app crashes with OutOfMemoryError after extended use. {v3}',
     correctionMessage: 'Implement LRU eviction, TTL, or max size limit.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addClassDeclaration((ClassDeclaration node) {
+    context.addClassDeclaration((ClassDeclaration node) {
       final String className = node.name.lexeme.toLowerCase();
 
       // Only check classes that appear to be caches
@@ -371,7 +360,8 @@ class RequireCacheEvictionPolicyRule extends SaropaLintRule {
       final String classSource = node.toSource();
 
       // Check for eviction patterns
-      final bool hasEviction = classSource.contains('remove(') ||
+      final bool hasEviction =
+          classSource.contains('remove(') ||
           classSource.contains('clear(') ||
           classSource.contains('maxSize') ||
           classSource.contains('_maxSize') ||
@@ -384,7 +374,7 @@ class RequireCacheEvictionPolicyRule extends SaropaLintRule {
           classSource.contains('LRU');
 
       if (!hasEviction) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
   }
@@ -413,7 +403,7 @@ class RequireCacheEvictionPolicyRule extends SaropaLintRule {
 /// }
 /// ```
 class PreferWeakReferencesForCacheRule extends SaropaLintRule {
-  const PreferWeakReferencesForCacheRule() : super(code: _code);
+  PreferWeakReferencesForCacheRule() : super(code: _code);
 
   /// Strong references in caches prevent GC under memory pressure.
   /// Consider for memory-sensitive applications.
@@ -424,21 +414,19 @@ class PreferWeakReferencesForCacheRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'prefer_weak_references_for_cache',
-    problemMessage:
-        '[prefer_weak_references_for_cache] Strong cache references prevent garbage collection under memory pressure. Strong references to large objects prevent garbage collection. Use WeakReference for caches that should yield to memory pressure. {v5}',
+    'prefer_weak_references_for_cache',
+    '[prefer_weak_references_for_cache] Strong cache references prevent garbage collection under memory pressure. Strong references to large objects prevent garbage collection. Use WeakReference for caches that should yield to memory pressure. {v5}',
     correctionMessage:
         'WeakReference allows garbage collection under memory pressure. Use the DevTools memory profiler to verify the leak is resolved after the fix.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addClassDeclaration((ClassDeclaration node) {
+    context.addClassDeclaration((ClassDeclaration node) {
       final String className = node.name.lexeme.toLowerCase();
 
       // Only check classes that appear to be caches
@@ -455,7 +443,7 @@ class PreferWeakReferencesForCacheRule extends SaropaLintRule {
           // Check for Map that doesn't use WeakReference
           if (typeSource.contains('Map<') &&
               !typeSource.contains('WeakReference')) {
-            reporter.atNode(member, code);
+            reporter.atNode(member);
           }
         }
       }
@@ -492,7 +480,7 @@ class PreferWeakReferencesForCacheRule extends SaropaLintRule {
 /// }
 /// ```
 class AvoidExpandoCircularReferencesRule extends SaropaLintRule {
-  const AvoidExpandoCircularReferencesRule() : super(code: _code);
+  AvoidExpandoCircularReferencesRule() : super(code: _code);
 
   /// Circular references in Expando prevent garbage collection.
   /// Each occurrence is a memory leak.
@@ -503,21 +491,19 @@ class AvoidExpandoCircularReferencesRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_expando_circular_references',
-    problemMessage:
-        '[avoid_expando_circular_references] Creating a circular reference by storing a reference to an Expando key inside its own value prevents Dart’s garbage collector from reclaiming memory, resulting in memory leaks. This subtle bug can cause your app’s memory usage to grow over time, degrade performance, and eventually lead to crashes or out-of-memory errors, especially in long-running or data-intensive applications. Such leaks are difficult to detect and debug, making it critical to avoid circular references when using Expando for metadata or caching. {v5}',
+    'avoid_expando_circular_references',
+    '[avoid_expando_circular_references] Creating a circular reference by storing a reference to an Expando key inside its own value prevents Dart’s garbage collector from reclaiming memory, resulting in memory leaks. This subtle bug can cause your app’s memory usage to grow over time, degrade performance, and eventually lead to crashes or out-of-memory errors, especially in long-running or data-intensive applications. Such leaks are difficult to detect and debug, making it critical to avoid circular references when using Expando for metadata or caching. {v5}',
     correctionMessage:
         'Never store a reference to the Expando key (such as an object or identifier) inside the value associated with that key. Refactor your code to ensure Expando values do not reference their own keys, breaking any potential cycles. Regularly review and test code that uses Expando for memory safety, and use memory profiling tools to detect leaks in production.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addIndexExpression((IndexExpression node) {
+    context.addIndexExpression((IndexExpression node) {
       // Check for Expando assignment pattern: expando[key] = value
       final Expression? target = node.target;
       if (target == null) return;
@@ -539,7 +525,7 @@ class AvoidExpandoCircularReferencesRule extends SaropaLintRule {
 
       // Check if value contains reference to key
       if (valueSource.contains(keySource)) {
-        reporter.atNode(parent, code);
+        reporter.atNode(parent);
       }
     });
   }
@@ -570,7 +556,7 @@ class AvoidExpandoCircularReferencesRule extends SaropaLintRule {
 /// }
 /// ```
 class AvoidLargeIsolateCommunicationRule extends SaropaLintRule {
-  const AvoidLargeIsolateCommunicationRule() : super(code: _code);
+  AvoidLargeIsolateCommunicationRule() : super(code: _code);
 
   /// Large isolate copies cause temporary memory spikes.
   /// Performance issue, not a memory leak.
@@ -581,21 +567,19 @@ class AvoidLargeIsolateCommunicationRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_large_isolate_communication',
-    problemMessage:
-        '[avoid_large_isolate_communication] Sending large objects between isolates is expensive. Sending large objects between isolates requires copying, which is expensive. Use SendPort with TransferableTypedData for large data. {v3}',
+    'avoid_large_isolate_communication',
+    '[avoid_large_isolate_communication] Sending large objects between isolates is expensive. Sending large objects between isolates requires copying, which is expensive. Use SendPort with TransferableTypedData for large data. {v3}',
     correctionMessage:
         'Use TransferableTypedData or process data in chunks. Use the DevTools memory profiler to verify the leak is resolved after the fix.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       final String methodName = node.methodName.name;
 
       // Check for compute() calls
@@ -610,7 +594,7 @@ class AvoidLargeIsolateCommunicationRule extends SaropaLintRule {
               argSource.contains('set') ||
               argSource.contains('bytes') ||
               argSource.contains('data')) {
-            reporter.atNode(node, code);
+            reporter.atNode(node);
           }
         }
       }
@@ -628,7 +612,7 @@ class AvoidLargeIsolateCommunicationRule extends SaropaLintRule {
               if (argSource.contains('list') ||
                   argSource.contains('bytes') ||
                   argSource.contains('data')) {
-                reporter.atNode(node, code);
+                reporter.atNode(node);
               }
             }
           }
@@ -676,7 +660,7 @@ class AvoidLargeIsolateCommunicationRule extends SaropaLintRule {
 /// }
 /// ```
 class RequireCacheExpirationRule extends SaropaLintRule {
-  const RequireCacheExpirationRule() : super(code: _code);
+  RequireCacheExpirationRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.medium;
@@ -685,21 +669,19 @@ class RequireCacheExpirationRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'require_cache_expiration',
-    problemMessage:
-        '[require_cache_expiration] Cache implementation lacks expiration logic. Caches without TTL serve stale data indefinitely. Implement expiration to ensure data freshness. Unreleased memory grows over time, increasing garbage collection pressure and risking out-of-memory crashes. {v2}',
+    'require_cache_expiration',
+    '[require_cache_expiration] Cache implementation lacks expiration logic. Caches without TTL serve stale data indefinitely. Implement expiration to ensure data freshness. Unreleased memory grows over time, increasing garbage collection pressure and risking out-of-memory crashes. {v2}',
     correctionMessage:
         'Add TTL/expiration to prevent serving stale data indefinitely. Use the DevTools memory profiler to verify the leak is resolved after the fix.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addClassDeclaration((ClassDeclaration node) {
+    context.addClassDeclaration((ClassDeclaration node) {
       final String className = node.name.lexeme.toLowerCase();
 
       // Only check cache-related classes
@@ -710,7 +692,8 @@ class RequireCacheExpirationRule extends SaropaLintRule {
       final String classSource = node.toSource().toLowerCase();
 
       // Check for expiration-related patterns
-      final bool hasExpiration = classSource.contains('expire') ||
+      final bool hasExpiration =
+          classSource.contains('expire') ||
           classSource.contains('ttl') ||
           classSource.contains('duration') ||
           classSource.contains('timestamp') ||
@@ -721,7 +704,7 @@ class RequireCacheExpirationRule extends SaropaLintRule {
       final bool hasMapCache = classSource.contains('map<');
 
       if (hasMapCache && !hasExpiration) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
   }
@@ -777,7 +760,7 @@ class RequireCacheExpirationRule extends SaropaLintRule {
 /// **Quick fix available:** Adds a `static const int maxSize = 100;` field.
 /// You'll need to manually add eviction logic in mutation methods.
 class AvoidUnboundedCacheGrowthRule extends SaropaLintRule {
-  const AvoidUnboundedCacheGrowthRule() : super(code: _code);
+  AvoidUnboundedCacheGrowthRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.high;
@@ -803,21 +786,19 @@ class AvoidUnboundedCacheGrowthRule extends SaropaLintRule {
   static final RegExp _mapKeyPattern = RegExp(r'Map<(\w+),');
 
   static const LintCode _code = LintCode(
-    name: 'avoid_unbounded_cache_growth',
-    problemMessage:
-        '[avoid_unbounded_cache_growth] Map or collection used as a cache has no maximum size constraint. Without eviction logic, the cache grows indefinitely as new entries are added, consuming increasing amounts of device memory. This eventually exhausts available RAM and crashes the app with an out-of-memory error, particularly on mobile devices with limited memory resources. {v4}',
+    'avoid_unbounded_cache_growth',
+    '[avoid_unbounded_cache_growth] Map or collection used as a cache has no maximum size constraint. Without eviction logic, the cache grows indefinitely as new entries are added, consuming increasing amounts of device memory. This eventually exhausts available RAM and crashes the app with an out-of-memory error, particularly on mobile devices with limited memory resources. {v4}',
     correctionMessage:
         'Implement a bounded cache with a maximum entry count and LRU (Least Recently Used) eviction policy, or use a cache library that manages size limits automatically.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addClassDeclaration((ClassDeclaration node) {
+    context.addClassDeclaration((ClassDeclaration node) {
       final String className = node.name.lexeme.toLowerCase();
 
       // Only check cache-related classes
@@ -838,7 +819,8 @@ class AvoidUnboundedCacheGrowthRule extends SaropaLintRule {
       // Check for size limiting patterns
       // Note: Use word boundaries to avoid false matches (e.g., Uint8List contains 'limit')
       // Note: Don't use 'bounded' - it matches 'unbounded' in expect_lint comments
-      final bool hasSizeLimit = classSource.contains('maxsize') ||
+      final bool hasSizeLimit =
+          classSource.contains('maxsize') ||
           classSource.contains('max_size') ||
           classSource.contains('capacity') ||
           _hasLimitPattern(classSource) ||
@@ -863,7 +845,7 @@ class AvoidUnboundedCacheGrowthRule extends SaropaLintRule {
         return;
       }
 
-      reporter.atNode(node, code);
+      reporter.atNode(node);
     });
   }
 
@@ -983,50 +965,9 @@ class AvoidUnboundedCacheGrowthRule extends SaropaLintRule {
     // void add(, void put(, void set(, void cache(, etc.
     return _mutationMethodPattern.hasMatch(classSource);
   }
-
-  @override
-  List<Fix> getFixes() => <Fix>[_AvoidUnboundedCacheGrowthFix()];
 }
 
 /// Quick fix that adds a maxSize constant to the cache class.
-class _AvoidUnboundedCacheGrowthFix extends DartFix {
-  @override
-  void run(
-    CustomLintResolver resolver,
-    ChangeReporter reporter,
-    CustomLintContext context,
-    AnalysisError analysisError,
-    List<AnalysisError> others,
-  ) {
-    context.registry.addClassDeclaration((ClassDeclaration node) {
-      if (!analysisError.sourceRange.intersects(node.sourceRange)) return;
-
-      // Find the first field declaration to insert after
-      FieldDeclaration? firstField;
-      for (final ClassMember member in node.members) {
-        if (member is FieldDeclaration) {
-          firstField = member;
-          break;
-        }
-      }
-
-      if (firstField == null) return;
-
-      final changeBuilder = reporter.createChangeBuilder(
-        message: 'Add maxSize limit (100 entries)',
-        priority: 80,
-      );
-
-      changeBuilder.addDartFileEdit((builder) {
-        // Insert maxSize constant after the first field
-        builder.addSimpleInsertion(
-          firstField!.end,
-          '\n  static const int maxSize = 100;',
-        );
-      });
-    });
-  }
-}
 
 /// Warns when cache keys may not be unique.
 ///
@@ -1055,7 +996,7 @@ class _AvoidUnboundedCacheGrowthFix extends DartFix {
 /// }
 /// ```
 class RequireCacheKeyUniquenessRule extends SaropaLintRule {
-  const RequireCacheKeyUniquenessRule() : super(code: _code);
+  RequireCacheKeyUniquenessRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.medium;
@@ -1064,12 +1005,11 @@ class RequireCacheKeyUniquenessRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'require_cache_key_uniqueness',
-    problemMessage:
-        '[require_cache_key_uniqueness] Cache key type may have unstable hashCode. Cache keys must be deterministic. Using objects without stable hashCode/equality as cache keys causes missed cache hits. {v2}',
+    'require_cache_key_uniqueness',
+    '[require_cache_key_uniqueness] Cache key type may have unstable hashCode. Cache keys must be deterministic. Using objects without stable hashCode/equality as cache keys causes missed cache hits. {v2}',
     correctionMessage:
         'Use String, int, or objects with stable hashCode/equality as cache keys. Use the DevTools memory profiler to verify the leak is resolved after the fix.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   // Types that are safe as cache keys
@@ -1085,11 +1025,10 @@ class RequireCacheKeyUniquenessRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addFieldDeclaration((FieldDeclaration node) {
+    context.addFieldDeclaration((FieldDeclaration node) {
       for (final VariableDeclaration variable in node.fields.variables) {
         final String fieldName = variable.name.lexeme.toLowerCase();
 
@@ -1112,7 +1051,7 @@ class RequireCacheKeyUniquenessRule extends SaropaLintRule {
           if (match != null) {
             final String keyType = match.group(1)!;
             if (!_safeKeyTypes.contains(keyType)) {
-              reporter.atNode(variable, code);
+              reporter.atNode(variable);
             }
           }
         }
@@ -1164,7 +1103,7 @@ class RequireCacheKeyUniquenessRule extends SaropaLintRule {
 /// }
 /// ```
 class AvoidRetainingDisposedWidgetsRule extends SaropaLintRule {
-  const AvoidRetainingDisposedWidgetsRule() : super(code: _code);
+  AvoidRetainingDisposedWidgetsRule() : super(code: _code);
 
   /// Retaining disposed widgets causes memory leaks and crashes.
   @override
@@ -1174,9 +1113,8 @@ class AvoidRetainingDisposedWidgetsRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_retaining_disposed_widgets',
-    problemMessage:
-        '[avoid_retaining_disposed_widgets] Non-widget class stores a '
+    'avoid_retaining_disposed_widgets',
+    '[avoid_retaining_disposed_widgets] Non-widget class stores a '
         'reference to a Widget or State object. After the widget is disposed, '
         'this reference prevents garbage collection and may cause '
         'use-after-dispose crashes. Widget and State objects are tied to the '
@@ -1186,7 +1124,7 @@ class AvoidRetainingDisposedWidgetsRule extends SaropaLintRule {
         'Store only the data you need (not the widget itself), or use '
         'callbacks (VoidCallback, ValueChanged) to communicate between '
         'widgets and services.',
-    errorSeverity: DiagnosticSeverity.ERROR,
+    severity: DiagnosticSeverity.ERROR,
   );
 
   /// Widget-related type names that should not be stored in non-widget classes
@@ -1218,11 +1156,10 @@ class AvoidRetainingDisposedWidgetsRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addClassDeclaration((ClassDeclaration node) {
+    context.addClassDeclaration((ClassDeclaration node) {
       // Skip widget classes — they can hold widget references
       if (_isWidgetClass(node)) return;
 
@@ -1240,7 +1177,7 @@ class AvoidRetainingDisposedWidgetsRule extends SaropaLintRule {
               typeSource == '$widgetType?' ||
               typeSource == 'List<$widgetType>' ||
               typeSource == 'List<$widgetType?>') {
-            reporter.atNode(member, code);
+            reporter.atNode(member);
             break;
           }
         }

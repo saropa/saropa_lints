@@ -3,12 +3,9 @@
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/token.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
-import 'package:analyzer/error/error.dart'
-    show AnalysisError, DiagnosticSeverity;
-import 'package:analyzer/source/source_range.dart';
-import 'package:custom_lint_builder/custom_lint_builder.dart';
 
 import '../async_context_utils.dart';
+import '../fixes/remove_empty_set_state_fix.dart';
 import '../saropa_lint_rule.dart';
 
 /// Shared regex for detecting private method calls (e.g., `_dispose()`).
@@ -16,7 +13,7 @@ import '../saropa_lint_rule.dart';
 final RegExp _privateMethodCallPattern = RegExp(r'_(\w+)\s*\(');
 
 class AvoidContextInInitStateDisposeRule extends SaropaLintRule {
-  const AvoidContextInInitStateDisposeRule() : super(code: _code);
+  AvoidContextInInitStateDisposeRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -29,23 +26,21 @@ class AvoidContextInInitStateDisposeRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
-    name: 'avoid_context_in_initstate_dispose',
-    problemMessage:
-        '[avoid_context_in_initstate_dispose] BuildContext used in initState or dispose may reference an unmounted widget, causing runtime errors or silent failures. '
+    'avoid_context_in_initstate_dispose',
+    '[avoid_context_in_initstate_dispose] BuildContext used in initState or dispose may reference an unmounted widget, causing runtime errors or silent failures. '
         'In initState the widget tree is not yet fully built, and in dispose the widget has been removed, so context-dependent lookups (Theme.of, Navigator.of) can return stale or invalid data. {v7}',
     correctionMessage:
         'Use WidgetsBinding.instance.addPostFrameCallback to defer context access until after the widget is mounted. '
         'For dispose, move context-dependent cleanup to deactivate() or use a pre-captured reference to ensure the widget tree is in a valid state when context is accessed.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodDeclaration((MethodDeclaration node) {
+    context.addMethodDeclaration((MethodDeclaration node) {
       final String methodName = node.name.lexeme;
 
       // Only check initState and dispose methods
@@ -65,7 +60,7 @@ class AvoidContextInInitStateDisposeRule extends SaropaLintRule {
 
       // Report each unsafe context usage
       for (final SimpleIdentifier contextNode in visitor.unsafeContextUsages) {
-        reporter.atNode(contextNode, code);
+        reporter.atNode(contextNode);
       }
     });
   }
@@ -196,7 +191,7 @@ class _ContextUsageVisitor extends RecursiveAstVisitor<void> {
 /// if (mounted) setState(() {});
 /// ```
 class AvoidEmptySetStateRule extends SaropaLintRule {
-  const AvoidEmptySetStateRule() : super(code: _code);
+  AvoidEmptySetStateRule() : super(code: _code);
 
   /// Style preference. Large counts are normal in codebases that use the
   /// `if (mounted) setState(() {})` idiom after async gaps.
@@ -209,22 +204,26 @@ class AvoidEmptySetStateRule extends SaropaLintRule {
   @override
   Set<FileType>? get applicableFileTypes => {FileType.widget};
 
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+    ({required CorrectionProducerContext context}) =>
+        RemoveEmptySetStateFix(context: context),
+  ];
+
   static const LintCode _code = LintCode(
-    name: 'avoid_empty_setstate',
-    problemMessage:
-        '[avoid_empty_setstate] setState callback is empty — state was likely modified before this call. An empty setState(() {}) still triggers a rebuild, but moving state changes inside the callback makes the intent clearer. {v5}',
+    'avoid_empty_setstate',
+    '[avoid_empty_setstate] setState callback is empty — state was likely modified before this call. An empty setState(() {}) still triggers a rebuild, but moving state changes inside the callback makes the intent clearer. {v5}',
     correctionMessage:
         'Move state changes inside the callback for clarity, or suppress if intentional. Verify the change works correctly with existing tests and add coverage for the new behavior.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       if (node.methodName.name != 'setState') return;
 
       final NodeList<Expression> args = node.argumentList.arguments;
@@ -235,7 +234,7 @@ class AvoidEmptySetStateRule extends SaropaLintRule {
         final FunctionBody body = callback.body;
         if (body is BlockFunctionBody && body.block.statements.isEmpty) {
           if (_isInsideMountedGuard(node)) return;
-          reporter.atNode(node, code);
+          reporter.atNode(node);
         }
       }
     });
@@ -294,7 +293,7 @@ class AvoidEmptySetStateRule extends SaropaLintRule {
 /// )
 /// ```
 class AvoidLateContextRule extends SaropaLintRule {
-  const AvoidLateContextRule() : super(code: _code);
+  AvoidLateContextRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -307,23 +306,21 @@ class AvoidLateContextRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
-    name: 'avoid_late_context',
-    problemMessage:
-        '[avoid_late_context] BuildContext in late field initializer captures a stale reference that may become invalid after rebuilds. '
+    'avoid_late_context',
+    '[avoid_late_context] BuildContext in late field initializer captures a stale reference that may become invalid after rebuilds. '
         'Late fields are initialized once on first access, but BuildContext changes whenever the widget rebuilds, so the captured context points to an outdated element that may no longer exist in the tree. {v8}',
     correctionMessage:
         'Initialize context-dependent values in didChangeDependencies() (which runs after every dependency change) or directly in build(). '
         'For one-time initialization, use addPostFrameCallback in initState to safely access context after the first frame is rendered.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addFieldDeclaration((FieldDeclaration node) {
+    context.addFieldDeclaration((FieldDeclaration node) {
       // Only check late fields
       if (!node.fields.isLate) return;
 
@@ -341,7 +338,7 @@ class AvoidLateContextRule extends SaropaLintRule {
       for (final VariableDeclaration variable in node.fields.variables) {
         final Expression? initializer = variable.initializer;
         if (initializer != null && _usesContext(initializer)) {
-          reporter.atNode(variable, code);
+          reporter.atNode(variable);
         }
       }
     });
@@ -416,7 +413,7 @@ class AvoidLateContextRule extends SaropaLintRule {
 /// }
 /// ```
 class AvoidMountedInSetStateRule extends SaropaLintRule {
-  const AvoidMountedInSetStateRule() : super(code: _code);
+  AvoidMountedInSetStateRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -429,21 +426,19 @@ class AvoidMountedInSetStateRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
-    name: 'avoid_mounted_in_setstate',
-    problemMessage:
-        '[avoid_mounted_in_setstate] Checking the mounted property inside a setState callback is an anti-pattern. If the widget is not mounted, setState should not be called at all. Placing the check inside the callback can lead to subtle bugs where partial state updates execute before the mounted check runs. {v5}',
+    'avoid_mounted_in_setstate',
+    '[avoid_mounted_in_setstate] Checking the mounted property inside a setState callback is an anti-pattern. If the widget is not mounted, setState should not be called at all. Placing the check inside the callback can lead to subtle bugs where partial state updates execute before the mounted check runs. {v5}',
     correctionMessage:
         'Always check if the widget is mounted before calling setState, not inside the callback. This ensures state updates are only triggered when the widget is in the tree, preventing runtime errors and unexpected behavior. See Flutter documentation on widget lifecycle and setState usage.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       if (node.methodName.name != 'setState') return;
 
       final ArgumentList args = node.argumentList;
@@ -456,7 +451,7 @@ class AvoidMountedInSetStateRule extends SaropaLintRule {
       firstArg.accept(visitor);
 
       for (final SimpleIdentifier mountedRef in visitor.mountedReferences) {
-        reporter.atNode(mountedRef, code);
+        reporter.atNode(mountedRef);
       }
     });
   }
@@ -481,7 +476,7 @@ class _MountedVisitor extends RecursiveAstVisitor<void> {
 /// Methods that return widgets can cause unnecessary rebuilds. Consider
 /// extracting to a separate widget class.
 class AvoidStateConstructorsRule extends SaropaLintRule {
-  const AvoidStateConstructorsRule() : super(code: _code);
+  AvoidStateConstructorsRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -494,21 +489,19 @@ class AvoidStateConstructorsRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
-    name: 'avoid_state_constructors',
-    problemMessage:
-        '[avoid_state_constructors] State class must not have a constructor body. Constructor logic runs before the framework initializes the State object, risking errors that bypass the widget lifecycle contract. {v4}',
+    'avoid_state_constructors',
+    '[avoid_state_constructors] State class must not have a constructor body. Constructor logic runs before the framework initializes the State object, risking errors that bypass the widget lifecycle contract. {v4}',
     correctionMessage:
         'Use initState() for initialization instead. Verify the change works correctly with existing tests and add coverage for the new behavior.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addClassDeclaration((ClassDeclaration node) {
+    context.addClassDeclaration((ClassDeclaration node) {
       // Check if extends State
       final ExtendsClause? extendsClause = node.extendsClause;
       if (extendsClause == null) return;
@@ -521,7 +514,7 @@ class AvoidStateConstructorsRule extends SaropaLintRule {
         if (member is ConstructorDeclaration) {
           final FunctionBody body = member.body;
           if (body is BlockFunctionBody && body.block.statements.isNotEmpty) {
-            reporter.atNode(member, code);
+            reporter.atNode(member);
           }
         }
       }
@@ -548,7 +541,7 @@ class AvoidStateConstructorsRule extends SaropaLintRule {
 /// }
 /// ```
 class AvoidStatelessWidgetInitializedFieldsRule extends SaropaLintRule {
-  const AvoidStatelessWidgetInitializedFieldsRule() : super(code: _code);
+  AvoidStatelessWidgetInitializedFieldsRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -561,21 +554,19 @@ class AvoidStatelessWidgetInitializedFieldsRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
-    name: 'avoid_stateless_widget_initialized_fields',
-    problemMessage:
-        '[avoid_stateless_widget_initialized_fields] StatelessWidget must not have initialized fields. This violates the widget lifecycle, risking setState-after-dispose errors or silent state corruption. {v4}',
+    'avoid_stateless_widget_initialized_fields',
+    '[avoid_stateless_widget_initialized_fields] StatelessWidget must not have initialized fields. This violates the widget lifecycle, risking setState-after-dispose errors or silent state corruption. {v4}',
     correctionMessage:
         'Pass values through the constructor instead. Verify the change works correctly with existing tests and add coverage for the new behavior.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addClassDeclaration((ClassDeclaration node) {
+    context.addClassDeclaration((ClassDeclaration node) {
       // Check if extends StatelessWidget
       final ExtendsClause? extendsClause = node.extendsClause;
       if (extendsClause == null) return;
@@ -590,7 +581,7 @@ class AvoidStatelessWidgetInitializedFieldsRule extends SaropaLintRule {
             if (variable.initializer != null) {
               // Skip static fields
               if (member.isStatic) continue;
-              reporter.atNode(variable, code);
+              reporter.atNode(variable);
             }
           }
         }
@@ -631,7 +622,7 @@ class AvoidStatelessWidgetInitializedFieldsRule extends SaropaLintRule {
 /// }
 /// ```
 class AvoidUnnecessarySetStateRule extends SaropaLintRule {
-  const AvoidUnnecessarySetStateRule() : super(code: _code);
+  AvoidUnnecessarySetStateRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -644,12 +635,11 @@ class AvoidUnnecessarySetStateRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
-    name: 'avoid_unnecessary_setstate',
-    problemMessage:
-        '[avoid_unnecessary_setstate] setState called in lifecycle method where not needed. This violates the widget lifecycle, risking setState-after-dispose errors or silent state corruption. {v6}',
+    'avoid_unnecessary_setstate',
+    '[avoid_unnecessary_setstate] setState called in lifecycle method where not needed. This violates the widget lifecycle, risking setState-after-dispose errors or silent state corruption. {v6}',
     correctionMessage:
         'In initState/dispose, modify state directly without setState. Verify the change works correctly with existing tests and add coverage for the new behavior.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   static const Set<String> _lifecycleMethods = <String>{
@@ -660,11 +650,10 @@ class AvoidUnnecessarySetStateRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodDeclaration((MethodDeclaration node) {
+    context.addMethodDeclaration((MethodDeclaration node) {
       final String methodName = node.name.lexeme;
       if (!_lifecycleMethods.contains(methodName)) return;
 
@@ -679,7 +668,7 @@ class AvoidUnnecessarySetStateRule extends SaropaLintRule {
       // Find setState calls in this method
       node.body.visitChildren(
         _SetStateCallFinder((MethodInvocation setStateCall) {
-          reporter.atNode(setStateCall, code);
+          reporter.atNode(setStateCall);
         }),
       );
     });
@@ -733,7 +722,7 @@ class _SetStateCallFinder extends RecursiveAstVisitor<void> {
 /// }
 /// ```
 class AvoidUnnecessaryStatefulWidgetsRule extends SaropaLintRule {
-  const AvoidUnnecessaryStatefulWidgetsRule() : super(code: _code);
+  AvoidUnnecessaryStatefulWidgetsRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -746,21 +735,19 @@ class AvoidUnnecessaryStatefulWidgetsRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
-    name: 'avoid_unnecessary_stateful_widgets',
-    problemMessage:
-        '[avoid_unnecessary_stateful_widgets] StatefulWidget may be unnecessary. If a State class never calls setState and has no mutable state, it should probably be a StatelessWidget. This violates the widget lifecycle, risking setState-after-dispose errors or silent state corruption. {v6}',
+    'avoid_unnecessary_stateful_widgets',
+    '[avoid_unnecessary_stateful_widgets] StatefulWidget may be unnecessary. If a State class never calls setState and has no mutable state, it should probably be a StatelessWidget. This violates the widget lifecycle, risking setState-after-dispose errors or silent state corruption. {v6}',
     correctionMessage:
         'Use StatelessWidget if no mutable state is needed. Verify the change works correctly with existing tests and add coverage for the new behavior.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addClassDeclaration((ClassDeclaration node) {
+    context.addClassDeclaration((ClassDeclaration node) {
       // Check if this is a State class
       final ExtendsClause? extendsClause = node.extendsClause;
       if (extendsClause == null) return;
@@ -790,7 +777,7 @@ class AvoidUnnecessaryStatefulWidgetsRule extends SaropaLintRule {
 
       // If no setState and no mutable fields, probably unnecessary
       if (!hasSetState && !hasMutableFields) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
   }
@@ -813,7 +800,7 @@ class _SetStatePresenceChecker extends RecursiveAstVisitor<void> {
 ///
 /// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v6
 class AvoidUnremovableCallbacksInListenersRule extends SaropaLintRule {
-  const AvoidUnremovableCallbacksInListenersRule() : super(code: _code);
+  AvoidUnremovableCallbacksInListenersRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -826,12 +813,11 @@ class AvoidUnremovableCallbacksInListenersRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
-    name: 'avoid_unremovable_callbacks_in_listeners',
-    problemMessage:
-        '[avoid_unremovable_callbacks_in_listeners] Anonymous function cannot be removed from listener. This violates the widget lifecycle, risking setState-after-dispose errors or silent state corruption. {v6}',
+    'avoid_unremovable_callbacks_in_listeners',
+    '[avoid_unremovable_callbacks_in_listeners] Anonymous function cannot be removed from listener. This violates the widget lifecycle, risking setState-after-dispose errors or silent state corruption. {v6}',
     correctionMessage:
         'Use a named function or store reference to remove later. Verify the change works correctly with existing tests and add coverage for the new behavior.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   static const List<String> _listenerMethods = <String>[
@@ -843,11 +829,10 @@ class AvoidUnremovableCallbacksInListenersRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       if (!_listenerMethods.contains(node.methodName.name)) return;
 
       final ArgumentList args = node.argumentList;
@@ -855,7 +840,7 @@ class AvoidUnremovableCallbacksInListenersRule extends SaropaLintRule {
 
       final Expression firstArg = args.arguments.first;
       if (firstArg is FunctionExpression) {
-        reporter.atNode(firstArg, code);
+        reporter.atNode(firstArg);
       }
     });
   }
@@ -897,7 +882,7 @@ class AvoidUnremovableCallbacksInListenersRule extends SaropaLintRule {
 /// }
 /// ```
 class AvoidUnsafeSetStateRule extends SaropaLintRule {
-  const AvoidUnsafeSetStateRule() : super(code: _code);
+  AvoidUnsafeSetStateRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -910,21 +895,19 @@ class AvoidUnsafeSetStateRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
-    name: 'avoid_unsafe_setstate',
-    problemMessage:
-        '[avoid_unsafe_setstate] setState() called without a mounted check. Calling setState() after a widget has been unmounted (e.g., after an async operation completes) can cause errors. Always check mounted before calling setState() in async contexts. {v6}',
+    'avoid_unsafe_setstate',
+    '[avoid_unsafe_setstate] setState() called without a mounted check. Calling setState() after a widget has been unmounted (e.g., after an async operation completes) can cause errors. Always check mounted before calling setState() in async contexts. {v6}',
     correctionMessage:
         'Wrap in `if (mounted)` or use `mounted ? setState(..) : null`. Verify the change works correctly with existing tests and add coverage for the new behavior.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       if (node.methodName.name != 'setState') {
         return;
       }
@@ -934,7 +917,7 @@ class AvoidUnsafeSetStateRule extends SaropaLintRule {
         return;
       }
 
-      reporter.atNode(node, code);
+      reporter.atNode(node);
     });
   }
 
@@ -1084,7 +1067,7 @@ class _NodeFinder extends GeneralizingAstVisitor<void> {
 /// )
 /// ```
 class RequireDisposeRule extends SaropaLintRule {
-  const RequireDisposeRule() : super(code: _code);
+  RequireDisposeRule() : super(code: _code);
 
   /// Each occurrence is a serious issue that should be fixed immediately.
   @override
@@ -1097,12 +1080,12 @@ class RequireDisposeRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
-    name: 'require_field_dispose',
-    problemMessage:
-        '[require_field_dispose] Disposable field may not be properly disposed. {v3}',
-    correctionMessage: 'Add a dispose() method that disposes this field, '
+    'require_field_dispose',
+    '[require_field_dispose] Disposable field may not be properly disposed. {v3}',
+    correctionMessage:
+        'Add a dispose() method that disposes this field, '
         'or ensure the existing dispose() method handles it.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   /// Map of disposable type names to their disposal method.
@@ -1160,11 +1143,10 @@ class RequireDisposeRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addClassDeclaration((ClassDeclaration node) {
+    context.addClassDeclaration((ClassDeclaration node) {
       // Check if this is a State class
       if (!_isStateClass(node)) {
         return;
@@ -1237,8 +1219,9 @@ class RequireDisposeRule extends SaropaLintRule {
     final StringBuffer expanded = StringBuffer(body);
 
     // Find method calls to private methods (starting with _)
-    for (final RegExpMatch match
-        in _privateMethodCallPattern.allMatches(body)) {
+    for (final RegExpMatch match in _privateMethodCallPattern.allMatches(
+      body,
+    )) {
       final String methodName = '_${match.group(1)}';
       final String? methodBody = methodBodies[methodName];
       if (methodBody != null) {
@@ -1412,7 +1395,7 @@ class _DisposableField {
 /// }
 /// ```
 class RequireTimerCancellationRule extends SaropaLintRule {
-  const RequireTimerCancellationRule() : super(code: _code);
+  RequireTimerCancellationRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -1425,13 +1408,12 @@ class RequireTimerCancellationRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
-    name: 'require_timer_cancellation',
-    problemMessage:
-        '[require_timer_cancellation] Timer or StreamSubscription must be canceled in dispose(). Timers and stream subscriptions that aren\'t canceled will continue running after the widget is disposed, causing: - Crashes if they call setState on a disposed widget - Memory leaks from retained references - Wasted CPU cycles. {v5}',
+    'require_timer_cancellation',
+    '[require_timer_cancellation] Timer or StreamSubscription must be canceled in dispose(). Timers and stream subscriptions that aren\'t canceled will continue running after the widget is disposed, causing: - Crashes if they call setState on a disposed widget - Memory leaks from retained references - Wasted CPU cycles. {v5}',
     correctionMessage:
         'Add cancel() in dispose() to prevent crashes and memory leaks. Verify the change works correctly with existing tests and add coverage for the new behavior.'
         'Uncanceled timers continue firing after widget disposal.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   /// Types that require cancel() to be called
@@ -1442,11 +1424,10 @@ class RequireTimerCancellationRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addClassDeclaration((ClassDeclaration node) {
+    context.addClassDeclaration((ClassDeclaration node) {
       // Only check State classes
       if (!_isStateClass(node)) {
         return;
@@ -1551,8 +1532,9 @@ class RequireTimerCancellationRule extends SaropaLintRule {
 
     final StringBuffer expanded = StringBuffer(body);
 
-    for (final RegExpMatch match
-        in _privateMethodCallPattern.allMatches(body)) {
+    for (final RegExpMatch match in _privateMethodCallPattern.allMatches(
+      body,
+    )) {
       final String methodName = '_${match.group(1)}';
       final String? methodBody = methodBodies[methodName];
       if (methodBody != null) {
@@ -1631,7 +1613,7 @@ class _CancellableField {
 /// }
 /// ```
 class NullifyAfterDisposeRule extends SaropaLintRule {
-  const NullifyAfterDisposeRule() : super(code: _code);
+  NullifyAfterDisposeRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -1644,13 +1626,12 @@ class NullifyAfterDisposeRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
-    name: 'nullify_after_dispose',
-    problemMessage:
-        '[nullify_after_dispose] Nullable disposable field must be set to null after disposal. When a nullable disposable field (Timer?, StreamSubscription?, etc.) is disposed/canceled, it\'s good practice to also set it to null. This: - Helps garbage collection - Prevents accidental reuse of disposed resources - Makes it clear the resource has been cleaned up. {v7}',
+    'nullify_after_dispose',
+    '[nullify_after_dispose] Nullable disposable field must be set to null after disposal. When a nullable disposable field (Timer?, StreamSubscription?, etc.) is disposed/canceled, it\'s good practice to also set it to null. This: - Helps garbage collection - Prevents accidental reuse of disposed resources - Makes it clear the resource has been cleaned up. {v7}',
     correctionMessage:
         'Add `fieldName = null;` after disposing to help garbage collection. Verify the change works correctly with existing tests and add coverage for the new behavior.'
         'and prevent accidental reuse.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   /// Map of disposable type names to their disposal method
@@ -1670,11 +1651,10 @@ class NullifyAfterDisposeRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       final String methodName = node.methodName.name;
 
       // Check if this is a disposal method call
@@ -1721,7 +1701,7 @@ class NullifyAfterDisposeRule extends SaropaLintRule {
       }
 
       // Report the issue
-      reporter.atNode(node, code);
+      reporter.atNode(node);
     });
   }
 
@@ -1889,7 +1869,7 @@ class NullifyAfterDisposeRule extends SaropaLintRule {
 /// }
 /// ```
 class UseSetStateSynchronouslyRule extends SaropaLintRule {
-  const UseSetStateSynchronouslyRule() : super(code: _code);
+  UseSetStateSynchronouslyRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -1902,21 +1882,19 @@ class UseSetStateSynchronouslyRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
-    name: 'use_setstate_synchronously',
-    problemMessage:
-        '[use_setstate_synchronously] setState called after async gap without mounted check. Quick fix available: Wraps the setState call in if (mounted) { .. }. This violates the widget lifecycle, risking setState-after-dispose errors or silent state corruption. {v9}',
+    'use_setstate_synchronously',
+    '[use_setstate_synchronously] setState called after async gap without mounted check. Quick fix available: Wraps the setState call in if (mounted) { .. }. This violates the widget lifecycle, risking setState-after-dispose errors or silent state corruption. {v9}',
     correctionMessage:
         'Check mounted before calling setState after await. Verify the change works correctly with existing tests and add coverage for the new behavior.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodDeclaration((MethodDeclaration node) {
+    context.addMethodDeclaration((MethodDeclaration node) {
       // Only check async methods with block body
       if (node.body is! BlockFunctionBody) return;
       final BlockFunctionBody body = node.body as BlockFunctionBody;
@@ -1949,72 +1927,15 @@ class UseSetStateSynchronouslyRule extends SaropaLintRule {
   }
 
   void _reportUnprotectedSetState(
-      Statement stmt, SaropaDiagnosticReporter reporter) {
+    Statement stmt,
+    SaropaDiagnosticReporter reporter,
+  ) {
     // Uses shared SetStateWithMountedCheckFinder from async_context_utils.dart
     stmt.visitChildren(
       SetStateWithMountedCheckFinder((MethodInvocation node) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }),
     );
-  }
-
-  @override
-  List<Fix> getFixes() => <Fix>[_WrapSetStateInMountedCheckFix()];
-}
-
-class _WrapSetStateInMountedCheckFix extends DartFix {
-  // Cached regex for performance - matches any non-whitespace
-  static final RegExp _nonWhitespacePattern = RegExp(r'[^\s]');
-
-  @override
-  void run(
-    CustomLintResolver resolver,
-    ChangeReporter reporter,
-    CustomLintContext context,
-    AnalysisError analysisError,
-    List<AnalysisError> others,
-  ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
-      if (node.methodName.name != 'setState') return;
-      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
-
-      // Find the statement containing this setState call
-      final AstNode? statement = _findContainingStatement(node);
-      if (statement == null) return;
-
-      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
-        message: 'Wrap in if (mounted) check',
-        priority: 1,
-      );
-
-      changeBuilder.addDartFileEdit((builder) {
-        final String originalCode = statement.toSource();
-        // Get indentation from the original statement
-        final int lineStart = resolver.lineInfo.getOffsetOfLine(
-          resolver.lineInfo.getLocation(statement.offset).lineNumber - 1,
-        );
-        final String leadingText = resolver.source.contents.data
-            .substring(lineStart, statement.offset);
-        final String indent = leadingText.replaceAll(
-            _nonWhitespacePattern, ''); // Keep only whitespace
-
-        builder.addSimpleReplacement(
-          SourceRange(statement.offset, statement.length),
-          'if (mounted) {\n$indent  $originalCode\n$indent}',
-        );
-      });
-    });
-  }
-
-  AstNode? _findContainingStatement(AstNode node) {
-    AstNode? current = node;
-    while (current != null) {
-      if (current is ExpressionStatement) {
-        return current;
-      }
-      current = current.parent;
-    }
-    return null;
   }
 }
 
@@ -2055,7 +1976,7 @@ class _WrapSetStateInMountedCheckFix extends DartFix {
 /// }
 /// ```
 class AlwaysRemoveListenerRule extends SaropaLintRule {
-  const AlwaysRemoveListenerRule() : super(code: _code);
+  AlwaysRemoveListenerRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -2068,21 +1989,19 @@ class AlwaysRemoveListenerRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
-    name: 'always_remove_listener',
-    problemMessage:
-        '[always_remove_listener] Listener added via addListener() but no matching removeListener() call found in dispose(). Orphaned listeners retain references to the widget, preventing garbage collection and causing memory leaks that accumulate as users navigate between screens. {v3}',
+    'always_remove_listener',
+    '[always_remove_listener] Listener added via addListener() but no matching removeListener() call found in dispose(). Orphaned listeners retain references to the widget, preventing garbage collection and causing memory leaks that accumulate as users navigate between screens. {v3}',
     correctionMessage:
         'Call removeListener() in the dispose() method for every addListener() call to release references and prevent memory leaks.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addClassDeclaration((ClassDeclaration node) {
+    context.addClassDeclaration((ClassDeclaration node) {
       // Only check State classes
       final ExtendsClause? extendsClause = node.extendsClause;
       if (extendsClause == null) return;
@@ -2204,7 +2123,7 @@ class _RemoveListenerFinder extends RecursiveAstVisitor<void> {
 /// const Border.fromBorderSide(BorderSide(color: Colors.red, width: 2))
 /// ```
 class RequireAnimationDisposalRule extends SaropaLintRule {
-  const RequireAnimationDisposalRule() : super(code: _code);
+  RequireAnimationDisposalRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -2217,21 +2136,19 @@ class RequireAnimationDisposalRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
-    name: 'require_animation_disposal',
-    problemMessage:
-        '[require_animation_disposal] Failing to dispose an AnimationController in the dispose() method causes it to retain resources, listeners, and animation frames, resulting in memory leaks and degraded performance. This is especially problematic in widgets that are frequently created and destroyed, such as in lists or navigation stacks, and can lead to app instability or crashes. Dispose every AnimationController to keep Flutter apps robust. {v7}',
+    'require_animation_disposal',
+    '[require_animation_disposal] Failing to dispose an AnimationController in the dispose() method causes it to retain resources, listeners, and animation frames, resulting in memory leaks and degraded performance. This is especially problematic in widgets that are frequently created and destroyed, such as in lists or navigation stacks, and can lead to app instability or crashes. Dispose every AnimationController to keep Flutter apps robust. {v7}',
     correctionMessage:
         "Call _controller.dispose() in your widget's dispose() method before calling super.dispose(). This releases all resources and prevents memory leaks. Audit your codebase for all AnimationController instances and verify each one is disposed.",
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addClassDeclaration((ClassDeclaration node) {
+    context.addClassDeclaration((ClassDeclaration node) {
       // Only check State classes - StatelessWidgets receive controllers
       // as parameters and don't own them (parent disposes)
       if (!_isStateClass(node)) {
@@ -2279,7 +2196,7 @@ class RequireAnimationDisposalRule extends SaropaLintRule {
               for (final VariableDeclaration variable
                   in member.fields.variables) {
                 if (variable.name.lexeme == fieldName) {
-                  reporter.atNode(variable, code);
+                  reporter.atNode(variable);
                 }
               }
             }
@@ -2343,7 +2260,7 @@ class _DisposeCallFinder extends RecursiveAstVisitor<void> {
 /// )
 /// ```
 class AvoidScaffoldMessengerAfterAwaitRule extends SaropaLintRule {
-  const AvoidScaffoldMessengerAfterAwaitRule() : super(code: _code);
+  AvoidScaffoldMessengerAfterAwaitRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -2356,21 +2273,19 @@ class AvoidScaffoldMessengerAfterAwaitRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
-    name: 'avoid_scaffold_messenger_after_await',
-    problemMessage:
-        '[avoid_scaffold_messenger_after_await] Using ScaffoldMessenger.of(context) after await may use an invalid context. This violates the widget lifecycle, risking setState-after-dispose errors or silent state corruption. {v8}',
+    'avoid_scaffold_messenger_after_await',
+    '[avoid_scaffold_messenger_after_await] Using ScaffoldMessenger.of(context) after await may use an invalid context. This violates the widget lifecycle, risking setState-after-dispose errors or silent state corruption. {v8}',
     correctionMessage:
         'Store ScaffoldMessenger.of(context) before the await. Verify the change works correctly with existing tests and add coverage for the new behavior.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addBlockFunctionBody((BlockFunctionBody node) {
+    context.addBlockFunctionBody((BlockFunctionBody node) {
       // Check if function is async
       if (node.keyword?.keyword != Keyword.ASYNC) return;
 
@@ -2386,7 +2301,7 @@ class AvoidScaffoldMessengerAfterAwaitRule extends SaropaLintRule {
           // Find and report the specific usage
           statement.visitChildren(
             _ScaffoldMessengerFinderNew((MethodInvocation invocation) {
-              reporter.atNode(invocation, code);
+              reporter.atNode(invocation);
             }),
           );
         }
@@ -2439,7 +2354,7 @@ class _ScaffoldMessengerFinderNew extends RecursiveAstVisitor<void> {
 /// }
 /// ```
 class AvoidBuildContextInProvidersRule extends SaropaLintRule {
-  const AvoidBuildContextInProvidersRule() : super(code: _code);
+  AvoidBuildContextInProvidersRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -2452,21 +2367,19 @@ class AvoidBuildContextInProvidersRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
-    name: 'avoid_build_context_in_providers',
-    problemMessage:
-        '[avoid_build_context_in_providers] Storing BuildContext in providers can cause memory leaks. BuildContext is stored in providers or state managers. This violates the widget lifecycle, risking setState-after-dispose errors or silent state corruption. {v6}',
+    'avoid_build_context_in_providers',
+    '[avoid_build_context_in_providers] Storing BuildContext in providers can cause memory leaks. BuildContext is stored in providers or state managers. This violates the widget lifecycle, risking setState-after-dispose errors or silent state corruption. {v6}',
     correctionMessage:
         'Pass BuildContext as a method parameter when needed instead. Verify the change works correctly with existing tests and add coverage for the new behavior.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addClassDeclaration((ClassDeclaration node) {
+    context.addClassDeclaration((ClassDeclaration node) {
       // Check if class is a provider (extends ChangeNotifier, etc.)
       final ExtendsClause? extendsClause = node.extendsClause;
       if (extendsClause == null) return;
@@ -2521,24 +2434,22 @@ class AvoidBuildContextInProvidersRule extends SaropaLintRule {
 /// )
 /// ```
 class PreferWidgetStateMixinRule extends SaropaLintRule {
-  const PreferWidgetStateMixinRule() : super(code: _code);
+  PreferWidgetStateMixinRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
-    name: 'prefer_widget_state_mixin',
-    problemMessage:
-        '[prefer_widget_state_mixin] Use WidgetStateMixin for interaction states. Widgets use generic names like Container instead of semantic alternatives. This violates the widget lifecycle, risking setState-after-dispose errors or silent state corruption. {v5}',
+    'prefer_widget_state_mixin',
+    '[prefer_widget_state_mixin] Use WidgetStateMixin for interaction states. Widgets use generic names like Container instead of semantic alternatives. This violates the widget lifecycle, risking setState-after-dispose errors or silent state corruption. {v5}',
     correctionMessage:
         'Use WidgetStateMixin to manage hover, pressed, and focus states. Verify the change works correctly with existing tests and add coverage for the new behavior.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addClassDeclaration((ClassDeclaration node) {
+    context.addClassDeclaration((ClassDeclaration node) {
       // Check if it's a State class
       final ExtendsClause? extendsClause = node.extendsClause;
       if (extendsClause == null) return;
@@ -2604,15 +2515,14 @@ class PreferWidgetStateMixinRule extends SaropaLintRule {
 /// )
 /// ```
 class AvoidInheritedWidgetInInitStateRule extends SaropaLintRule {
-  const AvoidInheritedWidgetInInitStateRule() : super(code: _code);
+  AvoidInheritedWidgetInInitStateRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
-    name: 'avoid_inherited_widget_in_initstate',
-    problemMessage:
-        '[avoid_inherited_widget_in_initstate] InheritedWidget accessed in initState(), where the widget is not yet fully mounted in the element tree. This call returns stale or missing data and does not subscribe to updates, so the widget never rebuilds when the inherited value changes. {v4}',
+    'avoid_inherited_widget_in_initstate',
+    '[avoid_inherited_widget_in_initstate] InheritedWidget accessed in initState(), where the widget is not yet fully mounted in the element tree. This call returns stale or missing data and does not subscribe to updates, so the widget never rebuilds when the inherited value changes. {v4}',
     correctionMessage:
         'Move the InheritedWidget lookup to didChangeDependencies(), which runs after initState and re-runs whenever dependencies change.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   static const Set<String> _inheritedWidgetMethods = <String>{
@@ -2633,11 +2543,10 @@ class AvoidInheritedWidgetInInitStateRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodDeclaration((MethodDeclaration node) {
+    context.addMethodDeclaration((MethodDeclaration node) {
       if (node.name.lexeme != 'initState') return;
 
       // Visit the method body to find inherited widget access
@@ -2657,17 +2566,19 @@ class _InheritedWidgetVisitor extends RecursiveAstVisitor<void> {
     super.visitMethodInvocation(node);
 
     final String methodName = node.methodName.name;
-    if (!AvoidInheritedWidgetInInitStateRule._inheritedWidgetMethods
-        .contains(methodName)) {
+    if (!AvoidInheritedWidgetInInitStateRule._inheritedWidgetMethods.contains(
+      methodName,
+    )) {
       return;
     }
 
     // Check if target is a common inherited widget
     final Expression? target = node.target;
     if (target is SimpleIdentifier) {
-      if (AvoidInheritedWidgetInInitStateRule._commonInheritedWidgets
-          .contains(target.name)) {
-        reporter.atNode(node, code);
+      if (AvoidInheritedWidgetInInitStateRule._commonInheritedWidgets.contains(
+        target.name,
+      )) {
+        reporter.atNode(node);
       }
     }
   }
@@ -2687,24 +2598,22 @@ class _InheritedWidgetVisitor extends RecursiveAstVisitor<void> {
 /// }
 /// ```
 class AvoidRecursiveWidgetCallsRule extends SaropaLintRule {
-  const AvoidRecursiveWidgetCallsRule() : super(code: _code);
+  AvoidRecursiveWidgetCallsRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
-    name: 'avoid_recursive_widget_calls',
-    problemMessage:
-        '[avoid_recursive_widget_calls] Widget build method creates a new instance of itself, triggering infinite recursion. This crashes the app with a stack overflow as Flutter repeatedly builds the same widget, consuming all available stack frames within milliseconds. {v6}',
+    'avoid_recursive_widget_calls',
+    '[avoid_recursive_widget_calls] Widget build method creates a new instance of itself, triggering infinite recursion. This crashes the app with a stack overflow as Flutter repeatedly builds the same widget, consuming all available stack frames within milliseconds. {v6}',
     correctionMessage:
         'Extract the repeated content into a separate widget class, or add a depth-limiting condition to terminate the recursion.',
-    errorSeverity: DiagnosticSeverity.ERROR,
+    severity: DiagnosticSeverity.ERROR,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addClassDeclaration((ClassDeclaration node) {
+    context.addClassDeclaration((ClassDeclaration node) {
       final String className = node.name.lexeme;
 
       // Check if it's a widget class
@@ -2721,8 +2630,9 @@ class AvoidRecursiveWidgetCallsRule extends SaropaLintRule {
       for (final ClassMember member in node.members) {
         if (member is MethodDeclaration && member.name.lexeme == 'build') {
           // Check for self-instantiation in build
-          member.body
-              .accept(_RecursiveWidgetVisitor(className, reporter, code));
+          member.body.accept(
+            _RecursiveWidgetVisitor(className, reporter, code),
+          );
         }
       }
     });
@@ -2742,7 +2652,7 @@ class _RecursiveWidgetVisitor extends RecursiveAstVisitor<void> {
 
     final String typeName = node.constructorName.type.name.lexeme;
     if (typeName == className) {
-      reporter.atNode(node, code);
+      reporter.atNode(node);
     }
   }
 }
@@ -2763,7 +2673,7 @@ class _RecursiveWidgetVisitor extends RecursiveAstVisitor<void> {
 /// }
 /// ```
 class AvoidUndisposedInstancesRule extends SaropaLintRule {
-  const AvoidUndisposedInstancesRule() : super(code: _code);
+  AvoidUndisposedInstancesRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -2776,12 +2686,11 @@ class AvoidUndisposedInstancesRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
-    name: 'avoid_undisposed_instances',
-    problemMessage:
-        '[avoid_undisposed_instances] Disposable object (e.g., TextEditingController, AnimationController, StreamController) created but no matching dispose() call found. Undisposed instances retain listeners, streams, and platform resources, causing memory leaks that grow with each widget rebuild or navigation. {v7}',
+    'avoid_undisposed_instances',
+    '[avoid_undisposed_instances] Disposable object (e.g., TextEditingController, AnimationController, StreamController) created but no matching dispose() call found. Undisposed instances retain listeners, streams, and platform resources, causing memory leaks that grow with each widget rebuild or navigation. {v7}',
     correctionMessage:
         'Call dispose() on the instance inside the State.dispose() method before calling super.dispose() to release all held resources.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   static const Set<String> _disposableTypes = <String>{
@@ -2798,11 +2707,10 @@ class AvoidUndisposedInstancesRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addClassDeclaration((ClassDeclaration node) {
+    context.addClassDeclaration((ClassDeclaration node) {
       // Check if it's a State class
       final ExtendsClause? extendsClause = node.extendsClause;
       if (extendsClause == null) return;
@@ -2867,7 +2775,7 @@ class AvoidUndisposedInstancesRule extends SaropaLintRule {
               for (final VariableDeclaration variable
                   in member.fields.variables) {
                 if (variable.name.lexeme == fieldName) {
-                  reporter.atNode(variable, code);
+                  reporter.atNode(variable);
                 }
               }
             }
@@ -2969,7 +2877,7 @@ class _DisposeVisitor extends RecursiveAstVisitor<void> {
 /// }
 /// ```
 class AvoidUnnecessaryOverridesInStateRule extends SaropaLintRule {
-  const AvoidUnnecessaryOverridesInStateRule() : super(code: _code);
+  AvoidUnnecessaryOverridesInStateRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -2982,12 +2890,11 @@ class AvoidUnnecessaryOverridesInStateRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
-    name: 'avoid_unnecessary_overrides_in_state',
-    problemMessage:
-        '[avoid_unnecessary_overrides_in_state] Override only calls super with no additional logic. State class has unnecessary overrides. This violates the widget lifecycle, risking setState-after-dispose errors or silent state corruption. {v4}',
+    'avoid_unnecessary_overrides_in_state',
+    '[avoid_unnecessary_overrides_in_state] Override only calls super with no additional logic. State class has unnecessary overrides. This violates the widget lifecycle, risking setState-after-dispose errors or silent state corruption. {v4}',
     correctionMessage:
         'Remove the unnecessary override. Verify the change works correctly with existing tests and add coverage for the new behavior.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   static const Set<String> _lifecycleMethods = <String>{
@@ -3001,11 +2908,10 @@ class AvoidUnnecessaryOverridesInStateRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addClassDeclaration((ClassDeclaration node) {
+    context.addClassDeclaration((ClassDeclaration node) {
       // Check if it's a State class
       final ExtendsClause? extendsClause = node.extendsClause;
       if (extendsClause == null) return;
@@ -3029,7 +2935,7 @@ class AvoidUnnecessaryOverridesInStateRule extends SaropaLintRule {
                 if (expr is MethodInvocation) {
                   if (expr.target is SuperExpression &&
                       expr.methodName.name == methodName) {
-                    reporter.atNode(member, code);
+                    reporter.atNode(member);
                   }
                 }
               }
@@ -3053,7 +2959,7 @@ class AvoidUnnecessaryOverridesInStateRule extends SaropaLintRule {
 /// }
 /// ```
 class DisposeFieldsRule extends SaropaLintRule {
-  const DisposeFieldsRule() : super(code: _code);
+  DisposeFieldsRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -3066,12 +2972,11 @@ class DisposeFieldsRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
-    name: 'dispose_widget_fields',
-    problemMessage:
-        '[dispose_widget_fields] Field requires disposal but dispose method is missing or incomplete. Fields that need disposal are not disposed. This violates the widget lifecycle, risking setState-after-dispose errors or silent state corruption. {v2}',
+    'dispose_widget_fields',
+    '[dispose_widget_fields] Field requires disposal but dispose method is missing or incomplete. Fields that need disposal are not disposed. This violates the widget lifecycle, risking setState-after-dispose errors or silent state corruption. {v2}',
     correctionMessage:
         'Add dispose method and call dispose on this field. Verify the change works correctly with existing tests and add coverage for the new behavior.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   static const Set<String> _disposableTypes = <String>{
@@ -3086,11 +2991,10 @@ class DisposeFieldsRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addClassDeclaration((ClassDeclaration node) {
+    context.addClassDeclaration((ClassDeclaration node) {
       // Check if it's a State class
       final ExtendsClause? extendsClause = node.extendsClause;
       if (extendsClause == null) return;
@@ -3125,7 +3029,7 @@ class DisposeFieldsRule extends SaropaLintRule {
       // Report if there are disposable fields but no dispose method
       if (disposableFields.isNotEmpty && !hasDisposeMethod) {
         for (final VariableDeclaration field in disposableFields) {
-          reporter.atNode(field, code);
+          reporter.atNode(field);
         }
       }
     });
@@ -3172,7 +3076,7 @@ class DisposeFieldsRule extends SaropaLintRule {
 /// )
 /// ```
 class PassExistingFutureToFutureBuilderRule extends SaropaLintRule {
-  const PassExistingFutureToFutureBuilderRule() : super(code: _code);
+  PassExistingFutureToFutureBuilderRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.high;
@@ -3184,22 +3088,19 @@ class PassExistingFutureToFutureBuilderRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
-    name: 'pass_existing_future_to_future_builder',
-    problemMessage:
-        '[pass_existing_future_to_future_builder] Creating new Future in FutureBuilder restarts the async operation on every widget rebuild. This causes duplicate network calls, database queries, and slow UI with visible loading states. {v8}',
+    'pass_existing_future_to_future_builder',
+    '[pass_existing_future_to_future_builder] Creating new Future in FutureBuilder restarts the async operation on every widget rebuild. This causes duplicate network calls, database queries, and slow UI with visible loading states. {v8}',
     correctionMessage:
         'Cache the Future in initState() or a final field and pass the stored reference to the FutureBuilder to prevent duplicate async operations on each rebuild.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry
-        .addInstanceCreationExpression((InstanceCreationExpression node) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final String typeName = node.constructorName.type.name.lexeme;
       if (typeName != 'FutureBuilder') return;
 
@@ -3210,17 +3111,17 @@ class PassExistingFutureToFutureBuilderRule extends SaropaLintRule {
 
           // Warn if future is a method invocation (creating new future)
           if (value is MethodInvocation) {
-            reporter.atNode(value, code);
+            reporter.atNode(value);
           }
 
           // Warn if future is a function expression
           if (value is FunctionExpression) {
-            reporter.atNode(value, code);
+            reporter.atNode(value);
           }
 
           // Warn if future is a Future constructor (e.g., Future.value())
           if (value is InstanceCreationExpression) {
-            reporter.atNode(value, code);
+            reporter.atNode(value);
           }
         }
       }
@@ -3250,7 +3151,7 @@ class PassExistingFutureToFutureBuilderRule extends SaropaLintRule {
 /// )
 /// ```
 class PassExistingStreamToStreamBuilderRule extends SaropaLintRule {
-  const PassExistingStreamToStreamBuilderRule() : super(code: _code);
+  PassExistingStreamToStreamBuilderRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -3263,22 +3164,19 @@ class PassExistingStreamToStreamBuilderRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
-    name: 'pass_existing_stream_to_stream_builder',
-    problemMessage:
-        '[pass_existing_stream_to_stream_builder] New Stream created inline in the StreamBuilder constructor. Every build() call creates a fresh stream, discarding the previous subscription and triggering an infinite rebuild loop as each new stream emits its initial value. {v7}',
+    'pass_existing_stream_to_stream_builder',
+    '[pass_existing_stream_to_stream_builder] New Stream created inline in the StreamBuilder constructor. Every build() call creates a fresh stream, discarding the previous subscription and triggering an infinite rebuild loop as each new stream emits its initial value. {v7}',
     correctionMessage:
         'Store the Stream in a field (e.g., a late final or a State variable initialized in initState) and pass the stored reference to StreamBuilder.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry
-        .addInstanceCreationExpression((InstanceCreationExpression node) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final String typeName = node.constructorName.type.name.lexeme;
       if (typeName != 'StreamBuilder') return;
 
@@ -3289,12 +3187,12 @@ class PassExistingStreamToStreamBuilderRule extends SaropaLintRule {
 
           // Warn if stream is a method invocation (creating new stream)
           if (value is MethodInvocation) {
-            reporter.atNode(value, code);
+            reporter.atNode(value);
           }
 
           // Warn if stream is a function expression
           if (value is FunctionExpression) {
-            reporter.atNode(value, code);
+            reporter.atNode(value);
           }
         }
       }
@@ -3323,24 +3221,22 @@ class PassExistingStreamToStreamBuilderRule extends SaropaLintRule {
 /// if (text.isNotEmpty) Text(text)
 /// ```
 class RequireScrollControllerDisposeRule extends SaropaLintRule {
-  const RequireScrollControllerDisposeRule() : super(code: _code);
+  RequireScrollControllerDisposeRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
-    name: 'require_scroll_controller_dispose',
-    problemMessage:
-        '[require_scroll_controller_dispose] ScrollController created but not disposed. Undisposed scroll controllers retain listeners and scroll position state, causing memory leaks that accumulate as users navigate between screens with scrollable content. {v5}',
+    'require_scroll_controller_dispose',
+    '[require_scroll_controller_dispose] ScrollController created but not disposed. Undisposed scroll controllers retain listeners and scroll position state, causing memory leaks that accumulate as users navigate between screens with scrollable content. {v5}',
     correctionMessage:
         'Add _controller.dispose() in the State.dispose() method before calling super.dispose() to release scroll position listeners and resources.',
-    errorSeverity: DiagnosticSeverity.ERROR,
+    severity: DiagnosticSeverity.ERROR,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addClassDeclaration((ClassDeclaration node) {
+    context.addClassDeclaration((ClassDeclaration node) {
       // Check if extends State<T>
       final ExtendsClause? extendsClause = node.extendsClause;
       if (extendsClause == null) return;
@@ -3392,14 +3288,16 @@ class RequireScrollControllerDisposeRule extends SaropaLintRule {
       // Check if each controller is disposed
       for (final String name in controllerNames) {
         // Direct disposal patterns (whitespace-tolerant)
-        final bool isDirectlyDisposed = disposeBody != null &&
+        final bool isDirectlyDisposed =
+            disposeBody != null &&
             RegExp(
               '${RegExp.escape(name)}\\s*[?.]+'
               '\\s*dispose(Safe)?\\s*\\(',
             ).hasMatch(disposeBody);
 
         // Iteration-based disposal
-        final bool isIterationDisposed = disposeBody != null &&
+        final bool isIterationDisposed =
+            disposeBody != null &&
             RegExp(
               'in\\s+${RegExp.escape(name)}(\\.values)?\\)',
             ).hasMatch(disposeBody) &&
@@ -3414,96 +3312,12 @@ class RequireScrollControllerDisposeRule extends SaropaLintRule {
               for (final VariableDeclaration variable
                   in member.fields.variables) {
                 if (variable.name.lexeme == name) {
-                  reporter.atNode(variable, code);
+                  reporter.atNode(variable);
                 }
               }
             }
           }
         }
-      }
-    });
-  }
-
-  @override
-  List<Fix> getFixes() => <Fix>[_AddScrollControllerDisposeFix()];
-}
-
-class _AddScrollControllerDisposeFix extends DartFix {
-  @override
-  void run(
-    CustomLintResolver resolver,
-    ChangeReporter reporter,
-    CustomLintContext context,
-    AnalysisError analysisError,
-    List<AnalysisError> others,
-  ) {
-    context.registry.addVariableDeclaration((VariableDeclaration node) {
-      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
-
-      final String fieldName = node.name.lexeme;
-
-      // Find the containing class
-      AstNode? current = node.parent;
-      while (current != null && current is! ClassDeclaration) {
-        current = current.parent;
-      }
-      if (current is! ClassDeclaration) return;
-
-      final ClassDeclaration classNode = current;
-
-      // Find existing dispose method
-      MethodDeclaration? disposeMethod;
-      for (final ClassMember member in classNode.members) {
-        if (member is MethodDeclaration && member.name.lexeme == 'dispose') {
-          disposeMethod = member;
-          break;
-        }
-      }
-
-      if (disposeMethod != null) {
-        // Insert dispose call before super.dispose()
-        final String bodySource = disposeMethod.body.toSource();
-        final int superDisposeIndex = bodySource.indexOf('super.dispose()');
-
-        if (superDisposeIndex != -1) {
-          // Find the actual offset in the file
-          final int bodyOffset = disposeMethod.body.offset;
-          final int insertOffset = bodyOffset + superDisposeIndex;
-
-          final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
-            message: 'Add $fieldName.dispose()',
-            priority: 1,
-          );
-
-          changeBuilder.addDartFileEdit((builder) {
-            builder.addSimpleInsertion(
-              insertOffset,
-              '$fieldName.dispose();\n    ',
-            );
-          });
-        }
-      } else {
-        // Create new dispose method after the last field or constructor
-        int insertOffset = classNode.rightBracket.offset;
-
-        // Try to find a good insertion point (after fields/constructors)
-        for (final ClassMember member in classNode.members) {
-          if (member is FieldDeclaration || member is ConstructorDeclaration) {
-            insertOffset = member.end;
-          }
-        }
-
-        final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
-          message: 'Add dispose() method with $fieldName.dispose()',
-          priority: 1,
-        );
-
-        changeBuilder.addDartFileEdit((builder) {
-          builder.addSimpleInsertion(
-            insertOffset,
-            '\n\n  @override\n  void dispose() {\n    $fieldName.dispose();\n    super.dispose();\n  }',
-          );
-        });
       }
     });
   }
@@ -3537,7 +3351,7 @@ class _AddScrollControllerDisposeFix extends DartFix {
 /// }
 /// ```
 class RequireFocusNodeDisposeRule extends SaropaLintRule {
-  const RequireFocusNodeDisposeRule() : super(code: _code);
+  RequireFocusNodeDisposeRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -3550,21 +3364,19 @@ class RequireFocusNodeDisposeRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
-    name: 'require_focus_node_dispose',
-    problemMessage:
-        '[require_focus_node_dispose] FocusNode created but not disposed. Undisposed focus nodes retain listeners and focus tree references, causing memory leaks and stale focus behavior that accumulates as users navigate between screens with form inputs. {v6}',
+    'require_focus_node_dispose',
+    '[require_focus_node_dispose] FocusNode created but not disposed. Undisposed focus nodes retain listeners and focus tree references, causing memory leaks and stale focus behavior that accumulates as users navigate between screens with form inputs. {v6}',
     correctionMessage:
         'Add _focusNode.dispose() in the State.dispose() method before calling super.dispose() to release focus tree references and listeners.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addClassDeclaration((ClassDeclaration node) {
+    context.addClassDeclaration((ClassDeclaration node) {
       // Check if extends State<T>
       final ExtendsClause? extendsClause = node.extendsClause;
       if (extendsClause == null) return;
@@ -3618,14 +3430,16 @@ class RequireFocusNodeDisposeRule extends SaropaLintRule {
       // Check if each node is disposed
       for (final String name in nodeNames) {
         // Direct disposal patterns (whitespace-tolerant)
-        final bool isDirectlyDisposed = disposeBody != null &&
+        final bool isDirectlyDisposed =
+            disposeBody != null &&
             RegExp(
               '${RegExp.escape(name)}\\s*[?.]+'
               '\\s*dispose(Safe)?\\s*\\(',
             ).hasMatch(disposeBody);
 
         // Iteration-based disposal
-        final bool isIterationDisposed = disposeBody != null &&
+        final bool isIterationDisposed =
+            disposeBody != null &&
             RegExp(
               'in\\s+${RegExp.escape(name)}(\\.values)?\\)',
             ).hasMatch(disposeBody) &&
@@ -3640,96 +3454,12 @@ class RequireFocusNodeDisposeRule extends SaropaLintRule {
               for (final VariableDeclaration variable
                   in member.fields.variables) {
                 if (variable.name.lexeme == name) {
-                  reporter.atNode(variable, code);
+                  reporter.atNode(variable);
                 }
               }
             }
           }
         }
-      }
-    });
-  }
-
-  @override
-  List<Fix> getFixes() => <Fix>[_AddFocusNodeDisposeFix()];
-}
-
-class _AddFocusNodeDisposeFix extends DartFix {
-  @override
-  void run(
-    CustomLintResolver resolver,
-    ChangeReporter reporter,
-    CustomLintContext context,
-    AnalysisError analysisError,
-    List<AnalysisError> others,
-  ) {
-    context.registry.addVariableDeclaration((VariableDeclaration node) {
-      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
-
-      final String fieldName = node.name.lexeme;
-
-      // Find the containing class
-      AstNode? current = node.parent;
-      while (current != null && current is! ClassDeclaration) {
-        current = current.parent;
-      }
-      if (current is! ClassDeclaration) return;
-
-      final ClassDeclaration classNode = current;
-
-      // Find existing dispose method
-      MethodDeclaration? disposeMethod;
-      for (final ClassMember member in classNode.members) {
-        if (member is MethodDeclaration && member.name.lexeme == 'dispose') {
-          disposeMethod = member;
-          break;
-        }
-      }
-
-      if (disposeMethod != null) {
-        // Insert dispose call before super.dispose()
-        final String bodySource = disposeMethod.body.toSource();
-        final int superDisposeIndex = bodySource.indexOf('super.dispose()');
-
-        if (superDisposeIndex != -1) {
-          // Find the actual offset in the file
-          final int bodyOffset = disposeMethod.body.offset;
-          final int insertOffset = bodyOffset + superDisposeIndex;
-
-          final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
-            message: 'Add $fieldName.dispose()',
-            priority: 1,
-          );
-
-          changeBuilder.addDartFileEdit((builder) {
-            builder.addSimpleInsertion(
-              insertOffset,
-              '$fieldName.dispose();\n    ',
-            );
-          });
-        }
-      } else {
-        // Create new dispose method after the last field or constructor
-        int insertOffset = classNode.rightBracket.offset;
-
-        // Try to find a good insertion point (after fields/constructors)
-        for (final ClassMember member in classNode.members) {
-          if (member is FieldDeclaration || member is ConstructorDeclaration) {
-            insertOffset = member.end;
-          }
-        }
-
-        final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
-          message: 'Add dispose() method with $fieldName.dispose()',
-          priority: 1,
-        );
-
-        changeBuilder.addDartFileEdit((builder) {
-          builder.addSimpleInsertion(
-            insertOffset,
-            '\n\n  @override\n  void dispose() {\n    $fieldName.dispose();\n    super.dispose();\n  }',
-          );
-        });
       }
     });
   }
@@ -3763,7 +3493,7 @@ class _AddFocusNodeDisposeFix extends DartFix {
 /// }
 /// ```
 class RequireShouldRebuildRule extends SaropaLintRule {
-  const RequireShouldRebuildRule() : super(code: _code);
+  RequireShouldRebuildRule() : super(code: _code);
 
   /// Performance issue - unnecessary rebuilds.
   @override
@@ -3776,21 +3506,19 @@ class RequireShouldRebuildRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
-    name: 'require_should_rebuild',
-    problemMessage:
-        '[require_should_rebuild] InheritedWidget missing updateShouldNotify. Causes unnecessary rebuilds. This violates the widget lifecycle, risking setState-after-dispose errors or silent state corruption. {v4}',
+    'require_should_rebuild',
+    '[require_should_rebuild] InheritedWidget missing updateShouldNotify. Causes unnecessary rebuilds. This violates the widget lifecycle, risking setState-after-dispose errors or silent state corruption. {v4}',
     correctionMessage:
         'Override updateShouldNotify to control when dependents rebuild. Verify the change works correctly with existing tests and add coverage for the new behavior.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addClassDeclaration((node) {
+    context.addClassDeclaration((node) {
       // Check if extends InheritedWidget
       final extendsClause = node.extendsClause;
       if (extendsClause == null) {
@@ -3816,7 +3544,7 @@ class RequireShouldRebuildRule extends SaropaLintRule {
       }
 
       if (!hasOverride) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
   }
@@ -3856,7 +3584,7 @@ class RequireShouldRebuildRule extends SaropaLintRule {
 /// );
 /// ```
 class RequireSuperDisposeCallRule extends SaropaLintRule {
-  const RequireSuperDisposeCallRule() : super(code: _code);
+  RequireSuperDisposeCallRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.critical;
@@ -3868,21 +3596,19 @@ class RequireSuperDisposeCallRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
-    name: 'require_super_dispose_call',
-    problemMessage:
-        '[require_super_dispose_call] Missing super.dispose() prevents parent '
+    'require_super_dispose_call',
+    '[require_super_dispose_call] Missing super.dispose() prevents parent '
         'State cleanup, causing memory leaks and broken widget lifecycle. {v1}',
     correctionMessage: 'Add super.dispose() at the end of your dispose method.',
-    errorSeverity: DiagnosticSeverity.ERROR,
+    severity: DiagnosticSeverity.ERROR,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodDeclaration((MethodDeclaration node) {
+    context.addMethodDeclaration((MethodDeclaration node) {
       if (node.name.lexeme != 'dispose') return;
 
       // Check if in State<T> class
@@ -3896,7 +3622,7 @@ class RequireSuperDisposeCallRule extends SaropaLintRule {
       // Check if super.dispose() is called
       final bodySource = node.body.toSource();
       if (!bodySource.contains('super.dispose()')) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
   }
@@ -3933,7 +3659,7 @@ class RequireSuperDisposeCallRule extends SaropaLintRule {
 /// }
 /// ```
 class RequireSuperInitStateCallRule extends SaropaLintRule {
-  const RequireSuperInitStateCallRule() : super(code: _code);
+  RequireSuperInitStateCallRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.critical;
@@ -3945,22 +3671,20 @@ class RequireSuperInitStateCallRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
-    name: 'require_super_init_state_call',
-    problemMessage:
-        '[require_super_init_state_call] Missing super.initState() skips parent '
+    'require_super_init_state_call',
+    '[require_super_init_state_call] Missing super.initState() skips parent '
         'initialization, breaking framework contracts and causing subtle bugs. {v2}',
     correctionMessage:
         'Add super.initState() at the beginning of your initState method.',
-    errorSeverity: DiagnosticSeverity.ERROR,
+    severity: DiagnosticSeverity.ERROR,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodDeclaration((MethodDeclaration node) {
+    context.addMethodDeclaration((MethodDeclaration node) {
       if (node.name.lexeme != 'initState') return;
 
       // Check if in State<T> class
@@ -3974,7 +3698,7 @@ class RequireSuperInitStateCallRule extends SaropaLintRule {
       // Check if super.initState() is called
       final bodySource = node.body.toSource();
       if (!bodySource.contains('super.initState()')) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
   }
@@ -4010,7 +3734,7 @@ class RequireSuperInitStateCallRule extends SaropaLintRule {
 /// }
 /// ```
 class AvoidSetStateInDisposeRule extends SaropaLintRule {
-  const AvoidSetStateInDisposeRule() : super(code: _code);
+  AvoidSetStateInDisposeRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.critical;
@@ -4022,22 +3746,20 @@ class AvoidSetStateInDisposeRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
-    name: 'avoid_set_state_in_dispose',
-    problemMessage:
-        '[avoid_set_state_in_dispose] setState in dispose() throws "setState '
+    'avoid_set_state_in_dispose',
+    '[avoid_set_state_in_dispose] setState in dispose() throws "setState '
         'called after dispose" error, crashing the app during navigation. {v2}',
     correctionMessage:
         'Remove setState - state changes are invalid during disposal.',
-    errorSeverity: DiagnosticSeverity.ERROR,
+    severity: DiagnosticSeverity.ERROR,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       if (node.methodName.name != 'setState') return;
 
       // Walk up to find enclosing method
@@ -4105,7 +3827,7 @@ class AvoidSetStateInDisposeRule extends SaropaLintRule {
 /// }
 /// ```
 class RequireWidgetsBindingCallbackRule extends SaropaLintRule {
-  const RequireWidgetsBindingCallbackRule() : super(code: _code);
+  RequireWidgetsBindingCallbackRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.high;
@@ -4114,28 +3836,28 @@ class RequireWidgetsBindingCallbackRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'require_widgets_binding_callback',
-    problemMessage:
-        '[require_widgets_binding_callback] showDialog/showModalBottomSheet in '
+    'require_widgets_binding_callback',
+    '[require_widgets_binding_callback] showDialog/showModalBottomSheet in '
         'initState without addPostFrameCallback may fail. {v2}',
     correctionMessage:
         'Wrap in WidgetsBinding.instance.addPostFrameCallback((_) { ... }).',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodDeclaration((MethodDeclaration node) {
+    context.addMethodDeclaration((MethodDeclaration node) {
       if (node.name.lexeme != 'initState') return;
 
       // Look for dialog methods called directly (not in addPostFrameCallback)
-      node.body.visitChildren(_DialogInInitStateVisitor((dialogNode) {
-        reporter.atNode(dialogNode, code);
-      }));
+      node.body.visitChildren(
+        _DialogInInitStateVisitor((dialogNode) {
+          reporter.atNode(dialogNode);
+        }),
+      );
     });
   }
 }
@@ -4215,7 +3937,7 @@ class _DialogInInitStateVisitor extends RecursiveAstVisitor<void> {
 /// }
 /// ```
 class AvoidGlobalKeysInStateRule extends SaropaLintRule {
-  const AvoidGlobalKeysInStateRule() : super(code: _code);
+  AvoidGlobalKeysInStateRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.medium;
@@ -4227,23 +3949,21 @@ class AvoidGlobalKeysInStateRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
-    name: 'avoid_global_keys_in_state',
-    problemMessage:
-        '[avoid_global_keys_in_state] GlobalKey in StatefulWidget persists '
+    'avoid_global_keys_in_state',
+    '[avoid_global_keys_in_state] GlobalKey in StatefulWidget persists '
         'across hot reload. Move to State class instead. {v3}',
     correctionMessage:
         'Move this GlobalKey to the State class where it will be properly '
         'managed during hot reload.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addClassDeclaration((ClassDeclaration node) {
+    context.addClassDeclaration((ClassDeclaration node) {
       // Check if this is a StatefulWidget
       final ExtendsClause? extendsClause = node.extendsClause;
       if (extendsClause == null) return;
@@ -4281,7 +4001,7 @@ class AvoidGlobalKeysInStateRule extends SaropaLintRule {
                   constructorFieldParams.contains(v.name.lexeme),
             );
             if (!isPassThrough) {
-              reporter.atNode(member, code);
+              reporter.atNode(member);
             }
           }
         }

@@ -7,8 +7,6 @@
 library;
 
 import 'package:analyzer/dart/ast/ast.dart';
-import 'package:analyzer/error/error.dart' show DiagnosticSeverity;
-import 'package:custom_lint_builder/custom_lint_builder.dart';
 
 import '../saropa_lint_rule.dart';
 
@@ -54,7 +52,7 @@ import '../saropa_lint_rule.dart';
 /// }
 /// ```
 class RequireLocationPermissionRationaleRule extends SaropaLintRule {
-  const RequireLocationPermissionRationaleRule() : super(code: _code);
+  RequireLocationPermissionRationaleRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.high;
@@ -63,22 +61,20 @@ class RequireLocationPermissionRationaleRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'require_location_permission_rationale',
-    problemMessage:
-        '[require_location_permission_rationale] Location permission requested '
+    'require_location_permission_rationale',
+    '[require_location_permission_rationale] Location permission requested '
         'without showing rationale. Users may deny without understanding why. {v2}',
     correctionMessage:
         'Show a dialog explaining why location is needed before requesting.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       final String methodName = node.methodName.name;
 
       // Check for permission request
@@ -122,7 +118,7 @@ class RequireLocationPermissionRationaleRule extends SaropaLintRule {
         return; // Has rationale
       }
 
-      reporter.atNode(node, code);
+      reporter.atNode(node);
     });
   }
 }
@@ -169,7 +165,7 @@ class RequireLocationPermissionRationaleRule extends SaropaLintRule {
 /// }
 /// ```
 class RequireCameraPermissionCheckRule extends SaropaLintRule {
-  const RequireCameraPermissionCheckRule() : super(code: _code);
+  RequireCameraPermissionCheckRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.critical;
@@ -181,24 +177,20 @@ class RequireCameraPermissionCheckRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
-    name: 'require_camera_permission_check',
-    problemMessage:
-        '[require_camera_permission_check] Camera initialized without permission '
+    'require_camera_permission_check',
+    '[require_camera_permission_check] Camera initialized without permission '
         'check. This crashes on iOS and throws on Android. {v3}',
     correctionMessage:
         'Request Permission.camera before creating CameraController.',
-    errorSeverity: DiagnosticSeverity.ERROR,
+    severity: DiagnosticSeverity.ERROR,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addInstanceCreationExpression((
-      InstanceCreationExpression node,
-    ) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final String typeName = node.constructorName.type.name.lexeme;
       if (typeName != 'CameraController') return;
 
@@ -236,11 +228,11 @@ class RequireCameraPermissionCheckRule extends SaropaLintRule {
         }
       }
 
-      reporter.atNode(node, code);
+      reporter.atNode(node);
     });
 
     // Also check for availableCameras and camera initialization
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       final String methodName = node.methodName.name;
 
       if (methodName != 'availableCameras' && methodName != 'initialize') {
@@ -281,7 +273,7 @@ class RequireCameraPermissionCheckRule extends SaropaLintRule {
           !bodySource.contains('.camera.status') &&
           !bodySource.contains('checkCameraPermission') &&
           !bodySource.contains('requestCameraPermission')) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
   }
@@ -324,7 +316,7 @@ class RequireCameraPermissionCheckRule extends SaropaLintRule {
 /// }
 /// ```
 class PreferImageCroppingRule extends SaropaLintRule {
-  const PreferImageCroppingRule() : super(code: _code);
+  PreferImageCroppingRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.low;
@@ -336,13 +328,12 @@ class PreferImageCroppingRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
-    name: 'prefer_image_cropping',
-    problemMessage:
-        '[prefer_image_cropping] Profile/avatar image picked without cropping. '
+    'prefer_image_cropping',
+    '[prefer_image_cropping] Profile/avatar image picked without cropping. '
         'Raw photos may have wrong aspect ratio for profile display. {v2}',
     correctionMessage:
         'Use ImageCropper to let users crop the image to the correct aspect ratio.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   /// Keywords suggesting profile/avatar context
@@ -358,11 +349,10 @@ class PreferImageCroppingRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       final String methodName = node.methodName.name;
 
       // Check for image picker methods
@@ -409,7 +399,7 @@ class PreferImageCroppingRule extends SaropaLintRule {
         return; // Has cropping
       }
 
-      reporter.atNode(node, code);
+      reporter.atNode(node);
     });
   }
 }
@@ -444,7 +434,7 @@ class PreferImageCroppingRule extends SaropaLintRule {
 /// }
 /// ```
 class AvoidPermissionHandlerNullSafetyRule extends SaropaLintRule {
-  const AvoidPermissionHandlerNullSafetyRule() : super(code: _code);
+  AvoidPermissionHandlerNullSafetyRule() : super(code: _code);
 
   /// Using deprecated APIs causes compile errors after migration.
   @override
@@ -454,18 +444,18 @@ class AvoidPermissionHandlerNullSafetyRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_permission_handler_null_safety',
-    problemMessage:
-        '[avoid_permission_handler_null_safety] Deprecated pre-null-safety '
+    'avoid_permission_handler_null_safety',
+    '[avoid_permission_handler_null_safety] Deprecated pre-null-safety '
         'permission_handler API detected. The PermissionHandler() constructor '
         'and PermissionGroup enum were removed in permission_handler 8.0+. '
         'Using these deprecated APIs prevents migration to null-safe versions '
         'and causes compile errors when updating the package. The modern API '
         'uses Permission.camera.status and Permission.camera.request() instead. {v2}',
-    correctionMessage: 'Migrate to the null-safe permission_handler API: use '
+    correctionMessage:
+        'Migrate to the null-safe permission_handler API: use '
         'Permission.camera.status instead of '
         'PermissionHandler().checkPermissionStatus(PermissionGroup.camera).',
-    errorSeverity: DiagnosticSeverity.ERROR,
+    severity: DiagnosticSeverity.ERROR,
   );
 
   /// Deprecated class names from pre-null-safety permission_handler
@@ -485,21 +475,19 @@ class AvoidPermissionHandlerNullSafetyRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
     // Detect deprecated constructor: PermissionHandler()
-    context.registry
-        .addInstanceCreationExpression((InstanceCreationExpression node) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final String typeName = node.constructorName.type.name2.lexeme;
       if (_deprecatedClasses.contains(typeName)) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
 
     // Detect deprecated method calls on PermissionHandler instances
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       final String methodName = node.methodName.name;
       if (!_deprecatedMethods.contains(methodName)) return;
 
@@ -509,18 +497,19 @@ class AvoidPermissionHandlerNullSafetyRule extends SaropaLintRule {
 
       if (target is SimpleIdentifier &&
           _deprecatedClasses.contains(target.name)) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       } else if (target is InstanceCreationExpression &&
-          _deprecatedClasses
-              .contains(target.constructorName.type.name2.lexeme)) {
-        reporter.atNode(node, code);
+          _deprecatedClasses.contains(
+            target.constructorName.type.name2.lexeme,
+          )) {
+        reporter.atNode(node);
       }
     });
 
     // Detect PermissionGroup enum usage
-    context.registry.addPrefixedIdentifier((PrefixedIdentifier node) {
+    context.addPrefixedIdentifier((PrefixedIdentifier node) {
       if (node.prefix.name == 'PermissionGroup') {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
   }
@@ -557,7 +546,7 @@ class AvoidPermissionHandlerNullSafetyRule extends SaropaLintRule {
 /// }
 /// ```
 class PreferPermissionRequestInContextRule extends SaropaLintRule {
-  const PreferPermissionRequestInContextRule() : super(code: _code);
+  PreferPermissionRequestInContextRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.medium;
@@ -566,12 +555,11 @@ class PreferPermissionRequestInContextRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'prefer_permission_request_in_context',
-    problemMessage:
-        '[prefer_permission_request_in_context] Permission requested at app startup (main or initState) instead of in response to user action. Users see permission dialogs before understanding why the app needs access, leading to higher denial rates and a confusing first-launch experience. Platform guidelines (Apple, Google) recommend requesting permissions just-in-time when the user performs a relevant action. {v1}',
+    'prefer_permission_request_in_context',
+    '[prefer_permission_request_in_context] Permission requested at app startup (main or initState) instead of in response to user action. Users see permission dialogs before understanding why the app needs access, leading to higher denial rates and a confusing first-launch experience. Platform guidelines (Apple, Google) recommend requesting permissions just-in-time when the user performs a relevant action. {v1}',
     correctionMessage:
         'Move the permission request to the point where the user performs the action that needs the permission (e.g., request camera when user taps "Take Photo").',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   /// Function names that indicate startup context.
@@ -586,11 +574,10 @@ class PreferPermissionRequestInContextRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       // Check if this is a .request() call
       if (node.methodName.name != 'request') return;
 
@@ -598,7 +585,8 @@ class PreferPermissionRequestInContextRule extends SaropaLintRule {
       final String? targetSource = node.target?.toSource();
       if (targetSource == null) return;
 
-      final bool isPermission = targetSource.contains('Permission') ||
+      final bool isPermission =
+          targetSource.contains('Permission') ||
           targetSource.contains('permission');
       if (!isPermission) return;
 
@@ -607,13 +595,13 @@ class PreferPermissionRequestInContextRule extends SaropaLintRule {
       while (current != null) {
         if (current is FunctionDeclaration) {
           if (_startupFunctions.contains(current.name.lexeme)) {
-            reporter.atNode(node, code);
+            reporter.atNode(node);
           }
           return;
         }
         if (current is MethodDeclaration) {
           if (_startupFunctions.contains(current.name.lexeme)) {
-            reporter.atNode(node, code);
+            reporter.atNode(node);
           }
           return;
         }

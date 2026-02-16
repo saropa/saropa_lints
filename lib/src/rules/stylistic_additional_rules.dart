@@ -2,9 +2,6 @@
 
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/element/nullability_suffix.dart';
-import 'package:analyzer/error/error.dart'
-    show AnalysisError, DiagnosticSeverity;
-import 'package:custom_lint_builder/custom_lint_builder.dart';
 
 import '../saropa_lint_rule.dart';
 
@@ -61,7 +58,7 @@ bool _isPrivateMember(ClassMember member) {
 /// **Pros:** More readable, less error-prone, Dart idiomatic
 /// **Cons:** Some prefer explicit concatenation for complex expressions
 class PreferInterpolationOverConcatenationRule extends SaropaLintRule {
-  const PreferInterpolationOverConcatenationRule() : super(code: _code);
+  PreferInterpolationOverConcatenationRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.opinionated;
@@ -70,21 +67,19 @@ class PreferInterpolationOverConcatenationRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'prefer_interpolation_over_concatenation',
-    problemMessage:
-        '[prefer_interpolation_over_concatenation] String concatenation with the + operator was detected where interpolation would be cleaner. Concatenation adds visual noise and is less idiomatic in Dart. Use \$-interpolation for improved readability. {v2}',
+    'prefer_interpolation_over_concatenation',
+    '[prefer_interpolation_over_concatenation] String concatenation with the + operator was detected where interpolation would be cleaner. Concatenation adds visual noise and is less idiomatic in Dart. Use \$-interpolation for improved readability. {v2}',
     correctionMessage:
         'Replace string concatenation with \$-interpolation for readability and to reduce operator noise.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addBinaryExpression((node) {
+    context.addBinaryExpression((node) {
       if (node.operator.lexeme != '+') return;
 
       // Check if either operand is a string literal
@@ -95,7 +90,7 @@ class PreferInterpolationOverConcatenationRule extends SaropaLintRule {
           left is SimpleStringLiteral || right is SimpleStringLiteral;
 
       if (hasStringLiteral) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
   }
@@ -120,7 +115,7 @@ class PreferInterpolationOverConcatenationRule extends SaropaLintRule {
 /// **Pros:** Explicit about string building, easier to debug
 /// **Cons:** More verbose, less Dart idiomatic
 class PreferConcatenationOverInterpolationRule extends SaropaLintRule {
-  const PreferConcatenationOverInterpolationRule() : super(code: _code);
+  PreferConcatenationOverInterpolationRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.opinionated;
@@ -129,22 +124,20 @@ class PreferConcatenationOverInterpolationRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'prefer_concatenation_over_interpolation',
-    problemMessage:
-        '[prefer_concatenation_over_interpolation] String interpolation was used where explicit concatenation is preferred. Use the + operator to build strings for a consistent style that keeps expressions visually separated from literal text. {v2}',
+    'prefer_concatenation_over_interpolation',
+    '[prefer_concatenation_over_interpolation] String interpolation was used where explicit concatenation is preferred. Use the + operator to build strings for a consistent style that keeps expressions visually separated from literal text. {v2}',
     correctionMessage:
         'Replace \$-interpolation with explicit + concatenation for a consistent string-building style.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addStringInterpolation((node) {
-      reporter.atNode(node, code);
+    context.addStringInterpolation((node) {
+      reporter.atNode(node);
     });
   }
 }
@@ -170,7 +163,7 @@ class PreferConcatenationOverInterpolationRule extends SaropaLintRule {
 /// **Pros:** Consistent style, single quotes are Dart convention
 /// **Cons:** Double quotes needed for strings with apostrophes
 class PreferDoubleQuotesRule extends SaropaLintRule {
-  const PreferDoubleQuotesRule() : super(code: _code);
+  PreferDoubleQuotesRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.opinionated;
@@ -179,64 +172,31 @@ class PreferDoubleQuotesRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'prefer_double_quotes',
-    problemMessage:
-        '[prefer_double_quotes] String literal uses single quotes instead of double quotes. Mixing quote styles creates inconsistent formatting that distracts during code review. {v6}',
+    'prefer_double_quotes',
+    '[prefer_double_quotes] String literal uses single quotes instead of double quotes. Mixing quote styles creates inconsistent formatting that distracts during code review. {v6}',
     correctionMessage:
         'Replace single quotes with double quotes across all string literals for a consistent codebase style.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addSimpleStringLiteral((node) {
+    context.addSimpleStringLiteral((node) {
       final lexeme = node.literal.lexeme;
       if (lexeme.startsWith("'") && !lexeme.contains('"')) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
   }
-
-  @override
-  List<Fix> getFixes() => [_PreferDoubleQuotesFix()];
 }
 
 /// Quick fix for [PreferDoubleQuotesRule].
 ///
 /// Converts single-quoted strings to double-quoted strings.
 /// Example: `'hello'` → `"hello"`
-class _PreferDoubleQuotesFix extends DartFix {
-  @override
-  void run(
-    CustomLintResolver resolver,
-    ChangeReporter reporter,
-    CustomLintContext context,
-    AnalysisError analysisError,
-    List<AnalysisError> others,
-  ) {
-    context.registry.addSimpleStringLiteral((node) {
-      if (!analysisError.sourceRange.intersects(node.sourceRange)) return;
-
-      final lexeme = node.literal.lexeme;
-      if (!lexeme.startsWith("'")) return;
-
-      final changeBuilder = reporter.createChangeBuilder(
-        message: 'Convert to double quotes',
-        priority: 80,
-      );
-
-      changeBuilder.addDartFileEdit((builder) {
-        // Replace ' with " at start and end
-        final newString = '"${node.value}"';
-        builder.addSimpleReplacement(node.sourceRange, newString);
-      });
-    });
-  }
-}
 
 // =============================================================================
 // IMPORT ORGANIZATION RULES
@@ -263,7 +223,7 @@ class _PreferDoubleQuotesFix extends DartFix {
 /// **Pros:** Easier refactoring, shorter imports
 /// **Cons:** Can be confusing in deep directory structures
 class PreferAbsoluteImportsRule extends SaropaLintRule {
-  const PreferAbsoluteImportsRule() : super(code: _code);
+  PreferAbsoluteImportsRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.opinionated;
@@ -272,27 +232,25 @@ class PreferAbsoluteImportsRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'prefer_absolute_imports',
-    problemMessage:
-        '[prefer_absolute_imports] Relative import detected instead of the preferred absolute package import. Absolute imports provide a canonical path that avoids breakage when files are moved and improves cross-file searchability. {v5}',
+    'prefer_absolute_imports',
+    '[prefer_absolute_imports] Relative import detected instead of the preferred absolute package import. Absolute imports provide a canonical path that avoids breakage when files are moved and improves cross-file searchability. {v5}',
     correctionMessage:
         'Replace relative imports with absolute package: imports so every file references the same canonical path.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addImportDirective((node) {
+    context.addImportDirective((node) {
       final uri = node.uri.stringValue;
       if (uri == null) return;
 
       // Flag relative imports (starting with . or ..)
       if (uri.startsWith('.')) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
   }
@@ -325,7 +283,7 @@ class PreferAbsoluteImportsRule extends SaropaLintRule {
 /// **Pros:** Organized, easy to find imports
 /// **Cons:** Requires manual maintenance
 class PreferGroupedImportsRule extends SaropaLintRule {
-  const PreferGroupedImportsRule() : super(code: _code);
+  PreferGroupedImportsRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.opinionated;
@@ -334,21 +292,19 @@ class PreferGroupedImportsRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'prefer_grouped_imports',
-    problemMessage:
-        '[prefer_grouped_imports] Imports are not grouped by type (dart:, package:, relative). Ungrouped imports make it harder to locate dependencies at a glance; organize them into dart:, package:, and relative sections separated by blank lines. {v4}',
+    'prefer_grouped_imports',
+    '[prefer_grouped_imports] Imports are not grouped by type (dart:, package:, relative). Ungrouped imports make it harder to locate dependencies at a glance; organize them into dart:, package:, and relative sections separated by blank lines. {v4}',
     correctionMessage:
         'Organize imports into dart:, package:, and relative groups separated by blank lines for quick scanning.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addCompilationUnit((node) {
+    context.addCompilationUnit((node) {
       final imports = node.directives.whereType<ImportDirective>().toList();
       if (imports.length < 2) return;
 
@@ -369,7 +325,7 @@ class PreferGroupedImportsRule extends SaropaLintRule {
 
         // Check if imports are out of order (higher group before lower)
         if (lastGroup > currentGroup) {
-          reporter.atNode(import, code);
+          reporter.atNode(import);
         }
         lastGroup = currentGroup;
       }
@@ -402,7 +358,7 @@ class PreferGroupedImportsRule extends SaropaLintRule {
 /// **Pros:** Compact, alphabetical sorting easier
 /// **Cons:** Harder to distinguish import types
 class PreferFlatImportsRule extends SaropaLintRule {
-  const PreferFlatImportsRule() : super(code: _code);
+  PreferFlatImportsRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.opinionated;
@@ -411,26 +367,25 @@ class PreferFlatImportsRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'prefer_flat_imports',
-    problemMessage:
-        '[prefer_flat_imports] Import block uses blank-line grouping that fragments the import list. A flat, alphabetically sorted import block is easier to scan and produces fewer merge conflicts. {v4}',
+    'prefer_flat_imports',
+    '[prefer_flat_imports] Import block uses blank-line grouping that fragments the import list. A flat, alphabetically sorted import block is easier to scan and produces fewer merge conflicts. {v4}',
     correctionMessage:
         'Remove blank lines between import groups so the entire import block stays compact and alphabetically sorted.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addCompilationUnit((node) {
-      final imports =
-          node.directives.whereType<ImportDirective>().toList(growable: false);
+    context.addCompilationUnit((node) {
+      final imports = node.directives.whereType<ImportDirective>().toList(
+        growable: false,
+      );
       if (imports.length < 2) return;
 
-      final lineInfo = resolver.lineInfo;
+      final lineInfo = context.lineInfo;
 
       for (var i = 1; i < imports.length; i++) {
         final prevImport = imports[i - 1];
@@ -438,12 +393,13 @@ class PreferFlatImportsRule extends SaropaLintRule {
 
         // Get line numbers for previous and current imports
         final prevEndLine = lineInfo.getLocation(prevImport.end).lineNumber;
-        final currStartLine =
-            lineInfo.getLocation(currImport.offset).lineNumber;
+        final currStartLine = lineInfo
+            .getLocation(currImport.offset)
+            .lineNumber;
 
         // If there's more than one line gap (blank line), report
         if (currStartLine - prevEndLine > 1) {
-          reporter.atNode(currImport, code);
+          reporter.atNode(currImport);
         }
       }
     });
@@ -483,7 +439,7 @@ class PreferFlatImportsRule extends SaropaLintRule {
 /// **Pros:** Data before behavior, easier to understand class state
 /// **Cons:** Some prefer methods near related fields
 class PreferFieldsBeforeMethodsRule extends SaropaLintRule {
-  const PreferFieldsBeforeMethodsRule() : super(code: _code);
+  PreferFieldsBeforeMethodsRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.opinionated;
@@ -492,28 +448,26 @@ class PreferFieldsBeforeMethodsRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'prefer_fields_before_methods',
-    problemMessage:
-        '[prefer_fields_before_methods] A method appears before a field declaration in this class. Placing fields first improves readability by showing the data model before behavior. Move all field declarations above methods. {v4}',
+    'prefer_fields_before_methods',
+    '[prefer_fields_before_methods] A method appears before a field declaration in this class. Placing fields first improves readability by showing the data model before behavior. Move all field declarations above methods. {v4}',
     correctionMessage:
         'Move field declarations above method declarations so readers see the data model before the behavior.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addClassDeclaration((node) {
+    context.addClassDeclaration((node) {
       bool seenMethod = false;
 
       for (final member in node.members) {
         if (member is MethodDeclaration) {
           seenMethod = true;
         } else if (member is FieldDeclaration && seenMethod) {
-          reporter.atNode(member, code);
+          reporter.atNode(member);
         }
       }
     });
@@ -540,7 +494,7 @@ class PreferFieldsBeforeMethodsRule extends SaropaLintRule {
 /// **Pros:** API/behavior first, implementation details last
 /// **Cons:** Unconventional, harder to see class state
 class PreferMethodsBeforeFieldsRule extends SaropaLintRule {
-  const PreferMethodsBeforeFieldsRule() : super(code: _code);
+  PreferMethodsBeforeFieldsRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.opinionated;
@@ -549,28 +503,26 @@ class PreferMethodsBeforeFieldsRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'prefer_methods_before_fields',
-    problemMessage:
-        '[prefer_methods_before_fields] A field declaration appears before a method in this class. Placing methods first highlights the public API before implementation details. Move all method declarations above fields. {v4}',
+    'prefer_methods_before_fields',
+    '[prefer_methods_before_fields] A field declaration appears before a method in this class. Placing methods first highlights the public API before implementation details. Move all method declarations above fields. {v4}',
     correctionMessage:
         'Move method declarations above field declarations so the public API is visible before implementation details.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addClassDeclaration((node) {
+    context.addClassDeclaration((node) {
       bool seenField = false;
 
       for (final member in node.members) {
         if (member is FieldDeclaration) {
           seenField = true;
         } else if (member is MethodDeclaration && seenField) {
-          reporter.atNode(member, code);
+          reporter.atNode(member);
         }
       }
     });
@@ -605,7 +557,7 @@ class PreferMethodsBeforeFieldsRule extends SaropaLintRule {
 /// **Pros:** Class-level constants visible first
 /// **Cons:** Some prefer grouping by purpose
 class PreferStaticMembersFirstRule extends SaropaLintRule {
-  const PreferStaticMembersFirstRule() : super(code: _code);
+  PreferStaticMembersFirstRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.opinionated;
@@ -614,21 +566,19 @@ class PreferStaticMembersFirstRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'prefer_static_members_first',
-    problemMessage:
-        '[prefer_static_members_first] A static member appears after an instance member in the class body. Mixing declaration order makes it harder to locate class-level constants and factories; move all static members above instance members. {v4}',
+    'prefer_static_members_first',
+    '[prefer_static_members_first] A static member appears after an instance member in the class body. Mixing declaration order makes it harder to locate class-level constants and factories; move all static members above instance members. {v4}',
     correctionMessage:
         'Move static declarations above instance declarations to group class-level constants and factories together.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addClassDeclaration((node) {
+    context.addClassDeclaration((node) {
       bool seenInstanceMember = false;
 
       for (final member in node.members) {
@@ -637,7 +587,7 @@ class PreferStaticMembersFirstRule extends SaropaLintRule {
         if (!isStatic) {
           seenInstanceMember = true;
         } else if (isStatic && seenInstanceMember) {
-          reporter.atNode(member, code);
+          reporter.atNode(member);
         }
       }
     });
@@ -664,7 +614,7 @@ class PreferStaticMembersFirstRule extends SaropaLintRule {
 /// **Pros:** Instance API first, factory/constants last
 /// **Cons:** Unconventional ordering
 class PreferInstanceMembersFirstRule extends SaropaLintRule {
-  const PreferInstanceMembersFirstRule() : super(code: _code);
+  PreferInstanceMembersFirstRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.opinionated;
@@ -673,21 +623,19 @@ class PreferInstanceMembersFirstRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'prefer_instance_members_first',
-    problemMessage:
-        '[prefer_instance_members_first] An instance member appears after a static member in the class body. Placing instance members first highlights per-object state before shared class-level members; reorder so all instance declarations precede static ones. {v4}',
+    'prefer_instance_members_first',
+    '[prefer_instance_members_first] An instance member appears after a static member in the class body. Placing instance members first highlights per-object state before shared class-level members; reorder so all instance declarations precede static ones. {v4}',
     correctionMessage:
         'Move instance declarations above static declarations so per-object state is visible before shared members.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addClassDeclaration((node) {
+    context.addClassDeclaration((node) {
       bool seenStaticMember = false;
 
       for (final member in node.members) {
@@ -696,7 +644,7 @@ class PreferInstanceMembersFirstRule extends SaropaLintRule {
         if (isStatic) {
           seenStaticMember = true;
         } else if (!isStatic && seenStaticMember) {
-          reporter.atNode(member, code);
+          reporter.atNode(member);
         }
       }
     });
@@ -723,7 +671,7 @@ class PreferInstanceMembersFirstRule extends SaropaLintRule {
 /// **Pros:** Public API visible first
 /// **Cons:** Some prefer grouping by functionality
 class PreferPublicMembersFirstRule extends SaropaLintRule {
-  const PreferPublicMembersFirstRule() : super(code: _code);
+  PreferPublicMembersFirstRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.opinionated;
@@ -732,21 +680,19 @@ class PreferPublicMembersFirstRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'prefer_public_members_first',
-    problemMessage:
-        '[prefer_public_members_first] A public member appears after a private member in the class body. Declaring public members first surfaces the external API at the top, making the class easier to consume. {v4}',
+    'prefer_public_members_first',
+    '[prefer_public_members_first] A public member appears after a private member in the class body. Declaring public members first surfaces the external API at the top, making the class easier to consume. {v4}',
     correctionMessage:
         'Move public declarations above private declarations so the external API is visible at the top of the class.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addClassDeclaration((node) {
+    context.addClassDeclaration((node) {
       bool seenPrivateMember = false;
 
       for (final member in node.members) {
@@ -755,7 +701,7 @@ class PreferPublicMembersFirstRule extends SaropaLintRule {
         if (isPrivate) {
           seenPrivateMember = true;
         } else if (!isPrivate && seenPrivateMember) {
-          reporter.atNode(member, code);
+          reporter.atNode(member);
         }
       }
     });
@@ -782,7 +728,7 @@ class PreferPublicMembersFirstRule extends SaropaLintRule {
 /// **Pros:** Implementation details first, encapsulation emphasis
 /// **Cons:** Unconventional, hides public API
 class PreferPrivateMembersFirstRule extends SaropaLintRule {
-  const PreferPrivateMembersFirstRule() : super(code: _code);
+  PreferPrivateMembersFirstRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.opinionated;
@@ -791,21 +737,19 @@ class PreferPrivateMembersFirstRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'prefer_private_members_first',
-    problemMessage:
-        '[prefer_private_members_first] A public member appears before a private member in the class body. Declaring private members first groups internal state at the top so implementation details are established before the public API. {v4}',
+    'prefer_private_members_first',
+    '[prefer_private_members_first] A public member appears before a private member in the class body. Declaring private members first groups internal state at the top so implementation details are established before the public API. {v4}',
     correctionMessage:
         'Move private declarations above public declarations so internal state is defined before the public surface.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addClassDeclaration((node) {
+    context.addClassDeclaration((node) {
       bool seenPublicMember = false;
 
       for (final member in node.members) {
@@ -814,7 +758,7 @@ class PreferPrivateMembersFirstRule extends SaropaLintRule {
         if (!isPrivate) {
           seenPublicMember = true;
         } else if (isPrivate && seenPublicMember) {
-          reporter.atNode(member, code);
+          reporter.atNode(member);
         }
       }
     });
@@ -846,7 +790,7 @@ class PreferPrivateMembersFirstRule extends SaropaLintRule {
 /// **Pros:** Self-documenting, explicit about types
 /// **Cons:** More verbose, type inference is powerful
 class PreferVarOverExplicitTypeRule extends SaropaLintRule {
-  const PreferVarOverExplicitTypeRule() : super(code: _code);
+  PreferVarOverExplicitTypeRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.opinionated;
@@ -855,21 +799,19 @@ class PreferVarOverExplicitTypeRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'prefer_var_over_explicit_type',
-    problemMessage:
-        '[prefer_var_over_explicit_type] An explicit type annotation is redundant when the right-hand side already makes the type obvious. Use var to reduce visual noise and let the initializer communicate the type. {v3}',
+    'prefer_var_over_explicit_type',
+    '[prefer_var_over_explicit_type] An explicit type annotation is redundant when the right-hand side already makes the type obvious. Use var to reduce visual noise and let the initializer communicate the type. {v3}',
     correctionMessage:
         'Replace the explicit type annotation with var when the right-hand side already makes the type obvious.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addVariableDeclarationStatement((node) {
+    context.addVariableDeclarationStatement((node) {
       final type = node.variables.type;
       if (type == null) return; // Already using var
 
@@ -883,7 +825,7 @@ class PreferVarOverExplicitTypeRule extends SaropaLintRule {
             init is InstanceCreationExpression ||
             init is ListLiteral ||
             init is SetOrMapLiteral) {
-          reporter.atNode(type, code);
+          reporter.atNode(type);
         }
       }
     });
@@ -911,7 +853,7 @@ class PreferVarOverExplicitTypeRule extends SaropaLintRule {
 /// **Pros:** Type-safe, catches errors at compile time
 /// **Cons:** Requires explicit casting, more verbose
 class PreferObjectOverDynamicRule extends SaropaLintRule {
-  const PreferObjectOverDynamicRule() : super(code: _code);
+  PreferObjectOverDynamicRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.opinionated;
@@ -920,59 +862,30 @@ class PreferObjectOverDynamicRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'prefer_object_over_dynamic',
-    problemMessage:
-        '[prefer_object_over_dynamic] Type is declared as dynamic, which disables static type checking and allows any member access without compile-time verification. Use Object? instead to retain type safety while still accepting any runtime type. {v4}',
+    'prefer_object_over_dynamic',
+    '[prefer_object_over_dynamic] Type is declared as dynamic, which disables static type checking and allows any member access without compile-time verification. Use Object? instead to retain type safety while still accepting any runtime type. {v4}',
     correctionMessage:
         'Replace dynamic with Object? to gain static type-safety while still accepting values of any runtime type.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addNamedType((node) {
+    context.addNamedType((node) {
       if (node.name.lexeme == 'dynamic') {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
   }
-
-  @override
-  List<Fix> getFixes() => [_PreferObjectOverDynamicFix()];
 }
 
 /// Quick fix for [PreferObjectOverDynamicRule].
 ///
 /// Replaces `dynamic` type with `Object?` for better type safety.
 /// Example: `dynamic value` → `Object? value`
-class _PreferObjectOverDynamicFix extends DartFix {
-  @override
-  void run(
-    CustomLintResolver resolver,
-    ChangeReporter reporter,
-    CustomLintContext context,
-    AnalysisError analysisError,
-    List<AnalysisError> others,
-  ) {
-    context.registry.addNamedType((node) {
-      if (!analysisError.sourceRange.intersects(node.sourceRange)) return;
-      if (node.name.lexeme != 'dynamic') return;
-
-      final changeBuilder = reporter.createChangeBuilder(
-        message: 'Replace dynamic with Object?',
-        priority: 80,
-      );
-
-      changeBuilder.addDartFileEdit((builder) {
-        builder.addSimpleReplacement(node.sourceRange, 'Object?');
-      });
-    });
-  }
-}
 
 /// Warns when `Object?` is used instead of `dynamic` (opposite).
 ///
@@ -995,7 +908,7 @@ class _PreferObjectOverDynamicFix extends DartFix {
 /// **Pros:** Less verbose, easier JSON/serialization handling
 /// **Cons:** Less type-safe, runtime errors possible
 class PreferDynamicOverObjectRule extends SaropaLintRule {
-  const PreferDynamicOverObjectRule() : super(code: _code);
+  PreferDynamicOverObjectRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.opinionated;
@@ -1004,59 +917,30 @@ class PreferDynamicOverObjectRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'prefer_dynamic_over_object',
-    problemMessage:
-        '[prefer_dynamic_over_object] Type is declared as Object? where dynamic is intended. Object? forces explicit casts on every access which adds verbosity; use dynamic to signal that static type checking is intentionally bypassed. {v4}',
+    'prefer_dynamic_over_object',
+    '[prefer_dynamic_over_object] Type is declared as Object? where dynamic is intended. Object? forces explicit casts on every access which adds verbosity; use dynamic to signal that static type checking is intentionally bypassed. {v4}',
     correctionMessage:
         'Replace Object? with dynamic when the variable intentionally bypasses static type checks on every access.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addNamedType((node) {
+    context.addNamedType((node) {
       if (node.name.lexeme == 'Object' && node.question != null) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
   }
-
-  @override
-  List<Fix> getFixes() => [_PreferDynamicOverObjectFix()];
 }
 
 /// Quick fix for [PreferDynamicOverObjectRule].
 ///
 /// Replaces `Object?` type with `dynamic` for more flexible typing.
 /// Example: `Object? value` → `dynamic value`
-class _PreferDynamicOverObjectFix extends DartFix {
-  @override
-  void run(
-    CustomLintResolver resolver,
-    ChangeReporter reporter,
-    CustomLintContext context,
-    AnalysisError analysisError,
-    List<AnalysisError> others,
-  ) {
-    context.registry.addNamedType((node) {
-      if (!analysisError.sourceRange.intersects(node.sourceRange)) return;
-      if (node.name.lexeme != 'Object' || node.question == null) return;
-
-      final changeBuilder = reporter.createChangeBuilder(
-        message: 'Replace Object? with dynamic',
-        priority: 80,
-      );
-
-      changeBuilder.addDartFileEdit((builder) {
-        builder.addSimpleReplacement(node.sourceRange, 'dynamic');
-      });
-    });
-  }
-}
 
 // =============================================================================
 // NAMING CONVENTION RULES
@@ -1083,7 +967,7 @@ class _PreferDynamicOverObjectFix extends DartFix {
 /// **Pros:** Consistent with Dart style guide
 /// **Cons:** Some prefer SCREAMING_CASE for visibility
 class PreferLowerCamelCaseConstantsRule extends SaropaLintRule {
-  const PreferLowerCamelCaseConstantsRule() : super(code: _code);
+  PreferLowerCamelCaseConstantsRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.opinionated;
@@ -1092,38 +976,36 @@ class PreferLowerCamelCaseConstantsRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'prefer_lower_camel_case_constants',
-    problemMessage:
-        '[prefer_lower_camel_case_constants] Constant name does not follow lowerCamelCase convention. Inconsistent casing breaks IDE autocompletion expectations and diverges from the Dart style guide. {v3}',
+    'prefer_lower_camel_case_constants',
+    '[prefer_lower_camel_case_constants] Constant name does not follow lowerCamelCase convention. Inconsistent casing breaks IDE autocompletion expectations and diverges from the Dart style guide. {v3}',
     correctionMessage:
         'Rename the constant to lowerCamelCase (e.g., maxRetries) to match the Dart style-guide convention.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addTopLevelVariableDeclaration((node) {
+    context.addTopLevelVariableDeclaration((node) {
       if (!node.variables.isConst) return;
 
       for (final variable in node.variables.variables) {
         final name = variable.name.lexeme;
         if (_isScreamingCase(name)) {
-          reporter.atNode(variable, code);
+          reporter.atNode(variable);
         }
       }
     });
 
-    context.registry.addFieldDeclaration((node) {
+    context.addFieldDeclaration((node) {
       if (!node.fields.isConst) return;
 
       for (final variable in node.fields.variables) {
         final name = variable.name.lexeme;
         if (_isScreamingCase(name)) {
-          reporter.atNode(variable, code);
+          reporter.atNode(variable);
         }
       }
     });
@@ -1155,7 +1037,7 @@ class PreferLowerCamelCaseConstantsRule extends SaropaLintRule {
 /// **Pros:** Consistent with Dart naming conventions
 /// **Cons:** Some prefer snake_case for readability
 class PreferCamelCaseMethodNamesRule extends SaropaLintRule {
-  const PreferCamelCaseMethodNamesRule() : super(code: _code);
+  PreferCamelCaseMethodNamesRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.opinionated;
@@ -1164,37 +1046,35 @@ class PreferCamelCaseMethodNamesRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'prefer_camel_case_method_names',
-    problemMessage:
-        '[prefer_camel_case_method_names] Method name does not follow lowerCamelCase convention. Non-standard casing breaks IDE autocompletion and makes the API inconsistent with Dart SDK and package conventions. {v2}',
+    'prefer_camel_case_method_names',
+    '[prefer_camel_case_method_names] Method name does not follow lowerCamelCase convention. Non-standard casing breaks IDE autocompletion and makes the API inconsistent with Dart SDK and package conventions. {v2}',
     correctionMessage:
         'Rename the method to lowerCamelCase (e.g., fetchUserData) to follow the Dart naming convention.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodDeclaration((node) {
+    context.addMethodDeclaration((node) {
       final name = node.name.lexeme;
       // Skip private methods and operators
       if (name.startsWith('_') || node.isOperator) return;
 
       // Check for snake_case pattern (underscores in middle)
       if (name.contains('_')) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
 
-    context.registry.addFunctionDeclaration((node) {
+    context.addFunctionDeclaration((node) {
       final name = node.name.lexeme;
       if (name.startsWith('_')) return;
 
       if (name.contains('_')) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
   }
@@ -1223,7 +1103,7 @@ class PreferCamelCaseMethodNamesRule extends SaropaLintRule {
 /// **Pros:** Self-documenting code, clearer intent
 /// **Cons:** Short names fine for small scopes (i, j, x, y)
 class PreferDescriptiveVariableNamesRule extends SaropaLintRule {
-  const PreferDescriptiveVariableNamesRule() : super(code: _code);
+  PreferDescriptiveVariableNamesRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.opinionated;
@@ -1232,30 +1112,28 @@ class PreferDescriptiveVariableNamesRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'prefer_descriptive_variable_names',
-    problemMessage:
-        '[prefer_descriptive_variable_names] Variable name is shorter than 3 characters, making its purpose unclear without reading surrounding context. Use a descriptive name that communicates intent at the point of use. {v3}',
+    'prefer_descriptive_variable_names',
+    '[prefer_descriptive_variable_names] Variable name is shorter than 3 characters, making its purpose unclear without reading surrounding context. Use a descriptive name that communicates intent at the point of use. {v3}',
     correctionMessage:
         'Rename the variable to a descriptive name that communicates its purpose without requiring surrounding context.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   static const _allowedShortNames = {'id', 'db', 'io', 'ui', 'x', 'y', 'z'};
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addVariableDeclaration((node) {
+    context.addVariableDeclaration((node) {
       final name = node.name.lexeme;
       // Skip private and allowed short names
       if (name.startsWith('_')) return;
       if (_allowedShortNames.contains(name.toLowerCase())) return;
 
       if (name.length < 3) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
   }
@@ -1282,7 +1160,7 @@ class PreferDescriptiveVariableNamesRule extends SaropaLintRule {
 /// **Pros:** More readable, fits on screen
 /// **Cons:** Sometimes long names are necessary for clarity
 class PreferConciseVariableNamesRule extends SaropaLintRule {
-  const PreferConciseVariableNamesRule() : super(code: _code);
+  PreferConciseVariableNamesRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.opinionated;
@@ -1291,24 +1169,22 @@ class PreferConciseVariableNamesRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'prefer_concise_variable_names',
-    problemMessage:
-        '[prefer_concise_variable_names] Variable name exceeds 30 characters, which reduces readability and makes code harder to scan. Shorten it to a concise name that still conveys its purpose. {v2}',
+    'prefer_concise_variable_names',
+    '[prefer_concise_variable_names] Variable name exceeds 30 characters, which reduces readability and makes code harder to scan. Shorten it to a concise name that still conveys its purpose. {v2}',
     correctionMessage:
         'Shorten the variable name to 30 characters or fewer while still communicating its purpose clearly.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addVariableDeclaration((node) {
+    context.addVariableDeclaration((node) {
       final name = node.name.lexeme;
       if (name.length > 30) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
   }
@@ -1343,7 +1219,7 @@ class PreferConciseVariableNamesRule extends SaropaLintRule {
 /// **Pros:** Explicit about field access, avoids shadowing confusion
 /// **Cons:** More verbose, Dart style guide discourages this
 class PreferExplicitThisRule extends SaropaLintRule {
-  const PreferExplicitThisRule() : super(code: _code);
+  PreferExplicitThisRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.opinionated;
@@ -1352,24 +1228,22 @@ class PreferExplicitThisRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'prefer_explicit_this',
-    problemMessage:
-        '[prefer_explicit_this] Instance field accessed without an explicit this. prefix, making it ambiguous whether the identifier refers to a local variable or a field. Add this. to clarify ownership and improve readability. {v3}',
+    'prefer_explicit_this',
+    '[prefer_explicit_this] Instance field accessed without an explicit this. prefix, making it ambiguous whether the identifier refers to a local variable or a field. Add this. to clarify ownership and improve readability. {v3}',
     correctionMessage:
         'Add an explicit this. prefix to every instance-field reference so readers can distinguish fields from locals.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
     // Note: Full implementation would require semantic analysis to distinguish
     // field access from local variables. This implementation detects cases where
     // a method parameter shadows a field name, which is the most common issue.
-    context.registry.addMethodDeclaration((node) {
+    context.addMethodDeclaration((node) {
       final parent = node.parent;
       if (parent is! ClassDeclaration) return;
 
@@ -1391,7 +1265,7 @@ class PreferExplicitThisRule extends SaropaLintRule {
         final paramName = param.name?.lexeme;
         if (paramName != null && fieldNames.contains(paramName)) {
           // Parameter shadows a field - recommend explicit this.
-          reporter.atNode(param, code);
+          reporter.atNode(param);
         }
       }
     });
@@ -1419,7 +1293,7 @@ class PreferExplicitThisRule extends SaropaLintRule {
 /// **Pros:** More concise, idiomatic Dart
 /// **Cons:** Explicit comparison can be clearer for nullable bools
 class PreferImplicitBooleanComparisonRule extends SaropaLintRule {
-  const PreferImplicitBooleanComparisonRule() : super(code: _code);
+  PreferImplicitBooleanComparisonRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.opinionated;
@@ -1428,21 +1302,19 @@ class PreferImplicitBooleanComparisonRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'prefer_implicit_boolean_comparison',
-    problemMessage:
-        '[prefer_implicit_boolean_comparison] Comparing a boolean expression to a boolean literal (== true or == false) is redundant and adds visual noise. Remove the comparison and use the expression directly for cleaner, idiomatic Dart. {v4}',
+    'prefer_implicit_boolean_comparison',
+    '[prefer_implicit_boolean_comparison] Comparing a boolean expression to a boolean literal (== true or == false) is redundant and adds visual noise. Remove the comparison and use the expression directly for cleaner, idiomatic Dart. {v4}',
     correctionMessage:
         'Remove the redundant == true or == false comparison — the expression is already a bool and reads more naturally.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addBinaryExpression((node) {
+    context.addBinaryExpression((node) {
       if (node.operator.lexeme != '==' && node.operator.lexeme != '!=') return;
 
       final right = node.rightOperand;
@@ -1455,7 +1327,7 @@ class PreferImplicitBooleanComparisonRule extends SaropaLintRule {
         return;
       }
 
-      reporter.atNode(node, code);
+      reporter.atNode(node);
     });
   }
 }
@@ -1480,7 +1352,7 @@ class PreferImplicitBooleanComparisonRule extends SaropaLintRule {
 /// **Pros:** Explicit about null handling, clearer intent
 /// **Cons:** More verbose
 class PreferExplicitBooleanComparisonRule extends SaropaLintRule {
-  const PreferExplicitBooleanComparisonRule() : super(code: _code);
+  PreferExplicitBooleanComparisonRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.opinionated;
@@ -1489,28 +1361,26 @@ class PreferExplicitBooleanComparisonRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'prefer_explicit_boolean_comparison',
-    problemMessage:
-        '[prefer_explicit_boolean_comparison] A nullable boolean expression is used without an explicit comparison, which can hide null-is-false behavior and confuse readers. Add == true to make the intent clear and self-documenting. {v4}',
+    'prefer_explicit_boolean_comparison',
+    '[prefer_explicit_boolean_comparison] A nullable boolean expression is used without an explicit comparison, which can hide null-is-false behavior and confuse readers. Add == true to make the intent clear and self-documenting. {v4}',
     correctionMessage:
         'Add an explicit == true comparison so the nullable bool intent is clear and avoids implicit null-is-false confusion.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
     // Detect `?? false` patterns - suggest using `== true` instead
-    context.registry.addBinaryExpression((node) {
+    context.addBinaryExpression((node) {
       if (node.operator.lexeme != '??') return;
 
       final right = node.rightOperand;
       if (right is BooleanLiteral && !right.value) {
         // `expr ?? false` - suggest `expr == true`
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
   }
