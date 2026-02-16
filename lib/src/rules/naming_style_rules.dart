@@ -2179,14 +2179,14 @@ class PreferCorrectPackageNameRule extends SaropaLintRule {
     SaropaContext context,
   ) {
     context.addLibraryDirective((LibraryDirective node) {
-      final LibraryIdentifier? name = node.name2;
-      if (name == null) return; // `library;` without name is valid
+      final LibraryIdentifier? libName = node.name;
+      if (libName == null) return; // `library;` without name is valid
 
-      final String libraryName = name.name;
+      final String libraryName = libName.name;
       if (libraryName.isEmpty) return;
 
       if (!_validPackageName.hasMatch(libraryName)) {
-        reporter.atNode(name);
+        reporter.atNode(libName);
       }
     });
   }

@@ -19,7 +19,7 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
       - uses: dart-lang/setup-dart@v1
         with:
-          sdk: '3.10.4'
+          sdk: stable
       - name: Install dependencies
         run: dart pub get
       - name: Analyze
@@ -38,7 +38,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: dart-lang/setup-dart@v1
         with:
-          sdk: '3.10.4'
+          sdk: stable
       - name: Install dependencies
         run: dart pub get
       - name: Run tests

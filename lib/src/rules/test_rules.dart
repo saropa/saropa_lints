@@ -1669,8 +1669,8 @@ class PreferTestDataBuilderRule extends SaropaLintRule {
       // Skip if few arguments
       if (argCount < _maxConstructorArgs) return;
 
-      // Get type name safely - name2 may be null for complex types
-      final Token? typeToken = node.constructorName.type.name2;
+      // Get type name safely - name may be null for complex types
+      final Token? typeToken = node.constructorName.type.name;
       if (typeToken == null) return;
 
       // Skip mock objects
@@ -2215,7 +2215,7 @@ class PreferSymbolOverKeyRule extends SaropaLintRule {
     }
 
     context.addInstanceCreationExpression((InstanceCreationExpression node) {
-      final String typeName = node.constructorName.type.name2.lexeme;
+      final String typeName = node.constructorName.type.name.lexeme;
 
       // Check for Key constructor with string literal
       if (typeName != 'Key' && typeName != 'ValueKey') return;

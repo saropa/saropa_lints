@@ -593,7 +593,7 @@ class RequireDioSingletonRule extends SaropaLintRule {
     SaropaContext context,
   ) {
     context.addInstanceCreationExpression((InstanceCreationExpression node) {
-      final typeName = node.constructorName.type.name2.lexeme;
+      final typeName = node.constructorName.type.name.lexeme;
       if (typeName != 'Dio') return;
 
       // Check if it's being assigned to a static final field
