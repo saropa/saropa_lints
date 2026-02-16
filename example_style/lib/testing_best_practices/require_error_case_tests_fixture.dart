@@ -124,8 +124,8 @@ void _bad1213() async {
   }
 }
 
-// GOOD: Should NOT trigger require_error_case_tests
-void _good1213_main() async {
+// GOOD: Should NOT trigger — throwsA matcher detected
+void _good1213_throwsA() async {
   test('login returns user', () async {
     final user = await service.login('valid@email.com', 'password');
     expect(user.name, isNotEmpty);
@@ -141,5 +141,50 @@ void _good1213_main() async {
   test('returns null for missing user', () async {
     final user = await service.findUser('nonexistent');
     expect(user, isNull);
+  });
+}
+
+// GOOD: Should NOT trigger — 'safely' keyword in test name
+// (defensive try-catch source code that never throws to caller)
+void _good1213_safely() async {
+  test('returns zero when unattached', () {
+    expect(service.safeOffset, 0.0);
+  });
+
+  test('handles multiple positions safely', () async {
+    expect(service.jumpTop(), completion(isFalse));
+  });
+}
+
+// GOOD: Should NOT trigger — 'timeout' keyword in test name
+void _good1213_timeout() async {
+  test('completes normally', () async {
+    expect(await service.fetchData(), isNotNull);
+  });
+
+  test('returns fallback on timeout', () async {
+    expect(await service.fetchData(), isEmpty);
+  });
+}
+
+// GOOD: Should NOT trigger — 'dispose' keyword in test name
+void _good1213_dispose() async {
+  test('creates controller', () {
+    expect(service.controller, isNotNull);
+  });
+
+  test('returns safely after dispose', () {
+    expect(service.safeOffset, 0.0);
+  });
+}
+
+// GOOD: Should NOT trigger — 'default' keyword in test name
+void _good1213_default() async {
+  test('processes valid input', () {
+    expect(service.process('hello'), isNotNull);
+  });
+
+  test('returns default when config missing', () {
+    expect(service.getTheme(), equals('light'));
   });
 }
