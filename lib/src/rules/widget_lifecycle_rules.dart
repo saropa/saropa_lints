@@ -599,25 +599,36 @@ class AvoidStatelessWidgetInitializedFieldsRule extends SaropaLintRule {
   }
 }
 
-/// Warns when GestureDetector has no gesture callbacks defined.
+/// Warns when setState is called directly in a lifecycle method.
 ///
 /// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v6
+///
+/// In initState/didChangeDependencies, state assignments take effect before
+/// the first build, so wrapping them in setState is unnecessary and misleading.
+/// However, setState inside closures (stream listeners, Future callbacks) is
+/// fine — those execute after the lifecycle method returns.
 ///
 /// ### Example
 ///
 /// #### BAD:
 /// ```dart
-/// GestureDetector(
-///   child: Text('Hello'),
-/// )
+/// @override
+/// void initState() {
+///   super.initState();
+///   setState(() { _value = 42; }); // unnecessary — assign directly
+/// }
 /// ```
 ///
 /// #### GOOD:
 /// ```dart
-/// GestureDetector(
-///   onTap: () => print('tapped'),
-///   child: Text('Hello'),
-/// )
+/// @override
+/// void initState() {
+///   super.initState();
+///   _value = 42; // direct assignment before first build
+///   _sub = stream.listen((_) {
+///     if (mounted) setState(() {}); // deferred — runs after build
+///   });
+/// }
 /// ```
 class AvoidUnnecessarySetStateRule extends SaropaLintRule {
   const AvoidUnnecessarySetStateRule() : super(code: _code);
@@ -685,6 +696,13 @@ class _SetStateCallFinder extends RecursiveAstVisitor<void> {
       onFound(node);
     }
     super.visitMethodInvocation(node);
+  }
+
+  /// Stop recursion into closures — setState inside a callback (e.g. .listen,
+  /// Future.delayed) runs after the lifecycle method, so it's not "unnecessary"
+  @override
+  void visitFunctionExpression(FunctionExpression node) {
+    // Intentionally do not call super — skip closure bodies
   }
 }
 
