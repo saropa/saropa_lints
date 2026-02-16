@@ -186,8 +186,16 @@ def find_duplicate_rules(rules_dir: Path) -> dict:
     for dart_file in rules_dir.glob("**/*.dart"):
         content = dart_file.read_text(encoding="utf-8")
 
+        # Strip doc comment lines to avoid matching name:/problemMessage:
+        # inside code examples (e.g. analytics.logEvent(name: 'purchase'))
+        code_only = "\n".join(
+            line
+            for line in content.splitlines()
+            if not line.strip().startswith("///")
+        )
+
         rule_problem_len = {}
-        for match in lint_code_pattern.finditer(content):
+        for match in lint_code_pattern.finditer(code_only):
             rule = match.group(1)
             msg = match.group(2) or match.group(3) or ""
             rule_problem_len[rule] = len(msg)
@@ -202,7 +210,7 @@ def find_duplicate_rules(rules_dir: Path) -> dict:
             )
 
         rule_names_in_file = set()
-        for match in rule_name_pattern.finditer(content):
+        for match in rule_name_pattern.finditer(code_only):
             rule_names_in_file.add(match.group(1))
         for rule_name in rule_names_in_file:
             problem_len = rule_problem_len.get(rule_name, 0)
