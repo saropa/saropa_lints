@@ -105,15 +105,41 @@
 
 import 'package:saropa_lints_example/flutter_mocks.dart';
 
-dynamic map;
+enum _Color { red, green, blue }
 
-// BAD: Should trigger avoid_missing_enum_constant_in_map
+enum _Status { active, inactive }
+
+// BAD: Missing _Color.blue
 // expect_lint: avoid_missing_enum_constant_in_map
-enum Status { active, inactive, pending }
+final _incompleteColorMap = <_Color, String>{
+  _Color.red: 'Red',
+  _Color.green: 'Green',
+};
 
-final map = {Status.active: 'A', Status.inactive: 'I'}; // Missing pending
+// BAD: Missing _Status.inactive
+// expect_lint: avoid_missing_enum_constant_in_map
+final _incompleteStatusMap = <_Status, int>{
+  _Status.active: 1,
+};
 
-// GOOD: Should NOT trigger avoid_missing_enum_constant_in_map
-void _good179() {
-  // TODO: Add compliant code for avoid_missing_enum_constant_in_map
-}
+// GOOD: All enum constants present (3 of 3)
+final _completeColorMap = <_Color, String>{
+  _Color.red: 'Red',
+  _Color.green: 'Green',
+  _Color.blue: 'Blue',
+};
+
+// GOOD: All enum constants present (2 of 2)
+final _completeStatusMap = <_Status, int>{
+  _Status.active: 1,
+  _Status.inactive: 0,
+};
+
+// GOOD: Not enum-keyed
+final _stringMap = <String, int>{
+  'a': 1,
+  'b': 2,
+};
+
+// GOOD: Empty map
+final _emptyMap = <_Color, String>{};

@@ -2551,6 +2551,12 @@ class AvoidMissingEnumConstantInMapRule extends SaropaLintRule {
   );
 
   @override
+  LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  @override
   void runWithReporter(
     CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
@@ -2560,32 +2566,49 @@ class AvoidMissingEnumConstantInMapRule extends SaropaLintRule {
       if (!node.isMap) return;
       if (node.elements.isEmpty) return;
 
-      // Check if keys are enum values
-      String? enumTypeName;
-      final Set<String> usedValues = <String>{};
+      // Resolve the enum type from the first key
+      final EnumElement? enumElement = _resolveEnumKeyType(node);
+      if (enumElement == null) return;
 
+      // Get all declared enum constants
+      final Set<String> allConstants = <String>{
+        for (final FieldElement f in enumElement.fields)
+          if (f.isEnumConstant && f.name != null) f.name!,
+      };
+
+      // Get all used constants from map keys
+      final Set<String> usedConstants = <String>{};
       for (final CollectionElement element in node.elements) {
         if (element is MapLiteralEntry) {
           final Expression key = element.key;
           if (key is PrefixedIdentifier) {
-            enumTypeName ??= key.prefix.name;
-            if (key.prefix.name == enumTypeName) {
-              usedValues.add(key.identifier.name);
-            }
+            usedConstants.add(key.identifier.name);
+          } else if (key is SimpleIdentifier) {
+            usedConstants.add(key.name);
           }
         }
       }
 
-      // If we found enum keys, check if it looks incomplete
-      // Full implementation would resolve the enum to get all values
-      if (enumTypeName != null &&
-          usedValues.length >= 2 &&
-          usedValues.length <= 5) {
-        // Heuristic: if we have 2-5 values, suggest checking for completeness
-        // A full implementation would resolve the enum type
+      // Only flag if there are actually missing constants
+      final Set<String> missing = allConstants.difference(usedConstants);
+      if (missing.isNotEmpty) {
         reporter.atNode(node, code);
       }
     });
+  }
+
+  /// Resolves the enum element from a map literal's key type.
+  EnumElement? _resolveEnumKeyType(SetOrMapLiteral node) {
+    for (final CollectionElement element in node.elements) {
+      if (element is MapLiteralEntry) {
+        final Expression key = element.key;
+        final DartType? keyType = key.staticType;
+        if (keyType is InterfaceType && keyType.element is EnumElement) {
+          return keyType.element as EnumElement;
+        }
+      }
+    }
+    return null;
   }
 }
 
@@ -3204,6 +3227,12 @@ class FunctionAlwaysReturnsNullRule extends SaropaLintRule {
     Token nameToken,
     SaropaDiagnosticReporter reporter,
   ) {
+    // Skip generators — they emit values via yield, not return.
+    // A bare `return;` in async*/sync* ends the stream/iterable,
+    // it does not "return null".
+    if (body.isGenerator) return;
+    if (body is BlockFunctionBody && body.star != null) return;
+
     // Skip void functions - bare return statements are valid
     if (_isVoidType(returnType)) return;
 

@@ -1447,11 +1447,14 @@ class RequireNumberFormatLocaleRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_number_format_locale',
     problemMessage:
-        '[require_number_format_locale] NumberFormat without explicit locale. 1,234.56 vs 1.234,56 varies by device. Consequence: Numbers may be formatted incorrectly for users in different locales, leading to misinterpretation. {v2}',
+        '[require_number_format_locale] NumberFormat without explicit locale. 1,234.56 vs 1.234,56 varies by device. Consequence: Numbers may be formatted incorrectly for users in different locales, leading to misinterpretation. {v3}',
     correctionMessage:
-        'Pass a locale to NumberFormat (e.g., NumberFormat.decimalPattern(locale)) so numbers display correctly for every user.',
+        'Pass a locale to NumberFormat (e.g., NumberFormat.decimalPattern(locale)). Use Intl.defaultLocale if device locale is intentional.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
+
+  @override
+  List<Fix> getFixes() => [_RequireNumberFormatLocaleFix()];
 
   @override
   void runWithReporter(
@@ -1518,6 +1521,92 @@ class RequireNumberFormatLocaleRule extends SaropaLintRule {
       if (!hasLocale) {
         reporter.atNode(node, code);
       }
+    });
+  }
+}
+
+/// Quick fix for [RequireNumberFormatLocaleRule].
+///
+/// Inserts `Intl.defaultLocale` as the locale argument so the developer
+/// explicitly acknowledges that device-locale formatting is intended.
+class _RequireNumberFormatLocaleFix extends DartFix {
+  /// Factory methods where locale is the first positional argument.
+  static const Set<String> _positionalLocaleMethods = <String>{
+    'decimalPattern',
+    'percentPattern',
+    'scientificPattern',
+  };
+
+  @override
+  void run(
+    CustomLintResolver resolver,
+    ChangeReporter reporter,
+    CustomLintContext context,
+    AnalysisError analysisError,
+    List<AnalysisError> others,
+  ) {
+    // Fix for NumberFormat constructor: NumberFormat('#,###')
+    // → NumberFormat('#,###', Intl.defaultLocale)
+    context.registry.addInstanceCreationExpression((
+      InstanceCreationExpression node,
+    ) {
+      if (!analysisError.sourceRange.intersects(node.sourceRange)) return;
+
+      final String typeName = node.constructorName.type.name.lexeme;
+      if (typeName != 'NumberFormat') return;
+
+      final args = node.argumentList.arguments;
+      if (args.length >= 2) return;
+
+      final changeBuilder = reporter.createChangeBuilder(
+        message: 'Use device locale (Intl.defaultLocale)',
+        priority: 80,
+      );
+
+      changeBuilder.addDartFileEdit((builder) {
+        if (args.isEmpty) {
+          // NumberFormat() → NumberFormat(Intl.defaultLocale)
+          final insertOffset = node.argumentList.leftParenthesis.end;
+          builder.addSimpleInsertion(insertOffset, 'Intl.defaultLocale');
+        } else {
+          // NumberFormat('#,###') → NumberFormat('#,###', Intl.defaultLocale)
+          final insertOffset = args.last.end;
+          builder.addSimpleInsertion(insertOffset, ', Intl.defaultLocale');
+        }
+      });
+    });
+
+    // Fix for factory methods: NumberFormat.decimalPattern()
+    // → NumberFormat.decimalPattern(Intl.defaultLocale)
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      if (!analysisError.sourceRange.intersects(node.sourceRange)) return;
+
+      final Expression? target = node.target;
+      if (target is! SimpleIdentifier || target.name != 'NumberFormat') return;
+
+      final String methodName = node.methodName.name;
+      final args = node.argumentList.arguments;
+
+      final changeBuilder = reporter.createChangeBuilder(
+        message: 'Use device locale (Intl.defaultLocale)',
+        priority: 80,
+      );
+
+      changeBuilder.addDartFileEdit((builder) {
+        final insertOffset = args.isEmpty
+            ? node.argumentList.leftParenthesis.end
+            : args.last.end;
+
+        if (_positionalLocaleMethods.contains(methodName)) {
+          builder.addSimpleInsertion(insertOffset, 'Intl.defaultLocale');
+        } else {
+          final prefix = args.isEmpty ? '' : ', ';
+          builder.addSimpleInsertion(
+            insertOffset,
+            '${prefix}locale: Intl.defaultLocale',
+          );
+        }
+      });
     });
   }
 }

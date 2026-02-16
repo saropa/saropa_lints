@@ -1735,7 +1735,7 @@ class _AwaitBeforeChecker extends RecursiveAstVisitor<void> {
 
 /// Warns when setState or context is accessed after await without mounted check.
 ///
-/// Since: v4.0.1 | Updated: v4.13.0 | Rule version: v4
+/// Since: v4.0.1 | Updated: v4.14.4 | Rule version: v5
 ///
 /// After an async gap, the widget may have been disposed. Calling setState
 /// or using context without checking mounted will cause errors.
@@ -1757,6 +1757,15 @@ class _AwaitBeforeChecker extends RecursiveAstVisitor<void> {
 ///   }
 /// }
 /// ```
+///
+/// **GOOD (early-return guard):**
+/// ```dart
+/// Future<void> _loadData() async {
+///   final data = await fetchData();
+///   if (!mounted) return;
+///   setState(() => _data = data);
+/// }
+/// ```
 class CheckMountedAfterAsyncRule extends SaropaLintRule {
   const CheckMountedAfterAsyncRule() : super(code: _code);
 
@@ -1770,8 +1779,9 @@ class CheckMountedAfterAsyncRule extends SaropaLintRule {
     name: 'check_mounted_after_async',
     problemMessage:
         '[check_mounted_after_async] setState() after await without mounted check. '
-        'State may be disposed during async gap, causing "setState() called after dispose()" crash. {v4}',
-    correctionMessage: 'Add if (mounted) { setState(...) } after the await.',
+        'State may be disposed during async gap, causing "setState() called after dispose()" crash. {v5}',
+    correctionMessage:
+        'Add if (mounted) { setState(...) } or if (!mounted) return; before the call.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -1835,7 +1845,7 @@ class CheckMountedAfterAsyncRule extends SaropaLintRule {
   }
 
   bool _hasMountedGuard(FunctionBody body, AstNode target) {
-    // Check if the target is inside an if statement checking mounted
+    // Check 1: Is the target inside a wrapping if-mounted block?
     AstNode? current = target.parent;
     while (current != null && current != body) {
       if (current is IfStatement) {
@@ -1846,7 +1856,87 @@ class CheckMountedAfterAsyncRule extends SaropaLintRule {
       }
       current = current.parent;
     }
+
+    // Check 2: Is there an early-return mounted guard before the target?
+    // Walk up from target to find each enclosing block, checking for guards
+    // at each level (handles nested blocks like if-statements).
+    AstNode? node = target;
+    while (node != null && node != body) {
+      final AstNode? parent = node.parent;
+      if (parent is Block) {
+        if (_hasEarlyReturnGuardInBlock(parent, node)) {
+          return true;
+        }
+      }
+      node = parent;
+    }
+
     return false;
+  }
+
+  /// Checks if [block] contains an early-return mounted guard before [target].
+  /// An early-return guard is: `if (!mounted) return;` or similar.
+  /// The guard is only valid if there is no await between it and the target.
+  bool _hasEarlyReturnGuardInBlock(Block block, AstNode target) {
+    for (final Statement statement in block.statements) {
+      // Stop when we reach or pass the target statement
+      if (statement.offset >= target.offset) break;
+
+      if (statement is! IfStatement) continue;
+
+      final String condition = statement.expression.toSource();
+      if (!condition.contains('mounted')) continue;
+      if (!_containsEarlyExit(statement.thenStatement)) continue;
+
+      // Guard found — check no await exists between guard and target
+      if (!_hasAwaitInRange(block, statement.end, target.offset)) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  /// Returns true if the statement unconditionally exits (return/throw).
+  bool _containsEarlyExit(Statement statement) {
+    if (statement is ReturnStatement) return true;
+    if (statement is ExpressionStatement &&
+        statement.expression is ThrowExpression) {
+      return true;
+    }
+    if (statement is Block) {
+      return statement.statements.any(
+        (Statement s) =>
+            s is ReturnStatement ||
+            (s is ExpressionStatement && s.expression is ThrowExpression),
+      );
+    }
+    return false;
+  }
+
+  /// Returns true if any await expression exists in [body] between
+  /// [startOffset] and [endOffset].
+  bool _hasAwaitInRange(AstNode body, int startOffset, int endOffset) {
+    bool found = false;
+    body.visitChildren(_AwaitRangeChecker((AwaitExpression awaitNode) {
+      if (found) return;
+      if (awaitNode.offset >= startOffset && awaitNode.offset < endOffset) {
+        found = true;
+      }
+    }));
+    return found;
+  }
+}
+
+/// Visitor that finds await expressions and calls a callback for each.
+class _AwaitRangeChecker extends RecursiveAstVisitor<void> {
+  _AwaitRangeChecker(this.onAwait);
+
+  final void Function(AwaitExpression) onAwait;
+
+  @override
+  void visitAwaitExpression(AwaitExpression node) {
+    onAwait(node);
+    super.visitAwaitExpression(node);
   }
 }
 

@@ -175,7 +175,8 @@ void _writeLogFile() {
     final logContent = _stripAnsi(_logBuffer.toString());
     File(logPath).writeAsStringSync(logContent);
 
-    print('${_Colors.dim}Log written to: $logPath${_Colors.reset}');
+    print(
+        '${_Colors.bold}Log:${_Colors.reset} ${_Colors.cyan}$logPath${_Colors.reset}');
   } on Exception catch (e) {
     print(
         '${_Colors.yellow}Warning: Could not write log file: $e${_Colors.reset}');
@@ -895,14 +896,35 @@ Future<void> main(List<String> args) async {
 
   // Compact summary
   _logTerminal('');
-  final customCount = userCustomizations.length;
-  final customStr = customCount > 0
-      ? ' ${_Colors.dim}(+$customCount custom)${_Colors.reset}'
-      : '';
+  final totalRules = finalEnabled.length + finalDisabled.length;
+  final disabledPct =
+      totalRules > 0 ? (finalDisabled.length * 100 ~/ totalRules) : 0;
   _logTerminal(
-      '${_Colors.bold}Rules:${_Colors.reset} ${_success('${finalEnabled.length} enabled')} / ${_error('${finalDisabled.length} disabled')}$customStr');
+      '${_Colors.bold}Rules:${_Colors.reset} ${_success('${finalEnabled.length} enabled')} / ${_error('${finalDisabled.length} disabled')} ${_Colors.dim}($disabledPct%)${_Colors.reset}');
   _logTerminal(
       '${_Colors.bold}Severity:${_Colors.reset} ${_Colors.red}${enabledBySeverity['ERROR']} errors${_Colors.reset} · ${_Colors.yellow}${enabledBySeverity['WARNING']} warnings${_Colors.reset} · ${_Colors.cyan}${enabledBySeverity['INFO']} info${_Colors.reset}');
+
+  // Project overrides summary
+  final customCount = userCustomizations.length;
+  if (customCount > 0) {
+    final Map<String, int> customBySeverity = {
+      'ERROR': 0,
+      'WARNING': 0,
+      'INFO': 0,
+    };
+    for (final rule in userCustomizations.keys) {
+      final severity = _getRuleSeverity(rule);
+      customBySeverity[severity] = (customBySeverity[severity] ?? 0) + 1;
+    }
+    _logTerminal(
+        '${_Colors.bold}Project Overrides${_Colors.reset} ${_Colors.dim}(analysis_options_custom.yaml):${_Colors.reset} '
+        '$customCount '
+        '${_Colors.dim}(${_Colors.reset}'
+        '${_Colors.red}${customBySeverity['ERROR']} error${_Colors.reset}, '
+        '${_Colors.yellow}${customBySeverity['WARNING']} warning${_Colors.reset}, '
+        '${_Colors.cyan}${customBySeverity['INFO']} info${_Colors.reset}'
+        '${_Colors.dim})${_Colors.reset}');
+  }
   _logTerminal('');
 
   // Generate the new custom_lint section with proper formatting
@@ -994,6 +1016,13 @@ Future<void> main(List<String> args) async {
       );
       await process.exitCode;
       _logTerminal('${'─' * 60}');
+
+      // Remind user where the init log is
+      if (_logTimestamp != null) {
+        final logPath = 'reports/${_logTimestamp}_saropa_lints_init.log';
+        _logTerminal(
+            '${_Colors.bold}Log:${_Colors.reset} ${_Colors.cyan}$logPath${_Colors.reset}');
+      }
     }
   }
 }
