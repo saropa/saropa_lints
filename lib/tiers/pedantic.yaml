@@ -1,4 +1,4 @@
-# Saropa Lints - Pedantic Tier (ALL 475 rules)
+# Saropa Lints - Pedantic Tier (ALL rules)
 #
 # Everything. For greenfield projects or the truly obsessive.
 # Many rules are INFO level and may be noisy.
@@ -8,95 +8,96 @@
 
 include: package:saropa_lints/tiers/comprehensive.yaml
 
-custom_lint:
-  rules:
-    # =========================================================================
-    # NOISY BUT VALUABLE - Style preferences that may generate many warnings
-    # =========================================================================
-    # prefer_no_commented_out_code: moved to stylistic tier (v4.2.0)
-    avoid_dynamic: true
-    avoid_late_keyword: true
-    avoid_nested_conditional_expressions: true
-    avoid_passing_async_when_sync_expected: true
-    binary_expression_operand_order: true
-    double_literal_format: true
-    member_ordering: true
-    newline_before_return: true
-    no_magic_number: true
-    prefer_async_await: true
-    prefer_conditional_expressions: true
-    prefer_match_file_name: true
-    prefer_moving_to_variable: true
-    prefer_static_class: true
-    avoid_returning_widgets: true
-    prefer_extracting_callbacks: true
-    prefer_single_widget_per_file: true
+plugins:
+  saropa_lints:
+    diagnostics:
+      # =========================================================================
+      # NOISY BUT VALUABLE - Style preferences that may generate many warnings
+      # =========================================================================
+      # prefer_no_commented_out_code: moved to stylistic tier (v4.2.0)
+      avoid_dynamic: true
+      avoid_late_keyword: true
+      avoid_nested_conditional_expressions: true
+      avoid_passing_async_when_sync_expected: true
+      binary_expression_operand_order: true
+      double_literal_format: true
+      member_ordering: true
+      newline_before_return: true
+      no_magic_number: true
+      prefer_async_await: true
+      prefer_conditional_expressions: true
+      prefer_match_file_name: true
+      prefer_moving_to_variable: true
+      prefer_static_class: true
+      avoid_returning_widgets: true
+      prefer_extracting_callbacks: true
+      prefer_single_widget_per_file: true
 
-    # =========================================================================
-    # STYLE PREFERENCES
-    # =========================================================================
-    prefer_getter_over_method: true
-    prefer_static_method: true
-    prefer_named_parameters: true
-    prefer_named_boolean_parameters: true
-    prefer_explicit_function_type: true
-    prefer_explicit_parameter_names: true
-    prefer_typedef_for_callbacks: true
-    prefer_extracting_function_callbacks: true
-    avoid_returning_cascades: true
-    avoid_returning_void: true
-    prefer_returning_shorthands: true
-    avoid_unnecessary_return: true
-    prefer_immediate_return: true
-    prefer_declaring_const_constructor: true
-    prefer_abstract_final_static_class: true
-    match_class_name_pattern: true
-    match_base_class_default_value: true
-    parameters_ordering: true
+      # =========================================================================
+      # STYLE PREFERENCES
+      # =========================================================================
+      prefer_getter_over_method: true
+      prefer_static_method: true
+      prefer_named_parameters: true
+      prefer_named_boolean_parameters: true
+      prefer_explicit_function_type: true
+      prefer_explicit_parameter_names: true
+      prefer_typedef_for_callbacks: true
+      prefer_extracting_function_callbacks: true
+      avoid_returning_cascades: true
+      avoid_returning_void: true
+      prefer_returning_shorthands: true
+      avoid_unnecessary_return: true
+      prefer_immediate_return: true
+      prefer_declaring_const_constructor: true
+      prefer_abstract_final_static_class: true
+      match_class_name_pattern: true
+      match_base_class_default_value: true
+      parameters_ordering: true
 
-    # =========================================================================
-    # ADVANCED PATTERNS
-    # =========================================================================
-    prefer_enhanced_enums: true
-    prefer_enums_by_name: true
-    avoid_unnecessary_enum_prefix: true
-    avoid_unnecessary_enum_arguments: true
-    prefer_shorthands_with_enums: true
-    prefer_named_extensions: true
-    avoid_nested_extension_types: true
-    avoid_implicitly_nullable_extension_types: true
-    prefer_private_extension_type_field: true
-    avoid_shadowed_extension_methods: true
+      # =========================================================================
+      # ADVANCED PATTERNS
+      # =========================================================================
+      prefer_enhanced_enums: true
+      prefer_enums_by_name: true
+      avoid_unnecessary_enum_prefix: true
+      avoid_unnecessary_enum_arguments: true
+      prefer_shorthands_with_enums: true
+      prefer_named_extensions: true
+      avoid_nested_extension_types: true
+      avoid_implicitly_nullable_extension_types: true
+      prefer_private_extension_type_field: true
+      avoid_shadowed_extension_methods: true
 
-    # =========================================================================
-    # ADVANCED CODE QUALITY
-    # =========================================================================
-    avoid_unassigned_fields: true
-    avoid_unassigned_late_fields: true
-    avoid_unnecessary_late_fields: true
-    avoid_unnecessary_local_late: true
-    prefer_returning_condition: true
-    prefer_returning_conditionals: true
-    prefer_switch_expression: true
-    prefer_switch_with_enums: true
-    prefer_switch_with_sealed_classes: true
-    prefer_pushing_conditional_expressions: true
-    avoid_unnecessary_if: true
-    pass_correct_accepted_type: true
-    pass_optional_argument: true
-    prefer_shorthands_with_constructors: true
-    prefer_shorthands_with_static_fields: true
-    prefer_inferred_type_arguments: true
-    avoid_passing_default_values: true
-    prefer_single_declaration_per_file: true
-    prefer_bytes_builder: true
+      # =========================================================================
+      # ADVANCED CODE QUALITY
+      # =========================================================================
+      avoid_unassigned_fields: true
+      avoid_unassigned_late_fields: true
+      avoid_unnecessary_late_fields: true
+      avoid_unnecessary_local_late: true
+      prefer_returning_condition: true
+      prefer_returning_conditionals: true
+      prefer_switch_expression: true
+      prefer_switch_with_enums: true
+      prefer_switch_with_sealed_classes: true
+      prefer_pushing_conditional_expressions: true
+      avoid_unnecessary_if: true
+      pass_correct_accepted_type: true
+      pass_optional_argument: true
+      prefer_shorthands_with_constructors: true
+      prefer_shorthands_with_static_fields: true
+      prefer_inferred_type_arguments: true
+      avoid_passing_default_values: true
+      prefer_single_declaration_per_file: true
+      prefer_bytes_builder: true
 
-    # =========================================================================
-    # TESTING - EXTRA
-    # =========================================================================
-    tag_name: true
+      # =========================================================================
+      # TESTING - EXTRA
+      # =========================================================================
+      tag_name: true
 
-    # =========================================================================
-    # ALWAYS FAIL (for testing the linter itself)
-    # =========================================================================
-    # prefer_fail_test_case: true  # Uncomment only for testing
+      # =========================================================================
+      # ALWAYS FAIL (for testing the linter itself)
+      # =========================================================================
+      # prefer_fail_test_case: true  # Uncomment only for testing
