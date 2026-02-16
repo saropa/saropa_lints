@@ -7,8 +7,6 @@
 library;
 
 import 'package:analyzer/dart/ast/ast.dart';
-import 'package:analyzer/error/error.dart' show DiagnosticSeverity;
-import 'package:custom_lint_builder/custom_lint_builder.dart';
 
 import '../mode_constants_utils.dart';
 import '../saropa_lint_rule.dart';
@@ -48,7 +46,7 @@ import '../saropa_lint_rule.dart';
 /// await Purchases.purchaseProduct(productId);
 /// ```
 class AvoidPurchaseInSandboxProductionRule extends SaropaLintRule {
-  const AvoidPurchaseInSandboxProductionRule() : super(code: _code);
+  AvoidPurchaseInSandboxProductionRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.critical;
@@ -57,22 +55,20 @@ class AvoidPurchaseInSandboxProductionRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_purchase_in_sandbox_production',
-    problemMessage:
-        '[avoid_purchase_in_sandbox_production] Hardcoded IAP environment URL '
+    'avoid_purchase_in_sandbox_production',
+    '[avoid_purchase_in_sandbox_production] Hardcoded IAP environment URL '
         'detected. Sandbox receipts fail in production and vice versa. {v3}',
     correctionMessage:
         'Use kReleaseMode or kDebugMode to select the correct verification URL.',
-    errorSeverity: DiagnosticSeverity.ERROR,
+    severity: DiagnosticSeverity.ERROR,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       // Check for hardcoded Apple sandbox/production URLs
       final String nodeSource = node.toSource();
 
@@ -101,12 +97,12 @@ class AvoidPurchaseInSandboxProductionRule extends SaropaLintRule {
           }
         }
 
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
 
     // Also check for string literals with these URLs
-    context.registry.addSimpleStringLiteral((SimpleStringLiteral node) {
+    context.addSimpleStringLiteral((SimpleStringLiteral node) {
       final String value = node.value;
       if (value.contains('sandbox.itunes.apple.com') ||
           value.contains('buy.itunes.apple.com')) {
@@ -131,7 +127,7 @@ class AvoidPurchaseInSandboxProductionRule extends SaropaLintRule {
           if (!usesFlutterModeConstants(bodySource) &&
               !bodySource.contains('isProduction') &&
               !bodySource.contains('isSandbox')) {
-            reporter.atNode(node, code);
+            reporter.atNode(node);
           }
         }
       }
@@ -182,7 +178,7 @@ class AvoidPurchaseInSandboxProductionRule extends SaropaLintRule {
 /// }
 /// ```
 class RequireSubscriptionStatusCheckRule extends SaropaLintRule {
-  const RequireSubscriptionStatusCheckRule() : super(code: _code);
+  RequireSubscriptionStatusCheckRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.high;
@@ -191,14 +187,13 @@ class RequireSubscriptionStatusCheckRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'require_subscription_status_check',
-    problemMessage:
-        '[require_subscription_status_check] Premium/subscription content '
+    'require_subscription_status_check',
+    '[require_subscription_status_check] Premium/subscription content '
         'displayed without status verification. Subscription may have expired. {v3}',
     correctionMessage:
         'Check subscription status before showing premium content. Use RevenueCat '
         'or InAppPurchase.instance.purchaseStream to verify entitlements.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   /// Keywords that suggest premium/subscription-gated content
@@ -222,11 +217,10 @@ class RequireSubscriptionStatusCheckRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodDeclaration((MethodDeclaration node) {
+    context.addMethodDeclaration((MethodDeclaration node) {
       if (node.name.lexeme != 'build') return;
 
       final FunctionBody body = node.body;
@@ -266,7 +260,7 @@ class RequireSubscriptionStatusCheckRule extends SaropaLintRule {
       }
 
       // TODO: Add quick fix support when custom_lint supports it for this rule type.
-      reporter.atNode(node, code);
+      reporter.atNode(node);
     });
   }
 }
@@ -296,7 +290,7 @@ class RequireSubscriptionStatusCheckRule extends SaropaLintRule {
 /// Text('Price: ${product.priceString}')
 /// ```
 class RequirePriceLocalizationRule extends SaropaLintRule {
-  const RequirePriceLocalizationRule() : super(code: _code);
+  RequirePriceLocalizationRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.medium;
@@ -305,27 +299,23 @@ class RequirePriceLocalizationRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'require_price_localization',
-    problemMessage:
-        '[require_price_localization] Hardcoded price detected. Prices vary by '
+    'require_price_localization',
+    '[require_price_localization] Hardcoded price detected. Prices vary by '
         'region and currency. Users may see incorrect amounts. {v3}',
     correctionMessage:
         'Use productDetails.price or priceString from the store SDK.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   /// Pattern to match hardcoded prices like $4.99, €9.99, £19.99
-  static final RegExp _pricePattern = RegExp(
-    r'[\$€£¥₹]\s*\d+[.,]\d{2}',
-  );
+  static final RegExp _pricePattern = RegExp(r'[\$€£¥₹]\s*\d+[.,]\d{2}');
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addSimpleStringLiteral((SimpleStringLiteral node) {
+    context.addSimpleStringLiteral((SimpleStringLiteral node) {
       final String value = node.value;
 
       // Check for hardcoded price patterns
@@ -352,13 +342,13 @@ class RequirePriceLocalizationRule extends SaropaLintRule {
         }
 
         if (isInUiContext) {
-          reporter.atNode(node, code);
+          reporter.atNode(node);
         }
       }
     });
 
     // Also check string interpolations
-    context.registry.addStringInterpolation((StringInterpolation node) {
+    context.addStringInterpolation((StringInterpolation node) {
       final String fullString = node.toSource();
 
       if (_pricePattern.hasMatch(fullString)) {
@@ -366,7 +356,7 @@ class RequirePriceLocalizationRule extends SaropaLintRule {
         AstNode? current = node.parent;
         while (current != null) {
           if (current is MethodDeclaration && current.name.lexeme == 'build') {
-            reporter.atNode(node, code);
+            reporter.atNode(node);
             return;
           }
           current = current.parent;
@@ -405,7 +395,7 @@ class RequirePriceLocalizationRule extends SaropaLintRule {
 /// }
 /// ```
 class PreferGracePeriodHandlingRule extends SaropaLintRule {
-  const PreferGracePeriodHandlingRule() : super(code: _code);
+  PreferGracePeriodHandlingRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.high;
@@ -414,21 +404,19 @@ class PreferGracePeriodHandlingRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'prefer_grace_period_handling',
-    problemMessage:
-        '[prefer_grace_period_handling] Purchase status check only handles PurchaseStatus.purchased without considering pending or grace period states. Apple and Google give users a billing grace period (typically 3-16 days) when their payment method fails. During this time, the subscription is still active but in a grace state. Locking out these users causes churn — they intend to pay but lose access, often uninstalling the app instead of fixing payment. {v1}',
+    'prefer_grace_period_handling',
+    '[prefer_grace_period_handling] Purchase status check only handles PurchaseStatus.purchased without considering pending or grace period states. Apple and Google give users a billing grace period (typically 3-16 days) when their payment method fails. During this time, the subscription is still active but in a grace state. Locking out these users causes churn — they intend to pay but lose access, often uninstalling the app instead of fixing payment. {v1}',
     correctionMessage:
         'Also handle PurchaseStatus.pending (and restored) in your purchase verification logic to support billing grace periods.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addBinaryExpression((BinaryExpression node) {
+    context.addBinaryExpression((BinaryExpression node) {
       // Check for purchaseDetails.status == PurchaseStatus.purchased
       final String source = node.toSource();
       if (!source.contains('PurchaseStatus.purchased')) return;
@@ -456,7 +444,7 @@ class PreferGracePeriodHandlingRule extends SaropaLintRule {
         current = current.parent;
       }
 
-      reporter.atNode(node, code);
+      reporter.atNode(node);
     });
   }
 }

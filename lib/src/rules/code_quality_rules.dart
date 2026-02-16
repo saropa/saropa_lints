@@ -6,13 +6,11 @@ import 'package:analyzer/dart/ast/visitor.dart';
 import 'package:analyzer/dart/element/element.dart';
 import 'package:analyzer/dart/element/nullability_suffix.dart';
 import 'package:analyzer/dart/element/type.dart';
-import 'package:analyzer/error/error.dart'
-    show AnalysisError, DiagnosticSeverity;
+import 'package:analyzer/source/line_info.dart';
 
 import '../ignore_utils.dart';
 import '../saropa_lint_rule.dart';
 import '../type_annotation_utils.dart';
-import 'package:custom_lint_builder/custom_lint_builder.dart';
 
 /// Warns against any usage of adjacent strings.
 ///
@@ -30,7 +28,7 @@ import 'package:custom_lint_builder/custom_lint_builder.dart';
 /// final message = 'HelloWorld';
 /// ```
 class AvoidAdjacentStringsRule extends SaropaLintRule {
-  const AvoidAdjacentStringsRule() : super(code: _code);
+  AvoidAdjacentStringsRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -40,22 +38,20 @@ class AvoidAdjacentStringsRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_adjacent_strings',
-    problemMessage:
-        '[avoid_adjacent_strings] Adjacent string literals detected without an explicit concatenation operator. Dart implicitly joins adjacent strings, which can mask accidental line breaks or missing commas in list literals, leading to silently merged values that are difficult to debug. {v4}',
+    'avoid_adjacent_strings',
+    '[avoid_adjacent_strings] Adjacent string literals detected without an explicit concatenation operator. Dart implicitly joins adjacent strings, which can mask accidental line breaks or missing commas in list literals, leading to silently merged values that are difficult to debug. {v4}',
     correctionMessage:
         'Combine into a single string literal, use the + operator for explicit concatenation, or use string interpolation to make the intent clear.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addAdjacentStrings((AdjacentStrings node) {
-      reporter.atNode(node, code);
+    context.addAdjacentStrings((AdjacentStrings node) {
+      reporter.atNode(node);
     });
   }
 }
@@ -64,7 +60,7 @@ class AvoidAdjacentStringsRule extends SaropaLintRule {
 ///
 /// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v4
 class AvoidEnumValuesByIndexRule extends SaropaLintRule {
-  const AvoidEnumValuesByIndexRule() : super(code: _code);
+  AvoidEnumValuesByIndexRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -74,21 +70,19 @@ class AvoidEnumValuesByIndexRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_enum_values_by_index',
-    problemMessage:
-        '[avoid_enum_values_by_index] Enum value accessed by numeric index on the .values list. If enum members are reordered or new values are inserted, the index silently resolves to the wrong constant, causing incorrect behavior that the compiler cannot catch. {v4}',
+    'avoid_enum_values_by_index',
+    '[avoid_enum_values_by_index] Enum value accessed by numeric index on the .values list. If enum members are reordered or new values are inserted, the index silently resolves to the wrong constant, causing incorrect behavior that the compiler cannot catch. {v4}',
     correctionMessage:
         'Use EnumName.values.byName() for string-based lookup, or switch on specific enum values to get compile-time exhaustiveness checking.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addIndexExpression((IndexExpression node) {
+    context.addIndexExpression((IndexExpression node) {
       final Expression? target = node.target;
       if (target is! PropertyAccess) return;
 
@@ -102,14 +96,14 @@ class AvoidEnumValuesByIndexRule extends SaropaLintRule {
         if (name.isNotEmpty &&
             name[0] == name[0].toUpperCase() &&
             !name.startsWith('_')) {
-          reporter.atNode(node, code);
+          reporter.atNode(node);
         }
       } else if (enumTarget is PrefixedIdentifier) {
         final String name = enumTarget.identifier.name;
         if (name.isNotEmpty &&
             name[0] == name[0].toUpperCase() &&
             !name.startsWith('_')) {
-          reporter.atNode(node, code);
+          reporter.atNode(node);
         }
       }
     });
@@ -132,7 +126,7 @@ class AvoidEnumValuesByIndexRule extends SaropaLintRule {
 /// final uri = Uri.parse('https://example.com/path');
 /// ```
 class AvoidIncorrectUriRule extends SaropaLintRule {
-  const AvoidIncorrectUriRule() : super(code: _code);
+  AvoidIncorrectUriRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -142,21 +136,19 @@ class AvoidIncorrectUriRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_incorrect_uri',
-    problemMessage:
-        '[avoid_incorrect_uri] URI string appears to be malformed or contains invalid characters. Malformed URIs cause runtime exceptions when parsed by Uri.parse(), leading to unhandled errors in network requests, routing logic, or deep link handling. {v4}',
+    'avoid_incorrect_uri',
+    '[avoid_incorrect_uri] URI string appears to be malformed or contains invalid characters. Malformed URIs cause runtime exceptions when parsed by Uri.parse(), leading to unhandled errors in network requests, routing logic, or deep link handling. {v4}',
     correctionMessage:
         'Verify the URI syntax matches RFC 3986, ensure special characters are percent-encoded, and test with Uri.parse() to confirm validity.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       final Expression? target = node.target;
       if (target is! SimpleIdentifier) return;
       if (target.name != 'Uri') return;
@@ -174,12 +166,11 @@ class AvoidIncorrectUriRule extends SaropaLintRule {
 
       // Basic validation checks
       if (_hasInvalidUriCharacters(uriString)) {
-        reporter.atNode(firstArg, code);
+        reporter.atNode(firstArg);
       }
     });
 
-    context.registry
-        .addInstanceCreationExpression((InstanceCreationExpression node) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final String typeName = node.constructorName.type.name.lexeme;
       if (typeName != 'Uri') return;
 
@@ -229,7 +220,7 @@ class AvoidIncorrectUriRule extends SaropaLintRule {
 /// Late variables can lead to runtime errors if accessed before initialization.
 /// Consider using nullable types or initializing in the constructor.
 class AvoidLateKeywordRule extends SaropaLintRule {
-  const AvoidLateKeywordRule() : super(code: _code);
+  AvoidLateKeywordRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -239,30 +230,28 @@ class AvoidLateKeywordRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_late_keyword',
-    problemMessage:
-        "[avoid_late_keyword] Field declared with the 'late' keyword defers initialization checking to runtime. If the field is accessed before assignment, Dart throws a LateInitializationError that crashes the app, bypassing the null safety guarantees the type system provides at compile time. {v7}",
+    'avoid_late_keyword',
+    "[avoid_late_keyword] Field declared with the 'late' keyword defers initialization checking to runtime. If the field is accessed before assignment, Dart throws a LateInitializationError that crashes the app, bypassing the null safety guarantees the type system provides at compile time. {v7}",
     correctionMessage:
         'Use a nullable type with a null check, provide a default value, or initialize the field in the constructor to keep initialization errors visible at compile time.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addVariableDeclaration((VariableDeclaration node) {
+    context.addVariableDeclaration((VariableDeclaration node) {
       final AstNode? parent = node.parent;
       if (parent is VariableDeclarationList && parent.lateKeyword != null) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
 
-    context.registry.addFieldDeclaration((FieldDeclaration node) {
+    context.addFieldDeclaration((FieldDeclaration node) {
       if (node.fields.lateKeyword != null) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
   }
@@ -286,7 +275,7 @@ class AvoidLateKeywordRule extends SaropaLintRule {
 /// print(myMethod());  // Method is called
 /// ```
 class AvoidMissedCallsRule extends SaropaLintRule {
-  const AvoidMissedCallsRule() : super(code: _code);
+  AvoidMissedCallsRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -296,21 +285,19 @@ class AvoidMissedCallsRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_missed_calls',
-    problemMessage:
-        '[avoid_missed_calls] Function reference passed without parentheses where a call was likely intended. Without the () invocation, the function is not executed and the reference is silently discarded, meaning the intended side effect or return value is lost. {v5}',
+    'avoid_missed_calls',
+    '[avoid_missed_calls] Function reference passed without parentheses where a call was likely intended. Without the () invocation, the function is not executed and the reference is silently discarded, meaning the intended side effect or return value is lost. {v5}',
     correctionMessage:
         'Add parentheses () to invoke the function, or if the reference is intentional, assign it to a variable with an explicit function type.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       final String methodName = node.methodName.name;
       if (methodName != 'print' && methodName != 'debugPrint') {
         return;
@@ -326,7 +313,7 @@ class AvoidMissedCallsRule extends SaropaLintRule {
         // Check if it looks like a function name (starts with verb)
         final String name = firstArg.name;
         if (_looksLikeFunctionName(name)) {
-          reporter.atNode(firstArg, code);
+          reporter.atNode(firstArg);
         }
       }
     });
@@ -389,7 +376,7 @@ class AvoidMissedCallsRule extends SaropaLintRule {
 /// Set<int> items = {1, 2, 3};  // Explicit Set type
 /// ```
 class AvoidMisusedSetLiteralsRule extends SaropaLintRule {
-  const AvoidMisusedSetLiteralsRule() : super(code: _code);
+  AvoidMisusedSetLiteralsRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -399,21 +386,21 @@ class AvoidMisusedSetLiteralsRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.high;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_misused_set_literals',
-    problemMessage: '[avoid_misused_set_literals] Set literal may be misused. '
+    'avoid_misused_set_literals',
+    '[avoid_misused_set_literals] Set literal may be misused. '
         'Empty `{}` without type annotation creates a Map, not a Set. {v2}',
-    correctionMessage: 'Add explicit type annotation: `<Type>{}` for Set '
+    correctionMessage:
+        'Add explicit type annotation: `<Type>{}` for Set '
         'or `<K, V>{}` for Map.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addSetOrMapLiteral((SetOrMapLiteral node) {
+    context.addSetOrMapLiteral((SetOrMapLiteral node) {
       // Only check empty literals without type arguments
       if (node.elements.isNotEmpty) return;
       if (node.typeArguments != null) return;
@@ -426,7 +413,7 @@ class AvoidMisusedSetLiteralsRule extends SaropaLintRule {
       final String typeStr = contextType.getDisplayString();
       if (typeStr.startsWith('Map<') || typeStr.startsWith('Set<')) {
         // Type is inferred, but empty {} can be confusing
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
   }
@@ -456,7 +443,7 @@ class AvoidMisusedSetLiteralsRule extends SaropaLintRule {
 /// 0.isBetween(0, 10);  // OK - literals are values, not references
 /// ```
 class AvoidPassingSelfAsArgumentRule extends SaropaLintRule {
-  const AvoidPassingSelfAsArgumentRule() : super(code: _code);
+  AvoidPassingSelfAsArgumentRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -466,21 +453,19 @@ class AvoidPassingSelfAsArgumentRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_passing_self_as_argument',
-    problemMessage:
-        '[avoid_passing_self_as_argument] Object passed as an argument to its own method, creating a self-referential call. This pattern often indicates a logic error and can lead to infinite recursion, stack overflow, or unexpected mutation of the object state during method execution. {v4}',
+    'avoid_passing_self_as_argument',
+    '[avoid_passing_self_as_argument] Object passed as an argument to its own method, creating a self-referential call. This pattern often indicates a logic error and can lead to infinite recursion, stack overflow, or unexpected mutation of the object state during method execution. {v4}',
     correctionMessage:
         'Extract the shared logic into a separate method, pass a different object, or restructure the call to eliminate the self-reference.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       final Expression? target = node.target;
       if (target == null) return;
 
@@ -492,10 +477,11 @@ class AvoidPassingSelfAsArgumentRule extends SaropaLintRule {
 
       // Check if any argument matches the target
       for (final Expression arg in node.argumentList.arguments) {
-        final Expression actualArg =
-            arg is NamedExpression ? arg.expression : arg;
+        final Expression actualArg = arg is NamedExpression
+            ? arg.expression
+            : arg;
         if (actualArg.toSource() == targetSource) {
-          reporter.atNode(actualArg, code);
+          reporter.atNode(actualArg);
         }
       }
     });
@@ -532,7 +518,7 @@ class AvoidPassingSelfAsArgumentRule extends SaropaLintRule {
 /// }
 /// ```
 class AvoidRecursiveCallsRule extends SaropaLintRule {
-  const AvoidRecursiveCallsRule() : super(code: _code);
+  AvoidRecursiveCallsRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -542,28 +528,26 @@ class AvoidRecursiveCallsRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_recursive_calls',
-    problemMessage:
-        '[avoid_recursive_calls] Function contains a direct recursive call to itself. Without a guaranteed base case or depth limit, unbounded recursion exhausts the call stack and crashes the application with a StackOverflowError, which cannot be caught in Dart. {v5}',
+    'avoid_recursive_calls',
+    '[avoid_recursive_calls] Function contains a direct recursive call to itself. Without a guaranteed base case or depth limit, unbounded recursion exhausts the call stack and crashes the application with a StackOverflowError, which cannot be caught in Dart. {v5}',
     correctionMessage:
         'Verify a terminating base case exists for all input paths, or convert the recursion to an iterative approach using a loop or explicit stack.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addFunctionDeclaration((FunctionDeclaration node) {
+    context.addFunctionDeclaration((FunctionDeclaration node) {
       final String functionName = node.name.lexeme;
       final FunctionBody body = node.functionExpression.body;
 
       _checkBodyForRecursion(body, functionName, reporter);
     });
 
-    context.registry.addMethodDeclaration((MethodDeclaration node) {
+    context.addMethodDeclaration((MethodDeclaration node) {
       final String methodName = node.name.lexeme;
       final FunctionBody body = node.body;
 
@@ -576,8 +560,11 @@ class AvoidRecursiveCallsRule extends SaropaLintRule {
     String functionName,
     SaropaDiagnosticReporter reporter,
   ) {
-    final _RecursiveCallVisitor visitor =
-        _RecursiveCallVisitor(functionName, reporter, code);
+    final _RecursiveCallVisitor visitor = _RecursiveCallVisitor(
+      functionName,
+      reporter,
+      code,
+    );
     body.accept(visitor);
   }
 }
@@ -592,7 +579,7 @@ class _RecursiveCallVisitor extends RecursiveAstVisitor<void> {
   @override
   void visitMethodInvocation(MethodInvocation node) {
     if (node.methodName.name == functionName && node.realTarget == null) {
-      reporter.atNode(node, code);
+      reporter.atNode(node);
     }
     super.visitMethodInvocation(node);
   }
@@ -601,7 +588,7 @@ class _RecursiveCallVisitor extends RecursiveAstVisitor<void> {
   void visitFunctionExpressionInvocation(FunctionExpressionInvocation node) {
     final Expression function = node.function;
     if (function is SimpleIdentifier && function.name == functionName) {
-      reporter.atNode(node, code);
+      reporter.atNode(node);
     }
     super.visitFunctionExpressionInvocation(node);
   }
@@ -628,7 +615,7 @@ class _RecursiveCallVisitor extends RecursiveAstVisitor<void> {
 /// }
 /// ```
 class AvoidRecursiveToStringRule extends SaropaLintRule {
-  const AvoidRecursiveToStringRule() : super(code: _code);
+  AvoidRecursiveToStringRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -638,21 +625,19 @@ class AvoidRecursiveToStringRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_recursive_tostring',
-    problemMessage:
-        '[avoid_recursive_tostring] toString() method references itself through \$this or this.toString(), creating infinite recursion. The runtime repeatedly invokes toString() until the call stack overflows, crashing the application with an unrecoverable StackOverflowError. {v5}',
+    'avoid_recursive_tostring',
+    '[avoid_recursive_tostring] toString() method references itself through \$this or this.toString(), creating infinite recursion. The runtime repeatedly invokes toString() until the call stack overflows, crashing the application with an unrecoverable StackOverflowError. {v5}',
     correctionMessage:
         'Reference individual fields directly (e.g. \$name, \$id) instead of \$this, or build the string using a StringBuffer to control the representation explicitly.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodDeclaration((MethodDeclaration node) {
+    context.addMethodDeclaration((MethodDeclaration node) {
       if (node.name.lexeme != 'toString') return;
       if (node.returnType?.toSource() != 'String') {
         // Check if it could still be toString override
@@ -661,8 +646,10 @@ class AvoidRecursiveToStringRule extends SaropaLintRule {
       }
 
       final FunctionBody body = node.body;
-      final _ToStringRecursionVisitor visitor =
-          _ToStringRecursionVisitor(reporter, code);
+      final _ToStringRecursionVisitor visitor = _ToStringRecursionVisitor(
+        reporter,
+        code,
+      );
       body.accept(visitor);
     });
   }
@@ -679,7 +666,7 @@ class _ToStringRecursionVisitor extends RecursiveAstVisitor<void> {
     // Check for $this in string interpolation
     final Expression expression = node.expression;
     if (expression is ThisExpression) {
-      reporter.atNode(node, code);
+      reporter.atNode(node);
     }
     super.visitInterpolationExpression(node);
   }
@@ -690,7 +677,7 @@ class _ToStringRecursionVisitor extends RecursiveAstVisitor<void> {
     if (node.methodName.name == 'toString') {
       final Expression? target = node.realTarget;
       if (target == null || target is ThisExpression) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     }
     super.visitMethodInvocation(node);
@@ -717,7 +704,7 @@ class _ToStringRecursionVisitor extends RecursiveAstVisitor<void> {
 /// print(value);
 /// ```
 class AvoidReferencingDiscardedVariablesRule extends SaropaLintRule {
-  const AvoidReferencingDiscardedVariablesRule() : super(code: _code);
+  AvoidReferencingDiscardedVariablesRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -727,12 +714,11 @@ class AvoidReferencingDiscardedVariablesRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_referencing_discarded_variables',
-    problemMessage:
-        '[avoid_referencing_discarded_variables] Variable prefixed with underscore is referenced after declaration. The underscore prefix signals that the value is intentionally discarded, so reading it later contradicts the naming convention and confuses developers who expect underscore-prefixed variables to be unused. {v5}',
+    'avoid_referencing_discarded_variables',
+    '[avoid_referencing_discarded_variables] Variable prefixed with underscore is referenced after declaration. The underscore prefix signals that the value is intentionally discarded, so reading it later contradicts the naming convention and confuses developers who expect underscore-prefixed variables to be unused. {v5}',
     correctionMessage:
         'Rename the variable without the underscore prefix if it is actually used, or remove the reference if the variable should remain discarded.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   // Cached regex for performance
@@ -740,11 +726,10 @@ class AvoidReferencingDiscardedVariablesRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addSimpleIdentifier((SimpleIdentifier node) {
+    context.addSimpleIdentifier((SimpleIdentifier node) {
       final String name = node.name;
 
       // Check for underscore-prefixed local variables (not private members)
@@ -773,7 +758,7 @@ class AvoidReferencingDiscardedVariablesRule extends SaropaLintRule {
           return;
         }
 
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
   }
@@ -801,7 +786,7 @@ class AvoidReferencingDiscardedVariablesRule extends SaropaLintRule {
 /// Matrix4 computeTransform() => /* complex computation */;
 /// ```
 class AvoidRedundantPragmaInlineRule extends SaropaLintRule {
-  const AvoidRedundantPragmaInlineRule() : super(code: _code);
+  AvoidRedundantPragmaInlineRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -811,21 +796,19 @@ class AvoidRedundantPragmaInlineRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_redundant_pragma_inline',
-    problemMessage:
-        '[avoid_redundant_pragma_inline] Pragma inline annotation applied to a trivial method that the compiler already inlines automatically. Redundant annotations add noise to the codebase, and overusing pragma inline can prevent the compiler from making better optimization decisions. {v5}',
+    'avoid_redundant_pragma_inline',
+    '[avoid_redundant_pragma_inline] Pragma inline annotation applied to a trivial method that the compiler already inlines automatically. Redundant annotations add noise to the codebase, and overusing pragma inline can prevent the compiler from making better optimization decisions. {v5}',
     correctionMessage:
         'Remove the @pragma(vm:prefer-inline) annotation from simple getters, setters, and one-line methods that the compiler inlines by default.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodDeclaration((MethodDeclaration node) {
+    context.addMethodDeclaration((MethodDeclaration node) {
       // Check for pragma annotation
       bool hasPragmaInline = false;
       Annotation? pragmaAnnotation;
@@ -857,7 +840,7 @@ class AvoidRedundantPragmaInlineRule extends SaropaLintRule {
             expr is Literal ||
             expr is ThisExpression ||
             expr is PrefixedIdentifier) {
-          reporter.atNode(pragmaAnnotation, code);
+          reporter.atNode(pragmaAnnotation);
         }
       }
     });
@@ -882,7 +865,7 @@ class AvoidRedundantPragmaInlineRule extends SaropaLintRule {
 /// // or use split/pattern matching for extracting parts
 /// ```
 class AvoidSubstringRule extends SaropaLintRule {
-  const AvoidSubstringRule() : super(code: _code);
+  AvoidSubstringRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -892,27 +875,25 @@ class AvoidSubstringRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_string_substring',
-    problemMessage:
-        '[avoid_string_substring] substring() throws RangeError if start or end indices are out of bounds, causing runtime crashes when input lengths vary. '
+    'avoid_string_substring',
+    '[avoid_string_substring] substring() throws RangeError if start or end indices are out of bounds, causing runtime crashes when input lengths vary. '
         'This is especially dangerous with user input, API responses, or dynamically sized strings where the length cannot be guaranteed at compile time. {v3}',
     correctionMessage:
         'Check string length before calling substring(), or use safer alternatives such as split(), replaceRange(), or pattern matching. '
         'For optional extraction, consider an extension method that returns null for invalid ranges instead of throwing.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       if (node.methodName.name == 'substring') {
         final DartType? targetType = node.realTarget?.staticType;
         if (targetType != null && targetType.isDartCoreString) {
-          reporter.atNode(node, code);
+          reporter.atNode(node);
         }
       }
     });
@@ -939,15 +920,14 @@ class AvoidSubstringRule extends SaropaLintRule {
 /// void foo() { }
 /// ```
 class AvoidUnknownPragmaRule extends SaropaLintRule {
-  const AvoidUnknownPragmaRule() : super(code: _code);
+  AvoidUnknownPragmaRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
-    name: 'avoid_unknown_pragma',
-    problemMessage:
-        '[avoid_unknown_pragma] Unrecognized pragma annotation detected. Unknown pragmas are silently ignored by the Dart compiler, which means the intended optimization or behavior hint has no effect and may mislead developers into thinking the code is optimized when it is not. {v3}',
+    'avoid_unknown_pragma',
+    '[avoid_unknown_pragma] Unrecognized pragma annotation detected. Unknown pragmas are silently ignored by the Dart compiler, which means the intended optimization or behavior hint has no effect and may mislead developers into thinking the code is optimized when it is not. {v3}',
     correctionMessage:
         'Use a recognized pragma value such as vm:prefer-inline, vm:never-inline, or dart2js:tryInline, or remove the annotation entirely.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   static const Set<String> _knownPragmas = <String>{
@@ -972,11 +952,10 @@ class AvoidUnknownPragmaRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addAnnotation((Annotation node) {
+    context.addAnnotation((Annotation node) {
       if (node.name.name != 'pragma') return;
 
       final ArgumentList? args = node.arguments;
@@ -987,7 +966,7 @@ class AvoidUnknownPragmaRule extends SaropaLintRule {
 
       final String pragmaValue = firstArg.value;
       if (!_knownPragmas.contains(pragmaValue)) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
   }
@@ -1015,7 +994,7 @@ class AvoidUnknownPragmaRule extends SaropaLintRule {
 /// void process(String data, int _) { ... }
 /// ```
 class AvoidUnusedParametersRule extends SaropaLintRule {
-  const AvoidUnusedParametersRule() : super(code: _code);
+  AvoidUnusedParametersRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -1025,21 +1004,19 @@ class AvoidUnusedParametersRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_unused_parameters',
-    problemMessage:
-        '[avoid_unused_parameters] Function parameter is declared but never referenced in the function body. Unused parameters add cognitive overhead for callers who must provide a value that has no effect, and they mask API design issues — either remove the parameter or complete the implementation that was supposed to use it. {v6}',
+    'avoid_unused_parameters',
+    '[avoid_unused_parameters] Function parameter is declared but never referenced in the function body. Unused parameters add cognitive overhead for callers who must provide a value that has no effect, and they mask API design issues — either remove the parameter or complete the implementation that was supposed to use it. {v6}',
     correctionMessage:
         'Remove the parameter from the function signature, or prefix it with an underscore to indicate it is intentionally unused for interface conformance.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addFunctionDeclaration((FunctionDeclaration node) {
+    context.addFunctionDeclaration((FunctionDeclaration node) {
       _checkParameters(
         node.functionExpression.parameters,
         node.functionExpression.body,
@@ -1047,7 +1024,7 @@ class AvoidUnusedParametersRule extends SaropaLintRule {
       );
     });
 
-    context.registry.addMethodDeclaration((MethodDeclaration node) {
+    context.addMethodDeclaration((MethodDeclaration node) {
       // Skip overrides (parameters may be required by interface)
       for (final Annotation annotation in node.metadata) {
         if (annotation.name.name == 'override') {
@@ -1122,7 +1099,7 @@ class _IdentifierCollector extends RecursiveAstVisitor<void> {
 /// final hash = sha256.convert(utf8.encode('password'));
 /// ```
 class AvoidWeakCryptographicAlgorithmsRule extends SaropaLintRule {
-  const AvoidWeakCryptographicAlgorithmsRule() : super(code: _code);
+  AvoidWeakCryptographicAlgorithmsRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -1132,12 +1109,11 @@ class AvoidWeakCryptographicAlgorithmsRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_weak_cryptographic_algorithms',
-    problemMessage:
-        '[avoid_weak_cryptographic_algorithms] Weak or deprecated cryptographic algorithm detected (e.g. MD5, SHA-1). These algorithms have known collision vulnerabilities that allow attackers to forge hashes, compromising data integrity verification, password storage, and digital signature validation. {v5}',
+    'avoid_weak_cryptographic_algorithms',
+    '[avoid_weak_cryptographic_algorithms] Weak or deprecated cryptographic algorithm detected (e.g. MD5, SHA-1). These algorithms have known collision vulnerabilities that allow attackers to forge hashes, compromising data integrity verification, password storage, and digital signature validation. {v5}',
     correctionMessage:
         'Replace with a stronger algorithm such as SHA-256, SHA-512, or bcrypt for password hashing. Use the crypto or pointycastle package for secure implementations.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   static const Set<String> _weakAlgorithms = <String>{
@@ -1149,13 +1125,12 @@ class AvoidWeakCryptographicAlgorithmsRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addSimpleIdentifier((SimpleIdentifier node) {
+    context.addSimpleIdentifier((SimpleIdentifier node) {
       if (_weakAlgorithms.contains(node.name)) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
   }
@@ -1165,24 +1140,22 @@ class AvoidWeakCryptographicAlgorithmsRule extends SaropaLintRule {
 ///
 /// Since: v4.9.5 | Updated: v4.13.0 | Rule version: v5
 class MissingUseResultAnnotationRule extends SaropaLintRule {
-  const MissingUseResultAnnotationRule() : super(code: _code);
+  MissingUseResultAnnotationRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
-    name: 'missing_use_result_annotation',
-    problemMessage:
-        '[missing_use_result_annotation] Function returns a value without @useResult annotation. Callers may accidentally ignore the return value, leading to missed error handling, lost data transformations, or incorrectly assuming the function has side effects when it does not. {v5}',
+    'missing_use_result_annotation',
+    '[missing_use_result_annotation] Function returns a value without @useResult annotation. Callers may accidentally ignore the return value, leading to missed error handling, lost data transformations, or incorrectly assuming the function has side effects when it does not. {v5}',
     correctionMessage:
         'Add @useResult annotation above the function declaration to signal that the returned value must be used. Include a reason parameter explaining what happens if the value is ignored.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodDeclaration((MethodDeclaration node) {
+    context.addMethodDeclaration((MethodDeclaration node) {
       // Skip void returns and setters
       if (node.isSetter) return;
       final TypeAnnotation? returnType = node.returnType;
@@ -1243,7 +1216,7 @@ class MissingUseResultAnnotationRule extends SaropaLintRule {
 /// }
 /// ```
 class NoObjectDeclarationRule extends SaropaLintRule {
-  const NoObjectDeclarationRule() : super(code: _code);
+  NoObjectDeclarationRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -1253,31 +1226,29 @@ class NoObjectDeclarationRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'no_object_declaration',
-    problemMessage:
-        '[no_object_declaration] Member declared with type Object, which erases all type information. Accessing any property or method requires an unsafe downcast, bypassing compile-time type checking and risking runtime cast errors that could have been prevented with a more specific type. {v4}',
+    'no_object_declaration',
+    '[no_object_declaration] Member declared with type Object, which erases all type information. Accessing any property or method requires an unsafe downcast, bypassing compile-time type checking and risking runtime cast errors that could have been prevented with a more specific type. {v4}',
     correctionMessage:
         'Replace Object with the most specific type that applies, use generics to preserve type information, or use a sealed class hierarchy for known subtypes.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addFieldDeclaration((FieldDeclaration node) {
+    context.addFieldDeclaration((FieldDeclaration node) {
       final TypeAnnotation? type = node.fields.type;
       if (type is NamedType && type.name.lexeme == 'Object') {
-        reporter.atNode(type, code);
+        reporter.atNode(type);
       }
     });
 
-    context.registry.addMethodDeclaration((MethodDeclaration node) {
+    context.addMethodDeclaration((MethodDeclaration node) {
       final TypeAnnotation? returnType = node.returnType;
       if (returnType is NamedType && returnType.name.lexeme == 'Object') {
-        reporter.atNode(returnType, code);
+        reporter.atNode(returnType);
       }
     });
   }
@@ -1304,22 +1275,20 @@ class NoObjectDeclarationRule extends SaropaLintRule {
 /// void foo() { }
 /// ```
 class PreferBothInliningAnnotationsRule extends SaropaLintRule {
-  const PreferBothInliningAnnotationsRule() : super(code: _code);
+  PreferBothInliningAnnotationsRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
-    name: 'prefer_both_inlining_annotations',
-    problemMessage:
-        '[prefer_both_inlining_annotations] Only one inlining pragma is present, but the Dart VM and dart2js compilers use different annotations. Without both vm:prefer-inline and dart2js:tryInline, the function is only inlined on one platform, leaving the other without the intended optimization. {v3}',
+    'prefer_both_inlining_annotations',
+    '[prefer_both_inlining_annotations] Only one inlining pragma is present, but the Dart VM and dart2js compilers use different annotations. Without both vm:prefer-inline and dart2js:tryInline, the function is only inlined on one platform, leaving the other without the intended optimization. {v3}',
     correctionMessage:
         'Add the missing counterpart annotation: use @pragma(dart2js:tryInline) alongside @pragma(vm:prefer-inline), or vice versa.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
     void checkAnnotations(NodeList<Annotation> metadata, Token reportAt) {
       bool hasVmInline = false;
@@ -1344,15 +1313,15 @@ class PreferBothInliningAnnotationsRule extends SaropaLintRule {
       }
 
       if (hasVmInline != hasDart2jsInline) {
-        reporter.atToken(reportAt, code);
+        reporter.atToken(reportAt);
       }
     }
 
-    context.registry.addMethodDeclaration((MethodDeclaration node) {
+    context.addMethodDeclaration((MethodDeclaration node) {
       checkAnnotations(node.metadata, node.name);
     });
 
-    context.registry.addFunctionDeclaration((FunctionDeclaration node) {
+    context.addFunctionDeclaration((FunctionDeclaration node) {
       checkAnnotations(node.metadata, node.name);
     });
   }
@@ -1379,7 +1348,7 @@ class PreferBothInliningAnnotationsRule extends SaropaLintRule {
 /// final padding = MediaQuery.paddingOf(context);
 /// ```
 class PreferDedicatedMediaQueryMethodRule extends SaropaLintRule {
-  const PreferDedicatedMediaQueryMethodRule() : super(code: _code);
+  PreferDedicatedMediaQueryMethodRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -1389,12 +1358,11 @@ class PreferDedicatedMediaQueryMethodRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'prefer_dedicated_media_query_method',
-    problemMessage:
-        '[prefer_dedicated_media_query_method] MediaQuery.of(context) accessed for a single property. This registers a dependency on the entire MediaQueryData object, causing the widget to rebuild whenever any media query value changes (orientation, padding, text scale), even if only one property is needed. {v6}',
+    'prefer_dedicated_media_query_method',
+    '[prefer_dedicated_media_query_method] MediaQuery.of(context) accessed for a single property. This registers a dependency on the entire MediaQueryData object, causing the widget to rebuild whenever any media query value changes (orientation, padding, text scale), even if only one property is needed. {v6}',
     correctionMessage:
         'Use the dedicated method such as MediaQuery.sizeOf(context), MediaQuery.paddingOf(context), or MediaQuery.textScaleFactorOf(context) to depend only on the specific property.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   static const Set<String> _dedicatedProperties = <String>{
@@ -1410,11 +1378,10 @@ class PreferDedicatedMediaQueryMethodRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addPropertyAccess((PropertyAccess node) {
+    context.addPropertyAccess((PropertyAccess node) {
       // Check for pattern: MediaQuery.of(context).size
       final Expression? target = node.target;
       if (target is! MethodInvocation) return;
@@ -1428,7 +1395,7 @@ class PreferDedicatedMediaQueryMethodRule extends SaropaLintRule {
       // Check if the property is one that has a dedicated method
       final String propertyName = node.propertyName.name;
       if (_dedicatedProperties.contains(propertyName)) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
   }
@@ -1448,7 +1415,7 @@ class PreferDedicatedMediaQueryMethodRule extends SaropaLintRule {
 /// MyEnum.values.byName('value');
 /// ```
 class PreferEnumsByNameRule extends SaropaLintRule {
-  const PreferEnumsByNameRule() : super(code: _code);
+  PreferEnumsByNameRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -1458,21 +1425,19 @@ class PreferEnumsByNameRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'prefer_enums_by_name',
-    problemMessage:
-        '[prefer_enums_by_name] Enum lookup uses firstWhere with name comparison instead of the built-in byName() method. The manual approach is more verbose, less readable, and throws a generic StateError on mismatch instead of the descriptive ArgumentError that byName() provides. {v5}',
+    'prefer_enums_by_name',
+    '[prefer_enums_by_name] Enum lookup uses firstWhere with name comparison instead of the built-in byName() method. The manual approach is more verbose, less readable, and throws a generic StateError on mismatch instead of the descriptive ArgumentError that byName() provides. {v5}',
     correctionMessage:
         'Replace .firstWhere((e) => e.name == x) with .byName(x) for cleaner code and a more descriptive error message on lookup failure.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       if (node.methodName.name != 'firstWhere') return;
 
       // Check if target is .values
@@ -1492,10 +1457,11 @@ class PreferEnumsByNameRule extends SaropaLintRule {
           // Check for pattern: e.name == 'something' or 'something' == e.name
           if (expr is BinaryExpression &&
               expr.operator.type == TokenType.EQ_EQ) {
-            final bool isNameComparison = _isNameAccess(expr.leftOperand) ||
+            final bool isNameComparison =
+                _isNameAccess(expr.leftOperand) ||
                 _isNameAccess(expr.rightOperand);
             if (isNameComparison) {
-              reporter.atNode(node, code);
+              reporter.atNode(node);
             }
           }
         }
@@ -1518,7 +1484,7 @@ class PreferEnumsByNameRule extends SaropaLintRule {
 ///
 /// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v4
 class PreferExtractingFunctionCallbacksRule extends SaropaLintRule {
-  const PreferExtractingFunctionCallbacksRule() : super(code: _code);
+  PreferExtractingFunctionCallbacksRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -1528,23 +1494,21 @@ class PreferExtractingFunctionCallbacksRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'prefer_extracting_function_callbacks',
-    problemMessage:
-        '[prefer_extracting_function_callbacks] Large inline callback detected spanning 10+ lines. Inline callbacks make code harder to read, test in isolation, and reuse across multiple call sites, reducing code maintainability and increasing complexity. {v4}',
+    'prefer_extracting_function_callbacks',
+    '[prefer_extracting_function_callbacks] Large inline callback detected spanning 10+ lines. Inline callbacks make code harder to read, test in isolation, and reuse across multiple call sites, reducing code maintainability and increasing complexity. {v4}',
     correctionMessage:
         'Extract this callback to a separate named method or private function. This enables unit testing the logic independently, improves readability by giving the behavior a descriptive name, and allows reuse.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   static const int _maxCallbackLines = 10;
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addFunctionExpression((FunctionExpression node) {
+    context.addFunctionExpression((FunctionExpression node) {
       // Skip if not used as an argument
       final AstNode? parent = node.parent;
       if (parent is! NamedExpression && parent is! ArgumentList) return;
@@ -1559,7 +1523,7 @@ class PreferExtractingFunctionCallbacksRule extends SaropaLintRule {
       final int lineCount = endLine - startLine + 1;
 
       if (lineCount > _maxCallbackLines) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
   }
@@ -1583,7 +1547,7 @@ class PreferExtractingFunctionCallbacksRule extends SaropaLintRule {
 /// final combined = [...?items];
 /// ```
 class PreferNullAwareSpreadRule extends SaropaLintRule {
-  const PreferNullAwareSpreadRule() : super(code: _code);
+  PreferNullAwareSpreadRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -1593,35 +1557,33 @@ class PreferNullAwareSpreadRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'prefer_null_aware_spread',
-    problemMessage:
-        '[prefer_null_aware_spread] Nullable collection spread without null-aware operator. Spreading a nullable list or set without ...? throws a runtime TypeError when the value is null, crashing the collection literal construction instead of gracefully contributing zero elements. {v4}',
+    'prefer_null_aware_spread',
+    '[prefer_null_aware_spread] Nullable collection spread without null-aware operator. Spreading a nullable list or set without ...? throws a runtime TypeError when the value is null, crashing the collection literal construction instead of gracefully contributing zero elements. {v4}',
     correctionMessage:
         'Replace ...nullableCollection with ...?nullableCollection so that null values are treated as empty and contribute no elements to the result.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addSpreadElement((SpreadElement node) {
+    context.addSpreadElement((SpreadElement node) {
       // Check for ...?(x ?? []) pattern
       final Expression expr = node.expression;
       if (node.isNullAware && expr is BinaryExpression) {
         if (expr.operator.lexeme == '??') {
           final Expression right = expr.rightOperand;
           if (right is ListLiteral && right.elements.isEmpty) {
-            reporter.atNode(node, code);
+            reporter.atNode(node);
           }
         }
       }
     });
 
     // Check for ternary patterns like: items != null ? [...items] : []
-    context.registry.addConditionalExpression((ConditionalExpression node) {
+    context.addConditionalExpression((ConditionalExpression node) {
       final Expression condition = node.condition;
       final Expression thenExpr = node.thenExpression;
       final Expression elseExpr = node.elseExpression;
@@ -1636,7 +1598,7 @@ class PreferNullAwareSpreadRule extends SaropaLintRule {
             elseExpr.elements.isEmpty) {
           final CollectionElement firstElement = thenExpr.elements.first;
           if (firstElement is SpreadElement && !firstElement.isNullAware) {
-            reporter.atNode(node, code);
+            reporter.atNode(node);
           }
         }
       }
@@ -1668,7 +1630,7 @@ class PreferNullAwareSpreadRule extends SaropaLintRule {
 /// }
 /// ```
 class PreferVisibleForTestingOnMembersRule extends SaropaLintRule {
-  const PreferVisibleForTestingOnMembersRule() : super(code: _code);
+  PreferVisibleForTestingOnMembersRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -1678,12 +1640,11 @@ class PreferVisibleForTestingOnMembersRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'prefer_visible_for_testing_on_members',
-    problemMessage:
-        '[prefer_visible_for_testing_on_members] Member exposed solely for testing lacks the @visibleForTesting annotation. Without the annotation, the analyzer cannot warn when production code accidentally calls the test-only member, breaking the intended encapsulation boundary. {v4}',
+    'prefer_visible_for_testing_on_members',
+    '[prefer_visible_for_testing_on_members] Member exposed solely for testing lacks the @visibleForTesting annotation. Without the annotation, the analyzer cannot warn when production code accidentally calls the test-only member, breaking the intended encapsulation boundary. {v4}',
     correctionMessage:
         'Add the @visibleForTesting annotation from package:meta so the analyzer flags any non-test usage of this member as a warning.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   static const Set<String> _testIndicators = <String>{
@@ -1701,14 +1662,13 @@ class PreferVisibleForTestingOnMembersRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
     // Skip test files
-    if (resolver.path.contains('_test.dart') ||
-        resolver.path.contains('/test/') ||
-        resolver.path.contains('\\test\\')) {
+    if (context.filePath.contains('_test.dart') ||
+        context.filePath.contains('/test/') ||
+        context.filePath.contains('\\test\\')) {
       return;
     }
 
@@ -1731,14 +1691,14 @@ class PreferVisibleForTestingOnMembersRule extends SaropaLintRule {
         if (annotation.name.name == 'visibleForTesting') return;
       }
 
-      reporter.atToken(nameToken, code);
+      reporter.atToken(nameToken);
     }
 
-    context.registry.addMethodDeclaration((MethodDeclaration node) {
+    context.addMethodDeclaration((MethodDeclaration node) {
       checkMember(node.name, node.metadata);
     });
 
-    context.registry.addFieldDeclaration((FieldDeclaration node) {
+    context.addFieldDeclaration((FieldDeclaration node) {
       for (final VariableDeclaration variable in node.fields.variables) {
         checkMember(variable.name, node.metadata);
       }
@@ -1762,7 +1722,7 @@ class PreferVisibleForTestingOnMembersRule extends SaropaLintRule {
 /// foo();  // Omit the parameter instead of passing null
 /// ```
 class AvoidAlwaysNullParametersRule extends SaropaLintRule {
-  const AvoidAlwaysNullParametersRule() : super(code: _code);
+  AvoidAlwaysNullParametersRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -1772,36 +1732,33 @@ class AvoidAlwaysNullParametersRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_always_null_parameters',
-    problemMessage:
-        '[avoid_always_null_parameters] Parameter is explicitly passed as null at every call site. Passing null as a constant argument adds noise, makes the call site harder to read, and defeats the purpose of optional parameters, which default to null when omitted. {v4}',
+    'avoid_always_null_parameters',
+    '[avoid_always_null_parameters] Parameter is explicitly passed as null at every call site. Passing null as a constant argument adds noise, makes the call site harder to read, and defeats the purpose of optional parameters, which default to null when omitted. {v4}',
     correctionMessage:
         'Omit the parameter entirely and let the default value apply, or if null has semantic meaning, document why it is passed explicitly.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
     // Check each method invocation for null arguments
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       for (final Expression arg in node.argumentList.arguments) {
         // Only check named parameters passed as explicit null
         if (arg is NamedExpression && arg.expression is NullLiteral) {
-          reporter.atNode(arg, code);
+          reporter.atNode(arg);
         }
       }
     });
 
-    context.registry
-        .addInstanceCreationExpression((InstanceCreationExpression node) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
       for (final Expression arg in node.argumentList.arguments) {
         // Only check named parameters passed as explicit null
         if (arg is NamedExpression && arg.expression is NullLiteral) {
-          reporter.atNode(arg, code);
+          reporter.atNode(arg);
         }
       }
     });
@@ -1822,24 +1779,22 @@ class AvoidAlwaysNullParametersRule extends SaropaLintRule {
 /// }
 /// ```
 class AvoidAssigningToStaticFieldRule extends SaropaLintRule {
-  const AvoidAssigningToStaticFieldRule() : super(code: _code);
+  AvoidAssigningToStaticFieldRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
-    name: 'avoid_assigning_to_static_field',
-    problemMessage:
-        '[avoid_assigning_to_static_field] Instance method modifies a static field, coupling instance behavior to global state. This makes the class unpredictable because any instance can silently alter shared state, causing race conditions in concurrent code and making tests unreliable. {v3}',
+    'avoid_assigning_to_static_field',
+    '[avoid_assigning_to_static_field] Instance method modifies a static field, coupling instance behavior to global state. This makes the class unpredictable because any instance can silently alter shared state, causing race conditions in concurrent code and making tests unreliable. {v3}',
     correctionMessage:
         'Move the assignment to a static method if the modification is class-level, or convert the static field to an instance field if the state should be per-instance.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addClassDeclaration((ClassDeclaration classNode) {
+    context.addClassDeclaration((ClassDeclaration classNode) {
       // Collect static field names
       final Set<String> staticFields = <String>{};
       for (final ClassMember member in classNode.members) {
@@ -1867,7 +1822,8 @@ class AvoidAssigningToStaticFieldRule extends SaropaLintRule {
     SaropaDiagnosticReporter reporter,
   ) {
     body.visitChildren(
-        _StaticFieldAssignmentVisitor(staticFields, reporter, _code));
+      _StaticFieldAssignmentVisitor(staticFields, reporter, _code),
+    );
   }
 }
 
@@ -1882,7 +1838,7 @@ class _StaticFieldAssignmentVisitor extends RecursiveAstVisitor<void> {
   void visitAssignmentExpression(AssignmentExpression node) {
     final Expression left = node.leftHandSide;
     if (left is SimpleIdentifier && staticFields.contains(left.name)) {
-      reporter.atNode(node, code);
+      reporter.atNode(node);
     }
     super.visitAssignmentExpression(node);
   }
@@ -1891,7 +1847,7 @@ class _StaticFieldAssignmentVisitor extends RecursiveAstVisitor<void> {
   void visitPostfixExpression(PostfixExpression node) {
     final Expression operand = node.operand;
     if (operand is SimpleIdentifier && staticFields.contains(operand.name)) {
-      reporter.atNode(node, code);
+      reporter.atNode(node);
     }
     super.visitPostfixExpression(node);
   }
@@ -1903,7 +1859,7 @@ class _StaticFieldAssignmentVisitor extends RecursiveAstVisitor<void> {
     if ((op == TokenType.PLUS_PLUS || op == TokenType.MINUS_MINUS) &&
         operand is SimpleIdentifier &&
         staticFields.contains(operand.name)) {
-      reporter.atNode(node, code);
+      reporter.atNode(node);
     }
     super.visitPrefixExpression(node);
   }
@@ -1920,7 +1876,7 @@ class _StaticFieldAssignmentVisitor extends RecursiveAstVisitor<void> {
 /// }
 /// ```
 class AvoidAsyncCallInSyncFunctionRule extends SaropaLintRule {
-  const AvoidAsyncCallInSyncFunctionRule() : super(code: _code);
+  AvoidAsyncCallInSyncFunctionRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -1930,23 +1886,21 @@ class AvoidAsyncCallInSyncFunctionRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.high;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_async_call_in_sync_function',
-    problemMessage:
-        '[avoid_async_call_in_sync_function] Async function called inside a synchronous function without handling the returned Future. The Future is silently discarded, so any errors thrown by the async operation are swallowed and any result is lost, making failures invisible. {v5}',
+    'avoid_async_call_in_sync_function',
+    '[avoid_async_call_in_sync_function] Async function called inside a synchronous function without handling the returned Future. The Future is silently discarded, so any errors thrown by the async operation are swallowed and any result is lost, making failures invisible. {v5}',
     correctionMessage:
         'Mark the enclosing function as async and await the call, chain with .then()/.catchError() for explicit handling, or wrap with unawaited() to document the intentional fire-and-forget.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       if (_shouldReport(node)) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
   }
@@ -2063,7 +2017,7 @@ class AvoidAsyncCallInSyncFunctionRule extends SaropaLintRule {
 /// while (a && b || c && d && e) { }
 /// ```
 class AvoidComplexLoopConditionsRule extends SaropaLintRule {
-  const AvoidComplexLoopConditionsRule() : super(code: _code);
+  AvoidComplexLoopConditionsRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -2073,31 +2027,29 @@ class AvoidComplexLoopConditionsRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_complex_loop_conditions',
-    problemMessage:
-        '[avoid_complex_loop_conditions] Loop condition contains too many operators or nested expressions, making it difficult to reason about when the loop terminates. Complex conditions increase the risk of off-by-one errors and infinite loops that are hard to diagnose. {v4}',
+    'avoid_complex_loop_conditions',
+    '[avoid_complex_loop_conditions] Loop condition contains too many operators or nested expressions, making it difficult to reason about when the loop terminates. Complex conditions increase the risk of off-by-one errors and infinite loops that are hard to diagnose. {v4}',
     correctionMessage:
         'Extract the condition into a named boolean variable or a separate method with a descriptive name that communicates the loop termination intent.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   static const int _maxOperators = 2;
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addWhileStatement((WhileStatement node) {
+    context.addWhileStatement((WhileStatement node) {
       _checkCondition(node.condition, reporter);
     });
 
-    context.registry.addDoStatement((DoStatement node) {
+    context.addDoStatement((DoStatement node) {
       _checkCondition(node.condition, reporter);
     });
 
-    context.registry.addForStatement((ForStatement node) {
+    context.addForStatement((ForStatement node) {
       final ForLoopParts parts = node.forLoopParts;
       if (parts is ForParts) {
         final Expression? condition = parts.condition;
@@ -2109,10 +2061,12 @@ class AvoidComplexLoopConditionsRule extends SaropaLintRule {
   }
 
   void _checkCondition(
-      Expression condition, SaropaDiagnosticReporter reporter) {
+    Expression condition,
+    SaropaDiagnosticReporter reporter,
+  ) {
     final int operatorCount = _countLogicalOperators(condition);
     if (operatorCount > _maxOperators) {
-      reporter.atNode(condition, code);
+      reporter.atNode(condition);
     }
   }
 
@@ -2142,7 +2096,7 @@ class AvoidComplexLoopConditionsRule extends SaropaLintRule {
 /// final x = 'a' + 'b';  // Should be 'ab'
 /// ```
 class AvoidConstantConditionsRule extends SaropaLintRule {
-  const AvoidConstantConditionsRule() : super(code: _code);
+  AvoidConstantConditionsRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -2152,21 +2106,19 @@ class AvoidConstantConditionsRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_constant_conditions',
-    problemMessage:
-        '[avoid_constant_conditions] Condition evaluates to a compile-time constant, making one branch unreachable dead code. This usually indicates a logic error where the condition was intended to be dynamic, or leftover debugging code that was never cleaned up. {v4}',
+    'avoid_constant_conditions',
+    '[avoid_constant_conditions] Condition evaluates to a compile-time constant, making one branch unreachable dead code. This usually indicates a logic error where the condition was intended to be dynamic, or leftover debugging code that was never cleaned up. {v4}',
     correctionMessage:
         'Remove the condition and keep only the reachable branch, or replace the constant with the intended dynamic expression that varies at runtime.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addBinaryExpression((BinaryExpression node) {
+    context.addBinaryExpression((BinaryExpression node) {
       final TokenType op = node.operator.type;
 
       // Only check comparison operators
@@ -2181,7 +2133,7 @@ class AvoidConstantConditionsRule extends SaropaLintRule {
 
       // Check if both sides are literals
       if (_isConstant(node.leftOperand) && _isConstant(node.rightOperand)) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
   }
@@ -2205,24 +2157,22 @@ class AvoidConstantConditionsRule extends SaropaLintRule {
 /// if (x == null && x.length > 0) { }  // Second part throws
 /// ```
 class AvoidContradictoryExpressionsRule extends SaropaLintRule {
-  const AvoidContradictoryExpressionsRule() : super(code: _code);
+  AvoidContradictoryExpressionsRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
-    name: 'avoid_contradictory_expressions',
-    problemMessage:
-        '[avoid_contradictory_expressions] Contradictory conditions detected where two expressions cannot both be true simultaneously. This creates unreachable code paths that silently skip intended logic, indicating a logic error that may cause incorrect behavior or missed edge cases. {v3}',
+    'avoid_contradictory_expressions',
+    '[avoid_contradictory_expressions] Contradictory conditions detected where two expressions cannot both be true simultaneously. This creates unreachable code paths that silently skip intended logic, indicating a logic error that may cause incorrect behavior or missed edge cases. {v3}',
     correctionMessage:
         'Review the boolean logic to ensure conditions are compatible, remove the contradictory branch, or correct the expression to reflect the intended behavior.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addBinaryExpression((BinaryExpression node) {
+    context.addBinaryExpression((BinaryExpression node) {
       if (node.operator.type != TokenType.AMPERSAND_AMPERSAND) return;
 
       // Check for x == null && x.something
@@ -2232,14 +2182,14 @@ class AvoidContradictoryExpressionsRule extends SaropaLintRule {
       if (_isNullCheck(left, true)) {
         final String? varName = _getNullCheckedVariable(left);
         if (varName != null && _usesVariable(right, varName)) {
-          reporter.atNode(node, code);
+          reporter.atNode(node);
         }
       }
 
       // Check for opposite comparisons like x > 5 && x < 3
       if (left is BinaryExpression && right is BinaryExpression) {
         if (_areOppositeComparisons(left, right)) {
-          reporter.atNode(node, code);
+          reporter.atNode(node);
         }
       }
     });
@@ -2333,7 +2283,7 @@ class AvoidContradictoryExpressionsRule extends SaropaLintRule {
 /// on IOException catch (e) { print(e); }  // Same as above
 /// ```
 class AvoidIdenticalExceptionHandlingBlocksRule extends SaropaLintRule {
-  const AvoidIdenticalExceptionHandlingBlocksRule() : super(code: _code);
+  AvoidIdenticalExceptionHandlingBlocksRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -2346,21 +2296,19 @@ class AvoidIdenticalExceptionHandlingBlocksRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.bloc};
 
   static const LintCode _code = LintCode(
-    name: 'avoid_identical_exception_handling_blocks',
-    problemMessage:
-        '[avoid_identical_exception_handling_blocks] Multiple catch blocks contain identical handling code. Duplicated exception handling increases maintenance burden because changes must be applied to every copy, and missed updates lead to inconsistent error recovery behavior. {v5}',
+    'avoid_identical_exception_handling_blocks',
+    '[avoid_identical_exception_handling_blocks] Multiple catch blocks contain identical handling code. Duplicated exception handling increases maintenance burden because changes must be applied to every copy, and missed updates lead to inconsistent error recovery behavior. {v5}',
     correctionMessage:
         'Combine the exception types into a single catch clause (e.g. on FormatException, IOException catch (e)) or extract the shared handling into a helper method.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addTryStatement((TryStatement node) {
+    context.addTryStatement((TryStatement node) {
       final NodeList<CatchClause> catches = node.catchClauses;
       if (catches.length < 2) return;
 
@@ -2394,7 +2342,7 @@ class AvoidIdenticalExceptionHandlingBlocksRule extends SaropaLintRule {
 /// }
 /// ```
 class AvoidLateFinalReassignmentRule extends SaropaLintRule {
-  const AvoidLateFinalReassignmentRule() : super(code: _code);
+  AvoidLateFinalReassignmentRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -2404,21 +2352,19 @@ class AvoidLateFinalReassignmentRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_late_final_reassignment',
-    problemMessage:
-        '[avoid_late_final_reassignment] Late final field has multiple assignment paths, which throws a LateInitializationError at runtime on the second write. The compiler cannot catch this statically, so the crash only surfaces during execution of the specific code path that triggers the duplicate assignment. {v4}',
+    'avoid_late_final_reassignment',
+    '[avoid_late_final_reassignment] Late final field has multiple assignment paths, which throws a LateInitializationError at runtime on the second write. The compiler cannot catch this statically, so the crash only surfaces during execution of the specific code path that triggers the duplicate assignment. {v4}',
     correctionMessage:
         'Ensure the late final field is assigned exactly once across all code paths, or convert it to a non-final late field if reassignment is intentional.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addClassDeclaration((ClassDeclaration classNode) {
+    context.addClassDeclaration((ClassDeclaration classNode) {
       // Collect late final field names
       final Set<String> lateFinalFields = <String>{};
       for (final ClassMember member in classNode.members) {
@@ -2441,14 +2387,22 @@ class AvoidLateFinalReassignmentRule extends SaropaLintRule {
           final Map<String, int> assignments = <String, int>{};
           member.body.visitChildren(
             _LateFinalAssignmentCounter(
-                lateFinalFields, assignments, reporter, _code),
+              lateFinalFields,
+              assignments,
+              reporter,
+              _code,
+            ),
           );
         }
         if (member is ConstructorDeclaration) {
           final Map<String, int> assignments = <String, int>{};
           member.body.visitChildren(
             _LateFinalAssignmentCounter(
-                lateFinalFields, assignments, reporter, _code),
+              lateFinalFields,
+              assignments,
+              reporter,
+              _code,
+            ),
           );
         }
       }
@@ -2458,7 +2412,11 @@ class AvoidLateFinalReassignmentRule extends SaropaLintRule {
 
 class _LateFinalAssignmentCounter extends RecursiveAstVisitor<void> {
   _LateFinalAssignmentCounter(
-      this.lateFinalFields, this.assignments, this.reporter, this.code);
+    this.lateFinalFields,
+    this.assignments,
+    this.reporter,
+    this.code,
+  );
 
   final Set<String> lateFinalFields;
   final Map<String, int> assignments;
@@ -2472,7 +2430,7 @@ class _LateFinalAssignmentCounter extends RecursiveAstVisitor<void> {
       final int count = assignments[left.name] ?? 0;
       assignments[left.name] = count + 1;
       if (count >= 1) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     }
     super.visitAssignmentExpression(node);
@@ -2493,7 +2451,7 @@ class _LateFinalAssignmentCounter extends RecursiveAstVisitor<void> {
 /// completer.completeError(error, stackTrace);
 /// ```
 class AvoidMissingCompleterStackTraceRule extends SaropaLintRule {
-  const AvoidMissingCompleterStackTraceRule() : super(code: _code);
+  AvoidMissingCompleterStackTraceRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -2503,27 +2461,25 @@ class AvoidMissingCompleterStackTraceRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_missing_completer_stack_trace',
-    problemMessage:
-        '[avoid_missing_completer_stack_trace] Completer.completeError() called without passing the stack trace as the second argument. Without the original stack trace, error reports show only the completeError() call site instead of the actual failure origin, making debugging asynchronous errors significantly harder. {v4}',
+    'avoid_missing_completer_stack_trace',
+    '[avoid_missing_completer_stack_trace] Completer.completeError() called without passing the stack trace as the second argument. Without the original stack trace, error reports show only the completeError() call site instead of the actual failure origin, making debugging asynchronous errors significantly harder. {v4}',
     correctionMessage:
         'Pass the stack trace as the second argument to completeError(error, stackTrace) to preserve the full async error chain for debugging.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       if (node.methodName.name != 'completeError') return;
 
       // Check argument count
       final NodeList<Expression> args = node.argumentList.arguments;
       if (args.length < 2) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
   }
@@ -2539,15 +2495,14 @@ class AvoidMissingCompleterStackTraceRule extends SaropaLintRule {
 /// final map = {Status.active: 'A', Status.inactive: 'I'};  // Missing pending
 /// ```
 class AvoidMissingEnumConstantInMapRule extends SaropaLintRule {
-  const AvoidMissingEnumConstantInMapRule() : super(code: _code);
+  AvoidMissingEnumConstantInMapRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
-    name: 'avoid_missing_enum_constant_in_map',
-    problemMessage:
-        '[avoid_missing_enum_constant_in_map] Map literal keyed by enum values does not include all enum constants. When a new enum value is added, this map silently returns null for the missing key instead of producing a compile-time error, leading to unexpected null values or fallback behavior at runtime. {v3}',
+    'avoid_missing_enum_constant_in_map',
+    '[avoid_missing_enum_constant_in_map] Map literal keyed by enum values does not include all enum constants. When a new enum value is added, this map silently returns null for the missing key instead of producing a compile-time error, leading to unexpected null values or fallback behavior at runtime. {v3}',
     correctionMessage:
         'Add entries for all enum constants to the map, or use a switch expression with exhaustiveness checking to ensure every enum value is handled.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
@@ -2558,11 +2513,10 @@ class AvoidMissingEnumConstantInMapRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addSetOrMapLiteral((SetOrMapLiteral node) {
+    context.addSetOrMapLiteral((SetOrMapLiteral node) {
       if (!node.isMap) return;
       if (node.elements.isEmpty) return;
 
@@ -2592,7 +2546,7 @@ class AvoidMissingEnumConstantInMapRule extends SaropaLintRule {
       // Only flag if there are actually missing constants
       final Set<String> missing = allConstants.difference(usedConstants);
       if (missing.isNotEmpty) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
   }
@@ -2650,7 +2604,7 @@ class AvoidMissingEnumConstantInMapRule extends SaropaLintRule {
 /// }
 /// ```
 class AvoidParameterReassignmentRule extends SaropaLintRule {
-  const AvoidParameterReassignmentRule() : super(code: _code);
+  AvoidParameterReassignmentRule() : super(code: _code);
 
   /// Style issue - low impact.
   @override
@@ -2660,22 +2614,20 @@ class AvoidParameterReassignmentRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_parameter_reassignment',
-    problemMessage:
-        '[avoid_parameter_reassignment] Parameter is being reassigned. '
+    'avoid_parameter_reassignment',
+    '[avoid_parameter_reassignment] Parameter is being reassigned. '
         'This hides the original input value. {v3}',
     correctionMessage:
         'Create a local variable instead of reassigning the parameter.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addFunctionDeclaration((FunctionDeclaration node) {
+    context.addFunctionDeclaration((FunctionDeclaration node) {
       final FormalParameterList? params = node.functionExpression.parameters;
       if (params == null) return;
 
@@ -2692,7 +2644,7 @@ class AvoidParameterReassignmentRule extends SaropaLintRule {
       );
     });
 
-    context.registry.addMethodDeclaration((MethodDeclaration node) {
+    context.addMethodDeclaration((MethodDeclaration node) {
       final FormalParameterList? params = node.parameters;
       if (params == null) return;
 
@@ -2725,7 +2677,7 @@ class _ParameterReassignmentVisitor extends RecursiveAstVisitor<void> {
   void visitAssignmentExpression(AssignmentExpression node) {
     final Expression left = node.leftHandSide;
     if (left is SimpleIdentifier && paramNames.contains(left.name)) {
-      reporter.atNode(node, code);
+      reporter.atNode(node);
     }
     super.visitAssignmentExpression(node);
   }
@@ -2734,7 +2686,7 @@ class _ParameterReassignmentVisitor extends RecursiveAstVisitor<void> {
   void visitPostfixExpression(PostfixExpression node) {
     final Expression operand = node.operand;
     if (operand is SimpleIdentifier && paramNames.contains(operand.name)) {
-      reporter.atNode(node, code);
+      reporter.atNode(node);
     }
     super.visitPostfixExpression(node);
   }
@@ -2745,7 +2697,7 @@ class _ParameterReassignmentVisitor extends RecursiveAstVisitor<void> {
     if (op == TokenType.PLUS_PLUS || op == TokenType.MINUS_MINUS) {
       final Expression operand = node.operand;
       if (operand is SimpleIdentifier && paramNames.contains(operand.name)) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     }
     super.visitPrefixExpression(node);
@@ -2794,7 +2746,7 @@ class _ParameterReassignmentVisitor extends RecursiveAstVisitor<void> {
 /// }
 /// ```
 class AvoidParameterMutationRule extends SaropaLintRule {
-  const AvoidParameterMutationRule() : super(code: _code);
+  AvoidParameterMutationRule() : super(code: _code);
 
   /// High impact - can cause bugs in calling code.
   @override
@@ -2804,13 +2756,12 @@ class AvoidParameterMutationRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_parameter_mutation',
-    problemMessage:
-        '[avoid_parameter_mutation] Parameter object is being mutated. '
+    'avoid_parameter_mutation',
+    '[avoid_parameter_mutation] Parameter object is being mutated. '
         'This modifies the caller\'s data. {v2}',
     correctionMessage:
         'Create a copy of the data instead of mutating the parameter.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   /// Known mutating methods for collection types.
@@ -2849,11 +2800,10 @@ class AvoidParameterMutationRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addFunctionDeclaration((FunctionDeclaration node) {
+    context.addFunctionDeclaration((FunctionDeclaration node) {
       _checkFunction(
         node.functionExpression.parameters,
         node.functionExpression.body,
@@ -2861,7 +2811,7 @@ class AvoidParameterMutationRule extends SaropaLintRule {
       );
     });
 
-    context.registry.addMethodDeclaration((MethodDeclaration node) {
+    context.addMethodDeclaration((MethodDeclaration node) {
       _checkFunction(node.parameters, node.body, reporter);
     });
   }
@@ -2911,7 +2861,7 @@ class _ParameterMutationVisitor extends RecursiveAstVisitor<void> {
     if (target is SimpleIdentifier && paramNames.contains(target.name)) {
       final String methodName = node.methodName.name;
       if (mutatingMethods.contains(methodName)) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     }
     super.visitMethodInvocation(node);
@@ -2925,7 +2875,7 @@ class _ParameterMutationVisitor extends RecursiveAstVisitor<void> {
     if (left is PrefixedIdentifier) {
       final SimpleIdentifier prefix = left.prefix;
       if (paramNames.contains(prefix.name)) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     }
 
@@ -2933,7 +2883,7 @@ class _ParameterMutationVisitor extends RecursiveAstVisitor<void> {
     if (left is IndexExpression) {
       final Expression? target = left.target;
       if (target is SimpleIdentifier && paramNames.contains(target.name)) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     }
 
@@ -2950,12 +2900,12 @@ class _ParameterMutationVisitor extends RecursiveAstVisitor<void> {
         if (section is MethodInvocation) {
           final String methodName = section.methodName.name;
           if (mutatingMethods.contains(methodName)) {
-            reporter.atNode(node, code);
+            reporter.atNode(node);
             return; // Report once per cascade
           }
         }
         if (section is AssignmentExpression) {
-          reporter.atNode(node, code);
+          reporter.atNode(node);
           return;
         }
       }
@@ -2975,7 +2925,7 @@ class _ParameterMutationVisitor extends RecursiveAstVisitor<void> {
 /// final valuel = 2;  // Too similar to value1
 /// ```
 class AvoidSimilarNamesRule extends SaropaLintRule {
-  const AvoidSimilarNamesRule() : super(code: _code);
+  AvoidSimilarNamesRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -2985,21 +2935,19 @@ class AvoidSimilarNamesRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_similar_names',
-    problemMessage:
-        '[avoid_similar_names] Variable name differs from another in-scope variable by only one or two characters. Near-identical names increase the risk of accidentally using the wrong variable, producing subtle bugs that pass code review because the names look correct at a glance. {v4}',
+    'avoid_similar_names',
+    '[avoid_similar_names] Variable name differs from another in-scope variable by only one or two characters. Near-identical names increase the risk of accidentally using the wrong variable, producing subtle bugs that pass code review because the names look correct at a glance. {v4}',
     correctionMessage:
         'Rename one or both variables to be more distinct, using descriptive names that clearly convey their different purposes (e.g. userInput vs validatedInput).',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addBlock((Block node) {
+    context.addBlock((Block node) {
       final List<String> names = <String>[];
       final List<Token> tokens = <Token>[];
 
@@ -3022,10 +2970,14 @@ class AvoidSimilarNamesRule extends SaropaLintRule {
 
     // Check for common confusable patterns
     // 1 and l, 0 and O
-    final String normalizedA =
-        a.replaceAll('1', 'l').replaceAll('0', 'O').toLowerCase();
-    final String normalizedB =
-        b.replaceAll('1', 'l').replaceAll('0', 'O').toLowerCase();
+    final String normalizedA = a
+        .replaceAll('1', 'l')
+        .replaceAll('0', 'O')
+        .toLowerCase();
+    final String normalizedB = b
+        .replaceAll('1', 'l')
+        .replaceAll('0', 'O')
+        .toLowerCase();
 
     if (normalizedA == normalizedB && a != b) return true;
 
@@ -3094,7 +3046,7 @@ class _VariableCollector extends RecursiveAstVisitor<void> {
 /// foo('b');  // Never null
 /// ```
 class AvoidUnnecessaryNullableParametersRule extends SaropaLintRule {
-  const AvoidUnnecessaryNullableParametersRule() : super(code: _code);
+  AvoidUnnecessaryNullableParametersRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -3104,23 +3056,21 @@ class AvoidUnnecessaryNullableParametersRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_unnecessary_nullable_parameters',
-    problemMessage:
-        '[avoid_unnecessary_nullable_parameters] Parameter declared as nullable but null is never passed at any call site. The unnecessary nullable type forces every usage within the function body to handle a null case that cannot occur, adding defensive checks and reducing code clarity. {v4}',
+    'avoid_unnecessary_nullable_parameters',
+    '[avoid_unnecessary_nullable_parameters] Parameter declared as nullable but null is never passed at any call site. The unnecessary nullable type forces every usage within the function body to handle a null case that cannot occur, adding defensive checks and reducing code clarity. {v4}',
     correctionMessage:
         'Change the parameter type to non-nullable. If null support is needed for future callers, add it when the requirement actually arises rather than preemptively.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
     // This is a simplified version - full implementation would track
     // all call sites across the codebase
-    context.registry.addFunctionDeclaration((FunctionDeclaration node) {
+    context.addFunctionDeclaration((FunctionDeclaration node) {
       final FormalParameterList? params = node.functionExpression.parameters;
       if (params == null) return;
 
@@ -3183,7 +3133,7 @@ class AvoidUnnecessaryNullableParametersRule extends SaropaLintRule {
 /// }
 /// ```
 class FunctionAlwaysReturnsNullRule extends SaropaLintRule {
-  const FunctionAlwaysReturnsNullRule() : super(code: _code);
+  FunctionAlwaysReturnsNullRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -3193,21 +3143,19 @@ class FunctionAlwaysReturnsNullRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'function_always_returns_null',
-    problemMessage:
-        '[function_always_returns_null] Function returns null on every code path, making the return type effectively void. Callers that check or use the return value are performing dead logic, and the nullable return type misleads developers into thinking the function can return meaningful data. {v6}',
+    'function_always_returns_null',
+    '[function_always_returns_null] Function returns null on every code path, making the return type effectively void. Callers that check or use the return value are performing dead logic, and the nullable return type misleads developers into thinking the function can return meaningful data. {v6}',
     correctionMessage:
         'Change the return type to void if the function is purely side-effecting, or add meaningful return values for different code paths to make the function useful to callers.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addFunctionDeclaration((FunctionDeclaration node) {
+    context.addFunctionDeclaration((FunctionDeclaration node) {
       _checkFunctionBody(
         node.functionExpression.body,
         node.returnType,
@@ -3216,7 +3164,7 @@ class FunctionAlwaysReturnsNullRule extends SaropaLintRule {
       );
     });
 
-    context.registry.addMethodDeclaration((MethodDeclaration node) {
+    context.addMethodDeclaration((MethodDeclaration node) {
       _checkFunctionBody(node.body, node.returnType, node.name, reporter);
     });
   }
@@ -3246,7 +3194,7 @@ class FunctionAlwaysReturnsNullRule extends SaropaLintRule {
 
     if (body is ExpressionFunctionBody) {
       if (body.expression is NullLiteral) {
-        reporter.atToken(nameToken, code);
+        reporter.atToken(nameToken);
       }
       return;
     }
@@ -3271,7 +3219,7 @@ class FunctionAlwaysReturnsNullRule extends SaropaLintRule {
       if (returnType == null && allBareReturns) return;
 
       if (allNull && returns.isNotEmpty) {
-        reporter.atToken(nameToken, code);
+        reporter.atToken(nameToken);
       }
     }
   }
@@ -3354,7 +3302,7 @@ class _ReturnCollector extends RecursiveAstVisitor<void> {
 /// }
 /// ```
 class AvoidAccessingCollectionsByConstantIndexRule extends SaropaLintRule {
-  const AvoidAccessingCollectionsByConstantIndexRule() : super(code: _code);
+  AvoidAccessingCollectionsByConstantIndexRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -3364,29 +3312,27 @@ class AvoidAccessingCollectionsByConstantIndexRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_accessing_collections_by_constant_index',
-    problemMessage:
-        '[avoid_accessing_collections_by_constant_index] Collection accessed by a constant index inside a loop body. This retrieves the same element on every iteration, which is wasteful and usually indicates a logic error where the loop variable was intended as the index instead. {v5}',
+    'avoid_accessing_collections_by_constant_index',
+    '[avoid_accessing_collections_by_constant_index] Collection accessed by a constant index inside a loop body. This retrieves the same element on every iteration, which is wasteful and usually indicates a logic error where the loop variable was intended as the index instead. {v5}',
     correctionMessage:
         'Replace the constant index with the loop variable, or extract the element into a local variable before the loop to make the single-access intent explicit.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addForStatement((ForStatement node) {
+    context.addForStatement((ForStatement node) {
       node.body.visitChildren(_ConstantIndexVisitor(reporter, _code));
     });
 
-    context.registry.addWhileStatement((WhileStatement node) {
+    context.addWhileStatement((WhileStatement node) {
       node.body.visitChildren(_ConstantIndexVisitor(reporter, _code));
     });
 
-    context.registry.addDoStatement((DoStatement node) {
+    context.addDoStatement((DoStatement node) {
       node.body.visitChildren(_ConstantIndexVisitor(reporter, _code));
     });
   }
@@ -3402,7 +3348,7 @@ class _ConstantIndexVisitor extends RecursiveAstVisitor<void> {
   void visitIndexExpression(IndexExpression node) {
     final Expression index = node.index;
     if (index is IntegerLiteral) {
-      reporter.atNode(node, code);
+      reporter.atNode(node);
     }
     super.visitIndexExpression(node);
   }
@@ -3421,7 +3367,7 @@ class _ConstantIndexVisitor extends RecursiveAstVisitor<void> {
 /// }
 /// ```
 class AvoidDefaultToStringRule extends SaropaLintRule {
-  const AvoidDefaultToStringRule() : super(code: _code);
+  AvoidDefaultToStringRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -3431,21 +3377,19 @@ class AvoidDefaultToStringRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_default_tostring',
-    problemMessage:
-        '[avoid_default_tostring] Class relies on default toString() implementation which returns unhelpful output like "Instance of \'ClassName\'". During debugging, logging, or error messages, developers see meaningless object identifiers instead of the actual state values needed to diagnose issues. {v5}',
+    'avoid_default_tostring',
+    '[avoid_default_tostring] Class relies on default toString() implementation which returns unhelpful output like "Instance of \'ClassName\'". During debugging, logging, or error messages, developers see meaningless object identifiers instead of the actual state values needed to diagnose issues. {v5}',
     correctionMessage:
         'Override toString() to return a string representation of the object\'s key fields and current state. Format as "ClassName(field1: value1, field2: value2)" for easy inspection during debugging.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addClassDeclaration((ClassDeclaration node) {
+    context.addClassDeclaration((ClassDeclaration node) {
       if (node.abstractKeyword != null) return;
 
       bool hasFields = false;
@@ -3477,24 +3421,22 @@ class AvoidDefaultToStringRule extends SaropaLintRule {
 /// const failureMessage = 'Error occurred';  // Same value
 /// ```
 class AvoidDuplicateConstantValuesRule extends SaropaLintRule {
-  const AvoidDuplicateConstantValuesRule() : super(code: _code);
+  AvoidDuplicateConstantValuesRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
-    name: 'avoid_duplicate_constant_values',
-    problemMessage:
-        '[avoid_duplicate_constant_values] Multiple constants share the same value in this scope. Duplicate constant definitions increase maintenance cost because changes must be applied to every copy, and inconsistent updates lead to subtle logic errors when the values diverge. {v3}',
+    'avoid_duplicate_constant_values',
+    '[avoid_duplicate_constant_values] Multiple constants share the same value in this scope. Duplicate constant definitions increase maintenance cost because changes must be applied to every copy, and inconsistent updates lead to subtle logic errors when the values diverge. {v3}',
     correctionMessage:
         'Consolidate duplicates into a single named constant and reference it from all usage sites to ensure changes propagate consistently.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addCompilationUnit((CompilationUnit unit) {
+    context.addCompilationUnit((CompilationUnit unit) {
       final Map<String, Token> seenConstants = <String, Token>{};
 
       for (final CompilationUnitMember declaration in unit.declarations) {
@@ -3532,7 +3474,7 @@ class AvoidDuplicateConstantValuesRule extends SaropaLintRule {
 /// }
 /// ```
 class AvoidDuplicateInitializersRule extends SaropaLintRule {
-  const AvoidDuplicateInitializersRule() : super(code: _code);
+  AvoidDuplicateInitializersRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -3542,21 +3484,19 @@ class AvoidDuplicateInitializersRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_duplicate_initializers',
-    problemMessage:
-        '[avoid_duplicate_initializers] Same initialization expression appears in multiple initializer list entries. Duplicate expressions waste computation, increase the risk of inconsistent updates when one copy is changed but others are missed, and obscure the intended initialization logic. {v4}',
+    'avoid_duplicate_initializers',
+    '[avoid_duplicate_initializers] Same initialization expression appears in multiple initializer list entries. Duplicate expressions waste computation, increase the risk of inconsistent updates when one copy is changed but others are missed, and obscure the intended initialization logic. {v4}',
     correctionMessage:
         'Extract the shared expression into a local variable or factory method and reference it from each initializer to keep the logic in a single place.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addConstructorDeclaration((ConstructorDeclaration node) {
+    context.addConstructorDeclaration((ConstructorDeclaration node) {
       final NodeList<ConstructorInitializer> initializers = node.initializers;
       if (initializers.length < 2) return;
 
@@ -3569,7 +3509,7 @@ class AvoidDuplicateInitializersRule extends SaropaLintRule {
           if (init.expression is SimpleIdentifier) continue;
 
           if (seenExpressions.contains(exprSource)) {
-            reporter.atNode(init, code);
+            reporter.atNode(init);
           } else {
             seenExpressions.add(exprSource);
           }
@@ -3591,7 +3531,7 @@ class AvoidDuplicateInitializersRule extends SaropaLintRule {
 /// }
 /// ```
 class AvoidUnnecessaryOverridesRule extends SaropaLintRule {
-  const AvoidUnnecessaryOverridesRule() : super(code: _code);
+  AvoidUnnecessaryOverridesRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -3601,21 +3541,19 @@ class AvoidUnnecessaryOverridesRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_unnecessary_overrides',
-    problemMessage:
-        '[avoid_unnecessary_overrides] Method override only delegates to super without adding any logic. Unnecessary overrides clutter the class, obscure the inheritance chain, and add a maintenance burden because developers must inspect each override to confirm it does nothing beyond the parent implementation. {v4}',
+    'avoid_unnecessary_overrides',
+    '[avoid_unnecessary_overrides] Method override only delegates to super without adding any logic. Unnecessary overrides clutter the class, obscure the inheritance chain, and add a maintenance burden because developers must inspect each override to confirm it does nothing beyond the parent implementation. {v4}',
     correctionMessage:
         'Remove the override entirely so the parent class implementation is used directly. Add the override back only when custom behavior is actually needed.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodDeclaration((MethodDeclaration node) {
+    context.addMethodDeclaration((MethodDeclaration node) {
       bool hasOverride = false;
       for (final Annotation annotation in node.metadata) {
         if (annotation.name.name == 'override') {
@@ -3633,7 +3571,7 @@ class AvoidUnnecessaryOverridesRule extends SaropaLintRule {
           final Expression? target = expr.target;
           if (target is SuperExpression &&
               expr.methodName.name == node.name.lexeme) {
-            reporter.atNode(node, code);
+            reporter.atNode(node);
           }
         }
       }
@@ -3648,7 +3586,7 @@ class AvoidUnnecessaryOverridesRule extends SaropaLintRule {
               final Expression? target = expr.target;
               if (target is SuperExpression &&
                   expr.methodName.name == node.name.lexeme) {
-                reporter.atNode(node, code);
+                reporter.atNode(node);
               }
             }
           }
@@ -3670,7 +3608,7 @@ class AvoidUnnecessaryOverridesRule extends SaropaLintRule {
 /// }
 /// ```
 class AvoidUnnecessaryStatementsRule extends SaropaLintRule {
-  const AvoidUnnecessaryStatementsRule() : super(code: _code);
+  AvoidUnnecessaryStatementsRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -3680,21 +3618,19 @@ class AvoidUnnecessaryStatementsRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_unnecessary_statements',
-    problemMessage:
-        '[avoid_unnecessary_statements] Statement produces a value or expression result that is never used and has no side effects. Dead statements clutter the code, mislead readers into thinking meaningful work is being done, and may indicate a missing assignment or function call. {v4}',
+    'avoid_unnecessary_statements',
+    '[avoid_unnecessary_statements] Statement produces a value or expression result that is never used and has no side effects. Dead statements clutter the code, mislead readers into thinking meaningful work is being done, and may indicate a missing assignment or function call. {v4}',
     correctionMessage:
         'Remove the statement if it is truly unused, assign the result to a variable, or call the intended method to produce the expected side effect.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addExpressionStatement((ExpressionStatement node) {
+    context.addExpressionStatement((ExpressionStatement node) {
       final Expression expr = node.expression;
 
       if (expr is MethodInvocation) return;
@@ -3714,7 +3650,7 @@ class AvoidUnnecessaryStatementsRule extends SaropaLintRule {
           expr is BinaryExpression ||
           expr is PropertyAccess ||
           expr is PrefixedIdentifier) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
   }
@@ -3732,24 +3668,22 @@ class AvoidUnnecessaryStatementsRule extends SaropaLintRule {
 /// }
 /// ```
 class AvoidUnusedAssignmentRule extends SaropaLintRule {
-  const AvoidUnusedAssignmentRule() : super(code: _code);
+  AvoidUnusedAssignmentRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
-    name: 'avoid_unused_assignment',
-    problemMessage:
-        '[avoid_unused_assignment] Variable is assigned a value that is never read before being overwritten or going out of scope. The assignment wastes computation, and the unused result often signals a logic error where the value was meant to be used in a subsequent expression or return statement. {v3}',
+    'avoid_unused_assignment',
+    '[avoid_unused_assignment] Variable is assigned a value that is never read before being overwritten or going out of scope. The assignment wastes computation, and the unused result often signals a logic error where the value was meant to be used in a subsequent expression or return statement. {v3}',
     correctionMessage:
         'Remove the assignment if the value is not needed, or use the variable in the intended expression. Check for missing return statements or conditional branches.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addBlock((Block node) {
+    context.addBlock((Block node) {
       final Map<String, List<AstNode>> assignments = <String, List<AstNode>>{};
       final Set<String> usedVariables = <String>{};
 
@@ -3815,7 +3749,7 @@ class _AssignmentUsageVisitor extends RecursiveAstVisitor<void> {
 /// }
 /// ```
 class AvoidUnusedInstancesRule extends SaropaLintRule {
-  const AvoidUnusedInstancesRule() : super(code: _code);
+  AvoidUnusedInstancesRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -3826,34 +3760,29 @@ class AvoidUnusedInstancesRule extends SaropaLintRule {
 
   /// Types whose constructors are intentionally used for side effects
   /// without needing to capture the returned instance.
-  static const Set<String> _fireAndForgetTypes = <String>{
-    'Future',
-    'Timer',
-  };
+  static const Set<String> _fireAndForgetTypes = <String>{'Future', 'Timer'};
 
   static const LintCode _code = LintCode(
-    name: 'avoid_unused_instances',
-    problemMessage:
-        '[avoid_unused_instances] Object instance created but never assigned to a variable or used in an expression. The constructor runs its side effects (if any) but the resulting object is immediately garbage-collected, wasting memory allocation and usually indicating a missing assignment. {v5}',
+    'avoid_unused_instances',
+    '[avoid_unused_instances] Object instance created but never assigned to a variable or used in an expression. The constructor runs its side effects (if any) but the resulting object is immediately garbage-collected, wasting memory allocation and usually indicating a missing assignment. {v5}',
     correctionMessage:
         'Assign the instance to a variable for later use, pass it directly as an argument, or remove the creation entirely if the side effects are not needed.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addExpressionStatement((ExpressionStatement node) {
+    context.addExpressionStatement((ExpressionStatement node) {
       final Expression expr = node.expression;
       if (expr is! InstanceCreationExpression) return;
 
       final String typeName = expr.constructorName.type.name2.lexeme;
       if (_fireAndForgetTypes.contains(typeName)) return;
 
-      reporter.atNode(node, code);
+      reporter.atNode(node);
     });
   }
 }
@@ -3869,24 +3798,22 @@ class AvoidUnusedInstancesRule extends SaropaLintRule {
 /// }
 /// ```
 class AvoidUnusedAfterNullCheckRule extends SaropaLintRule {
-  const AvoidUnusedAfterNullCheckRule() : super(code: _code);
+  AvoidUnusedAfterNullCheckRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
-    name: 'avoid_unused_after_null_check',
-    problemMessage:
-        '[avoid_unused_after_null_check] Variable is null-checked in a condition but never referenced inside the guarded block. The null check implies the variable is needed, so the missing reference likely indicates a logic error where the intended usage was accidentally omitted. {v3}',
+    'avoid_unused_after_null_check',
+    '[avoid_unused_after_null_check] Variable is null-checked in a condition but never referenced inside the guarded block. The null check implies the variable is needed, so the missing reference likely indicates a logic error where the intended usage was accidentally omitted. {v3}',
     correctionMessage:
         'Reference the variable inside the guarded block where the null check applies, or remove the null check entirely if the variable is genuinely not needed.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addIfStatement((IfStatement node) {
+    context.addIfStatement((IfStatement node) {
       final Expression condition = node.expression;
 
       String? checkedVariable;
@@ -3905,10 +3832,12 @@ class AvoidUnusedAfterNullCheckRule extends SaropaLintRule {
 
       if (checkedVariable == null) return;
 
-      final bool isUsed =
-          _containsIdentifier(node.thenStatement, checkedVariable);
+      final bool isUsed = _containsIdentifier(
+        node.thenStatement,
+        checkedVariable,
+      );
       if (!isUsed) {
-        reporter.atNode(condition, code);
+        reporter.atNode(condition);
       }
     });
   }
@@ -3945,7 +3874,7 @@ class _IdentifierFinder extends RecursiveAstVisitor<void> {
 /// }
 /// ```
 class AvoidWildcardCasesWithEnumsRule extends SaropaLintRule {
-  const AvoidWildcardCasesWithEnumsRule() : super(code: _code);
+  AvoidWildcardCasesWithEnumsRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -3955,21 +3884,19 @@ class AvoidWildcardCasesWithEnumsRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.high;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_wildcard_cases_with_enums',
-    problemMessage:
-        '[avoid_wildcard_cases_with_enums] Switch on an enum uses a default or wildcard case, suppressing exhaustiveness checking. When new enum values are added, the compiler will not flag this switch as incomplete, allowing the new case to silently fall into the default branch instead of being explicitly handled. {v5}',
+    'avoid_wildcard_cases_with_enums',
+    '[avoid_wildcard_cases_with_enums] Switch on an enum uses a default or wildcard case, suppressing exhaustiveness checking. When new enum values are added, the compiler will not flag this switch as incomplete, allowing the new case to silently fall into the default branch instead of being explicitly handled. {v5}',
     correctionMessage:
         'Remove the default/wildcard case and add explicit case clauses for every enum value so the compiler reports an error when new values are introduced.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addSwitchStatement((SwitchStatement node) {
+    context.addSwitchStatement((SwitchStatement node) {
       final Expression expression = node.expression;
       final DartType? type = expression.staticType;
       if (type == null) return;
@@ -3979,7 +3906,7 @@ class AvoidWildcardCasesWithEnumsRule extends SaropaLintRule {
 
       for (final SwitchMember member in node.members) {
         if (member is SwitchDefault) {
-          reporter.atNode(member, code);
+          reporter.atNode(member);
         }
       }
     });
@@ -4012,7 +3939,7 @@ class AvoidWildcardCasesWithEnumsRule extends SaropaLintRule {
 /// }
 /// ```
 class FunctionAlwaysReturnsSameValueRule extends SaropaLintRule {
-  const FunctionAlwaysReturnsSameValueRule() : super(code: _code);
+  FunctionAlwaysReturnsSameValueRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -4022,31 +3949,32 @@ class FunctionAlwaysReturnsSameValueRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'function_always_returns_same_value',
-    problemMessage:
-        '[function_always_returns_same_value] Function returns the same value on every code path regardless of input. The function body adds complexity without varying the output, suggesting the logic branches are incomplete or the function can be replaced by a constant. {v5}',
+    'function_always_returns_same_value',
+    '[function_always_returns_same_value] Function returns the same value on every code path regardless of input. The function body adds complexity without varying the output, suggesting the logic branches are incomplete or the function can be replaced by a constant. {v5}',
     correctionMessage:
         'Replace the function with a constant or static field if the value is truly fixed, or add the missing branches that return different values based on input.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addFunctionDeclaration((FunctionDeclaration node) {
+    context.addFunctionDeclaration((FunctionDeclaration node) {
       _checkFunctionBody(node.functionExpression.body, node.name, reporter);
     });
 
-    context.registry.addMethodDeclaration((MethodDeclaration node) {
+    context.addMethodDeclaration((MethodDeclaration node) {
       _checkFunctionBody(node.body, node.name, reporter);
     });
   }
 
   void _checkFunctionBody(
-      FunctionBody body, Token nameToken, SaropaDiagnosticReporter reporter) {
+    FunctionBody body,
+    Token nameToken,
+    SaropaDiagnosticReporter reporter,
+  ) {
     if (body is! BlockFunctionBody) return;
 
     final List<ReturnStatement> returns = <ReturnStatement>[];
@@ -4074,7 +4002,7 @@ class FunctionAlwaysReturnsSameValueRule extends SaropaLintRule {
     }
 
     if (allSame && firstValue != null) {
-      reporter.atToken(nameToken, code);
+      reporter.atToken(nameToken);
     }
   }
 }
@@ -4092,7 +4020,7 @@ class FunctionAlwaysReturnsSameValueRule extends SaropaLintRule {
 /// }
 /// ```
 class NoEqualNestedConditionsRule extends SaropaLintRule {
-  const NoEqualNestedConditionsRule() : super(code: _code);
+  NoEqualNestedConditionsRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -4102,24 +4030,23 @@ class NoEqualNestedConditionsRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'no_equal_nested_conditions',
-    problemMessage:
-        '[no_equal_nested_conditions] Inner condition is identical to an enclosing outer condition. The nested check is always true at that point because the outer condition already guarantees it, making the inner branch redundant dead logic that adds nesting depth without any behavioral effect. {v4}',
+    'no_equal_nested_conditions',
+    '[no_equal_nested_conditions] Inner condition is identical to an enclosing outer condition. The nested check is always true at that point because the outer condition already guarantees it, making the inner branch redundant dead logic that adds nesting depth without any behavioral effect. {v4}',
     correctionMessage:
         'Remove the redundant nested condition and keep only the code inside it, since the outer condition already provides the same guarantee.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addIfStatement((IfStatement node) {
+    context.addIfStatement((IfStatement node) {
       final String outerCondition = node.expression.toSource();
       node.thenStatement.visitChildren(
-          _NestedConditionChecker(outerCondition, reporter, _code));
+        _NestedConditionChecker(outerCondition, reporter, _code),
+      );
     });
   }
 }
@@ -4153,7 +4080,7 @@ class _NestedConditionChecker extends RecursiveAstVisitor<void> {
 /// }
 /// ```
 class NoEqualSwitchCaseRule extends SaropaLintRule {
-  const NoEqualSwitchCaseRule() : super(code: _code);
+  NoEqualSwitchCaseRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -4163,28 +4090,27 @@ class NoEqualSwitchCaseRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'no_equal_switch_case',
-    problemMessage:
-        '[no_equal_switch_case] Multiple switch cases contain identical body code. Duplicated case logic increases maintenance cost because changes must be applied to every copy, and missed updates cause inconsistent behavior across cases that are meant to be equivalent. {v4}',
+    'no_equal_switch_case',
+    '[no_equal_switch_case] Multiple switch cases contain identical body code. Duplicated case logic increases maintenance cost because changes must be applied to every copy, and missed updates cause inconsistent behavior across cases that are meant to be equivalent. {v4}',
     correctionMessage:
         'Combine the cases using comma-separated patterns (case a, b:) or extract the shared logic into a helper method referenced by each case.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addSwitchStatement((SwitchStatement node) {
+    context.addSwitchStatement((SwitchStatement node) {
       final List<String> caseBodies = <String>[];
       final List<SwitchMember> members = <SwitchMember>[];
 
       for (final SwitchMember member in node.members) {
         if (member is SwitchCase && member.statements.isNotEmpty) {
-          final String body =
-              member.statements.map((Statement s) => s.toSource()).join();
+          final String body = member.statements
+              .map((Statement s) => s.toSource())
+              .join();
           caseBodies.add(body);
           members.add(member);
         }
@@ -4215,7 +4141,7 @@ class NoEqualSwitchCaseRule extends SaropaLintRule {
 /// !list.any((e) => e > 5);
 /// ```
 class PreferAnyOrEveryRule extends SaropaLintRule {
-  const PreferAnyOrEveryRule() : super(code: _code);
+  PreferAnyOrEveryRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -4225,27 +4151,25 @@ class PreferAnyOrEveryRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'prefer_any_or_every',
-    problemMessage:
-        '[prefer_any_or_every] Collection filtered with where() only to check isEmpty/isNotEmpty. The where() call creates an intermediate lazy iterable and allocates a closure, while any() and every() short-circuit on the first matching element without creating intermediate objects. {v5}',
+    'prefer_any_or_every',
+    '[prefer_any_or_every] Collection filtered with where() only to check isEmpty/isNotEmpty. The where() call creates an intermediate lazy iterable and allocates a closure, while any() and every() short-circuit on the first matching element without creating intermediate objects. {v5}',
     correctionMessage:
         'Replace where(predicate).isEmpty with !any(predicate), and where(predicate).isNotEmpty with any(predicate) for clearer intent and better performance.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addPropertyAccess((PropertyAccess node) {
+    context.addPropertyAccess((PropertyAccess node) {
       final String propertyName = node.propertyName.name;
       if (propertyName != 'isEmpty' && propertyName != 'isNotEmpty') return;
 
       final Expression? target = node.target;
       if (target is MethodInvocation && target.methodName.name == 'where') {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
   }
@@ -4271,7 +4195,7 @@ class PreferAnyOrEveryRule extends SaropaLintRule {
 /// }
 /// ```
 class PreferForInRule extends SaropaLintRule {
-  const PreferForInRule() : super(code: _code);
+  PreferForInRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -4281,21 +4205,19 @@ class PreferForInRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'prefer_for_in',
-    problemMessage:
-        '[prefer_for_in] Using for-in loops instead of index-based for loops is a stylistic preference. Both have equivalent performance for most Dart collections. Enable via the stylistic tier. {v4}',
+    'prefer_for_in',
+    '[prefer_for_in] Using for-in loops instead of index-based for loops is a stylistic preference. Both have equivalent performance for most Dart collections. Enable via the stylistic tier. {v4}',
     correctionMessage:
         'Replace the index-based loop with a for-in loop (for (final item in list)) to iterate directly over elements without managing an index variable.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addForStatement((ForStatement node) {
+    context.addForStatement((ForStatement node) {
       final ForLoopParts parts = node.forLoopParts;
       if (parts is! ForPartsWithDeclarations) return;
 
@@ -4347,7 +4269,7 @@ class PreferForInRule extends SaropaLintRule {
 /// }
 /// ```
 class AvoidDuplicatePatternsRule extends SaropaLintRule {
-  const AvoidDuplicatePatternsRule() : super(code: _code);
+  AvoidDuplicatePatternsRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -4357,21 +4279,19 @@ class AvoidDuplicatePatternsRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_duplicate_patterns',
-    problemMessage:
-        '[avoid_duplicate_patterns] Same pattern appears multiple times in a switch or if-case chain. Duplicate patterns mean the second occurrence is unreachable dead code because the first match always wins, indicating a copy-paste error or incomplete refactoring. {v4}',
+    'avoid_duplicate_patterns',
+    '[avoid_duplicate_patterns] Same pattern appears multiple times in a switch or if-case chain. Duplicate patterns mean the second occurrence is unreachable dead code because the first match always wins, indicating a copy-paste error or incomplete refactoring. {v4}',
     correctionMessage:
         'Remove the duplicate pattern clause, or if different handling is intended, adjust the pattern to be distinct so both branches are reachable.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addSwitchExpression((SwitchExpression node) {
+    context.addSwitchExpression((SwitchExpression node) {
       final Set<String> seenPatterns = <String>{};
       for (final SwitchExpressionCase caseClause in node.cases) {
         final String patternSource = caseClause.guardedPattern.toSource();
@@ -4383,7 +4303,7 @@ class AvoidDuplicatePatternsRule extends SaropaLintRule {
       }
     });
 
-    context.registry.addSwitchStatement((SwitchStatement node) {
+    context.addSwitchStatement((SwitchStatement node) {
       final Set<String> seenPatterns = <String>{};
       for (final SwitchMember member in node.members) {
         if (member is SwitchPatternCase) {
@@ -4409,25 +4329,22 @@ class AvoidDuplicatePatternsRule extends SaropaLintRule {
 /// extension type Outer(Inner inner) {}  // Nested extension type
 /// ```
 class AvoidNestedExtensionTypesRule extends SaropaLintRule {
-  const AvoidNestedExtensionTypesRule() : super(code: _code);
+  AvoidNestedExtensionTypesRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
-    name: 'avoid_nested_extension_types',
-    problemMessage:
-        '[avoid_nested_extension_types] Extension type wraps another extension type, creating multiple layers of zero-cost abstraction. Each layer adds indirection to the representation type, making the code harder to reason about and increasing the chance of applying the wrong extension methods to the underlying value. {v3}',
+    'avoid_nested_extension_types',
+    '[avoid_nested_extension_types] Extension type wraps another extension type, creating multiple layers of zero-cost abstraction. Each layer adds indirection to the representation type, making the code harder to reason about and increasing the chance of applying the wrong extension methods to the underlying value. {v3}',
     correctionMessage:
         'Use the underlying representation type directly in the outer extension type to flatten the abstraction and reduce confusion about which methods are available.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry
-        .addExtensionTypeDeclaration((ExtensionTypeDeclaration node) {
+    context.addExtensionTypeDeclaration((ExtensionTypeDeclaration node) {
       final RepresentationDeclaration representation = node.representation;
 
       final DartType? fieldType = representation.fieldType.type;
@@ -4455,7 +4372,7 @@ class AvoidNestedExtensionTypesRule extends SaropaLintRule {
 /// }
 /// ```
 class AvoidSlowCollectionMethodsRule extends SaropaLintRule {
-  const AvoidSlowCollectionMethodsRule() : super(code: _code);
+  AvoidSlowCollectionMethodsRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -4465,31 +4382,32 @@ class AvoidSlowCollectionMethodsRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_slow_collection_methods',
-    problemMessage:
-        '[avoid_slow_collection_methods] sync* generator used for a simple collection that yields a small, fixed number of elements. Generator functions have overhead from creating state machines and lazy iterables that exceeds the cost of building a plain list for small collections. {v5}',
+    'avoid_slow_collection_methods',
+    '[avoid_slow_collection_methods] sync* generator used for a simple collection that yields a small, fixed number of elements. Generator functions have overhead from creating state machines and lazy iterables that exceeds the cost of building a plain list for small collections. {v5}',
     correctionMessage:
         'Return a List literal directly (e.g. [a, b, c]) for small fixed collections. Reserve sync* generators for large or computed sequences where lazy evaluation provides a real benefit.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addFunctionDeclaration((FunctionDeclaration node) {
+    context.addFunctionDeclaration((FunctionDeclaration node) {
       _checkForSyncStar(node.functionExpression.body, node.name, reporter);
     });
 
-    context.registry.addMethodDeclaration((MethodDeclaration node) {
+    context.addMethodDeclaration((MethodDeclaration node) {
       _checkForSyncStar(node.body, node.name, reporter);
     });
   }
 
   void _checkForSyncStar(
-      FunctionBody body, Token nameToken, SaropaDiagnosticReporter reporter) {
+    FunctionBody body,
+    Token nameToken,
+    SaropaDiagnosticReporter reporter,
+  ) {
     if (body.keyword?.lexeme != 'sync') return;
     if (body.star == null) return;
 
@@ -4499,7 +4417,7 @@ class AvoidSlowCollectionMethodsRule extends SaropaLintRule {
 
     // Warn if only a few yields (could be a simple list)
     if (yieldCount > 0 && yieldCount <= 5) {
-      reporter.atToken(nameToken, code);
+      reporter.atToken(nameToken);
     }
   }
 }
@@ -4532,7 +4450,7 @@ class _YieldCounter extends RecursiveAstVisitor<void> {
 /// }
 /// ```
 class AvoidUnassignedFieldsRule extends SaropaLintRule {
-  const AvoidUnassignedFieldsRule() : super(code: _code);
+  AvoidUnassignedFieldsRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -4542,21 +4460,19 @@ class AvoidUnassignedFieldsRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_unassigned_fields',
-    problemMessage:
-        '[avoid_unassigned_fields] Field declared without an initializer and no constructor or method assigns it a value. Reading this field returns the default value (null for nullable types), which may cause unexpected NullPointerExceptions or logic errors if the caller expects a meaningful value. {v4}',
+    'avoid_unassigned_fields',
+    '[avoid_unassigned_fields] Field declared without an initializer and no constructor or method assigns it a value. Reading this field returns the default value (null for nullable types), which may cause unexpected NullPointerExceptions or logic errors if the caller expects a meaningful value. {v4}',
     correctionMessage:
         'Add an initializer at the declaration site, assign the field in the constructor, or mark it as late if initialization is deferred to a lifecycle method.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addClassDeclaration((ClassDeclaration node) {
+    context.addClassDeclaration((ClassDeclaration node) {
       final Set<String> assignedFields = <String>{};
       final Map<String, Token> nullableFields = <String, Token>{};
 
@@ -4647,7 +4563,7 @@ class _FieldAssignmentVisitor extends RecursiveAstVisitor<void> {
 /// }
 /// ```
 class AvoidUnassignedLateFieldsRule extends SaropaLintRule {
-  const AvoidUnassignedLateFieldsRule() : super(code: _code);
+  AvoidUnassignedLateFieldsRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -4657,21 +4573,19 @@ class AvoidUnassignedLateFieldsRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_unassigned_late_fields',
-    problemMessage:
-        '[avoid_unassigned_late_fields] Late field has no assignment in any constructor, initializer, or lifecycle method. Accessing an unassigned late field throws a LateInitializationError at runtime, crashing the app at a point that the compiler cannot check statically. {v4}',
+    'avoid_unassigned_late_fields',
+    '[avoid_unassigned_late_fields] Late field has no assignment in any constructor, initializer, or lifecycle method. Accessing an unassigned late field throws a LateInitializationError at runtime, crashing the app at a point that the compiler cannot check statically. {v4}',
     correctionMessage:
         'Assign the field in the constructor, an initializer list, or a lifecycle method such as initState(). If initialization is conditional, use a nullable type instead of late.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addClassDeclaration((ClassDeclaration node) {
+    context.addClassDeclaration((ClassDeclaration node) {
       final Set<String> assignedFields = <String>{};
       final Map<String, Token> lateFields = <String, Token>{};
 
@@ -4725,7 +4639,7 @@ class AvoidUnassignedLateFieldsRule extends SaropaLintRule {
 /// }
 /// ```
 class AvoidUnnecessaryLateFieldsRule extends SaropaLintRule {
-  const AvoidUnnecessaryLateFieldsRule() : super(code: _code);
+  AvoidUnnecessaryLateFieldsRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -4735,21 +4649,19 @@ class AvoidUnnecessaryLateFieldsRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_unnecessary_late_fields',
-    problemMessage:
-        '[avoid_unnecessary_late_fields] Field marked as late but already assigned in the constructor or initializer list. The late keyword is redundant here and misleads readers into thinking initialization is deferred, while also disabling the compile-time guarantee that the field is always initialized. {v5}',
+    'avoid_unnecessary_late_fields',
+    '[avoid_unnecessary_late_fields] Field marked as late but already assigned in the constructor or initializer list. The late keyword is redundant here and misleads readers into thinking initialization is deferred, while also disabling the compile-time guarantee that the field is always initialized. {v5}',
     correctionMessage:
         'Remove the late keyword since the field is already assigned during construction. This restores compile-time initialization checking and clarifies the intent.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addClassDeclaration((ClassDeclaration node) {
+    context.addClassDeclaration((ClassDeclaration node) {
       final Map<String, FieldDeclaration> lateFields =
           <String, FieldDeclaration>{};
 
@@ -4824,7 +4736,7 @@ class AvoidUnnecessaryLateFieldsRule extends SaropaLintRule {
 /// }
 /// ```
 class AvoidUnnecessaryNullableFieldsRule extends SaropaLintRule {
-  const AvoidUnnecessaryNullableFieldsRule() : super(code: _code);
+  AvoidUnnecessaryNullableFieldsRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -4834,21 +4746,19 @@ class AvoidUnnecessaryNullableFieldsRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_unnecessary_nullable_fields',
-    problemMessage:
-        '[avoid_unnecessary_nullable_fields] Nullable field is always assigned a non-null value across all constructors and assignment sites. The unnecessary nullable type forces every read site to handle null even though it can never occur, adding redundant null checks and obscuring the actual data flow. {v4}',
+    'avoid_unnecessary_nullable_fields',
+    '[avoid_unnecessary_nullable_fields] Nullable field is always assigned a non-null value across all constructors and assignment sites. The unnecessary nullable type forces every read site to handle null even though it can never occur, adding redundant null checks and obscuring the actual data flow. {v4}',
     correctionMessage:
         'Change the field type to non-nullable and remove the ? suffix. Add null checks only if a future code path genuinely needs to store null.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addClassDeclaration((ClassDeclaration node) {
+    context.addClassDeclaration((ClassDeclaration node) {
       final Map<String, Token> nullableFields = <String, Token>{};
       final Set<String> assignedNullFields = <String>{};
       final Set<String> constructorInitializedFields = <String>{};
@@ -4944,7 +4854,7 @@ class _NullAssignmentChecker extends RecursiveAstVisitor<void> {
 /// }
 /// ```
 class AvoidUnnecessaryPatternsRule extends SaropaLintRule {
-  const AvoidUnnecessaryPatternsRule() : super(code: _code);
+  AvoidUnnecessaryPatternsRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -4954,21 +4864,19 @@ class AvoidUnnecessaryPatternsRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.high;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_unnecessary_patterns',
-    problemMessage:
-        '[avoid_unnecessary_patterns] Pattern matching syntax used where it does not narrow types or destructure values. The pattern adds syntactic complexity without any type-safety benefit, making the code harder to read compared to a plain variable declaration or assignment. {v5}',
+    'avoid_unnecessary_patterns',
+    '[avoid_unnecessary_patterns] Pattern matching syntax used where it does not narrow types or destructure values. The pattern adds syntactic complexity without any type-safety benefit, making the code harder to read compared to a plain variable declaration or assignment. {v5}',
     correctionMessage:
         'Replace the pattern with a simple variable declaration or assignment. Use pattern matching only when it provides destructuring or type narrowing.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addIfStatement((IfStatement node) {
+    context.addIfStatement((IfStatement node) {
       final CaseClause? caseClause = node.caseClause;
       if (caseClause == null) return;
 
@@ -4983,7 +4891,7 @@ class AvoidUnnecessaryPatternsRule extends SaropaLintRule {
         if (patternType != null && expressionType != null) {
           if (patternType.getDisplayString() ==
               expressionType.getDisplayString()) {
-            reporter.atNode(pattern, code);
+            reporter.atNode(pattern);
           }
         }
       }
@@ -5004,7 +4912,7 @@ class AvoidUnnecessaryPatternsRule extends SaropaLintRule {
 /// }
 /// ```
 class AvoidWildcardCasesWithSealedClassesRule extends SaropaLintRule {
-  const AvoidWildcardCasesWithSealedClassesRule() : super(code: _code);
+  AvoidWildcardCasesWithSealedClassesRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -5014,21 +4922,19 @@ class AvoidWildcardCasesWithSealedClassesRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_wildcard_cases_with_sealed_classes',
-    problemMessage:
-        '[avoid_wildcard_cases_with_sealed_classes] Switch on a sealed class uses a default or wildcard case, suppressing exhaustiveness checking. When new subtypes are added to the sealed hierarchy, the compiler will not flag this switch as incomplete, allowing unhandled subtypes to silently fall through. {v4}',
+    'avoid_wildcard_cases_with_sealed_classes',
+    '[avoid_wildcard_cases_with_sealed_classes] Switch on a sealed class uses a default or wildcard case, suppressing exhaustiveness checking. When new subtypes are added to the sealed hierarchy, the compiler will not flag this switch as incomplete, allowing unhandled subtypes to silently fall through. {v4}',
     correctionMessage:
         'Remove the default/wildcard case and add explicit case clauses for every sealed subtype so the compiler reports an error when new subtypes are introduced.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addSwitchStatement((SwitchStatement node) {
+    context.addSwitchStatement((SwitchStatement node) {
       final DartType? type = node.expression.staticType;
       if (type == null) return;
 
@@ -5038,12 +4944,12 @@ class AvoidWildcardCasesWithSealedClassesRule extends SaropaLintRule {
 
       for (final SwitchMember member in node.members) {
         if (member is SwitchDefault) {
-          reporter.atNode(member, code);
+          reporter.atNode(member);
         }
       }
     });
 
-    context.registry.addSwitchExpression((SwitchExpression node) {
+    context.addSwitchExpression((SwitchExpression node) {
       final DartType? type = node.expression.staticType;
       if (type == null) return;
 
@@ -5054,7 +4960,7 @@ class AvoidWildcardCasesWithSealedClassesRule extends SaropaLintRule {
       for (final SwitchExpressionCase caseClause in node.cases) {
         final DartPattern pattern = caseClause.guardedPattern.pattern;
         if (pattern is WildcardPattern) {
-          reporter.atNode(pattern, code);
+          reporter.atNode(pattern);
         }
       }
     });
@@ -5074,7 +4980,7 @@ class AvoidWildcardCasesWithSealedClassesRule extends SaropaLintRule {
 /// };
 /// ```
 class NoEqualSwitchExpressionCasesRule extends SaropaLintRule {
-  const NoEqualSwitchExpressionCasesRule() : super(code: _code);
+  NoEqualSwitchExpressionCasesRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -5084,21 +4990,19 @@ class NoEqualSwitchExpressionCasesRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'no_equal_switch_expression_cases',
-    problemMessage:
-        '[no_equal_switch_expression_cases] Multiple switch expression cases produce identical result values. Duplicate results increase maintenance cost because changes must be applied to every copy, and they obscure whether the cases were truly intended to behave the same. {v4}',
+    'no_equal_switch_expression_cases',
+    '[no_equal_switch_expression_cases] Multiple switch expression cases produce identical result values. Duplicate results increase maintenance cost because changes must be applied to every copy, and they obscure whether the cases were truly intended to behave the same. {v4}',
     correctionMessage:
         'Combine the cases using comma-separated patterns (case a, b => result) or extract the shared value into a named constant.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addSwitchExpression((SwitchExpression node) {
+    context.addSwitchExpression((SwitchExpression node) {
       final Map<String, SwitchExpressionCase> seenExpressions =
           <String, SwitchExpressionCase>{};
 
@@ -5126,7 +5030,7 @@ class NoEqualSwitchExpressionCasesRule extends SaropaLintRule {
 /// bytes.addAll([4, 5, 6]);
 /// ```
 class PreferBytesBuilderRule extends SaropaLintRule {
-  const PreferBytesBuilderRule() : super(code: _code);
+  PreferBytesBuilderRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -5136,21 +5040,19 @@ class PreferBytesBuilderRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.high;
 
   static const LintCode _code = LintCode(
-    name: 'prefer_bytes_builder',
-    problemMessage:
-        '[prefer_bytes_builder] List<int> with repeated addAll operations detected. Each addAll call may trigger memory reallocation and copying, causing O(n²) performance when building large byte arrays, resulting in slow processing and excessive memory churn. {v5}',
+    'prefer_bytes_builder',
+    '[prefer_bytes_builder] List<int> with repeated addAll operations detected. Each addAll call may trigger memory reallocation and copying, causing O(n²) performance when building large byte arrays, resulting in slow processing and excessive memory churn. {v5}',
     correctionMessage:
         'Replace with BytesBuilder which preallocates memory efficiently and avoids repeated copying. Use BytesBuilder.add() or addByte() to accumulate bytes, then call toBytes() once at the end for O(n) performance.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       if (node.methodName.name != 'addAll') return;
 
       final Expression? target = node.target;
@@ -5161,7 +5063,7 @@ class PreferBytesBuilderRule extends SaropaLintRule {
 
       final String typeName = targetType.getDisplayString();
       if (typeName == 'List<int>' || typeName == 'Uint8List') {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
   }
@@ -5183,7 +5085,7 @@ class PreferBytesBuilderRule extends SaropaLintRule {
 /// foo(1, condition ? 2 : 3);
 /// ```
 class PreferPushingConditionalExpressionsRule extends SaropaLintRule {
-  const PreferPushingConditionalExpressionsRule() : super(code: _code);
+  PreferPushingConditionalExpressionsRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -5193,21 +5095,19 @@ class PreferPushingConditionalExpressionsRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'prefer_pushing_conditional_expressions',
-    problemMessage:
-        '[prefer_pushing_conditional_expressions] Moving conditional logic into return expressions is a code shape preference. No performance or correctness difference between forms. Enable via the stylistic tier. {v4}',
+    'prefer_pushing_conditional_expressions',
+    '[prefer_pushing_conditional_expressions] Moving conditional logic into return expressions is a code shape preference. No performance or correctness difference between forms. Enable via the stylistic tier. {v4}',
     correctionMessage:
         'Move the conditional expression inside the single differing argument so the constructor or function call appears once with all shared arguments visible.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addConditionalExpression((ConditionalExpression node) {
+    context.addConditionalExpression((ConditionalExpression node) {
       final Expression thenExpr = node.thenExpression;
       final Expression elseExpr = node.elseExpression;
 
@@ -5219,10 +5119,10 @@ class PreferPushingConditionalExpressionsRule extends SaropaLintRule {
 
           if (thenTarget == elseTarget) {
             // Check if only one argument differs
-            final List<Expression> thenArgs =
-                thenExpr.argumentList.arguments.toList();
-            final List<Expression> elseArgs =
-                elseExpr.argumentList.arguments.toList();
+            final List<Expression> thenArgs = thenExpr.argumentList.arguments
+                .toList();
+            final List<Expression> elseArgs = elseExpr.argumentList.arguments
+                .toList();
 
             if (thenArgs.length == elseArgs.length && thenArgs.length >= 2) {
               int diffCount = 0;
@@ -5232,7 +5132,7 @@ class PreferPushingConditionalExpressionsRule extends SaropaLintRule {
                 }
               }
               if (diffCount == 1) {
-                reporter.atNode(node, code);
+                reporter.atNode(node);
               }
             }
           }
@@ -5256,7 +5156,7 @@ class PreferPushingConditionalExpressionsRule extends SaropaLintRule {
 /// final items = list.map(Item.new);
 /// ```
 class PreferShorthandsWithConstructorsRule extends SaropaLintRule {
-  const PreferShorthandsWithConstructorsRule() : super(code: _code);
+  PreferShorthandsWithConstructorsRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -5266,21 +5166,19 @@ class PreferShorthandsWithConstructorsRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'prefer_shorthands_with_constructors',
-    problemMessage:
-        '[prefer_shorthands_with_constructors] Lambda wraps a constructor call without adding any logic (e.g. (x) => MyClass(x)). The closure allocates an extra function object on each evaluation and obscures the simple delegation, making the code harder to read at a glance. {v4}',
+    'prefer_shorthands_with_constructors',
+    '[prefer_shorthands_with_constructors] Lambda wraps a constructor call without adding any logic (e.g. (x) => MyClass(x)). The closure allocates an extra function object on each evaluation and obscures the simple delegation, making the code harder to read at a glance. {v4}',
     correctionMessage:
         'Replace the lambda with a constructor tear-off (ClassName.new) to eliminate the wrapper function and communicate the delegation intent directly.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addFunctionExpression((FunctionExpression node) {
+    context.addFunctionExpression((FunctionExpression node) {
       final FunctionBody body = node.body;
 
       Expression? bodyExpr;
@@ -5308,7 +5206,7 @@ class PreferShorthandsWithConstructorsRule extends SaropaLintRule {
 
       final Expression arg = args.arguments.first;
       if (arg is SimpleIdentifier && arg.name == paramName) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
   }
@@ -5323,7 +5221,7 @@ class PreferShorthandsWithConstructorsRule extends SaropaLintRule {
 /// final status = Status.values.where((e) => e == Status.active);
 /// ```
 class PreferShorthandsWithEnumsRule extends SaropaLintRule {
-  const PreferShorthandsWithEnumsRule() : super(code: _code);
+  PreferShorthandsWithEnumsRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -5333,21 +5231,19 @@ class PreferShorthandsWithEnumsRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'prefer_shorthands_with_enums',
-    problemMessage:
-        '[prefer_shorthands_with_enums] Enum accessed using verbose qualification (EnumType.enumValue) where shorthand (.enumValue) is available. This adds unnecessary repetition, makes code harder to read, and increases the chance of errors when refactoring enum names. {v4}',
+    'prefer_shorthands_with_enums',
+    '[prefer_shorthands_with_enums] Enum accessed using verbose qualification (EnumType.enumValue) where shorthand (.enumValue) is available. This adds unnecessary repetition, makes code harder to read, and increases the chance of errors when refactoring enum names. {v4}',
     correctionMessage:
         'Use the shorthand enum syntax by omitting the enum type prefix. Within contexts that accept the enum type, write .enumValue instead of EnumType.enumValue for cleaner, more maintainable code.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       // Check for patterns like EnumType.values.where/firstWhere
       final Expression? target = node.target;
       if (target is! PropertyAccess) return;
@@ -5367,7 +5263,7 @@ class PreferShorthandsWithEnumsRule extends SaropaLintRule {
         if (methodName == 'where' ||
             methodName == 'firstWhere' ||
             methodName == 'singleWhere') {
-          reporter.atNode(node, code);
+          reporter.atNode(node);
         }
       }
     });
@@ -5383,7 +5279,7 @@ class PreferShorthandsWithEnumsRule extends SaropaLintRule {
 /// final color = Colors.values.firstWhere((c) => c == Colors.red);
 /// ```
 class PreferShorthandsWithStaticFieldsRule extends SaropaLintRule {
-  const PreferShorthandsWithStaticFieldsRule() : super(code: _code);
+  PreferShorthandsWithStaticFieldsRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -5393,21 +5289,19 @@ class PreferShorthandsWithStaticFieldsRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'prefer_shorthands_with_static_fields',
-    problemMessage:
-        '[prefer_shorthands_with_static_fields] Static field accessed through unnecessary collection search (firstWhere, where) when direct access is available. This wastes CPU cycles iterating through values and makes code less efficient and harder to understand. {v4}',
+    'prefer_shorthands_with_static_fields',
+    '[prefer_shorthands_with_static_fields] Static field accessed through unnecessary collection search (firstWhere, where) when direct access is available. This wastes CPU cycles iterating through values and makes code less efficient and harder to understand. {v4}',
     correctionMessage:
         'Replace the collection search with direct static field access (e.g., Colors.red instead of Colors.values.firstWhere((c) => c == Colors.red)). Direct access is instant, clearer, and cannot fail.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       if (node.methodName.name != 'firstWhere' &&
           node.methodName.name != 'singleWhere') {
         return;
@@ -5432,7 +5326,7 @@ class PreferShorthandsWithStaticFieldsRule extends SaropaLintRule {
         // Check if comparing against a static field
         final Expression right = bodyExpr.rightOperand;
         if (right is PrefixedIdentifier || right is PropertyAccess) {
-          reporter.atNode(node, code);
+          reporter.atNode(node);
         }
       }
     });
@@ -5448,24 +5342,22 @@ class PreferShorthandsWithStaticFieldsRule extends SaropaLintRule {
 /// void process(@Accept(String) int value) {} // Type mismatch
 /// ```
 class PassCorrectAcceptedTypeRule extends SaropaLintRule {
-  const PassCorrectAcceptedTypeRule() : super(code: _code);
+  PassCorrectAcceptedTypeRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
-    name: 'pass_correct_accepted_type',
-    problemMessage:
-        '[pass_correct_accepted_type] Argument type does not match the parameter type declared by the @Accept annotation. Passing an incompatible type circumvents the annotation contract, which may cause runtime cast failures or incorrect behavior in the called function. {v4}',
+    'pass_correct_accepted_type',
+    '[pass_correct_accepted_type] Argument type does not match the parameter type declared by the @Accept annotation. Passing an incompatible type circumvents the annotation contract, which may cause runtime cast failures or incorrect behavior in the called function. {v4}',
     correctionMessage:
         'Change the argument to match the type declared in the @Accept annotation, or update the annotation if the accepted type has intentionally changed.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addFormalParameter((FormalParameter node) {
+    context.addFormalParameter((FormalParameter node) {
       // Check for Accept-style annotations
       for (final Annotation annotation in node.metadata) {
         final String annotationName = annotation.name.name;
@@ -5478,14 +5370,15 @@ class PassCorrectAcceptedTypeRule extends SaropaLintRule {
               final String expectedTypeName = firstArg.type.toSource();
 
               // Get actual parameter type
-              final TypeAnnotation? paramType =
-                  node is SimpleFormalParameter ? node.type : null;
+              final TypeAnnotation? paramType = node is SimpleFormalParameter
+                  ? node.type
+                  : null;
 
               if (paramType != null) {
                 final String actualTypeName = paramType.toSource();
                 if (actualTypeName != expectedTypeName &&
                     !actualTypeName.contains(expectedTypeName)) {
-                  reporter.atNode(node, code);
+                  reporter.atNode(node);
                 }
               }
             }
@@ -5509,7 +5402,7 @@ class PassCorrectAcceptedTypeRule extends SaropaLintRule {
 /// process('test'); // Missing optional verbose arg
 /// ```
 class PassOptionalArgumentRule extends SaropaLintRule {
-  const PassOptionalArgumentRule() : super(code: _code);
+  PassOptionalArgumentRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -5519,12 +5412,11 @@ class PassOptionalArgumentRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'pass_optional_argument',
-    problemMessage:
-        '[pass_optional_argument] Function call omits important optional parameter, relying on default value. Future readers must hunt for the function definition to understand the omitted behavior, making code harder to comprehend and maintain at the call site. {v4}',
+    'pass_optional_argument',
+    '[pass_optional_argument] Function call omits important optional parameter, relying on default value. Future readers must hunt for the function definition to understand the omitted behavior, making code harder to comprehend and maintain at the call site. {v4}',
     correctionMessage:
         'Explicitly pass the optional parameter with its intended value, even if it matches the default. This documents your intent at the call site and prevents confusion if the default changes, improving code clarity.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   // Common boolean parameter names that should be passed explicitly
@@ -5539,11 +5431,10 @@ class PassOptionalArgumentRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addFunctionDeclaration((FunctionDeclaration node) {
+    context.addFunctionDeclaration((FunctionDeclaration node) {
       // Find functions that have important optional boolean parameters
       final FormalParameterList? params = node.functionExpression.parameters;
       if (params == null) return;
@@ -5578,24 +5469,22 @@ class PassOptionalArgumentRule extends SaropaLintRule {
 /// class Bar {} // Should be in separate file
 /// ```
 class PreferSingleDeclarationPerFileRule extends SaropaLintRule {
-  const PreferSingleDeclarationPerFileRule() : super(code: _code);
+  PreferSingleDeclarationPerFileRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
-    name: 'prefer_single_declaration_per_file',
-    problemMessage:
-        '[prefer_single_declaration_per_file] File contains multiple top-level class, enum, or extension declarations. Combining unrelated declarations in one file makes it harder to locate definitions, increases merge conflicts when multiple developers edit the same file, and breaks the convention of one-declaration-per-file. {v3}',
+    'prefer_single_declaration_per_file',
+    '[prefer_single_declaration_per_file] File contains multiple top-level class, enum, or extension declarations. Combining unrelated declarations in one file makes it harder to locate definitions, increases merge conflicts when multiple developers edit the same file, and breaks the convention of one-declaration-per-file. {v3}',
     correctionMessage:
         'Split each top-level declaration into its own file, named after the declaration (e.g. my_class.dart for MyClass), to improve discoverability and reduce merge conflicts.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addCompilationUnit((CompilationUnit node) {
+    context.addCompilationUnit((CompilationUnit node) {
       // Count significant top-level declarations
       int classCount = 0;
       int enumCount = 0;
@@ -5620,7 +5509,7 @@ class PreferSingleDeclarationPerFileRule extends SaropaLintRule {
       if (majorDeclarations > 1 && secondClass != null) {
         // Skip if it looks like a private helper class
         if (!secondClass.name.lexeme.startsWith('_')) {
-          reporter.atNode(secondClass, code);
+          reporter.atNode(secondClass);
         }
       }
     });
@@ -5648,7 +5537,7 @@ class PreferSingleDeclarationPerFileRule extends SaropaLintRule {
 /// };
 /// ```
 class PreferSwitchExpressionRule extends SaropaLintRule {
-  const PreferSwitchExpressionRule() : super(code: _code);
+  PreferSwitchExpressionRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -5658,21 +5547,19 @@ class PreferSwitchExpressionRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'prefer_switch_expression',
-    problemMessage:
-        '[prefer_switch_expression] Switch statement with only return/assignment detected. Using statement syntax for simple value mapping adds unnecessary boilerplate (break statements, case keywords) and makes the code more verbose and harder to scan. {v5}',
+    'prefer_switch_expression',
+    '[prefer_switch_expression] Switch statement with only return/assignment detected. Using statement syntax for simple value mapping adds unnecessary boilerplate (break statements, case keywords) and makes the code more verbose and harder to scan. {v5}',
     correctionMessage:
         'Replace with a switch expression that directly produces the mapped value. Switch expressions are more concise, cannot forget break statements, and guarantee exhaustiveness checking, reducing bugs and improving readability.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addSwitchStatement((SwitchStatement node) {
+    context.addSwitchStatement((SwitchStatement node) {
       // Check if all cases are simple assignments or returns
       bool allSimpleAssignments = true;
       String? targetVariable;
@@ -5757,7 +5644,7 @@ class PreferSwitchExpressionRule extends SaropaLintRule {
 /// }
 /// ```
 class PreferSwitchWithEnumsRule extends SaropaLintRule {
-  const PreferSwitchWithEnumsRule() : super(code: _code);
+  PreferSwitchWithEnumsRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -5767,21 +5654,19 @@ class PreferSwitchWithEnumsRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'prefer_switch_with_enums',
-    problemMessage:
-        '[prefer_switch_with_enums] Enum compared using if-else chain instead of switch statement. Without exhaustiveness checking, adding new enum values will not trigger compile errors in this code location, allowing silent bugs where new cases are unhandled. {v4}',
+    'prefer_switch_with_enums',
+    '[prefer_switch_with_enums] Enum compared using if-else chain instead of switch statement. Without exhaustiveness checking, adding new enum values will not trigger compile errors in this code location, allowing silent bugs where new cases are unhandled. {v4}',
     correctionMessage:
         'Replace the if-else chain with a switch statement over the enum. The compiler will verify all enum values are handled and flag warnings when you add new enum cases, preventing missed implementations.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addIfStatement((IfStatement node) {
+    context.addIfStatement((IfStatement node) {
       // Only check if statements with else-if chains
       if (node.elseStatement == null) return;
 
@@ -5880,7 +5765,7 @@ class PreferSwitchWithEnumsRule extends SaropaLintRule {
 /// }
 /// ```
 class PreferSwitchWithSealedClassesRule extends SaropaLintRule {
-  const PreferSwitchWithSealedClassesRule() : super(code: _code);
+  PreferSwitchWithSealedClassesRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -5890,21 +5775,19 @@ class PreferSwitchWithSealedClassesRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'prefer_switch_with_sealed_classes',
-    problemMessage:
-        '[prefer_switch_with_sealed_classes] Sealed class handled with if-else or type checks instead of switch. Missing exhaustiveness verification allows unhandled subtypes to silently pass through, causing runtime errors or incorrect behavior when new subtypes are added. {v5}',
+    'prefer_switch_with_sealed_classes',
+    '[prefer_switch_with_sealed_classes] Sealed class handled with if-else or type checks instead of switch. Missing exhaustiveness verification allows unhandled subtypes to silently pass through, causing runtime errors or incorrect behavior when new subtypes are added. {v5}',
     correctionMessage:
         'Replace with a switch statement using pattern matching on the sealed class subtypes. The compiler enforces that all possible subtypes are handled, preventing bugs when the sealed class hierarchy grows.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addIfStatement((IfStatement node) {
+    context.addIfStatement((IfStatement node) {
       // Only check if statements with else-if chains
       if (node.elseStatement == null) return;
 
@@ -5957,7 +5840,7 @@ class PreferSwitchWithSealedClassesRule extends SaropaLintRule {
 /// expect(string, contains('x'));
 /// ```
 class PreferTestMatchersRule extends SaropaLintRule {
-  const PreferTestMatchersRule() : super(code: _code);
+  PreferTestMatchersRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -5967,25 +5850,23 @@ class PreferTestMatchersRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'prefer_test_matchers',
-    problemMessage:
-        '[prefer_test_matchers] Generic expect(value, equals(x)) or expect(value, isTrue) used where a more specific matcher exists. Specific matchers produce clearer failure messages that show the actual vs expected difference, reducing debugging time when tests fail. {v4}',
+    'prefer_test_matchers',
+    '[prefer_test_matchers] Generic expect(value, equals(x)) or expect(value, isTrue) used where a more specific matcher exists. Specific matchers produce clearer failure messages that show the actual vs expected difference, reducing debugging time when tests fail. {v4}',
     correctionMessage:
         'Replace with the appropriate specific matcher (e.g. expect(list, contains(x)), expect(map, containsPair(k, v)), expect(fn, throwsA(isA<MyError>()))) for better diagnostics.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
     // Only check test files
-    final String path = resolver.source.fullName;
+    final String path = context.filePath;
     if (!path.contains('test') && !path.endsWith('_test.dart')) return;
 
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       if (node.methodName.name != 'expect') return;
 
       final List<Expression> args = node.argumentList.arguments.toList();
@@ -5998,12 +5879,12 @@ class PreferTestMatchersRule extends SaropaLintRule {
       if (actual is PropertyAccess && actual.propertyName.name == 'length') {
         if (matcher is MethodInvocation &&
             matcher.methodName.name == 'equals') {
-          final List<Expression> matcherArgs =
-              matcher.argumentList.arguments.toList();
+          final List<Expression> matcherArgs = matcher.argumentList.arguments
+              .toList();
           if (matcherArgs.isNotEmpty) {
             final Expression matcherArg = matcherArgs[0];
             if (matcherArg is IntegerLiteral && matcherArg.value == 0) {
-              reporter.atNode(node, code);
+              reporter.atNode(node);
               return;
             }
           }
@@ -6014,7 +5895,7 @@ class PreferTestMatchersRule extends SaropaLintRule {
       if (actual is MethodInvocation && actual.methodName.name == 'contains') {
         if (matcher is SimpleIdentifier) {
           if (matcher.name == 'isTrue' || matcher.name == 'isFalse') {
-            reporter.atNode(node, code);
+            reporter.atNode(node);
             return;
           }
         }
@@ -6026,7 +5907,7 @@ class PreferTestMatchersRule extends SaropaLintRule {
               actual.propertyName.name == 'isNotEmpty')) {
         if (matcher is SimpleIdentifier &&
             (matcher.name == 'isTrue' || matcher.name == 'isFalse')) {
-          reporter.atNode(node, code);
+          reporter.atNode(node);
         }
       }
     });
@@ -6059,7 +5940,7 @@ class PreferTestMatchersRule extends SaropaLintRule {
 /// }
 /// ```
 class PreferUnwrappingFutureOrRule extends SaropaLintRule {
-  const PreferUnwrappingFutureOrRule() : super(code: _code);
+  PreferUnwrappingFutureOrRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -6069,21 +5950,19 @@ class PreferUnwrappingFutureOrRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'prefer_unwrapping_future_or',
-    problemMessage:
-        '[prefer_unwrapping_future_or] FutureOr type detected requiring manual type checking and unwrapping. This forces runtime type inspection (is Future checks) and adds branching complexity, making the code harder to understand and more error-prone. {v4}',
+    'prefer_unwrapping_future_or',
+    '[prefer_unwrapping_future_or] FutureOr type detected requiring manual type checking and unwrapping. This forces runtime type inspection (is Future checks) and adds branching complexity, making the code harder to understand and more error-prone. {v4}',
     correctionMessage:
         'Convert the function to async and use await to unwrap values uniformly. Async/await eliminates the need for runtime type checking, produces cleaner control flow, and ensures consistent handling of both synchronous and asynchronous values.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addIfStatement((IfStatement node) {
+    context.addIfStatement((IfStatement node) {
       // Check for pattern: if (value is Future<T>)
       final Expression condition = node.expression;
       if (condition is! IsExpression) return;
@@ -6095,13 +5974,13 @@ class PreferUnwrappingFutureOrRule extends SaropaLintRule {
         // This is checking if something is a Future, likely FutureOr handling
         final Expression target = condition.expression;
         if (target is SimpleIdentifier) {
-          reporter.atNode(node, code);
+          reporter.atNode(node);
         }
       }
     });
 
     // Also check for FutureOr return types that could be simplified
-    context.registry.addFunctionDeclaration((FunctionDeclaration node) {
+    context.addFunctionDeclaration((FunctionDeclaration node) {
       final TypeAnnotation? returnType = node.returnType;
       if (returnType is NamedType && returnType.name.lexeme == 'FutureOr') {
         // Check if body is simple enough to just be async
@@ -6111,7 +5990,7 @@ class PreferUnwrappingFutureOrRule extends SaropaLintRule {
           bool hasAwait = false;
           body.accept(_AwaitFinderVisitor((bool found) => hasAwait = found));
           if (!hasAwait) {
-            reporter.atNode(returnType, code);
+            reporter.atNode(returnType);
           }
         }
       }
@@ -6151,7 +6030,7 @@ class _AwaitFinderVisitor extends RecursiveAstVisitor<void> {
 ///
 /// Formerly: `avoid_inferrable_type_arguments`
 class AvoidInferrableTypeArgumentsRule extends SaropaLintRule {
-  const AvoidInferrableTypeArgumentsRule() : super(code: _code);
+  AvoidInferrableTypeArgumentsRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -6161,25 +6040,24 @@ class AvoidInferrableTypeArgumentsRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.high;
 
   @override
-  List<String> get configAliases =>
-      const <String>['avoid_inferrable_type_arguments'];
+  List<String> get configAliases => const <String>[
+    'avoid_inferrable_type_arguments',
+  ];
 
   static const LintCode _code = LintCode(
-    name: 'prefer_inferred_type_arguments',
-    problemMessage:
-        '[prefer_inferred_type_arguments] Explicit generic type arguments match what the compiler already infers from context. Redundant type parameters add visual noise without providing additional type safety, and they must be manually updated if the underlying types change. {v3}',
+    'prefer_inferred_type_arguments',
+    '[prefer_inferred_type_arguments] Explicit generic type arguments match what the compiler already infers from context. Redundant type parameters add visual noise without providing additional type safety, and they must be manually updated if the underlying types change. {v3}',
     correctionMessage:
         'Remove the explicit type arguments and let the compiler infer them. This reduces verbosity and keeps the code in sync with the actual types automatically.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addListLiteral((ListLiteral node) {
+    context.addListLiteral((ListLiteral node) {
       final TypeArgumentList? typeArgs = node.typeArguments;
       if (typeArgs == null) return;
       if (node.elements.isEmpty) return;
@@ -6205,17 +6083,17 @@ class AvoidInferrableTypeArgumentsRule extends SaropaLintRule {
       }
 
       if (allMatch && node.elements.isNotEmpty) {
-        reporter.atNode(typeArgs, code);
+        reporter.atNode(typeArgs);
       }
     });
 
-    context.registry.addSetOrMapLiteral((SetOrMapLiteral node) {
+    context.addSetOrMapLiteral((SetOrMapLiteral node) {
       final TypeArgumentList? typeArgs = node.typeArguments;
       if (typeArgs == null) return;
       if (node.elements.isEmpty) return;
 
       // For non-empty literals with type args, the types can often be inferred
-      reporter.atNode(typeArgs, code);
+      reporter.atNode(typeArgs);
     });
   }
 }
@@ -6240,7 +6118,7 @@ class AvoidInferrableTypeArgumentsRule extends SaropaLintRule {
 /// foo();  // Omit argument when using default
 /// ```
 class AvoidPassingDefaultValuesRule extends SaropaLintRule {
-  const AvoidPassingDefaultValuesRule() : super(code: _code);
+  AvoidPassingDefaultValuesRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -6250,32 +6128,31 @@ class AvoidPassingDefaultValuesRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_passing_default_values',
-    problemMessage:
-        '[avoid_passing_default_values] Argument explicitly passes a value that matches the parameter default (e.g. empty list, false, 0). Passing the default adds noise to the call site without changing behavior, and if the library updates its default, this call site will not benefit from the change. {v4}',
+    'avoid_passing_default_values',
+    '[avoid_passing_default_values] Argument explicitly passes a value that matches the parameter default (e.g. empty list, false, 0). Passing the default adds noise to the call site without changing behavior, and if the library updates its default, this call site will not benefit from the change. {v4}',
     correctionMessage:
         'Omit the argument to use the default value. This keeps call sites concise and automatically picks up any default changes from the callee.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       _checkArguments(node.argumentList, reporter);
     });
 
-    context.registry
-        .addInstanceCreationExpression((InstanceCreationExpression node) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
       _checkArguments(node.argumentList, reporter);
     });
   }
 
   void _checkArguments(
-      ArgumentList argList, SaropaDiagnosticReporter reporter) {
+    ArgumentList argList,
+    SaropaDiagnosticReporter reporter,
+  ) {
     for (final Expression arg in argList.arguments) {
       if (arg is! NamedExpression) continue;
 
@@ -6283,7 +6160,7 @@ class AvoidPassingDefaultValuesRule extends SaropaLintRule {
 
       // Only flag empty collection literals - these are almost always defaults
       if (_isEmptyCollectionLiteral(value)) {
-        reporter.atNode(arg, code);
+        reporter.atNode(arg);
       }
     }
   }
@@ -6312,24 +6189,22 @@ class AvoidPassingDefaultValuesRule extends SaropaLintRule {
 /// }
 /// ```
 class AvoidShadowedExtensionMethodsRule extends SaropaLintRule {
-  const AvoidShadowedExtensionMethodsRule() : super(code: _code);
+  AvoidShadowedExtensionMethodsRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
-    name: 'avoid_shadowed_extension_methods',
-    problemMessage:
-        '[avoid_shadowed_extension_methods] Extension method has the same name as an instance method on the target class. The instance method always takes precedence, so the extension method is never called through normal dispatch, making it dead code that misleads developers. {v3}',
+    'avoid_shadowed_extension_methods',
+    '[avoid_shadowed_extension_methods] Extension method has the same name as an instance method on the target class. The instance method always takes precedence, so the extension method is never called through normal dispatch, making it dead code that misleads developers. {v3}',
     correctionMessage:
         'Rename the extension method to a unique name, or remove it if the instance method already provides the needed behavior.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addExtensionDeclaration((ExtensionDeclaration node) {
+    context.addExtensionDeclaration((ExtensionDeclaration node) {
       final ExtensionOnClause? onClause = node.onClause;
       if (onClause == null) return;
 
@@ -6378,7 +6253,7 @@ class AvoidShadowedExtensionMethodsRule extends SaropaLintRule {
 /// }
 /// ```
 class AvoidUnnecessaryLocalLateRule extends SaropaLintRule {
-  const AvoidUnnecessaryLocalLateRule() : super(code: _code);
+  AvoidUnnecessaryLocalLateRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -6388,29 +6263,28 @@ class AvoidUnnecessaryLocalLateRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_unnecessary_local_late',
-    problemMessage:
-        '[avoid_unnecessary_local_late] Local variable declared as late but assigned a value on the same line. The late keyword is designed for deferred initialization, so using it on an immediately initialized variable is misleading and disables the compile-time check that ensures the variable is assigned. {v5}',
+    'avoid_unnecessary_local_late',
+    '[avoid_unnecessary_local_late] Local variable declared as late but assigned a value on the same line. The late keyword is designed for deferred initialization, so using it on an immediately initialized variable is misleading and disables the compile-time check that ensures the variable is assigned. {v5}',
     correctionMessage:
         'Remove the late keyword and keep the immediate initializer. Use final or var to declare the variable with full compile-time initialization safety.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry
-        .addVariableDeclarationStatement((VariableDeclarationStatement node) {
+    context.addVariableDeclarationStatement((
+      VariableDeclarationStatement node,
+    ) {
       final VariableDeclarationList variables = node.variables;
       if (!variables.isLate) return;
 
       for (final VariableDeclaration variable in variables.variables) {
         if (variable.initializer != null) {
           // Variable has an initializer, late is unnecessary
-          reporter.atNode(node, code);
+          reporter.atNode(node);
         }
       }
     });
@@ -6446,24 +6320,22 @@ class AvoidUnnecessaryLocalLateRule extends SaropaLintRule {
 /// }
 /// ```
 class MatchBaseClassDefaultValueRule extends SaropaLintRule {
-  const MatchBaseClassDefaultValueRule() : super(code: _code);
+  MatchBaseClassDefaultValueRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
-    name: 'match_base_class_default_value',
-    problemMessage:
-        '[match_base_class_default_value] Overridden method parameter has a different default value than the parent class. Callers using the parent type see the parent default, while callers using the subtype see the override default, creating inconsistent behavior depending on the variable type. {v3}',
+    'match_base_class_default_value',
+    '[match_base_class_default_value] Overridden method parameter has a different default value than the parent class. Callers using the parent type see the parent default, while callers using the subtype see the override default, creating inconsistent behavior depending on the variable type. {v3}',
     correctionMessage:
         'Match the parent class default value exactly, or remove the default to inherit it. If a different default is intentional, document why the override diverges.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addClassDeclaration((ClassDeclaration classNode) {
+    context.addClassDeclaration((ClassDeclaration classNode) {
       // Get parent class
       final ExtendsClause? extendsClause = classNode.extendsClause;
       if (extendsClause == null) return;
@@ -6494,7 +6366,7 @@ class MatchBaseClassDefaultValueRule extends SaropaLintRule {
 
           // Flag non-standard defaults that are likely to differ from parent
           if (_isNonStandardDefault(defaultValue)) {
-            reporter.atNode(defaultValue, code);
+            reporter.atNode(defaultValue);
           }
         }
       }
@@ -6544,7 +6416,7 @@ class MatchBaseClassDefaultValueRule extends SaropaLintRule {
 /// }
 /// ```
 class MoveVariableCloserToUsageRule extends SaropaLintRule {
-  const MoveVariableCloserToUsageRule() : super(code: _code);
+  MoveVariableCloserToUsageRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -6554,23 +6426,21 @@ class MoveVariableCloserToUsageRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'move_variable_closer_to_its_usage',
-    problemMessage:
-        '[move_variable_closer_to_its_usage] Variable declared far from its first use, with many unrelated statements in between. This forces readers to hold the variable in memory while reading irrelevant code, reducing comprehension and increasing the risk of accidental reuse or shadowing. {v7}',
+    'move_variable_closer_to_its_usage',
+    '[move_variable_closer_to_its_usage] Variable declared far from its first use, with many unrelated statements in between. This forces readers to hold the variable in memory while reading irrelevant code, reducing comprehension and increasing the risk of accidental reuse or shadowing. {v7}',
     correctionMessage:
         'Move the variable declaration to just before its first usage. This narrows the scope, improves readability, and makes the data flow easier to follow.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   static const int _minLineDistance = 10;
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addBlock((Block node) {
+    context.addBlock((Block node) {
       final Map<String, int> declarationLines = <String, int>{};
       final Map<String, int> firstUsageLines = <String, int>{};
       final Map<String, VariableDeclaration> declarations =
@@ -6582,8 +6452,9 @@ class MoveVariableCloserToUsageRule extends SaropaLintRule {
           for (final VariableDeclaration variable
               in statement.variables.variables) {
             final String name = variable.name.lexeme;
-            declarationLines[name] =
-                resolver.lineInfo.getLocation(variable.offset).lineNumber;
+            declarationLines[name] = context.lineInfo
+                .getLocation(variable.offset)
+                .lineNumber;
             declarations[name] = variable;
           }
         }
@@ -6592,7 +6463,10 @@ class MoveVariableCloserToUsageRule extends SaropaLintRule {
       // Second pass: find first usage of each variable
       node.visitChildren(
         _FirstUsageVisitor(
-            declarationLines.keys.toSet(), firstUsageLines, resolver),
+          declarationLines.keys.toSet(),
+          firstUsageLines,
+          context.lineInfo,
+        ),
       );
 
       // Check distances
@@ -6612,11 +6486,11 @@ class MoveVariableCloserToUsageRule extends SaropaLintRule {
 }
 
 class _FirstUsageVisitor extends RecursiveAstVisitor<void> {
-  _FirstUsageVisitor(this.variableNames, this.firstUsageLines, this.resolver);
+  _FirstUsageVisitor(this.variableNames, this.firstUsageLines, this.lineInfo);
 
   final Set<String> variableNames;
   final Map<String, int> firstUsageLines;
-  final CustomLintResolver resolver;
+  final LineInfo lineInfo;
 
   @override
   void visitSimpleIdentifier(SimpleIdentifier node) {
@@ -6627,8 +6501,7 @@ class _FirstUsageVisitor extends RecursiveAstVisitor<void> {
           (node.parent as VariableDeclaration).name == node.token) {
         return;
       }
-      firstUsageLines[name] =
-          resolver.lineInfo.getLocation(node.offset).lineNumber;
+      firstUsageLines[name] = lineInfo.getLocation(node.offset).lineNumber;
     }
     super.visitSimpleIdentifier(node);
   }
@@ -6656,7 +6529,7 @@ class _FirstUsageVisitor extends RecursiveAstVisitor<void> {
 /// }
 /// ```
 class MoveVariableOutsideIterationRule extends SaropaLintRule {
-  const MoveVariableOutsideIterationRule() : super(code: _code);
+  MoveVariableOutsideIterationRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -6666,19 +6539,17 @@ class MoveVariableOutsideIterationRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'move_variable_outside_iteration',
-    problemMessage:
-        '[move_variable_outside_iteration] Variable declared and assigned inside a loop body produces the same value on every iteration. Recreating the same object or computing the same expression repeatedly wastes CPU cycles and puts unnecessary pressure on the garbage collector. {v4}',
+    'move_variable_outside_iteration',
+    '[move_variable_outside_iteration] Variable declared and assigned inside a loop body produces the same value on every iteration. Recreating the same object or computing the same expression repeatedly wastes CPU cycles and puts unnecessary pressure on the garbage collector. {v4}',
     correctionMessage:
         'Move the variable declaration above the loop so it is computed once and reused on each iteration, reducing allocation overhead and improving clarity.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
     void checkLoopBody(Statement body) {
       if (body is! Block) return;
@@ -6700,15 +6571,15 @@ class MoveVariableOutsideIterationRule extends SaropaLintRule {
       }
     }
 
-    context.registry.addForStatement((ForStatement node) {
+    context.addForStatement((ForStatement node) {
       checkLoopBody(node.body);
     });
 
-    context.registry.addWhileStatement((WhileStatement node) {
+    context.addWhileStatement((WhileStatement node) {
       checkLoopBody(node.body);
     });
 
-    context.registry.addDoStatement((DoStatement node) {
+    context.addDoStatement((DoStatement node) {
       checkLoopBody(node.body);
     });
   }
@@ -6765,24 +6636,22 @@ class MoveVariableOutsideIterationRule extends SaropaLintRule {
 /// }
 /// ```
 class PreferOverridingParentEqualityRule extends SaropaLintRule {
-  const PreferOverridingParentEqualityRule() : super(code: _code);
+  PreferOverridingParentEqualityRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
-    name: 'prefer_overriding_parent_equality',
-    problemMessage:
-        '[prefer_overriding_parent_equality] Subclass overrides == without incorporating the parent class equality check. If the parent class compares fields that the subclass ignores, two objects may be considered equal even though their parent fields differ, breaking the transitivity contract of ==. {v4}',
+    'prefer_overriding_parent_equality',
+    '[prefer_overriding_parent_equality] Subclass overrides == without incorporating the parent class equality check. If the parent class compares fields that the subclass ignores, two objects may be considered equal even though their parent fields differ, breaking the transitivity contract of ==. {v4}',
     correctionMessage:
         'Call super == other as part of the equality check, or explicitly compare all parent fields alongside the subclass fields to ensure consistent equality behavior.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addClassDeclaration((ClassDeclaration node) {
+    context.addClassDeclaration((ClassDeclaration node) {
       // Check if class has an == operator
       MethodDeclaration? equalityOperator;
       for (final ClassMember member in node.members) {
@@ -6813,8 +6682,9 @@ class PreferOverridingParentEqualityRule extends SaropaLintRule {
         if (method.name == '==' && !method.isAbstract) {
           // Check if it's from Object or a custom implementation
           final enclosing = (method as Element).enclosingElement;
-          final String? enclosingName =
-              enclosing is InterfaceElement ? enclosing.name : null;
+          final String? enclosingName = enclosing is InterfaceElement
+              ? enclosing.name
+              : null;
           if (enclosingName != null && enclosingName != 'Object') {
             parentHasCustomEquals = true;
             break;
@@ -6826,8 +6696,9 @@ class PreferOverridingParentEqualityRule extends SaropaLintRule {
 
       // Check if the child's == calls super.==
       bool callsSuper = false;
-      equalityOperator.body
-          .visitChildren(_SuperEqualityChecker(() => callsSuper = true));
+      equalityOperator.body.visitChildren(
+        _SuperEqualityChecker(() => callsSuper = true),
+      );
 
       if (!callsSuper) {
         reporter.atToken(equalityOperator.name, code);
@@ -6881,7 +6752,7 @@ class _SuperEqualityChecker extends RecursiveAstVisitor<void> {
 /// }
 /// ```
 class PreferSpecificCasesFirstRule extends SaropaLintRule {
-  const PreferSpecificCasesFirstRule() : super(code: _code);
+  PreferSpecificCasesFirstRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -6891,12 +6762,11 @@ class PreferSpecificCasesFirstRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'prefer_specific_cases_first',
-    problemMessage:
-        '[prefer_specific_cases_first] General switch case appears before a more specific case. In Dart, the first matching case wins, so a broad pattern placed early shadows narrower patterns below it, making those specific cases unreachable dead code. {v4}',
+    'prefer_specific_cases_first',
+    '[prefer_specific_cases_first] General switch case appears before a more specific case. In Dart, the first matching case wins, so a broad pattern placed early shadows narrower patterns below it, making those specific cases unreachable dead code. {v4}',
     correctionMessage:
         'Reorder the cases so more specific patterns appear first and general catch-all patterns appear last, ensuring every case is reachable.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   // Cached regex for performance
@@ -6904,18 +6774,17 @@ class PreferSpecificCasesFirstRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addSwitchExpression((SwitchExpression node) {
+    context.addSwitchExpression((SwitchExpression node) {
       _checkCaseOrder(
         node.cases.map((SwitchExpressionCase c) => c.guardedPattern).toList(),
         reporter,
       );
     });
 
-    context.registry.addSwitchStatement((SwitchStatement node) {
+    context.addSwitchStatement((SwitchStatement node) {
       final List<GuardedPattern> patterns = <GuardedPattern>[];
       for (final SwitchMember member in node.members) {
         if (member is SwitchPatternCase) {
@@ -6927,7 +6796,9 @@ class PreferSpecificCasesFirstRule extends SaropaLintRule {
   }
 
   void _checkCaseOrder(
-      List<GuardedPattern> patterns, SaropaDiagnosticReporter reporter) {
+    List<GuardedPattern> patterns,
+    SaropaDiagnosticReporter reporter,
+  ) {
     for (int i = 0; i < patterns.length - 1; i++) {
       final GuardedPattern current = patterns[i];
       final GuardedPattern next = patterns[i + 1];
@@ -6944,7 +6815,7 @@ class PreferSpecificCasesFirstRule extends SaropaLintRule {
 
         // Simple heuristic: same type pattern but one has a guard
         if (_sameBaseType(currentPattern, nextPattern)) {
-          reporter.atNode(next, code);
+          reporter.atNode(next);
         }
       }
     }
@@ -6978,7 +6849,7 @@ class PreferSpecificCasesFirstRule extends SaropaLintRule {
 /// print(x);  // Use destructured variable
 /// ```
 class UseExistingDestructuringRule extends SaropaLintRule {
-  const UseExistingDestructuringRule() : super(code: _code);
+  UseExistingDestructuringRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -6988,21 +6859,19 @@ class UseExistingDestructuringRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'use_existing_destructuring',
-    problemMessage:
-        '[use_existing_destructuring] Property accessed through the original object despite an existing destructured variable that already holds the same value. The redundant access obscures the data flow and ignores the destructuring that was set up to simplify property access. {v5}',
+    'use_existing_destructuring',
+    '[use_existing_destructuring] Property accessed through the original object despite an existing destructured variable that already holds the same value. The redundant access obscures the data flow and ignores the destructuring that was set up to simplify property access. {v5}',
     correctionMessage:
         'Replace the property access with the destructured variable name. This communicates that the value was already extracted and avoids redundant lookups.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addBlock((Block node) {
+    context.addBlock((Block node) {
       final Map<String, Set<String>> destructuredVars = <String, Set<String>>{};
 
       for (final Statement statement in node.statements) {
@@ -7057,7 +6926,10 @@ class _PatternFieldCollector extends RecursiveAstVisitor<void> {
 
 class _DestructuredPropertyAccessChecker extends RecursiveAstVisitor<void> {
   _DestructuredPropertyAccessChecker(
-      this.destructuredVars, this.reporter, this.code);
+    this.destructuredVars,
+    this.reporter,
+    this.code,
+  );
 
   final Map<String, Set<String>> destructuredVars;
   final SaropaDiagnosticReporter reporter;
@@ -7069,7 +6941,7 @@ class _DestructuredPropertyAccessChecker extends RecursiveAstVisitor<void> {
     if (target is SimpleIdentifier) {
       final Set<String>? fields = destructuredVars[target.name];
       if (fields != null && fields.contains(node.propertyName.name)) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     }
     super.visitPropertyAccess(node);
@@ -7079,7 +6951,7 @@ class _DestructuredPropertyAccessChecker extends RecursiveAstVisitor<void> {
   void visitPrefixedIdentifier(PrefixedIdentifier node) {
     final Set<String>? fields = destructuredVars[node.prefix.name];
     if (fields != null && fields.contains(node.identifier.name)) {
-      reporter.atNode(node, code);
+      reporter.atNode(node);
     }
     super.visitPrefixedIdentifier(node);
   }
@@ -7102,24 +6974,22 @@ class _DestructuredPropertyAccessChecker extends RecursiveAstVisitor<void> {
 /// print('$name, $name');
 /// ```
 class UseExistingVariableRule extends SaropaLintRule {
-  const UseExistingVariableRule() : super(code: _code);
+  UseExistingVariableRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
-    name: 'use_existing_variable',
-    problemMessage:
-        '[use_existing_variable] New variable created with the same value as an existing in-scope variable. The duplicate adds an unnecessary name to the scope, increases cognitive load, and risks divergence if one copy is later modified while the other is not. {v4}',
+    'use_existing_variable',
+    '[use_existing_variable] New variable created with the same value as an existing in-scope variable. The duplicate adds an unnecessary name to the scope, increases cognitive load, and risks divergence if one copy is later modified while the other is not. {v4}',
     correctionMessage:
         'Reference the existing variable directly instead of creating a new one. If a different name is needed for clarity, consider renaming the original.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addBlock((Block node) {
+    context.addBlock((Block node) {
       final Map<String, Token> expressionToVariable = <String, Token>{};
 
       for (final Statement statement in node.statements) {
@@ -7184,7 +7054,7 @@ class UseExistingVariableRule extends SaropaLintRule {
 /// }
 /// ```
 class AvoidDuplicateStringLiteralsRule extends SaropaLintRule {
-  const AvoidDuplicateStringLiteralsRule() : super(code: _code);
+  AvoidDuplicateStringLiteralsRule() : super(code: _code);
 
   /// Style/consistency issue. Large counts acceptable in legacy code.
   @override
@@ -7194,13 +7064,12 @@ class AvoidDuplicateStringLiteralsRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_duplicate_string_literals',
-    problemMessage:
-        '[avoid_duplicate_string_literals] String literal appears 3+ times in this file. Consider extracting '
+    'avoid_duplicate_string_literals',
+    '[avoid_duplicate_string_literals] String literal appears 3+ times in this file. Consider extracting '
         'to a constant. {v1}',
     correctionMessage:
         'Extract this string to a named constant for maintainability.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   /// Minimum occurrences to trigger this rule
@@ -7211,16 +7080,15 @@ class AvoidDuplicateStringLiteralsRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
     // Track occurrences and report when threshold is reached.
     // Note: Map state is per-file since runWithReporter is called per-file.
     final Map<String, List<AstNode>> stringOccurrences =
         <String, List<AstNode>>{};
 
-    context.registry.addSimpleStringLiteral((SimpleStringLiteral node) {
+    context.addSimpleStringLiteral((SimpleStringLiteral node) {
       final String value = node.value;
 
       // Skip short strings
@@ -7229,14 +7097,16 @@ class AvoidDuplicateStringLiteralsRule extends SaropaLintRule {
       // Skip excluded patterns
       if (_shouldSkipString(value)) return;
 
-      final List<AstNode> occurrences =
-          stringOccurrences.putIfAbsent(value, () => <AstNode>[]);
+      final List<AstNode> occurrences = stringOccurrences.putIfAbsent(
+        value,
+        () => <AstNode>[],
+      );
       occurrences.add(node);
 
       // Report when we hit the threshold (report the current node)
       // and when we exceed it (each subsequent occurrence)
       if (occurrences.length >= _minOccurrences) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
   }
@@ -7300,7 +7170,7 @@ class AvoidDuplicateStringLiteralsRule extends SaropaLintRule {
 /// }
 /// ```
 class AvoidDuplicateStringLiteralsPairRule extends SaropaLintRule {
-  const AvoidDuplicateStringLiteralsPairRule() : super(code: _code);
+  AvoidDuplicateStringLiteralsPairRule() : super(code: _code);
 
   /// Style/consistency issue. Large counts acceptable in legacy code.
   @override
@@ -7310,13 +7180,12 @@ class AvoidDuplicateStringLiteralsPairRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_duplicate_string_literals_pair',
-    problemMessage:
-        '[avoid_duplicate_string_literals_pair] String literal appears 2+ times in this file. Consider extracting '
+    'avoid_duplicate_string_literals_pair',
+    '[avoid_duplicate_string_literals_pair] String literal appears 2+ times in this file. Consider extracting '
         'to a constant. {v1}',
     correctionMessage:
         'Extract this string to a named constant for maintainability.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   /// Minimum occurrences to trigger this rule
@@ -7327,16 +7196,15 @@ class AvoidDuplicateStringLiteralsPairRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
     // Track occurrences and report when threshold is reached.
     // Note: Map state is per-file since runWithReporter is called per-file.
     final Map<String, List<AstNode>> stringOccurrences =
         <String, List<AstNode>>{};
 
-    context.registry.addSimpleStringLiteral((SimpleStringLiteral node) {
+    context.addSimpleStringLiteral((SimpleStringLiteral node) {
       final String value = node.value;
 
       // Skip short strings
@@ -7345,14 +7213,16 @@ class AvoidDuplicateStringLiteralsPairRule extends SaropaLintRule {
       // Skip excluded patterns
       if (_shouldSkipString(value)) return;
 
-      final List<AstNode> occurrences =
-          stringOccurrences.putIfAbsent(value, () => <AstNode>[]);
+      final List<AstNode> occurrences = stringOccurrences.putIfAbsent(
+        value,
+        () => <AstNode>[],
+      );
       occurrences.add(node);
 
       // Report when we hit the threshold (report the current node)
       // and when we exceed it (each subsequent occurrence)
       if (occurrences.length >= _minOccurrences) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
   }
@@ -7399,7 +7269,7 @@ class AvoidDuplicateStringLiteralsPairRule extends SaropaLintRule {
 /// void doAsync(ErrorCallback onError) {}
 /// ```
 class PreferTypedefsForCallbacksRule extends SaropaLintRule {
-  const PreferTypedefsForCallbacksRule() : super(code: _code);
+  PreferTypedefsForCallbacksRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.low;
@@ -7408,26 +7278,24 @@ class PreferTypedefsForCallbacksRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'prefer_typedefs_for_callbacks',
-    problemMessage:
-        '[prefer_typedefs_for_callbacks] Inline function type could be a typedef. Inline function types are harder to read and reuse. Suggests using typedefs for callback function types. {v2}',
+    'prefer_typedefs_for_callbacks',
+    '[prefer_typedefs_for_callbacks] Inline function type could be a typedef. Inline function types are harder to read and reuse. Suggests using typedefs for callback function types. {v2}',
     correctionMessage:
         'Create a named typedef for this callback signature and reference it by name, improving readability and allowing reuse across multiple parameters.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addFormalParameterList((FormalParameterList node) {
+    context.addFormalParameterList((FormalParameterList node) {
       for (final FormalParameter param in node.parameters) {
         if (param is SimpleFormalParameter) {
           final TypeAnnotation? type = param.type;
           if (type is GenericFunctionType) {
-            reporter.atNode(type, code);
+            reporter.atNode(type);
           }
         }
       }
@@ -7455,7 +7323,7 @@ class PreferTypedefsForCallbacksRule extends SaropaLintRule {
 /// }
 /// ```
 class PreferRedirectingSuperclassConstructorRule extends SaropaLintRule {
-  const PreferRedirectingSuperclassConstructorRule() : super(code: _code);
+  PreferRedirectingSuperclassConstructorRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.low;
@@ -7464,21 +7332,19 @@ class PreferRedirectingSuperclassConstructorRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'prefer_redirecting_superclass_constructor',
-    problemMessage:
-        '[prefer_redirecting_superclass_constructor] Constructor forwards parameters to super() without modification, which can be simplified with Dart 3 super parameters. {v2}',
+    'prefer_redirecting_superclass_constructor',
+    '[prefer_redirecting_superclass_constructor] Constructor forwards parameters to super() without modification, which can be simplified with Dart 3 super parameters. {v2}',
     correctionMessage:
         'Replace the explicit super(paramName) call with super.paramName in the parameter list to reduce boilerplate and keep the forwarding relationship visible in the signature.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addConstructorDeclaration((ConstructorDeclaration node) {
+    context.addConstructorDeclaration((ConstructorDeclaration node) {
       final NodeList<ConstructorInitializer> initializers = node.initializers;
       if (initializers.isEmpty) return;
 
@@ -7493,7 +7359,7 @@ class PreferRedirectingSuperclassConstructorRule extends SaropaLintRule {
               if (params != null) {
                 for (final FormalParameter param in params.parameters) {
                   if (param.name?.lexeme == arg.name) {
-                    reporter.atNode(init, code);
+                    reporter.atNode(init);
                     return;
                   }
                 }
@@ -7528,7 +7394,7 @@ class PreferRedirectingSuperclassConstructorRule extends SaropaLintRule {
 /// )
 /// ```
 class AvoidEmptyBuildWhenRule extends SaropaLintRule {
-  const AvoidEmptyBuildWhenRule() : super(code: _code);
+  AvoidEmptyBuildWhenRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.medium;
@@ -7537,23 +7403,19 @@ class AvoidEmptyBuildWhenRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_empty_build_when',
-    problemMessage:
-        '[avoid_empty_build_when] buildWhen callback always returns true, which is the default behavior. The callback adds code without filtering any rebuilds, defeating the purpose of the optimization that buildWhen provides in BlocBuilder and BlocListener. {v2}',
+    'avoid_empty_build_when',
+    '[avoid_empty_build_when] buildWhen callback always returns true, which is the default behavior. The callback adds code without filtering any rebuilds, defeating the purpose of the optimization that buildWhen provides in BlocBuilder and BlocListener. {v2}',
     correctionMessage:
         'Add a meaningful state comparison that returns false for states that do not require a rebuild, or remove buildWhen entirely to use the default behavior.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addInstanceCreationExpression((
-      InstanceCreationExpression node,
-    ) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final String? typeName = node.constructorName.type.element?.name;
       if (typeName != 'BlocBuilder' && typeName != 'BlocConsumer') return;
 
@@ -7566,7 +7428,7 @@ class AvoidEmptyBuildWhenRule extends SaropaLintRule {
             if (body is ExpressionFunctionBody) {
               final Expression returnExpr = body.expression;
               if (returnExpr is BooleanLiteral && returnExpr.value) {
-                reporter.atNode(arg, code);
+                reporter.atNode(arg);
               }
             }
             // Check for { return true; }
@@ -7577,7 +7439,7 @@ class AvoidEmptyBuildWhenRule extends SaropaLintRule {
                 final Expression? returnExpr =
                     (statements.first as ReturnStatement).expression;
                 if (returnExpr is BooleanLiteral && returnExpr.value) {
-                  reporter.atNode(arg, code);
+                  reporter.atNode(arg);
                 }
               }
             }
@@ -7606,7 +7468,7 @@ class AvoidEmptyBuildWhenRule extends SaropaLintRule {
 /// T useMyHook<T>() => useHook();
 /// ```
 class PreferUsePrefixRule extends SaropaLintRule {
-  const PreferUsePrefixRule() : super(code: _code);
+  PreferUsePrefixRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.opinionated;
@@ -7615,12 +7477,11 @@ class PreferUsePrefixRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'prefer_use_prefix',
-    problemMessage:
-        '[prefer_use_prefix] Prefixing Flutter Hooks function names with use is a naming convention. The prefix does not affect hook behavior or performance. Enable via the stylistic tier. {v2}',
+    'prefer_use_prefix',
+    '[prefer_use_prefix] Prefixing Flutter Hooks function names with use is a naming convention. The prefix does not affect hook behavior or performance. Enable via the stylistic tier. {v2}',
     correctionMessage:
         'Rename the function to start with "use" (e.g. useMyHook) following the hooks convention, so it is recognizable as a hook and subject to hook linting rules.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   static const Set<String> _hookMethods = <String>{
@@ -7639,11 +7500,10 @@ class PreferUsePrefixRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addFunctionDeclaration((FunctionDeclaration node) {
+    context.addFunctionDeclaration((FunctionDeclaration node) {
       final String name = node.name.lexeme;
 
       // Skip if already has hook prefix (use + PascalCase)
@@ -7651,13 +7511,15 @@ class PreferUsePrefixRule extends SaropaLintRule {
 
       // Check if body calls hook methods
       bool usesHooks = false;
-      node.functionExpression.body.visitChildren(_HookCallVisitor(
-        hookMethods: _hookMethods,
-        onHookFound: () => usesHooks = true,
-      ));
+      node.functionExpression.body.visitChildren(
+        _HookCallVisitor(
+          hookMethods: _hookMethods,
+          onHookFound: () => usesHooks = true,
+        ),
+      );
 
       if (usesHooks) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
   }
@@ -7709,7 +7571,7 @@ class _HookCallVisitor extends RecursiveAstVisitor<void> {
 /// }
 /// ```
 class PreferLateFinalRule extends SaropaLintRule {
-  const PreferLateFinalRule() : super(code: _code);
+  PreferLateFinalRule() : super(code: _code);
 
   /// Code quality improvement - prevents accidental mutation.
   @override
@@ -7719,21 +7581,19 @@ class PreferLateFinalRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'prefer_late_final',
-    problemMessage:
-        '[prefer_late_final] Late variable is never reassigned after its initial assignment, so it can be declared as late final for stronger immutability guarantees. {v3}',
+    'prefer_late_final',
+    '[prefer_late_final] Late variable is never reassigned after its initial assignment, so it can be declared as late final for stronger immutability guarantees. {v3}',
     correctionMessage:
         'Change late to late final so that any accidental reassignment is caught at compile time, preventing unintended state mutations.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addClassDeclaration((ClassDeclaration node) {
+    context.addClassDeclaration((ClassDeclaration node) {
       // Find late non-final fields
       final List<_LateFinalFieldInfo> lateFields = <_LateFinalFieldInfo>[];
 
@@ -7742,11 +7602,13 @@ class PreferLateFinalRule extends SaropaLintRule {
           final VariableDeclarationList fields = member.fields;
           if (fields.lateKeyword != null && !fields.isFinal) {
             for (final VariableDeclaration variable in fields.variables) {
-              lateFields.add(_LateFinalFieldInfo(
-                name: variable.name.lexeme,
-                declaration: variable,
-                field: member,
-              ));
+              lateFields.add(
+                _LateFinalFieldInfo(
+                  name: variable.name.lexeme,
+                  declaration: variable,
+                  field: member,
+                ),
+              );
             }
           }
         }
@@ -7801,11 +7663,7 @@ class PreferLateFinalRule extends SaropaLintRule {
       // Adjust counts for methods called from multiple sites.
       // A single assignment in a method called N times means the field
       // is effectively assigned N times at runtime.
-      _adjustForMethodCallSites(
-        node,
-        methodFieldAssignments,
-        assignmentCounts,
-      );
+      _adjustForMethodCallSites(node, methodFieldAssignments, assignmentCounts);
 
       // Report fields that are assigned exactly once
       // Skip never-assigned fields (count == 0) - those are bugs, not candidates
@@ -7969,7 +7827,7 @@ bool _allVariablesHaveInitializers(VariableDeclarationList fields) {
 /// }
 /// ```
 class AvoidLateForNullableRule extends SaropaLintRule {
-  const AvoidLateForNullableRule() : super(code: _code);
+  AvoidLateForNullableRule() : super(code: _code);
 
   /// Crash path - accessing before assignment throws LateInitializationError.
   @override
@@ -7979,21 +7837,19 @@ class AvoidLateForNullableRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_late_for_nullable',
-    problemMessage:
-        '[avoid_late_for_nullable] Nullable type declared with late keyword. Since the type already accepts null, the late keyword adds no initialization safety and instead introduces a hidden crash path: accessing the variable before assignment throws LateInitializationError rather than returning null. {v4}',
+    'avoid_late_for_nullable',
+    '[avoid_late_for_nullable] Nullable type declared with late keyword. Since the type already accepts null, the late keyword adds no initialization safety and instead introduces a hidden crash path: accessing the variable before assignment throws LateInitializationError rather than returning null. {v4}',
     correctionMessage:
         'Remove the late keyword and rely on the nullable type (T?) with null checks. The variable will default to null until explicitly assigned, which is safer and more predictable.',
-    errorSeverity: DiagnosticSeverity.ERROR,
+    severity: DiagnosticSeverity.ERROR,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addFieldDeclaration((FieldDeclaration node) {
+    context.addFieldDeclaration((FieldDeclaration node) {
       final VariableDeclarationList fields = node.fields;
       if (fields.lateKeyword == null) return;
 
@@ -8007,11 +7863,11 @@ class AvoidLateForNullableRule extends SaropaLintRule {
 
       // Check outer type nullability via AST question token
       if (isOuterTypeNullable(typeAnnotation)) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
 
-    context.registry.addVariableDeclarationStatement((node) {
+    context.addVariableDeclarationStatement((node) {
       final VariableDeclarationList variables = node.variables;
       if (variables.lateKeyword == null) return;
 
@@ -8024,7 +7880,7 @@ class AvoidLateForNullableRule extends SaropaLintRule {
       // Check outer type nullability via AST question token
       if (isOuterTypeNullable(typeAnnotation)) {
         for (final VariableDeclaration variable in variables.variables) {
-          reporter.atNode(variable, code);
+          reporter.atNode(variable);
         }
       }
     });
@@ -8068,7 +7924,7 @@ bool _isHookFunction(String name) {
 /// **Note:** This is a stylistic preference. Some teams prefer explicit
 /// enum names for clarity.
 class PreferDotShorthandRule extends SaropaLintRule {
-  const PreferDotShorthandRule() : super(code: _code);
+  PreferDotShorthandRule() : super(code: _code);
 
   /// Code style preference.
   @override
@@ -8078,21 +7934,19 @@ class PreferDotShorthandRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'prefer_dot_shorthand',
-    problemMessage:
-        '[prefer_dot_shorthand] Fully qualified enum reference detected where the type is already known from context. Use dot shorthand (.value) available in Dart 3 to reduce verbosity while preserving type safety. {v2}',
+    'prefer_dot_shorthand',
+    '[prefer_dot_shorthand] Fully qualified enum reference detected where the type is already known from context. Use dot shorthand (.value) available in Dart 3 to reduce verbosity while preserving type safety. {v2}',
     correctionMessage:
         'Replace the fully qualified EnumType.value with .value where the type is already known from context, reducing verbosity while keeping the code type-safe.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addPrefixedIdentifier((node) {
+    context.addPrefixedIdentifier((node) {
       // Check if prefix is an enum type accessing a value
       final prefix = node.prefix;
 
@@ -8115,15 +7969,15 @@ class PreferDotShorthandRule extends SaropaLintRule {
         if (declaredType is VariableDeclarationList &&
             declaredType.type != null) {
           // Type is explicit, shorthand could be used
-          reporter.atNode(node, code);
+          reporter.atNode(node);
         }
       } else if (parent is NamedExpression) {
         // In named parameter, type is known from function signature
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       } else if (parent is AssignmentExpression &&
           parent.rightHandSide == node) {
         // Assignment to typed variable
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
   }
@@ -8160,7 +8014,7 @@ class PreferDotShorthandRule extends SaropaLintRule {
 ///
 /// **Quick fix available:** Simplifies to direct boolean expression.
 class NoBooleanLiteralCompareRule extends SaropaLintRule {
-  const NoBooleanLiteralCompareRule() : super(code: _code);
+  NoBooleanLiteralCompareRule() : super(code: _code);
 
   /// Code style improvement.
   @override
@@ -8170,22 +8024,20 @@ class NoBooleanLiteralCompareRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'no_boolean_literal_compare',
-    problemMessage:
-        '[no_boolean_literal_compare] Comparing a boolean to true/false literally (x == true) instead of using the value directly (x) is a stylistic choice with no correctness or performance impact. Enable via the stylistic tier. {v3}',
+    'no_boolean_literal_compare',
+    '[no_boolean_literal_compare] Comparing a boolean to true/false literally (x == true) instead of using the value directly (x) is a stylistic choice with no correctness or performance impact. Enable via the stylistic tier. {v3}',
     correctionMessage:
         'Use the boolean expression directly: write x instead of x == true, and !x instead of x == false. '
         '!x instead of x == false.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addBinaryExpression((BinaryExpression node) {
+    context.addBinaryExpression((BinaryExpression node) {
       // Only check == and != operators
       final operatorType = node.operator.type;
       if (operatorType != TokenType.EQ_EQ &&
@@ -8213,85 +8065,14 @@ class NoBooleanLiteralCompareRule extends SaropaLintRule {
       if (otherType != null && otherType.isDartCoreBool) {
         // Check nullability - allow == true/false for nullable bools
         if (otherType.nullabilitySuffix == NullabilitySuffix.none) {
-          reporter.atNode(node, code);
+          reporter.atNode(node);
         }
       }
     });
   }
-
-  @override
-  List<Fix> getFixes() => <Fix>[_SimplifyBooleanComparisonFix()];
 }
 
 /// Quick fix: Simplifies boolean literal comparisons.
-class _SimplifyBooleanComparisonFix extends DartFix {
-  @override
-  void run(
-    CustomLintResolver resolver,
-    ChangeReporter reporter,
-    CustomLintContext context,
-    AnalysisError analysisError,
-    List<AnalysisError> others,
-  ) {
-    context.registry.addBinaryExpression((BinaryExpression node) {
-      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
-
-      final operatorType = node.operator.type;
-      final left = node.leftOperand;
-      final right = node.rightOperand;
-
-      final leftIsBoolLiteral = left is BooleanLiteral;
-      final rightIsBoolLiteral = right is BooleanLiteral;
-
-      if (!leftIsBoolLiteral && !rightIsBoolLiteral) return;
-
-      final BooleanLiteral boolLiteral =
-          leftIsBoolLiteral ? left : right as BooleanLiteral;
-      final Expression otherExpr = leftIsBoolLiteral ? right : left;
-
-      // Determine the replacement
-      String replacement;
-      final bool comparingToTrue = boolLiteral.value;
-      final bool isEquality = operatorType == TokenType.EQ_EQ;
-
-      // Truth table:
-      // x == true  -> x
-      // x == false -> !x
-      // x != true  -> !x
-      // x != false -> x
-      final bool needsNegation = comparingToTrue != isEquality;
-
-      if (needsNegation) {
-        // Check if we need parentheses
-        final exprSource = otherExpr.toSource();
-        if (_needsParentheses(otherExpr)) {
-          replacement = '!($exprSource)';
-        } else {
-          replacement = '!$exprSource';
-        }
-      } else {
-        replacement = otherExpr.toSource();
-      }
-
-      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
-        message: 'Simplify to: $replacement',
-        priority: 1,
-      );
-
-      changeBuilder.addDartFileEdit((builder) {
-        builder.addSimpleReplacement(node.sourceRange, replacement);
-      });
-    });
-  }
-
-  /// Check if expression needs parentheses when negated.
-  bool _needsParentheses(Expression expr) {
-    return expr is BinaryExpression ||
-        expr is ConditionalExpression ||
-        expr is AsExpression ||
-        expr is IsExpression;
-  }
-}
 
 // =============================================================================
 // prefer_returning_conditional_expressions
@@ -8324,7 +8105,7 @@ class _SimplifyBooleanComparisonFix extends DartFix {
 ///
 /// **Quick fix available:** Transforms if/else to ternary expression.
 class PreferReturningConditionalExpressionsRule extends SaropaLintRule {
-  const PreferReturningConditionalExpressionsRule() : super(code: _code);
+  PreferReturningConditionalExpressionsRule() : super(code: _code);
 
   /// Code quality improvement. Review when count exceeds 100.
   @override
@@ -8334,21 +8115,19 @@ class PreferReturningConditionalExpressionsRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'prefer_returning_conditional_expressions',
-    problemMessage:
-        '[prefer_returning_conditional_expressions] Returning a ternary expression instead of if-else is a stylistic preference. Both compile to the same code with no performance difference. Enable via the stylistic tier. {v2}',
+    'prefer_returning_conditional_expressions',
+    '[prefer_returning_conditional_expressions] Returning a ternary expression instead of if-else is a stylistic preference. Both compile to the same code with no performance difference. Enable via the stylistic tier. {v2}',
     correctionMessage:
         'Collapse to return condition ? valueA : valueB; for value returns, or return condition; when directly returning a boolean expression.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addIfStatement((IfStatement node) {
+    context.addIfStatement((IfStatement node) {
       // Must have else branch
       final Statement? elseStatement = node.elseStatement;
       if (elseStatement == null) return;
@@ -8364,83 +8143,11 @@ class PreferReturningConditionalExpressionsRule extends SaropaLintRule {
       if (elseReturn == null) return;
 
       // Both branches are single returns - report
-      reporter.atNode(node, code);
+      reporter.atNode(node);
     });
   }
 
   /// Extract single return statement from a block or bare statement.
-  ReturnStatement? _getSingleReturn(Statement statement) {
-    if (statement is ReturnStatement) return statement;
-    if (statement is Block) {
-      final statements = statement.statements;
-      if (statements.length == 1 && statements.first is ReturnStatement) {
-        return statements.first as ReturnStatement;
-      }
-    }
-    return null;
-  }
-
-  @override
-  List<Fix> getFixes() => <Fix>[_PreferReturningConditionalExpressionsFix()];
-}
-
-class _PreferReturningConditionalExpressionsFix extends DartFix {
-  @override
-  void run(
-    CustomLintResolver resolver,
-    ChangeReporter reporter,
-    CustomLintContext context,
-    AnalysisError analysisError,
-    List<AnalysisError> others,
-  ) {
-    context.registry.addIfStatement((IfStatement node) {
-      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
-
-      final Statement? elseStatement = node.elseStatement;
-      if (elseStatement == null) return;
-
-      final ReturnStatement? thenReturn = _getSingleReturn(node.thenStatement);
-      final ReturnStatement? elseReturn = _getSingleReturn(elseStatement);
-      if (thenReturn == null || elseReturn == null) return;
-
-      final Expression? thenValue = thenReturn.expression;
-      final Expression? elseValue = elseReturn.expression;
-      if (thenValue == null || elseValue == null) return;
-
-      final String condition = node.expression.toSource();
-      final String thenSource = thenValue.toSource();
-      final String elseSource = elseValue.toSource();
-
-      String replacement;
-
-      // Check for boolean literal returns
-      if (thenValue is BooleanLiteral && elseValue is BooleanLiteral) {
-        if (thenValue.value && !elseValue.value) {
-          // return true else return false -> return condition
-          replacement = 'return $condition;';
-        } else if (!thenValue.value && elseValue.value) {
-          // return false else return true -> return !condition
-          replacement = 'return !($condition);';
-        } else {
-          // Both same value - just use ternary
-          replacement = 'return $condition ? $thenSource : $elseSource;';
-        }
-      } else {
-        // General case: use ternary
-        replacement = 'return $condition ? $thenSource : $elseSource;';
-      }
-
-      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
-        message: 'Convert to conditional expression',
-        priority: 1,
-      );
-
-      changeBuilder.addDartFileEdit((builder) {
-        builder.addSimpleReplacement(node.sourceRange, replacement);
-      });
-    });
-  }
-
   ReturnStatement? _getSingleReturn(Statement statement) {
     if (statement is ReturnStatement) return statement;
     if (statement is Block) {
@@ -8478,7 +8185,7 @@ class _PreferReturningConditionalExpressionsFix extends DartFix {
 /// // ignore: my_rule
 /// ```
 class AvoidIgnoreTrailingCommentRule extends SaropaLintRule {
-  const AvoidIgnoreTrailingCommentRule() : super(code: _code);
+  AvoidIgnoreTrailingCommentRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.medium;
@@ -8487,21 +8194,20 @@ class AvoidIgnoreTrailingCommentRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_ignore_trailing_comment',
-    problemMessage: '[avoid_ignore_trailing_comment] '
+    'avoid_ignore_trailing_comment',
+    '[avoid_ignore_trailing_comment] '
         'Trailing comment breaks ignore suppression. {v2}',
     correctionMessage:
         'Move the comment to the line above the ignore directive.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addCompilationUnit((CompilationUnit unit) {
+    context.addCompilationUnit((CompilationUnit unit) {
       Token? token = unit.beginToken;
 
       while (token != null && !token.isEof) {
@@ -8521,9 +8227,6 @@ class AvoidIgnoreTrailingCommentRule extends SaropaLintRule {
     });
   }
 
-  @override
-  List<Fix> getFixes() => <Fix>[_MoveTrailingCommentFix()];
-
   static bool _hasTrailingComment(String lexeme) {
     return IgnoreUtils.trailingCommentOnIgnore.hasMatch(lexeme);
   }
@@ -8542,8 +8245,9 @@ class AvoidIgnoreTrailingCommentRule extends SaropaLintRule {
     // Check for trailing // comment first (higher priority)
     final trailingSlashIndex = afterColon.indexOf('//');
     if (trailingSlashIndex >= 0) {
-      final directive =
-          lexeme.substring(0, colonIndex + 1 + trailingSlashIndex).trimRight();
+      final directive = lexeme
+          .substring(0, colonIndex + 1 + trailingSlashIndex)
+          .trimRight();
       final trailing = afterColon.substring(trailingSlashIndex).trim();
       return (directive: directive, trailing: trailing);
     }
@@ -8551,63 +8255,15 @@ class AvoidIgnoreTrailingCommentRule extends SaropaLintRule {
     // Check for trailing - separator (space-hyphen-space)
     final dashMatch = RegExp(r'\s+-\s+').firstMatch(afterColon);
     if (dashMatch != null) {
-      final directive =
-          lexeme.substring(0, colonIndex + 1 + dashMatch.start).trimRight();
+      final directive = lexeme
+          .substring(0, colonIndex + 1 + dashMatch.start)
+          .trimRight();
       final text = afterColon.substring(dashMatch.end).trim();
       if (text.isEmpty) return null;
       return (directive: directive, trailing: '// $text');
     }
 
     return null;
-  }
-}
-
-class _MoveTrailingCommentFix extends DartFix {
-  @override
-  void run(
-    CustomLintResolver resolver,
-    ChangeReporter reporter,
-    CustomLintContext context,
-    AnalysisError analysisError,
-    List<AnalysisError> others,
-  ) {
-    context.registry.addCompilationUnit((CompilationUnit unit) {
-      Token? token = unit.beginToken;
-
-      while (token != null && !token.isEof) {
-        Token? comment = token.precedingComments;
-        while (comment != null) {
-          if (comment.offset == analysisError.offset) {
-            _applyFix(comment, analysisError, reporter);
-            return;
-          }
-          comment = comment.next;
-        }
-        token = token.next;
-      }
-    });
-  }
-
-  void _applyFix(
-    Token comment,
-    AnalysisError error,
-    ChangeReporter reporter,
-  ) {
-    final parts = AvoidIgnoreTrailingCommentRule.splitParts(
-      comment.lexeme,
-    );
-    if (parts == null) return;
-
-    final replacement = '${parts.trailing}\n${parts.directive}';
-
-    final changeBuilder = reporter.createChangeBuilder(
-      message: 'Move comment above directive',
-      priority: 80,
-    );
-
-    changeBuilder.addDartFileEdit((builder) {
-      builder.addSimpleReplacement(error.sourceRange, replacement);
-    });
   }
 }
 
@@ -8637,7 +8293,7 @@ class _MoveTrailingCommentFix extends DartFix {
 /// final path = '$baseUrl/api/$endpoint';
 /// ```
 class AvoidMissingInterpolationRule extends SaropaLintRule {
-  const AvoidMissingInterpolationRule() : super(code: _code);
+  AvoidMissingInterpolationRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.medium;
@@ -8646,21 +8302,19 @@ class AvoidMissingInterpolationRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_missing_interpolation',
-    problemMessage:
-        '[avoid_missing_interpolation] String concatenation using the + operator combines a string literal with a variable or expression. String interpolation (\$variable or \${expression}) is the idiomatic Dart approach that is more readable, less error-prone (no accidental space omission between segments), and avoids creating intermediate String objects for each + operation, improving both clarity and performance in concatenation-heavy code paths.',
+    'avoid_missing_interpolation',
+    '[avoid_missing_interpolation] String concatenation using the + operator combines a string literal with a variable or expression. String interpolation (\$variable or \${expression}) is the idiomatic Dart approach that is more readable, less error-prone (no accidental space omission between segments), and avoids creating intermediate String objects for each + operation, improving both clarity and performance in concatenation-heavy code paths.',
     correctionMessage:
         'Replace string concatenation with string interpolation using \$variable or \${expression} syntax for cleaner, more idiomatic Dart code.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addBinaryExpression((BinaryExpression node) {
+    context.addBinaryExpression((BinaryExpression node) {
       if (node.operator.type != TokenType.PLUS) return;
 
       final leftType = node.leftOperand.staticType;
@@ -8688,38 +8342,7 @@ class AvoidMissingInterpolationRule extends SaropaLintRule {
         }
       }
 
-      reporter.atNode(node, code);
-    });
-  }
-
-  @override
-  List<Fix> getFixes() => <Fix>[_UseStringInterpolationFix()];
-}
-
-class _UseStringInterpolationFix extends DartFix {
-  @override
-  void run(
-    CustomLintResolver resolver,
-    ChangeReporter reporter,
-    CustomLintContext context,
-    AnalysisError analysisError,
-    List<AnalysisError> others,
-  ) {
-    context.registry.addBinaryExpression((BinaryExpression node) {
-      if (!analysisError.sourceRange.intersects(node.sourceRange)) return;
-      if (node.operator.type != TokenType.PLUS) return;
-
-      final changeBuilder = reporter.createChangeBuilder(
-        message: 'Convert to string interpolation',
-        priority: 1,
-      );
-
-      changeBuilder.addDartFileEdit((builder) {
-        builder.addSimpleInsertion(
-          node.offset,
-          '/* TODO: use string interpolation instead of + concatenation */ ',
-        );
-      });
+      reporter.atNode(node);
     });
   }
 }
@@ -8753,7 +8376,7 @@ class _UseStringInterpolationFix extends DartFix {
 /// }
 /// ```
 class AvoidIgnoringReturnValuesRule extends SaropaLintRule {
-  const AvoidIgnoringReturnValuesRule() : super(code: _code);
+  AvoidIgnoringReturnValuesRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.medium;
@@ -8762,16 +8385,15 @@ class AvoidIgnoringReturnValuesRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_ignoring_return_values',
-    problemMessage:
-        '[avoid_ignoring_return_values] Return value of this invocation is '
+    'avoid_ignoring_return_values',
+    '[avoid_ignoring_return_values] Return value of this invocation is '
         'ignored. Discarding return values can hide bugs where an important '
         'result (a Future, a boolean success flag, or a parsed value) is '
         'silently lost. Assign the result to a variable or remove the call '
         'if it is truly unnecessary. {v1}',
     correctionMessage:
         'Assign the return value to a variable, or use it in an expression.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   /// Methods whose return values are commonly and safely ignored.
@@ -8812,11 +8434,10 @@ class AvoidIgnoringReturnValuesRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addExpressionStatement((ExpressionStatement node) {
+    context.addExpressionStatement((ExpressionStatement node) {
       final Expression expression = node.expression;
 
       // Only check method invocations and function invocations
@@ -8856,7 +8477,7 @@ class AvoidIgnoringReturnValuesRule extends SaropaLintRule {
         }
       }
 
-      reporter.atNode(expression, code);
+      reporter.atNode(expression);
     });
   }
 }

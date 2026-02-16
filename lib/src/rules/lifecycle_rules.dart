@@ -7,8 +7,6 @@
 library;
 
 import 'package:analyzer/dart/ast/ast.dart';
-import 'package:analyzer/error/error.dart' show DiagnosticSeverity;
-import 'package:custom_lint_builder/custom_lint_builder.dart';
 
 import '../saropa_lint_rule.dart';
 
@@ -48,7 +46,7 @@ import '../saropa_lint_rule.dart';
 /// }
 /// ```
 class AvoidWorkInPausedStateRule extends SaropaLintRule {
-  const AvoidWorkInPausedStateRule() : super(code: _code);
+  AvoidWorkInPausedStateRule() : super(code: _code);
 
   /// Battery drain and unexpected behavior in background.
   @override
@@ -58,21 +56,19 @@ class AvoidWorkInPausedStateRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_work_in_paused_state',
-    problemMessage:
-        '[avoid_work_in_paused_state] Timer.periodic without lifecycle handling. Will run when app is backgrounded. Timers and periodic callbacks should pause when the app is backgrounded to save battery and avoid unexpected behavior. {v2}',
+    'avoid_work_in_paused_state',
+    '[avoid_work_in_paused_state] Timer.periodic without lifecycle handling. Will run when app is backgrounded. Timers and periodic callbacks should pause when the app is backgrounded to save battery and avoid unexpected behavior. {v2}',
     correctionMessage:
         'Add WidgetsBindingObserver and pause timer in didChangeAppLifecycleState. Verify the change works correctly with existing tests and add coverage for the new behavior.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodInvocation((node) {
+    context.addMethodInvocation((node) {
       // Check for Timer.periodic
       final target = node.target;
       if (target is! SimpleIdentifier || target.name != 'Timer') {
@@ -106,11 +102,11 @@ class AvoidWorkInPausedStateRule extends SaropaLintRule {
         return;
       }
 
-      reporter.atNode(node, code);
+      reporter.atNode(node);
     });
 
     // Also check Stream.periodic
-    context.registry.addInstanceCreationExpression((node) {
+    context.addInstanceCreationExpression((node) {
       final typeName = node.constructorName.type.name.lexeme;
       final constructorName = node.constructorName.name?.name;
 
@@ -141,7 +137,7 @@ class AvoidWorkInPausedStateRule extends SaropaLintRule {
         return;
       }
 
-      reporter.atNode(node, code);
+      reporter.atNode(node);
     });
   }
 }
@@ -180,7 +176,7 @@ class AvoidWorkInPausedStateRule extends SaropaLintRule {
 /// }
 /// ```
 class RequireResumeStateRefreshRule extends SaropaLintRule {
-  const RequireResumeStateRefreshRule() : super(code: _code);
+  RequireResumeStateRefreshRule() : super(code: _code);
 
   /// Stale data after returning from background.
   @override
@@ -190,21 +186,19 @@ class RequireResumeStateRefreshRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'require_resume_state_refresh',
-    problemMessage:
-        '[require_resume_state_refresh] App handles paused state but not resumed, leaving UI stale after returning from background. When app returns from background, data may be stale and must be refreshed. Missing resumed handling leads to outdated UI. {v2}',
+    'require_resume_state_refresh',
+    '[require_resume_state_refresh] App handles paused state but not resumed, leaving UI stale after returning from background. When app returns from background, data may be stale and must be refreshed. Missing resumed handling leads to outdated UI. {v2}',
     correctionMessage:
         'Handle AppLifecycleState.resumed to refresh data when app returns to foreground.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodDeclaration((node) {
+    context.addMethodDeclaration((node) {
       if (node.name.lexeme != 'didChangeAppLifecycleState') {
         return;
       }
@@ -212,7 +206,8 @@ class RequireResumeStateRefreshRule extends SaropaLintRule {
       final methodSource = node.toSource();
 
       // Check if it handles paused
-      final handlesPaused = methodSource.contains('AppLifecycleState.paused') ||
+      final handlesPaused =
+          methodSource.contains('AppLifecycleState.paused') ||
           methodSource.contains('.paused');
 
       if (!handlesPaused) {
@@ -222,10 +217,10 @@ class RequireResumeStateRefreshRule extends SaropaLintRule {
       // Check if it handles resumed
       final handlesResumed =
           methodSource.contains('AppLifecycleState.resumed') ||
-              methodSource.contains('.resumed');
+          methodSource.contains('.resumed');
 
       if (!handlesResumed) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
   }
@@ -260,7 +255,7 @@ class RequireResumeStateRefreshRule extends SaropaLintRule {
 /// }
 /// ```
 class RequireDidUpdateWidgetCheckRule extends SaropaLintRule {
-  const RequireDidUpdateWidgetCheckRule() : super(code: _code);
+  RequireDidUpdateWidgetCheckRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -273,21 +268,19 @@ class RequireDidUpdateWidgetCheckRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
-    name: 'require_did_update_widget_check',
-    problemMessage:
-        '[require_did_update_widget_check] didUpdateWidget triggers updates without checking if properties changed, causing unnecessary rebuilds. didUpdateWidget receives the old widget for comparison. Without comparing oldWidget to widget, you might trigger unnecessary updates. {v3}',
+    'require_did_update_widget_check',
+    '[require_did_update_widget_check] didUpdateWidget triggers updates without checking if properties changed, causing unnecessary rebuilds. didUpdateWidget receives the old widget for comparison. Without comparing oldWidget to widget, you might trigger unnecessary updates. {v3}',
     correctionMessage:
         'Compare properties using operators (oldWidget.x != widget.x) or functions (listEquals, setEquals, mapEquals) before updating state.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodDeclaration((MethodDeclaration node) {
+    context.addMethodDeclaration((MethodDeclaration node) {
       if (node.name.lexeme != 'didUpdateWidget') return;
 
       final FunctionBody body = node.body;
@@ -319,11 +312,13 @@ class RequireDidUpdateWidgetCheckRule extends SaropaLintRule {
             RegExp.escape(paramName) +
             r'\s*\)',
       );
-      final String bodyWithoutSuper =
-          bodySource.replaceAll(superCallPattern, '');
+      final String bodyWithoutSuper = bodySource.replaceAll(
+        superCallPattern,
+        '',
+      );
 
       if (!bodyWithoutSuper.contains(paramName)) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
   }
@@ -372,7 +367,7 @@ class RequireDidUpdateWidgetCheckRule extends SaropaLintRule {
 /// }
 /// ```
 class RequireLateInitializationInInitStateRule extends SaropaLintRule {
-  const RequireLateInitializationInInitStateRule() : super(code: _code);
+  RequireLateInitializationInInitStateRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.high;
@@ -384,21 +379,19 @@ class RequireLateInitializationInInitStateRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
-    name: 'require_late_initialization_in_init_state',
-    problemMessage:
-        '[require_late_initialization_in_init_state] Late field initialized in build() recreates the object on every setState() call. AnimationController instances restart their animations, StreamSubscription objects create duplicate listeners, and the resulting UI jank becomes visible to users. This also wastes memory by allocating new objects on every widget rebuild cycle. {v3}',
+    'require_late_initialization_in_init_state',
+    '[require_late_initialization_in_init_state] Late field initialized in build() recreates the object on every setState() call. AnimationController instances restart their animations, StreamSubscription objects create duplicate listeners, and the resulting UI jank becomes visible to users. This also wastes memory by allocating new objects on every widget rebuild cycle. {v3}',
     correctionMessage:
         'Move late field initialization into initState(), which executes only once when the State object is first created, ensuring stable object lifecycle and preventing duplicate allocations.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addClassDeclaration((ClassDeclaration node) {
+    context.addClassDeclaration((ClassDeclaration node) {
       // Only check State classes
       final ExtendsClause? extendsClause = node.extendsClause;
       if (extendsClause == null) return;
@@ -450,7 +443,7 @@ class RequireLateInitializationInInitStateRule extends SaropaLintRule {
 
       if (assignmentPattern.hasMatch(bodySource)) {
         // Report at the build method level
-        reporter.atNode(buildMethod, code);
+        reporter.atNode(buildMethod);
         return; // Only report once per build method
       }
     }
@@ -499,7 +492,7 @@ class RequireLateInitializationInInitStateRule extends SaropaLintRule {
 /// ```
 class RequireAppLifecycleHandlingRule extends SaropaLintRule {
   /// Creates a new instance of [RequireAppLifecycleHandlingRule].
-  const RequireAppLifecycleHandlingRule() : super(code: _code);
+  RequireAppLifecycleHandlingRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.medium;
@@ -511,27 +504,27 @@ class RequireAppLifecycleHandlingRule extends SaropaLintRule {
   bool get requiresWidgets => true;
 
   @override
-  List<String> get configAliases =>
-      const <String>['require_ios_lifecycle_handling'];
+  List<String> get configAliases => const <String>[
+    'require_ios_lifecycle_handling',
+  ];
 
   static const LintCode _code = LintCode(
-    name: 'require_app_lifecycle_handling',
-    problemMessage:
-        '[require_app_lifecycle_handling] Timer or subscription detected '
+    'require_app_lifecycle_handling',
+    '[require_app_lifecycle_handling] Timer or subscription detected '
         'without lifecycle handling. '
         'Stop background work when app is inactive to save battery. {v4}',
-    correctionMessage: 'Implement WidgetsBindingObserver and pause/resume in '
+    correctionMessage:
+        'Implement WidgetsBindingObserver and pause/resume in '
         'didChangeAppLifecycleState, or use AppLifecycleListener.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addClassDeclaration((ClassDeclaration node) {
+    context.addClassDeclaration((ClassDeclaration node) {
       if (!_extendsState(node)) return;
       if (_hasLifecycleHandling(node)) return;
       if (_hasBackgroundWork(node)) {

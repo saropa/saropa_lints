@@ -1,8 +1,6 @@
 // ignore_for_file: depend_on_referenced_packages, deprecated_member_use
 
 import 'package:analyzer/dart/ast/ast.dart';
-import 'package:analyzer/error/error.dart' show DiagnosticSeverity;
-import 'package:custom_lint_builder/custom_lint_builder.dart';
 
 import '../mode_constants_utils.dart';
 import '../saropa_lint_rule.dart';
@@ -34,7 +32,7 @@ import '../saropa_lint_rule.dart';
 /// final baseUrl = AppConfig.instance.baseUrl;
 /// ```
 class AvoidHardcodedConfigRule extends SaropaLintRule {
-  const AvoidHardcodedConfigRule() : super(code: _code);
+  AvoidHardcodedConfigRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.medium;
@@ -43,12 +41,11 @@ class AvoidHardcodedConfigRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_hardcoded_config',
-    problemMessage:
-        '[avoid_hardcoded_config] Hardcoded configuration value detected. Embedding URLs, ports, API keys, or feature flags directly in source code makes the app inflexible across environments (dev, staging, production) and forces a rebuild for every configuration change, increasing deployment risk. {v4}',
+    'avoid_hardcoded_config',
+    '[avoid_hardcoded_config] Hardcoded configuration value detected. Embedding URLs, ports, API keys, or feature flags directly in source code makes the app inflexible across environments (dev, staging, production) and forces a rebuild for every configuration change, increasing deployment risk. {v4}',
     correctionMessage:
         'Use String.fromEnvironment, dotenv, or a config service for environment-specific values.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   // Patterns that suggest hardcoded config
@@ -70,11 +67,10 @@ class AvoidHardcodedConfigRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addVariableDeclaration((VariableDeclaration node) {
+    context.addVariableDeclaration((VariableDeclaration node) {
       final Expression? initializer = node.initializer;
       if (initializer is! StringLiteral) return;
 
@@ -88,13 +84,12 @@ class AvoidHardcodedConfigRule extends SaropaLintRule {
 
       // Check if value looks like a hardcoded config
       if (_urlPattern.hasMatch(value) || _keyPattern.hasMatch(value)) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
 
     // Also check top-level constants
-    context.registry
-        .addTopLevelVariableDeclaration((TopLevelVariableDeclaration node) {
+    context.addTopLevelVariableDeclaration((TopLevelVariableDeclaration node) {
       for (final VariableDeclaration variable in node.variables.variables) {
         final Expression? initializer = variable.initializer;
         if (initializer is! StringLiteral) continue;
@@ -107,7 +102,7 @@ class AvoidHardcodedConfigRule extends SaropaLintRule {
         // Check for URL or key patterns in config-named variables
         if (_configNamePattern.hasMatch(varName)) {
           if (_urlPattern.hasMatch(value) || _keyPattern.hasMatch(value)) {
-            reporter.atNode(variable, code);
+            reporter.atNode(variable);
           }
         }
       }
@@ -138,7 +133,7 @@ class AvoidHardcodedConfigRule extends SaropaLintRule {
 /// const testUrl = 'https://api.example.com/v1/users'; // const preferred
 /// ```
 class AvoidHardcodedConfigTestRule extends SaropaLintRule {
-  const AvoidHardcodedConfigTestRule() : super(code: _code);
+  AvoidHardcodedConfigTestRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.low;
@@ -150,32 +145,29 @@ class AvoidHardcodedConfigTestRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => const <FileType>{FileType.test};
 
   static const LintCode _code = LintCode(
-    name: 'avoid_hardcoded_config_test',
-    problemMessage:
-        '[avoid_hardcoded_config_test] Hardcoded configuration detected in test file. '
+    'avoid_hardcoded_config_test',
+    '[avoid_hardcoded_config_test] Hardcoded configuration detected in test file. '
         'Consider using a const or shared test helper. {v2}',
     correctionMessage:
         'Extract to a const or shared test fixture if reused across tests.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addVariableDeclaration((VariableDeclaration node) {
+    context.addVariableDeclaration((VariableDeclaration node) {
       if (_isHardcodedConfig(node)) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
 
-    context.registry
-        .addTopLevelVariableDeclaration((TopLevelVariableDeclaration node) {
+    context.addTopLevelVariableDeclaration((TopLevelVariableDeclaration node) {
       for (final VariableDeclaration variable in node.variables.variables) {
         if (_isHardcodedConfig(variable)) {
-          reporter.atNode(variable, code);
+          reporter.atNode(variable);
         }
       }
     });
@@ -244,7 +236,7 @@ class AvoidHardcodedConfigTestRule extends SaropaLintRule {
 /// }
 /// ```
 class AvoidMixedEnvironmentsRule extends SaropaLintRule {
-  const AvoidMixedEnvironmentsRule() : super(code: _code);
+  AvoidMixedEnvironmentsRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.critical;
@@ -257,12 +249,11 @@ class AvoidMixedEnvironmentsRule extends SaropaLintRule {
   bool get requiresClassDeclaration => true;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_mixed_environments',
-    problemMessage:
-        '[avoid_mixed_environments] Mixing production and development configuration in your codebase creates serious security vulnerabilities. Debug APIs may expose sensitive data, development endpoints can corrupt production databases, and credentials may leak to unauthorized users. This can result in data breaches, compliance violations, and loss of user trust. Environment-specific configuration must be strictly separated and managed. {v4}',
+    'avoid_mixed_environments',
+    '[avoid_mixed_environments] Mixing production and development configuration in your codebase creates serious security vulnerabilities. Debug APIs may expose sensitive data, development endpoints can corrupt production databases, and credentials may leak to unauthorized users. This can result in data breaches, compliance violations, and loss of user trust. Environment-specific configuration must be strictly separated and managed. {v4}',
     correctionMessage:
         'Use conditional configuration based on kReleaseMode, environment variables, or build flavors to separate production and development settings. Audit your codebase for hardcoded endpoints, credentials, or debug flags and refactor to ensure strict separation. Document environment management practices for your team and enforce them in code reviews.',
-    errorSeverity: DiagnosticSeverity.ERROR,
+    severity: DiagnosticSeverity.ERROR,
   );
 
   static final RegExp _prodPattern = RegExp(
@@ -277,11 +268,10 @@ class AvoidMixedEnvironmentsRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addClassDeclaration((ClassDeclaration node) {
+    context.addClassDeclaration((ClassDeclaration node) {
       final String className = node.name.lexeme.toLowerCase();
 
       // Only check config-related classes
@@ -332,7 +322,7 @@ class AvoidMixedEnvironmentsRule extends SaropaLintRule {
 
       // If both prod and dev indicators found, report
       if (hasProdIndicator && hasDevIndicator && firstProdMember != null) {
-        reporter.atNode(firstProdMember, code);
+        reporter.atNode(firstProdMember);
       }
     });
   }
@@ -358,7 +348,7 @@ class AvoidMixedEnvironmentsRule extends SaropaLintRule {
 /// final enabled = featureFlags.isEnabled(FeatureFlag.newCheckoutFlow);
 /// ```
 class RequireFeatureFlagTypeSafetyRule extends SaropaLintRule {
-  const RequireFeatureFlagTypeSafetyRule() : super(code: _code);
+  RequireFeatureFlagTypeSafetyRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.medium;
@@ -367,9 +357,8 @@ class RequireFeatureFlagTypeSafetyRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'require_feature_flag_type_safety',
-    problemMessage:
-        '[require_feature_flag_type_safety] Feature flag accessed with a '
+    'require_feature_flag_type_safety',
+    '[require_feature_flag_type_safety] Feature flag accessed with a '
         'raw string literal key. String-based lookups are error-prone: '
         'typos compile successfully but fail silently at runtime, renames '
         'require a fragile codebase-wide search-and-replace, and there '
@@ -377,7 +366,7 @@ class RequireFeatureFlagTypeSafetyRule extends SaropaLintRule {
     correctionMessage:
         'Define flag keys as typed constants (enum values or static '
         'const fields) and reference those instead of string literals.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   /// Unambiguous flag methods - still require a flag-like receiver to
@@ -409,11 +398,10 @@ class RequireFeatureFlagTypeSafetyRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       final String methodName = node.methodName.name;
 
       if (_flagSpecificMethods.contains(methodName)) {

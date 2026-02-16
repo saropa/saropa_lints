@@ -10,10 +10,6 @@ import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/token.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
 import 'package:analyzer/dart/element/type.dart';
-import 'package:analyzer/error/error.dart'
-    show AnalysisError, DiagnosticSeverity;
-import 'package:custom_lint_builder/custom_lint_builder.dart';
-
 import '../import_utils.dart';
 import '../saropa_lint_rule.dart';
 
@@ -52,7 +48,7 @@ import '../saropa_lint_rule.dart';
 /// )
 /// ```
 class RequireUnknownRouteHandlerRule extends SaropaLintRule {
-  const RequireUnknownRouteHandlerRule() : super(code: _code);
+  RequireUnknownRouteHandlerRule() : super(code: _code);
 
   /// Significant issue. Address when count exceeds 10.
   @override
@@ -62,23 +58,19 @@ class RequireUnknownRouteHandlerRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'require_unknown_route_handler',
-    problemMessage:
-        '[require_unknown_route_handler] MaterialApp or CupertinoApp defines routes or onGenerateRoute but does not provide an onUnknownRoute handler. When a user navigates to an undefined route path via deep link, push notification, or programmatic navigation, the app throws an unhandled exception and crashes instead of showing a helpful error screen. {v4}',
+    'require_unknown_route_handler',
+    '[require_unknown_route_handler] MaterialApp or CupertinoApp defines routes or onGenerateRoute but does not provide an onUnknownRoute handler. When a user navigates to an undefined route path via deep link, push notification, or programmatic navigation, the app throws an unhandled exception and crashes instead of showing a helpful error screen. {v4}',
     correctionMessage:
         'Add an onUnknownRoute callback to MaterialApp that returns a route to a user-friendly 404 error page when navigation targets an undefined route path.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addInstanceCreationExpression((
-      InstanceCreationExpression node,
-    ) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final String? constructorName = node.constructorName.type.element?.name;
       if (constructorName != 'MaterialApp' &&
           constructorName != 'CupertinoApp') {
@@ -138,7 +130,7 @@ class RequireUnknownRouteHandlerRule extends SaropaLintRule {
 /// }
 /// ```
 class AvoidContextAfterNavigationRule extends SaropaLintRule {
-  const AvoidContextAfterNavigationRule() : super(code: _code);
+  AvoidContextAfterNavigationRule() : super(code: _code);
 
   /// Significant issue. Address when count exceeds 10.
   @override
@@ -148,26 +140,24 @@ class AvoidContextAfterNavigationRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_context_after_navigation',
-    problemMessage:
-        '[avoid_context_after_navigation] BuildContext accessed after an awaited navigation call without a mounted check. The widget that owns this context is likely disposed by the time the await completes, and calling ScaffoldMessenger.of(), Navigator.of(), or Theme.of() on a disposed context throws a FlutterError that crashes the app or produces silent failures in release mode. {v3}',
+    'avoid_context_after_navigation',
+    '[avoid_context_after_navigation] BuildContext accessed after an awaited navigation call without a mounted check. The widget that owns this context is likely disposed by the time the await completes, and calling ScaffoldMessenger.of(), Navigator.of(), or Theme.of() on a disposed context throws a FlutterError that crashes the app or produces silent failures in release mode. {v3}',
     correctionMessage:
         'Insert "if (!mounted) return;" immediately after the awaited navigation call and before any subsequent BuildContext usage to guard against accessing a disposed widget tree.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodDeclaration((MethodDeclaration node) {
+    context.addMethodDeclaration((MethodDeclaration node) {
       if (!node.body.isAsynchronous) return;
 
       // Check if in a State class
-      final ClassDeclaration? classDecl =
-          node.thisOrAncestorOfType<ClassDeclaration>();
+      final ClassDeclaration? classDecl = node
+          .thisOrAncestorOfType<ClassDeclaration>();
       if (classDecl == null) return;
 
       final ExtendsClause? extendsClause = classDecl.extendsClause;
@@ -179,9 +169,6 @@ class AvoidContextAfterNavigationRule extends SaropaLintRule {
       node.body.visitChildren(_NavigationContextVisitor(reporter, code));
     });
   }
-
-  @override
-  List<Fix> getFixes() => <Fix>[_AddMountedCheckFix()];
 }
 
 class _NavigationContextVisitor extends RecursiveAstVisitor<void> {
@@ -239,45 +226,18 @@ class _NavigationContextVisitor extends RecursiveAstVisitor<void> {
             targetSource == 'Navigator.of(context)' ||
             targetSource == 'ScaffoldMessenger.of(context)' ||
             targetSource == 'Theme.of(context)') {
-          reporter.atNode(node, code);
+          reporter.atNode(node);
         }
       }
       // Check arguments for direct context usage
       for (final Expression arg in node.argumentList.arguments) {
         if (arg is SimpleIdentifier && arg.name == 'context') {
-          reporter.atNode(node, code);
+          reporter.atNode(node);
           break;
         }
       }
     }
     super.visitMethodInvocation(node);
-  }
-}
-
-class _AddMountedCheckFix extends DartFix {
-  @override
-  void run(
-    CustomLintResolver resolver,
-    ChangeReporter reporter,
-    CustomLintContext context,
-    AnalysisError analysisError,
-    List<AnalysisError> others,
-  ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
-      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
-
-      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
-        message: 'Add mounted check before this',
-        priority: 1,
-      );
-
-      changeBuilder.addDartFileEdit((builder) {
-        builder.addSimpleInsertion(
-          node.offset,
-          'if (!mounted) return;\n    ',
-        );
-      });
-    });
   }
 }
 
@@ -311,7 +271,7 @@ class _AddMountedCheckFix extends DartFix {
 /// )
 /// ```
 class RequireRouteTransitionConsistencyRule extends SaropaLintRule {
-  const RequireRouteTransitionConsistencyRule() : super(code: _code);
+  RequireRouteTransitionConsistencyRule() : super(code: _code);
 
   /// Significant issue. Address when count exceeds 10.
   @override
@@ -321,12 +281,11 @@ class RequireRouteTransitionConsistencyRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'require_route_transition_consistency',
-    problemMessage:
-        '[require_route_transition_consistency] Multiple route transition types (MaterialPageRoute, CupertinoPageRoute, PageRouteBuilder) are mixed in the same file. Mixing slide, fade, and zoom transitions within a single app produces a jarring, unprofessional navigation experience that disorients users and undermines perceived app quality. {v4}',
+    'require_route_transition_consistency',
+    '[require_route_transition_consistency] Multiple route transition types (MaterialPageRoute, CupertinoPageRoute, PageRouteBuilder) are mixed in the same file. Mixing slide, fade, and zoom transitions within a single app produces a jarring, unprofessional navigation experience that disorients users and undermines perceived app quality. {v4}',
     correctionMessage:
         'Define a unified transition strategy in ThemeData.pageTransitionsTheme and use a single route type throughout the app to ensure all page transitions are visually consistent.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   static const Set<String> _routeTypes = <String>{
@@ -340,17 +299,14 @@ class RequireRouteTransitionConsistencyRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
     // Track route types found in this file
     final Set<String> foundRouteTypes = <String>{};
     final List<AstNode> routeNodes = <AstNode>[];
 
-    context.registry.addInstanceCreationExpression((
-      InstanceCreationExpression node,
-    ) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final String? typeName = node.constructorName.type.element?.name;
       if (typeName != null && _routeTypes.contains(typeName)) {
         foundRouteTypes.add(typeName);
@@ -400,7 +356,7 @@ class RequireRouteTransitionConsistencyRule extends SaropaLintRule {
 /// context.go('/details');
 /// ```
 class AvoidNavigatorPushUnnamedRule extends SaropaLintRule {
-  const AvoidNavigatorPushUnnamedRule() : super(code: _code);
+  AvoidNavigatorPushUnnamedRule() : super(code: _code);
 
   /// Significant issue. Address when count exceeds 10.
   @override
@@ -410,21 +366,19 @@ class AvoidNavigatorPushUnnamedRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_navigator_push_unnamed',
-    problemMessage:
-        '[avoid_navigator_push_unnamed] Navigator.push used with an inline route constructor instead of a named route. Inline routes prevent deep linking, break URL-based navigation, and make route management unmaintainable. Users cannot share or bookmark specific screens, and analytics tools cannot track page views accurately. {v3}',
+    'avoid_navigator_push_unnamed',
+    '[avoid_navigator_push_unnamed] Navigator.push used with an inline route constructor instead of a named route. Inline routes prevent deep linking, break URL-based navigation, and make route management unmaintainable. Users cannot share or bookmark specific screens, and analytics tools cannot track page views accurately. {v3}',
     correctionMessage:
         'Define named routes in MaterialApp.routes or use a router package such as go_router. This ensures navigation is maintainable, testable, and less error-prone as your app scales. Update all push calls to use named routes for clarity and reliability.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       final String methodName = node.methodName.name;
 
       // Check for Navigator.push (not pushNamed)
@@ -483,7 +437,7 @@ class AvoidNavigatorPushUnnamedRule extends SaropaLintRule {
 /// )
 /// ```
 class RequireRouteGuardsRule extends SaropaLintRule {
-  const RequireRouteGuardsRule() : super(code: _code);
+  RequireRouteGuardsRule() : super(code: _code);
 
   /// Significant issue. Address when count exceeds 10.
   @override
@@ -493,12 +447,11 @@ class RequireRouteGuardsRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'require_route_guards',
-    problemMessage:
-        '[require_route_guards] Protected route path (profile, settings, admin, payment) lacks an authentication guard. Without a redirect callback, unauthorized users can access sensitive pages directly via deep link or URL manipulation, exposing personal data, financial information, or admin controls to unauthenticated sessions. {v3}',
+    'require_route_guards',
+    '[require_route_guards] Protected route path (profile, settings, admin, payment) lacks an authentication guard. Without a redirect callback, unauthorized users can access sensitive pages directly via deep link or URL manipulation, exposing personal data, financial information, or admin controls to unauthenticated sessions. {v3}',
     correctionMessage:
         'Add a redirect callback or middleware to check authentication before allowing access to this route. Ensure that only authorized users can reach protected pages, and redirect unauthenticated users to a login or error page. This helps prevent unauthorized access and protects user data.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   static const Set<String> _protectedRoutePatterns = <String>{
@@ -517,13 +470,10 @@ class RequireRouteGuardsRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addInstanceCreationExpression((
-      InstanceCreationExpression node,
-    ) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final String? typeName = node.constructorName.type.element?.name;
       if (typeName != 'GoRoute' && typeName != 'Route') return;
 
@@ -588,7 +538,7 @@ class RequireRouteGuardsRule extends SaropaLintRule {
 /// )
 /// ```
 class AvoidCircularRedirectsRule extends SaropaLintRule {
-  const AvoidCircularRedirectsRule() : super(code: _code);
+  AvoidCircularRedirectsRule() : super(code: _code);
 
   /// Significant issue. Address when count exceeds 10.
   @override
@@ -598,23 +548,19 @@ class AvoidCircularRedirectsRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_circular_redirects',
-    problemMessage:
-        '[avoid_circular_redirects] GoRoute redirect callback always returns a path and never returns null, creating an unconditional redirect that forms an infinite loop. The router exhausts the redirect limit and throws an exception, crashing the app or permanently locking users out of all navigation when the redirect chain has no termination condition. {v2}',
+    'avoid_circular_redirects',
+    '[avoid_circular_redirects] GoRoute redirect callback always returns a path and never returns null, creating an unconditional redirect that forms an infinite loop. The router exhausts the redirect limit and throws an exception, crashing the app or permanently locking users out of all navigation when the redirect chain has no termination condition. {v2}',
     correctionMessage:
         'Update your redirect callback to always include a condition that returns null in some cases, breaking the redirect chain. This prevents infinite navigation loops and ensures users can access the intended pages without being stuck.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addInstanceCreationExpression((
-      InstanceCreationExpression node,
-    ) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final String? typeName = node.constructorName.type.element?.name;
       if (typeName != 'GoRoute') return;
 
@@ -670,7 +616,7 @@ class AvoidCircularRedirectsRule extends SaropaLintRule {
 /// }
 /// ```
 class AvoidPopWithoutResultRule extends SaropaLintRule {
-  const AvoidPopWithoutResultRule() : super(code: _code);
+  AvoidPopWithoutResultRule() : super(code: _code);
 
   /// Significant issue. Address when count exceeds 10.
   @override
@@ -680,21 +626,19 @@ class AvoidPopWithoutResultRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_pop_without_result',
-    problemMessage:
-        '[avoid_pop_without_result] Navigator.push awaits a result but does not handle the null case when the user dismisses the route by pressing the back button or using a system gesture. Accessing properties on a null result throws a runtime exception that crashes the app. This creates a fragile navigation flow that fails under normal user interaction patterns. {v2}',
+    'avoid_pop_without_result',
+    '[avoid_pop_without_result] Navigator.push awaits a result but does not handle the null case when the user dismisses the route by pressing the back button or using a system gesture. Accessing properties on a null result throws a runtime exception that crashes the app. This creates a fragile navigation flow that fails under normal user interaction patterns. {v2}',
     correctionMessage:
         'Check if the navigation result is null before accessing its properties, and provide a default value or early return to handle route dismissal without a result.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addAwaitExpression((AwaitExpression node) {
+    context.addAwaitExpression((AwaitExpression node) {
       final Expression expression = node.expression;
       if (expression is! MethodInvocation) return;
 
@@ -730,7 +674,7 @@ class AvoidPopWithoutResultRule extends SaropaLintRule {
               !remainingCode.contains('$varName == null') &&
               !remainingCode.contains('$varName!') &&
               !remainingCode.contains('$varName?')) {
-            reporter.atNode(node, code);
+            reporter.atNode(node);
           }
         }
       }
@@ -784,7 +728,7 @@ class AvoidPopWithoutResultRule extends SaropaLintRule {
 /// )
 /// ```
 class PreferShellRouteForPersistentUiRule extends SaropaLintRule {
-  const PreferShellRouteForPersistentUiRule() : super(code: _code);
+  PreferShellRouteForPersistentUiRule() : super(code: _code);
 
   /// Significant issue. Address when count exceeds 10.
   @override
@@ -794,27 +738,23 @@ class PreferShellRouteForPersistentUiRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'prefer_shell_route_for_persistent_ui',
-    problemMessage:
-        '[prefer_shell_route_for_persistent_ui] Multiple GoRoute builders duplicate the same bottomNavigationBar, drawer, or NavigationRail instead of sharing a single wrapper. Each route rebuilds the persistent UI independently, causing duplicated code, inconsistent selection state across tabs, visual flicker during navigation, and increased memory usage from redundant widget trees. {v2}',
+    'prefer_shell_route_for_persistent_ui',
+    '[prefer_shell_route_for_persistent_ui] Multiple GoRoute builders duplicate the same bottomNavigationBar, drawer, or NavigationRail instead of sharing a single wrapper. Each route rebuilds the persistent UI independently, causing duplicated code, inconsistent selection state across tabs, visual flicker during navigation, and increased memory usage from redundant widget trees. {v2}',
     correctionMessage:
         'Wrap related routes in a ShellRoute to share persistent UI elements like bottomNavigationBar or drawer. This ensures consistent UI state, reduces code duplication, and improves navigation reliability across your app.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
     // Track routes with bottomNavigationBar/drawer
     final List<InstanceCreationExpression> routesWithPersistentUi =
         <InstanceCreationExpression>[];
 
-    context.registry.addInstanceCreationExpression((
-      InstanceCreationExpression node,
-    ) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final String? typeName = node.constructorName.type.element?.name;
       if (typeName != 'GoRoute') return;
 
@@ -890,7 +830,7 @@ class PreferShellRouteForPersistentUiRule extends SaropaLintRule {
 /// }
 /// ```
 class RequireDeepLinkFallbackRule extends SaropaLintRule {
-  const RequireDeepLinkFallbackRule() : super(code: _code);
+  RequireDeepLinkFallbackRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.high;
@@ -899,21 +839,19 @@ class RequireDeepLinkFallbackRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'require_deep_link_fallback',
-    problemMessage:
-        '[require_deep_link_fallback] Deep link handler navigates to content without verifying the target exists or is accessible. When a deep link references deleted, restricted, or invalid content, the app either crashes with a null reference error or displays a blank screen. Users tapping expired links in emails, notifications, or shared messages encounter a broken experience. {v9}',
+    'require_deep_link_fallback',
+    '[require_deep_link_fallback] Deep link handler navigates to content without verifying the target exists or is accessible. When a deep link references deleted, restricted, or invalid content, the app either crashes with a null reference error or displays a blank screen. Users tapping expired links in emails, notifications, or shared messages encounter a broken experience. {v9}',
     correctionMessage:
         'Add a fallback route or error screen that displays a user-friendly message when deep-linked content is missing, deleted, or inaccessible, with an option to navigate home.',
-    errorSeverity: DiagnosticSeverity.ERROR,
+    severity: DiagnosticSeverity.ERROR,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodDeclaration((MethodDeclaration node) {
+    context.addMethodDeclaration((MethodDeclaration node) {
       final String methodName = node.name.lexeme.toLowerCase();
 
       // Check for deep link handling methods
@@ -1049,7 +987,8 @@ class RequireDeepLinkFallbackRule extends SaropaLintRule {
       // Skip methods whose body has no deep link signals
       // If the body doesn't parse URIs or navigate, it's not a handler
       // regardless of method name
-      final bool hasDeepLinkSignal = bodySource.contains('Uri') ||
+      final bool hasDeepLinkSignal =
+          bodySource.contains('Uri') ||
           bodySource.contains('pathSegments') ||
           bodySource.contains('queryParameters') ||
           bodySource.contains('Navigator') ||
@@ -1065,7 +1004,8 @@ class RequireDeepLinkFallbackRule extends SaropaLintRule {
       if (!hasDeepLinkSignal) return;
 
       // Check for fallback patterns
-      final bool hasFallback = bodySource.contains('NotFound') ||
+      final bool hasFallback =
+          bodySource.contains('NotFound') ||
           bodySource.contains('404') ||
           bodySource.contains('error') ||
           bodySource.contains('null)') ||
@@ -1078,56 +1018,6 @@ class RequireDeepLinkFallbackRule extends SaropaLintRule {
       if (!hasFallback) {
         reporter.atToken(node.name, code);
       }
-    });
-  }
-
-  @override
-  List<Fix> getFixes() => <Fix>[_AddDeepLinkFallbackFix()];
-}
-
-/// Quick fix that wraps the deep link handler body with a try/catch pattern.
-class _AddDeepLinkFallbackFix extends DartFix {
-  @override
-  void run(
-    CustomLintResolver resolver,
-    ChangeReporter reporter,
-    CustomLintContext context,
-    AnalysisError analysisError,
-    List<AnalysisError> others,
-  ) {
-    context.registry.addMethodDeclaration((MethodDeclaration node) {
-      if (!analysisError.sourceRange.intersects(node.name.sourceRange)) return;
-
-      final FunctionBody? body = node.body;
-      if (body == null) return;
-
-      // Only fix block function bodies, not expression bodies
-      if (body is! BlockFunctionBody) return;
-
-      final Block block = body.block;
-      final String indent = '    '; // Standard 4-space indent
-
-      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
-        message: 'Wrap with try/catch for fallback handling',
-        priority: 80,
-      );
-
-      changeBuilder.addDartFileEdit((builder) {
-        // Insert try { after opening brace
-        builder.addSimpleInsertion(
-          block.leftBracket.end,
-          '\n${indent}try {',
-        );
-
-        // Insert catch block before closing brace
-        builder.addSimpleInsertion(
-          block.rightBracket.offset,
-          '} catch (e) {\n'
-          '$indent  // TODO: Handle error - show NotFound page or error message\n'
-          '$indent  rethrow;\n'
-          '$indent}\n$indent',
-        );
-      });
     });
   }
 }
@@ -1153,7 +1043,7 @@ class _AddDeepLinkFallbackFix extends DartFix {
 /// final token = uri.queryParameters['token'];
 /// ```
 class AvoidDeepLinkSensitiveParamsRule extends SaropaLintRule {
-  const AvoidDeepLinkSensitiveParamsRule() : super(code: _code);
+  AvoidDeepLinkSensitiveParamsRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.critical;
@@ -1162,12 +1052,11 @@ class AvoidDeepLinkSensitiveParamsRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_deep_link_sensitive_params',
-    problemMessage:
-        '[avoid_deep_link_sensitive_params] Deep link query parameter contains sensitive data (password, token, secret, API key, or credential), creating a security breach. Deep link URLs are recorded in system logs, browser history, HTTP referrer headers, and analytics platforms, permanently exposing credentials to attackers who gain access to those logs or the device history. {v4}',
+    'avoid_deep_link_sensitive_params',
+    '[avoid_deep_link_sensitive_params] Deep link query parameter contains sensitive data (password, token, secret, API key, or credential), creating a security breach. Deep link URLs are recorded in system logs, browser history, HTTP referrer headers, and analytics platforms, permanently exposing credentials to attackers who gain access to those logs or the device history. {v4}',
     correctionMessage:
         'Remove sensitive parameters from deep link URLs and exchange them server-side using a one-time token or secure session instead of transmitting credentials in the URL.',
-    errorSeverity: DiagnosticSeverity.ERROR,
+    severity: DiagnosticSeverity.ERROR,
   );
 
   static const Set<String> _sensitiveParams = <String>{
@@ -1188,11 +1077,10 @@ class AvoidDeepLinkSensitiveParamsRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addIndexExpression((IndexExpression node) {
+    context.addIndexExpression((IndexExpression node) {
       // Check for uri.queryParameters['password']
       final Expression? target = node.target;
       if (target == null) return;
@@ -1207,7 +1095,7 @@ class AvoidDeepLinkSensitiveParamsRule extends SaropaLintRule {
       if (index is SimpleStringLiteral) {
         final String paramName = index.value.toLowerCase();
         if (_sensitiveParams.contains(paramName)) {
-          reporter.atNode(node, code);
+          reporter.atNode(node);
         }
       }
     });
@@ -1243,7 +1131,7 @@ class AvoidDeepLinkSensitiveParamsRule extends SaropaLintRule {
 /// )
 /// ```
 class PreferTypedRouteParamsRule extends SaropaLintRule {
-  const PreferTypedRouteParamsRule() : super(code: _code);
+  PreferTypedRouteParamsRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.medium;
@@ -1252,21 +1140,19 @@ class PreferTypedRouteParamsRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'prefer_typed_route_params',
-    problemMessage:
-        '[prefer_typed_route_params] Route parameter from pathParameters or queryParameters is passed directly without type conversion. All route parameters are strings at runtime, and passing them where an int, double, or bool is expected causes type mismatch errors or silent data corruption. {v3}',
+    'prefer_typed_route_params',
+    '[prefer_typed_route_params] Route parameter from pathParameters or queryParameters is passed directly without type conversion. All route parameters are strings at runtime, and passing them where an int, double, or bool is expected causes type mismatch errors or silent data corruption. {v3}',
     correctionMessage:
         'Parse route parameters with int.tryParse(), double.tryParse(), or bool.parse() and provide a fallback default value to handle malformed or missing input safely.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addIndexExpression((IndexExpression node) {
+    context.addIndexExpression((IndexExpression node) {
       final Expression? target = node.target;
       if (target == null) return;
       final String targetSource = target.toSource();
@@ -1299,7 +1185,7 @@ class PreferTypedRouteParamsRule extends SaropaLintRule {
 
       // Report if used directly in expression
       if (parent is NamedExpression || parent is ArgumentList) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
   }
@@ -1332,7 +1218,7 @@ class PreferTypedRouteParamsRule extends SaropaLintRule {
 /// )
 /// ```
 class RequireStepperValidationRule extends SaropaLintRule {
-  const RequireStepperValidationRule() : super(code: _code);
+  RequireStepperValidationRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.high;
@@ -1341,23 +1227,19 @@ class RequireStepperValidationRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'require_stepper_validation',
-    problemMessage:
-        '[require_stepper_validation] Stepper onStepContinue callback does not validate form input before proceeding. This can allow users to advance with incomplete or invalid data, leading to errors or inconsistent state. {v3}',
+    'require_stepper_validation',
+    '[require_stepper_validation] Stepper onStepContinue callback does not validate form input before proceeding. This can allow users to advance with incomplete or invalid data, leading to errors or inconsistent state. {v3}',
     correctionMessage:
         'Add form validation logic in the onStepContinue callback to ensure all required fields are valid before allowing the user to proceed to the next step. This prevents incomplete or invalid submissions and improves data integrity.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addInstanceCreationExpression((
-      InstanceCreationExpression node,
-    ) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final String typeName = node.constructorName.type.name.lexeme;
       if (typeName != 'Stepper') return;
 
@@ -1369,13 +1251,14 @@ class RequireStepperValidationRule extends SaropaLintRule {
             final String bodySource = callback.body.toSource();
 
             // Check for validation patterns
-            final bool hasValidation = bodySource.contains('validate()') ||
+            final bool hasValidation =
+                bodySource.contains('validate()') ||
                 bodySource.contains('isValid') ||
                 bodySource.contains('canProceed') ||
                 bodySource.contains('if (');
 
             if (!hasValidation) {
-              reporter.atNode(arg, code);
+              reporter.atNode(arg);
             }
           }
         }
@@ -1410,7 +1293,7 @@ class RequireStepperValidationRule extends SaropaLintRule {
 /// ])
 /// ```
 class RequireStepCountIndicatorRule extends SaropaLintRule {
-  const RequireStepCountIndicatorRule() : super(code: _code);
+  RequireStepCountIndicatorRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.medium;
@@ -1419,21 +1302,19 @@ class RequireStepCountIndicatorRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'require_step_count_indicator',
-    problemMessage:
-        '[require_step_count_indicator] Multi-step flow with 3+ conditional step views lacks a progress indicator. Users have no visibility into how many steps remain, leading to abandonment when the process feels open-ended. {v2}',
+    'require_step_count_indicator',
+    '[require_step_count_indicator] Multi-step flow with 3+ conditional step views lacks a progress indicator. Users have no visibility into how many steps remain, leading to abandonment when the process feels open-ended. {v2}',
     correctionMessage:
         'Add a LinearProgressIndicator, Stepper widget, or "Step X of Y" text label so users know their current position and how many steps remain in the flow.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodDeclaration((MethodDeclaration node) {
+    context.addMethodDeclaration((MethodDeclaration node) {
       if (node.name.lexeme != 'build') return;
 
       final FunctionBody? body = node.body;
@@ -1450,11 +1331,11 @@ class RequireStepCountIndicatorRule extends SaropaLintRule {
       // Check for progress indicator
       final bool hasProgressIndicator =
           bodySource.contains('ProgressIndicator') ||
-              bodySource.contains('Stepper') ||
-              bodySource.contains('Step ') ||
-              bodySource.contains('of \$') ||
-              bodySource.contains('totalSteps') ||
-              bodySource.contains('stepCount');
+          bodySource.contains('Stepper') ||
+          bodySource.contains('Step ') ||
+          bodySource.contains('of \$') ||
+          bodySource.contains('totalSteps') ||
+          bodySource.contains('stepCount');
 
       if (!hasProgressIndicator) {
         reporter.atToken(node.name, code);
@@ -1491,7 +1372,7 @@ class RequireStepCountIndicatorRule extends SaropaLintRule {
 /// }
 /// ```
 class AvoidGoRouterInlineCreationRule extends SaropaLintRule {
-  const AvoidGoRouterInlineCreationRule() : super(code: _code);
+  AvoidGoRouterInlineCreationRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.high;
@@ -1500,23 +1381,19 @@ class AvoidGoRouterInlineCreationRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_go_router_inline_creation',
-    problemMessage:
-        '[avoid_go_router_inline_creation] GoRouter instance created inside build() is destroyed and recreated on every widget rebuild. This resets all navigation state including the current route stack, destroys in-flight transitions, breaks hot reload during development, and causes users to lose their navigation position whenever the parent widget rebuilds. {v3}',
+    'avoid_go_router_inline_creation',
+    '[avoid_go_router_inline_creation] GoRouter instance created inside build() is destroyed and recreated on every widget rebuild. This resets all navigation state including the current route stack, destroys in-flight transitions, breaks hot reload during development, and causes users to lose their navigation position whenever the parent widget rebuilds. {v3}',
     correctionMessage:
         'Create the GoRouter instance as a final field in the State class or initialize it in initState() so the router persists across rebuilds and preserves navigation state.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addInstanceCreationExpression((
-      InstanceCreationExpression node,
-    ) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final String typeName = node.constructorName.type.name.lexeme;
       if (typeName != 'GoRouter') return;
 
@@ -1527,7 +1404,7 @@ class AvoidGoRouterInlineCreationRule extends SaropaLintRule {
       AstNode? current = node.parent;
       while (current != null) {
         if (current is MethodDeclaration && current.name.lexeme == 'build') {
-          reporter.atNode(node, code);
+          reporter.atNode(node);
           return;
         }
         current = current.parent;
@@ -1555,7 +1432,7 @@ class AvoidGoRouterInlineCreationRule extends SaropaLintRule {
 /// )
 /// ```
 class RequireGoRouterErrorHandlerRule extends SaropaLintRule {
-  const RequireGoRouterErrorHandlerRule() : super(code: _code);
+  RequireGoRouterErrorHandlerRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.medium;
@@ -1564,23 +1441,19 @@ class RequireGoRouterErrorHandlerRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'require_go_router_error_handler',
-    problemMessage:
-        '[require_go_router_error_handler] GoRouter instance lacks an errorBuilder or errorPageBuilder parameter. When a user navigates to an undefined path via deep link, push notification, or typo, the router displays a blank white screen with no explanation or way to recover. {v3}',
+    'require_go_router_error_handler',
+    '[require_go_router_error_handler] GoRouter instance lacks an errorBuilder or errorPageBuilder parameter. When a user navigates to an undefined path via deep link, push notification, or typo, the router displays a blank white screen with no explanation or way to recover. {v3}',
     correctionMessage:
         'Add an errorBuilder parameter that returns a user-friendly error page with a message explaining the route was not found and a button to navigate back to the home screen.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addInstanceCreationExpression((
-      InstanceCreationExpression node,
-    ) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final String typeName = node.constructorName.type.name.lexeme;
       if (typeName != 'GoRouter') return;
 
@@ -1601,7 +1474,7 @@ class RequireGoRouterErrorHandlerRule extends SaropaLintRule {
       }
 
       if (!hasErrorHandler) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
   }
@@ -1630,7 +1503,7 @@ class RequireGoRouterErrorHandlerRule extends SaropaLintRule {
 /// )
 /// ```
 class RequireGoRouterRefreshListenableRule extends SaropaLintRule {
-  const RequireGoRouterRefreshListenableRule() : super(code: _code);
+  RequireGoRouterRefreshListenableRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.medium;
@@ -1639,23 +1512,19 @@ class RequireGoRouterRefreshListenableRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'require_go_router_refresh_listenable',
-    problemMessage:
-        '[require_go_router_refresh_listenable] GoRouter has a redirect callback but no refreshListenable. When authentication state changes (login, logout, token expiry), the router does not re-evaluate redirects, leaving users stranded on protected pages after logout or blocked from authenticated pages after login. {v3}',
+    'require_go_router_refresh_listenable',
+    '[require_go_router_refresh_listenable] GoRouter has a redirect callback but no refreshListenable. When authentication state changes (login, logout, token expiry), the router does not re-evaluate redirects, leaving users stranded on protected pages after logout or blocked from authenticated pages after login. {v3}',
     correctionMessage:
         'Add a refreshListenable parameter pointing to your auth state ChangeNotifier so the router re-evaluates redirect logic whenever authentication state changes.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addInstanceCreationExpression((
-      InstanceCreationExpression node,
-    ) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final String typeName = node.constructorName.type.name.lexeme;
       if (typeName != 'GoRouter') return;
 
@@ -1674,7 +1543,7 @@ class RequireGoRouterRefreshListenableRule extends SaropaLintRule {
       }
 
       if (hasRedirect && !hasRefreshListenable) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
   }
@@ -1699,7 +1568,7 @@ class RequireGoRouterRefreshListenableRule extends SaropaLintRule {
 /// UserProfileRoute(userId: '123').go(context);
 /// ```
 class AvoidGoRouterStringPathsRule extends SaropaLintRule {
-  const AvoidGoRouterStringPathsRule() : super(code: _code);
+  AvoidGoRouterStringPathsRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.low;
@@ -1708,12 +1577,11 @@ class AvoidGoRouterStringPathsRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_go_router_string_paths',
-    problemMessage:
-        '[avoid_go_router_string_paths] String literal used as a navigation path in go_router. Hardcoded path strings are error-prone, bypass compile-time validation, and break silently when route definitions change. {v3}',
+    'avoid_go_router_string_paths',
+    '[avoid_go_router_string_paths] String literal used as a navigation path in go_router. Hardcoded path strings are error-prone, bypass compile-time validation, and break silently when route definitions change. {v3}',
     correctionMessage:
         'Use go_router_builder to generate typed route classes that provide compile-time safety, auto-complete support, and catch route path mismatches at build time.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   static const Set<String> _navigationMethods = <String>{
@@ -1729,11 +1597,10 @@ class AvoidGoRouterStringPathsRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       final String methodName = node.methodName.name;
       if (!_navigationMethods.contains(methodName)) return;
 
@@ -1754,7 +1621,7 @@ class AvoidGoRouterStringPathsRule extends SaropaLintRule {
       if (firstArg is SimpleStringLiteral ||
           firstArg is StringInterpolation ||
           firstArg is AdjacentStrings) {
-        reporter.atNode(firstArg, code);
+        reporter.atNode(firstArg);
       }
     });
   }
@@ -1801,7 +1668,7 @@ class AvoidGoRouterStringPathsRule extends SaropaLintRule {
 /// )
 /// ```
 class PreferGoRouterRedirectAuthRule extends SaropaLintRule {
-  const PreferGoRouterRedirectAuthRule() : super(code: _code);
+  PreferGoRouterRedirectAuthRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.low;
@@ -1810,22 +1677,19 @@ class PreferGoRouterRedirectAuthRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'prefer_go_router_redirect_auth',
-    problemMessage:
-        '[prefer_go_router_redirect_auth] Authentication check detected inside a GoRoute builder instead of the router-level redirect callback. Scattering auth logic across individual page builders duplicates code, creates inconsistent enforcement, and allows new routes to accidentally skip authentication. {v3}',
+    'prefer_go_router_redirect_auth',
+    '[prefer_go_router_redirect_auth] Authentication check detected inside a GoRoute builder instead of the router-level redirect callback. Scattering auth logic across individual page builders duplicates code, creates inconsistent enforcement, and allows new routes to accidentally skip authentication. {v3}',
     correctionMessage:
         'Move authentication logic to the GoRouter redirect parameter so all routes are protected by a single, centralized auth check that runs before any page builder executes.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry
-        .addInstanceCreationExpression((InstanceCreationExpression node) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final String typeName = node.constructorName.type.name2.lexeme;
       if (typeName != 'GoRoute') return;
 
@@ -1848,7 +1712,7 @@ class PreferGoRouterRedirectAuthRule extends SaropaLintRule {
                   builderSource.contains('currentuser') ||
                   builderSource.contains('authstate')) &&
               (builderSource.contains('if ') || builderSource.contains('?'))) {
-            reporter.atNode(arg, code);
+            reporter.atNode(arg);
           }
         }
       }
@@ -1887,7 +1751,7 @@ class PreferGoRouterRedirectAuthRule extends SaropaLintRule {
 /// )
 /// ```
 class RequireGoRouterTypedParamsRule extends SaropaLintRule {
-  const RequireGoRouterTypedParamsRule() : super(code: _code);
+  RequireGoRouterTypedParamsRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.medium;
@@ -1896,21 +1760,19 @@ class RequireGoRouterTypedParamsRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'require_go_router_typed_params',
-    problemMessage:
-        '[require_go_router_typed_params] go_router pathParameters value accessed without type conversion. All path parameters are strings, and assigning them directly to int, double, or bool variables causes a runtime TypeError that crashes the app when users navigate to the route. {v2}',
+    'require_go_router_typed_params',
+    '[require_go_router_typed_params] go_router pathParameters value accessed without type conversion. All path parameters are strings, and assigning them directly to int, double, or bool variables causes a runtime TypeError that crashes the app when users navigate to the route. {v2}',
     correctionMessage:
         'Parse path parameters with int.tryParse(), double.tryParse(), or a custom parser, and provide a fallback default value to handle malformed or missing input safely.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addIndexExpression((IndexExpression node) {
+    context.addIndexExpression((IndexExpression node) {
       // Only apply to files that import go_router
       if (!fileImportsPackage(node, PackageImports.goRouter)) return;
 
@@ -1959,7 +1821,7 @@ class RequireGoRouterTypedParamsRule extends SaropaLintRule {
         current = current.parent;
       }
 
-      reporter.atNode(node, code);
+      reporter.atNode(node);
     });
   }
 }
@@ -1994,7 +1856,7 @@ class RequireGoRouterTypedParamsRule extends SaropaLintRule {
 /// final params = state.extra as ProfileParams; // Single typed cast
 /// ```
 class PreferGoRouterExtraTypedRule extends SaropaLintRule {
-  const PreferGoRouterExtraTypedRule() : super(code: _code);
+  PreferGoRouterExtraTypedRule() : super(code: _code);
 
   /// Code quality issue - type safety for navigation.
   @override
@@ -2004,12 +1866,11 @@ class PreferGoRouterExtraTypedRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.high;
 
   static const LintCode _code = LintCode(
-    name: 'prefer_go_router_extra_typed',
-    problemMessage:
-        '[prefer_go_router_extra_typed] go_router extra parameter passes a Map or dynamic value instead of a typed class. Untyped extras require unsafe casts at the destination route, causing runtime ClassCastException crashes when the map structure changes or keys are misspelled. {v2}',
+    'prefer_go_router_extra_typed',
+    '[prefer_go_router_extra_typed] go_router extra parameter passes a Map or dynamic value instead of a typed class. Untyped extras require unsafe casts at the destination route, causing runtime ClassCastException crashes when the map structure changes or keys are misspelled. {v2}',
     correctionMessage:
         'Create a dedicated data class for the extra parameter and cast to that type in the route builder. This provides compile-time field validation and eliminates unsafe string-keyed map lookups.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   static const Set<String> _goRouterMethods = <String>{
@@ -2025,11 +1886,10 @@ class PreferGoRouterExtraTypedRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       final String methodName = node.methodName.name;
       if (!_goRouterMethods.contains(methodName)) return;
 
@@ -2042,7 +1902,7 @@ class PreferGoRouterExtraTypedRule extends SaropaLintRule {
 
         // Check if extra is a Map literal
         if (extraValue is SetOrMapLiteral && extraValue.isMap) {
-          reporter.atNode(arg, code);
+          reporter.atNode(arg);
           return;
         }
 
@@ -2050,7 +1910,7 @@ class PreferGoRouterExtraTypedRule extends SaropaLintRule {
         if (extraValue is AsExpression) {
           final String typeStr = extraValue.type.toSource();
           if (typeStr.startsWith('Map<') || typeStr == 'dynamic') {
-            reporter.atNode(arg, code);
+            reporter.atNode(arg);
             return;
           }
         }
@@ -2064,7 +1924,7 @@ class PreferGoRouterExtraTypedRule extends SaropaLintRule {
                 typeStr == 'dynamic' ||
                 typeStr == 'Object?' ||
                 typeStr == 'Object') {
-              reporter.atNode(arg, code);
+              reporter.atNode(arg);
               return;
             }
           }
@@ -2074,7 +1934,7 @@ class PreferGoRouterExtraTypedRule extends SaropaLintRule {
         if (extraValue is InstanceCreationExpression) {
           final String typeName = extraValue.constructorName.type.name2.lexeme;
           if (typeName == 'Map' || typeName == 'HashMap') {
-            reporter.atNode(arg, code);
+            reporter.atNode(arg);
             return;
           }
         }
@@ -2123,7 +1983,7 @@ class PreferGoRouterExtraTypedRule extends SaropaLintRule {
 /// )
 /// ```
 class PreferMaybePopRule extends SaropaLintRule {
-  const PreferMaybePopRule() : super(code: _code);
+  PreferMaybePopRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.high;
@@ -2132,21 +1992,19 @@ class PreferMaybePopRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'prefer_maybe_pop',
-    problemMessage:
-        '[prefer_maybe_pop] Navigator.pop() called without verifying that a route exists on the navigation stack to pop. When the stack is empty or contains only the root route, this call throws a FlutterError at runtime, crashing the app. On Android, this also bypasses the system back button contract, preventing the app from exiting gracefully. {v3}',
+    'prefer_maybe_pop',
+    '[prefer_maybe_pop] Navigator.pop() called without verifying that a route exists on the navigation stack to pop. When the stack is empty or contains only the root route, this call throws a FlutterError at runtime, crashing the app. On Android, this also bypasses the system back button contract, preventing the app from exiting gracefully. {v3}',
     correctionMessage:
         'Replace Navigator.pop(context) with Navigator.maybePop(context), or check canPop() before calling pop. This prevents runtime errors and ensures your app only attempts to pop routes when it is safe to do so.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       final String methodName = node.methodName.name;
 
       // Check for Navigator.pop or Navigator.of(context).pop
@@ -2215,38 +2073,7 @@ class PreferMaybePopRule extends SaropaLintRule {
         current = current.parent;
       }
 
-      reporter.atNode(node, code);
-    });
-  }
-
-  @override
-  List<Fix> getFixes() => <Fix>[_ReplaceWithMaybePopFix()];
-}
-
-class _ReplaceWithMaybePopFix extends DartFix {
-  @override
-  void run(
-    CustomLintResolver resolver,
-    ChangeReporter reporter,
-    CustomLintContext context,
-    AnalysisError analysisError,
-    List<AnalysisError> others,
-  ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
-      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
-      if (node.methodName.name != 'pop') return;
-
-      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
-        message: 'Replace with maybePop',
-        priority: 1,
-      );
-
-      changeBuilder.addDartFileEdit((builder) {
-        builder.addSimpleReplacement(
-          node.methodName.sourceRange,
-          'maybePop',
-        );
-      });
+      reporter.atNode(node);
     });
   }
 }
@@ -2271,7 +2098,7 @@ class _ReplaceWithMaybePopFix extends DartFix {
 /// await launchUrl(uri);
 /// ```
 class PreferUrlLauncherUriOverStringRule extends SaropaLintRule {
-  const PreferUrlLauncherUriOverStringRule() : super(code: _code);
+  PreferUrlLauncherUriOverStringRule() : super(code: _code);
 
   /// Crash path - malformed URI throws FormatException at runtime.
   @override
@@ -2281,21 +2108,19 @@ class PreferUrlLauncherUriOverStringRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'prefer_url_launcher_uri_over_string',
-    problemMessage:
-        '[prefer_url_launcher_uri_over_string] launchUrl called with Uri.parse() on a string literal instead of constructing a Uri object directly. Uri.parse() defers validation to runtime, where malformed strings throw FormatException and crash the app. {v2}',
+    'prefer_url_launcher_uri_over_string',
+    '[prefer_url_launcher_uri_over_string] launchUrl called with Uri.parse() on a string literal instead of constructing a Uri object directly. Uri.parse() defers validation to runtime, where malformed strings throw FormatException and crash the app. {v2}',
     correctionMessage:
         'Replace Uri.parse() with Uri.https() or Uri.http() constructors that validate the URL structure at compile time and auto-encode query parameters correctly.',
-    errorSeverity: DiagnosticSeverity.ERROR,
+    severity: DiagnosticSeverity.ERROR,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       if (node.methodName.name != 'launchUrl' &&
           node.methodName.name != 'launch' &&
           node.methodName.name != 'canLaunchUrl') {
@@ -2310,7 +2135,7 @@ class PreferUrlLauncherUriOverStringRule extends SaropaLintRule {
       if (firstArg is MethodInvocation && firstArg.methodName.name == 'parse') {
         final Expression? target = firstArg.target;
         if (target is SimpleIdentifier && target.name == 'Uri') {
-          reporter.atNode(firstArg, code);
+          reporter.atNode(firstArg);
         }
       }
     });
@@ -2339,7 +2164,7 @@ class PreferUrlLauncherUriOverStringRule extends SaropaLintRule {
 /// context.push('/details/$id'); // Adds to stack - back button works
 /// ```
 class AvoidGoRouterPushReplacementConfusionRule extends SaropaLintRule {
-  const AvoidGoRouterPushReplacementConfusionRule() : super(code: _code);
+  AvoidGoRouterPushReplacementConfusionRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -2349,12 +2174,11 @@ class AvoidGoRouterPushReplacementConfusionRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_go_router_push_replacement_confusion',
-    problemMessage:
-        '[avoid_go_router_push_replacement_confusion] context.go() used to navigate to a detail route with a dynamic ID parameter. go() replaces the entire navigation stack, destroying the back button history and preventing users from returning to the previous screen. {v2}',
+    'avoid_go_router_push_replacement_confusion',
+    '[avoid_go_router_push_replacement_confusion] context.go() used to navigate to a detail route with a dynamic ID parameter. go() replaces the entire navigation stack, destroying the back button history and preventing users from returning to the previous screen. {v2}',
     correctionMessage:
         'Replace context.go() with context.push() for detail routes so the previous screen remains on the stack and the back button navigates users to their prior location.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   /// Route path segments that typically represent detail/item views
@@ -2372,11 +2196,10 @@ class AvoidGoRouterPushReplacementConfusionRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       if (node.methodName.name != 'go') return;
 
       // Check if it's called on context (context.go)
@@ -2401,14 +2224,15 @@ class AvoidGoRouterPushReplacementConfusionRule extends SaropaLintRule {
         (String segment) => pathSource.contains(segment),
       );
 
-      final bool hasDynamicParam = pathSource.contains(r'$') ||
+      final bool hasDynamicParam =
+          pathSource.contains(r'$') ||
           pathSource.contains(':id') ||
           pathSource.contains(':userid') ||
           pathSource.contains(':itemid');
 
       // Only warn if it's clearly a detail route with dynamic ID
       if (hasDetailSegment && hasDynamicParam) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
   }
@@ -2441,7 +2265,7 @@ class AvoidGoRouterPushReplacementConfusionRule extends SaropaLintRule {
 ///
 /// **Quick fix available:** Wraps interpolated variable with `Uri.encodeComponent()`.
 class RequireUrlLauncherEncodingRule extends SaropaLintRule {
-  const RequireUrlLauncherEncodingRule() : super(code: _code);
+  RequireUrlLauncherEncodingRule() : super(code: _code);
 
   /// Unencoded URLs fail or cause injection vulnerabilities.
   @override
@@ -2451,21 +2275,19 @@ class RequireUrlLauncherEncodingRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'require_url_launcher_encoding',
-    problemMessage:
-        '[require_url_launcher_encoding] URL passed to launchUrl or canLaunchUrl contains string interpolation without Uri.encodeComponent(). Unencoded special characters (spaces, ampersands, Unicode) produce malformed URLs that fail to open, display incorrect content, or enable URL injection attacks where user input manipulates the destination path or query parameters. {v2}',
+    'require_url_launcher_encoding',
+    '[require_url_launcher_encoding] URL passed to launchUrl or canLaunchUrl contains string interpolation without Uri.encodeComponent(). Unencoded special characters (spaces, ampersands, Unicode) produce malformed URLs that fail to open, display incorrect content, or enable URL injection attacks where user input manipulates the destination path or query parameters. {v2}',
     correctionMessage:
         'Use Uri.encodeComponent() for query parameters or construct URLs with Uri.https() to ensure all parts are properly encoded. This prevents malformed URLs and potential security vulnerabilities.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       final String methodName = node.methodName.name;
 
       // Check for launchUrl, launch, openUrl
@@ -2493,71 +2315,10 @@ class RequireUrlLauncherEncodingRule extends SaropaLintRule {
           final String source = urlArg.toSource();
           if (!source.contains('encodeComponent') &&
               !source.contains('encodeQueryComponent')) {
-            reporter.atNode(urlArg, code);
+            reporter.atNode(urlArg);
           }
         }
       }
-    });
-  }
-
-  @override
-  List<Fix> getFixes() => <Fix>[_WrapWithEncodeComponentFix()];
-}
-
-class _WrapWithEncodeComponentFix extends DartFix {
-  @override
-  void run(
-    CustomLintResolver resolver,
-    ChangeReporter reporter,
-    CustomLintContext context,
-    AnalysisError analysisError,
-    List<AnalysisError> others,
-  ) {
-    context.registry.addStringInterpolation((StringInterpolation node) {
-      if (!analysisError.sourceRange.intersects(node.sourceRange)) return;
-
-      // Find interpolation elements that are simple identifiers (variables)
-      for (final InterpolationElement element in node.elements) {
-        if (element is InterpolationExpression) {
-          final Expression expr = element.expression;
-          if (expr is SimpleIdentifier) {
-            final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
-              message: 'Wrap ${expr.name} with Uri.encodeComponent()',
-              priority: 80,
-            );
-
-            changeBuilder.addDartFileEdit((builder) {
-              // Replace $varName with ${Uri.encodeComponent(varName)}
-              builder.addSimpleReplacement(
-                element.sourceRange,
-                '\${Uri.encodeComponent(${expr.name})}',
-              );
-            });
-            return; // Fix the first one found
-          }
-        }
-      }
-
-      // If no simple identifier found, add a `HACK` comment
-      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
-        message: 'Add HACK comment for manual encoding review',
-        priority: 70,
-      );
-
-      changeBuilder.addDartFileEdit((builder) {
-        // Find the statement containing this interpolation
-        AstNode? current = node.parent;
-        while (current != null && current is! Statement) {
-          current = current.parent;
-        }
-
-        if (current != null) {
-          builder.addSimpleInsertion(
-            current.offset,
-            '// HACK: Wrap interpolated values with Uri.encodeComponent()\n    ',
-          );
-        }
-      });
     });
   }
 }
@@ -2585,7 +2346,7 @@ class _WrapWithEncodeComponentFix extends DartFix {
 /// // Or ensure the route is designed for deep linking
 /// ```
 class AvoidNestedRoutesWithoutParentRule extends SaropaLintRule {
-  const AvoidNestedRoutesWithoutParentRule() : super(code: _code);
+  AvoidNestedRoutesWithoutParentRule() : super(code: _code);
 
   /// Broken back button navigation frustrates users.
   @override
@@ -2595,21 +2356,19 @@ class AvoidNestedRoutesWithoutParentRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_nested_routes_without_parent',
-    problemMessage:
-        '[avoid_nested_routes_without_parent] context.go() navigates to a path with 3+ segments, which places users deep in the route hierarchy without parent routes on the stack. The back button skips intermediate screens, breaking expected navigation flow and disorienting users. {v2}',
+    'avoid_nested_routes_without_parent',
+    '[avoid_nested_routes_without_parent] context.go() navigates to a path with 3+ segments, which places users deep in the route hierarchy without parent routes on the stack. The back button skips intermediate screens, breaking expected navigation flow and disorienting users. {v2}',
     correctionMessage:
         'Use context.push() to preserve the navigation stack, or verify that your route hierarchy supports deep linking and restores parent routes automatically via ShellRoute.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       if (node.methodName.name != 'go' && node.methodName.name != 'goNamed') {
         return;
       }
@@ -2623,12 +2382,14 @@ class AvoidNestedRoutesWithoutParentRule extends SaropaLintRule {
       final String path = pathArg.value;
 
       // Count path segments
-      final List<String> segments =
-          path.split('/').where((s) => s.isNotEmpty).toList();
+      final List<String> segments = path
+          .split('/')
+          .where((s) => s.isNotEmpty)
+          .toList();
 
       // Warn if navigating to path with 3+ segments (deeply nested)
       if (segments.length >= 3) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
   }
@@ -2662,7 +2423,7 @@ class AvoidNestedRoutesWithoutParentRule extends SaropaLintRule {
 /// )
 /// ```
 class PreferShellRouteSharedLayoutRule extends SaropaLintRule {
-  const PreferShellRouteSharedLayoutRule() : super(code: _code);
+  PreferShellRouteSharedLayoutRule() : super(code: _code);
 
   /// Code duplication and maintenance burden.
   @override
@@ -2672,23 +2433,19 @@ class PreferShellRouteSharedLayoutRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'prefer_shell_route_shared_layout',
-    problemMessage:
-        '[prefer_shell_route_shared_layout] GoRoute with Scaffold builder may duplicate layout code. Multiple routes with the same Scaffold layout cause code duplication and inconsistent behavior. ShellRoute provides a shared wrapper. {v2}',
+    'prefer_shell_route_shared_layout',
+    '[prefer_shell_route_shared_layout] GoRoute with Scaffold builder may duplicate layout code. Multiple routes with the same Scaffold layout cause code duplication and inconsistent behavior. ShellRoute provides a shared wrapper. {v2}',
     correctionMessage:
         'Use ShellRoute for shared AppBar/BottomNav layouts. Test the full navigation flow including back button and deep links.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addInstanceCreationExpression((
-      InstanceCreationExpression node,
-    ) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final String typeName = node.constructorName.type.name.lexeme;
       if (typeName != 'GoRoute') return;
 
@@ -2701,7 +2458,7 @@ class PreferShellRouteSharedLayoutRule extends SaropaLintRule {
               (builderSource.contains('AppBar(') ||
                   builderSource.contains('BottomNavigationBar(') ||
                   builderSource.contains('NavigationBar('))) {
-            reporter.atNode(node, code);
+            reporter.atNode(node);
             return;
           }
         }
@@ -2737,7 +2494,7 @@ class PreferShellRouteSharedLayoutRule extends SaropaLintRule {
 /// )
 /// ```
 class RequireStatefulShellRouteTabsRule extends SaropaLintRule {
-  const RequireStatefulShellRouteTabsRule() : super(code: _code);
+  RequireStatefulShellRouteTabsRule() : super(code: _code);
 
   /// Tab state loss on navigation.
   @override
@@ -2750,23 +2507,19 @@ class RequireStatefulShellRouteTabsRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
-    name: 'require_stateful_shell_route_tabs',
-    problemMessage:
-        '[require_stateful_shell_route_tabs] ShellRoute with tab-like navigation may lose state on tab switch. Regular ShellRoute recreates child widgets on tab switch, losing state. StatefulShellRoute preserves each tab\'s state. {v2}',
+    'require_stateful_shell_route_tabs',
+    '[require_stateful_shell_route_tabs] ShellRoute with tab-like navigation may lose state on tab switch. Regular ShellRoute recreates child widgets on tab switch, losing state. StatefulShellRoute preserves each tab\'s state. {v2}',
     correctionMessage:
         'Use StatefulShellRoute.indexedStack for preserving tab state. Test the full navigation flow including back button and deep links.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addInstanceCreationExpression((
-      InstanceCreationExpression node,
-    ) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final String typeName = node.constructorName.type.name.lexeme;
       if (typeName != 'ShellRoute') return;
 
@@ -2780,7 +2533,7 @@ class RequireStatefulShellRouteTabsRule extends SaropaLintRule {
               builderSource.contains('NavigationBar') ||
               builderSource.contains('TabBar') ||
               builderSource.contains('IndexedStack')) {
-            reporter.atNode(node, code);
+            reporter.atNode(node);
             return;
           }
         }
@@ -2816,7 +2569,7 @@ class RequireStatefulShellRouteTabsRule extends SaropaLintRule {
 /// )
 /// ```
 class RequireGoRouterFallbackRouteRule extends SaropaLintRule {
-  const RequireGoRouterFallbackRouteRule() : super(code: _code);
+  RequireGoRouterFallbackRouteRule() : super(code: _code);
 
   /// User-facing errors on invalid navigation.
   @override
@@ -2826,23 +2579,19 @@ class RequireGoRouterFallbackRouteRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'require_go_router_fallback_route',
-    problemMessage:
-        '[require_go_router_fallback_route] GoRouter configuration without errorBuilder or errorPageBuilder has no fallback for unmatched routes. When users navigate to a non-existent path via deep link, push notification, or typo, the router throws an unhandled exception that crashes the app instead of showing a helpful error page. {v2}',
+    'require_go_router_fallback_route',
+    '[require_go_router_fallback_route] GoRouter configuration without errorBuilder or errorPageBuilder has no fallback for unmatched routes. When users navigate to a non-existent path via deep link, push notification, or typo, the router throws an unhandled exception that crashes the app instead of showing a helpful error page. {v2}',
     correctionMessage:
         'Add errorBuilder: (context, state) => NotFoundPage() or errorPageBuilder to display a user-friendly error screen when navigation targets an undefined route.',
-    errorSeverity: DiagnosticSeverity.ERROR,
+    severity: DiagnosticSeverity.ERROR,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addInstanceCreationExpression((
-      InstanceCreationExpression node,
-    ) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final String typeName = node.constructorName.type.name.lexeme;
       if (typeName != 'GoRouter') return;
 
@@ -2863,7 +2612,7 @@ class RequireGoRouterFallbackRouteRule extends SaropaLintRule {
       }
 
       if (!hasErrorHandler) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
   }
@@ -2899,7 +2648,7 @@ class RequireGoRouterFallbackRouteRule extends SaropaLintRule {
 /// );
 /// ```
 class PreferRouteSettingsNameRule extends SaropaLintRule {
-  const PreferRouteSettingsNameRule() : super(code: _code);
+  PreferRouteSettingsNameRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.low;
@@ -2908,13 +2657,12 @@ class PreferRouteSettingsNameRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'prefer_route_settings_name',
-    problemMessage:
-        '[prefer_route_settings_name] MaterialPageRoute without RouteSettings.name. '
+    'prefer_route_settings_name',
+    '[prefer_route_settings_name] MaterialPageRoute without RouteSettings.name. '
         'Analytics and debugging will be harder. {v2}',
     correctionMessage:
         'Add settings: RouteSettings(name: "/route_name") to the route.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   static const Set<String> _routeTypes = <String>{
@@ -2925,13 +2673,10 @@ class PreferRouteSettingsNameRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addInstanceCreationExpression((
-      InstanceCreationExpression node,
-    ) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final String typeName = node.constructorName.type.name.lexeme;
       if (!_routeTypes.contains(typeName)) return;
 
@@ -2947,7 +2692,7 @@ class PreferRouteSettingsNameRule extends SaropaLintRule {
       }
 
       if (!hasSettings) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
   }
@@ -2997,7 +2742,7 @@ class PreferRouteSettingsNameRule extends SaropaLintRule {
 /// }
 /// ```
 class AvoidNavigatorContextIssueRule extends SaropaLintRule {
-  const AvoidNavigatorContextIssueRule() : super(code: _code);
+  AvoidNavigatorContextIssueRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.high;
@@ -3006,22 +2751,20 @@ class AvoidNavigatorContextIssueRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_navigator_context_issue',
-    problemMessage:
-        '[avoid_navigator_context_issue] Using context from GlobalKey for '
+    'avoid_navigator_context_issue',
+    '[avoid_navigator_context_issue] Using context from GlobalKey for '
         'navigation can fail if widget is not in tree. {v2}',
     correctionMessage:
         'Use the BuildContext parameter directly instead of currentContext.',
-    errorSeverity: DiagnosticSeverity.ERROR,
+    severity: DiagnosticSeverity.ERROR,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       // Check for Navigator.of() or Navigator.push() etc.
       final Expression? target = node.target;
       if (target == null) return;
@@ -3038,16 +2781,14 @@ class AvoidNavigatorContextIssueRule extends SaropaLintRule {
       final ArgumentList args = node.argumentList;
       for (final Expression arg in args.arguments) {
         if (_hasProblematicContextUsage(arg.toSource())) {
-          reporter.atNode(arg, code);
+          reporter.atNode(arg);
           return;
         }
       }
     });
 
     // Check Navigator-related instance creations (routes, pages)
-    context.registry.addInstanceCreationExpression((
-      InstanceCreationExpression node,
-    ) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final String constructorName = node.constructorName.toSource();
 
       // Only check Navigator-related instance creations
@@ -3059,7 +2800,7 @@ class AvoidNavigatorContextIssueRule extends SaropaLintRule {
 
       for (final Expression arg in node.argumentList.arguments) {
         if (_hasProblematicContextUsage(arg.toSource())) {
-          reporter.atNode(arg, code);
+          reporter.atNode(arg);
         }
       }
     });
@@ -3114,7 +2855,7 @@ class AvoidNavigatorContextIssueRule extends SaropaLintRule {
 /// );
 /// ```
 class RequirePopResultTypeRule extends SaropaLintRule {
-  const RequirePopResultTypeRule() : super(code: _code);
+  RequirePopResultTypeRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.low;
@@ -3123,23 +2864,21 @@ class RequirePopResultTypeRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'require_pop_result_type',
-    problemMessage:
-        '[require_pop_result_type] Awaited route push without type parameter. '
+    'require_pop_result_type',
+    '[require_pop_result_type] Awaited route push without type parameter. '
         'Return type will be dynamic. {v2}',
     correctionMessage:
         'Add type parameter: Navigator.push<ReturnType>(...) and '
         'MaterialPageRoute<ReturnType>(...).',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addAwaitExpression((AwaitExpression node) {
+    context.addAwaitExpression((AwaitExpression node) {
       final Expression expr = node.expression;
       if (expr is! MethodInvocation) return;
 
@@ -3164,7 +2903,7 @@ class RequirePopResultTypeRule extends SaropaLintRule {
       // Check if type argument is provided
       final TypeArgumentList? typeArgs = expr.typeArguments;
       if (typeArgs == null || typeArgs.arguments.isEmpty) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
   }
@@ -3196,7 +2935,7 @@ class RequirePopResultTypeRule extends SaropaLintRule {
 /// Navigator.pushReplacement(context, homeRoute);
 /// ```
 class AvoidPushReplacementMisuseRule extends SaropaLintRule {
-  const AvoidPushReplacementMisuseRule() : super(code: _code);
+  AvoidPushReplacementMisuseRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.medium;
@@ -3205,14 +2944,13 @@ class AvoidPushReplacementMisuseRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_push_replacement_misuse',
-    problemMessage:
-        '[avoid_push_replacement_misuse] `[HEURISTIC]` pushReplacement removes '
+    'avoid_push_replacement_misuse',
+    '[avoid_push_replacement_misuse] `[HEURISTIC]` pushReplacement removes '
         'current route from stack. User cannot go back. {v2}',
     correctionMessage:
         'Use Navigator.push() if user should be able to go back. Use '
         'pushReplacement only for login->home or similar transitions.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   /// Route names that typically shouldn't use pushReplacement
@@ -3231,11 +2969,10 @@ class AvoidPushReplacementMisuseRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       final String methodName = node.methodName.name;
       if (methodName != 'pushReplacement' &&
           methodName != 'pushReplacementNamed') {
@@ -3250,7 +2987,7 @@ class AvoidPushReplacementMisuseRule extends SaropaLintRule {
         // Check if route name suggests it shouldn't use replacement
         for (final String indicator in _normalRouteIndicators) {
           if (argSource.contains(indicator)) {
-            reporter.atNode(node, code);
+            reporter.atNode(node);
             return;
           }
         }
@@ -3301,7 +3038,7 @@ class AvoidPushReplacementMisuseRule extends SaropaLintRule {
 /// )
 /// ```
 class AvoidNestedNavigatorsMisuseRule extends SaropaLintRule {
-  const AvoidNestedNavigatorsMisuseRule() : super(code: _code);
+  AvoidNestedNavigatorsMisuseRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.high;
@@ -3313,23 +3050,20 @@ class AvoidNestedNavigatorsMisuseRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
-    name: 'avoid_nested_navigators_misuse',
-    problemMessage: '[avoid_nested_navigators_misuse] Nested Navigator without '
+    'avoid_nested_navigators_misuse',
+    '[avoid_nested_navigators_misuse] Nested Navigator without '
         'WillPopScope/PopScope. Back button may behave unexpectedly. {v2}',
     correctionMessage:
         'Wrap with WillPopScope/PopScope to handle back navigation properly.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addInstanceCreationExpression((
-      InstanceCreationExpression node,
-    ) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final String constructorName = node.constructorName.type.name2.lexeme;
       if (constructorName != 'Navigator') return;
 
@@ -3394,7 +3128,7 @@ class AvoidNestedNavigatorsMisuseRule extends SaropaLintRule {
 /// )
 /// ```
 class RequireDeepLinkTestingRule extends SaropaLintRule {
-  const RequireDeepLinkTestingRule() : super(code: _code);
+  RequireDeepLinkTestingRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.medium;
@@ -3403,23 +3137,21 @@ class RequireDeepLinkTestingRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'require_deep_link_testing',
-    problemMessage:
-        '[require_deep_link_testing] `[HEURISTIC]` Route uses object parameter '
+    'require_deep_link_testing',
+    '[require_deep_link_testing] `[HEURISTIC]` Route uses object parameter '
         'instead of ID. Consider using path parameters for deep link support. {v2}',
     correctionMessage:
         'Use path/query parameters (e.g., /product/:id) instead of passing '
         'full objects for better deep link support.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       final String methodName = node.methodName.name;
       if (methodName != 'push' && methodName != 'pushNamed') return;
 
@@ -3435,7 +3167,7 @@ class RequireDeepLinkTestingRule extends SaropaLintRule {
             // Check if it looks like a model object
             final valueSource = value.toSource();
             if (!valueSource.contains('id:') && !valueSource.contains("'id'")) {
-              reporter.atNode(arg, code);
+              reporter.atNode(arg);
             }
           }
         }
@@ -3473,7 +3205,7 @@ class RequireDeepLinkTestingRule extends SaropaLintRule {
 /// if (result == true) refreshData();
 /// ```
 class RequireNavigationResultHandlingRule extends SaropaLintRule {
-  const RequireNavigationResultHandlingRule() : super(code: _code);
+  RequireNavigationResultHandlingRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.medium;
@@ -3482,12 +3214,11 @@ class RequireNavigationResultHandlingRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'require_navigation_result_handling',
-    problemMessage:
-        '[require_navigation_result_handling] Navigator push method is called as a fire-and-forget statement without awaiting or assigning its Future result. Navigator.push() returns a Future<T?> that resolves to the value passed to Navigator.pop(result). Ignoring this return value means the calling screen cannot react to user actions on the pushed screen, leading to stale UI, missed data updates, and broken back-navigation workflows that frustrate users. {v2}',
+    'require_navigation_result_handling',
+    '[require_navigation_result_handling] Navigator push method is called as a fire-and-forget statement without awaiting or assigning its Future result. Navigator.push() returns a Future<T?> that resolves to the value passed to Navigator.pop(result). Ignoring this return value means the calling screen cannot react to user actions on the pushed screen, leading to stale UI, missed data updates, and broken back-navigation workflows that frustrate users. {v2}',
     correctionMessage:
         'Await the Navigator.push() call and handle the returned result, or assign it to a variable for later use. If no result is expected, add an explicit comment.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   /// Navigator push methods that return results.
@@ -3502,11 +3233,10 @@ class RequireNavigationResultHandlingRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       if (!_pushMethods.contains(node.methodName.name)) return;
 
       // Check target is Navigator
@@ -3516,35 +3246,8 @@ class RequireNavigationResultHandlingRule extends SaropaLintRule {
       // Check if it's an expression statement (not awaited, not assigned)
       final AstNode? parent = node.parent;
       if (parent is ExpressionStatement) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
-    });
-  }
-
-  @override
-  List<Fix> getFixes() => <Fix>[_AddAwaitToNavigatorPushFix()];
-}
-
-class _AddAwaitToNavigatorPushFix extends DartFix {
-  @override
-  void run(
-    CustomLintResolver resolver,
-    ChangeReporter reporter,
-    CustomLintContext context,
-    AnalysisError analysisError,
-    List<AnalysisError> others,
-  ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
-      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
-
-      final changeBuilder = reporter.createChangeBuilder(
-        message: 'Add await to handle navigation result',
-        priority: 1,
-      );
-
-      changeBuilder.addDartFileEdit((builder) {
-        builder.addSimpleInsertion(node.offset, 'await ');
-      });
     });
   }
 }
@@ -3585,7 +3288,7 @@ class _AddAwaitToNavigatorPushFix extends DartFix {
 /// )
 /// ```
 class PreferGoRouterRedirectRule extends SaropaLintRule {
-  const PreferGoRouterRedirectRule() : super(code: _code);
+  PreferGoRouterRedirectRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.high;
@@ -3594,23 +3297,19 @@ class PreferGoRouterRedirectRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'prefer_go_router_redirect',
-    problemMessage:
-        '[prefer_go_router_redirect] GoRouter created without a redirect callback. Without redirect, authentication and authorization checks must happen in build(), which briefly shows the protected page before redirecting. Users see a flash of content they should not access, and crawlers or screen readers may capture protected information. Use the redirect callback to intercept navigation before any UI renders. {v1}',
+    'prefer_go_router_redirect',
+    '[prefer_go_router_redirect] GoRouter created without a redirect callback. Without redirect, authentication and authorization checks must happen in build(), which briefly shows the protected page before redirecting. Users see a flash of content they should not access, and crawlers or screen readers may capture protected information. Use the redirect callback to intercept navigation before any UI renders. {v1}',
     correctionMessage:
         'Add a redirect callback to GoRouter that checks authentication state and returns the login route for unauthenticated users.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addInstanceCreationExpression((
-      InstanceCreationExpression node,
-    ) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final String typeName = node.constructorName.type.name.lexeme;
       if (typeName != 'GoRouter') return;
 

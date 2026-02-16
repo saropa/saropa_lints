@@ -8,9 +8,6 @@ library;
 
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
-import 'package:analyzer/error/error.dart'
-    show AnalysisError, DiagnosticSeverity;
-import 'package:custom_lint_builder/custom_lint_builder.dart';
 
 import '../saropa_lint_rule.dart';
 
@@ -61,7 +58,7 @@ import '../saropa_lint_rule.dart';
 /// });
 /// ```
 class RequireTestAssertionsRule extends SaropaLintRule {
-  const RequireTestAssertionsRule() : super(code: _code);
+  RequireTestAssertionsRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -74,12 +71,11 @@ class RequireTestAssertionsRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.test};
 
   static const LintCode _code = LintCode(
-    name: 'require_test_assertions',
-    problemMessage:
-        '[require_test_assertions] Test has no assertions. Tests without assertions don\'t actually verify anything. This rule uses simple string matching on the test body source code for fast detection. {v4}',
+    'require_test_assertions',
+    '[require_test_assertions] Test has no assertions. Tests without assertions don\'t actually verify anything. This rule uses simple string matching on the test body source code for fast detection. {v4}',
     correctionMessage:
         'Add expect(), verify(), or other assertions. Run the full test suite to confirm the refactored tests maintain equivalent coverage.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   static const Set<String> _assertionMethods = <String>{
@@ -97,19 +93,18 @@ class RequireTestAssertionsRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
     // Only check test files
-    final String path = resolver.source.fullName;
+    final String path = context.filePath;
     if (!path.contains('_test.dart') &&
         !path.contains('/test/') &&
         !path.contains(r'\test\')) {
       return;
     }
 
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       final String methodName = node.methodName.name;
 
       // Check for test() or testWidgets() calls
@@ -119,8 +114,9 @@ class RequireTestAssertionsRule extends SaropaLintRule {
       if (args.arguments.length < 2) return;
 
       // Get the test body (second argument, usually a function)
-      final Expression? bodyArg =
-          args.arguments.length >= 2 ? args.arguments[1] : null;
+      final Expression? bodyArg = args.arguments.length >= 2
+          ? args.arguments[1]
+          : null;
 
       if (bodyArg == null) return;
 
@@ -161,7 +157,7 @@ class RequireTestAssertionsRule extends SaropaLintRule {
 /// test('throws ArgumentError when email is invalid', () { ... });
 /// ```
 class AvoidVagueTestDescriptionsRule extends SaropaLintRule {
-  const AvoidVagueTestDescriptionsRule() : super(code: _code);
+  AvoidVagueTestDescriptionsRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -174,12 +170,11 @@ class AvoidVagueTestDescriptionsRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.test};
 
   static const LintCode _code = LintCode(
-    name: 'avoid_vague_test_descriptions',
-    problemMessage:
-        '[avoid_vague_test_descriptions] Test description is too vague. Test names should clearly describe what is being tested. This weakens test quality, making failures harder to diagnose and reducing confidence in the test suite. {v5}',
+    'avoid_vague_test_descriptions',
+    '[avoid_vague_test_descriptions] Test description is too vague. Test names should clearly describe what is being tested. This weakens test quality, making failures harder to diagnose and reducing confidence in the test suite. {v5}',
     correctionMessage:
         'Use descriptive names like "should [action] when [condition]". Run the full test suite to confirm the refactored tests maintain equivalent coverage.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   static const Set<String> _vaguePatterns = <String>{
@@ -198,19 +193,18 @@ class AvoidVagueTestDescriptionsRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
     // Only check test files
-    final String path = resolver.source.fullName;
+    final String path = context.filePath;
     if (!path.contains('_test.dart') &&
         !path.contains('/test/') &&
         !path.contains(r'\test\')) {
       return;
     }
 
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       final String methodName = node.methodName.name;
 
       if (methodName != 'test' &&
@@ -231,7 +225,7 @@ class AvoidVagueTestDescriptionsRule extends SaropaLintRule {
       // Check for vague patterns
       for (final String pattern in _vaguePatterns) {
         if (description == pattern || description.startsWith(pattern)) {
-          reporter.atNode(firstArg, code);
+          reporter.atNode(firstArg);
           return;
         }
       }
@@ -239,7 +233,7 @@ class AvoidVagueTestDescriptionsRule extends SaropaLintRule {
       // Only flag very short descriptions (< 5 chars) as those are always vague
       // Don't flag moderately short names like "bug fix" which may be intentional
       if (description.length < 5) {
-        reporter.atNode(firstArg, code);
+        reporter.atNode(firstArg);
       }
     });
   }
@@ -270,7 +264,7 @@ class AvoidVagueTestDescriptionsRule extends SaropaLintRule {
 /// });
 /// ```
 class AvoidRealNetworkCallsInTestsRule extends SaropaLintRule {
-  const AvoidRealNetworkCallsInTestsRule() : super(code: _code);
+  AvoidRealNetworkCallsInTestsRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -283,12 +277,11 @@ class AvoidRealNetworkCallsInTestsRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.test};
 
   static const LintCode _code = LintCode(
-    name: 'avoid_real_network_calls_in_tests',
-    problemMessage:
-        '[avoid_real_network_calls_in_tests] Test may be making real network calls. Tests should mock external dependencies for reliability. This weakens test quality, making failures harder to diagnose and reducing confidence in the test suite. {v5}',
+    'avoid_real_network_calls_in_tests',
+    '[avoid_real_network_calls_in_tests] Test may be making real network calls. Tests should mock external dependencies for reliability. This weakens test quality, making failures harder to diagnose and reducing confidence in the test suite. {v5}',
     correctionMessage:
         'Mock HTTP clients and other external dependencies. Run the full test suite to confirm the refactored tests maintain equivalent coverage.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   /// Network patterns that indicate real HTTP calls.
@@ -309,19 +302,18 @@ class AvoidRealNetworkCallsInTestsRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
     // Only check test files
-    final String path = resolver.source.fullName;
+    final String path = context.filePath;
     if (!path.contains('_test.dart') &&
         !path.contains('/test/') &&
         !path.contains(r'\test\')) {
       return;
     }
 
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       final String methodName = node.methodName.name;
 
       if (methodName != 'test' && methodName != 'testWidgets') return;
@@ -329,8 +321,9 @@ class AvoidRealNetworkCallsInTestsRule extends SaropaLintRule {
       final ArgumentList args = node.argumentList;
       if (args.arguments.length < 2) return;
 
-      final Expression? bodyArg =
-          args.arguments.length >= 2 ? args.arguments[1] : null;
+      final Expression? bodyArg = args.arguments.length >= 2
+          ? args.arguments[1]
+          : null;
 
       if (bodyArg == null) return;
 
@@ -377,7 +370,7 @@ class AvoidRealNetworkCallsInTestsRule extends SaropaLintRule {
 /// });
 /// ```
 class AvoidHardcodedTestDelaysRule extends SaropaLintRule {
-  const AvoidHardcodedTestDelaysRule() : super(code: _code);
+  AvoidHardcodedTestDelaysRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -390,43 +383,41 @@ class AvoidHardcodedTestDelaysRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.test};
 
   static const LintCode _code = LintCode(
-    name: 'avoid_hardcoded_test_delays',
-    problemMessage:
-        '[avoid_hardcoded_test_delays] Test has hardcoded delay which makes tests slow and flaky. This weakens test quality, making failures harder to diagnose and reducing confidence in the test suite. {v5}',
+    'avoid_hardcoded_test_delays',
+    '[avoid_hardcoded_test_delays] Test has hardcoded delay which makes tests slow and flaky. This weakens test quality, making failures harder to diagnose and reducing confidence in the test suite. {v5}',
     correctionMessage:
         'Use pumpAndSettle(), stream matchers, or fake timers instead. Run the full test suite to confirm the refactored tests maintain equivalent coverage.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
     // Only check test files
-    final String path = resolver.source.fullName;
+    final String path = context.filePath;
     if (!path.contains('_test.dart') &&
         !path.contains('/test/') &&
         !path.contains(r'\test\')) {
       return;
     }
 
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       final String methodName = node.methodName.name;
 
       // Check for Future.delayed calls
       if (methodName == 'delayed') {
         final Expression? target = node.target;
         if (target is Identifier && target.name == 'Future') {
-          reporter.atNode(node, code);
+          reporter.atNode(node);
           return;
         }
       }
 
       // Check for sleep calls
       if (methodName == 'sleep') {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
   }
@@ -464,7 +455,7 @@ class AvoidHardcodedTestDelaysRule extends SaropaLintRule {
 /// }
 /// ```
 class RequireTestSetupTeardownRule extends SaropaLintRule {
-  const RequireTestSetupTeardownRule() : super(code: _code);
+  RequireTestSetupTeardownRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -477,29 +468,27 @@ class RequireTestSetupTeardownRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.test};
 
   static const LintCode _code = LintCode(
-    name: 'require_test_setup_teardown',
-    problemMessage:
-        '[require_test_setup_teardown] Test file lacks setUp/tearDown for shared resources. Tests should properly set up and clean up resources. This weakens test quality, making failures harder to diagnose and reducing confidence in the test suite. {v5}',
+    'require_test_setup_teardown',
+    '[require_test_setup_teardown] Test file lacks setUp/tearDown for shared resources. Tests should properly set up and clean up resources. This weakens test quality, making failures harder to diagnose and reducing confidence in the test suite. {v5}',
     correctionMessage:
         'Add setUp() and tearDown() to initialize and clean up test state. Run the full test suite to confirm the refactored tests maintain equivalent coverage.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
     // Only check test files
-    final String path = resolver.source.fullName;
+    final String path = context.filePath;
     if (!path.contains('_test.dart') &&
         !path.contains('/test/') &&
         !path.contains(r'\test\')) {
       return;
     }
 
-    context.registry.addFunctionDeclaration((FunctionDeclaration node) {
+    context.addFunctionDeclaration((FunctionDeclaration node) {
       // Only check main function
       if (node.name.lexeme != 'main') return;
 
@@ -507,14 +496,15 @@ class RequireTestSetupTeardownRule extends SaropaLintRule {
       final String bodySource = body.toSource();
 
       // Count tests
-      final int testCount = 'test('.allMatches(bodySource).length +
+      final int testCount =
+          'test('.allMatches(bodySource).length +
           'testWidgets('.allMatches(bodySource).length;
 
       // If multiple tests, check for setUp
       if (testCount > 2) {
         if (!bodySource.contains('setUp(') &&
             !bodySource.contains('setUpAll(')) {
-          reporter.atNode(node, code);
+          reporter.atNode(node);
         }
       }
     });
@@ -549,7 +539,7 @@ class RequireTestSetupTeardownRule extends SaropaLintRule {
 /// });
 /// ```
 class RequirePumpAfterInteractionRule extends SaropaLintRule {
-  const RequirePumpAfterInteractionRule() : super(code: _code);
+  RequirePumpAfterInteractionRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -562,12 +552,11 @@ class RequirePumpAfterInteractionRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.test};
 
   static const LintCode _code = LintCode(
-    name: 'require_pump_after_interaction',
-    problemMessage:
-        '[require_pump_after_interaction] Widget test may need pump() or pumpAndSettle() after interaction. Widget tests need to pump to process the widget lifecycle. This weakens test quality, making failures harder to diagnose and reducing confidence in the test suite. {v6}',
+    'require_pump_after_interaction',
+    '[require_pump_after_interaction] Widget test may need pump() or pumpAndSettle() after interaction. Widget tests need to pump to process the widget lifecycle. This weakens test quality, making failures harder to diagnose and reducing confidence in the test suite. {v6}',
     correctionMessage:
         'Call pump() or pumpAndSettle() after tap(), drag(), or other interactions. Run the full test suite to confirm the refactored tests maintain equivalent coverage.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   static const Set<String> _interactionMethods = <String>{
@@ -581,19 +570,18 @@ class RequirePumpAfterInteractionRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
     // Only check test files
-    final String path = resolver.source.fullName;
+    final String path = context.filePath;
     if (!path.contains('_test.dart') &&
         !path.contains('/test/') &&
         !path.contains(r'\test\')) {
       return;
     }
 
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       final String methodName = node.methodName.name;
 
       if (methodName != 'testWidgets') return;
@@ -601,8 +589,9 @@ class RequirePumpAfterInteractionRule extends SaropaLintRule {
       final ArgumentList args = node.argumentList;
       if (args.arguments.length < 2) return;
 
-      final Expression? bodyArg =
-          args.arguments.length >= 2 ? args.arguments[1] : null;
+      final Expression? bodyArg = args.arguments.length >= 2
+          ? args.arguments[1]
+          : null;
 
       if (bodyArg == null) return;
 
@@ -680,7 +669,7 @@ class RequirePumpAfterInteractionRule extends SaropaLintRule {
 /// });
 /// ```
 class AvoidProductionConfigInTestsRule extends SaropaLintRule {
-  const AvoidProductionConfigInTestsRule() : super(code: _code);
+  AvoidProductionConfigInTestsRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -693,12 +682,11 @@ class AvoidProductionConfigInTestsRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.test};
 
   static const LintCode _code = LintCode(
-    name: 'avoid_production_config_in_tests',
-    problemMessage:
-        '[avoid_production_config_in_tests] Test may be using production configuration. Tests should use test-specific configuration. This weakens test quality, making failures harder to diagnose and reducing confidence in the test suite. {v4}',
+    'avoid_production_config_in_tests',
+    '[avoid_production_config_in_tests] Test may be using production configuration. Tests should use test-specific configuration. This weakens test quality, making failures harder to diagnose and reducing confidence in the test suite. {v4}',
     correctionMessage:
         'Use test-specific or mocked configuration. Run the full test suite to confirm the refactored tests maintain equivalent coverage.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   // cspell:ignore firebaseio
@@ -718,24 +706,23 @@ class AvoidProductionConfigInTestsRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
     // Only check test files
-    final String path = resolver.source.fullName;
+    final String path = context.filePath;
     if (!path.contains('_test.dart') &&
         !path.contains('/test/') &&
         !path.contains(r'\test\')) {
       return;
     }
 
-    context.registry.addSimpleStringLiteral((SimpleStringLiteral node) {
+    context.addSimpleStringLiteral((SimpleStringLiteral node) {
       final String value = node.value.toLowerCase();
 
       for (final String pattern in _productionPatterns) {
         if (value.contains(pattern)) {
-          reporter.atNode(node, code);
+          reporter.atNode(node);
           return;
         }
       }
@@ -774,7 +761,7 @@ class AvoidProductionConfigInTestsRule extends SaropaLintRule {
 /// });
 /// ```
 class PreferPumpAndSettleRule extends SaropaLintRule {
-  const PreferPumpAndSettleRule() : super(code: _code);
+  PreferPumpAndSettleRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -787,12 +774,11 @@ class PreferPumpAndSettleRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.test};
 
   static const LintCode _code = LintCode(
-    name: 'prefer_pump_and_settle',
-    problemMessage:
-        '[prefer_pump_and_settle] Use pumpAndSettle() after interactions to wait for animations. After tap(), drag(), or other interactions, using pumpAndSettle() ensures all animations complete before assertions. Using pump() alone may miss animations or scheduled frames. {v2}',
+    'prefer_pump_and_settle',
+    '[prefer_pump_and_settle] Use pumpAndSettle() after interactions to wait for animations. After tap(), drag(), or other interactions, using pumpAndSettle() ensures all animations complete before assertions. Using pump() alone may miss animations or scheduled frames. {v2}',
     correctionMessage:
         'Use pumpAndSettle() after tap/drag/etc. to ensure animations complete. Run the full test suite to confirm the refactored tests maintain equivalent coverage.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   static const Set<String> _interactionMethods = <String>{
@@ -811,19 +797,18 @@ class PreferPumpAndSettleRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
     // Only check test files
-    final String path = resolver.source.fullName;
+    final String path = context.filePath;
     if (!path.contains('_test.dart') &&
         !path.contains('/test/') &&
         !path.contains(r'\test\')) {
       return;
     }
 
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       final String methodName = node.methodName.name;
 
       // Check for tester.pump() calls (not pumpWidget or pumpAndSettle)
@@ -846,7 +831,7 @@ class PreferPumpAndSettleRule extends SaropaLintRule {
                 final interactionIndex = bodySource.indexOf(pattern);
                 if (interactionIndex != -1) {
                   // Found an interaction - this pump() may need to be pumpAndSettle
-                  reporter.atNode(node, code);
+                  reporter.atNode(node);
                   return;
                 }
               }
@@ -888,7 +873,7 @@ class PreferPumpAndSettleRule extends SaropaLintRule {
 /// });
 /// ```
 class AvoidTestSleepRule extends SaropaLintRule {
-  const AvoidTestSleepRule() : super(code: _code);
+  AvoidTestSleepRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -901,34 +886,32 @@ class AvoidTestSleepRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.test};
 
   static const LintCode _code = LintCode(
-    name: 'avoid_test_sleep',
-    problemMessage:
-        '[avoid_test_sleep] Real sleep() or Future.delayed() call in test code blocks the test runner, slows the suite, and produces flaky failures when system load varies. Tests with real delays waste CI minutes and give inconsistent results across machines. {v5}',
+    'avoid_test_sleep',
+    '[avoid_test_sleep] Real sleep() or Future.delayed() call in test code blocks the test runner, slows the suite, and produces flaky failures when system load varies. Tests with real delays waste CI minutes and give inconsistent results across machines. {v5}',
     correctionMessage:
         'Replace with fakeAsync and clock.elapse() to simulate time passing instantly, keeping tests fast and deterministic.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
     // Only check test files
-    final String path = resolver.source.fullName;
+    final String path = context.filePath;
     if (!path.contains('_test.dart') &&
         !path.contains('/test/') &&
         !path.contains(r'\test\')) {
       return;
     }
 
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       final String methodName = node.methodName.name;
 
       // Check for sleep() calls
       if (methodName == 'sleep') {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
         return;
       }
 
@@ -947,7 +930,7 @@ class AvoidTestSleepRule extends SaropaLintRule {
             }
             current = current.parent;
           }
-          reporter.atNode(node, code);
+          reporter.atNode(node);
         }
       }
     });
@@ -979,7 +962,7 @@ class AvoidTestSleepRule extends SaropaLintRule {
 /// await tester.tap(find.byKey(Key('submit_button')));
 /// ```
 class AvoidFindByTextRule extends SaropaLintRule {
-  const AvoidFindByTextRule() : super(code: _code);
+  AvoidFindByTextRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -992,12 +975,11 @@ class AvoidFindByTextRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.test};
 
   static const LintCode _code = LintCode(
-    name: 'avoid_find_by_text',
-    problemMessage:
-        '[avoid_find_by_text] Prefer find.byKey() for widget interactions instead of find.text(). - find.text() is appropriate for verifying displayed content. - find.byKey() is preferred for tapping/interacting with widgets because it\'s stable when text changes (e.g., i18n, A/B testing). {v3}',
+    'avoid_find_by_text',
+    '[avoid_find_by_text] Prefer find.byKey() for widget interactions instead of find.text(). - find.text() is appropriate for verifying displayed content. - find.byKey() is preferred for tapping/interacting with widgets because it\'s stable when text changes (e.g., i18n, A/B testing). {v3}',
     correctionMessage:
         'Add a Key to the widget and use find.byKey() for tap/drag operations. Run the full test suite to confirm the refactored tests maintain equivalent coverage.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   /// Interaction methods where find.text() is fragile
@@ -1015,19 +997,18 @@ class AvoidFindByTextRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
     // Only check test files
-    final String path = resolver.source.fullName;
+    final String path = context.filePath;
     if (!path.contains('_test.dart') &&
         !path.contains('/test/') &&
         !path.contains(r'\test\')) {
       return;
     }
 
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       final String methodName = node.methodName.name;
 
       // Only warn if this is an interaction method
@@ -1039,7 +1020,7 @@ class AvoidFindByTextRule extends SaropaLintRule {
           if (arg.methodName.name == 'text') {
             final Expression? target = arg.target;
             if (target is SimpleIdentifier && target.name == 'find') {
-              reporter.atNode(arg, code);
+              reporter.atNode(arg);
             }
           }
         }
@@ -1076,7 +1057,7 @@ class AvoidFindByTextRule extends SaropaLintRule {
 /// });
 /// ```
 class RequireTestKeysRule extends SaropaLintRule {
-  const RequireTestKeysRule() : super(code: _code);
+  RequireTestKeysRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -1089,12 +1070,11 @@ class RequireTestKeysRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.test};
 
   static const LintCode _code = LintCode(
-    name: 'require_test_keys',
-    problemMessage:
-        '[require_test_keys] Interactive widget in test code lacks a Key, making it difficult to locate with find.byKey() in widget tests. Without a Key, tests rely on fragile finders like find.byType() that break when multiple instances of the same widget type exist in the tree. {v4}',
+    'require_test_keys',
+    '[require_test_keys] Interactive widget in test code lacks a Key, making it difficult to locate with find.byKey() in widget tests. Without a Key, tests rely on fragile finders like find.byType() that break when multiple instances of the same widget type exist in the tree. {v4}',
     correctionMessage:
         'Add a descriptive Key (e.g., key: Key("submit_button")) so the widget is reliably identifiable in widget test finders.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   static const Set<String> _interactiveWidgets = <String>{
@@ -1114,21 +1094,18 @@ class RequireTestKeysRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
     // Only check test files
-    final String path = resolver.source.fullName;
+    final String path = context.filePath;
     if (!path.contains('_test.dart') &&
         !path.contains('/test/') &&
         !path.contains(r'\test\')) {
       return;
     }
 
-    context.registry.addInstanceCreationExpression((
-      InstanceCreationExpression node,
-    ) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final String typeName = node.constructorName.type.name.lexeme;
       if (!_interactiveWidgets.contains(typeName)) return;
 
@@ -1184,7 +1161,7 @@ class RequireTestKeysRule extends SaropaLintRule {
 /// });
 /// ```
 class RequireArrangeActAssertRule extends SaropaLintRule {
-  const RequireArrangeActAssertRule() : super(code: _code);
+  RequireArrangeActAssertRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -1197,28 +1174,26 @@ class RequireArrangeActAssertRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.test};
 
   static const LintCode _code = LintCode(
-    name: 'require_arrange_act_assert',
-    problemMessage:
-        '[require_arrange_act_assert] Test should follow Arrange-Act-Assert pattern. AAA pattern makes tests more readable and maintainable. This weakens test quality, making failures harder to diagnose and reducing confidence in the test suite. {v3}',
+    'require_arrange_act_assert',
+    '[require_arrange_act_assert] Test should follow Arrange-Act-Assert pattern. AAA pattern makes tests more readable and maintainable. This weakens test quality, making failures harder to diagnose and reducing confidence in the test suite. {v3}',
     correctionMessage:
         'Add // Arrange, // Act, // Assert comments to structure the test. Run the full test suite to confirm the refactored tests maintain equivalent coverage.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    final String path = resolver.source.fullName;
+    final String path = context.filePath;
     if (!path.contains('_test.dart') &&
         !path.contains('/test/') &&
         !path.contains(r'\test\')) {
       return;
     }
 
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       final String methodName = node.methodName.name;
       if (methodName != 'test' && methodName != 'testWidgets') return;
 
@@ -1231,11 +1206,14 @@ class RequireArrangeActAssertRule extends SaropaLintRule {
       final String bodySource = bodyArg.toSource();
 
       // Check for AAA comments (case-insensitive)
-      final bool hasArrange = bodySource.toLowerCase().contains('// arrange') ||
+      final bool hasArrange =
+          bodySource.toLowerCase().contains('// arrange') ||
           bodySource.toLowerCase().contains('//arrange');
-      final bool hasAct = bodySource.toLowerCase().contains('// act') ||
+      final bool hasAct =
+          bodySource.toLowerCase().contains('// act') ||
           bodySource.toLowerCase().contains('//act');
-      final bool hasAssert = bodySource.toLowerCase().contains('// assert') ||
+      final bool hasAssert =
+          bodySource.toLowerCase().contains('// assert') ||
           bodySource.toLowerCase().contains('//assert');
 
       // Only warn for longer tests that would benefit from structure
@@ -1277,7 +1255,7 @@ class RequireArrangeActAssertRule extends SaropaLintRule {
 /// });
 /// ```
 class PreferMockNavigatorRule extends SaropaLintRule {
-  const PreferMockNavigatorRule() : super(code: _code);
+  PreferMockNavigatorRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -1290,28 +1268,26 @@ class PreferMockNavigatorRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.test};
 
   static const LintCode _code = LintCode(
-    name: 'prefer_mock_navigator',
-    problemMessage:
-        '[prefer_mock_navigator] Navigator usage in test must be mocked for verification. Real navigation in tests can cause issues and makes tests harder to verify. Navigator is used in tests without mocking. {v4}',
+    'prefer_mock_navigator',
+    '[prefer_mock_navigator] Navigator usage in test must be mocked for verification. Real navigation in tests can cause issues and makes tests harder to verify. Navigator is used in tests without mocking. {v4}',
     correctionMessage:
         'Use MockNavigatorObserver to verify navigation. Run the full test suite to confirm the refactored tests maintain equivalent coverage.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    final String path = resolver.source.fullName;
+    final String path = context.filePath;
     if (!path.contains('_test.dart') &&
         !path.contains('/test/') &&
         !path.contains(r'\test\')) {
       return;
     }
 
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       final String methodName = node.methodName.name;
 
       // Check for Navigator.push, Navigator.pop, etc.
@@ -1321,13 +1297,13 @@ class PreferMockNavigatorRule extends SaropaLintRule {
           methodName == 'pushReplacement') {
         final Expression? target = node.target;
         if (target is SimpleIdentifier && target.name == 'Navigator') {
-          reporter.atNode(node, code);
+          reporter.atNode(node);
         }
         // Also check Navigator.of(context).push
         if (target is MethodInvocation && target.methodName.name == 'of') {
           final Expression? navTarget = target.target;
           if (navTarget is SimpleIdentifier && navTarget.name == 'Navigator') {
-            reporter.atNode(node, code);
+            reporter.atNode(node);
           }
         }
       }
@@ -1358,7 +1334,7 @@ class PreferMockNavigatorRule extends SaropaLintRule {
 /// });
 /// ```
 class AvoidRealTimerInWidgetTestRule extends SaropaLintRule {
-  const AvoidRealTimerInWidgetTestRule() : super(code: _code);
+  AvoidRealTimerInWidgetTestRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -1371,32 +1347,28 @@ class AvoidRealTimerInWidgetTestRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.test};
 
   static const LintCode _code = LintCode(
-    name: 'avoid_real_timer_in_widget_test',
-    problemMessage:
-        '[avoid_real_timer_in_widget_test] Real Timer in widget test causes flaky results and slow execution due to actual time delays. '
+    'avoid_real_timer_in_widget_test',
+    '[avoid_real_timer_in_widget_test] Real Timer in widget test causes flaky results and slow execution due to actual time delays. '
         'Timer callbacks execute asynchronously outside the test framework control, leading to race conditions where assertions run before or after the timer fires depending on system load. {v6}',
     correctionMessage:
         'Use fakeAsync to control time advancement deterministically, or wrap timer-dependent code in tester.runAsync(). '
         'This eliminates real-time waits, prevents race conditions, and ensures tests produce consistent results regardless of system load or CI environment speed.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    final String path = resolver.source.fullName;
+    final String path = context.filePath;
     if (!path.contains('_test.dart') &&
         !path.contains('/test/') &&
         !path.contains(r'\test\')) {
       return;
     }
 
-    context.registry.addInstanceCreationExpression((
-      InstanceCreationExpression node,
-    ) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final String typeName = node.constructorName.type.name.lexeme;
       if (typeName == 'Timer') {
         // Check if inside fakeAsync
@@ -1442,7 +1414,7 @@ class AvoidRealTimerInWidgetTestRule extends SaropaLintRule {
 /// });
 /// ```
 class RequireMockVerificationRule extends SaropaLintRule {
-  const RequireMockVerificationRule() : super(code: _code);
+  RequireMockVerificationRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -1455,28 +1427,26 @@ class RequireMockVerificationRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.test};
 
   static const LintCode _code = LintCode(
-    name: 'require_mock_verification',
-    problemMessage:
-        '[require_mock_verification] Mock is stubbed but never verified. Creating mocks without verification means the test doesn\'t check behavior. This weakens test quality, making failures harder to diagnose and reducing confidence in the test suite. {v4}',
+    'require_mock_verification',
+    '[require_mock_verification] Mock is stubbed but never verified. Creating mocks without verification means the test doesn\'t check behavior. This weakens test quality, making failures harder to diagnose and reducing confidence in the test suite. {v4}',
     correctionMessage:
         'Add verify() call to check mock interactions. Run the full test suite to confirm the refactored tests maintain equivalent coverage.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    final String path = resolver.source.fullName;
+    final String path = context.filePath;
     if (!path.contains('_test.dart') &&
         !path.contains('/test/') &&
         !path.contains(r'\test\')) {
       return;
     }
 
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       final String methodName = node.methodName.name;
 
       // Check for when() calls (mockito stubbing)
@@ -1492,7 +1462,7 @@ class RequireMockVerificationRule extends SaropaLintRule {
               if (!testSource.contains('verify(') &&
                   !testSource.contains('verifyNever(') &&
                   !testSource.contains('verifyInOrder(')) {
-                reporter.atNode(node, code);
+                reporter.atNode(node);
               }
               return;
             }
@@ -1524,7 +1494,7 @@ class RequireMockVerificationRule extends SaropaLintRule {
 /// expect(result, isNull);
 /// ```
 class PreferMatcherOverEqualsRule extends SaropaLintRule {
-  const PreferMatcherOverEqualsRule() : super(code: _code);
+  PreferMatcherOverEqualsRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -1537,28 +1507,26 @@ class PreferMatcherOverEqualsRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.test};
 
   static const LintCode _code = LintCode(
-    name: 'prefer_matcher_over_equals',
-    problemMessage:
-        '[prefer_matcher_over_equals] Use matchers instead of direct equality to improve messages. Matchers provide better error messages and more expressive tests. Expect uses equality instead of matchers. {v7}',
+    'prefer_matcher_over_equals',
+    '[prefer_matcher_over_equals] Use matchers instead of direct equality to improve messages. Matchers provide better error messages and more expressive tests. Expect uses equality instead of matchers. {v7}',
     correctionMessage:
         'Replace with isTrue, isFalse, isNull, hasLength(), etc. Run the full test suite to confirm the refactored tests maintain equivalent coverage.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    final String path = resolver.source.fullName;
+    final String path = context.filePath;
     if (!path.contains('_test.dart') &&
         !path.contains('/test/') &&
         !path.contains(r'\test\')) {
       return;
     }
 
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       final String methodName = node.methodName.name;
       if (methodName != 'expect') return;
 
@@ -1569,23 +1537,23 @@ class PreferMatcherOverEqualsRule extends SaropaLintRule {
 
       // Check for literal booleans
       if (matcher is BooleanLiteral) {
-        reporter.atNode(matcher, code);
+        reporter.atNode(matcher);
         return;
       }
 
       // Check for null literal
       if (matcher is NullLiteral) {
-        reporter.atNode(matcher, code);
+        reporter.atNode(matcher);
         return;
       }
 
       // Check for .length comparisons
       final Expression actual = args.arguments.first;
       if (actual is PrefixedIdentifier && actual.identifier.name == 'length') {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
       if (actual is PropertyAccess && actual.propertyName.name == 'length') {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
   }
@@ -1627,7 +1595,7 @@ class PreferMatcherOverEqualsRule extends SaropaLintRule {
 /// });
 /// ```
 class PreferTestWrapperRule extends SaropaLintRule {
-  const PreferTestWrapperRule() : super(code: _code);
+  PreferTestWrapperRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -1640,12 +1608,11 @@ class PreferTestWrapperRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.test};
 
   static const LintCode _code = LintCode(
-    name: 'prefer_test_wrapper',
-    problemMessage:
-        '[prefer_test_wrapper] Widget test should wrap with MaterialApp/CupertinoApp. Most widgets need MaterialApp ancestor for theming and localization. Note: This rule ignores teardown patterns where simple widgets like SizedBox, Container, or Placeholder are pumped to unmount the widget tree before disposal. {v4}',
+    'prefer_test_wrapper',
+    '[prefer_test_wrapper] Widget test should wrap with MaterialApp/CupertinoApp. Most widgets need MaterialApp ancestor for theming and localization. Note: This rule ignores teardown patterns where simple widgets like SizedBox, Container, or Placeholder are pumped to unmount the widget tree before disposal. {v4}',
     correctionMessage:
         'Wrap the widget with MaterialApp(home: Scaffold(body: ..)). Run the full test suite to confirm the refactored tests maintain equivalent coverage.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   /// Simple widgets commonly used for teardown/cleanup in tests.
@@ -1659,18 +1626,17 @@ class PreferTestWrapperRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    final String path = resolver.source.fullName;
+    final String path = context.filePath;
     if (!path.contains('_test.dart') &&
         !path.contains('/test/') &&
         !path.contains(r'\test\')) {
       return;
     }
 
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       final String methodName = node.methodName.name;
       if (methodName != 'pumpWidget') return;
 
@@ -1687,13 +1653,10 @@ class PreferTestWrapperRule extends SaropaLintRule {
       if (!widgetSource.contains('MaterialApp') &&
           !widgetSource.contains('CupertinoApp') &&
           !widgetSource.contains('WidgetsApp')) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
   }
-
-  @override
-  List<Fix> getFixes() => <Fix>[_WrapWithMaterialAppFix()];
 
   /// Check if this is a simple widget used for teardown/cleanup.
   bool _isTeardownWidget(Expression widget) {
@@ -1735,39 +1698,6 @@ class PreferTestWrapperRule extends SaropaLintRule {
 }
 
 /// Quick fix that wraps a widget with MaterialApp(home: ...).
-class _WrapWithMaterialAppFix extends DartFix {
-  @override
-  void run(
-    CustomLintResolver resolver,
-    ChangeReporter reporter,
-    CustomLintContext context,
-    AnalysisError analysisError,
-    List<AnalysisError> others,
-  ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
-      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
-      if (node.methodName.name != 'pumpWidget') return;
-
-      final ArgumentList args = node.argumentList;
-      if (args.arguments.isEmpty) return;
-
-      final Expression widget = args.arguments.first;
-      final String widgetSource = widget.toSource();
-
-      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
-        message: 'Wrap with MaterialApp',
-        priority: 1,
-      );
-
-      changeBuilder.addDartFileEdit((builder) {
-        builder.addSimpleReplacement(
-          widget.sourceRange,
-          'MaterialApp(home: $widgetSource)',
-        );
-      });
-    });
-  }
-}
 
 /// Warns when widget tests don't test multiple screen sizes.
 ///
@@ -1796,7 +1726,7 @@ class _WrapWithMaterialAppFix extends DartFix {
 /// });
 /// ```
 class RequireScreenSizeTestsRule extends SaropaLintRule {
-  const RequireScreenSizeTestsRule() : super(code: _code);
+  RequireScreenSizeTestsRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -1809,28 +1739,26 @@ class RequireScreenSizeTestsRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.test};
 
   static const LintCode _code = LintCode(
-    name: 'require_screen_size_tests',
-    problemMessage:
-        '[require_screen_size_tests] Widget test does not verify behavior at multiple screen sizes. Responsive layouts can break on different devices, and single-size tests miss overflow and layout errors at runtime. {v3}',
+    'require_screen_size_tests',
+    '[require_screen_size_tests] Widget test does not verify behavior at multiple screen sizes. Responsive layouts can break on different devices, and single-size tests miss overflow and layout errors at runtime. {v3}',
     correctionMessage:
         'Use tester.binding.window.physicalSizeTestValue to test responsive layouts. Run the full test suite to confirm the refactored tests maintain equivalent coverage.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    final String path = resolver.source.fullName;
+    final String path = context.filePath;
     if (!path.contains('_test.dart') &&
         !path.contains('/test/') &&
         !path.contains(r'\test\')) {
       return;
     }
 
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       final String methodName = node.methodName.name;
       if (methodName != 'testWidgets') return;
 
@@ -1882,7 +1810,7 @@ class RequireScreenSizeTestsRule extends SaropaLintRule {
 /// });
 /// ```
 class AvoidStatefulTestSetupRule extends SaropaLintRule {
-  const AvoidStatefulTestSetupRule() : super(code: _code);
+  AvoidStatefulTestSetupRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -1895,28 +1823,26 @@ class AvoidStatefulTestSetupRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.test};
 
   static const LintCode _code = LintCode(
-    name: 'avoid_stateful_test_setup',
-    problemMessage:
-        '[avoid_stateful_test_setup] setUp must not mutate shared state. Shared mutable state can cause test pollution. This weakens test quality, making failures harder to diagnose and reducing confidence in the test suite. {v4}',
+    'avoid_stateful_test_setup',
+    '[avoid_stateful_test_setup] setUp must not mutate shared state. Shared mutable state can cause test pollution. This weakens test quality, making failures harder to diagnose and reducing confidence in the test suite. {v4}',
     correctionMessage:
         'Reassign variables instead of mutating them in setUp. Run the full test suite to confirm the refactored tests maintain equivalent coverage.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    final String path = resolver.source.fullName;
+    final String path = context.filePath;
     if (!path.contains('_test.dart') &&
         !path.contains('/test/') &&
         !path.contains(r'\test\')) {
       return;
     }
 
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       final String methodName = node.methodName.name;
       if (methodName != 'setUp' && methodName != 'setUpAll') return;
 
@@ -1932,7 +1858,7 @@ class AvoidStatefulTestSetupRule extends SaropaLintRule {
           bodySource.contains('.clear(') ||
           bodySource.contains('++') ||
           bodySource.contains('--')) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
   }
@@ -1960,7 +1886,7 @@ class AvoidStatefulTestSetupRule extends SaropaLintRule {
 /// });
 /// ```
 class PreferMockHttpRule extends SaropaLintRule {
-  const PreferMockHttpRule() : super(code: _code);
+  PreferMockHttpRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -1973,30 +1899,26 @@ class PreferMockHttpRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.test};
 
   static const LintCode _code = LintCode(
-    name: 'prefer_mock_http',
-    problemMessage:
-        '[prefer_mock_http] Use mock HTTP client in tests instead of real network calls. Real network calls make tests slow and flaky. This weakens test quality, making failures harder to diagnose and reducing confidence in the test suite. {v5}',
+    'prefer_mock_http',
+    '[prefer_mock_http] Use mock HTTP client in tests instead of real network calls. Real network calls make tests slow and flaky. This weakens test quality, making failures harder to diagnose and reducing confidence in the test suite. {v5}',
     correctionMessage:
         'Replace http.Client() with MockClient. Run the full test suite to confirm the refactored tests maintain equivalent coverage.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    final String path = resolver.source.fullName;
+    final String path = context.filePath;
     if (!path.contains('_test.dart') &&
         !path.contains('/test/') &&
         !path.contains(r'\test\')) {
       return;
     }
 
-    context.registry.addInstanceCreationExpression((
-      InstanceCreationExpression node,
-    ) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final String typeName = node.constructorName.type.name.lexeme;
 
       // Check for http.Client(), HttpClient(), or Dio()
@@ -2035,31 +1957,29 @@ class PreferMockHttpRule extends SaropaLintRule {
 /// });
 /// ```
 class RequireGoldenTestRule extends SaropaLintRule {
-  const RequireGoldenTestRule() : super(code: _code);
+  RequireGoldenTestRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
-    name: 'require_golden_test',
-    problemMessage:
-        '[require_golden_test] Add golden test for visual verification. Golden tests catch visual regressions automatically. Visual widgets must have golden tests. This weakens test quality, making failures harder to diagnose and reducing confidence in the test suite. {v3}',
+    'require_golden_test',
+    '[require_golden_test] Add golden test for visual verification. Golden tests catch visual regressions automatically. Visual widgets must have golden tests. This weakens test quality, making failures harder to diagnose and reducing confidence in the test suite. {v3}',
     correctionMessage:
         'Add matchesGoldenFile() for visual regression testing. Run the full test suite to confirm the refactored tests maintain equivalent coverage.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    final String path = resolver.source.fullName;
+    final String path = context.filePath;
     if (!path.contains('_test.dart') &&
         !path.contains('/test/') &&
         !path.contains(r'\test\')) {
       return;
     }
 
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       final String methodName = node.methodName.name;
       if (methodName != 'testWidgets') return;
 
@@ -2123,7 +2043,7 @@ class RequireGoldenTestRule extends SaropaLintRule {
 /// });
 /// ```
 class AvoidFlakyTestsRule extends SaropaLintRule {
-  const AvoidFlakyTestsRule() : super(code: _code);
+  AvoidFlakyTestsRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -2136,13 +2056,12 @@ class AvoidFlakyTestsRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.test};
 
   static const LintCode _code = LintCode(
-    name: 'avoid_flaky_tests',
-    problemMessage:
-        '[avoid_flaky_tests] Test contains patterns that may cause flakiness. Flaky tests fail intermittently, eroding confidence in the test suite. This rule detects common causes of test flakiness. {v4}',
+    'avoid_flaky_tests',
+    '[avoid_flaky_tests] Test contains patterns that may cause flakiness. Flaky tests fail intermittently, eroding confidence in the test suite. This rule detects common causes of test flakiness. {v4}',
     correctionMessage:
         'Use seeded Random, mock time sources, use tester.pump() instead of. Run the full test suite to confirm the refactored tests maintain equivalent coverage.'
         'Future.delayed, and mock network/file system access.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   /// Patterns that indicate flaky test code.
@@ -2186,18 +2105,18 @@ class AvoidFlakyTestsRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
     // Only check test files (handle both Unix / and Windows \ paths)
-    final String path = resolver.source.fullName;
-    final bool isTestFile = path.contains('_test.dart') ||
+    final String path = context.filePath;
+    final bool isTestFile =
+        path.contains('_test.dart') ||
         path.contains('/test/') ||
         path.contains(r'\test\');
     if (!isTestFile) return;
 
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       final String methodName = node.methodName.name;
 
       // Only check test() and testWidgets() functions
@@ -2284,7 +2203,7 @@ class AvoidFlakyTestsRule extends SaropaLintRule {
 /// });
 /// ```
 class PreferSingleAssertionRule extends SaropaLintRule {
-  const PreferSingleAssertionRule() : super(code: _code);
+  PreferSingleAssertionRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -2297,12 +2216,11 @@ class PreferSingleAssertionRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.test};
 
   static const LintCode _code = LintCode(
-    name: 'prefer_single_assertion',
-    problemMessage:
-        '[prefer_single_assertion] Test has many assertions. Split into focused tests. Tests with multiple assertions are harder to debug - you only see the first failure. One logical assertion per test clarifies what broke. {v2}',
+    'prefer_single_assertion',
+    '[prefer_single_assertion] Test has many assertions. Split into focused tests. Tests with multiple assertions are harder to debug - you only see the first failure. One logical assertion per test clarifies what broke. {v2}',
     correctionMessage:
         'One logical assertion per test makes failures easier to debug. Run the full test suite to confirm the refactored tests maintain equivalent coverage.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   /// Threshold for number of expect() calls before warning
@@ -2310,18 +2228,17 @@ class PreferSingleAssertionRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    final String path = resolver.source.fullName;
+    final String path = context.filePath;
     if (!path.contains('_test.dart') &&
         !path.contains('/test/') &&
         !path.contains(r'\test\')) {
       return;
     }
 
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       final String methodName = node.methodName.name;
       if (methodName != 'test' && methodName != 'testWidgets') return;
 
@@ -2363,7 +2280,7 @@ class PreferSingleAssertionRule extends SaropaLintRule {
 /// expect(find.byType(MyCustomWidget), findsOneWidget); // Custom widget OK
 /// ```
 class AvoidFindAllRule extends SaropaLintRule {
-  const AvoidFindAllRule() : super(code: _code);
+  AvoidFindAllRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -2376,12 +2293,11 @@ class AvoidFindAllRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.test};
 
   static const LintCode _code = LintCode(
-    name: 'avoid_find_all',
-    problemMessage:
-        '[avoid_find_all] Generic finder (Text, Container, etc.) matches many widgets. Use specific finder. Using generic finders like find.byType(Text) matches many widgets and makes tests fragile. Use more specific finders. {v2}',
+    'avoid_find_all',
+    '[avoid_find_all] Generic finder (Text, Container, etc.) matches many widgets. Use specific finder. Using generic finders like find.byType(Text) matches many widgets and makes tests fragile. Use more specific finders. {v2}',
     correctionMessage:
         'Use find.text(), find.byKey(), find.byIcon(), or find your custom widget type. Run the full test suite to confirm the refactored tests maintain equivalent coverage.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   /// Generic Flutter widget types that are too broad for reliable testing
@@ -2409,18 +2325,17 @@ class AvoidFindAllRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    final String path = resolver.source.fullName;
+    final String path = context.filePath;
     if (!path.contains('_test.dart') &&
         !path.contains('/test/') &&
         !path.contains(r'\test\')) {
       return;
     }
 
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       final String methodName = node.methodName.name;
       if (methodName != 'byType') return;
 
@@ -2436,7 +2351,7 @@ class AvoidFindAllRule extends SaropaLintRule {
       final String typeSource = typeArg.toSource();
 
       if (_genericTypes.contains(typeSource)) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
   }
@@ -2471,7 +2386,7 @@ class AvoidFindAllRule extends SaropaLintRule {
 /// }
 /// ```
 class RequireIntegrationTestSetupRule extends SaropaLintRule {
-  const RequireIntegrationTestSetupRule() : super(code: _code);
+  RequireIntegrationTestSetupRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -2484,21 +2399,19 @@ class RequireIntegrationTestSetupRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.test};
 
   static const LintCode _code = LintCode(
-    name: 'require_integration_test_setup',
-    problemMessage:
-        '[require_integration_test_setup] Integration test missing IntegrationTestWidgetsFlutterBinding.ensureInitialized(). Integration tests need IntegrationTestWidgetsFlutterBinding.ensureInitialized() in main(). Without it, tests hang or crash on device. {v2}',
+    'require_integration_test_setup',
+    '[require_integration_test_setup] Integration test missing IntegrationTestWidgetsFlutterBinding.ensureInitialized(). Integration tests need IntegrationTestWidgetsFlutterBinding.ensureInitialized() in main(). Without it, tests hang or crash on device. {v2}',
     correctionMessage:
         'Add IntegrationTestWidgetsFlutterBinding.ensureInitialized() at start of main().',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    final String path = resolver.source.fullName;
+    final String path = context.filePath;
 
     // Only check files in integration_test directory
     if (!path.contains('integration_test') &&
@@ -2506,7 +2419,7 @@ class RequireIntegrationTestSetupRule extends SaropaLintRule {
       return;
     }
 
-    context.registry.addFunctionDeclaration((FunctionDeclaration node) {
+    context.addFunctionDeclaration((FunctionDeclaration node) {
       if (node.name.lexeme != 'main') return;
 
       final String bodySource = node.functionExpression.body.toSource();
@@ -2515,40 +2428,6 @@ class RequireIntegrationTestSetupRule extends SaropaLintRule {
       if (!bodySource.contains('IntegrationTestWidgetsFlutterBinding')) {
         reporter.atToken(node.name, code);
       }
-    });
-  }
-
-  @override
-  List<Fix> getFixes() => <Fix>[_AddIntegrationTestBindingFix()];
-}
-
-class _AddIntegrationTestBindingFix extends DartFix {
-  @override
-  void run(
-    CustomLintResolver resolver,
-    ChangeReporter reporter,
-    CustomLintContext context,
-    AnalysisError analysisError,
-    List<AnalysisError> others,
-  ) {
-    context.registry.addFunctionDeclaration((FunctionDeclaration node) {
-      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
-      if (node.name.lexeme != 'main') return;
-
-      final FunctionBody body = node.functionExpression.body;
-      if (body is! BlockFunctionBody) return;
-
-      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
-        message: 'Add IntegrationTestWidgetsFlutterBinding.ensureInitialized()',
-        priority: 1,
-      );
-
-      changeBuilder.addDartFileEdit((builder) {
-        builder.addSimpleInsertion(
-          body.block.leftBracket.end,
-          '\n  IntegrationTestWidgetsFlutterBinding.ensureInitialized();\n',
-        );
-      });
     });
   }
 }
@@ -2580,7 +2459,7 @@ class _AddIntegrationTestBindingFix extends DartFix {
 /// await tester.pumpUntil(() => find.byType(LoadingIndicator).evaluate().isEmpty);
 /// ```
 class AvoidHardcodedDelaysRule extends SaropaLintRule {
-  const AvoidHardcodedDelaysRule() : super(code: _code);
+  AvoidHardcodedDelaysRule() : super(code: _code);
 
   /// Hardcoded delays cause flaky tests on slower machines.
   /// Tests may fail intermittently in CI environments.
@@ -2594,66 +2473,33 @@ class AvoidHardcodedDelaysRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.test};
 
   static const LintCode _code = LintCode(
-    name: 'avoid_hardcoded_delays',
-    problemMessage:
-        '[avoid_hardcoded_delays] Hardcoded delay in test is flaky. Use pumpAndSettle() instead. Hardcoded delays are flaky - too short and tests fail intermittently, too long and tests waste time. Use pumpAndSettle() or wait for conditions. {v1}',
+    'avoid_hardcoded_delays',
+    '[avoid_hardcoded_delays] Hardcoded delay in test is flaky. Use pumpAndSettle() instead. Hardcoded delays are flaky - too short and tests fail intermittently, too long and tests waste time. Use pumpAndSettle() or wait for conditions. {v1}',
     correctionMessage:
         'Replace Future.delayed with tester.pumpAndSettle() or condition-based waiting. Run the full test suite to confirm the refactored tests maintain equivalent coverage.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    final String path = resolver.source.fullName;
+    final String path = context.filePath;
     if (!path.contains('_test.dart') &&
         !path.contains('/test/') &&
         !path.contains(r'\test\')) {
       return;
     }
 
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       if (node.methodName.name != 'delayed') return;
 
       final Expression? target = node.target;
       if (target is! SimpleIdentifier) return;
       if (target.name != 'Future') return;
 
-      reporter.atNode(node, code);
-    });
-  }
-
-  @override
-  List<Fix> getFixes() => <Fix>[_AddPumpAndSettleTodoFix()];
-}
-
-class _AddPumpAndSettleTodoFix extends DartFix {
-  @override
-  void run(
-    CustomLintResolver resolver,
-    ChangeReporter reporter,
-    CustomLintContext context,
-    AnalysisError analysisError,
-    List<AnalysisError> others,
-  ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
-      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
-      if (node.methodName.name != 'delayed') return;
-
-      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
-        message: 'Add HACK: Replace with tester.pumpAndSettle()',
-        priority: 1,
-      );
-
-      changeBuilder.addDartFileEdit((builder) {
-        builder.addSimpleInsertion(
-          node.offset,
-          '// HACK: Replace Future.delayed with await tester.pumpAndSettle()\n      ',
-        );
-      });
+      reporter.atNode(node);
     });
   }
 }
@@ -2715,7 +2561,7 @@ class _AddPumpAndSettleTodoFix extends DartFix {
 /// }
 /// ```
 class RequireErrorCaseTestsRule extends SaropaLintRule {
-  const RequireErrorCaseTestsRule() : super(code: _code);
+  RequireErrorCaseTestsRule() : super(code: _code);
 
   /// Tests without error cases miss important edge cases.
   @override
@@ -2728,15 +2574,14 @@ class RequireErrorCaseTestsRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.test};
 
   static const LintCode _code = LintCode(
-    name: 'require_error_case_tests',
-    problemMessage:
-        '[require_error_case_tests] Test file has no error case tests. Consider adding tests for exceptions. {v4}',
+    'require_error_case_tests',
+    '[require_error_case_tests] Test file has no error case tests. Consider adding tests for exceptions. {v4}',
     correctionMessage:
         'Add tests using throwsA(), throwsException, or expect(..., isA<Exception>()). '
         'If the source code has no error-throwing paths (e.g. pure enums, '
         'defensive try/catch with fallback returns), suppress with '
         '// ignore_for_file: require_error_case_tests.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   /// Keywords in test names that indicate error-case or edge-case testing.
@@ -2759,11 +2604,10 @@ class RequireErrorCaseTestsRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    final String path = resolver.source.fullName;
+    final String path = context.filePath;
 
     // Only check test files
     if (!path.contains('_test.dart') &&
@@ -2776,13 +2620,13 @@ class RequireErrorCaseTestsRule extends SaropaLintRule {
     bool hasErrorCaseTest = false;
     FunctionDeclaration? mainFunction;
 
-    context.registry.addFunctionDeclaration((FunctionDeclaration node) {
+    context.addFunctionDeclaration((FunctionDeclaration node) {
       if (node.name.lexeme == 'main') {
         mainFunction = node;
       }
     });
 
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       final String methodName = node.methodName.name;
 
       // Check for error-related test patterns
@@ -2891,7 +2735,7 @@ class RequireErrorCaseTestsRule extends SaropaLintRule {
 /// **Note:** This rule only flags `find.byType()` usage. For `find.text()`
 /// used in interactions, see `avoid_find_by_text`.
 class PreferTestFindByKeyRule extends SaropaLintRule {
-  const PreferTestFindByKeyRule() : super(code: _code);
+  PreferTestFindByKeyRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.low;
@@ -2903,29 +2747,27 @@ class PreferTestFindByKeyRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.test};
 
   static const LintCode _code = LintCode(
-    name: 'prefer_test_find_by_key',
-    problemMessage:
-        '[prefer_test_find_by_key] find.byType() is fragile. Use find.byKey() for reliable widget testing. Using find.byType can be fragile when widget structure changes. Using find.byKey with ValueKey or Key is more reliable and explicit. {v3}',
+    'prefer_test_find_by_key',
+    '[prefer_test_find_by_key] find.byType() is fragile. Use find.byKey() for reliable widget testing. Using find.byType can be fragile when widget structure changes. Using find.byKey with ValueKey or Key is more reliable and explicit. {v3}',
     correctionMessage:
         'Add a Key to your widget and use find.byKey(Key(\'my_key\')) instead. Run the full test suite to confirm the refactored tests maintain equivalent coverage.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
     // File type filtering is handled by applicableFileTypes
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       if (node.methodName.name != 'byType') return;
 
       final Expression? target = node.target;
       if (target is! SimpleIdentifier) return;
       if (target.name != 'find') return;
 
-      reporter.atNode(node, code);
+      reporter.atNode(node);
     });
   }
 }
@@ -2999,7 +2841,7 @@ class PreferTestFindByKeyRule extends SaropaLintRule {
 /// });
 /// ```
 class PreferSetupTeardownRule extends SaropaLintRule {
-  const PreferSetupTeardownRule() : super(code: _code);
+  PreferSetupTeardownRule() : super(code: _code);
 
   /// Test quality improvement.
   @override
@@ -3012,22 +2854,20 @@ class PreferSetupTeardownRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.test};
 
   static const LintCode _code = LintCode(
-    name: 'prefer_setup_teardown',
-    problemMessage:
-        '[prefer_setup_teardown] Duplicated test setup code. Use setUp()/tearDown(). Repeated setup code in tests violates DRY and makes maintenance harder. Use setUp() and tearDown() for common test initialization. {v6}',
+    'prefer_setup_teardown',
+    '[prefer_setup_teardown] Duplicated test setup code. Use setUp()/tearDown(). Repeated setup code in tests violates DRY and makes maintenance harder. Use setUp() and tearDown() for common test initialization. {v6}',
     correctionMessage:
         'Move common initialization to setUp() and cleanup to tearDown(). Run the full test suite to confirm the refactored tests maintain equivalent coverage.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
     // File type filtering is handled by applicableFileTypes
-    context.registry.addCompilationUnit((CompilationUnit unit) {
+    context.addCompilationUnit((CompilationUnit unit) {
       final List<MethodInvocation> testCalls = [];
       unit.accept(_TestCallCollector(testCalls));
 
@@ -3082,7 +2922,7 @@ class PreferSetupTeardownRule extends SaropaLintRule {
       // Report on the first test with this duplicated setup
       for (final testCall in testCalls) {
         if (_signatureOf(testCall) == entry.key) {
-          reporter.atNode(testCall, code);
+          reporter.atNode(testCall);
           return true;
         }
       }
@@ -3229,7 +3069,7 @@ class _TestCallCollector extends RecursiveAstVisitor<void> {
 /// test('UserService.getById returns user with matching id', () { });
 /// ```
 class RequireTestDescriptionConventionRule extends SaropaLintRule {
-  const RequireTestDescriptionConventionRule() : super(code: _code);
+  RequireTestDescriptionConventionRule() : super(code: _code);
 
   /// Test quality improvement.
   @override
@@ -3242,12 +3082,11 @@ class RequireTestDescriptionConventionRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.test};
 
   static const LintCode _code = LintCode(
-    name: 'require_test_description_convention',
-    problemMessage:
-        '[require_test_description_convention] Test description should explain what is being tested and expected behavior. Test descriptions should explain WHAT is being tested and WHAT the expected behavior is. This helps with test maintenance and debugging. {v3}',
+    'require_test_description_convention',
+    '[require_test_description_convention] Test description should explain what is being tested and expected behavior. Test descriptions should explain WHAT is being tested and WHAT the expected behavior is. This helps with test maintenance and debugging. {v3}',
     correctionMessage:
         'Use format: "should [action] when [condition]" or "[Subject].[method] [expectation]".',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   /// Words that indicate a good test description.
@@ -3273,11 +3112,10 @@ class RequireTestDescriptionConventionRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       final name = node.methodName.name;
       if (name != 'test' && name != 'testWidgets') return;
 
@@ -3290,8 +3128,9 @@ class RequireTestDescriptionConventionRule extends SaropaLintRule {
       final description = firstArg.stringValue?.toLowerCase() ?? '';
 
       // Check if description has any good indicator words
-      final hasGoodWord =
-          _goodDescriptionWords.any((word) => description.contains(word));
+      final hasGoodWord = _goodDescriptionWords.any(
+        (word) => description.contains(word),
+      );
 
       // Check minimum length (should be descriptive)
       final isTooShort = description.length < 15;
@@ -3301,7 +3140,7 @@ class RequireTestDescriptionConventionRule extends SaropaLintRule {
           !description.contains(' ') && !description.contains('.');
 
       if (!hasGoodWord && (isTooShort || isSingleWord)) {
-        reporter.atNode(firstArg, code);
+        reporter.atNode(firstArg);
       }
     });
   }
@@ -3338,7 +3177,7 @@ class RequireTestDescriptionConventionRule extends SaropaLintRule {
 /// );
 /// ```
 class PreferBlocTestPackageRule extends SaropaLintRule {
-  const PreferBlocTestPackageRule() : super(code: _code);
+  PreferBlocTestPackageRule() : super(code: _code);
 
   /// Test quality improvement.
   @override
@@ -3351,22 +3190,20 @@ class PreferBlocTestPackageRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.test};
 
   static const LintCode _code = LintCode(
-    name: 'prefer_bloc_test_package',
-    problemMessage:
-        '[prefer_bloc_test_package] Use blocTest() from bloc_test package for Bloc testing. The bloc_test package provides blocTest() which is specifically designed for testing Blocs with better state and event assertions. {v3}',
+    'prefer_bloc_test_package',
+    '[prefer_bloc_test_package] Use blocTest() from bloc_test package for Bloc testing. The bloc_test package provides blocTest() which is specifically designed for testing Blocs with better state and event assertions. {v3}',
     correctionMessage:
         'Add bloc_test to dev_dependencies and use blocTest<Bloc, State>(). Run the full test suite to confirm the refactored tests maintain equivalent coverage.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
     // File type filtering is handled by applicableFileTypes
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       // Check for test() containing bloc.add() pattern
       if (node.methodName.name != 'test' && node.methodName.name != 'group') {
         return;
@@ -3378,7 +3215,7 @@ class PreferBlocTestPackageRule extends SaropaLintRule {
       if ((source.contains('.add(') || source.contains('.emit(')) &&
           (source.contains('Bloc') || source.contains('Cubit')) &&
           !source.contains('blocTest')) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
   }
@@ -3418,7 +3255,7 @@ class PreferBlocTestPackageRule extends SaropaLintRule {
 /// });
 /// ```
 class PreferMockVerifyRule extends SaropaLintRule {
-  const PreferMockVerifyRule() : super(code: _code);
+  PreferMockVerifyRule() : super(code: _code);
 
   /// Test quality improvement.
   @override
@@ -3431,22 +3268,20 @@ class PreferMockVerifyRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.test};
 
   static const LintCode _code = LintCode(
-    name: 'prefer_mock_verify',
-    problemMessage:
-        '[prefer_mock_verify] Mock setup with when() but no verify(). Test may pass without calling mock. Using verify() ensures that expected method calls actually happened. Without verification, tests may pass even when methods aren\'t called. {v3}',
+    'prefer_mock_verify',
+    '[prefer_mock_verify] Mock setup with when() but no verify(). Test may pass without calling mock. Using verify() ensures that expected method calls actually happened. Without verification, tests may pass even when methods aren\'t called. {v3}',
     correctionMessage:
         'Add verify(mock.method()).called(n) to ensure method was called. Run the full test suite to confirm the refactored tests maintain equivalent coverage.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
     // File type filtering is handled by applicableFileTypes
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       // Find test() calls
       final name = node.methodName.name;
       if (name != 'test' && name != 'testWidgets') return;
@@ -3459,7 +3294,7 @@ class PreferMockVerifyRule extends SaropaLintRule {
           !source.contains('verify(') &&
           !source.contains('verifyNever(') &&
           !source.contains('verifyInOrder(')) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
   }
@@ -3500,7 +3335,7 @@ class PreferMockVerifyRule extends SaropaLintRule {
 /// });
 /// ```
 class RequireDialogTestsRule extends SaropaLintRule {
-  const RequireDialogTestsRule() : super(code: _code);
+  RequireDialogTestsRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.low;
@@ -3512,21 +3347,19 @@ class RequireDialogTestsRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.test};
 
   static const LintCode _code = LintCode(
-    name: 'require_dialog_tests',
-    problemMessage:
-        '[require_dialog_tests] Dialog test may be incomplete. Ensure pumpAndSettle after showing dialog. Dialogs require special handling: tap to open, find within dialog context, test dismiss behavior. Don\'t forget barrier dismiss tests. {v2}',
+    'require_dialog_tests',
+    '[require_dialog_tests] Dialog test may be incomplete. Ensure pumpAndSettle after showing dialog. Dialogs require special handling: tap to open, find within dialog context, test dismiss behavior. Don\'t forget barrier dismiss tests. {v2}',
     correctionMessage:
         'Add pumpAndSettle() after showing dialog to wait for animations. Run the full test suite to confirm the refactored tests maintain equivalent coverage.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       // Check for showDialog calls in tests
       if (node.methodName.name != 'showDialog' &&
           !node.methodName.name.contains('Dialog')) {
@@ -3546,7 +3379,7 @@ class RequireDialogTestsRule extends SaropaLintRule {
       // Check if pumpAndSettle comes after showDialog
       final String afterDialog = blockSource.substring(dialogIndex);
       if (!afterDialog.contains('pumpAndSettle')) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
   }
@@ -3599,7 +3432,7 @@ class RequireDialogTestsRule extends SaropaLintRule {
 /// });
 /// ```
 class PreferFakePlatformRule extends SaropaLintRule {
-  const PreferFakePlatformRule() : super(code: _code);
+  PreferFakePlatformRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.medium;
@@ -3611,12 +3444,11 @@ class PreferFakePlatformRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.test};
 
   static const LintCode _code = LintCode(
-    name: 'prefer_fake_platform',
-    problemMessage:
-        '[prefer_fake_platform] Platform-dependent widget in test without mock. Platform channels (camera, GPS, storage) need fakes in tests. Use TestDefaultBinaryMessengerBinding to mock platform responses. {v2}',
+    'prefer_fake_platform',
+    '[prefer_fake_platform] Platform-dependent widget in test without mock. Platform channels (camera, GPS, storage) need fakes in tests. Use TestDefaultBinaryMessengerBinding to mock platform responses. {v2}',
     correctionMessage:
         'Use TestDefaultBinaryMessengerBinding to mock platform channel responses. Run the full test suite to confirm the refactored tests maintain equivalent coverage.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   static const Set<String> _platformWidgets = {
@@ -3635,12 +3467,10 @@ class PreferFakePlatformRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry
-        .addInstanceCreationExpression((InstanceCreationExpression node) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final String constructorName = node.constructorName.type.name2.lexeme;
 
       if (!_platformWidgets.contains(constructorName)) return;
@@ -3657,7 +3487,7 @@ class PreferFakePlatformRule extends SaropaLintRule {
           !testSource.contains('TestDefaultBinaryMessengerBinding') &&
           !testSource.contains('MockPlatform') &&
           !testSource.contains('FakePlatform')) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
   }
@@ -3731,7 +3561,7 @@ class PreferFakePlatformRule extends SaropaLintRule {
 /// });
 /// ```
 class RequireTestDocumentationRule extends SaropaLintRule {
-  const RequireTestDocumentationRule() : super(code: _code);
+  RequireTestDocumentationRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.low;
@@ -3743,23 +3573,21 @@ class RequireTestDocumentationRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.test};
 
   static const LintCode _code = LintCode(
-    name: 'require_test_documentation',
-    problemMessage:
-        '[require_test_documentation] Complex test lacks documentation. Complex integration tests with unusual setup or assertions need comments explaining the test scenario and why it matters. {v2}',
+    'require_test_documentation',
+    '[require_test_documentation] Complex test lacks documentation. Complex integration tests with unusual setup or assertions need comments explaining the test scenario and why it matters. {v2}',
     correctionMessage:
         'Add comments explaining the test scenario and why it matters. Run the full test suite to confirm the refactored tests maintain equivalent coverage.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   static const int _complexTestThreshold = 15; // lines
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       final String methodName = node.methodName.name;
       if (methodName != 'testWidgets' && methodName != 'test') return;
 
@@ -3778,12 +3606,13 @@ class RequireTestDocumentationRule extends SaropaLintRule {
 
       if (lineCount > _complexTestThreshold) {
         // Check for comments
-        final bool hasComments = bodySource.contains('//') ||
+        final bool hasComments =
+            bodySource.contains('//') ||
             bodySource.contains('/*') ||
             bodySource.contains('///');
 
         if (!hasComments) {
-          reporter.atNode(node, code);
+          reporter.atNode(node);
         }
       }
     });

@@ -7,10 +7,6 @@
 library;
 
 import 'package:analyzer/dart/ast/ast.dart';
-import 'package:analyzer/error/error.dart'
-    show AnalysisError, DiagnosticSeverity;
-import 'package:analyzer/source/source_range.dart';
-import 'package:custom_lint_builder/custom_lint_builder.dart';
 
 import '../../saropa_lint_rule.dart';
 
@@ -45,7 +41,7 @@ import '../../saropa_lint_rule.dart';
 /// }
 /// ```
 class RequireSupabaseErrorHandlingRule extends SaropaLintRule {
-  const RequireSupabaseErrorHandlingRule() : super(code: _code);
+  RequireSupabaseErrorHandlingRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.high;
@@ -54,22 +50,20 @@ class RequireSupabaseErrorHandlingRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'require_supabase_error_handling',
-    problemMessage:
-        '[require_supabase_error_handling] Supabase operation called without error handling crashes when the network is unavailable, authentication tokens expire, or the database rejects the query. Users see an unhandled exception crash screen instead of a friendly error message, causing data loss and a broken user experience. {v3}',
+    'require_supabase_error_handling',
+    '[require_supabase_error_handling] Supabase operation called without error handling crashes when the network is unavailable, authentication tokens expire, or the database rejects the query. Users see an unhandled exception crash screen instead of a friendly error message, causing data loss and a broken user experience. {v3}',
     correctionMessage:
         'Wrap Supabase operations in a try-catch block that handles PostgrestException and network errors, and display user-friendly messages with retry options.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
     // Look for the .from('table') pattern which is unique to Supabase
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       if (node.methodName.name != 'from') return;
 
       // Must be called on something containing 'supabase' or 'Supabase'
@@ -87,12 +81,9 @@ class RequireSupabaseErrorHandlingRule extends SaropaLintRule {
         current = current.parent;
       }
 
-      reporter.atNode(node, code);
+      reporter.atNode(node);
     });
   }
-
-  @override
-  List<Fix> getFixes() => <Fix>[_AddTryCatchTodoFix(code)];
 }
 
 /// Warns when Supabase anon key is hardcoded in source code.
@@ -120,7 +111,7 @@ class RequireSupabaseErrorHandlingRule extends SaropaLintRule {
 /// );
 /// ```
 class AvoidSupabaseAnonKeyInCodeRule extends SaropaLintRule {
-  const AvoidSupabaseAnonKeyInCodeRule() : super(code: _code);
+  AvoidSupabaseAnonKeyInCodeRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.critical;
@@ -129,13 +120,12 @@ class AvoidSupabaseAnonKeyInCodeRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_supabase_anon_key_in_code',
-    problemMessage:
-        '[avoid_supabase_anon_key_in_code] Hardcoded keys can be extracted '
+    'avoid_supabase_anon_key_in_code',
+    '[avoid_supabase_anon_key_in_code] Hardcoded keys can be extracted '
         'from app binary. Attackers gain direct access to your Supabase project. {v2}',
     correctionMessage:
         'Use environment variables or secure configuration for API keys.',
-    errorSeverity: DiagnosticSeverity.ERROR,
+    severity: DiagnosticSeverity.ERROR,
   );
 
   // Supabase JWT tokens start with this pattern
@@ -143,11 +133,10 @@ class AvoidSupabaseAnonKeyInCodeRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addSimpleStringLiteral((SimpleStringLiteral node) {
+    context.addSimpleStringLiteral((SimpleStringLiteral node) {
       final String value = node.value;
       if (value.length < 50) return; // JWT tokens are long
 
@@ -159,7 +148,7 @@ class AvoidSupabaseAnonKeyInCodeRule extends SaropaLintRule {
           if (source.contains('Supabase') ||
               source.contains('anonKey') ||
               source.contains('supabase')) {
-            reporter.atNode(node, code);
+            reporter.atNode(node);
             return;
           }
           if (current is FunctionBody || current is ClassDeclaration) break;
@@ -168,9 +157,6 @@ class AvoidSupabaseAnonKeyInCodeRule extends SaropaLintRule {
       }
     });
   }
-
-  @override
-  List<Fix> getFixes() => <Fix>[_AddEnvVarTodoFix()];
 }
 
 /// Warns when Supabase realtime subscriptions are not unsubscribed in dispose.
@@ -215,7 +201,7 @@ class AvoidSupabaseAnonKeyInCodeRule extends SaropaLintRule {
 /// }
 /// ```
 class RequireSupabaseRealtimeUnsubscribeRule extends SaropaLintRule {
-  const RequireSupabaseRealtimeUnsubscribeRule() : super(code: _code);
+  RequireSupabaseRealtimeUnsubscribeRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.critical;
@@ -224,22 +210,20 @@ class RequireSupabaseRealtimeUnsubscribeRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'require_supabase_realtime_unsubscribe',
-    problemMessage:
-        '[require_supabase_realtime_unsubscribe] Unsubscribed channel keeps '
+    'require_supabase_realtime_unsubscribe',
+    '[require_supabase_realtime_unsubscribe] Unsubscribed channel keeps '
         'WebSocket open, leaking connections and receiving stale updates. {v2}',
     correctionMessage:
         'Add channel.unsubscribe() in dispose() to prevent memory leaks.',
-    errorSeverity: DiagnosticSeverity.ERROR,
+    severity: DiagnosticSeverity.ERROR,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addClassDeclaration((ClassDeclaration node) {
+    context.addClassDeclaration((ClassDeclaration node) {
       final ExtendsClause? extendsClause = node.extendsClause;
       if (extendsClause == null) return;
 
@@ -273,7 +257,8 @@ class RequireSupabaseRealtimeUnsubscribeRule extends SaropaLintRule {
 
       // Check if channels are unsubscribed
       for (final String name in channelNames) {
-        final bool isUnsubscribed = disposeBody != null &&
+        final bool isUnsubscribed =
+            disposeBody != null &&
             (disposeBody.contains('$name.unsubscribe(') ||
                 disposeBody.contains('$name?.unsubscribe(') ||
                 disposeBody.contains('removeChannel'));
@@ -284,7 +269,7 @@ class RequireSupabaseRealtimeUnsubscribeRule extends SaropaLintRule {
               for (final VariableDeclaration variable
                   in member.fields.variables) {
                 if (variable.name.lexeme == name) {
-                  reporter.atNode(variable, code);
+                  reporter.atNode(variable);
                 }
               }
             }
@@ -293,129 +278,8 @@ class RequireSupabaseRealtimeUnsubscribeRule extends SaropaLintRule {
       }
     });
   }
-
-  @override
-  List<Fix> getFixes() => <Fix>[_AddDisposeTodoFix('unsubscribe()')];
 }
 
 // =============================================================================
 // FIX CLASSES
 // =============================================================================
-
-class _AddTryCatchTodoFix extends DartFix {
-  // ignore: avoid_unused_constructor_parameters
-  _AddTryCatchTodoFix(LintCode _);
-
-  @override
-  void run(
-    CustomLintResolver resolver,
-    ChangeReporter reporter,
-    CustomLintContext context,
-    AnalysisError analysisError,
-    List<AnalysisError> others,
-  ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
-      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
-
-      // Find the statement containing this method invocation
-      AstNode? statementNode = node.parent;
-      while (statementNode != null && statementNode is! Statement) {
-        statementNode = statementNode.parent;
-      }
-
-      if (statementNode == null) return;
-
-      // Get the indentation of the current statement
-      final int statementOffset = statementNode.offset;
-      final String sourceCode = resolver.source.contents.data;
-      int lineStart = statementOffset;
-      while (lineStart > 0 && sourceCode[lineStart - 1] != '\n') {
-        lineStart--;
-      }
-      final String leadingWhitespace =
-          sourceCode.substring(lineStart, statementOffset);
-      final String indent =
-          leadingWhitespace.isEmpty ? '  ' : leadingWhitespace;
-
-      final String statementSource = statementNode.toSource();
-
-      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
-        message: 'Wrap in try-catch',
-        priority: 1,
-      );
-
-      changeBuilder.addDartFileEdit((builder) {
-        builder.addSimpleReplacement(
-          SourceRange(statementNode!.offset, statementNode.length),
-          'try {\n$indent  $statementSource\n$indent} catch (e) {\n$indent  // Handle error\n$indent  rethrow;\n$indent}',
-        );
-      });
-    });
-  }
-}
-
-class _AddEnvVarTodoFix extends DartFix {
-  @override
-  void run(
-    CustomLintResolver resolver,
-    ChangeReporter reporter,
-    CustomLintContext context,
-    AnalysisError analysisError,
-    List<AnalysisError> others,
-  ) {
-    context.registry.addSimpleStringLiteral((SimpleStringLiteral node) {
-      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
-
-      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
-        message: 'Add HACK: Use environment variable',
-        priority: 1,
-      );
-
-      changeBuilder.addDartFileEdit((builder) {
-        builder.addSimpleInsertion(
-          node.offset,
-          '// HACK: Use environment variable or secure storage instead\n',
-        );
-      });
-    });
-  }
-}
-
-class _AddDisposeTodoFix extends DartFix {
-  _AddDisposeTodoFix(this._methodCall);
-  final String _methodCall;
-
-  @override
-  void run(
-    CustomLintResolver resolver,
-    ChangeReporter reporter,
-    CustomLintContext context,
-    AnalysisError analysisError,
-    List<AnalysisError> others,
-  ) {
-    context.registry.addVariableDeclaration((VariableDeclaration node) {
-      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
-
-      // Find the full field declaration (including semicolon)
-      AstNode? fieldDecl = node.parent?.parent;
-      if (fieldDecl is! FieldDeclaration) return;
-
-      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
-        message: 'Add FIXME reminder for $_methodCall',
-        priority: 1,
-      );
-
-      changeBuilder.addDartFileEdit((builder) {
-        // Find where the semicolon is and insert comment before it
-        final String fieldSource = fieldDecl.toSource();
-        final int semicolonIndex = fieldSource.lastIndexOf(';');
-        if (semicolonIndex == -1) return;
-
-        builder.addSimpleInsertion(
-          fieldDecl.offset + semicolonIndex,
-          ' // FIXME: Add $_methodCall in dispose()',
-        );
-      });
-    });
-  }
-}

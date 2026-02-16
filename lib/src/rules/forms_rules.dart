@@ -8,9 +8,6 @@ library;
 
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
-import 'package:analyzer/error/error.dart'
-    show AnalysisError, DiagnosticSeverity;
-import 'package:custom_lint_builder/custom_lint_builder.dart';
 
 import '../saropa_lint_rule.dart';
 
@@ -19,10 +16,7 @@ import '../saropa_lint_rule.dart';
 // =============================================================================
 
 /// Common text field widget types.
-const Set<String> _textFieldTypes = <String>{
-  'TextField',
-  'TextFormField',
-};
+const Set<String> _textFieldTypes = <String>{'TextField', 'TextFormField'};
 
 /// Warns when AutovalidateMode.always is used.
 ///
@@ -50,7 +44,7 @@ const Set<String> _textFieldTypes = <String>{
 /// // Validates when user moves to next field
 /// ```
 class PreferAutovalidateOnInteractionRule extends SaropaLintRule {
-  const PreferAutovalidateOnInteractionRule() : super(code: _code);
+  PreferAutovalidateOnInteractionRule() : super(code: _code);
 
   /// Significant issue. Address when count exceeds 10.
   @override
@@ -60,55 +54,23 @@ class PreferAutovalidateOnInteractionRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'prefer_autovalidate_on_interaction',
-    problemMessage:
-        '[prefer_autovalidate_on_interaction] AutovalidateMode.always triggers form validation on every keystroke and widget rebuild. This causes visible input lag as validators run continuously, fires excessive error messages before the user finishes typing, and degrades the user experience with distracting red error text that appears immediately on empty fields. {v3}',
+    'prefer_autovalidate_on_interaction',
+    '[prefer_autovalidate_on_interaction] AutovalidateMode.always triggers form validation on every keystroke and widget rebuild. This causes visible input lag as validators run continuously, fires excessive error messages before the user finishes typing, and degrades the user experience with distracting red error text that appears immediately on empty fields. {v3}',
     correctionMessage:
         'Use AutovalidateMode.onUserInteraction to defer validation until the user interacts with the field, reducing input lag and preventing premature error display.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addPrefixedIdentifier((PrefixedIdentifier node) {
+    context.addPrefixedIdentifier((PrefixedIdentifier node) {
       if (node.prefix.name == 'AutovalidateMode' &&
           node.identifier.name == 'always') {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
-    });
-  }
-
-  @override
-  List<Fix> getFixes() => <Fix>[_ChangeToOnUserInteractionFix()];
-}
-
-class _ChangeToOnUserInteractionFix extends DartFix {
-  @override
-  void run(
-    CustomLintResolver resolver,
-    ChangeReporter reporter,
-    CustomLintContext context,
-    AnalysisError analysisError,
-    List<AnalysisError> others,
-  ) {
-    context.registry.addPrefixedIdentifier((PrefixedIdentifier node) {
-      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
-
-      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
-        message: 'Change to onUserInteraction',
-        priority: 1,
-      );
-
-      changeBuilder.addDartFileEdit((builder) {
-        builder.addSimpleReplacement(
-          node.sourceRange,
-          'AutovalidateMode.onUserInteraction',
-        );
-      });
     });
   }
 }
@@ -144,7 +106,7 @@ class _ChangeToOnUserInteractionFix extends DartFix {
 /// )
 /// ```
 class RequireKeyboardTypeRule extends SaropaLintRule {
-  const RequireKeyboardTypeRule() : super(code: _code);
+  RequireKeyboardTypeRule() : super(code: _code);
 
   /// Significant issue. Address when count exceeds 10.
   @override
@@ -154,12 +116,11 @@ class RequireKeyboardTypeRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'require_keyboard_type',
-    problemMessage:
-        '[require_keyboard_type] Text field label suggests email or phone input but no keyboardType is specified. Without TextInputType.emailAddress or TextInputType.phone, users see a generic text keyboard lacking the @ key, .com shortcut, or numeric layout. This causes input errors, slows data entry, and hurts accessibility for users who rely on specialized keyboard layouts. {v3}',
+    'require_keyboard_type',
+    '[require_keyboard_type] Text field label suggests email or phone input but no keyboardType is specified. Without TextInputType.emailAddress or TextInputType.phone, users see a generic text keyboard lacking the @ key, .com shortcut, or numeric layout. This causes input errors, slows data entry, and hurts accessibility for users who rely on specialized keyboard layouts. {v3}',
     correctionMessage:
         'Add keyboardType: TextInputType.emailAddress for email fields or TextInputType.phone for phone number fields to show the appropriate keyboard layout.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   // cspell:ignore emailaddress
@@ -182,13 +143,10 @@ class RequireKeyboardTypeRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addInstanceCreationExpression((
-      InstanceCreationExpression node,
-    ) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final String? constructorName = node.constructorName.type.element?.name;
       if (constructorName != 'TextFormField' &&
           constructorName != 'TextField') {
@@ -238,10 +196,12 @@ class RequireKeyboardTypeRule extends SaropaLintRule {
 
       final String combined = '${labelText ?? ''} ${hintText ?? ''}';
 
-      bool isEmailField =
-          _emailPatterns.any((String p) => combined.contains(p));
-      bool isPhoneField =
-          _phonePatterns.any((String p) => combined.contains(p));
+      bool isEmailField = _emailPatterns.any(
+        (String p) => combined.contains(p),
+      );
+      bool isPhoneField = _phonePatterns.any(
+        (String p) => combined.contains(p),
+      );
 
       if (isEmailField || isPhoneField) {
         reporter.atNode(node.constructorName, code);
@@ -281,7 +241,7 @@ class RequireKeyboardTypeRule extends SaropaLintRule {
 /// )
 /// ```
 class RequireTextOverflowInRowRule extends SaropaLintRule {
-  const RequireTextOverflowInRowRule() : super(code: _code);
+  RequireTextOverflowInRowRule() : super(code: _code);
 
   /// Significant issue. Address when count exceeds 10.
   @override
@@ -291,23 +251,19 @@ class RequireTextOverflowInRowRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'require_text_overflow_in_row',
-    problemMessage:
-        '[require_text_overflow_in_row] Text child element inside a Row build tree has no overflow handling. When text content exceeds the available width, Flutter renders yellow and black diagonal overflow stripes that break the visual layout. Users see unreadable, clipped content with an ugly error indicator instead of gracefully truncated or wrapped text. {v3}',
+    'require_text_overflow_in_row',
+    '[require_text_overflow_in_row] Text child element inside a Row build tree has no overflow handling. When text content exceeds the available width, Flutter renders yellow and black diagonal overflow stripes that break the visual layout. Users see unreadable, clipped content with an ugly error indicator instead of gracefully truncated or wrapped text. {v3}',
     correctionMessage:
         'Add overflow: TextOverflow.ellipsis to the Text widget, or wrap it in an Expanded or Flexible widget to constrain its width within the Row layout.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addInstanceCreationExpression((
-      InstanceCreationExpression node,
-    ) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final String? constructorName = node.constructorName.type.element?.name;
       if (constructorName != 'Text') return;
 
@@ -371,7 +327,7 @@ class RequireTextOverflowInRowRule extends SaropaLintRule {
 /// )
 /// ```
 class RequireSecureKeyboardRule extends SaropaLintRule {
-  const RequireSecureKeyboardRule() : super(code: _code);
+  RequireSecureKeyboardRule() : super(code: _code);
 
   /// Significant issue. Address when count exceeds 10.
   @override
@@ -381,12 +337,11 @@ class RequireSecureKeyboardRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'require_secure_keyboard',
-    problemMessage:
-        '[require_secure_keyboard] Password field detected without obscureText: true. The password is displayed as plain text on screen, exposing credentials to shoulder surfing attacks in public spaces. Nearby observers can read the password directly from the display, compromising user account security and violating OWASP M1 credential protection guidelines. {v3}',
+    'require_secure_keyboard',
+    '[require_secure_keyboard] Password field detected without obscureText: true. The password is displayed as plain text on screen, exposing credentials to shoulder surfing attacks in public spaces. Nearby observers can read the password directly from the display, compromising user account security and violating OWASP M1 credential protection guidelines. {v3}',
     correctionMessage:
         'Add obscureText: true to the TextField or TextFormField to mask password characters and protect user credentials from visual exposure on screen.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   // cspell:ignore passwort contraseña
@@ -402,13 +357,10 @@ class RequireSecureKeyboardRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addInstanceCreationExpression((
-      InstanceCreationExpression node,
-    ) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final String? constructorName = node.constructorName.type.element?.name;
       if (constructorName != 'TextFormField' &&
           constructorName != 'TextField') {
@@ -457,52 +409,13 @@ class RequireSecureKeyboardRule extends SaropaLintRule {
 
       final String combined = '${labelText ?? ''} ${hintText ?? ''}';
 
-      bool isPasswordField =
-          _passwordPatterns.any((String p) => combined.contains(p));
+      bool isPasswordField = _passwordPatterns.any(
+        (String p) => combined.contains(p),
+      );
 
       if (isPasswordField) {
         reporter.atNode(node.constructorName, code);
       }
-    });
-  }
-
-  @override
-  List<Fix> getFixes() => <Fix>[_AddObscureTextFix()];
-}
-
-class _AddObscureTextFix extends DartFix {
-  @override
-  void run(
-    CustomLintResolver resolver,
-    ChangeReporter reporter,
-    CustomLintContext context,
-    AnalysisError analysisError,
-    List<AnalysisError> others,
-  ) {
-    context.registry.addInstanceCreationExpression((
-      InstanceCreationExpression node,
-    ) {
-      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
-
-      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
-        message: 'Add obscureText: true',
-        priority: 1,
-      );
-
-      changeBuilder.addDartFileEdit((builder) {
-        final ArgumentList args = node.argumentList;
-        if (args.arguments.isEmpty) {
-          builder.addSimpleInsertion(
-            args.leftParenthesis.end,
-            'obscureText: true',
-          );
-        } else {
-          builder.addSimpleInsertion(
-            args.arguments.last.end,
-            ', obscureText: true',
-          );
-        }
-      });
     });
   }
 }
@@ -534,7 +447,7 @@ class _AddObscureTextFix extends DartFix {
 /// )
 /// ```
 class RequireErrorMessageContextRule extends SaropaLintRule {
-  const RequireErrorMessageContextRule() : super(code: _code);
+  RequireErrorMessageContextRule() : super(code: _code);
 
   /// Significant issue. Address when count exceeds 10.
   @override
@@ -544,12 +457,11 @@ class RequireErrorMessageContextRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'require_error_message_context',
-    problemMessage:
-        '[require_error_message_context] Form validation returns a generic error message without explaining what the user did wrong or how to fix it. Vague messages like "Invalid" or "Required" frustrate users, increase form abandonment rates, and fail accessibility standards that require specific, actionable error feedback to help users correct their input. {v3}',
+    'require_error_message_context',
+    '[require_error_message_context] Form validation returns a generic error message without explaining what the user did wrong or how to fix it. Vague messages like "Invalid" or "Required" frustrate users, increase form abandonment rates, and fail accessibility standards that require specific, actionable error feedback to help users correct their input. {v3}',
     correctionMessage:
         'Replace generic messages with field-specific guidance: use "Email address format is invalid" instead of "Invalid" or "Phone number is required" instead of "Required".',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   /// Generic error messages that lack context
@@ -569,13 +481,10 @@ class RequireErrorMessageContextRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addInstanceCreationExpression((
-      InstanceCreationExpression node,
-    ) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final String? typeName = node.constructorName.type.element?.name;
       if (typeName != 'TextFormField') return;
 
@@ -635,7 +544,7 @@ class RequireErrorMessageContextRule extends SaropaLintRule {
 /// // _formKey.currentState!.validate()
 /// ```
 class RequireFormKeyRule extends SaropaLintRule {
-  const RequireFormKeyRule() : super(code: _code);
+  RequireFormKeyRule() : super(code: _code);
 
   /// Significant issue. Address when count exceeds 10.
   @override
@@ -645,24 +554,20 @@ class RequireFormKeyRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'require_form_key',
-    problemMessage:
-        '[require_form_key] Without GlobalKey, validate() and save() calls '
+    'require_form_key',
+    '[require_form_key] Without GlobalKey, validate() and save() calls '
         'fail because FormState cannot be accessed. {v2}',
     correctionMessage:
         'Add key: _formKey where _formKey = GlobalKey<FormState>()',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addInstanceCreationExpression((
-      InstanceCreationExpression node,
-    ) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final String typeName = node.constructorName.type.name.lexeme;
       if (typeName != 'Form') return;
 
@@ -716,7 +621,7 @@ class RequireFormKeyRule extends SaropaLintRule {
 /// }
 /// ```
 class AvoidValidationInBuildRule extends SaropaLintRule {
-  const AvoidValidationInBuildRule() : super(code: _code);
+  AvoidValidationInBuildRule() : super(code: _code);
 
   /// Significant issue. Address when count exceeds 10.
   @override
@@ -726,21 +631,19 @@ class AvoidValidationInBuildRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_validation_in_build',
-    problemMessage:
-        '[avoid_validation_in_build] Complex or async validation running inside build() executes on every keystroke and widget rebuild. This causes visible input lag as network calls fire per character, floods the backend API with excessive requests, degrades performance with unnecessary widget rebuilds, and frustrates users who see delayed responses while typing in form fields. {v3}',
+    'avoid_validation_in_build',
+    '[avoid_validation_in_build] Complex or async validation running inside build() executes on every keystroke and widget rebuild. This causes visible input lag as network calls fire per character, floods the backend API with excessive requests, degrades performance with unnecessary widget rebuilds, and frustrates users who see delayed responses while typing in form fields. {v3}',
     correctionMessage:
         'Move complex validation logic to the form onSubmit handler, or use a debounce mechanism to delay validation until the user pauses typing for a set interval.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodDeclaration((MethodDeclaration node) {
+    context.addMethodDeclaration((MethodDeclaration node) {
       if (node.name.lexeme != 'build') return;
 
       node.body.visitChildren(_ValidatorVisitor(reporter, code));
@@ -804,7 +707,7 @@ class _ValidatorVisitor extends RecursiveAstVisitor<void> {
 /// )
 /// ```
 class RequireSubmitButtonStateRule extends SaropaLintRule {
-  const RequireSubmitButtonStateRule() : super(code: _code);
+  RequireSubmitButtonStateRule() : super(code: _code);
 
   /// Significant issue. Address when count exceeds 10.
   @override
@@ -814,23 +717,19 @@ class RequireSubmitButtonStateRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'require_submit_button_state',
-    problemMessage:
-        '[require_submit_button_state] Submit button with an async onPressed handler lacks a loading state guard. Without disabling the button during submission, users can tap repeatedly and trigger duplicate network connection requests, duplicate database writes, and duplicate payment transactions. Each extra tap fires another async operation, wasting server memory and bandwidth while producing confusing duplicate entries. {v2}',
+    'require_submit_button_state',
+    '[require_submit_button_state] Submit button with an async onPressed handler lacks a loading state guard. Without disabling the button during submission, users can tap repeatedly and trigger duplicate network connection requests, duplicate database writes, and duplicate payment transactions. Each extra tap fires another async operation, wasting server memory and bandwidth while producing confusing duplicate entries. {v2}',
     correctionMessage:
         'Add a boolean loading state flag and set onPressed: _isLoading ? null : _submit to disable the button during async submission.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addInstanceCreationExpression((
-      InstanceCreationExpression node,
-    ) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final String typeName = node.constructorName.type.name.lexeme;
       if (!typeName.contains('Button')) return;
 
@@ -879,7 +778,7 @@ class RequireSubmitButtonStateRule extends SaropaLintRule {
 /// }
 /// ```
 class AvoidFormWithoutUnfocusRule extends SaropaLintRule {
-  const AvoidFormWithoutUnfocusRule() : super(code: _code);
+  AvoidFormWithoutUnfocusRule() : super(code: _code);
 
   /// Significant issue. Address when count exceeds 10.
   @override
@@ -889,21 +788,19 @@ class AvoidFormWithoutUnfocusRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_form_without_unfocus',
-    problemMessage:
-        '[avoid_form_without_unfocus] Form submission handler does not call unfocus() before processing. The on-screen keyboard stays open after submission, blocking the success message, navigation, or dialog that confirms the action to the user. This creates a confusing experience where users cannot see feedback and may repeatedly tap the submit button. {v2}',
+    'avoid_form_without_unfocus',
+    '[avoid_form_without_unfocus] Form submission handler does not call unfocus() before processing. The on-screen keyboard stays open after submission, blocking the success message, navigation, or dialog that confirms the action to the user. This creates a confusing experience where users cannot see feedback and may repeatedly tap the submit button. {v2}',
     correctionMessage:
         'Add FocusScope.of(context).unfocus() at the beginning of the submit handler to dismiss the keyboard before showing any success feedback or navigation.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodDeclaration((MethodDeclaration node) {
+    context.addMethodDeclaration((MethodDeclaration node) {
       final String name = node.name.lexeme.toLowerCase();
       // Look for submit-related methods
       if (!name.contains('submit') &&
@@ -919,7 +816,7 @@ class AvoidFormWithoutUnfocusRule extends SaropaLintRule {
           !bodySource.contains('unfocus') &&
           !bodySource.contains('FocusManager') &&
           !bodySource.contains('FocusScope')) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
   }
@@ -951,7 +848,7 @@ class AvoidFormWithoutUnfocusRule extends SaropaLintRule {
 /// }
 /// ```
 class RequireFormRestorationRule extends SaropaLintRule {
-  const RequireFormRestorationRule() : super(code: _code);
+  RequireFormRestorationRule() : super(code: _code);
 
   /// Significant issue. Address when count exceeds 10.
   @override
@@ -961,21 +858,19 @@ class RequireFormRestorationRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'require_form_restoration',
-    problemMessage:
-        '[require_form_restoration] Form with 5+ TextEditingController fields lacks RestorationMixin. When the operating system kills the app in the background to reclaim memory, all user input is permanently lost. Users who spent time filling out a lengthy form return to find every field empty and must re-enter all data from scratch. {v2}',
+    'require_form_restoration',
+    '[require_form_restoration] Form with 5+ TextEditingController fields lacks RestorationMixin. When the operating system kills the app in the background to reclaim memory, all user input is permanently lost. Users who spent time filling out a lengthy form return to find every field empty and must re-enter all data from scratch. {v2}',
     correctionMessage:
         'Add RestorationMixin to the State class and use RestorableTextEditingController fields, or persist draft state to SharedPreferences to prevent data loss.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addClassDeclaration((ClassDeclaration node) {
+    context.addClassDeclaration((ClassDeclaration node) {
       // Check if extends State
       final ExtendsClause? extendsClause = node.extendsClause;
       if (extendsClause == null) return;
@@ -1013,7 +908,7 @@ class RequireFormRestorationRule extends SaropaLintRule {
 
       // Warn if 5+ controllers without restoration (and has a Form)
       if (controllerCount >= 5 && hasForm) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
   }
@@ -1046,7 +941,7 @@ class RequireFormRestorationRule extends SaropaLintRule {
 /// }
 /// ```
 class AvoidClearingFormOnErrorRule extends SaropaLintRule {
-  const AvoidClearingFormOnErrorRule() : super(code: _code);
+  AvoidClearingFormOnErrorRule() : super(code: _code);
 
   /// Significant issue. Address when count exceeds 10.
   @override
@@ -1056,34 +951,32 @@ class AvoidClearingFormOnErrorRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_clearing_form_on_error',
-    problemMessage:
-        '[avoid_clearing_form_on_error] Form fields are cleared when validation fails, destroying all user input. Users lose their partially-correct data and must re-enter everything from scratch. This frustrating pattern increases form abandonment, wastes user time, and creates a hostile experience that drives users away from completing the form submission. {v2}',
+    'avoid_clearing_form_on_error',
+    '[avoid_clearing_form_on_error] Form fields are cleared when validation fails, destroying all user input. Users lose their partially-correct data and must re-enter everything from scratch. This frustrating pattern increases form abandonment, wastes user time, and creates a hostile experience that drives users away from completing the form submission. {v2}',
     correctionMessage:
         'Preserve all form field values when validation fails. Only highlight the specific fields with errors and show inline error messages to guide the user in correcting their input.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addIfStatement((IfStatement node) {
+    context.addIfStatement((IfStatement node) {
       final String condition = node.expression.toSource();
 
       // Check for !validate() or validate() == false
       final bool isValidationFailure =
           (condition.contains('!') && condition.contains('validate()')) ||
-              condition.contains('validate() == false') ||
-              condition.contains('validate()==false');
+          condition.contains('validate() == false') ||
+          condition.contains('validate()==false');
 
       if (isValidationFailure) {
         // Check if body contains .clear()
         final String thenSource = node.thenStatement.toSource();
         if (thenSource.contains('.clear()')) {
-          reporter.atNode(node, code);
+          reporter.atNode(node);
         }
       }
     });
@@ -1118,7 +1011,7 @@ class AvoidClearingFormOnErrorRule extends SaropaLintRule {
 /// )
 /// ```
 class RequireFormFieldControllerRule extends SaropaLintRule {
-  const RequireFormFieldControllerRule() : super(code: _code);
+  RequireFormFieldControllerRule() : super(code: _code);
 
   /// Significant issue. Address when count exceeds 10.
   @override
@@ -1128,23 +1021,19 @@ class RequireFormFieldControllerRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'require_form_field_controller',
-    problemMessage:
-        '[require_form_field_controller] TextFormField has no controller, onSaved, or initialValue. When the parent StatefulWidget triggers a rebuild via setState(), the field value is silently discarded because there is no mechanism to persist or retrieve the user input. This causes typed data to vanish unpredictably and forces users to re-enter their input repeatedly. {v2}',
+    'require_form_field_controller',
+    '[require_form_field_controller] TextFormField has no controller, onSaved, or initialValue. When the parent StatefulWidget triggers a rebuild via setState(), the field value is silently discarded because there is no mechanism to persist or retrieve the user input. This causes typed data to vanish unpredictably and forces users to re-enter their input repeatedly. {v2}',
     correctionMessage:
         'Add controller: _controller to persist the value, or onSaved: (value) => _field = value to capture input on form save.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addInstanceCreationExpression((
-      InstanceCreationExpression node,
-    ) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final String typeName = node.constructorName.type.name.lexeme;
       if (typeName != 'TextFormField') return;
 
@@ -1198,7 +1087,7 @@ class RequireFormFieldControllerRule extends SaropaLintRule {
 /// class _FormContent extends StatefulWidget { ... }
 /// ```
 class AvoidFormInAlertDialogRule extends SaropaLintRule {
-  const AvoidFormInAlertDialogRule() : super(code: _code);
+  AvoidFormInAlertDialogRule() : super(code: _code);
 
   /// Significant issue. Address when count exceeds 10.
   @override
@@ -1208,23 +1097,19 @@ class AvoidFormInAlertDialogRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_form_in_alert_dialog',
-    problemMessage:
-        '[avoid_form_in_alert_dialog] Form placed directly inside AlertDialog loses all field values, validation state, and user input when the dialog rebuilds due to a parent setState() or keyboard appearance. Because the dialog builder creates a new Form on each build call, there is no StatefulWidget to preserve form state across rebuilds, producing a frustrating experience where typed data disappears. {v2}',
+    'avoid_form_in_alert_dialog',
+    '[avoid_form_in_alert_dialog] Form placed directly inside AlertDialog loses all field values, validation state, and user input when the dialog rebuilds due to a parent setState() or keyboard appearance. Because the dialog builder creates a new Form on each build call, there is no StatefulWidget to preserve form state across rebuilds, producing a frustrating experience where typed data disappears. {v2}',
     correctionMessage:
         'Extract the form content into a dedicated StatefulWidget class and use that as the dialog content to preserve form state reliably.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addInstanceCreationExpression((
-      InstanceCreationExpression node,
-    ) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final String typeName = node.constructorName.type.name.lexeme;
       if (typeName != 'AlertDialog' && typeName != 'SimpleDialog') return;
 
@@ -1263,7 +1148,7 @@ class AvoidFormInAlertDialogRule extends SaropaLintRule {
 /// )
 /// ```
 class RequireKeyboardActionTypeRule extends SaropaLintRule {
-  const RequireKeyboardActionTypeRule() : super(code: _code);
+  RequireKeyboardActionTypeRule() : super(code: _code);
 
   /// Minor improvement. Track for later review.
   @override
@@ -1273,12 +1158,11 @@ class RequireKeyboardActionTypeRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'require_keyboard_action_type',
-    problemMessage:
-        '[require_keyboard_action_type] Text field must have textInputAction to improve UX. The textInputAction parameter controls the keyboard action button (e.g., Next, Done). This improves form navigation and UX. {v2}',
+    'require_keyboard_action_type',
+    '[require_keyboard_action_type] Text field must have textInputAction to improve UX. The textInputAction parameter controls the keyboard action button (e.g., Next, Done). This improves form navigation and UX. {v2}',
     correctionMessage:
         'Add textInputAction: TextInputAction.next or TextInputAction.done. Verify the change works correctly with existing tests and add coverage for the new behavior.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   static const Set<String> _textFieldTypes = <String>{
@@ -1288,13 +1172,10 @@ class RequireKeyboardActionTypeRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addInstanceCreationExpression((
-      InstanceCreationExpression node,
-    ) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final String typeName = node.constructorName.type.name.lexeme;
       if (!_textFieldTypes.contains(typeName)) return;
 
@@ -1338,7 +1219,7 @@ class RequireKeyboardActionTypeRule extends SaropaLintRule {
 /// )
 /// ```
 class RequireKeyboardDismissOnScrollRule extends SaropaLintRule {
-  const RequireKeyboardDismissOnScrollRule() : super(code: _code);
+  RequireKeyboardDismissOnScrollRule() : super(code: _code);
 
   /// Minor improvement. Track for later review.
   @override
@@ -1348,12 +1229,11 @@ class RequireKeyboardDismissOnScrollRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'require_keyboard_dismiss_on_scroll',
-    problemMessage:
-        '[require_keyboard_dismiss_on_scroll] Scroll view must have keyboardDismissBehavior for form UX. ScrollViews containing text fields should specify how the keyboard dismisses when the user scrolls. This provides better UX for forms in scrollable content. {v2}',
+    'require_keyboard_dismiss_on_scroll',
+    '[require_keyboard_dismiss_on_scroll] Scroll view must have keyboardDismissBehavior for form UX. ScrollViews containing text fields should specify how the keyboard dismisses when the user scrolls. This provides better UX for forms in scrollable content. {v2}',
     correctionMessage:
         'Add keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag. Verify the change works correctly with existing tests and add coverage for the new behavior.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   static const Set<String> _scrollViewTypes = <String>{
@@ -1365,13 +1245,10 @@ class RequireKeyboardDismissOnScrollRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addInstanceCreationExpression((
-      InstanceCreationExpression node,
-    ) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final String typeName = node.constructorName.type.name.lexeme;
       if (!_scrollViewTypes.contains(typeName)) return;
 
@@ -1438,7 +1315,7 @@ class RequireKeyboardDismissOnScrollRule extends SaropaLintRule {
 /// );
 /// ```
 class AvoidKeyboardOverlapRule extends SaropaLintRule {
-  const AvoidKeyboardOverlapRule() : super(code: _code);
+  AvoidKeyboardOverlapRule() : super(code: _code);
 
   /// UX issue - form fields hidden by keyboard.
   @override
@@ -1448,21 +1325,19 @@ class AvoidKeyboardOverlapRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_keyboard_overlap',
-    problemMessage:
-        '[avoid_keyboard_overlap] TextField may be hidden behind the soft keyboard when no viewInsets handling is detected. Users cannot see what they are typing, leading to input errors, frustration, and accessibility failures on devices where the keyboard covers a large portion of the screen. {v5}',
+    'avoid_keyboard_overlap',
+    '[avoid_keyboard_overlap] TextField may be hidden behind the soft keyboard when no viewInsets handling is detected. Users cannot see what they are typing, leading to input errors, frustration, and accessibility failures on devices where the keyboard covers a large portion of the screen. {v5}',
     correctionMessage:
         'Wrap the form content in a SingleChildScrollView, or use MediaQuery.viewInsets.bottom to add padding that keeps the focused TextField visible.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addInstanceCreationExpression((node) {
+    context.addInstanceCreationExpression((node) {
       final typeName = node.constructorName.type.name.lexeme;
 
       if (typeName != 'TextField' && typeName != 'TextFormField') {
@@ -1553,44 +1428,12 @@ class AvoidKeyboardOverlapRule extends SaropaLintRule {
 
       // Also skip if file path contains 'dialog' - files in dialog/ folders
       // or with 'dialog' in name are likely dialog components.
-      final filePath = resolver.path.toLowerCase();
+      final filePath = context.filePath.toLowerCase();
       if (filePath.contains('dialog')) {
         return;
       }
 
       reporter.atNode(node.constructorName, code);
-    });
-  }
-
-  @override
-  List<Fix> getFixes() => <Fix>[_AddKeyboardHandlingCommentFix()];
-}
-
-class _AddKeyboardHandlingCommentFix extends DartFix {
-  @override
-  void run(
-    CustomLintResolver resolver,
-    ChangeReporter reporter,
-    CustomLintContext context,
-    AnalysisError analysisError,
-    List<AnalysisError> others,
-  ) {
-    context.registry.addInstanceCreationExpression((node) {
-      final typeName = node.constructorName.type.name.lexeme;
-      if (typeName != 'TextField' && typeName != 'TextFormField') return;
-      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
-
-      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
-        message: 'Add keyboard handling comment',
-        priority: 1,
-      );
-
-      changeBuilder.addDartFileEdit((builder) {
-        builder.addSimpleInsertion(
-          node.offset,
-          '// HACK: Wrap parent in SingleChildScrollView or use MediaQuery.viewInsets\n              ',
-        );
-      });
     });
   }
 }
@@ -1621,7 +1464,7 @@ class _AddKeyboardHandlingCommentFix extends DartFix {
 /// // Validates when user interacts with fields
 /// ```
 class RequireFormAutoValidateModeRule extends SaropaLintRule {
-  const RequireFormAutoValidateModeRule() : super(code: _code);
+  RequireFormAutoValidateModeRule() : super(code: _code);
 
   /// Minor improvement. Track for later review.
   @override
@@ -1631,23 +1474,19 @@ class RequireFormAutoValidateModeRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'require_form_auto_validate_mode',
-    problemMessage:
-        '[require_form_auto_validate_mode] Form should specify autovalidateMode for consistent UX. Forms should specify how validation is triggered for consistent UX. The autovalidateMode parameter controls when the form fields validate. {v2}',
+    'require_form_auto_validate_mode',
+    '[require_form_auto_validate_mode] Form should specify autovalidateMode for consistent UX. Forms should specify how validation is triggered for consistent UX. The autovalidateMode parameter controls when the form fields validate. {v2}',
     correctionMessage:
         'Add autovalidateMode: AutovalidateMode.onUserInteraction. Verify the change works correctly with existing tests and add coverage for the new behavior.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addInstanceCreationExpression((
-      InstanceCreationExpression node,
-    ) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final String typeName = node.constructorName.type.name.lexeme;
       if (typeName != 'Form') return;
 
@@ -1664,46 +1503,6 @@ class RequireFormAutoValidateModeRule extends SaropaLintRule {
       if (!hasAutovalidateMode) {
         reporter.atNode(node.constructorName, code);
       }
-    });
-  }
-
-  @override
-  List<Fix> getFixes() => <Fix>[_AddAutoValidateModeFix()];
-}
-
-class _AddAutoValidateModeFix extends DartFix {
-  @override
-  void run(
-    CustomLintResolver resolver,
-    ChangeReporter reporter,
-    CustomLintContext context,
-    AnalysisError analysisError,
-    List<AnalysisError> others,
-  ) {
-    context.registry.addInstanceCreationExpression((
-      InstanceCreationExpression node,
-    ) {
-      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
-
-      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
-        message: 'Add autovalidateMode: AutovalidateMode.onUserInteraction',
-        priority: 1,
-      );
-
-      changeBuilder.addDartFileEdit((builder) {
-        final ArgumentList args = node.argumentList;
-        if (args.arguments.isEmpty) {
-          builder.addSimpleInsertion(
-            args.leftParenthesis.end,
-            'autovalidateMode: AutovalidateMode.onUserInteraction',
-          );
-        } else {
-          builder.addSimpleInsertion(
-            args.arguments.last.end,
-            ', autovalidateMode: AutovalidateMode.onUserInteraction',
-          );
-        }
-      });
     });
   }
 }
@@ -1733,7 +1532,7 @@ class _AddAutoValidateModeFix extends DartFix {
 /// // System can suggest saved email addresses
 /// ```
 class RequireAutofillHintsRule extends SaropaLintRule {
-  const RequireAutofillHintsRule() : super(code: _code);
+  RequireAutofillHintsRule() : super(code: _code);
 
   /// Minor improvement. Track for later review.
   @override
@@ -1743,12 +1542,11 @@ class RequireAutofillHintsRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'require_autofill_hints',
-    problemMessage:
-        '[require_autofill_hints] Form field must have autofillHints to improve user experience. The autofillHints parameter enables system autofill to help users complete forms faster. This improves UX especially for common fields like email, password, name, and address. {v2}',
+    'require_autofill_hints',
+    '[require_autofill_hints] Form field must have autofillHints to improve user experience. The autofillHints parameter enables system autofill to help users complete forms faster. This improves UX especially for common fields like email, password, name, and address. {v2}',
     correctionMessage:
         'Add autofillHints: [AutofillHints.email] or appropriate hint. Verify the change works correctly with existing tests and add coverage for the new behavior.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   static const Set<String> _textFieldTypes = <String>{
@@ -1758,13 +1556,10 @@ class RequireAutofillHintsRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addInstanceCreationExpression((
-      InstanceCreationExpression node,
-    ) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final String typeName = node.constructorName.type.name.lexeme;
       if (!_textFieldTypes.contains(typeName)) return;
 
@@ -1811,7 +1606,7 @@ class RequireAutofillHintsRule extends SaropaLintRule {
 /// // Pressing "Next" moves focus to password field
 /// ```
 class PreferOnFieldSubmittedRule extends SaropaLintRule {
-  const PreferOnFieldSubmittedRule() : super(code: _code);
+  PreferOnFieldSubmittedRule() : super(code: _code);
 
   /// Minor improvement. Track for later review.
   @override
@@ -1821,12 +1616,11 @@ class PreferOnFieldSubmittedRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'prefer_on_field_submitted',
-    problemMessage:
-        '[prefer_on_field_submitted] Form field must have onFieldSubmitted to handle keyboard action. This callback fires when the user presses the keyboard action button (e.g., Done, Next). Add it to move focus to the next field or submit the form for a smooth keyboard-driven workflow. {v3}',
+    'prefer_on_field_submitted',
+    '[prefer_on_field_submitted] Form field must have onFieldSubmitted to handle keyboard action. This callback fires when the user presses the keyboard action button (e.g., Done, Next). Add it to move focus to the next field or submit the form for a smooth keyboard-driven workflow. {v3}',
     correctionMessage:
         'Add onFieldSubmitted: (_) => nextFocusNode.requestFocus() or submit. Verify the change works correctly with existing tests and add coverage for the new behavior.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   static const Set<String> _textFieldTypes = <String>{
@@ -1836,13 +1630,10 @@ class PreferOnFieldSubmittedRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addInstanceCreationExpression((
-      InstanceCreationExpression node,
-    ) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final String typeName = node.constructorName.type.name.lexeme;
       if (!_textFieldTypes.contains(typeName)) return;
 
@@ -1889,7 +1680,7 @@ class PreferOnFieldSubmittedRule extends SaropaLintRule {
 /// )
 /// ```
 class RequireTextInputTypeRule extends SaropaLintRule {
-  const RequireTextInputTypeRule() : super(code: _code);
+  RequireTextInputTypeRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -1899,23 +1690,19 @@ class RequireTextInputTypeRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'require_text_input_type',
-    problemMessage:
-        '[require_text_input_type] TextField without keyboardType. Users may see wrong keyboard. Setting the appropriate keyboardType improves user experience by showing the right keyboard layout for the expected input. {v2}',
+    'require_text_input_type',
+    '[require_text_input_type] TextField without keyboardType. Users may see wrong keyboard. Setting the appropriate keyboardType improves user experience by showing the right keyboard layout for the expected input. {v2}',
     correctionMessage:
         'Add keyboardType parameter for appropriate keyboard layout. Verify the change works correctly with existing tests and add coverage for the new behavior.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addInstanceCreationExpression((
-      InstanceCreationExpression node,
-    ) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
       if (!_textFieldTypes.contains(node.typeName)) return;
 
       if (!node.hasNamedParameter('keyboardType')) {
@@ -1949,7 +1736,7 @@ class RequireTextInputTypeRule extends SaropaLintRule {
 /// )
 /// ```
 class PreferTextInputActionRule extends SaropaLintRule {
-  const PreferTextInputActionRule() : super(code: _code);
+  PreferTextInputActionRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -1959,23 +1746,19 @@ class PreferTextInputActionRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'prefer_text_input_action',
-    problemMessage:
-        '[prefer_text_input_action] TextField without textInputAction. Keyboard action button unclear. Setting textInputAction helps users navigate forms efficiently with the keyboard action button (Done, Next, Search, etc.). {v2}',
+    'prefer_text_input_action',
+    '[prefer_text_input_action] TextField without textInputAction. Keyboard action button unclear. Setting textInputAction helps users navigate forms efficiently with the keyboard action button (Done, Next, Search, etc.). {v2}',
     correctionMessage:
         'Add textInputAction (e.g., TextInputAction.next or .done). Verify the change works correctly with existing tests and add coverage for the new behavior.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addInstanceCreationExpression((
-      InstanceCreationExpression node,
-    ) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
       if (!_textFieldTypes.contains(node.typeName)) return;
 
       if (!node.hasNamedParameter('textInputAction')) {
@@ -2013,7 +1796,7 @@ class PreferTextInputActionRule extends SaropaLintRule {
 /// }
 /// ```
 class RequireFormKeyInStatefulWidgetRule extends SaropaLintRule {
-  const RequireFormKeyInStatefulWidgetRule() : super(code: _code);
+  RequireFormKeyInStatefulWidgetRule() : super(code: _code);
 
   /// Significant issue. Address when count exceeds 10.
   @override
@@ -2026,21 +1809,19 @@ class RequireFormKeyInStatefulWidgetRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
-    name: 'require_form_key_in_stateful_widget',
-    problemMessage:
-        '[require_form_key_in_stateful_widget] GlobalKey<FormState> created inside the build() method is re-instantiated on every widget rebuild triggered by setState(). Each rebuild creates a new key, causing the form to lose all current field values, validation state, and user input. This produces a frustrating user experience where typed data disappears unpredictably during state changes. {v2}',
+    'require_form_key_in_stateful_widget',
+    '[require_form_key_in_stateful_widget] GlobalKey<FormState> created inside the build() method is re-instantiated on every widget rebuild triggered by setState(). Each rebuild creates a new key, causing the form to lose all current field values, validation state, and user input. This produces a frustrating user experience where typed data disappears unpredictably during state changes. {v2}',
     correctionMessage:
         'Declare the GlobalKey<FormState> as a field in the State class rather than inside build(). State class fields persist across rebuilds and preserve form data.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodDeclaration((MethodDeclaration node) {
+    context.addMethodDeclaration((MethodDeclaration node) {
       // Only check build methods
       if (node.name.lexeme != 'build') return;
 
@@ -2050,7 +1831,7 @@ class RequireFormKeyInStatefulWidgetRule extends SaropaLintRule {
       // Check for GlobalKey creation in build
       if (bodySource.contains('GlobalKey<FormState>()') ||
           bodySource.contains('GlobalKey<FormState>(')) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
   }
@@ -2103,7 +1884,7 @@ class RequireFormKeyInStatefulWidgetRule extends SaropaLintRule {
 /// validator: (value) => isEmail(value) ? null : 'Invalid email',
 /// ```
 class PreferRegexValidationRule extends SaropaLintRule {
-  const PreferRegexValidationRule() : super(code: _code);
+  PreferRegexValidationRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.medium;
@@ -2112,13 +1893,12 @@ class PreferRegexValidationRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'prefer_regex_validation',
-    problemMessage:
-        '[prefer_regex_validation] Form field with basic empty check but label '
+    'prefer_regex_validation',
+    '[prefer_regex_validation] Form field with basic empty check but label '
         'suggests structured data (email/phone/url). Use regex validation. {v2}',
     correctionMessage:
         'Add regex pattern validation for the field type (email, phone, URL, etc.).',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   /// Labels/hints that suggest structured data needing regex validation
@@ -2143,13 +1923,10 @@ class PreferRegexValidationRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addInstanceCreationExpression((
-      InstanceCreationExpression node,
-    ) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final String typeName = node.constructorName.type.name.lexeme;
 
       // Check for form fields
@@ -2165,8 +1942,9 @@ class PreferRegexValidationRule extends SaropaLintRule {
 
         // Get label/hint text
         if (paramName == 'decoration') {
-          final String decorationSource =
-              arg.expression.toSource().toLowerCase();
+          final String decorationSource = arg.expression
+              .toSource()
+              .toLowerCase();
           for (final String label in _structuredDataLabels) {
             if (decorationSource.contains(label)) {
               labelText = label;
@@ -2228,7 +2006,7 @@ class PreferRegexValidationRule extends SaropaLintRule {
 /// )
 /// ```
 class PreferInputFormattersRule extends SaropaLintRule {
-  const PreferInputFormattersRule() : super(code: _code);
+  PreferInputFormattersRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.medium;
@@ -2237,12 +2015,11 @@ class PreferInputFormattersRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'prefer_input_formatters',
-    problemMessage:
-        '[prefer_input_formatters] Text field has a structured keyboardType (phone, number, datetime) but no inputFormatters. The keyboard type only restricts which keys appear — it does not format, mask, or validate input. Users must manually type dashes, parentheses, and spaces for phone numbers, credit cards, and dates, leading to inconsistent data and entry errors. Add TextInputFormatter to auto-format as the user types. {v1}',
+    'prefer_input_formatters',
+    '[prefer_input_formatters] Text field has a structured keyboardType (phone, number, datetime) but no inputFormatters. The keyboard type only restricts which keys appear — it does not format, mask, or validate input. Users must manually type dashes, parentheses, and spaces for phone numbers, credit cards, and dates, leading to inconsistent data and entry errors. Add TextInputFormatter to auto-format as the user types. {v1}',
     correctionMessage:
         'Add inputFormatters with appropriate formatters (e.g., FilteringTextInputFormatter.digitsOnly, LengthLimitingTextInputFormatter, or a custom mask formatter).',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   /// Keyboard types that typically need input formatting.
@@ -2254,13 +2031,10 @@ class PreferInputFormattersRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addInstanceCreationExpression((
-      InstanceCreationExpression node,
-    ) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final String typeName = node.constructorName.type.name.lexeme;
       if (!_textFieldTypes.contains(typeName)) return;
 
@@ -2326,7 +2100,7 @@ class PreferInputFormattersRule extends SaropaLintRule {
 /// )
 /// ```
 class RequireStepperStateManagementRule extends SaropaLintRule {
-  const RequireStepperStateManagementRule() : super(code: _code);
+  RequireStepperStateManagementRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.medium;
@@ -2335,9 +2109,8 @@ class RequireStepperStateManagementRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'require_stepper_state_management',
-    problemMessage:
-        '[require_stepper_state_management] Stepper widget without form state '
+    'require_stepper_state_management',
+    '[require_stepper_state_management] Stepper widget without form state '
         'preservation. Flutter Stepper does not persist form data across '
         'step navigation by default — when a user goes back to a previous '
         'step, text fields lose their values. Use GlobalKey<FormState>, '
@@ -2346,18 +2119,15 @@ class RequireStepperStateManagementRule extends SaropaLintRule {
     correctionMessage:
         'Wrap step content in Form with a GlobalKey<FormState>, or use '
         'TextEditingControllers to persist field values across steps.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addInstanceCreationExpression((
-      InstanceCreationExpression node,
-    ) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final String typeName = node.constructorName.type.name.lexeme;
       if (typeName != 'Stepper') return;
 

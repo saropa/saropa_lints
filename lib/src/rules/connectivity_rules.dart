@@ -7,8 +7,6 @@
 library;
 
 import 'package:analyzer/dart/ast/ast.dart';
-import 'package:analyzer/error/error.dart' show DiagnosticSeverity;
-import 'package:custom_lint_builder/custom_lint_builder.dart';
 
 import '../saropa_lint_rule.dart';
 
@@ -46,7 +44,7 @@ import '../saropa_lint_rule.dart';
 /// }
 /// ```
 class RequireConnectivityErrorHandlingRule extends SaropaLintRule {
-  const RequireConnectivityErrorHandlingRule() : super(code: _code);
+  RequireConnectivityErrorHandlingRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.medium;
@@ -55,22 +53,20 @@ class RequireConnectivityErrorHandlingRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'require_connectivity_error_handling',
-    problemMessage:
-        '[require_connectivity_error_handling] Connectivity check without '
+    'require_connectivity_error_handling',
+    '[require_connectivity_error_handling] Connectivity check without '
         'error handling. checkConnectivity() can throw platform exceptions. {v2}',
     correctionMessage:
         'Wrap connectivity checks in try-catch to handle platform exceptions.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       final String methodName = node.methodName.name;
 
       // Check for connectivity-related method calls
@@ -113,7 +109,7 @@ class RequireConnectivityErrorHandlingRule extends SaropaLintRule {
         parent = parent.parent;
       }
 
-      reporter.atNode(node, code);
+      reporter.atNode(node);
     });
   }
 }

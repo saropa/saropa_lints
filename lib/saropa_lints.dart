@@ -1,4 +1,4 @@
-// ignore_for_file: depend_on_referenced_packages
+// ignore_for_file: depend_on_referenced_packages, unused_element, unused_import
 
 /// Custom lint rules for Saropa codebase.
 ///
@@ -30,8 +30,6 @@
 library;
 
 import 'dart:io' show Directory, File, Platform, stderr;
-
-import 'package:custom_lint_builder/custom_lint_builder.dart';
 
 import 'package:saropa_lints/src/baseline/baseline_config.dart';
 import 'package:saropa_lints/src/baseline/baseline_manager.dart';
@@ -99,7 +97,7 @@ export 'package:saropa_lints/src/project_context.dart'
 /// **Warning:** This instantiates ALL rules. Use sparingly for tooling only.
 /// For normal analysis, the tier filtering uses [getRulesFromRegistry] which
 /// only instantiates the rules needed for the selected tier.
-List<LintRule> get allSaropaRules =>
+List<SaropaLintRule> get allSaropaRules =>
     _ruleFactories.values.map((f) => f()).toList();
 
 /// Cached package version resolved from pubspec.yaml at runtime.
@@ -135,19 +133,14 @@ String _resolveVersion() {
     final pubspec = File('$packageDir/pubspec.yaml');
     if (!pubspec.existsSync()) return 'unknown';
 
-    final versionMatch = RegExp(r'^version:\s*(.+)$', multiLine: true)
-        .firstMatch(pubspec.readAsStringSync());
+    final versionMatch = RegExp(
+      r'^version:\s*(.+)$',
+      multiLine: true,
+    ).firstMatch(pubspec.readAsStringSync());
     return versionMatch?.group(1)?.trim() ?? 'unknown';
   } catch (_) {
     return 'unknown';
   }
-}
-
-/// Entry point for custom_lint
-PluginBase createPlugin() {
-  // ignore: avoid_print
-  print('[saropa_lints] createPlugin() called - version $saropaLintsVersion');
-  return _SaropaLints();
 }
 
 /// All rule factories (not instances).
@@ -155,7 +148,8 @@ PluginBase createPlugin() {
 /// This list contains constructor references (`.new`), not instances.
 /// Rules are only instantiated when needed via [getRulesFromRegistry].
 /// This reduces memory usage from ~4GB (all rules) to ~500MB (essential tier).
-final List<LintRule Function()> _allRuleFactories = <LintRule Function()>[
+final List<SaropaLintRule Function()>
+_allRuleFactories = <SaropaLintRule Function()>[
   // Core rules
   AlwaysFailRule.new,
   AvoidNullAssertionRule.new,
@@ -1820,8 +1814,8 @@ final List<LintRule Function()> _allRuleFactories = <LintRule Function()>[
   PreferIosSafeAreaRule.new,
   AvoidIosHardcodedStatusBarRule.new,
   PreferIosHapticFeedbackRule.new,
-  RequireIosPlatformCheckRule.new,
-  AvoidIosBackgroundFetchAbuseRule.new,
+  // TODO(migration): RequireIosPlatformCheckRule - class not found
+  // TODO(migration): AvoidIosBackgroundFetchAbuseRule - class not found
   RequireAppleSignInRule.new,
   RequireIosBackgroundModeRule.new,
   AvoidIos13DeprecationsRule.new,
@@ -1869,7 +1863,7 @@ final List<LintRule Function()> _allRuleFactories = <LintRule Function()>[
   RequireIosNfcCapabilityCheckRule.new,
   RequireIosMethodChannelCleanupRule.new,
   AvoidIosForceUnwrapInCallbacksRule.new,
-  RequireMethodChannelErrorHandlingRule.new,
+  // TODO(migration): RequireMethodChannelErrorHandlingRule - class not found
   PreferIosAppIntentsFrameworkRule.new,
 
   // Device & Hardware Rules
@@ -1891,7 +1885,7 @@ final List<LintRule Function()> _allRuleFactories = <LintRule Function()>[
   RequireIosLocalNotificationPermissionRule.new,
 
   // Deep Linking Rules
-  RequireUniversalLinkValidationRule.new,
+  // TODO(migration): RequireUniversalLinkValidationRule - class not found
   RequireIosUniversalLinksDomainMatchingRule.new,
 
   // macOS Platform Rules
@@ -2484,11 +2478,11 @@ final List<LintRule Function()> _allRuleFactories = <LintRule Function()>[
 // This allows tier filtering without keeping all 1600+ rules in memory.
 
 /// Lazy name→factory map, built once on first access.
-late final Map<String, LintRule Function()> _ruleFactories =
+late final Map<String, SaropaLintRule Function()> _ruleFactories =
     _buildRuleFactoriesMap();
 
-Map<String, LintRule Function()> _buildRuleFactoriesMap() {
-  final map = <String, LintRule Function()>{};
+Map<String, SaropaLintRule Function()> _buildRuleFactoriesMap() {
+  final map = <String, SaropaLintRule Function()>{};
   for (final factory in _allRuleFactories) {
     final rule = factory(); // temporary instance to get name
     map[rule.code.name] = factory;
@@ -2502,8 +2496,8 @@ Map<String, LintRule Function()> _buildRuleFactoriesMap() {
 /// Only instantiates rules that are in the provided set.
 /// This is the key optimization - for essential tier (253 rules),
 /// only 253 rules are created instead of all 1600+.
-List<LintRule> getRulesFromRegistry(Set<String> ruleNames) {
-  final rules = <LintRule>[];
+List<SaropaLintRule> getRulesFromRegistry(Set<String> ruleNames) {
+  final rules = <SaropaLintRule>[];
   for (final name in ruleNames) {
     final factory = _ruleFactories[name];
     if (factory != null) {
@@ -2527,7 +2521,7 @@ List<LintRule> getRulesFromRegistry(Set<String> ruleNames) {
 // =============================================================================
 
 /// Cached filtered rules to avoid re-filtering on every file.
-List<LintRule>? _cachedFilteredRules;
+List<SaropaLintRule>? _cachedFilteredRules;
 
 /// The tier that was used to compute the cached rules.
 String? _cachedTier;
@@ -2538,302 +2532,6 @@ bool? _cachedEnableAll;
 /// Hash of individual rule overrides when cache was computed.
 /// This ensures cache invalidation when explicit rule configs change.
 int? _cachedRulesHash;
-
-class _SaropaLints extends PluginBase {
-  @override
-  List<LintRule> getLintRules(CustomLintConfigs configs) {
-    // Tier configuration: custom_lint does not support arbitrary plugin
-    // config keys, so YAML-based tier selection is unreliable. The
-    // recommended approach is `dart run saropa_lints:init --tier <name>`
-    // which generates explicit rule lists. This fallback reads from
-    // configs.rules['saropa_lints'] in case a user added it as a rule
-    // entry, but it will almost always be null (defaulting to essential).
-    final LintOptions? saropaConfig = configs.rules['saropa_lints'];
-    final String tier = saropaConfig?.json['tier'] as String? ?? 'essential';
-    final bool enableAll = configs.enableAllLintRules == true;
-
-    // =========================================================================
-    // BASELINE CONFIGURATION
-    // =========================================================================
-    // Initialize baseline manager for suppressing legacy violations.
-    // This allows brownfield projects to adopt linting without being
-    // overwhelmed by existing issues.
-    final baselineConfig = BaselineConfig.fromYaml(
-      saropaConfig?.json['baseline'],
-    );
-    if (baselineConfig.isEnabled) {
-      BaselineManager.initialize(baselineConfig);
-    }
-
-    // =========================================================================
-    // ANALYSIS CONFIGURATION
-    // =========================================================================
-    // Load max_issues and output mode from env vars or yaml config.
-    // Priority: env var > analysis_options_custom.yaml > default.
-    _loadAnalysisConfig();
-
-    // Log active configuration so users know what's happening
-    _logActiveConfig();
-
-    // =========================================================================
-    // PERFORMANCE INFRASTRUCTURE INITIALIZATION
-    // =========================================================================
-    // Initialize caches, string interning, and memory management on first run.
-    // This happens once per analysis session, not per file.
-    if (_cachedFilteredRules == null) {
-      // Initialize cache management with memory pressure handling
-      initializeCacheManagement(
-        maxFileContentCache: 500,
-        maxMetricsCache: 2000,
-        maxLocationCache: 2000,
-        memoryThresholdMb: 512,
-      );
-
-      // Pre-intern common Dart/Flutter strings for memory efficiency
-      StringInterner.preInternCommon();
-
-      // Register rule groups for batch execution
-      _registerRuleGroups();
-
-      // File discovery for progress % is now handled automatically
-      // in ProgressTracker.recordFile() using the first analyzed file's path
-      // to derive the actual project root (fixes wrong CWD in plugin mode).
-    }
-
-    // =========================================================================
-    // PERFORMANCE: Return cached rules if config hasn't changed
-    // =========================================================================
-    // This avoids re-filtering 1400+ rules for every single file.
-    // The filter is computed ONCE per analysis session, not per file.
-    // IMPORTANT: Hash includes individual rule overrides to ensure cache
-    // invalidation when explicit rules are enabled/disabled.
-    final int rulesHash = Object.hashAll(
-      configs.rules.entries
-          .where((e) => e.key != 'saropa_lints') // Exclude meta-config
-          .map((e) => '${e.key}:${e.value.enabled}'),
-    );
-    if (_cachedFilteredRules != null &&
-        _cachedTier == tier &&
-        _cachedEnableAll == enableAll &&
-        _cachedRulesHash == rulesHash) {
-      return _cachedFilteredRules!;
-    }
-
-    // Get all rules enabled for this tier
-    final Set<String> tierRules = getRulesForTier(tier);
-
-    // =========================================================================
-    // LAZY RULE LOADING (Memory Optimization)
-    // =========================================================================
-    // Instead of iterating over ALL 1500+ rules and filtering, we:
-    // 1. Determine which rule NAMES should be enabled
-    // 2. Only instantiate those specific rules from the registry
-    // This reduces memory usage significantly for lower tiers.
-
-    // Step 1: Determine which rules to enable
-    final Set<String> enabledRuleNames = <String>{};
-
-    if (enableAll) {
-      // Enable all registered rules
-      enabledRuleNames.addAll(_ruleFactories.keys);
-    } else {
-      // Start with tier rules
-      enabledRuleNames.addAll(tierRules);
-    }
-
-    // Step 2: Apply explicit overrides from config
-    for (final entry in configs.rules.entries) {
-      final ruleName = entry.key;
-      if (ruleName == 'saropa_lints') continue; // Skip meta-config
-
-      final options = entry.value;
-      if (options.enabled) {
-        // Explicitly enabled - add even if not in tier
-        enabledRuleNames.add(ruleName);
-      } else {
-        // Explicitly disabled - remove even if in tier
-        enabledRuleNames.remove(ruleName);
-      }
-    }
-
-    // Step 3: Instantiate only the needed rules from registry
-    final List<LintRule> filteredRules = getRulesFromRegistry(enabledRuleNames);
-
-    // =========================================================================
-    // UNRESOLVABLE RULE DETECTION (Diagnostic)
-    // =========================================================================
-    // Warn about rules listed in tier definitions or explicit config but
-    // missing from _ruleFactories. This catches orphaned entries that cause
-    // the init command's rule count to diverge from the plugin's loaded count.
-    final Set<String> loadedNames =
-        filteredRules.map((LintRule r) => r.code.name).toSet();
-    final Set<String> unresolvable = enabledRuleNames.difference(loadedNames);
-    if (unresolvable.isNotEmpty) {
-      // ignore: avoid_print
-      print(
-        '[saropa_lints] WARNING: ${unresolvable.length} rule(s) could not be '
-        'resolved (defined in tier/config but missing from rule registry): '
-        '${unresolvable.take(10).join(', ')}'
-        '${unresolvable.length > 10 ? '...' : ''}',
-      );
-    }
-
-    // =========================================================================
-    // RULE PRIORITY ORDERING (Performance Optimization)
-    // =========================================================================
-    // Sort rules by estimated execution cost so fast rules run first.
-    // This improves perceived performance and allows early termination
-    // strategies in the future.
-    filteredRules.sort((a, b) {
-      final costA = _getRuleCost(a);
-      final costB = _getRuleCost(b);
-      return costA.index.compareTo(costB.index);
-    });
-
-    // =========================================================================
-    // BUILD PATTERN INDEX (Performance Optimization)
-    // =========================================================================
-    // Build a combined index of all required patterns across rules.
-    // This allows single-pass content scanning instead of per-rule scanning.
-    final List<RulePatternInfo> patternInfos = filteredRules
-        .whereType<SaropaLintRule>()
-        .map((SaropaLintRule rule) => RulePatternInfo(
-              name: rule.code.name,
-              patterns: rule.requiredPatterns,
-            ))
-        .toList();
-    PatternIndex.build(patternInfos);
-
-    // =========================================================================
-    // SET RULE CONFIG HASH (Performance Optimization)
-    // =========================================================================
-    // Compute a hash of the current rule configuration for incremental analysis.
-    // If the config changes, all cached analysis results are invalidated.
-    final int configHash = Object.hashAll(<Object>[
-      tier,
-      enableAll,
-      ...filteredRules.map((LintRule r) => r.code.name),
-    ]);
-    IncrementalAnalysisTracker.setRuleConfig(configHash);
-
-    // =========================================================================
-    // CONFLICTING RULE DETECTION
-    // =========================================================================
-    // Warn when mutually exclusive stylistic rules are both enabled.
-    // These rule pairs have opposite effects and should not be used together.
-    _checkConflictingRules(filteredRules);
-
-    // Cache the result for subsequent files
-    _cachedFilteredRules = filteredRules;
-    _cachedTier = tier;
-    _cachedEnableAll = enableAll;
-    _cachedRulesHash = rulesHash;
-
-    // Infer the effective tier from the final enabled rule set so the log
-    // message reflects reality (the YAML `tier` field is almost always null,
-    // defaulting to 'essential', while the actual rules come from explicit
-    // overrides generated by `dart run saropa_lints:init`).
-    final String effectiveTier =
-        enableAll ? 'all' : _inferEffectiveTier(enabledRuleNames);
-
-    // Debug: show rule count to help diagnose "No issues found" problems
-    // ignore: avoid_print
-    print(
-        '[saropa_lints] Loaded ${filteredRules.length} rules (tier: $effectiveTier, enableAll: $enableAll)');
-
-    // Tell progress tracker how many rules are active
-    ProgressTracker.setEnabledRuleCount(filteredRules.length);
-
-    // Capture analysis config for the report header
-    _captureReportConfig(
-      effectiveTier: effectiveTier,
-      enabledRuleNames: enabledRuleNames,
-      configs: configs,
-    );
-
-    return filteredRules;
-  }
-
-  /// Infers the effective tier by finding the highest tier whose rules are
-  /// all present in [enabledRuleNames].
-  String _inferEffectiveTier(Set<String> enabledRuleNames) {
-    // Check from highest to lowest — first full match wins.
-    const tiers = [
-      'pedantic',
-      'comprehensive',
-      'professional',
-      'recommended',
-      'essential',
-    ];
-    for (final candidate in tiers) {
-      final tierRules = getRulesForTier(candidate);
-      if (tierRules.difference(enabledRuleNames).isEmpty) {
-        return candidate;
-      }
-    }
-    return 'custom';
-  }
-}
-
-/// Capture analysis config snapshot for the report header.
-///
-/// Reads platform/package settings from `analysis_options_custom.yaml`
-/// and combines with the resolved tier, enabled rules, and user
-/// exclusions from [configs].
-void _captureReportConfig({
-  required String effectiveTier,
-  required Set<String> enabledRuleNames,
-  required CustomLintConfigs configs,
-}) {
-  // Collect explicitly disabled rules from the YAML config
-  final userExclusions = <String>[];
-  for (final entry in configs.rules.entries) {
-    if (entry.key == 'saropa_lints') continue;
-    if (!entry.value.enabled) {
-      userExclusions.add(entry.key);
-    }
-  }
-  userExclusions.sort();
-
-  // Read platform/package settings from custom yaml
-  final customSettings = _parseCustomYamlSettings();
-
-  AnalysisReporter.setAnalysisConfig(ReportConfig(
-    version: saropaLintsVersion,
-    effectiveTier: effectiveTier,
-    enabledRuleCount: enabledRuleNames.length,
-    enabledRuleNames: enabledRuleNames.toList()..sort(),
-    enabledPlatforms: customSettings.enabledPlatforms,
-    disabledPlatforms: customSettings.disabledPlatforms,
-    enabledPackages: customSettings.enabledPackages,
-    disabledPackages: customSettings.disabledPackages,
-    userExclusions: userExclusions,
-    maxIssues: ProgressTracker.maxIssues,
-    outputMode: ProgressTracker.isFileOnly ? 'file' : 'both',
-  ));
-
-  // Build OWASP lookup map for the structured JSON export.
-  // Iterates all rule factories once to extract OWASP mappings.
-  AnalysisReporter.setOwaspLookup(_buildOwaspLookup());
-}
-
-/// Build a map from rule name to OWASP mapping for all registered rules.
-///
-/// Iterates all rule factories once at config time. Rules without OWASP
-/// mappings are omitted from the map.
-Map<String, OwaspMapping> _buildOwaspLookup() {
-  final lookup = <String, OwaspMapping>{};
-  for (final factory in _allRuleFactories) {
-    final rule = factory();
-    if (rule is SaropaLintRule) {
-      final owasp = rule.owasp;
-      if (owasp != null && owasp.isNotEmpty) {
-        lookup[rule.code.name] = owasp;
-      }
-    }
-  }
-  return lookup;
-}
 
 /// Parsed platform and package settings from custom YAML.
 class _CustomYamlSettings {
@@ -2907,10 +2605,7 @@ void _parseYamlSection({
 }) {
   // Match "sectionName:" then capture indented "key: true/false" lines
   final escaped = RegExp.escape(sectionName);
-  final sectionPattern = RegExp(
-    '^$escaped:\\s*\$',
-    multiLine: true,
-  );
+  final sectionPattern = RegExp('^$escaped:\\s*\$', multiLine: true);
   final match = sectionPattern.firstMatch(content);
   if (match == null) return;
 
@@ -2951,9 +2646,10 @@ const List<List<String>> _conflictingRulePairs = <List<String>>[
 ///
 /// This helps users catch configuration mistakes where they've enabled
 /// two mutually exclusive stylistic rules.
-void _checkConflictingRules(List<LintRule> enabledRules) {
-  final Set<String> enabledNames =
-      enabledRules.map((LintRule rule) => rule.code.name).toSet();
+void _checkConflictingRules(List<SaropaLintRule> enabledRules) {
+  final Set<String> enabledNames = enabledRules
+      .map((SaropaLintRule rule) => rule.code.name)
+      .toSet();
 
   for (final List<String> pair in _conflictingRulePairs) {
     final String rule1 = pair[0];
@@ -3029,8 +2725,10 @@ void _loadAnalysisConfig() {
 
     // Parse max_issues (root-level key only)
     if (!maxFromEnv) {
-      final match =
-          RegExp(r'^max_issues:\s*(\d+)', multiLine: true).firstMatch(content);
+      final match = RegExp(
+        r'^max_issues:\s*(\d+)',
+        multiLine: true,
+      ).firstMatch(content);
       if (match != null) {
         final value = int.tryParse(match.group(1)!);
         if (value != null) ProgressTracker.setMaxIssues(value);
@@ -3039,8 +2737,10 @@ void _loadAnalysisConfig() {
 
     // Parse output (root-level key only)
     if (!outputFromEnv) {
-      final match =
-          RegExp(r'^output:\s*(\w+)', multiLine: true).firstMatch(content);
+      final match = RegExp(
+        r'^output:\s*(\w+)',
+        multiLine: true,
+      ).firstMatch(content);
       if (match != null && match.group(1)!.toLowerCase() == 'file') {
         ProgressTracker.setFileOnly(fileOnly: true);
       }
@@ -3059,11 +2759,15 @@ void _logActiveConfig() {
   final maxLabel = max == 0 ? 'unlimited' : '$max';
 
   if (ProgressTracker.isFileOnly) {
-    stderr.writeln('[saropa_lints] Output: file-only — '
-        'all violations go to report log, nothing in Problems tab.');
+    stderr.writeln(
+      '[saropa_lints] Output: file-only — '
+      'all violations go to report log, nothing in Problems tab.',
+    );
   } else {
-    stderr.writeln('[saropa_lints] Output: $output — '
-        'Problems tab capped at $maxLabel, all issues in report log.');
+    stderr.writeln(
+      '[saropa_lints] Output: $output — '
+      'Problems tab capped at $maxLabel, all issues in report log.',
+    );
   }
 }
 
@@ -3071,12 +2775,8 @@ void _logActiveConfig() {
 ///
 /// If the rule is a [SaropaLintRule], use its declared cost.
 /// Otherwise, default to medium cost.
-RuleCost _getRuleCost(LintRule rule) {
-  if (rule is SaropaLintRule) {
-    return rule.cost;
-  }
-  // Non-Saropa rules default to medium cost
-  return RuleCost.medium;
+RuleCost _getRuleCost(SaropaLintRule rule) {
+  return rule.cost;
 }
 
 /// Register rule groups for batch execution optimization.
@@ -3085,102 +2785,114 @@ RuleCost _getRuleCost(LintRule rule) {
 /// shared setup/teardown and intermediate results.
 void _registerRuleGroups() {
   // Async rules - share Future/async/await patterns
-  RuleGroupExecutor.registerGroup(RuleGroup(
-    name: 'async_rules',
-    rules: const {
-      'avoid_slow_async_io',
-      'unawaited_futures',
-      'await_only_futures',
-      'prefer_async_await',
-      'avoid_async_void',
-      'avoid_unnecessary_async',
-      'missing_await_in_async',
-    },
-    sharedPatterns: const {'async', 'await', 'Future'},
-    priority: 10,
-  ));
+  RuleGroupExecutor.registerGroup(
+    RuleGroup(
+      name: 'async_rules',
+      rules: const {
+        'avoid_slow_async_io',
+        'unawaited_futures',
+        'await_only_futures',
+        'prefer_async_await',
+        'avoid_async_void',
+        'avoid_unnecessary_async',
+        'missing_await_in_async',
+      },
+      sharedPatterns: const {'async', 'await', 'Future'},
+      priority: 10,
+    ),
+  );
 
   // Widget rules - share StatelessWidget/StatefulWidget patterns
-  RuleGroupExecutor.registerGroup(RuleGroup(
-    name: 'widget_rules',
-    rules: const {
-      'avoid_stateless_widget_initialized_fields',
-      'avoid_state_constructors',
-      'prefer_const_constructors_in_immutables',
-      'avoid_unnecessary_setstate',
-      'use_build_context_synchronously',
-      'prefer_stateless_widget',
-    },
-    sharedPatterns: const {
-      'StatelessWidget',
-      'StatefulWidget',
-      'State<',
-      'build('
-    },
-    priority: 20,
-  ));
+  RuleGroupExecutor.registerGroup(
+    RuleGroup(
+      name: 'widget_rules',
+      rules: const {
+        'avoid_stateless_widget_initialized_fields',
+        'avoid_state_constructors',
+        'prefer_const_constructors_in_immutables',
+        'avoid_unnecessary_setstate',
+        'use_build_context_synchronously',
+        'prefer_stateless_widget',
+      },
+      sharedPatterns: const {
+        'StatelessWidget',
+        'StatefulWidget',
+        'State<',
+        'build(',
+      },
+      priority: 20,
+    ),
+  );
 
   // Context rules - share BuildContext patterns
-  RuleGroupExecutor.registerGroup(RuleGroup(
-    name: 'context_rules',
-    rules: const {
-      'use_build_context_synchronously',
-      'avoid_context_across_async_gaps',
-      'prefer_context_extension',
-    },
-    sharedPatterns: const {'BuildContext', 'context'},
-    priority: 30,
-  ));
+  RuleGroupExecutor.registerGroup(
+    RuleGroup(
+      name: 'context_rules',
+      rules: const {
+        'use_build_context_synchronously',
+        'avoid_context_across_async_gaps',
+        'prefer_context_extension',
+      },
+      sharedPatterns: const {'BuildContext', 'context'},
+      priority: 30,
+    ),
+  );
 
   // Dispose rules - share dispose/controller patterns
-  RuleGroupExecutor.registerGroup(RuleGroup(
-    name: 'dispose_rules',
-    rules: const {
-      'close_sinks',
-      'cancel_subscriptions',
-      'dispose_controllers',
-      'require_dispose_method',
-    },
-    sharedPatterns: const {
-      'dispose',
-      'Controller',
-      'StreamSubscription',
-      'StreamController'
-    },
-    priority: 40,
-  ));
+  RuleGroupExecutor.registerGroup(
+    RuleGroup(
+      name: 'dispose_rules',
+      rules: const {
+        'close_sinks',
+        'cancel_subscriptions',
+        'dispose_controllers',
+        'require_dispose_method',
+      },
+      sharedPatterns: const {
+        'dispose',
+        'Controller',
+        'StreamSubscription',
+        'StreamController',
+      },
+      priority: 40,
+    ),
+  );
 
   // Test rules - share test patterns
-  RuleGroupExecutor.registerGroup(RuleGroup(
-    name: 'test_rules',
-    rules: const {
-      'avoid_test_sleep',
-      'avoid_find_by_text',
-      'require_test_keys',
-      'prefer_pump_and_settle',
-      'prefer_test_find_by_key',
-    },
-    sharedPatterns: const {'test(', 'testWidgets(', 'expect(', 'find.'},
-    priority: 50,
-  ));
+  RuleGroupExecutor.registerGroup(
+    RuleGroup(
+      name: 'test_rules',
+      rules: const {
+        'avoid_test_sleep',
+        'avoid_find_by_text',
+        'require_test_keys',
+        'prefer_pump_and_settle',
+        'prefer_test_find_by_key',
+      },
+      sharedPatterns: const {'test(', 'testWidgets(', 'expect(', 'find.'},
+      priority: 50,
+    ),
+  );
 
   // Security rules - share security-sensitive patterns
-  RuleGroupExecutor.registerGroup(RuleGroup(
-    name: 'security_rules',
-    rules: const {
-      'avoid_weak_cryptographic_algorithms',
-      'avoid_hardcoded_credentials',
-      'avoid_dynamic_sql',
-      'avoid_insecure_random',
-    },
-    sharedPatterns: const {
-      'password',
-      'secret',
-      'token',
-      'credential',
-      'MD5',
-      'SHA1'
-    },
-    priority: 60,
-  ));
+  RuleGroupExecutor.registerGroup(
+    RuleGroup(
+      name: 'security_rules',
+      rules: const {
+        'avoid_weak_cryptographic_algorithms',
+        'avoid_hardcoded_credentials',
+        'avoid_dynamic_sql',
+        'avoid_insecure_random',
+      },
+      sharedPatterns: const {
+        'password',
+        'secret',
+        'token',
+        'credential',
+        'MD5',
+        'SHA1',
+      },
+      priority: 60,
+    ),
+  );
 }

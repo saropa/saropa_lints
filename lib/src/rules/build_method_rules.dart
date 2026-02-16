@@ -8,9 +8,6 @@ library;
 
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
-import 'package:analyzer/error/error.dart'
-    show AnalysisError, DiagnosticSeverity;
-import 'package:custom_lint_builder/custom_lint_builder.dart';
 
 import '../saropa_lint_rule.dart';
 
@@ -47,7 +44,7 @@ import '../saropa_lint_rule.dart';
 /// }
 /// ```
 class AvoidGradientInBuildRule extends SaropaLintRule {
-  const AvoidGradientInBuildRule() : super(code: _code);
+  AvoidGradientInBuildRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.medium;
@@ -56,12 +53,11 @@ class AvoidGradientInBuildRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_gradient_in_build',
-    problemMessage:
-        '[avoid_gradient_in_build] Creating Gradient in build() prevents reuse and causes allocations. This leads to unnecessary memory usage, slower UI performance, and increased battery drain. {v3}',
+    'avoid_gradient_in_build',
+    '[avoid_gradient_in_build] Creating Gradient in build() prevents reuse and causes allocations. This leads to unnecessary memory usage, slower UI performance, and increased battery drain. {v3}',
     correctionMessage:
         'Store gradient as a static const field or create outside build(). Use DevTools widget inspector to verify that rebuild counts decrease.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   static const Set<String> _gradientTypes = <String>{
@@ -72,11 +68,10 @@ class AvoidGradientInBuildRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodDeclaration((MethodDeclaration node) {
+    context.addMethodDeclaration((MethodDeclaration node) {
       // Only process build methods
       if (node.name.lexeme != 'build') return;
 
@@ -95,13 +90,14 @@ class _GradientVisitor extends GeneralizingAstVisitor<void> {
 
   @override
   void visitInstanceCreationExpression(InstanceCreationExpression node) {
-    final String typeName = node.constructorName.type.element?.name ??
+    final String typeName =
+        node.constructorName.type.element?.name ??
         node.constructorName.type.name2.lexeme;
 
     if (gradientTypes.contains(typeName)) {
       // Skip const gradients - they're properly reused
       if (node.keyword?.lexeme != 'const') {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     }
     super.visitInstanceCreationExpression(node);
@@ -112,7 +108,7 @@ class _GradientVisitor extends GeneralizingAstVisitor<void> {
     // Implicit constructor calls may appear as method invocations
     final String methodName = node.methodName.name;
     if (gradientTypes.contains(methodName)) {
-      reporter.atNode(node, code);
+      reporter.atNode(node);
     }
     super.visitMethodInvocation(node);
   }
@@ -153,7 +149,7 @@ class _GradientVisitor extends GeneralizingAstVisitor<void> {
 /// }
 /// ```
 class AvoidDialogInBuildRule extends SaropaLintRule {
-  const AvoidDialogInBuildRule() : super(code: _code);
+  AvoidDialogInBuildRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.critical;
@@ -162,12 +158,11 @@ class AvoidDialogInBuildRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_dialog_in_build',
-    problemMessage:
-        '[avoid_dialog_in_build] Calling showDialog (or similar) inside build() will cause your app to enter an infinite loop, repeatedly showing dialogs and freezing the UI. This results in a poor user experience and may crash the app. {v2}',
+    'avoid_dialog_in_build',
+    '[avoid_dialog_in_build] Calling showDialog (or similar) inside build() will cause your app to enter an infinite loop, repeatedly showing dialogs and freezing the UI. This results in a poor user experience and may crash the app. {v2}',
     correctionMessage:
         'Move all dialog calls out of build() and into event handlers (e.g., onPressed) or lifecycle methods (e.g., initState) to prevent infinite loops and keep your app responsive.',
-    errorSeverity: DiagnosticSeverity.ERROR,
+    severity: DiagnosticSeverity.ERROR,
   );
 
   static const Set<String> _dialogMethods = <String>{
@@ -188,11 +183,10 @@ class AvoidDialogInBuildRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodDeclaration((MethodDeclaration node) {
+    context.addMethodDeclaration((MethodDeclaration node) {
       if (node.name.lexeme != 'build') return;
 
       final String? returnType = node.returnType?.toSource();
@@ -219,7 +213,7 @@ class _DialogVisitor extends RecursiveAstVisitor<void> {
     }
 
     if (dialogMethods.contains(node.methodName.name)) {
-      reporter.atNode(node, code);
+      reporter.atNode(node);
     }
     super.visitMethodInvocation(node);
   }
@@ -294,7 +288,7 @@ class _DialogVisitor extends RecursiveAstVisitor<void> {
 /// }
 /// ```
 class AvoidSnackbarInBuildRule extends SaropaLintRule {
-  const AvoidSnackbarInBuildRule() : super(code: _code);
+  AvoidSnackbarInBuildRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.high;
@@ -303,21 +297,19 @@ class AvoidSnackbarInBuildRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_snackbar_in_build',
-    problemMessage:
-        '[avoid_snackbar_in_build] Calling showSnackBar inside build() causes a snackbar to be shown on every rebuild, flooding the user with duplicate messages and overwhelming the snackbar queue. This leads to poor user experience, lost context, and can make the app feel buggy or unresponsive. It may also result in app store rejection for UX violations and negative user reviews due to notification spam. {v3}',
+    'avoid_snackbar_in_build',
+    '[avoid_snackbar_in_build] Calling showSnackBar inside build() causes a snackbar to be shown on every rebuild, flooding the user with duplicate messages and overwhelming the snackbar queue. This leads to poor user experience, lost context, and can make the app feel buggy or unresponsive. It may also result in app store rejection for UX violations and negative user reviews due to notification spam. {v3}',
     correctionMessage:
         'Move all snackbar calls out of build() and into event handlers (e.g., onPressed) or lifecycle methods (e.g., initState). Ensure snackbars are only shown in response to user actions or specific events. Audit your codebase for accidental snackbar triggers in build() and add tests to verify correct notification behavior.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodDeclaration((MethodDeclaration node) {
+    context.addMethodDeclaration((MethodDeclaration node) {
       if (node.name.lexeme != 'build') return;
 
       final String? returnType = node.returnType?.toSource();
@@ -343,7 +335,7 @@ class _SnackbarVisitor extends RecursiveAstVisitor<void> {
     }
 
     if (node.methodName.name == 'showSnackBar') {
-      reporter.atNode(node, code);
+      reporter.atNode(node);
     }
     super.visitMethodInvocation(node);
   }
@@ -387,7 +379,7 @@ class _SnackbarVisitor extends RecursiveAstVisitor<void> {
 /// }
 /// ```
 class AvoidAnalyticsInBuildRule extends SaropaLintRule {
-  const AvoidAnalyticsInBuildRule() : super(code: _code);
+  AvoidAnalyticsInBuildRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.high;
@@ -396,12 +388,11 @@ class AvoidAnalyticsInBuildRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_analytics_in_build',
-    problemMessage:
-        '[avoid_analytics_in_build] Analytics calls inside build() are triggered on every rebuild, resulting in duplicate events, inaccurate tracking data, degraded app performance, and inflated backend costs. This can skew business metrics, produce misleading dashboards, and make it difficult to analyze real user behavior. Persistent analytics spam may also trigger rate limits or data quality flags in analytics platforms. {v3}',
+    'avoid_analytics_in_build',
+    '[avoid_analytics_in_build] Analytics calls inside build() are triggered on every rebuild, resulting in duplicate events, inaccurate tracking data, degraded app performance, and inflated backend costs. This can skew business metrics, produce misleading dashboards, and make it difficult to analyze real user behavior. Persistent analytics spam may also trigger rate limits or data quality flags in analytics platforms. {v3}',
     correctionMessage:
         'Move analytics calls to initState(), event handlers, or lifecycle methods triggered once per user action or screen view. Audit analytics logic for duplicate events and add tests to verify correct event tracking. Document analytics integration for maintainability.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   static const Set<String> _analyticsMethods = <String>{
@@ -425,18 +416,18 @@ class AvoidAnalyticsInBuildRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodDeclaration((MethodDeclaration node) {
+    context.addMethodDeclaration((MethodDeclaration node) {
       if (node.name.lexeme != 'build') return;
 
       final String? returnType = node.returnType?.toSource();
       if (returnType != 'Widget') return;
 
-      node.body
-          .visitChildren(_AnalyticsVisitor(reporter, code, _analyticsMethods));
+      node.body.visitChildren(
+        _AnalyticsVisitor(reporter, code, _analyticsMethods),
+      );
     });
   }
 }
@@ -457,7 +448,7 @@ class _AnalyticsVisitor extends RecursiveAstVisitor<void> {
     }
 
     if (analyticsMethods.contains(node.methodName.name)) {
-      reporter.atNode(node, code);
+      reporter.atNode(node);
     }
     super.visitMethodInvocation(node);
   }
@@ -508,7 +499,7 @@ class _AnalyticsVisitor extends RecursiveAstVisitor<void> {
 /// }
 /// ```
 class AvoidJsonEncodeInBuildRule extends SaropaLintRule {
-  const AvoidJsonEncodeInBuildRule() : super(code: _code);
+  AvoidJsonEncodeInBuildRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.medium;
@@ -517,21 +508,19 @@ class AvoidJsonEncodeInBuildRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_json_encode_in_build',
-    problemMessage:
-        '[avoid_json_encode_in_build] jsonEncode in build() is expensive and causes jank. JSON encoding is expensive. Doing it in build() causes performance issues because build() is called frequently (60fps during animations). {v2}',
+    'avoid_json_encode_in_build',
+    '[avoid_json_encode_in_build] jsonEncode in build() is expensive and causes jank. JSON encoding is expensive. Doing it in build() causes performance issues because build() is called frequently (60fps during animations). {v2}',
     correctionMessage:
         'Cache JSON encoding result outside of build(). Use DevTools widget inspector to verify that rebuild counts decrease.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodDeclaration((MethodDeclaration node) {
+    context.addMethodDeclaration((MethodDeclaration node) {
       if (node.name.lexeme != 'build') return;
 
       final String? returnType = node.returnType?.toSource();
@@ -552,7 +541,7 @@ class _JsonEncodeVisitor extends RecursiveAstVisitor<void> {
   void visitMethodInvocation(MethodInvocation node) {
     if (node.methodName.name == 'jsonEncode' ||
         node.methodName.name == 'json.encode') {
-      reporter.atNode(node, code);
+      reporter.atNode(node);
     }
     super.visitMethodInvocation(node);
   }
@@ -561,7 +550,7 @@ class _JsonEncodeVisitor extends RecursiveAstVisitor<void> {
   void visitFunctionExpressionInvocation(FunctionExpressionInvocation node) {
     final String source = node.function.toSource();
     if (source == 'jsonEncode') {
-      reporter.atNode(node, code);
+      reporter.atNode(node);
     }
     super.visitFunctionExpressionInvocation(node);
   }
@@ -595,7 +584,7 @@ class _JsonEncodeVisitor extends RecursiveAstVisitor<void> {
 /// }
 /// ```
 class AvoidCanvasInBuildRule extends SaropaLintRule {
-  const AvoidCanvasInBuildRule() : super(code: _code);
+  AvoidCanvasInBuildRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.high;
@@ -604,21 +593,19 @@ class AvoidCanvasInBuildRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_canvas_operations_in_build',
-    problemMessage:
-        '[avoid_canvas_operations_in_build] Canvas operations (drawing, painting) should only be performed in CustomPainter.paint(), not in build() or other widget methods. Doing this in build() can cause severe performance issues, unpredictable rendering, visual glitches, and broken platform optimizations. This may result in app store rejection for poor graphics handling and negative user feedback due to laggy or broken UI. {v3}',
+    'avoid_canvas_operations_in_build',
+    '[avoid_canvas_operations_in_build] Canvas operations (drawing, painting) should only be performed in CustomPainter.paint(), not in build() or other widget methods. Doing this in build() can cause severe performance issues, unpredictable rendering, visual glitches, and broken platform optimizations. This may result in app store rejection for poor graphics handling and negative user feedback due to laggy or broken UI. {v3}',
     correctionMessage:
         'Move all canvas operations to a CustomPainter subclass and override the paint() method. Trigger repaints using setState or notifier patterns, not by calling canvas methods in build(). Audit your codebase for accidental canvas calls in build() and add tests for rendering correctness.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodDeclaration((MethodDeclaration node) {
+    context.addMethodDeclaration((MethodDeclaration node) {
       if (node.name.lexeme != 'build') return;
 
       final String? returnType = node.returnType?.toSource();
@@ -630,7 +617,7 @@ class AvoidCanvasInBuildRule extends SaropaLintRule {
           bodySource.contains('.drawCircle') ||
           bodySource.contains('.drawPath') ||
           bodySource.contains('.drawLine')) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
   }
@@ -665,7 +652,7 @@ class AvoidCanvasInBuildRule extends SaropaLintRule {
 /// }
 /// ```
 class AvoidHardcodedFeatureFlagsRule extends SaropaLintRule {
-  const AvoidHardcodedFeatureFlagsRule() : super(code: _code);
+  AvoidHardcodedFeatureFlagsRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.low;
@@ -674,58 +661,23 @@ class AvoidHardcodedFeatureFlagsRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_hardcoded_feature_flags',
-    problemMessage:
-        '[avoid_hardcoded_feature_flags] Hardcoded if(true)/if(false) suggests incomplete feature flag. Hardcoded conditions like if (true) or if (false) suggest incomplete feature flag implementation or dead code. {v2}',
+    'avoid_hardcoded_feature_flags',
+    '[avoid_hardcoded_feature_flags] Hardcoded if(true)/if(false) suggests incomplete feature flag. Hardcoded conditions like if (true) or if (false) suggest incomplete feature flag implementation or dead code. {v2}',
     correctionMessage:
         'Use a proper feature flag system or remove dead code. Use DevTools widget inspector to verify that rebuild counts decrease.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addIfStatement((IfStatement node) {
+    context.addIfStatement((IfStatement node) {
       final Expression condition = node.expression;
       if (condition is BooleanLiteral) {
-        reporter.atNode(condition, code);
+        reporter.atNode(condition);
       }
-    });
-  }
-
-  @override
-  List<Fix> getFixes() => <Fix>[_AddFeatureFlagTodoFix()];
-}
-
-class _AddFeatureFlagTodoFix extends DartFix {
-  @override
-  void run(
-    CustomLintResolver resolver,
-    ChangeReporter reporter,
-    CustomLintContext context,
-    AnalysisError analysisError,
-    List<AnalysisError> others,
-  ) {
-    context.registry.addIfStatement((IfStatement node) {
-      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
-
-      final Expression condition = node.expression;
-      if (condition is! BooleanLiteral) return;
-
-      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
-        message: 'Add HACK to replace with feature flag',
-        priority: 1,
-      );
-
-      changeBuilder.addDartFileEdit((builder) {
-        builder.addSimpleInsertion(
-          node.offset,
-          '// HACK: Replace hardcoded ${condition.value} with feature flag\n    ',
-        );
-      });
     });
   }
 }
@@ -759,7 +711,7 @@ class _AddFeatureFlagTodoFix extends DartFix {
 /// }
 /// ```
 class PreferSingleSetStateRule extends SaropaLintRule {
-  const PreferSingleSetStateRule() : super(code: _code);
+  PreferSingleSetStateRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.medium;
@@ -771,33 +723,33 @@ class PreferSingleSetStateRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
-    name: 'prefer_single_setstate',
-    problemMessage:
-        '[prefer_single_setstate] Multiple setState calls cause unnecessary rebuilds. Multiple setState calls are made in the same method. This increases build() cost, causing unnecessary widget rebuilds that degrade scroll performance. {v2}',
+    'prefer_single_setstate',
+    '[prefer_single_setstate] Multiple setState calls cause unnecessary rebuilds. Multiple setState calls are made in the same method. This increases build() cost, causing unnecessary widget rebuilds that degrade scroll performance. {v2}',
     correctionMessage:
         'Combine setState calls into a single call. Use DevTools widget inspector to verify that rebuild counts decrease.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodDeclaration((MethodDeclaration node) {
+    context.addMethodDeclaration((MethodDeclaration node) {
       // Skip build methods - this rule is for other methods
       if (node.name.lexeme == 'build') return;
 
       int setStateCount = 0;
       MethodInvocation? firstSetState;
 
-      node.body.visitChildren(_SetStateCountVisitor(
-        onSetState: (MethodInvocation inv) {
-          setStateCount++;
-          firstSetState ??= inv;
-        },
-      ));
+      node.body.visitChildren(
+        _SetStateCountVisitor(
+          onSetState: (MethodInvocation inv) {
+            setStateCount++;
+            firstSetState ??= inv;
+          },
+        ),
+      );
 
       if (setStateCount > 1 && firstSetState != null) {
         reporter.atNode(firstSetState!, code);
@@ -842,7 +794,7 @@ class _SetStateCountVisitor extends RecursiveAstVisitor<void> {
 /// final result = await compute(parseJson, jsonString);
 /// ```
 class PreferComputeOverIsolateRunRule extends SaropaLintRule {
-  const PreferComputeOverIsolateRunRule() : super(code: _code);
+  PreferComputeOverIsolateRunRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.low;
@@ -851,28 +803,26 @@ class PreferComputeOverIsolateRunRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'prefer_compute_over_isolate_run',
-    problemMessage:
-        '[prefer_compute_over_isolate_run] Use compute() instead of Isolate.run(). For simple, quick operations, the overhead of spawning an isolate is greater than running inline. Use compute() for heavy work. {v2}',
+    'prefer_compute_over_isolate_run',
+    '[prefer_compute_over_isolate_run] Use compute() instead of Isolate.run(). For simple, quick operations, the overhead of spawning an isolate is greater than running inline. Use compute() for heavy work. {v2}',
     correctionMessage:
         'compute() provides better error handling and typing. Use DevTools widget inspector to verify that rebuild counts decrease.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       if (node.methodName.name != 'run') return;
 
       final Expression? target = node.target;
       if (target is! SimpleIdentifier) return;
       if (target.name != 'Isolate') return;
 
-      reporter.atNode(node, code);
+      reporter.atNode(node);
     });
   }
 }
@@ -904,7 +854,7 @@ class PreferComputeOverIsolateRunRule extends SaropaLintRule {
 /// )
 /// ```
 class PreferForLoopInChildrenRule extends SaropaLintRule {
-  const PreferForLoopInChildrenRule() : super(code: _code);
+  PreferForLoopInChildrenRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.low;
@@ -913,21 +863,19 @@ class PreferForLoopInChildrenRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'prefer_for_loop_in_children',
-    problemMessage:
-        '[prefer_for_loop_in_children] Prefer collection-for over List.generate in children. For building widget lists, prefer for-in collection or spread to improve readability and performance. {v2}',
+    'prefer_for_loop_in_children',
+    '[prefer_for_loop_in_children] Prefer collection-for over List.generate in children. For building widget lists, prefer for-in collection or spread to improve readability and performance. {v2}',
     correctionMessage:
         'Use [for (final item in items) Widget(item)]. Use DevTools widget inspector to verify that rebuild counts decrease.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       if (node.methodName.name != 'generate') return;
 
       final Expression? target = node.target;
@@ -939,7 +887,7 @@ class PreferForLoopInChildrenRule extends SaropaLintRule {
       while (current != null) {
         if (current is NamedExpression &&
             current.name.label.name == 'children') {
-          reporter.atNode(node, code);
+          reporter.atNode(node);
           return;
         }
         current = current.parent;
@@ -979,7 +927,7 @@ class PreferForLoopInChildrenRule extends SaropaLintRule {
 /// )
 /// ```
 class PreferContainerRule extends SaropaLintRule {
-  const PreferContainerRule() : super(code: _code);
+  PreferContainerRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.low;
@@ -991,12 +939,11 @@ class PreferContainerRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
-    name: 'prefer_single_container',
-    problemMessage:
-        '[prefer_single_container] Nested decoration widgets could be a single Container. Using nested Padding, DecoratedBox, etc. is verbose when Container provides all these features in one widget. {v2}',
+    'prefer_single_container',
+    '[prefer_single_container] Nested decoration widgets could be a single Container. Using nested Padding, DecoratedBox, etc. is verbose when Container provides all these features in one widget. {v2}',
     correctionMessage:
         'Use Container with padding, decoration, and size. Use DevTools widget inspector to verify that rebuild counts decrease.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   static const Set<String> _containerRelatedWidgets = <String>{
@@ -1010,13 +957,10 @@ class PreferContainerRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addInstanceCreationExpression((
-      InstanceCreationExpression node,
-    ) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final String? typeName = node.constructorName.type.element?.name;
       if (!_containerRelatedWidgets.contains(typeName)) return;
 
@@ -1028,7 +972,7 @@ class PreferContainerRule extends SaropaLintRule {
             final String? childType =
                 childExpr.constructorName.type.element?.name;
             if (_containerRelatedWidgets.contains(childType)) {
-              reporter.atNode(node, code);
+              reporter.atNode(node);
               return;
             }
           }

@@ -8,9 +8,6 @@ library;
 
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
-import 'package:analyzer/error/error.dart'
-    show AnalysisError, DiagnosticSeverity;
-import 'package:custom_lint_builder/custom_lint_builder.dart';
 
 import '../../saropa_lint_rule.dart';
 import '../../type_annotation_utils.dart';
@@ -77,7 +74,7 @@ bool _isHiveBoxField(String typeSource, String variableName) {
 /// }
 /// ```
 class RequireHiveInitializationRule extends SaropaLintRule {
-  const RequireHiveInitializationRule() : super(code: _code);
+  RequireHiveInitializationRule() : super(code: _code);
 
   /// HEURISTIC: This rule cannot verify cross-file initialization.
   /// It serves as a reminder to ensure init is called somewhere.
@@ -89,21 +86,19 @@ class RequireHiveInitializationRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'require_hive_initialization',
-    problemMessage:
-        '[require_hive_initialization] Hive.openBox() or Hive.openLazyBox() was called without a visible Hive.init() or Hive.initFlutter() call in this file. Opening a box before initialization throws a HiveError at runtime. {v4}',
+    'require_hive_initialization',
+    '[require_hive_initialization] Hive.openBox() or Hive.openLazyBox() was called without a visible Hive.init() or Hive.initFlutter() call in this file. Opening a box before initialization throws a HiveError at runtime. {v4}',
     correctionMessage:
         'Call Hive.initFlutter() in main() before any openBox() calls. This rule cannot verify cross-file initialization, so suppress the warning if Hive.init() is called in a separate startup file.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       final String methodName = node.methodName.name;
 
       // Check for openBox variants
@@ -118,7 +113,7 @@ class RequireHiveInitializationRule extends SaropaLintRule {
 
       if (target is SimpleIdentifier && target.name == 'Hive') {
         // This is a Hive.openBox call - warn about initialization
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
   }
@@ -150,7 +145,7 @@ class RequireHiveInitializationRule extends SaropaLintRule {
 /// }
 /// ```
 class RequireHiveTypeAdapterRule extends SaropaLintRule {
-  const RequireHiveTypeAdapterRule() : super(code: _code);
+  RequireHiveTypeAdapterRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.critical;
@@ -159,22 +154,20 @@ class RequireHiveTypeAdapterRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'require_hive_type_adapter',
-    problemMessage:
-        '[require_hive_type_adapter] Hive cannot serialize this object without '
+    'require_hive_type_adapter',
+    '[require_hive_type_adapter] Hive cannot serialize this object without '
         '@HiveType annotation. Storing will throw a HiveError at runtime. {v2}',
     correctionMessage:
         'Add @HiveType(typeId: X) annotation and generate adapter with build_runner.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       final String methodName = node.methodName.name;
 
       // Check for put/add operations
@@ -192,13 +185,14 @@ class RequireHiveTypeAdapterRule extends SaropaLintRule {
       if (args.isEmpty) return;
 
       // Get the value argument (2nd for put, 1st for add)
-      final Expression valueArg =
-          methodName == 'put' && args.length > 1 ? args[1] : args.first;
+      final Expression valueArg = methodName == 'put' && args.length > 1
+          ? args[1]
+          : args.first;
 
       // Check if value is a user-defined class instance
       final String? typeName = valueArg.staticType?.element?.name;
       if (typeName != null && !_isPrimitiveType(typeName)) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
   }
@@ -247,7 +241,7 @@ class RequireHiveTypeAdapterRule extends SaropaLintRule {
 /// }
 /// ```
 class RequireHiveBoxCloseRule extends SaropaLintRule {
-  const RequireHiveBoxCloseRule() : super(code: _code);
+  RequireHiveBoxCloseRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.high;
@@ -256,21 +250,19 @@ class RequireHiveBoxCloseRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'require_hive_box_close',
-    problemMessage:
-        '[require_hive_box_close] Hive database box opened but not closed in dispose. This leaves file handles open, prevents database compaction, causes memory leaks, and can lead to data corruption or app crashes over time. Unclosed boxes may also block updates and degrade device performance. {v3}',
+    'require_hive_box_close',
+    '[require_hive_box_close] Hive database box opened but not closed in dispose. This leaves file handles open, prevents database compaction, causes memory leaks, and can lead to data corruption or app crashes over time. Unclosed boxes may also block updates and degrade device performance. {v3}',
     correctionMessage:
         'Always call box.close() in dispose() or when the box is no longer needed. Audit all Hive usage for proper cleanup and add tests for resource management. Document cleanup logic for maintainability.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addClassDeclaration((ClassDeclaration node) {
+    context.addClassDeclaration((ClassDeclaration node) {
       // Find Box fields
       final List<VariableDeclaration> boxFields = <VariableDeclaration>[];
 
@@ -304,7 +296,7 @@ class RequireHiveBoxCloseRule extends SaropaLintRule {
 
       if (!hasClose) {
         for (final field in boxFields) {
-          reporter.atNode(field, code);
+          reporter.atNode(field);
         }
       }
     });
@@ -335,7 +327,7 @@ class RequireHiveBoxCloseRule extends SaropaLintRule {
 /// );
 /// ```
 class PreferHiveEncryptionRule extends SaropaLintRule {
-  const PreferHiveEncryptionRule() : super(code: _code);
+  PreferHiveEncryptionRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.critical;
@@ -344,13 +336,12 @@ class PreferHiveEncryptionRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'prefer_hive_encryption',
-    problemMessage:
-        '[prefer_hive_encryption] Unencrypted Hive box stores data in plaintext. '
+    'prefer_hive_encryption',
+    '[prefer_hive_encryption] Unencrypted Hive box stores data in plaintext. '
         'Anyone with device access can read sensitive user data. {v2}',
     correctionMessage:
         'Use encryptionCipher parameter with HiveAesCipher for sensitive data.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   static const Set<String> _sensitiveKeys = <String>{
@@ -368,11 +359,10 @@ class PreferHiveEncryptionRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       final String methodName = node.methodName.name;
 
       if (methodName != 'put' && methodName != 'add') return;
@@ -388,7 +378,7 @@ class PreferHiveEncryptionRule extends SaropaLintRule {
 
       for (final pattern in _sensitiveKeys) {
         if (keySource.contains(pattern)) {
-          reporter.atNode(node, code);
+          reporter.atNode(node);
           return;
         }
       }
@@ -417,7 +407,7 @@ class PreferHiveEncryptionRule extends SaropaLintRule {
 /// final cipher = HiveAesCipher(base64.decode(keyString!));
 /// ```
 class RequireHiveEncryptionKeySecureRule extends SaropaLintRule {
-  const RequireHiveEncryptionKeySecureRule() : super(code: _code);
+  RequireHiveEncryptionKeySecureRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.critical;
@@ -426,24 +416,20 @@ class RequireHiveEncryptionKeySecureRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'require_hive_encryption_key_secure',
-    problemMessage:
-        '[require_hive_encryption_key_secure] Hardcoded key defeats encryption. '
+    'require_hive_encryption_key_secure',
+    '[require_hive_encryption_key_secure] Hardcoded key defeats encryption. '
         'Anyone decompiling the app can decrypt all stored user data. {v2}',
     correctionMessage:
         'Store encryption key in flutter_secure_storage, not in code.',
-    errorSeverity: DiagnosticSeverity.ERROR,
+    severity: DiagnosticSeverity.ERROR,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addInstanceCreationExpression((
-      InstanceCreationExpression node,
-    ) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final String typeName = node.constructorName.type.name.lexeme;
 
       if (typeName != 'HiveAesCipher') return;
@@ -456,7 +442,7 @@ class RequireHiveEncryptionKeySecureRule extends SaropaLintRule {
 
       // Check for list literal
       if (keyArg is ListLiteral) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
         return;
       }
 
@@ -465,7 +451,7 @@ class RequireHiveEncryptionKeySecureRule extends SaropaLintRule {
         final String source = keyArg.toSource();
         // Look for decode with string literal
         if (source.contains("decode('") || source.contains('decode("')) {
-          reporter.atNode(node, code);
+          reporter.atNode(node);
         }
       }
     });
@@ -505,7 +491,7 @@ class RequireHiveEncryptionKeySecureRule extends SaropaLintRule {
 /// }
 /// ```
 class RequireHiveDatabaseCloseRule extends SaropaLintRule {
-  const RequireHiveDatabaseCloseRule() : super(code: _code);
+  RequireHiveDatabaseCloseRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.high;
@@ -514,25 +500,24 @@ class RequireHiveDatabaseCloseRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'require_hive_database_close',
-    problemMessage:
-        '[require_hive_database_close] Database opened but no close() method found. This creates a resource leak risk, leading to memory exhaustion, file locks, and possible data loss. Unclosed databases can prevent compaction and degrade app reliability. {v4}',
+    'require_hive_database_close',
+    '[require_hive_database_close] Database opened but no close() method found. This creates a resource leak risk, leading to memory exhaustion, file locks, and possible data loss. Unclosed databases can prevent compaction and degrade app reliability. {v4}',
     correctionMessage:
         'Add a dispose() method that calls database.close(). Audit all database usage for proper closure and add tests for resource cleanup. Document disposal logic for maintainability.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addClassDeclaration((ClassDeclaration node) {
+    context.addClassDeclaration((ClassDeclaration node) {
       final String classSource = node.toSource();
 
       // Check for database open patterns
-      final bool opensDatabase = classSource.contains('Isar.open') ||
+      final bool opensDatabase =
+          classSource.contains('Isar.open') ||
           classSource.contains('Hive.openBox') ||
           classSource.contains('openDatabase') ||
           classSource.contains('Realm.open') ||
@@ -541,13 +526,14 @@ class RequireHiveDatabaseCloseRule extends SaropaLintRule {
       if (!opensDatabase) return;
 
       // Check for close patterns
-      final bool hasClose = classSource.contains('.close()') ||
+      final bool hasClose =
+          classSource.contains('.close()') ||
           classSource.contains('dispose()') ||
           classSource.contains('_close') ||
           classSource.contains('closeDatabase');
 
       if (!hasClose) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
   }
@@ -579,7 +565,7 @@ class RequireHiveDatabaseCloseRule extends SaropaLintRule {
 /// }
 /// ```
 class RequireTypeAdapterRegistrationRule extends SaropaLintRule {
-  const RequireTypeAdapterRegistrationRule() : super(code: _code);
+  RequireTypeAdapterRegistrationRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.high;
@@ -588,21 +574,19 @@ class RequireTypeAdapterRegistrationRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'require_type_adapter_registration',
-    problemMessage:
-        '[require_type_adapter_registration] Hive box opened with a custom type but the corresponding TypeAdapter may not be registered. Unregistered adapters cause HiveError at runtime, preventing all read and write operations on the box, which leads to app crashes and complete data inaccessibility. {v3}',
+    'require_type_adapter_registration',
+    '[require_type_adapter_registration] Hive box opened with a custom type but the corresponding TypeAdapter may not be registered. Unregistered adapters cause HiveError at runtime, preventing all read and write operations on the box, which leads to app crashes and complete data inaccessibility. {v3}',
     correctionMessage:
         'Call Hive.registerAdapter() for every custom type before opening boxes that use it. Without registration, your app will crash or lose data when reading or writing.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       final String methodName = node.methodName.name;
 
       // Check for Hive openBox calls
@@ -645,7 +629,7 @@ class RequireTypeAdapterRegistrationRule extends SaropaLintRule {
 
       if (!scopeSource.contains('registerAdapter') ||
           !scopeSource.contains(adapterName)) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
   }
@@ -674,7 +658,7 @@ class RequireTypeAdapterRegistrationRule extends SaropaLintRule {
 /// final product = await box.get(id);
 /// ```
 class PreferLazyBoxForLargeRule extends SaropaLintRule {
-  const PreferLazyBoxForLargeRule() : super(code: _code);
+  PreferLazyBoxForLargeRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.medium;
@@ -683,12 +667,11 @@ class PreferLazyBoxForLargeRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'prefer_lazy_box_for_large',
-    problemMessage:
-        '[prefer_lazy_box_for_large] Regular box loads all entries into memory at once. Regular boxes load all data into memory at open time. For large datasets, use lazy boxes that load values on demand. {v4}',
+    'prefer_lazy_box_for_large',
+    '[prefer_lazy_box_for_large] Regular box loads all entries into memory at once. Regular boxes load all data into memory at open time. For large datasets, use lazy boxes that load values on demand. {v4}',
     correctionMessage:
         'Use Hive.openLazyBox() for collections that may grow large. Verify the change works correctly with existing tests and add coverage for the new behavior.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   /// Box names that typically contain many items
@@ -709,11 +692,10 @@ class PreferLazyBoxForLargeRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       final String methodName = node.methodName.name;
 
       // Only check regular openBox (not openLazyBox)
@@ -735,7 +717,7 @@ class PreferLazyBoxForLargeRule extends SaropaLintRule {
       // Check if this looks like a potentially large collection
       for (final String largeName in _largeCollectionNames) {
         if (boxName.contains(largeName)) {
-          reporter.atNode(node, code);
+          reporter.atNode(node);
           return;
         }
       }
@@ -746,7 +728,7 @@ class PreferLazyBoxForLargeRule extends SaropaLintRule {
         final String typeArg = typeArgs.first.toSource().toLowerCase();
         for (final String largeName in _largeCollectionNames) {
           if (typeArg.contains(largeName)) {
-            reporter.atNode(node, code);
+            reporter.atNode(node);
             return;
           }
         }
@@ -791,7 +773,7 @@ class PreferLazyBoxForLargeRule extends SaropaLintRule {
 /// class Settings extends HiveObject { ... }
 /// ```
 class RequireHiveTypeIdManagementRule extends SaropaLintRule {
-  const RequireHiveTypeIdManagementRule() : super(code: _code);
+  RequireHiveTypeIdManagementRule() : super(code: _code);
 
   // INFO severity - advisory rule to encourage documentation, not a crash risk
   @override
@@ -801,21 +783,19 @@ class RequireHiveTypeIdManagementRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'require_hive_type_id_management',
-    problemMessage:
-        '[require_hive_type_id_management] @HiveType found. Ensure typeId is unique and documented in a central registry. Hive typeIds must be unique and stable. Changing or duplicating typeIds corrupts stored data. Track typeIds in a central registry. {v2}',
+    'require_hive_type_id_management',
+    '[require_hive_type_id_management] @HiveType found. Ensure typeId is unique and documented in a central registry. Hive typeIds must be unique and stable. Changing or duplicating typeIds corrupts stored data. Track typeIds in a central registry. {v2}',
     correctionMessage:
         'Create a hive_type_ids.dart file to track all typeIds and prevent conflicts. Verify the change works correctly with existing tests and add coverage for the new behavior.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addAnnotation((Annotation node) {
+    context.addAnnotation((Annotation node) {
       final String annotationName = node.name.name;
       if (annotationName != 'HiveType') return;
 
@@ -832,14 +812,14 @@ class RequireHiveTypeIdManagementRule extends SaropaLintRule {
       }
 
       // Check if in a file that looks like a registry
-      final String filePath = resolver.source.fullName.toLowerCase();
+      final String filePath = context.filePath.toLowerCase();
       if (filePath.contains('type_id') ||
           filePath.contains('hive_type') ||
           filePath.contains('registry')) {
         return; // Already in a registry file
       }
 
-      reporter.atNode(node, code);
+      reporter.atNode(node);
     });
   }
 }
@@ -877,7 +857,7 @@ class RequireHiveTypeIdManagementRule extends SaropaLintRule {
 /// }
 /// ```
 class AvoidHiveFieldIndexReuseRule extends SaropaLintRule {
-  const AvoidHiveFieldIndexReuseRule() : super(code: _code);
+  AvoidHiveFieldIndexReuseRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.critical;
@@ -886,21 +866,19 @@ class AvoidHiveFieldIndexReuseRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_hive_field_index_reuse',
-    problemMessage:
-        '[avoid_hive_field_index_reuse] Reusing Hive field indexes across different fields or types can corrupt your database, cause data loss, and make migrations impossible. This can result in users losing critical data or experiencing app crashes after updates. Always assign unique field indexes and never change them after release. See https://docs.hivedb.dev/#/adapters/fields. {v3}',
+    'avoid_hive_field_index_reuse',
+    '[avoid_hive_field_index_reuse] Reusing Hive field indexes across different fields or types can corrupt your database, cause data loss, and make migrations impossible. This can result in users losing critical data or experiencing app crashes after updates. Always assign unique field indexes and never change them after release. See https://docs.hivedb.dev/#/adapters/fields. {v3}',
     correctionMessage:
         'Ensure each Hive field has a unique, immutable index and avoid reusing or changing indexes after deployment. See https://docs.hivedb.dev/#/adapters/fields for guidance.',
-    errorSeverity: DiagnosticSeverity.ERROR,
+    severity: DiagnosticSeverity.ERROR,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addClassDeclaration((ClassDeclaration node) {
+    context.addClassDeclaration((ClassDeclaration node) {
       // Check if this is a HiveType class
       bool isHiveType = false;
       for (final metadata in node.metadata) {
@@ -934,7 +912,7 @@ class AvoidHiveFieldIndexReuseRule extends SaropaLintRule {
         if (entry.value.length > 1) {
           // Report all occurrences of the duplicate
           for (final annotation in entry.value) {
-            reporter.atNode(annotation, code);
+            reporter.atNode(annotation);
           }
         }
       }
@@ -986,7 +964,7 @@ class AvoidHiveFieldIndexReuseRule extends SaropaLintRule {
 /// }
 /// ```
 class RequireHiveFieldDefaultValueRule extends SaropaLintRule {
-  const RequireHiveFieldDefaultValueRule() : super(code: _code);
+  RequireHiveFieldDefaultValueRule() : super(code: _code);
 
   /// Missing defaults cause crashes when reading existing data.
   @override
@@ -996,27 +974,26 @@ class RequireHiveFieldDefaultValueRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'require_hive_field_default_value',
-    problemMessage:
-        '[require_hive_field_default_value] @HiveField on nullable field without defaultValue. This can cause existing data to fail to load, trigger runtime exceptions, and break migrations. Missing defaults may result in silent data loss or corrupted records after schema changes. {v2}',
+    'require_hive_field_default_value',
+    '[require_hive_field_default_value] @HiveField on nullable field without defaultValue. This can cause existing data to fail to load, trigger runtime exceptions, and break migrations. Missing defaults may result in silent data loss or corrupted records after schema changes. {v2}',
     correctionMessage:
         'Add defaultValue parameter: @HiveField(0, defaultValue: ...) for all nullable fields. Audit schema migrations for missing defaults and add tests for data integrity. Document migration logic for maintainability.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addFieldDeclaration((FieldDeclaration node) {
+    context.addFieldDeclaration((FieldDeclaration node) {
       // Check if field has @HiveField annotation
-      final Annotation? hiveFieldAnnotation =
-          node.metadata.cast<Annotation?>().firstWhere(
-                (Annotation? a) => a?.name.name == 'HiveField',
-                orElse: () => null,
-              );
+      final Annotation? hiveFieldAnnotation = node.metadata
+          .cast<Annotation?>()
+          .firstWhere(
+            (Annotation? a) => a?.name.name == 'HiveField',
+            orElse: () => null,
+          );
 
       if (hiveFieldAnnotation == null) return;
 
@@ -1030,7 +1007,7 @@ class RequireHiveFieldDefaultValueRule extends SaropaLintRule {
       // Check if defaultValue is provided
       final ArgumentList? args = hiveFieldAnnotation.arguments;
       if (args == null) {
-        reporter.atNode(hiveFieldAnnotation, code);
+        reporter.atNode(hiveFieldAnnotation);
         return;
       }
 
@@ -1042,7 +1019,7 @@ class RequireHiveFieldDefaultValueRule extends SaropaLintRule {
       });
 
       if (!hasDefaultValue) {
-        reporter.atNode(hiveFieldAnnotation, code);
+        reporter.atNode(hiveFieldAnnotation);
       }
     });
   }
@@ -1075,7 +1052,7 @@ class RequireHiveFieldDefaultValueRule extends SaropaLintRule {
 /// }
 /// ```
 class RequireHiveAdapterRegistrationOrderRule extends SaropaLintRule {
-  const RequireHiveAdapterRegistrationOrderRule() : super(code: _code);
+  RequireHiveAdapterRegistrationOrderRule() : super(code: _code);
 
   /// Wrong order causes runtime crash.
   @override
@@ -1085,22 +1062,20 @@ class RequireHiveAdapterRegistrationOrderRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'require_hive_adapter_registration_order',
-    problemMessage:
-        '[require_hive_adapter_registration_order] Opening box before registering '
+    'require_hive_adapter_registration_order',
+    '[require_hive_adapter_registration_order] Opening box before registering '
         'adapters throws HiveError. Adapters must be registered first. {v2}',
     correctionMessage:
         'Ensure all Hive.registerAdapter() calls appear before Hive.openBox().',
-    errorSeverity: DiagnosticSeverity.ERROR,
+    severity: DiagnosticSeverity.ERROR,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addFunctionBody((FunctionBody body) {
+    context.addFunctionBody((FunctionBody body) {
       if (body is! BlockFunctionBody) return;
 
       int? firstOpenBoxLine;
@@ -1108,22 +1083,24 @@ class RequireHiveAdapterRegistrationOrderRule extends SaropaLintRule {
       MethodInvocation? openBoxNode;
 
       // Collect line numbers for openBox and registerAdapter
-      body.accept(_HiveOrderVisitor(
-        onOpenBox: (MethodInvocation node) {
-          final int line = node.offset;
-          if (firstOpenBoxLine == null || line < firstOpenBoxLine!) {
-            firstOpenBoxLine = line;
-            openBoxNode = node;
-          }
-        },
-        onRegisterAdapter: (MethodInvocation node) {
-          final int line = node.offset;
-          if (lastRegisterAdapterLine == null ||
-              line > lastRegisterAdapterLine!) {
-            lastRegisterAdapterLine = line;
-          }
-        },
-      ));
+      body.accept(
+        _HiveOrderVisitor(
+          onOpenBox: (MethodInvocation node) {
+            final int line = node.offset;
+            if (firstOpenBoxLine == null || line < firstOpenBoxLine!) {
+              firstOpenBoxLine = line;
+              openBoxNode = node;
+            }
+          },
+          onRegisterAdapter: (MethodInvocation node) {
+            final int line = node.offset;
+            if (lastRegisterAdapterLine == null ||
+                line > lastRegisterAdapterLine!) {
+              lastRegisterAdapterLine = line;
+            }
+          },
+        ),
+      );
 
       // If registerAdapter appears after openBox, report
       if (firstOpenBoxLine != null &&
@@ -1137,10 +1114,7 @@ class RequireHiveAdapterRegistrationOrderRule extends SaropaLintRule {
 }
 
 class _HiveOrderVisitor extends RecursiveAstVisitor<void> {
-  _HiveOrderVisitor({
-    required this.onOpenBox,
-    required this.onRegisterAdapter,
-  });
+  _HiveOrderVisitor({required this.onOpenBox, required this.onRegisterAdapter});
 
   final void Function(MethodInvocation) onOpenBox;
   final void Function(MethodInvocation) onRegisterAdapter;
@@ -1193,7 +1167,7 @@ class _HiveOrderVisitor extends RecursiveAstVisitor<void> {
 /// class Address { ... }
 /// ```
 class RequireHiveNestedObjectAdapterRule extends SaropaLintRule {
-  const RequireHiveNestedObjectAdapterRule() : super(code: _code);
+  RequireHiveNestedObjectAdapterRule() : super(code: _code);
 
   /// Missing nested adapter causes runtime crash.
   @override
@@ -1203,13 +1177,12 @@ class RequireHiveNestedObjectAdapterRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'require_hive_nested_object_adapter',
-    problemMessage:
-        '[require_hive_nested_object_adapter] Nested custom type without adapter '
+    'require_hive_nested_object_adapter',
+    '[require_hive_nested_object_adapter] Nested custom type without adapter '
         'causes runtime crash when Hive tries to serialize the object. {v2}',
     correctionMessage:
         'Add @HiveType annotation to the nested class or use a primitive type.',
-    errorSeverity: DiagnosticSeverity.ERROR,
+    severity: DiagnosticSeverity.ERROR,
   );
 
   /// Primitive types that don't need adapters.
@@ -1228,11 +1201,10 @@ class RequireHiveNestedObjectAdapterRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addFieldDeclaration((FieldDeclaration node) {
+    context.addFieldDeclaration((FieldDeclaration node) {
       // Check if field has @HiveField annotation
       final bool hasHiveField = node.metadata.any(
         (Annotation a) => a.name.name == 'HiveField',
@@ -1250,7 +1222,7 @@ class RequireHiveNestedObjectAdapterRule extends SaropaLintRule {
 
       // If it's not a primitive, warn
       if (!_primitiveTypes.contains(baseType)) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
   }
@@ -1279,7 +1251,7 @@ class RequireHiveNestedObjectAdapterRule extends SaropaLintRule {
 /// final settingsBox = await Hive.openBox<Settings>('settings');
 /// ```
 class AvoidHiveBoxNameCollisionRule extends SaropaLintRule {
-  const AvoidHiveBoxNameCollisionRule() : super(code: _code);
+  AvoidHiveBoxNameCollisionRule() : super(code: _code);
 
   /// HEURISTIC: This rule checks for common generic box names
   /// that are likely to cause collisions. Cross-file detection
@@ -1291,12 +1263,11 @@ class AvoidHiveBoxNameCollisionRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_hive_box_name_collision',
-    problemMessage:
-        '[avoid_hive_box_name_collision] Generic Hive box name may cause collision. Use a specific name. Box names must be unique across the application. Using the same name for different types causes data corruption or type errors. {v2}',
+    'avoid_hive_box_name_collision',
+    '[avoid_hive_box_name_collision] Generic Hive box name may cause collision. Use a specific name. Box names must be unique across the application. Using the same name for different types causes data corruption or type errors. {v2}',
     correctionMessage:
         'Use a unique, descriptive box name like "users" or "settings". Verify the change works correctly with existing tests and add coverage for the new behavior.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   /// Common generic names that are likely to cause collisions.
@@ -1315,11 +1286,10 @@ class AvoidHiveBoxNameCollisionRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       final String methodName = node.methodName.name;
       if (!methodName.startsWith('openBox') &&
           !methodName.startsWith('openLazyBox')) {
@@ -1339,7 +1309,7 @@ class AvoidHiveBoxNameCollisionRule extends SaropaLintRule {
 
       final String boxName = firstArg.value.toLowerCase();
       if (_genericNames.contains(boxName)) {
-        reporter.atNode(firstArg, code);
+        reporter.atNode(firstArg);
       }
     });
   }
@@ -1374,7 +1344,7 @@ class AvoidHiveBoxNameCollisionRule extends SaropaLintRule {
 /// )
 /// ```
 class PreferHiveValueListenableRule extends SaropaLintRule {
-  const PreferHiveValueListenableRule() : super(code: _code);
+  PreferHiveValueListenableRule() : super(code: _code);
 
   /// UI may not update after Hive changes.
   @override
@@ -1384,21 +1354,19 @@ class PreferHiveValueListenableRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'prefer_hive_value_listenable',
-    problemMessage:
-        '[prefer_hive_value_listenable] Manual setState after Hive changes is error-prone. Manually calling setState after Hive updates is error-prone. Use ValueListenableBuilder with box.listenable() for reactive updates. {v3}',
+    'prefer_hive_value_listenable',
+    '[prefer_hive_value_listenable] Manual setState after Hive changes is error-prone. Manually calling setState after Hive updates is error-prone. Use ValueListenableBuilder with box.listenable() for reactive updates. {v3}',
     correctionMessage:
         'Use ValueListenableBuilder with box.listenable() for reactive UI. Verify the change works correctly with existing tests and add coverage for the new behavior.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       if (node.methodName.name != 'setState') return;
 
       // Look for Hive operations in the same function body
@@ -1414,7 +1382,7 @@ class PreferHiveValueListenableRule extends SaropaLintRule {
               bodySource.contains('.putAll(') ||
               bodySource.contains('.deleteAll(')) &&
           (bodySource.contains('box') || bodySource.contains('Box'))) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
   }
@@ -1443,7 +1411,7 @@ class PreferHiveValueListenableRule extends SaropaLintRule {
 /// // Entries loaded on-demand, memory-efficient
 /// ```
 class PreferHiveLazyBoxRule extends SaropaLintRule {
-  const PreferHiveLazyBoxRule() : super(code: _code);
+  PreferHiveLazyBoxRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.medium;
@@ -1452,23 +1420,21 @@ class PreferHiveLazyBoxRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'prefer_hive_lazy_box',
-    problemMessage:
-        '[prefer_hive_lazy_box] Consider using LazyBox for potentially large '
+    'prefer_hive_lazy_box',
+    '[prefer_hive_lazy_box] Consider using LazyBox for potentially large '
         'collections. Regular Box loads all entries into memory. {v3}',
     correctionMessage:
         'Use Hive.openLazyBox() instead of Hive.openBox() for large datasets.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
     // Check for field declarations with Box<T> type
-    context.registry.addFieldDeclaration((FieldDeclaration node) {
+    context.addFieldDeclaration((FieldDeclaration node) {
       final String? typeName = node.fields.type?.toSource();
       if (typeName == null) return;
 
@@ -1479,14 +1445,14 @@ class PreferHiveLazyBoxRule extends SaropaLintRule {
         for (final variable in node.fields.variables) {
           final name = variable.name.lexeme.toLowerCase();
           if (_suggestsLargeCollection(name)) {
-            reporter.atNode(variable, code);
+            reporter.atNode(variable);
           }
         }
       }
     });
 
     // Also check for Hive.openBox calls
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       final target = node.target;
       if (target is! SimpleIdentifier || target.name != 'Hive') return;
 
@@ -1499,7 +1465,7 @@ class PreferHiveLazyBoxRule extends SaropaLintRule {
         if (firstArg is StringLiteral) {
           final boxName = firstArg.stringValue?.toLowerCase() ?? '';
           if (_suggestsLargeCollection(boxName)) {
-            reporter.atNode(node, code);
+            reporter.atNode(node);
           }
         }
       }
@@ -1523,9 +1489,6 @@ class PreferHiveLazyBoxRule extends SaropaLintRule {
     ];
     return largeCollectionHints.any((hint) => name.contains(hint));
   }
-
-  @override
-  List<Fix> getFixes() => [_PreferHiveLazyBoxFix()];
 }
 
 /// Quick fix for [PreferHiveLazyBoxRule].
@@ -1533,36 +1496,6 @@ class PreferHiveLazyBoxRule extends SaropaLintRule {
 /// Replaces `Hive.openBox()` with `Hive.openLazyBox()` for better memory
 /// efficiency with large collections. LazyBox loads entries on demand rather
 /// than loading everything into memory at once.
-class _PreferHiveLazyBoxFix extends DartFix {
-  @override
-  void run(
-    CustomLintResolver resolver,
-    ChangeReporter reporter,
-    CustomLintContext context,
-    AnalysisError analysisError,
-    List<AnalysisError> others,
-  ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
-      if (!analysisError.sourceRange.intersects(node.sourceRange)) return;
-
-      final target = node.target;
-      if (target is! SimpleIdentifier || target.name != 'Hive') return;
-      if (node.methodName.name != 'openBox') return;
-
-      final changeBuilder = reporter.createChangeBuilder(
-        message: 'Replace openBox with openLazyBox',
-        priority: 80,
-      );
-
-      changeBuilder.addDartFileEdit((builder) {
-        builder.addSimpleReplacement(
-          node.methodName.sourceRange,
-          'openLazyBox',
-        );
-      });
-    });
-  }
-}
 
 /// Warns when Uint8List or binary data is stored in Hive.
 ///
@@ -1589,7 +1522,7 @@ class _PreferHiveLazyBoxFix extends DartFix {
 /// }
 /// ```
 class AvoidHiveBinaryStorageRule extends SaropaLintRule {
-  const AvoidHiveBinaryStorageRule() : super(code: _code);
+  AvoidHiveBinaryStorageRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.medium;
@@ -1598,13 +1531,12 @@ class AvoidHiveBinaryStorageRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_hive_binary_storage',
-    problemMessage:
-        '[avoid_hive_binary_storage] Storing Uint8List/binary data in Hive. '
+    'avoid_hive_binary_storage',
+    '[avoid_hive_binary_storage] Storing Uint8List/binary data in Hive. '
         'This degrades performance for large files. {v2}',
     correctionMessage:
         'Store file paths instead and keep binary data in the file system.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   static const Set<String> _binaryTypes = <String>{
@@ -1616,11 +1548,10 @@ class AvoidHiveBinaryStorageRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addClassDeclaration((ClassDeclaration node) {
+    context.addClassDeclaration((ClassDeclaration node) {
       // Check if class has @HiveType annotation
       bool isHiveType = false;
       for (final annotation in node.metadata) {
@@ -1639,7 +1570,7 @@ class AvoidHiveBinaryStorageRule extends SaropaLintRule {
           if (typeName != null &&
               _binaryTypes.any((t) => typeName.contains(t))) {
             for (final variable in member.fields.variables) {
-              reporter.atNode(variable, code);
+              reporter.atNode(variable);
             }
           }
         }
@@ -1693,7 +1624,7 @@ class AvoidHiveBinaryStorageRule extends SaropaLintRule {
 /// class UserV2 { ... }
 /// ```
 class RequireHiveMigrationStrategyRule extends SaropaLintRule {
-  const RequireHiveMigrationStrategyRule() : super(code: _code);
+  RequireHiveMigrationStrategyRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.medium;
@@ -1702,22 +1633,20 @@ class RequireHiveMigrationStrategyRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'require_hive_migration_strategy',
-    problemMessage:
-        '[require_hive_migration_strategy] @HiveType with gaps in @HiveField '
+    'require_hive_migration_strategy',
+    '[require_hive_migration_strategy] @HiveType with gaps in @HiveField '
         'indices. This suggests fields were removed without migration. {v2}',
     correctionMessage:
         'Keep all @HiveField indices even for removed fields, or create new typeId for breaking changes.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addClassDeclaration((ClassDeclaration node) {
+    context.addClassDeclaration((ClassDeclaration node) {
       // Check if this is a HiveType class
       bool isHiveType = false;
       for (final annotation in node.metadata) {
@@ -1754,14 +1683,14 @@ class RequireHiveMigrationStrategyRule extends SaropaLintRule {
       for (int i = 0; i < indices.length - 1; i++) {
         if (indices[i + 1] - indices[i] > 1) {
           // Gap found - might indicate removed field without migration
-          reporter.atNode(node, code);
+          reporter.atNode(node);
           return;
         }
       }
 
       // Check if indices don't start at 0 (suggests early fields removed)
       if (indices.isNotEmpty && indices.first > 0) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
   }
@@ -1818,7 +1747,7 @@ class RequireHiveMigrationStrategyRule extends SaropaLintRule {
 /// }
 /// ```
 class AvoidHiveSynchronousInUiRule extends SaropaLintRule {
-  const AvoidHiveSynchronousInUiRule() : super(code: _code);
+  AvoidHiveSynchronousInUiRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.high;
@@ -1827,12 +1756,11 @@ class AvoidHiveSynchronousInUiRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_hive_synchronous_in_ui',
-    problemMessage:
-        '[avoid_hive_synchronous_in_ui] Synchronous Hive box operation (get, put, delete, add) is called inside a build() or initState() method. These operations perform disk I/O on the main isolate, blocking frame rendering and causing visible UI jank. On slower devices or with large boxes, this can trigger ANR (Application Not Responding) dialogs, force-close the app, and create a poor user experience that leads to negative app store reviews. {v2}',
+    'avoid_hive_synchronous_in_ui',
+    '[avoid_hive_synchronous_in_ui] Synchronous Hive box operation (get, put, delete, add) is called inside a build() or initState() method. These operations perform disk I/O on the main isolate, blocking frame rendering and causing visible UI jank. On slower devices or with large boxes, this can trigger ANR (Application Not Responding) dialogs, force-close the app, and create a poor user experience that leads to negative app store reviews. {v2}',
     correctionMessage:
         'Move the Hive operation to an async method and use setState() or a state management solution to update the UI when the data is ready. For large operations, use compute() or Isolate.run() to offload to a background isolate.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   /// Hive box methods that perform synchronous I/O.
@@ -1852,18 +1780,14 @@ class AvoidHiveSynchronousInUiRule extends SaropaLintRule {
   };
 
   /// UI lifecycle methods where sync I/O should be avoided.
-  static const Set<String> _uiMethods = <String>{
-    'build',
-    'initState',
-  };
+  static const Set<String> _uiMethods = <String>{'build', 'initState'};
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       if (!_syncHiveMethods.contains(node.methodName.name)) return;
 
       // Check if target looks like a Hive box
@@ -1874,41 +1798,11 @@ class AvoidHiveSynchronousInUiRule extends SaropaLintRule {
       while (current != null) {
         if (current is MethodDeclaration &&
             _uiMethods.contains(current.name.lexeme)) {
-          reporter.atNode(node, code);
+          reporter.atNode(node);
           return;
         }
         current = current.parent;
       }
-    });
-  }
-
-  @override
-  List<Fix> getFixes() => <Fix>[_WrapHiveInAsyncCommentFix()];
-}
-
-class _WrapHiveInAsyncCommentFix extends DartFix {
-  @override
-  void run(
-    CustomLintResolver resolver,
-    ChangeReporter reporter,
-    CustomLintContext context,
-    AnalysisError analysisError,
-    List<AnalysisError> others,
-  ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
-      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
-
-      final changeBuilder = reporter.createChangeBuilder(
-        message: 'Add TODO: move Hive operation to async method',
-        priority: 1,
-      );
-
-      changeBuilder.addDartFileEdit((builder) {
-        builder.addSimpleInsertion(
-          node.offset,
-          '/* TODO: move to async method or use compute() */ ',
-        );
-      });
     });
   }
 }
@@ -1939,7 +1833,7 @@ class _WrapHiveInAsyncCommentFix extends DartFix {
 /// await Hive.initFlutter('my_app_data');
 /// ```
 class RequireHiveWebSubdirectoryRule extends SaropaLintRule {
-  const RequireHiveWebSubdirectoryRule() : super(code: _code);
+  RequireHiveWebSubdirectoryRule() : super(code: _code);
 
   /// Missing subDir causes data conflicts between web apps on same domain.
   @override
@@ -1949,9 +1843,8 @@ class RequireHiveWebSubdirectoryRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'require_hive_web_subdirectory',
-    problemMessage:
-        '[require_hive_web_subdirectory] Hive.initFlutter() called without a '
+    'require_hive_web_subdirectory',
+    '[require_hive_web_subdirectory] Hive.initFlutter() called without a '
         'subDir parameter. On web platforms, Hive stores data in IndexedDB. '
         'Without an explicit subdirectory, multiple apps deployed on the same '
         'domain will share the same Hive storage namespace, causing data '
@@ -1961,16 +1854,15 @@ class RequireHiveWebSubdirectoryRule extends SaropaLintRule {
         'Pass a unique subdirectory name to Hive.initFlutter(), e.g., '
         "Hive.initFlutter('my_app_data'). Use your app's package name or a "
         'unique identifier to avoid storage conflicts.',
-    errorSeverity: DiagnosticSeverity.ERROR,
+    severity: DiagnosticSeverity.ERROR,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       // Check for initFlutter method
       if (node.methodName.name != 'initFlutter') return;
 
@@ -1983,7 +1875,7 @@ class RequireHiveWebSubdirectoryRule extends SaropaLintRule {
       final NodeList<Expression> args = node.argumentList.arguments;
       if (args.isEmpty) {
         // No arguments at all - missing subDir
-        reporter.atNode(node, code);
+        reporter.atNode(node);
         return;
       }
 
@@ -1992,40 +1884,9 @@ class RequireHiveWebSubdirectoryRule extends SaropaLintRule {
       if (firstArg is StringLiteral) {
         final String? value = firstArg.stringValue;
         if (value == null || value.isEmpty) {
-          reporter.atNode(node, code);
+          reporter.atNode(node);
         }
       }
-    });
-  }
-
-  @override
-  List<Fix> getFixes() => <Fix>[_AddHiveSubDirFix()];
-}
-
-class _AddHiveSubDirFix extends DartFix {
-  @override
-  void run(
-    CustomLintResolver resolver,
-    ChangeReporter reporter,
-    CustomLintContext context,
-    AnalysisError analysisError,
-    List<AnalysisError> others,
-  ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
-      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
-      if (node.methodName.name != 'initFlutter') return;
-
-      final changeBuilder = reporter.createChangeBuilder(
-        message: 'Add subdirectory parameter',
-        priority: 1,
-      );
-
-      changeBuilder.addDartFileEdit((builder) {
-        builder.addSimpleReplacement(
-          node.sourceRange,
-          "Hive.initFlutter('my_app_data')",
-        );
-      });
     });
   }
 }

@@ -1,11 +1,6 @@
 // ignore_for_file: depend_on_referenced_packages, deprecated_member_use
 
 import 'package:analyzer/dart/ast/ast.dart';
-import 'package:analyzer/error/error.dart'
-    show AnalysisError, DiagnosticSeverity;
-import 'package:analyzer/source/source_range.dart';
-import 'package:custom_lint_builder/custom_lint_builder.dart';
-
 import '../../saropa_lint_rule.dart';
 import '../../type_annotation_utils.dart';
 
@@ -74,7 +69,7 @@ bool isEquatable(ClassDeclaration node) {
 /// }
 /// ```
 class ExtendEquatableRule extends SaropaLintRule {
-  const ExtendEquatableRule() : super(code: _code);
+  ExtendEquatableRule() : super(code: _code);
 
   /// Maintainability issue. Cleaner equality pattern available.
   @override
@@ -85,21 +80,19 @@ class ExtendEquatableRule extends SaropaLintRule {
 
   /// Alias: extend_equatable
   static const LintCode _code = LintCode(
-    name: 'require_extend_equatable',
-    problemMessage:
-        '[require_extend_equatable] Class overrides operator == but does not extend Equatable. Equatable provides consistent hashCode and equality implementations with less boilerplate and fewer opportunities for bugs. {v2}',
+    'require_extend_equatable',
+    '[require_extend_equatable] Class overrides operator == but does not extend Equatable. Equatable provides consistent hashCode and equality implementations with less boilerplate and fewer opportunities for bugs. {v2}',
     correctionMessage:
         'Prefer extending Equatable for cleaner equality implementation. Verify the change works correctly with existing tests and add coverage for the new behavior.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addClassDeclaration((ClassDeclaration node) {
+    context.addClassDeclaration((ClassDeclaration node) {
       // Check if class extends Equatable
       if (_extendsEquatable(node)) return;
 
@@ -118,7 +111,7 @@ class ExtendEquatableRule extends SaropaLintRule {
       }
 
       if (hasEqualsOverride) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
   }
@@ -181,7 +174,7 @@ class ExtendEquatableRule extends SaropaLintRule {
 ///
 /// Alias: require_props_consistency
 class ListAllEquatableFieldsRule extends SaropaLintRule {
-  const ListAllEquatableFieldsRule() : super(code: _code);
+  ListAllEquatableFieldsRule() : super(code: _code);
 
   /// Potential bug. Missing field in equality comparison.
   @override
@@ -191,21 +184,19 @@ class ListAllEquatableFieldsRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'list_all_equatable_fields',
-    problemMessage:
-        '[list_all_equatable_fields] Equatable class has fields not included in props. Equality checks fail silently when these fields differ, causing inconsistent behavior in collections, comparisons, and UI updates. Two objects with different field values will be treated as equal, leading to missed rebuilds, incorrect deduplication, and subtle bugs that are extremely hard to trace. {v3}',
+    'list_all_equatable_fields',
+    '[list_all_equatable_fields] Equatable class has fields not included in props. Equality checks fail silently when these fields differ, causing inconsistent behavior in collections, comparisons, and UI updates. Two objects with different field values will be treated as equal, leading to missed rebuilds, incorrect deduplication, and subtle bugs that are extremely hard to trace. {v3}',
     correctionMessage:
         'Add all instance fields to the props getter for correct equality. Otherwise, objects may not compare as equal when expected, leading to subtle bugs.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addClassDeclaration((ClassDeclaration node) {
+    context.addClassDeclaration((ClassDeclaration node) {
       // Check if class extends Equatable or mixes in EquatableMixin
       if (!isEquatable(node)) return;
 
@@ -234,7 +225,7 @@ class ListAllEquatableFieldsRule extends SaropaLintRule {
 
       if (propsGetter == null) {
         // No props getter at all - definitely missing fields
-        reporter.atNode(node, code);
+        reporter.atNode(node);
         return;
       }
 
@@ -255,7 +246,7 @@ class ListAllEquatableFieldsRule extends SaropaLintRule {
       // Check if all instance fields are in props
       final Set<String> missingFields = instanceFields.difference(propsFields);
       if (missingFields.isNotEmpty) {
-        reporter.atNode(propsGetter, code);
+        reporter.atNode(propsGetter);
       }
     });
   }
@@ -278,37 +269,6 @@ class ListAllEquatableFieldsRule extends SaropaLintRule {
         identifiers.add(expr.propertyName.name);
       }
     }
-  }
-
-  @override
-  List<Fix> getFixes() => <Fix>[_AddMissingFieldsToPropsHint()];
-}
-
-class _AddMissingFieldsToPropsHint extends DartFix {
-  @override
-  void run(
-    CustomLintResolver resolver,
-    ChangeReporter reporter,
-    CustomLintContext context,
-    AnalysisError analysisError,
-    List<AnalysisError> others,
-  ) {
-    context.registry.addMethodDeclaration((MethodDeclaration node) {
-      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
-      if (node.name.lexeme != 'props' || !node.isGetter) return;
-
-      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
-        message: 'Review: ensure all fields are in props',
-        priority: 1,
-      );
-
-      changeBuilder.addDartFileEdit((builder) {
-        builder.addSimpleInsertion(
-          node.offset,
-          '// HACK: Ensure all instance fields are included in props\n  ',
-        );
-      });
-    });
   }
 }
 
@@ -346,7 +306,7 @@ class _AddMissingFieldsToPropsHint extends DartFix {
 /// and could benefit from using the mixin pattern instead. It's primarily
 /// about awareness of the mixin option.
 class PreferEquatableMixinRule extends SaropaLintRule {
-  const PreferEquatableMixinRule() : super(code: _code);
+  PreferEquatableMixinRule() : super(code: _code);
 
   /// Style preference. Consider mixin for flexibility.
   @override
@@ -357,22 +317,20 @@ class PreferEquatableMixinRule extends SaropaLintRule {
 
   /// Alias: prefer_equatable_mixin_pattern
   static const LintCode _code = LintCode(
-    name: 'prefer_equatable_mixin',
-    problemMessage:
-        '[prefer_equatable_mixin] Use EquatableMixin instead of extending Equatable. Using EquatableMixin is preferred when: - The class already extends another class - You want to preserve the class hierarchy. {v2}',
+    'prefer_equatable_mixin',
+    '[prefer_equatable_mixin] Use EquatableMixin instead of extending Equatable. Using EquatableMixin is preferred when: - The class already extends another class - You want to preserve the class hierarchy. {v2}',
     correctionMessage:
         'EquatableMixin allows you to extend other classes while keeping. Verify the change works correctly with existing tests and add coverage for the new behavior.'
         'Equatable functionality. Change to: class X with EquatableMixin',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addClassDeclaration((ClassDeclaration node) {
+    context.addClassDeclaration((ClassDeclaration node) {
       final ExtendsClause? extendsClause = node.extendsClause;
       if (extendsClause == null) return;
 
@@ -386,66 +344,14 @@ class PreferEquatableMixinRule extends SaropaLintRule {
       final WithClause? withClause = node.withClause;
       if (withClause != null && withClause.mixinTypes.isNotEmpty) {
         // Already using mixins, strongly suggest EquatableMixin
-        reporter.atNode(extendsClause, code);
+        reporter.atNode(extendsClause);
         return;
       }
 
       // For classes extending only Equatable with no mixins,
       // this is more of a suggestion for awareness
       // Report at INFO level
-      reporter.atNode(extendsClause, code);
-    });
-  }
-
-  @override
-  List<Fix> getFixes() => <Fix>[_ConvertToEquatableMixinFix()];
-}
-
-class _ConvertToEquatableMixinFix extends DartFix {
-  @override
-  void run(
-    CustomLintResolver resolver,
-    ChangeReporter reporter,
-    CustomLintContext context,
-    AnalysisError analysisError,
-    List<AnalysisError> others,
-  ) {
-    context.registry.addClassDeclaration((ClassDeclaration node) {
-      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
-
-      final ExtendsClause? extendsClause = node.extendsClause;
-      if (extendsClause == null) return;
-
-      if (extendsClause.superclass.name2.lexeme != 'Equatable') {
-        return;
-      }
-
-      final WithClause? withClause = node.withClause;
-
-      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
-        message: 'Convert to EquatableMixin',
-        priority: 1,
-      );
-
-      changeBuilder.addDartFileEdit((builder) {
-        if (withClause != null) {
-          // Already has mixins, just remove extends Equatable and add mixin
-          builder.addSimpleReplacement(
-            SourceRange(extendsClause.offset, extendsClause.length),
-            '',
-          );
-
-          // Add EquatableMixin to existing with clause
-          final int insertOffset = withClause.mixinTypes.last.end;
-          builder.addSimpleInsertion(insertOffset, ', EquatableMixin');
-        } else {
-          // Replace 'extends Equatable' with 'with EquatableMixin'
-          builder.addSimpleReplacement(
-            SourceRange(extendsClause.offset, extendsClause.length),
-            'with EquatableMixin',
-          );
-        }
-      });
+      reporter.atNode(extendsClause);
     });
   }
 }
@@ -488,7 +394,7 @@ class _ConvertToEquatableMixinFix extends DartFix {
 /// }
 /// ```
 class PreferEquatableStringifyRule extends SaropaLintRule {
-  const PreferEquatableStringifyRule() : super(code: _code);
+  PreferEquatableStringifyRule() : super(code: _code);
 
   /// Style preference. Improves debugging output.
   @override
@@ -498,21 +404,19 @@ class PreferEquatableStringifyRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'prefer_equatable_stringify',
-    problemMessage:
-        '[prefer_equatable_stringify] Equatable class does not override stringify to true. Overriding stringify to true provides better debugging output by including field values in toString() instead of just the class name. {v2}',
+    'prefer_equatable_stringify',
+    '[prefer_equatable_stringify] Equatable class does not override stringify to true. Overriding stringify to true provides better debugging output by including field values in toString() instead of just the class name. {v2}',
     correctionMessage:
         'Add: @override bool get stringify => true; to improve debugging. Verify the change works correctly with existing tests and add coverage for the new behavior.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addClassDeclaration((ClassDeclaration node) {
+    context.addClassDeclaration((ClassDeclaration node) {
       // Check if class extends Equatable or mixes in EquatableMixin
       if (!isEquatable(node)) return;
 
@@ -528,50 +432,8 @@ class PreferEquatableStringifyRule extends SaropaLintRule {
       }
 
       if (!hasStringifyOverride) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
-    });
-  }
-
-  @override
-  List<Fix> getFixes() => <Fix>[_AddStringifyOverrideFix()];
-}
-
-class _AddStringifyOverrideFix extends DartFix {
-  @override
-  void run(
-    CustomLintResolver resolver,
-    ChangeReporter reporter,
-    CustomLintContext context,
-    AnalysisError analysisError,
-    List<AnalysisError> others,
-  ) {
-    context.registry.addClassDeclaration((ClassDeclaration node) {
-      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
-
-      // Find props getter to insert after it
-      MethodDeclaration? propsGetter;
-      for (final ClassMember member in node.members) {
-        if (member is MethodDeclaration &&
-            member.name.lexeme == 'props' &&
-            member.isGetter) {
-          propsGetter = member;
-          break;
-        }
-      }
-
-      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
-        message: 'Add stringify override',
-        priority: 1,
-      );
-
-      changeBuilder.addDartFileEdit((builder) {
-        final int insertOffset = propsGetter?.end ?? node.rightBracket.offset;
-        builder.addSimpleInsertion(
-          insertOffset,
-          '\n\n  @override\n  bool get stringify => true;',
-        );
-      });
     });
   }
 }
@@ -611,7 +473,7 @@ class _AddStringifyOverrideFix extends DartFix {
 /// }
 /// ```
 class PreferImmutableAnnotationRule extends SaropaLintRule {
-  const PreferImmutableAnnotationRule() : super(code: _code);
+  PreferImmutableAnnotationRule() : super(code: _code);
 
   /// Style preference. Documents immutability intent.
   @override
@@ -621,21 +483,19 @@ class PreferImmutableAnnotationRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'prefer_immutable_annotation',
-    problemMessage:
-        '[prefer_immutable_annotation] Equatable class is not annotated with @immutable. Equatable classes must be immutable to ensure correct equality behavior. The @immutable annotation documents this intent and enables additional static analysis. {v2}',
+    'prefer_immutable_annotation',
+    '[prefer_immutable_annotation] Equatable class is not annotated with @immutable. Equatable classes must be immutable to ensure correct equality behavior. The @immutable annotation documents this intent and enables additional static analysis. {v2}',
     correctionMessage:
         'Add @immutable annotation to document immutability intent. Verify the change works correctly with existing tests and add coverage for the new behavior.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addClassDeclaration((ClassDeclaration node) {
+    context.addClassDeclaration((ClassDeclaration node) {
       // Check if class extends Equatable or mixes in EquatableMixin
       if (!isEquatable(node)) return;
 
@@ -650,38 +510,8 @@ class PreferImmutableAnnotationRule extends SaropaLintRule {
       }
 
       if (!hasImmutableAnnotation) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
-    });
-  }
-
-  @override
-  List<Fix> getFixes() => <Fix>[_AddImmutableAnnotationFix()];
-}
-
-class _AddImmutableAnnotationFix extends DartFix {
-  @override
-  void run(
-    CustomLintResolver resolver,
-    ChangeReporter reporter,
-    CustomLintContext context,
-    AnalysisError analysisError,
-    List<AnalysisError> others,
-  ) {
-    context.registry.addClassDeclaration((ClassDeclaration node) {
-      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
-
-      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
-        message: 'Add @immutable annotation',
-        priority: 1,
-      );
-
-      changeBuilder.addDartFileEdit((builder) {
-        // Insert before class declaration or first annotation
-        final int insertOffset =
-            node.metadata.isNotEmpty ? node.metadata.first.offset : node.offset;
-        builder.addSimpleInsertion(insertOffset, '@immutable\n');
-      });
     });
   }
 }
@@ -717,7 +547,7 @@ class _AddImmutableAnnotationFix extends DartFix {
 /// final point = (x: 10, y: 20);
 /// ```
 class PreferRecordOverEquatableRule extends SaropaLintRule {
-  const PreferRecordOverEquatableRule() : super(code: _code);
+  PreferRecordOverEquatableRule() : super(code: _code);
 
   /// Style preference. Records are more concise.
   @override
@@ -727,29 +557,27 @@ class PreferRecordOverEquatableRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'prefer_record_over_equatable',
-    problemMessage:
-        '[prefer_record_over_equatable] Simple Equatable class with only final fields and no custom methods detected. Dart 3 records provide built-in equality and immutability with far less boilerplate. Replace with a typedef record. {v5}',
+    'prefer_record_over_equatable',
+    '[prefer_record_over_equatable] Simple Equatable class with only final fields and no custom methods detected. Dart 3 records provide built-in equality and immutability with far less boilerplate. Replace with a typedef record. {v5}',
     correctionMessage:
         'Replace the Equatable subclass with a Dart 3 record: typedef ClassName = ({Type field, ...}); for less boilerplate.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   static const int _maxFieldsForRecord = 5;
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addClassDeclaration((ClassDeclaration node) {
+    context.addClassDeclaration((ClassDeclaration node) {
       // Check if class extends Equatable or mixes in EquatableMixin
       if (!isEquatable(node)) return;
 
       // Check if class is a simple data class suitable for record
       if (_isSimpleDataClass(node)) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
   }
@@ -840,7 +668,7 @@ class PreferRecordOverEquatableRule extends SaropaLintRule {
 /// }
 /// ```
 class AvoidMutableFieldInEquatableRule extends SaropaLintRule {
-  const AvoidMutableFieldInEquatableRule() : super(code: _code);
+  AvoidMutableFieldInEquatableRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.critical;
@@ -849,21 +677,19 @@ class AvoidMutableFieldInEquatableRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_mutable_field_in_equatable',
-    problemMessage:
-        '[avoid_mutable_field_in_equatable] Equatable classes should only have final fields. Mutable fields break value equality, causing bugs in collections, state management, and UI updates. Changing a field after object creation makes == and hashCode unreliable. {v4}',
+    'avoid_mutable_field_in_equatable',
+    '[avoid_mutable_field_in_equatable] Equatable classes should only have final fields. Mutable fields break value equality, causing bugs in collections, state management, and UI updates. Changing a field after object creation makes == and hashCode unreliable. {v4}',
     correctionMessage:
         'Make all fields in Equatable classes final to ensure correct value equality and predictable behavior.',
-    errorSeverity: DiagnosticSeverity.ERROR,
+    severity: DiagnosticSeverity.ERROR,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addClassDeclaration((ClassDeclaration node) {
+    context.addClassDeclaration((ClassDeclaration node) {
       // Check if class extends Equatable or mixes in EquatableMixin
       if (!isEquatable(node)) return;
 
@@ -875,7 +701,7 @@ class AvoidMutableFieldInEquatableRule extends SaropaLintRule {
             // Report each non-final field
             for (final VariableDeclaration variable
                 in member.fields.variables) {
-              reporter.atNode(variable, code);
+              reporter.atNode(variable);
             }
           }
         }
@@ -919,7 +745,7 @@ class AvoidMutableFieldInEquatableRule extends SaropaLintRule {
 /// }
 /// ```
 class RequireEquatableCopyWithRule extends SaropaLintRule {
-  const RequireEquatableCopyWithRule() : super(code: _code);
+  RequireEquatableCopyWithRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -929,21 +755,19 @@ class RequireEquatableCopyWithRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'require_equatable_copy_with',
-    problemMessage:
-        '[require_equatable_copy_with] Equatable class lacks copyWith method. Without copyWith, creating modified copies requires manually constructing new instances with all fields, leading to verbose code and errors when fields are added or removed from the class. {v2}',
+    'require_equatable_copy_with',
+    '[require_equatable_copy_with] Equatable class lacks copyWith method. Without copyWith, creating modified copies requires manually constructing new instances with all fields, leading to verbose code and errors when fields are added or removed from the class. {v2}',
     correctionMessage:
         'Add a copyWith method that accepts optional named parameters for each field and returns a new instance. This enables concise immutable updates and maintains compatibility when the class structure evolves.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addClassDeclaration((ClassDeclaration node) {
+    context.addClassDeclaration((ClassDeclaration node) {
       // Check if class extends Equatable or mixes in EquatableMixin
       if (!isEquatable(node)) return;
 
@@ -957,7 +781,7 @@ class RequireEquatableCopyWithRule extends SaropaLintRule {
       }
 
       if (!hasCopyWith) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
   }
@@ -992,7 +816,7 @@ class RequireEquatableCopyWithRule extends SaropaLintRule {
 /// // Or using freezed with @Default
 /// ```
 class RequireCopyWithNullHandlingRule extends SaropaLintRule {
-  const RequireCopyWithNullHandlingRule() : super(code: _code);
+  RequireCopyWithNullHandlingRule() : super(code: _code);
 
   /// copyWith that can't set null makes state management difficult.
   @override
@@ -1002,21 +826,19 @@ class RequireCopyWithNullHandlingRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'require_copy_with_null_handling',
-    problemMessage:
-        '[require_copy_with_null_handling] copyWith with ?? operator cannot set nullable fields to null. Standard copyWith pattern can\'t distinguish between "not provided" and "explicitly null". Use a sentinel value or wrapper class to support setting nullable fields back to null. {v2}',
+    'require_copy_with_null_handling',
+    '[require_copy_with_null_handling] copyWith with ?? operator cannot set nullable fields to null. Standard copyWith pattern can\'t distinguish between "not provided" and "explicitly null". Use a sentinel value or wrapper class to support setting nullable fields back to null. {v2}',
     correctionMessage:
         'Use a wrapper type like Optional<T> or generated copyWith from freezed. Verify the change works correctly with existing tests and add coverage for the new behavior.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodDeclaration((MethodDeclaration node) {
+    context.addMethodDeclaration((MethodDeclaration node) {
       if (node.name.lexeme != 'copyWith') return;
 
       // Check method body for ?? operator on nullable parameters
@@ -1061,7 +883,7 @@ class RequireCopyWithNullHandlingRule extends SaropaLintRule {
         // Pattern: paramName ?? this.paramName
         if (bodySource.contains('$paramName ??') ||
             bodySource.contains('$paramName??')) {
-          reporter.atNode(node, code);
+          reporter.atNode(node);
           return;
         }
       }
@@ -1098,7 +920,7 @@ class RequireCopyWithNullHandlingRule extends SaropaLintRule {
 /// }
 /// ```
 class RequireDeepEqualityCollectionsRule extends SaropaLintRule {
-  const RequireDeepEqualityCollectionsRule() : super(code: _code);
+  RequireDeepEqualityCollectionsRule() : super(code: _code);
 
   /// State comparison bugs from reference equality.
   @override
@@ -1108,21 +930,19 @@ class RequireDeepEqualityCollectionsRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'require_deep_equality_collections',
-    problemMessage:
-        '[require_deep_equality_collections] Collections (List, Map, Set) in Equatable props are compared by reference, not by contents. This causes false negatives in equality checks, leading to subtle bugs, missed UI updates, broken state management, and wasted rebuilds. In production, this can result in persistent UI glitches, incorrect state restoration, and hard-to-diagnose logic errors. Collections with identical contents but different references will not compare as equal, undermining the reliability of Equatable-based state classes. {v3}',
+    'require_deep_equality_collections',
+    '[require_deep_equality_collections] Collections (List, Map, Set) in Equatable props are compared by reference, not by contents. This causes false negatives in equality checks, leading to subtle bugs, missed UI updates, broken state management, and wasted rebuilds. In production, this can result in persistent UI glitches, incorrect state restoration, and hard-to-diagnose logic errors. Collections with identical contents but different references will not compare as equal, undermining the reliability of Equatable-based state classes. {v3}',
     correctionMessage:
         'Use DeepCollectionEquality().equals() and .hash() for collections, or wrap collections in unmodifiable views. Always document equality logic for collection fields, and add tests to verify correct behavior. This ensures reliable state comparison and prevents UI bugs and wasted rebuilds.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addClassDeclaration((ClassDeclaration node) {
+    context.addClassDeclaration((ClassDeclaration node) {
       // Check if extends Equatable
       final ExtendsClause? extendsClause = node.extendsClause;
       if (extendsClause == null) return;
@@ -1166,7 +986,7 @@ class RequireDeepEqualityCollectionsRule extends SaropaLintRule {
                 !propsSource.contains('ListEquality') &&
                 !propsSource.contains('SetEquality') &&
                 !propsSource.contains('MapEquality')) {
-              reporter.atNode(member, code);
+              reporter.atNode(member);
               return;
             }
           }
@@ -1202,7 +1022,7 @@ class RequireDeepEqualityCollectionsRule extends SaropaLintRule {
 /// List<Object?> get props => [timestamp.millisecondsSinceEpoch];
 /// ```
 class AvoidEquatableDatetimeRule extends SaropaLintRule {
-  const AvoidEquatableDatetimeRule() : super(code: _code);
+  AvoidEquatableDatetimeRule() : super(code: _code);
 
   /// Flaky equality from microsecond precision.
   @override
@@ -1212,21 +1032,19 @@ class AvoidEquatableDatetimeRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_equatable_datetime',
-    problemMessage:
-        '[avoid_equatable_datetime] DateTime in Equatable props may cause flaky equality checks. DateTime comparisons can fail due to microsecond differences. Compare truncated or formatted values instead. {v2}',
+    'avoid_equatable_datetime',
+    '[avoid_equatable_datetime] DateTime in Equatable props may cause flaky equality checks. DateTime comparisons can fail due to microsecond differences. Compare truncated or formatted values instead. {v2}',
     correctionMessage:
         'Use timestamp.millisecondsSinceEpoch or toIso8601String() instead. Verify the change works correctly with existing tests and add coverage for the new behavior.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addClassDeclaration((ClassDeclaration node) {
+    context.addClassDeclaration((ClassDeclaration node) {
       // Check if extends Equatable
       final ExtendsClause? extendsClause = node.extendsClause;
       if (extendsClause == null) return;
@@ -1267,7 +1085,7 @@ class AvoidEquatableDatetimeRule extends SaropaLintRule {
                 !propsSource.contains('$fieldName.toIso8601String') &&
                 !propsSource.contains('$fieldName?.millisecondsSinceEpoch') &&
                 !propsSource.contains('$fieldName?.toIso8601String')) {
-              reporter.atNode(member, code);
+              reporter.atNode(member);
               return;
             }
           }
@@ -1304,7 +1122,7 @@ class AvoidEquatableDatetimeRule extends SaropaLintRule {
 /// }
 /// ```
 class PreferUnmodifiableCollectionsRule extends SaropaLintRule {
-  const PreferUnmodifiableCollectionsRule() : super(code: _code);
+  PreferUnmodifiableCollectionsRule() : super(code: _code);
 
   /// State mutation bugs from mutable collections.
   @override
@@ -1314,21 +1132,19 @@ class PreferUnmodifiableCollectionsRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'prefer_unmodifiable_collections',
-    problemMessage:
-        '[prefer_unmodifiable_collections] Equatable class exposes mutable collection field. External code can modify the collection contents without creating a new instance, breaking Equatable\'s equality contract and causing inconsistent state where equal objects have different contents. {v3}',
+    'prefer_unmodifiable_collections',
+    '[prefer_unmodifiable_collections] Equatable class exposes mutable collection field. External code can modify the collection contents without creating a new instance, breaking Equatable\'s equality contract and causing inconsistent state where equal objects have different contents. {v3}',
     correctionMessage:
         'Wrap the collection in List.unmodifiable(), Map.unmodifiable(), or UnmodifiableSetView() to prevent external modifications. This enforces immutability and preserves Equatable semantics while still allowing read access.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addClassDeclaration((ClassDeclaration node) {
+    context.addClassDeclaration((ClassDeclaration node) {
       // Check if it's a state/model class (extends Equatable or has immutable intent)
       final ExtendsClause? extendsClause = node.extendsClause;
       bool isImmutableClass = false;
@@ -1365,8 +1181,9 @@ class PreferUnmodifiableCollectionsRule extends SaropaLintRule {
 
             for (final ClassMember constructor in node.members) {
               if (constructor is ConstructorDeclaration) {
-                final String? initSource =
-                    constructor.initializers.map((e) => e.toSource()).join();
+                final String? initSource = constructor.initializers
+                    .map((e) => e.toSource())
+                    .join();
                 if (initSource != null &&
                     (initSource.contains('List.unmodifiable') ||
                         initSource.contains('Map.unmodifiable') ||
@@ -1382,7 +1199,7 @@ class PreferUnmodifiableCollectionsRule extends SaropaLintRule {
             }
 
             if (!madeUnmodifiable) {
-              reporter.atNode(member, code);
+              reporter.atNode(member);
             }
           }
         }
@@ -1420,7 +1237,7 @@ class PreferUnmodifiableCollectionsRule extends SaropaLintRule {
 /// }
 /// ```
 class RequireEquatablePropsOverrideRule extends SaropaLintRule {
-  const RequireEquatablePropsOverrideRule() : super(code: _code);
+  RequireEquatablePropsOverrideRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.critical;
@@ -1429,21 +1246,19 @@ class RequireEquatablePropsOverrideRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'require_equatable_props_override',
-    problemMessage:
-        '[require_equatable_props_override] Without props override, equality '
+    'require_equatable_props_override',
+    '[require_equatable_props_override] Without props override, equality '
         'defaults to identity comparison, breaking state deduplication. {v1}',
     correctionMessage: 'Add: List<Object?> get props => [field1, field2];',
-    errorSeverity: DiagnosticSeverity.ERROR,
+    severity: DiagnosticSeverity.ERROR,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addClassDeclaration((ClassDeclaration node) {
+    context.addClassDeclaration((ClassDeclaration node) {
       // Check if extends Equatable
       final extendsClause = node.extendsClause;
       if (extendsClause == null) return;
@@ -1461,7 +1276,7 @@ class RequireEquatablePropsOverrideRule extends SaropaLintRule {
       }
 
       if (!hasProps) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
   }

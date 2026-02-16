@@ -26,10 +26,6 @@
 library;
 
 import 'package:analyzer/dart/ast/ast.dart';
-import 'package:analyzer/error/error.dart'
-    show AnalysisError, DiagnosticSeverity;
-import 'package:custom_lint_builder/custom_lint_builder.dart';
-
 import '../saropa_lint_rule.dart';
 
 // ---------------------------------------------------------------------------
@@ -287,7 +283,7 @@ bool _isFollowedBySafe(List<Statement> stmts, int i) {
 /// processData();
 /// ```
 class RequireYieldAfterDbWriteRule extends SaropaLintRule {
-  const RequireYieldAfterDbWriteRule() : super(code: _code);
+  RequireYieldAfterDbWriteRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.high;
@@ -296,29 +292,24 @@ class RequireYieldAfterDbWriteRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'require_yield_after_db_write',
-    problemMessage:
-        '[require_yield_after_db_write] Database or I/O write without a '
+    'require_yield_after_db_write',
+    '[require_yield_after_db_write] Database or I/O write without a '
         'following yieldToUI() call may block the UI thread and cause visible '
         'frame drops. Write operations acquire exclusive locks that starve '
         'the framework of time to paint. {v1}',
     correctionMessage:
         'Insert `await DelayUtils.yieldToUI();` after this write operation '
         'to give the framework a chance to process pending frames.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
     _registerYieldCheck(context, reporter, _code, _DbOperationType.write);
   }
-
-  @override
-  List<Fix> getFixes() => [_InsertYieldAfterDbWriteFix()];
 }
 
 // ---------------------------------------------------------------------------
@@ -346,7 +337,7 @@ class RequireYieldAfterDbWriteRule extends SaropaLintRule {
 /// final c = await isar.contacts.filter().idEqualTo(id).findFirst();
 /// ```
 class SuggestYieldAfterDbReadRule extends SaropaLintRule {
-  const SuggestYieldAfterDbReadRule() : super(code: _code);
+  SuggestYieldAfterDbReadRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.low;
@@ -355,33 +346,28 @@ class SuggestYieldAfterDbReadRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'suggest_yield_after_db_read',
-    problemMessage:
-        '[suggest_yield_after_db_read] Bulk database or I/O read without a '
+    'suggest_yield_after_db_read',
+    '[suggest_yield_after_db_read] Bulk database or I/O read without a '
         'following yieldToUI() call. Deserializing large payloads on the '
         'main isolate can cause frame drops during data-heavy workflows. {v1}',
     correctionMessage:
         'Consider inserting `await DelayUtils.yieldToUI();` after this read '
         'if the result set may be large.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
     _registerYieldCheck(context, reporter, _code, _DbOperationType.bulkRead);
   }
-
-  @override
-  List<Fix> getFixes() => [_InsertYieldAfterDbReadFix()];
 }
 
 /// Shared registration logic for yield-checking rules.
 void _registerYieldCheck(
-  CustomLintContext context,
+  SaropaContext context,
   SaropaDiagnosticReporter reporter,
   LintCode code,
   _DbOperationType targetType,
@@ -395,14 +381,12 @@ void _registerYieldCheck(
       final opType = _classifyDbAwait(awaitExpr);
       if (opType != targetType) return;
       if (_isFollowedBySafe(stmts, i)) return;
-      reporter.atNode(s, code);
+      reporter.atNode(s);
     });
   }
 
-  context.registry.addMethodDeclaration((n) => visit(n.body));
-  context.registry.addFunctionDeclaration(
-    (n) => visit(n.functionExpression.body),
-  );
+  context.addMethodDeclaration((n) => visit(n.body));
+  context.addFunctionDeclaration((n) => visit(n.functionExpression.body));
 }
 
 // ---------------------------------------------------------------------------
@@ -429,7 +413,7 @@ void _registerYieldCheck(
 /// return await isar.contacts.filter().idEqualTo(id).findFirst();
 /// ```
 class AvoidReturnAwaitDbRule extends SaropaLintRule {
-  const AvoidReturnAwaitDbRule() : super(code: _code);
+  AvoidReturnAwaitDbRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.high;
@@ -438,20 +422,19 @@ class AvoidReturnAwaitDbRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_return_await_db',
-    problemMessage:
-        '[avoid_return_await_db] Returning directly from a database/IO '
+    'avoid_return_await_db',
+    '[avoid_return_await_db] Returning directly from a database/IO '
         'write skips yieldToUI(). {v3}',
-    correctionMessage: 'Save the result to a variable, call '
+    correctionMessage:
+        'Save the result to a variable, call '
         '`await DelayUtils.yieldToUI();`, then return the variable.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
     void visit(FunctionBody body) {
       if (body is! BlockFunctionBody) return;
@@ -462,162 +445,11 @@ class AvoidReturnAwaitDbRule extends SaropaLintRule {
         if (expr is! AwaitExpression) return;
         final opType = _classifyDbAwait(expr);
         if (opType != _DbOperationType.write) return;
-        reporter.atNode(s, _code);
+        reporter.atNode(s);
       });
     }
 
-    context.registry.addMethodDeclaration((n) => visit(n.body));
-    context.registry.addFunctionDeclaration(
-      (n) => visit(n.functionExpression.body),
-    );
+    context.addMethodDeclaration((n) => visit(n.body));
+    context.addFunctionDeclaration((n) => visit(n.functionExpression.body));
   }
-
-  @override
-  List<Fix> getFixes() => [_SplitReturnAwaitDbFix()];
-}
-
-// ---------------------------------------------------------------------------
-// Quick Fixes
-// ---------------------------------------------------------------------------
-
-/// Inserts `await DelayUtils.yieldToUI();` after a flagged DB write.
-class _InsertYieldAfterDbWriteFix extends DartFix {
-  @override
-  void run(
-    CustomLintResolver resolver,
-    ChangeReporter reporter,
-    CustomLintContext context,
-    AnalysisError analysisError,
-    List<AnalysisError> others,
-  ) {
-    _insertYieldFix(
-      resolver,
-      reporter,
-      context,
-      analysisError,
-      'Insert yieldToUI() after this database write',
-    );
-  }
-}
-
-/// Inserts `await DelayUtils.yieldToUI();` after a flagged DB bulk read.
-class _InsertYieldAfterDbReadFix extends DartFix {
-  @override
-  void run(
-    CustomLintResolver resolver,
-    ChangeReporter reporter,
-    CustomLintContext context,
-    AnalysisError analysisError,
-    List<AnalysisError> others,
-  ) {
-    _insertYieldFix(
-      resolver,
-      reporter,
-      context,
-      analysisError,
-      'Insert yieldToUI() after this database read',
-    );
-  }
-}
-
-/// Shared logic for inserting a yieldToUI() call after the flagged statement.
-void _insertYieldFix(
-  CustomLintResolver resolver,
-  ChangeReporter reporter,
-  CustomLintContext context,
-  AnalysisError analysisError,
-  String message,
-) {
-  void tryFix(FunctionBody body) {
-    if (body is! BlockFunctionBody) return;
-    for (final s in body.block.statements) {
-      if (!s.sourceRange.intersects(analysisError.sourceRange)) continue;
-
-      final source = resolver.source.contents.data;
-      final indent = _leadingWhitespace(source, s.offset);
-
-      final changeBuilder = reporter.createChangeBuilder(
-        message: message,
-        priority: 80,
-      );
-      changeBuilder.addDartFileEdit((builder) {
-        builder.addSimpleInsertion(
-          s.end,
-          '\n'
-          '\n$indent// Let the UI catch up to reduce locks'
-          '\n${indent}await DelayUtils.yieldToUI();\n',
-        );
-      });
-      return;
-    }
-  }
-
-  context.registry.addMethodDeclaration((node) => tryFix(node.body));
-  context.registry.addFunctionDeclaration(
-    (node) => tryFix(node.functionExpression.body),
-  );
-}
-
-/// Splits `return await dbWriteCall();` into variable + yield + return.
-class _SplitReturnAwaitDbFix extends DartFix {
-  @override
-  void run(
-    CustomLintResolver resolver,
-    ChangeReporter reporter,
-    CustomLintContext context,
-    AnalysisError analysisError,
-    List<AnalysisError> others,
-  ) {
-    context.registry.addMethodDeclaration((node) {
-      _tryFix(node.body, resolver, reporter, analysisError);
-    });
-    context.registry.addFunctionDeclaration((node) {
-      _tryFix(node.functionExpression.body, resolver, reporter, analysisError);
-    });
-  }
-
-  void _tryFix(
-    FunctionBody body,
-    CustomLintResolver resolver,
-    ChangeReporter reporter,
-    AnalysisError analysisError,
-  ) {
-    if (body is! BlockFunctionBody) return;
-    for (final s in body.block.statements) {
-      if (!s.sourceRange.intersects(analysisError.sourceRange)) continue;
-      if (s is! ReturnStatement) continue;
-      final awaitExpr = s.expression;
-      if (awaitExpr is! AwaitExpression) continue;
-
-      final source = resolver.source.contents.data;
-      final indent = _leadingWhitespace(source, s.offset);
-      final awaitSource = awaitExpr.toSource();
-
-      final changeBuilder = reporter.createChangeBuilder(
-        message: 'Save to variable, yield, then return',
-        priority: 80,
-      );
-      changeBuilder.addDartFileEdit((builder) {
-        builder.addSimpleReplacement(
-          s.sourceRange,
-          'final result = $awaitSource;\n'
-          '${indent}await DelayUtils.yieldToUI();\n'
-          '${indent}return result;',
-        );
-      });
-      return;
-    }
-  }
-}
-
-/// Returns the leading whitespace for the line containing [offset].
-String _leadingWhitespace(String source, int offset) {
-  int lineStart = offset;
-  while (lineStart > 0 && source[lineStart - 1] != '\n') {
-    lineStart--;
-  }
-  final leading = source.substring(lineStart, offset);
-  // Return only whitespace characters.
-  final match = RegExp(r'^(\s*)').firstMatch(leading);
-  return match?.group(1) ?? '';
 }

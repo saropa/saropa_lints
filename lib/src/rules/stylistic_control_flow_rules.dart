@@ -2,9 +2,6 @@
 
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/token.dart';
-import 'package:analyzer/error/error.dart'
-    show AnalysisError, DiagnosticSeverity;
-import 'package:custom_lint_builder/custom_lint_builder.dart';
 
 import '../saropa_lint_rule.dart';
 
@@ -75,7 +72,7 @@ bool _containsAwaitExpression(Expression expr) {
 /// }
 /// ```
 class PreferEarlyReturnRule extends SaropaLintRule {
-  const PreferEarlyReturnRule() : super(code: _code);
+  PreferEarlyReturnRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.opinionated;
@@ -84,21 +81,19 @@ class PreferEarlyReturnRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'prefer_early_return',
-    problemMessage:
-        '[prefer_early_return] Deeply nested if blocks increase cognitive load and make code harder to follow. Early returns flatten the structure and clarify preconditions. {v7}',
+    'prefer_early_return',
+    '[prefer_early_return] Deeply nested if blocks increase cognitive load and make code harder to follow. Early returns flatten the structure and clarify preconditions. {v7}',
     correctionMessage:
         'Invert conditions and return early at the top of the function to reduce nesting and improve readability.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addIfStatement((node) {
+    context.addIfStatement((node) {
       // Check for nested if without else
       if (node.elseStatement != null) return;
 
@@ -128,7 +123,7 @@ class PreferEarlyReturnRule extends SaropaLintRule {
         }
 
         if (depth >= 3) {
-          reporter.atNode(node, code);
+          reporter.atNode(node);
         }
       }
     });
@@ -170,7 +165,7 @@ class PreferEarlyReturnRule extends SaropaLintRule {
 /// }
 /// ```
 class PreferSingleExitPointRule extends SaropaLintRule {
-  const PreferSingleExitPointRule() : super(code: _code);
+  PreferSingleExitPointRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.opinionated;
@@ -180,21 +175,19 @@ class PreferSingleExitPointRule extends SaropaLintRule {
 
   /// Alias: prefer_single_exit
   static const LintCode _code = LintCode(
-    name: 'prefer_single_exit_point',
-    problemMessage:
-        '[prefer_single_exit_point] Multiple return statements (early exits) make it harder to ensure cleanup, logging, and consistent resource management at the end of a function. This can lead to missed cleanup, inconsistent state, and bugs that are difficult to trace. Refactor to a single exit point so all cleanup and logging happens reliably before returning. {v1}',
+    'prefer_single_exit_point',
+    '[prefer_single_exit_point] Multiple return statements (early exits) make it harder to ensure cleanup, logging, and consistent resource management at the end of a function. This can lead to missed cleanup, inconsistent state, and bugs that are difficult to trace. Refactor to a single exit point so all cleanup and logging happens reliably before returning. {v1}',
     correctionMessage:
         'Refactor to a single exit point: move cleanup and logging to the end, and return once.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addFunctionBody((node) {
+    context.addFunctionBody((node) {
       if (node is! BlockFunctionBody) return;
 
       int returnCount = 0;
@@ -211,7 +204,7 @@ class PreferSingleExitPointRule extends SaropaLintRule {
           if (stmt is IfStatement) {
             final thenStmt = stmt.thenStatement;
             if (_containsReturn(thenStmt)) {
-              reporter.atNode(stmt, code);
+              reporter.atNode(stmt);
               return;
             }
           }
@@ -283,7 +276,7 @@ class PreferSingleExitPointRule extends SaropaLintRule {
 /// }
 /// ```
 class PreferGuardClausesRule extends SaropaLintRule {
-  const PreferGuardClausesRule() : super(code: _code);
+  PreferGuardClausesRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.opinionated;
@@ -292,21 +285,19 @@ class PreferGuardClausesRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'prefer_guard_clauses',
-    problemMessage:
-        '[prefer_guard_clauses] Wrapping the entire function body in an if block obscures preconditions and increases nesting. Guard clauses make preconditions explicit and help prevent bugs. {v3}',
+    'prefer_guard_clauses',
+    '[prefer_guard_clauses] Wrapping the entire function body in an if block obscures preconditions and increases nesting. Guard clauses make preconditions explicit and help prevent bugs. {v3}',
     correctionMessage:
         'Extract the condition as a guard clause with early return at the top to make preconditions explicit and reduce nesting.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addFunctionBody((node) {
+    context.addFunctionBody((node) {
       if (node is! BlockFunctionBody) return;
 
       final statements = node.block.statements;
@@ -319,7 +310,7 @@ class PreferGuardClausesRule extends SaropaLintRule {
 
       // If the if statement is the only statement or wraps most code
       if (statements.length == 1) {
-        reporter.atNode(first, code);
+        reporter.atNode(first);
       }
     });
   }
@@ -359,7 +350,7 @@ class PreferGuardClausesRule extends SaropaLintRule {
 /// }
 /// ```
 class PreferPositiveConditionsFirstRule extends SaropaLintRule {
-  const PreferPositiveConditionsFirstRule() : super(code: _code);
+  PreferPositiveConditionsFirstRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.opinionated;
@@ -368,21 +359,19 @@ class PreferPositiveConditionsFirstRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'prefer_positive_conditions_first',
-    problemMessage:
-        '[prefer_positive_conditions_first] Guard clauses with negated conditions push the happy path deeper into the function. Positive conditions make the primary logic path prominent and easier to understand. {v2}',
+    'prefer_positive_conditions_first',
+    '[prefer_positive_conditions_first] Guard clauses with negated conditions push the happy path deeper into the function. Positive conditions make the primary logic path prominent and easier to understand. {v2}',
     correctionMessage:
         'Restructure to place the positive condition first so the happy path is prominent and easier to follow.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addIfStatement((node) {
+    context.addIfStatement((node) {
       // Check for guard clause pattern: if (negative) return;
       if (node.elseStatement != null) return;
 
@@ -400,11 +389,11 @@ class PreferPositiveConditionsFirstRule extends SaropaLintRule {
             condition.operator.type == TokenType.EQ_EQ) {
           if (condition.rightOperand is NullLiteral ||
               condition.leftOperand is NullLiteral) {
-            reporter.atNode(node, code);
+            reporter.atNode(node);
           }
         } else if (condition is PrefixExpression &&
             condition.operator.type == TokenType.BANG) {
-          reporter.atNode(node, code);
+          reporter.atNode(node);
         }
       }
     });
@@ -445,7 +434,7 @@ class PreferPositiveConditionsFirstRule extends SaropaLintRule {
 /// }
 /// ```
 class PreferSwitchStatementRule extends SaropaLintRule {
-  const PreferSwitchStatementRule() : super(code: _code);
+  PreferSwitchStatementRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.opinionated;
@@ -454,22 +443,20 @@ class PreferSwitchStatementRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'prefer_switch_statement',
-    problemMessage:
-        '[prefer_switch_statement] Switch expressions limit flexibility for side effects and debugging. Switch statements support imperative logic, breakpoints, and multi-line case bodies. {v1}',
+    'prefer_switch_statement',
+    '[prefer_switch_statement] Switch expressions limit flexibility for side effects and debugging. Switch statements support imperative logic, breakpoints, and multi-line case bodies. {v1}',
     correctionMessage:
         'Replace the switch expression with a switch statement to enable side effects, multi-line cases, and debuggability.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addSwitchExpression((node) {
-      reporter.atNode(node, code);
+    context.addSwitchExpression((node) {
+      reporter.atNode(node);
     });
   }
 }
@@ -507,7 +494,7 @@ class PreferSwitchStatementRule extends SaropaLintRule {
 ///   ..add(3);
 /// ```
 class PreferCascadeOverChainedRule extends SaropaLintRule {
-  const PreferCascadeOverChainedRule() : super(code: _code);
+  PreferCascadeOverChainedRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.opinionated;
@@ -516,21 +503,19 @@ class PreferCascadeOverChainedRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'prefer_cascade_over_chained',
-    problemMessage:
-        '[prefer_cascade_over_chained] Consecutive method calls on the same variable repeat the target name unnecessarily. Cascade notation (..) signals that all operations mutate the same object. {v1}',
+    'prefer_cascade_over_chained',
+    '[prefer_cascade_over_chained] Consecutive method calls on the same variable repeat the target name unnecessarily. Cascade notation (..) signals that all operations mutate the same object. {v1}',
     correctionMessage:
         'Rewrite consecutive calls using cascade (..) to eliminate the repeated variable name and clarify mutation intent.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addBlock((node) {
+    context.addBlock((node) {
       // Look for consecutive method calls on the same variable
       final statements = node.statements;
       String? lastTarget;
@@ -598,7 +583,7 @@ class PreferCascadeOverChainedRule extends SaropaLintRule {
 /// list.add(2);
 /// ```
 class PreferChainedOverCascadeRule extends SaropaLintRule {
-  const PreferChainedOverCascadeRule() : super(code: _code);
+  PreferChainedOverCascadeRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.opinionated;
@@ -607,23 +592,21 @@ class PreferChainedOverCascadeRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'prefer_chained_over_cascade',
-    problemMessage:
-        '[prefer_chained_over_cascade] Cascade notation is unfamiliar to developers from other languages and breaks builder patterns. Separate statements are explicit about each operation. {v1}',
+    'prefer_chained_over_cascade',
+    '[prefer_chained_over_cascade] Cascade notation is unfamiliar to developers from other languages and breaks builder patterns. Separate statements are explicit about each operation. {v1}',
     correctionMessage:
         'Replace cascade (..) with separate statements to improve readability and maintain compatibility with builder patterns.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addCascadeExpression((node) {
+    context.addCascadeExpression((node) {
       if (node.cascadeSections.length >= 2) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
   }
@@ -663,7 +646,7 @@ class PreferChainedOverCascadeRule extends SaropaLintRule {
 /// }
 /// ```
 class PreferExhaustiveEnumsRule extends SaropaLintRule {
-  const PreferExhaustiveEnumsRule() : super(code: _code);
+  PreferExhaustiveEnumsRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.opinionated;
@@ -672,21 +655,19 @@ class PreferExhaustiveEnumsRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'prefer_exhaustive_enums',
-    problemMessage:
-        '[prefer_exhaustive_enums] Prefer exhaustive enum cases instead of default. Exhaustive cases catch missing logic at compile time and prevent silent failures. {v2}',
+    'prefer_exhaustive_enums',
+    '[prefer_exhaustive_enums] Prefer exhaustive enum cases instead of default. Exhaustive cases catch missing logic at compile time and prevent silent failures. {v2}',
     correctionMessage:
         'Remove the default branch and list every enum value explicitly so the compiler flags missing cases after additions.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addSwitchStatement((node) {
+    context.addSwitchStatement((node) {
       // Check if switching on an enum (heuristic: has case with enum prefix)
       bool looksLikeEnum = false;
       bool hasDefault = false;
@@ -703,7 +684,7 @@ class PreferExhaustiveEnumsRule extends SaropaLintRule {
       }
 
       if (looksLikeEnum && hasDefault) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
   }
@@ -743,7 +724,7 @@ class PreferExhaustiveEnumsRule extends SaropaLintRule {
 /// }
 /// ```
 class PreferDefaultEnumCaseRule extends SaropaLintRule {
-  const PreferDefaultEnumCaseRule() : super(code: _code);
+  PreferDefaultEnumCaseRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.opinionated;
@@ -752,21 +733,19 @@ class PreferDefaultEnumCaseRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'prefer_default_enum_case',
-    problemMessage:
-        '[prefer_default_enum_case] Exhaustive enum switches break at compile time when new values are added, requiring immediate updates across the codebase. A default case handles unknown values gracefully. {v1}',
+    'prefer_default_enum_case',
+    '[prefer_default_enum_case] Exhaustive enum switches break at compile time when new values are added, requiring immediate updates across the codebase. A default case handles unknown values gracefully. {v1}',
     correctionMessage:
         'Add a default case to handle unknown or future enum values gracefully and prevent compile-time breakage on enum changes.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addSwitchStatement((node) {
+    context.addSwitchStatement((node) {
       // Check if switching on enum without default
       bool looksLikeEnum = false;
       bool hasDefault = false;
@@ -783,7 +762,7 @@ class PreferDefaultEnumCaseRule extends SaropaLintRule {
       }
 
       if (looksLikeEnum && !hasDefault) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
   }
@@ -854,7 +833,7 @@ class PreferDefaultEnumCaseRule extends SaropaLintRule {
 /// await save(result);
 /// ```
 class PreferAwaitOverThenRule extends SaropaLintRule {
-  const PreferAwaitOverThenRule() : super(code: _code);
+  PreferAwaitOverThenRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.opinionated;
@@ -863,23 +842,21 @@ class PreferAwaitOverThenRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'prefer_await_over_then',
-    problemMessage:
-        '[prefer_await_over_then] The .then() chain obscures sequential async logic and complicates error handling. Rewrite with await for clearer control flow. {v3}',
+    'prefer_await_over_then',
+    '[prefer_await_over_then] The .then() chain obscures sequential async logic and complicates error handling. Rewrite with await for clearer control flow. {v3}',
     correctionMessage:
         'Replace .then() with await to enable sequential reading, try/catch error handling, and easier debugging of async code.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodInvocation((node) {
+    context.addMethodInvocation((node) {
       if (node.methodName.name == 'then') {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
   }
@@ -913,7 +890,7 @@ class PreferAwaitOverThenRule extends SaropaLintRule {
 /// fetchData().then((data) => processData(data)).then((result) => save(result));
 /// ```
 class PreferThenOverAwaitRule extends SaropaLintRule {
-  const PreferThenOverAwaitRule() : super(code: _code);
+  PreferThenOverAwaitRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.opinionated;
@@ -922,22 +899,20 @@ class PreferThenOverAwaitRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'prefer_then_over_await',
-    problemMessage:
-        '[prefer_then_over_await] The await keyword introduces implicit suspension points that break functional composition. Use .then() for explicit Future chaining. {v2}',
+    'prefer_then_over_await',
+    '[prefer_then_over_await] The await keyword introduces implicit suspension points that break functional composition. Use .then() for explicit Future chaining. {v2}',
     correctionMessage:
         'Replace await with .then() to maintain functional composition and make asynchronous data flow explicit in the call chain.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addAwaitExpression((node) {
-      reporter.atNode(node, code);
+    context.addAwaitExpression((node) {
+      reporter.atNode(node);
     });
   }
 }
@@ -973,7 +948,7 @@ class PreferThenOverAwaitRule extends SaropaLintRule {
 /// }
 /// ```
 class PreferSyncOverAsyncWhereSimpleRule extends SaropaLintRule {
-  const PreferSyncOverAsyncWhereSimpleRule() : super(code: _code);
+  PreferSyncOverAsyncWhereSimpleRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.opinionated;
@@ -982,21 +957,19 @@ class PreferSyncOverAsyncWhereSimpleRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'prefer_sync_over_async_where_possible',
-    problemMessage:
-        '[prefer_sync_over_async_where_possible] Marking a function async when it only returns a synchronous value adds unnecessary Future wrapping overhead and obscures intent. {v3}',
+    'prefer_sync_over_async_where_possible',
+    '[prefer_sync_over_async_where_possible] Marking a function async when it only returns a synchronous value adds unnecessary Future wrapping overhead and obscures intent. {v3}',
     correctionMessage:
         'Remove the async keyword and return Future.value() directly to eliminate unnecessary Future wrapping and clarify synchronous intent.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodDeclaration((node) {
+    context.addMethodDeclaration((node) {
       final body = node.body;
       if (body is! BlockFunctionBody) return;
       if (!body.isAsynchronous) return;
@@ -1011,7 +984,7 @@ class PreferSyncOverAsyncWhereSimpleRule extends SaropaLintRule {
 
       // Check if return expression contains await
       if (!_containsAwaitExpression(stmt.expression!)) {
-        reporter.atNode(body, code);
+        reporter.atNode(body);
       }
     });
   }
@@ -1037,30 +1010,6 @@ bool _isSimpleOperand(Expression expr) {
       expr is MethodInvocation ||
       expr is IndexExpression ||
       expr is FunctionExpressionInvocation;
-}
-
-/// Inverts a simple negative condition to its positive form.
-///
-/// Returns `null` if the condition is not a supported negation pattern.
-/// - `!simpleExpr` → `simpleExpr`
-/// - `a != b` → `a == b`
-String? _invertSimpleCondition(Expression condition) {
-  // !expr → expr
-  if (condition is PrefixExpression &&
-      condition.operator.type == TokenType.BANG) {
-    if (!_isSimpleOperand(condition.operand)) return null;
-    return condition.operand.toSource();
-  }
-
-  // a != b → a == b
-  if (condition is BinaryExpression &&
-      condition.operator.type == TokenType.BANG_EQ) {
-    final left = condition.leftOperand.toSource();
-    final right = condition.rightOperand.toSource();
-    return '$left == $right';
-  }
-
-  return null;
 }
 
 /// Warns when an if/else or ternary uses a negative condition.
@@ -1110,7 +1059,7 @@ String? _invertSimpleCondition(Expression condition) {
 /// final label = status == null ? 'unknown' : status.name;
 /// ```
 class PreferPositiveConditionsRule extends SaropaLintRule {
-  const PreferPositiveConditionsRule() : super(code: _code);
+  PreferPositiveConditionsRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.opinionated;
@@ -1119,30 +1068,29 @@ class PreferPositiveConditionsRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'prefer_positive_conditions',
-    problemMessage:
-        '[prefer_positive_conditions] Prefer a positive condition with '
+    'prefer_positive_conditions',
+    '[prefer_positive_conditions] Prefer a positive condition with '
         'the branches swapped for readability. {v3}',
-    correctionMessage: 'Invert the condition to its positive form and swap the '
+    correctionMessage:
+        'Invert the condition to its positive form and swap the '
         'then/else branches.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
     _checkIfStatements(context, reporter);
     _checkTernaryExpressions(context, reporter);
   }
 
   void _checkIfStatements(
-    CustomLintContext context,
+    SaropaContext context,
     SaropaDiagnosticReporter reporter,
   ) {
-    context.registry.addIfStatement((IfStatement node) {
+    context.addIfStatement((IfStatement node) {
       // Must have an else branch to swap with
       final elseStmt = node.elseStatement;
       if (elseStmt == null) return;
@@ -1157,10 +1105,10 @@ class PreferPositiveConditionsRule extends SaropaLintRule {
   }
 
   void _checkTernaryExpressions(
-    CustomLintContext context,
+    SaropaContext context,
     SaropaDiagnosticReporter reporter,
   ) {
-    context.registry.addConditionalExpression((ConditionalExpression node) {
+    context.addConditionalExpression((ConditionalExpression node) {
       if (_isNegativeCondition(node.condition)) {
         reporter.atNode(node.condition, code);
       }
@@ -1182,95 +1130,12 @@ class PreferPositiveConditionsRule extends SaropaLintRule {
 
     return false;
   }
-
-  @override
-  List<Fix> get customFixes => <Fix>[
-        _PreferPositiveConditionsIfElseFix(),
-        _PreferPositiveConditionsTernaryFix(),
-      ];
 }
 
 // -----------------------------------------------------------------------------
 // Quick fix: swap if/else branches and invert condition
 // -----------------------------------------------------------------------------
 
-class _PreferPositiveConditionsIfElseFix extends DartFix {
-  @override
-  void run(
-    CustomLintResolver resolver,
-    ChangeReporter reporter,
-    CustomLintContext context,
-    AnalysisError analysisError,
-    List<AnalysisError> others,
-  ) {
-    context.registry.addIfStatement((IfStatement node) {
-      // Match on the condition, not the full statement, to avoid
-      // accidentally matching a parent if-statement in nested cases.
-      if (!node.expression.sourceRange.intersects(analysisError.sourceRange)) {
-        return;
-      }
-
-      final elseStmt = node.elseStatement;
-      if (elseStmt == null || elseStmt is IfStatement) return;
-
-      final String? inverted = _invertSimpleCondition(node.expression);
-      if (inverted == null) return;
-
-      final String thenSource = node.thenStatement.toSource();
-      final String elseSource = elseStmt.toSource();
-
-      final changeBuilder = reporter.createChangeBuilder(
-        message: 'Invert condition and swap branches',
-        priority: 80,
-      );
-
-      changeBuilder.addDartFileEdit((builder) {
-        builder.addSimpleReplacement(
-          node.sourceRange,
-          'if ($inverted) $elseSource else $thenSource',
-        );
-      });
-    });
-  }
-}
-
 // -----------------------------------------------------------------------------
 // Quick fix: swap ternary branches and invert condition
 // -----------------------------------------------------------------------------
-
-class _PreferPositiveConditionsTernaryFix extends DartFix {
-  @override
-  void run(
-    CustomLintResolver resolver,
-    ChangeReporter reporter,
-    CustomLintContext context,
-    AnalysisError analysisError,
-    List<AnalysisError> others,
-  ) {
-    context.registry.addConditionalExpression((ConditionalExpression node) {
-      // Match on the condition, not the full ternary, to avoid
-      // accidentally matching a parent ternary in nested cases.
-      if (!node.condition.sourceRange.intersects(analysisError.sourceRange)) {
-        return;
-      }
-
-      final String? inverted = _invertSimpleCondition(node.condition);
-      if (inverted == null) return;
-
-      final String thenSource = node.thenExpression.toSource();
-      final String elseSource = node.elseExpression.toSource();
-
-      final changeBuilder = reporter.createChangeBuilder(
-        message: 'Invert condition and swap branches',
-        priority: 80,
-      );
-
-      changeBuilder.addDartFileEdit((builder) {
-        builder.addSimpleReplacement(
-          node.sourceRange,
-          '$inverted ? $elseSource : $thenSource',
-        );
-      });
-    });
-  }
-}
