@@ -108,17 +108,19 @@ void main() {
       expect(checker.hasKey('NSMicrophoneUsageDescription'), isFalse);
     });
 
-    test('hasKey returns true when Info.plist does not exist (cannot verify)',
-        () {
-      // When Info.plist doesn't exist, we can't verify, so we assume OK.
-      final testFile = '$projectRoot/lib/test.dart';
-      File(testFile).writeAsStringSync('// test file');
+    test(
+      'hasKey returns true when Info.plist does not exist (cannot verify)',
+      () {
+        // When Info.plist doesn't exist, we can't verify, so we assume OK.
+        final testFile = '$projectRoot/lib/test.dart';
+        File(testFile).writeAsStringSync('// test file');
 
-      final checker = InfoPlistChecker.forFile(testFile);
-      expect(checker!.hasInfoPlist, isFalse);
-      // Should return true because we can't verify.
-      expect(checker.hasKey('NSCameraUsageDescription'), isTrue);
-    });
+        final checker = InfoPlistChecker.forFile(testFile);
+        expect(checker!.hasInfoPlist, isFalse);
+        // Should return true because we can't verify.
+        expect(checker.hasKey('NSCameraUsageDescription'), isTrue);
+      },
+    );
 
     test('getMissingKeys returns empty list when all keys present', () {
       final plistPath = '$projectRoot/ios/Runner/Info.plist';
@@ -205,14 +207,15 @@ void main() {
     });
 
     test(
-        'getRequiredKeys returns null for ImagePicker (handled by smart detection)',
-        () {
-      // ImagePicker is intentionally NOT in typeToKeys because the rule uses
-      // smart method-level detection to check the actual ImageSource
-      // (gallery vs camera) and only require the relevant permission.
-      final keys = IosPermissionMapping.getRequiredKeys('ImagePicker');
-      expect(keys, isNull);
-    });
+      'getRequiredKeys returns null for ImagePicker (handled by smart detection)',
+      () {
+        // ImagePicker is intentionally NOT in typeToKeys because the rule uses
+        // smart method-level detection to check the actual ImageSource
+        // (gallery vs camera) and only require the relevant permission.
+        final keys = IosPermissionMapping.getRequiredKeys('ImagePicker');
+        expect(keys, isNull);
+      },
+    );
 
     test('getRequiredKeys returns null for unknown type', () {
       final keys = IosPermissionMapping.getRequiredKeys('UnknownType');
@@ -220,8 +223,9 @@ void main() {
     });
 
     test('getRequiredKeysDescription returns formatted string', () {
-      final desc =
-          IosPermissionMapping.getRequiredKeysDescription('SpeechToText');
+      final desc = IosPermissionMapping.getRequiredKeysDescription(
+        'SpeechToText',
+      );
       expect(desc, contains('NSSpeechRecognitionUsageDescription'));
       expect(desc, contains('+'));
       expect(desc, contains('NSMicrophoneUsageDescription'));

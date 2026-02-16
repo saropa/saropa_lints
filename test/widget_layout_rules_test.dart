@@ -240,10 +240,11 @@ void main() {
 
     group('require_physics_for_nested_scroll', () {
       test(
-          'nested scrollable without NeverScrollableScrollPhysics SHOULD trigger',
-          () {
-        expect('missing nested physics detected', isNotNull);
-      });
+        'nested scrollable without NeverScrollableScrollPhysics SHOULD trigger',
+        () {
+          expect('missing nested physics detected', isNotNull);
+        },
+      );
     });
 
     group('prefer_page_storage_key', () {
@@ -378,10 +379,11 @@ void main() {
 
     group('prefer_fractional_sizing', () {
       test(
-          'percentage-based sizing not using FractionallySizedBox SHOULD trigger',
-          () {
-        expect('non-fractional sizing detected', isNotNull);
-      });
+        'percentage-based sizing not using FractionallySizedBox SHOULD trigger',
+        () {
+          expect('non-fractional sizing detected', isNotNull);
+        },
+      );
     });
 
     group('prefer_intrinsic_dimensions', () {
@@ -557,10 +559,12 @@ void main() {
     });
 
     group('require_baseline_text_baseline', () {
-      test('CrossAxisAlignment.baseline without TextBaseline SHOULD trigger',
-          () {
-        expect('missing TextBaseline detected', isNotNull);
-      });
+      test(
+        'CrossAxisAlignment.baseline without TextBaseline SHOULD trigger',
+        () {
+          expect('missing TextBaseline detected', isNotNull);
+        },
+      );
     });
   });
 }

@@ -26,7 +26,7 @@ import 'dart:io';
 /// Cache is invalidated when file content changes (via content hash).
 class BaselineDate {
   BaselineDate(this.baselineDate, {String? gitPath})
-      : _gitPath = gitPath ?? 'git';
+    : _gitPath = gitPath ?? 'git';
 
   /// The cutoff date - violations in code unchanged since this date are ignored.
   final DateTime baselineDate;

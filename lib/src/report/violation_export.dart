@@ -161,13 +161,15 @@ class ViolationExporter {
       if (list == null) continue;
 
       for (final v in list) {
-        result.add(_SortableViolation(
-          record: v,
-          impact: impact,
-          relativePath: toRelativePath(v.file, projectRoot),
-          severity: ruleSeverities[v.rule]?.toLowerCase() ?? 'info',
-          owasp: owaspLookup[v.rule],
-        ));
+        result.add(
+          _SortableViolation(
+            record: v,
+            impact: impact,
+            relativePath: toRelativePath(v.file, projectRoot),
+            severity: ruleSeverities[v.rule]?.toLowerCase() ?? 'info',
+            owasp: owaspLookup[v.rule],
+          ),
+        );
       }
     }
 
@@ -177,15 +179,13 @@ class ViolationExporter {
   }
 
   /// Compare violations for sorting: impact → file → line.
-  static int _compareViolations(
-    _SortableViolation a,
-    _SortableViolation b,
-  ) {
+  static int _compareViolations(_SortableViolation a, _SortableViolation b) {
     final impactCmp = a.impact.index.compareTo(b.impact.index);
     if (impactCmp != 0) return impactCmp;
 
-    final fileCmp =
-        a.relativePath.toLowerCase().compareTo(b.relativePath.toLowerCase());
+    final fileCmp = a.relativePath.toLowerCase().compareTo(
+      b.relativePath.toLowerCase(),
+    );
     if (fileCmp != 0) return fileCmp;
 
     return a.record.line.compareTo(b.record.line);
@@ -250,9 +250,7 @@ class ViolationExporter {
       try {
         targetFile.writeAsStringSync(content);
       } catch (e) {
-        stderr.writeln(
-          '[saropa_lints] Could not write violation export: $e',
-        );
+        stderr.writeln('[saropa_lints] Could not write violation export: $e');
       }
 
       // Clean up temp file if it still exists
