@@ -8723,3 +8723,140 @@ class _UseStringInterpolationFix extends DartFix {
     });
   }
 }
+
+// =============================================================================
+// avoid_ignoring_return_values
+// =============================================================================
+
+/// Warns when a function's return value is ignored.
+///
+/// Since: v4.15.0 | Rule version: v1
+///
+/// Ignoring a return value often means the result of a computation or an
+/// error check is silently discarded. This can hide bugs where an important
+/// result (e.g., a Future, a boolean success flag, or a parsed value) is
+/// not being used.
+///
+/// **BAD:**
+/// ```dart
+/// void example() {
+///   list.map((e) => e * 2); // Return value ignored
+///   int.parse('42');        // Parsed value discarded
+/// }
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// void example() {
+///   final doubled = list.map((e) => e * 2).toList();
+///   final value = int.parse('42');
+/// }
+/// ```
+class AvoidIgnoringReturnValuesRule extends SaropaLintRule {
+  const AvoidIgnoringReturnValuesRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  static const LintCode _code = LintCode(
+    name: 'avoid_ignoring_return_values',
+    problemMessage:
+        '[avoid_ignoring_return_values] Return value of this invocation is '
+        'ignored. Discarding return values can hide bugs where an important '
+        'result (a Future, a boolean success flag, or a parsed value) is '
+        'silently lost. Assign the result to a variable or remove the call '
+        'if it is truly unnecessary. {v1}',
+    correctionMessage:
+        'Assign the return value to a variable, or use it in an expression.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  /// Methods whose return values are commonly and safely ignored.
+  static const Set<String> _safeToIgnore = <String>{
+    'print',
+    'debugPrint',
+    'debugPrintStack',
+    'log',
+    'setState',
+    'add',
+    'addAll',
+    'remove',
+    'removeAt',
+    'removeLast',
+    'removeWhere',
+    'retainWhere',
+    'clear',
+    'insert',
+    'insertAll',
+    'sort',
+    'shuffle',
+    'fillRange',
+    'setAll',
+    'setRange',
+    'replaceRange',
+    'addPostFrameCallback',
+    'addPersistentFrameCallback',
+    'scheduleMicrotask',
+    'runZoned',
+    'close',
+    'dispose',
+    'cancel',
+    'write',
+    'writeln',
+    'writeAll',
+    'writeCharCode',
+  };
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addExpressionStatement((ExpressionStatement node) {
+      final Expression expression = node.expression;
+
+      // Only check method invocations and function invocations
+      if (expression is! MethodInvocation &&
+          expression is! FunctionExpressionInvocation) {
+        return;
+      }
+
+      // Get method name and return type
+      String? methodName;
+      DartType? returnType;
+
+      if (expression is MethodInvocation) {
+        methodName = expression.methodName.name;
+        returnType = expression.staticType;
+      } else if (expression is FunctionExpressionInvocation) {
+        returnType = expression.staticType;
+      }
+
+      // Skip methods that are safe to ignore
+      if (methodName != null && _safeToIgnore.contains(methodName)) return;
+
+      // Skip cascade targets (they return the cascade target)
+      if (expression is MethodInvocation && expression.isCascaded) return;
+
+      // Skip void, dynamic, and Null return types
+      if (returnType == null || returnType is VoidType) return;
+      if (returnType is DynamicType) return;
+      if (returnType.isDartCoreNull) return;
+
+      // Skip Future<void>
+      if (returnType.isDartAsyncFuture) {
+        final InterfaceType futureType = returnType as InterfaceType;
+        if (futureType.typeArguments.isNotEmpty) {
+          final DartType typeArg = futureType.typeArguments.first;
+          if (typeArg is VoidType) return;
+        }
+      }
+
+      reporter.atNode(expression, code);
+    });
+  }
+}

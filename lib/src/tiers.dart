@@ -665,6 +665,9 @@ const Set<String> essentialRules = <String>{
 
   // v4.14.0 - GitHub issue rules (Essential)
   'avoid_blocking_main_thread', // WARNING - sync I/O blocks main thread
+
+  // v4.15.0 - ROADMAP ⭐ Rules (Essential)
+  'avoid_cached_image_unbounded_list', // WARNING - unbounded image cache in lists
 };
 
 /// Recommended tier rules - Essential + common mistakes, performance basics.
@@ -1471,6 +1474,7 @@ const Set<String> recommendedOnlyRules = <String>{
   // v4.15.0 - ROADMAP ⭐ Rules (Recommended)
   'require_analytics_error_handling', // INFO - analytics calls need try-catch
   'prefer_adaptive_icons', // INFO - use adaptive icon sizes
+  'avoid_ignoring_return_values', // INFO - don't discard return values
 };
 
 /// Professional tier rules - Recommended + architecture, testing, maintainability.
@@ -2458,6 +2462,11 @@ const Set<String> professionalOnlyRules = <String>{
   'prefer_infinite_scroll_preload', // INFO - preload at 80% scroll
   'prefer_use_callback', // INFO - memoize callbacks in HookWidget
   'require_stepper_state_management', // INFO - preserve Stepper form state
+
+  // v4.15.0 - ROADMAP ⭐ Rules (Professional) - batch 2
+  'prefer_optimistic_updates', // INFO - setState before await, not after
+  'avoid_full_sync_on_every_launch', // WARNING - use delta sync not getAll
+  'require_session_timeout', // INFO - auth needs session expiry
 };
 
 /// Rules that are only included in the comprehensive tier (not in professional).

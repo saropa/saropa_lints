@@ -4,6 +4,157 @@
 // ignore_for_file: unused_import, depend_on_referenced_packages
 
 // =============================================================================
+// avoid_ignoring_return_values
+// =============================================================================
+
+// BAD: Return value of map() is ignored
+void badIgnoreReturn() {
+  final list = [1, 2, 3];
+  // expect_lint: avoid_ignoring_return_values
+  list.map((e) => e * 2);
+}
+
+// BAD: Return value of int.parse() is ignored
+void badIgnoreParse() {
+  // expect_lint: avoid_ignoring_return_values
+  int.parse('42');
+}
+
+// GOOD: Return value is assigned
+void goodReturnUsed() {
+  final list = [1, 2, 3];
+  final doubled = list.map((e) => e * 2).toList();
+  final value = int.parse('42');
+  print('$doubled $value');
+}
+
+// FALSE POSITIVE: void methods should not trigger
+void fpVoidReturn() {
+  print('hello');
+  final list = <int>[];
+  list.add(1);
+  list.clear();
+}
+
+// FALSE POSITIVE: cascade expressions should not trigger
+void fpCascade() {
+  final sb = StringBuffer();
+  sb
+    ..write('a')
+    ..write('b');
+}
+
+// =============================================================================
+// prefer_optimistic_updates
+// =============================================================================
+
+// BAD: setState after await
+// class BadOptimistic extends StatefulWidget {
+//   Future<void> _onLike() async {
+//     await api.likePost(postId);
+//     setState(() { isLiked = true; }); // User waits for network
+//   }
+// }
+
+// GOOD: setState before await with rollback
+// class GoodOptimistic extends StatefulWidget {
+//   Future<void> _onLike() async {
+//     setState(() { isLiked = true; }); // Immediate feedback
+//     try {
+//       await api.likePost(postId);
+//     } catch (_) {
+//       setState(() { isLiked = false; }); // Rollback on failure
+//     }
+//   }
+// }
+
+// FALSE POSITIVE: setState in sync method (no await)
+// class FpOptimistic extends StatefulWidget {
+//   void _toggle() {
+//     setState(() { isLiked = !isLiked; });
+//   }
+// }
+
+// =============================================================================
+// avoid_full_sync_on_every_launch
+// =============================================================================
+
+// BAD: Bulk fetch in initState
+// class BadFullSync extends StatefulWidget {
+//   @override
+//   void initState() {
+//     super.initState();
+//     database.getAll(); // Downloads everything on launch
+//   }
+// }
+
+// GOOD: Delta sync in initState
+// class GoodFullSync extends StatefulWidget {
+//   @override
+//   void initState() {
+//     super.initState();
+//     syncService.syncSince(lastSyncTimestamp);
+//   }
+// }
+
+// FALSE POSITIVE: getAll outside initState
+// class FpFullSync extends StatefulWidget {
+//   void _refreshAll() {
+//     database.getAll(); // Explicit user action, OK
+//   }
+// }
+
+// =============================================================================
+// avoid_cached_image_unbounded_list
+// =============================================================================
+
+// BAD: CachedNetworkImage in ListView.builder without cache bounds
+// Widget badCachedList(List<String> urls) => ListView.builder(
+//   itemBuilder: (context, index) => CachedNetworkImage(
+//     imageUrl: urls[index],
+//   ),
+// );
+
+// GOOD: CachedNetworkImage with memCacheWidth
+// Widget goodCachedList(List<String> urls) => ListView.builder(
+//   itemBuilder: (context, index) => CachedNetworkImage(
+//     imageUrl: urls[index],
+//     memCacheWidth: 200,
+//     memCacheHeight: 200,
+//   ),
+// );
+
+// FALSE POSITIVE: CachedNetworkImage outside list builder
+// Widget fpCachedSingle() => CachedNetworkImage(
+//   imageUrl: 'https://example.com/img.png',
+// );
+
+// =============================================================================
+// require_session_timeout
+// =============================================================================
+
+// BAD: signIn without session timeout
+// Future<void> badSession() async {
+//   await FirebaseAuth.instance.signInWithEmailAndPassword(
+//     email: email, password: password,
+//   );
+//   // No session timeout configured
+// }
+
+// GOOD: signIn with session timer
+// Future<void> goodSession() async {
+//   await FirebaseAuth.instance.signInWithEmailAndPassword(
+//     email: email, password: password,
+//   );
+//   _sessionTimer = Timer(sessionTimeout, _handleSessionExpiry);
+// }
+
+// FALSE POSITIVE: non-signIn method that starts with 'sign'
+// void fpSession() {
+//   signalReady(); // Not a sign-in method
+// }
+
+// =============================================================================
 // prefer_semantics_container
 // =============================================================================
 

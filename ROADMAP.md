@@ -6,7 +6,7 @@
 # Roadmap: Aiming for 2,200 Lint Rules
 <!-- cspell:disable -->
 
-See [CHANGELOG.md](CHANGELOG.md) for implemented rules. Goal: 2200 rules (1721 implemented, 469 remaining).
+See [CHANGELOG.md](CHANGELOG.md) for implemented rules. Goal: 2200 rules (1726 implemented, 464 remaining).
 
 > **When implementing**: Remove from ROADMAP, add to CHANGELOG, register in `all_rules.dart` + `tiers.dart`. See [CONTRIBUTING.md](CONTRIBUTING.md).
 
@@ -72,7 +72,6 @@ See [CHANGELOG.md](CHANGELOG.md) for implemented rules. Goal: 2200 rules (1721 i
 
 | Rule Name | Tier | Severity | Description |
 |-----------|------|----------|-------------|
-| ℹ️⭐ `require_session_timeout` | Professional | INFO | Sessions without timeout remain valid forever if tokens are stolen. Implement idle timeout and absolute session limits. |
 | ℹ️ `prefer_deep_link_auth` | Professional | INFO | Deep links with auth tokens (password reset, magic links) must validate tokens server-side and expire quickly. |
 | ⚠️ `avoid_remember_me_insecure` | Recommended | WARNING | "Remember me" storing unencrypted credentials is a security risk. Use refresh tokens with proper rotation and revocation. |
 | ℹ️ `require_multi_factor` | Comprehensive | INFO | Sensitive operations (payments, account changes) should offer or require multi-factor authentication for additional security. |
@@ -180,9 +179,7 @@ See [CHANGELOG.md](CHANGELOG.md) for implemented rules. Goal: 2200 rules (1721 i
 
 | Rule Name | Tier | Severity | Description |
 |-----------|------|----------|-------------|
-| ℹ️⭐ `prefer_optimistic_updates` | Professional | INFO | Update local state immediately, sync to server in background. Waiting for server makes UI feel slow. |
 | ⚠️ `require_conflict_resolution_strategy` | Professional | WARNING | Offline edits that conflict with server need resolution: last-write-wins, merge, or user prompt. Define strategy upfront. |
-| ⚠️⭐ `avoid_full_sync_on_every_launch` | Professional | WARNING | Downloading entire dataset on launch is slow and expensive. Use delta sync with timestamps or change feeds. |
 
 ### 1.14 Background Processing Rules
 
@@ -334,7 +331,6 @@ See [CHANGELOG.md](CHANGELOG.md) for implemented rules. Goal: 2200 rules (1721 i
 |-----------|------|----------|-------------|
 | ⚠️⭐ `avoid_deprecated_usage` | Recommended | WARNING | Warn when using deprecated APIs, classes, or methods. |
 | ⚠️ `avoid_high_cyclomatic_complexity` | Professional | WARNING | Warn when functions exceed a configurable cyclomatic complexity threshold. |
-| ℹ️⭐ `avoid_ignoring_return_values` | Recommended | INFO | Warn when function return values are ignored (unless explicitly marked). |
 | ℹ️ `avoid_importing_entrypoint_exports` | Professional | INFO | Avoid importing from files that re-export entry points. |
 | ⚠️ `avoid_suspicious_global_reference` | Professional | WARNING | Detect suspicious references to global state in methods. |
 | ⚠️ `avoid_unused_local_variable` | Recommended | WARNING | Local variables that are declared but never used. |
@@ -684,7 +680,6 @@ Rules for popular Flutter packages based on common gotchas, anti-patterns, and b
 | Rule Name | Tier | Severity | Description |
 |-----------|------|----------|-------------|
 | ⚠️ `avoid_cached_image_web` | Recommended | WARNING | CachedNetworkImage lacks web caching. Detect web usage; suggest alternatives. |
-| ⚠️⭐ `avoid_cached_image_unbounded_list` | Essential | WARNING | Image lists need bounded cache. Detect ListView with many CachedNetworkImages. |
 
 ### 5.11 image_picker Rules
 

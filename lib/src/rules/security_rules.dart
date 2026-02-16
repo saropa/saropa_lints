@@ -6646,3 +6646,140 @@ class PreferOauthPkceRule extends SaropaLintRule {
     });
   }
 }
+
+// =============================================================================
+// require_session_timeout
+// =============================================================================
+
+/// Warns when authentication sign-in calls lack session timeout handling.
+///
+/// Since: v4.15.0 | Rule version: v1
+///
+/// Sessions without timeout remain valid forever if tokens are stolen.
+/// Authentication sign-in calls should be paired with idle timeout and
+/// absolute session limit logic. Without timeouts, compromised tokens
+/// grant indefinite access to user accounts.
+///
+/// **BAD:**
+/// ```dart
+/// Future<void> login() async {
+///   await FirebaseAuth.instance.signInWithEmailAndPassword(
+///     email: email,
+///     password: password,
+///   );
+///   // No session timeout configured
+/// }
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// Future<void> login() async {
+///   await FirebaseAuth.instance.signInWithEmailAndPassword(
+///     email: email,
+///     password: password,
+///   );
+///   _sessionTimer = Timer(sessionTimeout, _handleSessionExpiry);
+/// }
+/// ```
+class RequireSessionTimeoutRule extends SaropaLintRule {
+  const RequireSessionTimeoutRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  @override
+  Set<String>? get requiredPatterns => const <String>{'signIn', 'signUp'};
+
+  static const LintCode _code = LintCode(
+    name: 'require_session_timeout',
+    problemMessage:
+        '[require_session_timeout] Authentication sign-in without session '
+        'timeout handling. Sessions without timeout remain valid forever if '
+        'tokens are stolen or compromised. This is a security risk that '
+        'allows indefinite access to user accounts. Implement idle timeout '
+        'and absolute session limits after successful authentication. {v1}',
+    correctionMessage:
+        'Add session timeout logic (Timer, Duration) after sign-in to '
+        'automatically expire sessions.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  /// Method name patterns that indicate authentication sign-in.
+  /// Only matches Firebase/Auth SDK methods to minimize false positives.
+  static const Set<String> _signInMethods = <String>{
+    'signIn',
+    'signInWithEmailAndPassword',
+    'signInWithCredential',
+    'signInWithCustomToken',
+    'signInWithPopup',
+    'signInWithRedirect',
+    'signInAnonymously',
+    'signInWithPhoneNumber',
+    'signInWithProvider',
+    'signInWithApple',
+    'signInWithGoogle',
+  };
+
+  /// Tokens that indicate session timeout handling is present.
+  static const Set<String> _timeoutIndicators = <String>{
+    'Timer(',
+    'sessionTimeout',
+    'sessionExpiry',
+    'sessionDuration',
+    'idleTimeout',
+    'tokenExpiry',
+    'expiresIn',
+    'expiresAt',
+    'refreshToken',
+    'sessionTimer',
+    'autoLogout',
+  };
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      final String methodName = node.methodName.name;
+
+      // Check if this is a sign-in method
+      if (!_isSignInMethod(methodName)) return;
+
+      // Check the enclosing method/function for timeout handling
+      final AstNode? enclosingMethod = _findEnclosingMethod(node);
+      if (enclosingMethod == null) return;
+
+      final String bodySource = enclosingMethod.toSource();
+
+      // Check if timeout handling exists in the enclosing method
+      for (final String indicator in _timeoutIndicators) {
+        if (bodySource.contains(indicator)) return;
+      }
+
+      reporter.atNode(node, code);
+    });
+  }
+
+  bool _isSignInMethod(String name) {
+    if (_signInMethods.contains(name)) return true;
+    // Match methods starting with signIn/signUp (Firebase convention)
+    if (name.startsWith('signIn') || name.startsWith('signUp')) return true;
+    return false;
+  }
+
+  AstNode? _findEnclosingMethod(AstNode node) {
+    AstNode? current = node.parent;
+    while (current != null) {
+      if (current is MethodDeclaration || current is FunctionDeclaration) {
+        return current;
+      }
+      current = current.parent;
+    }
+    return null;
+  }
+}

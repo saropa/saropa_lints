@@ -4345,3 +4345,123 @@ class AvoidBlockingMainThreadRule extends SaropaLintRule {
     });
   }
 }
+
+// =============================================================================
+// avoid_full_sync_on_every_launch
+// =============================================================================
+
+/// Warns when bulk data fetching is performed inside initState.
+///
+/// Since: v4.15.0 | Rule version: v1
+///
+/// Downloading an entire dataset on every app launch is slow, expensive,
+/// and wastes bandwidth. Use delta sync with timestamps or change feeds
+/// instead. Move bulk fetches to a background sync mechanism that only
+/// downloads what has changed since the last sync.
+///
+/// **BAD:**
+/// ```dart
+/// @override
+/// void initState() {
+///   super.initState();
+///   database.getAll(); // Fetches everything on every launch
+/// }
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// @override
+/// void initState() {
+///   super.initState();
+///   syncService.syncSince(lastSyncTimestamp); // Delta sync
+/// }
+/// ```
+class AvoidFullSyncOnEveryLaunchRule extends SaropaLintRule {
+  const AvoidFullSyncOnEveryLaunchRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.widget};
+
+  static const LintCode _code = LintCode(
+    name: 'avoid_full_sync_on_every_launch',
+    problemMessage:
+        '[avoid_full_sync_on_every_launch] Bulk data fetch detected in '
+        'initState. Downloading the entire dataset on every launch is slow '
+        'and wastes bandwidth. This causes unnecessary network traffic and '
+        'increases startup time, especially on slow connections. Use delta '
+        'sync with timestamps or change feeds to only fetch what changed '
+        'since the last sync. {v1}',
+    correctionMessage:
+        'Replace bulk fetch with delta sync using timestamps or change feeds.',
+    errorSeverity: DiagnosticSeverity.WARNING,
+  );
+
+  /// Method names that suggest bulk data fetching.
+  static const Set<String> _bulkFetchMethods = <String>{
+    'getAll',
+    'fetchAll',
+    'findAll',
+    'listAll',
+    'queryAll',
+    'loadAll',
+    'readAll',
+    'syncAll',
+    'downloadAll',
+    'getAllDocuments',
+    'getAllRecords',
+    'getAllItems',
+    'getAllUsers',
+  };
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addMethodDeclaration((MethodDeclaration node) {
+      // Only check initState methods
+      if (node.name.lexeme != 'initState') return;
+
+      // Visit the body for bulk fetch calls
+      final FunctionBody body = node.body;
+      if (body is! BlockFunctionBody) return;
+
+      _checkForBulkFetch(body.block, reporter);
+    });
+  }
+
+  void _checkForBulkFetch(
+    Block block,
+    SaropaDiagnosticReporter reporter,
+  ) {
+    for (final Statement stmt in block.statements) {
+      _visitForBulkFetch(stmt, reporter);
+    }
+  }
+
+  void _visitForBulkFetch(
+    AstNode node,
+    SaropaDiagnosticReporter reporter,
+  ) {
+    if (node is MethodInvocation) {
+      final String name = node.methodName.name;
+      if (_bulkFetchMethods.contains(name)) {
+        reporter.atNode(node, code);
+        return;
+      }
+    }
+
+    for (final AstNode child in node.childEntities.whereType<AstNode>()) {
+      // Don't descend into nested function declarations
+      if (child is FunctionExpression || child is FunctionDeclaration) continue;
+      _visitForBulkFetch(child, reporter);
+    }
+  }
+}

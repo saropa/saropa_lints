@@ -1375,3 +1375,122 @@ class AvoidStaticStateRule extends SaropaLintRule {
     });
   }
 }
+
+// =============================================================================
+// prefer_optimistic_updates
+// =============================================================================
+
+/// Warns when setState is called after an await expression.
+///
+/// Since: v4.15.0 | Rule version: v1
+///
+/// Calling setState after an await makes the UI feel slow because the user
+/// must wait for the async operation to complete before seeing any visual
+/// feedback. Optimistic updates update local state immediately and sync
+/// to the server in the background, providing a much snappier experience.
+///
+/// **BAD:**
+/// ```dart
+/// Future<void> _onLike() async {
+///   await api.likePost(postId);
+///   setState(() { isLiked = true; }); // User waits for network
+/// }
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// Future<void> _onLike() async {
+///   setState(() { isLiked = true; }); // Immediate feedback
+///   try {
+///     await api.likePost(postId);
+///   } catch (_) {
+///     setState(() { isLiked = false; }); // Rollback on failure
+///   }
+/// }
+/// ```
+class PreferOptimisticUpdatesRule extends SaropaLintRule {
+  const PreferOptimisticUpdatesRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.widget};
+
+  @override
+  Set<String>? get requiredPatterns => const <String>{'setState'};
+
+  static const LintCode _code = LintCode(
+    name: 'prefer_optimistic_updates',
+    problemMessage:
+        '[prefer_optimistic_updates] setState called after an await '
+        'expression. The UI will not update until the async operation '
+        'completes, making the app feel slow and unresponsive. Consider '
+        'updating the state optimistically before the await and rolling '
+        'back on failure for a snappier user experience. {v1}',
+    correctionMessage:
+        'Move setState before the await and add a try-catch to rollback '
+        'on failure.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addMethodDeclaration((MethodDeclaration node) {
+      // Only check async methods
+      if (!node.isAbstract && node.body is! EmptyFunctionBody) {
+        final FunctionBody body = node.body;
+        if (body is! BlockFunctionBody) return;
+        if (!body.isAsynchronous) return;
+
+        _checkBlockForSetStateAfterAwait(body.block, reporter);
+      }
+    });
+  }
+
+  void _checkBlockForSetStateAfterAwait(
+    Block block,
+    SaropaDiagnosticReporter reporter,
+  ) {
+    bool seenAwait = false;
+
+    for (final Statement stmt in block.statements) {
+      // Check if this statement contains an await
+      if (_containsAwait(stmt)) {
+        seenAwait = true;
+      }
+
+      // Check if this statement is a setState call after an await
+      if (seenAwait && _isSetStateCall(stmt)) {
+        reporter.atNode(stmt, code);
+      }
+    }
+  }
+
+  bool _containsAwait(AstNode node) {
+    if (node is AwaitExpression) return true;
+    for (final AstNode child in node.childEntities.whereType<AstNode>()) {
+      // Don't descend into nested function bodies
+      if (child is FunctionBody || child is FunctionExpression) continue;
+      if (_containsAwait(child)) return true;
+    }
+    return false;
+  }
+
+  bool _isSetStateCall(Statement stmt) {
+    if (stmt is ExpressionStatement) {
+      final Expression expr = stmt.expression;
+      if (expr is MethodInvocation) {
+        return expr.methodName.name == 'setState';
+      }
+    }
+    return false;
+  }
+}

@@ -1960,3 +1960,124 @@ class RequireCachedImageDevicePixelRatioRule extends SaropaLintRule {
     });
   }
 }
+
+// =============================================================================
+// avoid_cached_image_unbounded_list
+// =============================================================================
+
+/// Warns when CachedNetworkImage is used in a ListView without cache bounds.
+///
+/// Since: v4.15.0 | Rule version: v1
+///
+/// Using CachedNetworkImage inside a ListView.builder or GridView.builder
+/// without specifying memCacheWidth or memCacheHeight causes all images to
+/// be cached at full resolution. In a long scrollable list this leads to
+/// excessive memory usage and potential out-of-memory crashes, especially
+/// on lower-end devices.
+///
+/// **BAD:**
+/// ```dart
+/// ListView.builder(
+///   itemBuilder: (context, index) => CachedNetworkImage(
+///     imageUrl: urls[index],
+///   ),
+/// )
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// ListView.builder(
+///   itemBuilder: (context, index) => CachedNetworkImage(
+///     imageUrl: urls[index],
+///     memCacheWidth: 200,
+///     memCacheHeight: 200,
+///   ),
+/// )
+/// ```
+class AvoidCachedImageUnboundedListRule extends SaropaLintRule {
+  const AvoidCachedImageUnboundedListRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.widget};
+
+  @override
+  Set<String>? get requiredPatterns => const <String>{'CachedNetworkImage'};
+
+  static const LintCode _code = LintCode(
+    name: 'avoid_cached_image_unbounded_list',
+    problemMessage:
+        '[avoid_cached_image_unbounded_list] CachedNetworkImage used inside '
+        'a scrollable list without memCacheWidth or memCacheHeight. All '
+        'images are cached at full resolution, causing excessive memory '
+        'usage that can lead to OOM crashes on lower-end devices. In a long '
+        'list, this quickly exhausts available memory. {v1}',
+    correctionMessage:
+        'Add memCacheWidth and/or memCacheHeight to limit cached image '
+        'resolution.',
+    errorSeverity: DiagnosticSeverity.WARNING,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addInstanceCreationExpression((
+      InstanceCreationExpression node,
+    ) {
+      final String constructorSource = node.constructorName.toSource();
+      if (!constructorSource.contains('CachedNetworkImage')) return;
+
+      // Check if already has memCacheWidth or memCacheHeight
+      for (final Expression arg in node.argumentList.arguments) {
+        if (arg is NamedExpression) {
+          final String name = arg.name.label.name;
+          if (name == 'memCacheWidth' || name == 'memCacheHeight') {
+            return; // Has cache bounds, OK
+          }
+        }
+      }
+
+      // Check if inside a list builder's itemBuilder
+      if (_isInsideListBuilder(node)) {
+        reporter.atNode(node.constructorName, code);
+      }
+    });
+  }
+
+  /// Walks up the AST to check if this node is inside a scrollable list
+  /// widget's itemBuilder callback.
+  bool _isInsideListBuilder(AstNode node) {
+    AstNode? current = node.parent;
+    while (current != null) {
+      if (current is InstanceCreationExpression) {
+        final String source = current.constructorName.toSource();
+        if (_isListBuilderConstructor(source)) return true;
+      }
+      current = current.parent;
+    }
+    return false;
+  }
+
+  /// Checks if a constructor source matches a scrollable list builder.
+  static bool _isListBuilderConstructor(String source) {
+    // Match ListView.builder, ListView.separated, GridView.builder, etc.
+    if (source.startsWith('ListView') ||
+        source.startsWith('GridView') ||
+        source.startsWith('SliverList') ||
+        source.startsWith('SliverGrid')) {
+      return source.contains('.builder') ||
+          source.contains('.separated') ||
+          source.contains('.count') ||
+          source.contains('.extent');
+    }
+    return false;
+  }
+}
