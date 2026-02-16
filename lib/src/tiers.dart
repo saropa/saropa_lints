@@ -668,6 +668,11 @@ const Set<String> essentialRules = <String>{
 
   // v4.15.0 - ROADMAP ⭐ Rules (Essential)
   'avoid_cached_image_unbounded_list', // WARNING - unbounded image cache in lists
+
+  // v4.16.0 - ROADMAP ⭐ Rules (Essential)
+  'avoid_color_only_meaning', // WARNING - WCAG 1.4.1 color-only indicators
+  'avoid_excessive_rebuilds_animation', // WARNING - too many widgets in builder
+  'avoid_misused_hooks', // WARNING - hooks in callbacks/closures
 };
 
 /// Recommended tier rules - Essential + common mistakes, performance basics.
@@ -1475,6 +1480,10 @@ const Set<String> recommendedOnlyRules = <String>{
   'require_analytics_error_handling', // INFO - analytics calls need try-catch
   'prefer_adaptive_icons', // INFO - use adaptive icon sizes
   'avoid_ignoring_return_values', // INFO - don't discard return values
+
+  // v4.16.0 - ROADMAP ⭐ Rules (Recommended)
+  'require_rtl_layout_support', // WARNING - hardcoded left/right in layouts
+  'avoid_misused_test_matchers', // WARNING - raw literals as test matchers
 };
 
 /// Professional tier rules - Recommended + architecture, testing, maintainability.

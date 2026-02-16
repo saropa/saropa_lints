@@ -1807,3 +1807,173 @@ class _SuggestSpringSimulationFix extends DartFix {
     });
   }
 }
+
+// =============================================================================
+// avoid_excessive_rebuilds_animation
+// =============================================================================
+
+/// Warns when animation builder callbacks contain too many widgets.
+///
+/// Since: v4.16.0 | Rule version: v1
+///
+/// Alias: animation_builder_too_large, excessive_animation_rebuilds
+///
+/// Animation builder callbacks (AnimatedBuilder, ValueListenableBuilder,
+/// StreamBuilder, etc.) run on every frame or value change. Placing too
+/// many widget constructors inside the builder wastes CPU rebuilding
+/// static content that could be passed via the `child` parameter.
+///
+/// **BAD:**
+/// ```dart
+/// AnimatedBuilder(
+///   animation: _controller,
+///   builder: (context, child) {
+///     return Column(
+///       children: [
+///         AppBar(title: Text('Title')),
+///         Text('Static'),
+///         Icon(Icons.star),
+///         Container(color: Colors.blue),
+///         Opacity(opacity: _controller.value, child: child),
+///       ],
+///     );
+///   },
+/// )
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// AnimatedBuilder(
+///   animation: _controller,
+///   child: Column(children: [Text('Static'), Icon(Icons.star)]),
+///   builder: (context, child) {
+///     return Opacity(opacity: _controller.value, child: child);
+///   },
+/// )
+/// ```
+class AvoidExcessiveRebuildsAnimationRule extends SaropaLintRule {
+  const AvoidExcessiveRebuildsAnimationRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  static const LintCode _code = LintCode(
+    name: 'avoid_excessive_rebuilds_animation',
+    problemMessage:
+        '[avoid_excessive_rebuilds_animation] The builder callback of this '
+        'animation widget contains too many widget constructors, causing the '
+        'entire subtree to rebuild on every animation frame (typically 60 '
+        'times per second). This wastes CPU cycles, increases battery drain, '
+        'and degrades animation smoothness. Only widgets that actually change '
+        'during the animation should be inside the builder; static content '
+        'should be passed via the child parameter or moved outside. {v1}',
+    correctionMessage:
+        'Extract static widgets outside the builder callback. Use the child '
+        'parameter to pass non-animating subtrees through. Only keep widgets '
+        'that depend on the animation value inside the builder.',
+    errorSeverity: DiagnosticSeverity.WARNING,
+  );
+
+  static const Set<String> _builderWidgets = <String>{
+    'AnimatedBuilder',
+    'ValueListenableBuilder',
+    'StreamBuilder',
+    'FutureBuilder',
+    'ListenableBuilder',
+  };
+
+  /// Threshold: flag builders with more than this many widget constructors.
+  static const int _widgetCountThreshold = 5;
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addInstanceCreationExpression((
+      InstanceCreationExpression node,
+    ) {
+      final String typeName = node.constructorName.type.name.lexeme;
+      if (!_builderWidgets.contains(typeName)) return;
+
+      // Find the builder named argument
+      for (final Expression arg in node.argumentList.arguments) {
+        if (arg is! NamedExpression) continue;
+        if (arg.name.label.name != 'builder') continue;
+
+        final Expression builderExpr = arg.expression;
+        if (builderExpr is! FunctionExpression) continue;
+
+        final int count = _countWidgetsInBody(builderExpr.body);
+        if (count > _widgetCountThreshold) {
+          reporter.atNode(node.constructorName, code);
+        }
+        return;
+      }
+    });
+  }
+
+  int _countWidgetsInBody(FunctionBody body) {
+    final _WidgetCountVisitor visitor = _WidgetCountVisitor();
+    body.accept(visitor);
+    return visitor.widgetCount;
+  }
+}
+
+/// Counts widget constructor invocations in a subtree.
+///
+/// Uses a set of common Flutter widget names rather than a PascalCase
+/// heuristic. This avoids counting data classes (User, Config, Duration)
+/// which would cause false positives. The set covers the most common
+/// layout, styling, and interactive widgets found in builder callbacks.
+class _WidgetCountVisitor extends RecursiveAstVisitor<void> {
+  int widgetCount = 0;
+
+  static const Set<String> _knownWidgets = <String>{
+    'Align',
+    'AnimatedOpacity',
+    'AppBar',
+    'Card',
+    'Center',
+    'ClipOval',
+    'ClipRRect',
+    'ColoredBox',
+    'Column',
+    'Container',
+    'DecoratedBox',
+    'ElevatedButton',
+    'Expanded',
+    'Flexible',
+    'GestureDetector',
+    'Icon',
+    'IconButton',
+    'Image',
+    'InkWell',
+    'ListTile',
+    'Material',
+    'Opacity',
+    'Padding',
+    'Positioned',
+    'Row',
+    'Scaffold',
+    'SizedBox',
+    'Stack',
+    'Text',
+    'TextButton',
+    'Transform',
+    'Wrap',
+  };
+
+  @override
+  void visitInstanceCreationExpression(InstanceCreationExpression node) {
+    final String typeName = node.constructorName.type.name.lexeme;
+    if (_knownWidgets.contains(typeName)) {
+      widgetCount++;
+    }
+    super.visitInstanceCreationExpression(node);
+  }
+}

@@ -3222,3 +3222,204 @@ class RequireIntegrationTestTimeoutRule extends SaropaLintRule {
     });
   }
 }
+
+// =============================================================================
+// avoid_misused_test_matchers
+// =============================================================================
+
+/// Warns when raw literals are used as test matchers instead of proper ones.
+///
+/// Since: v4.16.0 | Rule version: v1
+///
+/// Alias: raw_matcher_literal, expect_literal, prefer_proper_matcher
+///
+/// Using raw literals (true, false, null) as the second argument to expect()
+/// produces poor failure messages like "Expected: true, Actual: false".
+/// Proper matchers like isTrue, isFalse, isNull, hasLength provide clearer
+/// assertion semantics and better diagnostic output.
+///
+/// **BAD:**
+/// ```dart
+/// expect(result, true);
+/// expect(value, false);
+/// expect(item, null);
+/// expect(list.length, 3);
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// expect(result, isTrue);
+/// expect(value, isFalse);
+/// expect(item, isNull);
+/// expect(list, hasLength(3));
+/// ```
+class AvoidMisusedTestMatchersRule extends SaropaLintRule {
+  const AvoidMisusedTestMatchersRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.test};
+
+  static const LintCode _code = LintCode(
+    name: 'avoid_misused_test_matchers',
+    problemMessage:
+        '[avoid_misused_test_matchers] Raw literal used as a test matcher '
+        'instead of a proper matcher function. Using literals (true, false, '
+        'null) as the second argument to expect() produces poor failure '
+        'messages that show "Expected: true, Actual: false" instead of '
+        'descriptive matcher output. Proper matchers like isTrue, isFalse, '
+        'isNull, hasLength, equals, and isA provide clearer assertion '
+        'semantics and significantly better diagnostic output when tests '
+        'fail, making debugging faster. {v1}',
+    correctionMessage: 'Replace literal matchers with proper test matchers: '
+        'expect(x, true) => expect(x, isTrue), '
+        'expect(x, false) => expect(x, isFalse), '
+        'expect(x, null) => expect(x, isNull), '
+        'expect(list.length, N) => expect(list, hasLength(N)).',
+    errorSeverity: DiagnosticSeverity.WARNING,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      if (node.methodName.name != 'expect') return;
+
+      final List<Expression> positionalArgs = node.argumentList.arguments
+          .where((Expression e) => e is! NamedExpression)
+          .toList();
+
+      if (positionalArgs.length < 2) return;
+
+      final Expression actual = positionalArgs[0];
+      final Expression matcher = positionalArgs[1];
+
+      // Pattern 1: expect(x, true) or expect(x, false)
+      if (matcher is BooleanLiteral) {
+        reporter.atNode(matcher, code);
+        return;
+      }
+
+      // Pattern 2: expect(x, null)
+      if (matcher is NullLiteral) {
+        reporter.atNode(matcher, code);
+        return;
+      }
+
+      // Pattern 3: expect(list.length, N)
+      if (matcher is IntegerLiteral && _isLengthAccess(actual)) {
+        reporter.atNode(node, code);
+        return;
+      }
+    });
+  }
+
+  /// Checks if the expression is a `.length` property access.
+  bool _isLengthAccess(Expression expr) {
+    if (expr is PropertyAccess) {
+      return expr.propertyName.name == 'length';
+    }
+    if (expr is PrefixedIdentifier) {
+      return expr.identifier.name == 'length';
+    }
+    return false;
+  }
+
+  @override
+  List<Fix> getFixes() => [_AvoidMisusedTestMatchersFix()];
+}
+
+/// Quick fix for [AvoidMisusedTestMatchersRule].
+class _AvoidMisusedTestMatchersFix extends DartFix {
+  @override
+  void run(
+    CustomLintResolver resolver,
+    ChangeReporter reporter,
+    CustomLintContext context,
+    AnalysisError analysisError,
+    List<AnalysisError> others,
+  ) {
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
+      if (node.methodName.name != 'expect') return;
+
+      final List<Expression> positionalArgs = node.argumentList.arguments
+          .where((Expression e) => e is! NamedExpression)
+          .toList();
+
+      if (positionalArgs.length < 2) return;
+
+      final Expression actual = positionalArgs[0];
+      final Expression matcher = positionalArgs[1];
+
+      // Fix: expect(x, true) → expect(x, isTrue)
+      // Fix: expect(x, false) → expect(x, isFalse)
+      if (matcher is BooleanLiteral) {
+        final String replacement = matcher.value ? 'isTrue' : 'isFalse';
+        final changeBuilder = reporter.createChangeBuilder(
+          message: 'Replace with $replacement',
+          priority: 80,
+        );
+        changeBuilder.addDartFileEdit((builder) {
+          builder.addSimpleReplacement(matcher.sourceRange, replacement);
+        });
+        return;
+      }
+
+      // Fix: expect(x, null) → expect(x, isNull)
+      if (matcher is NullLiteral) {
+        final changeBuilder = reporter.createChangeBuilder(
+          message: 'Replace with isNull',
+          priority: 80,
+        );
+        changeBuilder.addDartFileEdit((builder) {
+          builder.addSimpleReplacement(matcher.sourceRange, 'isNull');
+        });
+        return;
+      }
+
+      // Fix: expect(list.length, N) → expect(list, hasLength(N))
+      if (matcher is IntegerLiteral && _isLengthTarget(actual)) {
+        final String collection = _extractBeforeLength(actual);
+        if (collection.isEmpty) return;
+
+        final changeBuilder = reporter.createChangeBuilder(
+          message: 'Replace with hasLength(${matcher.toSource()})',
+          priority: 80,
+        );
+        changeBuilder.addDartFileEdit((builder) {
+          builder.addSimpleReplacement(
+            SourceRange(
+              node.argumentList.leftParenthesis.offset + 1,
+              node.argumentList.rightParenthesis.offset -
+                  node.argumentList.leftParenthesis.offset -
+                  1,
+            ),
+            '$collection, hasLength(${matcher.toSource()})',
+          );
+        });
+      }
+    });
+  }
+
+  bool _isLengthTarget(Expression expr) {
+    if (expr is PropertyAccess) return expr.propertyName.name == 'length';
+    if (expr is PrefixedIdentifier) return expr.identifier.name == 'length';
+    return false;
+  }
+
+  /// Extracts the collection expression before `.length`.
+  String _extractBeforeLength(Expression expr) {
+    if (expr is PropertyAccess) return expr.target?.toSource() ?? '';
+    if (expr is PrefixedIdentifier) return expr.prefix.name;
+    return '';
+  }
+}

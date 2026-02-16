@@ -456,3 +456,140 @@ class _InlineCallbackVisitor extends RecursiveAstVisitor<void> {
     super.visitNamedExpression(node);
   }
 }
+
+// =============================================================================
+// avoid_misused_hooks
+// =============================================================================
+
+/// Warns when hook functions are called inside callbacks or closures.
+///
+/// Since: v4.16.0 | Rule version: v1
+///
+/// Alias: hooks_in_callback, hook_in_closure, hooks_rules_violation
+///
+/// Flutter hooks must be called at the top level of the build method, never
+/// inside callbacks (onPressed, onTap), event handlers, or nested functions.
+/// Hooks called inside closures execute unpredictably because the closure may
+/// run zero, one, or many times per build, breaking hook state tracking.
+///
+/// This rule complements `avoid_conditional_hooks` (which catches hooks in
+/// if/for/while/switch) and `avoid_hooks_outside_build` (which catches hooks
+/// outside build entirely). This rule catches the gap: hooks inside
+/// callbacks/closures within build.
+///
+/// **BAD:**
+/// ```dart
+/// class MyWidget extends HookWidget {
+///   Widget build(BuildContext context) {
+///     return ElevatedButton(
+///       onPressed: () {
+///         final value = useState(0); // Hook in callback!
+///       },
+///       child: Text('Click'),
+///     );
+///   }
+/// }
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// class MyWidget extends HookWidget {
+///   Widget build(BuildContext context) {
+///     final value = useState(0); // Hook at top of build
+///     return ElevatedButton(
+///       onPressed: () {
+///         value.value++;
+///       },
+///       child: Text('${value.value}'),
+///     );
+///   }
+/// }
+/// ```
+class AvoidMisusedHooksRule extends SaropaLintRule {
+  const AvoidMisusedHooksRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  static const LintCode _code = LintCode(
+    name: 'avoid_misused_hooks',
+    problemMessage:
+        '[avoid_misused_hooks] Hook function is called inside a callback or '
+        'closure, which violates the rules of hooks. Hooks must be called at '
+        'the top level of the build method, never inside callbacks (onPressed, '
+        'onTap), event handlers, or nested functions. Hooks called inside '
+        'closures execute unpredictably because the closure may run zero, one, '
+        'or many times per build, breaking hook state tracking and causing '
+        'runtime errors or lost state. {v1}',
+    correctionMessage:
+        'Move the hook call to the top level of the build() method, before '
+        'any callbacks or closures. Store the hook result in a variable and '
+        'use that variable inside the callback instead.',
+    errorSeverity: DiagnosticSeverity.WARNING,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      final String methodName = node.methodName.name;
+      if (!_isHookFunction(methodName)) return;
+
+      // Only flag inside HookWidget/HookConsumerWidget classes
+      if (!_isInsideHookWidget(node)) return;
+
+      // Walk up AST: if we find a FunctionExpression before reaching
+      // a MethodDeclaration named 'build', the hook is in a callback.
+      AstNode? current = node.parent;
+      while (current != null) {
+        // If we hit a MethodDeclaration named 'build', hook is at top level
+        if (current is MethodDeclaration && current.name.lexeme == 'build') {
+          return; // OK — hook is at the top level of build
+        }
+
+        // If we hit a FunctionExpression, hook is inside a callback/closure
+        if (current is FunctionExpression) {
+          // Exception: the FunctionExpression IS the build method body
+          // (shouldn't happen for MethodDeclaration, but be safe)
+          final AstNode? funcParent = current.parent;
+          if (funcParent is MethodDeclaration &&
+              funcParent.name.lexeme == 'build') {
+            return; // OK
+          }
+          reporter.atNode(node, code);
+          return;
+        }
+
+        // If we hit a FunctionDeclaration (local function), also a violation
+        if (current is FunctionDeclaration) {
+          reporter.atNode(node, code);
+          return;
+        }
+
+        current = current.parent;
+      }
+    });
+  }
+
+  /// Returns true if [node] is inside a class extending HookWidget or
+  /// HookConsumerWidget, preventing false positives on non-hook `use*`
+  /// methods in regular widgets.
+  bool _isInsideHookWidget(AstNode node) {
+    AstNode? current = node.parent;
+    while (current != null) {
+      if (current is ClassDeclaration) {
+        final String? superName =
+            current.extendsClause?.superclass.name2.lexeme;
+        return superName == 'HookWidget' || superName == 'HookConsumerWidget';
+      }
+      current = current.parent;
+    }
+    return false;
+  }
+}

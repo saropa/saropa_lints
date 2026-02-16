@@ -4075,3 +4075,168 @@ class AvoidRedundantSemanticsRule extends SaropaLintRule {
     });
   }
 }
+
+// =============================================================================
+// avoid_color_only_meaning
+// =============================================================================
+
+/// Warns when color is the sole visual means of conveying meaning.
+///
+/// Since: v4.16.0 | Rule version: v1
+///
+/// Alias: color_only_meaning, wcag_1_4_1, colorblind_accessibility
+///
+/// Approximately 8% of men and 0.5% of women have color vision deficiency.
+/// WCAG 1.4.1 (Use of Color) requires that color is never the only visual
+/// means of conveying information. Always pair conditional color with a
+/// secondary cue such as an icon, text label, or pattern.
+///
+/// This rule is broader than `avoid_color_only_indicators` (which only
+/// checks Container). It checks any widget using conditional color and
+/// verifies a companion Icon or Text exists nearby.
+///
+/// **BAD:**
+/// ```dart
+/// Card(
+///   color: isError ? Colors.red : Colors.green,
+///   child: SizedBox(width: 24, height: 24),
+/// )
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// Card(
+///   color: isError ? Colors.red : Colors.green,
+///   child: Icon(isError ? Icons.error : Icons.check),
+/// )
+/// ```
+class AvoidColorOnlyMeaningRule extends SaropaLintRule {
+  const AvoidColorOnlyMeaningRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  static const LintCode _code = LintCode(
+    name: 'avoid_color_only_meaning',
+    problemMessage:
+        '[avoid_color_only_meaning] Color is used as the sole visual indicator '
+        'to convey meaning or state, which is inaccessible to approximately 8% '
+        'of men and 0.5% of women with color vision deficiency. WCAG 1.4.1 '
+        '(Use of Color) requires that color is never the only visual means of '
+        'conveying information, indicating an action, or distinguishing a '
+        'visual element. Always pair color with a secondary cue such as an '
+        'icon, text label, underline, or pattern. {v1}',
+    correctionMessage:
+        'Add a non-color visual indicator alongside the conditional color: '
+        'an Icon, Text label, border, shape, or pattern that conveys the '
+        'same information independently of color.',
+    errorSeverity: DiagnosticSeverity.WARNING,
+  );
+
+  // Container is excluded — already checked by avoid_color_only_indicators.
+  static const Set<String> _colorBearingWidgets = <String>{
+    'DecoratedBox',
+    'ColoredBox',
+    'Card',
+    'AnimatedContainer',
+    'Material',
+    'PhysicalModel',
+    'Chip',
+    'CircleAvatar',
+    'Badge',
+  };
+
+  static const Set<String> _companionWidgets = <String>{
+    'Icon',
+    'Text',
+    'RichText',
+    'Semantics',
+  };
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addInstanceCreationExpression((
+      InstanceCreationExpression node,
+    ) {
+      final String typeName = node.constructorName.type.name.lexeme;
+      if (!_colorBearingWidgets.contains(typeName)) return;
+
+      // Find color or backgroundColor named argument with conditional
+      NamedExpression? conditionalColorArg;
+      for (final Expression arg in node.argumentList.arguments) {
+        if (arg is! NamedExpression) continue;
+        final String name = arg.name.label.name;
+        if ((name == 'color' || name == 'backgroundColor') &&
+            arg.expression is ConditionalExpression) {
+          conditionalColorArg = arg;
+          break;
+        }
+      }
+      if (conditionalColorArg == null) return;
+
+      // Check if this widget or its parent has a companion Icon/Text
+      if (_hasCompanionWidget(node)) return;
+
+      reporter.atNode(conditionalColorArg, code);
+    });
+  }
+
+  /// Walks the child/children of this widget and up to 3 parent levels
+  /// looking for an Icon, Text, or Semantics companion widget.
+  bool _hasCompanionWidget(InstanceCreationExpression node) {
+    // Check own children
+    if (_subtreeHasCompanion(node)) return true;
+
+    // Walk up to 3 parent levels checking siblings
+    AstNode? current = node;
+    for (int i = 0; i < 3; i++) {
+      current = current?.parent;
+      if (current == null) break;
+      if (current is InstanceCreationExpression) {
+        if (_subtreeHasCompanion(current, excludeNode: node)) return true;
+      }
+    }
+    return false;
+  }
+
+  bool _subtreeHasCompanion(
+    InstanceCreationExpression node, {
+    AstNode? excludeNode,
+  }) {
+    for (final Expression arg in node.argumentList.arguments) {
+      if (arg is NamedExpression) {
+        final String name = arg.name.label.name;
+        if (name == 'child' || name == 'children') {
+          return _expressionHasCompanion(arg.expression, excludeNode);
+        }
+      }
+    }
+    return false;
+  }
+
+  bool _expressionHasCompanion(Expression expr, AstNode? excludeNode) {
+    if (identical(expr, excludeNode)) return false;
+    if (expr is InstanceCreationExpression) {
+      final String typeName = expr.constructorName.type.name.lexeme;
+      if (_companionWidgets.contains(typeName)) return true;
+      // Recurse into child/children
+      return _subtreeHasCompanion(expr, excludeNode: excludeNode);
+    }
+    if (expr is ListLiteral) {
+      for (final CollectionElement element in expr.elements) {
+        if (element is Expression &&
+            _expressionHasCompanion(element, excludeNode)) {
+          return true;
+        }
+      }
+    }
+    return false;
+  }
+}

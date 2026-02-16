@@ -1428,3 +1428,22 @@ custom_lint:
 
     # --- Flutter Hooks ---
     - prefer_use_callback: false                     # INFO - inline closure in HookWidget needs useCallback (v4.15.0)
+
+    # =========================================================================
+    # V4.16.0 RULES - ROADMAP ⭐ Rules
+    # =========================================================================
+
+    # --- Accessibility ---
+    - avoid_color_only_meaning: false                # WARNING - conditional color without companion Icon/Text (v4.16.0, quick fix)
+
+    # --- Animation ---
+    - avoid_excessive_rebuilds_animation: false      # WARNING - builder callback with >5 widget constructors (v4.16.0)
+
+    # --- Flutter Hooks ---
+    - avoid_misused_hooks: false                     # WARNING - hook called inside callback within build (v4.16.0)
+
+    # --- Internationalization ---
+    - require_rtl_layout_support: false              # WARNING - hardcoded left/right values break RTL (v4.16.0, quick fix)
+
+    # --- Testing ---
+    - avoid_misused_test_matchers: false             # WARNING - raw literals as test matchers (v4.16.0, quick fix)

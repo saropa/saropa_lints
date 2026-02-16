@@ -11,6 +11,17 @@ Dates are not included in version headers — [pub.dev](https://pub.dev/packages
 ** See the current published changelog: [saropa_lints/changelog](https://pub.dev/packages/saropa_lints/changelog)
 
 ---
+## [Unreleased]
+
+### Added
+
+- **`avoid_color_only_meaning`** (Essential, WARNING): Warns when color is the sole visual indicator to convey meaning or state, violating WCAG 1.4.1. Checks multiple widget types (Container, Card, Material, etc.) and verifies a companion Icon/Text exists
+- **`avoid_excessive_rebuilds_animation`** (Essential, WARNING): Warns when animation builder callbacks (AnimatedBuilder, ValueListenableBuilder, StreamBuilder, etc.) contain more than 5 widget constructors, causing excessive rebuilds every frame
+- **`avoid_misused_hooks`** (Essential, WARNING): Warns when Flutter hook functions (useState, useEffect, etc.) are called inside callbacks or closures rather than at the top level of the build method
+- **`require_rtl_layout_support`** (Recommended, WARNING): Warns when hardcoded left/right directional values are used (TextAlign.left, Alignment.centerLeft, EdgeInsets.fromLTRB) instead of directional equivalents (start/end) for RTL language support. Quick fix converts to directional equivalents
+- **`avoid_misused_test_matchers`** (Recommended, WARNING): Warns when raw literals (true, false, null) are used as test matchers instead of proper matchers (isTrue, isFalse, isNull, hasLength). Quick fix replaces with proper matchers
+
+---
 ## [4.15.0]
 
 ### Added
