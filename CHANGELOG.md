@@ -11,6 +11,17 @@ Dates are not included in version headers — [pub.dev](https://pub.dev/packages
 ** See the current published changelog: [saropa_lints/changelog](https://pub.dev/packages/saropa_lints/changelog)
 
 ---
+## [4.15.0]
+
+### Added
+
+- **`avoid_ignoring_return_values`** (Recommended, INFO): Warns when a function's return value is discarded, which can silently hide bugs where an important result (Future, boolean, parsed value) is lost
+- **`prefer_optimistic_updates`** (Professional, INFO): Warns when `setState` is called after an `await` expression — update local state immediately for a snappier UX and rollback on failure
+- **`avoid_full_sync_on_every_launch`** (Professional, WARNING): Warns when bulk data fetch methods (`getAll`, `fetchAll`, `findAll`) are called inside `initState`, which wastes bandwidth on every launch instead of using delta sync
+- **`avoid_cached_image_unbounded_list`** (Essential, WARNING): Warns when `CachedNetworkImage` is used in a scrollable list without `memCacheWidth`/`memCacheHeight`, causing OOM from full-resolution image caching
+- **`require_session_timeout`** (Professional, INFO): Warns when authentication sign-in calls lack session timeout handling, leaving sessions valid indefinitely if tokens are compromised
+
+---
 ## [4.14.5]
 
 ### Fixed
