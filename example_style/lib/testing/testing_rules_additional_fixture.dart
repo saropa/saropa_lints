@@ -125,6 +125,62 @@ void goodWithSetUp() {
   });
 }
 
+// OK: Assertion/verification calls should not be treated as setup code.
+// expect(), verify(), fail() etc. are test body, not initialization.
+void goodRepeatedAssertions() {
+  group('documented behavior', () {
+    test('case A', () {
+      expect(true, isTrue, reason: 'Verified via code review');
+    });
+
+    test('case B', () {
+      expect(true, isTrue, reason: 'Verified via code review');
+    });
+
+    test('case C', () {
+      expect(true, isTrue, reason: 'Verified via code review');
+    });
+  });
+}
+
+// OK: Repeated await expectLater() should also not trigger.
+void goodRepeatedAwaitAssertions() {
+  group('stream tests', () {
+    test('stream A', () async {
+      await expectLater(stream, emitsInOrder([1, 2]));
+    });
+
+    test('stream B', () async {
+      await expectLater(stream, emitsInOrder([1, 2]));
+    });
+
+    test('stream C', () async {
+      await expectLater(stream, emitsInOrder([1, 2]));
+    });
+  });
+}
+
+// OK: Tests in different groups should not count toward the same threshold.
+void goodCrossGroupNotCounted() {
+  group('group A', () {
+    test('test 1', () {
+      final repo = MockRepository();
+    });
+  });
+
+  group('group B', () {
+    test('test 2', () {
+      final repo = MockRepository();
+    });
+  });
+
+  group('group C', () {
+    test('test 3', () {
+      final repo = MockRepository();
+    });
+  });
+}
+
 // OK: Independent primitive locals should not trigger prefer_setup_teardown.
 // Each test declares its own counter/constant — these are not shared setup.
 void goodRepeatedPrimitiveLocals() {

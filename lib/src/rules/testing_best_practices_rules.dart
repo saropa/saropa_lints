@@ -2670,9 +2670,12 @@ class _AddPumpAndSettleTodoFix extends DartFix {
 ///   `throwsStateError`, `throwsFormatException`, etc.
 /// - **Expect patterns**: `expect(..., isA<Exception>())`,
 ///   `expect(..., isA<Error>())`, or `throwsA` inside `expect`.
-/// - **Test name keywords**: `throw`, `error`, `fail`, `invalid`,
-///   `exception`, `null`, `empty`, `boundary`, `edge`, `negative`,
-///   `fallback`, `missing`.
+/// - **Test name keywords**: `throw`, `error`, `fail`, `exception`,
+///   `invalid`, `malformed`, `corrupt`, `null`, `empty`, `boundary`,
+///   `edge`, `negative`, `zero`, `overflow`, `missing`, `not found`,
+///   `unavailable`, `fallback`, `default`, `safely`, `graceful`,
+///   `defensive`, `dispose`, `closed`, `disconnect`, `timeout`,
+///   `cancel`, `reject`, `denied`, `unauthorized`.
 ///
 /// If the source code under test has no error-throwing paths (e.g. pure
 /// enums with exhaustive switches, defensive try/catch with fallback
@@ -2736,6 +2739,24 @@ class RequireErrorCaseTestsRule extends SaropaLintRule {
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
+  /// Keywords in test names that indicate error-case or edge-case testing.
+  static const _errorCaseKeywords = <String>{
+    // Exception/error testing
+    'throw', 'error', 'fail', 'exception',
+    // Input validation
+    'invalid', 'malformed', 'corrupt',
+    // Boundary/edge conditions
+    'null', 'empty', 'boundary', 'edge', 'negative', 'zero', 'overflow',
+    // Missing/unavailable resources
+    'missing', 'not found', 'unavailable',
+    // Defensive behavior
+    'fallback', 'default', 'safely', 'graceful', 'defensive',
+    // Lifecycle/state conditions
+    'dispose', 'closed', 'disconnect',
+    // Failure conditions
+    'timeout', 'cancel', 'reject', 'denied', 'unauthorized',
+  };
+
   @override
   void runWithReporter(
     CustomLintResolver resolver,
@@ -2793,18 +2814,7 @@ class RequireErrorCaseTestsRule extends SaropaLintRule {
         final ArgumentList args = node.argumentList;
         if (args.arguments.isNotEmpty) {
           final String firstArg = args.arguments.first.toSource().toLowerCase();
-          if (firstArg.contains('throw') ||
-              firstArg.contains('error') ||
-              firstArg.contains('fail') ||
-              firstArg.contains('invalid') ||
-              firstArg.contains('exception') ||
-              firstArg.contains('null') ||
-              firstArg.contains('empty') ||
-              firstArg.contains('boundary') ||
-              firstArg.contains('edge') ||
-              firstArg.contains('negative') ||
-              firstArg.contains('fallback') ||
-              firstArg.contains('missing')) {
+          if (_errorCaseKeywords.any(firstArg.contains)) {
             hasErrorCaseTest = true;
           }
         }
@@ -2922,12 +2932,22 @@ class PreferTestFindByKeyRule extends SaropaLintRule {
 
 /// Warns when test setup code is duplicated instead of using setUp/tearDown.
 ///
-/// Since: v2.5.0 | Updated: v4.13.0 | Rule version: v5
+/// Since: v2.5.0 | Updated: v4.14.5 | Rule version: v6
 ///
 /// Alias: setup_teardown, test_setup, dry_tests
 ///
 /// Repeated setup code in tests violates DRY and makes maintenance harder.
 /// Use setUp() and tearDown() for common test initialization.
+///
+/// The rule compares the first 1-2 meaningful statements of each test body
+/// within the same `group()` scope. When 3+ tests share the same setup
+/// pattern, the rule fires on the first match.
+///
+/// **Excluded from setup signatures:**
+/// - Simple local variable initializations (literals, constants)
+/// - Test assertions: `expect`, `expectLater`, `expectAsync0..6`, `fail`
+/// - Mock verifications: `verify`, `verifyInOrder`, `verifyNever`,
+///   `verifyNoMoreInteractions`, `verifyZeroInteractions`
 ///
 /// **BAD:**
 /// ```dart
@@ -2963,6 +2983,21 @@ class PreferTestFindByKeyRule extends SaropaLintRule {
 /// test('test 1', () { /* test logic */ });
 /// test('test 2', () { /* test logic */ });
 /// ```
+///
+/// **GOOD (assertions are not setup code):**
+/// ```dart
+/// group('documented behavior', () {
+///   test('case A', () {
+///     expect(true, isTrue, reason: 'Verified via review');
+///   });
+///   test('case B', () {
+///     expect(true, isTrue, reason: 'Verified via review');
+///   });
+///   test('case C', () {
+///     expect(true, isTrue, reason: 'Verified via review');
+///   });
+/// });
+/// ```
 class PreferSetupTeardownRule extends SaropaLintRule {
   const PreferSetupTeardownRule() : super(code: _code);
 
@@ -2979,7 +3014,7 @@ class PreferSetupTeardownRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_setup_teardown',
     problemMessage:
-        '[prefer_setup_teardown] Duplicated test setup code. Use setUp()/tearDown(). Repeated setup code in tests violates DRY and makes maintenance harder. Use setUp() and tearDown() for common test initialization. {v5}',
+        '[prefer_setup_teardown] Duplicated test setup code. Use setUp()/tearDown(). Repeated setup code in tests violates DRY and makes maintenance harder. Use setUp() and tearDown() for common test initialization. {v6}',
     correctionMessage:
         'Move common initialization to setUp() and cleanup to tearDown(). Run the full test suite to confirm the refactored tests maintain equivalent coverage.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -2993,71 +3028,131 @@ class PreferSetupTeardownRule extends SaropaLintRule {
   ) {
     // File type filtering is handled by applicableFileTypes
     context.registry.addCompilationUnit((CompilationUnit unit) {
-      // Find all test() calls in the file
       final List<MethodInvocation> testCalls = [];
       unit.accept(_TestCallCollector(testCalls));
 
       if (testCalls.length < 2) return;
 
-      // Extract the first statements from each test
-      final Map<String, int> firstStatementCounts = <String, int>{};
-
+      // Group tests by their nearest enclosing group() call.
+      // Tests in different groups should not count toward the same
+      // signature threshold — extracting shared setup across unrelated
+      // groups into a file-level setUp() rarely makes sense.
+      final grouped = <MethodInvocation?, List<MethodInvocation>>{};
       for (final testCall in testCalls) {
-        final callback = _getTestCallback(testCall);
-        if (callback == null) continue;
-
-        final body = callback.body;
-        if (body is! BlockFunctionBody) continue;
-
-        final statements = body.block.statements;
-        if (statements.isEmpty) continue;
-
-        final setupSignature = _buildSetupSignature(statements);
-        if (setupSignature == null) continue;
-
-        firstStatementCounts[setupSignature] =
-            (firstStatementCounts[setupSignature] ?? 0) + 1;
+        final group = _findEnclosingGroup(testCall);
+        (grouped[group] ??= []).add(testCall);
       }
 
-      // If any setup pattern appears 3+ times, suggest setUp()
-      for (final entry in firstStatementCounts.entries) {
-        if (entry.value >= 3) {
-          // Report on the first test with duplicated setup
-          for (final testCall in testCalls) {
-            final callback = _getTestCallback(testCall);
-            if (callback == null) continue;
-
-            final body = callback.body;
-            if (body is! BlockFunctionBody) continue;
-
-            final statements = body.block.statements;
-            if (statements.isEmpty) continue;
-
-            final setupSignature = _buildSetupSignature(statements);
-
-            if (setupSignature == entry.key) {
-              reporter.atNode(testCall, code);
-              break;
-            }
-          }
-          break;
-        }
+      for (final scopeTests in grouped.values) {
+        if (scopeTests.length < 3) continue;
+        if (_reportDuplicateSetup(scopeTests, reporter)) return;
       }
     });
   }
 
+  /// Returns the nearest enclosing group() call, or null for top-level tests.
+  static MethodInvocation? _findEnclosingGroup(MethodInvocation testCall) {
+    AstNode? current = testCall.parent;
+    while (current != null) {
+      if (current is MethodInvocation && current.methodName.name == 'group') {
+        return current;
+      }
+      current = current.parent;
+    }
+    return null;
+  }
+
+  /// Checks [testCalls] (all within the same group scope) for duplicated
+  /// setup patterns. Reports on the first match and returns true if reported.
+  bool _reportDuplicateSetup(
+    List<MethodInvocation> testCalls,
+    SaropaDiagnosticReporter reporter,
+  ) {
+    final Map<String, int> counts = {};
+
+    for (final testCall in testCalls) {
+      final sig = _signatureOf(testCall);
+      if (sig == null) continue;
+      counts[sig] = (counts[sig] ?? 0) + 1;
+    }
+
+    for (final entry in counts.entries) {
+      if (entry.value < 3) continue;
+
+      // Report on the first test with this duplicated setup
+      for (final testCall in testCalls) {
+        if (_signatureOf(testCall) == entry.key) {
+          reporter.atNode(testCall, code);
+          return true;
+        }
+      }
+    }
+    return false;
+  }
+
+  /// Returns the setup signature for a test call, or null.
+  String? _signatureOf(MethodInvocation testCall) {
+    final callback = _getTestCallback(testCall);
+    if (callback == null) return null;
+
+    final body = callback.body;
+    if (body is! BlockFunctionBody) return null;
+
+    final statements = body.block.statements;
+    if (statements.isEmpty) return null;
+
+    return _buildSetupSignature(statements);
+  }
+
   /// Builds a normalized signature from the first 1-2 meaningful statements,
-  /// skipping simple local initializations (primitives, constants, literals).
+  /// skipping simple local initializations (primitives, constants, literals)
+  /// and test assertion/verification calls (expect, verify, fail, etc.).
   /// Returns null if no meaningful setup statements remain.
   String? _buildSetupSignature(NodeList<Statement> statements) {
-    final meaningful =
-        statements.where((s) => !_isSimpleLocalInit(s)).take(2).toList();
+    final meaningful = statements
+        .where((s) => !_isSimpleLocalInit(s) && !_isAssertionCall(s))
+        .take(2)
+        .toList();
     if (meaningful.isEmpty) return null;
 
     return meaningful
         .map((s) => s.toSource().replaceAll(RegExp(r'\s+'), ' '))
         .join(';');
   }
+
+  /// Returns true if the statement is a test assertion or verification call
+  /// that should never be considered setup code (e.g. expect, verify, fail).
+  /// Also handles `await expectLater(...)` where the expression is wrapped
+  /// in an AwaitExpression.
+  bool _isAssertionCall(Statement statement) {
+    if (statement is! ExpressionStatement) return false;
+    var expression = statement.expression;
+    // Unwrap: await expectLater(...)
+    if (expression is AwaitExpression) {
+      expression = expression.expression;
+    }
+    if (expression is! MethodInvocation) return false;
+
+    return _assertionFunctions.contains(expression.methodName.name);
+  }
+
+  static const Set<String> _assertionFunctions = {
+    'expect',
+    'expectLater',
+    'expectAsync0',
+    'expectAsync1',
+    'expectAsync2',
+    'expectAsync3',
+    'expectAsync4',
+    'expectAsync5',
+    'expectAsync6',
+    'fail',
+    'verify',
+    'verifyInOrder',
+    'verifyNever',
+    'verifyNoMoreInteractions',
+    'verifyZeroInteractions',
+  };
 
   /// Returns true if the statement is a simple local variable initialization
   /// that should not be considered setup code for setUp() extraction.
