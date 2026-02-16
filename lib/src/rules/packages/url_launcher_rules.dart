@@ -10,6 +10,7 @@ import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/error/error.dart' show DiagnosticSeverity;
 import 'package:custom_lint_builder/custom_lint_builder.dart';
 
+import '../../import_utils.dart';
 import '../../saropa_lint_rule.dart';
 
 // =============================================================================
@@ -103,29 +104,41 @@ class RequireUrlLauncherCanLaunchCheckRule extends SaropaLintRule {
 
 /// Warns when URL launcher tests may fail on simulator/emulator.
 ///
-/// Since: v4.2.0 | Updated: v4.13.0 | Rule version: v2
+/// Since: v4.2.0 | Updated: v4.14.5 | Rule version: v3
 ///
 /// Alias: url_launcher_test, simulator_url_test
 ///
 /// URL schemes like tel:, mailto:, sms: fail on iOS Simulator and Android
 /// Emulator because there's no handler app. Skip or mock these tests.
 ///
+/// Only fires when the file imports `url_launcher` AND the test body contains
+/// both a problematic scheme string and a launcher API call (`launchUrl`,
+/// `canLaunchUrl`, etc.). Pure string/URI tests that happen to use scheme
+/// strings are not flagged. Only matches `test()` / `testWidgets()` calls,
+/// not `group()`.
+///
 /// **BAD:**
 /// ```dart
+/// // File imports url_launcher
 /// testWidgets('can make phone call', (tester) async {
-///   await tester.tap(find.byKey(Key('call_button')));
-///   // This will fail on simulator!
+///   await launchUrl(Uri.parse('tel:+1234567890'));
 /// });
 /// ```
 ///
 /// **GOOD:**
 /// ```dart
 /// testWidgets('can make phone call', (tester) async {
-///   // Mock the url_launcher for testing
 ///   when(mockUrlLauncher.canLaunch(any)).thenAnswer((_) async => true);
 ///   await tester.tap(find.byKey(Key('call_button')));
 ///   verify(mockUrlLauncher.launch('tel:+1234567890'));
 /// }, skip: Platform.environment.containsKey('FLUTTER_TEST'));
+/// ```
+///
+/// **Also GOOD** (no url_launcher usage — pure string logic):
+/// ```dart
+/// test('rejects mailto URLs', () {
+///   expect(parseHttpUrl('mailto:test@example.com'), isNull);
+/// });
 /// ```
 class AvoidUrlLauncherSimulatorTestsRule extends SaropaLintRule {
   const AvoidUrlLauncherSimulatorTestsRule() : super(code: _code);
@@ -142,7 +155,7 @@ class AvoidUrlLauncherSimulatorTestsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_url_launcher_simulator_tests',
     problemMessage:
-        '[avoid_url_launcher_simulator_tests] URL launcher test with tel:/mailto:/sms:/facetime:/maps: scheme may fail on simulator. These schemes are not supported in emulators and will cause test failures. {v2}',
+        '[avoid_url_launcher_simulator_tests] URL launcher test with tel:/mailto:/sms:/facetime:/maps: scheme may fail on simulator. These schemes are not supported in emulators and will cause test failures. {v3}',
     correctionMessage:
         'Mock url_launcher in tests or add skip condition for simulator. Example: skip: !Platform.isAndroid or use a mockUrlLauncher.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -155,6 +168,15 @@ class AvoidUrlLauncherSimulatorTestsRule extends SaropaLintRule {
     'facetime:',
     'maps:',
   };
+
+  /// Evidence that url_launcher APIs are actually being used.
+  static const List<String> _launcherIndicators = <String>[
+    'launchUrl',
+    'canLaunchUrl',
+    'launch(',
+    'canLaunch(',
+    'url_launcher',
+  ];
 
   @override
   void runWithReporter(
@@ -169,35 +191,47 @@ class AvoidUrlLauncherSimulatorTestsRule extends SaropaLintRule {
     }
 
     context.registry.addMethodInvocation((MethodInvocation node) {
-      // Check for test function calls
+      // Only match individual test calls, not group() which is too coarse
       final String methodName = node.methodName.name;
-      if (methodName != 'test' &&
-          methodName != 'testWidgets' &&
-          methodName != 'group') {
+      if (methodName != 'test' && methodName != 'testWidgets') {
         return;
       }
 
-      // Check the test body for URL launcher usage with problematic schemes
+      // Skip if url_launcher is not imported in this file
+      if (!fileImportsPackage(node, PackageImports.urlLauncher)) {
+        return;
+      }
+
+      // Check the test body for problematic schemes
       final NodeList<Expression> args = node.argumentList.arguments;
       for (final Expression arg in args) {
-        if (arg is FunctionExpression) {
-          final String bodySource = arg.body.toSource();
+        if (arg is! FunctionExpression) continue;
 
-          // Check for problematic schemes
-          for (final String scheme in _problematicSchemes) {
-            if (bodySource.contains("'$scheme") ||
-                bodySource.contains('"$scheme')) {
-              // Check if there's mocking or skip
-              if (!bodySource.contains('mock') &&
-                  !bodySource.contains('Mock') &&
-                  !bodySource.contains('when(') &&
-                  !node.toSource().contains('skip:')) {
-                reporter.atNode(node, code);
-                return;
-              }
-            }
-          }
+        final String bodySource = arg.body.toSource();
+
+        // Must contain a problematic scheme string
+        final bool hasScheme = _problematicSchemes.any(
+          (scheme) =>
+              bodySource.contains("'$scheme") ||
+              bodySource.contains('"$scheme'),
+        );
+        if (!hasScheme) continue;
+
+        // Must also contain launcher API usage
+        final bool hasLauncherUsage =
+            _launcherIndicators.any(bodySource.contains);
+        if (!hasLauncherUsage) continue;
+
+        // Check if there's mocking or skip
+        if (bodySource.contains('mock') ||
+            bodySource.contains('Mock') ||
+            bodySource.contains('when(') ||
+            node.toSource().contains('skip:')) {
+          return;
         }
+
+        reporter.atNode(node, code);
+        return;
       }
     });
   }
