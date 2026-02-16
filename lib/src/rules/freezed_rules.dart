@@ -355,7 +355,7 @@ class RequireFreezedExplicitJsonRule extends SaropaLintRule {
     }
 
     if (type is NamedType) {
-      final String typeName = type.name2.lexeme;
+      final String typeName = type.name.lexeme;
       // Skip primitive types, common Flutter/Dart types, and collections
       const Set<String> primitiveTypes = <String>{
         'String',
@@ -388,7 +388,7 @@ class RequireFreezedExplicitJsonRule extends SaropaLintRule {
       if (typeArgs != null) {
         for (final TypeAnnotation arg in typeArgs.arguments) {
           if (arg is NamedType) {
-            final String argTypeName = arg.name2.lexeme;
+            final String argTypeName = arg.name.lexeme;
             const Set<String> innerPrimitiveTypes = <String>{
               'String',
               'int',

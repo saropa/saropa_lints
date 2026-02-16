@@ -480,7 +480,7 @@ class AvoidPermissionHandlerNullSafetyRule extends SaropaLintRule {
   ) {
     // Detect deprecated constructor: PermissionHandler()
     context.addInstanceCreationExpression((InstanceCreationExpression node) {
-      final String typeName = node.constructorName.type.name2.lexeme;
+      final String typeName = node.constructorName.type.name.lexeme;
       if (_deprecatedClasses.contains(typeName)) {
         reporter.atNode(node);
       }
@@ -500,7 +500,7 @@ class AvoidPermissionHandlerNullSafetyRule extends SaropaLintRule {
         reporter.atNode(node);
       } else if (target is InstanceCreationExpression &&
           _deprecatedClasses.contains(
-            target.constructorName.type.name2.lexeme,
+            target.constructorName.type.name.lexeme,
           )) {
         reporter.atNode(node);
       }

@@ -3471,7 +3471,7 @@ class PreferFakePlatformRule extends SaropaLintRule {
     SaropaContext context,
   ) {
     context.addInstanceCreationExpression((InstanceCreationExpression node) {
-      final String constructorName = node.constructorName.type.name2.lexeme;
+      final String constructorName = node.constructorName.type.name.lexeme;
 
       if (!_platformWidgets.contains(constructorName)) return;
 

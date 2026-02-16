@@ -1237,7 +1237,7 @@ class AvoidCatchExceptionAloneRule extends SaropaLintRule {
 
       // Check if catching Exception (misses Error types)
       if (exceptionType is NamedType) {
-        final String typeName = exceptionType.name2.lexeme;
+        final String typeName = exceptionType.name.lexeme;
         if (typeName == 'Exception') {
           // Check if there's a fallback catch-all in the same try statement
           if (!_hasObjectCatchFallback(node)) {
@@ -1264,7 +1264,7 @@ class AvoidCatchExceptionAloneRule extends SaropaLintRule {
       // if (type == null) return true;
 
       // on Object catch catches everything
-      if (type is NamedType && type.name2.lexeme == 'Object') {
+      if (type is NamedType && type.name.lexeme == 'Object') {
         return true;
       }
     }

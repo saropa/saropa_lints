@@ -1690,7 +1690,7 @@ class PreferGoRouterRedirectAuthRule extends SaropaLintRule {
     SaropaContext context,
   ) {
     context.addInstanceCreationExpression((InstanceCreationExpression node) {
-      final String typeName = node.constructorName.type.name2.lexeme;
+      final String typeName = node.constructorName.type.name.lexeme;
       if (typeName != 'GoRoute') return;
 
       // Only apply to files that import go_router
@@ -1932,7 +1932,7 @@ class PreferGoRouterExtraTypedRule extends SaropaLintRule {
 
         // Check for Map constructor
         if (extraValue is InstanceCreationExpression) {
-          final String typeName = extraValue.constructorName.type.name2.lexeme;
+          final String typeName = extraValue.constructorName.type.name.lexeme;
           if (typeName == 'Map' || typeName == 'HashMap') {
             reporter.atNode(arg);
             return;
@@ -3064,7 +3064,7 @@ class AvoidNestedNavigatorsMisuseRule extends SaropaLintRule {
     SaropaContext context,
   ) {
     context.addInstanceCreationExpression((InstanceCreationExpression node) {
-      final String constructorName = node.constructorName.type.name2.lexeme;
+      final String constructorName = node.constructorName.type.name.lexeme;
       if (constructorName != 'Navigator') return;
 
       // Check if this Navigator is inside TabBarView or similar
@@ -3074,7 +3074,7 @@ class AvoidNestedNavigatorsMisuseRule extends SaropaLintRule {
 
       while (current != null) {
         if (current is InstanceCreationExpression) {
-          final String parentType = current.constructorName.type.name2.lexeme;
+          final String parentType = current.constructorName.type.name.lexeme;
 
           if (parentType == 'TabBarView' ||
               parentType == 'PageView' ||

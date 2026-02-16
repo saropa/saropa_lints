@@ -2447,7 +2447,7 @@ class PreferChangeNotifierProxyProviderRule extends SaropaLintRule {
     SaropaContext context,
   ) {
     context.addInstanceCreationExpression((InstanceCreationExpression node) {
-      final String typeName = node.constructorName.type.name2.lexeme;
+      final String typeName = node.constructorName.type.name.lexeme;
       if (typeName != 'ChangeNotifierProvider') return;
 
       // Find create parameter

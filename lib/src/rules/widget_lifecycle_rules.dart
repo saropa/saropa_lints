@@ -2743,7 +2743,7 @@ class AvoidUndisposedInstancesRule extends SaropaLintRule {
             // Check type annotation (handles nullable types like Timer?)
             final TypeAnnotation? typeAnnotation = member.fields.type;
             if (typeAnnotation is NamedType) {
-              if (_disposableTypes.contains(typeAnnotation.name2.lexeme)) {
+              if (_disposableTypes.contains(typeAnnotation.name.lexeme)) {
                 disposableFields.add(fieldName);
               }
             }
@@ -3525,7 +3525,7 @@ class RequireShouldRebuildRule extends SaropaLintRule {
         return;
       }
 
-      final superName = extendsClause.superclass.name2.lexeme;
+      final superName = extendsClause.superclass.name.lexeme;
       if (superName != 'InheritedWidget' &&
           superName != 'InheritedNotifier' &&
           superName != 'InheritedModel') {

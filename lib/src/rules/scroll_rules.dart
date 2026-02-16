@@ -100,8 +100,7 @@ class AvoidShrinkWrapInScrollViewRule extends SaropaLintRule {
       if (arg is NamedExpression && arg.name.label.name == 'physics') {
         final Expression physicsValue = arg.expression;
         if (physicsValue is InstanceCreationExpression) {
-          final String typeName =
-              physicsValue.constructorName.type.name2.lexeme;
+          final String typeName = physicsValue.constructorName.type.name.lexeme;
           if (typeName == 'NeverScrollableScrollPhysics') {
             return true;
           }
@@ -134,7 +133,7 @@ class AvoidShrinkWrapInScrollViewRule extends SaropaLintRule {
   }
 
   String? _getTypeName(InstanceCreationExpression node) {
-    return node.constructorName.type.name2.lexeme;
+    return node.constructorName.type.name.lexeme;
   }
 
   bool _isInsideScrollable(AstNode node) {
@@ -233,7 +232,7 @@ class _NestedScrollableVisitor extends RecursiveAstVisitor<void> {
   void visitInstanceCreationExpression(InstanceCreationExpression node) {
     _checkScrollable(
       node,
-      node.constructorName.type.name2.lexeme,
+      node.constructorName.type.name.lexeme,
       node.argumentList,
     );
     super.visitInstanceCreationExpression(node);
@@ -270,7 +269,7 @@ class _NestedScrollableVisitor extends RecursiveAstVisitor<void> {
     AstNode? current = node.parent;
     while (current != null) {
       if (current is InstanceCreationExpression) {
-        final String typeName = current.constructorName.type.name2.lexeme;
+        final String typeName = current.constructorName.type.name.lexeme;
         if (scrollableTypes.contains(typeName)) {
           return true;
         }
@@ -332,7 +331,7 @@ class AvoidListViewChildrenForLargeListsRule extends SaropaLintRule {
     SaropaContext context,
   ) {
     context.addInstanceCreationExpression((InstanceCreationExpression node) {
-      final String typeName = node.constructorName.type.name2.lexeme;
+      final String typeName = node.constructorName.type.name.lexeme;
 
       if (typeName != 'ListView' && typeName != 'GridView') return;
 
@@ -426,7 +425,7 @@ class AvoidExcessiveBottomNavItemsRule extends SaropaLintRule {
     AstNode? current = node.parent;
     while (current != null) {
       if (current is InstanceCreationExpression) {
-        final String typeName = current.constructorName.type.name2.lexeme;
+        final String typeName = current.constructorName.type.name.lexeme;
         if (_navTypes.contains(typeName)) return true;
       } else if (current is MethodInvocation) {
         if (_navTypes.contains(current.methodName.name)) return true;
@@ -599,7 +598,7 @@ class AvoidRefreshWithoutAwaitRule extends SaropaLintRule {
     SaropaContext context,
   ) {
     context.addInstanceCreationExpression((InstanceCreationExpression node) {
-      final String typeName = node.constructorName.type.name2.lexeme;
+      final String typeName = node.constructorName.type.name.lexeme;
 
       if (typeName != 'RefreshIndicator') return;
 
@@ -871,7 +870,7 @@ class AvoidShrinkWrapExpensiveRule extends SaropaLintRule {
     AstNode? current = node.parent;
     while (current != null) {
       if (current is InstanceCreationExpression) {
-        final String typeName = current.constructorName.type.name2.lexeme;
+        final String typeName = current.constructorName.type.name.lexeme;
         if (_scrollableTypes.contains(typeName)) return current;
       } else if (current is MethodInvocation) {
         if (_scrollableTypes.contains(current.methodName.name)) return current;
@@ -953,7 +952,7 @@ class PreferItemExtentRule extends SaropaLintRule {
     SaropaContext context,
   ) {
     context.addInstanceCreationExpression((InstanceCreationExpression node) {
-      final String typeName = node.constructorName.type.name2.lexeme;
+      final String typeName = node.constructorName.type.name.lexeme;
 
       if (typeName != 'ListView') return;
 
@@ -1028,7 +1027,7 @@ class PreferPrototypeItemRule extends SaropaLintRule {
     SaropaContext context,
   ) {
     context.addInstanceCreationExpression((InstanceCreationExpression node) {
-      final String typeName = node.constructorName.type.name2.lexeme;
+      final String typeName = node.constructorName.type.name.lexeme;
 
       if (typeName != 'ListView') return;
 
@@ -1111,7 +1110,7 @@ class RequireKeyForReorderableRule extends SaropaLintRule {
     SaropaContext context,
   ) {
     context.addInstanceCreationExpression((InstanceCreationExpression node) {
-      final String typeName = node.constructorName.type.name2.lexeme;
+      final String typeName = node.constructorName.type.name.lexeme;
 
       if (!_reorderableTypes.contains(typeName)) return;
 
@@ -1279,7 +1278,7 @@ class RequireAddAutomaticKeepAlivesOffRule extends SaropaLintRule {
     SaropaContext context,
   ) {
     context.addInstanceCreationExpression((InstanceCreationExpression node) {
-      final String typeName = node.constructorName.type.name2.lexeme;
+      final String typeName = node.constructorName.type.name.lexeme;
 
       if (!_listTypes.contains(typeName)) return;
 

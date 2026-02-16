@@ -206,7 +206,7 @@ class PreferSecureRandomForCryptoRule extends SaropaLintRule {
     SaropaContext context,
   ) {
     context.addInstanceCreationExpression((InstanceCreationExpression node) {
-      final String typeName = node.constructorName.type.name2.lexeme;
+      final String typeName = node.constructorName.type.name.lexeme;
       final String? constructorName = node.constructorName.name?.name;
 
       // Only flag Random() without .secure()
@@ -337,7 +337,7 @@ class AvoidDeprecatedCryptoAlgorithmsRule extends SaropaLintRule {
 
     // Check for constructor calls like MD5()
     context.addInstanceCreationExpression((InstanceCreationExpression node) {
-      final String typeName = node.constructorName.type.name2.lexeme;
+      final String typeName = node.constructorName.type.name.lexeme;
       if (_deprecatedAlgorithms.contains(typeName)) {
         reporter.atNode(node);
       }
@@ -587,7 +587,7 @@ class RequireSecureKeyGenerationRule extends SaropaLintRule {
 
     // Detect Key(literal_list) or Key(Uint8List.fromList([...]))
     context.addInstanceCreationExpression((InstanceCreationExpression node) {
-      final String typeName = node.constructorName.type.name2.lexeme;
+      final String typeName = node.constructorName.type.name.lexeme;
       if (!_keyClasses.contains(typeName)) return;
 
       final NodeList<Expression> args = node.argumentList.arguments;

@@ -7532,7 +7532,7 @@ class AvoidStaticRouteConfigRule extends SaropaLintRule {
       for (final VariableDeclaration variable in node.fields.variables) {
         final Expression? initializer = variable.initializer;
         if (initializer is InstanceCreationExpression) {
-          final String typeName = initializer.constructorName.type.name2.lexeme;
+          final String typeName = initializer.constructorName.type.name.lexeme;
           if (_routerTypes.contains(typeName)) {
             reporter.atNode(node);
             return;
@@ -7605,7 +7605,7 @@ class RequireLocaleForTextRule extends SaropaLintRule {
     SaropaContext context,
   ) {
     context.addInstanceCreationExpression((InstanceCreationExpression node) {
-      final String constructorName = node.constructorName.type.name2.lexeme;
+      final String constructorName = node.constructorName.type.name.lexeme;
 
       // Check for NumberFormat, DateFormat
       if (constructorName != 'NumberFormat' &&

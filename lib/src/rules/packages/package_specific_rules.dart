@@ -253,7 +253,7 @@ class RequireWebviewSslErrorHandlingRule extends SaropaLintRule {
     SaropaContext context,
   ) {
     context.addInstanceCreationExpression((InstanceCreationExpression node) {
-      final String typeName = node.constructorName.type.name2.lexeme;
+      final String typeName = node.constructorName.type.name.lexeme;
 
       // Check for legacy WebView/InAppWebView constructors
       if (typeName == 'WebView' || typeName == 'InAppWebView') {
@@ -356,7 +356,7 @@ class AvoidWebviewFileAccessRule extends SaropaLintRule {
 
     // Also check named parameters
     context.addInstanceCreationExpression((InstanceCreationExpression node) {
-      final String typeName = node.constructorName.type.name2.lexeme;
+      final String typeName = node.constructorName.type.name.lexeme;
       if (!typeName.contains('WebView') && !typeName.contains('Settings')) {
         return;
       }
@@ -437,7 +437,7 @@ class RequireCalendarTimezoneHandlingRule extends SaropaLintRule {
     SaropaContext context,
   ) {
     context.addInstanceCreationExpression((InstanceCreationExpression node) {
-      final String typeName = node.constructorName.type.name2.lexeme;
+      final String typeName = node.constructorName.type.name.lexeme;
       if (typeName != 'Event') return;
 
       final ArgumentList args = node.argumentList;
@@ -1543,7 +1543,7 @@ class PreferGeolocatorDistanceFilterRule extends SaropaLintRule {
 
     // Also check for direct LocationSettings construction
     context.addInstanceCreationExpression((node) {
-      final String typeName = node.constructorName.type.name2.lexeme;
+      final String typeName = node.constructorName.type.name.lexeme;
 
       // Check for various LocationSettings types from geolocator
       if (typeName != 'LocationSettings' &&

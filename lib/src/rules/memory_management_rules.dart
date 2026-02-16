@@ -1191,6 +1191,6 @@ class AvoidRetainingDisposedWidgetsRule extends SaropaLintRule {
     final NamedType? superclass = node.extendsClause?.superclass;
     if (superclass == null) return false;
 
-    return _widgetBaseClasses.contains(superclass.name2.lexeme);
+    return _widgetBaseClasses.contains(superclass.name.lexeme);
   }
 }
