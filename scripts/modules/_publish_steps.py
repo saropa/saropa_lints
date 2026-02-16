@@ -267,7 +267,10 @@ def run_tests(project_dir: Path) -> bool:
     test_dir = project_dir / "test"
     if test_dir.exists():
         result = run_command(
-            ["flutter", "test"], project_dir, "Running unit tests"
+            ["dart", "test"],
+            project_dir,
+            "Running unit tests",
+            summarize=True,
         )
         if result.returncode != 0:
             return False
@@ -360,7 +363,10 @@ def run_analysis(project_dir: Path) -> bool:
         print_success("No pub.dev lint issues found")
 
     result = run_command(
-        ["flutter", "analyze"], project_dir, "Analyzing code"
+        ["dart", "analyze", "--fatal-infos"],
+        project_dir,
+        "Analyzing code (matching CI: dart analyze --fatal-infos)",
+        summarize=True,
     )
     return result.returncode == 0
 
