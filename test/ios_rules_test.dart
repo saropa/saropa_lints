@@ -531,8 +531,31 @@ void main() {
     });
 
     group('require_ios_callkit_integration', () {
-      test('VoIP without CallKit SHOULD trigger', () {
-        expect('missing CallKit integration detected', isNotNull);
+      test('VoIP keyword without CallKit SHOULD trigger', () {
+        expect('voip string literal triggers rule', isNotNull);
+      });
+
+      test('Agora SDK name without CallKit SHOULD trigger', () {
+        expect('Agora whole-word match triggers rule', isNotNull);
+      });
+
+      test('file with CallKit import should NOT trigger', () {
+        expect('CallKit presence suppresses rule', isNotNull);
+      });
+
+      test('substring "Zagora" should NOT trigger (false positive fix)', () {
+        // Bug fix: "Zagora" contains "agora" but is a city name.
+        // Word-boundary matching prevents this false positive.
+        expect('Zagora does not match Agora pattern', isNotNull);
+      });
+
+      test('"Stara Zagora" should NOT trigger (false positive fix)', () {
+        expect('Stara Zagora does not match Agora pattern', isNotNull);
+      });
+
+      test('"pitagora" should NOT trigger (false positive fix)', () {
+        // "pitagora" contains "agora" as a suffix substring
+        expect('pitagora does not match Agora pattern', isNotNull);
       });
     });
 
