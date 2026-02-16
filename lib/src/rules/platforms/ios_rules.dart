@@ -4831,10 +4831,28 @@ class RequireIosNfcCapabilityCheckRule extends SaropaLintRule {
 
 /// Warns when CallKit integration may be missing for VoIP apps.
 ///
-/// Since: v2.4.0 | Updated: v4.13.0 | Rule version: v3
+/// Since: v2.4.0 | Updated: v4.14.5 | Rule version: v4
 ///
 /// iOS VoIP apps must use CallKit to display the native call UI.
-/// Apps that don't use CallKit have limited functionality.
+/// Without CallKit, incoming calls won't appear on the lock screen,
+/// call audio routing will fail, and Apple will reject the app.
+///
+/// Uses word-boundary matching (`\b`) to avoid false positives from
+/// substring matches (e.g. "Zagora" does not match the "Agora" pattern).
+///
+/// **BAD:**
+/// ```dart
+/// // VoIP keyword without CallKit integration
+/// const protocol = 'voip';
+/// const sdk = 'Agora';
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// // CallKit already integrated (file contains 'CallKit')
+/// import 'package:flutter_callkit_incoming/flutter_callkit_incoming.dart';
+/// const sdk = 'Agora';
+/// ```
 ///
 /// ## CallKit Requirements
 ///
@@ -4854,13 +4872,17 @@ class RequireIosCallkitIntegrationRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_ios_callkit_integration',
     problemMessage:
-        '[require_ios_callkit_integration] VoIP call handling detected. iOS requires CallKit integration for native call UI. Without CallKit, incoming calls will not appear on the lock screen, call audio routing will fail, and Apple will reject your app from the App Store during review. {v3}',
+        '[require_ios_callkit_integration] VoIP call handling detected. iOS requires CallKit integration for native call UI. Without CallKit, incoming calls will not appear on the lock screen, call audio routing will fail, and Apple will reject your app from the App Store during review. {v4}',
     correctionMessage:
         'Integrate CallKit using flutter_callkit_incoming or a similar package to ensure App Store compliance and a native call experience on iOS.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
-  static const Set<String> _voipPatterns = {
+  /// Word-boundary regexes for VoIP pattern matching.
+  ///
+  /// Uses `\b` anchors to prevent false positives from substring matches
+  /// (e.g. "Zagora" should not match the "Agora" pattern).
+  static final List<RegExp> _voipRegexes = [
     'voip',
     'incoming_call',
     'outgoing_call',
@@ -4869,7 +4891,9 @@ class RequireIosCallkitIntegrationRule extends SaropaLintRule {
     'Twilio',
     'Agora',
     'Vonage',
-  };
+  ]
+      .map((p) => RegExp('\\b${RegExp.escape(p)}\\b', caseSensitive: false))
+      .toList();
 
   @override
   void runWithReporter(
@@ -4891,9 +4915,9 @@ class RequireIosCallkitIntegrationRule extends SaropaLintRule {
     context.registry.addSimpleStringLiteral((SimpleStringLiteral node) {
       if (hasReported) return;
 
-      final String value = node.value.toLowerCase();
-      for (final String pattern in _voipPatterns) {
-        if (value.contains(pattern.toLowerCase())) {
+      final String value = node.value;
+      for (final RegExp regex in _voipRegexes) {
+        if (regex.hasMatch(value)) {
           reporter.atNode(node, code);
           hasReported = true;
           return;

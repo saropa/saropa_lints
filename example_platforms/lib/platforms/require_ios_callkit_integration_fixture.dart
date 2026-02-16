@@ -105,13 +105,17 @@
 
 import 'package:saropa_lints_example/flutter_mocks.dart';
 
-// BAD: Should trigger require_ios_callkit_integration
-// expect_lint: require_ios_callkit_integration
+// BAD: VoIP keyword without CallKit integration triggers the rule.
+// Only the first string literal match in a file is reported (hasReported flag).
 void _bad880() {
-  // TODO: Add code that triggers require_ios_callkit_integration
+  // expect_lint: require_ios_callkit_integration
+  const protocol = 'voip';
 }
 
-// GOOD: Should NOT trigger require_ios_callkit_integration
+// GOOD: Substring matches should NOT trigger (word-boundary fix).
+// "Zagora" contains "agora" but is a city name, not the Agora VoIP SDK.
 void _good880() {
-  // TODO: Add compliant code for require_ios_callkit_integration
+  const city = 'Zagora';
+  const city2 = 'Stara Zagora';
+  const word = 'The ancient pitagora theorem';
 }
