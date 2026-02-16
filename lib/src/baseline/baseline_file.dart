@@ -17,10 +17,8 @@ import 'dart:io';
 /// }
 /// ```
 class BaselineFile {
-  BaselineFile({
-    required this.violations,
-    DateTime? generated,
-  }) : generated = generated ?? DateTime.now();
+  BaselineFile({required this.violations, DateTime? generated})
+    : generated = generated ?? DateTime.now();
 
   /// Current baseline file format version.
   static const int currentVersion = 1;
@@ -60,8 +58,9 @@ class BaselineFile {
     }
 
     final generatedStr = json['generated'] as String?;
-    final generated =
-        generatedStr != null ? DateTime.tryParse(generatedStr) : DateTime.now();
+    final generated = generatedStr != null
+        ? DateTime.tryParse(generatedStr)
+        : DateTime.now();
 
     final violationsRaw = json['violations'] as Map<String, dynamic>? ?? {};
     final violations = <String, Map<String, List<int>>>{};
@@ -85,10 +84,7 @@ class BaselineFile {
       }
     }
 
-    return BaselineFile(
-      violations: violations,
-      generated: generated,
-    );
+    return BaselineFile(violations: violations, generated: generated);
   }
 
   /// Converts this baseline to JSON format.
@@ -187,7 +183,8 @@ class BaselineFile {
   }
 
   @override
-  String toString() => 'BaselineFile('
+  String toString() =>
+      'BaselineFile('
       'violations: $totalViolations in $fileCount files, '
       'generated: $generated)';
 }

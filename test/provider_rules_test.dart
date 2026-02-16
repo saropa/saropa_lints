@@ -262,10 +262,12 @@ void main() {
 
   group('Provider Composition Rules', () {
     group('prefer_proxy_provider', () {
-      test('provider depending on another without ProxyProvider SHOULD trigger',
-          () {
-        expect('missing ProxyProvider detected', isNotNull);
-      });
+      test(
+        'provider depending on another without ProxyProvider SHOULD trigger',
+        () {
+          expect('missing ProxyProvider detected', isNotNull);
+        },
+      );
 
       test('ProxyProvider should NOT trigger', () {
         expect('ProxyProvider passes', isNotNull);
@@ -283,20 +285,21 @@ void main() {
     });
 
     group(
-        'prefer_change_notifier_proxy / prefer_change_notifier_proxy_provider',
-        () {
-      test(
-        'ChangeNotifierProvider depending on other provider SHOULD trigger',
-        () {
-          // Should use ChangeNotifierProxyProvider
-          expect('missing proxy pattern detected', isNotNull);
-        },
-      );
+      'prefer_change_notifier_proxy / prefer_change_notifier_proxy_provider',
+      () {
+        test(
+          'ChangeNotifierProvider depending on other provider SHOULD trigger',
+          () {
+            // Should use ChangeNotifierProxyProvider
+            expect('missing proxy pattern detected', isNotNull);
+          },
+        );
 
-      test('ChangeNotifierProxyProvider should NOT trigger', () {
-        expect('proxy provider passes', isNotNull);
-      });
-    });
+        test('ChangeNotifierProxyProvider should NOT trigger', () {
+          expect('proxy provider passes', isNotNull);
+        });
+      },
+    );
   });
 
   group('Provider Optimization Rules', () {

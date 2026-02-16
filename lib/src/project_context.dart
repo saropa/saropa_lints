@@ -197,11 +197,11 @@ class GitAwarePriority {
 
     try {
       // Get modified and staged files
-      final result = await Process.run(
-        'git',
-        ['status', '--porcelain', '-z'],
-        workingDirectory: root,
-      );
+      final result = await Process.run('git', [
+        'status',
+        '--porcelain',
+        '-z',
+      ], workingDirectory: root);
 
       if (result.exitCode != 0) return;
 
@@ -368,13 +368,16 @@ class _ProjectInfo {
 
     try {
       final content = pubspecFile.readAsStringSync();
-      final isFlutter = content.contains('flutter:') ||
+      final isFlutter =
+          content.contains('flutter:') ||
           content.contains('flutter_test:') ||
           content.contains('sdk: flutter');
 
       // Parse package name from top-level `name:` field (valid Dart pkg names)
-      final nameMatch = RegExp(r'^name:\s+([a-z][a-z0-9_]*)', multiLine: true)
-          .firstMatch(content);
+      final nameMatch = RegExp(
+        r'^name:\s+([a-z][a-z0-9_]*)',
+        multiLine: true,
+      ).firstMatch(content);
       final packageName = nameMatch?.group(1) ?? '';
 
       // Parse dependencies (simple regex-based parsing)
@@ -881,10 +884,12 @@ class FileMetricsCache {
 
     // Package import detection (single pass through content)
     final hasFlutterImport = content.contains('package:flutter/');
-    final hasBlocImport = content.contains('package:bloc/') ||
+    final hasBlocImport =
+        content.contains('package:bloc/') ||
         content.contains('package:flutter_bloc/');
     final hasProviderImport = content.contains('package:provider/');
-    final hasRiverpodImport = content.contains('package:riverpod/') ||
+    final hasRiverpodImport =
+        content.contains('package:riverpod/') ||
         content.contains('package:flutter_riverpod/') ||
         content.contains('package:hooks_riverpod/');
 
@@ -1274,15 +1279,17 @@ class IncrementalAnalysisTracker {
         result['version'] = int.parse(versionMatch.group(1)!);
       }
 
-      final configHashMatch =
-          RegExp(r'"configHash":\s*(-?\d+)').firstMatch(json);
+      final configHashMatch = RegExp(
+        r'"configHash":\s*(-?\d+)',
+      ).firstMatch(json);
       if (configHashMatch != null) {
         result['configHash'] = int.parse(configHashMatch.group(1)!);
       }
 
       // Parse files section - this is complex, so we'll use a regex approach
-      final filesMatch =
-          RegExp(r'"files":\s*\{([^}]*(?:\{[^}]*\}[^}]*)*)\}').firstMatch(json);
+      final filesMatch = RegExp(
+        r'"files":\s*\{([^}]*(?:\{[^}]*\}[^}]*)*)\}',
+      ).firstMatch(json);
       if (filesMatch != null) {
         final filesContent = filesMatch.group(1)!;
         final files = <String, dynamic>{};
@@ -1304,10 +1311,7 @@ class IncrementalAnalysisTracker {
             rules.add(ruleMatch.group(1)!);
           }
 
-          files[path] = <String, dynamic>{
-            'hash': hash,
-            'rules': rules,
-          };
+          files[path] = <String, dynamic>{'hash': hash, 'rules': rules};
         }
 
         result['files'] = files;
@@ -1449,15 +1453,12 @@ class RulePriorityQueue {
   }
 
   /// Sort rules by priority (lowest priority number runs first).
-  static List<T> sortByPriority<T>(
-    List<T> rules,
-    String Function(T) getName,
-  ) {
+  static List<T> sortByPriority<T>(List<T> rules, String Function(T) getName) {
     return [...rules]..sort((a, b) {
-        final pa = _rulePriority[getName(a)] ?? 200;
-        final pb = _rulePriority[getName(b)] ?? 200;
-        return pa.compareTo(pb);
-      });
+      final pa = _rulePriority[getName(a)] ?? 200;
+      final pb = _rulePriority[getName(b)] ?? 200;
+      return pa.compareTo(pb);
+    });
   }
 
   /// Get priority for a rule (lower = runs first).
@@ -1715,14 +1716,16 @@ class ViolationBatch {
     required String message,
     required String? correction,
   }) {
-    _pending.add(_BatchedViolation(
-      filePath: filePath,
-      ruleName: ruleName,
-      offset: offset,
-      length: length,
-      message: message,
-      correction: correction,
-    ));
+    _pending.add(
+      _BatchedViolation(
+        filePath: filePath,
+        ruleName: ruleName,
+        offset: offset,
+        length: length,
+        message: message,
+        correction: correction,
+      ),
+    );
 
     // Auto-flush when batch is full
     if (_pending.length >= _batchSize) {
@@ -1830,12 +1833,12 @@ class ContentFingerprint {
     final sizeBucket = lineCount < 50
         ? 0
         : lineCount < 200
-            ? 1
-            : lineCount < 500
-                ? 2
-                : lineCount < 1000
-                    ? 3
-                    : 4;
+        ? 1
+        : lineCount < 500
+        ? 2
+        : lineCount < 1000
+        ? 3
+        : 4;
 
     return Object.hash(
       importCount.clamp(0, 20), // Cap at 20 imports
@@ -1990,8 +1993,10 @@ class RuleExecutionStats {
   static List<String> getSlowRules() {
     return _stats.entries
         .where((e) => e.value.executionCount > 10)
-        .where((e) =>
-            (e.value.totalTime ~/ e.value.executionCount).inMilliseconds > 50)
+        .where(
+          (e) =>
+              (e.value.totalTime ~/ e.value.executionCount).inMilliseconds > 50,
+        )
         .map((e) => e.key)
         .toList();
   }
@@ -2126,8 +2131,9 @@ class ParallelAnalysisResult {
       fileTypes: (map['fileTypes'] as List<dynamic>)
           .map((e) => FileType.values[e as int])
           .toSet(),
-      matchingPatterns:
-          (map['matchingPatterns'] as List<dynamic>).cast<String>().toSet(),
+      matchingPatterns: (map['matchingPatterns'] as List<dynamic>)
+          .cast<String>()
+          .toSet(),
     );
   }
 
@@ -2239,18 +2245,16 @@ class ParallelAnalyzer {
     final batches = <List<String>>[];
 
     for (var i = 0; i < uncached.length; i += batchSize) {
-      batches.add(uncached.sublist(
-        i,
-        (i + batchSize).clamp(0, uncached.length),
-      ));
+      batches.add(
+        uncached.sublist(i, (i + batchSize).clamp(0, uncached.length)),
+      );
     }
 
     if (_useIsolates && batches.length > 1) {
       // Process batches in parallel using isolates
-      final futures = batches.map((batch) => _processBatchInIsolate(
-            batch,
-            patterns.toList(),
-          ));
+      final futures = batches.map(
+        (batch) => _processBatchInIsolate(batch, patterns.toList()),
+      );
       final batchResults = await Future.wait(futures);
       for (final batchResult in batchResults) {
         results.addAll(batchResult);
@@ -2447,10 +2451,12 @@ class ParallelAnalyzer {
 
     // Package import detection
     final hasFlutterImport = content.contains('package:flutter/');
-    final hasBlocImport = content.contains('package:bloc/') ||
+    final hasBlocImport =
+        content.contains('package:bloc/') ||
         content.contains('package:flutter_bloc/');
     final hasProviderImport = content.contains('package:provider/');
-    final hasRiverpodImport = content.contains('package:riverpod/') ||
+    final hasRiverpodImport =
+        content.contains('package:riverpod/') ||
         content.contains('package:flutter_riverpod/') ||
         content.contains('package:hooks_riverpod/');
 
@@ -2474,12 +2480,12 @@ class ParallelAnalyzer {
     final sizeBucket = metrics.lineCount < 50
         ? 0
         : metrics.lineCount < 200
-            ? 1
-            : metrics.lineCount < 500
-                ? 2
-                : metrics.lineCount < 1000
-                    ? 3
-                    : 4;
+        ? 1
+        : metrics.lineCount < 500
+        ? 2
+        : metrics.lineCount < 1000
+        ? 3
+        : 4;
 
     return Object.hash(
       metrics.importCount.clamp(0, 20),
@@ -2540,10 +2546,14 @@ class ParallelAnalyzer {
     // These calls will use putIfAbsent, so they won't overwrite
     // if somehow the cache was already populated
     FileMetricsCache._cache.putIfAbsent(result.filePath, () => result.metrics);
-    FileTypeDetector._cache
-        .putIfAbsent(result.filePath, () => result.fileTypes);
-    ContentFingerprint._cache
-        .putIfAbsent(result.filePath, () => result.fingerprint);
+    FileTypeDetector._cache.putIfAbsent(
+      result.filePath,
+      () => result.fileTypes,
+    );
+    ContentFingerprint._cache.putIfAbsent(
+      result.filePath,
+      () => result.fingerprint,
+    );
   }
 
   /// Get cached result for a file (if available).
@@ -2629,8 +2639,9 @@ class BatchableRuleInfo {
 
     // Check required patterns
     if (requiredPatterns != null && requiredPatterns!.isNotEmpty) {
-      if (!requiredPatterns!
-          .any((p) => analysis.matchingPatterns.contains(p))) {
+      if (!requiredPatterns!.any(
+        (p) => analysis.matchingPatterns.contains(p),
+      )) {
         return false;
       }
     }
@@ -2772,9 +2783,9 @@ class ConsolidatedVisitorDispatch {
     _registeredRules.add(ruleName);
 
     for (final category in nodeTypes) {
-      _callbacks.putIfAbsent(category, () => []).add(
-            _RegisteredCallback(ruleName: ruleName, callback: callback),
-          );
+      _callbacks
+          .putIfAbsent(category, () => [])
+          .add(_RegisteredCallback(ruleName: ruleName, callback: callback));
     }
   }
 
@@ -2824,10 +2835,7 @@ class ConsolidatedVisitorDispatch {
 }
 
 class _RegisteredCallback {
-  const _RegisteredCallback({
-    required this.ruleName,
-    required this.callback,
-  });
+  const _RegisteredCallback({required this.ruleName, required this.callback});
 
   final String ruleName;
   final NodeVisitCallback callback;
@@ -2990,7 +2998,9 @@ class DiffBasedAnalysis {
   ///
   /// Returns list of changed line ranges. Updates internal cache.
   static List<LineRange> computeChanges(
-      String filePath, String currentContent) {
+    String filePath,
+    String currentContent,
+  ) {
     final previous = _previousContent[filePath];
     _previousContent[filePath] = currentContent;
 
@@ -3152,10 +3162,7 @@ class ImportNode {
     return _transitivelyImportsHelper(target, visited);
   }
 
-  bool _transitivelyImportsHelper(
-    String target,
-    Set<String> visited,
-  ) {
+  bool _transitivelyImportsHelper(String target, Set<String> visited) {
     if (visited.contains(filePath)) return false;
     visited.add(filePath);
 
@@ -3473,7 +3480,10 @@ class SourceLocationCache {
 
   /// Get source location for an offset.
   static SourceLocation getLocation(
-      String filePath, String content, int offset) {
+    String filePath,
+    String content,
+    int offset,
+  ) {
     // Ensure line starts are computed
     if (!_lineStarts.containsKey(filePath) ||
         _contentHashes[filePath] != content.hashCode) {
@@ -3672,7 +3682,9 @@ class SemanticTokenCache {
 
   /// Get all symbols of a specific kind in a file.
   static List<CachedSymbolInfo> getSymbolsByKind(
-      String filePath, SymbolKind kind) {
+    String filePath,
+    SymbolKind kind,
+  ) {
     final fileSymbols = _symbols[filePath];
     if (fileSymbols == null) return [];
 
@@ -3711,10 +3723,7 @@ class SemanticTokenCache {
       totalSymbols += symbols.length;
     }
 
-    return {
-      'cachedFiles': _symbols.length,
-      'totalSymbols': totalSymbols,
-    };
+    return {'cachedFiles': _symbols.length, 'totalSymbols': totalSymbols};
   }
 }
 
@@ -3802,7 +3811,9 @@ class CompilationUnitCache {
 
   /// Get cached data for a file, or create empty data if not cached.
   static CompilationUnitDerivedData getOrCreate(
-      String filePath, String content) {
+    String filePath,
+    String content,
+  ) {
     final hash = content.hashCode;
     if (_contentHashes[filePath] == hash && _cache.containsKey(filePath)) {
       return _cache[filePath]!;
@@ -3822,7 +3833,8 @@ class CompilationUnitCache {
   /// Quick content analysis to populate basic data.
   static void _analyzeContent(String content, CompilationUnitDerivedData data) {
     // Check for widgets
-    data.hasWidgets = content.contains('extends StatelessWidget') ||
+    data.hasWidgets =
+        content.contains('extends StatelessWidget') ||
         content.contains('extends StatefulWidget') ||
         content.contains('extends State<');
 
@@ -3831,7 +3843,8 @@ class CompilationUnitCache {
         content.contains('async') || content.contains('Future<');
 
     // Check for tests
-    data.hasTests = content.contains('@Test') ||
+    data.hasTests =
+        content.contains('@Test') ||
         content.contains('void main()') && content.contains('test(');
 
     // Check for main function
@@ -4635,12 +4648,14 @@ class HotPathProfiler {
 
     _measurements.putIfAbsent(name, () => []).add(duration);
 
-    _recentEntries.add(ProfilingEntry(
-      name: name,
-      duration: duration,
-      timestamp: DateTime.now(),
-      metadata: metadata,
-    ));
+    _recentEntries.add(
+      ProfilingEntry(
+        name: name,
+        duration: duration,
+        timestamp: DateTime.now(),
+        metadata: metadata,
+      ),
+    );
 
     while (_recentEntries.length > _maxRecentEntries) {
       _recentEntries.removeAt(0);
@@ -4723,8 +4738,9 @@ class HotPathProfiler {
       'totalMeasurements': totalMeasurements,
       'recentEntries': _recentEntries.length,
       'slowOperationCount': slowOperations.length,
-      'slowestOperations':
-          slowest.map((e) => '${e.key}: ${e.value.inMilliseconds}ms').toList(),
+      'slowestOperations': slowest
+          .map((e) => '${e.key}: ${e.value.inMilliseconds}ms')
+          .toList(),
     };
   }
 }

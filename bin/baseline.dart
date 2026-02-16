@@ -62,7 +62,8 @@ Future<void> main(List<String> args) async {
     existingBaseline = BaselineFile.load(outputPath);
     if (existingBaseline != null) {
       print(
-          'Updating existing baseline (${existingBaseline.totalViolations} violations)');
+        'Updating existing baseline (${existingBaseline.totalViolations} violations)',
+      );
     } else {
       print('No existing baseline found, creating new one');
     }
@@ -243,10 +244,7 @@ Future<bool> _updateAnalysisOptions(String baselinePath) async {
   }
 
   // If no saropa_lints section found, check for custom_lint section
-  final customLintPattern = RegExp(
-    r'(custom_lint:\s*\n)',
-    multiLine: true,
-  );
+  final customLintPattern = RegExp(r'(custom_lint:\s*\n)', multiLine: true);
 
   final customMatch = customLintPattern.firstMatch(content);
   if (customMatch != null) {
@@ -300,11 +298,14 @@ void _printUsage() {
   print('');
   print('Options:');
   print(
-      '  -o, --output <path>   Output file path (default: saropa_baseline.json)');
+    '  -o, --output <path>   Output file path (default: saropa_baseline.json)',
+  );
   print(
-      '  --update              Update existing baseline, removing fixed violations');
+    '  --update              Update existing baseline, removing fixed violations',
+  );
   print(
-      '  --dry-run             Show what would be done without making changes');
+    '  --dry-run             Show what would be done without making changes',
+  );
   print('  --skip-config         Skip updating analysis_options.yaml');
   print('  -h, --help            Show this help message');
   print('');

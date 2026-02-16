@@ -319,8 +319,10 @@ class AnalysisReporter {
     buf.writeln('CONFIGURATION');
     buf.writeln('  Tier:             ${config.effectiveTier}');
     buf.writeln('  Rules enabled:    ${config.enabledRuleCount}');
-    buf.writeln('  Max issues:       '
-        '${config.maxIssues == 0 ? 'unlimited' : config.maxIssues}');
+    buf.writeln(
+      '  Max issues:       '
+      '${config.maxIssues == 0 ? 'unlimited' : config.maxIssues}',
+    );
     buf.writeln('  Output mode:      ${config.outputMode}');
     buf.writeln();
 
@@ -332,10 +334,7 @@ class AnalysisReporter {
   }
 
   /// Write platforms subsection of the config.
-  static void _writePlatformsSubsection(
-    StringBuffer buf,
-    ReportConfig config,
-  ) {
+  static void _writePlatformsSubsection(StringBuffer buf, ReportConfig config) {
     buf.writeln('  Platforms:');
     if (config.enabledPlatforms.isNotEmpty) {
       buf.writeln('    Enabled:  ${config.enabledPlatforms.join(', ')}');
@@ -347,10 +346,7 @@ class AnalysisReporter {
   }
 
   /// Write packages subsection of the config.
-  static void _writePackagesSubsection(
-    StringBuffer buf,
-    ReportConfig config,
-  ) {
+  static void _writePackagesSubsection(StringBuffer buf, ReportConfig config) {
     buf.writeln('  Packages:');
     if (config.enabledPackages.isNotEmpty) {
       buf.writeln('    Enabled:  ${config.enabledPackages.join(', ')}');
@@ -381,8 +377,9 @@ class AnalysisReporter {
 
     try {
       final sep = Platform.pathSeparator;
-      final customFile =
-          File('$_projectRoot${sep}analysis_options_custom.yaml');
+      final customFile = File(
+        '$_projectRoot${sep}analysis_options_custom.yaml',
+      );
       if (!customFile.existsSync()) return;
 
       final content = customFile.readAsStringSync().trimRight();
@@ -425,7 +422,8 @@ class AnalysisReporter {
 
     buf.writeln('${'=' * 70}');
     buf.writeln(
-        'ALL VIOLATIONS${total > _maxInlineViolations ? ' (showing $_maxInlineViolations of $total)' : ''}');
+      'ALL VIOLATIONS${total > _maxInlineViolations ? ' (showing $_maxInlineViolations of $total)' : ''}',
+    );
     buf.writeln('${'=' * 70}');
     buf.writeln();
 
@@ -452,9 +450,11 @@ class AnalysisReporter {
 
     for (var i = 0; i < limit; i++) {
       final v = list[i];
-      buf.writeln('  ${v.file}:${v.line} '
-          '| [${v.rule}] ${v.message} '
-          '| ${impact.name}');
+      buf.writeln(
+        '  ${v.file}:${v.line} '
+        '| [${v.rule}] ${v.message} '
+        '| ${impact.name}',
+      );
     }
 
     final omitted = list.length - limit;
@@ -514,8 +514,10 @@ class AnalysisReporter {
     var i = 1;
     for (final entry in top) {
       final severity = ruleSeverities[entry.key] ?? '?';
-      buf.writeln('  ${i.toString().padLeft(2)}. '
-          '${entry.key} (${entry.value}) [$severity]');
+      buf.writeln(
+        '  ${i.toString().padLeft(2)}. '
+        '${entry.key} (${entry.value}) [$severity]',
+      );
       i++;
     }
     buf.writeln();
@@ -550,22 +552,30 @@ class AnalysisReporter {
     final capped = scored.take(_maxFileImportanceRows).toList();
     final omitted = scored.length - capped.length;
 
-    buf.writeln('FILE IMPORTANCE (${scored.length} files, '
-        'sorted by priority score'
-        '${omitted > 0 ? ', showing top ${capped.length}' : ''})');
-    buf.writeln('  ${'Score'.padLeft(5)} | '
-        '${'Fan-in'.padLeft(6)} | '
-        '${'Layer'.padRight(10)} | '
-        '${'Issues'.padLeft(6)} | File');
-    buf.writeln('  ${'-' * 5}-+-${'-' * 6}-+-'
-        '${'-' * 10}-+-${'-' * 6}-+-${'-' * 30}');
+    buf.writeln(
+      'FILE IMPORTANCE (${scored.length} files, '
+      'sorted by priority score'
+      '${omitted > 0 ? ', showing top ${capped.length}' : ''})',
+    );
+    buf.writeln(
+      '  ${'Score'.padLeft(5)} | '
+      '${'Fan-in'.padLeft(6)} | '
+      '${'Layer'.padRight(10)} | '
+      '${'Issues'.padLeft(6)} | File',
+    );
+    buf.writeln(
+      '  ${'-' * 5}-+-${'-' * 6}-+-'
+      '${'-' * 10}-+-${'-' * 6}-+-${'-' * 30}',
+    );
 
     for (final f in capped) {
-      buf.writeln('  ${f.score.toStringAsFixed(0).padLeft(5)} | '
-          '${f.fanIn.toString().padLeft(6)} | '
-          '${f.layer.padRight(10)} | '
-          '${f.issues.toString().padLeft(6)} | '
-          '${_relativePath(f.path)}');
+      buf.writeln(
+        '  ${f.score.toStringAsFixed(0).padLeft(5)} | '
+        '${f.fanIn.toString().padLeft(6)} | '
+        '${f.layer.padRight(10)} | '
+        '${f.issues.toString().padLeft(6)} | '
+        '${_relativePath(f.path)}',
+      );
     }
 
     if (omitted > 0) {
@@ -597,28 +607,37 @@ class AnalysisReporter {
 
     all.sort((a, b) => b.priority.compareTo(a.priority));
 
-    final showing =
-        all.length > _maxInlineViolations ? _maxInlineViolations : all.length;
+    final showing = all.length > _maxInlineViolations
+        ? _maxInlineViolations
+        : all.length;
 
     buf.writeln('${'=' * 70}');
-    buf.writeln('FIX PRIORITY (${all.length} violations, '
-        'sorted by priority = impact * importance * layer)');
+    buf.writeln(
+      'FIX PRIORITY (${all.length} violations, '
+      'sorted by priority = impact * importance * layer)',
+    );
     buf.writeln('${'=' * 70}');
     buf.writeln();
-    buf.writeln('  ${'Priority'.padLeft(8)} | '
-        '${'Impact'.padRight(11)} | '
-        '${'File'.padRight(40)} | '
-        '${'Line'.padLeft(4)} | Rule');
-    buf.writeln('  ${'-' * 8}-+-${'-' * 11}-+-'
-        '${'-' * 40}-+-${'-' * 4}-+-${'-' * 20}');
+    buf.writeln(
+      '  ${'Priority'.padLeft(8)} | '
+      '${'Impact'.padRight(11)} | '
+      '${'File'.padRight(40)} | '
+      '${'Line'.padLeft(4)} | Rule',
+    );
+    buf.writeln(
+      '  ${'-' * 8}-+-${'-' * 11}-+-'
+      '${'-' * 40}-+-${'-' * 4}-+-${'-' * 20}',
+    );
 
     for (var i = 0; i < showing; i++) {
       final e = all[i];
-      buf.writeln('  ${e.priority.toStringAsFixed(0).padLeft(8)} | '
-          '${e.impact.name.padRight(11)} | '
-          '${_relativePath(e.v.file).padRight(40)} | '
-          '${e.v.line.toString().padLeft(4)} | '
-          '${e.v.rule}');
+      buf.writeln(
+        '  ${e.priority.toStringAsFixed(0).padLeft(8)} | '
+        '${e.impact.name.padRight(11)} | '
+        '${_relativePath(e.v.file).padRight(40)} | '
+        '${e.v.line.toString().padLeft(4)} | '
+        '${e.v.rule}',
+      );
     }
 
     final omitted = all.length - showing;
@@ -634,8 +653,10 @@ class AnalysisReporter {
     if (files.isEmpty) return;
 
     buf.writeln('${'=' * 70}');
-    buf.writeln('PROJECT STRUCTURE '
-        '(${files.length} files, ${ImportGraphTracker.totalEdges} edges)');
+    buf.writeln(
+      'PROJECT STRUCTURE '
+      '(${files.length} files, ${ImportGraphTracker.totalEdges} edges)',
+    );
     buf.writeln('${'=' * 70}');
     buf.writeln();
 
@@ -686,7 +707,8 @@ class AnalysisReporter {
     final layer = ImportGraphTracker.getLayer(file);
     final fanIn = ImportGraphTracker.importersOf(file).length;
     final fanOut = ImportGraphTracker.importsOf(file).length;
-    final label = '${_relativePath(file)} '
+    final label =
+        '${_relativePath(file)} '
         '[$layer] (fan-in: $fanIn, fan-out: $fanOut)';
 
     if (!visited.add(file)) {
@@ -698,8 +720,9 @@ class AnalysisReporter {
 
     final children = ImportGraphTracker.importsOf(file).toList()..sort();
     // Only show children that are in our project graph
-    final projectChildren =
-        children.where((c) => ImportGraphTracker.allFiles.contains(c)).toList();
+    final projectChildren = children
+        .where((c) => ImportGraphTracker.allFiles.contains(c))
+        .toList();
 
     final childPrefix =
         prefix + (prefix.isEmpty ? '' : (isLast ? '    ' : '│   '));
@@ -732,12 +755,13 @@ class AnalysisReporter {
       final reportsDir = Directory('$_projectRoot${sep}reports');
       if (!reportsDir.existsSync()) return;
 
-      final reportFiles = reportsDir
-          .listSync()
-          .whereType<File>()
-          .where((f) => f.path.endsWith('_saropa_lint_report.log'))
-          .toList()
-        ..sort((a, b) => b.path.compareTo(a.path));
+      final reportFiles =
+          reportsDir
+              .listSync()
+              .whereType<File>()
+              .where((f) => f.path.endsWith('_saropa_lint_report.log'))
+              .toList()
+            ..sort((a, b) => b.path.compareTo(a.path));
 
       if (reportFiles.length <= _maxReportFiles) return;
 

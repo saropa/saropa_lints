@@ -72,7 +72,9 @@ void main() {
 
       test('prose labels with colon: GOOD: Preferred approach', () {
         expect(
-            CommentPatterns.isLikelyCode('GOOD: Preferred approach'), isFalse);
+          CommentPatterns.isLikelyCode('GOOD: Preferred approach'),
+          isFalse,
+        );
       });
 
       test('prose labels with colon: LINT: Description', () {
@@ -107,12 +109,16 @@ void main() {
 
     test('should detect FIXME markers', () {
       expect(
-          CommentPatterns.isSpecialMarker('FIXME: handle edge case'), isTrue);
+        CommentPatterns.isSpecialMarker('FIXME: handle edge case'),
+        isTrue,
+      );
     });
 
     test('should detect ignore directives', () {
       expect(
-          CommentPatterns.isSpecialMarker('ignore: unused_variable'), isTrue);
+        CommentPatterns.isSpecialMarker('ignore: unused_variable'),
+        isTrue,
+      );
     });
 
     test('should detect ignore_for_file directives', () {
@@ -123,10 +129,7 @@ void main() {
     });
 
     test('should detect expect_lint directives', () {
-      expect(
-        CommentPatterns.isSpecialMarker('expect_lint: my_rule'),
-        isTrue,
-      );
+      expect(CommentPatterns.isSpecialMarker('expect_lint: my_rule'), isTrue);
     });
 
     test('should detect cspell directives', () {

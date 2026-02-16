@@ -590,10 +590,12 @@ void main() {
     });
 
     group('require_ios_entitlements', () {
-      test('entitlement-requiring feature without declaration SHOULD trigger',
-          () {
-        expect('missing entitlement detected', isNotNull);
-      });
+      test(
+        'entitlement-requiring feature without declaration SHOULD trigger',
+        () {
+          expect('missing entitlement detected', isNotNull);
+        },
+      );
     });
 
     group('require_ios_launch_storyboard', () {
