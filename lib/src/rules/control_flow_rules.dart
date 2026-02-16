@@ -1694,7 +1694,14 @@ class NoEqualConditionsRule extends SaropaLintRule {
 
       IfStatement? current = node;
       while (current != null) {
-        final String conditionSource = current.expression.toSource();
+        // Include case clause in condition key when present,
+        // so different patterns on the same scrutinee are not
+        // treated as duplicates (Dart 3 if-case pattern matching).
+        String conditionSource = current.expression.toSource();
+        final caseClause = current.caseClause;
+        if (caseClause != null) {
+          conditionSource += ' ${caseClause.toSource()}';
+        }
         conditions.add(conditionSource);
         conditionNodes.add(current.expression);
 
