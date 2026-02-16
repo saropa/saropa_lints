@@ -260,25 +260,33 @@ Re-enabled in `SaropaContext._wrapCallback()`. All 83 `addXxx()` callbacks wrapp
 
 ---
 
-### Phase 3: Reporter Features - PARTIALLY DONE
+### Phase 3: Reporter Features - DONE
 
 **Goal**: Add back saropa features to `SaropaDiagnosticReporter`
 
 | Feature | Priority | Status | Notes |
 |---------|----------|--------|-------|
 | Ignore comment fixes | High | **DONE** | Native framework provides automatically |
-| Ignore comment checking (`IgnoreUtils`) | High | TODO | Already works with pure `analyzer` imports |
-| Baseline suppression (`BaselineManager`) | Medium | TODO | Needs import cleanup from custom_lint deps |
-| Impact tracking (`ImpactTracker`) | Low | TODO | Analytics feature |
-| Progress tracking (`ProgressTracker`) | Low | TODO | Analytics feature |
-| Severity overrides | Medium | TODO | Via `diagnostics:` config in `analysis_options.yaml` |
+| Ignore comment checking (`IgnoreUtils`) | High | **SKIP** | Native framework handles `// ignore:` automatically |
+| Baseline suppression (`BaselineManager`) | Medium | **DONE** | Wired into reporter via `RuleContext` |
+| Impact tracking (`ImpactTracker`) | Low | **DONE** | Every reported violation tracked by impact level |
+| Progress tracking (`ProgressTracker`) | Low | **DONE** | Files + violations tracked per-file and per-rule |
+| Severity overrides | Medium | **DONE** | Via `severities:` in `analysis_options_custom.yaml` |
+
+#### Implementation
+
+- `config_loader.dart` — loads severity overrides, baseline config, output settings from yaml + env vars
+- `Plugin.start()` — calls `loadNativePluginConfig()` once per analysis context
+- `diagnosticCode` getter — returns modified `LintCode` with overridden severity (cached)
+- `SaropaDiagnosticReporter` — checks baseline before reporting, records to ImpactTracker + ProgressTracker after
+- `SaropaContext` — calls `ProgressTracker.recordFile()` on each new file
 
 #### Deliverables
 - [x] Ignore comment fixes (provided by native framework)
-- [ ] Add ignore comment checking to reporter
-- [ ] Add baseline suppression
-- [ ] Add severity override support
-- [ ] Add impact/progress tracking
+- [x] Ignore comment checking (native framework handles automatically)
+- [x] Baseline suppression wired into reporter
+- [x] Severity override support via config + `diagnosticCode` getter
+- [x] Impact/progress tracking in reporter
 
 ---
 
@@ -406,6 +414,7 @@ dart run saropa_lints:init --tier recommended
 | `lib/src/native/saropa_context.dart` | 1 | Registry wrapper (83 `addXxx` methods + per-file filtering) |
 | `lib/src/native/compat_visitor.dart` | 1 | `SimpleAstVisitor` bridge (83 node type callbacks) |
 | `lib/src/native/saropa_fix.dart` | 2 | `SaropaFixProducer` base class + `SaropaFixGenerator` typedef |
+| `lib/src/native/config_loader.dart` | 3 | Config loading (severities, baseline, output settings) |
 | `lib/src/fixes/comment_out_debug_print_fix.dart` | 2 | PoC fix: comment out debugPrint |
 | `lib/src/fixes/remove_empty_set_state_fix.dart` | 2 | PoC fix: remove empty setState |
 | `scripts/migrate_to_native.py` | 4 | Automated rule migration script |
