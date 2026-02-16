@@ -661,8 +661,8 @@ The tier you choose has a direct impact on analysis speed:
 
 - `essential`: ~300 rules → **fastest** (memory leaks, security, crashes)
 - `recommended`: ~800 rules → moderate (+ accessibility, performance)
-- `professional`: ~1400 rules → slower (+ architecture, documentation)
-- `comprehensive`/`pedantic`: 1562+ rules → **slowest** (everything)
+- `professional`: ~1500 rules → slower (+ architecture, documentation)
+- `comprehensive`/`pedantic`: 1567+ rules → **slowest** (everything)
 
 ## Adoption Strategy
 
