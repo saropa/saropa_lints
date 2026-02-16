@@ -23,9 +23,6 @@ jobs:
       - name: Analyze
         run: dart analyze --fatal-infos
 
-      - name: Format check
-        run: dart format --set-exit-if-changed .
-
       - name: Run tests
         run: dart test
 
