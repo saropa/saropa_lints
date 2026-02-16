@@ -11,19 +11,38 @@ Dates are not included in version headers — [pub.dev](https://pub.dev/packages
 ** See the current published changelog: [saropa_lints/changelog](https://pub.dev/packages/saropa_lints/changelog)
 
 ---
-## [Unreleased]
+## [Unreleased] — Native Plugin Migration (v5.0.0-dev)
+
+Migrated from `custom_lint_builder` to the native `analysis_server_plugin` system. This is a **breaking change** for consumers (v4 → v5).
+
+**Why this matters:**
+- **Quick fixes now work in IDE** — the old analyzer_plugin protocol never forwarded fix requests to custom_lint plugins (Dart SDK #61491). The native system delivers fixes properly.
+- **Per-file filtering is enforced** — 425+ uses of `applicableFileTypes`, `requiredPatterns`, `requiresWidgets`, etc. were defined but never checked. Now enforced via `SaropaContext._wrapCallback()`, cached per file.
+- **Future-proof** — the old `analyzer_plugin` protocol is being deprecated (Dart SDK #62164). custom_lint was the primary client.
+- **~18K lines removed** — native API eliminates boilerplate (no more `CustomLintResolver`/`ErrorReporter`/`CustomLintContext` parameter triples).
 
 ### Added
-- **Native plugin migration Phase 2**: Quick fix infrastructure and per-file filtering
-  - `SaropaFixProducer` base class for native quick fixes (`analysis_server_plugin`)
-  - `fixGenerators` getter on `SaropaLintRule` — rules declare their fixes for automatic registration
-  - Per-file filtering re-enabled in native plugin (applicableFileTypes, requiredPatterns, content requirements)
-  - PoC quick fixes: `CommentOutDebugPrintFix` (avoid_debug_print), `RemoveEmptySetStateFix` (avoid_empty_set_state)
-  - Native framework provides ignore-comment fixes automatically (no custom code needed)
+- Native plugin entry point (`lib/main.dart`) with `SaropaLintsPlugin`
+- `SaropaFixProducer` base class for quick fixes (`analysis_server_plugin`)
+- `fixGenerators` getter on `SaropaLintRule` for automatic fix registration
+- `SaropaContext` with per-file filtering wrapper on all 83 `addXxx()` methods
+- `CompatVisitor` bridging callbacks to native `SimpleAstVisitor` dispatch
+- PoC quick fixes: `CommentOutDebugPrintFix`, `RemoveEmptySetStateFix`
+- Native framework provides ignore-comment fixes automatically (no custom code needed)
+
+### Changed
+- All 96 rule files migrated to native `AnalysisRule` API
+- `SaropaLintRule` now extends `AnalysisRule` (was `DartLintRule`)
+- `LintCode` uses positional constructor: `LintCode('name', 'message')` (was named params)
+- `runWithReporter` drops `CustomLintResolver` parameter
+- `context.addXxx()` replaces `context.registry.addXxx()`
+- `reporter.atNode(node)` replaces `reporter.atNode(node, code)` (code is implicit)
+- Dependencies: `analysis_server_plugin: ^0.3.3` replaces `custom_lint_builder`
 
 ### Removed
-- Redundant PoC files from Phase 1 (`saropa_analysis_rule.dart`, `poc_rules.dart`, `saropa_reporter.dart`)
-- Old v4 ignore-fix classes (`AddIgnoreCommentFix`, `AddIgnoreForFileFix`, `WrapInTryCatchFix`) — superseded by native framework
+- `custom_lint_builder` dependency and `lib/custom_lint_client.dart`
+- Redundant PoC files (`saropa_analysis_rule.dart`, `poc_rules.dart`, `saropa_reporter.dart`)
+- Old v4 ignore-fix classes — superseded by native framework
 
 ---
 ## [4.15.1]
