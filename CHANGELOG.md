@@ -35,8 +35,13 @@ Migrated from `custom_lint_builder` to the native `analysis_server_plugin` syste
 - Impact tracking — every violation recorded in `ImpactTracker` by impact level
 - Progress tracking — files and violations tracked in `ProgressTracker` per file/rule
 - `Plugin.start()` lifecycle hook for one-time config loading
+- Tier preset YAML files updated to native `plugins: saropa_lints: diagnostics:` format
+- Migration guide (`MIGRATION_V5.md`) for v4 to v5 upgrade
 
 ### Changed
+- `bin/init.dart` generates native `plugins:` format (was `custom_lint:`)
+- Tier presets use `diagnostics:` map entries (was `rules:` list entries)
+- Init command runs `dart analyze` after generation (was `dart run custom_lint`)
 - All 96 rule files migrated to native `AnalysisRule` API
 - `SaropaLintRule` now extends `AnalysisRule` (was `DartLintRule`)
 - `LintCode` uses positional constructor: `LintCode('name', 'message')` (was named params)

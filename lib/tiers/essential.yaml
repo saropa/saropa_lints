@@ -6,83 +6,82 @@
 # Usage in analysis_options.yaml:
 #   include: package:saropa_lints/tiers/essential.yaml
 
-custom_lint:
-  enable_all_lint_rules: false
+plugins:
+  saropa_lints:
+    diagnostics:
+      # =========================================================================
+      # MEMORY LEAKS - Will crash your app
+      # =========================================================================
+      require_dispose: true
+      dispose_fields: true
+      require_animation_disposal: true
+      avoid_undisposed_instances: true
+      avoid_unassigned_stream_subscriptions: true
+      require_stream_controller_dispose: true
+      require_value_notifier_dispose: true
+      always_remove_listener: true
 
-  rules:
-    # =========================================================================
-    # MEMORY LEAKS - Will crash your app
-    # =========================================================================
-    require_dispose: true
-    dispose_fields: true
-    require_animation_disposal: true
-    avoid_undisposed_instances: true
-    avoid_unassigned_stream_subscriptions: true
-    require_stream_controller_dispose: true
-    require_value_notifier_dispose: true
-    always_remove_listener: true
+      # =========================================================================
+      # FLUTTER LIFECYCLE - Critical bugs
+      # =========================================================================
+      avoid_context_in_initstate_dispose: true
+      avoid_inherited_widget_in_initstate: true
+      avoid_build_context_in_providers: true
+      avoid_unsafe_setstate: true
+      use_setstate_synchronously: true
+      avoid_recursive_widget_calls: true
+      require_mounted_check: true
+      avoid_global_key_in_build: true
+      pass_existing_future_to_future_builder: true
+      pass_existing_stream_to_stream_builder: true
+      avoid_duplicate_widget_keys: true
+      avoid_mounted_in_setstate: true
 
-    # =========================================================================
-    # FLUTTER LIFECYCLE - Critical bugs
-    # =========================================================================
-    avoid_context_in_initstate_dispose: true
-    avoid_inherited_widget_in_initstate: true
-    avoid_build_context_in_providers: true
-    avoid_unsafe_setstate: true
-    use_setstate_synchronously: true
-    avoid_recursive_widget_calls: true
-    require_mounted_check: true
-    avoid_global_key_in_build: true
-    pass_existing_future_to_future_builder: true
-    pass_existing_stream_to_stream_builder: true
-    avoid_duplicate_widget_keys: true
-    avoid_mounted_in_setstate: true
+      # =========================================================================
+      # SECURITY - Data breaches
+      # =========================================================================
+      avoid_hardcoded_credentials: true
+      avoid_logging_sensitive_data: true
+      avoid_eval_like_patterns: true
+      avoid_weak_cryptographic_algorithms: true
+      avoid_path_traversal: true
 
-    # =========================================================================
-    # SECURITY - Data breaches
-    # =========================================================================
-    avoid_hardcoded_credentials: true
-    avoid_logging_sensitive_data: true
-    avoid_eval_like_patterns: true
-    avoid_weak_cryptographic_algorithms: true
-    avoid_path_traversal: true
+      # =========================================================================
+      # NULL SAFETY - Crashes
+      # =========================================================================
+      avoid_null_assertion: true
+      avoid_unsafe_collection_methods: true
+      avoid_unsafe_reduce: true
+      avoid_late_final_reassignment: true
 
-    # =========================================================================
-    # NULL SAFETY - Crashes
-    # =========================================================================
-    avoid_null_assertion: true
-    avoid_unsafe_collection_methods: true
-    avoid_unsafe_reduce: true
-    avoid_late_final_reassignment: true
+      # =========================================================================
+      # ASYNC - Unhandled errors
+      # =========================================================================
+      avoid_throw_in_finally: true
+      avoid_uncaught_future_errors: true  # Alias: require_future_error_handling
 
-    # =========================================================================
-    # ASYNC - Unhandled errors
-    # =========================================================================
-    avoid_throw_in_finally: true
-    avoid_uncaught_future_errors: true  # Alias: require_future_error_handling
+      # =========================================================================
+      # COLLECTIONS - Runtime errors
+      # =========================================================================
+      avoid_duplicate_map_keys: true
+      avoid_isar_enum_field: true
 
-    # =========================================================================
-    # COLLECTIONS - Runtime errors
-    # =========================================================================
-    avoid_duplicate_map_keys: true
-    avoid_isar_enum_field: true
+      # =========================================================================
+      # ARCHITECTURE - Circular dependencies
+      # =========================================================================
+      avoid_circular_dependencies: true
 
-    # =========================================================================
-    # ARCHITECTURE - Circular dependencies
-    # =========================================================================
-    avoid_circular_dependencies: true
+      # =========================================================================
+      # RESOURCE MANAGEMENT - Leaks
+      # =========================================================================
+      require_native_resource_cleanup: true
+      require_file_close_in_finally: true
+      require_database_close: true
+      require_websocket_close: true
 
-    # =========================================================================
-    # RESOURCE MANAGEMENT - Leaks
-    # =========================================================================
-    require_native_resource_cleanup: true
-    require_file_close_in_finally: true
-    require_database_close: true
-    require_websocket_close: true
-
-    # =========================================================================
-    # ERROR HANDLING - Critical
-    # =========================================================================
-    avoid_swallowing_exceptions: true
-    avoid_losing_stack_trace: true
-    no_empty_block: true
+      # =========================================================================
+      # ERROR HANDLING - Critical
+      # =========================================================================
+      avoid_swallowing_exceptions: true
+      avoid_losing_stack_trace: true
+      no_empty_block: true
